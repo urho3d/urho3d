@@ -7,15 +7,17 @@ const uint NO_ITEM = 0xffffffff;
 
 Window@ sceneWindow;
 XMLFile copyBuffer;
-bool copyBufferLocal;
-bool copyBufferExpanded;
+bool copyBufferLocal = false;
+bool copyBufferExpanded = false;
+bool pickComponents = false;
+bool pickUsingPhysics = false;
 
 void CreateSceneWindow()
 {
     if (sceneWindow !is null)
         return;
 
-    @sceneWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/SceneWindow.xml"), uiStyle);
+    @sceneWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSceneWindow.xml"), uiStyle);
     ui.root.AddChild(sceneWindow);
     int height = Min(ui.root.height - 60, 500);
     sceneWindow.SetSize(300, height);
@@ -41,6 +43,12 @@ void CreateSceneWindow()
         choice.text = componentTypes[i];
         newComponentList.AddItem(choice);
     }
+
+    // Set drag & drop target mode on the node list background, which is used to parent
+    // nodes back to the root node
+    ListView@ list = sceneWindow.GetChild("NodeList");
+    list.contentElement.dragDropMode = DD_TARGET;
+    list.scrollPanel.dragDropMode = DD_TARGET;
 
     SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
     SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandSceneHierarchy");
@@ -464,7 +472,7 @@ void HandleNodeListItemDoubleClick(StringHash eventType, VariantMap& eventData)
 void HandleNodeListKey(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
-    
+
     /// \todo Add required functionality
 }
 
@@ -486,6 +494,10 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
     Node@ sourceNode = editorScene.GetNodeByID(source.vars["NodeID"].GetUInt());
     Node@ targetNode = editorScene.GetNodeByID(target.vars["NodeID"].GetUInt());
+
+    // If target is null, parent to scene
+    if (targetNode is null)
+        targetNode = editorScene;
 
     // Perform the reparenting
     // Set transform so that the world transform stays through the parent change
@@ -526,17 +538,24 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
 {
     // Test for validity of reparenting by drag and drop
-    Node@ sourceNode = editorScene.GetNodeByID(source.vars["NodeID"].GetUInt());
-    Node@ targetNode = editorScene.GetNodeByID(target.vars["NodeID"].GetUInt());
+    Node@ sourceNode;
+    Node@ targetNode;
+    if (source.vars.Contains("NodeID"))
+        sourceNode = editorScene.GetNodeByID(source.vars["NodeID"].GetUInt());
+    if (target.vars.Contains("NodeID"))
+        editorScene.GetNodeByID(target.vars["NodeID"].GetUInt());
 
-    if (sourceNode is null || targetNode is null)
+    if (sourceNode is null)
         return false;
-    if (sourceNode is targetNode)
+    if (sourceNode is editorScene)
         return false;
-    if (sourceNode.parent is targetNode)
-        return false;
-    if (targetNode.parent is sourceNode)
-        return false;
+    if (targetNode !is null)
+    {
+        if (sourceNode.parent is targetNode)
+            return false;
+        if (targetNode.parent is sourceNode)
+            return false;
+    }
     
     return true;
 }

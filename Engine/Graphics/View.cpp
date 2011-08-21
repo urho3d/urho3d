@@ -1089,7 +1089,7 @@ unsigned View::ProcessLight(Light* light)
     
     unsigned numSplits;
     // Check if light should be shadowed
-    bool isShadowed = drawShadows_ && light->GetCastShadows();
+    bool isShadowed = drawShadows_ && light->GetCastShadows() && light->GetShadowIntensity() < 1.0f;
     // If shadow distance non-zero, check it
     if (isShadowed && light->GetShadowDistance() > 0.0f && light->GetDistance() > light->GetShadowDistance())
         isShadowed = false;

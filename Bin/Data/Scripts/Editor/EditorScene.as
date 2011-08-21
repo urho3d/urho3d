@@ -273,26 +273,48 @@ void SceneMouseClick()
 
 void SceneRaycast(bool mouseClick)
 {
-    if (editorScene.octree is null)
-        return;
-    
     DebugRenderer@ debug = editorScene.debugRenderer;
     IntVector2 pos = ui.cursorPosition;
+    Component@ selected;
 
-    /// \todo allow to switch between renderer and physics raycast
     if (ui.GetElementAt(pos, true) is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY);
-        Drawable@ drawable;
-        if (!result.empty)
+
+        if (!pickUsingPhysics)
         {
-            drawable = result[0].drawable;
-            if (debug !is null)
-                drawable.DrawDebugGeometry(debug, false);
-            if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
-                SelectNode(drawable.node);
+            if (editorScene.octree is null)
+                return;
+            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY);
+            if (!result.empty)
+            {
+                Drawable@ drawable = result[0].drawable;
+                if (debug !is null)
+                    drawable.DrawDebugGeometry(debug, false);
+                selected = drawable;
+            }
         }
+        else
+        {
+            if (editorScene.physicsWorld is null)
+                return;
+            Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
+            if (!result.empty)
+            {
+                CollisionShape@ shape = result[0].collisionShape;
+                if (debug !is null)
+                    shape.DrawDebugGeometry(debug, false);
+                selected = shape;
+            }
+        }
+    }
+    
+    if (selected !is null && mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+    {
+        if (pickComponents)
+            SelectComponent(selected);
+        else
+            SelectNode(selected.node);
     }
 }
 

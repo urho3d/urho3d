@@ -50,8 +50,8 @@ struct PhysicsRaycastResult
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;
-    /// Scene node.
-    Node* node_;
+    /// Collision shape that was hit.
+    CollisionShape* collisionShape_;
 };
 
 /// Internal physics contact info

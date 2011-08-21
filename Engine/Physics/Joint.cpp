@@ -35,9 +35,9 @@
 
 static const String typeNames[] =
 {
-    "none",
-    "ball",
-    "hinge",
+    "None",
+    "Ball",
+    "Hinge",
     ""
 };
 

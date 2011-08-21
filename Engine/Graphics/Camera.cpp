@@ -60,15 +60,15 @@ void Camera::RegisterObject(Context* context)
 {
     context->RegisterFactory<Camera>();
     
-    ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", nearClip_, DEFAULT_NEARCLIP, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", farClip_, DEFAULT_FARCLIP, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "FOV", fov_, DEFAULT_FOV, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", aspectRatio_, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", orthographic_, false, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", orthoSize_, DEFAULT_ORTHOSIZE, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", zoom_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", lodBias_, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VOF_NONE, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", projectionOffset_, Vector2::ZERO, AM_DEFAULT);

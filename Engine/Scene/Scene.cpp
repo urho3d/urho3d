@@ -79,8 +79,8 @@ void Scene::RegisterObject(Context* context)
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Motion Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Motion Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "User Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String(), AM_FILE | AM_NOEDIT);
 }
 

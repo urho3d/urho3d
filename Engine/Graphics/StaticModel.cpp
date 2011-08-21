@@ -58,8 +58,11 @@ void StaticModel::RegisterObject(Context* context)
     context->CopyBaseAttributes<Drawable, StaticModel>();
     
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(StaticModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "Raycast LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)

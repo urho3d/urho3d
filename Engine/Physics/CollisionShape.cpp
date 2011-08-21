@@ -44,14 +44,14 @@
 
 static const String typeNames[] = 
 {
-    "none",
-    "box",
-    "sphere",
-    "capsule",
-    "cylinder",
-    "trianglemesh",
-    "heightfield",
-    "convexhull",
+    "None",
+    "Box",
+    "Sphere",
+    "Capsule",
+    "Cylinder",
+    "TriangleMesh",
+    "Heightfield",
+    "ConvexHull",
     ""
 };
 
@@ -324,17 +324,17 @@ void CollisionShape::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape>();
     
-    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "Model LOD Level", lodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ZERO, AM_DEFAULT);
+    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Bounce", GetBounce, SetBounce, float, DEFAULT_BOUNCE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

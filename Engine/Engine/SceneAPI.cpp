@@ -29,11 +29,11 @@
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint AM_FILE", (void*)AM_FILE);
-    engine->RegisterGlobalProperty("const uint AM_NET", (void*)AM_NET);
-    engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)AM_DEFAULT);
-    engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)AM_LATESTDATA);
-    engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)AM_NOEDIT);
+    engine->RegisterGlobalProperty("const uint AM_FILE", (void*)&AM_FILE);
+    engine->RegisterGlobalProperty("const uint AM_NET", (void*)&AM_NET);
+    engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)&AM_DEFAULT);
+    engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)&AM_LATESTDATA);
+    engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)&AM_NOEDIT);
     
     RegisterSerializable<Serializable>(engine, "Serializable");
 }

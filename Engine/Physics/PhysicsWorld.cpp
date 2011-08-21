@@ -137,18 +137,18 @@ void PhysicsWorld::RegisterObject(Context* context)
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Contacts", maxContacts_, DEFAULT_MAX_CONTACTS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Bounce Threshold", bounceThreshold_, DEFAULT_BOUNCE_THRESHOLD, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Max Network Angular Velocity", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Network Max Ang Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, Vector3::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "ERP", GetERP, SetERP, float, 0.2f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "CFM", GetCFM, SetCFM, float, 0.00001f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Damp Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Damp Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Ang Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Ang Damp Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Ang Damp Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "ERP Parameter", GetERP, SetERP, float, 0.2f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "CFM Parameter", GetCFM, SetCFM, float, 0.00001f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Contact Surface Layer", GetContactSurfaceLayer, SetContactSurfaceLayer, float, 0.0f, AM_DEFAULT);
 }
 
@@ -615,9 +615,11 @@ void PhysicsWorld::RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
         
         // Check which of the geometries is the raycast ray
         if (shapeA)
-            newResult.node_ = shapeA->GetNode();
+            newResult.collisionShape_ = shapeA;
+        else if (shapeB)
+            newResult.collisionShape_ = shapeB;
         else
-            newResult.node_ = shapeB->GetNode();
+            return;
         
         newResult.distance_ = contact.geom.depth;
         newResult.position_ = Vector3(contact.geom.pos[0], contact.geom.pos[1], contact.geom.pos[2]);

@@ -88,12 +88,12 @@
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const String typeNames[] = 
+static const String typeNames[] =
 {
-    "master",
-    "effect",
-    "music",
-    "voice",
+    "Master",
+    "Effect",
+    "Music",
+    "Voice",
     ""
 };
 

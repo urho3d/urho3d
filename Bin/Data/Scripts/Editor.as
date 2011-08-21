@@ -70,22 +70,38 @@ void LoadConfig()
 
     XMLElement cameraElem = configElem.GetChild("camera");
     XMLElement objectElem = configElem.GetChild("object");
-    if (cameraElem.isNull || objectElem.isNull)
-        return;
+    XMLElement renderingElem = configElem.GetChild("rendering");
 
-    camera.nearClip = cameraElem.GetFloat("nearclip");
-    camera.farClip = cameraElem.GetFloat("farclip");
-    camera.fov = cameraElem.GetFloat("fov");
-    cameraBaseSpeed = cameraElem.GetFloat("speed");
+    if (!cameraElem.isNull)
+    {
+        camera.nearClip = cameraElem.GetFloat("nearclip");
+        camera.farClip = cameraElem.GetFloat("farclip");
+        camera.fov = cameraElem.GetFloat("fov");
+        cameraBaseSpeed = cameraElem.GetFloat("speed");
+    }
 
-    newNodeDistance = objectElem.GetFloat("newnodedistance");
-    moveStep = objectElem.GetFloat("movestep");
-    rotateStep = objectElem.GetFloat("rotatestep");
-    scaleStep = objectElem.GetFloat("scalestep");
-    moveSnap = objectElem.GetBool("movesnap");
-    rotateSnap = objectElem.GetBool("rotatesnap");
-    scaleSnap = objectElem.GetBool("scalesnap");
-    useLocalIDs = objectElem.GetBool("uselocalids");
+    if (!objectElem.isNull)
+    {
+        newNodeDistance = objectElem.GetFloat("newnodedistance");
+        moveStep = objectElem.GetFloat("movestep");
+        rotateStep = objectElem.GetFloat("rotatestep");
+        scaleStep = objectElem.GetFloat("scalestep");
+        moveSnap = objectElem.GetBool("movesnap");
+        rotateSnap = objectElem.GetBool("rotatesnap");
+        scaleSnap = objectElem.GetBool("scalesnap");
+        useLocalIDs = objectElem.GetBool("uselocalids");
+        pickComponents = objectElem.GetBool("pickcomponents");
+        pickUsingPhysics = objectElem.GetBool("pickusingphysics");
+    }
+    
+    if (!renderingElem.isNull)
+    {
+        renderer.textureQuality = renderingElem.GetInt("texturequality");
+        renderer.materialQuality = renderingElem.GetInt("materialquality");
+        SetShadowQuality(renderingElem.GetInt("shadowquality"));
+        renderer.specularLighting = renderingElem.GetBool("specularlighting");
+        engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
+    }
 }
 
 void SaveConfig()
@@ -97,6 +113,7 @@ void SaveConfig()
     XMLElement configElem = config.CreateRoot("configuration");
     XMLElement cameraElem = configElem.CreateChild("camera");
     XMLElement objectElem = configElem.CreateChild("object");
+    XMLElement renderingElem = configElem.CreateChild("rendering");
 
     cameraElem.SetFloat("nearclip", camera.nearClip);
     cameraElem.SetFloat("farclip", camera.farClip);
@@ -111,6 +128,14 @@ void SaveConfig()
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
+    objectElem.SetBool("pickcomponents", pickComponents);
+    objectElem.SetBool("pickusingphysics", pickUsingPhysics);
+
+    renderingElem.SetInt("texturequality", renderer.textureQuality);
+    renderingElem.SetInt("materialquality", renderer.materialQuality);
+    renderingElem.SetInt("shadowquality", GetShadowQuality());
+    renderingElem.SetBool("specularlighting", renderer.specularLighting);
+    renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

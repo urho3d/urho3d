@@ -385,10 +385,10 @@
         <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="EditorAttributeText">
-        <font name="Fonts/Anonymous Pro.ttf" size="9" />
+        <font name="Fonts/BlueHighway.ttf" size="11" />
     </element>
     <element type="EditorEnumAttributeText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <font name="Fonts/BlueHighway.ttf" size="11" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="EditorAttributeEdit">
@@ -398,8 +398,7 @@
         <clipborder value="1 1 1 1" />
         <hoveroffset value="0 16" />
         <text>
-            <position value="1 1" />
-            <font name="Fonts/Anonymous Pro.ttf" size="9" />
+            <font name="Fonts/Anonymous Pro.ttf" size="11" />
             <hovercolor value="0.45 0.70 0.45" />
             <selectioncolor value="0.70 0.70 0.70" />
         </text>

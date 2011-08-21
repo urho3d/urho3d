@@ -2,90 +2,60 @@
 
 Window@ nodeWindow;
 
-const uint ATTR_EDITOR_STRING = 0;
-const uint ATTR_EDITOR_FLOAT = 1;
-const uint ATTR_EDITOR_VECTOR2 = 2;
-const uint ATTR_EDITOR_VECTOR3 = 3;
-const uint ATTR_EDITOR_VECTOR4 = 4;
-const uint ATTR_EDITOR_BOOL = 5;
-const uint ATTR_EDITOR_ENUM = 64;
-const uint ATTR_EDITOR_RESOURCE = 128;
-const uint MAX_ATTRNAME_LENGTH = 15;
-
-class EnumEditorData
-{
-    String componentType;
-    String categoryName;
-    String attributeName;
-    Array<String>@ choices;
-
-    EnumEditorData(const String&in componentType_, const String&in categoryName_, const String&in attributeName_, Array<String>@ choices_)
-    {
-        componentType = componentType_;
-        categoryName = categoryName_;
-        attributeName = attributeName_;
-        choices = choices_;
-    }
-}
+const uint MAX_ATTRNAME_LENGTH = 28;
 
 class ResourceEditorData
 {
-    String componentType;
-    String categoryName;
-    String attributeName;
     String resourceType;
-    String fileExtension;
     String lastPath;
+    Array<String> filters;
 
-    ResourceEditorData(const String&in componentType_, const String&in categoryName_, const String&in attributeName_, const String&in resourceType_, const String&in fileExtension_)
+    ResourceEditorData(const String&in resourceType_, const String&in filter_)
     {
-        componentType = componentType_;
-        categoryName = categoryName_;
-        attributeName = attributeName_;
         resourceType = resourceType_;
-        fileExtension = fileExtension_;
+        filters.Push(filter_);
+    }
+
+    ResourceEditorData(const String&in resourceType_, const Array<String>@ filters_)
+    {
+        resourceType = resourceType_;
+        filters = filters_;
     }
 }
 
-Array<EnumEditorData@> enumEditors;
 Array<ResourceEditorData@> resourceEditors;
 
 bool inLoadAttributeEditor = false;
-uint lastAttributeCount = 0;
-
 uint resourcePickType = 0;
 String resourcePickEditorName;
 
 void CreateNodeWindow()
 {
-    /*
     if (nodeWindow !is null)
         return;
 
-    nodeWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/NodeWindow.xml"), uiStyle);
-    ui.root.addChild(nodeWindow);
-    int height = min(ui.root.getHeight() - 60, 500);
-    nodeWindow.setSize(300, height);
-    nodeWindow.setPosition(ui.root.getWidth() - 20 - nodeWindow.getWidth(), 40);
-    nodeWindow.setVisible(true);
-    updateNodeWindow();
-    
-    // Fill enum & resource editor data
-    Array<String> lightTypes = {"directional", "spot", "point"};
-    Array<String> bodyTypes = {"static", "dynamic", "kinematic"};
-    enumEditors.push(EnumEditorData("Light", "light", "type", lightTypes));
-    enumEditors.push(EnumEditorData("RigidBody", "body", "mode", bodyTypes));
+    // Fill resource editor data
+    resourceEditors.Push(ResourceEditorData("Model", "*.mdl"));
+    resourceEditors.Push(ResourceEditorData("Material", "*.xml"));
+    Array<String> textureFilters;
+    textureFilters.Push("*.dds");
+    textureFilters.Push("*.jpg");
+    textureFilters.Push("*.png");
+    resourceEditors.Push(ResourceEditorData("Texture2D", textureFilters));
+    resourceEditors.Push(ResourceEditorData("TextureCube", "*.xml"));
+    resourceEditors.Push(ResourceEditorData("Animation", "*.ani"));
+    resourceEditors.Push(ResourceEditorData("ScriptFile", "*.as"));
+    resourceEditors.Push(ResourceEditorData("XMLFile", "*.xml"));
 
-    resourceEditors.push(ResourceEditorData("", "material", "name", "Material", ".xml"));
-    resourceEditors.push(ResourceEditorData("", "model", "name", "Model", ".mdl"));
-    resourceEditors.push(ResourceEditorData("", "animation", "name", "Animation", ".ani"));
-    resourceEditors.push(ResourceEditorData("RigidBody", "collision", "name", "CollisionShape", ".xml"));
-    resourceEditors.push(ResourceEditorData("ScriptInstance", "script", "name", "ScriptFile", ".as"));
-    resourceEditors.push(ResourceEditorData("ParticleEmitter", "emitter", "name", "XMLFile", ".xml"));
+    nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
+    ui.root.AddChild(nodeWindow);
+    int height = Min(ui.root.height - 60, 500);
+    nodeWindow.SetSize(300, height);
+    nodeWindow.SetPosition(ui.root.width - 20 - nodeWindow.width, 40);
+    nodeWindow.visible = true;
+    UpdateNodeWindow();
 
-    subscribeToEvent(nodeWindow.getChild("CloseButton", true), "Released", "HideNodeWindow");
-    subscribeToEvent(nodeWindow.getChild("NodeNameEdit", true), "TextFinished", "EditNodeName");
-    */
+    SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
 }
 
 void HideNodeWindow()
@@ -104,235 +74,93 @@ void UpdateNodeWindow()
     // If a resource pick was in progress, it cannot be completed now, as component was changed
     PickResourceCanceled();
 
-    /*
-    Text@ entityTitle = nodeWindow.getChild("EntityTitle", true);
-    Text@ componentTitle = nodeWindow.getChild("ComponentTitle", true);
-    LineEdit@ entityNameEdit = nodeWindow.getChild("EntityNameEdit", true);
-    LineEdit@ componentNameEdit = nodeWindow.getChild("ComponentNameEdit", true);
-    ListView@ list = nodeWindow.getChild("AttributeList", true);
-    list.removeAllItems();
-    lastAttributeCount = 0;
+    Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
+    Text@ componentTitle = nodeWindow.GetChild("ComponentTitle", true);
 
-    if (selectedEntity is null)
-    {
-        entityTitle.setText("No entity");
-        entityNameEdit.setText("");
-        entityNameEdit.setEnabled(false);
-    }
+    if (selectedNode is null)
+        nodeTitle.text = "No node";
     else
     {
-        uint entityID = selectedEntity.getID();
-        entityTitle.setText("Entity ID " + entityID + " " + (entityID < 65536 ? "(Replicated)" : "(Local)"));
-        entityNameEdit.setText(selectedEntity.getName());
-        entityNameEdit.setEnabled(true);
+        String localText;
+        if (selectedNode.id >= FIRST_LOCAL_ID)
+            localText = ", Local";
+        nodeTitle.text = selectedNode.typeName + " (ID " + String(selectedNode.id) + localText + ")";
     }
 
     if (selectedComponent is null)
-    {
-        componentTitle.setText("No component");
-        componentNameEdit.setText("");
-        componentNameEdit.setEnabled(false);
-    }
+        componentTitle.text = "No component";
     else
-    {
-        componentTitle.setText("Component " + selectedComponent.getTypeName());
-        componentNameEdit.setText(selectedComponent.getName());
-        componentNameEdit.setEnabled(true);
-        updateComponentAttributes();
-    }
-    */
+        componentTitle.text = GetComponentTitle(selectedComponent, 0);
+
+    UpdateAttributes(true);
 }
 
-void EditNodeName()
+void UpdateAttributes(bool fullUpdate)
 {
-    if (selectedNode is null)
+    if (nodeWindow !is null)
+    {
+        UpdateAttributes(selectedNode, nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
+        UpdateAttributes(selectedComponent, nodeWindow.GetChild("ComponentAttributeList", true), fullUpdate);
+    }
+}
+
+void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdate)
+{
+    // If attributes have changed structurally, do a full update
+    if (fullUpdate == false)
+    {
+        uint count = GetAttributeEditorCount(serializable);
+        if (list.contentElement.numChildren != count)
+            fullUpdate = true;
+    }
+    
+    if (fullUpdate)
+        list.RemoveAllItems();
+
+    if (serializable is null)
         return;
-    /*
-    LineEdit@ nameEdit = nodeWindow.getChild("EntityNameEdit", true);
-    
-    BeginModify(selectedNode.id);
-    selectedNode.setName(nameEdit.text);
-    EndModify(selectedNode.id);
 
-    updateSceneWindowEntityOnly(selectedNode);
-    */
+    for (uint i = 0; i < serializable.numAttributes; ++i)
+    {
+        AttributeInfo info = serializable.attributeInfos[i];
+        if (info.mode & AM_NOEDIT != 0)
+            continue;
+
+        if (fullUpdate)
+            CreateAttributeEditor(list, serializable, i);
+
+        LoadAttributeEditor(list, serializable, i);
+    }
 }
 
-void UpdateAttributes()
+void EditAttribute(StringHash eventType, VariantMap& eventData)
 {
-    /*
-    ListView@ list = nodeWindow.getChild("AttributeList", true);
-
-    // Save component to XML, then inspect the result
-    XMLElement rootElem = componentData.createRootElement("component");
-    selectedComponent.saveXML(rootElem);
-    Node@ node = cast<Node>(selectedComponent);
-
-    // Check amount of attributes. If has changed, do full refresh. Otherwise just refresh values
-    XMLElement categoryElem = rootElem.getChildElement();
-    uint attributeCount = 0;
-    while (categoryElem.notNull())
-    {
-        attributeCount += categoryElem.getNumAttributes();
-        categoryElem = categoryElem.getNextElement();
-    }
-
-    categoryElem = rootElem.getChildElement();
-    uint index = 0;
-
-    if (attributeCount != lastAttributeCount)
-    {
-        // If a resource pick was in progress, it cannot be completed now, as component structure was changed
-        pickResourceCanceled();
-
-        IntVector2 listOldPos = list.getViewPosition();
-
-        list.removeAllItems();
-
-        attributeCount = 0;
-        while (categoryElem.notNull())
-        {
-            String category = categoryElem.getName();
-
-            Text@ text = Text();
-            text.setStyleAuto(uiStyle);
-            text.setText(category);
-            list.addItem(text);
-
-            {
-                UIElement@ spacer = UIElement();
-                spacer.setFixedHeight(4);
-                list.addItem(spacer);
-            }
-
-            Array<String> attrs = categoryElem.getAttributeNames();
-
-            // Do not make the parent node reference editable. It is handled via scene window drag and drop instead
-            if ((category == "parent") && (node !is null))
-            {
-                Node@ parentNode = node.getParent();
-
-                Text@ attrName = Text();
-                attrName.setStyle(uiStyle, "EditorAttributeText");
-                if (parentNode !is null)
-                    attrName.setText(" " + parentNode.getTypeName() + " in " + getEntityTitle(parentNode.getEntity()));
-                else
-                    attrName.setText(" No parent");
-
-                list.addItem(attrName);
-            }
-            else
-            {
-                for (uint i = 0; i < attrs.size(); ++i)
-                {
-                    String name = attrs[i];
-                    if (name.length() > MAX_ATTRNAME_LENGTH)
-                        name.resize(MAX_ATTRNAME_LENGTH);
-    
-                    UIElement@ bar = UIElement();
-                    bar.setLayout(LM_HORIZONTAL, 4, IntRect(0, 0, 0, 0));
-                    bar.setFixedHeight(18);
-                    list.addItem(bar);
-
-                    uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
-
-                    UIElement@ spacer = UIElement();
-                    spacer.setFixedWidth(8);
-                    bar.addChild(spacer);
-
-                    // Do not create the name for resource editors
-                    if (type < ATTR_EDITOR_RESOURCE)
-                    {
-                        Text@ attrName = Text();
-                        attrName.setStyle(uiStyle, "EditorAttributeText");
-                        attrName.setText(name);
-                        attrName.setFixedWidth(110);
-                        bar.addChild(attrName);
-                    }
-
-                    createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
-                    loadAttributeEditor(type, categoryElem, index, attrs[i]);
-                }
-            }
-
-            {
-                UIElement@ spacer = UIElement();
-                spacer.setFixedHeight(4);
-                list.addItem(spacer);
-            }
-
-            categoryElem = categoryElem.getNextElement();
-            attributeCount += attrs.size();
-            ++index;
-        }
-    
-        lastAttributeCount = attributeCount;
-        
-        // Try to reset to old view position
-        list.setViewPosition(listOldPos);
-    }
-    else
-    {
-        while (categoryElem.notNull())
-        {
-            Array<String> attrs = categoryElem.getAttributeNames();
-        
-            for (uint i = 0; i < attrs.size(); ++i)
-            {
-                String category = categoryElem.getName();
-                uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
-                loadAttributeEditor(type, categoryElem, index, attrs[i]);
-            }
-
-            categoryElem = categoryElem.getNextElement();
-            ++index;
-        }
-    }
-    */
-}
-
-void EditComponentAttribute(StringHash eventType, VariantMap& eventData)
-{
-    /*
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
-    if ((selectedComponent is null) || (inLoadAttributeEditor))
+    if (inLoadAttributeEditor)
         return;
 
-    UIElement@ attrEdit = eventData["Element"].getUIElement();
-    editComponentAttribute(attrEdit, eventType == StringHash("TextChanged"));
-    */
-}
-
-void EditComponentAttribute(UIElement@ attrEdit, bool intermediateEdit)
-{
-    /*
-    if ((selectedComponent is null) || (inLoadAttributeEditor))
+    UIElement@ attrEdit = eventData["Element"].GetUIElement();
+    UIElement@ parent = attrEdit.parent;
+    Serializable@ serializable = GetAttributeEditorTarget(attrEdit);
+    if (serializable is null)
         return;
 
-    XMLElement rootElem = componentData.getRootElement();
-    XMLElement categoryElem = rootElem.getChildElement();
-    uint index = 0;
-    while (categoryElem.notNull())
-    {
-        if (index == uint(attrEdit.vars["Index"].getInt()))
-        {
-            storeAttributeEditor(attrEdit.vars["Type"].getInt(), categoryElem, index, attrEdit.vars["Attribute"].getString());
+    uint index = attrEdit.vars["Index"].GetUInt();
+    bool intermediateEdit = eventType == StringHash("TextChanged");
 
-            uint id = selectedComponent.getEntity().id;
-            BeginModify(id);
-            selectedComponent.loadXML(rootElem);
-            selectedComponent.postLoad();
-            EndModify(id);
+    StoreAttributeEditorDirect(parent, serializable, index);
+    // Some attributes need the finish step to take effect. This is often to avoid some expensive operation,
+    // but while editing every change should happen instantly
+    serializable.FinishUpdate();
 
-            // If intermediate edit on a numeric field, do not refresh value back from the component to the edit field
-            if (!intermediateEdit)
-                updateComponentAttributes();
-            return;
-        }
-        categoryElem = categoryElem.getNextElement();
-        ++index;
-    }
-    */
+    // If not an intermediate edit, reload the editor fields with validated values
+    // (attributes may have interactions; therefore we load everything, not just the value being edited)
+    if (!intermediateEdit)
+        UpdateAttributes(false);
+
+    // If node changed, update it in the scene window also
+    if (cast<Node>(serializable) !is null)
+        UpdateSceneWindowNodeOnly(selectedNode);
 }
 
 void PickResource(StringHash eventType, VariantMap& eventData)
@@ -340,6 +168,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     if (uiFileSelector !is null)
         return;
 
+    /*
     UIElement@ button = eventData["Element"].GetUIElement();
     LineEdit@ attrEdit = button.parent.children[1];
     uint type = uint(attrEdit.vars["Type"].GetInt());
@@ -356,6 +185,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
 
     resourcePickType = type;
     resourcePickEditorName = attrEdit.name;
+    */
 }
 
 void OpenResource(StringHash eventType, VariantMap& eventData)
@@ -400,7 +230,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
     if (res is null)
         return;
 
-    attrEdit.setText(resourceName);
+    attrEdit.SetText(resourceName);
     editComponentAttribute(attrEdit, false);
     */
 }
@@ -414,255 +244,489 @@ void PickResourceCanceled()
     }
 }
 
-int GetAttributeEditorType(Component@ component, const String& in category, const String& in attribute, const String& in value)
+uint GetAttributeEditorCount(Serializable@ serializable)
 {
-    /*
-    for (uint i = 0; i < enumEditors.size(); ++i)
+    uint count = 0;
+
+    if (serializable !is null)
     {
-        if ((category == enumEditors[i].categoryName) && (attribute == enumEditors[i].attributeName) && ((enumEditors[i].componentType.empty())
-            || (component.GetTypeName() == enumEditors[i].componentType)))
-            return ATTR_EDITOR_ENUM + i;
-    }
-
-    for (uint i = 0; i < resourceEditors.size(); ++i)
-    {
-        if ((category == resourceEditors[i].categoryName) && (attribute == resourceEditors[i].attributeName) && 
-            ((resourceEditors[i].componentType.empty()) || (component.GetTypeName() == resourceEditors[i].componentType)))
-            return ATTR_EDITOR_RESOURCE + i;
-    }
-
-    // Note: we always use valid, ie. just serialized data for this, not own edited values
-    if ((category == "animation") && (attribute == "startbone"))
-        return ATTR_EDITOR_STRING;
-    else if ((category == "script") && (attribute == "class"))
-        return ATTR_EDITOR_STRING;
-    else if ((value == "true") || (value == "false"))
-        return ATTR_EDITOR_BOOL;
-
-    uint coords = value.split(' ').size();
-    if (coords == 1)
-        return ATTR_EDITOR_FLOAT;
-    if (coords == 2)
-        return ATTR_EDITOR_VECTOR2;
-    else if (coords == 3)
-        return ATTR_EDITOR_VECTOR3;
-    else if (coords == 4)
-        return ATTR_EDITOR_VECTOR4;
-    */
-    return ATTR_EDITOR_STRING;
-}
-
-String GetAttributeEditorName(uint index, const String& in attribute)
-{
-    return "Attr_" + index + "_" + attribute;
-}
-
-void CreateAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, uint index, const String& in attribute)
-{
-    /*
-    if (type == ATTR_EDITOR_STRING)
-    {
-        LineEdit@ attrEdit = LineEdit.GetAttributeEditorName(index, attribute));
-        attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
-        attrEdit.vars["Type"] = type;
-        attrEdit.vars["Index"] = index;
-        attrEdit.vars["Attribute"] = attribute;
-        attrEdit.setFixedHeight(16);
-        bar.addChild(attrEdit);
-        subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
-    }
-
-    if (type == ATTR_EDITOR_BOOL)
-    {
-        CheckBox@ attrEdit = CheckBox.GetAttributeEditorName(index, attribute));
-        attrEdit.setStyleAuto(uiStyle);
-        attrEdit.vars["Type"] = type;
-        attrEdit.vars["Index"] = index;
-        attrEdit.vars["Attribute"] = attribute;
-        attrEdit.setFixedSize(16, 16);
-        bar.addChild(attrEdit);
-        subscribeToEvent(attrEdit, "Toggled", "editComponentAttribute");
-    }
-
-    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
-    {
-        for (uint i = 0; i < type; ++i)
+        for (uint i = 0; i < serializable.numAttributes; ++i)
         {
-            LineEdit@ attrEdit = LineEdit.GetAttributeEditorName(index, attribute) + "_" + toString(i));
-            attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.vars["Type"] = type;
+            // Resource editors have the title + the editor row itself, so count 2
+            if (serializable.attributeInfos[i].type == VAR_RESOURCEREF)
+                count += 2;
+            else if (serializable.attributeInfos[i].type == VAR_RESOURCEREFLIST)
+                count += 2 * serializable.attributes[i].GetResourceRefList().length;
+            else
+                ++count;
+        }
+    }
+
+    return count;
+}
+
+UIElement@ CreateAttributeEditorTextBar(ListView@ list, String name)
+{
+    UIElement@ editorBar = UIElement();
+    editorBar.SetLayout(LM_HORIZONTAL);
+    editorBar.SetFixedHeight(18);
+    list.AddItem(editorBar);
+
+    Text@ attrNameText = Text();
+    attrNameText.SetStyle(uiStyle, "EditorAttributeText");
+    attrNameText.text = name;
+    editorBar.AddChild(attrNameText);
+
+    return editorBar;
+}
+
+UIElement@ CreateAttributeEditorBar(ListView@ list, String name, uint index, uint subIndex)
+{
+    if (name.length > MAX_ATTRNAME_LENGTH)
+        name.Resize(MAX_ATTRNAME_LENGTH);
+
+    UIElement@ editorBar = UIElement("Edit" + String(index) + "_" + String(subIndex));
+    editorBar.SetLayout(LM_HORIZONTAL);
+    editorBar.SetFixedHeight(18);
+    list.AddItem(editorBar);
+
+    if (!name.empty)
+    {
+        Text@ attrNameText = Text();
+        attrNameText.SetStyle(uiStyle, "EditorAttributeText");
+        attrNameText.text = name;
+        attrNameText.SetFixedWidth(125);
+        editorBar.AddChild(attrNameText);
+    }
+
+    return editorBar;
+}
+
+void SetAttributeEditorID(UIElement@ attrEdit, Serializable@ serializable)
+{
+    // Serializable does not expose the ID, so must cast into both Node & Component
+    Node@ node = cast<Node>(serializable);
+    Component@ component = cast<Component>(serializable);
+    if (node !is null)
+        attrEdit.vars["NodeID"] = node.id;
+    else if (component !is null)
+        attrEdit.vars["ComponentID"] = component.id;
+}
+
+Serializable@ GetAttributeEditorTarget(UIElement@ attrEdit)
+{
+    if (attrEdit.vars.Contains("NodeID"))
+        return editorScene.GetNodeByID(attrEdit.vars["NodeID"].GetUInt());
+    else if (attrEdit.vars.Contains("ComponentID"))
+        return editorScene.GetComponentByID(attrEdit.vars["ComponentID"].GetUInt());
+    else
+        return null;
+}
+
+UIElement@ GetAttributeEditorBar(ListView@ list, uint index, uint subIndex)
+{
+    return list.GetChild("Edit" + String(index) + "_" + String(subIndex), true);
+}
+
+void CreateAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
+{
+    AttributeInfo info = serializable.attributeInfos[index];
+
+    if (info.type == VAR_STRING)
+    {
+        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
+
+        LineEdit@ attrEdit = LineEdit();
+        attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+        attrEdit.SetFixedHeight(16);
+        attrEdit.vars["Index"] = index;
+        SetAttributeEditorID(attrEdit, serializable);
+        parent.AddChild(attrEdit);
+        SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+        SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+    }
+
+    if (info.type == VAR_BOOL)
+    {
+        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
+
+        CheckBox@ attrEdit = CheckBox();
+        attrEdit.style = uiStyle;
+        attrEdit.SetFixedSize(16, 16);
+        attrEdit.vars["Index"] = index;
+        SetAttributeEditorID(attrEdit, serializable);
+        parent.AddChild(attrEdit);
+        SubscribeToEvent(attrEdit, "Toggled", "EditAttribute");
+    }
+
+    if ((info.type >= VAR_FLOAT && info.type <= VAR_VECTOR4) || info.type == VAR_QUATERNION || info.type == VAR_COLOR)
+    {
+        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
+
+        uint numCoords = info.type - VAR_FLOAT + 1;
+        if (info.type == VAR_QUATERNION)
+            numCoords = 3;
+        if (info.type == VAR_COLOR)
+            numCoords = 4;
+
+        for (uint i = 0; i < numCoords; ++i)
+        {
+            LineEdit@ attrEdit = LineEdit();
+            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+            attrEdit.SetFixedHeight(16);
             attrEdit.vars["Index"] = index;
-            attrEdit.vars["Attribute"] = attribute;
-            attrEdit.setFixedHeight(16);
-            bar.addChild(attrEdit);
-            // For the numeric style editors, subscribe to every change
-            subscribeToEvent(attrEdit, "TextChanged", "editComponentAttribute");
-            subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
+            attrEdit.vars["Coord"] = i;
+            SetAttributeEditorID(attrEdit, serializable);
+            parent.AddChild(attrEdit);
+            SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         }
     }
-    
-    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
+
+    if (info.type == VAR_INT)
     {
-        DropDownList@ attrEdit = DropDownList.GetAttributeEditorName(index, attribute));
-        attrEdit.setStyleAuto(uiStyle);
-        attrEdit.vars["Type"] = type;
-        attrEdit.vars["Index"] = index;
-        attrEdit.vars["Attribute"] = attribute;
-        attrEdit.setFixedHeight(16);
-        attrEdit.setResizePopup(true);
-        
-        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
-        for (uint i = 0; i < data.choices.size(); ++i)
+        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
+
+        // Check for enums
+        Array<String>@ enumNames = info.enumNames;
+        if (enumNames.empty)
         {
-            Text@ choice = Text();
-            choice.setStyle(uiStyle, "EditorEnumAttributeText");
-            choice.setText(data.choices[i]);
-            attrEdit.addItem(choice);
+            // No enums, create a numeric editor
+            LineEdit@ attrEdit = LineEdit();
+            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+            attrEdit.SetFixedHeight(16);
+            attrEdit.vars["Index"] = index;
+            SetAttributeEditorID(attrEdit, serializable);
+            parent.AddChild(attrEdit);
+            SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         }
-        bar.addChild(attrEdit);
-        
-        subscribeToEvent(attrEdit, "ItemSelected", "editComponentAttribute");
+        else
+        {
+            DropDownList@ attrEdit = DropDownList();
+            attrEdit.style = uiStyle;
+            attrEdit.SetFixedHeight(16);
+            attrEdit.resizePopup = true;
+            attrEdit.vars["Index"] = index;
+            SetAttributeEditorID(attrEdit, serializable);
+
+            for (uint i = 0; i < enumNames.length; ++i)
+            {
+                // Check for certain internal enums and break
+                if (enumNames[i] == "Master" || enumNames[i] == "SplitPoint")
+                    break;
+
+                Text@ choice = Text();
+                choice.SetStyle(uiStyle, "EditorEnumAttributeText");
+                choice.text = enumNames[i];
+                attrEdit.AddItem(choice);
+            }
+            parent.AddChild(attrEdit);
+            SubscribeToEvent(attrEdit, "ItemSelected", "EditAttribute");
+        }
     }
-    
-    if (type >= ATTR_EDITOR_RESOURCE)
+
+    if (info.type == VAR_RESOURCEREF || info.type == VAR_RESOURCEREFLIST)
     {
-        LineEdit@ attrEdit = LineEdit.GetAttributeEditorName(index, attribute));
-        attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
-        attrEdit.vars["Type"] = type;
-        attrEdit.vars["Index"] = index;
-        attrEdit.vars["Attribute"] = attribute;
-        attrEdit.setFixedHeight(16);
-        bar.addChild(attrEdit);
-        subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
+        uint numRefs = 1;
+        // Otherwise we do not yet query the attribute values at this point, but for reflist we must know
+        // the number of resources
+        if (info.type == VAR_RESOURCEREFLIST)
+            numRefs = serializable.attributes[index].GetResourceRefList().length;
 
-        Button@ pickButton = Button.GetAttributeEditorName(index, attribute) + "_Pick");
-        pickButton.setStyleAuto(uiStyle);
-        pickButton.vars["Type"] = type;
-        pickButton.vars["Index"] = index;
-        pickButton.vars["Attribute"] = attribute;
-        pickButton.setFixedSize(36, 16);
-        Text@ pickButtonText = Text();
-        pickButtonText.setStyle(uiStyle, "EditorAttributeText");
-        pickButtonText.setAlignment(HA_CENTER, VA_CENTER);
-        pickButtonText.setText("Pick");
-        pickButton.addChild(pickButtonText);
-        bar.addChild(pickButton);
-        subscribeToEvent(pickButton, "Released", "pickResource");
+        for (uint i = 0; i < numRefs; ++i)
+        {
+            // Create the resource name on a separate non-interactive line to allow for more space
+            if (numRefs == 1)
+                CreateAttributeEditorTextBar(list, info.name);
+            else
+                CreateAttributeEditorTextBar(list, info.name + " " + String(i + 1));
 
-        Button@ openButton = Button.GetAttributeEditorName(index, attribute) + "_Edit");
-        openButton.setStyleAuto(uiStyle);
-        openButton.vars["Type"] = type;
-        openButton.vars["Index"] = index;
-        openButton.vars["Attribute"] = attribute;
-        openButton.setFixedSize(36, 16);
-        Text@ openButtonText = Text();
-        openButtonText.setStyle(uiStyle, "EditorAttributeText");
-        openButtonText.setAlignment(HA_CENTER, VA_CENTER);
-        openButtonText.setText("Open");
-        openButton.addChild(openButtonText);
-        bar.addChild(openButton);
-        subscribeToEvent(openButton, "Released", "openResource");
+            UIElement@ parent = CreateAttributeEditorBar(list, "", index, i);
+
+            UIElement@ spacer = UIElement();
+            spacer.SetFixedSize(12, 16);
+            parent.AddChild(spacer);
+
+            LineEdit@ attrEdit = LineEdit();
+            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+            attrEdit.SetFixedHeight(16);
+            attrEdit.vars["Index"] = index;
+            attrEdit.vars["SubIndex"] = i;
+            SetAttributeEditorID(attrEdit, serializable);
+            parent.AddChild(attrEdit);
+            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+
+            UIElement@ spacer2 = UIElement();
+            spacer2.SetFixedSize(4, 16);
+            parent.AddChild(spacer2);
+
+            Button@ pickButton = Button();
+            pickButton.style = uiStyle;
+            pickButton.SetFixedSize(36, 16);
+            pickButton.vars["Index"] = index;
+            pickButton.vars["SubIndex"] = i;
+            SetAttributeEditorID(pickButton, serializable);
+
+            Text@ pickButtonText = Text();
+            pickButtonText.SetStyle(uiStyle, "EditorAttributeText");
+            pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
+            pickButtonText.text = "Pick";
+            pickButton.AddChild(pickButtonText);
+            parent.AddChild(pickButton);
+            SubscribeToEvent(pickButton, "Released", "PickResource");
+    
+            UIElement@ spacer3 = UIElement();
+            spacer3.SetFixedSize(4, 16);
+            parent.AddChild(spacer3);
+
+            Button@ openButton = Button();
+            openButton.style = uiStyle;
+            openButton.SetFixedSize(36, 16);
+            openButton.vars["Index"] = index;
+            openButton.vars["SubIndex"] = i;
+            SetAttributeEditorID(openButton, serializable);
+    
+            Text@ openButtonText = Text();
+            openButtonText.SetStyle(uiStyle, "EditorAttributeText");
+            openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
+            openButtonText.text = "Open";
+            openButton.AddChild(openButtonText);
+            parent.AddChild(openButton);
+            SubscribeToEvent(openButton, "Released", "OpenResource");
+        }
     }
-    */
 }
 
-void LoadAttributeEditor(uint type, XMLElement categoryElem, int index, const String& in attribute)
+void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
 {
-    /*
+    UIElement@ parent = GetAttributeEditorBar(list, index, 0);
+    if (parent is null)
+        return;
+
     inLoadAttributeEditor = true;
 
-    ListView@ list = nodeWindow.GetChild("AttributeList", true);
-    String value = categoryElem.GetAttribute(attribute);
+    AttributeInfo info = serializable.attributeInfos[index];
+    Variant value = serializable.attributes[index];
 
-    if ((type == ATTR_EDITOR_STRING) || (type >= ATTR_EDITOR_RESOURCE))
+    if (info.type == VAR_STRING)
     {
-        LineEdit@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        if (attrEdit is null)
-            return;
-        attrEdit.setText(value);
+        LineEdit@ attrEdit = parent.children[1];
+        attrEdit.text = value.GetString();
+        attrEdit.cursorPosition = 0;
     }
-
-    if (type == ATTR_EDITOR_BOOL)
+    if (info.type == VAR_BOOL)
     {
-        CheckBox@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        if (attrEdit is null)
-            return;
-        attrEdit.setChecked(value.toBool());
+        CheckBox@ attrEdit = parent.children[1];
+        attrEdit.checked = value.GetBool();
     }
-
-    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
+    if (info.type == VAR_FLOAT)
     {
-        String baseName =.GetAttributeEditorName(index, attribute);
-        Array<String> coords = value.split(' ');
-        for (uint i = 0; (i < coords.size()) && (i < type); ++i)
+        LineEdit@ attrEdit = parent.children[1];
+        attrEdit.text = String(value.GetFloat());
+        attrEdit.cursorPosition = 0;
+    }
+    if (info.type == VAR_VECTOR2)
+    {
+        Vector2 vec = value.GetVector2();
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        attrEditX.text = String(vec.x);
+        attrEditY.text = String(vec.y);
+        attrEditX.cursorPosition = 0;
+        attrEditY.cursorPosition = 0;
+    }
+    if (info.type == VAR_VECTOR3)
+    {
+        Vector3 vec = value.GetVector3();
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        attrEditX.text = String(vec.x);
+        attrEditY.text = String(vec.y);
+        attrEditZ.text = String(vec.z);
+        attrEditX.cursorPosition = 0;
+        attrEditY.cursorPosition = 0;
+        attrEditZ.cursorPosition = 0;     
+    }
+    if (info.type == VAR_VECTOR4)
+    {
+        Vector4 vec = value.GetVector4();
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        LineEdit@ attrEditW = parent.children[4];
+        attrEditX.text = String(vec.x);
+        attrEditY.text = String(vec.y);
+        attrEditZ.text = String(vec.z);
+        attrEditW.text = String(vec.w);
+        attrEditX.cursorPosition = 0;
+        attrEditY.cursorPosition = 0;
+        attrEditZ.cursorPosition = 0;
+        attrEditW.cursorPosition = 0;      
+    }
+    if (info.type == VAR_COLOR)
+    {
+        Color col = value.GetColor();
+        LineEdit@ attrEditR = parent.children[1];
+        LineEdit@ attrEditG = parent.children[2];
+        LineEdit@ attrEditB = parent.children[3];
+        LineEdit@ attrEditA = parent.children[4];
+        attrEditR.text = String(col.r);
+        attrEditG.text = String(col.g);
+        attrEditB.text = String(col.b);
+        attrEditA.text = String(col.a);
+        attrEditR.cursorPosition = 0;
+        attrEditG.cursorPosition = 0;
+        attrEditB.cursorPosition = 0;
+        attrEditA.cursorPosition = 0;
+    }
+    if (info.type == VAR_QUATERNION)
+    {
+        Vector3 vec = value.GetQuaternion().eulerAngles;
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        attrEditX.text = String(vec.x);
+        attrEditY.text = String(vec.y);
+        attrEditZ.text = String(vec.z);
+        attrEditX.cursorPosition = 0;
+        attrEditY.cursorPosition = 0;
+        attrEditZ.cursorPosition = 0;
+    }
+    if (info.type == VAR_INT)
+    {
+        Array<String>@ enumNames = info.enumNames;
+        if (enumNames.empty)
         {
-            LineEdit@ attrEdit = list.GetChild(baseName + "_" + toString(i), true);
-            if (attrEdit !is null)
-                attrEdit.setText(coords[i]);
-            else
-                break;
+            LineEdit@ attrEdit = parent.children[1];
+            attrEdit.text = String(value.GetInt());
+            attrEdit.cursorPosition = 0;
+        }
+        else
+        {
+            DropDownList@ attrEdit = parent.children[1];
+            attrEdit.selection = value.GetInt();
         }
     }
-
-    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
+    if (info.type == VAR_RESOURCEREF)
     {
-        DropDownList@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        if (attrEdit is null)
-            return;
-        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
-        String value = categoryElem.GetAttribute(attribute);
-        for (uint i = 0; i < data.choices.size(); ++i)
+        LineEdit@ attrEdit = parent.children[1];
+        attrEdit.text = cache.GetResourceName(value.GetResourceRef().id);
+        attrEdit.cursorPosition = 0;
+    }
+    if (info.type == VAR_RESOURCEREFLIST)
+    {
+        ResourceRefList refList = value.GetResourceRefList();
+        for (uint subIndex = 0; subIndex < refList.length; ++subIndex)
         {
-            if (value.toLower() == data.choices[i])
-            {
-                attrEdit.setSelection(i);
+            parent = GetAttributeEditorBar(list, index, subIndex);
+            if (parent is null)
                 break;
-            }
+            LineEdit@ attrEdit = parent.children[1];
+            attrEdit.text = cache.GetResourceName(refList.ids[subIndex]);
+            attrEdit.cursorPosition = 0;
         }
     }
 
     inLoadAttributeEditor = false;
-    */
 }
 
-void StoreAttributeEditor(uint type, XMLElement categoryElem, int index, const String& in attribute)
+void StoreAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
 {
-    /*
-    ListView@ list = nodeWindow.GetChild("AttributeList", true);
-
-    if ((type == ATTR_EDITOR_STRING) || (type >= ATTR_EDITOR_RESOURCE))
-    {
-        LineEdit@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        categoryElem.setAttribute(attribute, attrEdit.text);
-    }
-
-    if (type == ATTR_EDITOR_BOOL)
-    {
-        CheckBox@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        categoryElem.setAttribute(attribute, toString(attrEdit.isChecked()));
-    }
-
-    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
-    {
-        String baseName =.GetAttributeEditorName(index, attribute);
-        String value;
-        for (uint i = 0; i < type; ++i)
-        {
-            LineEdit@ attrEdit = list.GetChild(baseName + "_" + toString(i), true);
-            if (attrEdit is null)
-                break;
-            if (i != 0)
-                value += " ";
-            value += attrEdit.text;
-        }
-        categoryElem.setAttribute(attribute, value);
-    }
-    
-    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
-    {
-        DropDownList@ attrEdit = list.GetChild.GetAttributeEditorName(index, attribute), true);
-        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
-        categoryElem.setAttribute(attribute, data.choices[attrEdit.GetSelection()]);
-    }
-    */
+    UIElement@ parent = GetAttributeEditorBar(list, index, 0);
+    if (parent is null)
+        return;
+    StoreAttributeEditorDirect(parent, serializable, index);
 }
+
+void StoreAttributeEditorDirect(UIElement@ parent, Serializable@ serializable, uint index)
+{
+    AttributeInfo info = serializable.attributeInfos[index];
+    
+    if (info.type == VAR_STRING)
+    {
+        LineEdit@ attrEdit = parent.children[1];
+        serializable.attributes[index] = Variant(attrEdit.text.Trimmed());
+    }
+    if (info.type == VAR_BOOL)
+    {
+        CheckBox@ attrEdit = parent.children[1];
+        serializable.attributes[index] = Variant(attrEdit.checked);
+    }
+    if (info.type == VAR_FLOAT)
+    {
+        LineEdit@ attrEdit = parent.children[1];
+        serializable.attributes[index] = Variant(attrEdit.text.ToFloat());
+    }
+    if (info.type == VAR_VECTOR2)
+    {
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        Vector2 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat());
+        serializable.attributes[index] = Variant(vec);
+    }
+    if (info.type == VAR_VECTOR3)
+    {
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
+        serializable.attributes[index] = Variant(vec);
+    }
+    if (info.type == VAR_VECTOR4)
+    {
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        LineEdit@ attrEditW = parent.children[4];
+        Vector4 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat(), attrEditW.text.ToFloat());
+        serializable.attributes[index] = Variant(vec);
+    }
+    if (info.type == VAR_COLOR)
+    {
+        LineEdit@ attrEditR = parent.children[1];
+        LineEdit@ attrEditG = parent.children[2];
+        LineEdit@ attrEditB = parent.children[3];
+        LineEdit@ attrEditA = parent.children[4];
+        Color col(attrEditR.text.ToFloat(), attrEditG.text.ToFloat(), attrEditB.text.ToFloat(), attrEditA.text.ToFloat());
+        serializable.attributes[index] = Variant(col);
+    }
+    if (info.type == VAR_QUATERNION)
+    {
+        LineEdit@ attrEditX = parent.children[1];
+        LineEdit@ attrEditY = parent.children[2];
+        LineEdit@ attrEditZ = parent.children[3];
+        Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
+        serializable.attributes[index] = Variant(Quaternion(vec));
+    }
+    if (info.type == VAR_INT)
+    {
+        if (info.enumNames.empty)
+        {
+            LineEdit@ attrEdit = parent.children[1];
+            serializable.attributes[index] = Variant(attrEdit.text.ToInt());
+        }
+        else
+        {
+            DropDownList@ attrEdit = parent.children[1];
+            serializable.attributes[index] = Variant(attrEdit.selection);
+        }
+    }
+    if (info.type == VAR_RESOURCEREF)
+    {
+        LineEdit@ attrEdit = parent.children[1];
+        ResourceRef ref = serializable.attributes[index].GetResourceRef();
+        ref.id = StringHash(attrEdit.text.Trimmed());
+        serializable.attributes[index] = Variant(ref);
+    }
+    if (info.type == VAR_RESOURCEREFLIST)
+    {
+        LineEdit@ attrEdit = parent.children[1];
+        uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
+        ResourceRefList refList = serializable.attributes[index].GetResourceRefList();
+        refList.ids[subIndex] = StringHash(attrEdit.text.Trimmed());
+        serializable.attributes[index] = Variant(refList);
+    }
+}
+

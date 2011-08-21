@@ -51,8 +51,8 @@ Zone::~Zone()
 void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>();
-    context->CopyBaseAttributes<Drawable, Zone>();
     
+    ATTRIBUTE(Zone, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
@@ -60,6 +60,8 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOGSTART, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOGEND, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Zone Priority", priority_, 0, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

@@ -131,6 +131,7 @@ struct FocusParameters
 static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const float SHADOW_DEFAULT_NEARCLIP = 0.1f;
+static const int MAX_LIGHT_SPLITS = 6;
 
 /// %Light component.
 class Light : public Drawable
@@ -145,6 +146,8 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Handle attribute change.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Add debug geometry to the debug graphics.

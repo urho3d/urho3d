@@ -19,6 +19,10 @@
     </element>
     <element type="ListView" name="NodeAttributeList">
         <highlight value="always" />
+        <fixedheight value="74" />  
+        <horizontalscrollbar>
+            <visible enable="false" />
+        </horizontalscrollbar>
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />
@@ -28,5 +32,8 @@
     </element>
     <element type="ListView" name="ComponentAttributeList">
         <highlight value="always" />
+        <horizontalscrollbar>
+            <visible enable="false" />
+        </horizontalscrollbar>
     </element>
 </element>

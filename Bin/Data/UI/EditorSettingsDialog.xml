@@ -126,4 +126,127 @@
             <text value="Use local entity IDs on import" />
         </element>
     </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="PickComponentsToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Pick components instead of nodes" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="PickUsingPhysicsToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Pick using physics raycast" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Texture quality" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="TextureLow">
+            <text value="Low" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="TextureMedium">
+            <text value="Medium" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="TextureHigh">
+            <text value="High" />
+        </element>
+        <element type="DropDownList" name="TextureQualityEdit">
+            <fixedwidth value="80" />
+            <popupitem name="TextureLow" />
+            <popupitem name="TextureMedium" />
+            <popupitem name="TextureHigh" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Material quality" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="MaterialLow">
+            <text value="Low" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="MaterialMedium">
+            <text value="Medium" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="MaterialHigh">
+            <text value="High" />
+        </element>
+        <element type="DropDownList" name="MaterialQualityEdit">
+            <fixedwidth value="80" />
+            <popupitem name="MaterialLow" />
+            <popupitem name="MaterialMedium" />
+            <popupitem name="MaterialHigh" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Shadow quality" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowsOff">
+            <text value="Off" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowsLow">
+            <text value="Low" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowsMedium">
+            <text value="Medium" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowsHigh">
+            <text value="High" />
+        </element>
+        <element type="DropDownList" name="ShadowQualityEdit">
+            <fixedwidth value="80" />
+            <popupitem name="ShadowsOff" />
+            <popupitem name="ShadowsLow" />
+            <popupitem name="ShadowsMedium" />
+            <popupitem name="ShadowsHigh" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="ShadowMapHiresDepthToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Shadow map 24-bit depth" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="SpecularLightingToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Specular lighting" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="FrameLimiterToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Frame limiter" />
+        </element>
+    </element>
 </element>

@@ -32,11 +32,11 @@ class DebugRenderer;
 class Light;
 class Drawable;
 class OcclusionBuffer;
+class Octree;
 class RenderSurface;
+class Technique;
 class Zone;
 struct Viewport;
-
-static const int MAX_LIGHT_SPLITS = 6;
 
 /// %Geometry view space depth minimum and maximum values.
 struct GeometryDepthBounds

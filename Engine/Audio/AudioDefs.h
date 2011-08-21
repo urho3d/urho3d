@@ -26,9 +26,9 @@
 /// SoundSource type enumeration for master gain control.
 enum SoundType
 {
-    SOUND_MASTER = 0,
-    SOUND_EFFECT,
+    SOUND_EFFECT = 0,
     SOUND_MUSIC,
     SOUND_VOICE,
+    SOUND_MASTER,
     MAX_SOUND_TYPES
 };

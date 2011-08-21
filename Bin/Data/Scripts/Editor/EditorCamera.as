@@ -103,6 +103,30 @@ void UpdateEditorSettingsDialog()
     CheckBox@ localIDToggle = editorSettingsDialog.GetChild("LocalIDToggle", true);
     localIDToggle.checked = useLocalIDs;
 
+    CheckBox@ pickComponentsToggle = editorSettingsDialog.GetChild("PickComponentsToggle", true);
+    pickComponentsToggle.checked = pickComponents;
+
+    CheckBox@ pickUsingPhysicsToggle = editorSettingsDialog.GetChild("PickUsingPhysicsToggle", true);
+    pickUsingPhysicsToggle.checked = pickUsingPhysics;
+
+    DropDownList@ textureQualityEdit = editorSettingsDialog.GetChild("TextureQualityEdit", true);
+    textureQualityEdit.selection = renderer.textureQuality;
+
+    DropDownList@ materialQualityEdit = editorSettingsDialog.GetChild("MaterialQualityEdit", true);
+    materialQualityEdit.selection = renderer.materialQuality;
+
+    DropDownList@ shadowQualityEdit = editorSettingsDialog.GetChild("ShadowQualityEdit", true);
+    shadowQualityEdit.selection = GetShadowQuality();
+    
+    CheckBox@ shadowMapHiresDepthToggle = editorSettingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
+    shadowMapHiresDepthToggle.checked = renderer.shadowMapHiresDepth;
+
+    CheckBox@ specularLightingToggle = editorSettingsDialog.GetChild("SpecularLightingToggle", true);
+    specularLightingToggle.checked = renderer.specularLighting;
+
+    CheckBox@ frameLimiterToggle = editorSettingsDialog.GetChild("FrameLimiterToggle", true);
+    frameLimiterToggle.checked = engine.maxFps > 0;
+
     if (!subscribedToCameraEdits)
     {
         SubscribeToEvent(nearClipEdit, "TextChanged", "EditCameraNearClip");
@@ -125,6 +149,14 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(rotateSnapToggle, "Toggled", "EditRotateSnap");
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
         SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
+        SubscribeToEvent(pickComponentsToggle, "Toggled", "EditPickComponents");
+        SubscribeToEvent(pickUsingPhysicsToggle, "Toggled", "EditPickUsingPhysics");
+        SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
+        SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
+        SubscribeToEvent(shadowQualityEdit, "ItemSelected", "EditShadowQuality");
+        SubscribeToEvent(shadowMapHiresDepthToggle, "Toggled", "EditShadowMapHiresDepth");
+        SubscribeToEvent(specularLightingToggle, "Toggled", "EditSpecularLighting");
+        SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(editorSettingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         subscribedToCameraEdits = true;
     }
@@ -228,6 +260,54 @@ void EditUseLocalIDs(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     useLocalIDs = edit.checked;
+}
+
+void EditPickComponents(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    pickComponents = edit.checked;
+}
+
+void EditPickUsingPhysics(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    pickUsingPhysics = edit.checked;
+}
+
+void EditTextureQuality(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetUIElement();
+    renderer.textureQuality = edit.selection;
+}
+
+void EditMaterialQuality(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetUIElement();
+    renderer.materialQuality = edit.selection;
+}
+
+void EditShadowQuality(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetUIElement();
+    SetShadowQuality(edit.selection);
+}
+
+void EditShadowMapHiresDepth(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    renderer.shadowMapHiresDepth = edit.checked;
+}
+
+void EditSpecularLighting(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    renderer.specularLighting = edit.checked;
+}
+
+void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    engine.maxFps = edit.checked ? 200 : 0;
 }
 
 void CreateStatsBar()
@@ -384,7 +464,7 @@ void MoveCamera(float timeStep)
         }
 
         if (changed)
-            UpdateAttributes();
+            UpdateAttributes(false);
     }
 }
 
@@ -494,10 +574,41 @@ void SteppedObjectManipulation(int key)
         break;
     }
 
-    UpdateAttributes();
+    UpdateAttributes(false);
 }
 
 Vector3 GetNewNodePosition()
 {
     return cameraNode.position + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
+}
+
+int GetShadowQuality()
+{
+    if (!renderer.drawShadows)
+        return 0;
+    int level = 1;
+    int res = renderer.shadowMapSize;
+    while (res > 512)
+    {
+        res >>= 1;
+        ++level;
+    }
+    if (level > 3)
+        level = 3;
+    
+    return level;
+}
+
+void SetShadowQuality(int level)
+{
+    if (level <= 0)
+    {
+        renderer.drawShadows = false;
+        return;
+    }
+    else
+    {
+        renderer.drawShadows = true;
+        renderer.shadowMapSize = 256 << level;
+    }
 }

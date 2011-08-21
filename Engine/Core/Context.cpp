@@ -111,11 +111,15 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 {
     const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
     if (baseAttributes)
-        attributes_[derivedType] = *baseAttributes;
-    
-    const Vector<AttributeInfo>* baseNetworkAttributes = GetNetworkAttributes(baseType);
-    if (baseNetworkAttributes)
-        networkAttributes_[derivedType] = *baseNetworkAttributes;
+    {
+        for (unsigned i = 0; i < baseAttributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = baseAttributes->At(i);
+            attributes_[derivedType].Push(attr);
+            if (attr.mode_ & AM_NET)
+                networkAttributes_[derivedType].Push(attr);
+        }
+    }
 }
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)

@@ -45,12 +45,12 @@ static void ConstructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
     ptr->position_ = Vector3::ZERO;
     ptr->normal_ = Vector3::ZERO;
     ptr->distance_ = 0.0f;
-    ptr->node_ = 0;
+    ptr->collisionShape_ = 0;
 }
 
-static Node* PhysicsRaycastResultGetNode(PhysicsRaycastResult* ptr)
+static CollisionShape* PhysicsRaycastResultGetCollisionShape(PhysicsRaycastResult* ptr)
 {
-    return ptr->node_;
+    return ptr->collisionShape_;
 }
 
 static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
@@ -58,52 +58,6 @@ static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsi
     static PODVector<PhysicsRaycastResult> result;
     ptr->Raycast(result, ray, maxDistance, collisionMask);
     return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
-}
-
-static void RegisterPhysicsWorld(asIScriptEngine* engine)
-{
-    engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_POD);
-    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPhysicsRaycastResult), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, position_));
-    engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, normal_));
-    engine->RegisterObjectProperty("PhysicsRaycastResult", "float distance", offsetof(PhysicsRaycastResult, distance_));
-    engine->RegisterObjectMethod("PhysicsRaycastResult", "Node@+ get_node() const", asFUNCTION(PhysicsRaycastResultGetNode), asCALL_CDECL_OBJLAST);
-    
-    RegisterComponent<PhysicsWorld>(engine, "PhysicsWorld");
-    engine->RegisterObjectMethod("PhysicsWorld", "void Update(float)", asMETHOD(PhysicsWorld, Update), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float, uint)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_maxContacts(uint)", asMETHOD(PhysicsWorld, SetMaxContacts), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "uint get_maxContacts() const", asMETHOD(PhysicsWorld, GetMaxContacts), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearRestThreshold(float)", asMETHOD(PhysicsWorld, SetLinearRestThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearRestThreshold() const", asMETHOD(PhysicsWorld, GetLinearRestThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularRestThreshold(float)", asMETHOD(PhysicsWorld, SetAngularRestThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularRestThreshold() const", asMETHOD(PhysicsWorld, GetAngularRestThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_bounceThreshold(float)", asMETHOD(PhysicsWorld, SetBounceThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_bounceThreshold() const", asMETHOD(PhysicsWorld, GetBounceThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_erp(float)", asMETHOD(PhysicsWorld, SetERP), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_erp() const", asMETHOD(PhysicsWorld, GetERP), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_cfm(float)", asMETHOD(PhysicsWorld, SetCFM), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_cfm() const", asMETHOD(PhysicsWorld, GetCFM), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_contactSurfaceLayer(float)", asMETHOD(PhysicsWorld, SetContactSurfaceLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_contactSurfaceLayer() const", asMETHOD(PhysicsWorld, GetContactSurfaceLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearDampingThreshold(float)", asMETHOD(PhysicsWorld, SetLinearDampingThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearDampingThreshold() const", asMETHOD(PhysicsWorld, GetLinearDampingThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearDampingScale(float)", asMETHOD(PhysicsWorld, SetLinearDampingScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearDampingScale() const", asMETHOD(PhysicsWorld, GetLinearDampingScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularDampingThreshold(float)", asMETHOD(PhysicsWorld, SetAngularDampingThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularDampingThreshold() const", asMETHOD(PhysicsWorld, GetAngularDampingThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularDampingScale(float)", asMETHOD(PhysicsWorld, SetAngularDampingScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularDampingScale() const", asMETHOD(PhysicsWorld, GetAngularDampingScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
-    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
-    
-    // Register Variant GetPtr() for PhysicsWorld
-    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterCollisionShape(asIScriptEngine* engine)
@@ -207,10 +161,56 @@ static void RegisterJoint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Joint", "JointType get_jointType() const", asMETHOD(Joint, GetJointType), asCALL_THISCALL);
 }
 
+static void RegisterPhysicsWorld(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_POD);
+    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPhysicsRaycastResult), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, position_));
+    engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, normal_));
+    engine->RegisterObjectProperty("PhysicsRaycastResult", "float distance", offsetof(PhysicsRaycastResult, distance_));
+    engine->RegisterObjectMethod("PhysicsRaycastResult", "CollisionShape@+ get_collisionShape() const", asFUNCTION(PhysicsRaycastResultGetCollisionShape), asCALL_CDECL_OBJLAST);
+    
+    RegisterComponent<PhysicsWorld>(engine, "PhysicsWorld");
+    engine->RegisterObjectMethod("PhysicsWorld", "void Update(float)", asMETHOD(PhysicsWorld, Update), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffffffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_maxContacts(uint)", asMETHOD(PhysicsWorld, SetMaxContacts), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "uint get_maxContacts() const", asMETHOD(PhysicsWorld, GetMaxContacts), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearRestThreshold(float)", asMETHOD(PhysicsWorld, SetLinearRestThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearRestThreshold() const", asMETHOD(PhysicsWorld, GetLinearRestThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularRestThreshold(float)", asMETHOD(PhysicsWorld, SetAngularRestThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularRestThreshold() const", asMETHOD(PhysicsWorld, GetAngularRestThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_bounceThreshold(float)", asMETHOD(PhysicsWorld, SetBounceThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_bounceThreshold() const", asMETHOD(PhysicsWorld, GetBounceThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_erp(float)", asMETHOD(PhysicsWorld, SetERP), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_erp() const", asMETHOD(PhysicsWorld, GetERP), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_cfm(float)", asMETHOD(PhysicsWorld, SetCFM), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_cfm() const", asMETHOD(PhysicsWorld, GetCFM), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_contactSurfaceLayer(float)", asMETHOD(PhysicsWorld, SetContactSurfaceLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_contactSurfaceLayer() const", asMETHOD(PhysicsWorld, GetContactSurfaceLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearDampingThreshold(float)", asMETHOD(PhysicsWorld, SetLinearDampingThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearDampingThreshold() const", asMETHOD(PhysicsWorld, GetLinearDampingThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_linearDampingScale(float)", asMETHOD(PhysicsWorld, SetLinearDampingScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_linearDampingScale() const", asMETHOD(PhysicsWorld, GetLinearDampingScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularDampingThreshold(float)", asMETHOD(PhysicsWorld, SetAngularDampingThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularDampingThreshold() const", asMETHOD(PhysicsWorld, GetAngularDampingThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_angularDampingScale(float)", asMETHOD(PhysicsWorld, SetAngularDampingScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "float get_angularDampingScale() const", asMETHOD(PhysicsWorld, GetAngularDampingScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
+    engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
+    
+    // Register Variant GetPtr() for PhysicsWorld
+    engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
+}
+
 void RegisterPhysicsAPI(asIScriptEngine* engine)
 {
-    RegisterPhysicsWorld(engine);
     RegisterCollisionShape(engine);
     RegisterRigidBody(engine);
     RegisterJoint(engine);
+    RegisterPhysicsWorld(engine);
 }

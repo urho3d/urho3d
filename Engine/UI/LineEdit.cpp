@@ -53,8 +53,9 @@ LineEdit::LineEdit(Context* context) :
     
     text_ = new Text(context_);
     cursor_ = new BorderImage(context_);
+    cursor_->SetPriority(1); // Show over text
     AddChild(text_);
-    text_->AddChild(cursor_);
+    AddChild(cursor_);
 }
 
 LineEdit::~LineEdit()
@@ -524,9 +525,9 @@ void LineEdit::UpdateCursor()
     if (charPositions.Size())
         x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
     
-    cursor_->SetPosition(x, 0);
-    cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
     text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
+    cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
+    cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
     
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
