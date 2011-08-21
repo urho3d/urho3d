@@ -117,12 +117,18 @@ void UpdateEditorSettingsDialog()
 
     DropDownList@ shadowQualityEdit = editorSettingsDialog.GetChild("ShadowQualityEdit", true);
     shadowQualityEdit.selection = GetShadowQuality();
-    
-    CheckBox@ shadowMapHiresDepthToggle = editorSettingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
-    shadowMapHiresDepthToggle.checked = renderer.shadowMapHiresDepth;
+
+    LineEdit@ maxOccluderTrianglesEdit = editorSettingsDialog.GetChild("MaxOccluderTrianglesEdit", true);
+    maxOccluderTrianglesEdit.text = String(renderer.maxOccluderTriangles);
 
     CheckBox@ specularLightingToggle = editorSettingsDialog.GetChild("SpecularLightingToggle", true);
     specularLightingToggle.checked = renderer.specularLighting;
+
+    CheckBox@ dynamicInstancingToggle = editorSettingsDialog.GetChild("DynamicInstancingToggle", true);
+    dynamicInstancingToggle.checked = renderer.dynamicInstancing;
+
+    CheckBox@ shadowMapHiresDepthToggle = editorSettingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
+    shadowMapHiresDepthToggle.checked = renderer.shadowMapHiresDepth;
 
     CheckBox@ frameLimiterToggle = editorSettingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
@@ -154,8 +160,11 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
         SubscribeToEvent(shadowQualityEdit, "ItemSelected", "EditShadowQuality");
-        SubscribeToEvent(shadowMapHiresDepthToggle, "Toggled", "EditShadowMapHiresDepth");
+        SubscribeToEvent(maxOccluderTrianglesEdit, "TextChanged", "EditMaxOccluderTriangles");
+        SubscribeToEvent(maxOccluderTrianglesEdit, "TextFinished", "EditMaxOccluderTriangles");
         SubscribeToEvent(specularLightingToggle, "Toggled", "EditSpecularLighting");
+        SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
+        SubscribeToEvent(shadowMapHiresDepthToggle, "Toggled", "EditShadowMapHiresDepth");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(editorSettingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         subscribedToCameraEdits = true;
@@ -292,16 +301,30 @@ void EditShadowQuality(StringHash eventType, VariantMap& eventData)
     SetShadowQuality(edit.selection);
 }
 
-void EditShadowMapHiresDepth(StringHash eventType, VariantMap& eventData)
+void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    renderer.shadowMapHiresDepth = edit.checked;
+    LineEdit@ edit = eventData["Element"].GetUIElement();
+    renderer.maxOccluderTriangles = edit.text.ToInt();
+    if (eventType == StringHash("TextFinished"))
+        edit.text = String(renderer.maxOccluderTriangles);
 }
 
 void EditSpecularLighting(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     renderer.specularLighting = edit.checked;
+}
+
+void EditShadowMapHiresDepth(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    renderer.shadowMapHiresDepth = edit.checked;
+}
+
+void EditDynamicInstancing(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    renderer.dynamicInstancing = edit.checked;
 }
 
 void EditFrameLimiter(StringHash eventType, VariantMap& eventData)

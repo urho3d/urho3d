@@ -69,12 +69,9 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    ATTRIBUTE(Drawable, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
-    ATTRIBUTE(Drawable, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
-    ATTRIBUTE(Drawable, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Drawable, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
 
 void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)

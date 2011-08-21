@@ -45,7 +45,7 @@ class SnowBall : GameObject
     
         // Create collision shape. Create as local to avoid divergent simulation by the client
         CollisionShape@ shape = node.CreateComponent("CollisionShape", LOCAL);
-        shape.SetBox(Vector3(15, 15, 15), Vector3(), Quaternion());
+        shape.SetBox(Vector3(15, 15, 15));
         shape.collisionGroup = 1;
         shape.collisionMask = 3;
         shape.friction = snowballFriction;

@@ -55,14 +55,17 @@ StaticModel::~StaticModel()
 void StaticModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticModel>();
-    context->CopyBaseAttributes<Drawable, StaticModel>();
     
+    ATTRIBUTE(StaticModel, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(StaticModel, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(StaticModel, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE(StaticModel, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
-    ATTRIBUTE(StaticModel, VAR_INT, "Raycast LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(StaticModel, Drawable);
+    ATTRIBUTE(StaticModel, VAR_INT, "Ray/Occl. LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)

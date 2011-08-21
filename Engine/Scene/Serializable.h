@@ -169,6 +169,8 @@ public:
     SetFunctionPtr setFunction_;
 };
 
+#define COPY_BASE_ATTRIBUTES(className, sourceClassName) context->CopyBaseAttributes<sourceClassName, className>()
+#define REMOVE_ATTRIBUTE(className, name) context->RemoveAttribute<className>(name)
 #define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
 #define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(VAR_INT, name, offsetof(className, variable), enumNames, defaultValue, mode))
 #define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))

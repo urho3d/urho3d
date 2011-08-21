@@ -301,9 +301,9 @@ CollisionShape::CollisionShape(Context* context) :
     Component(context),
     geometry_(0),
     shapeType_(SHAPE_NONE),
-    size_(Vector3::ZERO),
+    size_(Vector3::UNITY),
     thickness_(0.0f),
-    lodLevel_(M_MAX_UNSIGNED),
+    lodLevel_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     geometryScale_(Vector3::UNITY),
@@ -324,13 +324,13 @@ void CollisionShape::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape>();
     
+    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::UNITY, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ZERO, AM_DEFAULT);
-    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
@@ -344,8 +344,12 @@ void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     // Change of some attributes requires the geometry to be recreated
     switch (attr.offset_)
     {
-    case offsetof(CollisionShape, shapeType_):
     case offsetof(CollisionShape, size_):
+        size_ = size_.Abs(); // Negative size is not allowed
+        recreateGeometry_ = true;
+        break;
+        
+    case offsetof(CollisionShape, shapeType_):
     case offsetof(CollisionShape, thickness_):
     case offsetof(CollisionShape, lodLevel_):
         recreateGeometry_ = true;
@@ -417,7 +421,7 @@ void CollisionShape::SetCylinder(float radius, float height, const Vector3& posi
     CreateGeometry();
 }
 
-void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
 {
     PROFILE(SetTriangleMeshShape);
     
@@ -432,14 +436,14 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     model_ = model;
     shapeType_ = SHAPE_TRIANGLEMESH;
     lodLevel_ = lodLevel;
-    size_ = model->GetBoundingBox().Size();
+    size_ = size.Abs();
     position_ = position;
     rotation_ = rotation;
     
     CreateGeometry();
 }
 
-void CollisionShape::SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
 {
     PROFILE(SetHeightFieldShape);
     
@@ -456,14 +460,14 @@ void CollisionShape::SetHeightfield(Model* model, unsigned xPoints, unsigned zPo
     numPoints_ = IntVector2(xPoints, zPoints);
     thickness_ = thickness;
     lodLevel_ = lodLevel;
+    size_ = size.Abs();
     position_ = position;
     rotation_ = rotation;
-    size_ = model->GetBoundingBox().Size();
     
     CreateGeometry();
 }
 
-void CollisionShape::SetConvexHull(Model* model, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetConvexHull(Model* model, float thickness, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
 {
     PROFILE(SetConvexHullShape);
     
@@ -479,7 +483,7 @@ void CollisionShape::SetConvexHull(Model* model, float thickness, unsigned lodLe
     shapeType_ = SHAPE_CONVEXHULL;
     thickness_ = thickness;
     lodLevel_ = lodLevel;
-    size_ = model->GetBoundingBox().Size();
+    size_ = size.Abs();
     position_ = position;
     rotation_ = rotation;
     
@@ -783,7 +787,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void CollisionShape::OnMarkedDirty(Node* node)
 {
     // If scale has changed, must recreate the geometry
-    if (node->GetScale() != geometryScale_)
+    if (node->GetWorldScale() != geometryScale_)
         CreateGeometry();
     else
         UpdateTransform();
@@ -855,7 +859,7 @@ void CollisionShape::CreateGeometry()
     case SHAPE_CONVEXHULL:
         {
             // Check the geometry cache
-            String id = model_->GetName() + "_" + String(geometryScale_) + "_" + String(lodLevel_);
+            String id = model_->GetName() + "_" + String(size) + "_" + String(lodLevel_);
             if (shapeType_ == SHAPE_CONVEXHULL)
                 id += "_" + String(thickness_);
             
@@ -869,7 +873,7 @@ void CollisionShape::CreateGeometry()
             else
             {
                 SharedPtr<TriangleMeshData> newData(new TriangleMeshData(model_, shapeType_ == SHAPE_CONVEXHULL, thickness_,
-                    lodLevel_, geometryScale_));
+                    lodLevel_, size));
                 cache[id] = newData;
                 geometry_ = dCreateTriMesh(space, newData->triMesh_, 0, 0, 0);
                 geometryData_ = StaticCast<CollisionGeometryData>(newData);
@@ -880,7 +884,8 @@ void CollisionShape::CreateGeometry()
     case SHAPE_HEIGHTFIELD:
         {
             // Check the geometry cache
-            String id = model_->GetName() + "_" + String(numPoints_) + "_" + String(thickness_) + "_" + String(lodLevel_);
+            String id = model_->GetName() + "_" + String(size) + "_" + String(numPoints_) + "_" + String(thickness_) + "_" +
+                String(lodLevel_);
             
             Map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
             Map<String, SharedPtr<HeightfieldData> >::Iterator j = cache.Find(id);
@@ -891,7 +896,7 @@ void CollisionShape::CreateGeometry()
             }
             else
             {
-                SharedPtr<HeightfieldData> newData(new HeightfieldData(model_, numPoints_, thickness_, lodLevel_, geometryScale_));
+                SharedPtr<HeightfieldData> newData(new HeightfieldData(model_, numPoints_, thickness_, lodLevel_, size));
                 cache[id] = newData;
                 geometry_ = dCreateHeightfield(space, newData->heightfield_, 1);
                 geometryData_ = StaticCast<CollisionGeometryData>(newData);

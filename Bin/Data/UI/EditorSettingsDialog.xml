@@ -221,13 +221,13 @@
     </element>
     <element>
         <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="ShadowMapHiresDepthToggle">
-            <fixedsize value="16 16" />
-        </element>
+        <layout mode="horizontal" spacing="20" />
         <element type="Text">
-            <text value="Shadow map 24-bit depth" />
+            <text value="Max occluder triangles" />
         </element>
+        <element type="LineEdit" name="MaxOccluderTrianglesEdit">
+            <fixedwidth value="80" />
+         </element>
     </element>
     <element>
         <fixedheight value="17" />
@@ -237,6 +237,26 @@
         </element>
         <element type="Text">
             <text value="Specular lighting" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="DynamicInstancingToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Dynamic instancing" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="ShadowMapHiresDepthToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Shadow map 24-bit depth" />
         </element>
     </element>
     <element>

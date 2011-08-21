@@ -148,7 +148,7 @@ void InitScene()
     zone.fogStart = 5000;
     zone.fogEnd = 15000;
 
-    Node@ lightNode = gameScene.CreateChild("Sunlight");
+    Node@ lightNode = gameScene.CreateChild("GlobalLight");
     lightNode.rotation = Quaternion(0.888074, 0.325058, -0.325058, 0);
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
@@ -163,7 +163,7 @@ void InitScene()
     staticModel.model = cache.GetResource("Model", "Models/Level.mdl");
     staticModel.material = cache.GetResource("Material", "Materials/Snow.xml");
     CollisionShape@ shape = staticNode.CreateComponent("CollisionShape");
-    shape.SetTriangleMesh(cache.GetResource("Model", "Models/Level.mdl"), 0, Vector3(), Quaternion());
+    shape.SetTriangleMesh(cache.GetResource("Model", "Models/Level.mdl"), 0);
     shape.collisionGroup = 2;
     shape.collisionMask = 3;
 

@@ -50,8 +50,8 @@ SoundSource3D::SoundSource3D(Context* context) :
 void SoundSource3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource3D>();
-    context->CopyBaseAttributes<SoundSource, SoundSource3D>();
     
+    COPY_BASE_ATTRIBUTES(SoundSource3D, SoundSource);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Near Distance", nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Far Distance", farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Rolloff Factor", rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);

@@ -134,13 +134,11 @@ void PhysicsWorld::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld>();
     
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Contacts", maxContacts_, DEFAULT_MAX_CONTACTS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Bounce Threshold", bounceThreshold_, DEFAULT_BOUNCE_THRESHOLD, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Network Max Ang Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, Vector3::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Damp Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Lin Damp Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
@@ -150,6 +148,8 @@ void PhysicsWorld::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "ERP Parameter", GetERP, SetERP, float, 0.2f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "CFM Parameter", GetCFM, SetCFM, float, 0.00001f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Contact Surface Layer", GetContactSurfaceLayer, SetContactSurfaceLayer, float, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0, AM_FILE | AM_NOEDIT);
 }
 
 void PhysicsWorld::Update(float timeStep)

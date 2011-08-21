@@ -99,7 +99,10 @@ void LoadConfig()
         renderer.textureQuality = renderingElem.GetInt("texturequality");
         renderer.materialQuality = renderingElem.GetInt("materialquality");
         SetShadowQuality(renderingElem.GetInt("shadowquality"));
+        renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
         renderer.specularLighting = renderingElem.GetBool("specularlighting");
+        renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
+        renderer.shadowMapHiresDepth = renderingElem.GetBool("shadowmaphiresdepth");
         engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
     }
 }
@@ -134,7 +137,10 @@ void SaveConfig()
     renderingElem.SetInt("texturequality", renderer.textureQuality);
     renderingElem.SetInt("materialquality", renderer.materialQuality);
     renderingElem.SetInt("shadowquality", GetShadowQuality());
+    renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
     renderingElem.SetBool("specularlighting", renderer.specularLighting);
+    renderingElem.SetBool("dynamicinstancing", renderer.dynamicInstancing);
+    renderingElem.SetBool("shadowmaphiresdepth", renderer.shadowMapHiresDepth);
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 
     config.Save(File(configFileName, FILE_WRITE));

@@ -38,7 +38,7 @@ class SnowCrate : GameObject
 
         // Create collision shape
         CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(80, 80, 80), Vector3(), Quaternion());
+        shape.SetBox(Vector3(80, 80, 80));
         shape.collisionGroup = 2;
         shape.collisionMask = 3;
         shape.friction = snowcrateFriction;

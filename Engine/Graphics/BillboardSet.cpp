@@ -73,17 +73,20 @@ BillboardSet::~BillboardSet()
 void BillboardSet::RegisterObject(Context* context)
 {
     context->RegisterFactory<BillboardSet>();
-    context->CopyBaseAttributes<Drawable, BillboardSet>();
     
+    ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
+    ATTRIBUTE(BillboardSet, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE);
-    ATTRIBUTE(BillboardSet, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(BillboardSet, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE(BillboardSet, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(BillboardSet, Drawable);
     REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 

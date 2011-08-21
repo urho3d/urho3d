@@ -220,14 +220,14 @@ void Node::SetDirection(const Vector3& direction)
 
 void Node::SetScale(float scale)
 {
-    scale_ = Vector3(scale, scale, scale);
+    scale_ = Vector3(scale, scale, scale).Abs();
     if (!dirty_)
         MarkDirty();
 }
 
 void Node::SetScale(const Vector3& scale)
 {
-    scale_ = scale;
+    scale_ = scale.Abs();
     if (!dirty_)
         MarkDirty();
 }

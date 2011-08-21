@@ -102,7 +102,8 @@ void InitScene()
     world.angularRestThreshold = 0.1;
     world.contactSurfaceLayer = 0.001;
 
-    Zone@ zone = testScene.CreateComponent("Zone");
+    Node@ zoneNode = testScene.CreateChild("Zone");
+    Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.ambientColor = Color(0.1, 0.1, 0.1);
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 100.0;
@@ -110,7 +111,7 @@ void InitScene()
     zone.boundingBox = BoundingBox(-1000.0, 1000.0);
 
     {
-        Node@ lightNode = testScene.CreateChild("Light");
+        Node@ lightNode = testScene.CreateChild("GlobalLight");
         lightNode.direction = Vector3(0.5, -0.5, 0.5);
 
         Light@ light = lightNode.CreateComponent("Light");
@@ -132,7 +133,7 @@ void InitScene()
         object.occluder = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0), Vector3(), Quaternion());
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }
@@ -148,7 +149,7 @@ void InitScene()
         object.castShadows = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0), Vector3(), Quaternion());
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }
@@ -166,7 +167,7 @@ void InitScene()
         object.occluder = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0), Vector3(), Quaternion());
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }
@@ -184,7 +185,7 @@ void InitScene()
         object.castShadows = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0, Vector3(), Quaternion());
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }
@@ -411,7 +412,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     newNode.SetScale(0.1);
 
     CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-    shape.SetBox(Vector3(2, 2, 2), Vector3(), Quaternion());
+    shape.SetBox(Vector3(2, 2, 2));
     shape.friction = 1.0;
     shape.collisionGroup = 1;
     shape.collisionMask = 3;

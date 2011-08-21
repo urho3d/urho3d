@@ -41,7 +41,8 @@ Skybox::~Skybox()
 void Skybox::RegisterObject(Context* context)
 {
     context->RegisterFactory<Skybox>();
-    context->CopyBaseAttributes<StaticModel, Skybox>();
+    
+    COPY_BASE_ATTRIBUTES(Skybox, StaticModel);
 }
 
 void Skybox::UpdateDistance(const FrameInfo& frame)

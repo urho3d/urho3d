@@ -39,7 +39,7 @@ class Potion : GameObject
 
         // Create collision shape
         CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(20, 40, 20), Vector3(), Quaternion());
+        shape.SetBox(Vector3(20, 40, 20));
         shape.collisionGroup = 1;
         shape.collisionMask = 3;
         shape.friction = potionFriction;

@@ -755,6 +755,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         ref.type = ShortStringHash(resourcePicker.resourceType);
         ref.id = StringHash(resourceName);
         target.attributes[resourcePickIndex] = Variant(ref);
+        target.FinishUpdate();
     }
     else if (info.type == VAR_RESOURCEREFLIST)
     {
@@ -763,6 +764,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             refList.ids[resourcePickSubIndex] = StringHash(resourceName);
             target.attributes[resourcePickIndex] = Variant(refList);
+            target.FinishUpdate();
         }
     }
 
