@@ -35,7 +35,7 @@ Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-Currently, three example application scripts exist:
+Currently, four example application scripts exist:
 
 \section Running_TestScene TestScene
 
@@ -83,6 +83,12 @@ On the client, first type the server address to the text edit box and click "Con
 either press return or click "Send" to send them. Press ESC to exit.
 
 To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
+
+\section Running_Editor Editor
+
+%Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
+
+For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
 
 \section Running_Commandline Command line options
 
@@ -481,4 +487,75 @@ void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
 \endcode
 
 Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than Urho3D.exe, due to leaving out the scripting functionality.
+
+
+\page EditorInstructions Editor instructions
+
+The Urho3D scene editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D.exe Scripts/Editor.as
+
+\section EditorInstructions_Controls Controls
+
+\verbatim
+Left mouse      - Select objects
+Right mouse     - Hold down and move mouse to rotate camera
+
+WSAD or arrows  - Move
+Shift+WSAD      - Move faster
+Ctrl+1,2,3      - Select manipulation mode: move/rotate/scale
+Ctrl+arrows     - Manipulate node in X & Z directions
+Ctrl+pgup/pgdn  - Manipulate node in Y direction
+Ctrl+plus/minus - Scale node uniformly (scale mode only)
+Ctrl+O          - Open scene
+Ctrl+S          - Save scene
+Ctrl+Shift+S    - Save scene as
+Ctrl+X,C,V      - Cut/copy/paste node or component
+Ctrl+H	        - Open the scene hierarchy window
+Ctrl+N	        - Open the node / component edit window
+Ctrl+P          - Toggle scene update on/off
+Ctrl+R          - Reload scene resources
+ESC             - Close the topmost window
+DEL             - Delete node or component
+F1              - Toggle console
+F2              - Toggle rendering debug geometry
+F3              - Toggle physics debug geometry
+F4              - Toggle octree debug geometry
+\endverbatim
+
+Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
+
+\section EditorInstructions_Workflow Workflow
+
+When you start with an empty scene, set the resource path first (%File -> %Set resource path). This is the base directory, under which the subdirectories Models, Materials & Textures will be created as you import assets.
+
+Scenes should be saved either into this base directory, or into its immediate subdirectory, named for example Scenes or Levels. When loading a scene, the resource path will be set automatically.
+
+Check the Editor settings window so that the camera parameters match the size of the objects you are using.
+
+The editor settings will be saved on exit to a file Urho3D\Editor\Config.xml in the My Documents directory. Delete this file if you want to revert the settings to defaults.
+
+\section EditorInstructions_Editing Editing
+
+New scene nodes and components are created with the buttons at the bottom of the hierarchy window. Their attributes can then be edited in the node / component edit window. Note that the node transform shown is the local transform (offset from parent.)
+
+%Scene nodes can also be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2 or 3 to change the manipulation mode.
+
+To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
+
+Currently, when you edit for example a material or texture, you need to manually reload scene resources (Ctrl+R) to make the changes visible.
+
+To create a user variable into the current node, or delete it, type its name into the edit field below the node attributes, and press New or Del buttons. The New button will prompt to choose the variable type.
+
+While editing, you can execute script files using the "Run script" item in the %File menu. These are AngelScript files that are executed in immediate mode ie. you do not need to define a function. The editor's scene will be accessible to the script as the global property "scene."
+
+\section EditorInstructions_Importing Importing
+
+The editor can import models or scenes from all the formats that the Open Asset Import Library supports, see http://assimp.sourceforge.net/main_features_formats.html
+
+%Model and scene import work differently: model import will take everything in the source file (for example a Collada scene), and combine it into a single model, with possibly many subgeometries. %Scene import on the other hand will export each source scene node separately, creating multiple models as necessary.
+
+When a model is imported, it will also be instantiated into the scene as a new scene node with a StaticModel component.
+
+To do the actual importing, the editor will invoke AssetImporter.exe from the same directory as where Urho3D.exe resides, so be sure both are built.
+
+Importing lights is not properly supported yet. Instead, when a scene is imported, a zone for ambient lighting and a single directional light are created, so that you can at least see something.
 */
