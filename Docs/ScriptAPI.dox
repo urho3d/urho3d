@@ -524,10 +524,13 @@ VariantMap
 Methods:<br>
 - bool Contains(const String&) const
 - void Erase(const String&)
+- bool Contains(ShortStringHash) const
+- void Erase(ShortStringHash)
 - void Clear()
 
 Properties:<br>
 - uint length (readonly)
+- ShortStringHash[]@ keys (readonly)
 
 
 AttributeInfo

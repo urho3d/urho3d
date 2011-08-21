@@ -3,6 +3,7 @@
 Window@ nodeWindow;
 
 const uint MAX_ATTRNAME_LENGTH = 28;
+const uint MAX_NODE_ATTRIBUTES = 8;
 
 class ResourcePicker
 {
@@ -62,6 +63,8 @@ void CreateNodeWindow()
     UpdateNodeWindow();
 
     SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
+    SubscribeToEvent(nodeWindow.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
+    SubscribeToEvent(nodeWindow.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
 }
 
 void HideNodeWindow()
@@ -113,13 +116,13 @@ void UpdateAttributes(bool fullUpdate)
 void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdate)
 {
     // If attributes have changed structurally, do a full update
+    uint count = GetAttributeEditorCount(serializable);
     if (fullUpdate == false)
     {
-        uint count = GetAttributeEditorCount(serializable);
         if (list.contentElement.numChildren != count)
             fullUpdate = true;
     }
-    
+
     if (fullUpdate)
         list.RemoveAllItems();
 
@@ -136,6 +139,15 @@ void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdat
             CreateAttributeEditor(list, serializable, i);
 
         LoadAttributeEditor(list, serializable, i);
+    }
+    
+    // Resize the node editor according to the number of variables, up to a certain maximum
+    if (fullUpdate && serializable.typeName != "Component")
+    {
+        uint maxAttrs = count;
+        if (maxAttrs > MAX_NODE_ATTRIBUTES)
+            maxAttrs = MAX_NODE_ATTRIBUTES;
+        list.SetFixedHeight(maxAttrs * 18 + 2);
     }
 }
 
@@ -177,11 +189,16 @@ uint GetAttributeEditorCount(Serializable@ serializable)
     {
         for (uint i = 0; i < serializable.numAttributes; ++i)
         {
+            AttributeInfo info = serializable.attributeInfos[i];
+            if (info.mode & AM_NOEDIT != 0)
+                continue;
             // Resource editors have the title + the editor row itself, so count 2
-            if (serializable.attributeInfos[i].type == VAR_RESOURCEREF)
+            if (info.type == VAR_RESOURCEREF)
                 count += 2;
-            else if (serializable.attributeInfos[i].type == VAR_RESOURCEREFLIST)
+            else if (info.type == VAR_RESOURCEREFLIST)
                 count += 2 * serializable.attributes[i].GetResourceRefList().length;
+            else if (info.type == VAR_VARIANTMAP)
+                count += serializable.attributes[i].GetVariantMap().length;
             else
                 ++count;
         }
@@ -421,6 +438,29 @@ void CreateAttributeEditor(ListView@ list, Serializable@ serializable, uint inde
             SubscribeToEvent(openButton, "Released", "OpenResource");
         }
     }
+    
+    if (info.type == VAR_VARIANTMAP)
+    {
+        VariantMap map = serializable.attributes[index].GetVariantMap();
+        Array<ShortStringHash>@ keys = map.keys;
+        for (uint i = 0; i < keys.length; ++i)
+        {
+            Variant value = map[keys[i]];
+
+            UIElement@ parent = CreateAttributeEditorBar(list, editorScene.GetVarName(keys[i]) + " (" + value.typeName + ")", index, i);
+
+            LineEdit@ attrEdit = LineEdit();
+            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+            attrEdit.SetFixedHeight(16);
+            attrEdit.vars["Index"] = index;
+            attrEdit.vars["SubIndex"] = i;
+            attrEdit.vars["Key"] = keys[i].value;
+            SetAttributeEditorID(attrEdit, serializable);
+            parent.AddChild(attrEdit);
+            SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+        }
+    }
 }
 
 void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
@@ -553,6 +593,24 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
             attrEdit.cursorPosition = 0;
         }
     }
+    if (info.type == VAR_VARIANTMAP)
+    {
+        VariantMap map = value.GetVariantMap();
+        Array<ShortStringHash>@ keys = map.keys;
+        for (uint i = 0; i < keys.length; ++i)
+        {
+            Variant value = map[keys[i]];
+            parent = GetAttributeEditorBar(list, index, i);
+            if (parent is null)
+                break;
+            Text@ name = parent.children[0];
+            LineEdit@ attrEdit = parent.children[1];
+            // In case we overwrite the variable with another of different type, update also the name + type
+            name.text = editorScene.GetVarName(keys[i]) + " (" + value.typeName + ")";
+            attrEdit.text = value.ToString();
+            attrEdit.cursorPosition = 0;
+        }
+    }
 
     inLoadAttributeEditor = false;
 }
@@ -653,8 +711,18 @@ void StoreAttributeEditorDirect(UIElement@ parent, Serializable@ serializable, u
         refList.ids[subIndex] = StringHash(attrEdit.text.Trimmed());
         serializable.attributes[index] = Variant(refList);
     }
+    if (info.type == VAR_VARIANTMAP)
+    {
+        LineEdit@ attrEdit = parent.children[1];
+        ShortStringHash key(attrEdit.vars["Key"].GetUInt());
+        VariantMap map = serializable.attributes[index].GetVariantMap();
+        String existingType = map[key].typeName;
+        Variant newValue;
+        newValue.FromString(existingType, attrEdit.text.Trimmed());
+        map[key] = newValue;
+        serializable.attributes[index] = Variant(map);
+    }
 }
-
 
 ResourcePicker@ GetResourcePicker(const String&in resourceType)
 {
@@ -803,4 +871,58 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
             return;
         }
     }
+}
+
+void CreateNewVariable(StringHash eventType, VariantMap& eventData)
+{
+    if (selectedNode is null)
+        return;
+
+    DropDownList@ dropDown = eventData["Element"].GetUIElement();
+    LineEdit@ nameEdit = nodeWindow.GetChild("VarNameEdit", true);
+    String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
+    if (sanitatedVarName.empty)
+        return;
+
+    editorScene.RegisterVar(sanitatedVarName);
+
+    Variant newValue;
+    switch (dropDown.selection)
+    {
+    case 0:
+        newValue = int(0);
+        break;
+    case 1:
+        newValue = false;
+        break;
+    case 2:
+        newValue = float(0.0);
+        break;
+    case 3:
+        newValue = String();
+        break;
+    case 4:
+        newValue = Vector3();
+        break;
+    case 5:
+        newValue = Color();
+        break;
+    }
+
+    selectedNode.vars[sanitatedVarName] = newValue;
+    UpdateAttributes(false);
+}
+
+void DeleteVariable(StringHash eventType, VariantMap& eventData)
+{
+    if (selectedNode is null)
+        return;
+
+    LineEdit@ nameEdit = nodeWindow.GetChild("VarNameEdit", true);
+    String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
+    if (sanitatedVarName.empty)
+        return;
+
+    selectedNode.vars.Erase(sanitatedVarName);
+    UpdateAttributes(false);
 }

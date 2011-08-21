@@ -19,10 +19,61 @@
     </element>
     <element type="ListView" name="NodeAttributeList">
         <highlight value="always" />
-        <fixedheight value="74" />  
+        <fixedheight value="74" />
         <horizontalscrollbar>
             <visible enable="false" />
         </horizontalscrollbar>
+    </element>
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="LineEdit" name="VarNameEdit">
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarInt">
+            <text value="Int" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarBool">
+            <text value="Bool" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarFloat">
+            <text value="Float" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarString">
+            <text value="String" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarVector3">
+            <text value="Vector3" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="VarColor">
+            <text value="Color" />
+        </element>
+        <element type="DropDownList" name="NewVarDropDown">
+            <fixedsize value="50 16" />
+            <layout mode="free" />
+            <placeholder>
+                <visible enable="false" />
+            </placeholder>
+            <element type="Text">
+                <text value="New" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+            <popup>
+                <layout border="4 4 4 4" />   
+            </popup>
+            <popupitem name="VarInt" />
+            <popupitem name="VarBool" />
+            <popupitem name="VarFloat" />
+            <popupitem name="VarString" />
+            <popupitem name="VarVector3" />
+            <popupitem name="VarColor" />
+        </element>
+        <element type="Button" name="DeleteVarButton">
+            <fixedsize value="50 16" />
+            <element type="Text">
+                <text value="Del" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />

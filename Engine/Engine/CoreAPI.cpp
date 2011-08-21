@@ -42,6 +42,11 @@ static void ConstructStringHashInit(const String& str, StringHash* ptr)
     new(ptr) StringHash(str);
 }
 
+static void ConstructStringHashInitUInt(unsigned value, StringHash* ptr)
+{
+    new(ptr) StringHash(value);
+}
+
 static int StringHashCmp(const StringHash& lhs, const StringHash& rhs)
 {
     int cmp = 0;
@@ -72,6 +77,11 @@ static void ConstructShortStringHashInit(const String& str, ShortStringHash* ptr
     new(ptr) ShortStringHash(str);
 }
 
+static void ConstructShortStringHashInitUInt(unsigned value, ShortStringHash* ptr)
+{
+    new(ptr) ShortStringHash(value);
+}
+
 static int ShortStringHashCmp(const ShortStringHash& lhs, const ShortStringHash& rhs)
 {
     int cmp = 0;
@@ -88,6 +98,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructStringHashInitUInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("StringHash", "StringHash& opAssign(const StringHash&in)", asMETHOD(StringHash, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "StringHash& opAddAssign(const StringHash&in)", asMETHOD(StringHash, operator +=), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
@@ -101,6 +112,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash&in)", asFUNCTION(ConstructShortStringHashCopyShort), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructShortStringHashCopyLong), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructShortStringHashInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructShortStringHashInitUInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ShortStringHash", "ShortStringHash& opAssign(const ShortStringHash&in)", asMETHODPR(ShortStringHash, operator =, (const ShortStringHash&), ShortStringHash&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "bool opEquals(const ShortStringHash&in) const", asMETHOD(ShortStringHash, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "int opCmp(const ShortStringHash&in) const", asFUNCTION(ShortStringHashCmp), asCALL_CDECL_OBJFIRST);
@@ -315,6 +327,11 @@ static Variant& VariantMapAt(const String& key, VariantMap& map)
     return map[ShortStringHash(key)];
 }
 
+static Variant& VariantMapAtHash(ShortStringHash key, VariantMap& map)
+{
+    return map[key];
+}
+
 static bool VariantMapContains(const String& key, VariantMap& map)
 {
     return map.Find(ShortStringHash(key)) != map.End();
@@ -323,6 +340,24 @@ static bool VariantMapContains(const String& key, VariantMap& map)
 static void VariantMapErase(const String& key, VariantMap& map)
 {
     map.Erase(ShortStringHash(key));
+}
+
+static bool VariantMapContainsHash(ShortStringHash key, VariantMap& map)
+{
+    return map.Find(key) != map.End();
+}
+
+static void VariantMapEraseHash(ShortStringHash key, VariantMap& map)
+{
+    map.Erase(key);
+}
+
+static CScriptArray* VariantMapGetKeys(const VariantMap& map)
+{
+    Vector<ShortStringHash> result;
+    for (VariantMap::ConstIterator i = map.Begin(); i != map.End(); ++i)
+        result.Push(i->first_);
+    return VectorToArray<ShortStringHash>(result, "Array<StringHash>");
 }
 
 static void RegisterVariant(asIScriptEngine* engine)
@@ -449,10 +484,15 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap&in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const String&in)", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const String&in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(ShortStringHash)", asFUNCTION(VariantMapAtHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(ShortStringHash) const", asFUNCTION(VariantMapAtHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "bool Contains(const String&in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void Erase(const String&in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Contains(ShortStringHash) const", asFUNCTION(VariantMapContainsHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "void Erase(ShortStringHash)", asFUNCTION(VariantMapEraseHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "Array<ShortStringHash>@ get_keys() const", asFUNCTION(VariantMapGetKeys), asCALL_CDECL_OBJLAST);
 }
 
 static CScriptArray* StringSplit(char separator, const String* str)
