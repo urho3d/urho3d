@@ -2165,8 +2165,13 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetDepthStencil(shadowMap);
     graphics_->Clear(CLEAR_DEPTH);
     
-    // Set shadow depth bias
+    // Set shadow depth bias. Adjust according to the global shadow map resolution
     BiasParameters parameters = queue.light_->GetShadowBias();
+    unsigned shadowMapSize = renderer_->GetShadowMapSize();
+    if (shadowMapSize <= 512)
+        parameters.constantBias_ *= 2.0f;
+    else if (shadowMapSize >= 2048)
+        parameters.constantBias_ *= 0.5f;
     graphics_->SetDepthBias(parameters.constantBias_, parameters.slopeScaledBias_);
     
     // Set a scissor rectangle to match possible shadow map size reduction by out-zooming

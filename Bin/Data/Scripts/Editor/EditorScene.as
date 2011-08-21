@@ -100,6 +100,20 @@ Array<Resource@> GetSceneResources()
                             AddResourceIfUnique(sceneResources, resource);
                     }
                 }
+                else if (attr.type == VAR_VARIANTVECTOR)
+                {
+                    Array<Variant>@ variants = attr.GetVariantVector();
+                    for (uint l = 0; l < variants.length; ++l)
+                    {
+                        if (variants[l].type == VAR_RESOURCEREF)
+                        {
+                            ResourceRef ref = variants[l].GetResourceRef();
+                            Resource@ resource = cache.GetResource(ref.type, ref.id);
+                            if (resource !is null)
+                                AddResourceIfUnique(sceneResources, resource);
+                        }
+                    }
+                }
             }
         }
     }
@@ -135,7 +149,6 @@ void ReloadResources()
         }
     }
 
-    Print("Reloading resources");
     for (uint i = 0; i < sceneResources.length; ++i)
         cache.ReloadResource(sceneResources[i]);
 }

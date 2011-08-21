@@ -117,7 +117,7 @@ void InitScene()
         light.lightType = LIGHT_DIRECTIONAL;
         light.castShadows = true;
         light.shadowBias = BiasParameters(0.0001, 0.5);
-        light.shadowCascade = CascadeParameters(3, 0.90, 0.2, 200.0);
+        light.shadowCascade = CascadeParameters(3, 0.90, 0.15, 200.0);
         light.specularIntensity = 0.5f;
     }
 

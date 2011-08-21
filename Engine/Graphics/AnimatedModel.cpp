@@ -545,6 +545,37 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     
     if (isMaster_)
     {
+        // Check if bone structure has stayed compatible (reloading the model.) In that case retain the old bones and animations
+        if (skeleton_.GetNumBones() == skeleton.GetNumBones())
+        {
+            Vector<Bone>& destBones = skeleton_.GetModifiableBones();
+            const Vector<Bone>& srcBones = skeleton.GetBones();
+            bool compatible = true;
+            
+            for (unsigned i = 0; i < destBones.Size(); ++i)
+            {
+                if (destBones[i].node_ && destBones[i].name_ == srcBones[i].name_ && destBones[i].parentIndex_ ==
+                    srcBones[i].parentIndex_)
+                {
+                    // If compatible, just copy the values and retain the old node and animated status
+                    Node* boneNode = destBones[i].node_;
+                    bool animated = destBones[i].animated_;
+                    destBones[i] = srcBones[i];
+                    destBones[i].node_ = boneNode;
+                    destBones[i].animated_ = animated;
+                }
+                else
+                {
+                    compatible = false;
+                    break;
+                }
+            }
+            if (compatible)
+                return;
+        }
+        
+        RemoveAllAnimationStates();
+        
         // Detach the rootbone of the previous model if any
         if (createBones)
         {
@@ -552,8 +583,6 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             if (rootBone)
                 node_->RemoveChild(rootBone->node_);
         }
-        
-        RemoveAllAnimationStates();
         
         skeleton_.Define(skeleton);
         

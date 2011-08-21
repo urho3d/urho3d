@@ -155,7 +155,7 @@ void InitScene()
     light.castShadows = true;
     light.shadowNearFarRatio = 0.002;
     light.shadowBias = BiasParameters(0.00025, 0.001);
-    light.shadowCascade = CascadeParameters(2, 0.5, 0.2, 5000);
+    light.shadowCascade = CascadeParameters(2, 0.5, 0.15, 5000);
     light.shadowFocus = FocusParameters(true, true, true, 50, 900);
 
     Node@ staticNode = gameScene.CreateChild("Static");
