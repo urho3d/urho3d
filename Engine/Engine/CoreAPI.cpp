@@ -610,6 +610,11 @@ static Object* GetEventSender()
     return GetScriptContext()->GetEventSender();
 }
 
+static const String& GetTypeName(ShortStringHash type)
+{
+    return GetScriptContext()->GetTypeName(type);
+}
+
 void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
@@ -634,6 +639,7 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
+    engine->RegisterGlobalFunction("const String& GetTypeName(ShortStringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
 }
 
 void RegisterCoreAPI(asIScriptEngine* engine)

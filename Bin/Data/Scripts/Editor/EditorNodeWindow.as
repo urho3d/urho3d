@@ -4,29 +4,35 @@ Window@ nodeWindow;
 
 const uint MAX_ATTRNAME_LENGTH = 28;
 
-class ResourceEditorData
+class ResourcePicker
 {
     String resourceType;
     String lastPath;
+    uint lastFilter;
     Array<String> filters;
 
-    ResourceEditorData(const String&in resourceType_, const String&in filter_)
+    ResourcePicker(const String&in resourceType_, const String&in filter_)
     {
         resourceType = resourceType_;
         filters.Push(filter_);
+        lastFilter = 0;
     }
 
-    ResourceEditorData(const String&in resourceType_, const Array<String>@ filters_)
+    ResourcePicker(const String&in resourceType_, const Array<String>@ filters_)
     {
         resourceType = resourceType_;
         filters = filters_;
+        lastFilter = 0;
     }
 }
 
-Array<ResourceEditorData@> resourceEditors;
+Array<ResourcePicker@> resourcePickers;
 
 bool inLoadAttributeEditor = false;
-uint resourcePickType = 0;
+uint resourcePickID = 0;
+uint resourcePickIndex = 0;
+uint resourcePickSubIndex = 0;
+ResourcePicker@ resourcePicker;
 String resourcePickEditorName;
 
 void CreateNodeWindow()
@@ -35,17 +41,17 @@ void CreateNodeWindow()
         return;
 
     // Fill resource editor data
-    resourceEditors.Push(ResourceEditorData("Model", "*.mdl"));
-    resourceEditors.Push(ResourceEditorData("Material", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
+    resourcePickers.Push(ResourcePicker("Material", "*.xml"));
     Array<String> textureFilters;
     textureFilters.Push("*.dds");
     textureFilters.Push("*.jpg");
     textureFilters.Push("*.png");
-    resourceEditors.Push(ResourceEditorData("Texture2D", textureFilters));
-    resourceEditors.Push(ResourceEditorData("TextureCube", "*.xml"));
-    resourceEditors.Push(ResourceEditorData("Animation", "*.ani"));
-    resourceEditors.Push(ResourceEditorData("ScriptFile", "*.as"));
-    resourceEditors.Push(ResourceEditorData("XMLFile", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
+    resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
+    resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
+    resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
     ui.root.AddChild(nodeWindow);
@@ -161,87 +167,6 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     // If node changed, update it in the scene window also
     if (cast<Node>(serializable) !is null)
         UpdateSceneWindowNodeOnly(selectedNode);
-}
-
-void PickResource(StringHash eventType, VariantMap& eventData)
-{
-    if (uiFileSelector !is null)
-        return;
-
-    /*
-    UIElement@ button = eventData["Element"].GetUIElement();
-    LineEdit@ attrEdit = button.parent.children[1];
-    uint type = uint(attrEdit.vars["Type"].GetInt());
-
-    ResourceEditorData@ data = resourceEditors[type - ATTR_EDITOR_RESOURCE];
-
-    Array<String> filters;
-    filters.Push("*" + data.fileExtension);
-    String lastPath = data.lastPath;
-    if (lastPath.empty)
-        lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + data.resourceType, "OK", "Cancel", lastPath, filters, 0);
-    SubscribeToEvent(uiFileSelector, "FileSelected", "PickResourceDone");
-
-    resourcePickType = type;
-    resourcePickEditorName = attrEdit.name;
-    */
-}
-
-void OpenResource(StringHash eventType, VariantMap& eventData)
-{
-    UIElement@ button = eventData["Element"].GetUIElement();
-    LineEdit@ attrEdit = button.parent.children[1];
-    fileSystem.SystemOpen(sceneResourcePath + attrEdit.text, "");
-}
-
-void PickResourceDone(StringHash eventType, VariantMap& eventData)
-{
-    CloseFileSelector();
-
-    if (!eventData["OK"].GetBool())
-    {
-        resourcePickType = 0;
-        return;
-    }
-
-    // Check if another component was selected in the meanwhile
-    if (resourcePickType == 0)
-        return;
-
-    /*
-    ResourceEditorData@ data = resourceEditors[resourcePickType - ATTR_EDITOR_RESOURCE];
-    resourcePickType = 0;
-
-    ListView@ list = nodeWindow.GetChild("AttributeList", true);
-    LineEdit@ attrEdit = list.GetChild(resourcePickEditorName, true);
-    if (attrEdit is null)
-        return;
-
-    // Validate the resource. It must come from within the scene resource directory, and be loaded successfully
-    String resourceName = eventData["FileName"].GetString();
-    if (resourceName.find(sceneResourcePath) != 0)
-        return;
-    data.lastPath = GetPath(resourceName);
-
-    resourceName = resourceName.substr(sceneResourcePath.length());
-
-    Resource@ res = cache.GetResource(data.resourceType, resourceName);
-    if (res is null)
-        return;
-
-    attrEdit.SetText(resourceName);
-    editComponentAttribute(attrEdit, false);
-    */
-}
-
-void PickResourceCanceled()
-{
-    if (resourcePickType != 0)
-    {
-        resourcePickType = 0;
-        CloseFileSelector();
-    }
 }
 
 uint GetAttributeEditorCount(Serializable@ serializable)
@@ -730,3 +655,136 @@ void StoreAttributeEditorDirect(UIElement@ parent, Serializable@ serializable, u
     }
 }
 
+
+ResourcePicker@ GetResourcePicker(const String&in resourceType)
+{
+    for (uint i = 0; i < resourcePickers.length; ++i)
+    {
+        if (resourcePickers[i].resourceType.Compare(resourceType, false) == 0)
+            return resourcePickers[i];
+    }
+
+    return null;
+}
+
+void PickResource(StringHash eventType, VariantMap& eventData)
+{
+    if (uiFileSelector !is null)
+        return;
+
+    UIElement@ button = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = button.parent.children[1];
+    // Note: nodes never contain resources. Therefore can assume the target is always a component
+    Component@ target = GetAttributeEditorTarget(attrEdit);
+    if (target is null)
+        return;
+
+    resourcePickIndex = attrEdit.vars["Index"].GetUInt();
+    resourcePickSubIndex = attrEdit.vars["SubIndex"].GetUInt();
+    AttributeInfo info = target.attributeInfos[resourcePickIndex];
+
+    if (info.type == VAR_RESOURCEREF)
+    {
+        String resourceType = GetTypeName(target.attributes[resourcePickIndex].GetResourceRef().type);
+        // Hack: if the resource is a light's shape texture, change resource type according to light type
+        // (TextureCube for point light)
+        if (info.name == "Light Shape Texture" && cast<Light>(target).lightType == LIGHT_POINT)
+            resourceType = "TextureCube";
+        @resourcePicker = GetResourcePicker(resourceType);
+    }
+    else if (info.type == VAR_RESOURCEREFLIST)
+    {
+        String resourceType = GetTypeName(target.attributes[resourcePickIndex].GetResourceRefList().type);
+        @resourcePicker = GetResourcePicker(resourceType);
+    }
+    else
+        @resourcePicker = null;
+
+    if (resourcePicker is null)
+        return;
+
+    resourcePickID = target.id;
+    String lastPath = resourcePicker.lastPath;
+    if (lastPath.empty)
+        lastPath = sceneResourcePath;
+    CreateFileSelector("Pick " + resourcePicker.resourceType, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    SubscribeToEvent(uiFileSelector, "FileSelected", "PickResourceDone");
+}
+
+void PickResourceDone(StringHash eventType, VariantMap& eventData)
+{
+    // Store filter and directory for next time
+    if (resourcePicker !is null)
+    {
+        resourcePicker.lastPath = uiFileSelector.path;
+        resourcePicker.lastFilter = uiFileSelector.filterIndex;
+    }
+
+    CloseFileSelector();
+
+    if (!eventData["OK"].GetBool())
+    {
+        resourcePickID = 0;
+        @resourcePicker = null;
+        return;
+    }
+
+    Component@ target = editorScene.GetComponentByID(resourcePickID);
+    if (target is null || resourcePicker is null)
+        return;
+
+    // Validate the resource. It must come from within a registered resource directory, and be loaded successfully
+    String resourceName = eventData["FileName"].GetString();
+    Array<String>@ resourceDirs = cache.resourceDirs;
+    Resource@ res;
+    for (uint i = 0; i < resourceDirs.length; ++i)
+    {
+        if (!resourceName.ToLower().StartsWith(resourceDirs[i].ToLower()))
+            continue;
+        resourceName = resourceName.Substring(resourceDirs[i].length);
+        res = cache.GetResource(resourcePicker.resourceType, resourceName);
+        break;
+    }
+    if (res is null)
+        return;
+
+    AttributeInfo info = target.attributeInfos[resourcePickIndex];
+    if (info.type == VAR_RESOURCEREF)
+    {
+        ResourceRef ref = target.attributes[resourcePickIndex].GetResourceRef();
+        ref.type = ShortStringHash(resourcePicker.resourceType);
+        ref.id = StringHash(resourceName);
+        target.attributes[resourcePickIndex] = Variant(ref);
+    }
+    else if (info.type == VAR_RESOURCEREFLIST)
+    {
+        ResourceRefList refList = target.attributes[resourcePickIndex].GetResourceRefList();
+        if (resourcePickSubIndex < refList.length)
+        {
+            refList.ids[resourcePickSubIndex] = StringHash(resourceName);
+            target.attributes[resourcePickIndex] = Variant(refList);
+        }
+    }
+
+    UpdateAttributes(false);
+
+    resourcePickID = 0;
+    @resourcePicker = null;
+}
+
+void PickResourceCanceled()
+{
+    if (resourcePickID != 0)
+    {
+        resourcePickID = 0;
+        @resourcePicker = null;
+        CloseFileSelector();
+    }
+}
+
+void OpenResource(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ button = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = button.parent.children[1];
+    fileSystem.SystemOpen(sceneResourcePath + attrEdit.text.Trimmed(), "");
+}

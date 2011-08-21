@@ -38,6 +38,7 @@
 - void UnsubscribeFromEvents(Object@)
 - void UnsubscribeFromAllEvents()
 - Object@ GetEventSender()
+- const String& GetTypeName(ShortStringHash)
 - void Print(const String&)
 - void Print(int)
 - void Print(uint)
@@ -223,6 +224,8 @@ Methods:<br>
 - int Find(uint8, uint arg1 = 0) const
 - int FindLast(const String&, uint arg1 = 0xffffffff) const
 - int FindLast(uint8, uint arg1 = 0xffffffff) const
+- bool StartsWith(const String&) const
+- bool EndsWith(const String&) const
 - String Substring(uint) const
 - String Substring(uint, uint) const
 - String ToUpper() const

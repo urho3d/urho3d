@@ -218,9 +218,9 @@ Vector3 GetVector3FromStrings(Array<String>@ coords, uint startIndex)
 
 void ProcessRef(String& ref)
 {
-    if (ref.Find("local://") == 0)
+    if (ref.StartsWith("local://"))
         ref = ref.Substring(8);
-    if (ref.Find("file://") == 0)
+    if (ref.StartsWith("file://"))
         ref = ref.Substring(7);
 }
 
@@ -254,11 +254,11 @@ void ConvertMaterial(const String&in materialName, const String&in filePath)
     while (!file.eof)
     {
         String line = file.ReadLine().Trimmed();
-        if (line.Find("alpha_rejection") == 0)
+        if (line.StartsWith("alpha_rejection"))
             mask = true;
-        if (line.Find("cull_hardware none") == 0)
+        if (line.StartsWith("cull_hardware none"))
             twoSided = true;
-        if (line.Find("texture ") == 0)
+        if (line.StartsWith("texture "))
         {
             textureName = line.Substring(8);
             ProcessRef(textureName);
