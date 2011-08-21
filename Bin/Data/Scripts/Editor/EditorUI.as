@@ -6,9 +6,11 @@ FileSelector@ uiFileSelector;
 
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
 Array<String> uiAllFilter = {"*.*"};
+Array<String> uiScriptFilter = {"*.as", "*.*"};
 uint uiSceneFilter = 0;
 String uiScenePath;
 String uiImportPath;
+String uiScriptPath;
 
 void CreateUI()
 {
@@ -58,6 +60,7 @@ void CreateMenuBar()
         filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Import model", 0, 0));
         filePopup.AddChild(CreateMenuItem("Import scene", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Run script", 0, 0));
         filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Set resource path", 0, 0));
         filePopup.AddChild(CreateMenuItem("Reload resources", 'R', QUAL_CTRL));
@@ -232,6 +235,12 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
         }
         
+        if (action == "Run script")
+        {
+            CreateFileSelector("Run script", "Import", "Cancel", uiScriptPath, uiScriptFilter, 0);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
+        }
+
         if (action == "Set resource path")
         {
             CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilter, 0);
@@ -327,6 +336,30 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
 
     String fileName = eventData["FileName"].GetString();
     ImportScene(fileName);
+}
+
+void HandleRunScript(StringHash eventType, VariantMap& eventData)
+{
+    // Save path for next time
+    uiScriptPath = uiFileSelector.path;
+    CloseFileSelector();
+    
+    // Check for cancel
+    if (!eventData["OK"].GetBool())
+        return;
+
+    String fileName = eventData["FileName"].GetString();
+    File@ file = File(fileName, FILE_READ);
+    if (file.open)
+    {
+        String scriptCode;
+        while (!file.eof)
+            scriptCode += file.ReadLine() + "\n";
+        file.Close();
+        
+        if (script.Execute(scriptCode))
+            log.Info("Script " + fileName + " run successfully");
+    }
 }
 
 void HandleResourcePath(StringHash eventType, VariantMap& eventData)

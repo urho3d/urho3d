@@ -16,6 +16,7 @@ class ResourcePicker
     {
         resourceType = resourceType_;
         filters.Push(filter_);
+        filters.Push("*.*");
         lastFilter = 0;
     }
 
@@ -23,6 +24,7 @@ class ResourcePicker
     {
         resourceType = resourceType_;
         filters = filters_;
+        filters.Push("*.*");
         lastFilter = 0;
     }
 }
@@ -59,12 +61,9 @@ void CreateNodeWindow()
         return;
 
     // Fill resource picker data
+    Array<String> textureFilters = {"*.dds", "*.jpg", "*.png"};
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
     resourcePickers.Push(ResourcePicker("Material", "*.xml"));
-    Array<String> textureFilters;
-    textureFilters.Push("*.dds");
-    textureFilters.Push("*.jpg");
-    textureFilters.Push("*.png");
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
@@ -72,14 +71,15 @@ void CreateNodeWindow()
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
 
     // Fill vector structure data
-    Array<String> billboardVariables;
-    billboardVariables.Push("Number Of Billboards");
-    billboardVariables.Push("   Position");
-    billboardVariables.Push("   Size");
-    billboardVariables.Push("   UV Coordinates");
-    billboardVariables.Push("   Color");
-    billboardVariables.Push("   Rotation");
-    billboardVariables.Push("   Is Enabled");
+    Array<String> billboardVariables = {
+        "Number Of Billboards",
+        "   Position",
+        "   Size", 
+        "   UV Coordinates", 
+        "   Color", 
+        "   Rotation", 
+        "   Is Enabled"
+    };
     vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
@@ -214,9 +214,19 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (!intermediateEdit)
         UpdateAttributes(false);
 
-    // If node changed, update it in the scene window also
-    if (cast<Node>(serializable) !is null)
-        UpdateSceneWindowNodeOnly(selectedNode);
+    // If a model was loaded, update the scene hierarchy in case bones were recreated
+    if (serializable.attributeInfos[index].type == VAR_RESOURCEREF && serializable.attributes[index].GetResourceRef().type ==
+        ShortStringHash("Model"))
+    {
+        if (selectedNode !is null)
+            UpdateSceneWindowNode(selectedNode);
+    }
+    else
+    {
+        // If node name changed, update it in the scene window also
+        if (serializable.attributeInfos[index].name == "Name" && selectedNode !is null)
+            UpdateSceneWindowNodeOnly(selectedNode);
+    }
 }
 
 uint GetAttributeEditorCount(Serializable@ serializable)
@@ -875,6 +885,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
     if (res is null)
         return;
 
+    bool isModel = false;
     AttributeInfo info = target.attributeInfos[resourcePickIndex];
     if (info.type == VAR_RESOURCEREF)
     {
@@ -883,6 +894,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         ref.id = StringHash(resourceName);
         target.attributes[resourcePickIndex] = Variant(ref);
         target.FinishUpdate();
+        isModel = ref.type == ShortStringHash("Model");
     }
     else if (info.type == VAR_RESOURCEREFLIST)
     {
@@ -896,6 +908,10 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
     }
 
     UpdateAttributes(false);
+
+    // If a model was loaded, update the scene hierarchy in case bones were recreated
+    if (isModel && selectedNode !is null)
+        UpdateSceneWindowNode(selectedNode);
 
     resourcePickID = 0;
     @resourcePicker = null;
