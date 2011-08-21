@@ -311,6 +311,7 @@ CollisionShape::CollisionShape(Context* context) :
     collisionMask_(M_MAX_UNSIGNED),
     friction_(DEFAULT_FRICTION),
     bounce_(DEFAULT_BOUNCE),
+    phantom_(false),
     recreateGeometry_(false)
 {
 }
@@ -331,10 +332,11 @@ void CollisionShape::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Bounce", GetBounce, SetBounce, float, DEFAULT_BOUNCE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Phantom", phantom_, false, AM_DEFAULT);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -531,6 +533,11 @@ void CollisionShape::SetFriction(float friction)
 void CollisionShape::SetBounce(float bounce)
 {
     bounce_ = Max(bounce, 0.0f);
+}
+
+void CollisionShape::SetPhantom(bool enable)
+{
+    phantom_ = enable;
 }
 
 void CollisionShape::UpdateTransform()

@@ -788,5 +788,19 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ button = eventData["Element"].GetUIElement();
     LineEdit@ attrEdit = button.parent.children[1];
-    fileSystem.SystemOpen(sceneResourcePath + attrEdit.text.Trimmed(), "");
+    
+    String fileName = attrEdit.text.Trimmed();
+    if (fileName.empty)
+        return;
+
+    Array<String>@ resourceDirs = cache.resourceDirs;
+    for (uint i = 0; i < resourceDirs.length; ++i)
+    {
+        String fullPath = resourceDirs[i] + fileName;
+        if (fileSystem.FileExists(fullPath))
+        {
+            fileSystem.SystemOpen(fullPath, "");
+            return;
+        }
+    }
 }

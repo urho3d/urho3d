@@ -80,12 +80,12 @@ void ParticleEmitter::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter>();
     
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", scaled_, true, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", scaled_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }

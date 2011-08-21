@@ -134,6 +134,8 @@ public:
     void SetFriction(float friction);
     /// %Set bounce coefficient.
     void SetBounce(float bounce);
+    /// %Set phantom flag. Phantom shapes generate collision events only, but no contact joints.
+    void SetPhantom(bool enable);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -163,6 +165,8 @@ public:
     float GetFriction() const { return friction_; }
     /// Return bounce coefficient.
     float GetBounce() const { return bounce_; }
+    /// Return phantom flag.
+    bool IsPhantom() const { return phantom_; }
     
     /// Update geometry transform and associate with rigid body if available.
     void UpdateTransform();
@@ -218,6 +222,8 @@ private:
     float friction_;
     /// Bounce coefficient.
     float bounce_;
+    /// Phantom flag.
+    bool phantom_;
     /// Recreate geometry flag.
     bool recreateGeometry_;
 };

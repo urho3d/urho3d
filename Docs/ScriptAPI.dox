@@ -3599,13 +3599,13 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void Clear()
-- void SetSphere(float, const Vector3&, const Quaternion&)
-- void SetBox(const Vector3&, const Vector3&, const Quaternion&)
-- void SetCylinder(float, float, const Vector3&, const Quaternion&)
-- void SetCapsule(float, float, const Vector3&, const Quaternion&)
-- void SetTriangleMesh(Model@, uint, const Vector3&, const Quaternion&)
-- void SetHeightfield(Model@, uint, uint, float, uint, const Vector3&, const Quaternion&)
-- void SetConvexHull(Model@, float, uint, const Vector3&, const Quaternion&)
+- void SetSphere(float, const Vector3& arg1 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg2 = Quaternion ( ))
+- void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg2 = Quaternion ( ))
+- void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg3 = Quaternion ( ))
+- void SetCapsule(float, float, const Vector3& arg2 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg3 = Quaternion ( ))
+- void SetTriangleMesh(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg4 = Quaternion ( ))
+- void SetHeightfield(Model@, uint, uint, float, uint, const Vector3& arg5 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg6 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg7 = Quaternion ( ))
+- void SetConvexHull(Model@, float, uint, const Vector3& arg3 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg4 = Vector3 ( 0 , 0 , 0 ), const Quaternion& arg5 = Quaternion ( ))
 - void SetTransform(const Vector3&, const Quaternion&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
@@ -3625,6 +3625,7 @@ Properties:<br>
 - uint collisionMask
 - float friction
 - float bounce
+- bool phantom
 
 
 RigidBody

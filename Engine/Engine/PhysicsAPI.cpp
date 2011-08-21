@@ -94,9 +94,11 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void set_collisionMask(uint)", asMETHOD(CollisionShape, SetCollisionMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "uint get_collisionMask() const", asMETHOD(CollisionShape, GetCollisionMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_friction(float)", asMETHOD(CollisionShape, SetFriction), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "float get_friction()", asMETHOD(CollisionShape, GetFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "float get_friction() const", asMETHOD(CollisionShape, GetFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_bounce(float)", asMETHOD(CollisionShape, SetBounce), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "float get_bounce()", asMETHOD(CollisionShape, GetBounce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "float get_bounce() const", asMETHOD(CollisionShape, GetBounce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void set_phantom(bool)", asMETHOD(CollisionShape, SetPhantom), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "bool get_phantom() const", asMETHOD(CollisionShape, IsPhantom), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);

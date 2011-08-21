@@ -583,9 +583,12 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
             contacts[i].surface.mode |= dContactFDir1;
         }
         
-        // Create contact joint
-        dJointID contact = dJointCreateContact(world->physicsWorld_, world->contactJoints_, &contacts[i]);
-        dJointAttach(contact, bodyA, bodyB);
+        // If neither of the shapes are phantom, create contact joint
+        if (!shapeA->IsPhantom() && !shapeB->IsPhantom())
+        {
+            dJointID contact = dJointCreateContact(world->physicsWorld_, world->contactJoints_, &contacts[i]);
+            dJointAttach(contact, bodyA, bodyB);
+        }
         
         // Store contact info
         PhysicsContactInfo contactInfo;
