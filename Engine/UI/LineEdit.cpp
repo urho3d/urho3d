@@ -123,7 +123,7 @@ void LineEdit::Update(float timeStep)
     }
    
     bool cursorVisible = false;
-    if (focus_)
+    if (HasFocus())
         cursorVisible = cursorBlinkTimer_ < 0.5f;
     cursor_->SetVisible(cursorVisible);
 }

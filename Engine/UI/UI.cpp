@@ -120,8 +120,9 @@ void UI::SetFocusElement(UIElement* element)
     if (element)
     {
         // Return if already has focus
-        if (element->HasFocus())
+        if (focusElement_ == element)
             return;
+        
         // If element can not be focused, and does not reset the focus either, search toward the parent
         for (;;)
         {
@@ -134,18 +135,28 @@ void UI::SetFocusElement(UIElement* element)
         }
     }
     
-    PODVector<UIElement*> allChildren = rootElement_->GetChildren(true);
-    
-    // Go through all elements to clear the old focus
-    for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
+    // Remove focus from the old element
+    if (focusElement_)
     {
-        UIElement* other = *i;
-        if (other != element && other->HasFocus())
-            other->SetFocus(false);
+        UIElement* oldFocusElement = focusElement_;
+        focusElement_.Reset();
+        oldFocusElement->OnDefocus();
+        
+        VariantMap focusEventData;
+        focusEventData[Defocused::P_ELEMENT] = oldFocusElement;
+        oldFocusElement->SendEvent(E_DEFOCUSED, focusEventData);
     }
     
+    // Then set focus to the new
     if (element)
-        element->SetFocus(true);
+    {
+        focusElement_ = element;
+        element->OnFocus();
+        
+        VariantMap focusEventData;
+        focusEventData[Focused::P_ELEMENT] = element;
+        element->SendEvent(E_FOCUSED, focusEventData);
+    }
     
     eventData[P_ELEMENT] = (void*)element;
     SendEvent(E_FOCUSCHANGED, eventData);
@@ -205,15 +216,6 @@ void UI::Update(float timeStep)
         }
         else if (dragSource)
             cursor_->SetShape(dragElement_ == element ? CS_ACCEPTDROP : CS_REJECTDROP);
-    }
-    
-    // Defocus element now if should
-    if (defocusElement_)
-    {
-        // Do nothing if the focus element changed in the meanwhile
-        if (defocusElement_ == GetFocusElement())
-            SetFocusElement(0);
-        defocusElement_.Reset();
     }
     
     Update(timeStep, rootElement_);
@@ -367,17 +369,7 @@ UIElement* UI::GetElementAt(int x, int y, bool activeOnly)
 
 UIElement* UI::GetFocusElement() const
 {
-    if (!rootElement_)
-        return 0;
-    
-    PODVector<UIElement*> allChildren = rootElement_->GetChildren(true);
-    for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
-    {
-        if ((*i)->HasFocus())
-            return *i;
-    }
-    
-    return 0;
+    return focusElement_;
 }
 
 UIElement* UI::GetFrontElement() const
@@ -671,8 +663,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         }
         else
         {
-            // If clicked over no element, or a disabled element, try to lose focus
-            defocusElement_ = GetFocusElement();
+            // If clicked over no element, or a disabled element, lose focus
+            SetFocusElement(0);
         }
         
         using namespace UIMouseClick;
@@ -790,7 +782,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         // Defocus the element
         else if (key == KEY_ESC && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
-            defocusElement_ = element;
+            element->SetFocus(false);
         // If none of the special keys, pass the key to the focused element
         else
             element->OnKey(key, mouseButtons_, qualifiers_);

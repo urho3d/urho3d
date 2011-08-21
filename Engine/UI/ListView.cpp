@@ -67,6 +67,7 @@ ListView::ListView(Context* context) :
     SetContentElement(container);
     
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
+    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
 }
 
 ListView::~ListView()
@@ -662,7 +663,7 @@ void ListView::UpdateSelectionEffect()
     {
         UIElement* item = GetItem(i);
         if (highlightMode_ != HM_NEVER && selections_.Find(i) != selections_.End())
-            item->SetSelected(focus_ || highlightMode_ == HM_ALWAYS);
+            item->SetSelected(HasFocus() || highlightMode_ == HM_ALWAYS);
         else
             item->SetSelected(false);
     }
@@ -670,7 +671,11 @@ void ListView::UpdateSelectionEffect()
 
 void ListView::EnsureItemVisibility(unsigned index)
 {
-    UIElement* item = GetItem(index);
+    EnsureItemVisibility(GetItem(index));
+}
+
+void ListView::EnsureItemVisibility(UIElement* item)
+{
     if (!item || !item->IsVisible())
         return;
     
@@ -775,5 +780,23 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
             
             return;
         }
+    }
+}
+
+void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace FocusChanged;
+    
+    UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
+    while (element)
+    {
+        // If the focused element or its parent is in the list, scroll the list to make the item visible
+        UIElement* parent = element->GetParent();
+        if (parent == contentElement_)
+        {
+            EnsureItemVisibility(element);
+            return;
+        }
+        element = parent;
     }
 }

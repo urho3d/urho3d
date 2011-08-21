@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
+#include "UI.h"
 #include "UIElement.h"
 #include "UIEvents.h"
 
@@ -77,7 +78,6 @@ UIElement::UIElement(Context* context) :
     clipChildren_(false),
     active_(false),
     focusMode_(FM_NOTFOCUSABLE),
-    focus_(false),
     selected_(false),
     visible_(true),
     hovering_(false),
@@ -526,20 +526,19 @@ void UIElement::SetFocus(bool enable)
     if (focusMode_ < FM_FOCUSABLE)
         enable = false;
     
-    if (enable != focus_)
+    UI* ui = GetSubsystem<UI>();
+    if (!ui)
+        return;
+    
+    if (enable)
     {
-        focus_ = enable;
-        
-        if (enable)
-            OnFocus();
-        else
-            OnDefocus();
-        
-        using namespace Focused;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        SendEvent(focus_ ? E_FOCUSED : E_DEFOCUSED, eventData);
+        if (ui->GetFocusElement() != this)
+            ui->SetFocusElement(this);
+    }
+    else
+    {
+        if (ui->GetFocusElement() == this)
+            ui->SetFocusElement(0);
     }
 }
 
@@ -904,6 +903,15 @@ float UIElement::GetDerivedOpacity()
     }
     
     return derivedOpacity_;
+}
+
+bool UIElement::HasFocus() const
+{
+    UI* ui = GetSubsystem<UI>();
+    if (!ui)
+        return false;
+    else
+        return ui->GetFocusElement() == this;
 }
 
 PODVector<UIElement*> UIElement::GetChildren(bool recursive) const

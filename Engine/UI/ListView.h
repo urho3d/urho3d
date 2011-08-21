@@ -136,6 +136,8 @@ protected:
     void UpdateSelectionEffect();
     /// Ensure full visibility of the item.
     void EnsureItemVisibility(unsigned index);
+    /// Ensure full visibility of the item.
+    void EnsureItemVisibility(UIElement* item);
     
     /// Current selection.
     Set<unsigned> selections_;
@@ -157,4 +159,6 @@ protected:
 private:
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
+    /// Handle focus change to check whether an invisible item was focused.
+    void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
 };

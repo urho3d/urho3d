@@ -352,7 +352,9 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_ESC)
     {
         UIElement@ front = ui.frontElement;
-        if (uiFileSelector !is null && front is uiFileSelector.window)
+        if (console.visible)
+            console.visible = false;
+        else if (uiFileSelector !is null && front is uiFileSelector.window)
             CloseFileSelector();
         else if (front is editorSettingsDialog || front is sceneWindow || front is nodeWindow)
             front.visible = false;

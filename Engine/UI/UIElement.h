@@ -207,7 +207,7 @@ public:
     void SetClipChildren(bool enable);
     /// %Set whether reacts to input.
     void SetActive(bool enable);
-    /// %Set whether is focused. Usually called by UI. If called manually, other elements should be defocused.
+    /// %Set whether is focused. Only one element can be focused at a time.
     void SetFocus(bool enable);
     /// %Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
     void SetSelected(bool enable);
@@ -297,7 +297,7 @@ public:
     /// Return whether should clip child elements.
     bool GetClipChildren() const { return clipChildren_; }
     /// Return whether has focus.
-    bool HasFocus() const { return focus_; }
+    bool HasFocus() const;
     /// Return whether reacts to input.
     bool IsActive() const { return active_; }
     /// Return whether is selected. Actual meaning is element dependent.
@@ -381,8 +381,6 @@ protected:
     bool bringToBack_;
     /// Clip children flag.
     bool clipChildren_;
-    /// Focused flag.
-    bool focus_;
     /// Input enabled flag.
     bool active_;
     /// Selected flag.

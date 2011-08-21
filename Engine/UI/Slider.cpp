@@ -104,7 +104,7 @@ void Slider::OnDragStart(const IntVector2& position, const IntVector2& screenPos
 
 void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (!dragSlider_)
+    if (!dragSlider_ || GetSize() == knob_->GetSize())
         return;
     
     float newValue = value_;
@@ -113,14 +113,14 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     if (orientation_ == O_HORIZONTAL)
     {
         int newX = Clamp(dragStartPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth());
-        knob_->SetPosition(newX, dragStartPosition_.y_);
-        newValue = Clamp((float)newX * (range_ + 1.0f) / (float)GetWidth(), 0.0f, range_);
+        knob_->SetPosition(newX, 0);
+        newValue = (float)newX * range_ / (float)(GetWidth() - knob_->GetWidth());
     }
     else
     {
         int newY = Clamp(dragStartPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight());
-        knob_->SetPosition(dragStartPosition_.x_, newY);
-        newValue = Clamp((float)newY * (range_ + 1.0f) / (float)GetHeight(), 0.0f, range_);
+        knob_->SetPosition(0, newY);
+        newValue = (float)newY * range_ / (float)(GetHeight() - knob_->GetHeight());
     }
     
     SetValue(newValue);
@@ -176,24 +176,28 @@ void Slider::ChangeValue(float delta)
 
 void Slider::UpdateSlider()
 {
-    if (orientation_ == O_HORIZONTAL)
+    const IntRect& border = knob_->GetBorder();
+    
+    if (range_ > 0.0f)
     {
-        float width = (float)GetWidth();
-        if (width < M_EPSILON)
-            return;
-        float sliderLength = width / (range_ + 1.0f);
-        float sliderPos = width * value_ / (range_ + 1.0f);
-        knob_->SetSize((int)sliderLength, GetHeight());
-        knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+        if (orientation_ == O_HORIZONTAL)
+        {
+            int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
+            float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
+            knob_->SetSize(sliderLength, GetHeight());
+            knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+        }
+        else
+        {
+            int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
+            float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;
+            knob_->SetSize(GetWidth(), sliderLength);
+            knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+        }
     }
     else
     {
-        float height = (float)GetHeight();
-        if (height < M_EPSILON)
-            return;
-        float sliderLength = height / (range_ + 1.0f);
-        float sliderPos = height * value_ / (range_ + 1.0f);
-        knob_->SetSize(GetWidth(), (int)sliderLength);
-        knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+        knob_->SetSize(GetSize());
+        knob_->SetPosition(0, 0);
     }
 }
