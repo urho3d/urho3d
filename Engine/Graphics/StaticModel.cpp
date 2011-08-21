@@ -61,7 +61,7 @@ void StaticModel::RegisterObject(Context* context)
     ATTRIBUTE(StaticModel, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(StaticModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ATTRIBUTE(StaticModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(StaticModel, Drawable);

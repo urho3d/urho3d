@@ -84,7 +84,7 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
