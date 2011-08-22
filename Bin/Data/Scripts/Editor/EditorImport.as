@@ -127,6 +127,7 @@ void ImportTundraScene(const String&in fileName)
             {
                 Array<String> coords = GetComponentAttribute(compElem, "Transform").Split(',');
                 meshPos = GetVector3FromStrings(coords, 0);
+                meshPos.z = -meshPos.z; // Convert to lefthanded
                 meshRot = GetVector3FromStrings(coords, 3);
                 meshScale = GetVector3FromStrings(coords, 6);
                 meshName = GetComponentAttribute(compElem, "Mesh ref");
@@ -143,6 +144,7 @@ void ImportTundraScene(const String&in fileName)
             {
                 Array<String> coords = GetComponentAttribute(compElem, "Transform").Split(',');
                 pos = GetVector3FromStrings(coords, 0);
+                pos.z = -pos.z; // Convert to lefthanded
                 rot = GetVector3FromStrings(coords, 3);
                 scale = GetVector3FromStrings(coords, 6);
             }
@@ -188,8 +190,9 @@ void ImportTundraScene(const String&in fileName)
             StaticModel@ model = newNode.CreateComponent("StaticModel");
 
             // Calculate final transform in an Ogre-like fashion
-            Quaternion quat = Quaternion(rot);
-            Quaternion meshQuat = Quaternion(meshRot);            
+            /// \todo Tundra 2.0 supports entity parenting. It is not yet taken into account
+            Quaternion quat = GetTransformQuaternion(rot);
+            Quaternion meshQuat = GetTransformQuaternion(meshRot);
             Quaternion finalQuat = quat * meshQuat;
             Vector3 finalScale = scale * meshScale;
             Vector3 finalPos = pos + quat * (scale * meshPos);
@@ -206,7 +209,16 @@ void ImportTundraScene(const String&in fileName)
     }
 
     UpdateSceneWindow();
-    UpdateWindowTitle();    
+    UpdateWindowTitle();
+}
+
+Quaternion GetTransformQuaternion(Vector3 rotEuler)
+{
+    // Convert rotation to lefthanded
+    Quaternion rotateX(-rotEuler.x, Vector3(1, 0, 0));
+    Quaternion rotateY(-rotEuler.y, Vector3(0, 1, 0));
+    Quaternion rotateZ(-rotEuler.z, Vector3(0, 0, -1));
+    return rotateZ * rotateY * rotateX;
 }
 
 String GetComponentAttribute(XMLElement compElem, const String&in name)
