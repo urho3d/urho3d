@@ -3657,6 +3657,7 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - float mass
+- int massAxis
 - Vector3& linearVelocity
 - float linearRestThreshold
 - Vector3& angularVelocity
