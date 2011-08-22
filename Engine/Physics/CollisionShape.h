@@ -107,13 +107,13 @@ public:
     /// Clear the collision geometry.
     void Clear();
     /// %Set as a sphere.
-    void SetSphere(float radius, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a cylinder.
-    void SetCylinder(float radius, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a capsule.
-    void SetCapsule(float radius, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a triangle mesh.
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size = Vector3::UNITY, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a heightfield.
@@ -169,7 +169,7 @@ public:
     bool IsPhantom() const { return phantom_; }
     
     /// Update geometry transform and associate with rigid body if available.
-    void UpdateTransform();
+    void UpdateTransform(bool nodeUpdate = false);
     /// Add debug geometry to the debug graphics.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     

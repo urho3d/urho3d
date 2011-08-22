@@ -549,15 +549,15 @@ void RigidBody::UpdateMass()
             break;
             
         case SHAPE_SPHERE:
-            dMassSetSphere(&subMass, density, size.x_);
+            dMassSetSphere(&subMass, density, 0.5f * size.x_);
             break;
             
         case SHAPE_CYLINDER:
-            dMassSetCylinder(&subMass, density, 2, size.x_, size.z_);
+            dMassSetCylinder(&subMass, density, 1, 0.5f * size.x_, size.y_);
             break;
             
         case SHAPE_CAPSULE:
-            dMassSetCapsule(&subMass, density, 2, size.x_, size.z_);
+            dMassSetCapsule(&subMass, density, 1, 0.5f * size.x_, Max(size.y_ - size.x_, 0.0f));
             break;
             
         case SHAPE_TRIANGLEMESH:

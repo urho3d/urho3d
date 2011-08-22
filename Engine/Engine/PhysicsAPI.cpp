@@ -74,13 +74,13 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     
     RegisterComponent<CollisionShape>(engine, "CollisionShape");
     engine->RegisterObjectMethod("CollisionShape", "void Clear()", asMETHOD(CollisionShape, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetBox(const Vector3&in, const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetCylinder(float, float, const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCylinder), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetCapsule(float, float, const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCapsule), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, uint, uint, float, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, float, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(0, 0, 0), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetBox(const Vector3&in, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetCylinder(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCylinder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetCapsule(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCapsule), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, uint, uint, float, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, float, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(CollisionShape, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "Model@+ get_model()", asMETHOD(CollisionShape, GetModel), asCALL_THISCALL);

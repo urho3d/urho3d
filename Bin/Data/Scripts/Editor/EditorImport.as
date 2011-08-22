@@ -245,15 +245,15 @@ void ImportTundraScene(const String&in fileName)
                     break;
 
                 case 1:
-                    shape.SetSphere(bodySize.x * 0.5);
+                    shape.SetSphere(bodySize.x);
                     break;
 
                 case 2:
-                    shape.SetCylinder(bodySize.x * 0.5, bodySize.y, Vector3(0, 0, 0), Quaternion(90, 0, 0));
+                    shape.SetCylinder(bodySize.x, bodySize.y);
                     break;
 
                 case 3:
-                    shape.SetCapsule(bodySize.x * 0.5, bodySize.y - bodySize.x, Vector3(0, 0, 0), Quaternion(90, 0, 0));
+                    shape.SetCapsule(bodySize.x, bodySize.y);
                     break;
                     
                 case 4:

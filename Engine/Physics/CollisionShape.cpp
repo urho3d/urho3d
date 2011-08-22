@@ -57,6 +57,7 @@ static const String typeNames[] =
 
 static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_BOUNCE = 0.0f;
+static const Quaternion CYLINDER_ROTATION(90.0f, 0.0f, 0.0f);
 
 void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr<Vector3>& destVertexData, unsigned& destVertexCount,
     SharedArrayPtr<unsigned>& destIndexData, unsigned& destIndexCount, const Vector3& scale)
@@ -375,12 +376,12 @@ void CollisionShape::Clear()
     shapeType_ = SHAPE_NONE;
 }
 
-void CollisionShape::SetSphere(float radius, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetSphere(float diameter, const Vector3& position, const Quaternion& rotation)
 {
     ReleaseGeometry();
     
     shapeType_ = SHAPE_SPHERE;
-    size_ = Vector3(radius, radius, radius);
+    size_ = Vector3(diameter, diameter, diameter);
     position_ = position;
     rotation_ = rotation;
     
@@ -399,24 +400,24 @@ void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const 
     CreateGeometry();
 }
 
-void CollisionShape::SetCapsule(float radius, float height, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetCapsule(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
     ReleaseGeometry();
     
     shapeType_ = SHAPE_CAPSULE;
-    size_ = Vector3(radius, radius, height);
+    size_ = Vector3(diameter, height, diameter);
     position_ = position;
     rotation_ = rotation;
     
     CreateGeometry();
 }
 
-void CollisionShape::SetCylinder(float radius, float height, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetCylinder(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
     ReleaseGeometry();
     
     shapeType_ = SHAPE_CYLINDER;
-    size_ = Vector3(radius, radius, height);
+    size_ = Vector3(diameter, height, diameter);
     position_ = position;
     rotation_ = rotation;
     
@@ -540,33 +541,40 @@ void CollisionShape::SetPhantom(bool enable)
     phantom_ = enable;
 }
 
-void CollisionShape::UpdateTransform()
+void CollisionShape::UpdateTransform(bool nodeUpdate)
 {
     if (!geometry_)
         return;
     
     // Get the ODE body ID from the RigidBody component, if it exists
-    dBodyID body = 0;
     RigidBody* rigidBody = GetComponent<RigidBody>();
-    if (rigidBody)
-        body = rigidBody->GetBody();
+    dBodyID body = rigidBody ? rigidBody->GetBody() : 0;
     
-    // If body already assigned, need to do nothing
+    // Apply an adjustment to the cylinder and capsule shapes to make them upright by default
+    Quaternion offsetQuaternion = (shapeType_ == SHAPE_CYLINDER || shapeType_ == SHAPE_CAPSULE) ? CYLINDER_ROTATION * rotation_ : rotation_;
+    
     if (body)
     {
-        if (dGeomGetBody(geometry_) == body)
-            return;
+        // Assign body now if necessary
+        if (dGeomGetBody(geometry_) != body)
+            dGeomSetBody(geometry_, body);
+        else
+        {
+            // If the body is already assigned, and this is a node dirtying update, need to do nothing
+            if (nodeUpdate)
+                return;
+        }
         
-        // Assign the body, then set offset transform if necessary
-        dGeomSetBody(geometry_, body);
-        
-        if (position_ != Vector3::ZERO || rotation_ != Quaternion::IDENTITY)
+        // Update the offset transform
+        if (position_ != Vector3::ZERO || offsetQuaternion != Quaternion::IDENTITY)
         {
             Vector3 offset = geometryScale_ * position_;
             
             dGeomSetOffsetPosition(geometry_, offset.x_, offset.y_, offset.z_);
-            dGeomSetOffsetQuaternion(geometry_, rotation_.GetData());
+            dGeomSetOffsetQuaternion(geometry_, offsetQuaternion.GetData());
         }
+        else
+            dGeomClearOffset(geometry_);
     }
     else
     {
@@ -576,7 +584,7 @@ void CollisionShape::UpdateTransform()
         Vector3 nodePos = transform.Translation();
         Quaternion nodeRot = transform.Rotation();
         Vector3 geomPos = nodePos + (nodeRot * (geometryScale_ * position_));
-        Quaternion geomRot = nodeRot * rotation_;
+        Quaternion geomRot = nodeRot * offsetQuaternion;
         
         dGeomSetPosition(geometry_, geomPos.x_, geomPos.y_, geomPos.z_);
         dGeomSetQuaternion(geometry_, geomRot.GetData());
@@ -797,7 +805,7 @@ void CollisionShape::OnMarkedDirty(Node* node)
     if (node->GetWorldScale() != geometryScale_)
         CreateGeometry();
     else
-        UpdateTransform();
+        UpdateTransform(true);
 }
 
 void CollisionShape::SetModelAttr(ResourceRef value)
@@ -851,15 +859,15 @@ void CollisionShape::CreateGeometry()
         break;
         
     case SHAPE_SPHERE:
-        geometry_ = dCreateSphere(space, size.x_);
+        geometry_ = dCreateSphere(space, 0.5f * size.x_);
         break;
         
     case SHAPE_CAPSULE:
-        geometry_ = dCreateCapsule(space, size.x_, size.z_);
+        geometry_ = dCreateCapsule(space, 0.5f * size.x_, Max(size.y_ - size.x_, 0.0f));
         break;
         
     case SHAPE_CYLINDER:
-        geometry_ = dCreateCylinder(space, size.x_, size.z_);
+        geometry_ = dCreateCylinder(space, 0.5f * size.x_, size.y_);
         break;
         
     case SHAPE_TRIANGLEMESH:
