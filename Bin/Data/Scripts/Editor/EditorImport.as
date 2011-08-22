@@ -86,7 +86,7 @@ void ImportTundraScene(const String&in fileName)
     
     Array<String> convertedMaterials;
     Array<String> convertedMeshes;
-    
+
     // Clear old scene, then create a zone and a directional light first
     CreateScene();
 
@@ -108,9 +108,12 @@ void ImportTundraScene(const String&in fileName)
     {
         String nodeName;
         String meshName;
+        Vector3 meshPos;
+        Vector3 meshRot;
+        Vector3 meshScale(1, 1, 1);
         Vector3 pos;
         Vector3 rot;
-        Vector3 scale;
+        Vector3 scale(1, 1, 1);
         bool castShadows = false;
         float drawDistance = 0;
         Array<String> materialNames;
@@ -119,8 +122,13 @@ void ImportTundraScene(const String&in fileName)
         while (!compElem.isNull)
         {
             String compType = compElem.GetAttribute("type");
+
             if (compType == "EC_Mesh")
             {
+                Array<String> coords = GetComponentAttribute(compElem, "Transform").Split(',');
+                meshPos = GetVector3FromStrings(coords, 0);
+                meshRot = GetVector3FromStrings(coords, 3);
+                meshScale = GetVector3FromStrings(coords, 6);
                 meshName = GetComponentAttribute(compElem, "Mesh ref");
                 castShadows = GetComponentAttribute(compElem, "Cast shadows").ToBool();
                 drawDistance = GetComponentAttribute(compElem, "Draw distance").ToFloat();
@@ -137,64 +145,68 @@ void ImportTundraScene(const String&in fileName)
                 pos = GetVector3FromStrings(coords, 0);
                 rot = GetVector3FromStrings(coords, 3);
                 scale = GetVector3FromStrings(coords, 6);
-                
-                // Fix coordinate system
-                //pos = Vector3(pos.x, pos.z, pos.y);
-                //rot = Vector3(rot.x, -rot.z + 180, rot.y);
             }
             
             compElem = compElem.GetNext("component");
         }
 
         // For now we are only interested of meshes
-        if (meshName.empty)
-            continue;
-        
-        for (uint i = 0; i < materialNames.length; ++i)
+        if (!meshName.empty)
         {
-            bool found = false;
-            for (uint j = 0; j < convertedMaterials.length; ++j)
+            for (uint i = 0; i < materialNames.length; ++i)
             {
-                if (convertedMaterials[j] == materialNames[i])
+                bool found = false;
+                for (uint j = 0; j < convertedMaterials.length; ++j)
+                {
+                    if (convertedMaterials[j] == materialNames[i])
+                    {
+                        found = true;
+                        break;
+                    }                    
+                }
+    
+                if (!found)
+                {
+                    ConvertMaterial(materialNames[i], filePath);
+                    convertedMaterials.Push(materialNames[i]);
+                }
+            }
+    
+            bool found = false;
+            for (uint i = 0; i < convertedMeshes.length; ++i)
+            {
+                if (convertedMeshes[i] == meshName)
                 {
                     found = true;
                     break;
-                }                    
+                }
             }
-
             if (!found)
-            {
-                ConvertMaterial(materialNames[i], filePath);
-                convertedMaterials.Push(materialNames[i]);
-            }
+                ConvertModel(meshName, filePath);
+    
+            Node@ newNode = editorScene.CreateChild(nodeName, useLocalIDs ? LOCAL : REPLICATED);
+            StaticModel@ model = newNode.CreateComponent("StaticModel");
+
+            // Calculate final transform in an Ogre-like fashion
+            Quaternion quat = Quaternion(rot);
+            Quaternion meshQuat = Quaternion(meshRot);            
+            Quaternion finalQuat = quat * meshQuat;
+            Vector3 finalScale = scale * meshScale;
+            Vector3 finalPos = pos + quat * (scale * meshPos);
+
+            newNode.SetTransform(finalPos, finalQuat, finalScale);
+            model.model = cache.GetResource("Model", "Models/" + meshName.Replaced(".mesh", ".mdl"));
+            model.drawDistance = drawDistance;
+            model.castShadows = castShadows;
+            for (uint i = 0; i < materialNames.length; ++i)
+                model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
         }
-
-        bool found = false;
-        for (uint i = 0; i < convertedMeshes.length; ++i)
-        {
-            if (convertedMeshes[i] == meshName)
-            {
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-            ConvertModel(meshName, filePath);
-
-        Node@ newNode = editorScene.CreateChild(nodeName, useLocalIDs ? LOCAL : REPLICATED);
-        StaticModel@ model = newNode.CreateComponent("StaticModel");
-        
-        newNode.SetTransform(pos, Quaternion(rot), scale);
-        model.model = cache.GetResource("Model", "Models/" + meshName.Replaced(".mesh", ".mdl"));
-        model.drawDistance = drawDistance;
-        model.castShadows = castShadows;
-        for (uint i = 0; i < materialNames.length; ++i)
-            model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
-
-        UpdateSceneWindow();
 
         entityElem = entityElem.GetNext("entity");
     }
+
+    UpdateSceneWindow();
+    UpdateWindowTitle();    
 }
 
 String GetComponentAttribute(XMLElement compElem, const String&in name)
