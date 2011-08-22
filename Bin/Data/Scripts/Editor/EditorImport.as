@@ -2,6 +2,12 @@
 
 bool useLocalIDs = false;
 
+class ParentAssignment
+{
+    uint childID;
+    String parentName;
+}
+
 void ImportModel(const String&in fileName)
 {
     String modelName = "Models/" + GetFileName(fileName) + ".mdl";
@@ -71,21 +77,23 @@ void ImportScene(const String&in fileName)
     }
 }
 
+
 void ImportTundraScene(const String&in fileName)
 {
     fileSystem.CreateDir(sceneResourcePath + "Materials");
     fileSystem.CreateDir(sceneResourcePath + "Models");
     fileSystem.CreateDir(sceneResourcePath + "Textures");
-    
+
     XMLFile source;
     source.Load(File(fileName, FILE_READ));
     String filePath = GetPath(fileName);
 
     XMLElement sceneElem = source.root;
     XMLElement entityElem = sceneElem.GetChild("entity");
-    
+
     Array<String> convertedMaterials;
     Array<String> convertedMeshes;
+    Array<ParentAssignment> parentAssignments;
 
     // Clear old scene, then create a zone and a directional light first
     CreateScene();
@@ -108,6 +116,7 @@ void ImportTundraScene(const String&in fileName)
     {
         String nodeName;
         String meshName;
+        String parentName;
         Vector3 meshPos;
         Vector3 meshRot;
         Vector3 meshScale(1, 1, 1);
@@ -147,6 +156,7 @@ void ImportTundraScene(const String&in fileName)
                 pos.z = -pos.z; // Convert to lefthanded
                 rot = GetVector3FromStrings(coords, 3);
                 scale = GetVector3FromStrings(coords, 6);
+                parentName = GetComponentAttribute(compElem, "Parent entity ref");
             }
             
             compElem = compElem.GetNext("component");
@@ -203,9 +213,27 @@ void ImportTundraScene(const String&in fileName)
             model.castShadows = castShadows;
             for (uint i = 0; i < materialNames.length; ++i)
                 model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
+                
+            // Store pending parent assignment if necessary
+            if (!parentName.empty)
+            {
+                ParentAssignment assignment;
+                assignment.childID = newNode.id;
+                assignment.parentName = parentName;
+                parentAssignments.Push(assignment);
+            }
         }
 
         entityElem = entityElem.GetNext("entity");
+    }
+
+    // Process any parent assignments now
+    for (uint i = 0; i < parentAssignments.length; ++i)
+    {
+        Node@ childNode = editorScene.GetNodeByID(parentAssignments[i].childID);
+        Node@ parentNode = editorScene.GetChild(parentAssignments[i].parentName, true);
+        if (childNode !is null && parentNode !is null)
+            childNode.parent = parentNode;
     }
 
     UpdateSceneWindow();
