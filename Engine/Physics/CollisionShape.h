@@ -127,7 +127,7 @@ public:
     /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// %Set collision group bits.
-    void SetCollisionGroup(unsigned group);
+    void SetCollisionLayer(unsigned group);
     /// %Set collision mask bits.
     void SetCollisionMask(unsigned mask);
     /// %Set friction coefficient.
@@ -158,7 +158,7 @@ public:
     /// Return rotation.
     const Quaternion& GetRotation() const { return rotation_; }
     /// Return collision group bits.
-    unsigned GetCollisionGroup() const { return collisionGroup_; }
+    unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask bits.
     unsigned GetCollisionMask() const { return collisionMask_; }
     /// Return friction coefficient.
@@ -215,7 +215,7 @@ private:
     /// Scene node scale used to create the geometry.
     Vector3 geometryScale_;
     /// Collision group bits.
-    unsigned collisionGroup_;
+    unsigned collisionLayer_;
     /// Collision mask bits.
     unsigned collisionMask_;
     /// Friction coefficient.

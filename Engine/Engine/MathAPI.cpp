@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Color.h"
 #include "Frustum.h"
+#include "Ray.h"
 
 #include <angelscript.h>
 
@@ -404,7 +405,9 @@ static void RegisterRay(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Ray", "Ray& opAssign(const Ray&in)", asMETHOD(Ray, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "bool opEquals(const Ray&in) const", asMETHOD(Ray, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "void Define(const Vector3&in, const Vector3&in)", asMETHOD(Ray, Define), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Ray", "float Distance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, Distance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "float HitDistance(const Sphere&in) const", asMETHODPR(Ray, HitDistance, (const Sphere&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "float HitDistance(const BoundingBox&in) const", asMETHODPR(Ray, HitDistance, (const BoundingBox&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "float HitDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, HitDistance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);
     engine->RegisterObjectProperty("Ray", "Vector3 origin", offsetof(Ray, origin_));
     engine->RegisterObjectProperty("Ray", "Vector3 direction", offsetof(Ray, direction_));
 }
@@ -538,7 +541,6 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Vector3&in) const", asMETHODPR(BoundingBox, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Sphere&in) const", asMETHODPR(BoundingBox, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(BoundingBox, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "float Distance(const Ray&in) const", asMETHOD(BoundingBox, Distance), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_center() const", asMETHOD(BoundingBox, Center), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_size() const", asMETHOD(BoundingBox, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_halfSize() const", asMETHOD(BoundingBox, HalfSize), asCALL_THISCALL);
@@ -561,7 +563,6 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const Vector3&in) const", asMETHODPR(Sphere, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const Sphere&in) const", asMETHODPR(Sphere, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(Sphere, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sphere", "float Distance(const Ray&in) const", asMETHOD(Sphere, Distance), asCALL_THISCALL);
     engine->RegisterObjectProperty("Sphere", "Vector3 center", offsetof(Sphere, center_));
     engine->RegisterObjectProperty("Sphere", "float radius", offsetof(Sphere, radius_));
     engine->RegisterObjectProperty("Sphere", "bool defined", offsetof(Sphere, defined_));
@@ -628,10 +629,10 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterVector3(engine);
     RegisterVector4(engine);
     RegisterQuaternion(engine);
-    RegisterRay(engine);
     RegisterRect(engine);
     RegisterVolumes(engine);
+    RegisterRay(engine);
     RegisterColor(engine);
     
-    /// \todo Register Matrix types
+    /// \todo Register matrix types
 }

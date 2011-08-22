@@ -135,7 +135,7 @@ class GameObject : ScriptObject
         CollisionShape@ otherShape = eventData["OtherShape"].GetCollisionShape();
 
         // If the other collision shape belongs to static geometry, perform world collision
-        if (otherShape.collisionGroup == 2)
+        if (otherShape.collisionLayer == 2)
             WorldCollision(eventData);
 
         // If the other node is scripted, perform object-to-object collision

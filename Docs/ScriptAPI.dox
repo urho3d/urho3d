@@ -342,17 +342,6 @@ Properties:<br>
 - float z
 
 
-Ray
-
-Methods:<br>
-- void Define(const Vector3&, const Vector3&)
-- float Distance(const Vector3&, const Vector3&, const Vector3&) const
-
-Properties:<br>
-- Vector3 origin
-- Vector3 direction
-
-
 Rect
 
 Methods:<br>
@@ -386,7 +375,6 @@ Methods:<br>
 - Intersection IsInside(const Vector3&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const BoundingBox&) const
-- float Distance(const Ray&) const
 
 Properties:<br>
 - Vector3 center (readonly)
@@ -410,7 +398,6 @@ Methods:<br>
 - Intersection IsInside(const Vector3&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const BoundingBox&) const
-- float Distance(const Ray&) const
 
 Properties:<br>
 - Vector3 center
@@ -428,6 +415,19 @@ Methods:<br>
 Properties:<br>
 - Vector3[] vertices (readonly)
 - bool defined
+
+
+Ray
+
+Methods:<br>
+- void Define(const Vector3&, const Vector3&)
+- float HitDistance(const Sphere&) const
+- float HitDistance(const BoundingBox&) const
+- float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
+
+Properties:<br>
+- Vector3 origin
+- Vector3 direction
 
 
 Color
@@ -1053,7 +1053,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents(const String&) const
-- Component@ GetComponent(const String&, uint arg1 = 0) const
+- Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
 - ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
@@ -1131,7 +1131,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents(const String&) const
-- Component@ GetComponent(const String&, uint arg1 = 0) const
+- Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - bool LoadXML(File@)
 - bool SaveXML(File@)
@@ -1144,8 +1144,8 @@ Methods:<br>
 - void RegisterVar(const String&)
 - void UnregisterVar(const String&)
 - void UnregisterAllVars(const String&)
-- Component@ GetComponentByID(uint)
-- Node@ GetNodeByID(uint)
+- Component@ GetComponent(uint)
+- Node@ GetNode(uint)
 - const String& GetVarName(ShortStringHash) const
 - void Update(float)
 
@@ -3624,7 +3624,7 @@ Properties:<br>
 - ShapeType shapeType (readonly)
 - Vector3& position
 - Quaternion& rotation
-- uint collisionGroup
+- uint collisionLayer
 - uint collisionMask
 - float friction
 - float bounce

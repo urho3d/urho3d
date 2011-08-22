@@ -699,24 +699,13 @@ bool Node::HasComponent(ShortStringHash type) const
     return false;
 }
 
-Component* Node::GetComponent(unsigned index) const
+Component* Node::GetComponent(ShortStringHash type) const
 {
-    return index < components_.Size() ? components_[index].Get() : 0;
-}
-
-Component* Node::GetComponent(ShortStringHash type, unsigned index) const
-{
-    unsigned cmpIndex = 0;
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
-        {
-            if (cmpIndex == index)
-                return *i;
-            ++cmpIndex;
-        }
+            return *i;
     }
-    
     return 0;
 }
 
@@ -767,7 +756,7 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
     }
     
     unsigned baseNodeID = buf.ReadNetID();
-    Node* baseNode = scene->GetNodeByID(baseNodeID);
+    Node* baseNode = scene->GetNode(baseNodeID);
     if (!baseNode)
     {
         LOGWARNING("Failed to find parent node " + String(baseNodeID));

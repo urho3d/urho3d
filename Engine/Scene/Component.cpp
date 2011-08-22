@@ -61,9 +61,9 @@ bool Component::HasComponent(ShortStringHash type) const
     return node_ ? node_->HasComponent(type) : false;
 }
 
-Component* Component::GetComponent(ShortStringHash type, unsigned index) const
+Component* Component::GetComponent(ShortStringHash type) const
 {
-    return node_ ? node_->GetComponent(type, index) : 0;
+    return node_ ? node_->GetComponent(type) : 0;
 }
 
 void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const

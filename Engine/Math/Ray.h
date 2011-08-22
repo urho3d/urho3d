@@ -25,6 +25,10 @@
 
 #include "Vector3.h"
 
+class BoundingBox;
+class Plane;
+class Sphere;
+
 /// Infinite straight line in three-dimensional space.
 class Ray
 {
@@ -70,10 +74,16 @@ public:
     
     /// Project a point on the ray.
     Vector3 Project(const Vector3& point) const;
-    /// Return minimum distance to a triangle, or infinity if no hit.
-    float Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Return minimum distance to a triangle mesh defined by vertex and index data.
-    float Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
+    /// Return hit distance to a plane, or infinity if no hit.
+    float HitDistance(const Plane& plane) const;
+    /// Return hit distance to a sphere, or infinity if no hit.
+    float HitDistance(const Sphere& sphere) const;
+    /// Return hit distance to a bounding box, or infinity if no hit.
+    float HitDistance(const BoundingBox& box) const;
+    /// Return hit distance to a triangle, or infinity if no hit.
+    float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
+    /// Return hit distance to a triangle mesh defined by vertex and index data, or infinity if no hit.
+    float HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
     
     /// Ray origin.
     Vector3 origin_;

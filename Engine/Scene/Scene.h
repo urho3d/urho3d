@@ -54,6 +54,7 @@ class Scene : public Node
 {
     OBJECT(Scene);
     
+    using Node::GetComponent;
     using Node::SaveXML;
     
 public:
@@ -103,9 +104,9 @@ public:
     void UnregisterAllVars();
     
     /// Return node from the whole scene by ID, or null if not found.
-    Node* GetNodeByID(unsigned id) const;
+    Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
-    Component* GetComponentByID(unsigned id) const;
+    Component* GetComponent(unsigned id) const;
     /// Return active flag.
     bool IsActive() const { return active_; }
     /// Return asynchronous loading flag.

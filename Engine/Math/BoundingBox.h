@@ -30,7 +30,6 @@ class Frustum;
 class Matrix3;
 class Matrix4;
 class Matrix3x4;
-class Ray;
 class Sphere;
 
 /// Three-dimensional axis-aligned bounding box.
@@ -243,8 +242,6 @@ public:
     Intersection IsInside(const Sphere& sphere) const;
     /// Test if a sphere is (partially) inside or outside.
     Intersection IsInsideFast(const Sphere& sphere) const;
-    /// Return ray hit distance, or infinity if no hit.
-    float Distance(const Ray& ray) const;
     
     /// Minimum vector.
     Vector3 min_;

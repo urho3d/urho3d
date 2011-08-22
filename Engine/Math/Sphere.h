@@ -27,7 +27,6 @@
 
 class BoundingBox;
 class Frustum;
-class Ray;
 
 /// %Sphere in three-dimensional space.
 class Sphere
@@ -153,8 +152,6 @@ public:
     Intersection IsInside(const BoundingBox& box) const;
     /// Test if a bounding box is (partially) inside or outside.
     Intersection IsInsideFast(const BoundingBox& box) const;
-    /// Return distance to a ray, or infinity if no intersection.
-    float Distance(const Ray& ray) const;
     
     /// Sphere center.
     Vector3 center_;

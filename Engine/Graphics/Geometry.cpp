@@ -224,7 +224,7 @@ float Geometry::GetDistance(const Ray& ray)
     if (!rawIndexData_ || !rawVertexData_ || !indexBuffer_)
         return M_INFINITY;
     
-    return ray.Distance(rawVertexData_.Get(), 3 * sizeof(float), rawIndexData_.Get(), indexBuffer_->GetIndexSize(), indexStart_, indexCount_);
+    return ray.HitDistance(rawVertexData_.Get(), 3 * sizeof(float), rawIndexData_.Get(), indexBuffer_->GetIndexSize(), indexStart_, indexCount_);
 }
 
 void Geometry::GetPositionBufferIndex()

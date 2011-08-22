@@ -130,7 +130,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
             // Do an initial crude test using the bone's AABB
             const BoundingBox& box = bone.boundingBox_;
             const Matrix3x4& transform = bone.node_->GetWorldTransform();
-            float distance = box.Transformed(transform).Distance(query.ray_);
+            float distance = query.ray_.HitDistance(box.Transformed(transform));
             if (distance < query.maxDistance_)
             {
                 if (level == RAY_AABB)
@@ -147,7 +147,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                     // Follow with an OBB test if required
                     Matrix3x4 inverse = transform.Inverse();
                     Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-                    distance = box.Distance(localRay);
+                    distance = localRay.HitDistance(box);
                     if (distance < query.maxDistance_)
                     {
                         RayQueryResult result;
@@ -164,7 +164,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
         {
             boneSphere.center_ = bone.node_->GetWorldPosition();
             boneSphere.radius_ = bone.radius_;
-            float distance = boneSphere.Distance(query.ray_);
+            float distance = query.ray_.HitDistance(boneSphere);
             if (distance < query.maxDistance_)
             {
                 RayQueryResult result;
@@ -709,7 +709,7 @@ void AnimatedModel::OnNodeSet(Node* node)
     Drawable::OnNodeSet(node);
     
     // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
-    isMaster_ = GetComponent<AnimatedModel>(0) == this;
+    isMaster_ = GetComponent<AnimatedModel>() == this;
 }
 
 void AnimatedModel::OnMarkedDirty(Node* node)

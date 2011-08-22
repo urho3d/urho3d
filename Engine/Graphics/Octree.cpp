@@ -205,7 +205,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     if (!numDrawables_)
         return;
     
-    float octantDist = cullingBox_.Distance(query.ray_);
+    float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist >= query.maxDistance_)
         return;
     
@@ -219,7 +219,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
             !drawable->GetCastShadows()))
             continue;
         
-        float drawableDist = drawable->GetWorldBoundingBox().Distance(query.ray_);
+        float drawableDist = query.ray_.HitDistance(drawable->GetWorldBoundingBox());
         // The drawable will possibly do more accurate collision testing, then store the result(s)
         if (drawableDist < query.maxDistance_)
             drawable->ProcessRayQuery(query, drawableDist);

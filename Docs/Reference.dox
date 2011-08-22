@@ -723,7 +723,7 @@ The other physics components are:
 
 Triangle meshes, convex hulls and heightfields are created by specifying a Model resource.
 
-Several collision shapes may exist in the same scene node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. The shape (instead of RigidBody) also contains collision behaviour parameters: which other objects to collide with (see \ref CollisionShape::SetCollisionGroup "SetCollisionGroup()" and \ref CollisionShape::SetCollisionMask "SetCollisionMask()"), the friction coefficient, and the bounce coefficient.
+Several collision shapes may exist in the same scene node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. The shape (instead of RigidBody) also contains collision behaviour parameters: which other objects to collide with (see \ref CollisionShape::SetCollisionLayer "SetCollisionLayer()" and \ref CollisionShape::SetCollisionMask "SetCollisionMask()"), the friction coefficient, and the bounce coefficient.
 
 Note that static physics objects such as unmoving level geometry should not have RigidBody components at all.
 

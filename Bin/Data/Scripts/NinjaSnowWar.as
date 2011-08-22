@@ -164,7 +164,7 @@ void InitScene()
     staticModel.material = cache.GetResource("Material", "Materials/Snow.xml");
     CollisionShape@ shape = staticNode.CreateComponent("CollisionShape");
     shape.SetTriangleMesh(cache.GetResource("Model", "Models/Level.mdl"), 0);
-    shape.collisionGroup = 2;
+    shape.collisionLayer = 2;
     shape.collisionMask = 3;
 
     Node@ skyNode = gameScene.CreateChild("Sky");
@@ -563,7 +563,7 @@ int FindPlayerIndex(uint nodeID)
 Node@ FindPlayerNode(int playerIndex)
 {
     if (playerIndex >= 0 && playerIndex < int(players.length))
-        return gameScene.GetNodeByID(players[playerIndex].nodeID);
+        return gameScene.GetNode(players[playerIndex].nodeID);
     else
         return null;
 }
@@ -573,7 +573,7 @@ Node@ FindOwnNode()
     if (singlePlayer)
         return gameScene.GetChild("Player", true);
     else
-        return gameScene.GetNodeByID(clientNodeID);
+        return gameScene.GetNode(clientNodeID);
 }
 
 bool CheckHiscore(int playerIndex)

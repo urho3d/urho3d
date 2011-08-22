@@ -89,8 +89,8 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "const Vector3& get_position() const", asMETHOD(CollisionShape, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_rotation(const Quaternion&in)", asMETHOD(CollisionShape, SetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "const Quaternion& get_rotation() const", asMETHOD(CollisionShape, GetRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void set_collisionGroup(uint)", asMETHOD(CollisionShape, SetCollisionGroup), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "uint get_collisionGroup() const", asMETHOD(CollisionShape, GetCollisionGroup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void set_collisionLayer(uint)", asMETHOD(CollisionShape, SetCollisionLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "uint get_collisionLayer() const", asMETHOD(CollisionShape, GetCollisionLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_collisionMask(uint)", asMETHOD(CollisionShape, SetCollisionMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "uint get_collisionMask() const", asMETHOD(CollisionShape, GetCollisionMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_friction(float)", asMETHOD(CollisionShape, SetFriction), asCALL_THISCALL);

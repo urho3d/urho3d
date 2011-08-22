@@ -149,7 +149,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     Vector<PODVector<float> >& blendWeights);
 unsigned GetElementMask(aiMesh* mesh);
 
-aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
+aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode);
 aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode);
@@ -327,7 +327,7 @@ void Run(const Vector<String>& arguments)
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
         {
-            rootNode_ = FindNode(rootNodeName, rootNode_, false);
+            rootNode_ = GetNode(rootNodeName, rootNode_, false);
             if (!rootNode_)
                 ErrorExit("Could not find scene node " + rootNodeName);
         }
@@ -491,7 +491,7 @@ void CollectBones(OutModel& model)
         {
             aiBone* bone = mesh->mBones[j];
             String boneName(FromAIString(bone->mName));
-            aiNode* boneNode = FindNode(boneName, scene_->mRootNode, true);
+            aiNode* boneNode = GetNode(boneName, scene_->mRootNode, true);
             if (!boneNode)
                 ErrorExit("Could not find scene node for bone " + boneName);
             necessary.Insert(boneNode);
@@ -1571,7 +1571,7 @@ unsigned GetElementMask(aiMesh* mesh)
     return elementMask;
 }
 
-aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive)
+aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
 {
     if (!rootNode)
         return 0;
@@ -1579,7 +1579,7 @@ aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive)
         return rootNode;
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
     {
-        aiNode* found = FindNode(name, rootNode->mChildren[i], caseSensitive);
+        aiNode* found = GetNode(name, rootNode->mChildren[i], caseSensitive);
         if (found)
             return found;
     }

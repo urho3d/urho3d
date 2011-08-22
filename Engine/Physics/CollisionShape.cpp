@@ -307,7 +307,7 @@ CollisionShape::CollisionShape(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     geometryScale_(Vector3::UNITY),
-    collisionGroup_(M_MAX_UNSIGNED),
+    collisionLayer_(M_MAX_UNSIGNED),
     collisionMask_(M_MAX_UNSIGNED),
     friction_(DEFAULT_FRICTION),
     bounce_(DEFAULT_BOUNCE),
@@ -334,7 +334,7 @@ void CollisionShape::RegisterObject(Context* context)
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Bounce", GetBounce, SetBounce, float, DEFAULT_BOUNCE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionLayer, SetCollisionLayer, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Phantom", phantom_, false, AM_DEFAULT);
 }
@@ -511,9 +511,9 @@ void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rot
     UpdateTransform();
 }
 
-void CollisionShape::SetCollisionGroup(unsigned group)
+void CollisionShape::SetCollisionLayer(unsigned group)
 {
-    collisionGroup_ = group;
+    collisionLayer_ = group;
     if (geometry_)
         dGeomSetCategoryBits(geometry_, group);
 }
@@ -923,7 +923,7 @@ void CollisionShape::CreateGeometry()
     // Set collision group and mask & userdata
     if (geometry_)
     {
-        dGeomSetCategoryBits(geometry_, collisionGroup_);
+        dGeomSetCategoryBits(geometry_, collisionLayer_);
         dGeomSetCollideBits(geometry_, collisionMask_);
         dGeomSetData(geometry_, this);
     }

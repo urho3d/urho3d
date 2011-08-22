@@ -253,10 +253,8 @@ public:
     const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type.
     void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
-    /// Return component by index.
-    Component* GetComponent(unsigned index) const;
-    /// Return component by type. The optional index allows to specify which component, if there are several.
-    Component* GetComponent(ShortStringHash type, unsigned index = 0) const;
+    /// Return component by type. If there are several, returns the first.
+    Component* GetComponent(ShortStringHash type) const;
     /// Return whether has a specific component.
     bool HasComponent(ShortStringHash type) const;
     /// Return listener components.
@@ -268,7 +266,7 @@ public:
     /// Template version of returning child nodes with a specific component.
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
-    template <class T> T* GetComponent(unsigned index = 0) const;
+    template <class T> T* GetComponent() const;
     /// Template version of returning all components of type.
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     /// Template version of checking whether has a specific component.
@@ -357,6 +355,6 @@ private:
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }
 template <class T> T* Node::GetOrCreateComponent(CreateMode mode) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode)); }
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const { GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive); }
-template <class T> T* Node::GetComponent(unsigned index) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), index)); }
+template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Node::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
 template <class T> bool Node::HasComponent() const { return HasComponent(T::GetTypeStatic()); }

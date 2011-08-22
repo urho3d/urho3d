@@ -23,10 +23,7 @@
 
 #pragma once
 
-#include "Ray.h"
 #include "Vector3.h"
-
-class Ray;
 
 /// Surface in three-dimensional space.
 class Plane
@@ -85,16 +82,6 @@ public:
     {
         // Point must contain only positive X, Y, Z
         return absNormal_.DotProduct(absPoint);
-    }
-    
-    /// Return ray hit distance, or infinity if no hit.
-    float Distance(const Ray& ray) const
-    {
-        float d = normal_.DotProduct(ray.direction_);
-        if (fabsf(d) >= M_EPSILON)
-            return (-normal_.DotProduct(ray.origin_) + intercept_) / d;
-        else
-            return M_INFINITY;
     }
     
     /// Plane normal.

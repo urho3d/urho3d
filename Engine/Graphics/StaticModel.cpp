@@ -91,7 +91,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
         {
             Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = boundingBox_.Distance(localRay);
+            float distance = localRay.HitDistance(boundingBox_);
             if (distance < query.maxDistance_)
             {
                 RayQueryResult result;
@@ -108,7 +108,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
             // Do a pretest using the OBB
             Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = boundingBox_.Distance(localRay);
+            float distance = localRay.HitDistance(boundingBox_);
             if (distance < query.maxDistance_)
             {
                 // Then the actual test using triangle geometry

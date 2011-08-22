@@ -344,7 +344,7 @@ void Connection::ProcessPendingLatestData()
     for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
     {
         HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
-        Node* node = scene_->GetNodeByID(current->first_);
+        Node* node = scene_->GetNode(current->first_);
         if (node)
         {
             MemoryBuffer msg(current->second_);
@@ -358,7 +358,7 @@ void Connection::ProcessPendingLatestData()
     for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
     {
         HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
-        Component* component = scene_->GetComponentByID(current->first_);
+        Component* component = scene_->GetComponent(current->first_);
         if (component)
         {
             MemoryBuffer msg(current->second_);
@@ -497,7 +497,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         {
             unsigned nodeID = msg.ReadNetID();
             // In case of the root node (scene), it should already exist. Do not create in that case
-            Node* node = scene_->GetNodeByID(nodeID);
+            Node* node = scene_->GetNode(nodeID);
             if (!node)
             {
                 // Add initially to the root level. May be moved as we receive the parent attribute
@@ -532,7 +532,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
-                Component* component = scene_->GetComponentByID(componentID);
+                Component* component = scene_->GetComponent(componentID);
                 if (!component || component->GetType() != type || component->GetNode() != node)
                 {
                     if (component)
@@ -557,7 +557,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_NODEDELTAUPDATE:
         {
             unsigned nodeID = msg.ReadNetID();
-            Node* node = scene_->GetNodeByID(nodeID);
+            Node* node = scene_->GetNode(nodeID);
             if (node)
             {
                 node->ReadDeltaUpdate(msg, deltaUpdateBits_);
@@ -580,7 +580,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_NODELATESTDATA:
         {
             unsigned nodeID = msg.ReadNetID();
-            Node* node = scene_->GetNodeByID(nodeID);
+            Node* node = scene_->GetNode(nodeID);
             if (node)
                 node->ReadLatestDataUpdate(msg);
             else
@@ -596,7 +596,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_REMOVENODE:
         {
             unsigned nodeID = msg.ReadNetID();
-            Node* node = scene_->GetNodeByID(nodeID);
+            Node* node = scene_->GetNode(nodeID);
             if (node)
                 node->Remove();
             nodeLatestData_.Erase(nodeID);
@@ -606,14 +606,14 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_CREATECOMPONENT:
         {
             unsigned nodeID = msg.ReadNetID();
-            Node* node = scene_->GetNodeByID(nodeID);
+            Node* node = scene_->GetNode(nodeID);
             if (node)
             {
                 ShortStringHash type = msg.ReadShortStringHash();
                 unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
-                Component* component = scene_->GetComponentByID(componentID);
+                Component* component = scene_->GetComponent(componentID);
                 if (!component || component->GetType() != type || component->GetNode() != node)
                 {
                     if (component)
@@ -640,7 +640,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_COMPONENTDELTAUPDATE:
         {
             unsigned componentID = msg.ReadNetID();
-            Component* component = scene_->GetComponentByID(componentID);
+            Component* component = scene_->GetComponent(componentID);
             if (component)
             {
                 component->ReadDeltaUpdate(msg, deltaUpdateBits_);
@@ -654,7 +654,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_COMPONENTLATESTDATA:
         {
             unsigned componentID = msg.ReadNetID();
-            Component* component = scene_->GetComponentByID(componentID);
+            Component* component = scene_->GetComponent(componentID);
             if (component)
             {
                 component->ReadLatestDataUpdate(msg);
@@ -673,7 +673,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_REMOVECOMPONENT:
         {
             unsigned componentID = msg.ReadNetID();
-            Component* component = scene_->GetComponentByID(componentID);
+            Component* component = scene_->GetComponent(componentID);
             if (component)
                 component->Remove();
             componentLatestData_.Erase(componentID);
@@ -925,7 +925,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         }
         
         VariantMap eventData = msg.ReadVariantMap();
-        Node* receiver = scene_->GetNodeByID(nodeID);
+        Node* receiver = scene_->GetNode(nodeID);
         if (!receiver)
         {
             LOGWARNING("Missing receiver for remote node event, discarding");

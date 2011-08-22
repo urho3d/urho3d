@@ -85,7 +85,7 @@ class Ninja : GameObject
         // Create collision shape
         CollisionShape@ shape = node.CreateComponent("CollisionShape");
         shape.SetCapsule(35, 110, Vector3(), Quaternion(90, 0, 0));
-        shape.collisionGroup = 1;
+        shape.collisionLayer = 1;
         shape.collisionMask = 3;
         shape.friction = ninjaFriction;
 

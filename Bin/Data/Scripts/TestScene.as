@@ -134,7 +134,7 @@ void InitScene()
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        shape.collisionGroup = 2;
+        shape.collisionLayer = 2;
         shape.collisionMask = 1;
     }
 
@@ -150,7 +150,7 @@ void InitScene()
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        shape.collisionGroup = 2;
+        shape.collisionLayer = 2;
         shape.collisionMask = 1;
     }
 
@@ -168,7 +168,7 @@ void InitScene()
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        shape.collisionGroup = 2;
+        shape.collisionLayer = 2;
         shape.collisionMask = 1;
     }
 
@@ -186,7 +186,7 @@ void InitScene()
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
-        shape.collisionGroup = 2;
+        shape.collisionLayer = 2;
         shape.collisionMask = 1;
     }
 
@@ -414,7 +414,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
     shape.SetBox(Vector3(2, 2, 2));
     shape.friction = 1.0;
-    shape.collisionGroup = 1;
+    shape.collisionLayer = 1;
     shape.collisionMask = 3;
 
     RigidBody@ body = newNode.CreateComponent("RigidBody");

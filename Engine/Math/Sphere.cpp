@@ -235,31 +235,3 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
     else
         return INSIDE;
 }
-
-float Sphere::Distance(const Ray& ray) const
-{
-    Vector3 centeredOrigin = ray.origin_ - center_;
-    float squaredRadius = radius_ * radius_;
-    
-    // Check if ray originates inside the sphere
-    if (centeredOrigin.LengthSquared() <= squaredRadius)
-        return 0.0f;
-    
-    // Calculate intersection by quadratic equation
-    float a = ray.direction_.DotProduct(ray.direction_);
-    float b = 2.0f * centeredOrigin.DotProduct(ray.direction_);
-    float c = centeredOrigin.DotProduct(centeredOrigin) - squaredRadius;
-    float d = b * b - 4.0f * a * c;
-    
-    // No solution
-    if (d < 0.0f)
-        return M_INFINITY;
-    
-    // Get the nearer solution
-    float dSqrt = sqrtf(d);
-    float dist = (-b - dSqrt) / (2.0f * a);
-    if (dist >= 0.0f)
-        return dist;
-    else
-        return (-b + dSqrt) / (2.0f * a);
-}

@@ -22,7 +22,10 @@
 //
 
 #include "Precompiled.h"
+#include "BoundingBox.h"
+#include "Plane.h"
 #include "Ray.h"
+#include "Sphere.h"
 
 Vector3 Ray::Project(const Vector3& point) const
 {
@@ -30,7 +33,123 @@ Vector3 Ray::Project(const Vector3& point) const
     return origin_ + offset.DotProduct(direction_) * direction_;
 }
 
-float Ray::Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
+float Ray::HitDistance(const Plane& plane) const
+{
+    float d = plane.normal_.DotProduct(direction_);
+    if (fabsf(d) >= M_EPSILON)
+        return (-plane.normal_.DotProduct(origin_) + plane.intercept_) / d;
+    else
+        return M_INFINITY;
+}
+
+float Ray::HitDistance(const Sphere& sphere) const
+{
+    Vector3 centeredOrigin = origin_ - sphere.center_;
+    float squaredRadius = sphere.radius_ * sphere.radius_;
+    
+    // Check if ray originates inside the sphere
+    if (centeredOrigin.LengthSquared() <= squaredRadius)
+        return 0.0f;
+    
+    // Calculate intersection by quadratic equation
+    float a = direction_.DotProduct(direction_);
+    float b = 2.0f * centeredOrigin.DotProduct(direction_);
+    float c = centeredOrigin.DotProduct(centeredOrigin) - squaredRadius;
+    float d = b * b - 4.0f * a * c;
+    
+    // No solution
+    if (d < 0.0f)
+        return M_INFINITY;
+    
+    // Get the nearer solution
+    float dSqrt = sqrtf(d);
+    float dist = (-b - dSqrt) / (2.0f * a);
+    if (dist >= 0.0f)
+        return dist;
+    else
+        return (-b + dSqrt) / (2.0f * a);
+}
+
+float Ray::HitDistance(const BoundingBox& box) const
+{
+    // If undefined, no hit (infinite distance)
+    if (!box.defined_)
+        return M_INFINITY;
+    
+    // Check for ray origin being inside the box
+    if (box.IsInside(origin_))
+        return 0.0f;
+    
+    float dist = M_INFINITY;
+    
+    // Check for intersecting in the X-direction
+    if (origin_.x_ < box.min_.x_ && direction_.x_ > 0.0f)
+    {
+        float x = (box.min_.x_ - origin_.x_) / direction_.x_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.y_ >= box.min_.y_ && point.y_ <= box.max_.y_ && point.z_ >= box.min_.z_ && point.z_ <= box.max_.z_)
+                dist = x;
+        }
+    }
+    if (origin_.x_ > box.max_.x_ && direction_.x_ < 0.0f)
+    {
+        float x = (box.max_.x_ - origin_.x_) / direction_.x_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.y_ >= box.min_.y_ && point.y_ <= box.max_.y_ && point.z_ >= box.min_.z_ && point.z_ <= box.max_.z_)
+                dist = x;
+        }
+    }
+    // Check for intersecting in the Y-direction
+    if (origin_.y_ < box.min_.y_ && direction_.y_ > 0.0f)
+    {
+        float x = (box.min_.y_ - origin_.y_) / direction_.y_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.x_ >= box.min_.x_ && point.x_ <= box.max_.x_ && point.z_ >= box.min_.z_ && point.z_ <= box.max_.z_)
+                dist = x;
+        }
+    }
+    if (origin_.y_ > box.max_.y_ && direction_.y_ < 0.0f)
+    {
+        float x = (box.max_.y_ - origin_.y_) / direction_.y_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.x_ >= box.min_.x_ && point.x_ <= box.max_.x_ && point.z_ >= box.min_.z_ && point.z_ <= box.max_.z_)
+                dist = x;
+        }
+    }
+    // Check for intersecting in the Z-direction
+    if (origin_.z_ < box.min_.z_ && direction_.z_ > 0.0f)
+    {
+        float x = (box.min_.z_ - origin_.z_) / direction_.z_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.x_ >= box.min_.x_ && point.x_ <= box.max_.x_ && point.y_ >= box.min_.y_ && point.y_ <= box.max_.y_)
+                dist = x;
+        }
+    }
+    if (origin_.z_ > box.max_.z_ && direction_.z_ < 0.0f)
+    {
+        float x = (box.max_.z_ - origin_.z_) / direction_.z_;
+        if (x < dist)
+        {
+            Vector3 point = origin_ + x * direction_;
+            if (point.x_ >= box.min_.x_ && point.x_ <= box.max_.x_ && point.y_ >= box.min_.y_ && point.y_ <= box.max_.y_)
+                dist = x;
+        }
+    }
+    
+    return dist;
+}
+
+float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
     // Based on Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
     // http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
@@ -61,7 +180,7 @@ float Ray::Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) con
     return M_INFINITY;
 }
 
-float Ray::Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
+float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
 {
     float nearest = M_INFINITY;
     const unsigned char* vertices = (const unsigned char*)vertexData;
@@ -76,7 +195,7 @@ float Ray::Distance(const void* vertexData, unsigned vertexSize, const void* ind
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
-            nearest = Min(nearest, Distance(v0, v1, v2));
+            nearest = Min(nearest, HitDistance(v0, v1, v2));
         }
     }
     // 32-bit indices
@@ -89,7 +208,7 @@ float Ray::Distance(const void* vertexData, unsigned vertexSize, const void* ind
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
-            nearest = Min(nearest, Distance(v0, v1, v2));
+            nearest = Min(nearest, HitDistance(v0, v1, v2));
         }
     }
     

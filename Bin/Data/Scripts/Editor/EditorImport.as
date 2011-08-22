@@ -77,7 +77,6 @@ void ImportScene(const String&in fileName)
     }
 }
 
-
 void ImportTundraScene(const String&in fileName)
 {
     fileSystem.CreateDir(sceneResourcePath + "Materials");
@@ -97,21 +96,27 @@ void ImportTundraScene(const String&in fileName)
 
     // Clear old scene, then create a zone and a directional light first
     CreateScene();
+    
+    // Set standard gravity
+    editorScene.physicsWorld.gravity = Vector3(0, -9.81, 0);
 
+    // Create zone & global light
     Node@ zoneNode = editorScene.CreateChild("Zone", useLocalIDs ? LOCAL : REPLICATED);
     Zone@ zone = zoneNode.CreateComponent("Zone");
-    Node@ lightNode = editorScene.CreateChild("GlobalLight", useLocalIDs ? LOCAL : REPLICATED);
-    Light@ light = lightNode.CreateComponent("Light");
-    lightNode.rotation = Quaternion(60, 30, 0);
-    light.lightType = LIGHT_DIRECTIONAL;
-    light.castShadows = true;
-    light.shadowCascade = CascadeParameters(3, 0.95, 0.2, 1000000);
     zone.boundingBox = BoundingBox(-1000, 1000);
     zone.ambientColor = Color(0.5, 0.5, 0.5);
     zone.fogColor = Color(0.5, 0.7, 1.0);
     zone.fogStart = 100.0;
     zone.fogEnd = 500.0;
 
+    Node@ lightNode = editorScene.CreateChild("GlobalLight", useLocalIDs ? LOCAL : REPLICATED);
+    Light@ light = lightNode.CreateComponent("Light");
+    lightNode.rotation = Quaternion(60, 30, 0);
+    light.lightType = LIGHT_DIRECTIONAL;
+    light.castShadows = true;
+    light.shadowCascade = CascadeParameters(3, 0.95, 0.2, 1000000);
+
+    // Loop through scene entities
     while (!entityElem.isNull)
     {
         String nodeName;
@@ -126,6 +131,15 @@ void ImportTundraScene(const String&in fileName)
         bool castShadows = false;
         float drawDistance = 0;
         Array<String> materialNames;
+        
+        int shapeType = -1;
+        float mass = 0.0f;
+        Vector3 bodySize;
+        bool phantom = false;
+        bool kinematic = false;
+        uint collisionLayer;
+        uint collisionMask;
+        String collisionMeshName;
 
         XMLElement compElem = entityElem.GetChild("component");
         while (!compElem.isNull)
@@ -158,49 +172,37 @@ void ImportTundraScene(const String&in fileName)
                 scale = GetVector3FromStrings(coords, 6);
                 parentName = GetComponentAttribute(compElem, "Parent entity ref");
             }
-            
+            if (compType == "EC_RigidBody")
+            {
+                shapeType = GetComponentAttribute(compElem, "Shape type").ToInt();
+                mass = GetComponentAttribute(compElem, "Mass").ToFloat();
+                bodySize = GetComponentAttribute(compElem, "Size").ToVector3();
+                collisionMeshName = GetComponentAttribute(compElem, "Collision mesh ref");
+                phantom = GetComponentAttribute(compElem, "Phantom").ToBool();
+                kinematic = GetComponentAttribute(compElem, "Kinematic").ToBool();
+                collisionLayer = GetComponentAttribute(compElem, "Collision Layer").ToInt();
+                collisionMask = GetComponentAttribute(compElem, "Collision Mask").ToInt();
+                ProcessRef(collisionMeshName);
+            }
+
             compElem = compElem.GetNext("component");
         }
 
-        // For now we are only interested of meshes
-        if (!meshName.empty)
+        // If collision mesh not specified for the rigid body, assume same as the visible mesh
+        if ((shapeType == 4 || shapeType == 6) && collisionMeshName.Trimmed().empty)
+            collisionMeshName = meshName;
+
+        if (!meshName.empty || shapeType >= 0)
         {
             for (uint i = 0; i < materialNames.length; ++i)
-            {
-                bool found = false;
-                for (uint j = 0; j < convertedMaterials.length; ++j)
-                {
-                    if (convertedMaterials[j] == materialNames[i])
-                    {
-                        found = true;
-                        break;
-                    }                    
-                }
-    
-                if (!found)
-                {
-                    ConvertMaterial(materialNames[i], filePath);
-                    convertedMaterials.Push(materialNames[i]);
-                }
-            }
-    
-            bool found = false;
-            for (uint i = 0; i < convertedMeshes.length; ++i)
-            {
-                if (convertedMeshes[i] == meshName)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-                ConvertModel(meshName, filePath);
-    
+                ConvertMaterial(materialNames[i], filePath, convertedMaterials);
+            
+            ConvertModel(meshName, filePath, convertedMeshes);
+            ConvertModel(collisionMeshName, filePath, convertedMeshes);
+
             Node@ newNode = editorScene.CreateChild(nodeName, useLocalIDs ? LOCAL : REPLICATED);
-            StaticModel@ model = newNode.CreateComponent("StaticModel");
 
             // Calculate final transform in an Ogre-like fashion
-            /// \todo Tundra 2.0 supports entity parenting. It is not yet taken into account
             Quaternion quat = GetTransformQuaternion(rot);
             Quaternion meshQuat = GetTransformQuaternion(meshRot);
             Quaternion finalQuat = quat * meshQuat;
@@ -208,12 +210,75 @@ void ImportTundraScene(const String&in fileName)
             Vector3 finalPos = pos + quat * (scale * meshPos);
 
             newNode.SetTransform(finalPos, finalQuat, finalScale);
-            model.model = cache.GetResource("Model", "Models/" + meshName.Replaced(".mesh", ".mdl"));
-            model.drawDistance = drawDistance;
-            model.castShadows = castShadows;
-            for (uint i = 0; i < materialNames.length; ++i)
-                model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
+
+            // Create model
+            if (!meshName.empty)
+            {
+                StaticModel@ model = newNode.CreateComponent("StaticModel");
+                model.model = cache.GetResource("Model", "Models/" + meshName.Replaced(".mesh", ".mdl"));
+                model.drawDistance = drawDistance;
+                model.castShadows = castShadows;
+                // Set default grey material to match Tundra defaults
+                model.material = cache.GetResource("Material", "Materials/DefaultGrey.xml");
+                // Then try to assign the actual materials
+                for (uint i = 0; i < materialNames.length; ++i)
+                {
+                    Material@ mat = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
+                    if (mat !is null)
+                        model.materials[i] = mat;
+                }
+            }
+            
+            // Create collision shape
+            if (shapeType >= 0)
+            {
+                // If mesh has scaling, undo it for the collision shape
+                bodySize.x /= meshScale.x;
+                bodySize.y /= meshScale.y;
+                bodySize.z /= meshScale.z;
+
+                CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+                switch (shapeType)
+                {
+                case 0:
+                    shape.SetBox(bodySize);
+                    break;
+
+                case 1:
+                    shape.SetSphere(bodySize.x * 0.5);
+                    break;
+
+                case 2:
+                    shape.SetCylinder(bodySize.x * 0.5, bodySize.y, Vector3(0, 0, 0), Quaternion(90, 0, 0));
+                    break;
+
+                case 3:
+                    shape.SetCapsule(bodySize.x * 0.5, bodySize.y - bodySize.x, Vector3(0, 0, 0), Quaternion(90, 0, 0));
+                    break;
+                    
+                case 4:
+                    shape.SetTriangleMesh(cache.GetResource("Model", "Models/" + collisionMeshName.Replaced(".mesh", ".mdl")), 0, bodySize);
+                    break;
+                    
+                case 6:
+                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + collisionMeshName.Replaced(".mesh", ".mdl")), 0.1, 0, bodySize);
+                    break;
+                }
                 
+                shape.collisionLayer = collisionLayer;
+                shape.collisionMask = collisionMask;
+                shape.phantom = phantom;
+
+                // Create rigid body if the object should be dynamic or kinematic
+                if (mass > 0.0)
+                {
+                    RigidBody@ body = newNode.CreateComponent("RigidBody");
+                    //if (kinematic)
+                    //    mass = 0.0;
+                    body.mass = mass;
+                }
+            }
+
             // Store pending parent assignment if necessary
             if (!parentName.empty)
             {
@@ -230,7 +295,7 @@ void ImportTundraScene(const String&in fileName)
     // Process any parent assignments now
     for (uint i = 0; i < parentAssignments.length; ++i)
     {
-        Node@ childNode = editorScene.GetNodeByID(parentAssignments[i].childID);
+        Node@ childNode = editorScene.GetNode(parentAssignments[i].childID);
         Node@ parentNode = editorScene.GetChild(parentAssignments[i].parentName, true);
         if (childNode !is null && parentNode !is null)
             childNode.parent = parentNode;
@@ -276,8 +341,17 @@ void ProcessRef(String& ref)
         ref = ref.Substring(7);
 }
 
-void ConvertModel(const String&in modelName, const String&in filePath)
+void ConvertModel(const String&in modelName, const String&in filePath, Array<String>@ convertedModels)
 {
+    if (modelName.Trimmed().empty)
+        return;
+
+    for (uint i = 0; i < convertedModels.length; ++i)
+    {
+        if (convertedModels[i] == modelName)
+            return;
+    }
+
     // Convert .mesh to .mesh.xml
     String cmdLine = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + filePath + modelName + ".xml\"";
     fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
@@ -288,10 +362,21 @@ void ConvertModel(const String&in modelName, const String&in filePath)
     args.Push("\"" + sceneResourcePath + "Models/" + modelName.Replaced(".mesh", ".mdl") + "\"");
     args.Push("-a");
     fileSystem.SystemRun(fileSystem.programDir + "OgreImporter.exe", args);
+    
+    convertedModels.Push(modelName);
 }
 
-void ConvertMaterial(const String&in materialName, const String&in filePath)
+void ConvertMaterial(const String&in materialName, const String&in filePath, Array<String>@ convertedMaterials)
 {
+    if (materialName.Trimmed().empty)
+        return;
+
+    for (uint i = 0; i < convertedMaterials.length; ++i)
+    {
+        if (convertedMaterials[i] == materialName)
+            return;
+    }
+
     String fileName = filePath + materialName;
     String outFileName = sceneResourcePath + "Materials/" + GetFileName(materialName) + ".xml";
 
@@ -341,4 +426,6 @@ void ConvertMaterial(const String&in materialName, const String&in filePath)
     
         fileSystem.Copy(filePath + textureName, sceneResourcePath + "Textures/" + textureName);
     }
+    
+    convertedMaterials.Push(materialName);
 }

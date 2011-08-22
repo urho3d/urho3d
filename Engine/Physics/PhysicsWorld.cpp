@@ -32,6 +32,7 @@
 #include "PhysicsWorld.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
+#include "Ray.h"
 #include "RigidBody.h"
 #include "Scene.h"
 #include "SceneEvents.h"

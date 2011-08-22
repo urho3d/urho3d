@@ -260,14 +260,14 @@ Vector3 Joint::GetAxis() const
 void Joint::SetBodyAAttr(int value)
 {
     Scene* scene = node_ ? node_->GetScene() : 0;
-    bodyA_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponentByID(value)) : (RigidBody*)0;
+    bodyA_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponent(value)) : (RigidBody*)0;
     recreateJoint_ = true;
 }
 
 void Joint::SetBodyBAttr(int value)
 {
     Scene* scene = node_ ? node_->GetScene() : 0;
-    bodyB_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponentByID(value)) : (RigidBody*)0;
+    bodyB_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponent(value)) : (RigidBody*)0;
     recreateJoint_ = true;
 }
 

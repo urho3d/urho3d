@@ -323,7 +323,7 @@ void Scene::UnregisterAllVars()
     varNames_.Clear();
 }
 
-Node* Scene::GetNodeByID(unsigned id) const
+Node* Scene::GetNode(unsigned id) const
 {
     Map<unsigned, Node*>::ConstIterator i = allNodes_.Find(id);
     if (i != allNodes_.End())
@@ -332,7 +332,7 @@ Node* Scene::GetNodeByID(unsigned id) const
         return 0;
 }
 
-Component* Scene::GetComponentByID(unsigned id) const
+Component* Scene::GetComponent(unsigned id) const
 {
     Map<unsigned, Component*>::ConstIterator i = allComponents_.Find(id);
     if (i != allComponents_.End())

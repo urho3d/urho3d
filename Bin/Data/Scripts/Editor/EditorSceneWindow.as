@@ -280,7 +280,7 @@ Node@ GetListNode(uint index)
     if (item is null)
         return null;
 
-    return editorScene.GetNodeByID(item.vars["NodeID"].GetUInt());
+    return editorScene.GetNode(item.vars["NodeID"].GetUInt());
 }
 
 Component@ GetListComponent(uint index)
@@ -298,7 +298,7 @@ Component@ GetListComponent(UIElement@ item)
     if (item.vars["Type"].GetInt() != ITEM_COMPONENT)
         return null;
 
-    return editorScene.GetComponentByID(item.vars["ComponentID"].GetUInt());
+    return editorScene.GetComponent(item.vars["ComponentID"].GetUInt());
 }
 
 uint GetComponentListIndex(Component@ component)
@@ -493,8 +493,8 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     if (!accept)
         return;
 
-    Node@ sourceNode = editorScene.GetNodeByID(source.vars["NodeID"].GetUInt());
-    Node@ targetNode = editorScene.GetNodeByID(target.vars["NodeID"].GetUInt());
+    Node@ sourceNode = editorScene.GetNode(source.vars["NodeID"].GetUInt());
+    Node@ targetNode = editorScene.GetNode(target.vars["NodeID"].GetUInt());
 
     // If target is null, parent to scene
     if (targetNode is null)
@@ -542,9 +542,9 @@ bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
     Node@ sourceNode;
     Node@ targetNode;
     if (source.vars.Contains("NodeID"))
-        sourceNode = editorScene.GetNodeByID(source.vars["NodeID"].GetUInt());
+        sourceNode = editorScene.GetNode(source.vars["NodeID"].GetUInt());
     if (target.vars.Contains("NodeID"))
-        editorScene.GetNodeByID(target.vars["NodeID"].GetUInt());
+        editorScene.GetNode(target.vars["NodeID"].GetUInt());
 
     if (sourceNode is null)
         return false;

@@ -319,9 +319,9 @@ void SetAttributeEditorID(UIElement@ attrEdit, Serializable@ serializable)
 Serializable@ GetAttributeEditorTarget(UIElement@ attrEdit)
 {
     if (attrEdit.vars.Contains("NodeID"))
-        return editorScene.GetNodeByID(attrEdit.vars["NodeID"].GetUInt());
+        return editorScene.GetNode(attrEdit.vars["NodeID"].GetUInt());
     else if (attrEdit.vars.Contains("ComponentID"))
-        return editorScene.GetComponentByID(attrEdit.vars["ComponentID"].GetUInt());
+        return editorScene.GetComponent(attrEdit.vars["ComponentID"].GetUInt());
     else
         return null;
 }
@@ -866,7 +866,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         return;
     }
 
-    Component@ target = editorScene.GetComponentByID(resourcePickID);
+    Component@ target = editorScene.GetComponent(resourcePickID);
     if (target is null || resourcePicker is null)
         return;
 

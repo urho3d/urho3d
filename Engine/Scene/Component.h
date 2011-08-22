@@ -67,12 +67,12 @@ public:
     
     /// Return components in the same scene node by type.
     void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
-    /// Return component in the same scene node by type. The optional index allows to specify which component, if there are several.
-    Component* GetComponent(ShortStringHash type, unsigned index = 0) const;
+    /// Return component in the same scene node by type. If there are several, returns the first.
+    Component* GetComponent(ShortStringHash type) const;
     /// Return whether the same scene node has a specific component.
     bool HasComponent(ShortStringHash type) const;
     /// Template version of returning a component in the same scene node by type.
-    template <class T> T* GetComponent(unsigned index = 0) const;
+    template <class T> T* GetComponent() const;
     /// Template version of returning components in the same scene node by type.
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     
@@ -88,5 +88,5 @@ protected:
     Node* node_;
 };
 
-template <class T> T* Component::GetComponent(unsigned index) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), index)); }
+template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Component::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
