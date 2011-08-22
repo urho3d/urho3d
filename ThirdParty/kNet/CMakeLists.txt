@@ -146,14 +146,14 @@ elseif (UNIX)
    file(GLOB kNetUnixSourceFiles ./src/unix/*.cpp)
    file(GLOB kNetUnixHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/unix/*.h)
 
-   set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})
-   set(kNetHeaderFiles ${kNetHeaderFiles} ${kNetUnixHeaderFiles})
-
    if (USE_BOOST)
       list(REMOVE_ITEM kNetUnixSourceFiles ${PROJECT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
    else()
       set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
    endif()
+
+   set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})
+   set(kNetHeaderFiles ${kNetHeaderFiles} ${kNetUnixHeaderFiles})
 endif()
 
 #AddCompilationUnitNameDefines(kNetSourceFiles)

@@ -38,6 +38,7 @@
 #include "DebugNew.h"
 
 static const float DEFAULT_MASS = 1.0f;
+static const int DEFAULT_MASS_AXIS = 1;
 
 static const String modeNames[] =
 {
@@ -51,6 +52,7 @@ OBJECTTYPESTATIC(RigidBody);
 RigidBody::RigidBody(Context* context) :
     Component(context),
     mass_(DEFAULT_MASS),
+    massAxis_(DEFAULT_MASS_AXIS),
     body_(0),
     inPostStep_(false)
 {
@@ -68,7 +70,8 @@ void RigidBody::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody>();
     
-    ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", GetMass, SetMass, float, DEFAULT_MASS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Mass Axis", GetMassAxis, SetMassAxis, int, DEFAULT_MASS_AXIS, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Lin Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
@@ -87,6 +90,12 @@ void RigidBody::RegisterObject(Context* context)
 void RigidBody::SetMass(float mass)
 {
     mass_ = Max(mass, 0.0f);
+    UpdateMass();
+}
+
+void RigidBody::SetMassAxis(int massAxis)
+{
+    massAxis_ = Clamp(massAxis, 0, 2);
     UpdateMass();
 }
 
@@ -553,11 +562,11 @@ void RigidBody::UpdateMass()
             break;
             
         case SHAPE_CYLINDER:
-            dMassSetCylinder(&subMass, density, 1, 0.5f * size.x_, size.y_);
+            dMassSetCylinder(&subMass, density, massAxis_, 0.5f * size.x_, size.y_);
             break;
             
         case SHAPE_CAPSULE:
-            dMassSetCapsule(&subMass, density, 1, 0.5f * size.x_, Max(size.y_ - size.x_, 0.0f));
+            dMassSetCapsule(&subMass, density, massAxis_, 0.5f * size.x_, Max(size.y_ - size.x_, 0.0f));
             break;
             
         case SHAPE_TRIANGLEMESH:

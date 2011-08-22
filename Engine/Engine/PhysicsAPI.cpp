@@ -114,6 +114,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void ResetForces()", asMETHOD(RigidBody, ResetForces), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_mass(float)", asMETHOD(RigidBody, SetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_mass() const", asMETHOD(RigidBody, GetMass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_massAxis(int)", asMETHOD(RigidBody, SetMassAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "int get_massAxis() const", asMETHOD(RigidBody, GetMassAxis), asCALL_THISCALL),
     engine->RegisterObjectMethod("RigidBody", "void set_linearVelocity(const Vector3&in)", asMETHOD(RigidBody, SetLinearVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "const Vector3& get_linearVelocity() const", asMETHOD(RigidBody, GetLinearVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_linearRestThreshold(float)", asMETHOD(RigidBody, SetLinearRestThreshold), asCALL_THISCALL);

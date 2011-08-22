@@ -47,6 +47,8 @@ public:
     
     /// %Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic.
     void SetMass(float mass);
+    /// %Set mass axis for the cylinder and capsule shapes. By default 1 (Y-axis.)
+    void SetMassAxis(int axis);
     /// %Set physics position.
     void SetPosition(const Vector3& position);
     /// %Set physics rotation.
@@ -86,6 +88,8 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return mass.
     float GetMass() const { return mass_; }
+    /// Return mass axis for cylinder and capsule shapes.
+    int GetMassAxis() const { return massAxis_; }
     /// Return ODE body ID.
     dBodyID GetBody() const { return body_; }
     /// Return physics position.
@@ -140,6 +144,8 @@ private:
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Mass.
     float mass_;
+    /// Mass axis for cylinder and capsule shapes.
+    int massAxis_;
     /// ODE body ID.
     dBodyID body_;
     /// Previous position for rendering interpolation.

@@ -42,9 +42,8 @@ class SnowBall : GameObject
         model.material = cache.GetResource("Material", "Materials/Snow.xml");
         model.drawDistance = snowballDrawDistance;
         model.castShadows = true;
-    
-        // Create collision shape. Create as local to avoid divergent simulation by the client
-        CollisionShape@ shape = node.CreateComponent("CollisionShape", LOCAL);
+
+        CollisionShape@ shape = node.CreateComponent("CollisionShape");
         shape.SetBox(Vector3(15, 15, 15));
         shape.collisionLayer = 1;
         shape.collisionMask = 3;
