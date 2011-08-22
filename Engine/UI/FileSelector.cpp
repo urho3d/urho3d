@@ -47,7 +47,7 @@ static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry
         return true;
     if (!lhs.directory_ && rhs.directory_)
         return false;
-    return lhs.name_ < rhs.name_;
+    return lhs.name_.Compare(rhs.name_, false) < 0;
 }
 
 OBJECTTYPESTATIC(FileSelector);
