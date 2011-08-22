@@ -123,16 +123,10 @@ void UI::SetFocusElement(UIElement* element)
         if (focusElement_ == element)
             return;
         
-        // If element can not be focused, and does not reset the focus either, search toward the parent
-        for (;;)
-        {
-            if (element->GetFocusMode() != FM_NOTFOCUSABLE)
-                break;
-            element = element->GetParent();
-            // Return if did not find any parent element that changes the focus
-            if (!element)
-                return;
-        }
+        // Search for an element in the hierarchy that can alter focus. If none found, exit
+        element = GetFocusableElement(element);
+        if (!element)
+            return;
     }
     
     // Remove focus from the old element
@@ -148,7 +142,7 @@ void UI::SetFocusElement(UIElement* element)
     }
     
     // Then set focus to the new
-    if (element)
+    if (element && element->GetFocusMode() >= FM_FOCUSABLE)
     {
         focusElement_ = element;
         element->OnFocus();
@@ -550,6 +544,17 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     }
 }
 
+UIElement* UI::GetFocusableElement(UIElement* element)
+{
+    while (element)
+    {
+        if (element->GetFocusMode() != FM_NOTFOCUSABLE)
+            break;
+        element = element->GetParent();
+    }
+    return element;
+}
+
 void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)
 {
     XMLElement childElem = elem.GetChild("element");
@@ -740,6 +745,19 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     UIElement* element = GetFocusElement();
     if (element)
         element->OnWheel(delta, mouseButtons_, qualifiers_);
+    else
+    {
+        // If no element has actual focus, get the element at cursor
+        if (cursor_)
+        {
+            IntVector2 pos = cursor_->GetPosition();
+            UIElement* element = GetElementAt(pos);
+            // If the element itself is not focusable, search for a focusable parent
+            element = GetFocusableElement(element);
+            if (element && element->GetFocusMode() >= FM_FOCUSABLE)
+                element->OnWheel(delta, mouseButtons_, qualifiers_);
+        }
+    }
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)

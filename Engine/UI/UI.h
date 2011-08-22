@@ -90,6 +90,8 @@ private:
     bool IsVisible(UIElement* element, const IntRect& currentScissor);
     /// Return UI element at screen position recursively.
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly);
+    /// Return the first element in hierarchy that can alter focus.
+    UIElement* GetFocusableElement(UIElement* element);
     /// Load a UI layout from an XML file recursively.
     void LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile);
     /// Handle screen mode event.
