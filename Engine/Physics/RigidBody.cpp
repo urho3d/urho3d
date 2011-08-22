@@ -424,15 +424,13 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     inPostStep_ = true;
     
     // If the parent node has a rigid body, process it first
+    // Note: for optimization, we intentionally assume that the scene root node can not have a rigid body
     Node* parent = node_->GetParent();
-    if (parent)
+    if (parent && parent != node_->GetScene())
     {
         RigidBody* parentBody = parent->GetComponent<RigidBody>();
-        if (parentBody)
-        {
-            if (!processedBodies.Contains(parentBody))
-                parentBody->PostStep(t, processedBodies);
-        }
+        if (parentBody && !processedBodies.Contains(parentBody))
+            parentBody->PostStep(t, processedBodies);
     }
     
     // Apply the physics transform to rendering transform now
