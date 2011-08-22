@@ -423,10 +423,9 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     processedBodies.Insert(this);
     inPostStep_ = true;
     
-    // If the parent node has a rigid body, process it first. For now, treat node parented to the Scene as unparented
+    // If the parent node has a rigid body, process it first
     Node* parent = node_->GetParent();
-    bool hasParent = parent && parent != node_->GetScene();
-    if (hasParent)
+    if (parent)
     {
         RigidBody* parentBody = parent->GetComponent<RigidBody>();
         if (parentBody)
@@ -439,7 +438,7 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     // Apply the physics transform to rendering transform now
     const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
     const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
-    if (!hasParent)
+    if (!parent)
     {
         // If node already has motion smoothing enabled, do not do substep interpolation
         if (!node_->IsSmoothed())

@@ -761,7 +761,10 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
     MemoryBuffer buf(value);
     // If nothing in the buffer, parent is the root node
     if (buf.IsEof())
+    {
+        SetParent(scene);
         return;
+    }
     
     unsigned baseNodeID = buf.ReadNetID();
     Node* baseNode = scene->GetNodeByID(baseNodeID);
@@ -771,18 +774,18 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
         return;
     }
     
-    // If buffer contains just an ID, the parent is replicated
+    // If buffer contains just an ID, the parent is replicated and we are done
     if (buf.IsEof())
-        baseNode->AddChild(this);
+        SetParent(baseNode);
     else
     {
         // Else the parent is local and we must find it recursively by name hash
         StringHash nameHash = buf.ReadStringHash();
-        Node* parent = baseNode->GetChild(nameHash, true);
-        if (!parent)
+        Node* parentNode = baseNode->GetChild(nameHash, true);
+        if (!parentNode)
             LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
         else
-            parent->AddChild(this);
+            SetParent(parentNode);
     }
 }
 
@@ -974,9 +977,7 @@ Node* Node::CreateChild(unsigned id, CreateMode mode)
 
 void Node::UpdateWorldTransform() const
 {
-    // For now, assume that the Scene has identity transform so that we skip one matrix multiply. However in the future
-    // we may want dynamic root nodes for large worlds
-    if (parent_ && parent_ != scene_)
+    if (parent_)
     {
         if (parent_->dirty_)
             parent_->UpdateWorldTransform();

@@ -75,14 +75,18 @@ void Scene::RegisterObject(Context* context)
     context->RegisterFactory<Scene>();
     
     REF_ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "Name", GetName, SetName, String, String(), AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE); // Network replication of vars uses custom data
+    REF_ACCESSOR_ATTRIBUTE(Scene, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Scene, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Scene, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::UNITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "User Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String(), AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(Scene, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE); // Network replication of vars uses custom data
+    ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String(), AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(Scene, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
 bool Scene::Load(Deserializer& source)

@@ -493,6 +493,8 @@ Now you should be ready to compile HelloWorld.cpp. The resulting executable will
 
 The Urho3D scene editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D.exe Scripts/Editor.as
 
+Hint: to get some content to look at, run the TestScene example, and press F5. This saves a scene file called Scene.xml into the Data subdirectory, which can be loaded in the editor.
+
 \section EditorInstructions_Controls Controls
 
 \verbatim
@@ -541,11 +543,13 @@ New scene nodes and components are created with the buttons at the bottom of the
 
 To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
 
-Currently, when you edit for example a material or texture, you need to manually reload scene resources (Ctrl+R) to make the changes visible.
+Though Urho3D supports setting a non-identity transform on the root node (scene), it is still best to leave it at identity (position 0, 0, 0, rotation 0, 0, 0, scale 1, 1, 1.)
 
-To create a user variable into the current node, or delete it, type its name into the edit field below the node attributes, and press New or Del buttons. The New button will prompt to choose the variable type.
+To create a user variable into the current node, or delete it, type the variable name into the edit field below the node attributes, and press New or Del buttons next to it. The New button will prompt to choose the variable type.
 
 While editing, you can execute script files using the "Run script" item in the %File menu. These are AngelScript files that are executed in immediate mode ie. you do not need to define a function. The editor's scene will be accessible to the script as the global property "scene."
+
+Currently, when you edit for example a material or texture, you need to manually reload scene resources (Ctrl+R) to make the changes visible.
 
 \section EditorInstructions_Importing Importing
 

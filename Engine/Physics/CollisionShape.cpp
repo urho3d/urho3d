@@ -865,8 +865,13 @@ void CollisionShape::CreateGeometry()
     case SHAPE_TRIANGLEMESH:
     case SHAPE_CONVEXHULL:
         {
+            // For mesh cache lookup purposes, quantize size to 3 decimals only. Otherwise floating point inaccuracy from world
+            // matrix multiplications and rotation/scale decomposing causes several slightly differing meshes to be created
+            char sizeText[CONVERSION_BUFFER_LENGTH];
+            sprintf(sizeText, "%.3f%.3f%.3f", size.x_, size.y_, size.z_);
+            
             // Check the geometry cache
-            String id = model_->GetName() + "_" + String(size) + "_" + String(lodLevel_);
+            String id = model_->GetName() + "_" + String(sizeText) + "_" + String(lodLevel_);
             if (shapeType_ == SHAPE_CONVEXHULL)
                 id += "_" + String(thickness_);
             
@@ -890,8 +895,11 @@ void CollisionShape::CreateGeometry()
         
     case SHAPE_HEIGHTFIELD:
         {
+            char sizeText[CONVERSION_BUFFER_LENGTH];
+            sprintf(sizeText, "%.3f%.3f%.3f", size.x_, size.y_, size.z_);
+            
             // Check the geometry cache
-            String id = model_->GetName() + "_" + String(size) + "_" + String(numPoints_) + "_" + String(thickness_) + "_" +
+            String id = model_->GetName() + "_" + String(sizeText) + "_" + String(numPoints_) + "_" + String(thickness_) + "_" +
                 String(lodLevel_);
             
             Map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
