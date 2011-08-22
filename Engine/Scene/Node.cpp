@@ -587,7 +587,7 @@ Matrix3x4 Node::GetWorldTargetTransform() const
     
     Matrix3x4 ret(targetPosition_, targetRotation_, scale_);
     Node* current = parent_;
-    while (current && current != scene_)
+    while (current)
     {
         ret = Matrix3x4(current->targetPosition_, current->targetRotation_, current->scale_) * ret;
         current = current->parent_;
