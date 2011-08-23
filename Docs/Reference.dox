@@ -273,7 +273,7 @@ The following methods that implement the component behaviour will be checked for
 - void FixedPostUpdate(float)
 - void Save(Serializer&)
 - void Load(Deserializer&)
-- void FinishUpdate()
+- void ApplyAttributes()
 
 The update methods above correspond to the variable timestep scene update and post-update, and the fixed timestep physics world update and post-update. The application-wide update events are not handled by default.
 

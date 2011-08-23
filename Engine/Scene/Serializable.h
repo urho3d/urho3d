@@ -53,8 +53,8 @@ public:
     virtual bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Perform finalization after a scene load or network update.
-    virtual void FinishUpdate() {}
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes() {}
     
     /// %Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);

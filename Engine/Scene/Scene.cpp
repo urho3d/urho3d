@@ -589,7 +589,7 @@ void Scene::FinishAsyncLoading()
 
 void Scene::FinishLoading(Deserializer* source)
 {
-    FinishUpdate();
+    ApplyAttributes();
     if (source)
     {
         fileName_ = source->GetName();

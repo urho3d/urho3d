@@ -70,8 +70,8 @@ public:
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Perform finalization for components and child nodes. Called after scene load, but not for network updates.
-    virtual void FinishUpdate();
+    /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
+    virtual void ApplyAttributes();
     
     /// %Set name.
     void SetName(const String& name);

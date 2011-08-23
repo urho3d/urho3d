@@ -737,7 +737,7 @@ void ScenePaste()
     if (mode == "component")
     {
         BeginModify(selectedNode.id);
-        
+
         // If this is the root node, do not allow to create duplicate scene-global components
         if (selectedNode is editorScene && CheckForExistingGlobalComponent(selectedNode, rootElem.GetAttribute("type")))
             return;
@@ -751,7 +751,7 @@ void ScenePaste()
             return;
         }
         newComponent.LoadXML(rootElem);
-        newComponent.FinishUpdate();
+        newComponent.ApplyAttributes();
         EndModify(selectedNode.id);
 
         UpdateSceneWindowNode(selectedNode);
@@ -765,7 +765,7 @@ void ScenePaste()
         Node@ newNode = editorScene.CreateChild("", copyBufferLocal ? LOCAL : REPLICATED);
         BeginModify(newNode.id);
         newNode.LoadXML(rootElem);
-        newNode.FinishUpdate();
+        newNode.ApplyAttributes();
         EndModify(newNode.id);
         EndModify(editorScene.id);
 

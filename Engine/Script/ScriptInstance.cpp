@@ -48,7 +48,7 @@ static const String methodDeclarations[] = {
     "void FixedPostUpdate(float)",
     "void Load(Deserializer&)",
     "void Save(Serializer&)",
-    "void FinishUpdate()"
+    "void ApplyAttributes()"
 };
 
 OBJECTTYPESTATIC(ScriptInstance);
@@ -84,7 +84,7 @@ void ScriptInstance::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
 }
 
-void ScriptInstance::FinishUpdate()
+void ScriptInstance::ApplyAttributes()
 {
     if (scriptObject_ && methods_[METHOD_FINISHUPDATE])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_FINISHUPDATE]);

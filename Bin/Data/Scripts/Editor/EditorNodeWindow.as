@@ -205,9 +205,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     bool intermediateEdit = eventType == StringHash("TextChanged");
 
     StoreAttributeEditor(parent, serializable, index, subIndex);
-    // Some attributes need the finish step to take effect. This is often to avoid some expensive operation,
-    // but while editing every change should happen instantly
-    serializable.FinishUpdate();
+    serializable.ApplyAttributes();
 
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
@@ -215,8 +213,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
         UpdateAttributes(false);
 
     // If a model was loaded, update the scene hierarchy in case bones were recreated
-    if (serializable.attributeInfos[index].type == VAR_RESOURCEREF && serializable.attributes[index].GetResourceRef().type ==
-        ShortStringHash("Model"))
+    if (serializable.attributes[index].GetResourceRef().type == ShortStringHash("Model"))
     {
         if (selectedNode !is null)
             UpdateSceneWindowNode(selectedNode);
@@ -893,7 +890,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         ref.type = ShortStringHash(resourcePicker.resourceType);
         ref.id = StringHash(resourceName);
         target.attributes[resourcePickIndex] = Variant(ref);
-        target.FinishUpdate();
+        target.ApplyAttributes();
         isModel = ref.type == ShortStringHash("Model");
     }
     else if (info.type == VAR_RESOURCEREFLIST)
@@ -903,7 +900,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             refList.ids[resourcePickSubIndex] = StringHash(resourceName);
             target.attributes[resourcePickIndex] = Variant(refList);
-            target.FinishUpdate();
+            target.ApplyAttributes();
         }
     }
 

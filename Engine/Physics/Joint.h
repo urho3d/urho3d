@@ -53,8 +53,8 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Perform finalization after a scene load or network update.
-    virtual void FinishUpdate();
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest);
     

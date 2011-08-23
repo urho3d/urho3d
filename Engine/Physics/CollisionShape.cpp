@@ -360,7 +360,7 @@ void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     }
 }
 
-void CollisionShape::FinishUpdate()
+void CollisionShape::ApplyAttributes()
 {
     if (recreateGeometry_)
     {

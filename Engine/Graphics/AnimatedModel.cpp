@@ -94,7 +94,7 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }
 
-void AnimatedModel::FinishUpdate()
+void AnimatedModel::ApplyAttributes()
 {
     if (assignBonesPending_)
     {

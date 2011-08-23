@@ -78,7 +78,7 @@ void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         recreateJoint_ = true;
 }
 
-void Joint::FinishUpdate()
+void Joint::ApplyAttributes()
 {
     if (recreateJoint_)
     {

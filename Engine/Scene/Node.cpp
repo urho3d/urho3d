@@ -167,13 +167,13 @@ bool Node::SaveXML(XMLElement& dest)
     return true;
 }
 
-void Node::FinishUpdate()
+void Node::ApplyAttributes()
 {
     for (unsigned i = 0; i < components_.Size(); ++i)
-        components_[i]->FinishUpdate();
+        components_[i]->ApplyAttributes();
     
     for (unsigned i = 0; i < children_.Size(); ++i)
-        children_[i]->FinishUpdate();
+        children_[i]->ApplyAttributes();
 }
 
 void Node::SetName(const String& name)
