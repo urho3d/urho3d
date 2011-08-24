@@ -1,5 +1,4 @@
 <technique>
     <pass name="base" vs="Forward" ps="Forward_Ambient" depthwrite="false" blend="alpha" />
-    <pass name="litbase" vs="Forward" ps="Forward_Ambient" depthwrite="false" blend="alpha" />
     <pass name="light" vs="Forward" ps="Forward" depthwrite="false" blend="addalpha" />
 </technique>

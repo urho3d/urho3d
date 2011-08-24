@@ -17,18 +17,12 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" />
         <option name="SpecMap" define="SPECMAP" include="Spec" />
-        <option name="VCol" define="VERTEXCOLOR">
-            <exclude name="Normal" />
-            <exclude name="Shadow" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </option>
+        <option name="VCol" define="VERTEXCOLOR" />
         <option name="Volume" define="VOLUMETRIC">
             <exclude name="Additive" />
             <exclude name="Ambient" />
             <exclude name="Normal" />
             <exclude name="Shadow" />
-            <exclude name="Spec" />
             <exclude name="SpecMap" />
             <exclude name="Unlit" />
         </option>
@@ -46,11 +40,6 @@
             <exclude name="Normal" />
             <exclude name="Spec" />
             <exclude name="SpecMap" />
-        </variation>
-        <variation name="AmbientDir">
-            <define name="AMBIENT" />
-            <define name="DIRLIGHT" />
-            <define name="LIGHT" />
         </variation>
         <variation name="Dir">
             <define name="DIRLIGHT" />

@@ -347,7 +347,7 @@ void View::GetDrawables()
         unsigned flags = drawable->GetDrawableFlags();
         if (flags & DRAWABLE_GEOMETRY)
         {
-            drawable->ClearBasePass();
+            drawable->ClearLights();
             drawable->MarkInView(frame_);
             drawable->UpdateGeometry(frame_);
             
@@ -390,6 +390,87 @@ void View::GetBatches()
     HashSet<LitTransparencyCheck> litTransparencies;
     HashSet<Drawable*> maxLightsDrawables;
     Map<Light*, unsigned> lightQueueIndex;
+    
+    // Go through geometries for base pass batches
+    {
+        PROFILE(GetBaseBatches);
+        for (unsigned i = 0; i < geometries_.Size(); ++i)
+        {
+            Drawable* drawable = geometries_[i];
+            unsigned numBatches = drawable->GetNumBatches();
+            
+            for (unsigned j = 0; j < numBatches; ++j)
+            {
+                Batch baseBatch;
+                drawable->GetBatch(frame_, j, baseBatch);
+                
+                Technique* tech = GetTechnique(drawable, baseBatch.material_);
+                if (!baseBatch.geometry_ || !tech)
+                    continue;
+                
+                // Check here if the material technique refers to a render target texture with camera(s) attached
+                // Only check this for the main view (null rendertarget)
+                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
+                    CheckMaterialForAuxView(baseBatch.material_);
+                
+                // Fill the rest of the batch
+                baseBatch.camera_ = camera_;
+                baseBatch.distance_ = drawable->GetDistance();
+                
+                Pass* pass = 0;
+                // In deferred mode, check for a G-buffer batch first
+                if (mode_ != RENDER_FORWARD)
+                {
+                    pass = tech->GetPass(PASS_GBUFFER);
+                    if (pass)
+                    {
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
+                        gBufferQueue_.AddBatch(baseBatch);
+                        
+                        // Check also for an additional pass (possibly for emissive)
+                        pass = tech->GetPass(PASS_EXTRA);
+                        if (pass)
+                        {
+                            renderer_->SetBatchShaders(baseBatch, tech, pass);
+                            baseQueue_.AddBatch(baseBatch);
+                        }
+                        
+                        continue;
+                    }
+                }
+                
+                // Then check for forward rendering base pass
+                pass = tech->GetPass(PASS_BASE);
+                if (pass)
+                {
+                    renderer_->SetBatchShaders(baseBatch, tech, pass);
+                    if (pass->GetBlendMode() == BLEND_REPLACE)
+                    {
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
+                        baseQueue_.AddBatch(baseBatch);
+                    }
+                    else
+                    {
+                        baseBatch.hasPriority_ = true;
+                        transparentQueue_.AddBatch(baseBatch, true);
+                    }
+                    continue;
+                }
+                else
+                {
+                    // If no base pass, finally check for extra / custom pass
+                    pass = tech->GetPass(PASS_EXTRA);
+                    if (pass)
+                    {
+                        baseBatch.hasPriority_ = false;
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
+                        extraQueue_.AddBatch(baseBatch);
+                    }
+                }
+            }
+        }
+    }
     
     // Go through lights
     {
@@ -539,91 +620,6 @@ void View::GetBatches()
         }
     }
     
-    // Go through geometries for base pass batches
-    {
-        PROFILE(GetBaseBatches);
-        for (unsigned i = 0; i < geometries_.Size(); ++i)
-        {
-            Drawable* drawable = geometries_[i];
-            unsigned numBatches = drawable->GetNumBatches();
-            
-            for (unsigned j = 0; j < numBatches; ++j)
-            {
-                Batch baseBatch;
-                drawable->GetBatch(frame_, j, baseBatch);
-                
-                Technique* tech = GetTechnique(drawable, baseBatch.material_);
-                if (!baseBatch.geometry_ || !tech)
-                    continue;
-                
-                // Check here if the material technique refers to a render target texture with camera(s) attached
-                // Only check this for the main view (null rendertarget)
-                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
-                    CheckMaterialForAuxView(baseBatch.material_);
-                
-                // If object already has a lit base pass, can skip the unlit base pass
-                if (drawable->HasBasePass(j))
-                    continue;
-                
-                // Fill the rest of the batch
-                baseBatch.camera_ = camera_;
-                baseBatch.distance_ = drawable->GetDistance();
-                
-                Pass* pass = 0;
-                // In deferred mode, check for a G-buffer batch first
-                if (mode_ != RENDER_FORWARD)
-                {
-                    pass = tech->GetPass(PASS_GBUFFER);
-                    if (pass)
-                    {
-                        renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
-                        gBufferQueue_.AddBatch(baseBatch);
-                        
-                        // Check also for an additional pass (possibly for emissive)
-                        pass = tech->GetPass(PASS_EXTRA);
-                        if (pass)
-                        {
-                            renderer_->SetBatchShaders(baseBatch, tech, pass);
-                            baseQueue_.AddBatch(baseBatch);
-                        }
-                        
-                        continue;
-                    }
-                }
-                
-                // Then check for forward rendering base pass
-                pass = tech->GetPass(PASS_BASE);
-                if (pass)
-                {
-                    renderer_->SetBatchShaders(baseBatch, tech, pass);
-                    if (pass->GetBlendMode() == BLEND_REPLACE)
-                    {
-                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
-                        baseQueue_.AddBatch(baseBatch);
-                    }
-                    else
-                    {
-                        baseBatch.hasPriority_ = true;
-                        transparentQueue_.AddBatch(baseBatch, true);
-                    }
-                    continue;
-                }
-                else
-                {
-                    // If no base pass, finally check for extra / custom pass
-                    pass = tech->GetPass(PASS_EXTRA);
-                    if (pass)
-                    {
-                        baseBatch.hasPriority_ = false;
-                        renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        extraQueue_.AddBatch(baseBatch);
-                    }
-                }
-            }
-        }
-    }
-    
     // All batches have been collected. Sort them now
     SortBatches();
 }
@@ -651,22 +647,8 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
         
         Pass* pass = 0;
         bool priority = false;
-        
-        // For directional light, check for lit base pass
-        if (splitLight->GetLightType() == LIGHT_DIRECTIONAL)
-        {
-            if (!drawable->HasBasePass(i))
-            {
-                pass = tech->GetPass(PASS_LITBASE);
-                if (pass)
-                {
-                    priority = true;
-                    drawable->SetBasePass(i);
-                }
-            }
-        }
-        
-        // If no lit base pass, get ordinary light pass
+         
+        // Get lit pass
         if (!pass)
             pass = tech->GetPass(PASS_LIGHT);
         // Skip if material does not receive light at all
@@ -1562,9 +1544,9 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
                 if (lightPixels < SHADOW_MIN_PIXELS)
                     lightPixels = SHADOW_MIN_PIXELS;
                 
-                float zoolevel_ = Min(lightPixels / (float)light->GetShadowMap()->GetHeight(), 1.0f);
+                float zoomLevel = Min(lightPixels / (float)light->GetShadowMap()->GetHeight(), 1.0f);
                 
-                shadowCamera->SetZoom(zoolevel_);
+                shadowCamera->SetZoom(zoomLevel);
             }
         }
         break;

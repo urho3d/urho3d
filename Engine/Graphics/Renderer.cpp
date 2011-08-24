@@ -883,7 +883,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     {
         //  Check whether is a forward lit pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
-        if (type != PASS_LITBASE && type != PASS_LIGHT)
+        if (type != PASS_LIGHT)
         {
             unsigned vsi = batch.geometryType_;
             batch.vertexShader_ = vertexShaders[vsi];
@@ -1043,7 +1043,6 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     if (mode == RENDER_FORWARD)
     {
         LoadPassShaders(technique, PASS_BASE);
-        LoadPassShaders(technique, PASS_LITBASE);
         LoadPassShaders(technique, PASS_LIGHT);
     }
     else
@@ -1054,7 +1053,6 @@ void Renderer::LoadMaterialShaders(Technique* technique)
         {
             LoadPassShaders(technique, PASS_BASE);
             // If shadow maps are not reused, transparencies can be rendered shadowed
-            LoadPassShaders(technique, PASS_LITBASE, !reuseShadowMaps_);
             LoadPassShaders(technique, PASS_LIGHT, !reuseShadowMaps_);
         }
     }
@@ -1076,7 +1074,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
         pixelShaderName += "_";
     
     // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
-    if (reuseShadowMaps_ && (pass == PASS_LIGHT || pass == PASS_LITBASE))
+    if (reuseShadowMaps_ && pass == PASS_LIGHT)
     {
         if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
             allowShadows = false;
@@ -1101,14 +1099,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
         pixelShaders[0] = GetPixelShader(pixelShaderName);
         break;
         
-    case PASS_LITBASE:
     case PASS_LIGHT:
         {
-            // In first light pass, load only directional light shaders
-            unsigned numPS = i->first_ == PASS_LIGHT ? MAX_LIGHT_PS_VARIATIONS : LPS_SPOT;
-            
             vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            pixelShaders.Resize(numPS);
+            pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
             
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
             {
@@ -1119,7 +1113,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
                 else
                     vertexShaders[j].Reset();
             }
-            for (unsigned j = 0; j < numPS; ++j)
+            for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
             {
                 unsigned variation = j % LPS_SPOT;
                 if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)

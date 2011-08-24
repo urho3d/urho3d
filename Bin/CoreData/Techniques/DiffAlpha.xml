@@ -1,6 +1,5 @@
 <technique>
     <pass name="base" vs="Forward" ps="Forward_DiffAmbient" depthwrite="false" blend="alpha" />
-    <pass name="litbase" vs="Forward" ps="Forward_DiffAmbient" depthwrite="false" blend="alpha" />
     <pass name="light" vs="Forward" ps="Forward_Diff" depthwrite="false" blend="addalpha" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

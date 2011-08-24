@@ -286,11 +286,12 @@ void Light::SetShapeTexture(Texture* texture)
 
 void Light::CopyFrom(Light* original)
 {
-    node_->SetTransform(original->GetWorldPosition(), original->GetWorldRotation(), Vector3::UNITY);
+    node_->SetTransform(original->GetWorldPosition(), original->GetWorldRotation(), original->GetWorldScale());
     castShadows_ = original->castShadows_;
     drawDistance_ = original->drawDistance_;
     shadowDistance_ = original->shadowDistance_;
     viewMask_ = original->viewMask_;
+    lightMask_ = original->lightMask_;
     distance_ = original->distance_;
     lightType_ = original->lightType_;
     range_ = original->range_;
@@ -330,7 +331,7 @@ float Light::GetVolumeExtent() const
     case LIGHT_SPOT:
         {
             float safeRange = range_ * 1.001f;
-            float yScale = tan(fov_ * M_DEGTORAD * 0.5f) * safeRange;
+            float yScale = tanf(fov_ * M_DEGTORAD * 0.5f) * safeRange;
             float xScale = aspectRatio_ * yScale;
             return sqrtf(xScale * xScale + yScale * yScale + safeRange * safeRange);
         }
@@ -366,6 +367,7 @@ Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
         farVector.z_ *= (distance / farClip);
     
     // Set an epsilon from clip planes due to possible inaccuracy
+    /// \todo Rather set an identity projection matrix
     farVector.z_ = Clamp(farVector.z_, (1.0f + M_LARGE_EPSILON) * nearClip, (1.0f - M_LARGE_EPSILON) * farClip);
     
     return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
@@ -387,7 +389,7 @@ const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
         
     case LIGHT_SPOT:
         {
-            float yScale = tan(fov_ * M_DEGTORAD * 0.5f) * range_;
+            float yScale = tanf(fov_ * M_DEGTORAD * 0.5f) * range_;
             float xScale = aspectRatio_ * yScale;
             volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), Vector3(xScale, yScale, range_));
         }

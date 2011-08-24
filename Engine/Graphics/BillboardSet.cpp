@@ -424,8 +424,6 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     for (unsigned i = 0; i < enabledBillboards; ++i)
     {
         Billboard& billboard = *sortedBillboards_[i];
-        if (!billboard.enabled_)
-            continue;
         
         Vector3 position(billboardTransform * billboard.position_);
         Vector2 size(billboard.size_.x_ * billboardScale.x_, billboard.size_.y_ * billboardScale.y_);

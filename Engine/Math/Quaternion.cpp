@@ -93,17 +93,16 @@ Quaternion::Quaternion(const Vector3& start, const Vector3& end)
 
 Quaternion::Quaternion(const Matrix3& matrix)
 {
-    float t = matrix.m00_ + matrix.m11_ + matrix.m22_ + 1.0f;
+    float t = matrix.m00_ + matrix.m11_ + matrix.m22_;
     
-    if (t > 0.001f)
+    if (t > 0.0f)
     {
-        float s = sqrtf(t) * 2.0f;
-        float invS = 1.0f / s;
+        float s = 0.5f / sqrtf(1.0f + t);
         
-        x_ = (matrix.m21_ - matrix.m12_) * invS;
-        y_ = (matrix.m02_ - matrix.m20_) * invS;
-        z_ = (matrix.m10_ - matrix.m01_) * invS;
-        w_ = 0.25f * s;
+        x_ = (matrix.m21_ - matrix.m12_) * s;
+        y_ = (matrix.m02_ - matrix.m20_) * s;
+        z_ = (matrix.m10_ - matrix.m01_) * s;
+        w_ = 0.25f / s;
     }
     else
     {

@@ -154,8 +154,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
     {
         if (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light_))
         {
-            const Matrix3x4& transform = light_->GetWorldTransform();
-            Matrix3x4 spotView(transform.Translation(), transform.Rotation(), 1.0f);
+            Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
             Matrix4 spotProj(Matrix4::ZERO);
             Matrix4 texAdjust(Matrix4::IDENTITY);
             
@@ -180,8 +179,8 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTATTEN, light_))
         {
-            Vector4 light_Atten(1.0f / Max(light_->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
-            graphics->SetShaderParameter(PSP_LIGHTATTEN, light_Atten);
+            Vector4 lightAtten(1.0f / Max(light_->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
+            graphics->SetShaderParameter(PSP_LIGHTATTEN, lightAtten);
         }
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light_))
@@ -233,7 +232,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         {
             Matrix3x4 viewPos(camera_->GetWorldPosition(), Quaternion::IDENTITY, Vector3::UNITY);
             Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
-            Matrix4 spotProj(Matrix4::IDENTITY);
+            Matrix4 spotProj(Matrix4::ZERO);
             Matrix4 texAdjust(Matrix4::IDENTITY);
             
             // Make the projected light slightly smaller than the shadow map to prevent light spill
@@ -422,7 +421,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
         Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass_->GetVertexShaders();
         Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
-        if (type != PASS_LITBASE && type != PASS_LIGHT)
+        if (type != PASS_LIGHT)
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
         else
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED * MAX_LIGHT_VS_VARIATIONS];

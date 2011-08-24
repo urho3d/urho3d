@@ -174,7 +174,6 @@ enum PassType
 {
     PASS_GBUFFER,
     PASS_BASE,
-    PASS_LITBASE,
     PASS_LIGHT,
     PASS_EXTRA,
     PASS_SHADOW,

@@ -55,7 +55,6 @@ Drawable::Drawable(Context* context) :
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
-    basePassFlags_(0),
     viewCamera_(0),
     worldBoundingBoxDirty_(true),
     lodLevelsDirty_(true)
@@ -185,15 +184,9 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::ClearBasePass()
+void Drawable::ClearLights()
 {
-    basePassFlags_ = 0;
     lights_.Clear();
-}
-
-void Drawable::SetBasePass(unsigned batchIndex)
-{
-    basePassFlags_ |= (1 << batchIndex);
 }
 
 void Drawable::AddLight(Light* light)

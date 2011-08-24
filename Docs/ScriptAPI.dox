@@ -1750,7 +1750,6 @@ Methods:<br>
 - float GetMorphWeight(uint) const
 - AnimationState@ GetAnimationState(Animation@) const
 - AnimationState@ GetAnimationState(uint) const
-- float getMorphWeight(const String&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1781,6 +1780,7 @@ Properties:<br>
 - uint numAnimationStates (readonly)
 - AnimationState@[] animationStates (readonly)
 - uint numMorphs (readonly)
+- float[] morphWeights
 
 
 AnimationController

@@ -274,7 +274,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnum("PassType");
     engine->RegisterEnumValue("PassType", "PASS_GBUFFER", PASS_GBUFFER);
     engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
-    engine->RegisterEnumValue("PassType", "PASS_LITBASE", PASS_LITBASE);
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
     engine->RegisterEnumValue("PassType", "PASS_EXTRA", PASS_EXTRA);
     engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);
@@ -590,8 +589,8 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeight(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)

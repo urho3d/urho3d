@@ -57,6 +57,8 @@ T           Toggle profiling display
 
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
 
+There is also a variation of TestScene ported from Urho3D 1.0, TestSceneOld. It lacks networking features, but is provided for examining backward compatibility and performance. It can be run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as
+ 
 \section Running_NinjaSnowWar NinjaSnowWar
 
 A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as
