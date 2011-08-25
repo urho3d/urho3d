@@ -86,10 +86,10 @@ void InitScene()
             newNode.scale = Vector3(10, 0.5, 10);
 
             CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-            shape.SetBox(Vector3(1, 1, 1));
+            shape.SetBox(Vector3(2, 2, 2));
             shape.collisionLayer = 2;
             shape.collisionMask = 1;
-            
+
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
             object.material = cache.GetResource("Material", "Materials/Test.xml");
@@ -105,7 +105,7 @@ void InitScene()
         newNode.scale = Vector3(112, 5, 0.5);
 
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(1, 1, 1));
+        shape.SetBox(Vector3(2, 2, 2));
         shape.collisionLayer = 2;
         shape.collisionMask = 1;
 
@@ -123,7 +123,7 @@ void InitScene()
         newNode.SetScale(10);
 
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("CollisionShape", "Physics/Mushroom.xml"), 0);
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
         shape.collisionLayer = 2;
         shape.collisionMask = 1;
 
@@ -248,9 +248,6 @@ void InitScene()
 
         lights.Push(newNode);
     }
-
-    // Save the ready scene for examination
-    testScene.SaveXML(File("Data/SceneOld.xml", FILE_WRITE));
 }
 
 void AnimateScene(float timeStep)
@@ -506,8 +503,8 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         Quaternion rotation = eventData["Rot"].GetQuaternion();
     
         Node@ newNode = testScene.CreateChild();
-        newNode.position = position;
-        newNode.rotation = rotation;
+        newNode.position = cameraNode.position;
+        newNode.rotation = cameraNode.rotation;
         newNode.SetScale(0.1);
     
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
@@ -518,7 +515,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     
         RigidBody@ body = newNode.CreateComponent("RigidBody");
         body.angularMaxVelocity = 500.0;
-        body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
+        body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
         body.mass = 1;
     
         StaticModel@ object = newNode.CreateComponent("StaticModel");

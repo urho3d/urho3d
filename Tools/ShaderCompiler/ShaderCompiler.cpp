@@ -630,7 +630,7 @@ void Compile(CompiledVariation* variation)
     // Set the profile, entrypoint and flags according to the shader being compiled
     String profile;
     String entryPoint;
-    unsigned flags = 0;
+    unsigned flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
     
     if (variation->type_ == VS)
     {
