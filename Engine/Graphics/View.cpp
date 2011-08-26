@@ -1964,13 +1964,13 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             graphics_->SetColorWrite(false);
             graphics_->SetDepthWrite(false);
             graphics_->SetCullMode(drawBackFaces ? CULL_CW : CULL_CCW);
-            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATEREQUAL : CMP_LESSEQUAL);
+            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATER : CMP_LESS);
             graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
             graphics_->SetShaderParameter(VSP_MODEL, model);
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
             graphics_->ClearTransformSources();
             
-            // Draw the faces to stencil which we should draw (where no light has not been rendered yet)
+            // Draw the faces to stencil which we should draw (where no light has been rendered yet)
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_INCR, OP_KEEP, OP_KEEP, 0);
             renderer_->spotLightGeometry_->Draw(graphics_);
             
@@ -2016,7 +2016,7 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                 
                 // If the split begins at the near plane (first split), draw at split far plane, otherwise at near plane
                 bool firstSplit = light->GetNearSplit() <= camera.GetNearClip();
-                graphics_->SetDepthTest(firstSplit ? CMP_GREATEREQUAL : CMP_LESSEQUAL);
+                graphics_->SetDepthTest(firstSplit ? CMP_GREATER : CMP_LESS);
                 graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
                 graphics_->SetShaderParameter(VSP_MODEL, firstSplit ? farTransform : nearTransform);
                 graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
