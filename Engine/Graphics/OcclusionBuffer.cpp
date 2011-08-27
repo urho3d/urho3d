@@ -50,8 +50,7 @@ OcclusionBuffer::OcclusionBuffer(Context* context) :
     cullMode_(CULL_CCW),
     depthHierarchyDirty_(true),
     nearClip_(0.0f),
-    farClip_(0.0f),
-    depthBias_(0.0f)
+    farClip_(0.0f)
 {
 }
 
@@ -111,7 +110,6 @@ void OcclusionBuffer::SetView(Camera* camera)
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
     farClip_ = camera->GetFarClip();
-    depthBias_ = farClip_ * 0.00002f;
     CalculateViewport();
 }
 
@@ -355,7 +353,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
         (int)(maxX + 0.5f), (int)(maxY + 0.5f)
     );
     
-    // If outside, can not test, so assume visible (should be frustum culled in that case)
+    // If the rect is outside, let frustum culling handle
     if (rect.right_ < 0 || rect.bottom_ < 0)
         return true;
     if (rect.left_ >= width_ || rect.top_ >= height_)
@@ -371,7 +369,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (rect.bottom_ >= height_)
         rect.bottom_ = height_ - 1;
     
-    int z = ((int)(minZ * OCCLUSION_Z_SCALE)) - OCCLUSION_DEPTH_BIAS;
+    int z = (int)(minZ * OCCLUSION_Z_SCALE + 0.5f) - OCCLUSION_DEPTH_BIAS;
     
     if (!depthHierarchyDirty_)
     {
@@ -626,7 +624,7 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
                 unsigned newIdx = numTriangles * 3;
                 triangles[numTriangles] = true;
                 ++numTriangles;
-                    
+                
                 vertices[newIdx + 2] = ClipEdge(vertices[index + 2], vertices[index], d2, d0);
                 vertices[newIdx] = vertices[index];
                 vertices[newIdx + 1] = vertices[index + 2] = ClipEdge(vertices[index + 2], vertices[index + 1], d2, d1);
@@ -678,10 +676,10 @@ struct Edge
         float yPreStep = (float)(topY + 1) - top.y_;
         float xPreStep = slope * yPreStep;
         
-        x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE);
-        xStep_ = (int)(slope * OCCLUSION_X_SCALE);
-        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_);
-        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_);
+        x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE + 0.5f);
+        xStep_ = (int)(slope * OCCLUSION_X_SCALE + 0.5f);
+        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_ + 0.5f);
+        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_ + 0.5f);
     }
     
     /// X coordinate.
