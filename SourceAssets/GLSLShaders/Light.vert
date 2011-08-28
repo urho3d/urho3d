@@ -9,7 +9,7 @@ varying vec4 vScreenPos;
 #endif
 varying vec3 vFarRay;
 #ifdef ORTHO
-varying vec3 vNearFar;
+varying vec3 vNearRay;
 #endif
 
 void main()
