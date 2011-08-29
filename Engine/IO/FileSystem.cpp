@@ -357,7 +357,7 @@ String FileSystem::GetProgramDir()
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
     #endif
-    
+
     return GetPath(String(exeName));
 }
 
@@ -459,7 +459,9 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
     String fullPathCopy = GetInternalPath(fullPath);
     
     unsigned extPos = fullPathCopy.FindLast('.');
-    if (extPos != String::NPOS)
+    unsigned pathPos = fullPathCopy.FindLast('/');
+    
+    if (extPos != String::NPOS && (pathPos == String::NPOS || extPos > pathPos))
     {
         extension = fullPathCopy.Substring(extPos).ToLower();
         fullPathCopy = fullPathCopy.Substring(0, extPos);
@@ -467,7 +469,7 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
     else
         extension.Clear();
     
-    unsigned pathPos = fullPathCopy.FindLast('/');
+    pathPos = fullPathCopy.FindLast('/');
     if (pathPos != String::NPOS)
     {
         fileName = fullPathCopy.Substring(pathPos + 1);
