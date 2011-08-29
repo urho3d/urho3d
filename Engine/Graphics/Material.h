@@ -128,6 +128,8 @@ public:
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
     /// Return whether should render occlusion.
     bool GetOcclusion() const { return occlusion_; }
+    /// Return whether should render specular.
+    bool GetSpecular() const { return specular_; }
     
     /// Return name for texture unit.
     static const String& GetTextureUnitName(TextureUnit unit);
@@ -135,6 +137,8 @@ public:
 private:
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
+    /// Re-evaluate specular lighting.
+    void CheckSpecular();
     
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
@@ -150,4 +154,6 @@ private:
     unsigned auxViewFrameNumber_;
     /// Render occlusion flag.
     bool occlusion_;
+    /// Specular lighting flag.
+    bool specular_;
 };

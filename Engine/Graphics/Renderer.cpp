@@ -905,7 +905,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             unsigned psi = 0;
             vsi = batch.geometryType_ * MAX_LIGHT_VS_VARIATIONS;
             
-            if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
+            bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
+            if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
                 psi += LPS_SPEC;
             if (allowShadows && light->GetShadowMap())
             {

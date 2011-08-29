@@ -94,6 +94,8 @@ Material::Material(Context* context) :
     SetShaderParameter("MatDiffColor", Vector4::UNITY);
     SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
     SetShaderParameter("MatSpecProperties", Vector4::ZERO);
+    
+    CheckSpecular();
 }
 
 Material::~Material()
@@ -197,6 +199,7 @@ bool Material::Load(Deserializer& source)
     
     SetMemoryUse(memoryUse);
     CheckOcclusion();
+    CheckSpecular();
     return true;
 }
 
@@ -264,6 +267,8 @@ void Material::SetShaderParameter(const String& name, const Vector4& value)
     newParam.name_ = name;
     newParam.value_ = value;
     shaderParameters_[StringHash(name)] = newParam;
+    
+    CheckSpecular();
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -321,6 +326,7 @@ void Material::SetShadowCullMode(CullMode mode)
 void Material::RemoveShaderParameter(const String& name)
 {
     shaderParameters_.Erase(StringHash(name));
+    CheckSpecular();
 }
 
 void Material::ReleaseShaders()
@@ -402,4 +408,13 @@ void Material::CheckOcclusion()
             }
         }
     }
+}
+
+void Material::CheckSpecular()
+{
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(PSP_MATSPECPROPERTIES);
+    if (i != shaderParameters_.End())
+        specular_ = i->second_.value_.x_ > 0.0f;
+    else
+        specular_ = false;
 }

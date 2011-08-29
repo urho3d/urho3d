@@ -1930,7 +1930,6 @@ void View::CalculateShaderParameters()
     shaderParameters_[PSP_FOGPARAMS] = fogParams;
 }
 
-
 void View::SetupLightBatch(Batch& batch, bool firstSplit)
 {
     Matrix3x4 view(batch.camera_->GetInverseWorldTransform());
