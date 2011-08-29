@@ -30,13 +30,15 @@ GraphicsImpl::GraphicsImpl() :
     interface_(0),
     device_(0),
     defaultColorSurface_(0),
-    frameQuery_(0),
     adapter_(D3DADAPTER_DEFAULT),
     deviceType_(D3DDEVTYPE_HAL),
     instance_(GetModuleHandle(0)),
     window_(0)
 {
     memset(&presentParams_, 0, sizeof presentParams_);
+    
+    for (unsigned i = 0; i < NUM_QUERIES; ++i)
+        frameQueries_[i] = 0;
 }
 
 bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type)

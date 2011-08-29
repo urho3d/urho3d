@@ -330,10 +330,6 @@ private:
     Light* CreateSplitLight(Light* original);
     /// Allocate a temporary scene node for attaching a split light or a shadow camera.
     Node* CreateTempNode();
-    /// %Set up a light volume rendering batch.
-    void SetupLightBatch(Batch& batch);
-    /// Draw a full screen quad (either near or far.)
-    void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.

@@ -164,7 +164,6 @@ Graphics::Graphics(Context* context) :
     vsync_(false),
     flushGPU_(true),
     deviceLost_(false),
-    queryIssued_(false),
     renderTargetSupport_(true),
     deferredSupport_(false),
     hardwareShadowSupport_(false),
@@ -172,6 +171,7 @@ Graphics::Graphics(Context* context) :
     streamOffsetSupport_(false),
     hasSM3_(false),
     forceSM2_(false),
+    queryIndex_(0),
     numPrimitives_(0),
     numBatches_(0),
     immediateBuffer_(0),
@@ -192,10 +192,13 @@ Graphics::~Graphics()
     
     vertexDeclarations_.Clear();
     
-    if (impl_->frameQuery_)
+    for (unsigned i = 0; i < NUM_QUERIES; ++i)
     {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = 0;
+        if (impl_->frameQueries_[i])
+        {
+            impl_->frameQueries_[i]->Release();
+            impl_->frameQueries_[i] = 0;
+        }
     }
     if (impl_->defaultColorSurface_)
     {
@@ -545,16 +548,6 @@ bool Graphics::BeginFrame()
     
     impl_->device_->BeginScene();
     
-    // If a query was issued on the previous frame, wait for it to finish before beginning the next
-    if (impl_->frameQuery_ && queryIssued_)
-    {
-        while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
-        {
-        }
-        
-        queryIssued_ = false;
-    }
-    
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
     viewTexture_ = 0;
@@ -587,16 +580,26 @@ void Graphics::EndFrame()
     
     SendEvent(E_ENDRENDERING);
     
-    // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to pre-render
-    if (impl_->frameQuery_ && flushGPU_)
+    impl_->device_->EndScene();
+    
+    // Issue a new GPU flush query now if necessary
+    if (flushGPU_ && impl_->frameQueries_[queryIndex_])
     {
-        impl_->frameQuery_->Issue(D3DISSUE_END);
-        queryIssued_ = true;
+        impl_->frameQueries_[queryIndex_]->Issue(D3DISSUE_END);
+        queryIssued_[queryIndex_] = true;
+        
+        ++queryIndex_;
+        if (queryIndex_ >= NUM_QUERIES)
+            queryIndex_ = 0;
     }
     
+    impl_->device_->Present(0, 0, 0, 0);
+    
+    // If a previous GPU flush query is in progress, wait for it to finish
+    if (queryIssued_[queryIndex_])
     {
-        impl_->device_->EndScene();
-        impl_->device_->Present(0, 0, 0, 0);
+        while (impl_->frameQueries_[queryIndex_]->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE);
+        queryIssued_[queryIndex_] = false;
     }
 }
 
@@ -2225,10 +2228,13 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
-    if (impl_->frameQuery_)
+    for (unsigned i = 0; i < NUM_QUERIES; ++i)
     {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = 0;
+        if (impl_->frameQueries_[i])
+        {
+            impl_->frameQueries_[i]->Release();
+            impl_->frameQueries_[i] = 0;
+        }
     }
     if (impl_->defaultColorSurface_)
     {
@@ -2249,8 +2255,12 @@ void Graphics::OnDeviceReset()
 {
     ResetCachedState();
     
-    // Create frame query
-    impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQuery_);
+    // Create frame queries for GPU buffer flushing
+    for (unsigned i = 0; i < NUM_QUERIES; ++i)
+        impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQueries_[i]);
+    
+    // In case AutoDepthStencil is not used, depth buffering must be enabled manually
+    impl_->device_->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     
     // Create deferred rendering buffers now
     CreateRenderTargets();
@@ -2325,7 +2335,8 @@ void Graphics::ResetCachedState()
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;
     
-    queryIssued_ = false;
+    for (unsigned i = 0; i < NUM_QUERIES; ++i)
+        queryIssued_[i] = false;
 }
 
 void Graphics::SetTextureUnitMappings()

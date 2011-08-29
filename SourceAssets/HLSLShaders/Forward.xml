@@ -1,10 +1,7 @@
 <shaders>
     <shader name="Forward" type="vs">
         <option name="Normal" define="NORMALMAP" />
-        <option name="VCol" define="VERTEXCOLOR">
-            <exclude name="Normal" />
-            <exclude name="Shadow" />
-        </option>
+        <option name="VCol" define="VERTEXCOLOR" />
         <option name="Spot" define="SPOTLIGHT" />
         <option name="Shadow" define="SHADOW" />
         <variation name="" />

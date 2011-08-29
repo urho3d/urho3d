@@ -47,6 +47,7 @@ class VertexBuffer;
 class VertexDeclaration;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
+static const unsigned NUM_QUERIES = 2;
 
 /// %Shader parameter definition.
 struct ShaderParameter
@@ -260,25 +261,25 @@ public:
     PODVector<int> GetMultiSampleLevels() const;
     /// Return vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
-    /// Return index buffer.
+    /// Return current index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
-    /// Return vertex declaration.
+    /// Return current vertex declaration.
     VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
-    /// Return vertex shader.
+    /// Return current vertex shader.
     ShaderVariation* GetVertexShader() const { return vertexShader_; }
-    /// Return pixel shader.
+    /// Return current pixel shader.
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
-    /// Return texture by texture unit index.
+    /// Return current texture by texture unit index.
     Texture* GetTexture(unsigned index) const;
     /// Return deferred rendering destination render target.
     Texture* GetViewTexture() const { return viewTexture_; }
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
-    /// Return render target by index.
+    /// Return current render target by index.
     RenderSurface* GetRenderTarget(unsigned index) const;
-    /// Return depth stencil buffer.
+    /// Return current depth stencil buffer.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
@@ -405,8 +406,6 @@ private:
     bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
-    /// Query issued (used to flush the GPU command queue) flag.
-    bool queryIssued_;
     /// Texture render target support flag.
     bool renderTargetSupport_;
     /// Deferred rendering support flag.
@@ -421,6 +420,10 @@ private:
     bool hasSM3_;
     /// Force Shader Model 2 flag.
     bool forceSM2_;
+    /// Query issued (used to flush the GPU command queue) flag.
+    bool queryIssued_[NUM_QUERIES];
+    /// Current query index
+    unsigned queryIndex_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

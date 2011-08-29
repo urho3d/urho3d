@@ -256,6 +256,6 @@ struct LightBatchQueue
     BatchQueue litBatches_;
     /// Light volume draw calls, should be only one.
     PODVector<Batch> volumeBatches_;
-    /// Last split flag for clearing the stencil buffer.
-    bool lastSplit_;
+    /// First split flag for clearing the stencil buffer.
+    bool firstSplit_;
 };

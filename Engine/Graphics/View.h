@@ -175,12 +175,16 @@ private:
     void PrepareInstancingBuffer();
     /// Calculate view-global shader parameters.
     void CalculateShaderParameters();
+    /// %Set up a light volume rendering batch.
+    void SetupLightBatch(Batch& batch, bool firstSplit);
     /// Draw a split light to stencil buffer.
-    void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
+    void DrawSplitLightToStencil(Camera& camera, Light* light, bool firstSplit);
+    /// Draw a full screen quad (either near or far.)
+    void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);
     /// Draw everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool disableScissor = true);
     /// Draw a forward (shadowed) light batch queue.
-    void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
+    void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight, bool firstSplit);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     
