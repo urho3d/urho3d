@@ -31,5 +31,5 @@ float3 GetNearRay(float4 clipPos)
         clipPos.y / clipPos.w * cFrustumSize.y,
         0.0);
 
-    return mul(viewRay, cCameraRot) * cDepthMode.z;
+    return mul(viewRay, cCameraRot) * cDepthMode.x;
 }

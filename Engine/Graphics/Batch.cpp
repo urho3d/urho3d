@@ -111,7 +111,15 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
     {
         Vector4 depthMode = Vector4::ZERO;
         if (camera_->IsOrthographic())
+        {
+            depthMode.x_ = 1.0f;
+            #ifdef USE_OPENGL
+            depthMode.z_ = 0.5f;
+            depthMode.w_ = 0.5f;
+            #else
             depthMode.z_ = 1.0f;
+            #endif
+        }
         else
             depthMode.w_ = 1.0f / camera_->GetFarClip();
         
