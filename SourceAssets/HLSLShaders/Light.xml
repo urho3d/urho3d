@@ -4,7 +4,8 @@
         <option name="Dir" define="DIRLIGHT" />
     </shader>
     <shader name="Light" type="ps">
-        <option name="Ortho" define="ORTHO" />
+        <option name="Linear" define="LINEAR" exclude="Ortho" />
+        <option name="Ortho" define="ORTHO" exclude="Linear" />
         <variation name="Dir">
             <define name="DIRLIGHT" />
             <define name="LIGHT" />

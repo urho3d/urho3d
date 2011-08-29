@@ -249,6 +249,8 @@ public:
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
+    /// Return whether the hardware depth buffer can be sampled.
+    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether 24-bit shadow maps are supported.
@@ -406,10 +408,14 @@ private:
     bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
+    //! Use auto depth stencil flag
+    bool systemDepthStencil_;
     /// Texture render target support flag.
     bool renderTargetSupport_;
     /// Deferred rendering support flag.
     bool deferredSupport_;
+    /// Hardware depth sampling support flag.
+    bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
     /// 24-bit shadow map support flag.

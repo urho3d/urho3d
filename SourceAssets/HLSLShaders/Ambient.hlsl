@@ -16,7 +16,11 @@ void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     float4 diffInput = tex2D(sDiffBuffer, iScreenPos);
-    float depth = tex2D(sDepthBuffer, iScreenPos).r;
+    #ifdef LINEAR
+        float depth = tex2D(sDepthBuffer, iScreenPos).r;
+    #else
+        float depth = ReconstructDepth(tex2D(sDepthBuffer, iScreenPos).r);
+    #endif
     float3 ambientColor = cAmbientColor * diffInput.rgb;
 
     oColor = float4(ambientColor + GetFogFactor(depth) * cFogColor, 1.0);

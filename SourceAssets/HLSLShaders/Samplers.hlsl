@@ -37,3 +37,8 @@ float3 UnpackNormal(float4 normalInput)
     normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
     return normal;
 }
+
+float ReconstructDepth(float hwDepth)
+{
+    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
+}

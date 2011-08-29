@@ -164,8 +164,8 @@ Graphics::Graphics(Context* context) :
     vsync_(false),
     flushGPU_(true),
     deviceLost_(false),
-    renderTargetSupport_(true),
-    deferredSupport_(false),
+    systemDepthStencil_(false),
+    hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
     streamOffsetSupport_(false),
@@ -207,7 +207,8 @@ Graphics::~Graphics()
     }
     if (impl_->defaultDepthStencilSurface_)
     {
-        impl_->defaultDepthStencilSurface_->Release();
+        if (systemDepthStencil_)
+            impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
     }
     if (impl_->device_)
@@ -334,6 +335,9 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         impl_->presentParams_.Windowed         = true;
     }
     
+    // Use AutoDepthStencil normally. However, if INTZ depth is available, create a depth texture instead in deferred mode
+    bool autoDepthStencil = mode != RENDER_DEFERRED || !hardwareDepthSupport_;
+    
     impl_->presentParams_.BackBufferWidth            = width;
     impl_->presentParams_.BackBufferHeight           = height;
     impl_->presentParams_.BackBufferCount            = 1;
@@ -341,7 +345,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
     impl_->presentParams_.hDeviceWindow              = impl_->window_;
-    impl_->presentParams_.EnableAutoDepthStencil     = true;
+    impl_->presentParams_.EnableAutoDepthStencil     = autoDepthStencil;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
     impl_->presentParams_.Flags                      = 0;
     impl_->presentParams_.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -423,6 +427,7 @@ void Graphics::Close()
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
+        screenBuffer_.Reset();
         immediateVertexBuffers_.Clear();
         
         DestroyWindow(impl_->window_);
@@ -2076,7 +2081,15 @@ bool Graphics::CreateInterface()
     
     if (impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
     {
-        if (impl_->deviceCaps_.NumSimultaneousRTs >= 3)
+        if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+        {
+            // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs
+            // So, use INTZ buffer only with other vendors
+            if (impl_->adapterIdentifier_.VendorId != 0x1002)
+                hardwareDepthSupport_ = true;
+        }
+        unsigned requiredRTs = hardwareDepthSupport_ ? 2 : 3;
+        if (impl_->deviceCaps_.NumSimultaneousRTs >= requiredRTs)
             deferredSupport_ = true;
     }
     
@@ -2174,7 +2187,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
 void Graphics::CreateRenderTargets()
 {
-    if (mode_ != RENDER_FORWARD)
+    if (mode_ == RENDER_DEFERRED)
     {
         if (!diffBuffer_)
         {
@@ -2191,7 +2204,10 @@ void Graphics::CreateRenderTargets()
         if (!depthBuffer_)
         {
             depthBuffer_ = new Texture2D(context_);
-            depthBuffer_->SetSize(0, 0, GetDepthFormat(), TEXTURE_RENDERTARGET);
+            if (!hardwareDepthSupport_)
+                depthBuffer_->SetSize(0, 0, D3DFMT_R32F, TEXTURE_RENDERTARGET);
+            else
+                depthBuffer_->SetSize(0, 0, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
         }
         
         // If deferred antialiasing is used, reserve screen buffer
@@ -2270,7 +2286,16 @@ void Graphics::OnDeviceReset()
     
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
-    impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+    if (impl_->presentParams_.EnableAutoDepthStencil)
+    {
+        impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+        systemDepthStencil_ = true;
+    }
+    else
+    {
+        impl_->defaultDepthStencilSurface_ = (IDirect3DSurface9*)depthBuffer_->GetRenderSurface()->GetSurface();
+        systemDepthStencil_ = false;
+    }
     
     immediateBuffer_ = 0;
 }

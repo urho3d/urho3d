@@ -65,9 +65,11 @@ void PS(
     #else
         float3 iNormal : TEXCOORD2,
     #endif
+    #ifdef DEPTH
+        out float4 oDepth : COLOR2,
+    #endif
     out float4 oDiff : COLOR0,
-    out float4 oNormal : COLOR1,
-    out float4 oDepth : COLOR2)
+    out float4 oNormal : COLOR1)
 {
     #ifdef DIFFMAP
         float4 diffInput = tex2D(sDiffMap, iTexCoord);
@@ -97,5 +99,7 @@ void PS(
     // Take fogging into account here so that deferred lights do not need to calculate it
     oDiff = GetReverseFogFactor(iDepth) * float4(diffColor, specStrength);
     oNormal = float4(normal * 0.5 + 0.5, specPower);
-    oDepth = iDepth;
+    #ifdef DEPTH
+        oDepth = iDepth;
+    #endif
 }

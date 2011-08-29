@@ -177,6 +177,18 @@ static const String hwVariations[] =
     "HW"
 };
 
+static const String linearVariations[] =
+{
+    "",
+    "Linear"
+};
+
+static const String depthVariations[] =
+{
+    "",
+    "Depth"
+};
+
 static const String geometryVSVariations[] =
 {
     "",
@@ -1022,10 +1034,12 @@ void Renderer::LoadShaders()
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
         {
             unsigned variation = i % DLPS_SPOT;
+            unsigned linear = !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
+            
             if (variation == DLPS_SHADOW || variation == DLPS_SHADOWSPEC)
-                lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i] + hwVariations[hwShadows]);
+                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] + hwVariations[hwShadows]);
             else
-                lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i]);
+                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i]);
         }
     }
     
@@ -1074,6 +1088,14 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
+    // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
+    // Also check for fallback G-buffer (different layout)
+    if (pass == PASS_GBUFFER)
+    {
+        unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
+        pixelShaderName += depthVariations[depth];
+    }
+
     // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
     if (reuseShadowMaps_ && pass == PASS_LIGHT)
     {
@@ -1090,46 +1112,42 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    switch (i->first_)
+    if (pass == PASS_LIGHT)
     {
-    default:
+        vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+        pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
+            
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
+        {
+            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
+            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
+            if (!(l & LVS_SHADOW) || allowShadows)
+                vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
+            else
+                vertexShaders[j].Reset();
+        }
+        for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
+        {
+            unsigned variation = j % LPS_SPOT;
+            if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)
+            {
+                if (allowShadows)
+                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] +
+                        hwVariations[hwShadows]);
+                else
+                    pixelShaders[j].Reset();
+            }
+            else
+                pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j]);
+        }
+    }
+    else
+    {
         vertexShaders.Resize(MAX_GEOMETRYTYPES);
         pixelShaders.Resize(1);
         for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             vertexShaders[j] = GetVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
         pixelShaders[0] = GetPixelShader(pixelShaderName);
-        break;
-        
-    case PASS_LIGHT:
-        {
-            vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
-            
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
-            {
-                unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
-                unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-                if (!(l & LVS_SHADOW) || allowShadows)
-                    vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
-                else
-                    vertexShaders[j].Reset();
-            }
-            for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
-            {
-                unsigned variation = j % LPS_SPOT;
-                if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)
-                {
-                    if (allowShadows)
-                        pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] +
-                            hwVariations[hwShadows]);
-                    else
-                        pixelShaders[j].Reset();
-                }
-                else
-                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j]);
-            }
-            break;
-        }
     }
     
     technique->MarkShadersLoaded(shadersChangedFrameNumber_);

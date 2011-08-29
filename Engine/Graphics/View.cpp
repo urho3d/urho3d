@@ -772,9 +772,6 @@ void View::RenderBatchesDeferred()
     float widthRange = 0.5f * width_ / gBufferWidth;
     float heightRange = 0.5f * height_ / gBufferHeight;
     
-    #ifdef USE_OPENGL
-    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
-        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
     // Hardware depth is non-linear in perspective views, so calculate the depth reconstruction parameters
     float farClip = camera_->GetFarClip();
     float nearClip = camera_->GetNearClip();
@@ -782,6 +779,10 @@ void View::RenderBatchesDeferred()
     depthReconstruct.x_ = farClip / (farClip - nearClip);
     depthReconstruct.y_ = -nearClip / (farClip - nearClip);
     shaderParameters_[PSP_DEPTHRECONSTRUCT] = depthReconstruct;
+    
+    #ifdef USE_OPENGL
+    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
+        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
     #else
     Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
         (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
@@ -810,7 +811,8 @@ void View::RenderBatchesDeferred()
         // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
         graphics_->SetRenderTarget(0, diffBuffer);
         graphics_->SetRenderTarget(1, normalBuffer);
-        graphics_->SetRenderTarget(2, depthBuffer);
+        if (!graphics_->GetHardwareDepthSupport())
+            graphics_->SetRenderTarget(2, depthBuffer);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
@@ -825,10 +827,17 @@ void View::RenderBatchesDeferred()
         // On Direct3D9, clear now the parts of G-Buffer that were not rendered into
         graphics_->SetDepthTest(CMP_LESSEQUAL);
         graphics_->SetDepthWrite(false);
-        graphics_->ResetRenderTarget(2);
-        graphics_->SetRenderTarget(1, depthBuffer);
-        
-        DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("GBufferFill"), renderer_->GetPixelShader("GBufferFill"),
+        if (graphics_->GetHardwareDepthSupport())
+            graphics_->ResetRenderTarget(1);
+        else
+        {
+            graphics_->ResetRenderTarget(2);
+            graphics_->SetRenderTarget(1, depthBuffer);
+        }
+        String pixelShaderName = "GBufferFill";
+        if (!graphics_->GetHardwareDepthSupport())
+            pixelShaderName += "_Depth";
+        DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("GBufferFill"), renderer_->GetPixelShader(pixelShaderName),
             false, shaderParameters_);
         #endif
     }
@@ -853,12 +862,15 @@ void View::RenderBatchesDeferred()
         String pixelShaderName = "Ambient";
         #ifdef USE_OPENGL
         if (camera_->IsOrthographic())
-            pixelShaderName += "Ortho";
+            pixelShaderName += "_Ortho";
         // On OpenGL, set up a stencil operation to reset the stencil during ambient quad rendering
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP);
+        #else
+        if (camera_->IsOrthographic() || !graphics_->GetHardwareDepthSupport())
+            pixelShaderName += "_Linear";
         #endif
         
-        DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Ambient"), renderer_->GetPixelShader("Ambient"),
+        DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Ambient"), renderer_->GetPixelShader(pixelShaderName),
             false, shaderParameters_);
         
         #ifdef USE_OPENGL

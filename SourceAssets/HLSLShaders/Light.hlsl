@@ -50,7 +50,11 @@ void PS(
             float depth = Sample(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth);
         #else
-            float depth = Sample(sDepthBuffer, iScreenPos).r;
+            #ifdef LINEAR
+                float depth = Sample(sDepthBuffer, iScreenPos).r;
+            #else
+                float depth = ReconstructDepth(Sample(sDepthBuffer, iScreenPos).r);
+            #endif
             float3 worldPos = iFarRay * depth;
         #endif
         float4 normalInput = Sample(sNormalBuffer, iScreenPos);
@@ -60,7 +64,11 @@ void PS(
             float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth) / iScreenPos.w;
         #else
-            float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+            #ifdef LINEAR
+                float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+            #else
+                float depth = ReconstructDepth(tex2Dproj(sDepthBuffer, iScreenPos).r);
+            #endif
             float3 worldPos = iFarRay * depth / iScreenPos.w;
         #endif
         float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
