@@ -630,7 +630,7 @@ Deferred rendering creates the following G-buffer, using 3 render targets:
 - World-space normal and specular power (D3DFMT_A8R8G8B8)
 - Linear depth (D3DFMT_R32F)
 
-(on OpenGL a DEPTH_COMPONENT24 texture is used instead for non-linear hardware depth)
+If the INTZ hardware depth format is available, the third render target is omitted. Likewise on OpenGL a DEPTH_COMPONENT24 depth texture is always used instead.
 
 Opaque objects are rendered to the G-buffer first, then an initial full-screen quad is drawn to initialize the backbuffer, using the G-buffer information to blend between ambient lighting and fog color. After this, light volumes are rendered with additive blending, using stencil masking to optimize the light volume depth range if possible.
 
@@ -646,7 +646,7 @@ Deferred rendering will win particularly in vertex-heavy scenes, as the actual g
 
 Note that it is not possible to specify the material's specular color in deferred rendering, only the specular intensity. The default forward rendering shaders have also been written in the same way to match the output of deferred rendering, but more material variety could in fact be achieved with forward-shaded materials.
 
-Forward rendering also allows per-object control of which lights will influence the object.
+Forward rendering also allows per-object control of which lights influence the object.
 
 
 \page Input %Input
