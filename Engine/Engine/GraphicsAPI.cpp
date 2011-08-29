@@ -301,9 +301,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("CullMode", "CULL_CCW", CULL_CCW);
     engine->RegisterEnumValue("CullMode", "CULL_CW", CULL_CW);
     
-    engine->RegisterObjectType("Pass", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("Pass", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Pass", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    RegisterRefCounted<Pass>(engine, "Pass");
     engine->RegisterObjectMethod("Pass", "void set_alphaMask(bool)", asMETHOD(Pass, SetAlphaMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_alphaMask() const", asMETHOD(Pass, GetAlphaMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_alphaTest(bool)", asMETHOD(Pass, SetAlphaTest), asCALL_THISCALL);
@@ -325,7 +323,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "bool HasPass(PassType) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void set_sm3(bool)", asMETHOD(Technique, SetIsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ get_pass(PassType)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(PassType)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
     RegisterResource<Material>(engine, "Material");
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
@@ -696,7 +694,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterEnumValue("RenderMode", "RENDER_FORWARD", RENDER_FORWARD);
     
     RegisterObject<Graphics>(engine, "Graphics");
-    engine->RegisterObjectMethod("Graphics", "bool SetMode(RenderMode, int, int, bool, bool, int)", asMETHODPR(Graphics, SetMode, (RenderMode, int, int, bool, bool, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool SetMode(RenderMode, int, int, bool, bool, bool, int)", asMETHODPR(Graphics, SetMode, (RenderMode, int, int, bool, bool, bool, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int)", asMETHODPR(Graphics, SetMode, (int, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool SetMode(RenderMode)", asMETHODPR(Graphics, SetMode, (RenderMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool ToggleFullscreen()", asMETHOD(Graphics, ToggleFullscreen), asCALL_THISCALL);
@@ -712,6 +710,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "int get_multiSample() const", asMETHOD(Graphics, GetMultiSample), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_fullscreen() const", asMETHOD(Graphics, GetFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_vsync() const", asMETHOD(Graphics, GetVSync), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_tripleBuffer() const", asMETHOD(Graphics, GetTripleBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_initialized() const", asMETHOD(Graphics, IsInitialized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_deviceLost() const", asMETHOD(Graphics, IsDeviceLost), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "uint get_numPrimitives() const", asMETHOD(Graphics, GetNumPrimitives), asCALL_THISCALL);

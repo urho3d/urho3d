@@ -63,7 +63,7 @@ public:
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
     /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA.
-    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
+    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only.
     bool SetMode(int width, int height);
     /// Set rendering mode only.
@@ -217,6 +217,8 @@ public:
     bool GetFullscreen() const { return fullscreen_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
+    /// Return whether triple buffering is enabled.
+    bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether GPU command queue is flushed at the end of each frame.
     bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether device is lost, and can not yet render. Always false on OpenGL.
@@ -241,8 +243,10 @@ public:
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
-    /// Return whether shadow map depth compare is done in hardware. Always false on OpenGL to avoid the HW suffix in shaders.
-    bool GetHardwareShadowSupport() const { return false; }
+    /// Return whether the hardware depth buffer can be sampled. Always true on OpenGL.
+    bool GetHardwareDepthSupport() const { return true; }
+    /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
+    bool GetHardwareShadowSupport() const { return true; }
     /// Return whether 24-bit shadow maps are supported. Assume true on OpenGL.
     bool GetHiresShadowSupport() const { return true; }
     /// Return whether stream offset is supported. Always false on OpenGL.
@@ -390,6 +394,8 @@ private:
     bool fullscreen_;
     /// Vertical sync flag.
     bool vsync_;
+    /// Triple buffering flag.
+    bool tripleBuffer_;
     /// Flush GPU command queue flag.
     bool flushGPU_;
     /// Texture render target support flag.

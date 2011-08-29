@@ -65,10 +65,6 @@ static const String CompareModeNames[] =
     ""
 };
 
-Pass::Pass()
-{
-}
-
 Pass::Pass(PassType type) :
     type_(type),
     alphaMask_(false),
@@ -172,37 +168,37 @@ bool Technique::Load(Deserializer& source)
         
         if (type != MAX_PASSES)
         {
-            Pass& newPass = *CreatePass(type);
+            Pass* newPass = CreatePass(type);
             
             if (passElem.HasAttribute("vs"))
-                newPass.SetVertexShader(passElem.GetString("vs"));
+                newPass->SetVertexShader(passElem.GetString("vs"));
             
             if (passElem.HasAttribute("ps"))
-                newPass.SetPixelShader(passElem.GetString("ps"));
+                newPass->SetPixelShader(passElem.GetString("ps"));
             
             if (passElem.HasAttribute("alphamask"))
-                newPass.SetAlphaMask(passElem.GetBool("alphamask"));
+                newPass->SetAlphaMask(passElem.GetBool("alphamask"));
             
             if (passElem.HasAttribute("alphatest"))
-                newPass.SetAlphaTest(passElem.GetBool("alphatest"));
+                newPass->SetAlphaTest(passElem.GetBool("alphatest"));
             
             if (passElem.HasAttribute("blend"))
             {
                 String blend = passElem.GetStringLower("blend");
-                newPass.SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, BLEND_REPLACE));
+                newPass->SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, BLEND_REPLACE));
             }
             
             if (passElem.HasAttribute("depthtest"))
             {
                 String depthTest = passElem.GetStringLower("depthtest");
                 if (depthTest == "false")
-                    newPass.SetDepthTestMode(CMP_ALWAYS);
+                    newPass->SetDepthTestMode(CMP_ALWAYS);
                 else
-                    newPass.SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, CompareModeNames, CMP_LESSEQUAL));
+                    newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, CompareModeNames, CMP_LESS));
             }
             
             if (passElem.HasAttribute("depthwrite"))
-                newPass.SetDepthWrite(passElem.GetBool("depthwrite"));
+                newPass->SetDepthWrite(passElem.GetBool("depthwrite"));
         }
         
         passElem = passElem.GetNext("pass");
@@ -211,8 +207,11 @@ bool Technique::Load(Deserializer& source)
     // Calculate memory use
     unsigned memoryUse = 0;
     memoryUse += sizeof(Technique);
-    for (Map<PassType, Pass>::ConstIterator j = passes_.Begin(); j != passes_.End(); ++j)
-        memoryUse += sizeof(Pass);
+    for (unsigned i = 0; i < MAX_PASSES; ++i)
+    {
+        if (passes_[i])
+            memoryUse += sizeof(Pass);
+    }
     
     SetMemoryUse(memoryUse);
     return true;
@@ -225,25 +224,24 @@ void Technique::SetIsSM3(bool enable)
 
 void Technique::ReleaseShaders()
 {
-    for (Map<PassType, Pass>::Iterator i = passes_.Begin(); i != passes_.End(); ++i)
-        i->second_.ReleaseShaders();
+    for (unsigned i = 0; i < MAX_PASSES; ++i)
+    {
+        if (passes_[i])
+            passes_[i]->ReleaseShaders();
+    }
 }
 
 Pass* Technique::CreatePass(PassType pass)
 {
-    Pass* existing = GetPass(pass);
-    if (existing)
-        return existing;
+    if (!passes_[pass])
+        passes_[pass] = new Pass(pass);
     
-    Pass newPass(pass);
-    passes_[pass] = newPass;
-    
-    return GetPass(pass);
+    return passes_[pass];
 }
 
 void Technique::RemovePass(PassType pass)
 {
-    passes_.Erase(pass);
+    passes_[pass].Reset();
 }
 
 void Technique::MarkShadersLoaded(unsigned frameNumber)

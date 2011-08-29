@@ -162,6 +162,7 @@ Graphics::Graphics(Context* context) :
     windowPosY_(0),
     fullscreen_(false),
     vsync_(false),
+    tripleBuffer_(false),
     flushGPU_(true),
     deviceLost_(false),
     systemDepthStencil_(false),
@@ -238,7 +239,7 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         SetWindowText(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
+bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
     
@@ -262,9 +263,10 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
-
-    if (mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ && vsync == vsync_
-        && multiSample == multiSample_)
+    
+    // If nothing changes, do not reset the device
+    if (mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ && vsync == vsync_ && tripleBuffer ==
+        tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     if (!impl_->window_)
@@ -340,7 +342,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     impl_->presentParams_.BackBufferWidth            = width;
     impl_->presentParams_.BackBufferHeight           = height;
-    impl_->presentParams_.BackBufferCount            = 1;
+    impl_->presentParams_.BackBufferCount            = tripleBuffer ? 2 : 1;
     impl_->presentParams_.MultiSampleType            = multiSample > 1 ? (D3DMULTISAMPLE_TYPE)multiSample : D3DMULTISAMPLE_NONE;
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
@@ -359,6 +361,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     height_ = height;
     fullscreen_ = fullscreen;
     vsync_ = vsync;
+    tripleBuffer_ = tripleBuffer;
     mode_ = mode;
     
     if (!impl_->device_)
@@ -407,17 +410,17 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(mode_, width, height, fullscreen_, vsync_, multiSample_);
+    return SetMode(mode_, width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::SetMode(RenderMode mode)
 {
-    return SetMode(mode, width_, height_, fullscreen_, vsync_, multiSample_);
+    return SetMode(mode, width_, height_, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, multiSample_);
+    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()

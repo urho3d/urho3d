@@ -29,12 +29,10 @@
 class ShaderVariation;
 
 /// %Material rendering pass, which defines shaders and render state.
-class Pass
+class Pass : public RefCounted
 {
 public:
-    /// Construct with defaults.
-    Pass();
-    /// Construct with pass type.
+    /// Construct.
     Pass(PassType type);
     /// Destruct.
     ~Pass();
@@ -131,22 +129,13 @@ public:
     void MarkShadersLoaded(unsigned frameNumber);
     
     /// Return whether has a pass.
-    bool HasPass(PassType pass) const { return passes_.Find(pass) != passes_.End(); }
+    bool HasPass(PassType pass) const { return passes_[pass] != 0; }
     
     /// Return a pass.
-    Pass* GetPass(PassType pass)
-    {
-        Map<PassType, Pass>::Iterator i = passes_.Find(pass);
-        if (i != passes_.End())
-            return &(i->second_);
-        else
-            return 0;
-    }
+    Pass* GetPass(PassType pass) const { return passes_[pass]; }
     
     /// Return whether requires Shader Model 3.
     bool IsSM3() const { return isSM3_; }
-    /// Return all passes.
-    const Map<PassType, Pass>& GetPasses() const { return passes_; }
     /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     
@@ -159,5 +148,5 @@ private:
     /// Last shaders loaded frame number.
     unsigned shadersLoadedFrameNumber_;
     /// Passes.
-    Map<PassType, Pass> passes_;
+    SharedPtr<Pass> passes_[MAX_PASSES];
 };

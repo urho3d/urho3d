@@ -309,7 +309,7 @@ private:
     /// Reload shaders for a material technique.
     void LoadMaterialShaders(Technique* technique);
     /// Reload shaders for a material pass.
-    void LoadPassShaders(Technique* technique, PassType pass, bool allowShadows = true);
+    void LoadPassShaders(Technique* technique, PassType type, bool allowShadows = true);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.

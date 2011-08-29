@@ -79,6 +79,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     int mixRate = 44100;
     bool fullscreen = true;
     bool vsync = false;
+    bool tripleBuffer = false;
     bool forceSM2 = false;
     bool shadows = true;
     bool sound = true;
@@ -143,6 +144,10 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                     vsync = true;
                     break;
                     
+                case 't':
+                    tripleBuffer = true;
+                    break;
+                    
                 case 'f':
                     fullscreen = true;
                     break;
@@ -192,7 +197,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         graphics->SetFlushGPU(flush);
         graphics->SetForceSM2(forceSM2);
         graphics->SetWindowTitle(windowTitle);
-        if (!graphics->SetMode(mode, width, height, fullscreen, vsync, multiSample))
+        if (!graphics->SetMode(mode, width, height, fullscreen, vsync, tripleBuffer, multiSample))
             return false;
         if (!shadows)
             GetSubsystem<Renderer>()->SetDrawShadows(false);

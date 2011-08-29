@@ -158,6 +158,9 @@ public:
     static const Color BLACK;
 };
 
+/// Multiply Color with a scalar.
+inline Color operator * (float lhs, const Color& rhs) { return rhs * lhs; }
+
 /// Color-time pair for color interpolation.
 class ColorFade
 {

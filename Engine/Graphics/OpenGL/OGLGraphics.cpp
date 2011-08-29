@@ -127,6 +127,7 @@ Graphics::Graphics(Context* context_) :
     multiSample_(1),
     fullscreen_(false),
     vsync_(false),
+    tripleBuffer_(false),
     flushGPU_(true),
     renderTargetSupport_(false),
     deferredSupport_(false),
@@ -173,19 +174,19 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         glfwSetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
+bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
     
     multiSample = Clamp(multiSample, 1, 16);
     
     if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
-        vsync == vsync_ && multiSample == multiSample_)
+        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
     if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
-        multiSample == multiSample_ && vsync != vsync_)
+        tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         glfwSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
@@ -281,6 +282,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     glfwGetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
+    tripleBuffer_ = tripleBuffer;
     mode_ = mode;
     multiSample_ = multiSample;
     
@@ -318,17 +320,17 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(mode_, width, height, fullscreen_, vsync_, multiSample_);
+    return SetMode(mode_, width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::SetMode(RenderMode mode)
 {
-    return SetMode(mode, width_, height_, fullscreen_, vsync_, multiSample_);
+    return SetMode(mode, width_, height_, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, multiSample_);
+    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()

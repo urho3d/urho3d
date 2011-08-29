@@ -174,7 +174,12 @@ static const unsigned short spotLightIndexData[] =
 static const String hwVariations[] =
 {
     "",
+    // No specific hardware shadow compare variation on OpenGL, it is always supported
+    #ifdef USE_OPENGL
+    ""
+    #else
     "HW"
+    #endif
 };
 
 static const String linearVariations[] =
@@ -1067,20 +1072,20 @@ void Renderer::LoadMaterialShaders(Technique* technique)
         else
         {
             LoadPassShaders(technique, PASS_BASE);
-            // If shadow maps are not reused, transparencies can be rendered shadowed
+            // If shadow maps are not reused, forward lighting in deferred mode can render shadows
             LoadPassShaders(technique, PASS_LIGHT, !reuseShadowMaps_);
         }
     }
 }
 
-void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowShadows)
+void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowShadows)
 {
-    Map<PassType, Pass>::Iterator i = technique->passes_.Find(pass);
-    if (i == technique->passes_.End())
+    Pass* pass = technique->GetPass(type);
+    if (!pass)
         return;
     
-    String vertexShaderName = i->second_.GetVertexShaderName();
-    String pixelShaderName = i->second_.GetPixelShaderName();
+    String vertexShaderName = pass->GetVertexShaderName();
+    String pixelShaderName = pass->GetPixelShaderName();
     
     // Check if the shader name is already a variation in itself
     if (vertexShaderName.Find('_') == String::NPOS)
@@ -1090,14 +1095,14 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     
     // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
     // Also check for fallback G-buffer (different layout)
-    if (pass == PASS_GBUFFER)
+    if (type == PASS_GBUFFER)
     {
         unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
         pixelShaderName += depthVariations[depth];
     }
 
     // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
-    if (reuseShadowMaps_ && pass == PASS_LIGHT)
+    if (reuseShadowMaps_ && type == PASS_LIGHT)
     {
         if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
             allowShadows = false;
@@ -1105,14 +1110,14 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = i->second_.GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = i->second_.GetPixelShaders();
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
     
     // Forget all the old shaders
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (pass == PASS_LIGHT)
+    if (type == PASS_LIGHT)
     {
         vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
         pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
@@ -1132,8 +1137,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
             if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)
             {
                 if (allowShadows)
-                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] +
-                        hwVariations[hwShadows]);
+                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + hwVariations[hwShadows]);
                 else
                     pixelShaders[j].Reset();
             }

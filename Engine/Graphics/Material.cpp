@@ -200,6 +200,7 @@ bool Material::Load(Deserializer& source)
     SetMemoryUse(memoryUse);
     CheckOcclusion();
     CheckSpecular();
+    
     return true;
 }
 
@@ -393,18 +394,17 @@ void Material::CheckOcclusion()
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
         Technique* technique = techniques_[i].technique_;
-        if (!technique)
-            continue;
-        
-        const Map<PassType, Pass>& passes = technique->GetPasses();
-        if (!passes.Empty())
+        if (technique)
         {
-            // If pass writes depth, enable occlusion
-            const Pass& pass = passes.Begin()->second_;
-            if (pass.GetDepthWrite())
-            {
+            // If pass writes depth, assume it occludes
+            Pass* pass = technique->GetPass(PASS_GBUFFER);
+            if (pass && pass->GetDepthWrite())
                 occlusion_ = true;
-                break;
+            else
+            {
+                pass = technique->GetPass(PASS_BASE);
+                if (pass && pass->GetDepthWrite())
+                    occlusion_ = true;
             }
         }
     }

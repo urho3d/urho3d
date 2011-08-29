@@ -101,6 +101,7 @@ Urho3D.exe understands the following command line options:
 -y<res>     Vertical resolution
 -m<level>   Enable hardware multisampling (*)
 -v          Enable vertical sync
+-t          Enable triple buffering
 -w          Start in windowed mode
 -headless   Headless mode. No application window will be created
 -forward    Use forward rendering (default)

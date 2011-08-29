@@ -1396,7 +1396,7 @@ Properties:<br>
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - bool sm3
-- Pass@[] pass (readonly)
+- Pass@[] passes (readonly)
 
 
 Material
@@ -1957,7 +1957,7 @@ Properties:<br>
 Graphics
 
 Methods:<br>
-- bool SetMode(RenderMode, int, int, bool, bool, int)
+- bool SetMode(RenderMode, int, int, bool, bool, bool, int)
 - bool SetMode(int, int)
 - bool SetMode(RenderMode)
 - bool ToggleFullscreen()
@@ -1975,6 +1975,7 @@ Properties:<br>
 - int multiSample (readonly)
 - bool fullscreen (readonly)
 - bool vsync (readonly)
+- bool tripleBuffer (readonly)
 - bool initialized (readonly)
 - bool deviceLost (readonly)
 - uint numPrimitives (readonly)

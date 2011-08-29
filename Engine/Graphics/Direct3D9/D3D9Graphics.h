@@ -74,7 +74,7 @@ public:
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);
     /// %Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA.
-    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
+    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
     /// %Set screen resolution only.
     bool SetMode(int width, int height);
     /// %Set rendering mode only.
@@ -225,6 +225,8 @@ public:
     bool GetFullscreen() const { return fullscreen_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
+    /// Return whether triple buffering is enabled.
+    bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether GPU command queue is flushed at the end of each frame.
     bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
@@ -404,6 +406,8 @@ private:
     bool fullscreen_;
     /// Vertical sync flag.
     bool vsync_;
+    /// Triple buffering flag.
+    bool tripleBuffer_;
     /// Flush GPU command queue flag.
     bool flushGPU_;
     /// Direct3D device lost flag.
@@ -426,7 +430,7 @@ private:
     bool hasSM3_;
     /// Force Shader Model 2 flag.
     bool forceSM2_;
-    /// Query issued (used to flush the GPU command queue) flag.
+    /// Query (used to flush the GPU command queue) issued flags.
     bool queryIssued_[NUM_QUERIES];
     /// Current query index
     unsigned queryIndex_;
