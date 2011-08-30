@@ -43,10 +43,8 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Get a named variation. Return null if not found or could not be created.
+    /// Return a named variation. Return null if not found.
     ShaderVariation* GetVariation(const String& name);
-    /// Get a named variation. Return null if not found or could not be created.
-    ShaderVariation* GetVariation(StringHash nameHash);
     /// Release (unload) all variations.
     void ReleaseAll();
     

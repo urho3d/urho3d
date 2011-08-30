@@ -149,14 +149,14 @@ bool Shader::Load(Deserializer& source)
 
 ShaderVariation* Shader::GetVariation(const String& name)
 {
-    return GetVariation(StringHash(name));
-}
-
-ShaderVariation* Shader::GetVariation(StringHash nameHash)
-{
+    StringHash nameHash(name);
     Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
-    if (i != variations_.End())
-        return i->second_;
-    else
+    if (i == variations_.End())
+    {
+        LOGERROR("Could not find shader variation " + GetName() + "_" + name);
+        variations_[nameHash] = 0; // Store a null pointer so that the error is printed only once
         return 0;
+    }
+    else
+        return i->second_;
 }
