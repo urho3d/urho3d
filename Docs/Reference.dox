@@ -369,7 +369,7 @@ Graphics implements the low-level functionality:
 
 It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
 
-Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled as incompatible in deferred rendering mode; instead it is replaced by a post-process edge filter, based on NVIDIA's FXAA II.
+Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled as incompatible in deferred rendering mode; instead it is replaced by a temporal antialiasing post-process filter.
 
 When setting the initial screen mode, Graphics does a few checks:
 
@@ -638,7 +638,7 @@ After light accumulation, emissive properties of materials as well as effects li
 
 \section ForwardDeferred_DeferredAntiAlias Deferred antialiasing
 
-As actual hardware multisampling is incompatible with deferred rendering, a post-process edge filter based on NVIDIA's FXAA II will be used instead, if multisampling is requested, to detect luminance gradients and smooth them. Depending on the GPU speed, this has a low-to-moderate performance impact.
+As actual hardware multisampling is incompatible with deferred rendering, a temporal antialiasing post-process filter will be used instead. Depending on the GPU speed, this has a low-to-moderate performance impact.
 
 \section ForwardDeferred_Conclusion Conclusion
 

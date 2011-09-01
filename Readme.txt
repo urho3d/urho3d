@@ -34,6 +34,8 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 - NVIDIA FXAA II for Consoles by Timothy Lottes
   http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
+- DX11 Perspective Matrix Jittering Temporal AA by yakiimo02 
+  http://www.yakiimo3d.com/2010/09/28/dx11-perspective-matrix-jittering-temporal-aa/
 
 Urho3D uses the following third-party libraries:
 - AngelScript 2.21.1 WIP (http://www.angelcode.com/angelscript/)

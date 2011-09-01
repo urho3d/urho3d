@@ -131,33 +131,6 @@ enum DeferredLightPSVariation
     MAX_DEFERRED_LIGHT_PS_VARIATIONS
 };
 
-/// Deferred rendering edge filter parameters.
-struct EdgeFilterParameters
-{
-    /// Construct undefined.
-    EdgeFilterParameters()
-    {
-    }
-    
-    /// Construct with initial values.
-    EdgeFilterParameters(float radius, float threshold, float strength) :
-        radius_(radius),
-        threshold_(threshold),
-        strength_(strength)
-    {
-    }
-    
-    //! Validate parameters.
-    void Validate();
-    
-    //! Radius for calculating luminance gradient.
-    float radius_;
-    //! Luminance difference threshold needed to pass pixel.
-    float threshold_;
-    //! Filter strength.
-    float strength_;
-};
-
 /// High-level rendering subsystem. Manages drawing of 3D views.
 class Renderer : public Object
 {
@@ -197,8 +170,6 @@ public:
     void SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter);
     /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
-    /// %Set deferred rendering edge filter parameters.
-    void SetEdgeFilter(const EdgeFilterParameters& parameters);
     /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
@@ -235,8 +206,6 @@ public:
     unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].Size(); }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
-    /// Return deferred rendering edge filter parameters.
-    const EdgeFilterParameters& GetEdgeFilter() const { return edgeFilter_; }
     /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
@@ -423,8 +392,6 @@ private:
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
-    /// Deferred rendering edge filter parameters.
-    EdgeFilterParameters edgeFilter_;
     /// Maximum occluder triangles.
     int maxOccluderTriangles_;
     /// Occlusion buffer width.

@@ -66,7 +66,8 @@ View::View(Context* context) :
     camera_(0),
     zone_(0),
     renderTarget_(0),
-    depthStencil_(0)
+    depthStencil_(0),
+    jitterCounter_(0)
 {
     frame_.camera_ = 0;
 }
@@ -758,41 +759,24 @@ void View::RenderBatchesDeferred()
     Texture2D* normalBuffer = graphics_->GetNormalBuffer();
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
     
-    // Check for deferred antialiasing (edge filter) in deferred mode. Only use it on the main view (null rendertarget)
-    bool edgeFilter = !renderTarget_ && graphics_->GetMultiSample() > 1;
-    RenderSurface* renderBuffer = edgeFilter ? graphics_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
+    // Check for temporal antialiasing in deferred mode. Only use it on the main view (null rendertarget)
+    bool temporalAA = (!renderTarget_) && (graphics_->GetMultiSample() > 1);
+    if (temporalAA)
+    {
+        ++jitterCounter_;
+        if (jitterCounter_ > 3)
+            jitterCounter_ = 2;
+        
+        Vector2 jitter(-0.25f, -0.25f);
+        if (jitterCounter_ & 1)
+            jitter = -jitter;
+        jitter.x_ /= width_;
+        jitter.y_ /= height_;
+        
+        camera_->SetProjectionOffset(jitter);
+    }
     
-    // Calculate shader parameters needed only in deferred rendering
-    Vector3 nearVector, farVector;
-    camera_->GetFrustumSize(nearVector, farVector);
-    Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
-    
-    float gBufferWidth = (float)diffBuffer->GetWidth();
-    float gBufferHeight = (float)diffBuffer->GetHeight();
-    float widthRange = 0.5f * width_ / gBufferWidth;
-    float heightRange = 0.5f * height_ / gBufferHeight;
-    
-    // Hardware depth is non-linear in perspective views, so calculate the depth reconstruction parameters
-    float farClip = camera_->GetFarClip();
-    float nearClip = camera_->GetNearClip();
-    Vector4 depthReconstruct = Vector4::ZERO;
-    depthReconstruct.x_ = farClip / (farClip - nearClip);
-    depthReconstruct.y_ = -nearClip / (farClip - nearClip);
-    shaderParameters_[PSP_DEPTHRECONSTRUCT] = depthReconstruct;
-    
-    #ifdef USE_OPENGL
-    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
-        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
-    #else
-    Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
-        (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
-    #endif
-    
-    Vector4 viewportSize((float)screenRect_.left_ / gBufferWidth, (float)screenRect_.top_ / gBufferHeight,
-        (float)screenRect_.right_ / gBufferWidth, (float)screenRect_.bottom_ / gBufferHeight);
-    
-    shaderParameters_[VSP_FRUSTUMSIZE] = viewportParams;
-    shaderParameters_[VSP_GBUFFEROFFSETS] = bufferUVOffset;
+    RenderSurface* renderBuffer = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
     
     {
         // Clear and render the G-buffer
@@ -958,28 +942,53 @@ void View::RenderBatchesDeferred()
         RenderBatchQueue(transparentQueue_, true);
     }
     
-    // Render deferred antialiasing now if enabled
-    if (edgeFilter)
+    // Render temporal antialiasing now if enabled
+    if (temporalAA)
     {
-        PROFILE(RenderEdgeFilter);
+        PROFILE(RenderTemporalAA);
         
-        const EdgeFilterParameters& parameters = renderer_->GetEdgeFilter();
-        ShaderVariation* vs = renderer_->GetVertexShader("EdgeFilter");
-        ShaderVariation* ps = renderer_->GetPixelShader("EdgeFilter");
+        // Disable averaging if it is the first frame rendered in this view
+        float thisFrameWeight = jitterCounter_ < 2 ? 1.0f : 0.5f;
         
-        HashMap<StringHash, Vector4> shaderParameters(shaderParameters_);
-        shaderParameters[PSP_EDGEFILTERPARAMS] = Vector4(parameters.radius_, parameters.threshold_, parameters.strength_, 0.0f);
-        shaderParameters[PSP_SAMPLEOFFSETS] = Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f);
+        String vsName = "TemporalAA";
+        String psName = vsName;
+        if (camera_->IsOrthographic())
+        {
+            vsName += "_Ortho";
+            psName += "_Ortho";
+        }
+        else if (!graphics_->GetHardwareDepthSupport())
+            psName += "_Linear";
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
-        graphics_->SetDepthTest(CMP_ALWAYS),
+        graphics_->SetDepthTest(CMP_ALWAYS);
+        graphics_->SetDepthWrite(false);
+        graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
-        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer());
-        DrawFullScreenQuad(*camera_, vs, ps, false, shaderParameters);
+        
+        // Pre-select the right shaders so that we can set shader parameters that can not go into the parameter map
+        // (matrices)
+        float gBufferWidth = (float)graphics_->GetWidth();
+        float gBufferHeight = (float)graphics_->GetHeight();
+        ShaderVariation* vertexShader = renderer_->GetVertexShader(vsName);
+        ShaderVariation* pixelShader = renderer_->GetPixelShader(psName);
+        graphics_->SetShaders(vertexShader, pixelShader);
+        graphics_->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
+        graphics_->SetShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
+        graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, thisFrameWeight, 1.0f - thisFrameWeight));
+        graphics_->SetShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
+        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
+        graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
+        graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
+        
+        DrawFullScreenQuad(*camera_, vertexShader, pixelShader, false, shaderParameters_);
+        
+        // Store view transform for next frame
+        lastCameraView_ = camera_->GetInverseWorldTransform();
     }
 }
 
@@ -1934,12 +1943,63 @@ void View::CalculateShaderParameters()
     Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
     Vector4 elapsedTime((time->GetTotalMSec() & 0x3fffff) / 1000.0f, 0.0f, 0.0f, 0.0f);
     
+    Vector4 depthMode = Vector4::ZERO;
+    if (camera_->IsOrthographic())
+    {
+        depthMode.x_ = 1.0f;
+        #ifdef USE_OPENGL
+        depthMode.z_ = 0.5f;
+        depthMode.w_ = 0.5f;
+        #else
+        depthMode.z_ = 1.0f;
+        #endif
+    }
+    else
+        depthMode.w_ = 1.0f / camera_->GetFarClip();
+    
     shaderParameters_.Clear();
+    shaderParameters_[VSP_DEPTHMODE] = depthMode;
     shaderParameters_[VSP_ELAPSEDTIME] = elapsedTime;
     shaderParameters_[PSP_AMBIENTCOLOR] = zone_->GetAmbientColor().ToVector4();
     shaderParameters_[PSP_ELAPSEDTIME] = elapsedTime;
     shaderParameters_[PSP_FOGCOLOR] = zone_->GetFogColor().ToVector4(),
     shaderParameters_[PSP_FOGPARAMS] = fogParams;
+    
+    if (mode_ == RENDER_DEFERRED)
+    {
+        // Calculate shader parameters needed only in deferred rendering
+        Vector3 nearVector, farVector;
+        camera_->GetFrustumSize(nearVector, farVector);
+        Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
+        
+        float gBufferWidth = (float)graphics_->GetWidth();
+        float gBufferHeight = (float)graphics_->GetHeight();
+        float widthRange = 0.5f * width_ / gBufferWidth;
+        float heightRange = 0.5f * height_ / gBufferHeight;
+        
+        // Hardware depth is non-linear in perspective views, so calculate the depth reconstruction parameters
+        float farClip = camera_->GetFarClip();
+        float nearClip = camera_->GetNearClip();
+        Vector4 depthReconstruct = Vector4::ZERO;
+        depthReconstruct.x_ = farClip / (farClip - nearClip);
+        depthReconstruct.y_ = -nearClip / (farClip - nearClip);
+        shaderParameters_[PSP_DEPTHRECONSTRUCT] = depthReconstruct;
+        
+        #ifdef USE_OPENGL
+        Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
+            ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #else
+        Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
+            (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #endif
+        
+        Vector4 viewportSize((float)screenRect_.left_ / gBufferWidth, (float)screenRect_.top_ / gBufferHeight,
+            (float)screenRect_.right_ / gBufferWidth, (float)screenRect_.bottom_ / gBufferHeight);
+        
+        shaderParameters_[VSP_FRUSTUMSIZE] = viewportParams;
+        shaderParameters_[VSP_GBUFFEROFFSETS] = bufferUVOffset;
+        shaderParameters_[PSP_GBUFFEROFFSETS] = bufferUVOffset;
+    }
 }
 
 void View::SetupLightBatch(Batch& batch, bool firstSplit)

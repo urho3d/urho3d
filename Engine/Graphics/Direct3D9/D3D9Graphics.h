@@ -48,6 +48,7 @@ class VertexDeclaration;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 static const unsigned NUM_QUERIES = 2;
+static const unsigned NUM_SCREEN_BUFFERS = 2;
 
 /// %Shader parameter definition.
 struct ShaderParameter
@@ -340,7 +341,7 @@ public:
     /// Return depth buffer for deferred rendering. If reading hardware depth is supported, return a depth texture.
     Texture2D* GetDepthBuffer() const { return depthBuffer_; }
     /// Return screen buffer for post-processing.
-    Texture2D* GetScreenBuffer() const { return screenBuffer_; }
+    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffers_[index]; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -465,7 +466,7 @@ private:
     /// Deferred rendering depth buffer.
     SharedPtr<Texture2D> depthBuffer_;
     /// Screen buffer for post processing.
-    SharedPtr<Texture2D> screenBuffer_;
+    SharedPtr<Texture2D> screenBuffers_[NUM_SCREEN_BUFFERS];
     /// Shadow map dummy color texture format.
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format.

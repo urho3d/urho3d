@@ -430,7 +430,8 @@ void Graphics::Close()
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
-        screenBuffer_.Reset();
+        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
+            screenBuffers_[i].Reset();
         immediateVertexBuffers_.Clear();
         
         DestroyWindow(impl_->window_);
@@ -2213,24 +2214,31 @@ void Graphics::CreateRenderTargets()
                 depthBuffer_->SetSize(0, 0, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
         }
         
-        // If deferred antialiasing is used, reserve screen buffer
+        // If deferred antialiasing is used, reserve screen buffers
         // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
         // which will also be useful in forward rendering)
         if (multiSample_ > 1)
         {
-            screenBuffer_ = new Texture2D(context_);
-            screenBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-            screenBuffer_->SetFilterMode(FILTER_BILINEAR);
+            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
+            {
+                screenBuffers_[i] = new Texture2D(context_);
+                screenBuffers_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
+                screenBuffers_[i]->SetFilterMode(FILTER_BILINEAR);
+            }
         }
         else
-            screenBuffer_.Reset();
+        {
+            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
+                screenBuffers_[i].Reset();
+        }
     }
     else
     {
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
-        screenBuffer_.Reset();
+        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
+            screenBuffers_[i].Reset();
     }
 }
 

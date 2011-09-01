@@ -216,6 +216,10 @@ private:
     int materialQuality_;
     /// Maximum number of occluder triangles.
     int maxOccluderTriangles_;
+    /// Jitter counter for temporal antialiasing.
+    int jitterCounter_;
+    /// Previous view matrix for temporal antialiasing.
+    Matrix3x4 lastCameraView_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
     /// Combined bounding box of visible geometries.

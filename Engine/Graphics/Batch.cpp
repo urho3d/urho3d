@@ -107,25 +107,6 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
     if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
         graphics->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
-    if (graphics->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
-    {
-        Vector4 depthMode = Vector4::ZERO;
-        if (camera_->IsOrthographic())
-        {
-            depthMode.x_ = 1.0f;
-            #ifdef USE_OPENGL
-            depthMode.z_ = 0.5f;
-            depthMode.w_ = 0.5f;
-            #else
-            depthMode.z_ = 1.0f;
-            #endif
-        }
-        else
-            depthMode.w_ = 1.0f / camera_->GetFarClip();
-        
-        graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
-    }
-    
     if (overrideView_)
     {
         // If we override the view matrix, also disable any projection jittering

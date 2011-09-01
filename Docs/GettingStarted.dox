@@ -116,7 +116,7 @@ Urho3D.exe understands the following command line options:
 -sm2        Force SM2.0 rendering
 \endverbatim
 
-(*) Only forward rendering supports hardware multisampling. In deferred rendering a post-process edge filter based on NVIDIA FXAA II will be used instead.
+(*) Only forward rendering supports hardware multisampling. In deferred rendering temporal antialiasing will be used instead.
 
 
 \page Structure Overall structure

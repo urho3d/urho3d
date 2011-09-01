@@ -216,11 +216,13 @@ extern StringHash VSP_VIEWRIGHTVECTOR;
 extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_SKINMATRICES;
 extern StringHash PSP_AMBIENTCOLOR;
+extern StringHash PSP_ANTIALIASWEIGHTS;
+extern StringHash PSP_CAMERAPOS;
 extern StringHash PSP_DEPTHRECONSTRUCT;
-extern StringHash PSP_EDGEFILTERPARAMS;
 extern StringHash PSP_ELAPSEDTIME;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
+extern StringHash PSP_GBUFFEROFFSETS;
 extern StringHash PSP_LIGHTATTEN;
 extern StringHash PSP_LIGHTCOLOR;
 extern StringHash PSP_LIGHTDIR;
@@ -234,6 +236,7 @@ extern StringHash PSP_SAMPLEOFFSETS;
 extern StringHash PSP_SHADOWINTENSITY;
 extern StringHash PSP_SHADOWPROJ;
 extern StringHash PSP_SPOTPROJ;
+extern StringHash PSP_VIEWPROJ;
 
 /// Texture units.
 enum TextureUnit
