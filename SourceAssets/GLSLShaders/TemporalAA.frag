@@ -45,7 +45,7 @@ void main()
     // To eliminate ghosting, clamp RGB values to the pixel's neighbours
     // This is rather expensive, so only do it if there is a large color difference
     if (dot(abs(current - last), 1.0) > 0.25)
-    /{
+    {
         vec3 left = texture2D(sDiffBuffer, vScreenPos - hOffset).rgb;
         vec3 right = texture2D(sDiffBuffer, vScreenPos + hOffset).rgb;
         vec3 up = texture2D(sDiffBuffer, vScreenPos - vOffset).rgb;
