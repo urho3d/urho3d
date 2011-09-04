@@ -1,6 +1,7 @@
 <technique>
     <pass name="gbuffer" vs="GBuffer" ps="GBuffer_Diff" />
     <pass name="base" vs="Forward" ps="Forward_DiffAmbient" />
+    <pass name="litbase" vs="Forward" ps="Forward_DiffAmbient" />
     <pass name="light" vs="Forward" ps="Forward_Diff" depthwrite="false" blend="add" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

@@ -274,6 +274,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnum("PassType");
     engine->RegisterEnumValue("PassType", "PASS_GBUFFER", PASS_GBUFFER);
     engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
+    engine->RegisterEnumValue("PassType", "PASS_LITBASE", PASS_LITBASE);
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
     engine->RegisterEnumValue("PassType", "PASS_EXTRA", PASS_EXTRA);
     engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);

@@ -39,6 +39,11 @@
             <exclude name="Spec" />
             <exclude name="SpecMap" />
         </variation>
+        <variation name="AmbientDir">
+            <define name="AMBIENT" />
+            <define name="DIRLIGHT" />
+            <define name="LIGHT" />
+        </variation>
         <variation name="Dir">
             <define name="DIRLIGHT" />
             <define name="LIGHT" />

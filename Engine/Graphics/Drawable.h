@@ -142,8 +142,10 @@ public:
     void MarkInView(const FrameInfo& frame);
     /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View.
     void MarkInShadowView(const FrameInfo& frame);
-    /// Clear light vector.
-    void ClearLights();
+    /// Clear base pass flags. Also resets light vector.
+    void ClearBasePass();
+    /// %Set base pass flag for a batch.
+    void SetBasePass(unsigned batchIndex);
     /// Add a light, for drawables that limit the maximum light count.
     void AddLight(Light* light);
     /// Sort and limit lights to maximum allowed.
@@ -158,6 +160,8 @@ public:
     bool IsInView(unsigned frameNumber) const;
     /// Return whether is visible in a specific view this frame.
     bool IsInView(const FrameInfo& frame) const;
+    /// Return whether has a base pass.
+    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     
@@ -207,6 +211,8 @@ protected:
     float sortValue_;
     /// Last visible frame number.
     unsigned viewFrameNumber_;
+    /// Base pass flags per batch index.
+    unsigned basePassFlags_;
     /// Last camera rendered from. Not safe to dereference.
     Camera* viewCamera_;
     /// Lights affecting this drawable, when light count is limited.

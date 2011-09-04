@@ -182,7 +182,7 @@ private:
     /// Draw a full screen quad (either near or far.)
     void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);
     /// Draw everything in a batch queue, priority batches first.
-    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool disableScissor = true);
+    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
     /// Draw a forward (shadowed) light batch queue.
     void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight, bool firstSplit);
     /// Render a shadow map.
@@ -226,8 +226,6 @@ private:
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space.
     BoundingBox sceneViewBox_;
-    /// Cache for light scissor queries.
-    Map<Light*, Rect> lightScissorCache_;
     /// Current split lights being processed.
     Light* splitLights_[MAX_LIGHT_SPLITS];
     /// Current lit geometries being processed.
@@ -248,9 +246,12 @@ private:
     PODVector<Light*> lights_;
     /// Render surfaces for which a G-buffer size error has already been logged, to prevent log spam.
     HashSet<RenderSurface*> gBufferErrorDisplayed_;
+    /// Helper set for combining lit geometries of a split light.
+    HashSet<Drawable*> allLitGeometries_;
     /// View-global shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
-    
+    /// Cache for light scissor queries.
+    HashMap<Light*, Rect> lightScissorCache_;
     /// G-buffer batches.
     BatchQueue gBufferQueue_;
     /// Base pass batches.

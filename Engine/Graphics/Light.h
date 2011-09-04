@@ -234,7 +234,7 @@ public:
     /// %Set shadow map depth texture.
     void SetShadowMap(Texture2D* shadowMap);
     /// %Set sort value based on intensity at given world position.
-    void SetIntensitySortValue(const Vector3& position);
+    void SetIntensitySortValue(const Vector3& position, bool forDrawable = false);
     /// Copy values from another light.
     void CopyFrom(Light* original);
     /// Return near split distance.

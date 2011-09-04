@@ -55,6 +55,7 @@ Drawable::Drawable(Context* context) :
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
+    basePassFlags_(0),
     viewCamera_(0),
     worldBoundingBoxDirty_(true),
     lodLevelsDirty_(true)
@@ -184,9 +185,15 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::ClearLights()
+void Drawable::ClearBasePass()
 {
+    basePassFlags_ = 0;
     lights_.Clear();
+}
+
+void Drawable::SetBasePass(unsigned batchIndex)
+{
+    basePassFlags_ |= (1 << batchIndex);
 }
 
 void Drawable::AddLight(Light* light)
@@ -200,7 +207,7 @@ void Drawable::LimitLights()
     
     const Vector3& worldPos = GetWorldPosition();
     for (unsigned i = 0; i < lights_.Size(); ++i)
-        lights_[i]->SetIntensitySortValue(worldPos);
+        lights_[i]->SetIntensitySortValue(worldPos, true);
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     

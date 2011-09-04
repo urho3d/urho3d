@@ -227,6 +227,8 @@ void View::Render()
         graphics_->SetViewTexture(0);
     
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
     
     // Calculate view-global shader parameters
     CalculateShaderParameters();
@@ -248,6 +250,9 @@ void View::Render()
         RenderBatchesDeferred();
     
     graphics_->SetViewTexture(0);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
+    graphics_->ResetStreamFrequencies();
     
     // If this is a main view, draw the associated debug geometry now
     if (!renderTarget_)
@@ -348,7 +353,7 @@ void View::GetDrawables()
         unsigned flags = drawable->GetDrawableFlags();
         if (flags & DRAWABLE_GEOMETRY)
         {
-            drawable->ClearLights();
+            drawable->ClearBasePass();
             drawable->MarkInView(frame_);
             drawable->UpdateGeometry(frame_);
             
@@ -391,87 +396,6 @@ void View::GetBatches()
     HashSet<LitTransparencyCheck> litTransparencies;
     HashSet<Drawable*> maxLightsDrawables;
     Map<Light*, unsigned> lightQueueIndex;
-    
-    // Go through geometries for base pass batches
-    {
-        PROFILE(GetBaseBatches);
-        for (unsigned i = 0; i < geometries_.Size(); ++i)
-        {
-            Drawable* drawable = geometries_[i];
-            unsigned numBatches = drawable->GetNumBatches();
-            
-            for (unsigned j = 0; j < numBatches; ++j)
-            {
-                Batch baseBatch;
-                drawable->GetBatch(frame_, j, baseBatch);
-                
-                Technique* tech = GetTechnique(drawable, baseBatch.material_);
-                if (!baseBatch.geometry_ || !tech)
-                    continue;
-                
-                // Check here if the material technique refers to a render target texture with camera(s) attached
-                // Only check this for the main view (null rendertarget)
-                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
-                    CheckMaterialForAuxView(baseBatch.material_);
-                
-                // Fill the rest of the batch
-                baseBatch.camera_ = camera_;
-                baseBatch.distance_ = drawable->GetDistance();
-                
-                Pass* pass = 0;
-                // In deferred mode, check for a G-buffer batch first
-                if (mode_ != RENDER_FORWARD)
-                {
-                    pass = tech->GetPass(PASS_GBUFFER);
-                    if (pass)
-                    {
-                        renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
-                        gBufferQueue_.AddBatch(baseBatch);
-                        
-                        // Check also for an additional pass (possibly for emissive)
-                        pass = tech->GetPass(PASS_EXTRA);
-                        if (pass)
-                        {
-                            renderer_->SetBatchShaders(baseBatch, tech, pass);
-                            baseQueue_.AddBatch(baseBatch);
-                        }
-                        
-                        continue;
-                    }
-                }
-                
-                // Then check for forward rendering base pass
-                pass = tech->GetPass(PASS_BASE);
-                if (pass)
-                {
-                    renderer_->SetBatchShaders(baseBatch, tech, pass);
-                    if (pass->GetBlendMode() == BLEND_REPLACE)
-                    {
-                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
-                        baseQueue_.AddBatch(baseBatch);
-                    }
-                    else
-                    {
-                        baseBatch.hasPriority_ = true;
-                        transparentQueue_.AddBatch(baseBatch, true);
-                    }
-                    continue;
-                }
-                else
-                {
-                    // If no base pass, finally check for extra / custom pass
-                    pass = tech->GetPass(PASS_EXTRA);
-                    if (pass)
-                    {
-                        baseBatch.hasPriority_ = false;
-                        renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        extraQueue_.AddBatch(baseBatch);
-                    }
-                }
-            }
-        }
-    }
     
     // Go through lights
     {
@@ -618,6 +542,91 @@ void View::GetBatches()
         }
     }
     
+    // Go through geometries for base pass batches
+    {
+        PROFILE(GetBaseBatches);
+        for (unsigned i = 0; i < geometries_.Size(); ++i)
+        {
+            Drawable* drawable = geometries_[i];
+            unsigned numBatches = drawable->GetNumBatches();
+            
+            for (unsigned j = 0; j < numBatches; ++j)
+            {
+                Batch baseBatch;
+                drawable->GetBatch(frame_, j, baseBatch);
+                
+                Technique* tech = GetTechnique(drawable, baseBatch.material_);
+                if (!baseBatch.geometry_ || !tech)
+                    continue;
+                
+                // Check here if the material technique refers to a render target texture with camera(s) attached
+                // Only check this for the main view (null rendertarget)
+                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
+                    CheckMaterialForAuxView(baseBatch.material_);
+                
+                // If object already has a lit base pass, can skip the unlit base pass
+                if (drawable->HasBasePass(j))
+                    continue;
+                
+                // Fill the rest of the batch
+                baseBatch.camera_ = camera_;
+                baseBatch.distance_ = drawable->GetDistance();
+                
+                Pass* pass = 0;
+                // In deferred mode, check for a G-buffer batch first
+                if (mode_ != RENDER_FORWARD)
+                {
+                    pass = tech->GetPass(PASS_GBUFFER);
+                    if (pass)
+                    {
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
+                        gBufferQueue_.AddBatch(baseBatch);
+                        
+                        // Check also for an additional pass (possibly for emissive)
+                        pass = tech->GetPass(PASS_EXTRA);
+                        if (pass)
+                        {
+                            renderer_->SetBatchShaders(baseBatch, tech, pass);
+                            baseQueue_.AddBatch(baseBatch);
+                        }
+                        
+                        continue;
+                    }
+                }
+                
+                // Then check for forward rendering base pass
+                pass = tech->GetPass(PASS_BASE);
+                if (pass)
+                {
+                    renderer_->SetBatchShaders(baseBatch, tech, pass);
+                    if (pass->GetBlendMode() == BLEND_REPLACE)
+                    {
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
+                        baseQueue_.AddBatch(baseBatch);
+                    }
+                    else
+                    {
+                        baseBatch.hasPriority_ = true;
+                        transparentQueue_.AddBatch(baseBatch, true);
+                    }
+                    continue;
+                }
+                else
+                {
+                    // If no base pass, finally check for extra / custom pass
+                    pass = tech->GetPass(PASS_EXTRA);
+                    if (pass)
+                    {
+                        baseBatch.hasPriority_ = false;
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
+                        extraQueue_.AddBatch(baseBatch);
+                    }
+                }
+            }
+        }
+    }
+    
     // All batches have been collected. Sort them now
     SortBatches();
 }
@@ -645,8 +654,22 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
         
         Pass* pass = 0;
         bool priority = false;
-         
-        // Get lit pass
+        
+        // For the (first) directional light, check for lit base pass
+        if (light == lights_[0] && splitLight->GetLightType() == LIGHT_DIRECTIONAL)
+        {
+            if (!drawable->HasBasePass(i))
+            {
+                pass = tech->GetPass(PASS_LITBASE);
+                if (pass)
+                {
+                    priority = true;
+                    drawable->SetBasePass(i);
+                }
+            }
+        }
+        
+        // If no lit base pass, get ordinary light pass
         if (!pass)
             pass = tech->GetPass(PASS_LIGHT);
         // Skip if material does not receive light at all
@@ -703,7 +726,6 @@ void View::RenderBatchesForward()
         PROFILE(RenderBasePass);
         
         graphics_->SetColorWrite(true);
-        graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
@@ -732,6 +754,8 @@ void View::RenderBatchesForward()
         }
     }
     
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget_);
     graphics_->SetDepthStencil(depthStencil_);
     graphics_->SetViewport(screenRect_);
@@ -783,8 +807,6 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderGBuffer);
         
         graphics_->SetColorWrite(true);
-        graphics_->SetScissorTest(false);
-        graphics_->SetStencilTest(false);
         #ifdef USE_OPENGL
         // On OpenGL, clear the diffuse and depth buffers normally
         graphics_->SetRenderTarget(0, diffBuffer);
@@ -915,7 +937,6 @@ void View::RenderBatchesDeferred()
         // Render base passes
         PROFILE(RenderBasePass);
         
-        graphics_->SetStencilTest(false);
         graphics_->SetTexture(TU_DIFFBUFFER, 0);
         graphics_->SetTexture(TU_NORMALBUFFER, 0);
         graphics_->SetTexture(TU_DEPTHBUFFER, 0);
@@ -964,8 +985,6 @@ void View::RenderBatchesDeferred()
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetDepthTest(CMP_ALWAYS);
         graphics_->SetDepthWrite(false);
-        graphics_->SetScissorTest(false);
-        graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
@@ -1300,16 +1319,16 @@ unsigned View::ProcessLight(Light* light)
         if (numSplits > 1)
         {
             // Make sure there are no duplicates
-            HashSet<Drawable*> allLitGeometries;
+            allLitGeometries_.Clear();
             for (unsigned i = 0; i < numSplits; ++i)
             {
                 for (Vector<Drawable*>::Iterator j = litGeometries_[i].Begin(); j != litGeometries_[i].End(); ++j)
-                    allLitGeometries.Insert(*j);
+                    allLitGeometries_.Insert(*j);
             }
             
-            litGeometries_[0].Resize(allLitGeometries.Size());
+            litGeometries_[0].Resize(allLitGeometries_.Size());
             unsigned index = 0;
-            for (HashSet<Drawable*>::Iterator i = allLitGeometries.Begin(); i != allLitGeometries.End(); ++i)
+            for (HashSet<Drawable*>::Iterator i = allLitGeometries_.Begin(); i != allLitGeometries_.End(); ++i)
                 litGeometries_[0][index++] = *i;
         }
         
@@ -1669,7 +1688,7 @@ void View::OptimizeLightByScissor(Light* light)
 
 const Rect& View::GetLightScissor(Light* light)
 {
-    Map<Light*, Rect>::Iterator i = lightScissorCache_.Find(light);
+    HashMap<Light*, Rect>::Iterator i = lightScissorCache_.Find(light);
     if (i != lightScissorCache_.End())
         return i->second_;
     
@@ -2233,13 +2252,13 @@ void View::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariati
     renderer_->dirLightGeometry_->Draw(graphics_);
 }
 
-void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disableScissor)
+void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
     VertexBuffer* instancingBuffer = 0;
     if (renderer_->GetDynamicInstancing())
         instancingBuffer = renderer_->instancingBuffer_;
     
-    if (disableScissor)
+    if (useScissor)
         graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
@@ -2262,10 +2281,8 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disab
         queue.batchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        if (useScissor && group.light_)
+        if (useScissor)
             OptimizeLightByScissor(group.light_);
-        else
-            graphics_->SetScissorTest(false);
         group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Non-priority non-instanced
@@ -2273,10 +2290,13 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disab
     {
         Batch* batch = *i;
         // For the transparent queue, both priority and non-priority batches are copied here, so check the flag
-        if (useScissor && batch->light_ && !batch->hasPriority_)
-            OptimizeLightByScissor(batch->light_);
-        else
-            graphics_->SetScissorTest(false);
+        if (useScissor)
+        {
+            if (!batch->hasPriority_)
+                OptimizeLightByScissor(batch->light_);
+            else
+                graphics_->SetScissorTest(false);
+        }
         batch->Draw(graphics_, shaderParameters_);
     }
 }
@@ -2335,7 +2355,6 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     Texture2D* shadowMap = queue.light_->GetShadowMap();
     
     graphics_->SetColorWrite(false);
-    graphics_->SetStencilTest(false);
     graphics_->SetTexture(TU_SHADOWMAP, 0);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     graphics_->SetDepthStencil(shadowMap);
@@ -2363,8 +2382,9 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         graphics_->SetScissorTest(false);
     
     // Draw instanced and non-instanced shadow casters
-    RenderBatchQueue(queue.shadowBatches_, false, false);
+    RenderBatchQueue(queue.shadowBatches_);
     
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
+    graphics_->SetScissorTest(false);
 }

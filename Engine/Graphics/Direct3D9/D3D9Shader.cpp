@@ -151,12 +151,8 @@ ShaderVariation* Shader::GetVariation(const String& name)
 {
     StringHash nameHash(name);
     Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
-    if (i == variations_.End())
-    {
-        LOGERROR("Could not find shader variation " + GetFileName(GetName()) + "_" + name);
-        variations_[nameHash] = 0; // Store a null pointer so that the error is printed only once
-        return 0;
-    }
-    else
+    if (i != variations_.End())
         return i->second_;
+    else
+        return 0;
 }

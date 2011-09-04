@@ -222,34 +222,34 @@ static const String lightPSVariations[] =
 {
     "Dir",
     "DirSpec",
-    "DirShadow",
-    "DirShadowSpec",
     "Spot",
     "SpotSpec",
-    "SpotShadow",
-    "SpotShadowSpec",
     "Point",
     "PointSpec",
-    "PointShadow",
-    "PointShadowSpec",
     "PointMask",
     "PointMaskSpec",
+    "DirShadow",
+    "DirShadowSpec",
+    "SpotShadow",
+    "SpotShadowSpec",
+    "PointShadow",
+    "PointShadowSpec",
     "PointMaskShadow",
     "PointMaskShadowSpec",
     "OrthoDir",
     "OrthoDirSpec",
-    "OrthoDirShadow",
-    "OrthoDirShadowSpec",
     "OrthoSpot",
     "OrthoSpotSpec",
-    "OrthoSpotShadow",
-    "OrthoSpotShadowSpec",
     "OrthoPoint",
     "OrthoPointSpec",
-    "OrthoPointShadow",
-    "OrthoPointShadowSpec",
     "OrthoPointMask",
     "OrthoPointMaskSpec",
+    "OrthoDirShadow",
+    "OrthoDirShadowSpec",
+    "OrthoSpotShadow",
+    "OrthoSpotShadowSpec",
+    "OrthoPointShadow",
+    "OrthoPointShadowSpec",
     "OrthoPointMaskShadow",
     "OrthoPointMaskShadowSpec"
 };
@@ -623,11 +623,6 @@ void Renderer::Render()
     for (unsigned i = numViews_ - 1; i < numViews_; --i)
         views_[i]->Render();
     
-    // Disable scissor/stencil tests if left on by lights, and reset stream frequencies
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
-    graphics_->ResetStreamFrequencies();
-    
     // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
     numPrimitives_ = graphics_->GetNumPrimitives();
     numBatches_ = graphics_->GetNumBatches();
@@ -886,14 +881,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     {
         //  Check whether is a forward lit pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
-        if (type != PASS_LIGHT)
-        {
-            unsigned vsi = batch.geometryType_;
-            batch.vertexShader_ = vertexShaders[vsi];
-            batch.pixelShader_ = pixelShaders[0];
-            batch.vertexShaderIndex_ = vsi;
-        }
-        else
+        if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
             Light* light = batch.light_;
             if (!light)
@@ -935,6 +923,13 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[psi];
+            batch.vertexShaderIndex_ = vsi;
+        }
+        else
+        {
+            unsigned vsi = batch.geometryType_;
+            batch.vertexShader_ = vertexShaders[vsi];
+            batch.pixelShader_ = pixelShaders[0];
             batch.vertexShaderIndex_ = vsi;
         }
     }
@@ -1024,10 +1019,9 @@ void Renderer::LoadShaders()
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
         {
-            unsigned variation = i % DLPS_SPOT;
             unsigned linear = !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
             
-            if (variation == DLPS_SHADOW || variation == DLPS_SHADOWSPEC)
+            if (i & DLPS_SHADOW)
                 lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] + hwVariations[hwShadows]);
             else
                 lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i]);
@@ -1049,6 +1043,7 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     if (mode == RENDER_FORWARD)
     {
         LoadPassShaders(technique, PASS_BASE);
+        LoadPassShaders(technique, PASS_LITBASE);
         LoadPassShaders(technique, PASS_LIGHT);
     }
     else
@@ -1059,6 +1054,7 @@ void Renderer::LoadMaterialShaders(Technique* technique)
         {
             LoadPassShaders(technique, PASS_BASE);
             // If shadow maps are not reused, forward lighting in deferred mode can render shadows
+            LoadPassShaders(technique, PASS_LITBASE, !reuseShadowMaps_);
             LoadPassShaders(technique, PASS_LIGHT, !reuseShadowMaps_);
         }
     }
@@ -1080,20 +1076,12 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         pixelShaderName += "_";
     
     // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
-    // Also check for fallback G-buffer (different layout)
     if (type == PASS_GBUFFER)
     {
         unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
         pixelShaderName += depthVariations[depth];
     }
 
-    // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
-    if (reuseShadowMaps_ && type == PASS_LIGHT)
-    {
-        if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
-            allowShadows = false;
-    }
-    
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
@@ -1103,11 +1091,18 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (type == PASS_LIGHT)
+    if (type == PASS_LIGHT || type == PASS_LITBASE)
     {
+        // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
+        if (reuseShadowMaps_)
+        {
+            if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
+                allowShadows = false;
+        }
+        
         vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
         pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
-            
+        
         for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
         {
             unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
@@ -1119,8 +1114,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
         {
-            unsigned variation = j % LPS_SPOT;
-            if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)
+            if (j & LPS_SHADOW)
             {
                 if (allowShadows)
                     pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + hwVariations[hwShadows]);

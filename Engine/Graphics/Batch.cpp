@@ -410,10 +410,10 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
         Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass_->GetVertexShaders();
         Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
-        if (type != PASS_LIGHT)
-            batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
-        else
+        if (type == PASS_LIGHT || type == PASS_LITBASE)
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED * MAX_LIGHT_VS_VARIATIONS];
+        else
+            batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
         
         batch.Prepare(graphics, shaderParameters, false);
         

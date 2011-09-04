@@ -480,12 +480,15 @@ void Light::SetShadowMap(Texture2D* shadowMap)
     shadowMap_ = shadowMap;
 }
 
-void Light::SetIntensitySortValue(const Vector3& position)
+void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
 {
     // Directional lights are always assumed to be "infinitely" close, while point and spot lights take distance into account
     float invIntensity = 1.0f / color_.Intensity();
     if (lightType_ == LIGHT_DIRECTIONAL)
-        sortValue_ = invIntensity;
+        // If sorting lights for a drawable's maximum lights sorting, use the actual intensity
+        // Else (when sorting lights globally for the view) ensure directional lights always have a fixed first priority
+        // so that the combined ambient + first light optimization works as expected
+        sortValue_ = forDrawable ? invIntensity : 0.0f;
     else
         sortValue_ = invIntensity * (1.0f + (GetWorldPosition() - position).LengthFast() / range_);
 }
