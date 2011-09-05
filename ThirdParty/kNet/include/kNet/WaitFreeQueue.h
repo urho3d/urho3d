@@ -88,6 +88,37 @@ public:
 	/// Thread-safe.
 	int CapacityLeft() const { return Capacity() - Size(); }
 
+	/// Starts a new item insert operation.
+	/// This function returns a pointer to the next element to be added to this queue.
+	/// You can fill there the next value to add, and call FinishInsert() when done. The consumer
+	/// will not see the object in the queue before FinishInsert() is called.
+	/// Use Begin/FinishInsert when the type T has a heavy copy-ctor to avoid generating a temporary.
+	/// \note Do not call BeginInsert() several times before calling FinishInsert() in between. You can
+	///       have only one outstanding BeginInsert() call active at a time (multiple consecutive BeginInsert()
+	///       calls will keep returning the same pointer until FinishInsert() is called)
+	/// @return A pointer where to fill the next value to produce to the queue, or 0 if the queue is full
+	///       and no value can be added. For each returned pointer, call FinishInsert after filling the value 
+	///       to commit it to the queue. If 0 is returned, FinishInsert does not need to be called.
+	///  This function can be called only by a single producer thread.
+	T *BeginInsert()
+	{
+		unsigned long tail_ = tail;
+		unsigned long nextTail = (tail_ + 1) & maxElementsMask;
+		if (nextTail == head)
+			return 0;
+		return &data[tail];
+	}
+
+	/// Commits to the end of the queue the item filled with a previous call to BeginInsert.
+	///  This function can be called only by a single producer thread.
+	void FinishInsert()
+	{
+		unsigned long tail_ = tail;
+		unsigned long nextTail = (tail_ + 1) & maxElementsMask;
+		assert(nextTail != head && "Error: Calling FinishInsert after BeginInsert failed, or was not even called!");
+		tail = nextTail;
+	}
+
 	/// Inserts the new value into the queue. Can be called only by a single producer thread.
 	bool Insert(const T &value)
 	{
@@ -143,6 +174,7 @@ public:
 
 	/// Returns a pointer to the first item in the queue (the item that is coming off next, i.e. the one that has
 	/// been in the queue the longest). Can be called only from a single consumer thread.
+	/// This function can safely be called even if the queue is empty, in which case 0 is returned.
 	T *Front()
 	{
 		if (head == tail)
@@ -152,6 +184,7 @@ public:
 
 	/// Returns a pointer to the first item in the queue (the item that is coming off next, i.e. the one that has
 	/// been in the queue the longest). Can be called only from a single consumer thread.
+	/// This function can safely be called even if the queue is empty, in which case 0 is returned.
 	const T *Front() const
 	{
 		if (head == tail)
@@ -160,8 +193,10 @@ public:
 	}
 
 	/// Returns a copy of the first item in the queue and pops that item off the queue. Can be called only from a single consumer thread.
+	/// Requires that there exists an element in the queue.
 	T TakeFront()
 	{
+		assert(Front());
 		T frontVal = *Front();
 		PopFront();
 		return frontVal;

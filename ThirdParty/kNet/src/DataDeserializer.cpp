@@ -33,16 +33,16 @@ namespace kNet
 DataDeserializer::DataDeserializer(const char *data_, size_t size_)
 :data(data_), size(size_)
 {
-	assert(data);
-	assert(size > 0);
+	if (!data && size > 0)
+		throw NetException("Specified a null input buffer to DataDeserializer, but a nonzero input size!");
 	ResetTraversal();
 }
 
 DataDeserializer::DataDeserializer(const char *data_, size_t size_, const SerializedMessageDesc *msgTemplate)
 :data(data_), size(size_)
 {
-	assert(data);
-	assert(size > 0);
+	if (!data && size > 0)
+		throw NetException("Specified a null input buffer to DataDeserializer, but a nonzero input size!");
 	assert(msgTemplate);
 
 	iter = new SerializedDataIterator(*msgTemplate);
@@ -69,20 +69,17 @@ u32 DataDeserializer::ReadBitsToU32(int count)
 	{
 		int bitsToRead = std::min(std::min(8, count), 8 - bitOfs);
 		u32 readMask = ((1 << bitsToRead) - 1) << bitOfs;
-		assert(elemOfs < size);
-		if (elemOfs >= size)
-			throw NetException("Ran off past the array in DataDeserializer::ReadBits!");
+		assert(elemOfs < size); // We already counted above we should have enough bits to read.
 
 		var |= (((u32)data[elemOfs] & readMask) >> bitOfs) << bitsFilled;
 		bitsFilled += bitsToRead;
 		bitOfs += bitsToRead;
 		assert(bitOfs <= 8);
 
-		if (bitOfs == 8)
-		{
-			bitOfs = 0;
-			++elemOfs;
-		}
+		// If bitOfs has accumulated a full byte, move elemOfs ahead by one.
+		elemOfs += (bitOfs >> 3);
+		bitOfs &= 7;
+
 		count -= bitsToRead;
 	}
 	return var;
@@ -138,13 +135,10 @@ void DataDeserializer::SkipBits(size_t numBits)
 {
 	assert(!iter);
 
-	elemOfs += numBits / 8;
-	bitOfs += numBits % 8;
-	if (bitOfs >= 8)
-	{
-		bitOfs -= 8;
-		++elemOfs;
-	}
+	bitOfs += numBits;
+	// Move all accumulated full bytes from bitOfs to elemOfs.
+	elemOfs += (bitOfs >> 3);
+	bitOfs &= 7;
 
 	if (elemOfs > size)
 		throw NetException("Not enough bits left in DataDeserializer::SkipBits!");

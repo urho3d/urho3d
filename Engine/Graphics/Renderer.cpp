@@ -582,7 +582,7 @@ void Renderer::Update(float timeStep)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
         Octree* octree = viewport.scene_->GetComponent<Octree>();
         DebugRenderer* debug = viewport.scene_->GetComponent<DebugRenderer>();
-        if (updateOctrees_.Find(octree) == updateOctrees_.End())
+        if (!updateOctrees_.Contains(octree))
         {
             frame_.camera_ = viewport.camera_;
             frame_.viewSize_ = IntVector2(viewport.rect_.right_ - viewport.rect_.left_, viewport.rect_.bottom_ - viewport.rect_.top_);
@@ -669,7 +669,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
-            if (processedGeometries.Find(geometries[i]) == processedGeometries.End())
+            if (!processedGeometries.Contains(geometries[i]))
             {
                 geometries[i]->DrawDebugGeometry(debug, depthTest);
                 processedGeometries.Insert(geometries[i]);
@@ -677,7 +677,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         }
         for (unsigned i = 0; i < lights.Size(); ++i)
         {
-            if (processedLights.Find(lights[i]) == processedLights.End())
+            if (!processedLights.Contains(lights[i]))
             {
                 lights[i]->DrawDebugGeometry(debug, depthTest);
                 processedLights.Insert(lights[i]);
@@ -951,7 +951,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     // Log error if shaders could not be assigned, but only once per technique
     if (!batch.vertexShader_ || !batch.pixelShader_)
     {
-        if (shaderErrorDisplayed_.Find(technique) == shaderErrorDisplayed_.End())
+        if (!shaderErrorDisplayed_.Contains(technique))
         {
             shaderErrorDisplayed_.Insert(technique);
             LOGERROR("Technique " + technique->GetName() + " has missing shaders");

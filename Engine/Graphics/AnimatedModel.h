@@ -156,7 +156,7 @@ private:
     /// Refresh mapping of subgeometry bone indices.
     void RefreshGeometryBoneMappings();
     /// Clone geometries as required.
-    void cloneGeometries();
+    void CloneGeometries();
     /// Recalculate animations. Called from UpdateNode().
     void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning.

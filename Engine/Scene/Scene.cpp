@@ -399,7 +399,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            if (allNodes_.Find(replicatedNodeID_) == allNodes_.End())
+            if (!allNodes_.Contains(replicatedNodeID_))
                 return replicatedNodeID_;
             
             if (replicatedNodeID_ != LAST_REPLICATED_ID)
@@ -412,7 +412,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            if (allNodes_.Find(localNodeID_) == allNodes_.End())
+            if (!allNodes_.Contains(localNodeID_))
                 return localNodeID_;
             
             if (localNodeID_ != LAST_LOCAL_ID)
@@ -429,7 +429,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            if (allComponents_.Find(replicatedComponentID_) == allComponents_.End())
+            if (!allComponents_.Contains(replicatedComponentID_))
                 return replicatedComponentID_;
             
             if (replicatedComponentID_ != LAST_REPLICATED_ID)
@@ -442,7 +442,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            if (allComponents_.Find(localComponentID_) == allComponents_.End())
+            if (!allComponents_.Contains(localComponentID_))
                 return localComponentID_;
             
             if (localComponentID_ != LAST_LOCAL_ID)

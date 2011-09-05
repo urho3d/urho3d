@@ -38,7 +38,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://www.yakiimo3d.com/2010/09/28/dx11-perspective-matrix-jittering-temporal-aa/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.21.1 WIP (http://www.angelcode.com/angelscript/)
+- AngelScript 2.21.1 (http://www.angelcode.com/angelscript/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
 - GLFW 3.0 WIP (http://www.glfw.org/)

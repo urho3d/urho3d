@@ -382,7 +382,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         String includeFileLower = includeFile.ToLower();
                         
                         // If not included yet, store it for later processing
-                        if (includeFiles_.Find(includeFileLower) == includeFiles_.End())
+                        if (!includeFiles_.Contains(includeFileLower))
                         {
                             includeFiles_.Insert(includeFileLower);
                             includeFiles.Push(includeFile);

@@ -1023,7 +1023,7 @@ void Connection::ProcessNode(Node* node)
         ProcessNode(*i);
     
     // Check if the client's replication state already has this node
-    if (sceneState_.Find(node->GetID()) != sceneState_.End())
+    if (sceneState_.Contains(node->GetID()))
         ProcessExistingNode(node);
     else
         ProcessNewNode(node);

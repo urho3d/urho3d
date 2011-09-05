@@ -385,7 +385,7 @@ void ListView::SetSelections(const Set<unsigned>& indices)
     for (Set<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
         unsigned index = *i;
-        if (indices.Find(index) == indices.End())
+        if (!indices.Contains(index))
         {
             Set<unsigned>::Iterator current = i++;
             selections_.Erase(current);
@@ -461,7 +461,7 @@ void ListView::ToggleSelection(unsigned index)
     if (index >= numItems)
         return;
     
-    if (selections_.Find(index) != selections_.End())
+    if (selections_.Contains(index))
         RemoveSelection(index);
     else
         AddSelection(index);
@@ -662,7 +662,7 @@ void ListView::UpdateSelectionEffect()
     for (unsigned i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
-        if (highlightMode_ != HM_NEVER && selections_.Find(i) != selections_.End())
+        if (highlightMode_ != HM_NEVER && selections_.Contains(i))
             item->SetSelected(HasFocus() || highlightMode_ == HM_ALWAYS);
         else
             item->SetSelected(false);

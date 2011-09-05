@@ -751,7 +751,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
     if (hash)
     {
         // If no previous vertex declaration for that hash, create new
-        if (vertexDeclarations_.Find(hash) == vertexDeclarations_.End())
+        if (!vertexDeclarations_.Contains(hash))
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
@@ -825,7 +825,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
     if (hash)
     {
         // If no previous vertex declaration for that hash, create new
-        if (vertexDeclarations_.Find(hash) == vertexDeclarations_.End())
+        if (!vertexDeclarations_.Contains(hash))
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
@@ -1695,7 +1695,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
         newSize <<= 1;
         
     // See if buffer exists for this vertex format. If not, create new
-    if (immediateVertexBuffers_.Find(elementMask) == immediateVertexBuffers_.End())
+    if (!immediateVertexBuffers_.Contains(elementMask))
     {
         LOGDEBUG("Created immediate vertex buffer");
         VertexBuffer* newBuffer = new VertexBuffer(context_);

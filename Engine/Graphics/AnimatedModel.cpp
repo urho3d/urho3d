@@ -309,7 +309,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     // If model has morphs, must clone all geometries & vertex buffers that refer to morphable vertex data
     if (morphs.Size())
     {
-        cloneGeometries();
+        CloneGeometries();
         MarkMorphsDirty();
     }
     
@@ -797,7 +797,7 @@ void AnimatedModel::MarkMorphsDirty()
     morphsDirty_ = true;
 }
 
-void AnimatedModel::cloneGeometries()
+void AnimatedModel::CloneGeometries()
 {
     // Clone vertex buffers as necessary
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
@@ -841,7 +841,7 @@ void AnimatedModel::cloneGeometries()
             for (unsigned k = 0; k < originalVertexBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
-                if (clonedVertexBuffers.Find(originalBuffer) != clonedVertexBuffers.End())
+                if (clonedVertexBuffers.Contains(originalBuffer))
                     clone->SetVertexBuffer(k, clonedVertexBuffers[originalBuffer], original->GetVertexElementMask(k));
                 else
                     clone->SetVertexBuffer(k, originalBuffers[k], original->GetVertexElementMask(k));

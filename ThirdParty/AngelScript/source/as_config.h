@@ -636,12 +636,12 @@
 		#if defined(i386) && !defined(__LP64__)
 			// Support native calling conventions on Intel 32bit CPU
 			#define AS_X86
-		#elif defined(__LP64__)
-			// No support for native calling conventions yet
-			#define AS_MAX_PORTABILITY
-			// STDCALL is not available on 64bit Linux
-			#undef STDCALL
-			#define STDCALL
+		#elif defined(__x86_64__)
+			#define AS_X64_MINGW
+			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+			#define AS_LARGE_OBJS_PASSED_BY_REF
+			#define AS_LARGE_OBJ_MIN_SIZE 3
+			#define COMPLEX_OBJS_PASSED_BY_REF
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -897,7 +897,7 @@
 
 // If there are no current support for native calling
 // conventions, then compile with AS_MAX_PORTABILITY
-#if (!defined(AS_X86) && !defined(AS_SH4) && !defined(AS_MIPS) && !defined(AS_PPC) && !defined(AS_PPC_64) && !defined(AS_XENON) && !defined(AS_X64_GCC) && !defined(AS_X64_MSVC) && !defined(AS_ARM))
+#if (!defined(AS_X86) && !defined(AS_SH4) && !defined(AS_MIPS) && !defined(AS_PPC) && !defined(AS_PPC_64) && !defined(AS_XENON) && !defined(AS_X64_GCC) && !defined(AS_X64_MSVC) && !defined(AS_ARM) && !defined(AS_X64_MINGW))
 	#ifndef AS_MAX_PORTABILITY
 		#define AS_MAX_PORTABILITY
 	#endif
@@ -909,7 +909,6 @@
 #if !defined(AS_POSIX_THREADS) && !defined(AS_WINDOWS_THREADS)
 	#define AS_NO_THREADS
 #endif
-
 
 // Urho3D: always use float type, use EMMS to clear FPU stack
 #define AS_USE_DOUBLE_AS_FLOAT

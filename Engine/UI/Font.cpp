@@ -157,7 +157,7 @@ const FontFace* Font::GetFace(int pointSize)
     for (unsigned i = 0; i < MAX_FONT_CHARS; ++i)
     {
         unsigned index = FT_Get_Char_Index(face, i);
-        if (toRemapped.Find(index) == toRemapped.End())
+        if (!toRemapped.Contains(index))
         {
             newFace.glyphIndex_[i] = freeIndex;
             toRemapped[index] = freeIndex;

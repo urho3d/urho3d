@@ -155,8 +155,8 @@ private:
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// %Set up initial shadow camera view.
     void SetupShadowCamera(Light* light, bool shadowOcclusion = false);
-    /// Focus shadow camera to use shadow map texture space more optimally.
-    void FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox);
+    /// Finalize shadow camera view after shadow casters and lit geometries are known.
+    void FinalizeShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox);
     /// Quantize the directional light shadow camera view to eliminate artefacts.
     void QuantizeDirShadowCamera(Light* light, const BoundingBox& viewBox);
     /// Optimize light rendering by setting up a scissor rectangle.

@@ -18,6 +18,8 @@
 
 #ifndef KNET_NO_FIXEDWIDTH_TYPES
 
+#include "kNetBuildConfig.h"
+
 // As a reminder: http://predef.sourceforge.net/prestd.html
 
 // If we have C99, take the types from there.

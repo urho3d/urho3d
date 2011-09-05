@@ -409,13 +409,13 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
             {
                 for (unsigned k = 0; k < variations[j].includes_.Size(); ++k)
                 {
-                    if (nameToIndex.Find(variations[j].includes_[k]) != nameToIndex.End())
+                    if (nameToIndex.Contains(variations[j].includes_[k]))
                         active |= (1 << nameToIndex[variations[j].includes_[k]]);
                 }
                 
                 for (unsigned k = 0; k < variations[j].excludes_.Size(); ++k)
                 {
-                    if (nameToIndex.Find(variations[j].excludes_[k]) != nameToIndex.End())
+                    if (nameToIndex.Contains(variations[j].excludes_[k]))
                         active &= ~(1 << nameToIndex[variations[j].excludes_[k]]);
                 }
                 
@@ -586,9 +586,9 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         CompiledVariation& variation = compiledVariations[i];
         outFile.WriteString(variation.name_);
         for (unsigned j = 0; j < constants.Size(); ++j)
-            outFile.WriteBool(variation.constants_.Find(constants[j]) != variation.constants_.End());
+            outFile.WriteBool(variation.constants_.Contains(constants[j]));
         for (unsigned j = 0; j < textureUnits.Size(); ++j)
-            outFile.WriteBool(variation.textureUnits_.Find(textureUnits[j]) != variation.textureUnits_.End());
+            outFile.WriteBool(variation.textureUnits_.Contains(textureUnits[j]));
         
         unsigned dataSize = variation.byteCode_.Size();
         outFile.WriteUInt(dataSize);

@@ -476,7 +476,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         for (unsigned j = 0; j < i->second_.Size() && j < 4; ++j)
                         {
                             unsigned originalIndex = i->second_[j].boneIndex_;
-                            if (usedBoneMap.Find(originalIndex) == usedBoneMap.End())
+                            if (!usedBoneMap.Contains(originalIndex))
                             {
                                 usedBoneMap[originalIndex] = remapIndex;
                                 remapIndex++;

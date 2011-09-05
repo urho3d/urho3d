@@ -97,7 +97,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
         if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
         {
             // Display message only once per rendertarget, do not spam each frame
-            if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
+            if (!gBufferErrorDisplayed_.Contains(renderTarget))
             {
                 gBufferErrorDisplayed_.Insert(renderTarget);
                 LOGERROR("Render texture is larger than the G-buffer, can not render");
@@ -706,11 +706,12 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
             {
                 // Check if already lit
                 LitTransparencyCheck check(light, drawable, i);
-                if (litTransparencies.Find(check) != litTransparencies.End())
-                    continue;
-                // Use the original light instead of the split one, to choose correct scissor
-                litBatch.light_ = light;
-                litTransparencies.Insert(check);
+                if (!litTransparencies.Contains(check))
+                {
+                    // Use the original light instead of the split one, to choose correct scissor
+                    litBatch.light_ = light;
+                    litTransparencies.Insert(check);
+                }
             }
             
             renderer_->SetBatchShaders(litBatch, tech, pass, allowShadows);
@@ -1286,24 +1287,12 @@ unsigned View::ProcessLight(Light* light)
             break;
         }
         
-        // Optimization: if a particular split has no shadow casters, render as unshadowed
+        // Optimization: if a particular split has no shadow casters, render as unshadowed. Else finalize shadow camera view
+        // according to the geometries and shadow casters combined bounding boxes
         if (!shadowCasters_[i].Size())
             split->SetShadowMap(0);
-        
-        // Focus shadow camera as applicable
-        if (split->GetShadowMap())
-        {
-            if (split->GetShadowFocus().focus_)
-                FocusShadowCamera(split, geometryBox, shadowCasterBox);
-            
-            // Set a zoom factor to ensure that we do not render to the shadow map border
-            // (clamp addressing is necessary because border mode /w hardware shadow maps is not supported by all GPUs)
-            Camera* shadowCamera = split->GetShadowCamera();
-            Texture2D* shadowMap = split->GetShadowMap();
-            if (shadowCamera->GetZoom() >= 1.0f)
-                shadowCamera->SetZoom(shadowCamera->GetZoom() * ((float)(shadowMap->GetWidth() - 2) /
-                    (float)shadowMap->GetWidth()));
-        }
+        else
+            FinalizeShadowCamera(split, geometryBox, shadowCasterBox);
         
         // Update count of total lit geometries & shadow casters
         numLitGeometries += litGeometries_[i].Size();
@@ -1349,13 +1338,14 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
     Matrix4 lightProj;
     Frustum lightViewFrustum;
     BoundingBox lightViewFrustumBox;
-    bool mergeBoxes = light->GetLightType() != LIGHT_SPLITPOINT && light->GetShadowMap() && light->GetShadowFocus().focus_;
+    bool mergeBoxes = false;
     bool projectBoxes = false;
     
     Camera* shadowCamera = light->GetShadowCamera();
     if (shadowCamera)
     {
-        bool projectBoxes = !shadowCamera->IsOrthographic();
+        mergeBoxes = light->GetLightType() != LIGHT_SPLITPOINT && light->GetShadowFocus().focus_;
+        projectBoxes = !shadowCamera->IsOrthographic();
         lightView = shadowCamera->GetInverseWorldTransform();
         lightProj = shadowCamera->GetProjection();
         
@@ -1556,29 +1546,12 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             shadowCamera->SetOrthographic(false);
             shadowCamera->SetFov(light->GetFov());
             shadowCamera->SetAspectRatio(light->GetAspectRatio());
-            
-            // For spot lights, zoom out shadowmap if far away (reduces fillrate)
-            if (light->GetLightType() == LIGHT_SPOT && parameters.zoomOut_)
-            {
-                // Make sure the out-zooming does not start while we are inside the spot
-                float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(),
-                    1.0f);
-                float lightPixels = (((float)height_ * light->GetRange() * camera_->GetZoom() * 0.5f) / distance);
-                
-                // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
-                if (lightPixels < SHADOW_MIN_PIXELS)
-                    lightPixels = SHADOW_MIN_PIXELS;
-                
-                float zoomLevel = Min(lightPixels / (float)light->GetShadowMap()->GetHeight(), 1.0f);
-                
-                shadowCamera->SetZoom(zoomLevel);
-            }
         }
         break;
     }
 }
 
-void View::FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox)
+void View::FinalizeShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox)
 {
     // If either no geometries or no shadow casters, do nothing
     if (!geometryBox.defined_ || !shadowCasterBox.defined_)
@@ -1590,6 +1563,7 @@ void View::FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const
     switch (light->GetLightType())
     {
     case LIGHT_DIRECTIONAL:
+        if (parameters.focus_)
         {
             BoundingBox combinedBox;
             combinedBox.max_.y_ = shadowCamera->GetOrthoSize() * 0.5f;
@@ -1603,8 +1577,21 @@ void View::FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const
         break;
         
     case LIGHT_SPOT:
-        // Can not move, but can zoom the shadow camera. Check for out-zooming (distant shadow map), do nothing in that case
-        if (shadowCamera->GetZoom() >= 1.0f)
+        // For spot lights, zoom out shadowmap if far away (reduces fillrate)
+        if (parameters.zoomOut_)
+        {
+            // Make sure the out-zooming does not start while we are inside the spot
+            float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
+            float lightPixels = (((float)height_ * light->GetRange() * camera_->GetZoom() * 0.5f) / distance);
+            
+            // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
+            if (lightPixels < SHADOW_MIN_PIXELS)
+                lightPixels = SHADOW_MIN_PIXELS;
+            
+            shadowCamera->SetZoom(Min(lightPixels / (float)light->GetShadowMap()->GetHeight(), 1.0f));
+        }
+        // If camera was not out-zoomed, check for focusing
+        if (parameters.focus_ && shadowCamera->GetZoom() >= 1.0f)
         {
             BoundingBox combinedBox(-1.0f, 1.0f);
             combinedBox.Intersect(geometryBox);
@@ -1623,6 +1610,18 @@ void View::FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const
                 shadowCamera->SetZoom(1.0f / viewSize);
         }
         break;
+        
+    case LIGHT_SPLITPOINT:
+        return;
+    }
+    
+    // For unzoomed spot and directional lights, set a zoom factor now to ensure that we do not render to the shadow map border
+    // (border addressing can not be reliably used because border & hardware shadow maps is not supported by all GPUs)
+    if (shadowCamera->GetZoom() >= 1.0f)
+    {
+        Texture2D* shadowMap = light->GetShadowMap();
+        shadowCamera->SetZoom(shadowCamera->GetZoom() * ((float)(shadowMap->GetWidth() - 2) /
+            (float)shadowMap->GetWidth()));
     }
 }
 
@@ -1914,8 +1913,7 @@ void View::PrepareInstancingBuffer()
     
     unsigned totalInstances = 0;
     
-    if (mode_ != RENDER_FORWARD)
-        totalInstances += gBufferQueue_.GetNumInstances(renderer_);
+    totalInstances += gBufferQueue_.GetNumInstances(renderer_);
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += extraQueue_.GetNumInstances(renderer_);
     
@@ -1932,8 +1930,7 @@ void View::PrepareInstancingBuffer()
         void* lockedData = renderer_->instancingBuffer_->Lock(0, totalInstances, LOCK_DISCARD);
         if (lockedData)
         {
-            if (mode_ != RENDER_FORWARD)
-                gBufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            gBufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             extraQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
@@ -2370,7 +2367,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetDepthBias(parameters.constantBias_, parameters.slopeScaledBias_);
     
     // Set a scissor rectangle to match possible shadow map size reduction by out-zooming
-    // However, do not do this for point lights
+    // However, do not do this for point lights, which need to render continuously across cube faces
     if (queue.light_->GetLightType() != LIGHT_SPLITPOINT)
     {
         float zoom = Min(queue.light_->GetShadowCamera()->GetZoom(),

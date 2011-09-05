@@ -39,11 +39,17 @@ public:
 	/// Constructs a DataDeserializer that reads its data from the given buffer.
 	/// DataDeserializer will not copy the contents of the buffer to its own memory area, so
 	/// be sure to keep the data alive and unmoved for the duration DataDeserializer exists.
+	/// @param data A pointer to the data to deserialize. This may be null, but only if size == 0. If data == 0 and size > 0,
+	///            an exception is thrown.
+	/// @param size The number of bytes in the input buffer.
 	DataDeserializer(const char *data, size_t size);
 
 	/// Constructs a DataDeserializer that reads its data from the given buffer.
 	/// DataDeserializer will not copy the contents of the buffer to its own memory area, so
 	/// be sure to keep the data alive and unmoved for the duration DataDeserializer exists.
+	/// @param data A pointer to the data to deserialize. This may be null, but only if size == 0. If data == 0 and size > 0,
+	///            an exception is thrown.
+	/// @param size The number of bytes in the input buffer.
 	/// @param msgTemplate A pointer to an existing message template structure, which is used
 	///        to validate that deserialization of the data proceeds in the defined order.
 	///        DataDeserializer does not make a copy of this description, but dereferences

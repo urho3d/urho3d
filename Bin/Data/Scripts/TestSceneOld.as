@@ -234,7 +234,7 @@ void InitScene()
         light.fov = 15;
         light.color = color;
         light.specularIntensity = 1;
-        light.castShadows = true;
+        //light.castShadows = true;
         light.shadowBias = BiasParameters(0.00002, 0.0);
         light.shadowDistance = 200;
         light.shadowFadeDistance = 150;
