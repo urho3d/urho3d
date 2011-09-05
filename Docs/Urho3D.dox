@@ -2,7 +2,7 @@
 
 \mainpage Urho3D rendering and game engine
 
-Urho3D is a lightweight, cross platform open source rendering and game engine implemented in C++, that utilizes either Direct3D9 or OpenGL for rendering.
+Urho3D is a lightweight, cross platform rendering and game engine implemented in C++ and released under the MIT license. It utilizes either Direct3D9 or OpenGL (Shader Model 2 or OpenGL 2.0 required as minimum) for rendering.
 
 For getting started, see:
 
