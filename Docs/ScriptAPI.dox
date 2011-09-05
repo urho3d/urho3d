@@ -1989,14 +1989,6 @@ Properties:<br>
 - int[]@ multiSampleLevels (readonly)
 
 
-EdgeFilterParameters
-
-Properties:<br>
-- float radius
-- float threshold
-- float strength
-
-
 Renderer
 
 Methods:<br>
@@ -2018,7 +2010,8 @@ Properties:<br>
 - bool shadowMapHiresDepth
 - bool reuseShadowMaps
 - bool dynamicInstancing
-- EdgeFilterParameters& edgeFilter
+- int minInstanceGroupSize
+- int maxInstanceTriangles
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold

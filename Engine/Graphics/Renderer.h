@@ -48,7 +48,6 @@ class Zone;
 
 static const int SHADOW_MIN_PIXELS = 64;
 static const int NUM_SHADOWMAP_RESOLUTIONS = 3;
-static const int MIN_INSTANCES = 4;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 
 /// Light vertex shader variations.
@@ -170,6 +169,10 @@ public:
     void SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter);
     /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
+    /// %Set minimum object group size for instancing.
+    void SetMinInstanceGroupSize(int size);
+    /// %Set maximum number of triangles per object for instancing.
+    void SetMaxInstanceTriangles(int triangles);
     /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
@@ -206,6 +209,10 @@ public:
     unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].Size(); }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
+    /// Return minimum object group size for instancing.
+    int GetMinInstanceGroupSize() const { return minInstanceGroupSize_; }
+    /// Return maximum number of triangles per object for instancing.
+    int GetMaxInstanceTriangles() { return maxInstanceTriangles_; }
     /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
@@ -392,6 +399,10 @@ private:
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
+    /// Minimum object group size for instancing.
+    int minInstanceGroupSize_;
+    /// Maximum triangles per object for instancing.
+    int maxInstanceTriangles_;
     /// Maximum occluder triangles.
     int maxOccluderTriangles_;
     /// Occlusion buffer width.

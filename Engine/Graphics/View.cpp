@@ -1915,14 +1915,14 @@ void View::PrepareInstancingBuffer()
     unsigned totalInstances = 0;
     
     if (mode_ != RENDER_FORWARD)
-        totalInstances += gBufferQueue_.GetNumInstances();
-    totalInstances += baseQueue_.GetNumInstances();
-    totalInstances += extraQueue_.GetNumInstances();
+        totalInstances += gBufferQueue_.GetNumInstances(renderer_);
+    totalInstances += baseQueue_.GetNumInstances(renderer_);
+    totalInstances += extraQueue_.GetNumInstances(renderer_);
     
     for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
-        totalInstances += lightQueues_[i].shadowBatches_.GetNumInstances();
-        totalInstances += lightQueues_[i].litBatches_.GetNumInstances();
+        totalInstances += lightQueues_[i].shadowBatches_.GetNumInstances(renderer_);
+        totalInstances += lightQueues_[i].litBatches_.GetNumInstances(renderer_);
     }
     
     // If fail to set buffer size, fall back to per-group locking
@@ -1933,14 +1933,14 @@ void View::PrepareInstancingBuffer()
         if (lockedData)
         {
             if (mode_ != RENDER_FORWARD)
-                gBufferQueue_.SetTransforms(lockedData, freeIndex);
-            baseQueue_.SetTransforms(lockedData, freeIndex);
-            extraQueue_.SetTransforms(lockedData, freeIndex);
+                gBufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            extraQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
             for (unsigned i = 0; i < lightQueues_.Size(); ++i)
             {
-                lightQueues_[i].shadowBatches_.SetTransforms(lockedData, freeIndex);
-                lightQueues_[i].litBatches_.SetTransforms(lockedData, freeIndex);
+                lightQueues_[i].shadowBatches_.SetTransforms(renderer_, lockedData, freeIndex);
+                lightQueues_[i].litBatches_.SetTransforms(renderer_, lockedData, freeIndex);
             }
             
             renderer_->instancingBuffer_->Unlock();

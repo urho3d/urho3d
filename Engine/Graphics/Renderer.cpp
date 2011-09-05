@@ -276,6 +276,8 @@ Renderer::Renderer(Context* context) :
     shadowMapHiresDepth_(false),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
+    minInstanceGroupSize_(4),
+    maxInstanceTriangles_(500),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
@@ -417,6 +419,16 @@ void Renderer::SetDynamicInstancing(bool enable)
         enable = false;
     
     dynamicInstancing_ = enable;
+}
+
+void Renderer::SetMinInstanceGroupSize(int size)
+{
+    minInstanceGroupSize_ = Max(size, 2);
+}
+
+void Renderer::SetMaxInstanceTriangles(int triangles)
+{
+    maxInstanceTriangles_ = Max(triangles, 0);
 }
 
 void Renderer::SetMaxOccluderTriangles(int triangles)

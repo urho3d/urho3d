@@ -36,8 +36,9 @@ class Geometry;
 class Graphics;
 class Light;
 class Material;
-class Pass;
 class Matrix3x4;
+class Pass;
+class Renderer;
 class ShaderVariation;
 class VertexBuffer;
 
@@ -132,7 +133,7 @@ struct BatchGroup
     }
     
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
-    void SetTransforms(void* lockedData, unsigned& freeIndex);
+    void SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex);
     /// Prepare and draw.
     void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<StringHash, Vector4>& shaderParameters) const;
     
@@ -227,10 +228,10 @@ public:
     /// Sort instanced and non-instanced draw calls front to back.
     void SortFrontToBack();
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
-    void SetTransforms(void* lockedData, unsigned& freeIndex);
+    void SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex);
     
     /// Return the combined amount of instances.
-    unsigned GetNumInstances() const;
+    unsigned GetNumInstances(Renderer* renderer) const;
     /// Return whether the batch group is empty.
     bool IsEmpty() const { return batches_.Empty() && priorityBatchGroups_.Empty() && batchGroups_.Empty(); }
     /// Unsorted non-instanced draw calls.
