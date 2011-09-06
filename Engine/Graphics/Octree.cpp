@@ -170,23 +170,23 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 {
-    if (!numDrawables_)
-        return;
-    
-    Intersection res = query.TestOctant(cullingBox_, inside);
-    if (res == OUTSIDE && this != root_)
-        // Fully outside, so cull this octant, its children & drawables
-        return;
-    if (res == INSIDE)
-        inside = true;
+    if (this != root_)
+    {
+        Intersection res = query.TestOctant(cullingBox_, inside);
+        if (res == OUTSIDE)
+            // Fully outside, so cull this octant, its children & drawables
+            return;
+        if (res == INSIDE)
+            inside = true;
+    }
     
     for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         
         if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            !drawable->IsVisible() || (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ &&
-            !drawable->GetCastShadows()))
+            (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ && !drawable->GetCastShadows()) ||
+            !drawable->IsVisible())
             continue;
         
         if (query.TestDrawable(drawable->GetWorldBoundingBox(), inside) != OUTSIDE)

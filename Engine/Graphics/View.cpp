@@ -283,14 +283,13 @@ void View::GetDrawables()
     Vector3 cameraPos = camera_->GetWorldPosition();
     
     // Get zones & find the zone camera is in
-    PODVector<Zone*> zones;
-    PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE, camera_->GetViewMask());
+    PointOctreeQuery query(tempDrawables_, cameraPos, DRAWABLE_ZONE, camera_->GetViewMask());
     octree_->GetDrawables(query);
     
     int highestZonePriority = M_MIN_INT;
-    for (unsigned i = 0; i < zones.Size(); ++i)
+    for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
     {
-        Zone* zone = zones[i];
+        Zone* zone = static_cast<Zone*>(tempDrawables_[i]);
         if (zone->IsInside(cameraPos) && zone->GetPriority() > highestZonePriority)
         {
             zone_ = zone;
@@ -299,27 +298,23 @@ void View::GetDrawables()
     }
     
     // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
-    bool useOcclusion = false;
     OcclusionBuffer* buffer = 0;
     
     if (maxOccluderTriangles_ > 0)
     {
         FrustumOctreeQuery query(occluders_, camera_->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(), true, false);
-        
         octree_->GetDrawables(query);
         UpdateOccluders(occluders_, camera_);
         
         if (occluders_.Size())
         {
             buffer = renderer_->GetOrCreateOcclusionBuffer(camera_, maxOccluderTriangles_);
-            
             DrawOccluders(buffer, occluders_);
             buffer->BuildDepthHierarchy();
-            useOcclusion = true;
         }
     }
     
-    if (!useOcclusion)
+    if (!buffer)
     {
         // Get geometries & lights without occlusion
         FrustumOctreeQuery query(tempDrawables_, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
@@ -359,14 +354,14 @@ void View::GetDrawables()
             
             // Expand the scene bounding boxes
             const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
-            BoundingBox geoview_Box = geomBox.Transformed(view);
+            BoundingBox geomViewBox = geomBox.Transformed(view);
             sceneBox_.Merge(geomBox);
-            sceneViewBox_.Merge(geoview_Box);
+            sceneViewBox_.Merge(geomViewBox);
             
             // Store depth info to speed up split directional light queries
             GeometryDepthBounds bounds;
-            bounds.min_ = geoview_Box.min_.z_;
-            bounds.max_ = geoview_Box.max_.z_;
+            bounds.min_ = geomViewBox.min_.z_;
+            bounds.max_ = geomViewBox.max_.z_;
             
             geometryDepthBounds_.Push(bounds);
             geometries_.Push(drawable);
