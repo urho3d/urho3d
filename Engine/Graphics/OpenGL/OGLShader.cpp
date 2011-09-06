@@ -98,7 +98,7 @@ bool Shader::Load(Deserializer& source)
 ShaderVariation* Shader::GetVariation(const String& name)
 {
     StringHash nameHash(name);
-    Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
+    HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
     if (i != variations_.End())
         return i->second_;
     else

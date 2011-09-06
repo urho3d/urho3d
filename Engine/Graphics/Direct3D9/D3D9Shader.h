@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "HashMap.h"
 #include "Resource.h"
 
 class ShaderVariation;
@@ -61,5 +62,5 @@ private:
     /// Shader Model 3 flag.
     bool isSM3_;
     /// Shader variations. Will be in an unloaded state until requested.
-    Map<StringHash, SharedPtr<ShaderVariation> > variations_;
+    HashMap<StringHash, SharedPtr<ShaderVariation> > variations_;
 };

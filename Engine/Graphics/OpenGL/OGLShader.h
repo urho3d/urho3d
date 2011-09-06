@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include "Resource.h"
 #include "ArrayPtr.h"
+#include "HashMap.h"
+#include "Resource.h"
 
 class ShaderVariation;
 
@@ -62,5 +63,5 @@ private:
     /// Source code length.
     unsigned sourceCodeLength_;
     /// Shader variations. Will be in an unloaded state until requested.
-    Map<StringHash, SharedPtr<ShaderVariation> > variations_;
+    HashMap<StringHash, SharedPtr<ShaderVariation> > variations_;
 };
