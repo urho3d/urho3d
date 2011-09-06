@@ -388,9 +388,9 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
-    HashSet<LitTransparencyCheck> litTransparencies;
-    HashSet<Drawable*> maxLightsDrawables;
-    Map<Light*, unsigned> lightQueueIndex;
+    litTransparencies_.Clear();
+    maxLightsDrawables_.Clear();
+    lightQueueIndex_.Clear();
     
     // Go through lights
     {
@@ -463,11 +463,11 @@ void View::GetBatches()
                         
                         // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                         if (!drawable->GetMaxLights())
-                            GetLitBatches(drawable, light, splitLight, &lightQueue, litTransparencies);
+                            GetLitBatches(drawable, light, splitLight, lightQueue);
                         else
                         {
                             drawable->AddLight(splitLight);
-                            maxLightsDrawables.Insert(drawable);
+                            maxLightsDrawables_.Insert(drawable);
                         }
                     }
                     
@@ -496,7 +496,7 @@ void View::GetBatches()
                     
                     if (storeLightQueue)
                     {
-                        lightQueueIndex[splitLight] = lightQueueCount;
+                        lightQueueIndex_[splitLight] = lightQueueCount;
                         firstSplitStored = true;
                         ++lightQueueCount;
                     }
@@ -509,11 +509,11 @@ void View::GetBatches()
     }
     
     // Process drawables with limited light count
-    if (maxLightsDrawables.Size())
+    if (maxLightsDrawables_.Size())
     {
         PROFILE(GetMaxLightsBatches);
         
-        for (HashSet<Drawable*>::Iterator i = maxLightsDrawables.Begin(); i != maxLightsDrawables.End(); ++i)
+        for (HashSet<Drawable*>::Iterator i = maxLightsDrawables_.Begin(); i != maxLightsDrawables_.End(); ++i)
         {
             Drawable* drawable = *i;
             drawable->LimitLights();
@@ -528,11 +528,9 @@ void View::GetBatches()
                 
                 // Find the correct light queue again
                 LightBatchQueue* queue = 0;
-                Map<Light*, unsigned>::Iterator j = lightQueueIndex.Find(splitLight);
-                if (j != lightQueueIndex.End())
-                    queue = &lightQueues_[j->second_];
-                
-                GetLitBatches(drawable, light, splitLight, queue, litTransparencies);
+                Map<Light*, unsigned>::Iterator j = lightQueueIndex_.Find(splitLight);
+                if (j != lightQueueIndex_.End())
+                    GetLitBatches(drawable, light, splitLight, lightQueues_[j->second_]);
             }
         }
     }
@@ -626,8 +624,7 @@ void View::GetBatches()
     SortBatches();
 }
 
-void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, LightBatchQueue* lightQueue,
-    HashSet<LitTransparencyCheck>& litTransparencies)
+void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, LightBatchQueue& lightQueue)
 {
     bool splitPointLight = splitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
@@ -683,11 +680,8 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
         {
             if (mode_ == RENDER_FORWARD)
             {
-                if (lightQueue)
-                {
-                    renderer_->SetBatchShaders(litBatch, tech, pass);
-                    lightQueue->litBatches_.AddBatch(litBatch);
-                }
+                renderer_->SetBatchShaders(litBatch, tech, pass);
+                lightQueue.litBatches_.AddBatch(litBatch);
             }
             else
             {
@@ -701,12 +695,14 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
             {
                 // Check if already lit
                 LitTransparencyCheck check(light, drawable, i);
-                if (!litTransparencies.Contains(check))
+                if (!litTransparencies_.Contains(check))
                 {
                     // Use the original light instead of the split one, to choose correct scissor
                     litBatch.light_ = light;
-                    litTransparencies.Insert(check);
+                    litTransparencies_.Insert(check);
                 }
+                else
+                    continue;
             }
             
             renderer_->SetBatchShaders(litBatch, tech, pass, allowShadows);

@@ -138,7 +138,7 @@ private:
     /// Construct batches from the drawable objects.
     void GetBatches();
     /// Get lit batches for a certain light and drawable.
-    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies);
+    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue& lightQueue);
     /// Render batches, forward mode.
     void RenderBatchesForward();
     /// Render batches, deferred mode.
@@ -248,6 +248,12 @@ private:
     HashSet<RenderSurface*> gBufferErrorDisplayed_;
     /// Helper set for combining lit geometries of a split light.
     HashSet<Drawable*> allLitGeometries_;
+    /// Transparent drawables that are already lit, to avoid multiple lighting.
+    HashSet<LitTransparencyCheck> litTransparencies_;
+    /// Drawables that limit their maximum light count.
+    HashSet<Drawable*> maxLightsDrawables_;
+    /// Light queue indices of processed lights.
+    Map<Light*, unsigned> lightQueueIndex_;
     /// View-global shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Cache for light scissor queries.

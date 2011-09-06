@@ -3220,15 +3220,19 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 
 
 // TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
-int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
+// Urho3D: modified for id caching
+int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dt) const
 {
-	if( dtIn.IsNullHandle() ) return 0;
+	if( dt.IsNullHandle() ) return 0;
 
 	// ASHANDLE is mimicking a handle, but it really is a value 
 	// type so only the non-handle form should be registered.
-	asCDataType dt(dtIn);
-	if( dt.GetObjectType() && dt.GetObjectType()->flags & asOBJ_ASHANDLE )
-		dt.MakeHandle(false);
+	if( dt.GetObjectType() && dt.GetObjectType()->flags & asOBJ_ASHANDLE && dt.IsObjectHandle() )
+	{
+		asCDataType dtNoHandle(dt);
+		dtNoHandle.MakeHandle(false);
+		return GetTypeIdFromDataType(dtNoHandle);
+	}
 
 	// Urho3D: check first for cached id in the type itself
 	int typeId = dt.GetCachedTypeId();
