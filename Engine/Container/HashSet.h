@@ -210,10 +210,9 @@ public:
         if (existing)
             return Iterator(existing);
         
-        Node** ptrs = Ptrs();
         Node* newNode = InsertNode(Tail(), key);
-        newNode->down_ = ptrs[hashKey];
-        ptrs[hashKey] = newNode;
+        newNode->down_ = ptrs_[hashKey];
+        ptrs_[hashKey] = newNode;
         
         // Rehash if the maximum load factor has been exceeded
         if (size_ > numBuckets_ * MAX_LOAD_FACTOR)
@@ -336,17 +335,11 @@ private:
     Node* Head() const { return reinterpret_cast<Node*>(head_); }
     /// Return the tail pointer with correct type.
     Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
-    /// Return the bucket pointers with correct type.
-    Node** Ptrs() const { return reinterpret_cast<Node**>(ptrs_); }
     
-    /// Find a node from the buckets.
+    /// Find a node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey) const
     {
-        Node** ptrs = Ptrs();
-        if (!ptrs)
-            return 0;
-        
-        Node* node = ptrs[hashKey];
+        Node* node = reinterpret_cast<Node*>(ptrs_[hashKey]);
         while (node)
         {
             if (node->key_ == key)
@@ -357,16 +350,12 @@ private:
         return 0;
     }
     
-    /// Find a node and the previous node from the buckets.
+    /// Find a node and the previous node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey, Node*& previous) const
     {
         previous = 0;
         
-        Node** ptrs = Ptrs();
-        if (!ptrs)
-            return 0;
-        
-        Node* node = ptrs[hashKey];
+        Node* node = reinterpret_cast<Node*>(ptrs_[hashKey]);
         while (node)
         {
             if (node->key_ == key)

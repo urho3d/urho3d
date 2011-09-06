@@ -135,6 +135,8 @@ public:
     void DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg);
     /// Check whether a shader parameter in the currently set shaders needs update.
     bool NeedParameterUpdate(StringHash param, const void* source);
+    /// Check whether a shader parameter in the currently set shaders needs update, optimized version.
+    bool NeedParameterUpdate(ShaderType type, StringHash param, const void* source);
     /// Check whether the current pixel shader uses a texture unit.
     bool NeedTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter sources.

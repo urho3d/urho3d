@@ -1116,7 +1116,7 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
     
     if (i->second_.type_ == VS)
     {
-        if (vertexShader_ && vertexShader_->HasParameter(param) && i->second_.lastSource_ != source)
+        if (i->second_.lastSource_ != source && vertexShader_ && vertexShader_->HasParameter(param))
         {
             i->second_.lastSource_ = source;
             return true;
@@ -1124,10 +1124,40 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
     }
     else
     {
-        if (pixelShader_ && pixelShader_->HasParameter(param) && i->second_.lastSource_ != source)
+        if (i->second_.lastSource_ != source && pixelShader_ && pixelShader_->HasParameter(param))
         {
             i->second_.lastSource_ = source;
             return true;
+        }
+    }
+    
+    return false;
+}
+
+bool Graphics::NeedParameterUpdate(ShaderType type, StringHash param, const void* source)
+{
+    if (type == VS)
+    {
+        if (vertexShader_ && vertexShader_->HasParameter(param))
+        {
+            HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+            if (i != shaderParameters_.End() && i->second_.lastSource_ != source)
+            {
+                i->second_.lastSource_ = source;
+                return true;
+            }
+        }
+    }
+    else
+    {
+        if (pixelShader_ && pixelShader_->HasParameter(param))
+        {
+            HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+            if (i != shaderParameters_.End() && i->second_.lastSource_ != source)
+            {
+                i->second_.lastSource_ = source;
+                return true;
+            }
         }
     }
     
