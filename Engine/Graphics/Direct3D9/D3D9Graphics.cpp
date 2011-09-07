@@ -1104,8 +1104,15 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 
 void Graphics::DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg)
 {
+    unsigned oldSize = shaderParameters_.Size();
+    
     shaderParameters_[param].type_ = type;
     shaderParameters_[param].register_ = hwReg;
+    
+    // Rehash if necessary to ensure minimum load factor and fast queries
+    unsigned newSize = shaderParameters_.Size();
+    if (newSize > oldSize)
+        shaderParameters_.Rehash(NextPowerOfTwo(newSize));
 }
 
 bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
@@ -1128,36 +1135,6 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
         {
             i->second_.lastSource_ = source;
             return true;
-        }
-    }
-    
-    return false;
-}
-
-bool Graphics::NeedParameterUpdate(ShaderType type, StringHash param, const void* source)
-{
-    if (type == VS)
-    {
-        if (vertexShader_ && vertexShader_->HasParameter(param))
-        {
-            HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
-            if (i != shaderParameters_.End() && i->second_.lastSource_ != source)
-            {
-                i->second_.lastSource_ = source;
-                return true;
-            }
-        }
-    }
-    else
-    {
-        if (pixelShader_ && pixelShader_->HasParameter(param))
-        {
-            HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
-            if (i != shaderParameters_.End() && i->second_.lastSource_ != source)
-            {
-                i->second_.lastSource_ = source;
-                return true;
-            }
         }
     }
     

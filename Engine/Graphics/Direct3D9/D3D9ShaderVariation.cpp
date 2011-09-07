@@ -126,6 +126,11 @@ void ShaderVariation::SetUseTextureUnit(TextureUnit unit, bool enable)
     useTextureUnit_[unit] = enable;
 }
 
+void ShaderVariation::OptimizeParameters()
+{
+    useParameter_.Rehash(NextPowerOfTwo(useParameter_.Size()));
+}
+
 void ShaderVariation::ClearParameters()
 {
     useParameter_.Clear();

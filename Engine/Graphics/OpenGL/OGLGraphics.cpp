@@ -1021,14 +1021,6 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
     return false;
 }
 
-bool Graphics::NeedParameterUpdate(ShaderType type, StringHash param, const void* source)
-{
-    if (shaderProgram_)
-        return shaderProgram_->NeedParameterUpdate(param, source, shaderParameterFrame_);
-    
-    return false;
-}
-
 bool Graphics::NeedTextureUnit(TextureUnit unit)
 {
     if (shaderProgram_ && shaderProgram_->HasTextureUnit(unit))

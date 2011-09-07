@@ -53,6 +53,8 @@ public:
     void SetUseParameter(StringHash param, bool enable);
     /// %Set to use a texture unit.
     void SetUseTextureUnit(TextureUnit unit, bool enable);
+    /// Optimize the parameter map for optimal query speed
+    void OptimizeParameters();
     /// Clear parameter and texture unit use flags.
     void ClearParameters();
     

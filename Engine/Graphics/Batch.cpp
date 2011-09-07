@@ -101,47 +101,47 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
     }
     
     // Set viewport and camera shader parameters
-    if (graphics->NeedParameterUpdate(VS, VSP_CAMERAPOS, camera_))
+    if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
         graphics->SetShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
     
-    if (graphics->NeedParameterUpdate(VS, VSP_CAMERAROT, camera_))
+    if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
         graphics->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
     if (overrideView_)
     {
         // If we override the view matrix, also disable any projection jittering
         /// \todo This may not be correct in all cases (skybox rendering?)
-        if (graphics->NeedParameterUpdate(VS, VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
+        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
             graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
     }
     else
     {
-        if (graphics->NeedParameterUpdate(VS, VSP_VIEWPROJ, camera_))
+        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
             graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
                 camera_->GetInverseWorldTransform());
     }
     
-    if (graphics->NeedParameterUpdate(VS, VSP_VIEWRIGHTVECTOR, camera_))
+    if (graphics->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
         graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
     
-    if (graphics->NeedParameterUpdate(VS, VSP_VIEWUPVECTOR, camera_))
+    if (graphics->NeedParameterUpdate(VSP_VIEWUPVECTOR, camera_))
         graphics->SetShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
     
     // Set model transform
-    if (setModelTransform && graphics->NeedParameterUpdate(VS, VSP_MODEL, worldTransform_))
+    if (setModelTransform && graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_))
         graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
     
     // Set skinning transforms
     if (shaderData_ && shaderDataSize_)
     {
-        if (graphics->NeedParameterUpdate(VS, VSP_SKINMATRICES, shaderData_))
+        if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
             graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
     }
     
     // Set light-related shader parameters
     if (light_)
     {
-        if (graphics->NeedParameterUpdate(VS, VSP_SPOTPROJ, light_))
+        if (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light_))
         {
             Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
             Matrix4 spotProj(Matrix4::ZERO);
@@ -166,13 +166,13 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             graphics->SetShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTATTEN, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTATTEN, light_))
         {
             Vector4 lightAtten(1.0f / Max(light_->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
             graphics->SetShaderParameter(PSP_LIGHTATTEN, lightAtten);
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTCOLOR, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light_))
         {
             float fade = 1.0f;
             float fadeEnd = light_->GetDrawDistance();
@@ -186,13 +186,13 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
                 light_->GetSpecularIntensity()) * fade);
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTDIR, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTDIR, light_))
             graphics->SetShaderParameter(PSP_LIGHTDIR, light_->GetWorldRotation() * Vector3::BACK);
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTPOS, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTPOS, light_))
             graphics->SetShaderParameter(PSP_LIGHTPOS, light_->GetWorldPosition() - camera_->GetWorldPosition());
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTSPLITS, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTSPLITS, light_))
         {
             float nearFadeRange = light_->GetNearFadeRange();
             float farFadeRange = light_->GetFarFadeRange();
@@ -204,7 +204,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
                 farFadeStart / depthRange, 1.0f / (farFadeRange / depthRange)));
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_LIGHTVECROT, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTVECROT, light_))
         {
             Matrix3x4 lightVecRot;
             // Use original light if available (split lights)
@@ -217,7 +217,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             graphics->SetShaderParameter(PSP_LIGHTVECROT, lightVecRot);
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_SPOTPROJ, light_))
+        if (graphics->NeedParameterUpdate(PSP_SPOTPROJ, light_))
         {
             Matrix3x4 viewPos(camera_->GetWorldPosition(), Quaternion::IDENTITY, Vector3::UNITY);
             Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
@@ -251,7 +251,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
     
     if (shadowMap)
     {
-        if (graphics->NeedParameterUpdate(VS, VSP_SHADOWPROJ, light_))
+        if (graphics->NeedParameterUpdate(VSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
             Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
@@ -270,13 +270,13 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             graphics->SetShaderParameter(VSP_SHADOWPROJ, texAdjust * shadowProj * shadowView);
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_SAMPLEOFFSETS, shadowMap))
+        if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
         {
             float invWidth = 1.0f / (float)shadowMap->GetWidth();
             graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, -0.5f * invWidth, 0.0f, 0.0f));
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_SHADOWINTENSITY, light_))
+        if (graphics->NeedParameterUpdate(PSP_SHADOWINTENSITY, light_))
         {
             float intensity = light_->GetShadowIntensity();
             float fadeStart = light_->GetShadowFadeDistance();
@@ -287,7 +287,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
         }
         
-        if (graphics->NeedParameterUpdate(PS, PSP_SHADOWPROJ, light_))
+        if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
             Matrix3x4 viewPos(camera_->GetWorldPosition(), Quaternion::IDENTITY, Vector3::UNITY);

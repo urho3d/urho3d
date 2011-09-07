@@ -305,6 +305,26 @@ public:
             ptrs_[i] = 0;
     }
     
+    /// Rehash to a specific bucket count, which must be a power of two. Return true if successful.
+    bool Rehash(unsigned numBuckets)
+    {
+        if (numBuckets == numBuckets_)
+            return true;
+        if (!numBuckets || numBuckets < size_ / MAX_LOAD_FACTOR)
+            return false;
+        
+        // Check for being power of two
+        unsigned check = numBuckets;
+        while (!(check & 1))
+            check >>= 1;
+        if (check != 1)
+            return false;
+        
+        numBuckets_ = numBuckets;
+        Rehash();
+        return true;
+    }
+    
     /// Return iterator to the pair with key, or end iterator if not found.
     Iterator Find(const T& key)
     {

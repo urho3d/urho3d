@@ -165,6 +165,9 @@ bool ShaderProgram::Link()
     attributeLocations_[8] = glGetAttribLocation(object_, "iBlendWeights");
     attributeLocations_[9] = glGetAttribLocation(object_, "iBlendIndices");
     
+    // Rehash the parameter map to ensure minimal load factor
+    shaderParameters_.Rehash(NextPowerOfTwo(shaderParameters_.Size()));
+    
     return true;
 }
 

@@ -119,6 +119,8 @@ bool Shader::Load(Deserializer& source)
                 variation->SetUseParameter(StringHash(parameters[j].first_), true);
         }
         
+        variation->OptimizeParameters();
+        
         for (unsigned j = 0; j < numTextureUnits; ++j)
         {
             if (source.ReadBool())
