@@ -81,7 +81,7 @@ public:
     ResourceRefList GetMaterialsAttr() const;
     
 protected:
-    /// Update the world bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// %Set the bounding box.
     void SetBoundingBox(const BoundingBox& box);

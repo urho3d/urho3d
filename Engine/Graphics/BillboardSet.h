@@ -120,7 +120,7 @@ public:
 protected:
     /// Transform has changed. Mark billboards dirty if necessary.
     virtual void OnMarkedDirty(Node* node);
-    /// Update world-space bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Mark billboard vertex buffer to need an update.
     void MarkPositionsDirty();

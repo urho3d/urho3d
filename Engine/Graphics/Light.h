@@ -268,7 +268,7 @@ public:
     ResourceRef GetShapeTextureAttr() const;
     
 protected:
-    /// Update world-space bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:

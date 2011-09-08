@@ -139,7 +139,7 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    /// Update world-space bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:

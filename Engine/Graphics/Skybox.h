@@ -44,7 +44,7 @@ public:
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     
 protected:
-    /// Update world-space bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
     /// Custom world transform.

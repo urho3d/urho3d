@@ -72,7 +72,7 @@ public:
     virtual bool IsInside(const Vector3& point);
     
 protected:
-    /// Update world-space bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
     /// Bounding box.

@@ -142,11 +142,12 @@ void InitScene()
         
         for (uint j = 0; j < NUM_INSTANCES; ++j)
         {
+            Vector3 position = Vector3(Random() * 20 - 10, 0, Random() * 20 - 10);
             float angle = Random() * 360;
             float size = 1 + Random() * 2;
             
             Node@ instance = newNode.CreateChild();
-            instance.position = Vector3(Random() * 20 - 10, 0, Random() * 20 - 10);
+            instance.position = position;
             instance.rotation = Quaternion(angle, Vector3(0, 1, 0));
             instance.SetScale(size);
 

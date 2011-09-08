@@ -170,7 +170,7 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    /// Recalculate world bounding box.
+    /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate() = 0;
     /// Add to octree.
     void AddToOctree();
