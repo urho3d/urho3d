@@ -226,6 +226,7 @@ void View::Render()
     else
         graphics_->SetViewTexture(0);
     
+    graphics_->SetColorWrite(true);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -717,7 +718,6 @@ void View::RenderBatchesForward()
         // Render opaque objects' base passes
         PROFILE(RenderBasePass);
         
-        graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
@@ -798,46 +798,39 @@ void View::RenderBatchesDeferred()
         // Clear and render the G-buffer
         PROFILE(RenderGBuffer);
         
-        graphics_->SetColorWrite(true);
-        #ifdef USE_OPENGL
-        // On OpenGL, clear the diffuse and depth buffers normally
         graphics_->SetRenderTarget(0, diffBuffer);
         graphics_->SetDepthStencil(depthBuffer);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
-        graphics_->SetRenderTarget(1, normalBuffer);
-        #else
-        // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
-        graphics_->SetRenderTarget(0, diffBuffer);
-        graphics_->SetRenderTarget(1, normalBuffer);
-        if (!graphics_->GetHardwareDepthSupport())
+        if (graphics_->GetHardwareDepthSupport())
+        {
+            graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
+            graphics_->SetRenderTarget(1, normalBuffer);
+        }
+        else
+        {
+            graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+            graphics_->SetRenderTarget(1, normalBuffer);
             graphics_->SetRenderTarget(2, depthBuffer);
-        graphics_->SetDepthStencil(depthStencil_);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
-        #endif
+        }
         
         RenderBatchQueue(gBufferQueue_);
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
         
-        #ifndef USE_OPENGL
-        // On Direct3D9, clear now the parts of G-Buffer that were not rendered into
-        graphics_->SetDepthTest(CMP_LESSEQUAL);
-        graphics_->SetDepthWrite(false);
-        if (graphics_->GetHardwareDepthSupport())
-            graphics_->ResetRenderTarget(1);
-        else
+        // If hardware depth is not available, perform a post-step to initialize the parts of the G-buffer that were not rendered into
+        // (it is less expensive than clearing all the buffers in the first place)
+        if (!graphics_->GetHardwareDepthSupport())
         {
+            graphics_->SetDepthTest(CMP_LESSEQUAL);
+            graphics_->SetDepthWrite(false);
             graphics_->ResetRenderTarget(2);
             graphics_->SetRenderTarget(1, depthBuffer);
+            
+            DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("GBufferFill"), renderer_->GetPixelShader("GBufferFill"),
+                false, shaderParameters_);
         }
-        String pixelShaderName = "GBufferFill";
-        if (!graphics_->GetHardwareDepthSupport())
-            pixelShaderName += "_Depth";
-        DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("GBufferFill"), renderer_->GetPixelShader(pixelShaderName),
-            false, shaderParameters_);
-        #endif
+        
+        graphics_->ResetRenderTarget(1);
     }
     
     {
@@ -845,13 +838,12 @@ void View::RenderBatchesDeferred()
         
         // Render ambient color & fog. On OpenGL the depth buffer will be copied now
         graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetRenderTarget(0, renderBuffer);
-        graphics_->ResetRenderTarget(1);
         #ifdef USE_OPENGL
         graphics_->SetDepthWrite(true);
         #else
-        graphics_->ResetRenderTarget(2);
+        graphics_->SetDepthWrite(false);
         #endif
+        graphics_->SetRenderTarget(0, renderBuffer);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);

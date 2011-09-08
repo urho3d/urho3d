@@ -8,13 +8,10 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(
-    #ifdef DEPTH
-        out float4 oDepth : COLOR1,
-    #endif
-    out float4 oDiff : COLOR0)
+    out float4 oDiff : COLOR0,
+    out float4 oDepth : COLOR1
+)
 {
     oDiff = 0.0;
-    #ifdef DEPTH
     oDepth = 1.0;
-    #endif
 }
