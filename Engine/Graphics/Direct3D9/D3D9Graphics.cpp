@@ -173,6 +173,7 @@ Graphics::Graphics(Context* context) :
     fallback_(false),
     hasSM3_(false),
     forceSM2_(false),
+    forceFallback_(false),
     queryIndex_(0),
     numPrimitives_(0),
     numBatches_(0),
