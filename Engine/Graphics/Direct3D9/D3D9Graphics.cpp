@@ -170,6 +170,7 @@ Graphics::Graphics(Context* context) :
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
     streamOffsetSupport_(false),
+    fallback_(false),
     hasSM3_(false),
     forceSM2_(false),
     queryIndex_(0),
@@ -281,10 +282,6 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             return false;
     }
     
-    // Disable deferred  rendering if not supported
-    if (mode == RENDER_DEFERRED && !deferredSupport_)
-        mode = RENDER_FORWARD;
-
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
     // In deferred rendering mode, it is used to control temporal antialiasing
     multiSample_ = multiSample;
@@ -1829,6 +1826,12 @@ void Graphics::SetForceSM2(bool enable)
     forceSM2_ = enable;
 }
 
+void Graphics::SetForceFallback(bool enable)
+{
+    // Note: this only has effect before calling SetMode() for the first time
+    forceFallback_ = enable;
+}
+
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
@@ -2083,13 +2086,6 @@ bool Graphics::CreateInterface()
     
     // Check supported features: Shader Model 3, deferred rendering, hardware depth texture, shadow map, dummy color surface,
     // stream offset
-    if (!forceSM2_)
-    {
-        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
-            D3DPS_VERSION(3, 0))
-            hasSM3_ = true;
-    }
-    
     if (impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
     {
         if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
@@ -2100,11 +2096,14 @@ bool Graphics::CreateInterface()
                 hardwareDepthSupport_ = true;
         }
         unsigned requiredRTs = hardwareDepthSupport_ ? 2 : 3;
-        if (impl_->deviceCaps_.NumSimultaneousRTs >= requiredRTs)
-            deferredSupport_ = true;
+        if (forceFallback_ || impl_->deviceCaps_.NumSimultaneousRTs < requiredRTs)
+        {
+            hardwareDepthSupport_ = false;
+            fallback_ = true;
+        }
     }
     
-    // Prefer NVIDIA style hardware depth Compared shadow maps if available
+    // Prefer NVIDIA style hardware depth compared shadow maps if available
     shadowMapFormat_ = D3DFMT_D16;
     if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
     {
@@ -2131,11 +2130,22 @@ bool Graphics::CreateInterface()
                 hiresShadowMapFormat_ = shadowMapFormat_;
         }
         else
-        {
-            // No depth texture shadow map support -> no shadows at all
-            shadowMapFormat_ = 0;
-            hiresShadowMapFormat_ = 0;
-        }
+            // No depth texture shadow map support, use fallback mode
+            fallback_ = true;
+    }
+    
+    if (fallback_)
+    {
+        shadowMapFormat_ = D3DFMT_A8R8G8B8;
+        hiresShadowMapFormat_ = D3DFMT_A8R8G8B8;
+        hardwareShadowSupport_ = false;
+    }
+    
+    if (!forceSM2_ && !fallback_)
+    {
+        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
+            D3DPS_VERSION(3, 0))
+            hasSM3_ = true;
     }
     
     // Check for Intel 4 Series with an old driver, enable manual shadow map compare in that case

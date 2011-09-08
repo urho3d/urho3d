@@ -1819,6 +1819,10 @@ void Graphics::SetForceSM2(bool enable)
 {
 }
 
+void Graphics::SetForceFallback(bool enable)
+{
+}
+
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0;

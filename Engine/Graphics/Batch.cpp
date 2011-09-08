@@ -283,8 +283,16 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             float fadeEnd = light_->GetShadowDistance();
             if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                 intensity = Lerp(intensity, 1.0f, Clamp((light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
-            float pcfValues = (1.0f - intensity) * 0.25f;
-            graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
+            float pcfValues = (1.0f - intensity);
+            // In fallback mode, a single sample is used. Otherwise 4 samples are used, so divide the intensity of one sample
+            // Also, fallback mode requires manual depth biasing. We do not do proper slope scale biasing, instead just fudge the
+            // bias values together
+            if (!graphics->GetFallback())
+                pcfValues *= 0.25f;
+            float constantBias = graphics->GetDepthConstantBias();
+            float slopeScaledBias = graphics->GetDepthSlopeScaledBias();
+            graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, constantBias + slopeScaledBias *
+                constantBias, 0.0f));
         }
         
         if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))

@@ -709,10 +709,11 @@ void Renderer::Initialize()
     }
     else
     {
-        shaderPath_ = "Shaders/SM2/";
+        shaderPath_ = graphics_->GetFallback() ? "Shaders/SM2FB/" : "Shaders/SM2/";
         vsFormat_ = ".vs2";
         psFormat_ = ".ps2";
     }
+    
     #else
     {
         shaderPath_ = "Shaders/GLSL/";
@@ -1296,23 +1297,45 @@ bool Renderer::CreateShadowMaps()
     #else
     // Create shadow maps and dummy color rendertargets
     unsigned size = shadowMapSize_;
+    bool fallback = graphics_->GetFallback();
     for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
     {
-        if (!colorShadowMaps_[i])
-            colorShadowMaps_[i] = new Texture2D(context_);
-        if (!colorShadowMaps_[i]->SetSize(size, size, dummyColorFormat, TEXTURE_RENDERTARGET))
-            return false;
-        
+        // Dummy color rendertargets are not required in fallback mode, as the shadows are rendered into a color texture
+        if (!fallback)
+        {
+            if (!colorShadowMaps_[i])
+                colorShadowMaps_[i] = new Texture2D(context_);
+            if (!colorShadowMaps_[i]->SetSize(size, size, dummyColorFormat, TEXTURE_RENDERTARGET))
+                return false;
+        }
+        else
+        {
+            // In fallback mode, create one depth stencil that is large enough for the largest shadow map
+            if (!i)
+            {
+                if (!colorShadowMaps_[i])
+                    colorShadowMaps_[i] = new Texture2D(context_);
+                if (!colorShadowMaps_[i]->SetSize(size, size, D3DFMT_D16, TEXTURE_DEPTHSTENCIL))
+                    return false;
+            }
+        }
         for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
         {
             if (!shadowMaps_[i][j])
                 shadowMaps_[i][j] = new Texture2D(context_);
-            if (!shadowMaps_[i][j]->SetSize(size, size, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
+            if (!shadowMaps_[i][j]->SetSize(size, size, shadowMapFormat, fallback ? TEXTURE_RENDERTARGET : TEXTURE_DEPTHSTENCIL))
                 return false;
-            shadowMaps_[i][j]->SetFilterMode(hardwarePCF ? FILTER_BILINEAR : FILTER_NEAREST);
-            
-            // Link the color rendertarget to depth rendertarget
-            shadowMaps_[i][j]->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[i]->GetRenderSurface());
+            if (!fallback)
+            {
+                shadowMaps_[i][j]->SetFilterMode(hardwarePCF ? FILTER_BILINEAR : FILTER_NEAREST);
+                // Link the color rendertarget to depth rendertarget
+                shadowMaps_[i][j]->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[i]->GetRenderSurface());
+            }
+            else
+            {
+                shadowMaps_[i][j]->SetFilterMode(FILTER_NEAREST);
+                shadowMaps_[i][j]->GetRenderSurface()->SetLinkedDepthBuffer(colorShadowMaps_[0]->GetRenderSurface());
+            }
         }
         size >>= 1;
     }

@@ -207,6 +207,8 @@ public:
     void EndImmediate();
     /// %Set force Shader Model 2 flag. Needs to be set before setting initial screen mode to have effect.
     void SetForceSM2(bool enable);
+    /// %Set force fallback shaders flag. Needs to be set before setting initial screen mode to have effect.
+    void SetForceFallback(bool enable);
     
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -246,10 +248,10 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether texture render targets are supported.
-    bool GetRenderTargetSupport() const { return renderTargetSupport_; }
-    /// Return whether deferred rendering is supported.
-    bool GetDeferredSupport() const { return deferredSupport_; }
+    /// Return whether texture render targets are supported. Always true on Direct3D9
+    bool GetRenderTargetSupport() const { return true; }
+    /// Return whether fallback shaders are required.
+    bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
     /// Return whether the hardware depth buffer can be sampled.
@@ -415,10 +417,6 @@ private:
     bool deviceLost_;
     //! Use auto depth stencil flag
     bool systemDepthStencil_;
-    /// Texture render target support flag.
-    bool renderTargetSupport_;
-    /// Deferred rendering support flag.
-    bool deferredSupport_;
     /// Hardware depth sampling support flag.
     bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
@@ -427,10 +425,14 @@ private:
     bool hiresShadowSupport_;
     /// Stream offset support flag.
     bool streamOffsetSupport_;
+    /// Fallback shader mode flag.
+    bool fallback_;
     /// Shader Model 3 flag.
     bool hasSM3_;
     /// Force Shader Model 2 flag.
     bool forceSM2_;
+    /// Force fallback shaders flag.
+    bool forceFallback_;
     /// Query (used to flush the GPU command queue) issued flags.
     bool queryIssued_[NUM_QUERIES];
     /// Current query index

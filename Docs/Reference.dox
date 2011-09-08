@@ -376,7 +376,7 @@ When setting the initial screen mode, Graphics does a few checks:
 - For Direct3D9, it checks which shader model is supported. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()" before calling SetMode() for the first time.
 - For OpenGL, version 2.0 is required as a minimum. Shadows and deferred rendering additionally require the frame buffer object and packed depth stencil extensions.
 - Are multiple render targets supported? If not, only forward rendering will be available.
-- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, shadow rendering will be disabled.
+- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode with non-filtered shadows will be chosen instead.
 
 \section Rendering_Renderer Renderer
 

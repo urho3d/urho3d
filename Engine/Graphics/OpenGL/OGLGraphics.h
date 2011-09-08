@@ -200,6 +200,8 @@ public:
     void EndImmediate();
     /// Set force Shader Model 2 flag. No effect on OpenGL.
     void SetForceSM2(bool enable);
+    /// %Set force fallback shaders flag. No effect on OpenGL.
+    void SetForceFallback(bool enable);
     
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -241,8 +243,8 @@ public:
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether texture render targets are supported.
     bool GetRenderTargetSupport() const { return renderTargetSupport_; }
-    /// Return whether deferred rendering is supported.
-    bool GetDeferredSupport() const { return deferredSupport_; }
+    /// Return whether fallback shaders are required. Always false on OpenGL.
+    bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
     /// Return whether the hardware depth buffer can be sampled. Always true on OpenGL.

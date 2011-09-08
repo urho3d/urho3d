@@ -81,6 +81,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool vsync = false;
     bool tripleBuffer = false;
     bool forceSM2 = false;
+    bool forceFallback = false;
     bool shadows = true;
     bool sound = true;
     bool stereo = true;
@@ -111,6 +112,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 flush = false;
             else if (argument == "sm2")
                 forceSM2 = true;
+            else if (argument == "fallback")
+                forceFallback = true;
             else
             {
                 switch (tolower(argument[0]))
@@ -196,6 +199,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         Graphics* graphics = GetSubsystem<Graphics>();
         graphics->SetFlushGPU(flush);
         graphics->SetForceSM2(forceSM2);
+        graphics->SetForceFallback(forceFallback);
         graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(mode, width, height, fullscreen, vsync, tripleBuffer, multiSample))
             return false;

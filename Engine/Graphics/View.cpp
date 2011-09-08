@@ -1091,12 +1091,12 @@ unsigned View::ProcessLight(Light* light)
     if (light->GetLightType() == LIGHT_SPOT && !light->GetShapeTexture())
         light->SetShapeTexture(renderer_->GetDefaultLightSpot());
     
-    // Split the light if necessary
+    // Split the light if using shadows
     if (isShadowed)
         numSplits = SplitLight(light);
     else
     {
-        // No splitting, use the original light
+        // No shadows and no splitting, use the original light
         splitLights_[0] = light;
         numSplits = 1;
     }
@@ -2334,19 +2334,31 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     Texture2D* shadowMap = queue.light_->GetShadowMap();
     
-    graphics_->SetColorWrite(false);
     graphics_->SetTexture(TU_SHADOWMAP, 0);
-    graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
-    graphics_->SetDepthStencil(shadowMap);
-    graphics_->Clear(CLEAR_DEPTH);
+    if (!graphics_->GetFallback())
+    {
+        graphics_->SetColorWrite(false);
+        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+        graphics_->SetDepthStencil(shadowMap);
+        graphics_->Clear(CLEAR_DEPTH);
+    }
+    else
+    {
+        graphics_->SetColorWrite(true);
+        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface());
+        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthBuffer());
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, Color::WHITE);
+    }
     
-    // Set shadow depth bias. Adjust according to the global shadow map resolution
+    // Set shadow depth bias
     BiasParameters parameters = queue.light_->GetShadowBias();
+    // Adjust the light's constant depth bias according to global shadow map resolution
     unsigned shadowMapSize = renderer_->GetShadowMapSize();
     if (shadowMapSize <= 512)
         parameters.constantBias_ *= 2.0f;
     else if (shadowMapSize >= 2048)
         parameters.constantBias_ *= 0.5f;
+    
     graphics_->SetDepthBias(parameters.constantBias_, parameters.slopeScaledBias_);
     
     // Set a scissor rectangle to match possible shadow map size reduction by out-zooming

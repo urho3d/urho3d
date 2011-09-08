@@ -114,6 +114,7 @@ Urho3D.exe understands the following command line options:
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering
+-fallback   Force fallback rendering (no MRT, no hardware shadows)
 \endverbatim
 
 (*) Only forward rendering supports hardware multisampling. In deferred rendering temporal antialiasing will be used instead.

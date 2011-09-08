@@ -33,7 +33,7 @@ uniform float4 cMatDiffColor : register(C15);
 uniform float3 cMatEmissiveColor : register(C16);
 uniform float2 cMatSpecProperties : register(C17);
 uniform float4 cSampleOffsets : register(C18);
-uniform float2 cShadowIntensity : register(C19);
+uniform float3 cShadowIntensity : register(C19);
 uniform float4x4 cShadowProjPS : register(C20);
 uniform float4x4 cSpotProjPS : register(C24);
 uniform float4x4 cViewProjPS : register(C24);

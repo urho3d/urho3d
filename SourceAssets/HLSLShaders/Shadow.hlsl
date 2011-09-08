@@ -14,6 +14,9 @@ void VS(float4 iPos : POSITION,
         float2 iTexCoord : TEXCOORD0,
         out float2 oTexCoord : TEXCOORD0,
     #endif
+    #ifdef FALLBACK
+        out float4 oClipPos : TEXCOORD1,
+    #endif
     out float4 oPos : POSITION)
 {
     #if defined(SKINNED)
@@ -27,11 +30,17 @@ void VS(float4 iPos : POSITION,
     #ifdef ALPHAMASK
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
+    #ifdef FALLBACK
+        oClipPos = oPos;
+    #endif
 }
 
 void PS(
     #ifdef ALPHAMASK
         float2 iTexCoord : TEXCOORD0,
+    #endif
+    #ifdef FALLBACK
+        float4 iClipPos : TEXCOORD1,
     #endif
     out float4 oColor : COLOR0)
 {
@@ -40,5 +49,10 @@ void PS(
             discard;
     #endif
 
-    oColor = 1.0;
+    #ifdef FALLBACK
+        float depth = min(iClipPos.z / iClipPos.w + cShadowIntensity.z, 1.0);
+        oColor = float4(EncodeDepth(depth), 1.0, 1.0);
+    #else
+        oColor = 1.0;
+    #endif
 }

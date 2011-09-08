@@ -42,3 +42,15 @@ float ReconstructDepth(float hwDepth)
 {
     return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
 }
+
+float2 EncodeDepth(float depth)
+{
+    depth *= 255.0;
+    return float2(floor(depth) / 255.0, frac(depth));
+}
+
+float DecodeDepth(float2 depth)
+{
+    const float2 dotValues = float2(1.0, 1.0 / 255.0);
+    return dot(depth, dotValues);
+}
