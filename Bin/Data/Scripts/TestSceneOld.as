@@ -283,7 +283,7 @@ void InitConsole()
 
     DebugHud@ hud = engine.CreateDebugHud();
     debugHud.style = uiStyle;
-    debugHud.mode = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE;
+    debugHud.mode = DEBUGHUD_SHOW_ALL;
 }
 
 void InitUI()
