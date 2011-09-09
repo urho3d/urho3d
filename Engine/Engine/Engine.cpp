@@ -83,6 +83,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool forceSM2 = false;
     bool forceFallback = false;
     bool shadows = true;
+    bool lqShadows = false;
     bool sound = true;
     bool stereo = true;
     bool interpolate = true;
@@ -108,6 +109,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 stereo = false;
             else if (argument == "noshadows")
                 shadows = false;
+            else if (argument == "lqshadows")
+                lqShadows = true;
             else if (argument == "noflush")
                 flush = false;
             else if (argument == "sm2")
@@ -197,14 +200,20 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     if (!headless_)
     {
         Graphics* graphics = GetSubsystem<Graphics>();
+        Renderer* renderer = GetSubsystem<Renderer>();
+        
         graphics->SetFlushGPU(flush);
         graphics->SetForceSM2(forceSM2);
         graphics->SetForceFallback(forceFallback);
         graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(mode, width, height, fullscreen, vsync, tripleBuffer, multiSample))
             return false;
+        
         if (!shadows)
-            GetSubsystem<Renderer>()->SetDrawShadows(false);
+            renderer->SetDrawShadows(false);
+        else if (lqShadows)
+            renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
+        
         if (sound)
             GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolate);
     }

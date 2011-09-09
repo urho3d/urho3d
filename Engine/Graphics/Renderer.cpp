@@ -171,15 +171,26 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
-static const String hwVariations[] =
+static const String shadowVariations[] =
 {
-    "",
     // No specific hardware shadow compare variation on OpenGL, it is always supported
     #ifdef USE_OPENGL
+    "LQ",
+    "LQ",
+    "",
     ""
     #else
+    "LQ",
+    "LQHW",
+    "",
     "HW"
     #endif
+};
+
+static const String fallbackVariations[] =
+{
+    "",
+    "FB"
 };
 
 static const String linearVariations[] =
@@ -273,7 +284,7 @@ Renderer::Renderer(Context* context) :
     textureQuality_(QUALITY_HIGH),
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
-    shadowMapHiresDepth_(false),
+    shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
     minInstanceGroupSize_(4),
@@ -375,17 +386,22 @@ void Renderer::SetShadowMapSize(int size)
     }
 }
 
-void Renderer::SetShadowMapHiresDepth(bool enable)
+void Renderer::SetShadowQuality(int quality)
 {
     if (!graphics_)
         return;
     
+    quality &= SHADOWQUALITY_HIGH_24BIT;
     if (!graphics_->GetHiresShadowSupport())
-        enable = false;
+        quality &= SHADOWQUALITY_HIGH_16BIT;
     
-    shadowMapHiresDepth_ = enable;
-    if (!CreateShadowMaps())
-        drawShadows_ = false;
+    if (quality != shadowQuality_)
+    {
+        shadowQuality_ = quality;
+        shadersDirty_ = true;
+        if (!CreateShadowMaps())
+            drawShadows_ = false;
+    }
 }
 
 void Renderer::SetReuseShadowMaps(bool enable)
@@ -709,7 +725,7 @@ void Renderer::Initialize()
     }
     else
     {
-        shaderPath_ = graphics_->GetFallback() ? "Shaders/SM2FB/" : "Shaders/SM2/";
+        shaderPath_ = "Shaders/SM2/";
         vsFormat_ = ".vs2";
         psFormat_ = ".ps2";
     }
@@ -1025,7 +1041,7 @@ void Renderer::LoadShaders()
         lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
         
-        unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
+        unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
             lightVS_[i] = GetVertexShader("Light_" + deferredLightVSVariations[i]);
@@ -1035,7 +1051,7 @@ void Renderer::LoadShaders()
             unsigned linear = !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
             
             if (i & DLPS_SHADOW)
-                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] + hwVariations[hwShadows]);
+                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] + shadowVariations[shadows]);
             else
                 lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i]);
         }
@@ -1088,14 +1104,21 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
+    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    unsigned fallback = graphics_->GetFallback() ? 1 : 0;
+    
     // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
     if (type == PASS_GBUFFER)
     {
         unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
         pixelShaderName += depthVariations[depth];
     }
-
-    unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
+    
+    if (type == PASS_SHADOW)
+    {
+        vertexShaderName += fallbackVariations[fallback];
+        pixelShaderName += fallbackVariations[fallback];
+    }
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
@@ -1130,7 +1153,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
             if (j & LPS_SHADOW)
             {
                 if (allowShadows)
-                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + hwVariations[hwShadows]);
+                {
+                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows] +
+                        fallbackVariations[fallback]);
+                }
                 else
                     pixelShaders[j].Reset();
             }
@@ -1261,7 +1287,8 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
 
 bool Renderer::CreateShadowMaps()
 {
-    unsigned shadowMapFormat = shadowMapHiresDepth_ ? graphics_->GetHiresShadowMapFormat() : graphics_->GetShadowMapFormat();
+    unsigned shadowMapFormat = (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() :
+        graphics_->GetShadowMapFormat();
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     bool hardwarePCF = graphics_->GetHardwareShadowSupport();
     

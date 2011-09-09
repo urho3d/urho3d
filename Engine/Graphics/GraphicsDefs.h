@@ -263,6 +263,11 @@ static const int QUALITY_MEDIUM = 1;
 static const int QUALITY_HIGH = 2;
 static const int QUALITY_MAX = 15;
 
+static const int SHADOWQUALITY_LOW_16BIT = 0;
+static const int SHADOWQUALITY_LOW_24BIT = 1;
+static const int SHADOWQUALITY_HIGH_16BIT = 2;
+static const int SHADOWQUALITY_HIGH_24BIT = 3;
+
 static const unsigned CLEAR_COLOR = 0x1;
 static const unsigned CLEAR_DEPTH = 0x2;
 static const unsigned CLEAR_STENCIL = 0x4;

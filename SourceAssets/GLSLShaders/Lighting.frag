@@ -42,14 +42,20 @@ float GetSpecular(vec3 normal, vec3 worldPos, vec3 lightDir, float specularPower
 
 float GetShadow(vec4 shadowPos)
 {
-    // Take four samples and average them
-    vec4 pcfValues = vec4(cShadowIntensity.x);
-    vec2 projOfs = cSampleOffsets.xy * shadowPos.w;
-    vec4 inLight = vec4(
-        shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.x), shadowPos.zw)).r,
-        shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.x), shadowPos.zw)).r,
-        shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.y), shadowPos.zw)).r,
-        shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.y), shadowPos.zw)).r
-    );
-    return cShadowIntensity.y + dot(inLight, pcfValues);
+    #ifndef LQSHADOW
+        // Take four samples and average them
+        vec4 pcfValues = vec4(cShadowIntensity.y);
+        vec2 projOfs = cSampleOffsets.xy * shadowPos.w;
+        vec4 inLight = vec4(
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.x), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.x), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.y), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.y), shadowPos.zw)).r
+        );
+        return cShadowIntensity.z + dot(inLight, pcfValues);
+    #else
+        // Take one sample
+        float inLight = shadow2DProj(sShadowMap, shadowPos).r;
+        return cShadowIntensity.z + cShadowIntensity.x * inLight;
+    #endif
 }

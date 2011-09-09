@@ -292,7 +292,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
 
         if (input.keyPress['7'])
-            renderer.shadowMapHiresDepth = !renderer.shadowMapHiresDepth;
+            renderer.shadowQuality = renderer.shadowQuality + 1;
 
         if (input.keyPress['8'])
         {

@@ -50,7 +50,7 @@ void PS(
     #endif
 
     #ifdef FALLBACK
-        float depth = min(iClipPos.z / iClipPos.w + cShadowIntensity.z, 1.0);
+        float depth = min(iClipPos.z / iClipPos.w + cShadowIntensity.w, 1.0);
         oColor = float4(EncodeDepth(depth), 1.0, 1.0);
     #else
         oColor = 1.0;

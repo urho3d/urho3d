@@ -59,6 +59,13 @@
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
         <option name="Shadow" define="SHADOW" require="LIGHT" />
         <option name="Spec" define="SPECULAR" />
+        <option name="LQ" define="LQSHADOW" require="SHADOW" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
+        <option name="FB" define="FALLBACK">
+            <exclude name="LQ" />
+            <exclude name="HW" />
+            <require name="SHADOW" />
+            <require name="SM2" />
+        </option>
     </shader>
 </shaders>

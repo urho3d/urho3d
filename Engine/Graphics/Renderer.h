@@ -161,8 +161,8 @@ public:
     void SetMaterialQuality(int quality);
     /// %Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// %Set shadow map 24-bit depth on/off.
-    void SetShadowMapHiresDepth(bool enable);
+    /// %Set shadow quality (amount of samples and bit depth.)
+    void SetShadowQuality(int quality);
     /// %Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing.
     void SetReuseShadowMaps(bool enable);
     /// %Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first.
@@ -197,8 +197,8 @@ public:
     int GetMaterialQuality() const { return materialQuality_; }
     /// Return shadow map resolution.
     int GetShadowMapSize() const { return shadowMapSize_; }
-    /// Return whether shadow maps use 24-bit depth.
-    bool GetShadowMapHiresDepth() const { return shadowMapHiresDepth_; }
+    /// Return shadow quality.
+    int GetShadowQuality() const { return shadowQuality_; }
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
     /// Return number of full resolution shadow maps.
@@ -393,8 +393,8 @@ private:
     int materialQuality_;
     /// Shadow map resolution.
     int shadowMapSize_;
-    /// Shadow map 24-bit depth flag.
-    bool shadowMapHiresDepth_;
+    /// Shadow quality.
+    int shadowQuality_;
     /// Shadow map reuse flag.
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.

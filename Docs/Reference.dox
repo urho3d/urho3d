@@ -534,7 +534,7 @@ Care must be utilized when doing light culling with lightmasks, because they eas
 
 \section Lights_ShadowedLights Shadowed lights
 
-Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of parameters exists for controlling the shadows:
+Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of per-light parameters exists for controlling the shadows:
 
 - BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Also, these can be different for orthographic (directional) and projective (point and spot) shadows. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
 
@@ -551,6 +551,8 @@ Additionally, there exist shadow fade distance, shadow intensity, shadow resolut
 - The shadow resolution parameter allows choosing between a fullsize (1.0), half-size (0.5) and quarter-size (0.25) shadow map. Choose according to the size and importance of the light; smaller shadow maps will be much less performance hungry.
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
+
+Finally, there are global settings for the shadow map base resolution and shadow map depth (16 or 24 bit) & filtering quality (1 or 4 samples) in Renderer. 
 
 \section Lights_ShadowMapReuse Shadow map reuse
 

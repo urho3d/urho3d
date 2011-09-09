@@ -111,6 +111,10 @@
 - int QUALITY_LOW
 - int QUALITY_MEDIUM
 - int QUALITY_HIGH
+- int SHADOWQUALITY_LOW_16BIT
+- int SHADOWQUALITY_LOW_24BIT
+- int SHADOWQUALITY_HIGH_16BIT
+- int SHADOWQUALITY_HIGH_24BIT
 - int MOUSEB_LEFT
 - int MOUSEB_RIGHT
 - int MOUSEB_MIDDLE
@@ -2007,7 +2011,7 @@ Properties:<br>
 - int textureQuality
 - int materialQuality
 - int shadowMapSize
-- bool shadowMapHiresDepth
+- int shadowQuality
 - bool reuseShadowMaps
 - bool dynamicInstancing
 - int minInstanceGroupSize

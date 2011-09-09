@@ -395,7 +395,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
 
         if (input.keyPress['7'])
-            renderer.shadowMapHiresDepth = !renderer.shadowMapHiresDepth;
+            renderer.shadowQuality = renderer.shadowQuality + 1;
 
         if (input.keyPress['8'])
         {
@@ -403,7 +403,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
-        
+
         if (input.keyPress['9'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 

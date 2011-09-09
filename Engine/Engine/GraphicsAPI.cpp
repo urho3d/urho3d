@@ -737,6 +737,11 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int QUALITY_MEDIUM", (void*)&QUALITY_MEDIUM);
     engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
     
+    engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_16BIT", (void*)&SHADOWQUALITY_LOW_16BIT);
+    engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_24BIT", (void*)&SHADOWQUALITY_LOW_24BIT);
+    engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_16BIT", (void*)&SHADOWQUALITY_HIGH_16BIT);
+    engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_24BIT", (void*)&SHADOWQUALITY_HIGH_24BIT);
+    
     RegisterObject<Renderer>(engine, "Renderer");
     engine->RegisterObjectMethod("Renderer", "void SetNumShadowMaps(uint, uint, uint)", asMETHOD(Renderer, SetNumShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
@@ -758,8 +763,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "int get_materialQuality() const", asMETHOD(Renderer, GetMaterialQuality), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_shadowMapSize(int)", asMETHOD(Renderer, SetShadowMapSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_shadowMapSize() const", asMETHOD(Renderer, GetShadowMapSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_shadowMapHiresDepth(bool)", asMETHOD(Renderer, SetShadowMapHiresDepth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "bool get_shadowMapHiresDepth() const", asMETHOD(Renderer, GetShadowMapHiresDepth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_shadowQuality(int)", asMETHOD(Renderer, SetShadowQuality), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "int get_shadowQuality() const", asMETHOD(Renderer, GetShadowQuality), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_reuseShadowMaps(bool)", asMETHOD(Renderer, SetReuseShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_reuseShadowMaps() const", asMETHOD(Renderer, GetReuseShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_dynamicInstancing(bool)", asMETHOD(Renderer, SetDynamicInstancing), asCALL_THISCALL);

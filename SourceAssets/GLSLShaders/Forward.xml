@@ -61,5 +61,6 @@
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
         <option name="Shadow" define="SHADOW" require="LIGHT" />
         <option name="Spec" define="SPECULAR" />
+        <option name="LQ" define="LQSHADOW" require="SHADOW" />
     </shader>
 </shaders>

@@ -60,7 +60,7 @@ T           Toggle profiling display
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
 
 There is also a variation of TestScene ported from Urho3D 1.0, TestSceneOld. It lacks networking features, but is provided for examining backward compatibility and performance. It can be run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as
- 
+
 \section Running_NinjaSnowWar NinjaSnowWar
 
 A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as
@@ -108,6 +108,7 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -forward    Use forward rendering (default)
 -deferred   Use deferred rendering
+-lqshadows  Use low-quality (1-sample) shadow filtering
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
 -noflush    Disable GPU command queue flushing
@@ -116,10 +117,11 @@ Urho3D.exe understands the following command line options:
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering
--fallback   Force fallback rendering (no MRT, no hardware shadows)
+-fallback   Force fallback rendering: no MRT, no hardware shadows (**)
 \endverbatim
 
 (*) Only forward rendering supports hardware multisampling. In deferred rendering temporal antialiasing will be used instead.
+(**) Relevant only on Direct3D9
 
 
 \page Structure Overall structure

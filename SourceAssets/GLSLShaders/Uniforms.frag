@@ -15,7 +15,7 @@ uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec2 cMatSpecProperties;
 uniform vec4 cSampleOffsets;
-uniform vec2 cShadowIntensity;
+uniform vec4 cShadowIntensity;
 uniform mat4 cShadowProjPS;
 uniform mat4 cSpotProjPS;
 uniform mat4 cViewProjPS;

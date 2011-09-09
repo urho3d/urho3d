@@ -141,6 +141,8 @@ bool Shader::Load(Deserializer& source)
         }
         
         // Store the variation
+        if (variations_.Contains(nameHash))
+            LOGERROR("Shader variation name hash collision: " + variationName);
         variations_[nameHash] = variation;
     }
     

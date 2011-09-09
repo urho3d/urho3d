@@ -87,6 +87,9 @@ bool Shader::Load(Deserializer& source)
             newVariation->SetName(fileName);
         newVariation->SetSourceCode(sourceCode_, sourceCodeLength_);
         newVariation->SetDefines(variationElem.GetString("defines").Split(' '));
+        
+        if (variations_.Contains(nameHash))
+            LOGERROR("Shader variation name hash collision: " + variationName);
         variations_[nameHash] = newVariation;
         
         variationElem = variationElem.GetNext();

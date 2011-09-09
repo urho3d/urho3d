@@ -35,6 +35,13 @@
 
 #include "DebugNew.h"
 
+static const String shadowQualityTexts[] = {
+    "16bit Low",
+    "24bit Low",
+    "16bit High",
+    "24bit High"
+};
+
 OBJECTTYPESTATIC(DebugHud);
 
 DebugHud::DebugHud(Context* context) :
@@ -156,12 +163,8 @@ void DebugHud::Update(float timeStep)
         int shadowMapSize = renderer->GetShadowMapSize();
         mode += " Size:" + String(shadowMapSize);
         
-        bool shadowMapHiresDepth = renderer->GetShadowMapHiresDepth();
-        mode += " Depth:";
-        if (shadowMapHiresDepth)
-            mode += "24";
-        else
-            mode += "16";
+        int shadowQuality = renderer->GetShadowQuality();
+        mode += " Quality:" + shadowQualityTexts[shadowQuality];
         
         bool occlusion = renderer->GetMaxOccluderTriangles() > 0;
         mode += " Occlusion:";
