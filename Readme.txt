@@ -1,5 +1,5 @@
-Urho3D rendering and game engine
---------------------------------
+Urho3D - cross-platform rendering and game engine
+-------------------------------------------------
 
 http://urho3d.googlecode.com
 
@@ -72,18 +72,36 @@ root directory with doxywizard and click "Run doxygen" from the "Run" tab.
 Get Doxygen from http://www.doxygen.org
 
 
-Building
---------
+Building prerequisites
+----------------------
+
+Although all required third-party libraries are included as source code, there
+are system-level dependencies that must be satisfied before Urho3D can be built
+successfully:
+
+- For Windows, the DirectX SDK needs to be installed and its include and library
+  directories set as Visual Studio global directories (Tools -> Options -> 
+  Projects and Solutions -> VC++ Directories in VS2008.)
+
+- For Linux, the following development packages need to be installed:
+  libx11-dev, libxrandr-dev, libgl1-mesa-dev, libasound2-dev.
+
+- For Mac OS X, the Xcode developer tools package should include everything
+  necessary.
+  
+
+Build process
+-------------
 
 Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 1) Run CMake in the root directory with your preferred toolchain specified to
 generate the build files. You can use the batch files or shell scripts provided:
-cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and 
+cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and
 Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For gcc, execute make (by default, cmake_gcc.sh specifies to make a Release 
+For gcc, execute make (by default, cmake_gcc.sh specifies to make a Release
 build.)
 
 The build process will also compile models and shaders from the Source_Asset
@@ -103,7 +121,3 @@ obnoxious as the mouse cursor will most probably be hidden.
 To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
 following arguments: Scripts/TestScene.as -w
-
-Note: some Direct3D9 SM2.0 shaders in Urho3D reach exactly the arithmetic 
-instruction count limit. Some versions of the HLSL compiler may fail to compile
-them. At least the February 2010 SDK is known to work.

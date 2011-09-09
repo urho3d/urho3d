@@ -1981,7 +1981,7 @@ Properties:<br>
 - uint numPrimitives (readonly)
 - uint numBatches (readonly)
 - bool renderTargetSupport (readonly)
-- bool deferredSupport (readonly)
+- bool fallback (readonly)
 - bool sm3Support (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)

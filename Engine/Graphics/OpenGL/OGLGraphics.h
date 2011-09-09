@@ -244,7 +244,7 @@ public:
     /// Return whether texture render targets are supported.
     bool GetRenderTargetSupport() const { return renderTargetSupport_; }
     /// Return whether fallback shaders are required. Always false on OpenGL.
-    bool GetFallback() const { return fallback_; }
+    bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
     /// Return whether the hardware depth buffer can be sampled. Always true on OpenGL.

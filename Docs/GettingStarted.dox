@@ -2,6 +2,18 @@
 
 \page Building Building Urho3D
 
+\section Building_Prerequisites Building prerequisites
+
+Although all required third-party libraries are included as source code, there are system-level dependencies that must be satisfied before Urho3D can be built successfully:
+
+- For Windows, the DirectX SDK needs to be installed and its include and library directories set as Visual Studio global directories (Tools -> Options -> Projects and Solutions -> VC++ Directories in VS2008.)
+
+- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libgl1-mesa-dev, libasound2-dev.
+
+- For Mac OS X, the Xcode developer tools package should include everything necessary.
+
+\section Building_BuildProcess Build process
+
 Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 1) Run CMake in the root directory with your preferred toolchain specified to generate the build files. You can use the batch files or shell scripts provided: cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and Mac OS X.
@@ -13,16 +25,6 @@ The build process will also compile models and shaders from the Source_Asset dir
 To run Urho3D from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
-
-\section Building_SystemDependencies System-level dependencies
-
-Although all required third-party libraries are included as source code, there are also system-level dependencies that must be satisfied before Urho3D can be built successfully:
-
-- For Windows, the DirectX SDK needs to be installed. The HLSL compiler included in some SDK's may fail to compile those SM2.0 shaders that reach exactly the arithmetic instruction count limit; at least the February 2010 SDK is known to work.
-
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libgl1-mesa-dev, libasound2-dev.
-
-- For Mac OS X, the Xcode developer tools package should include everything necessary.
 
 
 \page Running Running Urho3D
