@@ -335,6 +335,8 @@ private:
     Vector<SharedPtr<Texture2D> > shadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
     /// Shadow map dummy color textures by resolution.
     SharedPtr<Texture2D> colorShadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
+    /// Shadow map depth stencil buffer, used only in fallback mode.
+    SharedPtr<Texture2D> shadowDepthStencil_;
     /// Shadow map use count if reusing is disabled. Is reset for each view.
     unsigned shadowMapUseCount_[NUM_SHADOWMAP_RESOLUTIONS];
     /// Stencil rendering vertex shader.
