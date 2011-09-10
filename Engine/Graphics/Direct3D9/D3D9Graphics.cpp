@@ -2223,7 +2223,7 @@ void Graphics::CreateRenderTargets()
             normalBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
         }
         
-        if (!depthBuffer_)
+        if (!depthBuffer_ && !fallback_)
         {
             depthBuffer_ = new Texture2D(context_);
             if (!hardwareDepthSupport_)

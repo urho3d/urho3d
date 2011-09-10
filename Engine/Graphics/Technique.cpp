@@ -34,6 +34,7 @@
 static const String passNames[] =
 {
     "gbuffer",
+    "gbuffer2",
     "base",
     "litbase",
     "light",

@@ -129,14 +129,12 @@ Graphics::Graphics(Context* context_) :
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(true),
-    renderTargetSupport_(false),
-    deferredSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     immediateVertexCount_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
-    shadowMapFormat_(0),
-    hiresShadowMapFormat_(0),
+    shadowMapFormat_(GL_DEPTH_COMPONENT16),
+    hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     shaderParameterFrame_(0)
 {
     ResetCachedState();
@@ -247,13 +245,19 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             return false;
         }
         
+        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil)
+        {
+            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+            glfwCloseWindow(impl_->window_);
+            return false;
+        }
+        
         // Set window close callback
         glfwSetWindowCloseCallback(CloseCallback);
         
         // Associate GLFW window with the execution context
         SetWindowContext(impl_->window_, context_);
     }
-
     
     // Set vsync
     glfwSwapInterval(vsync ? 1 : 0);
@@ -262,17 +266,8 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
     impl_->depthBits_ = impl_->windowDepthBits_;
     
-    // Create the FBO if fully supported
-    if (_GLEE_EXT_framebuffer_object && _GLEE_EXT_packed_depth_stencil)
-    {
-        glGenFramebuffersEXT(1, &impl_->fbo_);
-        
-        // Shadows, render targets and deferred rendering all depend on FBO & packed depth stencil
-        shadowMapFormat_ = GL_DEPTH_COMPONENT16;
-        hiresShadowMapFormat_ = GL_DEPTH_COMPONENT24;
-        renderTargetSupport_ = true;
-        deferredSupport_ = true;
-    }
+    // Create the FBO
+    glGenFramebuffersEXT(1, &impl_->fbo_);
     
     // Set initial state to match Direct3D
     glEnable(GL_DEPTH_TEST);
@@ -1180,7 +1175,7 @@ void Graphics::ResetDepthStencil()
 
 void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
 {
-    if (index >= MAX_RENDERTARGETS || !impl_->fbo_)
+    if (index >= MAX_RENDERTARGETS)
         return;
     
     if (renderTarget != renderTargets_[index])
@@ -1257,7 +1252,7 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* renderTexture)
 
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
-    if (impl_->fbo_ && depthStencil != depthStencil_)
+    if (depthStencil != depthStencil_)
     {
         // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth stencil
         // Create a new depth stencil texture as necessary to be able to provide similar behaviour.

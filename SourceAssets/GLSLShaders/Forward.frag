@@ -56,14 +56,12 @@ void main()
             diff *= GetShadow(vShadowPos);
         #endif
 
-        #ifdef SPOTLIGHT
+        #if defined(SPOTLIGHT)
             lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
+        #elif defined(CUBEMASK)
+            lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
         #else
-            #ifdef CUBEMASK
-                lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
-            #else
-                lightColor = cLightColor.rgb;
-            #endif
+            lightColor = cLightColor.rgb;
         #endif
 
         #ifdef SPECULAR
@@ -99,14 +97,12 @@ void main()
                 diff = GetDiffusePointOrSpotVolumetric(vWorldPos.xyz, lightVec);
             #endif
 
-            #ifdef SPOTLIGHT
+            #if defined(SPOTLIGHT)
                 lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
+            #elif defined(CUBEMASK)
+                lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
             #else
-                #ifdef CUBEMASK
-                    lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
-                #else
-                    lightColor = cLightColor.rgb;
-                #endif
+                lightColor = cLightColor.rgb;
             #endif
 
             vec3 finalColor = diff * lightColor * diffColor.rgb;

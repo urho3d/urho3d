@@ -46,33 +46,45 @@ void PS(
 {
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
+        float4 normalInput = Sample(sNormalBuffer, iScreenPos);
+        float4 diffInput = Sample(sDiffBuffer, iScreenPos);
         #ifdef ORTHO
-            float depth = Sample(sDepthBuffer, iScreenPos).r;
+            #ifndef FALLBACK
+                float depth = Sample(sDepthBuffer, iScreenPos).r;
+            #else
+                float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
+            #endif
             float3 worldPos = lerp(iNearRay, iFarRay, depth);
         #else
-            #ifdef LINEAR
+            #if defined(LINEAR)
                 float depth = Sample(sDepthBuffer, iScreenPos).r;
+            #elif defined(FALLBACK)
+                float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
             #else
                 float depth = ReconstructDepth(Sample(sDepthBuffer, iScreenPos).r);
             #endif
             float3 worldPos = iFarRay * depth;
         #endif
-        float4 normalInput = Sample(sNormalBuffer, iScreenPos);
-        float4 diffInput = Sample(sDiffBuffer, iScreenPos);
     #else
+        float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
+        float4 diffInput = tex2Dproj(sDiffBuffer, iScreenPos);
         #ifdef ORTHO
-            float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+            #ifndef FALLBACK
+                float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+            #else
+                float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
+            #endif
             float3 worldPos = lerp(iNearRay, iFarRay, depth) / iScreenPos.w;
         #else
-            #ifdef LINEAR
+            #if defined(LINEAR)
                 float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+            #elif defined(FALLBACK)
+                float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
             #else
                 float depth = ReconstructDepth(tex2Dproj(sDepthBuffer, iScreenPos).r);
             #endif
             float3 worldPos = iFarRay * depth / iScreenPos.w;
         #endif
-        float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
-        float4 diffInput = tex2Dproj(sDiffBuffer, iScreenPos);
     #endif
 
     // With specular, normalization greatly improves stability of reflections,
@@ -99,15 +111,13 @@ void PS(
         diff *= GetShadow(shadowPos);
     #endif
 
-    #ifdef SPOTLIGHT
+    #if defined(SPOTLIGHT)
         float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+    #elif defined(CUBEMASK)
+        lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
     #else
-        #ifdef CUBEMASK
-            lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
-        #else
-            lightColor = cLightColor.rgb;
-        #endif
+        lightColor = cLightColor.rgb;
     #endif
 
     #ifdef SPECULAR

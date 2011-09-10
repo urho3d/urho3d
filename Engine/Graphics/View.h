@@ -260,6 +260,8 @@ private:
     HashMap<Light*, Rect> lightScissorCache_;
     /// G-buffer batches.
     BatchQueue gBufferQueue_;
+    /// G-buffer pass 2 batches (fallback mode only.)
+    BatchQueue gBuffer2Queue_;
     /// Base pass batches.
     BatchQueue baseQueue_;
     /// Extra pass batches.

@@ -11,13 +11,16 @@ void VS(float4 iPos : POSITION,
     GetPosition(iPos, oPos);
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+                 
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     float4 diffInput = tex2D(sDiffBuffer, iScreenPos);
-    #ifdef LINEAR
+    #if defined(LINEAR)
         float depth = tex2D(sDepthBuffer, iScreenPos).r;
+    #elif defined(FALLBACK)
+        float4 normalInput = tex2D(sNormalBuffer, iScreenPos);
+        float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
     #else
         float depth = ReconstructDepth(tex2D(sDepthBuffer, iScreenPos).r);
     #endif

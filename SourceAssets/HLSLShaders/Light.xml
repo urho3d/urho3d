@@ -23,5 +23,11 @@
         <option name="Spec" define="SPECULAR" />
         <option name="LQ" define="LQSHADOW" require="SHADOW" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
+        <option name="FB" define="FALLBACK" require="SM2">
+            <exclude name="Linear" />
+            <exclude name="Spec" />
+            <exclude name="LQ" />
+            <exclude name="HW" />
+        </option>
     </shader>
 </shaders>

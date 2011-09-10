@@ -173,6 +173,7 @@ enum TextureUsage
 enum PassType
 {
     PASS_GBUFFER,
+    PASS_GBUFFER2,
     PASS_BASE,
     PASS_LITBASE,
     PASS_LIGHT,

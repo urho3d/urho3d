@@ -1984,7 +1984,6 @@ Properties:<br>
 - bool deviceLost (readonly)
 - uint numPrimitives (readonly)
 - uint numBatches (readonly)
-- bool renderTargetSupport (readonly)
 - bool fallback (readonly)
 - bool sm3Support (readonly)
 - bool hardwareShadowSupport (readonly)

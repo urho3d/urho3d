@@ -373,9 +373,9 @@ Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, an
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, it checks which shader model is supported. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()" before calling SetMode() for the first time.
-- For OpenGL, version 2.0 is required as a minimum. Shadows and deferred rendering additionally require the frame buffer object and packed depth stencil extensions.
-- Are multiple render targets supported? If not, only forward rendering will be available.
+- For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()" before calling SetMode() for the first time.
+- For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil is checked for.
+- Are multiple render targets supported? If not, a fallback mode for deferred rendering (use 2 passes for the G-buffer, do not render specular lighting) is chosen.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode with non-filtered shadows will be chosen instead.
 
 \section Rendering_Renderer Renderer
@@ -442,9 +442,9 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 - Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 on Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
 
-- In deferred rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the hardware depth buffer will be read directly, and linear depth will be reconstructed in the pixel shader. This results in less GPU memory bandwidth needed, but can introduce inaccuracy to depth calculations.
+- In deferred rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the hardware depth buffer will be read directly, and linear depth will be reconstructed in the pixel shader. Direct3D9 will behave similarly if the INTZ depth format is supported.
 
-- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change. 
+- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change.
 
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
 
@@ -638,9 +638,16 @@ Opaque objects are rendered to the G-buffer first, then an initial full-screen q
 
 After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional pass for objects that need them.
 
+\section ForwardDeferred_Fallback Fallback deferred rendering
+
+If multiple render targets are not available on Direct3D9, a fallback G-buffer format is used for deferred rendering. It is rendered in two separate passes, and as there is no room for specular properties, specular lighting calculations are omitted:
+
+- %Pass 1: diffuse albedo and high bits of depth (D3DFMT_A8R8G8B8)
+- %Pass 2: world-space normal and low bits of depth (D3DFMT_A8R8G8B8)
+
 \section ForwardDeferred_DeferredAntiAlias Deferred antialiasing
 
-As actual hardware multisampling is incompatible with deferred rendering, a temporal antialiasing post-process filter will be used instead. Depending on the GPU speed, this has a low-to-moderate performance impact.
+As actual hardware multisampling is incompatible with deferred rendering, a temporal antialiasing post-process filter will be used instead. Depending on the GPU speed, this has a low-to-moderate performance impact. RGB value minimum/maximum clamping will be used to eliminate or reduce ghosting artifacts, but some ghosting can nevertheless appear if both the camera and objects move.
 
 \section ForwardDeferred_Conclusion Conclusion
 

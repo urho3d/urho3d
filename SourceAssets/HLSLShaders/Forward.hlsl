@@ -141,14 +141,12 @@ void PS(float2 iTexCoord : TEXCOORD0,
             diff *= GetShadow(iShadowPos);
         #endif
 
-        #ifdef SPOTLIGHT
+        #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+        #elif defined(CUBEMASK)
+            lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
         #else
-            #ifdef CUBEMASK
-                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
-            #else
-                lightColor = cLightColor.rgb;
-            #endif
+            lightColor = cLightColor.rgb;
         #endif
 
         #ifdef SPECULAR
@@ -184,14 +182,12 @@ void PS(float2 iTexCoord : TEXCOORD0,
                 diff = GetDiffusePointOrSpotVolumetric(iWorldPos.xyz, lightVec);
             #endif
 
-            #ifdef SPOTLIGHT
+            #if defined(SPOTLIGHT)
                 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            #elif defined(CUBEMASK)
+                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
             #else
-                #ifdef CUBEMASK
-                    lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
-                #else
-                    lightColor = cLightColor.rgb;
-                #endif
+                lightColor = cLightColor.rgb;
             #endif
 
             float3 finalColor = diff * lightColor * diffColor.rgb;

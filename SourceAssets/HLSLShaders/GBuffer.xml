@@ -12,5 +12,15 @@
         <option name="Spec" define="SPECMAP" />      
         <option name="Mask" define="ALPHAMASK" include="Diff" />
         <option name="Depth" define="DEPTH" />
+        <option name="FB" define="FALLBACK" require="SM2">
+            <exclude name="Depth" />
+            <exclude name="Pass2FB" />
+        </option>
+        <option name="Pass2FB" require="SM2">
+            <define name="FALLBACK" />
+            <define name="PASS2" />
+            <exclude name="Depth" />
+            <exclude name="FB" />
+        </option>
     </shader>
 </shaders>

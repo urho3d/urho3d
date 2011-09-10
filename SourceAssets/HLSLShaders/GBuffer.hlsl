@@ -68,8 +68,10 @@ void PS(
     #ifdef DEPTH
         out float4 oDepth : COLOR2,
     #endif
-    out float4 oDiff : COLOR0,
-    out float4 oNormal : COLOR1)
+    #ifndef FALLBACK
+        out float4 oNormal : COLOR1,
+    #endif
+    out float4 oDiff : COLOR0)
 {
     #ifdef DIFFMAP
         float4 diffInput = tex2D(sDiffMap, iTexCoord);
@@ -97,8 +99,17 @@ void PS(
     float specPower = cMatSpecProperties.y / 255.0;
 
     // Take fogging into account here so that deferred lights do not need to calculate it
-    oDiff = GetReverseFogFactor(iDepth) * float4(diffColor, specStrength);
-    oNormal = float4(normal * 0.5 + 0.5, specPower);
+    #ifndef FALLBACK
+        oDiff = GetReverseFogFactor(iDepth) * float4(diffColor, specStrength);
+        oNormal = float4(normal * 0.5 + 0.5, specPower);
+    #else
+        // Fallback G-buffer requires 2 passes, first diffuse and coarse depth, then normal and fine depth
+        #ifndef PASS2
+            oDiff = float4(GetReverseFogFactor(iDepth) * diffColor, floor(iDepth * 255.0) / 255.0);
+        #else
+            oDiff = float4(normal * 0.5 + 0.5, frac(iDepth * 255.0));
+        #endif
+    #endif
     #ifdef DEPTH
         oDepth = iDepth;
     #endif

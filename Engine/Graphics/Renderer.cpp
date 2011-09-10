@@ -763,12 +763,9 @@ void Renderer::ResetViews()
 
 bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
 {
-    // If using a render target texture, make sure it is supported, and will not be rendered to multiple times
+    // If using a render target texture, make sure it will not be rendered to multiple times
     if (renderTarget)
     {
-        if (!graphics_->GetRenderTargetSupport())
-            return false;
-        
         for (unsigned i = 0; i < numViews_; ++i)
         {
             if (views_[i]->GetRenderTarget() == renderTarget)
@@ -1004,7 +1001,8 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     if (light->GetShadowMap())
         psi += DLPS_SHADOW;
     
-    if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
+    // Deferred fallback mode does not support specular
+    if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && !graphics_->GetFallback())
         psi += DLPS_SPEC;
     
     if (batch.camera_->IsOrthographic())
@@ -1042,18 +1040,27 @@ void Renderer::LoadShaders()
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
         
         unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+        unsigned fallback = graphics_->GetFallback() ? 1 : 0;
+        if (fallback)
+            shadows = SHADOWQUALITY_HIGH_16BIT;
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
             lightVS_[i] = GetVertexShader("Light_" + deferredLightVSVariations[i]);
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
         {
-            unsigned linear = !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
+            unsigned linear = fallback == 0 && !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
             
             if (i & DLPS_SHADOW)
-                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] + shadowVariations[shadows]);
+            {
+                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] +
+                    shadowVariations[shadows] + fallbackVariations[fallback]);
+            }
             else
-                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i]);
+            {
+                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] +
+                    fallbackVariations[fallback]);
+            }
         }
     }
     
@@ -1078,7 +1085,11 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     else
     {
         if (technique->HasPass(PASS_GBUFFER))
+        {
             LoadPassShaders(technique, PASS_GBUFFER);
+            if (graphics_->GetFallback())
+                LoadPassShaders(technique, PASS_GBUFFER2);
+        }
         else
         {
             LoadPassShaders(technique, PASS_BASE);
@@ -1106,12 +1117,17 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
     unsigned fallback = graphics_->GetFallback() ? 1 : 0;
+    if (fallback)
+        shadows = SHADOWQUALITY_HIGH_16BIT;
     
     // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
-    if (type == PASS_GBUFFER)
+    if (type == PASS_GBUFFER || type == PASS_GBUFFER2)
     {
         unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
-        pixelShaderName += depthVariations[depth];
+        if (fallback)
+            pixelShaderName += fallbackVariations[fallback];
+        else
+            pixelShaderName += depthVariations[depth];
     }
     
     if (type == PASS_SHADOW)

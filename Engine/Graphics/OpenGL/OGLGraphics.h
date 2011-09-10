@@ -241,8 +241,6 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether texture render targets are supported.
-    bool GetRenderTargetSupport() const { return renderTargetSupport_; }
     /// Return whether fallback shaders are required. Always false on OpenGL.
     bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
@@ -402,10 +400,6 @@ private:
     bool tripleBuffer_;
     /// Flush GPU command queue flag.
     bool flushGPU_;
-    /// Texture render target support flag.
-    bool renderTargetSupport_;
-    /// Deferred rendering support flag.
-    bool deferredSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

@@ -61,15 +61,13 @@ void main()
         diff *= GetShadow(shadowPos);
     #endif
 
-    #ifdef SPOTLIGHT
+    #if defined(SPOTLIGHT)
         vec4 spotPos = cSpotProjPS * vec4(worldPos, 1.0);
         lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
+    #elif defined(CUBEMASK)
+        lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
     #else
-        #ifdef CUBEMASK
-            lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
-        #else
-            lightColor = cLightColor.rgb;
-        #endif
+        lightColor = cLightColor.rgb;
     #endif
 
     #ifdef SPECULAR

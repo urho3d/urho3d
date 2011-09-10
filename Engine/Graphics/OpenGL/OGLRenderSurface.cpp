@@ -87,8 +87,6 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
         return false;
-    if (!graphics->GetRenderTargetSupport())
-        return false;
     
     Release();
     

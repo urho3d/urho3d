@@ -31,13 +31,24 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float2 vOffset = float2(0, cSampleOffsets.y);
     float3 current = Sample(sDiffBuffer, iScreenPos).rgb;
 
+    #ifdef FALLBACK
+        float4 diffInput = Sample(sDetailMap, iScreenPos);
+        float4 normalInput = Sample(sEnvMap, iScreenPos);
+    #endif
+
     // Reconstruct position for this frame's pixel
     #ifdef ORTHO
-        float depth = Sample(sDepthBuffer, iScreenPos).r;
+        #ifdef FALLBACK
+            float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
+        #else
+            float depth = Sample(sDepthBuffer, iScreenPos).r;
+        #endif
         float3 worldPos = lerp(iNearRay, iFarRay, depth) + cCameraPosPS;
     #else
-        #ifdef LINEAR
+        #if defined(LINEAR)
             float depth = Sample(sDepthBuffer, iScreenPos).r;
+        #elif defined(FALLBACK)
+            float depth = DecodeDepth(float2(diffInput.w, normalInput.w));
         #else
             float depth = ReconstructDepth(Sample(sDepthBuffer, iScreenPos).r);
         #endif

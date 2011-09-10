@@ -177,6 +177,7 @@ void View::Update(const FrameInfo& frame)
     occluders_.Clear();
     shadowOccluders_.Clear();
     gBufferQueue_.Clear();
+    gBuffer2Queue_.Clear();
     baseQueue_.Clear();
     extraQueue_.Clear();
     transparentQueue_.Clear();
@@ -393,6 +394,8 @@ void View::GetBatches()
     maxLightsDrawables_.Clear();
     lightQueueIndex_.Clear();
     
+    bool fallback = graphics_->GetFallback();
+    
     // Go through lights
     {
         PROFILE_MULTIPLE(GetLightBatches, lights_.Size());
@@ -576,6 +579,17 @@ void View::GetBatches()
                         renderer_->SetBatchShaders(baseBatch, tech, pass);
                         baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         gBufferQueue_.AddBatch(baseBatch);
+                        
+                        // In fallback mode, add also G-buffer second pass batch
+                        if (fallback)
+                        {
+                            pass = tech->GetPass(PASS_GBUFFER2);
+                            if (pass)
+                            {
+                                renderer_->SetBatchShaders(baseBatch, tech, pass);
+                                gBuffer2Queue_.AddBatch(baseBatch);
+                            }
+                        }
                         
                         // Check also for an additional pass (possibly for emissive)
                         pass = tech->GetPass(PASS_EXTRA);
@@ -775,6 +789,8 @@ void View::RenderBatchesDeferred()
     Texture2D* normalBuffer = graphics_->GetNormalBuffer();
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
     
+    bool fallback = graphics_->GetFallback();
+    
     // Check for temporal antialiasing in deferred mode. Only use it on the main view (null rendertarget)
     bool temporalAA = (!renderTarget_) && (graphics_->GetMultiSample() > 1);
     if (temporalAA)
@@ -799,27 +815,47 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderGBuffer);
         
         graphics_->SetRenderTarget(0, diffBuffer);
-        graphics_->SetDepthStencil(depthBuffer);
         if (graphics_->GetHardwareDepthSupport())
         {
+            graphics_->SetDepthStencil(depthBuffer);
+            graphics_->SetViewport(screenRect_);
             graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
             graphics_->SetRenderTarget(1, normalBuffer);
+            
+            RenderBatchQueue(gBufferQueue_);
         }
-        else
+        else if (!fallback)
         {
+            graphics_->SetDepthStencil(depthStencil_);
+            graphics_->SetViewport(screenRect_);
             graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
             graphics_->SetRenderTarget(1, normalBuffer);
             graphics_->SetRenderTarget(2, depthBuffer);
+            
+            RenderBatchQueue(gBufferQueue_);
         }
-        
-        RenderBatchQueue(gBufferQueue_);
+        else
+        {
+            // Fallback mode: render the G-buffer in 2 passes without MRT
+            graphics_->SetDepthStencil(depthStencil_);
+            graphics_->SetViewport(screenRect_);
+            graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color(0.f, 0.f, 0.f, 1.0f));
+            
+            RenderBatchQueue(gBufferQueue_);
+            
+            graphics_->SetRenderTarget(0, normalBuffer);
+            graphics_->SetViewport(screenRect_);
+            graphics_->Clear(CLEAR_COLOR, Color(0.5f, 0.5f, 0.5f, 1.0f));
+            
+            RenderBatchQueue(gBuffer2Queue_);
+        }
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
         
         // If hardware depth is not available, perform a post-step to initialize the parts of the G-buffer that were not rendered into
         // (it is less expensive than clearing all the buffers in the first place)
-        if (!graphics_->GetHardwareDepthSupport())
+        if (!graphics_->GetHardwareDepthSupport() && !fallback)
         {
             graphics_->SetDepthTest(CMP_LESSEQUAL);
             graphics_->SetDepthWrite(false);
@@ -847,7 +883,10 @@ void View::RenderBatchesDeferred()
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
-        graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
+        if (fallback)
+            graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
+        else
+            graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
         
         String pixelShaderName = "Ambient";
         #ifdef USE_OPENGL
@@ -856,8 +895,10 @@ void View::RenderBatchesDeferred()
         // On OpenGL, set up a stencil operation to reset the stencil during ambient quad rendering
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP);
         #else
-        if (camera_->IsOrthographic() || !graphics_->GetHardwareDepthSupport())
+        if (!fallback && (camera_->IsOrthographic() || !graphics_->GetHardwareDepthSupport()))
             pixelShaderName += "_Linear";
+        else if (fallback)
+            pixelShaderName += "_FB";
         #endif
         
         DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Ambient"), renderer_->GetPixelShader(pixelShaderName),
@@ -961,9 +1002,13 @@ void View::RenderBatchesDeferred()
         {
             vsName += "_Ortho";
             psName += "_Ortho";
+            if (fallback)
+                psName += "FB";
         }
-        else if (!graphics_->GetHardwareDepthSupport())
+        else if (!fallback && !graphics_->GetHardwareDepthSupport())
             psName += "_Linear";
+        else if (fallback)
+            psName += "_FB";
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
@@ -986,7 +1031,13 @@ void View::RenderBatchesDeferred()
         graphics_->SetShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
         graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
         graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
-        graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
+        if (!fallback)
+            graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
+        else
+        {
+            graphics_->SetTexture(TU_DETAIL, graphics_->GetDiffBuffer());
+            graphics_->SetTexture(TU_ENVIRONMENT, graphics_->GetNormalBuffer());
+        }
         
         DrawFullScreenQuad(*camera_, vertexShader, pixelShader, false, shaderParameters_);
         
@@ -1876,6 +1927,7 @@ void View::SortBatches()
     if (mode_ != RENDER_FORWARD)
     {
         gBufferQueue_.SortFrontToBack();
+        gBuffer2Queue_.SortFrontToBack();
         noShadowLightQueue_.SortFrontToBack();
     }
     
@@ -1897,6 +1949,7 @@ void View::PrepareInstancingBuffer()
     unsigned totalInstances = 0;
     
     totalInstances += gBufferQueue_.GetNumInstances(renderer_);
+    totalInstances += gBuffer2Queue_.GetNumInstances(renderer_);
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += extraQueue_.GetNumInstances(renderer_);
     
@@ -1914,6 +1967,7 @@ void View::PrepareInstancingBuffer()
         if (lockedData)
         {
             gBufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            gBuffer2Queue_.SetTransforms(renderer_, lockedData, freeIndex);
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             extraQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
