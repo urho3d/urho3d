@@ -38,6 +38,7 @@ For further reference, see:
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
+For release history and major changes, see \ref History.
 
 \page Credits Credits
 
@@ -83,7 +84,7 @@ Anonymous Pro font by Mark Simonson.
 NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 
 
-\page License
+\page License License
 
 Urho3D %Engine
 Copyright (c) 2008-2011 Lasse &Ouml;&ouml;rni
@@ -94,5 +95,24 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+\page History History
+
+V1.0
+
+- Original release.
+
+V1.1
+
+- %Object and scene model refactoring.
+- Automatic serialization of scene objects via attributes.
+- Added OpenGL and cross-platform support.
+- Switched to kNet library for networking.
+
+V1.11
+
+- Bugfixes and performance optimizations.
+- Added GraphicsTest example from V1.0 (now called TestSceneOld.)
+- Added fallback mode, which is used if multiple render targets or hardware shadow maps are not available.
 
 */

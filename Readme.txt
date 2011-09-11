@@ -121,3 +121,19 @@ obnoxious as the mouse cursor will most probably be hidden.
 To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
 following arguments: Scripts/TestScene.as -w
+
+
+History
+-------
+
+V1.0    - Original release.
+
+V1.1    - Object and scene model refactoring.
+        - Automatic serialization of scene objects via attributes.
+        - Added OpenGL and cross-platform support.
+        - Switched to kNet library for networking.
+
+V1.11   - Bugfixes and performance optimizations.
+        - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
+        - Added fallback mode, which is used if multiple render targets or 
+          hardware shadow maps are not available.
