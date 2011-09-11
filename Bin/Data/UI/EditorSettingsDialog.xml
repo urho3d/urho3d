@@ -1,4 +1,5 @@
 <element type="Window" name="EditorSettingsDialog">
+    <fixedwidth value="400" />
     <movable enable="true" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element>
@@ -19,7 +20,7 @@
             <text value="Near clip distance" />
         </element>
         <element type="LineEdit" name="NearClipEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -29,7 +30,7 @@
             <text value="Far clip distance" />
         </element>
         <element type="LineEdit" name="FarClipEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
          </element>
     </element>
     <element>
@@ -39,7 +40,7 @@
             <text value="Field of view" />
         </element>
         <element type="LineEdit" name="FOVEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -49,7 +50,7 @@
             <text value="Movement speed" />
         </element>
         <element type="LineEdit" name="SpeedEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
@@ -62,7 +63,7 @@
             <text value="New node distance" />
         </element>
         <element type="LineEdit" name="DistanceEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -79,7 +80,7 @@
             <text value="Snap" />
         </element>
         <element type="LineEdit" name="MoveStepEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -96,7 +97,7 @@
             <text value="Snap" />
         </element>
         <element type="LineEdit" name="RotateStepEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -113,7 +114,7 @@
             <text value="Snap" />
         </element>
         <element type="LineEdit" name="ScaleStepEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
         </element>
     </element>
     <element>
@@ -165,7 +166,7 @@
             <text value="High" />
         </element>
         <element type="DropDownList" name="TextureQualityEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
             <popupitem name="TextureLow" />
             <popupitem name="TextureMedium" />
             <popupitem name="TextureHigh" />
@@ -187,7 +188,7 @@
             <text value="High" />
         </element>
         <element type="DropDownList" name="MaterialQualityEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
             <popupitem name="MaterialLow" />
             <popupitem name="MaterialMedium" />
             <popupitem name="MaterialHigh" />
@@ -197,26 +198,52 @@
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
         <element type="Text">
-            <text value="Shadow quality" />
+            <text value="Shadow resolution" />
         </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowsOff">
+        <element type="Text" style="FileSelectorFilterText" name="ShadowResOff">
             <text value="Off" />
         </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowsLow">
-            <text value="Low" />
+        <element type="Text" style="FileSelectorFilterText" name="ShadowResLow">
+            <text value="512x512" />
         </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowsMedium">
-            <text value="Medium" />
+        <element type="Text" style="FileSelectorFilterText" name="ShadowResMedium">
+            <text value="1024x1024" />
         </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowsHigh">
-            <text value="High" />
+        <element type="Text" style="FileSelectorFilterText" name="ShadowResHigh">
+            <text value="2048x2048" />
+        </element>
+        <element type="DropDownList" name="ShadowResolutionEdit">
+            <fixedwidth value="100" />
+            <popupitem name="ShadowResOff" />
+            <popupitem name="ShadowResLow" />
+            <popupitem name="ShadowResMedium" />
+            <popupitem name="ShadowResHigh" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Shadow quality" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality0">
+            <text value="1-tap 16bit" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality1">
+            <text value="1-tap 24bit" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality2">
+            <text value="4-tap 16bit" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality3">
+            <text value="4-tap 24bit" />
         </element>
         <element type="DropDownList" name="ShadowQualityEdit">
-            <fixedwidth value="80" />
-            <popupitem name="ShadowsOff" />
-            <popupitem name="ShadowsLow" />
-            <popupitem name="ShadowsMedium" />
-            <popupitem name="ShadowsHigh" />
+            <fixedwidth value="100" />
+            <popupitem name="ShadowQuality0" />
+            <popupitem name="ShadowQuality1" />
+            <popupitem name="ShadowQuality2" />
+            <popupitem name="ShadowQuality3" />
         </element>
     </element>
     <element>
@@ -226,7 +253,7 @@
             <text value="Max occluder triangles" />
         </element>
         <element type="LineEdit" name="MaxOccluderTrianglesEdit">
-            <fixedwidth value="80" />
+            <fixedwidth value="100" />
          </element>
     </element>
     <element>
@@ -247,16 +274,6 @@
         </element>
         <element type="Text">
             <text value="Dynamic instancing" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="ShadowMapHiresDepthToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Shadow map 24-bit depth" />
         </element>
     </element>
     <element>

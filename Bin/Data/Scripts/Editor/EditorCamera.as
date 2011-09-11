@@ -115,8 +115,11 @@ void UpdateEditorSettingsDialog()
     DropDownList@ materialQualityEdit = settingsDialog.GetChild("MaterialQualityEdit", true);
     materialQualityEdit.selection = renderer.materialQuality;
 
+    DropDownList@ shadowResolutionEdit = settingsDialog.GetChild("ShadowResolutionEdit", true);
+    shadowResolutionEdit.selection = GetShadowResolution();
+
     DropDownList@ shadowQualityEdit = settingsDialog.GetChild("ShadowQualityEdit", true);
-    shadowQualityEdit.selection = GetShadowQuality();
+    shadowQualityEdit.selection = renderer.shadowQuality;
 
     LineEdit@ maxOccluderTrianglesEdit = settingsDialog.GetChild("MaxOccluderTrianglesEdit", true);
     maxOccluderTrianglesEdit.text = String(renderer.maxOccluderTriangles);
@@ -126,9 +129,6 @@ void UpdateEditorSettingsDialog()
 
     CheckBox@ dynamicInstancingToggle = settingsDialog.GetChild("DynamicInstancingToggle", true);
     dynamicInstancingToggle.checked = renderer.dynamicInstancing;
-
-    CheckBox@ shadowMapHiresDepthToggle = settingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
-    shadowMapHiresDepthToggle.checked = renderer.shadowMapHiresDepth;
 
     CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
@@ -159,12 +159,12 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(pickUsingPhysicsToggle, "Toggled", "EditPickUsingPhysics");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
+        SubscribeToEvent(shadowResolutionEdit, "ItemSelected", "EditShadowResolution");
         SubscribeToEvent(shadowQualityEdit, "ItemSelected", "EditShadowQuality");
         SubscribeToEvent(maxOccluderTrianglesEdit, "TextChanged", "EditMaxOccluderTriangles");
         SubscribeToEvent(maxOccluderTrianglesEdit, "TextFinished", "EditMaxOccluderTriangles");
         SubscribeToEvent(specularLightingToggle, "Toggled", "EditSpecularLighting");
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
-        SubscribeToEvent(shadowMapHiresDepthToggle, "Toggled", "EditShadowMapHiresDepth");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         subscribedToCameraEdits = true;
@@ -295,10 +295,16 @@ void EditMaterialQuality(StringHash eventType, VariantMap& eventData)
     renderer.materialQuality = edit.selection;
 }
 
+void EditShadowResolution(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetUIElement();
+    SetShadowResolution(edit.selection);
+}
+
 void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetUIElement();
-    SetShadowQuality(edit.selection);
+    renderer.shadowQuality = edit.selection;
 }
 
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
@@ -313,12 +319,6 @@ void EditSpecularLighting(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     renderer.specularLighting = edit.checked;
-}
-
-void EditShadowMapHiresDepth(StringHash eventType, VariantMap& eventData)
-{
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    renderer.shadowMapHiresDepth = edit.checked;
 }
 
 void EditDynamicInstancing(StringHash eventType, VariantMap& eventData)
@@ -378,10 +378,10 @@ void UpdateStats(float timeStep)
     xText.Resize(8);
     yText.Resize(8);
     zText.Resize(8);
-    
+
     cameraPosText.text = moveModeText[moveMode] + "Updates: " + (runUpdate ? "Running " : "Paused  ") + " Camera pos: " + xText
         + " " + yText + " " + zText + " ";
-    
+
     renderStatsText.size = renderStatsText.minSize;
     cameraPosText.size = cameraPosText.minSize;
 }
@@ -605,7 +605,7 @@ Vector3 GetNewNodePosition()
     return cameraNode.position + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
 }
 
-int GetShadowQuality()
+int GetShadowResolution()
 {
     if (!renderer.drawShadows)
         return 0;
@@ -618,11 +618,11 @@ int GetShadowQuality()
     }
     if (level > 3)
         level = 3;
-    
+
     return level;
 }
 
-void SetShadowQuality(int level)
+void SetShadowResolution(int level)
 {
     if (level <= 0)
     {
