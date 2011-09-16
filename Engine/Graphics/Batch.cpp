@@ -429,8 +429,10 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
         batch.Prepare(graphics, shaderParameters, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
-        Vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();
-        PODVector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
+        // Hack: use a const_cast to avoid dynamic allocation of temp vectors
+        Vector<SharedPtr<VertexBuffer> >& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>
+            (geometry_->GetVertexBuffers());
+        PODVector<unsigned>& elementMasks = const_cast<PODVector<unsigned>&>(geometry_->GetVertexElementMasks());
         vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
         elementMasks.Push(instanceBuffer->GetElementMask());
         
@@ -447,7 +449,12 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
                 // Lock the instance stream buffer and copy the transforms
                 void* data = instanceBuffer->Lock(0, instances, LOCK_DISCARD);
                 if (!data)
+                {
+                    // Remember to remove the instancing buffer and element mask
+                    vertexBuffers.Pop();
+                    elementMasks.Pop();
                     return;
+                }
                 Matrix3x4* dest = (Matrix3x4*)data;
                 for (unsigned i = 0; i < instances; ++i)
                     dest[i] = *instances_[i + startIndex].worldTransform_;
@@ -469,6 +476,10 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
             graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                 geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
         }
+        
+        // Remove the instancing buffer & element mask now
+        vertexBuffers.Pop();
+        elementMasks.Pop();
     }
 }
 
