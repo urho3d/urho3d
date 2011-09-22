@@ -1521,9 +1521,9 @@ void Graphics::SetFillMode(FillMode mode)
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
-     // During some light rendering loops, a full rect is toggled on/off repeatedly.
+    // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
-    if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.y_ >= 1.0f && rect.max_.y_ >= 1.0f)
+    if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.x_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
     
     // Check for illegal rect, disable in that case
