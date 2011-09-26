@@ -104,8 +104,8 @@ void ImportTundraScene(const String&in fileName)
     Node@ zoneNode = editorScene.CreateChild("Zone", useLocalIDs ? LOCAL : REPLICATED);
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000, 1000);
-    zone.ambientColor = Color(0.5, 0.5, 0.5);
-    zone.fogColor = Color(0.5, 0.7, 1.0);
+    zone.ambientColor = Color(0.364, 0.364, 0.364);
+    zone.fogColor = Color(0.707792, 0.770537, 0.831373);
     zone.fogStart = 100.0;
     zone.fogEnd = 500.0;
 
@@ -113,8 +113,9 @@ void ImportTundraScene(const String&in fileName)
     Light@ light = lightNode.CreateComponent("Light");
     lightNode.rotation = Quaternion(60, 30, 0);
     light.lightType = LIGHT_DIRECTIONAL;
+    light.color = Color(0.639, 0.639, 0.639);
     light.castShadows = true;
-    light.shadowCascade = CascadeParameters(3, 0.95, 0.2, 1000000);
+    light.shadowCascade = CascadeParameters(5, 15.0, 50.0, 0.0, 0.9);
 
     // Loop through scene entities
     while (!entityElem.isNull)

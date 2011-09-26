@@ -568,8 +568,7 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
         // Update the offset transform
         if (position_ != Vector3::ZERO || offsetQuaternion != Quaternion::IDENTITY)
         {
-            Vector3 offset = geometryScale_ * position_;
-            
+            Vector3 offset(geometryScale_ * position_);
             dGeomSetOffsetPosition(geometry_, offset.x_, offset.y_, offset.z_);
             dGeomSetOffsetQuaternion(geometry_, offsetQuaternion.GetData());
         }
@@ -580,11 +579,11 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
     {
         // No rigid body. Must update the geometry transform manually
         // Use the target transform in case the node has smoothed motion enabled
-        Matrix3x4 transform = node_->GetWorldTargetTransform();
-        Vector3 nodePos = transform.Translation();
-        Quaternion nodeRot = transform.Rotation();
-        Vector3 geomPos = nodePos + (nodeRot * (geometryScale_ * position_));
-        Quaternion geomRot = nodeRot * offsetQuaternion;
+        Matrix3x4 transform(node_->GetWorldTargetTransform());
+        Vector3 nodePos(transform.Translation());
+        Quaternion nodeRot(transform.Rotation());
+        Vector3 geomPos(nodePos + (nodeRot * (geometryScale_ * position_)));
+        Quaternion geomRot(nodeRot * offsetQuaternion);
         
         dGeomSetPosition(geometry_, geomPos.x_, geomPos.y_, geomPos.z_);
         dGeomSetQuaternion(geometry_, geomRot.GetData());
@@ -741,16 +740,19 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             
             const Vector3* vertices = data->vertexData_;
             const unsigned* indices = data->indexData_;
+            const unsigned* indicesEnd = indices + data->indexCount_;
             
-            for (unsigned i = 0; i < data->indexCount_; i += 3)
+            while (indices < indicesEnd)
             {
-                Vector3 v0 = transform * vertices[indices[i]];
-                Vector3 v1 = transform * vertices[indices[i + 1]];
-                Vector3 v2 = transform * vertices[indices[i + 2]];
+                Vector3 v0 = transform * vertices[indices[0]];
+                Vector3 v1 = transform * vertices[indices[1]];
+                Vector3 v2 = transform * vertices[indices[2]];
                 
                 debug->AddLine(v0, v1, uintColor, depthTest);
                 debug->AddLine(v1, v2, uintColor, depthTest);
                 debug->AddLine(v2, v0, uintColor, depthTest);
+                
+                indices += 3;
             }
         }
         break;

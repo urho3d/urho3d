@@ -1,7 +1,7 @@
 <texture>
-    <address coord="u" mode="clamp" />
-    <address coord="v" mode="clamp" />
-    <mipmap enable="false" />
+    <address coord="u" mode="border" />
+    <address coord="v" mode="border" />
+    <border color="0 0 0 0" />
     <quality low="0" />
 </texture>
 

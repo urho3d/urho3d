@@ -37,9 +37,13 @@ enum LightType
 {
     LIGHT_DIRECTIONAL = 0,
     LIGHT_SPOT,
-    LIGHT_POINT,
-    LIGHT_SPLITPOINT
+    LIGHT_POINT
 };
+
+static const float SHADOW_MIN_QUANTIZE = 0.1f;
+static const float SHADOW_MIN_VIEW = 1.0f;
+static const int MAX_LIGHT_SPLITS = 6;
+static const int MAX_CASCADE_SPLITS = 4;
 
 /// Shadow depth bias parameters.
 struct BiasParameters
@@ -74,25 +78,34 @@ struct CascadeParameters
     }
     
     /// Construct with initial values.
-    CascadeParameters(unsigned splits, float lambda, float splitFadeRange, float shadowRange) :
-        splits_(splits),
-        lambda_(lambda),
-        splitFadeRange_(splitFadeRange),
-        shadowRange_(shadowRange)
+    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart) :
+        fadeStart_(fadeStart)
     {
+        splits_[0] = split1;
+        splits_[1] = split2;
+        splits_[2] = split3;
+        splits_[3] = split4;
     }
     
     /// Validate parameters.
     void Validate();
     
-    /// Number of splits.
-    unsigned splits_;
-    /// Split lambda.
-    float lambda_;
-    /// Fade range between splits.
-    float splitFadeRange_;
-    /// Maximum shadow distance.
-    float shadowRange_;
+    /// Return shadow maximum range.
+    float GetShadowRange() const
+    {
+        float ret = 0.0f;
+        for (unsigned i = 0; i < MAX_CASCADE_SPLITS; ++i)
+            ret = Max(ret, splits_[i]);
+        
+        return ret;
+    }
+    
+    /// Near clip of first split.
+    float start_;
+    /// Far clip values of the splits.
+    float splits_[MAX_CASCADE_SPLITS];
+    /// The point relative to final split far clipwhere fade out begins. (0.0 - 1.0)
+    float fadeStart_;
 };
 
 /// Shadow map focusing parameters.
@@ -104,10 +117,10 @@ struct FocusParameters
     }
     
     /// Construct with initial values.
-    FocusParameters(bool focus, bool nonUniform, bool zoomOut, float quantize, float minView) :
+    FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :
         focus_(focus),
         nonUniform_(nonUniform),
-        zoomOut_(zoomOut),
+        autoSize_(autoSize),
         quantize_(quantize),
         minView_(minView)
     {
@@ -120,6 +133,8 @@ struct FocusParameters
     bool focus_;
     /// Non-uniform focusing flag.
     bool nonUniform_;
+    /// Auto-size (reduce resolution when far away) flag.
+    bool autoSize_;
     /// Zoom out flag.
     bool zoomOut_;
     /// Focus quantization.
@@ -127,11 +142,6 @@ struct FocusParameters
     /// Minimum view size.
     float minView_;
 };
-
-static const float SHADOW_MIN_QUANTIZE = 0.1f;
-static const float SHADOW_MIN_VIEW = 1.0f;
-static const float SHADOW_DEFAULT_NEARCLIP = 0.1f;
-static const int MAX_LIGHT_SPLITS = 6;
 
 /// %Light component.
 class Light : public Drawable
@@ -221,42 +231,10 @@ public:
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     
-    /// %Set near split distance for directional light.
-    void SetNearSplit(float near);
-    /// %Set far split distance for directional light.
-    void SetFarSplit(float far);
-    /// %Set near fade range for directional light.
-    void SetNearFadeRange(float range);
-    /// %Set far fade range for directional light.
-    void SetFarFadeRange(float range);
-    /// %Set shadow camera.
-    void SetShadowCamera(Camera* camera);
-    /// %Set shadow map depth texture.
-    void SetShadowMap(Texture2D* shadowMap);
     /// %Set sort value based on intensity at given world position.
     void SetIntensitySortValue(const Vector3& position, bool forDrawable = false);
-    /// Copy values from another light.
-    void CopyFrom(Light* original);
-    /// Return near split distance.
-    float GetNearSplit() const { return nearSplit_; }
-    /// Return far split distance.
-    float GetFarSplit() const { return farSplit_; }
-    /// Return near fade range.
-    float GetNearFadeRange() const { return nearFadeRange_; }
-    /// Return far fade range.
-    float GetFarFadeRange() const { return farFadeRange_; }
-    /// Return shadow camera. Not safe to dereference outside rendering.
-    Camera* GetShadowCamera() { return shadowCamera_; }
-    /// Return shadow map.
-    Texture2D* GetShadowMap() const { return shadowMap_; }
-    /// Return original light (split lights only.)
-    Light* GetOriginalLight() const { return originalLight_; }
-    /// Return volume safety extent of spot or point light.
-    float GetVolumeExtent() const;
-    /// Return directional light quad transform for either near or far split.
-    Matrix3x4 GetDirLightTransform(Camera& camera, bool getNearQuad = false);
-    /// Return light volume model transform. For directional lights, the view transform must be overridden.
-    const Matrix3x4& GetVolumeTransform(Camera& camera);
+    /// Return light volume model transform.
+    const Matrix3x4& GetVolumeTransform();
     
     /// %Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);
@@ -302,22 +280,8 @@ private:
     float shadowResolution_;
     /// Shadow camera near/far clip distance ratio.
     float shadowNearFarRatio_;
-    /// Directional light near split distance.
-    float nearSplit_;
-    /// Directional light far split distance.
-    float farSplit_;
-    /// Directional light near fade range.
-    float nearFadeRange_;
-    /// Directional light far fade range.
-    float farFadeRange_;
     /// Range attenuation texture.
     SharedPtr<Texture> rampTexture_;
     /// Spotlight attenuation texture.
     SharedPtr<Texture> shapeTexture_;
-    /// Shadow camera.
-    Camera* shadowCamera_;
-    /// Shadow map.
-    Texture2D* shadowMap_;
-    /// Original light for splitting.
-    Light* originalLight_;
 };

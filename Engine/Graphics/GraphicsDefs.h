@@ -26,13 +26,6 @@
 #include "HashBase.h"
 #include "StringHash.h"
 
-/// Rendering mode.
-enum RenderMode
-{
-    RENDER_FORWARD = 0,
-    RENDER_DEFERRED
-};
-
 /// Primitive type.
 enum PrimitiveType
 {
@@ -172,8 +165,6 @@ enum TextureUsage
 /// Rendering passes.
 enum PassType
 {
-    PASS_GBUFFER,
-    PASS_GBUFFER2,
     PASS_BASE,
     PASS_LITBASE,
     PASS_LIGHT,
@@ -206,8 +197,10 @@ extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
 extern StringHash VSP_DEPTHMODE;
 extern StringHash VSP_ELAPSEDTIME;
-extern StringHash VSP_FRUSTUMSIZE;
-extern StringHash VSP_GBUFFEROFFSETS;
+extern StringHash VSP_LIGHTATTEN;
+extern StringHash VSP_LIGHTDIR;
+extern StringHash VSP_LIGHTPOS;
+extern StringHash VSP_LIGHTVECROT;
 extern StringHash VSP_MODEL;
 extern StringHash VSP_SHADOWPROJ;
 extern StringHash VSP_SPOTPROJ;
@@ -218,45 +211,35 @@ extern StringHash VSP_VIEWRIGHTVECTOR;
 extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_SKINMATRICES;
 extern StringHash PSP_AMBIENTCOLOR;
-extern StringHash PSP_ANTIALIASWEIGHTS;
-extern StringHash PSP_CAMERAPOS;
-extern StringHash PSP_DEPTHRECONSTRUCT;
 extern StringHash PSP_ELAPSEDTIME;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
-extern StringHash PSP_GBUFFEROFFSETS;
-extern StringHash PSP_LIGHTATTEN;
 extern StringHash PSP_LIGHTCOLOR;
-extern StringHash PSP_LIGHTDIR;
-extern StringHash PSP_LIGHTPOS;
-extern StringHash PSP_LIGHTSPLITS;
-extern StringHash PSP_LIGHTVECROT;
 extern StringHash PSP_MATDIFFCOLOR;
 extern StringHash PSP_MATEMISSIVECOLOR;
 extern StringHash PSP_MATSPECPROPERTIES;
 extern StringHash PSP_SAMPLEOFFSETS;
+extern StringHash PSP_SHADOWCUBEADJUST;
+extern StringHash PSP_SHADOWCUBEPROJ;
+extern StringHash PSP_SHADOWFADE;
 extern StringHash PSP_SHADOWINTENSITY;
-extern StringHash PSP_SHADOWPROJ;
-extern StringHash PSP_SPOTPROJ;
-extern StringHash PSP_VIEWPROJ;
+extern StringHash PSP_SHADOWSPLITS;
 
 /// Texture units.
 enum TextureUnit
 {
     TU_DIFFUSE = 0,
     TU_NORMAL = 1,
-    TU_SPECULAR = 2,
+    TU_EMISSIVE = 2,
     TU_DETAIL = 3,
     TU_ENVIRONMENT = 4,
-    TU_EMISSIVE = 5,
     MAX_MATERIAL_TEXTURE_UNITS = 6,
-    TU_DIFFBUFFER = 0,
-    TU_NORMALBUFFER = 1,
-    TU_DEPTHBUFFER = 2,
-    TU_SHADOWMAP = 5,
-    TU_LIGHTRAMP = 6,
-    TU_LIGHTSPOT = 7,
-    MAX_TEXTURE_UNITS = 8
+    TU_SHADOWMAP = 6,
+    TU_LIGHTRAMP = 7,
+    TU_LIGHTSPOT = 8,
+    TU_FACESELECT = 9,
+    TU_INDIRECTION = 10,
+    MAX_TEXTURE_UNITS = 16
 };
 
 static const int QUALITY_LOW = 0;

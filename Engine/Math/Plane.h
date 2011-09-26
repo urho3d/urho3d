@@ -61,7 +61,7 @@ public:
         
         normal_ = (dist1.CrossProduct(dist2)).Normalized();
         absNormal_ = Vector3(fabsf(normal_.x_), fabsf(normal_.y_), fabsf(normal_.z_));
-        intercept_ = -normal_.DotProduct(v0);
+        intercept_ = normal_.DotProduct(v0);
     }
 
     /// Define from a normal and a point.
@@ -69,20 +69,11 @@ public:
     {
         normal_ = normal;
         absNormal_ = Vector3(fabsf(normal_.x_), fabsf(normal_.y_), fabsf(normal_.z_));
-        intercept_ = -normal_.DotProduct(point);
+        intercept_ = normal_.DotProduct(point);
     }
     
     /// Return distance to a point.
-    float Distance(const Vector3& point) const { return normal_.DotProduct(point) + intercept_; }
-    /// Return absolute distance to a point.
-    float AbsDistance(const Vector3& point) const { return normal_.AbsDotProduct(point); }
-    
-    /// Return absolute distance to a point which has only positive coordinates.
-    float AbsDistanceFast(const Vector3& absPoint) const
-    {
-        // Point must contain only positive X, Y, Z
-        return absNormal_.DotProduct(absPoint);
-    }
+    float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     
     /// Plane normal.
     Vector3 normal_;

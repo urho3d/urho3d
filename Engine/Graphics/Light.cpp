@@ -37,8 +37,7 @@ static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_FOV = 30.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
-static const float DEFAULT_LAMBDA = 0.5f;
-static const float DEFAULT_SHADOWFADERANGE = 0.2f;
+static const float DEFAULT_SHADOWFADESTART = 0.8f;
 static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
@@ -48,7 +47,6 @@ static const String typeNames[] =
     "Directional",
     "Spot",
     "Point",
-    "SplitPoint",
     ""
 };
 
@@ -60,10 +58,9 @@ void BiasParameters::Validate()
 
 void CascadeParameters::Validate()
 {
-    splits_ = Clamp(splits_, 1, MAX_LIGHT_SPLITS);
-    lambda_ = Clamp(lambda_, 0.0f, 1.0f);
-    splitFadeRange_ = Clamp(splitFadeRange_, M_EPSILON, 0.5f);
-    shadowRange_ = Max(shadowRange_, M_EPSILON);
+    for (unsigned i = 0; i < MAX_CASCADE_SPLITS; ++i)
+        splits_[i] = Max(splits_[i], 0.0f);
+    fadeStart_ = Clamp(fadeStart_, M_EPSILON, 1.0f);
 }
 
 void FocusParameters::Validate()
@@ -84,18 +81,11 @@ Light::Light(Context* context) :
     fadeDistance_(0.0f),
     shadowFadeDistance_(0.0f),
     shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
-    shadowCascade_(CascadeParameters(1, DEFAULT_LAMBDA, DEFAULT_SHADOWFADERANGE, M_LARGE_VALUE)),
+    shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     shadowIntensity_(0.0f),
     shadowResolution_(1.0f),
-    shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
-    nearSplit_(0.0f),
-    farSplit_(M_LARGE_VALUE),
-    nearFadeRange_(M_EPSILON),
-    farFadeRange_(M_EPSILON),
-    shadowCamera_(0),
-    shadowMap_(0),
-    originalLight_(0)
+    shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO)
 {
     drawableFlags_ =  DRAWABLE_LIGHT;
 }
@@ -127,13 +117,14 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_INT, "CSM Splits", shadowCascade_.splits_, 1, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Lambda", shadowCascade_.lambda_, DEFAULT_LAMBDA, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Range", shadowCascade_.splitFadeRange_, DEFAULT_SHADOWFADERANGE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Max Range", shadowCascade_.shadowRange_, M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 1 End", shadowCascade_.splits_[0], M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 2 End", shadowCascade_.splits_[1], M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 3 End", shadowCascade_.splits_[2], M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 4 End", shadowCascade_.splits_[3], M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Focus Shadow Map", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Allow Non-uniform", shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Allow Zoom-out", shadowFocus_.zoomOut_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Auto-Size Shadow MAp", shadowFocus_.autoSize_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
@@ -152,10 +143,12 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         shadowBias_.Validate();
         break;
     
+    case offsetof(Light, shadowCascade_.start_):
     case offsetof(Light, shadowCascade_.splits_):
-    case offsetof(Light, shadowCascade_.lambda_):
-    case offsetof(Light, shadowCascade_.splitFadeRange_):
-    case offsetof(Light, shadowCascade_.shadowRange_):
+    case offsetof(Light, shadowCascade_.splits_) + sizeof(float):
+    case offsetof(Light, shadowCascade_.splits_) + sizeof(float) * 2:
+    case offsetof(Light, shadowCascade_.splits_) + sizeof(float) * 3:
+    case offsetof(Light, shadowCascade_.fadeStart_):
         shadowCascade_.Validate();
         break;
         
@@ -271,7 +264,7 @@ void Light::SetShadowIntensity(float intensity)
 
 void Light::SetShadowResolution(float resolution)
 {
-    shadowResolution_ = Clamp(resolution, 0.25f, 1.0f);
+    shadowResolution_ = Clamp(resolution, 0.125f, 1.0f);
 }
 
 void Light::SetRampTexture(Texture* texture)
@@ -284,34 +277,6 @@ void Light::SetShapeTexture(Texture* texture)
     shapeTexture_ = texture;
 }
 
-void Light::CopyFrom(Light* original)
-{
-    node_->SetTransform(original->GetWorldPosition(), original->GetWorldRotation(), original->GetWorldScale());
-    castShadows_ = original->castShadows_;
-    drawDistance_ = original->drawDistance_;
-    shadowDistance_ = original->shadowDistance_;
-    viewMask_ = original->viewMask_;
-    lightMask_ = original->lightMask_;
-    distance_ = original->distance_;
-    lightType_ = original->lightType_;
-    range_ = original->range_;
-    fov_ = original->fov_;
-    aspectRatio_ = original->aspectRatio_;
-    color_ = original->color_;
-    specularIntensity_ = original->specularIntensity_;
-    fadeDistance_ = original->fadeDistance_;
-    shadowBias_ = original->shadowBias_;
-    shadowCascade_ = original->shadowCascade_;
-    shadowFocus_ = original->shadowFocus_;
-    shadowFadeDistance_ = original->shadowFadeDistance_;
-    shadowIntensity_ = original->shadowIntensity_;
-    shadowResolution_ = original->shadowResolution_;
-    shadowNearFarRatio_ = original->shadowNearFarRatio_;
-    rampTexture_ = original->rampTexture_;
-    shapeTexture_ = original->shapeTexture_;
-    originalLight_ = original;
-}
-
 Frustum Light::GetFrustum() const
 {
     const Matrix3x4& transform = GetWorldTransform();
@@ -321,68 +286,12 @@ Frustum Light::GetFrustum() const
     return ret;
 }
 
-float Light::GetVolumeExtent() const
-{
-    switch (lightType_)
-    {
-    case LIGHT_POINT:
-        return range_ * 1.36f;
-        
-    case LIGHT_SPOT:
-        {
-            float safeRange = range_ * 1.001f;
-            float yScale = tanf(fov_ * M_DEGTORAD * 0.5f) * safeRange;
-            float xScale = aspectRatio_ * yScale;
-            return sqrtf(xScale * xScale + yScale * yScale + safeRange * safeRange);
-        }
-        
-    case LIGHT_SPLITPOINT:
-        {
-            float safeRange = range_ * 1.001f;
-            return sqrtf(3.0f * safeRange * safeRange);
-        }
-        
-    default:
-        return M_LARGE_VALUE;
-    }
-}
-
-Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
-{
-    Vector3 nearVector, farVector;
-    camera.GetFrustumSize(nearVector, farVector);
-    float nearClip = camera.GetNearClip();
-    float farClip = camera.GetFarClip();
-    
-    float distance;
-    
-    if (getNearQuad)
-        distance = Max(nearSplit_ - nearFadeRange_, nearClip);
-    else
-        distance = Min(farSplit_, farClip);
-    
-    if (!camera.IsOrthographic())
-        farVector *= (distance / farClip);
-    else
-        farVector.z_ *= (distance / farClip);
-    
-    // Set an epsilon from clip planes due to possible inaccuracy
-    /// \todo Rather set an identity projection matrix
-    farVector.z_ = Clamp(farVector.z_, (1.0f + M_LARGE_EPSILON) * nearClip, (1.0f - M_LARGE_EPSILON) * farClip);
-    
-    return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
-}
-
-const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
+const Matrix3x4& Light::GetVolumeTransform()
 {
     const Matrix3x4& transform = GetWorldTransform();
     
     switch (lightType_)
     {
-    case LIGHT_DIRECTIONAL:
-        volumeTransform_ = GetDirLightTransform(camera);
-        break;
-        
     case LIGHT_POINT:
         volumeTransform_ = Matrix3x4(transform.Translation(), Quaternion::IDENTITY, range_);
         break;
@@ -393,10 +302,6 @@ const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
             float xScale = aspectRatio_ * yScale;
             volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), Vector3(xScale, yScale, range_));
         }
-        break;
-        
-    case LIGHT_SPLITPOINT:
-        volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), range_);
         break;
     }
     
@@ -443,41 +348,10 @@ void Light::OnWorldBoundingBoxUpdate()
         break;
         
     case LIGHT_SPOT:
-    case LIGHT_SPLITPOINT:
         // Frustum is already transformed into world space
         worldBoundingBox_.Define(GetFrustum());
         break;
     }
-}
-
-void Light::SetNearSplit(float nearSplit)
-{
-    nearSplit_ = Max(nearSplit, 0.0f);
-}
-
-void Light::SetFarSplit(float farSplit)
-{
-    farSplit_ = Max(farSplit, 0.0f);
-}
-
-void Light::SetNearFadeRange(float range)
-{
-    nearFadeRange_ = Max(range, M_EPSILON);
-}
-
-void Light::SetFarFadeRange(float range)
-{
-    farFadeRange_ = Max(range, M_EPSILON);
-}
-
-void Light::SetShadowCamera(Camera* camera)
-{
-    shadowCamera_ = camera;
-}
-
-void Light::SetShadowMap(Texture2D* shadowMap)
-{
-    shadowMap_ = shadowMap;
 }
 
 void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)

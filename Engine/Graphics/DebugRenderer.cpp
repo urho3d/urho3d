@@ -30,6 +30,7 @@
 #include "DebugRenderer.h"
 #include "Graphics.h"
 #include "Light.h"
+#include "Polyhedron.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
@@ -60,7 +61,7 @@ void DebugRenderer::SetView(Camera* camera)
         return;
     
     view_ = camera->GetInverseWorldTransform();
-    projection_ = camera->GetProjection(false);
+    projection_ = camera->GetProjection();
     frustum_ = camera->GetFrustum();
 }
 
@@ -117,14 +118,14 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
     
-    Vector3 v0(transform * Vector3(min.x_, min.y_, min.z_));
+    Vector3 v0(transform * min);
     Vector3 v1(transform * Vector3(max.x_, min.y_, min.z_));
     Vector3 v2(transform * Vector3(max.x_, max.y_, min.z_));
     Vector3 v3(transform * Vector3(min.x_, max.y_, min.z_));
     Vector3 v4(transform * Vector3(min.x_, min.y_, max.z_));
     Vector3 v5(transform * Vector3(max.x_, min.y_, max.z_));
     Vector3 v6(transform * Vector3(max.x_, max.y_, max.z_));
-    Vector3 v7(transform * Vector3(min.x_, max.y_, max.z_));
+    Vector3 v7(transform * max);
     
     unsigned uintColor = color.ToUInt();
     
@@ -144,6 +145,25 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     dest->Push(DebugLine(v1, v5, uintColor));
     dest->Push(DebugLine(v2, v6, uintColor));
     dest->Push(DebugLine(v3, v7, uintColor));
+}
+
+void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
+{
+    unsigned uintColor = color.ToUInt();
+    
+    PODVector<DebugLine>* dest = &lines_;
+    if (!depthTest)
+        dest = &noDepthLines_;
+    
+    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    {
+        const Vector<Vector3>& face = poly.faces_[i];
+        if (face.Size() >= 3)
+        {
+            for (unsigned j = 0; j < face.Size(); ++j)
+                dest->Push(DebugLine(face[j], face[(j + 1) % face.Size()], uintColor));
+        }
+    }
 }
 
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)

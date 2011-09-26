@@ -92,7 +92,7 @@ void InitScene()
     PhysicsWorld@ world = testScene.CreateComponent("PhysicsWorld");
     testScene.CreateComponent("Octree");
     testScene.CreateComponent("DebugRenderer");
-    
+
     testScene.RegisterVar("Score");
     testScene.RegisterVar("Health");
 
@@ -118,7 +118,7 @@ void InitScene()
         light.lightType = LIGHT_DIRECTIONAL;
         light.castShadows = true;
         light.shadowBias = BiasParameters(0.0001, 0.5);
-        light.shadowCascade = CascadeParameters(3, 0.90, 0.15, 200.0);
+        light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8);
         light.specularIntensity = 0.5f;
     }
 
@@ -241,25 +241,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress['1'])
         {
-            int nextRenderMode = graphics.renderMode;
-            if (input.keyDown[KEY_LSHIFT])
-            {
-                --nextRenderMode;
-                if (nextRenderMode < 0)
-                    nextRenderMode = 1;
-            }
-            else
-            {
-                ++nextRenderMode;
-                if (nextRenderMode > 1)
-                    nextRenderMode = 0;
-            }
-
-            graphics.SetMode(RenderMode(nextRenderMode));
-        }
-
-        if (input.keyPress['2'])
-        {
             int quality = renderer.textureQuality;
             ++quality;
             if (quality > 2)
@@ -267,7 +248,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.textureQuality = quality;
         }
 
-        if (input.keyPress['3'])
+        if (input.keyPress['2'])
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -276,13 +257,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.materialQuality = quality;
         }
 
-        if (input.keyPress['4'])
+        if (input.keyPress['3'])
             renderer.specularLighting = !renderer.specularLighting;
 
-        if (input.keyPress['5'])
+        if (input.keyPress['4'])
             renderer.drawShadows = !renderer.drawShadows;
 
-        if (input.keyPress['6'])
+        if (input.keyPress['5'])
         {
             int size = renderer.shadowMapSize;
             size *= 2;
@@ -291,18 +272,21 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.shadowMapSize = size;
         }
 
-        if (input.keyPress['7'])
+        if (input.keyPress['6'])
             renderer.shadowQuality = renderer.shadowQuality + 1;
 
-        if (input.keyPress['8'])
+        if (input.keyPress['7'])
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
         
-        if (input.keyPress['9'])
+        if (input.keyPress['8'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
+
+        if (input.keyPress['9'])
+            renderer.lightStencilMasking = !renderer.lightStencilMasking;
 
         if (input.keyPress[' '])
         {

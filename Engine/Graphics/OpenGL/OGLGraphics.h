@@ -64,12 +64,10 @@ public:
     
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
-    /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA.
-    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
+    /// Set screen mode.
+    bool SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only.
     bool SetMode(int width, int height);
-    /// Set rendering mode only.
-    bool SetMode(RenderMode mode);
     /// Toggle between full screen and windowed mode.
     bool ToggleFullscreen();
     /// Close the window.
@@ -156,8 +154,6 @@ public:
     void SetDepthStencil(Texture2D* depthTexture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
-    /// Set deferred rendering destination render target to prevent sampling from it during G-buffer rendering.
-    void SetViewTexture(Texture* texture);
     /// Set alpha test.
     void SetAlphaTest(bool enable, CompareMode mode = CMP_ALWAYS, float alphaRef = 0.5f);
     /// Set blending mode.
@@ -209,8 +205,6 @@ public:
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
-    /// Return rendering mode.
-    RenderMode GetRenderMode() const { return mode_; }
     /// Return window width.
     int GetWidth() const { return width_; }
     /// Return window height.
@@ -245,8 +239,6 @@ public:
     bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
-    /// Return whether the hardware depth buffer can be sampled. Always true on OpenGL.
-    bool GetHardwareDepthSupport() const { return true; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether 24-bit shadow maps are supported. Assume true on OpenGL.
@@ -273,8 +265,6 @@ public:
     const String& GetTextureUnitName(TextureUnit unit);
     /// Return texture by texture unit index.
     Texture* GetTexture(unsigned index) const;
-    /// Return deferred rendering destination render target.
-    Texture* GetViewTexture() const { return viewTexture_; }
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
     /// Return render target by index.
@@ -329,14 +319,6 @@ public:
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
     /// Return render target width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return diffuse buffer for deferred rendering.
-    Texture2D* GetDiffBuffer() const { return diffBuffer_; }
-    /// Return normal buffer for deferred rendering.
-    Texture2D* GetNormalBuffer() const { return normalBuffer_; }
-    /// Return depth buffer for deferred rendering. If reading hardware depth is supported, return a depth texture.
-    Texture2D* GetDepthBuffer() const { return depthBuffer_; }
-    /// Return screen buffer for post-processing.
-    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffers_[index]; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -353,24 +335,12 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific deferred rendering depth texture format.
+    /// Return the API-specific depth texture format.
     static unsigned GetDepthFormat();
     /// Return the API-specific depth stencil texture format.
     static unsigned GetDepthStencilFormat();
     
 private:
-    /// Create the application window. Return true if successful.
-    bool OpenWindow(int width, int height);
-    /// Get the pixel format for a given multisample level. Return nonzero if successful.
-    int GetPixelFormat(RenderMode mode, int multiSample);
-    /// Change to a fullscreen mode. Return true if successful.
-    bool SetScreenMode(int newWidth, int newHeight);
-    /// Restore desktop mode.
-    void RestoreScreenMode();
-    /// Adjust the window for new resolution and fullscreen mode.
-    void AdjustWindow(int newWidth, int newHeight, bool newFullscreen);
-    /// Create deferred rendering render targets.
-    void CreateRenderTargets();
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Set draw buffer(s) on the FBO.
@@ -384,8 +354,6 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-    /// Rendering mode.
-    RenderMode mode_;
     /// Window width.
     int width_;
     /// Window height.
@@ -422,14 +390,6 @@ private:
     unsigned immediateElementOffsets_[MAX_IMMEDIATE_ELEMENTS];
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
-    /// Deferred rendering diffuse buffer.
-    SharedPtr<Texture2D> diffBuffer_;
-    /// Deferred rendering normal buffer.
-    SharedPtr<Texture2D> normalBuffer_;
-    /// Deferred rendering depth buffer.
-    SharedPtr<Texture2D> depthBuffer_;
-    /// Screen buffers for post processing.
-    SharedPtr<Texture2D> screenBuffers_[NUM_SCREEN_BUFFERS];
     /// Shadow map depth texture format.
     unsigned shadowMapFormat_;
     /// Shadow map 24-bit depth texture format.
@@ -454,8 +414,6 @@ private:
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// OpenGL texture types in use.
     unsigned textureTypes_[MAX_TEXTURE_UNITS];
-    /// Deferred rendering destination render target.
-    Texture* viewTexture_;
     /// Texture unit mappings.
     Map<String, TextureUnit> textureUnits_;
     /// Render targets in use.

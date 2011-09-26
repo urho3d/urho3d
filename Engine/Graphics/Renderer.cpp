@@ -52,20 +52,6 @@
 
 #include "DebugNew.h"
 
-static const float dirLightVertexData[] =
-{
-    -1, 1, 0,
-    1, 1, 0,
-    1, -1, 0,
-    -1, -1, 0,
-};
-
-static const unsigned short dirLightIndexData[] =
-{
-    0, 1, 2,
-    2, 3, 0,
-};
-
 static const float pointLightVertexData[] =
 {
     -0.423169f, -1.000000f, 0.423169f,
@@ -144,15 +130,14 @@ static const unsigned short pointLightIndexData[] =
 
 static const float spotLightVertexData[] =
 {
-    // Use slightly clamped Z-range so that shadowed point light splits line up nicely
-    0.00001f, 0.00001f, 0.00001f,
-    0.00001f, -0.00001f, 0.00001f,
-    -0.00001f, -0.00001f, 0.00001f,
-    -0.00001f, 0.00001f, 0.00001f,
-    1.00000f, 1.00000f, 0.99999f,
-    1.00000f, -1.00000f, 0.99999f,
-    -1.00000f,  -1.00000f, 0.99999f,
-    -1.00000f, 1.00000f, 0.99999f,
+    0.001f, 0.001f, 0.001f,
+    0.001f, -0.001f, 0.001f,
+    -0.001f, -0.001f, 0.001f,
+    -0.001f, 0.001f, 0.001f,
+    1.0f, 1.0f, 1.0f,
+    1.0f, -1.0f, 1.0f,
+    -1.0f,  -1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
 };
 
 static const unsigned short spotLightIndexData[] =
@@ -180,7 +165,7 @@ static const String shadowVariations[] =
     "",
     ""
     #else
-    "LQ",
+    "",
     "LQHW",
     "",
     "HW"
@@ -191,18 +176,6 @@ static const String fallbackVariations[] =
 {
     "",
     "FB"
-};
-
-static const String linearVariations[] =
-{
-    "",
-    "Linear"
-};
-
-static const String depthVariations[] =
-{
-    "",
-    "Depth"
 };
 
 static const String geometryVSVariations[] =
@@ -216,17 +189,21 @@ static const String geometryVSVariations[] =
 static const String lightVSVariations[] =
 {
     "",
-    "Spot",
-    "Shadow",
-    "SpotShadow"
-};
-
-static const String deferredLightVSVariations[] =
-{
-    "",
     "Dir",
-    "Ortho",
-    "OrthoDir"
+    "Spot",
+    "Point",
+    "Spec",
+    "DirSpec",
+    "SpotSpec",
+    "PointSpec",
+    "Shadow",
+    "DirShadow",
+    "SpotShadow",
+    "PointShadow",
+    "SpcShadow",
+    "DirSpecShadow",
+    "SpotSpecShadow",
+    "PointSpecShadow"
 };
 
 static const String lightPSVariations[] = 
@@ -246,23 +223,7 @@ static const String lightPSVariations[] =
     "PointShadow",
     "PointShadowSpec",
     "PointMaskShadow",
-    "PointMaskShadowSpec",
-    "OrthoDir",
-    "OrthoDirSpec",
-    "OrthoSpot",
-    "OrthoSpotSpec",
-    "OrthoPoint",
-    "OrthoPointSpec",
-    "OrthoPointMask",
-    "OrthoPointMaskSpec",
-    "OrthoDirShadow",
-    "OrthoDirShadowSpec",
-    "OrthoSpotShadow",
-    "OrthoSpotShadowSpec",
-    "OrthoPointShadow",
-    "OrthoPointShadowSpec",
-    "OrthoPointMaskShadow",
-    "OrthoPointMaskShadowSpec"
+    "PointMaskShadowSpec"
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
@@ -275,33 +236,31 @@ Renderer::Renderer(Context* context) :
     defaultZone_(new Zone(context)),
     numViews_(0),
     numShadowCameras_(0),
-    numSplitLights_(0),
     numTempNodes_(0),
-    specularLighting_(true),
-    drawShadows_(true),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
-    reuseShadowMaps_(true),
-    dynamicInstancing_(true),
+    maxShadowMaps_(1),
+    maxShadowCascades_(MAX_CASCADE_SPLITS),
     minInstanceGroupSize_(4),
     maxInstanceTriangles_(500),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
+    specularLighting_(true),
+    drawShadows_(true),
+    reuseShadowMaps_(true),
+    lightStencilMasking_(true),
+    dynamicInstancing_(true),
     shadersDirty_(true),
     initialized_(false)
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
-    
-    // Default to one of each shadow map resolution
-    for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-        shadowMaps_[i].Resize(1);
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -332,17 +291,6 @@ void Renderer::SetSpecularLighting(bool enable)
     specularLighting_ = enable;
 }
 
-void Renderer::SetDrawShadows(bool enable)
-{
-    if (!graphics_)
-        return;
-    
-    drawShadows_ = enable;
-    
-    if (!CreateShadowMaps())
-        drawShadows_ = false;
-}
-
 void Renderer::SetTextureAnisotropy(int level)
 {
     textureAnisotropy_ = Max(level, 1);
@@ -371,18 +319,26 @@ void Renderer::SetMaterialQuality(int quality)
     ResetViews();
 }
 
+void Renderer::SetDrawShadows(bool enable)
+{
+    if (!graphics_)
+        return;
+    
+    drawShadows_ = enable;
+    if (!drawShadows_)
+        ResetShadowMaps();
+}
+
 void Renderer::SetShadowMapSize(int size)
 {
     if (!graphics_)
         return;
     
-    shadowMapSize_ = Max(size, SHADOW_MIN_PIXELS);
-    
-    if (!CreateShadowMaps())
+    size = NextPowerOfTwo(Max(size, SHADOW_MIN_PIXELS));
+    if (size != shadowMapSize_)
     {
-        shadowMapSize_ = 1024;
-        if (!CreateShadowMaps())
-            drawShadows_ = false;
+        shadowMapSize_ = size;
+        ResetShadowMaps();
     }
 }
 
@@ -399,8 +355,7 @@ void Renderer::SetShadowQuality(int quality)
     {
         shadowQuality_ = quality;
         shadersDirty_ = true;
-        if (!CreateShadowMaps())
-            drawShadows_ = false;
+        ResetShadowMaps();
     }
 }
 
@@ -410,23 +365,35 @@ void Renderer::SetReuseShadowMaps(bool enable)
         return;
     
     reuseShadowMaps_ = enable;
-    if (reuseShadowMaps_)
-    {
-        for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-            shadowMaps_[i].Resize(1);
-    }
-    if (!CreateShadowMaps())
-        drawShadows_ = false;
-    shadersDirty_ = true;
 }
 
-void Renderer::SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter)
+void Renderer::SetMaxShadowMaps(int shadowMaps)
 {
-    shadowMaps_[0].Resize(full ? full : 1);
-    shadowMaps_[1].Resize(half ? half : 1);
-    shadowMaps_[2].Resize(quarter ? quarter : 1);
-    if (!CreateShadowMaps())
-        drawShadows_ = false;
+    if (shadowMaps < 1)
+        return;
+    
+    maxShadowMaps_ = shadowMaps;
+    for (HashMap<int, Vector<SharedPtr<Texture2D> > >::Iterator i = shadowMaps_.Begin(); i != shadowMaps_.End(); ++i)
+    {
+        if ((int)i->second_.Size() > maxShadowMaps_)
+            i->second_.Resize(maxShadowMaps_);
+    }
+}
+
+void Renderer::SetMaxShadowCascades(int cascades)
+{
+    cascades = Clamp(cascades, 1, MAX_CASCADE_SPLITS);
+    
+    if (cascades != maxShadowCascades_)
+    {
+        maxShadowCascades_ = cascades;
+        ResetShadowMaps();
+    }
+}
+
+void Renderer::SetLightStencilMasking(bool enable)
+{
+    lightStencilMasking_ = enable;
 }
 
 void Renderer::SetDynamicInstancing(bool enable)
@@ -491,13 +458,13 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
 
 unsigned Renderer::GetNumLights(bool allViews) const
 {
-    unsigned nulights_ = 0;
+    unsigned numLights = 0;
     unsigned lastView = allViews ? numViews_ : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        nulights_ += views_[i]->GetLights().Size();
+        numLights += views_[i]->GetLights().Size();
     
-    return nulights_;
+    return numLights;
 }
 
 unsigned Renderer::GetNumShadowMaps(bool allViews) const
@@ -511,8 +478,7 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
         
         for (unsigned j = 0; j < lightQueues.Size(); ++j)
         {
-            Light* light = lightQueues[j].light_;
-            if (light && light->GetShadowMap())
+            if (lightQueues[j].shadowMap_)
                 ++numShadowMaps;
         }
     }
@@ -577,7 +543,6 @@ void Renderer::Update(float timeStep)
     frame_.timeStep_ = timeStep;
     frame_.camera_ = 0;
     numShadowCameras_ = 0;
-    numSplitLights_ = 0;
     numTempNodes_ = 0;
     updateOctrees_.Clear();
     
@@ -739,14 +704,11 @@ void Renderer::Initialize()
     #endif
     
     defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
-    defaultLightSpot = cache->GetResource<Texture2D>("Textures/Spot.png");
+    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
     defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
     
     CreateGeometries();
     CreateInstancingBuffer();
-    
-    if (!CreateShadowMaps())
-        drawShadows_ = false;
     
     viewports_.Resize(1);
     ResetViews();
@@ -819,45 +781,165 @@ OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOcc
 
 Geometry* Renderer::GetLightGeometry(Light* light)
 {
-    switch (light->GetLightType())
-    {
-    case LIGHT_POINT:
-        return pointLightGeometry_;
-        
-    case LIGHT_SPOT:
-    case LIGHT_SPLITPOINT:
+    LightType type = light->GetLightType();
+    if (type == LIGHT_SPOT)
         return spotLightGeometry_;
-        
-    default:
-        return dirLightGeometry_;
-    }
-}
-
-Texture2D* Renderer::GetShadowMap(float resolution)
-{
-    unsigned index = 0;
-    if (resolution < 0.75f)
-        index = (resolution >= 0.375f) ? 1 : 2;
-    
-    if (reuseShadowMaps_)
-        return shadowMaps_[index][0];
+    else if (type == LIGHT_POINT)
+        return pointLightGeometry_;
     else
-    {
-        // If higher resolution shadow maps already used up, fall back to lower resolutions
-        while (index < NUM_SHADOWMAP_RESOLUTIONS)
-        {
-            if (shadowMapUseCount_[index] < shadowMaps_[index].Size())
-                return shadowMaps_[index][shadowMapUseCount_[index]++];
-            ++index;
-        }
         return 0;
-    }
 }
 
-void Renderer::ResetShadowMapUseCount()
+Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
 {
-    for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-        shadowMapUseCount_[i] = 0;
+    LightType type = light->GetLightType();
+    const FocusParameters& parameters = light->GetShadowFocus();
+    float size = (float)shadowMapSize_ * light->GetShadowResolution();
+    // Automatically reduce shadow map size when far away
+    if (parameters.autoSize_ && type != LIGHT_DIRECTIONAL)
+    {
+        Matrix3x4 view(camera->GetInverseWorldTransform());
+        Matrix4 projection(camera->GetProjection());
+        BoundingBox lightBox;
+        float lightPixels;
+        
+        if (type == LIGHT_POINT)
+        {
+            // Calculate point light pixel size from the projection of its diagonal
+            Vector3 center = view * light->GetWorldPosition();
+            float extent = 0.58f * light->GetRange();
+            lightBox.Define(center + Vector3(extent, extent, extent), center - Vector3(extent, extent, extent));
+        }
+        else
+        {
+            // Calculate spot light pixel size from the projection of its frustum far vertices
+            Frustum lightFrustum = light->GetFrustum().Transformed(view);
+            lightBox.Define(&lightFrustum.vertices_[4], 4);
+        }
+        
+        Vector2 projectionSize = lightBox.Projected(projection).Size();
+        lightPixels = Max(0.5f * (float)viewWidth * projectionSize.x_, 0.5f * (float)viewHeight * projectionSize.y_);
+        
+        // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
+        if (lightPixels < SHADOW_MIN_PIXELS)
+            lightPixels = SHADOW_MIN_PIXELS;
+        
+        size = Min(size, lightPixels);
+    }
+    
+    /// \todo Allow to specify maximum shadow maps per resolution, as smaller shadow maps take less memory
+    int width = NextPowerOfTwo((unsigned)size);
+    int height = width;
+    
+    // Adjust the size for directional or point light shadow map atlases
+    if (type == LIGHT_DIRECTIONAL)
+    {
+        if (maxShadowCascades_ > 1)
+            width *= 2;
+        if (maxShadowCascades_ > 2)
+            height *= 2;
+    }
+    else if (type == LIGHT_POINT)
+    {
+        width *= 2;
+        height *= 3;
+    }
+    
+    int searchKey = (width << 16) | height;
+    if (shadowMaps_.Contains(searchKey))
+    {
+        // If shadow maps are reused, always return the first
+        if (reuseShadowMaps_)
+            return shadowMaps_[searchKey][0];
+        else
+        {
+            // If not reused, check allocation count and return existing shadow map if possible
+            unsigned allocated = shadowMapAllocations_[searchKey].Size();
+            if (allocated < shadowMaps_[searchKey].Size())
+            {
+                shadowMapAllocations_[searchKey].Push(light);
+                return shadowMaps_[searchKey][allocated];
+            }
+            else if ((int)allocated >= maxShadowMaps_)
+                return 0;
+        }
+    }
+    
+    unsigned shadowMapFormat = (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() :
+        graphics_->GetShadowMapFormat();
+    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
+    bool hardwarePCF = graphics_->GetHardwareShadowSupport();
+    if (!shadowMapFormat)
+        return 0;
+    
+    SharedPtr<Texture2D> newShadowMap(new Texture2D(context_));
+    int retries = 3;
+    
+    #ifdef USE_OPENGL
+    // Create shadow map only. Color rendertarget is not needed
+    while (retries)
+    {
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
+        {
+            width >>= 1;
+            height >>= 1;
+            --retries;
+        }
+        else
+        {
+            newShadowMap->SetFilterMode(FILTER_BILINEAR);
+            newShadowMap->SetShadowCompare(true);
+            break;
+        }
+    }
+    #else
+    // Create shadow map and dummy color rendertarget
+    bool fallback = graphics_->GetFallback();
+    while (retries)
+    {
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, fallback ? TEXTURE_RENDERTARGET : TEXTURE_DEPTHSTENCIL))
+        {
+            width >>= 1;
+            height >>= 1;
+            --retries;
+        }
+        else
+        {
+            newShadowMap->SetFilterMode(hardwarePCF ? FILTER_BILINEAR : FILTER_NEAREST);
+            if (!fallback)
+            {
+                // If no dummy color rendertarget for this size exists yet, create one now
+                if (!colorShadowMaps_.Contains(searchKey))
+                {
+                    colorShadowMaps_[searchKey] = new Texture2D(context_);
+                    colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
+                }
+                // Link the color rendertarget to the shadow map
+                newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
+            }
+            else
+            {
+                // In fallback mode link the shared shadow map depth stencil to the shadow map instead.
+                // Create it first if not created yet, and resize larger if necessary
+                if (!shadowDepthStencil_)
+                    shadowDepthStencil_ = new Texture2D(context_);
+                if (shadowDepthStencil_->GetWidth() < width || shadowDepthStencil_->GetHeight() < height)
+                    shadowDepthStencil_->SetSize(width, height, D3DFMT_D16, TEXTURE_DEPTHSTENCIL);
+                newShadowMap->GetRenderSurface()->SetLinkedDepthBuffer(shadowDepthStencil_->GetRenderSurface());
+            }
+            break;
+        }
+    }
+    #endif
+    // If failed to set size, store a null pointer so that we will not retry
+    if (!retries)
+        newShadowMap.Reset();
+    
+    shadowMaps_[searchKey].Push(newShadowMap);
+    if (!reuseShadowMaps_)
+        shadowMapAllocations_[searchKey].Push(light);
+    
+    return newShadowMap;
 }
 
 ShaderVariation* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
@@ -909,8 +991,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
         PassType type = pass->GetType();
         if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
-            Light* light = batch.light_;
-            if (!light)
+            LightBatchQueue* lightQueue = batch.lightQueue_;
+            if (!lightQueue)
             {
                 // Do not log error, as it would result in a lot of spam
                 batch.vertexShader_ = 0;
@@ -918,14 +1000,18 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
                 return;
             }
             
+            Light* light = lightQueue->light_;
             unsigned vsi = 0;
             unsigned psi = 0;
             vsi = batch.geometryType_ * MAX_LIGHT_VS_VARIATIONS;
             
             bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
             if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
+            {
                 psi += LPS_SPEC;
-            if (allowShadows && light->GetShadowMap())
+                vsi += LVS_SPEC;
+            }
+            if (allowShadows && lightQueue->shadowMap_)
             {
                 vsi += LVS_SHADOW;
                 psi += LPS_SHADOW;
@@ -933,12 +1019,16 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             
             switch (light->GetLightType())
             {
+            case LIGHT_DIRECTIONAL:
+                vsi += LVS_DIR;
+                break;
+                
             case LIGHT_POINT:
-            case LIGHT_SPLITPOINT:
                 if (light->GetShapeTexture())
                     psi += LPS_POINTMASK;
                 else
                     psi += LPS_POINT;
+                vsi += LVS_POINT;
                 break;
                 
             case LIGHT_SPOT:
@@ -973,52 +1063,6 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
 }
 
-void Renderer::SetLightVolumeShaders(Batch& batch)
-{
-    unsigned vsi = DLVS_NONE;
-    unsigned psi = DLPS_NONE;
-    Light* light = batch.light_;
-    
-    switch (light->GetLightType())
-    {
-    case LIGHT_DIRECTIONAL:
-        vsi += DLVS_DIR;
-        break;
-        
-    case LIGHT_POINT:
-    case LIGHT_SPLITPOINT:
-        if (light->GetShapeTexture())
-            psi += DLPS_POINTMASK;
-        else
-            psi += DLPS_POINT;
-        break;
-        
-    case LIGHT_SPOT:
-        psi += DLPS_SPOT;
-        break;
-    }
-    
-    if (light->GetShadowMap())
-        psi += DLPS_SHADOW;
-    
-    // Deferred fallback mode does not support specular
-    if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && !graphics_->GetFallback())
-        psi += DLPS_SPEC;
-    
-    if (batch.camera_->IsOrthographic())
-    {
-        vsi += DLVS_ORTHO;
-        psi += DLPS_ORTHO;
-    }
-    
-    batch.material_ = 0;
-    batch.pass_ = 0;
-    batch.vertexShader_ = lightVS_[vsi];
-    batch.pixelShader_ = lightPS_[psi];
-    batch.vertexShaderIndex_ = vsi;
-    batch.CalculateSortKey();
-}
-
 void Renderer::LoadShaders()
 {
     LOGINFO("Reloading shaders");
@@ -1030,39 +1074,6 @@ void Renderer::LoadShaders()
     // Load inbuilt shaders
     stencilVS_ = GetVertexShader("Stencil");
     stencilPS_ = GetPixelShader("Stencil");
-    lightVS_.Clear();
-    lightPS_.Clear();
-    
-    RenderMode mode = graphics_->GetRenderMode();
-    if (mode != RENDER_FORWARD)
-    {
-        lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
-        lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-        
-        unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-        unsigned fallback = graphics_->GetFallback() ? 1 : 0;
-        if (fallback)
-            shadows = SHADOWQUALITY_HIGH_16BIT;
-        
-        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-            lightVS_[i] = GetVertexShader("Light_" + deferredLightVSVariations[i]);
-        
-        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
-        {
-            unsigned linear = fallback == 0 && !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO ? 1 : 0;
-            
-            if (i & DLPS_SHADOW)
-            {
-                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] +
-                    shadowVariations[shadows] + fallbackVariations[fallback]);
-            }
-            else
-            {
-                lightPS_[i] = GetPixelShader("Light_" + linearVariations[linear] + lightPSVariations[i] +
-                    fallbackVariations[fallback]);
-            }
-        }
-    }
     
     // Remove shaders that are no longer referenced from the cache
     cache_->ReleaseResources(Shader::GetTypeStatic());
@@ -1074,30 +1085,9 @@ void Renderer::LoadMaterialShaders(Technique* technique)
 {
     LoadPassShaders(technique, PASS_SHADOW);
     LoadPassShaders(technique, PASS_EXTRA);
-    
-    RenderMode mode = graphics_->GetRenderMode();
-    if (mode == RENDER_FORWARD)
-    {
-        LoadPassShaders(technique, PASS_BASE);
-        LoadPassShaders(technique, PASS_LITBASE);
-        LoadPassShaders(technique, PASS_LIGHT);
-    }
-    else
-    {
-        if (technique->HasPass(PASS_GBUFFER))
-        {
-            LoadPassShaders(technique, PASS_GBUFFER);
-            if (graphics_->GetFallback())
-                LoadPassShaders(technique, PASS_GBUFFER2);
-        }
-        else
-        {
-            LoadPassShaders(technique, PASS_BASE);
-            // If shadow maps are not reused, forward lighting in deferred mode can render shadows
-            LoadPassShaders(technique, PASS_LITBASE, !reuseShadowMaps_);
-            LoadPassShaders(technique, PASS_LIGHT, !reuseShadowMaps_);
-        }
-    }
+    LoadPassShaders(technique, PASS_BASE);
+    LoadPassShaders(technique, PASS_LITBASE);
+    LoadPassShaders(technique, PASS_LIGHT);
 }
 
 void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowShadows)
@@ -1119,16 +1109,6 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     unsigned fallback = graphics_->GetFallback() ? 1 : 0;
     if (fallback)
         shadows = SHADOWQUALITY_HIGH_16BIT;
-    
-    // If INTZ depth is used, do not write depth into a rendertarget in the G-buffer pass
-    if (type == PASS_GBUFFER || type == PASS_GBUFFER2)
-    {
-        unsigned depth = graphics_->GetHardwareDepthSupport() ? 0 : 1;
-        if (fallback)
-            pixelShaderName += fallbackVariations[fallback];
-        else
-            pixelShaderName += depthVariations[depth];
-    }
     
     if (type == PASS_SHADOW)
     {
@@ -1216,19 +1196,6 @@ void Renderer::ReloadTextures()
 
 void Renderer::CreateGeometries()
 {
-    SharedPtr<VertexBuffer> dlvb(new VertexBuffer(context_));
-    dlvb->SetSize(4, MASK_POSITION);
-    dlvb->SetData(dirLightVertexData);
-    
-    SharedPtr<IndexBuffer> dlib(new IndexBuffer(context_));
-    dlib->SetSize(6, false);
-    dlib->SetData(dirLightIndexData);
-    
-    dirLightGeometry_ = new Geometry(context_);
-    dirLightGeometry_->SetVertexBuffer(0, dlvb);
-    dirLightGeometry_->SetIndexBuffer(dlib);
-    dirLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, dlib->GetIndexCount());
-    
     SharedPtr<VertexBuffer> plvb(new VertexBuffer(context_));
     plvb->SetSize(24, MASK_POSITION);
     plvb->SetData(pointLightVertexData);
@@ -1254,6 +1221,57 @@ void Renderer::CreateGeometries()
     spotLightGeometry_->SetVertexBuffer(0, slvb);
     spotLightGeometry_->SetIndexBuffer(slib);
     spotLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, slib->GetIndexCount());
+    
+    faceSelectCubeMap_ = new TextureCube(context_);
+    faceSelectCubeMap_->SetNumLevels(1);
+    faceSelectCubeMap_->SetSize(1, graphics_->GetRGBAFormat());
+    faceSelectCubeMap_->SetFilterMode(FILTER_NEAREST);
+    
+    unsigned char data[256 * 256 * 4];
+    
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        unsigned axis = i / 2;
+        data[0] = (axis == 0) ? 255 : 0;
+        data[1] = (axis == 1) ? 255 : 0;
+        data[2] = (axis == 2) ? 255 : 0;
+        data[3] = 0;
+        faceSelectCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 1, 1, data);
+    }
+    
+    indirectionCubeMap_ = new TextureCube(context_);
+    indirectionCubeMap_->SetNumLevels(1);
+    indirectionCubeMap_->SetSize(256, graphics_->GetRGBAFormat());
+    indirectionCubeMap_->SetFilterMode(FILTER_BILINEAR);
+    indirectionCubeMap_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+    indirectionCubeMap_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+    indirectionCubeMap_->SetAddressMode(COORD_W, ADDRESS_CLAMP);
+    
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        unsigned char faceX = (i & 1) * 255;
+        unsigned char faceY = (i / 2) * 255 / 3;
+        unsigned char* dest = data;
+        for (unsigned y = 0; y < 256; ++y)
+        {
+            for (unsigned x = 0; x < 256; ++x)
+            {
+                #ifdef USE_OPENGL
+                *dest++ = x;
+                *dest++ = 255 - y;
+                *dest++ = faceX;
+                *dest++ = 255 * 2 / 3 - faceY;
+                #else
+                *dest++ = x;
+                *dest++ = y;
+                *dest++ = faceX;
+                *dest++ = faceY;
+                #endif
+            }
+        }
+        
+        indirectionCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 256, 256, data);
+    }
 }
 
 void Renderer::CreateInstancingBuffer()
@@ -1301,87 +1319,17 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     return true;
 }
 
-bool Renderer::CreateShadowMaps()
+void Renderer::ResetShadowMaps()
 {
-    unsigned shadowMapFormat = (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() :
-        graphics_->GetShadowMapFormat();
-    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
-    bool hardwarePCF = graphics_->GetHardwareShadowSupport();
-    
-    if (!shadowMapFormat)
-        return false;
-    
-    if (!drawShadows_)
-    {
-        shadowDepthStencil_.Reset();
-        for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-        {
-            colorShadowMaps_[i].Reset();
-            for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
-                shadowMaps_[i][j].Reset();
-        }
-        return true;
-    }
-    
-    #ifdef USE_OPENGL
-    // Create shadow maps only. Color rendertargets are not needed
-    unsigned size = shadowMapSize_;
-    for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-    {
-        for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
-        {
-            if (!shadowMaps_[i][j])
-                shadowMaps_[i][j] = new Texture2D(context_);
-            if (!shadowMaps_[i][j]->SetSize(size, size, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
-                return false;
-            shadowMaps_[i][j]->SetFilterMode(FILTER_BILINEAR);
-            shadowMaps_[i][j]->SetShadowCompare(true);
-        }
-        size >>= 1;
-    }
-    #else
-    // Create shadow maps and dummy color rendertargets
-    unsigned size = shadowMapSize_;
-    bool fallback = graphics_->GetFallback();
-    // Create one depth stencil buffer in fallback mode to be shared by all shadow maps
-    if (fallback)
-    {
-        if (!shadowDepthStencil_)
-            shadowDepthStencil_ = new Texture2D(context_);
-        if (!shadowDepthStencil_->SetSize(size, size, D3DFMT_D16, TEXTURE_DEPTHSTENCIL))
-            return false;
-    }
-    for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-    {
-        // Dummy color rendertargets are not required in fallback mode, as the shadows are rendered into a color texture
-        if (!fallback)
-        {
-            if (!colorShadowMaps_[i])
-                colorShadowMaps_[i] = new Texture2D(context_);
-            if (!colorShadowMaps_[i]->SetSize(size, size, dummyColorFormat, TEXTURE_RENDERTARGET))
-                return false;
-        }
-        for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
-        {
-            if (!shadowMaps_[i][j])
-                shadowMaps_[i][j] = new Texture2D(context_);
-            if (!shadowMaps_[i][j]->SetSize(size, size, shadowMapFormat, fallback ? TEXTURE_RENDERTARGET : TEXTURE_DEPTHSTENCIL))
-                return false;
-            if (!fallback)
-            {
-                shadowMaps_[i][j]->SetFilterMode(hardwarePCF ? FILTER_BILINEAR : FILTER_NEAREST);
-                // Link the color rendertarget to depth rendertarget
-                shadowMaps_[i][j]->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[i]->GetRenderSurface());
-            }
-            else
-                // In fallback mode, link the shared depth stencil buffer to all shadow maps
-                shadowMaps_[i][j]->GetRenderSurface()->SetLinkedDepthBuffer(shadowDepthStencil_->GetRenderSurface());
-        }
-        size >>= 1;
-    }
-    #endif
-    
-    return true;
+    shadowMaps_.Clear();
+    colorShadowMaps_.Clear();
+    shadowDepthStencil_.Reset();
+}
+
+void Renderer::ResetShadowMapAllocations()
+{
+    for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
+        i->second_.Clear();
 }
 
 Camera* Renderer::CreateShadowCamera()
@@ -1390,21 +1338,10 @@ Camera* Renderer::CreateShadowCamera()
         shadowCameraStore_.Push(SharedPtr<Camera>(new Camera(context_)));
     Camera* camera = shadowCameraStore_[numShadowCameras_];
     camera->SetNode(CreateTempNode());
-    
+    camera->SetOrthographic(false);
+    camera->SetZoom(1.0f);
     ++numShadowCameras_;
     return camera;
-}
-
-Light* Renderer::CreateSplitLight(Light* original)
-{
-    if (numSplitLights_ >= splitLightStore_.Size())
-        splitLightStore_.Push(SharedPtr<Light>(new Light(context_)));
-    Light* light = splitLightStore_[numSplitLights_];
-    light->SetNode(CreateTempNode());
-    light->CopyFrom(original);
-    
-    ++numSplitLights_;
-    return light;
 }
 
 Node* Renderer::CreateTempNode()

@@ -48,7 +48,6 @@ class VertexDeclaration;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 static const unsigned NUM_QUERIES = 2;
-static const unsigned NUM_SCREEN_BUFFERS = 2;
 
 /// %Shader parameter definition.
 struct ShaderParameter
@@ -74,12 +73,10 @@ public:
     
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);
-    /// %Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA.
-    bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
+    /// %Set screen mode.
+    bool SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
     /// %Set screen resolution only.
     bool SetMode(int width, int height);
-    /// %Set rendering mode only.
-    bool SetMode(RenderMode mode);
     /// Toggle between full screen and windowed mode.
     bool ToggleFullscreen();
     /// Close the window.
@@ -129,7 +126,7 @@ public:
     void SetShaderParameter(StringHash param, const Matrix4& matrix);
     /// %Set shader 4D vector constant.
     void SetShaderParameter(StringHash param, const Vector4& vector);
-    /// %Set shader 4x3 matrix constant.
+    /// %Set shader 3x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Define a shader parameter. Called by Shader.
     void DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg);
@@ -163,8 +160,6 @@ public:
     void SetDepthStencil(Texture2D* depthTexture);
     /// %Set viewport.
     void SetViewport(const IntRect& rect);
-    /// %Set deferred rendering destination render target to prevent sampling from it during G-buffer rendering.
-    void SetViewTexture(Texture* texture);
     /// %Set alpha test.
     void SetAlphaTest(bool enable, CompareMode mode = CMP_ALWAYS, float alphaRef = 0.5f);
     /// %Set blending mode.
@@ -216,8 +211,6 @@ public:
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
-    /// Return rendering mode.
-    RenderMode GetRenderMode() const { return mode_; }
     /// Return window width.
     int GetWidth() const { return width_; }
     /// Return window height.
@@ -254,8 +247,6 @@ public:
     bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
-    /// Return whether the hardware depth buffer can be sampled.
-    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether 24-bit shadow maps are supported.
@@ -280,8 +271,6 @@ public:
     TextureUnit GetTextureUnit(const String& name);
     /// Return current texture by texture unit index.
     Texture* GetTexture(unsigned index) const;
-    /// Return deferred rendering destination render target.
-    Texture* GetViewTexture() const { return viewTexture_; }
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
     /// Return current render target by index.
@@ -336,14 +325,6 @@ public:
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return render target width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return diffuse buffer for deferred rendering.
-    Texture2D* GetDiffBuffer() const { return diffBuffer_; }
-    /// Return normal buffer for deferred rendering.
-    Texture2D* GetNormalBuffer() const { return normalBuffer_; }
-    /// Return depth buffer for deferred rendering. If reading hardware depth is supported, return a depth texture.
-    Texture2D* GetDepthBuffer() const { return depthBuffer_; }
-    /// Return screen buffer for post-processing.
-    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffers_[index]; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -360,7 +341,7 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific deferred rendering depth texture format.
+    /// Return the API-specific depth texture format.
     static unsigned GetDepthFormat();
     /// Return the API-specific depth stencil texture format.
     static unsigned GetDepthStencilFormat();
@@ -374,8 +355,6 @@ private:
     bool CreateInterface();
     /// Create the Direct3D device.
     bool CreateDevice(unsigned adapter, unsigned deviceType);
-    /// Create deferred rendering render targets.
-    void CreateRenderTargets();
     /// Reset the Direct3D device.
     void ResetDevice();
     /// Notify all GPU resources so they can release themselves as needed.
@@ -393,8 +372,6 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-    /// Rendering mode.
-    RenderMode mode_;
     /// Window width.
     int width_;
     /// Window height.
@@ -415,10 +392,6 @@ private:
     bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
-    //! Use auto depth stencil flag
-    bool systemDepthStencil_;
-    /// Hardware depth sampling support flag.
-    bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
     /// 24-bit shadow map support flag.
@@ -461,14 +434,6 @@ private:
     HashMap<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
     /// Immediate rendering vertex buffer start positions.
     HashMap<unsigned, unsigned> immediateVertexBufferPos_;
-    /// Deferred rendering diffuse buffer.
-    SharedPtr<Texture2D> diffBuffer_;
-    /// Deferred rendering normal buffer.
-    SharedPtr<Texture2D> normalBuffer_;
-    /// Deferred rendering depth buffer.
-    SharedPtr<Texture2D> depthBuffer_;
-    /// Screen buffer for post processing.
-    SharedPtr<Texture2D> screenBuffers_[NUM_SCREEN_BUFFERS];
     /// Shadow map dummy color texture format.
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format.
@@ -493,8 +458,6 @@ private:
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
-    /// Deferred rendering destination render target.
-    Texture* viewTexture_;
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
     /// Render targets in use.

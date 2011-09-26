@@ -101,13 +101,11 @@ Urho3D.exe understands the following command line options:
 \verbatim
 -x<res>     Horizontal resolution
 -y<res>     Vertical resolution
--m<level>   Enable hardware multisampling (*)
+-m<level>   Enable hardware multisampling
 -v          Enable vertical sync
 -t          Enable triple buffering
 -w          Start in windowed mode
 -headless   Headless mode. No application window will be created
--forward    Use forward rendering (default)
--deferred   Use deferred rendering
 -lqshadows  Use low-quality (1-sample) shadow filtering
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
@@ -117,11 +115,10 @@ Urho3D.exe understands the following command line options:
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering
--fallback   Force fallback rendering: no MRT, no hardware shadows (**)
+-fallback   Force fallback rendering (*)
 \endverbatim
 
-(*) Only forward rendering supports hardware multisampling. In deferred rendering temporal antialiasing will be used instead.
-(**) Relevant only on Direct3D9.
+(*) Uses only RGBA rendertargets, and shadows are rendered unfiltered. Implies SM2.0. Relevant only on Direct3D9.
 
 
 \page Structure Overall structure

@@ -369,13 +369,12 @@ Graphics implements the low-level functionality:
 
 It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
 
-Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled as incompatible in deferred rendering mode; instead it is replaced by a temporal antialiasing post-process filter.
+Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.
 
 When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()" before calling SetMode() for the first time.
 - For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is checked for.
-- Are multiple render targets supported? If not, deferred rendering will use a fallback mode, which renders the G-buffer in 2 passes with specular lighting disabled.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode with non-filtered shadows will be chosen instead.
 
 \section Rendering_Renderer Renderer
@@ -396,7 +395,7 @@ For opaque, non-skinned geometry, batches using the same material and same verte
 
 The rendering operations are divided into passes in the following order:
 
-- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (deferred.)
+- Opaque geometry ambient pass.
 - Lighting opaque geometry. For shadow casting lights, the shadow map is rendered first.
 - Post-opaque or "extra" rendering pass for materials that define that.
 - Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
@@ -421,8 +420,6 @@ The rendering-related components defined by the %Graphics library are:
 
 See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems" and \ref AuxiliaryViews "Auxiliary views".
 
-For details on how lighting opaque geometry differs between forward and deferred rendering, see \ref ForwardDeferred "Comparision of forward and deferred rendering".
-
 For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferences "Differences between Direct3D9 and OpenGL".
 
 
@@ -442,8 +439,6 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 - Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 on Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
 
-- In deferred rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the hardware depth buffer will be read directly, and linear depth will be reconstructed in the pixel shader. Direct3D9 will behave similarly if the INTZ depth format is supported.
-
 - On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change.
 
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
@@ -462,7 +457,7 @@ A material definition looks like this:
 \code
 <material>
     <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
-    <texture unit="diffuse|normal|specular|detail|environment|emissive" name="TextureName" />
+    <texture unit="diffuse|normal|detail|environment|emissive" name="TextureName" />
     <texture ... />
     <parameter name="name" value="x y z w" />
     <parameter ... />
@@ -470,6 +465,8 @@ A material definition looks like this:
     <shadowcull value="cw|ccw|none" />
 </material>
 \endcode
+
+Note the lack of a dedicated specular map texture: specular intensity is instead read from the alpha channel of the normal map.
 
 The shadowcull element is optional and specifies the culling mode to use in the shadow pass. If omitted, the culling mode when drawing shadows is the same as the normal culling mode.
 
@@ -487,7 +484,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="gbuffer|base|litbase|light|extra|shadow"
+    <pass name="base|litbase|light|extra|shadow"
         vs="VertexShaderName" ps="PixelShaderName" alphamask="true|false"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
@@ -496,13 +493,12 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-"Alphamask" is not an actual renderstate. It is a hint that the pixel shader will do discard(), and should therefore be rendered after geometry that does not use discard(), to ensure optimal depth buffer performance.
+"Alphamask" is not an actual renderstate. It is a hint that the pixel shader will do discard(), and should therefore be rendered after fully opaque geometry to ensure optimal depth buffer performance.
 
 The passes are:
 
-- gbuffer: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, specular power and depth.
 - base: forward rendering base pass. Renders the ambient light.
-- litbase: forward rendering base pass. Renders the ambient light and the first light affecting the object for optimization.
+- litbase: forward rendering lit base pass. Renders the ambient light and the first directional light affecting the object for optimization.
 - light: forward rendering light pass. Renders one light's contribution additively.
 - extra: custom rendering pass. Rendered after the opaque geometry.
 - shadow: shadow map rendering pass. Renders depth only.
@@ -526,29 +522,29 @@ Both point and spot lights use an attenuation ramp texture to determine how the 
 
 When occlusion is used, a light will automatically be culled if its bounding box is fully behind an occluder. However, directional lights have an infinite bounding box, and can not be culled this way.
 
-In forward rendering, it is possible to limit which objects are affected by each light, by calling \ref Drawable::SetLightMask "SetLightMask()" on both the light and the objects. The lightmasks of the light and objects are ANDed to check whether the light should have effect: the light will only illuminate an object if the result is nonzero. By default objects and lights have all bits set in their lightmask, thus passing this test always.
+It is possible to limit which objects are affected by each light, by calling \ref Drawable::SetLightMask "SetLightMask()" on both the light and the objects. The lightmasks of the light and objects are ANDed to check whether the light should have effect: the light will only illuminate an object if the result is nonzero. By default objects and lights have all bits set in their lightmask, thus passing this test always.
 
-\ref Zone "Zones" can also be used for light culling in a similar manner. The lightmask of the zone the camera is in will be ANDed with each light's lightmask to see whether the light should be included in rendering. This method of light culling works equally in deferred and forward rendering. By default a zone has all bits set in its lightmask.
+\ref Zone "Zones" can also be used for light culling in a similar manner. The lightmask of the zone the camera is in will be ANDed with each light's lightmask to see whether the light should be included in rendering. By default a zone has all bits set in its lightmask.
 
-Care must be utilized when doing light culling with lightmasks, because they easily create situations where a light's influence is cut off unnaturally. However, they can be a great performance boost: for example if you imagine a multi-store building with lights, lights would normally need to have shadows enabled to not "bleed" into the lower floors, which would cost performance. The bleeding could also be prevented by using unique lightmask bits on the objects and lights of each floor.
+Care must be utilized when doing light culling with lightmasks, because they easily create situations where a light's influence is cut off unnaturally. However, they can be a great performance boost: imagine a multi-store building, where the lights of each floor would normally need to have shadows enabled to not "bleed" into the lower floors, costing performance. Instead of enabling shadows, the bleeding could also be prevented by using unique lightmask bits on the objects and lights of each floor.
 
 \section Lights_ShadowedLights Shadowed lights
 
 Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of per-light parameters exists for controlling the shadows:
 
-- BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Also, these can be different for orthographic (directional) and projective (point and spot) shadows. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
+- BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
 
-- CascadeParameters: these have effect only for directional lights, and they consist of the number of splits, split lambda parameter, split fade range, and shadow maximum range. Lambda is between 0.0 - 1.0. Higher values create more high-resolution splits near the viewer. Split fade range determines to what degree the splits overlap, creating a smooth fade effect. For example fade range of 0.1 would use 10% of the full depth range to fade each split to the next. Geometry beyond shadow maximum range will be unshadowed (practically, an extra unshadowed split will be rendered, if maximum range is less than the far clip distance.)
+- CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0.
 
-- FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), out-zooming enable flag (reduces fillrate of distant spot lights by not using the whole shadow map when not necessary), and quantization & minimum size parameters for the shadow camera view.
+- FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic resolution reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
-Additionally, there exist shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
+Additionally there are shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
 
 - If both shadow distance and shadow fade distance are greater than zero, shadows start to fade at the shadow fade distance, and vanish completely at the shadow distance.
 
 - Shadow intensity defines how dark the shadows are, between 0.0 (maximum darkness, the default) and 1.0 (fully lit.)
 
-- The shadow resolution parameter allows choosing between a fullsize (1.0), half-size (0.5) and quarter-size (0.25) shadow map. Choose according to the size and importance of the light; smaller shadow maps will be much less performance hungry.
+- The shadow resolution parameter scales the global shadow map size set in Renderer to determine the actual shadow map size. Maximum is 1.0 (full size) and minimum is 0.125 (one eighth size.) Choose according to the size and importance of the light; smaller shadow maps will be less performance hungry.
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
@@ -607,55 +603,11 @@ The viewport is not assigned directly to the texture because of cube map support
 
 A "backup texture" can be assigned to the rendertarget texture: because it is illegal to sample a texture that is also being simultaneously rendered to (in cases where the rendertarget texture becomes "recursively" visible in the auxiliary view), the backup texture can be used to specify which texture should be used in place instead.
 
-When using deferred rendering, there is currently a limitation that the auxiliary view rendertarget can not be bigger in either width or height than the rendering window, due to the G-buffer's size. Overcoming this would require reserving an additional G-buffer for large auxiliary views.
-
 Rendering detailed auxiliary views can easily have a large performance impact. Some things you can do for optimization with the auxiliary view camera:
 
 - Set the far clip distance as small as possible.
 - Set the camera's viewmask to for example VIEW_REFLECTION, then clear that viewmask bit from objects you don't need rendered.
 - Use the camera's \ref Camera::SetViewOverrideFlags "SetViewOverrideFlags()" function to disable shadows, to disable occlusion, or force the lowest material quality.
-
-
-\page ForwardDeferred Comparision of forward and deferred rendering
-
-The rendering mode configured to the Graphics subsystem determines whether forward or deferred rendering is used for opaque objects. Transparent objects are always rendered using forward rendering.
-
-\section ForwardDeferred_Forward Forward rendering
-
-For each light that influences the object in question, the object is redrawn with additive blending. Multiple lights per pass are not used to not explode the shader permutation count, and to not go over SM2.0 instruction limits. Scissor optimization is used to reduce pixel count in case of small lights / large geometries.
-
-\section ForwardDeferred_Deferred Deferred rendering
-
-Deferred rendering creates the following G-buffer, using 3 render targets:
-
-- Diffuse albedo and specular intensity (D3DFMT_A8R8G8B8)
-- World-space normal and specular power (D3DFMT_A8R8G8B8)
-- Linear depth (D3DFMT_R32F)
-
-If the INTZ hardware depth format is available, the third render target is omitted. Likewise on OpenGL a DEPTH_COMPONENT24 depth texture is always used instead.
-
-Opaque objects are rendered to the G-buffer first, then an initial full-screen quad is drawn to initialize the backbuffer, using the G-buffer information to blend between ambient lighting and fog color. After this, light volumes are rendered with additive blending, using stencil masking to optimize the light volume depth range if possible.
-
-After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional pass for objects that need them.
-
-\section ForwardDeferred_Fallback Fallback deferred rendering
-
-If multiple render targets are not available on Direct3D9, a fallback G-buffer format is used for deferred rendering. It is rendered in two separate passes, and as there is no room for specular properties, specular lighting calculations are omitted:
-
-- %Pass 1: diffuse albedo and high bits of depth (D3DFMT_A8R8G8B8)
-- %Pass 2: world-space normal and low bits of depth (D3DFMT_A8R8G8B8)
-
-\section ForwardDeferred_DeferredAntiAlias Deferred antialiasing
-
-As actual hardware multisampling is incompatible with deferred rendering, a temporal antialiasing post-process filter will be used instead. Depending on the GPU speed, this has a low-to-moderate performance impact. RGB value minimum/maximum clamping will be used to eliminate or reduce ghosting artifacts, but some ghosting can nevertheless appear if both the camera and objects move.
-
-\section ForwardDeferred_Conclusion Conclusion
-
-Deferred rendering will win particularly in vertex-heavy scenes, as the actual geometries need to be rendered only once. However, in simple scenes the cost of filling the G-buffer may be substantial and outweight the benefit.
-
-Note that it is not possible to specify the material's specular color in deferred rendering, only the specular intensity. The default forward rendering shaders have also been written in the same way to match the output of deferred rendering, but more material variety could in fact be achieved with forward-shaded materials.
-
-Forward rendering also allows per-object control of which lights influence the object.
 
 
 \page Input %Input
@@ -1139,22 +1091,6 @@ GLShaderProcessor <definitionfile> <outputpath> [define1] [define2]
 GLSL files will be loaded from definition file directory, and finalized GLSL +
 XML files are saved to the output path, preserving the subdirectory structure.
 \endverbatim
-
-\section Tools_NormalMapTool NormalMapTool
-
-NormalMapTool converts normal map images into DXT5 format, with an encoding that preserves quality better than simply compressing the original, unmodified image. The encoding is:
-
-- X axis (red in the original normal map) goes into the alpha channel
-- Y axis (green in the original normal map) goes into the color channels
-- Z axis will be reconstructed in the pixel shader
-
-Usage:
-
-\verbatim
-NormalMapTool <input image file>
-\endverbatim
-
-The texconv tool from the DirectX SDK needs to be available through the system PATH.
 
 \section Tools_OgreImporter OgreImporter
 

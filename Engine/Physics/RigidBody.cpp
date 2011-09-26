@@ -365,7 +365,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     
     const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
     const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
-    Quaternion newRotation = node_->GetWorldRotation();
+    Quaternion newRotation(node_->GetWorldRotation());
     
     if (newPosition != currentPosition || newRotation != currentRotation)
     {
@@ -490,7 +490,7 @@ void RigidBody::CreateBody()
         
         // Set initial transform. Use target position in case the node is smoothed
         const Vector3& position = node_->GetTargetPosition();
-        Quaternion rotation = node_->GetTargetRotation();
+        Quaternion rotation(node_->GetTargetRotation());
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
         dBodySetQuaternion(body_, rotation.GetData());
         previousPosition_ = position;

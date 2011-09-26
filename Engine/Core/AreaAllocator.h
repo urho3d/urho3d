@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Rect.h"
-#include "Vector.h"
 
 /// Rectangular area allocator.
 class AreaAllocator

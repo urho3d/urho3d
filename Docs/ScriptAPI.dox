@@ -327,6 +327,9 @@ Properties:<br>
 Quaternion
 
 Methods:<br>
+- void FromAngleAxis(float, const Vector3&)
+- void FromEulerAngles(float, float, float)
+- void FromRotationTo(const Vector3&, const Vector3&)
 - void Normalize()
 - Quaternion Normalized() const
 - Quaternion Inverse() const
@@ -353,6 +356,7 @@ Methods:<br>
 - void Define(const Vector2&)
 - void Merge(const Vector2&)
 - void Merge(const Rect&)
+- void Clear()
 
 Properties:<br>
 - Vector2 min
@@ -369,13 +373,17 @@ BoundingBox
 Methods:<br>
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
+- void Define(const BoundingBox&)
 - void Define(const Frustum&)
+- void Define(const Polyhedron&)
 - void Define(const Sphere&)
 - void Merge(const Vector3&)
 - void Merge(const BoundingBox&)
 - void Merge(const Frustum&)
+- void Merge(const Polyhedron&)
 - void Merge(const Sphere&)
-- void Intersect(const BoundingBox&)
+- void Clip(const BoundingBox&)
+- void Clear()
 - Intersection IsInside(const Vector3&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const BoundingBox&) const
@@ -389,35 +397,57 @@ Properties:<br>
 - bool defined
 
 
-Sphere
-
-Methods:<br>
-- void Define(const Vector3&, float)
-- void Define(const BoundingBox&)
-- void Define(const Frustum&)
-- void Merge(const Vector3&)
-- void Merge(const BoundingBox&)
-- void Merge(const Frustum&)
-- void Merge(const Sphere&)
-- Intersection IsInside(const Vector3&) const
-- Intersection IsInside(const Sphere&) const
-- Intersection IsInside(const BoundingBox&) const
-
-Properties:<br>
-- Vector3 center
-- float radius
-- bool defined
-
-
 Frustum
 
 Methods:<br>
 - Intersection IsInside(const Vector3&)
 - Intersection IsInside(const BoundingBox&)
 - Intersection IsInside(const Sphere&)
+- float Distance(const Vector3&) const
 
 Properties:<br>
 - Vector3[] vertices (readonly)
+- bool defined
+
+
+Polyhedron
+
+Methods:<br>
+- void AddFace(const Vector3&, const Vector3&, const Vector3&)
+- void AddFace(const Vector3&, const Vector3&, const Vector3&, const Vector3&)
+- void AddFace(const Vector3[]@)
+- void Define(const BoundingBox&)
+- void Define(const Frustum&)
+- void Clip(const BoundingBox&)
+- void Clip(const Frustum&)
+- void Clear()
+
+Properties:<br>
+- uint numFaces (readonly)
+- Vector3[]@[] face (readonly)
+
+
+Sphere
+
+Methods:<br>
+- void Define(const Vector3&, float)
+- void Define(const BoundingBox&)
+- void Define(const Frustum&)
+- void Define(const Polyhedron&)
+- void Define(const Sphere&)
+- void Merge(const Vector3&)
+- void Merge(const BoundingBox&)
+- void Merge(const Frustum&)
+- void Merge(const Sphere&)
+- void Clear()
+- Intersection IsInside(const Vector3&) const
+- Intersection IsInside(const Sphere&) const
+- Intersection IsInside(const BoundingBox&) const
+- float Distance(const Vector3&) const
+
+Properties:<br>
+- Vector3 center
+- float radius
 - bool defined
 
 
@@ -1228,6 +1258,7 @@ Properties:<br>
 - float lodBias
 - bool orthographic
 - bool autoAspectRatio
+- Vector2& projectionOffset
 - uint viewMask
 - Frustum frustum (readonly)
 - Frustum viewSpaceFrustum (readonly)
@@ -1478,6 +1509,7 @@ Methods:<br>
 - void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
 - void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
 - void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
+- void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
 - void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
 
 Properties:<br>
@@ -1533,10 +1565,11 @@ Properties:<br>
 CascadeParameters
 
 Properties:<br>
-- uint splits
-- float lambda
-- float splitFadeRange
-- float shadowRange
+- float split1
+- float split2
+- float split3
+- float split4
+- float fadeStart
 
 
 FocusParameters
@@ -1544,7 +1577,7 @@ FocusParameters
 Properties:<br>
 - bool focus
 - bool nonUniform
-- bool zoomOut
+- bool autoSize
 - float quantize
 - float minView
 
@@ -1961,9 +1994,8 @@ Properties:<br>
 Graphics
 
 Methods:<br>
-- bool SetMode(RenderMode, int, int, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, int)
 - bool SetMode(int, int)
-- bool SetMode(RenderMode)
 - bool ToggleFullscreen()
 - void Close()
 - bool TakeScreenShot(Image@)
@@ -1973,7 +2005,6 @@ Properties:<br>
 - String& typeName (readonly)
 - bool flushGPU
 - String& windowTitle
-- RenderMode renderMode (readonly)
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)
@@ -1995,7 +2026,6 @@ Properties:<br>
 Renderer
 
 Methods:<br>
-- void SetNumShadowMaps(uint, uint, uint)
 - void DrawDebugGeometry(bool) const
 
 Properties:<br>
@@ -2004,14 +2034,17 @@ Properties:<br>
 - uint numViewports
 - Viewport&[] viewports
 - bool specularLighting
-- bool drawShadows
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
 - int textureQuality
 - int materialQuality
+- bool drawShadows
 - int shadowMapSize
 - int shadowQuality
+- int maxShadowCascades
+- int maxShadowMaps
 - bool reuseShadowMaps
+- bool lightStencilMasking
 - bool dynamicInstancing
 - int minInstanceGroupSize
 - int maxInstanceTriangles
@@ -2026,9 +2059,6 @@ Properties:<br>
 - uint[] numShadowMaps (readonly)
 - uint[] numOccluders (readonly)
 - uint[] numShadowOccluders (readonly)
-- uint numFullShadowMaps (readonly)
-- uint numHalfShadowMaps (readonly)
-- uint numQuarterShadowMaps (readonly)
 
 
 Input

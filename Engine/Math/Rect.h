@@ -29,21 +29,23 @@
 class Rect
 {
 public:
-    /// Construct an undefined rect
+    /// Construct an undefined rect.
     Rect() :
+        min_(Vector2::ZERO),
+        max_(Vector2::ZERO),
         defined_(false)
     {
     }
     
-    /// Copy-construct from another rect
+    /// Copy-construct from another rect.
     Rect(const Rect& rect) :
         min_(rect.min_),
         max_(rect.max_),
-        defined_(true)
+        defined_(rect.defined_)
     {
     }
     
-    /// Construct from minimum and maximum vectors
+    /// Construct from minimum and maximum vectors.
     Rect(const Vector2& min, const Vector2& max) :
         min_(min),
         max_(max),
@@ -51,7 +53,7 @@ public:
     {
     }
     
-    /// Construct from coordinates
+    /// Construct from coordinates.
     Rect(float left, float top, float right, float bottom) :
         min_(left, top),
         max_(right, bottom),
@@ -59,21 +61,29 @@ public:
     {
     }
     
-    /// Assign from another rect
+    /// Assign from another rect.
     Rect& operator = (const Rect& rhs)
     {
         min_ = rhs.min_;
         max_ = rhs.max_;
-        defined_ = true;
+        defined_ = rhs.defined_;
         return *this;
     }
     
-    /// Test for equality with another rect
+    /// Test for equality with another rect.
     bool operator == (const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }
-    /// Test for inequality with another rect
+    /// Test for inequality with another rect.
     bool operator != (const Rect& rhs) const { return min_ != rhs.min_ || max_ != rhs.max_; }
     
-    /// Define from minimum and maximum vectors
+    /// Define from another rect.
+    void Define(const Rect& rect)
+    {
+        min_ = rect.min_;
+        max_ = rect.max_;
+        defined_ = true;
+    }
+    
+    /// Define from minimum and maximum vectors.
     void Define(const Vector2& min, const Vector2& max)
     {
         min_ = min;
@@ -81,14 +91,14 @@ public:
         defined_ = true;
     }
     
-    /// Define from a point
+    /// Define from a point.
     void Define(const Vector2& point)
     {
         min_ = max_ = point;
         defined_ = true;
     }
     
-    /// Merge a point
+    /// Merge a point.
     void Merge(const Vector2& point)
     {
         if (!defined_)
@@ -107,7 +117,7 @@ public:
             max_.y_ = point.y_;
     }
     
-    /// Merge a rect
+    /// Merge a rect.
     void Merge(const Rect& rect)
     {
         if (!defined_)
@@ -127,23 +137,38 @@ public:
             max_.y_ = rect.max_.y_;
     }
     
-    /// Return float data
+    /// Clear to undefined state.
+    void Clear()
+    {
+        min_ = Vector2::ZERO;
+        max_ = Vector2::ZERO;
+        defined_ = false;
+    }
+    
+    /// Return center.
+    Vector2 Center() const { return (max_ + min_) * 0.5f; }
+    /// Return size.
+    Vector2 Size() const { return max_ - min_; }
+    /// Return half-size.
+    Vector2 HalfSize() const { return (max_ - min_) * 0.5f; }
+    
+    /// Return float data.
     const void* GetData() const { return &min_.x_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// Minimum vector
+    /// Minimum vector.
     Vector2 min_;
-    /// Maximum vector
+    /// Maximum vector.
     Vector2 max_;
-    /// Defined flag
+    /// Defined flag.
     bool defined_;
     
     /// Rect in the range (-1, -1) - (1, 1)
     static const Rect FULL;
     /// Rect in the range (0, 0) - (1, 1)
     static const Rect POSITIVE;
-    /// Zero-sized rect
+    /// Zero-sized rect.
     static const Rect ZERO;
 };
 
@@ -151,12 +176,12 @@ public:
 class IntRect
 {
 public:
-    /// Construct an undefined rect
+    /// Construct an undefined rect.
     IntRect()
     {
     }
     
-    /// Construct from coordinates
+    /// Construct from coordinates.
     IntRect(int left, int top, int right, int bottom) :
         left_(left),
         top_(top),
@@ -165,24 +190,24 @@ public:
     {
     }
     
-    /// Test for equality with another rect
+    /// Test for equality with another rect.
     bool operator == (const IntRect& rhs) const { return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_; }
-    /// Test for inequality with another rect
+    /// Test for inequality with another rect.
     bool operator != (const IntRect& rhs) const { return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_; }
-    /// Return integer data
+    /// Return integer data.
     const int* GetData() const { return &left_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// Left coordinate
+    /// Left coordinate.
     int left_;
-    /// Top coordinate
+    /// Top coordinate.
     int top_;
-    /// Right coordinate
+    /// Right coordinate.
     int right_;
-    /// Bottom coordinate
+    /// Bottom coordinate.
     int bottom_;
     
-    /// Zero-sized rect
+    /// Zero-sized rect.
     static const IntRect ZERO;
 };

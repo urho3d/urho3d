@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Frustum.h"
+#include "Polyhedron.h"
 
 void Sphere::Define(const Vector3* vertices, unsigned count)
 {
@@ -54,6 +55,12 @@ void Sphere::Define(const Frustum& frustum)
     Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
+void Sphere::Define(const Polyhedron& poly)
+{
+    defined_ = false;
+    Merge(poly);
+}
+
 void Sphere::Merge(const Vector3* vertices, unsigned count)
 {
     while (count--)
@@ -82,6 +89,16 @@ void Sphere::Merge(const Frustum& frustum)
 {
     const Vector3* vertices = frustum.vertices_;
     Merge(vertices, NUM_FRUSTUM_VERTICES);
+}
+
+void Sphere::Merge(const Polyhedron& poly)
+{
+    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    {
+        const Vector<Vector3>& face = poly.faces_[i];
+        if (!face.Empty())
+            Merge(&face[0], face.Size());
+    }
 }
 
 void Sphere::Merge(const Sphere& sphere)

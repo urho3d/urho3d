@@ -26,6 +26,7 @@
 #include "Vector3.h"
 
 class BoundingBox;
+class Polyhedron;
 class Frustum;
 
 /// %Sphere in three-dimensional space.
@@ -34,6 +35,8 @@ class Sphere
 public:
     /// Construct undefined.
     Sphere() :
+        center_(Vector3::ZERO),
+        radius_(0.0f),
         defined_(false)
     {
     }
@@ -54,6 +57,34 @@ public:
     {
     }
     
+    /// Construct from an array of vertices.
+    Sphere(const Vector3* vertices, unsigned count) :
+        defined_(false)
+    {
+        Define(vertices, count);
+    }
+    
+    /// Construct from a bounding box.
+    Sphere(const BoundingBox& box) :
+        defined_(false)
+    {
+        Define(box);
+    }
+    
+    /// Construct from a frustum.
+    Sphere(const Frustum& frustum) :
+        defined_(false)
+    {
+        Define(frustum);
+    }
+    
+    /// Construct from a polyhedron.
+    Sphere(const Polyhedron& poly) :
+        defined_(false)
+    {
+        Define(poly);
+    }
+    
     /// Assign from another sphere.
     Sphere& operator = (const Sphere& rhs)
     {
@@ -67,6 +98,12 @@ public:
     bool operator == (const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }
     /// Test for inequality with another sphere.
     bool operator != (const Sphere& rhs) const { return center_ != rhs.center_ || radius_ != rhs.radius_; }
+    
+    /// Define from another sphere.
+    void Define(const Sphere& sphere)
+    {
+        Define(sphere.center_, sphere.radius_);
+    }
     
     /// Define from center and radius.
     void Define(const Vector3& center, float radius)
@@ -82,6 +119,8 @@ public:
     void Define(const BoundingBox& box);
     /// Define from a frustum.
     void Define(const Frustum& frustum);
+    /// Define from a polyhedron.
+    void Define(const Polyhedron& poly);
     
     /// Merge a point.
     void Merge(const Vector3& point)
@@ -111,8 +150,18 @@ public:
     void Merge(const BoundingBox& box);
     /// Merge a frustum.
     void Merge(const Frustum& frustum);
+    /// Merge a polyhedron.
+    void Merge(const Polyhedron& poly);
     /// Merge a sphere.
     void Merge(const Sphere& sphere);
+    
+    /// Clear to undefined state.
+    void Clear()
+    {
+        center_ = Vector3::ZERO;
+        radius_ = 0.0f;
+        defined_ = false;
+    }
     
     /// Test if a point is inside.
     Intersection IsInside(const Vector3& point) const
@@ -152,6 +201,12 @@ public:
     Intersection IsInside(const BoundingBox& box) const;
     /// Test if a bounding box is (partially) inside or outside.
     Intersection IsInsideFast(const BoundingBox& box) const;
+    
+    /// Return distance of a point to the surface, or 0 if inside.
+    float Distance(const Vector3& point) const { return Max((point - center_).Length() - radius_, 0.0f); }
+    
+    /// Return distance of a point to the surface, or 0 if inside, using fast square root.
+    float DistanceFast(const Vector3& point) const { return Max((point - center_).LengthFast() - radius_, 0.0f); }
     
     /// Sphere center.
     Vector3 center_;

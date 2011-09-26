@@ -42,12 +42,9 @@ static const String textureUnitNames[] =
 {
     "diffuse",
     "normal",
-    "specular",
+    "emissive",
     "detail",
     "environment",
-    "emissive",
-    "lightramp", // Not defined by materials
-    "lightspot", // Not defined by materials
     ""
 };
 
@@ -153,8 +150,6 @@ bool Material::Load(Deserializer& source)
                 unit = TU_DIFFUSE;
             if (unitName == "norm")
                 unit = TU_NORMAL;
-            if (unitName == "spec")
-                unit = TU_SPECULAR;
             if (unitName == "env")
                 unit = TU_ENVIRONMENT;
             if (unit == MAX_MATERIAL_TEXTURE_UNITS)
@@ -396,16 +391,9 @@ void Material::CheckOcclusion()
         Technique* technique = techniques_[i].technique_;
         if (technique)
         {
-            // If pass writes depth, assume it occludes
-            Pass* pass = technique->GetPass(PASS_GBUFFER);
+            Pass* pass = technique->GetPass(PASS_BASE);
             if (pass && pass->GetDepthWrite())
                 occlusion_ = true;
-            else
-            {
-                pass = technique->GetPass(PASS_BASE);
-                if (pass && pass->GetDepthWrite())
-                    occlusion_ = true;
-            }
         }
     }
 }

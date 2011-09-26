@@ -28,7 +28,7 @@
 
 const Quaternion Quaternion::IDENTITY;
 
-Quaternion::Quaternion(float angle, const Vector3& axis)
+void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 {
     Vector3 normAxis = axis.Normalized();
     float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
@@ -40,7 +40,7 @@ Quaternion::Quaternion(float angle, const Vector3& axis)
     z_ = normAxis.z_ * sinAngle;
 }
 
-Quaternion::Quaternion(float x, float y, float z)
+void Quaternion::FromEulerAngles(float x, float y, float z)
 {
     // Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
     float sinX = sinf((x * M_DEGTORAD) * 0.5f);
@@ -56,7 +56,7 @@ Quaternion::Quaternion(float x, float y, float z)
     z_ = cosY * cosX * sinZ - sinY * sinX * cosZ;
 }
 
-Quaternion::Quaternion(const Vector3& start, const Vector3& end)
+void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
 {
     Vector3 normStart = start.Normalized();
     Vector3 normEnd = end.Normalized();
@@ -91,7 +91,7 @@ Quaternion::Quaternion(const Vector3& start, const Vector3& end)
     }
 }
 
-Quaternion::Quaternion(const Matrix3& matrix)
+void Quaternion::FromRotationMatrix(const Matrix3& matrix)
 {
     float t = matrix.m00_ + matrix.m11_ + matrix.m22_;
     

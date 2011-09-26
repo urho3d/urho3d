@@ -1,6 +1,4 @@
 <technique>
-    <pass name="gbuffer" vs="GBuffer" ps="GBuffer" />
-    <pass name="gbuffer2" vs="GBuffer" ps="GBuffer_Pass2" depthwrite="false" />
     <pass name="base" vs="Forward" ps="Forward_Ambient" />
     <pass name="litbase" vs="Forward" ps="Forward_Ambient" />
     <pass name="light" vs="Forward" ps="Forward" depthwrite="false" blend="add" />

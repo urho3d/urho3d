@@ -20,17 +20,27 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float4 oWorldPos : TEXCOORD1,
-    out float3 oNormal : TEXCOORD2,
-    #ifdef NORMALMAP
-        out float3 oTangent : TEXCOORD3,
-        out float3 oBitangent : TEXCOORD4,
+    out float4 oLightVec : TEXCOORD1,
+    #ifndef NORMALMAP
+        out float3 oNormal : TEXCOORD2,
+    #endif
+    #ifdef SPECULAR
+        out float3 oEyeVec : TEXCOORD3,
     #endif
     #ifdef SHADOW
-        out float4 oShadowPos : TEXCOORD5,
+        #if defined(DIRLIGHT)
+            out float4 oShadowPos[4] : TEXCOORD4,
+        #elif defined(SPOTLIGHT)
+            out float4 oShadowPos : TEXCOORD4,
+        #else
+            out float3 oWorldLightVec : TEXCOORD4,
+        #endif
     #endif
     #ifdef SPOTLIGHT
-        out float4 oSpotPos : TEXCOORD6,
+        out float4 oSpotPos : TEXCOORD5,
+    #endif
+    #ifdef POINTLIGHT
+        out float3 oCubeMaskVec : TEXCOORD5,
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -40,6 +50,12 @@ void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0)
 {
     float4 pos;
+
+    #ifdef NORMALMAP
+        float3 oNormal;
+        float3 oTangent;
+        float3 oBitangent;
+    #endif
 
     #if defined(SKINNED)
         #ifndef NORMALMAP
@@ -64,20 +80,50 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 
-    // Store adjusted world position and linear depth for light calculations
-    oWorldPos = float4(pos.xyz - cCameraPos, GetDepth(oPos));
+    float3 worldPos = pos.xyz - cCameraPos;
+
+    #ifdef DIRLIGHT
+        oLightVec = float4(cLightDir, GetDepth(oPos));
+    #elif defined(LIGHT)
+        oLightVec = float4((cLightPos - worldPos) * cLightAtten, GetDepth(oPos));
+    #else
+        oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
+    #endif
 
     #ifdef SHADOW
         // Shadow projection: transform from world space to shadow space
-        oShadowPos = mul(pos, cShadowProj);
+        #if defined(DIRLIGHT)
+            oShadowPos[0] = mul(pos, cShadowProj[0]);
+            oShadowPos[1] = mul(pos, cShadowProj[1]);
+            oShadowPos[2] = mul(pos, cShadowProj[2]);
+            oShadowPos[3] = mul(pos, cShadowProj[3]);
+        #elif defined(SPOTLIGHT)
+            oShadowPos = mul(pos, cShadowProj[0]);
+        #else
+            oWorldLightVec = worldPos - cLightPos;
+        #endif
     #endif
+
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
         oSpotPos = mul(pos, cSpotProj);
     #endif
 
+    #ifdef POINTLIGHT
+        oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
+    #endif
+
     #ifdef NORMALMAP
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
+        float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
+        #ifdef LIGHT
+            oLightVec.xyz = mul(tbn, oLightVec.xyz);
+        #endif
+        #ifdef SPECULAR
+            oEyeVec = mul(tbn, -worldPos);
+        #endif
+    #elif defined(SPECULAR)
+        oEyeVec = -worldPos;
     #endif
 
     #ifdef VERTEXCOLOR
@@ -88,19 +134,27 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
-    float4 iWorldPos : TEXCOORD1,
-    #ifdef NORMALMAP
-        float3 iNormal : TEXCOORD2,
-        float3 iTangent : TEXCOORD3,
-        float3 iBitangent : TEXCOORD4,
-    #else
+    float4 iLightVec : TEXCOORD1,
+    #ifndef NORMALMAP
         float3 iNormal : TEXCOORD2,
     #endif
-    #if defined(SHADOW)
-        float4 iShadowPos : TEXCOORD5,
+    #ifdef SPECULAR
+        float3 iEyeVec : TEXCOORD3,
+    #endif
+    #ifdef SHADOW
+        #if defined(DIRLIGHT)
+            float4 iShadowPos[4] : TEXCOORD4,
+        #elif defined(SPOTLIGHT)
+            float4 iShadowPos : TEXCOORD4,
+        #else
+            float3 iWorldLightVec : TEXCOORD4,
+        #endif
     #endif
     #ifdef SPOTLIGHT
-        float4 iSpotPos : TEXCOORD6,
+        float4 iSpotPos : TEXCOORD5,
+    #endif
+    #ifdef CUBEMASK
+        float3 iCubeMaskVec : TEXCOORD5,
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -117,45 +171,68 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
+    #if defined(NORMALMAP) || defined(SPECMAP)
+        float4 normalInput = tex2D(sNormalMap, iTexCoord);
+    #endif
+
     #if !defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
 
         float3 lightColor;
         float3 lightDir;
-        float3 lightVec;
         float diff;
+        float NdotL;
 
         #ifdef NORMALMAP
-            float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
-            float3 normal = normalize(mul(UnpackNormal(tex2D(sNormalMap, iTexCoord)), tbn));
+            float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
         #else
             float3 normal = normalize(iNormal);
         #endif
 
         #ifdef DIRLIGHT
-            diff = GetDiffuseDir(normal, lightDir) * GetSplitFade(iWorldPos.w);
+            #ifdef NORMALMAP
+                lightDir = normalize(iLightVec.xyz);
+            #else
+                lightDir = iLightVec.xyz;
+            #endif
+            diff = GetDiffuseDir(normal, lightDir, NdotL);
         #else
-            diff = GetDiffusePointOrSpot(normal, iWorldPos.xyz, lightDir, lightVec);
+            diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir, NdotL);
         #endif
 
         #ifdef SHADOW
-            diff *= GetShadow(iShadowPos);
+            #if defined(DIRLIGHT)
+                float4 shadowPos;
+                if (iLightVec.w < cShadowSplits.x)
+                    shadowPos = iShadowPos[0];
+                else if (iLightVec.w < cShadowSplits.y)
+                    shadowPos = iShadowPos[1];
+                else if (iLightVec.w < cShadowSplits.z)
+                    shadowPos = iShadowPos[2];
+                else
+                    shadowPos = iShadowPos[3];
+                diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iLightVec.w));
+            #elif defined(SPOTLIGHT)
+                diff *= GetShadow(iShadowPos);
+            #else
+                diff *= GetCubeShadow(iWorldLightVec);
+            #endif
         #endif
 
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
-            lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+            lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif
 
         #ifdef SPECULAR
             #ifdef SPECMAP
-                float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord).g;
+                float specStrength = cMatSpecProperties.x * normalInput.a;
             #else
                 float specStrength = cMatSpecProperties.x;
             #endif
-            float spec = GetSpecular(normal, iWorldPos.xyz, lightDir, cMatSpecProperties.y);
+            float spec = GetSpecular(normal, iEyeVec, lightDir, NdotL, cMatSpecProperties.y);
             float3 finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
         #else
             float3 finalColor = diff * lightColor * diffColor.rgb;
@@ -163,9 +240,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
-            oColor = float4(GetFog(finalColor, iWorldPos.w), diffColor.a);
+            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
         #else
-            oColor = float4(GetLitFog(finalColor, iWorldPos.w), diffColor.a);
+            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
         #endif
 
     #else
@@ -173,19 +250,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #if defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
 
             float3 lightColor;
-            float3 lightVec;
             float diff;
 
             #ifdef DIRLIGHT
-                diff = GetDiffuseDirVolumetric() * GetSplitFade(iWorldPos.w);
+                diff = GetDiffuseDirVolumetric();
             #else
-                diff = GetDiffusePointOrSpotVolumetric(iWorldPos.xyz, lightVec);
+                diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
             #endif
 
             #if defined(SPOTLIGHT)
                 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
             #elif defined(CUBEMASK)
-                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+                lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
             #else
                 lightColor = cLightColor.rgb;
             #endif
@@ -194,24 +270,24 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
             #ifdef AMBIENT
                 finalColor += cAmbientColor * diffColor.rgb;
-                oColor = float4(GetFog(finalColor, iWorldPos.w), diffColor.a);
+                oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
             #else
-                oColor = float4(GetLitFog(finalColor, iWorldPos.w), diffColor.a);
+                oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
             #endif
 
         #else
 
             #ifdef UNLIT
-                oColor = float4(GetFog(diffColor.rgb, iWorldPos.w), diffColor.a);
+                oColor = float4(GetFog(diffColor.rgb, iLightVec.w), diffColor.a);
             #endif
 
             #ifdef ADDITIVE
-                oColor = float4(GetLitFog(diffColor.rgb, iWorldPos.w), diffColor.a);
+                oColor = float4(GetLitFog(diffColor.rgb, iLightVec.w), diffColor.a);
             #endif
 
             #ifdef AMBIENT
                 float3 finalColor = cAmbientColor * diffColor.rgb;
-                oColor = float4(GetFog(finalColor, iWorldPos.w), diffColor.a);
+                oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
             #endif
 
         #endif

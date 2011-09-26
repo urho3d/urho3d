@@ -28,6 +28,7 @@
 #include "Map.h"
 #include "MathDefs.h"
 #include "Ptr.h"
+#include "Rect.h"
 #include "Vector4.h"
 
 class Camera;
@@ -40,14 +41,16 @@ class Matrix3x4;
 class Pass;
 class Renderer;
 class ShaderVariation;
+class Texture2D;
 class VertexBuffer;
+struct LightBatchQueue;
 
 /// Description of a 3D geometry draw call.
 struct Batch
 {
     /// Construct with defaults.
     Batch() :
-        light_(0),
+        lightQueue_(0),
         shaderData_(0),
         shaderDataSize_(0),
         geometryType_(GEOM_STATIC),
@@ -69,8 +72,8 @@ struct Batch
     const Matrix3x4* worldTransform_;
     /// Camera.
     Camera* camera_;
-    /// Light that affects the geometry, if any.
-    Light* light_;
+    /// Light properties.
+    LightBatchQueue* lightQueue_;
     /// Material.
     Material* material_;
     /// Material pass.
@@ -143,8 +146,8 @@ struct BatchGroup
     PODVector<InstanceData> instances_;
     /// Camera.
     Camera* camera_;
-    /// Light that affects the geometry, if any.
-    Light* light_;
+    /// Light properties.
+    LightBatchQueue* lightQueue_;
     /// Material.
     Material* material_;
     /// Material pass.
@@ -162,8 +165,8 @@ struct BatchGroup
 /// Instanced draw call key.
 struct BatchGroupKey
 {
-    /// Light that affects the geometry, if any.
-    Light* light_;
+    /// Light properties.
+    LightBatchQueue* lightQueue_;
     /// Material pass.
     Pass* pass_;
     /// Material.
@@ -172,14 +175,14 @@ struct BatchGroupKey
     Geometry* geometry_;
     
     /// Test for equality with another batch group key.
-    bool operator == (const BatchGroupKey& rhs) const { return light_ == rhs.light_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
+    bool operator == (const BatchGroupKey& rhs) const { return lightQueue_ == rhs.lightQueue_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
     /// Test for inequality with another batch group key.
-    bool operator != (const BatchGroupKey& rhs) const { return light_ != rhs.light_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
+    bool operator != (const BatchGroupKey& rhs) const { return lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
     /// Test if less than another batch group key.
     bool operator < (const BatchGroupKey& rhs) const
     {
-        if (light_ == rhs.light_)
+        if (lightQueue_ == rhs.lightQueue_)
         {
             if (pass_ == rhs.pass_)
             {
@@ -192,13 +195,13 @@ struct BatchGroupKey
                 return pass_ < rhs.pass_;
         }
         else
-            return light_ < rhs.light_;
+            return lightQueue_ < rhs.lightQueue_;
     }
     
     /// Test if greater than another batch group key.
     bool operator > (const BatchGroupKey& rhs) const
     {
-        if (light_ == rhs.light_)
+        if (lightQueue_ == rhs.lightQueue_)
         {
             if (pass_ == rhs.pass_)
             {
@@ -211,7 +214,7 @@ struct BatchGroupKey
                 return pass_ > rhs.pass_;
         }
         else
-            return light_ > rhs.light_;
+            return lightQueue_ > rhs.lightQueue_;
     }
 };
 
@@ -246,17 +249,30 @@ public:
     Map<BatchGroupKey, BatchGroup> batchGroups_;
 };
 
+/// Queue for shadow map draw calls
+struct ShadowBatchQueue
+{
+    /// Shadow map camera.
+    Camera* shadowCamera_;
+    /// Shadow map viewport.
+    IntRect shadowViewport_;
+    /// Shadow caster draw calls.
+    BatchQueue shadowBatches_;
+    /// Directional light cascade near split distance.
+    float nearSplit_;
+    /// Directional light cascade far split distance.
+    float farSplit_;
+};
+
 /// Queue for light related draw calls
 struct LightBatchQueue
 {
     /// Light drawable.
     Light* light_;
-    /// Shadowcaster draw calls.
-    BatchQueue shadowBatches_;
     /// Lit geometry draw calls.
     BatchQueue litBatches_;
-    /// Light volume draw calls, should be only one.
-    PODVector<Batch> volumeBatches_;
-    /// First split flag for clearing the stencil buffer.
-    bool firstSplit_;
+    /// Shadow map depth texture.
+    Texture2D* shadowMap_;
+    /// Shadow map split queues.
+    Vector<ShadowBatchQueue> shadowSplits_;
 };

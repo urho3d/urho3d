@@ -121,7 +121,6 @@ OBJECTTYPESTATIC(Graphics);
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
-    mode_(RENDER_FORWARD),
     width_(0),
     height_(0),
     multiSample_(1),
@@ -172,18 +171,18 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         glfwSetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
     
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         glfwSwapInterval(vsync ? 1 : 0);
@@ -222,7 +221,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
         glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
         glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
-        if (multiSample > 1 && mode == RENDER_FORWARD)
+        if (multiSample > 1)
             glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
         else
             glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
@@ -278,19 +277,14 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
-    mode_ = mode;
     multiSample_ = multiSample;
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
-    viewTexture_ = 0;
     
     // Clear the window to black now, because GPU object restore may take time
     Clear(CLEAR_COLOR);
     glfwSwapBuffers();
-    
-    // Create deferred rendering buffers as necessary
-    CreateRenderTargets();
     
     // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
@@ -315,17 +309,12 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(mode_, width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
-}
-
-bool Graphics::SetMode(RenderMode mode)
-{
-    return SetMode(mode, width_, height_, fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -371,7 +360,6 @@ bool Graphics::BeginFrame()
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
-    viewTexture_ = 0;
     
     // Cleanup textures from previous frame
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -1061,10 +1049,6 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
-        // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
-        // but should still not sample it either
-        else if (texture == viewTexture_)
-            texture = texture->GetBackupTexture();
     }
     
     if (textures_[index] != texture)
@@ -1379,21 +1363,6 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetViewTexture(Texture* texture)
-{
-    viewTexture_ = texture;
-    
-    // Check for the view texture being currently bound
-    if (texture)
-    {
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        {
-            if (textures_[i] == texture)
-                SetTexture(i, textures_[i]->GetBackupTexture());
-        }
-    }
-}
-
 void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
 {
     if (enable != alphaTest_)
@@ -1521,13 +1490,9 @@ void Graphics::SetFillMode(FillMode mode)
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
-    // During some light rendering loops, a full rect is toggled on/off repeatedly.
+     // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
     if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.x_ >= 1.0f && rect.max_.y_ >= 1.0f)
-        enable = false;
-    
-    // Check for illegal rect, disable in that case
-    if (rect.max_.x_ < rect.min_.x_ || rect.max_.y_ < rect.min_.y_)
         enable = false;
     
     if (enable)
@@ -1579,10 +1544,6 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     
     // Full scissor is same as disabling the test
     if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
-        enable = false;
-    
-    // Check for illegal rect, disable in that case
-    if (rect.right_ < rect.left_ || rect.bottom_ < rect.top_)
         enable = false;
     
     if (enable)
@@ -1984,59 +1945,6 @@ unsigned Graphics::GetDepthStencilFormat()
     return GL_DEPTH24_STENCIL8_EXT;
 }
 
-void Graphics::CreateRenderTargets()
-{
-    if (mode_ != RENDER_FORWARD)
-    {
-        if (!diffBuffer_)
-        {
-            diffBuffer_ = new Texture2D(context_);
-            diffBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-        }
-        
-        if (!normalBuffer_)
-        {
-            normalBuffer_ = new Texture2D(context_);
-            normalBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-        }
-        
-        if (!depthBuffer_)
-        {
-            depthBuffer_ = new Texture2D(context_);
-            depthBuffer_->SetSize(0, 0, GetDepthFormat(), TEXTURE_DEPTHSTENCIL);
-        }
-        
-        // If deferred antialiasing is used, reserve screen buffers
-        // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
-        // which will also be useful in forward rendering)
-        // If deferred antialiasing is used, reserve screen buffers
-        // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
-        // which will also be useful in forward rendering)
-        if (multiSample_ > 1)
-        {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            {
-                screenBuffers_[i] = new Texture2D(context_);
-                screenBuffers_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-                screenBuffers_[i]->SetFilterMode(FILTER_BILINEAR);
-            }
-        }
-        else
-        {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-                screenBuffers_[i].Reset();
-        }
-    }
-    else
-    {
-        diffBuffer_.Reset();
-        normalBuffer_.Reset();
-        depthBuffer_.Reset();
-        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            screenBuffers_[i].Reset();
-    }
-}
-
 void Graphics::ResetCachedState()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
@@ -2056,7 +1964,6 @@ void Graphics::ResetCachedState()
     
     depthStencil_ = 0;
     viewport_ = IntRect(0, 0, 0, 0);
-    viewTexture_ = 0;
     indexBuffer_ = 0;
     vertexShader_ = 0;
     pixelShader_ = 0;
@@ -2126,11 +2033,6 @@ void Graphics::Release()
     if (!impl_->window_)
         return;
     
-    diffBuffer_.Reset();
-    normalBuffer_.Reset();
-    depthBuffer_.Reset();
-    for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-        screenBuffers_[i].Reset();
     depthTextures_.Clear();
     
     // If GPU objects exist ie. it's a context delete/recreate, not Close(), tell them to save and release themselves
@@ -2158,11 +2060,9 @@ void Graphics::Release()
 
 void Graphics::SetTextureUnitMappings()
 {
-    // Map texture units
-    textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["DiffMap"] = TU_DIFFUSE;
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
-    textureUnits_["SpecMap"] = TU_SPECULAR;
+    textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
     textureUnits_["DetailMap"] = TU_DETAIL;
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;
@@ -2171,9 +2071,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["LightSpotMap"] = TU_LIGHTSPOT;
     textureUnits_["LightCubeMap"]  = TU_LIGHTSPOT;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
-    textureUnits_["DiffBuffer"] = TU_DIFFBUFFER;
-    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
-    textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
+    textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
+    textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
 }
 
 void RegisterGraphicsLibrary(Context* context)

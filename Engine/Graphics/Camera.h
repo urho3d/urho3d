@@ -70,7 +70,7 @@ public:
     void SetOrthographic(bool enable);
     /// %Set automatic aspect ratio based on viewport dimensions.
     void SetAutoAspectRatio(bool enable);
-    /// %Set projection jitter offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+    /// %Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
     
     /// Return far clip distance.
@@ -98,15 +98,17 @@ public:
     /// Return frustum in world space.
     Frustum GetFrustum() const;
     /// Return projection matrix.
-    Matrix4 GetProjection(bool enableOffset = true) const;
+    Matrix4 GetProjection() const;
     /// Return frustum near and far sizes.
     void GetFrustumSize(Vector3& near, Vector3& far) const;
     /// Return half view size.
     float GetHalfViewSize() const;
-    /// Return frustum transformed to view space.
-    Frustum GetViewSpaceFrustum() const;
     /// Return frustum split by custom near and far clip distances.
     Frustum GetSplitFrustum(float nearClip, float farClip);
+    /// Return frustum in view space.
+    Frustum GetViewSpaceFrustum() const;
+    /// Return split frustum in view space.
+    Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
     /// Return ray corresponding to screen coordinates (0.0 to 1.0.)
     Ray GetScreenRay(float x, float y);
     /// Return forward vector.
@@ -115,7 +117,7 @@ public:
     Vector3 GetRightVector();
     /// Return up vector.
     Vector3 GetUpVector();
-    /// Return projection jitter offset.
+    /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos);
@@ -152,6 +154,6 @@ private:
     bool orthographic_;
     /// Auto aspect ratio flag.
     bool autoAspectRatio_;
-    /// Projection jitter offset.
+    /// Projection offset.
     Vector2 projectionOffset_;
 };

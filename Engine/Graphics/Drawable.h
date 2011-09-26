@@ -161,7 +161,7 @@ public:
     /// Return whether is visible in a specific view this frame.
     bool IsInView(const FrameInfo& frame) const;
     /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
+    bool HasBasePass(unsigned batchIndex) const;
     /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     
@@ -212,7 +212,7 @@ protected:
     /// Last visible frame number.
     unsigned viewFrameNumber_;
     /// Base pass flags per batch index.
-    unsigned basePassFlags_;
+    PODVector<unsigned> basePassFlags_;
     /// Last camera rendered from. Not safe to dereference.
     Camera* viewCamera_;
     /// Lights affecting this drawable, when light count is limited.

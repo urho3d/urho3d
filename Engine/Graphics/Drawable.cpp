@@ -187,13 +187,22 @@ void Drawable::SetSortValue(float value)
 
 void Drawable::ClearBasePass()
 {
-    basePassFlags_ = 0;
+    for (unsigned i = 0; i < basePassFlags_.Size(); ++i)
+        basePassFlags_[i] = 0;
     lights_.Clear();
 }
 
 void Drawable::SetBasePass(unsigned batchIndex)
 {
-    basePassFlags_ |= (1 << batchIndex);
+    unsigned index = batchIndex << 5;
+    if (basePassFlags_.Size() <= index)
+    {
+        unsigned oldSize = basePassFlags_.Size();
+        basePassFlags_.Resize(index + 1);
+        for (unsigned i = oldSize; i <= index; ++i)
+            basePassFlags_[i] = 0;
+    }
+    basePassFlags_[index] |= (1 << (batchIndex & 31));
 }
 
 void Drawable::AddLight(Light* light)
@@ -203,7 +212,9 @@ void Drawable::AddLight(Light* light)
 
 void Drawable::LimitLights()
 {
-    HashSet<Light*> uniqueLights;
+    // Maximum lights value 0 means unlimited
+    if (!maxLights_)
+        return;
     
     const Vector3& worldPos = GetWorldPosition();
     for (unsigned i = 0; i < lights_.Size(); ++i)
@@ -211,22 +222,9 @@ void Drawable::LimitLights()
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     
-    for (unsigned i = 0; i < lights_.Size(); ++i)
-    {
-        // For split lights, take into account the original light instead, so that we do not get "partial" lighting
-        Light* originalLight = lights_[i]->GetOriginalLight();
-        if (originalLight)
-            uniqueLights.Insert(originalLight);
-        else
-            uniqueLights.Insert(lights_[i]);
-        
-        // Stop when allowed light count exceeded
-        if (uniqueLights.Size() > maxLights_)
-        {
-            lights_.Resize(i);
-            return;
-        }
-    }
+    // If more lights than allowed, cut the list
+    if (lights_.Size() > maxLights_)
+        lights_.Resize(maxLights_);
 }
 
 bool Drawable::IsInView(unsigned frameNumber) const
@@ -237,6 +235,15 @@ bool Drawable::IsInView(unsigned frameNumber) const
 bool Drawable::IsInView(const FrameInfo& frame) const
 {
     return viewFrameNumber_ == frame.frameNumber_ && viewCamera_ == frame.camera_;
+}
+
+bool Drawable::HasBasePass(unsigned batchIndex) const
+{
+    unsigned index = batchIndex >> 5;
+    if (index < basePassFlags_.Size())
+        return (basePassFlags_[index] & (1 << (batchIndex & 31))) != 0;
+    else
+        return false;
 }
 
 void Drawable::OnNodeSet(Node* node)

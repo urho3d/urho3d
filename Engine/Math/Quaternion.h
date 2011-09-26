@@ -66,13 +66,28 @@ public:
     }
     
     /// Construct from an angle (in degrees) and axis.
-    Quaternion(float angle, const Vector3& axis);
+    Quaternion(float angle, const Vector3& axis)
+    {
+        FromAngleAxis(angle, axis);
+    }
+    
     /// Construct from Euler angles (in degrees.)
-    Quaternion(float x, float y, float z);
+    Quaternion(float x, float y, float z)
+    {
+        FromEulerAngles(x, y, z);
+    }
+    
     /// Construct from the rotation difference between two vectors.
-    Quaternion(const Vector3& start, const Vector3& end);
+    Quaternion(const Vector3& start, const Vector3& end)
+    {
+        FromRotationTo(start, end);
+    }
+    
     /// Construct from a rotation matrix.
-    Quaternion(const Matrix3& matrix);
+    Quaternion(const Matrix3& matrix)
+    {
+        FromRotationMatrix(matrix);
+    }
     
     /// Assign from another quaternion.
     Quaternion& operator = (const Quaternion& rhs)
@@ -127,6 +142,15 @@ public:
         
         return rhs + 2.0f * (cross1 * w_ + cross2);
     }
+    
+    /// Define from an angle (in degrees) and axis.
+    void FromAngleAxis(float angle, const Vector3& axis);
+    /// Define from Euler angles (in degrees.)
+    void FromEulerAngles(float x, float y, float z);
+    /// Define from the rotation difference between two vectors.
+    void FromRotationTo(const Vector3& start, const Vector3& end);
+    /// Define from a rotation matrix.
+    void FromRotationMatrix(const Matrix3& matrix);
     
     /// Normalize to unit length and return the previous length.
     float Normalize()

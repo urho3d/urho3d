@@ -58,12 +58,12 @@ public:
     /// Define with projection parameters and a transform matrix.
     void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     /// Define with near and far dimension vectors and a transform matrix.
-    void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform);
+    void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     /// Define with orthographic projection parameters and a transform matrix.
     void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     /// Transform by a 3x3 matrix.
     void Transform(const Matrix3& transform);
-    /// Transform by a 4x3 matrix.
+    /// Transform by a 3x4 matrix.
     void Transform(const Matrix3x4& transform);
     
     /// Test if a point is inside or outside.
@@ -115,8 +115,9 @@ public:
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].Distance(center);
-            float absDist = planes_[i].AbsDistanceFast(edge);
+            const Plane& plane = planes_[i];
+            float dist = plane.normal_.DotProduct(center) - plane.intercept_;
+            float absDist = plane.absNormal_.DotProduct(edge);
             
             if (dist < -absDist)
                 return OUTSIDE;
@@ -135,8 +136,9 @@ public:
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].Distance(center);
-            float absDist = planes_[i].AbsDistanceFast(edge);
+            const Plane& plane = planes_[i];
+            float dist = plane.normal_.DotProduct(center) - plane.intercept_;
+            float absDist = plane.absNormal_.DotProduct(edge);
             
             if (dist < -absDist)
                 return OUTSIDE;
@@ -145,9 +147,19 @@ public:
         return INSIDE;
     }
     
+    /// Return distance of a point to the frustum, or 0 if inside.
+    float Distance(const Vector3& point) const
+    {
+        float distance = 0.0f;
+        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+            distance = Max(-planes_[i].Distance(point), distance);
+        
+        return distance;
+    }
+    
     /// Return transformed by a 3x3 matrix.
     Frustum Transformed(const Matrix3& transform) const;
-    /// Return transformed by a 4x3 matrix.
+    /// Return transformed by a 3x4 matrix.
     Frustum Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix.
     Rect Projected(const Matrix4& transform) const;

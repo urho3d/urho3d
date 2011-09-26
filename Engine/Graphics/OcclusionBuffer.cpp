@@ -163,40 +163,46 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const unsigned char* vertexDa
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
     {
-        const unsigned short* indices = (const unsigned short*)indexData;
+        const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
+        const unsigned short* indicesEnd = indices + indexCount;
         
-        for (unsigned i = indexStart; i < indexStart + indexCount; i += 3)
+        while (indices < indicesEnd)
         {
             if (numTriangles_ >= max_Triangles)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[i] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[i + 1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[i + 2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);
             vertices[2] = ModelTransform(modelViewProj, v2);
             DrawTriangle(vertices);
+            
+            indices += 3;
         }
     }
     else
     {
-        const unsigned* indices = (const unsigned*)indexData;
+        const unsigned* indices = ((const unsigned*)indexData) + indexStart;
+        const unsigned* indicesEnd = indices + indexCount;
         
-        for (unsigned i = indexStart; i < indexStart + indexCount; i += 3)
+        while (indices < indicesEnd)
         {
             if (numTriangles_ >= max_Triangles)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[i] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[i + 1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[i + 2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);
             vertices[2] = ModelTransform(modelViewProj, v2);
             DrawTriangle(vertices);
+            
+            indices += 3;
         }
     }
     

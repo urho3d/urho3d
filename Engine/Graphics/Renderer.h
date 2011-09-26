@@ -43,10 +43,12 @@ class ResourceCache;
 class Skeleton;
 class OcclusionBuffer;
 class Texture2D;
+class TextureCube;
 class View;
 class Zone;
 
 static const int SHADOW_MIN_PIXELS = 64;
+static const int NUM_LIGHT_TYPES = 3;
 static const int NUM_SHADOWMAP_RESOLUTIONS = 3;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 
@@ -54,9 +56,21 @@ static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 enum LightVSVariation
 {
     LVS_NONE = 0,
+    LVS_DIR,
     LVS_SPOT,
+    LVS_POINT,
+    LVS_SPEC,
+    LVS_DIRSPEC,
+    LVS_SPOTSPEC,
+    LVS_POINTSPEC,
     LVS_SHADOW,
+    LVS_DIRSHADOW,
     LVS_SPOTSHADOW,
+    LVS_POINTSHADOW,
+    LVS_SPECSHADOW,
+    LVS_DIRSPECSHADOW,
+    LVS_SPOTSPECSHADOW,
+    LVS_POINTSPECSHADOW,
     MAX_LIGHT_VS_VARIATIONS
 };
 
@@ -82,54 +96,6 @@ enum LightPSVariation
     MAX_LIGHT_PS_VARIATIONS
 };
 
-/// Deferred light volume vertex shader variations.
-enum DeferredLightVSVariation
-{
-    DLVS_NONE = 0,
-    DLVS_DIR,
-    DLVS_ORTHO,
-    DLVS_ORTHODIR,
-    MAX_DEFERRED_LIGHT_VS_VARIATIONS
-};
-
-/// Deferred light volume pixels shader variations.
-enum DeferredLightPSVariation
-{
-    DLPS_NONE = 0,
-    DLPS_SPEC,
-    DLPS_SPOT,
-    DLPS_SPOTSPEC,
-    DLPS_POINT,
-    DLPS_POINTSPEC,
-    DLPS_POINTMASK,
-    DLPS_POINTMASKSPEC,
-    DLPS_SHADOW,
-    DLPS_SHADOWSPEC,
-    DLPS_SPOTSHADOW,
-    DLPS_SPOTSHADOWSPEC,
-    DLPS_POINTSHADOW,
-    DLPS_POINTSHADOWSPEC,
-    DLPS_POINTMASKSHADOW,
-    DLPS_POINTMASKSHADOWSPEC,
-    DLPS_ORTHO,
-    DLPS_ORTHOSPEC,
-    DLPS_ORTHOSPOT,
-    DLPS_ORTHOSPOTSPEC,
-    DLPS_ORTHOPOINT,
-    DLPS_ORTHOPOINTSPEC,
-    DLPS_ORTHOPOINTMASK,
-    DLPS_ORTHOPOINTMASKSPEC,
-    DLPS_ORTHOSHADOW,
-    DLPS_ORTHOSHADOWSPEC,
-    DLPS_ORTHOSPOTSHADOW,
-    DLPS_ORTHOSPOTSHADOWSPEC,
-    DLPS_ORTHOPOINTSHADOW,
-    DLPS_ORTHOPOINTSHADOWSPEC,
-    DLPS_ORTHOPOINTMASKSHADOW,
-    DLPS_ORTHOPOINTMASKSHADOWSPEC,
-    MAX_DEFERRED_LIGHT_PS_VARIATIONS
-};
-
 /// High-level rendering subsystem. Manages drawing of 3D views.
 class Renderer : public Object
 {
@@ -149,8 +115,6 @@ public:
     void SetViewport(unsigned index, const Viewport& viewport);
     /// %Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// %Set shadows on/off.
-    void SetDrawShadows(bool enable);
     /// %Set texture anisotropy.
     void SetTextureAnisotropy(int level);
     /// %Set texture filtering.
@@ -159,14 +123,20 @@ public:
     void SetTextureQuality(int quality);
     /// %Set material quality level.
     void SetMaterialQuality(int quality);
+    /// %Set shadows on/off.
+    void SetDrawShadows(bool enable);
     /// %Set shadow map resolution.
     void SetShadowMapSize(int size);
     /// %Set shadow quality (amount of samples and bit depth.)
     void SetShadowQuality(int quality);
-    /// %Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing.
+    /// %Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
-    /// %Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first.
-    void SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter);
+    /// %Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
+    void SetMaxShadowMaps(int shadowMaps);
+    /// %Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
+    void SetMaxShadowCascades(int cascades);
+    /// %Set light stencil optimization on/off.
+    void SetLightStencilMasking(bool enable);
     /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
     /// %Set minimum object group size for instancing.
@@ -201,12 +171,12 @@ public:
     int GetShadowQuality() const { return shadowQuality_; }
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
-    /// Return number of full resolution shadow maps.
-    unsigned GetNumFullShadowMaps() const { return shadowMaps_[0].Size(); }
-    /// Return number of half resolution shadow maps.
-    unsigned GetNumHalfShadowMaps() const { return shadowMaps_[1].Size(); }
-    /// Return number of quarter resolution shadow maps.
-    unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].Size(); }
+    /// Return maximum number of shadow maps per resolution.
+    int GetMaxShadowMaps() const { return maxShadowMaps_; }
+    /// Return maximum number of directional light shadow map cascades.
+    int GetMaxShadowCascades() const { return maxShadowCascades_; }
+    /// Return whether light stencil optimization is in use.
+    bool GetLightStencilMasking() const { return lightStencilMasking_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return minimum object group size for instancing.
@@ -244,7 +214,11 @@ public:
     /// Return the default range attenuation texture.
     Texture2D* GetDefaultLightRamp() const { return defaultLightRamp_; }
     /// Return the default spotlight attenuation texture.
-    Texture2D* GetDefaultLightSpot() const { return defaultLightSpot; }
+    Texture2D* GetDefaultLightSpot() const { return defaultLightSpot_; }
+    /// Return the shadowed pointlight face selection cube map.
+    TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
+    /// Return the shadowed pointlight indirection cube map.
+    TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return a vertex shader by name.
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name.
@@ -270,16 +244,12 @@ private:
     OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
-    /// Return shadow map by resolution. If shadow map reuse is disabled, a different map is returned each time.
-    Texture2D* GetShadowMap(float resolution);
-    /// Reset shadow map use count.
-    void ResetShadowMapUseCount();
+    /// Return shadow map for a light. If shadow map reuse is disabled, a different map is returned each time.
+    Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Get a shader program.
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
-    /// Choose light volume shaders for a batch.
-    void SetLightVolumeShaders(Batch& batch);
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material technique.
@@ -296,8 +266,10 @@ private:
     void CreateInstancingBuffer();
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
-    /// Create shadow maps. Return true if successful.
-    bool CreateShadowMaps();
+    /// Remove all shadow maps. Called when global shadow map resolution or format is changed.
+    void ResetShadowMaps();
+    /// Reset shadow map allocation counts.
+    void ResetShadowMapAllocations();
     /// Split a light into several for shadow mapping.
     unsigned SplitLight(Light* light);
     /// Allocate a shadow camera and a scene node for it.
@@ -317,8 +289,6 @@ private:
     WeakPtr<ResourceCache> cache_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
-    /// Directional light geometry.
-    SharedPtr<Geometry> dirLightGeometry_;
     /// Point light volume geometry.
     SharedPtr<Geometry> pointLightGeometry_;
     /// Spot light volume geometry.
@@ -330,31 +300,29 @@ private:
     /// Default range attenuation texture.
     SharedPtr<Texture2D> defaultLightRamp_;
     /// Default spotlight attenuation texture.
-    SharedPtr<Texture2D> defaultLightSpot;
-    /// Shadow maps by resolution.
-    Vector<SharedPtr<Texture2D> > shadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
-    /// Shadow map dummy color textures by resolution.
-    SharedPtr<Texture2D> colorShadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
-    /// Shadow map depth stencil buffer, used only in fallback mode.
-    SharedPtr<Texture2D> shadowDepthStencil_;
-    /// Shadow map use count if reusing is disabled. Is reset for each view.
-    unsigned shadowMapUseCount_[NUM_SHADOWMAP_RESOLUTIONS];
+    SharedPtr<Texture2D> defaultLightSpot_;
+    /// Face selection cube map for shadowed pointlights.
+    SharedPtr<TextureCube> faceSelectCubeMap_;
+    /// Indirection cube map for shadowed pointlights.
+    SharedPtr<TextureCube> indirectionCubeMap_;
     /// Stencil rendering vertex shader.
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
     SharedPtr<ShaderVariation> stencilPS_;
-    /// Light vertex shaders.
-    Vector<SharedPtr<ShaderVariation> > lightVS_;
-    /// Light pixel shaders.
-    Vector<SharedPtr<ShaderVariation> > lightPS_;
     /// Reusable shadow cameras.
     Vector<SharedPtr<Camera> > shadowCameraStore_;
-    /// Reusable split lights.
-    Vector<SharedPtr<Light> > splitLightStore_;
     /// Reusable temporary scene nodes.
     Vector<SharedPtr<Node> > tempNodeStore_;
     /// Occlusion buffers.
     HashMap<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
+    /// Shadow maps by resolution.
+    HashMap<int, Vector<SharedPtr<Texture2D> > > shadowMaps_;
+    /// Shadow map dummy color buffers by resolution.
+    HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
+    /// Shadow map allocations by resolution.
+    HashMap<int, PODVector<Light*> > shadowMapAllocations_;
+    /// Shadow map stencil buffer, fallback mode only.
+    SharedPtr<Texture2D> shadowDepthStencil_;
     /// Viewports.
     Vector<Viewport> viewports_;
     /// Views.
@@ -369,22 +337,8 @@ private:
     String psFormat_;
     /// Base directory for shaders.
     String shaderPath_;
-    /// Number of views.
-    unsigned numViews_;
-    /// Number of shadow cameras.
-    unsigned numShadowCameras_;
-    /// Number of split lights.
-    unsigned numSplitLights_;
-    /// Number of temporary scene nodes.
-    unsigned numTempNodes_;
-    /// Number of primitives (3D geometry only.)
-    unsigned numPrimitives_;
-    /// Number of batches (3D geometry only.)
-    unsigned numBatches_;
-    /// Specular lighting flag.
-    bool specularLighting_;
-    /// Draw shadows flag.
-    bool drawShadows_;
+    /// Frame info for rendering.
+    FrameInfo frame_;
     /// Texture anisotropy level.
     int textureAnisotropy_;
     /// Texture filtering mode.
@@ -397,10 +351,10 @@ private:
     int shadowMapSize_;
     /// Shadow quality.
     int shadowQuality_;
-    /// Shadow map reuse flag.
-    bool reuseShadowMaps_;
-    /// Dynamic instancing flag.
-    bool dynamicInstancing_;
+    /// Maximum number of shadow maps per resolution.
+    int maxShadowMaps_;
+    /// Maximum number of directional light shadow cascades.
+    int maxShadowCascades_;
     /// Minimum object group size for instancing.
     int minInstanceGroupSize_;
     /// Maximum triangles per object for instancing.
@@ -411,10 +365,28 @@ private:
     int occlusionBufferSize_;
     /// Occluder screen size threshold.
     float occluderSizeThreshold_;
+    /// Number of views.
+    unsigned numViews_;
+    /// Number of shadow cameras.
+    unsigned numShadowCameras_;
+    /// Number of temporary scene nodes.
+    unsigned numTempNodes_;
+    /// Number of primitives (3D geometry only.)
+    unsigned numPrimitives_;
+    /// Number of batches (3D geometry only.)
+    unsigned numBatches_;
     /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_;
-    /// Frame info for rendering.
-    FrameInfo frame_;
+    /// Specular lighting flag.
+    bool specularLighting_;
+    /// Draw shadows flag.
+    bool drawShadows_;
+    /// Shadow map reuse flag.
+    bool reuseShadowMaps_;
+    /// Light stencil optimization flag.
+    bool lightStencilMasking_;
+    /// Dynamic instancing flag.
+    bool dynamicInstancing_;
     /// Shaders need reloading flag.
     bool shadersDirty_;
     /// Initialized flag.

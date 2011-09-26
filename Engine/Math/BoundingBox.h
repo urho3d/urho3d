@@ -26,6 +26,7 @@
 #include "Rect.h"
 #include "Vector3.h"
 
+class Polyhedron;
 class Frustum;
 class Matrix3;
 class Matrix4;
@@ -76,6 +77,34 @@ public:
     {
     }
     
+    /// Construct from an array of vertices.
+    BoundingBox(const Vector3* vertices, unsigned count) :
+        defined_(false)
+    {
+        Define(vertices, count);
+    }
+    
+    /// Construct from a frustum.
+    BoundingBox(const Frustum& frustum) :
+        defined_(false)
+    {
+        Define(frustum);
+    }
+    
+    /// Construct from a polyhedron.
+    BoundingBox(const Polyhedron& poly) :
+        defined_(false)
+    {
+        Define(poly);
+    }
+    
+    /// Construct from a sphere.
+    BoundingBox(const Sphere& sphere) :
+        defined_(false)
+    {
+        Define(sphere);
+    }
+    
     /// Assign from another bounding box.
     BoundingBox& operator = (const BoundingBox& rhs)
     {
@@ -100,6 +129,18 @@ public:
     /// Test for inequality with another bounding box.
     bool operator != (const BoundingBox& rhs) const { return (min_ != rhs.min_ || max_ != rhs.max_); }
     
+    /// Define from another bounding box.
+    void Define(const BoundingBox& box)
+    {
+        Define(box.min_, box.max_);
+    }
+    
+    /// Define from a Rect.
+    void Define(const Rect& rect)
+    {
+        Define(Vector3(rect.min_, 0.0f), Vector3(rect.max_, 0.0f));
+    }
+    
     /// Define from minimum and maximum vectors.
     void Define(const Vector3& min, const Vector3& max)
     {
@@ -108,18 +149,18 @@ public:
         defined_ = true;
     }
     
-    /// Define from a point.
-    void Define(const Vector3& point)
-    {
-        min_ = max_ = point;
-        defined_ = true;
-    }
-    
     /// Define from minimum and maximum floats (all dimensions same.)
     void Define(float min, float max)
     {
         min_ = Vector3(min, min, min);
         max_ = Vector3(max, max, max);
+        defined_ = true;
+    }
+    
+    /// Define from a point.
+    void Define(const Vector3& point)
+    {
+        min_ = max_ = point;
         defined_ = true;
     }
     
@@ -176,20 +217,32 @@ public:
     void Define(const Vector3* vertices, unsigned count);
     /// Define from a frustum.
     void Define(const Frustum& frustum);
+    /// Define from a polyhedron.
+    void Define(const Polyhedron& poly);
     /// Define from a sphere.
     void Define(const Sphere& sphere);
     /// Merge an array of vertices.
     void Merge(const Vector3* vertices, unsigned count);
     /// Merge a frustum.
     void Merge(const Frustum& frustum);
+    /// Merge a polyhedron.
+    void Merge(const Polyhedron& poly);
     /// Merge a sphere.
     void Merge(const Sphere& sphere);
-    /// Intersect with another bounding box.
-    void Intersect(const BoundingBox& box);
+    /// Clip with another bounding box.
+    void Clip(const BoundingBox& box);
     /// Transform with a 3x3 matrix.
     void Transform(const Matrix3& transform);
-    /// Transform with a 4x3 matrix.
+    /// Transform with a 3x4 matrix.
     void Transform(const Matrix3x4& transform);
+    
+    /// Clear to undefined state.
+    void Clear()
+    {
+        min_ = Vector3::ZERO;
+        max_ = Vector3::ZERO;
+        defined_ = false;
+    }
     
     /// Return center.
     Vector3 Center() const { return (max_ + min_) * 0.5f; }
@@ -200,7 +253,7 @@ public:
     
     /// Return transformed by a 3x3 matrix.
     BoundingBox Transformed(const Matrix3& transform) const;
-    /// Return transformed by a 4x3 matrix.
+    /// Return transformed by a 3x4 matrix.
     BoundingBox Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix.
     Rect Projected(const Matrix4& projection) const;

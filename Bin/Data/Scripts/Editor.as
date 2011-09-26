@@ -17,11 +17,9 @@ void Start()
     }
 
     configFileName = fileSystem.userDocumentsDir + "Urho3D/Editor/Config.xml";
-
+    SubscribeToEvent("Update", "HandleUpdate");
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
-
-    SubscribeToEvent("Update", "HandleUpdate");
 
     CreateScene();
     CreateUI();

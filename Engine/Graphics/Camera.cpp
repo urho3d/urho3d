@@ -151,18 +151,6 @@ float Camera::GetNearClip() const
         return 0.0f;
 }
 
-Frustum Camera::GetViewSpaceFrustum() const
-{
-    Frustum ret;
-    
-    if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_);
-    else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_);
-    
-    return ret;
-}
-
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
 {
     Frustum ret;
@@ -176,6 +164,35 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
         ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, GetWorldTransform());
     else
         ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, GetWorldTransform());
+    
+    return ret;
+}
+
+Frustum Camera::GetViewSpaceFrustum() const
+{
+    Frustum ret;
+    
+    if (!orthographic_)
+        ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_);
+    else
+        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_);
+    
+    return ret;
+}
+
+Frustum Camera::GetViewSpaceSplitFrustum(float nearClip, float farClip) const
+{
+    Frustum ret;
+    
+    nearClip = Max(nearClip, GetNearClip());
+    farClip = Min(farClip, farClip_);
+    if (farClip < nearClip)
+        farClip = nearClip;
+    
+    if (!orthographic_)
+        ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip);
+    else
+        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip);
     
     return ret;
 }
@@ -223,7 +240,7 @@ Frustum Camera::GetFrustum() const
     return ret;
 }
 
-Matrix4 Camera::GetProjection(bool enableOffset) const
+Matrix4 Camera::GetProjection() const
 {
     Matrix4 ret(Matrix4::ZERO);
     
@@ -241,16 +258,12 @@ Matrix4 Camera::GetProjection(bool enableOffset) const
         #endif
         
         ret.m00_ = w;
+        ret.m02_ = projectionOffset_.x_ * 2.0f;
         ret.m11_ = h;
+        ret.m12_ = projectionOffset_.y_ * 2.0f;
         ret.m22_ = q;
         ret.m23_ = r;
         ret.m32_ = 1.0f;
-        
-        if (enableOffset)
-        {
-            ret.m02_ = projectionOffset_.x_ * 2.0f;
-            ret.m12_ = projectionOffset_.y_ * 2.0f;
-        }
     }
     else
     {
@@ -266,16 +279,12 @@ Matrix4 Camera::GetProjection(bool enableOffset) const
         #endif
         
         ret.m00_ = w;
+        ret.m03_ = projectionOffset_.x_ * 2.0f;
         ret.m11_ = h;
+        ret.m13_ = projectionOffset_.y_ * 2.0f;
         ret.m22_ = q;
         ret.m23_ = r;
         ret.m33_ = 1.0f;
-        
-        if (enableOffset)
-        {
-            ret.m03_ = projectionOffset_.x_ * 2.0f;
-            ret.m13_ = projectionOffset_.y_ * 2.0f;
-        }
     }
     
     return ret;

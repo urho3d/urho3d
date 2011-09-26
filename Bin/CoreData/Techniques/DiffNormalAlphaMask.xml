@@ -1,6 +1,4 @@
 <technique>
-    <pass name="gbuffer" vs="GBuffer_Normal" ps="GBuffer_DiffNormalMask" alphamask="true" />
-    <pass name="gbuffer2" vs="GBuffer_Normal" ps="GBuffer_DiffNormalMaskPass2" alphamask="true" depthwrite="false" />
     <pass name="base" vs="Forward" ps="Forward_DiffAmbient" alphatest="true" />
     <pass name="litbase" vs="Forward_Normal" ps="Forward_DiffNormalAmbient" alphatest="true" />
     <pass name="light" vs="Forward_Normal" ps="Forward_DiffNormal" alphatest="true" depthwrite="false" blend="add" />

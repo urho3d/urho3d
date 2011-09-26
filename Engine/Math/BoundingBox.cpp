@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Frustum.h"
+#include "Polyhedron.h"
 
 void BoundingBox::Define(const Vector3* vertices, unsigned count)
 {
@@ -36,6 +37,12 @@ void BoundingBox::Define(const Vector3* vertices, unsigned count)
 void BoundingBox::Define(const Frustum& frustum)
 {
     Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
+}
+
+void BoundingBox::Define(const Polyhedron& poly)
+{
+    defined_ = false;
+    Merge(poly);
 }
 
 void BoundingBox::Define(const Sphere& sphere)
@@ -62,6 +69,16 @@ void BoundingBox::Merge(const Frustum& frustum)
     Merge(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
+void BoundingBox::Merge(const Polyhedron& poly)
+{
+    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    {
+        const Vector<Vector3>& face = poly.faces_[i];
+        if (!face.Empty())
+            Merge(&face[0], face.Size());
+    }
+}
+
 void BoundingBox::Merge(const Sphere& sphere)
 {
     const Vector3& center = sphere.center_;
@@ -71,7 +88,7 @@ void BoundingBox::Merge(const Sphere& sphere)
     Merge(center + Vector3(-radius, -radius, -radius));
 }
 
-void BoundingBox::Intersect(const BoundingBox& box)
+void BoundingBox::Clip(const BoundingBox& box)
 {
     if (box.min_.x_ > min_.x_)
         min_.x_ = box.min_.x_;

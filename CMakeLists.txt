@@ -97,7 +97,7 @@ if (USE_OPENGL)
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
             COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
+            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
         )
         
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)
@@ -107,13 +107,13 @@ else()
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2
             COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM2 SM2
-            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl ScreenPos.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
+            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
         )
             
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3
             COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM3 SM3
-            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl ScreenPos.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
+            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
         )
 
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2 ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3)
@@ -150,7 +150,6 @@ add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/TinyXML)
 add_subdirectory (Tools/AssetImporter)
-add_subdirectory (Tools/NormalMapTool)
 add_subdirectory (Tools/OgreImporter)
 add_subdirectory (Tools/PackageTool)
 add_subdirectory (Tools/RampGenerator)

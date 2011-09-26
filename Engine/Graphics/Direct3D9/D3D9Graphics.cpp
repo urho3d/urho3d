@@ -154,7 +154,6 @@ OBJECTTYPESTATIC(Graphics);
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
-    mode_(RENDER_FORWARD),
     width_(0),
     height_(0),
     multiSample_(1),
@@ -165,8 +164,6 @@ Graphics::Graphics(Context* context) :
     tripleBuffer_(false),
     flushGPU_(true),
     deviceLost_(false),
-    systemDepthStencil_(false),
-    hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
     streamOffsetSupport_(false),
@@ -210,8 +207,7 @@ Graphics::~Graphics()
     }
     if (impl_->defaultDepthStencilSurface_)
     {
-        if (systemDepthStencil_)
-            impl_->defaultDepthStencilSurface_->Release();
+        impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
     }
     if (impl_->device_)
@@ -241,7 +237,7 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         SetWindowText(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
     
@@ -267,7 +263,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
     
     // If nothing changes, do not reset the device
-    if (mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ && vsync == vsync_ && tripleBuffer ==
+    if (width == width_ && height == height_ && fullscreen == fullscreen_ && vsync == vsync_ && tripleBuffer ==
         tripleBuffer_ && multiSample == multiSample_)
         return true;
     
@@ -284,10 +280,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
-    // In deferred rendering mode, it is used to control temporal antialiasing
     multiSample_ = multiSample;
-    if (mode != RENDER_FORWARD)
-        multiSample = 1;
     
     // Check fullscreen mode validity. If not valid, revert to windowed
     if (fullscreen)
@@ -335,9 +328,6 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         impl_->presentParams_.Windowed         = true;
     }
     
-    // Use AutoDepthStencil normally. However, if INTZ depth is available, create a depth texture instead in deferred mode
-    bool autoDepthStencil = mode != RENDER_DEFERRED || !hardwareDepthSupport_;
-    
     impl_->presentParams_.BackBufferWidth            = width;
     impl_->presentParams_.BackBufferHeight           = height;
     impl_->presentParams_.BackBufferCount            = tripleBuffer ? 2 : 1;
@@ -345,7 +335,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
     impl_->presentParams_.hDeviceWindow              = impl_->window_;
-    impl_->presentParams_.EnableAutoDepthStencil     = autoDepthStencil;
+    impl_->presentParams_.EnableAutoDepthStencil     = true;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
     impl_->presentParams_.Flags                      = 0;
     impl_->presentParams_.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -360,7 +350,6 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
-    mode_ = mode;
     
     if (!impl_->device_)
     {
@@ -408,28 +397,18 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(mode_, width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
-}
-
-bool Graphics::SetMode(RenderMode mode)
-{
-    return SetMode(mode, width_, height_, fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(mode_, width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
 {
     if (impl_->window_)
     {
-        diffBuffer_.Reset();
-        normalBuffer_.Reset();
-        depthBuffer_.Reset();
-        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            screenBuffers_[i].Reset();
         immediateVertexBuffers_.Clear();
         
         DestroyWindow(impl_->window_);
@@ -557,7 +536,6 @@ bool Graphics::BeginFrame()
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
-    viewTexture_ = 0;
     
     // Cleanup textures from previous frame
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -1166,10 +1144,6 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
-        // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
-        // but should still not sample it either
-        else if (texture == viewTexture_)
-            texture = texture->GetBackupTexture();
     }
     
     if (texture != textures_[index])
@@ -1214,6 +1188,15 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         {
             impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSV, v);
             impl_->vAddressModes_[index] = v;
+        }
+        if (texture->GetType() == TextureCube::GetTypeStatic())
+        {
+            D3DTEXTUREADDRESS w = d3dAddressMode[texture->GetAddressMode(COORD_W)];
+            if (w != impl_->wAddressModes_[index])
+            {
+                impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSW, w);
+                impl_->wAddressModes_[index] = w;
+            }
         }
         if (u == D3DTADDRESS_BORDER || v == D3DTADDRESS_BORDER)
         {
@@ -1367,21 +1350,6 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetViewTexture(Texture* texture)
-{
-    viewTexture_ = texture;
-    
-    // Check for the view texture being currently bound
-    if (texture)
-    {
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        {
-            if (textures_[i] == texture)
-                SetTexture(i, textures_[i]->GetBackupTexture());
-        }
-    }
-}
-
 void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
 {
     if (enable != alphaTest_)
@@ -1516,10 +1484,6 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
     if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.x_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
     
-    // Check for illegal rect, disable in that case
-    if (rect.max_.x_ < rect.min_.x_ || rect.max_.y_ < rect.min_.y_)
-        enable = false;
-    
     if (enable)
     {
         IntVector2 rtSize(GetRenderTargetDimensions());
@@ -1571,10 +1535,6 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     
     // Full scissor is same as disabling the test
     if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
-        enable = false;
-    
-    // Check for illegal rect, disable in that case
-    if (rect.right_ < rect.left_ || rect.bottom_ < rect.top_)
         enable = false;
     
     if (enable)
@@ -2085,61 +2045,47 @@ bool Graphics::CreateInterface()
         return false;
     }
     
-    // Check supported features: Shader Model 3, deferred rendering, hardware depth texture, shadow map, dummy color surface,
-    // stream offset
-    if (impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
-    {
-        if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
-        {
-            // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs
-            // So, use INTZ buffer only with other vendors
-            if (impl_->adapterIdentifier_.VendorId != 0x1002)
-                hardwareDepthSupport_ = true;
-        }
-        unsigned requiredRTs = hardwareDepthSupport_ ? 2 : 3;
-        if (forceFallback_ || impl_->deviceCaps_.NumSimultaneousRTs < requiredRTs)
-        {
-            hardwareDepthSupport_ = false;
-            fallback_ = true;
-        }
-    }
-    
+    // Check supported features: Shader Model 3, shadow map, dummy color surface, stream offset
     // Prefer NVIDIA style hardware depth compared shadow maps if available
-    shadowMapFormat_ = D3DFMT_D16;
-    if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+    if (!forceFallback_)
     {
-        hardwareShadowSupport_ = true;
-        
-        // Check for hires depth support
-        hiresShadowMapFormat_ = D3DFMT_D24X8;
-        if (impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
-            hiresShadowSupport_ = true;
-        else
-            hiresShadowMapFormat_ = shadowMapFormat_;
-    }
-    else
-    {
-        // ATI DF16 format needs manual depth compare in the shader
-        shadowMapFormat_ = MAKEFOURCC('D', 'F', '1', '6');
+        shadowMapFormat_ = D3DFMT_D16;
         if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
         {
+            hardwareShadowSupport_ = true;
+        
             // Check for hires depth support
-            hiresShadowMapFormat_ = MAKEFOURCC('D', 'F', '2', '4');
+            hiresShadowMapFormat_ = D3DFMT_D24X8;
             if (impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
                 hiresShadowSupport_ = true;
             else
                 hiresShadowMapFormat_ = shadowMapFormat_;
         }
         else
-            // No depth texture shadow map support, use fallback mode
-            fallback_ = true;
+        {
+            // ATI DF16 format needs manual depth compare in the shader
+            shadowMapFormat_ = MAKEFOURCC('D', 'F', '1', '6');
+            if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+            {
+                // Check for hires depth support
+                hiresShadowMapFormat_ = MAKEFOURCC('D', 'F', '2', '4');
+                if (impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+                    hiresShadowSupport_ = true;
+                else
+                    hiresShadowMapFormat_ = shadowMapFormat_;
+            }
+            else
+                // No depth texture shadow map support, use fallback mode
+                fallback_ = true;
+        }
     }
+    else
+        fallback_ = true;
     
     if (fallback_)
     {
         shadowMapFormat_ = D3DFMT_A8R8G8B8;
         hiresShadowMapFormat_ = D3DFMT_A8R8G8B8;
-        hardwareShadowSupport_ = false;
     }
     
     if (!forceSM2_ && !fallback_)
@@ -2207,59 +2153,6 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
     return true;
 }
 
-void Graphics::CreateRenderTargets()
-{
-    if (mode_ == RENDER_DEFERRED)
-    {
-        if (!diffBuffer_)
-        {
-            diffBuffer_ = new Texture2D(context_);
-            diffBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-        }
-        
-        if (!normalBuffer_)
-        {
-            normalBuffer_ = new Texture2D(context_);
-            normalBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-        }
-        
-        if (!depthBuffer_ && !fallback_)
-        {
-            depthBuffer_ = new Texture2D(context_);
-            if (!hardwareDepthSupport_)
-                depthBuffer_->SetSize(0, 0, D3DFMT_R32F, TEXTURE_RENDERTARGET);
-            else
-                depthBuffer_->SetSize(0, 0, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
-        }
-        
-        // If deferred antialiasing is used, reserve screen buffers
-        // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
-        // which will also be useful in forward rendering)
-        if (multiSample_ > 1)
-        {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            {
-                screenBuffers_[i] = new Texture2D(context_);
-                screenBuffers_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-                screenBuffers_[i]->SetFilterMode(FILTER_BILINEAR);
-            }
-        }
-        else
-        {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-                screenBuffers_[i].Reset();
-        }
-    }
-    else
-    {
-        diffBuffer_.Reset();
-        normalBuffer_.Reset();
-        depthBuffer_.Reset();
-        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            screenBuffers_[i].Reset();
-    }
-}
-
 void Graphics::ResetDevice()
 {
     OnDeviceLost();
@@ -2304,27 +2197,12 @@ void Graphics::OnDeviceReset()
     for (unsigned i = 0; i < NUM_QUERIES; ++i)
         impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQueries_[i]);
     
-    // In case AutoDepthStencil is not used, depth buffering must be enabled manually
-    impl_->device_->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-    
-    // Create deferred rendering buffers now
-    CreateRenderTargets();
-    
     for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceReset();
     
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
-    if (impl_->presentParams_.EnableAutoDepthStencil)
-    {
-        impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
-        systemDepthStencil_ = true;
-    }
-    else
-    {
-        impl_->defaultDepthStencilSurface_ = (IDirect3DSurface9*)depthBuffer_->GetRenderSurface()->GetSurface();
-        systemDepthStencil_ = false;
-    }
+    impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
     
     immediateBuffer_ = 0;
 }
@@ -2344,6 +2222,7 @@ void Graphics::ResetCachedState()
         impl_->mipFilters_[i] = D3DTEXF_NONE;
         impl_->uAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->vAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl_->wAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
     }
     
@@ -2355,7 +2234,6 @@ void Graphics::ResetCachedState()
     depthStencil_ = 0;
     impl_->depthStencilSurface_ = 0;
     viewport_ = IntRect(0, 0, width_, height_);
-    viewTexture_ = 0;
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         streamFrequencies_[i] = 1;
@@ -2395,10 +2273,9 @@ void Graphics::ResetCachedState()
 
 void Graphics::SetTextureUnitMappings()
 {
-    textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["DiffMap"] = TU_DIFFUSE;
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
-    textureUnits_["SpecMap"] = TU_SPECULAR;
+    textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
     textureUnits_["DetailMap"] = TU_DETAIL;
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;
@@ -2407,9 +2284,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["LightSpotMap"] = TU_LIGHTSPOT;
     textureUnits_["LightCubeMap"]  = TU_LIGHTSPOT;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
-    textureUnits_["DiffBuffer"] = TU_DIFFBUFFER;
-    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
-    textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
+    textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
+    textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
 }
 
 void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)

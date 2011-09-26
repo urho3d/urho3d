@@ -26,6 +26,7 @@
 #include "Batch.h"
 #include "HashSet.h"
 #include "Object.h"
+#include "Polyhedron.h"
 
 class Camera;
 class DebugRenderer;
@@ -35,6 +36,7 @@ class OcclusionBuffer;
 class Octree;
 class RenderSurface;
 class Technique;
+class Texture2D;
 class Zone;
 struct Viewport;
 
@@ -45,52 +47,6 @@ struct GeometryDepthBounds
     float min_;
     /// Maximum value.
     float max_;
-};
-
-/// Helper structure for checking whether a transparent object is already lit by a certain light.
-struct LitTransparencyCheck
-{
-    /// Construct undefined.
-    LitTransparencyCheck()
-    {
-    }
-    
-    /// Construct.
-    LitTransparencyCheck(Light* light, Drawable* drawable, unsigned batchIndex) :
-        light_(light),
-        drawable_(drawable),
-        batchIndex_(batchIndex)
-    {
-    }
-    
-    /// Test for equality with another lit transparency check.
-    bool operator == (const LitTransparencyCheck& rhs) const { return light_ == rhs.light_ && drawable_ == rhs.drawable_ && batchIndex_ == rhs.batchIndex_; }
-    /// Test for inequality with another lit transparency check.
-    bool operator != (const LitTransparencyCheck& rhs) const { return light_ != rhs.light_ || drawable_ != rhs.drawable_ || batchIndex_ != rhs.batchIndex_; }
-    
-    /// Test if less than another lit transparency check.
-    bool operator < (const LitTransparencyCheck& rhs) const
-    {
-        if (light_ == rhs.light_)
-        {
-            if (drawable_ == rhs.drawable_)
-                return batchIndex_ < rhs.batchIndex_;
-            else
-                return drawable_ < rhs.drawable_;
-        }
-        else
-            return light_ < rhs.light_;
-    }
-    
-    /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return ((unsigned)light_) / sizeof(Light) + ((unsigned)drawable_) / sizeof(Drawable) + batchIndex_; }
-    
-    /// Light.
-    Light* light_;
-    /// Lit drawable.
-    Drawable* drawable_;
-    /// Batch index.
-    unsigned batchIndex_;
 };
 
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
@@ -138,29 +94,33 @@ private:
     /// Construct batches from the drawable objects.
     void GetBatches();
     /// Get lit batches for a certain light and drawable.
-    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue& lightQueue);
-    /// Render batches, forward mode.
-    void RenderBatchesForward();
-    /// Render batches, deferred mode.
-    void RenderBatchesDeferred();
+    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
+    /// Render batches.
+    void RenderBatches();
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
     void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
     unsigned ProcessLight(Light* light);
-    /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility.
-    void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool getShadowCasters);
+    /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
+    void ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVector<Drawable*>& drawables, BoundingBox& shadowCasterBox);
+    /// %Set up initial shadow camera view(s). Returns the number of splits used.
+    unsigned SetupShadowCameras(Light* light);
+    /// %Set up a directional light shadow camera
+    void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit, bool shadowOcclusion);
+    /// Finalize shadow camera view after shadow casters and the shadow map are known.
+    void FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRect& shadowViewport, const BoundingBox& shadowCasterBox);
+    /// Quantize a directional light shadow camera view to eliminate swimming.
+    void QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, const IntRect& shadowViewport, const BoundingBox& viewBox);
     /// Check visibility of one shadow caster.
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
-    /// %Set up initial shadow camera view.
-    void SetupShadowCamera(Light* light, bool shadowOcclusion = false);
-    /// Finalize shadow camera view after shadow casters and lit geometries are known.
-    void FinalizeShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox);
-    /// Quantize the directional light shadow camera view to eliminate artefacts.
-    void QuantizeDirShadowCamera(Light* light, const BoundingBox& viewBox);
+    /// Return the viewport for a shadow map split.
+    IntRect GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap);
     /// Optimize light rendering by setting up a scissor rectangle.
     void OptimizeLightByScissor(Light* light);
+    /// Optimize spot or point light rendering by drawing its volume to the stencil buffer.
+    void OptimizeLightByStencil(Light* light);
     /// Return scissor rectangle for a light.
     const Rect& GetLightScissor(Light* light);
     /// Split directional or point light for shadow rendering.
@@ -175,16 +135,10 @@ private:
     void PrepareInstancingBuffer();
     /// Calculate view-global shader parameters.
     void CalculateShaderParameters();
-    /// %Set up a light volume rendering batch.
-    void SetupLightBatch(Batch& batch, bool firstSplit);
-    /// Draw a split light to stencil buffer.
-    void DrawSplitLightToStencil(Camera& camera, Light* light, bool firstSplit);
-    /// Draw a full screen quad (either near or far.)
-    void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);
-    /// Draw everything in a batch queue, priority batches first.
+    /// Render everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
-    /// Draw a forward (shadowed) light batch queue.
-    void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight, bool firstSplit);
+    /// Render batches lit by a specific light.
+    void RenderLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     
@@ -208,30 +162,34 @@ private:
     int width_;
     /// Render target height.
     int height_;
-    /// Rendering mode.
-    RenderMode mode_;
     /// Draw shadows flag.
     bool drawShadows_;
     /// Material quality level.
     int materialQuality_;
     /// Maximum number of occluder triangles.
     int maxOccluderTriangles_;
-    /// Jitter counter for temporal antialiasing.
-    int jitterCounter_;
-    /// Previous view matrix for temporal antialiasing.
-    Matrix3x4 lastCameraView_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
+    /// Camera frustum.
+    Frustum frustum_;
     /// Combined bounding box of visible geometries.
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space.
     BoundingBox sceneViewBox_;
-    /// Current split lights being processed.
-    Light* splitLights_[MAX_LIGHT_SPLITS];
-    /// Current lit geometries being processed.
-    PODVector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
+    /// Volume for frustum clipping.
+    Polyhedron frustumVolume_;
+    /// Current shadow cameras being processed.
+    Camera* shadowCameras_[MAX_LIGHT_SPLITS];
     /// Current shadow casters being processed.
     PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
+    /// Combined bounding box of shadow casters in light view or projection space.
+    BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
+    /// Shadow camera near splits (directional lights only.)
+    float shadowNearSplits_[MAX_LIGHT_SPLITS];
+    /// Shadow camera far splits (directional lights only.)
+    float shadowFarSplits_[MAX_LIGHT_SPLITS];
+    /// Current lit geometries being processed.
+    PODVector<Drawable*> litGeometries_;
     /// Temporary drawable query result.
     PODVector<Drawable*> tempDrawables_;
     /// Geometry objects.
@@ -244,12 +202,6 @@ private:
     PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights.
     PODVector<Light*> lights_;
-    /// Render surfaces for which a G-buffer size error has already been logged, to prevent log spam.
-    HashSet<RenderSurface*> gBufferErrorDisplayed_;
-    /// Helper set for combining lit geometries of a split light.
-    HashSet<Drawable*> allLitGeometries_;
-    /// Transparent drawables that are already lit, to avoid multiple lighting.
-    HashSet<LitTransparencyCheck> litTransparencies_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Light queue indices of processed lights.
@@ -258,18 +210,14 @@ private:
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Cache for light scissor queries.
     HashMap<Light*, Rect> lightScissorCache_;
-    /// G-buffer batches.
-    BatchQueue gBufferQueue_;
-    /// G-buffer pass 2 batches (fallback mode only.)
-    BatchQueue gBuffer2Queue_;
     /// Base pass batches.
     BatchQueue baseQueue_;
     /// Extra pass batches.
     BatchQueue extraQueue_;
     /// Transparent geometry batches.
     BatchQueue transparentQueue_;
-    /// Unshadowed light volume batches.
-    BatchQueue noShadowLightQueue_;
-    /// Shadowed light queues.
+    /// Light queues.
     Vector<LightBatchQueue> lightQueues_;
+    /// Current stencil value for light optimization;
+    unsigned char lightStencilValue_;
 };

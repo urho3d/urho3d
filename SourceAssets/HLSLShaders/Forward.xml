@@ -2,7 +2,25 @@
     <shader name="Forward" type="vs">
         <option name="Normal" define="NORMALMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
-        <option name="Spot" define="SPOTLIGHT" />
+        <option name="Dir">
+            <define name="LIGHT" />
+            <define name="DIRLIGHT" />
+            <exclude name="Spot" />
+            <exclude name="PointMask" />
+        </option>
+        <option name="Spot">
+            <define name="LIGHT" />
+            <define name="SPOTLIGHT" />
+            <exclude name="Dir" />
+            <exclude name="PointMask" />
+        </option>
+        <option name="Point">
+            <define name="LIGHT" />
+            <define name="POINTLIGHT" />
+            <exclude name="Dir" />
+            <exclude name="Spot" />
+        </option>
+        <option name="Spec" define="SPECULAR" />
         <option name="Shadow" define="SHADOW" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
@@ -59,7 +77,7 @@
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
         <option name="Shadow" define="SHADOW" require="LIGHT" />
         <option name="Spec" define="SPECULAR" />
-        <option name="LQ" define="LQSHADOW" require="SHADOW" />
+        <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
         <option name="FB" define="FALLBACK">
             <exclude name="LQ" />

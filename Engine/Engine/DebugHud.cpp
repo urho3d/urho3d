@@ -35,6 +35,12 @@
 
 #include "DebugNew.h"
 
+static const String qualityTexts[] = {
+    "Low",
+    "Med",
+    "High"
+};
+
 static const String shadowQualityTexts[] = {
     "16bit Low",
     "24bit Low",
@@ -122,60 +128,40 @@ void DebugHud::Update(float timeStep)
     {
         String mode;
         
-        RenderMode renderMode = graphics->GetRenderMode();
-        if (renderMode == RENDER_FORWARD)
-            mode = "Forward";
-        else
-            mode = "Deferred";
+        mode += "Tex: " + qualityTexts[renderer->GetTextureQuality()];
         
-        int textureQuality = renderer->GetTextureQuality();
-        mode += " Tex:";
-        if (textureQuality == 0)
-            mode += "Low";
-        if (textureQuality == 1)
-            mode += "Med";
-        if (textureQuality == 2)
-            mode += "High";
+        mode += " Mat: " + qualityTexts[renderer->GetMaterialQuality()];
         
-        int materialQuality = renderer->GetMaterialQuality();
-        mode +=" Mat:";
-        if (materialQuality == 0)
-            mode += "Low";
-        if (materialQuality == 1)
-            mode += "Med";
-        if (materialQuality == 2)
-            mode += "High";
-        
-        bool specular = renderer->GetSpecularLighting();
         mode += " Spec:";
-        if (specular)
+        if (renderer->GetSpecularLighting())
             mode += "On";
         else
             mode += "Off";
         
-        bool shadows = renderer->GetDrawShadows();
         mode += " Shadows:";
-        if (shadows)
+        if (renderer->GetDrawShadows())
             mode += "On";
         else
             mode += "Off";
         
-        int shadowMapSize = renderer->GetShadowMapSize();
-        mode += " Size:" + String(shadowMapSize);
+        mode += " Size:" + String(renderer->GetShadowMapSize());
         
-        int shadowQuality = renderer->GetShadowQuality();
-        mode += " Quality:" + shadowQualityTexts[shadowQuality];
+        mode += " Quality:" + shadowQualityTexts[renderer->GetShadowQuality()];
         
-        bool occlusion = renderer->GetMaxOccluderTriangles() > 0;
         mode += " Occlusion:";
-        if (occlusion)
+        if (renderer->GetMaxOccluderTriangles() > 0)
             mode += "On";
         else
             mode += "Off";
         
-        bool instancing = renderer->GetDynamicInstancing();
         mode += " Instancing:";
-        if (instancing)
+        if (renderer->GetDynamicInstancing())
+            mode += "On";
+        else
+            mode += "Off";
+        
+        mode += " Stencil:";
+        if (renderer->GetLightStencilMasking())
             mode += "On";
         else
             mode += "Off";
@@ -184,11 +170,15 @@ void DebugHud::Update(float timeStep)
         #ifdef USE_OPENGL
         mode += "OGL";
         #else
-        bool sm3 = graphics->GetSM3Support();
-        if (sm3)
+        if (graphics->GetSM3Support())
             mode += "SM3";
         else
-            mode += "SM2";
+        {
+            if (graphics->GetFallback())
+                mode += "SM2 (FB)";
+            else
+                mode += "SM2";
+        }
         #endif
         
         modeText_->SetText(mode);

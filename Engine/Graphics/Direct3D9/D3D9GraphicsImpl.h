@@ -85,6 +85,8 @@ private:
     D3DTEXTUREADDRESS uAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture V coordinate addressing modes in use.
     D3DTEXTUREADDRESS vAddressModes_[MAX_TEXTURE_UNITS];
+    /// Texture W coordinate addressing modes in use.
+    D3DTEXTUREADDRESS wAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use.
     Color borderColors_[MAX_TEXTURE_UNITS];
     /// Color surfaces in use.

@@ -70,7 +70,6 @@ void Start()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
-    SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
 
     if (singlePlayer)
@@ -155,8 +154,8 @@ void InitScene()
     light.castShadows = true;
     light.shadowNearFarRatio = 0.002;
     light.shadowBias = BiasParameters(0.00025, 0.001);
-    light.shadowCascade = CascadeParameters(2, 0.5, 0.15, 5000);
-    light.shadowFocus = FocusParameters(true, true, true, 50, 900);
+    light.shadowCascade = CascadeParameters(1000.0, 2000.0, 5000.0, 0.0, 0.8);
+    light.shadowFocus = FocusParameters(true, true, true, 25, 500);
 
     Node@ staticNode = gameScene.CreateChild("Static");
     StaticModel@ staticModel = staticNode.CreateComponent("StaticModel");
@@ -209,7 +208,7 @@ void CreateCamera()
     gameCameraNode.position = Vector3(0, 200, -1000);
 
     gameCamera = gameCameraNode.CreateComponent("Camera");
-    gameCamera.nearClip = 10.0;
+    gameCamera.nearClip = 50.0;
     gameCamera.farClip = 16000.0;
 
     if (!engine.headless)
@@ -377,13 +376,15 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
+    if (input.keyPress[KEY_F1])
+        console.Toggle();
     if (input.keyPress[KEY_F2])
         debugHud.ToggleAll();
     if (input.keyPress[KEY_F3])
         drawDebug = !drawDebug;
     if (input.keyPress[KEY_F4])
         drawOctreeDebug = !drawOctreeDebug;
-
+    
     // Allow pause only in singleplayer
     if (singlePlayer && input.keyPress['P'] && !console.visible && gameOn)
     {
@@ -903,13 +904,6 @@ void UpdateStatus()
         }
         healthBar.width = 116 * health / playerHealth;
     }
-}
-
-void HandleKeyDown(StringHash eventType, VariantMap& eventData)
-{
-    // Check for toggling the console
-    if (eventData["Key"].GetInt() == KEY_F1)
-        console.Toggle();
 }
 
 void HandleScreenMode()

@@ -37,7 +37,7 @@ float Ray::HitDistance(const Plane& plane) const
 {
     float d = plane.normal_.DotProduct(direction_);
     if (fabsf(d) >= M_EPSILON)
-        return (-plane.normal_.DotProduct(origin_) + plane.intercept_) / d;
+        return -(plane.normal_.DotProduct(origin_) - plane.intercept_) / d;
     else
         return M_INFINITY;
 }
@@ -154,20 +154,20 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
     // Based on Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
     // http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
     // Calculate edge vectors
-    Vector3 edge1 = v1 - v0;
-    Vector3 edge2 = v2 - v0;
+    Vector3 edge1(v1 - v0);
+    Vector3 edge2(v2 - v0);
     
     // Calculate determinant & check backfacing
-    Vector3 p = direction_.CrossProduct(edge2);
+    Vector3 p(direction_.CrossProduct(edge2));
     float det = edge1.DotProduct(p);
     if (det >= M_EPSILON)
     {
         // Calculate u & v parameters and test
-        Vector3 t = origin_ - v0;
+        Vector3 t(origin_ - v0);
         float u = t.DotProduct(p);
         if (u >= 0.0f && u <= det)
         {
-            Vector3 q = t.CrossProduct(edge1);
+            Vector3 q(t.CrossProduct(edge1));
             float v = direction_.DotProduct(q);
             if (v >= 0.0f && u + v <= det)
             {
@@ -188,27 +188,31 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
     {
-        const unsigned short* indices = (const unsigned short*)indexData;
+        const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
+        const unsigned short* indicesEnd = indices + indexCount;
         
-        for (unsigned i = indexStart; i < indexStart + indexCount; i += 3)
+        while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
             nearest = Min(nearest, HitDistance(v0, v1, v2));
+            indices += 3;
         }
     }
     // 32-bit indices
     else
     {
-        const unsigned* indices = (const unsigned*)indexData;
+        const unsigned* indices = ((const unsigned*)indexData) + indexStart;
+        const unsigned* indicesEnd = indices + indexCount;
         
-        for (unsigned i = indexStart; i < indexStart + indexCount; i += 3)
+        while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
             nearest = Min(nearest, HitDistance(v0, v1, v2));
+            indices += 3;
         }
     }
     

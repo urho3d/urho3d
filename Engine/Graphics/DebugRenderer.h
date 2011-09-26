@@ -30,6 +30,7 @@
 
 class BoundingBox;
 class Camera;
+class Polyhedron;
 class Frustum;
 class Drawable;
 class Light;
@@ -86,6 +87,8 @@ public:
     void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
     /// Add a frustum.
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
+    /// Add a polyhedron.
+    void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Render all debug lines. The viewport and rendertarget should be set before.
