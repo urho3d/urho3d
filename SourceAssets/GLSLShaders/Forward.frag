@@ -51,7 +51,6 @@ void main()
         vec3 lightColor;
         vec3 lightDir;
         float diff;
-        float NdotL;
 
         #ifdef NORMALMAP
             vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
@@ -65,9 +64,9 @@ void main()
             #else
                 lightDir = vLightVec.xyz;
             #endif
-            diff = GetDiffuseDir(normal, lightDir, NdotL);
+            diff = GetDiffuseDir(normal, lightDir);
         #else
-            diff = GetDiffusePointOrSpot(normal, vLightVec.xyz, lightDir, NdotL);
+            diff = GetDiffusePointOrSpot(normal, vLightVec.xyz, lightDir);
         #endif
 
         #ifdef SHADOW
@@ -103,7 +102,7 @@ void main()
             #else
                 float specStrength = cMatSpecProperties.x;
             #endif
-            float spec = GetSpecular(normal, vEyeVec, lightDir, NdotL, cMatSpecProperties.y);
+            float spec = GetSpecular(normal, vEyeVec, lightDir, cMatSpecProperties.y);
             vec3 finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
         #else
             vec3 finalColor = diff * lightColor * diffColor.rgb;

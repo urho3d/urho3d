@@ -1,15 +1,13 @@
-float GetDiffuseDir(vec3 normal, vec3 lightDir, out float NdotL)
+float GetDiffuseDir(vec3 normal, vec3 lightDir)
 {
-    NdotL = max(dot(normal, lightDir), 0.0);
-    return NdotL;
+    return max(dot(normal, lightDir), 0.0);
 }
 
 float GetDiffusePointOrSpot(vec3 normal, vec3 lightVec, out vec3 lightDir, out float NdotL)
 {
     float lightDist = length(lightVec);
     lightDir = lightVec / lightDist;
-    NdotL = max(dot(normal, lightDir), 0.0);
-    return NdotL * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
+    return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
 }
 
 float GetDiffuseDirVolumetric()
@@ -23,10 +21,10 @@ float GetDiffusePointOrSpotVolumetric(vec3 lightVec)
     return texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
 }
 
-float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float NdotL, float specularPower)
+float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
-    vec3 reflectDir = 2.0 * NdotL * normal - lightDir;
-    return pow(max(dot(reflectDir, normalize(eyeVec)), 0.0), specularPower);
+    vec3 halfVec = normalize(normalize(eyeVec) + lightDir);
+    return pow(dot(normal, halfVec), specularPower);
 }
 
 float GetShadow(vec4 shadowPos)

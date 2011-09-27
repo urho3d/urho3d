@@ -180,7 +180,6 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 lightColor;
         float3 lightDir;
         float diff;
-        float NdotL;
 
         #ifdef NORMALMAP
             float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
@@ -194,9 +193,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
             #else
                 lightDir = iLightVec.xyz;
             #endif
-            diff = GetDiffuseDir(normal, lightDir, NdotL);
+            diff = GetDiffuseDir(normal, lightDir);
         #else
-            diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir, NdotL);
+            diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir);
         #endif
 
         #ifdef SHADOW
@@ -232,7 +231,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
             #else
                 float specStrength = cMatSpecProperties.x;
             #endif
-            float spec = GetSpecular(normal, iEyeVec, lightDir, NdotL, cMatSpecProperties.y);
+            float spec = GetSpecular(normal, iEyeVec, lightDir, cMatSpecProperties.y);
             float3 finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
         #else
             float3 finalColor = diff * lightColor * diffColor.rgb;

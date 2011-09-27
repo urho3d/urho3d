@@ -1,17 +1,15 @@
 #pragma warning(disable:3571)
 
-float GetDiffuseDir(float3 normal, float3 lightDir, out float NdotL)
+float GetDiffuseDir(float3 normal, float3 lightDir)
 {
-    NdotL = saturate(dot(normal, lightDir));
-    return NdotL;
+    return saturate(dot(normal, lightDir));
 }
 
-float GetDiffusePointOrSpot(float3 normal, float3 lightVec, out float3 lightDir, out float NdotL)
+float GetDiffusePointOrSpot(float3 normal, float3 lightVec, out float3 lightDir)
 {
     float lightDist = length(lightVec);
     lightDir = lightVec / lightDist;
-    NdotL = saturate(dot(normal, lightDir));
-    return NdotL * tex1D(sLightRampMap, lightDist).r;
+    return saturate(dot(normal, lightDir)) * tex1D(sLightRampMap, lightDist).r;
 }
 
 float GetDiffuseDirVolumetric()
@@ -25,10 +23,10 @@ float GetDiffusePointOrSpotVolumetric(float3 lightVec)
     return tex1D(sLightRampMap, lightDist).r;
 }
 
-float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float NdotL, float specularPower)
+float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularPower)
 {
-    float3 reflectDir = 2.0 * NdotL * normal - lightDir;
-    return pow(saturate(dot(reflectDir, normalize(eyeVec))), specularPower);
+    float3 halfVec = normalize(normalize(eyeVec) + lightDir);
+    return pow(dot(normal, halfVec), specularPower);
 }
 
 float GetShadow(float4 shadowPos)
