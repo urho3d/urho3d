@@ -295,7 +295,6 @@ void Input::MakeActive()
     #else
     // Get the current mouse position as a base for movement calculations
     lastCursorPosition_ = GetCursorPosition();
-    glfwGetScrollOffset(graphics_->GetWindowHandle(), 0, &lastWheelPosition_);
     #endif
     
     using namespace Activation;
@@ -641,8 +640,7 @@ void MouseScrollCallback(GLFWwindow window, int x, int y)
     if (!instance)
         return;
     
-    instance->SetMouseWheel(y - instance->lastWheelPosition_);
-    instance->lastWheelPosition_ = y;
+    instance->SetMouseWheel(y);
 }
 #endif
 
@@ -688,7 +686,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     glfwSetMouseButtonCallback(&MouseButtonCallback);
     glfwSetScrollCallback(&MouseScrollCallback);
     lastCursorPosition_ = GetCursorPosition();
-    glfwGetScrollOffset(window, 0, &lastWheelPosition_);
     #endif
 }
 

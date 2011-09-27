@@ -122,11 +122,11 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 3 End", shadowCascade_.splits_[2], M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 4 End", shadowCascade_.splits_[3], M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, M_LARGE_VALUE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Focus Shadow Map", shadowFocus_.focus_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Allow Non-uniform", shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Auto-Size Shadow MAp", shadowFocus_.autoSize_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }

@@ -127,8 +127,6 @@ private:
     unsigned mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastCursorPosition_;
-    /// Last mouse wheel position for calculating movement.
-    int lastWheelPosition_;
     /// Mouse movement since last frame.
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
