@@ -45,14 +45,15 @@ void PS(
     out float4 oColor : COLOR0)
 {
     #ifdef ALPHAMASK
-        if (tex2D(sDiffMap, iTexCoord).a < 0.5)
-            discard;
+        float alpha = tex2D(sDiffMap, iTexCoord).a;
+    #else
+        const float alpha = 1.0;
     #endif
 
     #ifdef FALLBACK
         float depth = min(iClipPos.z / iClipPos.w + cShadowIntensity.w, 1.0);
-        oColor = float4(EncodeDepth(depth), 1.0, 1.0);
+        oColor = float4(EncodeDepth(depth), 1.0, alpha);
     #else
-        oColor = 1.0;
+        oColor = alpha;
     #endif
 }
