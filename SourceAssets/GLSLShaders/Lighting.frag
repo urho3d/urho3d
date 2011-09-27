@@ -24,7 +24,7 @@ float GetDiffusePointOrSpotVolumetric(vec3 lightVec)
 float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
     vec3 halfVec = normalize(normalize(eyeVec) + lightDir);
-    return pow(dot(normal, halfVec), specularPower);
+    return pow(max(dot(normal, halfVec), 0.0), specularPower);
 }
 
 float GetShadow(vec4 shadowPos)
