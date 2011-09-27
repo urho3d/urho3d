@@ -2,7 +2,7 @@
 #include "Samplers.frag"
 
 #ifdef ALPHAMASK
-varying vec2 vTexCoord;
+    varying vec2 vTexCoord;
 #endif
 
 void main()

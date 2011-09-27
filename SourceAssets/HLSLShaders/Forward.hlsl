@@ -21,26 +21,28 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float4 oLightVec : TEXCOORD1,
-    #ifndef NORMALMAP
-        out float3 oNormal : TEXCOORD2,
-    #endif
-    #ifdef SPECULAR
-        out float3 oEyeVec : TEXCOORD3,
-    #endif
-    #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            out float4 oShadowPos[4] : TEXCOORD4,
-        #elif defined(SPOTLIGHT)
-            out float4 oShadowPos : TEXCOORD4,
-        #else
-            out float3 oWorldLightVec : TEXCOORD4,
+    #ifndef UNLIT
+        #ifndef NORMALMAP
+            out float3 oNormal : TEXCOORD2,
         #endif
-    #endif
-    #ifdef SPOTLIGHT
-        out float4 oSpotPos : TEXCOORD5,
-    #endif
-    #ifdef POINTLIGHT
-        out float3 oCubeMaskVec : TEXCOORD5,
+        #ifdef SPECULAR
+            out float3 oEyeVec : TEXCOORD3,
+        #endif
+        #ifdef SHADOW
+            #if defined(DIRLIGHT)
+                out float4 oShadowPos[4] : TEXCOORD4,
+            #elif defined(SPOTLIGHT)
+                out float4 oShadowPos : TEXCOORD4,
+            #else
+                out float3 oWorldLightVec : TEXCOORD4,
+            #endif
+        #endif
+        #ifdef SPOTLIGHT
+            out float4 oSpotPos : TEXCOORD5,
+        #endif
+        #ifdef POINTLIGHT
+            out float3 oCubeMaskVec : TEXCOORD5,
+        #endif
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -51,79 +53,97 @@ void VS(float4 iPos : POSITION,
 {
     float4 pos;
 
-    #ifdef NORMALMAP
-        float3 oNormal;
-        float3 oTangent;
-        float3 oBitangent;
-    #endif
+    #ifndef UNLIT
 
-    #if defined(SKINNED)
-        #ifndef NORMALMAP
-            pos = GetPositionNormalSkinned(iPos, iNormal, iBlendWeights, iBlendIndices, oPos, oNormal);
-        #else
-            pos = GetPositionNormalTangentSkinned(iPos, iNormal, iTangent, iBlendWeights, iBlendIndices, oPos, oNormal, oTangent);
+        #ifdef NORMALMAP
+            float3 oNormal;
+            float3 oTangent;
+            float3 oBitangent;
         #endif
-    #elif defined(INSTANCED)
-        #ifndef NORMALMAP
-            pos = GetPositionNormalInstanced(iPos, iNormal, iModelInstance, oPos, oNormal);
+    
+        #if defined(SKINNED)
+            #ifndef NORMALMAP
+                pos = GetPositionNormalSkinned(iPos, iNormal, iBlendWeights, iBlendIndices, oPos, oNormal);
+            #else
+                pos = GetPositionNormalTangentSkinned(iPos, iNormal, iTangent, iBlendWeights, iBlendIndices, oPos, oNormal, oTangent);
+            #endif
+        #elif defined(INSTANCED)
+            #ifndef NORMALMAP
+                pos = GetPositionNormalInstanced(iPos, iNormal, iModelInstance, oPos, oNormal);
+            #else
+                pos = GetPositionNormalTangentInstanced(iPos, iNormal, iTangent, iModelInstance, oPos, oNormal, oTangent);
+            #endif
+        #elif defined(BILLBOARD)
+            pos = GetPositionBillboard(iPos, iSize, oPos);
+            oNormal = float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
         #else
-            pos = GetPositionNormalTangentInstanced(iPos, iNormal, iTangent, iModelInstance, oPos, oNormal, oTangent);
+            #ifndef NORMALMAP
+                pos = GetPositionNormal(iPos, iNormal, oPos, oNormal);
+            #else
+                pos = GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
+            #endif
         #endif
-    #elif defined(BILLBOARD)
-        pos = GetPositionBillboard(iPos, iSize, oPos);
-        oNormal = float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
+    
+        float3 worldPos = pos.xyz - cCameraPos;
+    
+        #ifdef DIRLIGHT
+            oLightVec = float4(cLightDir, GetDepth(oPos));
+        #elif defined(LIGHT)
+            oLightVec = float4((cLightPos - worldPos) * cLightAtten, GetDepth(oPos));
+        #else
+            oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
+        #endif
+    
+        #ifdef SHADOW
+            // Shadow projection: transform from world space to shadow space
+            #if defined(DIRLIGHT)
+                oShadowPos[0] = mul(pos, cShadowProj[0]);
+                oShadowPos[1] = mul(pos, cShadowProj[1]);
+                oShadowPos[2] = mul(pos, cShadowProj[2]);
+                oShadowPos[3] = mul(pos, cShadowProj[3]);
+            #elif defined(SPOTLIGHT)
+                oShadowPos = mul(pos, cShadowProj[0]);
+            #else
+                oWorldLightVec = worldPos - cLightPos;
+            #endif
+        #endif
+    
+        #ifdef SPOTLIGHT
+            // Spotlight projection: transform from world space to projector texture coordinates
+            oSpotPos = mul(pos, cSpotProj);
+        #endif
+    
+        #ifdef POINTLIGHT
+            oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
+        #endif
+    
+        #ifdef NORMALMAP
+            oBitangent = cross(oTangent, oNormal) * iTangent.w;
+            float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
+            #ifdef LIGHT
+                oLightVec.xyz = mul(tbn, oLightVec.xyz);
+            #endif
+            #ifdef SPECULAR
+                oEyeVec = mul(tbn, -worldPos);
+            #endif
+        #elif defined(SPECULAR)
+            oEyeVec = -worldPos;
+        #endif
+
     #else
-        #ifndef NORMALMAP
-            pos = GetPositionNormal(iPos, iNormal, oPos, oNormal);
+    
+        #if defined(SKINNED)
+            pos = GetPositionSkinned(iPos, iBlendWeights, iBlendIndices, oPos);
+        #elif defined(INSTANCED)
+            pos = GetPositionInstanced(iPos, iModelInstance, oPos);
+        #elif defined(BILLBOARD)
+            pos = GetPositionBillboard(iPos, iSize, oPos);
         #else
-            pos = GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
+            pos = GetPosition(iPos, oPos);
         #endif
-    #endif
-
-    float3 worldPos = pos.xyz - cCameraPos;
-
-    #ifdef DIRLIGHT
-        oLightVec = float4(cLightDir, GetDepth(oPos));
-    #elif defined(LIGHT)
-        oLightVec = float4((cLightPos - worldPos) * cLightAtten, GetDepth(oPos));
-    #else
+        
         oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
-    #endif
 
-    #ifdef SHADOW
-        // Shadow projection: transform from world space to shadow space
-        #if defined(DIRLIGHT)
-            oShadowPos[0] = mul(pos, cShadowProj[0]);
-            oShadowPos[1] = mul(pos, cShadowProj[1]);
-            oShadowPos[2] = mul(pos, cShadowProj[2]);
-            oShadowPos[3] = mul(pos, cShadowProj[3]);
-        #elif defined(SPOTLIGHT)
-            oShadowPos = mul(pos, cShadowProj[0]);
-        #else
-            oWorldLightVec = worldPos - cLightPos;
-        #endif
-    #endif
-
-    #ifdef SPOTLIGHT
-        // Spotlight projection: transform from world space to projector texture coordinates
-        oSpotPos = mul(pos, cSpotProj);
-    #endif
-
-    #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
-    #endif
-
-    #ifdef NORMALMAP
-        oBitangent = cross(oTangent, oNormal) * iTangent.w;
-        float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
-        #ifdef LIGHT
-            oLightVec.xyz = mul(tbn, oLightVec.xyz);
-        #endif
-        #ifdef SPECULAR
-            oEyeVec = mul(tbn, -worldPos);
-        #endif
-    #elif defined(SPECULAR)
-        oEyeVec = -worldPos;
     #endif
 
     #ifdef VERTEXCOLOR

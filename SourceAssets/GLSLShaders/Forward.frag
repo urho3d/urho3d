@@ -4,30 +4,32 @@
 #include "Fog.frag"
 
 varying vec2 vTexCoord;
-varying vec4 vLightVec;
-#ifdef SPECULAR
-varying vec3 vEyeVec;
-#endif
-#ifndef NORMALMAP
-varying vec3 vNormal;
-#endif
-#ifdef SHADOW
-#if defined(DIRLIGHT)
-varying vec4 vShadowPos[4];
-#elif defined(SPOTLIGHT)
-varying vec4 vShadowPos;
-#else
-varying vec3 vWorldLightVec;
-#endif
-#endif
-#ifdef SPOTLIGHT
-varying vec4 vSpotPos;
-#endif
-#ifdef CUBEMASK
-varying vec3 vCubeMaskVec;
-#endif
 #ifdef VERTEXCOLOR
-varying vec4 vColor;
+    varying vec4 vColor;
+#endif
+varying vec4 vLightVec;
+#ifndef UNLIT
+    #ifdef SPECULAR
+        varying vec3 vEyeVec;
+    #endif
+    #ifndef NORMALMAP
+        varying vec3 vNormal;
+    #endif
+    #ifdef SHADOW
+        #if defined(DIRLIGHT)
+            varying vec4 vShadowPos[4];
+        #elif defined(SPOTLIGHT)
+            varying vec4 vShadowPos;
+        #else
+            varying vec3 vWorldLightVec;
+        #endif
+    #endif
+    #ifdef SPOTLIGHT
+        varying vec4 vSpotPos;
+    #endif
+    #ifdef POINTLIGHT
+        varying vec3 vCubeMaskVec;
+    #endif
 #endif
 
 void main()

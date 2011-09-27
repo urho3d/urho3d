@@ -6,13 +6,13 @@
             <define name="LIGHT" />
             <define name="DIRLIGHT" />
             <exclude name="Spot" />
-            <exclude name="PointMask" />
+            <exclude name="Point" />
         </option>
         <option name="Spot">
             <define name="LIGHT" />
             <define name="SPOTLIGHT" />
             <exclude name="Dir" />
-            <exclude name="PointMask" />
+            <exclude name="Point" />
         </option>
         <option name="Point">
             <define name="LIGHT" />
@@ -22,6 +22,14 @@
         </option>
         <option name="Spec" define="SPECULAR" />
         <option name="Shadow" define="SHADOW" />
+        <option name="Unlit" define="UNLIT">
+            <exclude name="Normal" />
+            <exclude name="Dir" />
+            <exclude name="Spot" />
+            <exclude name="Point" />
+            <exclude name="Spec" />
+            <exclude name="Shadow" />
+        </option>
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />

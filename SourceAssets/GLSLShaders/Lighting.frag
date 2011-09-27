@@ -3,7 +3,7 @@ float GetDiffuseDir(vec3 normal, vec3 lightDir)
     return max(dot(normal, lightDir), 0.0);
 }
 
-float GetDiffusePointOrSpot(vec3 normal, vec3 lightVec, out vec3 lightDir, out float NdotL)
+float GetDiffusePointOrSpot(vec3 normal, vec3 lightVec, out vec3 lightDir)
 {
     float lightDist = length(lightVec);
     lightDir = lightVec / lightDist;
