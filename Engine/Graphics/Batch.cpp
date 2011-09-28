@@ -59,6 +59,11 @@ inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceD
     return lhs.distance_ < rhs.distance_;
 }
 
+inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
+{
+    return lhs->instances_[0].distance_ < rhs->instances_[0].distance_;
+}
+
 void Batch::CalculateSortKey()
 {
     unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0x7fff;
@@ -562,6 +567,17 @@ void BatchQueue::SortBackToFront()
         sortedBatches_[i] = &batches_[i];
     
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
+    
+    // Do not actually sort batch groups, just list them
+    sortedPriorityBatchGroups_.Resize(priorityBatchGroups_.Size());
+    sortedBatchGroups_.Resize(batchGroups_.Size());
+    
+    unsigned index = 0;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+        sortedPriorityBatchGroups_[index++] = &i->second_;
+    index = 0;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+        sortedBatchGroups_[index++] = &i->second_;
 }
 
 void BatchQueue::SortFrontToBack()
@@ -587,6 +603,20 @@ void BatchQueue::SortFrontToBack()
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
     for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+    
+    // Now sort batch groups by the distance of the first batch
+    sortedPriorityBatchGroups_.Resize(priorityBatchGroups_.Size());
+    sortedBatchGroups_.Resize(batchGroups_.Size());
+    
+    unsigned index = 0;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+        sortedPriorityBatchGroups_[index++] = &i->second_;
+    index = 0;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+        sortedBatchGroups_[index++] = &i->second_;
+    
+    Sort(sortedPriorityBatchGroups_.Begin(), sortedPriorityBatchGroups_.End(), CompareBatchGroupsFrontToBack);
+    Sort(sortedBatchGroups_.Begin(), sortedBatchGroups_.End(), CompareBatchGroupsFrontToBack);
 }
 
 void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)

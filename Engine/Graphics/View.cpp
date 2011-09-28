@@ -1545,11 +1545,11 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
     graphics_->SetStencilTest(false);
     
     // Priority instanced
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.priorityBatchGroups_.Begin(); i !=
-        queue.priorityBatchGroups_.End(); ++i)
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedPriorityBatchGroups_.Begin(); i !=
+        queue.sortedPriorityBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second_;
-        group.Draw(graphics_, renderer_, shaderParameters_);
+        BatchGroup* group = *i;
+        group->Draw(graphics_, renderer_, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
@@ -1559,13 +1559,12 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
     }
     
     // Non-priority instanced
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.batchGroups_.Begin(); i !=
-        queue.batchGroups_.End(); ++i)
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBatchGroups_.Begin(); i != queue.sortedBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second_;
-        if (useScissor && group.lightQueue_)
-            OptimizeLightByScissor(group.lightQueue_->light_);
-        group.Draw(graphics_, renderer_, shaderParameters_);
+        BatchGroup* group = *i;
+        if (useScissor && group->lightQueue_)
+            OptimizeLightByScissor(group->lightQueue_->light_);
+        group->Draw(graphics_, renderer_, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
@@ -1589,11 +1588,11 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     graphics_->SetStencilTest(false);
     
     // Priority instanced
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.priorityBatchGroups_.Begin(); i !=
-        queue.priorityBatchGroups_.End(); ++i)
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedPriorityBatchGroups_.Begin(); i !=
+        queue.sortedPriorityBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second_;
-        group.Draw(graphics_, renderer_, shaderParameters_);
+        BatchGroup* group = *i;
+        group->Draw(graphics_, renderer_, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
@@ -1607,11 +1606,10 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     OptimizeLightByScissor(light);
     
     // Non-priority instanced
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.batchGroups_.Begin(); i !=
-        queue.batchGroups_.End(); ++i)
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBatchGroups_.Begin(); i != queue.sortedBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second_;
-        group.Draw(graphics_, renderer_, shaderParameters_);
+        BatchGroup* group = *i;
+        group->Draw(graphics_, renderer_, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)

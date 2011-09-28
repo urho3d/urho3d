@@ -1195,8 +1195,8 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         
         for (int i = 0; i < numResizable; ++i)
         {
-            unsigned idx = resizable[i];
-            int targetSize = sizes[idx] + errorPerChild;
+            unsigned index = resizable[i];
+            int targetSize = sizes[index] + errorPerChild;
             if (remainder)
             {
                 acc += add;
@@ -1208,7 +1208,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
                 }
             }
             
-            sizes[idx] = Clamp(targetSize, minSizes[idx], maxSizes[idx]);
+            sizes[index] = Clamp(targetSize, minSizes[index], maxSizes[index]);
         }
     }
     

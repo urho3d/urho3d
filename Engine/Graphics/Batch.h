@@ -239,14 +239,18 @@ public:
     bool IsEmpty() const { return batches_.Empty() && priorityBatchGroups_.Empty() && batchGroups_.Empty(); }
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
-    /// Sorted non-instanced draw calls with priority flag.
-    PODVector<Batch*> sortedPriorityBatches_;
-    /// Sorted non-instanced draw calls.
-    PODVector<Batch*> sortedBatches_;
     /// Instanced draw calls with priority flag.
     Map<BatchGroupKey, BatchGroup> priorityBatchGroups_;
     /// Instanced draw calls.
     Map<BatchGroupKey, BatchGroup> batchGroups_;
+    /// Sorted non-instanced draw calls with priority flag.
+    PODVector<Batch*> sortedPriorityBatches_;
+    /// Sorted non-instanced draw calls.
+    PODVector<Batch*> sortedBatches_;
+    /// Sorted instanced draw calls with priority flag.
+    PODVector<BatchGroup*> sortedPriorityBatchGroups_;
+    /// Sorted instanced draw calls.
+    PODVector<BatchGroup*> sortedBatchGroups_;
 };
 
 /// Queue for shadow map draw calls
