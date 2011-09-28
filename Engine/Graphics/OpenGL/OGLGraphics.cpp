@@ -2068,8 +2068,8 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;
     textureUnits_["EnvironmentCubeMap"] = TU_ENVIRONMENT;
     textureUnits_["LightRampMap"] = TU_LIGHTRAMP;
-    textureUnits_["LightSpotMap"] = TU_LIGHTSPOT;
-    textureUnits_["LightCubeMap"]  = TU_LIGHTSPOT;
+    textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
+    textureUnits_["LightCubeMap"]  = TU_LIGHTSHAPE;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;

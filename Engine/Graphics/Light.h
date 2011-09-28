@@ -104,7 +104,7 @@ struct CascadeParameters
     float start_;
     /// Far clip values of the splits.
     float splits_[MAX_CASCADE_SPLITS];
-    /// The point relative to final split far clipwhere fade out begins. (0.0 - 1.0)
+    /// The point relative to final split far clip where fade out begins. (0.0 - 1.0)
     float fadeStart_;
 };
 

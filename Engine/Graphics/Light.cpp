@@ -69,6 +69,11 @@ void FocusParameters::Validate()
     minView_ = Max(minView_, SHADOW_MIN_VIEW);
 }
 
+template<> LightType Variant::Get<LightType>() const
+{
+    return (LightType)GetInt();
+}
+
 OBJECTTYPESTATIC(Light);
 
 Light::Light(Context* context) :
@@ -98,7 +103,7 @@ void Light::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light>();
     
-    ENUM_ATTRIBUTE(Light, "Light Type", lightType_, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_COLOR, "Color", color_, Color(), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, 0.0f, AM_DEFAULT);
@@ -114,9 +119,9 @@ void Light::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 1 End", shadowCascade_.splits_[0], M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 2 End", shadowCascade_.splits_[1], M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 3 End", shadowCascade_.splits_[2], M_LARGE_VALUE, AM_DEFAULT);
@@ -124,9 +129,9 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, M_LARGE_VALUE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
@@ -191,12 +196,7 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void Light::SetLightType(LightType type)
 {
     lightType_ = type;
-    
-    // Validate shape texture type: 2D for spot lights, cube for point lights. Change to null if wrong
-    if (lightType_ == LIGHT_SPOT && shapeTexture_ && shapeTexture_->GetType() != Texture2D::GetTypeStatic())
-        shapeTexture_ = 0;
-    if (lightType_ == LIGHT_POINT && shapeTexture_ && shapeTexture_->GetType() != TextureCube::GetTypeStatic())
-        shapeTexture_ = 0;
+    OnMarkedDirty(node_);
 }
 
 void Light::SetColor(const Color& color)
@@ -207,16 +207,19 @@ void Light::SetColor(const Color& color)
 void Light::SetRange(float range)
 {
     range_ = Max(range, 0.0f);
+    OnMarkedDirty(node_);
 }
 
 void Light::SetFov(float fov)
 {
     fov_ = Clamp(fov, 0.0f, M_MAX_FOV);
+    OnMarkedDirty(node_);
 }
 
 void Light::SetAspectRatio(float aspectRatio)
 {
     aspectRatio_ = Max(aspectRatio, M_EPSILON);
+    OnMarkedDirty(node_);
 }
 
 void Light::SetShadowNearFarRatio(float nearFarRatio)

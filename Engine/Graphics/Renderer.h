@@ -78,20 +78,20 @@ enum LightVSVariation
 enum LightPSVariation
 {
     LPS_NONE = 0,
-    LPS_SPEC,
     LPS_SPOT,
-    LPS_SPOTSPEC,
     LPS_POINT,
-    LPS_POINTSPEC,
     LPS_POINTMASK,
+    LPS_SPEC,
+    LPS_SPOTSPEC,
+    LPS_POINTSPEC,
     LPS_POINTMASKSPEC,
     LPS_SHADOW,
-    LPS_SHADOWSPEC,
     LPS_SPOTSHADOW,
-    LPS_SPOTSHADOWSPEC,
     LPS_POINTSHADOW,
-    LPS_POINTSHADOWSPEC,
     LPS_POINTMASKSHADOW,
+    LPS_SHADOWSPEC,
+    LPS_SPOTSHADOWSPEC,
+    LPS_POINTSHADOWSPEC,
     LPS_POINTMASKSHADOWSPEC,
     MAX_LIGHT_PS_VARIATIONS
 };
@@ -219,6 +219,8 @@ public:
     TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
     /// Return the shadowed pointlight indirection cube map.
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
+    /// Return the instancing vertex buffer
+    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a vertex shader by name.
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name.
@@ -232,7 +234,15 @@ public:
     void Render();
     /// Add debug geometry to the debug graphics(s).
     void DrawDebugGeometry(bool depthTest);
-    
+    /// Return volume geometry for a light.
+    Geometry* GetLightGeometry(Light* light);
+    /// Return shadow map for a light. If shadow map reuse is disabled, a different map is returned each time.
+    Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
+    /// Get a shader program.
+    ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
+    /// Choose shaders for a batch.
+    void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
@@ -242,14 +252,6 @@ private:
     bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
     /// Return an occlusion buffer for use.
     OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
-    /// Return volume geometry for a light.
-    Geometry* GetLightGeometry(Light* light);
-    /// Return shadow map for a light. If shadow map reuse is disabled, a different map is returned each time.
-    Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
-    /// Get a shader program.
-    ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
-    /// Choose shaders for a batch.
-    void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material technique.

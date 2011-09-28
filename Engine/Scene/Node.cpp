@@ -936,10 +936,12 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id, CreateMode m
     
     components_.Push(newComponent);
     
-    // If zero ID specified, let the scene assign
+    // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)
     {
-        newComponent->SetID(id ? id : scene_->GetFreeComponentID(mode));
+        if (!id || scene_->GetComponent(id))
+            id = scene_->GetFreeComponentID(mode);
+        newComponent->SetID(id);
         scene_->ComponentAdded(newComponent);
     }
     else
@@ -954,9 +956,13 @@ Node* Node::CreateChild(unsigned id, CreateMode mode)
 {
     SharedPtr<Node> newNode(new Node(context_));
     
-    // If zero ID specified, let the scene assign
+    // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)
-        newNode->SetID(id ? id : scene_->GetFreeNodeID(mode));
+    {
+        if (!id || scene_->GetComponent(id))
+            id = scene_->GetFreeNodeID(mode);
+        newNode->SetID(id);
+    }
     else
         newNode->SetID(id);
     

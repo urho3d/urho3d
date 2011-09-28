@@ -200,7 +200,7 @@ static const String lightVSVariations[] =
     "DirShadow",
     "SpotShadow",
     "PointShadow",
-    "SpcShadow",
+    "SpecShadow",
     "DirSpecShadow",
     "SpotSpecShadow",
     "PointSpecShadow"
@@ -209,21 +209,21 @@ static const String lightVSVariations[] =
 static const String lightPSVariations[] = 
 {
     "Dir",
-    "DirSpec",
     "Spot",
-    "SpotSpec",
     "Point",
-    "PointSpec",
     "PointMask",
+    "DirSpec",
+    "SpotSpec",
+    "PointSpec",
     "PointMaskSpec",
     "DirShadow",
-    "DirShadowSpec",
     "SpotShadow",
-    "SpotShadowSpec",
     "PointShadow",
-    "PointShadowSpec",
     "PointMaskShadow",
-    "PointMaskShadowSpec"
+    "DirSpecShadow",
+    "SpotSpecShadow",
+    "PointSpecShadow",
+    "PointMaskSpecShadow"
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
@@ -1039,6 +1039,23 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[psi];
+            
+            // If specular or shadow variations do not exist, try without them
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi & LVS_SPEC))
+            {
+                vsi &= ~LVS_SPEC;
+                psi &= ~LPS_SPEC;
+                batch.vertexShader_ = vertexShaders[vsi];
+                batch.pixelShader_ = pixelShaders[psi];
+            }
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi & LVS_SHADOW))
+            {
+                vsi &= ~LVS_SHADOW;
+                psi &= ~LPS_SHADOW;
+                batch.vertexShader_ = vertexShaders[vsi];
+                batch.pixelShader_ = pixelShaders[psi];
+            }
+            
             batch.vertexShaderIndex_ = vsi;
         }
         else
@@ -1296,7 +1313,7 @@ void Renderer::CreateInstancingBuffer()
 
 bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
 {
-    if (!instancingBuffer_)
+    if (!instancingBuffer_ || !dynamicInstancing_)
         return false;
     
     unsigned oldSize = instancingBuffer_->GetVertexCount();

@@ -436,15 +436,13 @@ void View::GetBatches()
             for (unsigned j = 0; j < litGeometries_.Size(); ++j)
             {
                 Drawable* drawable = litGeometries_[j];
-                
+                drawable->AddLight(light);
+
                 // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                 if (!drawable->GetMaxLights())
                     GetLitBatches(drawable, lightQueue);
                 else
-                {
-                    drawable->AddLight(light);
                     maxLightsDrawables_.Insert(drawable);
-                }
             }
             
             ++lightQueueCount;
@@ -547,6 +545,8 @@ void View::GetBatches()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
+    Light* drawableFirstLight = drawable->GetLights()[0];
+    
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->reuseShadowMaps_;
     unsigned numBatches = drawable->GetNumBatches();
@@ -564,7 +564,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         bool priority = false;
         
         // For the (first) directional light, check for lit base pass
-        if (light == lights_[0] && light->GetLightType() == LIGHT_DIRECTIONAL)
+        if (light == drawableFirstLight && light->GetLightType() == LIGHT_DIRECTIONAL)
         {
             if (!drawable->HasBasePass(i))
             {
@@ -763,12 +763,6 @@ unsigned View::ProcessLight(Light* light)
         isShadowed = false;
     
     LightType type = light->GetLightType();
-    
-    // If light has no ramp textures defined, set defaults
-    if (type != LIGHT_DIRECTIONAL && !light->GetRampTexture())
-        light->SetRampTexture(renderer_->GetDefaultLightRamp());
-    if (type == LIGHT_SPOT && !light->GetShapeTexture())
-        light->SetShapeTexture(renderer_->GetDefaultLightSpot());
     
     // Get lit geometries. They must match the light mask and be inside the main camera frustum to be considered
     litGeometries_.Clear();
@@ -1047,52 +1041,61 @@ void View::OptimizeLightByScissor(Light* light)
 
 void View::OptimizeLightByStencil(Light* light)
 {
-    LightType type = light->GetLightType();
-    if (light && renderer_->GetLightStencilMasking() && type != LIGHT_DIRECTIONAL)
+    if (light && renderer_->GetLightStencilMasking())
     {
-        // If the stencil value has wrapped, clear the whole stencil first
-        if (!lightStencilValue_)
+        Geometry* geometry = renderer_->GetLightGeometry(light);
+        
+        if (geometry)
         {
-            graphics_->Clear(CLEAR_STENCIL);
-            lightStencilValue_ = 1;
+            LightType type = light->GetLightType();
+            
+            // If the stencil value has wrapped, clear the whole stencil first
+            if (!lightStencilValue_)
+            {
+                graphics_->Clear(CLEAR_STENCIL);
+                lightStencilValue_ = 1;
+            }
+            
+            Matrix3x4 view(camera_->GetInverseWorldTransform());
+            Matrix4 projection(camera_->GetProjection());
+            float lightDist;
+            if (type == LIGHT_POINT)
+                lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).DistanceFast(camera_->GetWorldPosition());
+            else
+                lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
+            
+            // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
+            // to avoid clipping the front faces.
+            if (lightDist < camera_->GetNearClip() * 2.0f)
+            {
+                graphics_->SetCullMode(CULL_CW);
+                graphics_->SetDepthTest(CMP_GREATER);
+            }
+            else
+            {
+                graphics_->SetCullMode(CULL_CCW);
+                graphics_->SetDepthTest(CMP_LESSEQUAL);
+            }
+            
+            graphics_->SetColorWrite(false);
+            graphics_->SetDepthWrite(false);
+            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
+            graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+            graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
+            
+            geometry->Draw(graphics_);
+            
+            graphics_->ClearTransformSources();
+            graphics_->SetColorWrite(true);
+            graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, lightStencilValue_);
+            ++lightStencilValue_;
+            
+            return;
         }
-        
-        Matrix3x4 view(camera_->GetInverseWorldTransform());
-        Matrix4 projection(camera_->GetProjection());
-        float lightDist;
-        if (type == LIGHT_POINT)
-            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.2f).DistanceFast(camera_->GetWorldPosition());
-        else
-            lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
-        
-        // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
-        // to avoid clipping the front faces.
-        if (lightDist < camera_->GetNearClip() * 2.0f)
-        {
-            graphics_->SetCullMode(CULL_CW);
-            graphics_->SetDepthTest(CMP_GREATER);
-        }
-        else
-        {
-            graphics_->SetCullMode(CULL_CCW);
-            graphics_->SetDepthTest(CMP_LESSEQUAL);
-        }
-        
-        graphics_->SetColorWrite(false);
-        graphics_->SetDepthWrite(false);
-        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-        graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
-        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
-        renderer_->GetLightGeometry(light)->Draw(graphics_);
-        
-        graphics_->ClearTransformSources();
-        graphics_->SetColorWrite(true);
-        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, lightStencilValue_);
-        ++lightStencilValue_;
     }
-    else
-        graphics_->SetStencilTest(false);
+    
+    graphics_->SetStencilTest(false);
 }
 
 const Rect& View::GetLightScissor(Light* light)
@@ -1478,8 +1481,9 @@ void View::PrepareInstancingBuffer()
     // If fail to set buffer size, fall back to per-group locking
     if (totalInstances && renderer_->ResizeInstancingBuffer(totalInstances))
     {
+        VertexBuffer* instancingBuffer = renderer_->GetInstancingBuffer();
         unsigned freeIndex = 0;
-        void* lockedData = renderer_->instancingBuffer_->Lock(0, totalInstances, LOCK_DISCARD);
+        void* lockedData = instancingBuffer->Lock(0, totalInstances, LOCK_DISCARD);
         if (lockedData)
         {
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
@@ -1492,7 +1496,7 @@ void View::PrepareInstancingBuffer()
                 lightQueues_[i].litBatches_.SetTransforms(renderer_, lockedData, freeIndex);
             }
             
-            renderer_->instancingBuffer_->Unlock();
+            instancingBuffer->Unlock();
         }
     }
 }
@@ -1536,10 +1540,6 @@ void View::CalculateShaderParameters()
 
 void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
-    VertexBuffer* instancingBuffer = 0;
-    if (renderer_->GetDynamicInstancing())
-        instancingBuffer = renderer_->instancingBuffer_;
-    
     if (useScissor)
         graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -1549,13 +1549,13 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
         queue.priorityBatchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        group.Draw(graphics_, instancingBuffer, shaderParameters_);
+        group.Draw(graphics_, renderer_, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, shaderParameters_);
+        batch->Draw(graphics_, renderer_, shaderParameters_);
     }
     
     // Non-priority instanced
@@ -1565,7 +1565,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
         const BatchGroup& group = i->second_;
         if (useScissor && group.lightQueue_)
             OptimizeLightByScissor(group.lightQueue_->light_);
-        group.Draw(graphics_, instancingBuffer, shaderParameters_);
+        group.Draw(graphics_, renderer_, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
@@ -1579,16 +1579,12 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
             else
                 graphics_->SetScissorTest(false);
         }
-        batch->Draw(graphics_, shaderParameters_);
+        batch->Draw(graphics_, renderer_, shaderParameters_);
     }
 }
 
 void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
 {
-    VertexBuffer* instancingBuffer = 0;
-    if (renderer_->GetDynamicInstancing())
-        instancingBuffer = renderer_->instancingBuffer_;
-    
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
@@ -1597,13 +1593,13 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
         queue.priorityBatchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        group.Draw(graphics_, instancingBuffer, shaderParameters_);
+        group.Draw(graphics_, renderer_, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, shaderParameters_);
+        batch->Draw(graphics_, renderer_, shaderParameters_);
     }
     
     // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
@@ -1615,13 +1611,13 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
         queue.batchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        group.Draw(graphics_, instancingBuffer, shaderParameters_);
+        group.Draw(graphics_, renderer_, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, shaderParameters_);
+        batch->Draw(graphics_, renderer_, shaderParameters_);
     }
 }
 

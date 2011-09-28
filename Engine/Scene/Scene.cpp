@@ -488,7 +488,12 @@ void Scene::ComponentAdded(Component* component)
     if (!component)
         return;
     
-    allComponents_[component->GetID()] = component;
+    unsigned id = component->GetID();
+    Map<unsigned, Component*>::Iterator i = allComponents_.Find(id);
+    if (i != allComponents_.End() && i->second_ != component)
+        LOGWARNING("Overwriting component with ID " + String(id));
+    
+    allComponents_[id] = component;
 }
 
 void Scene::ComponentRemoved(Component* component)

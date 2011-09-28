@@ -33,9 +33,7 @@
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />
-        <variation name="Billboard" define="BILLBOARD">
-            <exclude name="Normal" />
-        </variation>
+        <variation name="Billboard" define="BILLBOARD" exclude="Normal" />
     </shader>
     <shader name="Forward" type="ps">
         <option name="Diff" define="DIFFMAP" />
@@ -47,6 +45,7 @@
             <exclude name="Ambient" />
             <exclude name="Normal" />
             <exclude name="Shadow" />
+            <exclude name="Spec" />
             <exclude name="SpecMap" />
             <exclude name="Unlit" />
         </option>
@@ -83,8 +82,8 @@
             <define name="LIGHT" />
         </variation>
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Spec" define="SPECULAR" require="LIGHT" />
         <option name="Shadow" define="SHADOW" require="LIGHT" />
-        <option name="Spec" define="SPECULAR" />
         <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
         <option name="FB" define="FALLBACK">

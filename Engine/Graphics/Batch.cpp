@@ -71,7 +71,7 @@ void Batch::CalculateSortKey()
         (((unsigned long long)material) << 16) | geometry;
 }
 
-void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform) const
+void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform) const
 {
     if (!vertexShader_ || !pixelShader_)
         return;
@@ -362,15 +362,25 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         if (shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP))
             graphics->SetTexture(TU_SHADOWMAP, shadowMap);
         if (graphics->NeedTextureUnit(TU_LIGHTRAMP))
-            graphics->SetTexture(TU_LIGHTRAMP, light->GetRampTexture());
-        if (graphics->NeedTextureUnit(TU_LIGHTSPOT))
-            graphics->SetTexture(TU_LIGHTSPOT, light->GetShapeTexture());
+        {
+            Texture* rampTexture = light->GetRampTexture();
+            if (!rampTexture)
+                rampTexture = renderer->GetDefaultLightRamp();
+            graphics->SetTexture(TU_LIGHTRAMP, rampTexture);
+        }
+        if (graphics->NeedTextureUnit(TU_LIGHTSHAPE))
+        {
+            Texture* shapeTexture = light->GetShapeTexture();
+            if (!shapeTexture && light->GetLightType() == LIGHT_SPOT)
+                shapeTexture = renderer->GetDefaultLightSpot();
+            graphics->SetTexture(TU_LIGHTSHAPE, shapeTexture);
+        }
     }
 }
 
-void Batch::Draw(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters) const
+void Batch::Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const
 {
-    Prepare(graphics, shaderParameters);
+    Prepare(graphics, renderer, shaderParameters);
     geometry_->Draw(graphics);
 }
 
@@ -392,7 +402,7 @@ void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<StringHash, Vector4>& shaderParameters) const
+void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const
 {
     if (!instances_.Size())
         return;
@@ -408,14 +418,14 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
     batch.lightQueue_ = lightQueue_;
     batch.vertexShaderIndex_ = vertexShaderIndex_;
     
-    Renderer* renderer = graphics->GetSubsystem<Renderer>();
     unsigned minGroupSize = renderer->GetMinInstanceGroupSize();
     unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
     
     // Draw as individual instances if below minimum size, or if instancing not supported
+    VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
     if (!instanceBuffer || instances_.Size() < minGroupSize || geometry_->GetIndexCount() > maxIndexCount)
     {
-        batch.Prepare(graphics, shaderParameters, false);
+        batch.Prepare(graphics, renderer, shaderParameters, false);
         
         graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
         graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -441,7 +451,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
         else
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
         
-        batch.Prepare(graphics, shaderParameters, false);
+        batch.Prepare(graphics, renderer, shaderParameters, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
         // Hack: use a const_cast to avoid dynamic allocation of new temp vectors

@@ -130,6 +130,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ dynamicInstancingToggle = settingsDialog.GetChild("DynamicInstancingToggle", true);
     dynamicInstancingToggle.checked = renderer.dynamicInstancing;
 
+    CheckBox@ lightStencilMaskingToggle = settingsDialog.GetChild("LightStencilMaskingToggle", true);
+    lightStencilMaskingToggle.checked = renderer.lightStencilMasking;
+
     CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
 
@@ -165,6 +168,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(maxOccluderTrianglesEdit, "TextFinished", "EditMaxOccluderTriangles");
         SubscribeToEvent(specularLightingToggle, "Toggled", "EditSpecularLighting");
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
+        SubscribeToEvent(lightStencilMaskingToggle, "Toggled", "EditLightStencilMasking");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         subscribedToCameraEdits = true;
@@ -325,6 +329,12 @@ void EditDynamicInstancing(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     renderer.dynamicInstancing = edit.checked;
+}
+
+void EditLightStencilMasking(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    renderer.lightStencilMasking = edit.checked;
 }
 
 void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
