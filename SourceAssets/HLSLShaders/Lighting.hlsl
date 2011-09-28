@@ -37,17 +37,16 @@ float GetShadow(float4 shadowPos)
             // Take four samples and average them
             float4 pcfValues = cShadowIntensity.y;
             #ifdef SM3
-                float4 ofs = cSampleOffsets;
                 #ifndef POINTLIGHT
                     float4 projShadowPos = float4(shadowPos.xyz / shadowPos.w, 0.0);
                 #else
                     float4 projShadowPos = float4(shadowPos.xyz, 0.0);
                 #endif
                 float4 inLight = float4(
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(ofs.x, ofs.z), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(ofs.y, ofs.z), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(ofs.x, ofs.w), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(ofs.y, ofs.w), projShadowPos.zw)).r
+                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(cSampleOffsets.x, cSampleOffsets.y), projShadowPos.zw)).r,
+                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(-cSampleOffsets.x, cSampleOffsets.y), projShadowPos.zw)).r,
+                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(cSampleOffsets.x, -cSampleOffsets.y), projShadowPos.zw)).r,
+                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(-cSampleOffsets.x, -cSampleOffsets.y), projShadowPos.zw)).r
                 );
                 #ifdef HWSHADOW
                     return cShadowIntensity.z + dot(inLight, pcfValues);
@@ -56,15 +55,15 @@ float GetShadow(float4 shadowPos)
                 #endif
             #else
                 #ifndef POINTLIGHT
-                    float4 projOfs = cSampleOffsets * shadowPos.w;
+                    float2 offsets = cSampleOffsets * shadowPos.w;
                 #else
-                    float4 projOfs = cSampleOffsets;
+                    float2 offsets = cSampleOffsets;
                 #endif
                 float4 inLight = float4(
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(projOfs.x, projOfs.z), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(projOfs.y, projOfs.z), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(projOfs.x, projOfs.w), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(projOfs.y, projOfs.w), shadowPos.zw)).r
+                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(offsets.x, offsets.y), shadowPos.zw)).r,
+                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(-offsets.x, offsets.y), shadowPos.zw)).r,
+                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(offsets.x, -offsets.y), shadowPos.zw)).r,
+                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(-offsets.x, -offsets.y), shadowPos.zw)).r
                 );
                 #ifdef HWSHADOW
                     return cShadowIntensity.z + dot(inLight, pcfValues);

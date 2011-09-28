@@ -34,15 +34,15 @@ float GetShadow(vec4 shadowPos)
         // Take four samples and average them
         vec4 pcfValues = vec4(cShadowIntensity.y);
         #ifndef POINTLIGHT
-            vec4 projOfs = cSampleOffsets * shadowPos.w;
+            vec2 offsets = cSampleOffsets * shadowPos.w;
         #else
-            vec4 projOfs = cSampleOffsets;
+            vec2 offsets = cSampleOffsets;
         #endif
         vec4 inLight = vec4(
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.z), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.z), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.x, projOfs.w), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(projOfs.y, projOfs.w), shadowPos.zw)).r
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(offsets.x, offsets.y), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(-offsets.x, offsets.y), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(offsets.x, -offsets.y), shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(-offsets.x, -offsets.y), shadowPos.zw)).r
         );
         return cShadowIntensity.z + dot(inLight, pcfValues);
     #else

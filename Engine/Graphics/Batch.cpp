@@ -258,8 +258,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             {
                 float invWidth = 1.0f / (float)shadowMap->GetWidth();
                 float invHeight = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, -0.5f * invWidth, 0.5f * invHeight,
-                    -0.5f * invHeight));
+                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, 0.5f * invHeight, 0.0f, 0.0f));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEADJUST, light))
