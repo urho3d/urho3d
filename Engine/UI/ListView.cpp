@@ -286,16 +286,19 @@ void ListView::InsertItem(unsigned index, UIElement* item)
     contentElement_->InsertChild(index, item);
     
     // If necessary, shift the following selections
-    Set<unsigned> prevSelections;
-    selections_.Clear();
-    for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+    if (!selections_.Empty())
     {
-        if (*j >= index)
-            selections_.Insert(*j + 1);
-        else
-            selections_.Insert(*j);
+        Set<unsigned> prevSelections;
+        selections_.Clear();
+        for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+        {
+            if (*j >= index)
+                selections_.Insert(*j + 1);
+            else
+                selections_.Insert(*j);
+        }
+        UpdateSelectionEffect();
     }
-    UpdateSelectionEffect();
 }
 
 void ListView::RemoveItem(UIElement* item)
@@ -334,16 +337,19 @@ void ListView::RemoveItem(UIElement* item)
             }
             
             // If necessary, shift the following selections
-            Set<unsigned> prevSelections;
-            selections_.Clear();
-            for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+            if (!selections_.Empty())
             {
-                if (*j > i)
-                    selections_.Insert(*j - removed);
-                else
-                    selections_.Insert(*j);
+                Set<unsigned> prevSelections;
+                selections_.Clear();
+                for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+                {
+                    if (*j > i)
+                        selections_.Insert(*j - removed);
+                    else
+                        selections_.Insert(*j);
+                }
+                UpdateSelectionEffect();
             }
-            UpdateSelectionEffect();
             break;
         }
     }
