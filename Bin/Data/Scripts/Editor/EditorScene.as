@@ -58,8 +58,8 @@ void SetResourcePath(String newPath)
 
     cache.ReleaseAllResources(false);
 
-    // Remove the old scene resource path if any. However make sure that CoreData path never gets removed
-    if (!sceneResourcePath.empty && sceneResourcePath.Find("CoreData") < 0)
+    // Remove the old scene resource path if any. However make sure that the default data paths do not get removed
+    if (!sceneResourcePath.empty && sceneResourcePath.Find(fileSystem.programDir) < 0)
         cache.RemoveResourceDir(sceneResourcePath);
 
     cache.AddResourceDir(newPath);
@@ -241,6 +241,10 @@ void ScenePostRenderUpdate()
     DebugRenderer@ debug = editorScene.debugRenderer;
     if (debug is null)
         return;
+
+    // Visualize the currently selected node as its local axes
+    if (selectedNode !is null)
+        debug.AddNode(selectedNode, false);
 
     // Visualize current selection (either drawables or collisionshapes can be visualized)
     if (selectedComponent !is null)

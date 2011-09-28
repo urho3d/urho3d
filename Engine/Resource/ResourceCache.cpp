@@ -141,26 +141,28 @@ void ResourceCache::RemoveResourceDir(const String& path)
         if (!i->Compare(path, false))
         {
             resourceDirs_.Erase(i);
+            LOGINFO("Removed resource path " + fixedPath);
             return;
         }
     }
 }
 
-void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResources, bool forceRelease)
+void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResources, bool forceRelease)
 {
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if (*i == package)
         {
-            if (ReleaseResources)
+            if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
+            LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }
     }
 }
 
-void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResources, bool forceRelease)
+void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResources, bool forceRelease)
 {
     // Compare the name and extension only, not the path
     String fileNameNoPath = GetFileNameAndExtension(fileName);
@@ -169,8 +171,9 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResour
     {
         if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
         {
-            if (ReleaseResources)
+            if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
+            LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }

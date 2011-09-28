@@ -24,7 +24,9 @@
 #pragma once
 
 #include "Matrix3x4.h"
-#include "Node.h"
+#include "Serializable.h"
+
+class Node;
 
 /// Base class for components. Components can be created to scene nodes.
 class Component : public Serializable
@@ -57,7 +59,7 @@ public:
     Node* GetNode() const { return node_; }
     
     /// Return parent node's world transform.
-    const Matrix3x4& GetWorldTransform() const { return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY; }
+    const Matrix3x4& GetWorldTransform() const;
     /// Return parent node's world position.
     Vector3 GetWorldPosition() const { return GetWorldTransform().Translation(); }
     /// Return parent node's world rotation.

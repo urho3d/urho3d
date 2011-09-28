@@ -66,9 +66,9 @@ public:
     /// Remove a resource load directory.
     void RemoveResourceDir(const String& pathName);
     /// Remove a package file. Optionally release the resources loaded from it.
-    void RemovePackageFile(PackageFile* package, bool ReleaseResources = true, bool forceRelease = false);
+    void RemovePackageFile(PackageFile* package, bool releaseResources = true, bool forceRelease = false);
     /// Remove a package file by name. Optionally release the resources loaded from it.
-    void RemovePackageFile(const String& fileName, bool ReleaseResources = true, bool forceRelease = false);
+    void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
     void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
     /// Release a resource by name hash.

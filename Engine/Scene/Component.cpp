@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Context.h"
+#include "Node.h"
 #include "XMLElement.h"
 
 OBJECTTYPESTATIC(Component);
@@ -43,6 +44,11 @@ void Component::Remove()
 {
     if (node_)
         node_->RemoveComponent(this);
+}
+
+const Matrix3x4& Component::GetWorldTransform() const
+{
+    return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
 }
 
 void Component::SetID(unsigned id)

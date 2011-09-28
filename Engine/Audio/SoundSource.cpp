@@ -344,8 +344,8 @@ void SoundSource::Update(float timeStep)
             autoRemoveTimer_ += timeStep;
             if (autoRemoveTimer_ > AUTOREMOVE_DELAY)
             {
-                if (node_)
-                    node_->RemoveComponent(this);
+                Remove();
+                // Note: this object is now deleted, so only returning immediately is safe
                 return;
             }
         }

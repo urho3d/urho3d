@@ -347,6 +347,7 @@ void Text::UpdateText(bool inResize)
         const FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
+        
         rowHeight_ = face->rowHeight_;
         int rowWidth = 0;
         int rowHeight = (int)(rowSpacing_ * rowHeight_);

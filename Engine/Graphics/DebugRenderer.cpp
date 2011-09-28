@@ -81,6 +81,28 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned c
         noDepthLines_.Push(DebugLine(start, end, color));
 }
 
+void DebugRenderer::AddNode(Node* node, bool depthTest)
+{
+    if (!node)
+        return;
+    
+    Vector3 start = node->GetWorldPosition();
+    Quaternion rotation = node->GetWorldRotation();
+    
+    if (depthTest)
+    {
+        lines_.Push(DebugLine(start, start + rotation * Vector3::RIGHT, Color::RED.ToUInt()));
+        lines_.Push(DebugLine(start, start + rotation * Vector3::UP, Color::GREEN.ToUInt()));
+        lines_.Push(DebugLine(start, start + rotation * Vector3::FORWARD, Color::BLUE.ToUInt()));
+    }
+    else
+    {
+        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::RIGHT, Color::RED.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::UP, Color::GREEN.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::FORWARD, Color::BLUE.ToUInt()));
+    }
+}
+
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
 {
     const Vector3& min = box.min_;
