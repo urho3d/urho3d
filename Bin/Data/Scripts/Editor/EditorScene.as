@@ -307,7 +307,10 @@ void SceneRaycast(bool mouseClick)
             {
                 Drawable@ drawable = result[0].drawable;
                 if (debug !is null)
+                {
+                    debug.AddNode(drawable.node, false);
                     drawable.DrawDebugGeometry(debug, false);
+                }
                 selected = drawable;
             }
         }
@@ -320,7 +323,10 @@ void SceneRaycast(bool mouseClick)
             {
                 CollisionShape@ shape = result[0].collisionShape;
                 if (debug !is null)
+                {
+                    debug.AddNode(shape.node, false);
                     shape.DrawDebugGeometry(debug, false);
+                }
                 selected = shape;
             }
         }
