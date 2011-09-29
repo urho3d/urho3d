@@ -437,7 +437,7 @@ void View::GetBatches()
             {
                 Drawable* drawable = litGeometries_[j];
                 drawable->AddLight(light);
-
+                
                 // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                 if (!drawable->GetMaxLights())
                     GetLitBatches(drawable, lightQueue);
@@ -545,7 +545,6 @@ void View::GetBatches()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
-    Light* drawableFirstLight = drawable->GetLights()[0];
     
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->reuseShadowMaps_;
@@ -564,7 +563,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         bool priority = false;
         
         // For the (first) directional light, check for lit base pass
-        if (light == drawableFirstLight && light->GetLightType() == LIGHT_DIRECTIONAL)
+        if (light == lights_[0] && light->GetLightType() == LIGHT_DIRECTIONAL)
         {
             if (!drawable->HasBasePass(i))
             {
