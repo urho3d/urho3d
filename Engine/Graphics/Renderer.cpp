@@ -753,7 +753,8 @@ OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOcc
 {
     // Get an occlusion buffer matching the aspect ratio. If not found, allocate new
     int width = occlusionBufferSize_;
-    int height = (int)(occlusionBufferSize_ / camera->GetAspectRatio());
+    int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
+    
     if (halfResolution)
     {
         width >>= 1;

@@ -563,16 +563,13 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         bool priority = false;
         
         // For the (first) directional light, check for lit base pass
-        if (light == lights_[0] && light->GetLightType() == LIGHT_DIRECTIONAL)
+        if (light == lights_[0] && light->GetLightType() == LIGHT_DIRECTIONAL && !drawable->HasBasePass(i))
         {
-            if (!drawable->HasBasePass(i))
+            pass = tech->GetPass(PASS_LITBASE);
+            if (pass)
             {
-                pass = tech->GetPass(PASS_LITBASE);
-                if (pass)
-                {
-                    priority = true;
-                    drawable->SetBasePass(i);
-                }
+                priority = true;
+                drawable->SetBasePass(i);
             }
         }
         

@@ -72,6 +72,10 @@ bool OcclusionBuffer::SetSize(int width, int height)
         return false;
     }
     
+    // Force the height to an even amount of pixels for better mip generation
+    if (height & 1)
+        ++height;
+    
     PROFILE(ResizeOcclusion);
     
     width_ = width;
