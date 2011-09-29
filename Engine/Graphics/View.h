@@ -204,6 +204,8 @@ private:
     PODVector<Light*> lights_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
+    /// Directional light shadow caster drawables.
+    HashSet<Drawable*> dirLightShadowCasters_;
     /// Light queue indices of processed lights.
     Map<Light*, unsigned> lightQueueIndex_;
     /// View-global shader parameters.

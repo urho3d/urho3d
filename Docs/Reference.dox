@@ -484,8 +484,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|extra|shadow"
-        vs="VertexShaderName" ps="PixelShaderName" alphamask="true|false"
+    <pass name="base|litbase|light|extra|shadow" vs="VertexShaderName" ps="PixelShaderName" 
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
     <pass ... />
@@ -493,17 +492,15 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-"Alphamask" is not an actual renderstate. It is a hint that the pixel shader will do discard(), and should therefore be rendered after fully opaque geometry to ensure optimal depth buffer performance.
-
 The passes are:
 
 - base: forward rendering base pass. Renders the ambient light.
-- litbase: forward rendering lit base pass. Renders the ambient light and the first directional light affecting the object for optimization.
+- litbase: forward rendering lit base pass. Renders both the ambient light and the first light affecting the object for optimization.
 - light: forward rendering light pass. Renders one light's contribution additively.
 - extra: custom rendering pass. Rendered after the opaque geometry.
 - shadow: shadow map rendering pass. Renders depth only.
 
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist.
+Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, specular and no specular, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist.
 
 
 \page Lights Lights and shadows
@@ -536,7 +533,7 @@ Shadow rendering is easily the most complex aspect of using lights, and therefor
 
 - CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0.
 
-- FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic resolution reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
+- FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic size reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
 Additionally there are shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
 

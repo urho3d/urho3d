@@ -37,8 +37,6 @@ public:
     /// Destruct.
     ~Pass();
     
-    /// %Set alpha masking hint on/off.
-    void SetAlphaMask(bool enable);
     /// %Set alpha test on/off.
     void SetAlphaTest(bool enable);
     /// %Set blend mode.
@@ -56,8 +54,6 @@ public:
     
     /// Return pass type.
     PassType GetType() const { return type_; }
-    /// Return alpha masking hint.
-    bool GetAlphaMask() const { return alphaMask_; }
     /// Return alpha test mode.
     bool GetAlphaTest() const { return alphaTest_; }
     /// Return blend mode.
@@ -78,8 +74,6 @@ public:
 private:
     /// Pass type.
     PassType type_;
-    /// Alpha masking hint.
-    bool alphaMask_;
     /// Alpha test mode.
     bool alphaTest_;
     /// Blend mode.

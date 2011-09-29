@@ -55,8 +55,8 @@ Drawable::Drawable(Context* context) :
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
-    basePassFlags_(0),
     viewCamera_(0),
+    firstLight_(0),
     worldBoundingBoxDirty_(true),
     lodLevelsDirty_(true)
 {
@@ -185,28 +185,18 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::ClearBasePass()
+void Drawable::ClearLights()
 {
     for (unsigned i = 0; i < basePassFlags_.Size(); ++i)
         basePassFlags_[i] = 0;
+    firstLight_ = 0;
     lights_.Clear();
-}
-
-void Drawable::SetBasePass(unsigned batchIndex)
-{
-    unsigned index = batchIndex << 5;
-    if (basePassFlags_.Size() <= index)
-    {
-        unsigned oldSize = basePassFlags_.Size();
-        basePassFlags_.Resize(index + 1);
-        for (unsigned i = oldSize; i <= index; ++i)
-            basePassFlags_[i] = 0;
-    }
-    basePassFlags_[index] |= (1 << (batchIndex & 31));
 }
 
 void Drawable::AddLight(Light* light)
 {
+    if (lights_.Empty())
+        firstLight_ = light;
     lights_.Push(light);
 }
 
@@ -225,6 +215,19 @@ void Drawable::LimitLights()
     // If more lights than allowed, cut the list
     if (lights_.Size() > maxLights_)
         lights_.Resize(maxLights_);
+}
+
+void Drawable::SetBasePass(unsigned batchIndex)
+{
+    unsigned index = batchIndex << 5;
+    if (basePassFlags_.Size() <= index)
+    {
+        unsigned oldSize = basePassFlags_.Size();
+        basePassFlags_.Resize(index + 1);
+        for (unsigned i = oldSize; i <= index; ++i)
+            basePassFlags_[i] = 0;
+    }
+    basePassFlags_[index] |= (1 << (batchIndex & 31));
 }
 
 bool Drawable::IsInView(unsigned frameNumber) const

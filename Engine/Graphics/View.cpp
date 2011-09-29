@@ -305,7 +305,7 @@ void View::GetDrawables()
         unsigned flags = drawable->GetDrawableFlags();
         if (flags & DRAWABLE_GEOMETRY)
         {
-            drawable->ClearBasePass();
+            drawable->ClearLights();
             drawable->MarkInView(frame_);
             drawable->UpdateGeometry(frame_);
             
@@ -424,7 +424,6 @@ void View::GetBatches()
                         shadowBatch.camera_ = shadowCamera;
                         shadowBatch.distance_ = shadowCamera->GetDistance(drawable->GetWorldPosition());
                         shadowBatch.lightQueue_ = &lightQueue;
-                        shadowBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         
                         renderer_->SetBatchShaders(shadowBatch, tech, pass);
                         shadowQueue.shadowBatches_.AddBatch(shadowBatch);
@@ -436,6 +435,11 @@ void View::GetBatches()
             for (unsigned j = 0; j < litGeometries_.Size(); ++j)
             {
                 Drawable* drawable = litGeometries_[j];
+                // In the occluded & shadowed directional light optimization, we null out pointers instead of removing entries
+                // from the lit geometry vector. Therefore must be prepared for a null pointer
+                if (!drawable)
+                    continue;
+                
                 drawable->AddLight(light);
                 
                 // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
@@ -503,6 +507,7 @@ void View::GetBatches()
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
                 baseBatch.distance_ = drawable->GetDistance();
+                baseBatch.hasPriority_ = true;
                 
                 Pass* pass = 0;
                 
@@ -512,15 +517,10 @@ void View::GetBatches()
                 {
                     renderer_->SetBatchShaders(baseBatch, tech, pass);
                     if (pass->GetBlendMode() == BLEND_REPLACE)
-                    {
-                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         baseQueue_.AddBatch(baseBatch);
-                    }
                     else
-                    {
-                        baseBatch.hasPriority_ = true;
                         transparentQueue_.AddBatch(baseBatch, true);
-                    }
+                    
                     continue;
                 }
                 else
@@ -529,7 +529,6 @@ void View::GetBatches()
                     pass = tech->GetPass(PASS_EXTRA);
                     if (pass)
                     {
-                        baseBatch.hasPriority_ = false;
                         renderer_->SetBatchShaders(baseBatch, tech, pass);
                         extraQueue_.AddBatch(baseBatch);
                     }
@@ -545,6 +544,7 @@ void View::GetBatches()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
+    Light* firstLight = drawable->GetFirstLight();
     
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->reuseShadowMaps_;
@@ -560,15 +560,14 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             continue;
         
         Pass* pass = 0;
-        bool priority = false;
         
-        // For the (first) directional light, check for lit base pass
-        if (light == lights_[0] && light->GetLightType() == LIGHT_DIRECTIONAL && !drawable->HasBasePass(i))
+        // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
+        if (light == firstLight && !drawable->HasBasePass(i))
         {
             pass = tech->GetPass(PASS_LITBASE);
             if (pass)
             {
-                priority = true;
+                litBatch.hasPriority_ = true;
                 drawable->SetBasePass(i);
             }
         }
@@ -584,7 +583,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         litBatch.camera_ = camera_;
         litBatch.distance_ = drawable->GetDistance();
         litBatch.lightQueue_ = &lightQueue;
-        litBatch.hasPriority_ = priority;
         
         // Check from the ambient pass whether the object is opaque or transparent
         Pass* ambientPass = tech->GetPass(PASS_BASE);
@@ -765,6 +763,7 @@ unsigned View::ProcessLight(Light* light)
     switch (type)
     {
     case LIGHT_DIRECTIONAL:
+        dirLightShadowCasters_.Clear();
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             if (geometries_[i]->GetLightMask() & light->GetLightMask())
@@ -868,6 +867,10 @@ unsigned View::ProcessLight(Light* light)
             OccludedFrustumOctreeQuery query(tempDrawables_, shadowCamera->GetFrustum(), buffer,
                 DRAWABLE_GEOMETRY, camera_->GetViewMask(), false, true);
             octree_->GetDrawables(query);
+            
+            // Store the raw list of possible shadow casters for a later optimization step
+            for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
+                dirLightShadowCasters_.Insert(tempDrawables_[i]);
         }
         
         // Check which shadow casters actually contribute to the shadowing
@@ -876,11 +879,23 @@ unsigned View::ProcessLight(Light* light)
             hasShadowCasters = true;
     }
     
-    // If no shadow casters, the light can be rendered unshadowed. At this point we have not allocated a shadow map
-    // yet, so the only cost is the shadow camera setup & queries
+    // If no shadow casters, the light can be rendered unshadowed. At this point we have not allocated a shadow map yet, so the
+    // only cost has been the shadow camera setup & queries
     if (!hasShadowCasters)
         shadowSplits = 0;
     
+    // For a directional light queried with occlusion, can perform an optimization post-step: if a visible shadow caster has been
+    // rejected due to occlusion, the light does not need to be rendered on it either
+    if (shadowSplits && useOcclusion)
+    {
+        for (unsigned i = 0; i < litGeometries_.Size(); ++i)
+        {
+            Drawable* drawable = litGeometries_[i];
+            if (drawable->GetCastShadows() && !dirLightShadowCasters_.Contains(drawable))
+                litGeometries_[i] = 0;
+        }
+    }
+
     return shadowSplits;
 }
 
@@ -1040,58 +1055,67 @@ void View::OptimizeLightByStencil(Light* light)
     if (light && renderer_->GetLightStencilMasking())
     {
         Geometry* geometry = renderer_->GetLightGeometry(light);
-        
-        if (geometry)
+        if (!geometry)
         {
-            LightType type = light->GetLightType();
-            
-            // If the stencil value has wrapped, clear the whole stencil first
-            if (!lightStencilValue_)
-            {
-                graphics_->Clear(CLEAR_STENCIL);
-                lightStencilValue_ = 1;
-            }
-            
-            Matrix3x4 view(camera_->GetInverseWorldTransform());
-            Matrix4 projection(camera_->GetProjection());
-            float lightDist;
-            if (type == LIGHT_POINT)
-                lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).DistanceFast(camera_->GetWorldPosition());
-            else
-                lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
-            
-            // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
-            // to avoid clipping the front faces.
-            if (lightDist < camera_->GetNearClip() * 2.0f)
-            {
-                graphics_->SetCullMode(CULL_CW);
-                graphics_->SetDepthTest(CMP_GREATER);
-            }
-            else
-            {
-                graphics_->SetCullMode(CULL_CCW);
-                graphics_->SetDepthTest(CMP_LESSEQUAL);
-            }
-            
-            graphics_->SetColorWrite(false);
-            graphics_->SetDepthWrite(false);
-            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-            graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
-            graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
-            
-            geometry->Draw(graphics_);
-            
-            graphics_->ClearTransformSources();
-            graphics_->SetColorWrite(true);
-            graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, lightStencilValue_);
-            ++lightStencilValue_;
-            
+            graphics_->SetStencilTest(false);
             return;
         }
+        
+        LightType type = light->GetLightType();
+        Matrix3x4 view(camera_->GetInverseWorldTransform());
+        Matrix4 projection(camera_->GetProjection());
+        float lightDist;
+        
+        if (type == LIGHT_POINT)
+            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).DistanceFast(camera_->GetWorldPosition());
+        else
+            lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
+        
+        // If the camera is actually inside the light volume, do not draw to stencil as it would waste fillrate
+        if (lightDist < M_EPSILON)
+        {
+            graphics_->SetStencilTest(false);
+            return;
+        }
+        
+        // If the stencil value has wrapped, clear the whole stencil first
+        if (!lightStencilValue_)
+        {
+            graphics_->Clear(CLEAR_STENCIL);
+            lightStencilValue_ = 1;
+        }
+        
+        // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
+        // to avoid clipping the front faces.
+        if (lightDist < camera_->GetNearClip() * 2.0f)
+        {
+            graphics_->SetCullMode(CULL_CW);
+            graphics_->SetDepthTest(CMP_GREATER);
+        }
+        else
+        {
+            graphics_->SetCullMode(CULL_CCW);
+            graphics_->SetDepthTest(CMP_LESSEQUAL);
+        }
+        
+        graphics_->SetColorWrite(false);
+        graphics_->SetDepthWrite(false);
+        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
+        graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
+        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
+        
+        geometry->Draw(graphics_);
+        
+        graphics_->ClearTransformSources();
+        graphics_->SetColorWrite(true);
+        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, lightStencilValue_);
+        
+        // Increase stencil value for next light
+        ++lightStencilValue_;
     }
-    
-    graphics_->SetStencilTest(false);
+    else
+        graphics_->SetStencilTest(false);
 }
 
 const Rect& View::GetLightScissor(Light* light)

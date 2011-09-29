@@ -44,7 +44,7 @@ void main()
         diffColor *= vColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(SPECMAP)
+    #ifdef NORMALMAP
         vec4 normalInput = texture2D(sNormalMap, vTexCoord);
     #endif
 

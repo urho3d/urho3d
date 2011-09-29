@@ -67,7 +67,6 @@ static const String CompareModeNames[] =
 
 Pass::Pass(PassType type) :
     type_(type),
-    alphaMask_(false),
     alphaTest_(false),
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
@@ -77,11 +76,6 @@ Pass::Pass(PassType type) :
 
 Pass::~Pass()
 {
-}
-
-void Pass::SetAlphaMask(bool enable)
-{
-    alphaMask_ = enable;
 }
 
 void Pass::SetAlphaTest(bool enable)
@@ -175,9 +169,6 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("ps"))
                 newPass->SetPixelShader(passElem.GetString("ps"));
-            
-            if (passElem.HasAttribute("alphamask"))
-                newPass->SetAlphaMask(passElem.GetBool("alphamask"));
             
             if (passElem.HasAttribute("alphatest"))
                 newPass->SetAlphaTest(passElem.GetBool("alphatest"));

@@ -37,38 +37,20 @@
     </shader>
     <shader name="Forward" type="ps">
         <option name="Diff" define="DIFFMAP" />
-        <option name="Normal" define="NORMALMAP" />
-        <option name="SpecMap" define="SPECMAP" include="Spec" />
+        <option name="Normal" define="NORMALMAP" require="LIGHT" />
+        <option name="SpecMap" define="SPECMAP" require="NORMALMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Volume" define="VOLUMETRIC">
             <exclude name="Additive" />
-            <exclude name="Ambient" />
             <exclude name="Normal" />
             <exclude name="Shadow" />
             <exclude name="Spec" />
             <exclude name="SpecMap" />
             <exclude name="Unlit" />
         </option>
-        <variation name="Unlit" define="UNLIT">
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </variation>
-        <variation name="Additive" define="ADDITIVE">
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </variation>
-        <variation name="Ambient" define="AMBIENT">
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </variation>
-        <variation name="AmbientDir">
-            <define name="AMBIENT" />
-            <define name="DIRLIGHT" />
-            <define name="LIGHT" />
-        </variation>
+        <variation name="Unlit" define="UNLIT" />
+        <variation name="Additive" define="ADDITIVE" />
+        <variation name="Ambient" define="AMBIENT" />
         <variation name="Dir">
             <define name="DIRLIGHT" />
             <define name="LIGHT" />
@@ -78,6 +60,21 @@
             <define name="LIGHT" />
         </variation>
         <variation name="Point">
+            <define name="POINTLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <variation name="AmbientDir">
+            <define name="AMBIENT" />
+            <define name="DIRLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <variation name="AmbientSpot">
+            <define name="AMBIENT" />
+            <define name="SPOTLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <variation name="AmbientPoint">
+            <define name="AMBIENT" />
             <define name="POINTLIGHT" />
             <define name="LIGHT" />
         </variation>

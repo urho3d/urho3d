@@ -191,7 +191,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(SPECMAP)
+    #ifdef NORMALMAP
         float4 normalInput = tex2D(sNormalMap, iTexCoord);
     #endif
 

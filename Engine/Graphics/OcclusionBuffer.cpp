@@ -81,8 +81,8 @@ bool OcclusionBuffer::SetSize(int width, int height)
     width_ = width;
     height_ = height;
     // Reserve extra memory in case 3D clipping is not exact
-    fullBuffer_ = new int[width * (height + 2)];
-    buffer_ = fullBuffer_.Get() + 1 * width;
+    fullBuffer_ = new int[width * (height + 2) + 2];
+    buffer_ = fullBuffer_.Get() + width + 1;
     mipBuffers_.Clear();
     
     // Build buffers for mip levels

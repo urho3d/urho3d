@@ -364,7 +364,7 @@ void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
     if (lightType_ == LIGHT_DIRECTIONAL)
         // If sorting lights for a drawable's maximum lights sorting, use the actual intensity
         // Else (when sorting lights globally for the view) ensure directional lights always have a fixed first priority
-        // so that the combined ambient + first light optimization works as expected
+        // so that the lit base pass optimization has the most benefit
         sortValue_ = forDrawable ? invIntensity : 0.0f;
     else
         sortValue_ = invIntensity * (1.0f + (GetWorldPosition() - position).LengthFast() / range_);
