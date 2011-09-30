@@ -435,11 +435,6 @@ void View::GetBatches()
             for (unsigned j = 0; j < litGeometries_.Size(); ++j)
             {
                 Drawable* drawable = litGeometries_[j];
-                // In the occluded & shadowed directional light optimization, we null out pointers instead of removing entries
-                // from the lit geometry vector. Therefore must be prepared for a null pointer
-                if (!drawable)
-                    continue;
-                
                 drawable->AddLight(light);
                 
                 // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
@@ -763,7 +758,6 @@ unsigned View::ProcessLight(Light* light)
     switch (type)
     {
     case LIGHT_DIRECTIONAL:
-        dirLightShadowCasters_.Clear();
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             if (geometries_[i]->GetLightMask() & light->GetLightMask())
@@ -867,10 +861,6 @@ unsigned View::ProcessLight(Light* light)
             OccludedFrustumOctreeQuery query(tempDrawables_, shadowCamera->GetFrustum(), buffer,
                 DRAWABLE_GEOMETRY, camera_->GetViewMask(), false, true);
             octree_->GetDrawables(query);
-            
-            // Store the raw list of possible shadow casters for a later optimization step
-            for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
-                dirLightShadowCasters_.Insert(tempDrawables_[i]);
         }
         
         // Check which shadow casters actually contribute to the shadowing
@@ -884,18 +874,6 @@ unsigned View::ProcessLight(Light* light)
     if (!hasShadowCasters)
         shadowSplits = 0;
     
-    // For a directional light queried with occlusion, can perform an optimization post-step: if a visible shadow caster has been
-    // rejected due to occlusion, the light does not need to be rendered on it either
-    if (shadowSplits && useOcclusion)
-    {
-        for (unsigned i = 0; i < litGeometries_.Size(); ++i)
-        {
-            Drawable* drawable = litGeometries_[i];
-            if (drawable->GetCastShadows() && !dirLightShadowCasters_.Contains(drawable))
-                litGeometries_[i] = 0;
-        }
-    }
-
     return shadowSplits;
 }
 
