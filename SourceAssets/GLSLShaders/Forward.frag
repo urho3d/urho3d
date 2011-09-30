@@ -48,7 +48,7 @@ void main()
         vec4 normalInput = texture2D(sNormalMap, vTexCoord);
     #endif
 
-    #if (!defined(VOLUMETRIC)) && ((defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT)))
+    #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         vec3 lightColor;
         vec3 lightDir;
@@ -117,52 +117,44 @@ void main()
             gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
         #endif
 
+    #elif defined(VOLUMETRIC) && defined(LIGHT)
+
+        vec3 lightColor;
+        vec3 lightVec;
+        float diff;
+
+        #ifdef DIRLIGHT
+            diff = GetDiffuseDirVolumetric();
+        #else
+            diff = GetDiffusePointOrSpotVolumetric(vLightVec.xyz);
+        #endif
+
+        #if defined(SPOTLIGHT)
+            lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
+        #elif defined(CUBEMASK)
+            lightColor = textureCube(sLightCubeMap, vCubeMaskVec).rgb * cLightColor.rgb;
+        #else
+            lightColor = cLightColor.rgb;
+        #endif
+
+        vec3 finalColor = diff * lightColor * diffColor.rgb;
+
+        #ifdef AMBIENT
+            finalColor += cAmbientColor * diffColor.rgb;
+            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
+        #else
+            gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
+        #endif
+
     #else
 
-        #if (defined(VOLUMETRIC)) && ((defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT)))
-
-            vec3 lightColor;
-            vec3 lightVec;
-            float diff;
-
-            #ifdef DIRLIGHT
-                diff = GetDiffuseDirVolumetric();
-            #else
-                diff = GetDiffusePointOrSpotVolumetric(vLightVec.xyz);
-            #endif
-
-            #if defined(SPOTLIGHT)
-                lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
-            #elif defined(CUBEMASK)
-                lightColor = textureCube(sLightCubeMap, vCubeMaskVec).rgb * cLightColor.rgb;
-            #else
-                lightColor = cLightColor.rgb;
-            #endif
-
-            vec3 finalColor = diff * lightColor * diffColor.rgb;
-
-            #ifdef AMBIENT
-                finalColor += cAmbientColor * diffColor.rgb;
-                gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
-            #else
-                gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
-            #endif
-
-        #else
-
-            #ifdef UNLIT
-                gl_FragColor = vec4(GetFog(diffColor.rgb, vLightVec.w), diffColor.a);
-            #endif
-
-            #ifdef ADDITIVE
-                gl_FragColor = vec4(GetLitFog(diffColor.rgb, vLightVec.w), diffColor.a);
-            #endif
-
-            #ifdef AMBIENT
-                vec3 finalColor = cAmbientColor * diffColor.rgb;
-                gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
-            #endif
-
+        #if defined(UNLIT)
+            gl_FragColor = vec4(GetFog(diffColor.rgb, vLightVec.w), diffColor.a);
+        #elif defined(ADDITIVE)
+            gl_FragColor = vec4(GetLitFog(diffColor.rgb, vLightVec.w), diffColor.a);
+        #elif defined(AMBIENT)
+            vec3 finalColor = cAmbientColor * diffColor.rgb;
+            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
         #endif
 
     #endif

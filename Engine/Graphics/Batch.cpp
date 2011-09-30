@@ -43,13 +43,13 @@ inline bool CompareBatchesFrontToBack(Batch* lhs, Batch* rhs)
     if (lhs->sortKey_ == rhs->sortKey_)
         return lhs->distance_ < rhs->distance_;
     else
-        return lhs->sortKey_ < rhs->sortKey_;
+        return lhs->sortKey_ > rhs->sortKey_;
 }
 
 inline bool CompareBatchesBackToFront(Batch* lhs, Batch* rhs)
 {
     if (lhs->distance_ == rhs->distance_)
-        return lhs->sortKey_ < rhs->sortKey_;
+        return lhs->sortKey_ > rhs->sortKey_;
     else
         return lhs->distance_ > rhs->distance_;
 }

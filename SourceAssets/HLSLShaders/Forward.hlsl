@@ -195,7 +195,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float4 normalInput = tex2D(sNormalMap, iTexCoord);
     #endif
 
-    #if !defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
+    #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         float3 lightColor;
         float3 lightDir;
@@ -264,51 +264,43 @@ void PS(float2 iTexCoord : TEXCOORD0,
             oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
         #endif
 
+    #elif defined(VOLUMETRIC) && defined(LIGHT)
+
+        float3 lightColor;
+        float diff;
+
+        #ifdef DIRLIGHT
+            diff = GetDiffuseDirVolumetric();
+        #else
+            diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
+        #endif
+
+        #if defined(SPOTLIGHT)
+            lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+        #elif defined(CUBEMASK)
+            lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
+        #else
+            lightColor = cLightColor.rgb;
+        #endif
+
+        float3 finalColor = diff * lightColor * diffColor.rgb;
+
+        #ifdef AMBIENT
+            finalColor += cAmbientColor * diffColor.rgb;
+            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
+        #else
+            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+        #endif
+
     #else
 
-        #if defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
-
-            float3 lightColor;
-            float diff;
-
-            #ifdef DIRLIGHT
-                diff = GetDiffuseDirVolumetric();
-            #else
-                diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
-            #endif
-
-            #if defined(SPOTLIGHT)
-                lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
-            #elif defined(CUBEMASK)
-                lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
-            #else
-                lightColor = cLightColor.rgb;
-            #endif
-
-            float3 finalColor = diff * lightColor * diffColor.rgb;
-
-            #ifdef AMBIENT
-                finalColor += cAmbientColor * diffColor.rgb;
-                oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
-            #else
-                oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
-            #endif
-
-        #else
-
-            #ifdef UNLIT
-                oColor = float4(GetFog(diffColor.rgb, iLightVec.w), diffColor.a);
-            #endif
-
-            #ifdef ADDITIVE
-                oColor = float4(GetLitFog(diffColor.rgb, iLightVec.w), diffColor.a);
-            #endif
-
-            #ifdef AMBIENT
-                float3 finalColor = cAmbientColor * diffColor.rgb;
-                oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
-            #endif
-
+        #if defined(UNLIT)
+            oColor = float4(GetFog(diffColor.rgb, iLightVec.w), diffColor.a);
+        #elif defined(ADDITIVE)
+            oColor = float4(GetLitFog(diffColor.rgb, iLightVec.w), diffColor.a);
+        #elif defined(AMBIENT)
+            float3 finalColor = cAmbientColor * diffColor.rgb;
+            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
         #endif
 
     #endif
