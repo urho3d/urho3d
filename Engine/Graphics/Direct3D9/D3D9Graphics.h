@@ -56,6 +56,8 @@ struct ShaderParameter
     ShaderType type_;
     /// Hardware register.
     unsigned register_;
+    /// Number of registers.
+    unsigned regCount_;
     /// Last source.
     const void* lastSource_;
 };
@@ -108,12 +110,8 @@ public:
     void SetIndexBuffer(IndexBuffer* buffer);
     /// %Set shaders.
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// %Set shader bool constants.
-    void SetShaderParameter(StringHash param, const bool* data, unsigned count);
     /// %Set shader float constants.
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
-    /// %Set shader int constants.
-    void SetShaderParameter(StringHash param, const int* data, unsigned count);
     /// %Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
     /// %Set shader color constant.
@@ -129,7 +127,7 @@ public:
     /// %Set shader 3x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Define a shader parameter. Called by Shader.
-    void DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg);
+    void DefineShaderParameter(StringHash param, ShaderType type, unsigned reg, unsigned regCount);
     /// Check whether a shader parameter in the currently set shaders needs update.
     bool NeedParameterUpdate(StringHash param, const void* source);
     /// Check whether the current pixel shader uses a texture unit.
@@ -365,9 +363,11 @@ private:
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
+    /// Assign a shader parameter to hardware registers and clear remembered source if another parameter was overwritten.
+    void AssignShaderRegisters(ShaderType type, StringHash param, unsigned reg, unsigned count);
     /// Handle operating system window message.
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
-    
+
     /// Implementation.
     GraphicsImpl* impl_;
     /// Window title.
@@ -456,6 +456,10 @@ private:
     ShaderVariation* pixelShader_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
+    /// Currently assigned vertex shader parameter per hardware register.
+    StringHash vsRegisterAssignments_[MAX_VS_REGISTERS];
+    /// Currently assigned pixel shader parameter per hardware register.
+    StringHash psRegisterAssignments_[MAX_PS_REGISTERS];
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.

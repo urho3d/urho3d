@@ -804,11 +804,6 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
 }
 
-void Graphics::SetShaderParameter(StringHash param, const bool* data, unsigned count)
-{
-    // Not supported
-}
-
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
     if (shaderProgram_)
@@ -840,35 +835,6 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 
             case GL_FLOAT_MAT4:
                 glUniformMatrix4fv(info->location_, count / 16, GL_TRUE, data);
-                break;
-            }
-        }
-    }
-}
-
-void Graphics::SetShaderParameter(StringHash param, const int* data, unsigned count)
-{
-    if (shaderProgram_)
-    {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
-        if (info)
-        {
-            switch (info->type_)
-            {
-            case GL_INT:
-                glUniform1iv(info->location_, count, data);
-                break;
-                
-            case GL_INT_VEC2:
-                glUniform2iv(info->location_, count / 2, data);
-                break;
-                
-            case GL_INT_VEC3:
-                glUniform3iv(info->location_, count / 3, data);
-                break;
-                
-            case GL_INT_VEC4:
-                glUniform4iv(info->location_, count / 4, data);
                 break;
             }
         }

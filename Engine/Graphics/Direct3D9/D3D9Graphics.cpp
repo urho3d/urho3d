@@ -929,40 +929,18 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
 }
 
-void Graphics::SetShaderParameter(StringHash param, const bool* data, unsigned count)
-{
-    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
-    if (i == shaderParameters_.End())
-        return;
-    
-    if (i->second_.type_ == VS)
-       impl_->device_->SetVertexShaderConstantB(i->second_.register_, (const BOOL*)data, count);
-    else
-       impl_->device_->SetPixelShaderConstantB(i->second_.register_, (const BOOL*)data, count);
-}
-
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
     HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, count / 4);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, data, count / 4);
     else
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, data, count / 4);
-}
-
-void Graphics::SetShaderParameter(StringHash param, const int* data, unsigned count)
-{
-    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
-    if (i == shaderParameters_.End())
-        return;
-    
-    if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantI(i->second_.register_, data, count / 4);
-    else
-        impl_->device_->SetPixelShaderConstantI(i->second_.register_, data, count / 4);
 }
 
 void Graphics::SetShaderParameter(StringHash param, float value)
@@ -978,6 +956,8 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     data[2] = 0.0f;
     data[3] = 0.0f;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 1);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data[0], 1);
     else
@@ -989,6 +969,8 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
     HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
+    
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 1);
     
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, color.GetData(), 1);
@@ -1017,6 +999,8 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     data[10] = matrix.m22_;
     data[11] = 0.0f;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 3);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data[0], 3);
     else
@@ -1036,6 +1020,8 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
     data[2] = vector.z_;
     data[3] = 0.0f;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 1);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data[0], 1);
     else
@@ -1047,6 +1033,8 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
+    
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 4);
     
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.GetData(), 4);
@@ -1060,6 +1048,8 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
     if (i == shaderParameters_.End())
         return;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 1);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, vector.GetData(), 1);
     else
@@ -1072,18 +1062,21 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     if (i == shaderParameters_.End())
         return;
     
+    AssignShaderRegisters(i->second_.type_, param, i->second_.register_, 3);
+    
     if (i->second_.type_ == VS)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.GetData(), 3);
     else
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.GetData(), 3);
 }
 
-void Graphics::DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg)
+void Graphics::DefineShaderParameter(StringHash param, ShaderType type, unsigned reg, unsigned regCount)
 {
     unsigned oldSize = shaderParameters_.Size();
     
     shaderParameters_[param].type_ = type;
-    shaderParameters_[param].register_ = hwReg;
+    shaderParameters_[param].register_ = reg;
+    shaderParameters_[param].regCount_ = regCount;
     
     // Rehash if necessary to ensure minimum load factor and fast queries
     unsigned newSize = shaderParameters_.Size();
@@ -1099,18 +1092,48 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
     
     if (i->second_.type_ == VS)
     {
-        if (i->second_.lastSource_ != source && vertexShader_ && vertexShader_->HasParameter(param))
+        if (!vertexShader_ || !vertexShader_->HasParameter(param))
+            return false;
+        
+        if (i->second_.lastSource_ != source)
         {
             i->second_.lastSource_ = source;
             return true;
         }
+        else
+        {
+            // If last source is same, check if the register assignment has changed
+            unsigned lastReg = i->second_.register_ + i->second_.regCount_;
+            for (unsigned j = i->second_.register_; j < lastReg; ++j)
+            {
+                if (vsRegisterAssignments_[j] != param)
+                    return true;
+            }
+            
+            return false;
+        }
     }
     else
     {
-        if (i->second_.lastSource_ != source && pixelShader_ && pixelShader_->HasParameter(param))
+        if (!pixelShader_ || !pixelShader_->HasParameter(param))
+            return false;
+        
+        if (i->second_.lastSource_ != source)
         {
             i->second_.lastSource_ = source;
             return true;
+        }
+        else
+        {
+            // If last source is same, check if the register assignment has changed
+            unsigned lastReg = i->second_.register_ + i->second_.regCount_;
+            for (unsigned j = i->second_.register_; j < lastReg; ++j)
+            {
+                if (psRegisterAssignments_[j] != param)
+                    return true;
+            }
+            
+            return false;
         }
     }
     
@@ -1126,6 +1149,10 @@ void Graphics::ClearParameterSources()
 {
     for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
         i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
+    for (unsigned i = 0; i < MAX_VS_REGISTERS; ++i)
+        vsRegisterAssignments_[i] = StringHash();
+    for (unsigned i = 0; i < MAX_PS_REGISTERS; ++i)
+        psRegisterAssignments_[i] = StringHash();
 }
 
 void Graphics::ClearTransformSources()
@@ -2286,6 +2313,22 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
+}
+
+void Graphics::AssignShaderRegisters(ShaderType type, StringHash param, unsigned reg, unsigned regCount)
+{
+    unsigned lastReg = reg + regCount;
+    
+    if (type == VS)
+    {
+        for (unsigned i = reg; i < lastReg; ++i)
+            vsRegisterAssignments_[i] = param;
+    }
+    else
+    {
+        for (unsigned i = reg; i < lastReg; ++i)
+            psRegisterAssignments_[i] = param;
+    }
 }
 
 void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)

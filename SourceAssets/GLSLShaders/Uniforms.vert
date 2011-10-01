@@ -1,7 +1,6 @@
 uniform vec3 cCameraPos;
 uniform mat3 cCameraRot;
 uniform vec4 cDepthMode;
-uniform vec2 cElapsedTime;
 uniform float cLightAtten;
 uniform vec3 cLightDir;
 uniform vec3 cLightPos;

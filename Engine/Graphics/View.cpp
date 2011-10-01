@@ -1511,7 +1511,6 @@ void View::CalculateShaderParameters()
         fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
     float fogRange = Max(fogEnd - fogStart, M_EPSILON);
     Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
-    Vector4 elapsedTime((time->GetTotalMSec() & 0x3fffff) / 1000.0f, 0.0f, 0.0f, 0.0f);
     
     Vector4 depthMode = Vector4::ZERO;
     if (camera_->IsOrthographic())
@@ -1529,9 +1528,7 @@ void View::CalculateShaderParameters()
     
     shaderParameters_.Clear();
     shaderParameters_[VSP_DEPTHMODE] = depthMode;
-    shaderParameters_[VSP_ELAPSEDTIME] = elapsedTime;
     shaderParameters_[PSP_AMBIENTCOLOR] = zone_->GetAmbientColor().ToVector4();
-    shaderParameters_[PSP_ELAPSEDTIME] = elapsedTime;
     shaderParameters_[PSP_FOGCOLOR] = zone_->GetFogColor().ToVector4(),
     shaderParameters_[PSP_FOGPARAMS] = fogParams;
 }

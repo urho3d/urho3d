@@ -98,12 +98,8 @@ public:
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders.
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// Set shader bool constants.
-    void SetShaderParameter(StringHash param, const bool* data, unsigned count);
     /// Set shader float constants.
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
-    /// Set shader int constants.
-    void SetShaderParameter(StringHash param, const int* data, unsigned count);
     /// Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
     /// Set shader color constant.

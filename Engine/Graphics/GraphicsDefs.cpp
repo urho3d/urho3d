@@ -29,7 +29,6 @@
 StringHash VSP_CAMERAPOS("CameraPos");
 StringHash VSP_CAMERAROT("CameraRot");
 StringHash VSP_DEPTHMODE("DepthMode");
-StringHash VSP_ELAPSEDTIME("ElapsedTime");
 StringHash VSP_LIGHTATTEN("LightAtten");
 StringHash VSP_LIGHTDIR("LightDir");
 StringHash VSP_LIGHTPOS("LightPos");
@@ -44,7 +43,6 @@ StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
 StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 StringHash VSP_SKINMATRICES("SkinMatrices");
 StringHash PSP_AMBIENTCOLOR("AmbientColor");
-StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
 StringHash PSP_FOGCOLOR("FogColor");
 StringHash PSP_FOGPARAMS("FogParams");
 StringHash PSP_LIGHTCOLOR("LightColor");

@@ -1280,6 +1280,7 @@ uint       Number of constant parameters
     For each constant parameter:
     cstring    Parameter name
     byte       Hardware register index
+    byte       Number of hardware registers
 
 uint       Number of texture units (0 for vertex shaders)
 

@@ -53,9 +53,10 @@ struct Parameter
     {
     }
     
-    Parameter(const String& name, unsigned index) :
+    Parameter(const String& name, unsigned index, unsigned regCount) :
         name_(name),
-        index_(index)
+        index_(index),
+        regCount_(regCount)
     {
     }
     
@@ -63,24 +64,29 @@ struct Parameter
     {
         if (index_ != rhs.index_)
             return index_ < rhs.index_;
-        else
+        else if (name_ != rhs.name_)
             return name_ < rhs.name_;
+        else
+            return regCount_ < rhs.regCount_;
     }
     
     bool operator > (const Parameter& rhs) const
     {
         if (index_ != rhs.index_)
             return index_ > rhs.index_;
-        else
+        else if (name_ != rhs.name_)
             return name_ > rhs.name_;
+        else
+            return regCount_ > rhs.regCount_;
     }
     
-    bool operator == (const Parameter& rhs) const { return index_ == rhs.index_ && name_ == rhs.name_; }
+    bool operator == (const Parameter& rhs) const { return index_ == rhs.index_ && name_ == rhs.name_ && regCount_ == rhs.regCount_; }
     
-    bool operator != (const Parameter& rhs) const { return index_ != rhs.index_ || name_ != rhs.name_; }
+    bool operator != (const Parameter& rhs) const { return index_ != rhs.index_ || name_ != rhs.name_ || regCount_ != rhs.regCount_; }
     
     String name_;
     unsigned index_;
+    unsigned regCount_;
 };
 
 struct Variation
@@ -571,6 +577,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     {
         outFile.WriteString(constants[i].name_);
         outFile.WriteUByte(constants[i].index_);
+        outFile.WriteUByte(constants[i].regCount_);
     }
     
     outFile.WriteUInt(textureUnits.Size());
@@ -683,6 +690,7 @@ void Compile(CompiledVariation* variation)
             
             String name(constantDesc.Name);
             unsigned index = constantDesc.RegisterIndex;
+            unsigned regCount = constantDesc.RegisterCount;
             
             // Check if the parameter is a constant or a texture sampler
             bool isSampler = (name[0] == 's');
@@ -695,14 +703,14 @@ void Compile(CompiledVariation* variation)
                 // Skip if it's a G-buffer sampler
                 if (name.Find("Buffer") == String::NPOS)
                 {
-                    Parameter newTextureUnit(name, index);
+                    Parameter newTextureUnit(name, index, 1);
                     variation->textureUnits_.Insert(newTextureUnit);
                     textureUnits_.Insert(newTextureUnit);
                 }
             }
             else
             {
-                Parameter newParam(name, index);
+                Parameter newParam(name, index, regCount);
                 variation->constants_.Insert(newParam);
                 constants_.Insert(newParam);
             }
