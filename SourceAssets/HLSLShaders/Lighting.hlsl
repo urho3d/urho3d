@@ -31,74 +31,39 @@ float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularP
 
 float GetShadow(float4 shadowPos)
 {
-    // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
     #ifndef FALLBACK
         #ifndef LQSHADOW
             // Take four samples and average them
-            float4 pcfValues = cShadowIntensity.y;
-            #ifdef SM3
-                #ifndef POINTLIGHT
-                    float4 projShadowPos = float4(shadowPos.xyz / shadowPos.w, 0.0);
-                #else
-                    float4 projShadowPos = float4(shadowPos.xyz, 0.0);
-                #endif
-                float4 inLight = float4(
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(cSampleOffsets.x, cSampleOffsets.y), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(-cSampleOffsets.x, cSampleOffsets.y), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(cSampleOffsets.x, -cSampleOffsets.y), projShadowPos.zw)).r,
-                    tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(-cSampleOffsets.x, -cSampleOffsets.y), projShadowPos.zw)).r
-                );
-                #ifdef HWSHADOW
-                    return cShadowIntensity.z + dot(inLight, pcfValues);
-                #else
-                    return cShadowIntensity.z + dot(inLight > projShadowPos.z, pcfValues);
-                #endif
+            #ifndef POINTLIGHT
+                float4 offsets = cSampleOffsets * shadowPos.w;
+            #else
+                float4 offsets = cSampleOffsets;
+            #endif
+            float4 inLight = float4(
+                tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r,
+                tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.zw, shadowPos.zw)).r,
+                tex2Dproj(sShadowMap, float4(shadowPos.xy - offsets.xy, shadowPos.zw)).r,
+                tex2Dproj(sShadowMap, float4(shadowPos.xy - offsets.zw, shadowPos.zw)).r
+            );
+            #ifdef HWSHADOW
+                return cShadowIntensity.z + dot(inLight, cShadowIntensity.y);
             #else
                 #ifndef POINTLIGHT
-                    float2 offsets = cSampleOffsets * shadowPos.w;
+                    return cShadowIntensity.z + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.y);
                 #else
-                    float2 offsets = cSampleOffsets;
-                #endif
-                float4 inLight = float4(
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(offsets.x, offsets.y), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(-offsets.x, offsets.y), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(offsets.x, -offsets.y), shadowPos.zw)).r,
-                    tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(-offsets.x, -offsets.y), shadowPos.zw)).r
-                );
-                #ifdef HWSHADOW
-                    return cShadowIntensity.z + dot(inLight, pcfValues);
-                #else
-                    #ifndef POINTLIGHT
-                        return cShadowIntensity.z + dot(inLight * shadowPos.w > shadowPos.z, pcfValues);
-                    #else
-                        return cShadowIntensity.z + dot(inLight > shadowPos.z, pcfValues);
-                    #endif
+                    return cShadowIntensity.z + dot(inLight > shadowPos.z, cShadowIntensity.y);
                 #endif
             #endif
         #else
             // Take one sample
-            #ifdef SM3
-                #ifndef POINTLIGHT
-                    float4 projShadowPos = float4(shadowPos.xyz / shadowPos.w, 0.0);
-                #else
-                    float4 projShadowPos = float4(shadowPos.xyz, 0.0);
-                #endif
-                float inLight = tex2Dlod(sShadowMap, float4(projShadowPos)).r;
-                #ifdef HWSHADOW
-                    return cShadowIntensity.z + cShadowIntensity.x * inLight;
-                #else
-                    return cShadowIntensity.z + cShadowIntensity.x * (inLight > projShadowPos.z);
-                #endif
+            float inLight = tex2Dproj(sShadowMap, shadowPos).r;
+            #ifdef HWSHADOW
+                return cShadowIntensity.z + cShadowIntensity.x * inLight;
             #else
-                float inLight = tex2Dproj(sShadowMap, shadowPos).r;
-                #ifdef HWSHADOW
-                    return cShadowIntensity.z + cShadowIntensity.x * inLight;
+                #ifndef POINTLIGHT
+                    return cShadowIntensity.z + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
                 #else
-                    #ifndef POINTLIGHT
-                        return cShadowIntensity.z + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
-                    #else
-                        return cShadowIntensity.z + cShadowIntensity.x * (inLight > shadowPos.z);
-                    #endif
+                    return cShadowIntensity.z + cShadowIntensity.x * (inLight > shadowPos.z);
                 #endif
             #endif
         #endif

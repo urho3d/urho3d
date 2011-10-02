@@ -32,19 +32,18 @@ float GetShadow(vec4 shadowPos)
     // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
     #ifndef LQSHADOW
         // Take four samples and average them
-        vec4 pcfValues = vec4(cShadowIntensity.y);
         #ifndef POINTLIGHT
-            vec2 offsets = cSampleOffsets * shadowPos.w;
+            float4 offsets = cSampleOffsets * shadowPos.w;
         #else
-            vec2 offsets = cSampleOffsets;
+            float4 offsets = cSampleOffsets;
         #endif
         vec4 inLight = vec4(
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(offsets.x, offsets.y), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(-offsets.x, offsets.y), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(offsets.x, -offsets.y), shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + vec2(-offsets.x, -offsets.y), shadowPos.zw)).r
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.zw, shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy - offsets.xy, shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy - offsets.zw, shadowPos.zw)).r
         );
-        return cShadowIntensity.z + dot(inLight, pcfValues);
+        return cShadowIntensity.z + dot(inLight, vec4(cShadowIntensity.y));
     #else
         // Take one sample
         float inLight = shadow2DProj(sShadowMap, shadowPos).r;

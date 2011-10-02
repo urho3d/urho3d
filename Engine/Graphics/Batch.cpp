@@ -261,9 +261,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
             
             if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
             {
-                float invWidth = 1.0f / (float)shadowMap->GetWidth();
-                float invHeight = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, 0.5f * invHeight, 0.0f, 0.0f));
+                float xOffset = 0.5f / (float)shadowMap->GetWidth();
+                float yOffset = 0.5f / (float)shadowMap->GetHeight();
+                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(xOffset, yOffset, xOffset, -yOffset));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEADJUST, light))
