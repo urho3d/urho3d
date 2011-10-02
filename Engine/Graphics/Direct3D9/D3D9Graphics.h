@@ -46,21 +46,10 @@ class Vector4;
 class VertexBuffer;
 class VertexDeclaration;
 
+struct ShaderParameter;
+
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 static const unsigned NUM_QUERIES = 2;
-
-/// %Shader parameter definition.
-struct ShaderParameter
-{
-    /// %Shader type.
-    ShaderType type_;
-    /// Hardware register.
-    unsigned register_;
-    /// Number of registers.
-    unsigned regCount_;
-    /// Last source.
-    const void* lastSource_;
-};
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
@@ -126,8 +115,8 @@ public:
     void SetShaderParameter(StringHash param, const Vector4& vector);
     /// %Set shader 3x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
-    /// Define a shader parameter. Called by Shader.
-    void DefineShaderParameter(StringHash param, ShaderType type, unsigned reg, unsigned regCount);
+    /// Register a shader parameter globally. Called by Shader.
+    void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
     /// Check whether a shader parameter in the currently set shaders needs update.
     bool NeedParameterUpdate(StringHash param, const void* source);
     /// Check whether the current pixel shader uses a texture unit.
@@ -363,8 +352,8 @@ private:
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
-    /// Assign a shader parameter to hardware registers and clear remembered source if another parameter was overwritten.
-    void AssignShaderRegisters(ShaderType type, StringHash param, unsigned reg, unsigned count);
+    /// Return the hardware register index of a shader parameter in the current shader and update the register assignments.
+    unsigned GetParameterRegister(HashMap<StringHash, ShaderParameter>::Iterator i, unsigned regCount);
     /// Handle operating system window message.
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
 
@@ -454,12 +443,14 @@ private:
     ShaderVariation* vertexShader_;
     /// Pixel shader in use.
     ShaderVariation* pixelShader_;
-    /// Shader parameters.
+    /// All known shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
-    /// Currently assigned vertex shader parameter per hardware register.
-    StringHash vsRegisterAssignments_[MAX_VS_REGISTERS];
-    /// Currently assigned pixel shader parameter per hardware register.
-    StringHash psRegisterAssignments_[MAX_PS_REGISTERS];
+    /// Initial assignment of vertex shader constant registers for testing overlap.
+    StringHash vsRegisterAssignments_[MAX_CONSTANT_REGISTERS];
+    /// Initial assignment of pixel shader constant registers for testing overlap.
+    StringHash psRegisterAssignments_[MAX_CONSTANT_REGISTERS];
+    /// Overlapping shader parameters flag. If false, overlap checks can be skipped.
+    bool shaderParametersOverlap_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.

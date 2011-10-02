@@ -1184,12 +1184,12 @@ uint    Number of index buffers
   For each index buffer:
   uint       Index count
   uint       Index size (2 for 16-bit indices, 4 for 32-bit indices)
-  byte[]     Index data (index count * index size)  
+  byte[]     Index data (index count * index size)
 
 uint    Number of geometries
 
   For each geometry:
-  uint       Number of bone mapping entries 
+  uint       Number of bone mapping entries
   uint[]     Bone mapping data, Maps geometry bone indices to global bone indices for HW skinning.
              May be empty, in this case identity mapping will be used.
   uint       Number of LOD levels
@@ -1207,7 +1207,7 @@ uint    Number of vertex morphs (may be 0)
   For each vertex morph:
   cstring    Name of morph
   uint       Number of affected vertex buffers
- 
+
     For each affected vertex buffer:
     uint       Vertex buffer index, starting from 0
     uint       Vertex element mask for morph data. Only positions, normals & tangents are supported.
@@ -1217,7 +1217,7 @@ uint    Number of vertex morphs (may be 0)
       uint       Vertex index
       Vector3    Position (if included in the mask)
       Vector3    Normal (if included in the mask)
-      Vector3    Tangent (if included in the mask) 
+      Vector3    Tangent (if included in the mask)
 
 Skeleton data
 
@@ -1231,7 +1231,7 @@ uint       Number of bones (may be 0)
   Vector3    Initial scale
   float[12]  4x3 offset matrix for skinning
   byte       Bone collision info bitmask. 1 = bounding sphere 2 = bounding box
-  
+
   If bounding sphere data included:
   float      Bone radius
 
@@ -1275,25 +1275,33 @@ byte[4]    Identifier "USHD"
 short      Shader type (0 = vertex, 1 = pixel)
 short      Shader model (2 or 3)
 
-uint       Number of constant parameters
+uint       Number of all constant parameters
 
     For each constant parameter:
     cstring    Parameter name
-    byte       Hardware register index
-    byte       Number of hardware registers
 
-uint       Number of texture units (0 for vertex shaders)
+uint       Number of all texture units
 
     For each texture unit:
     cstring    Texture unit name
-    byte       Hardware sampler index
 
 uint       Number of shader variations
 
     For each variation:
     cstring    Variation name
-    bool[]     Use flags for constants
-    bool[]     Use flags for texture units
+    uint       Number of constant parameters in use
+
+        For each constant parameter in use:
+        StringHash Parameter name hash
+        byte       Register index
+        byte       Number of registers
+
+    uint       Number of texture units in use
+
+        For each texture unit in use:
+        StringHash Texture unit name hash
+        byte       Sampler index
+
     uint       Bytecode size
     byte[]     Bytecode
 \endverbatim
@@ -1322,6 +1330,5 @@ uint       Number of shader variations
 - Header files are commented using one-line comments beginning with /// to mark the comments for Doxygen.
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
-
 
 */

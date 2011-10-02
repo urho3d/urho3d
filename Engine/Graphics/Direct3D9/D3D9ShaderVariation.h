@@ -31,6 +31,37 @@
 
 class Shader;
 
+/// %Shader parameter definition.
+struct ShaderParameter
+{
+    /// Construct with defaults.
+    ShaderParameter() :
+        type_(VS),
+        register_(M_MAX_UNSIGNED),
+        regCount_(0),
+        lastSource_((void*)M_MAX_UNSIGNED)
+    {
+    }
+    
+    /// Construct with parameters.
+    ShaderParameter(ShaderType type, unsigned reg, unsigned regCount) :
+        type_(type),
+        register_(reg),
+        regCount_(regCount),
+        lastSource_((void*)M_MAX_UNSIGNED)
+    {
+    }
+    
+    /// %Shader type.
+    ShaderType type_;
+    /// Hardware register.
+    unsigned register_;
+    /// Number of registers.
+    unsigned regCount_;
+    /// Last data source.
+    const void* lastSource_;
+};
+
 /// Vertex or pixel shader on the GPU.
 class ShaderVariation : public RefCounted, public GPUObject
 {
@@ -49,14 +80,14 @@ public:
     void SetName(const String& name);
     /// %Set bytecode.
     void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
-    /// %Set to use a parameter.
-    void SetUseParameter(StringHash param, bool enable);
-    /// %Set to use a texture unit.
-    void SetUseTextureUnit(TextureUnit unit, bool enable);
+    /// Add a parameter.
+    void AddParameter(StringHash param, const ShaderParameter& definition);
+    /// Add a texture unit.
+    void AddTextureUnit(TextureUnit unit);
+    /// Clear parameters and texture unit use flags.
+    void ClearParameters();
     /// Optimize the parameter map for optimal query speed
     void OptimizeParameters();
-    /// Clear parameter and texture unit use flags.
-    void ClearParameters();
     
     /// Return shader type.
     ShaderType GetShaderType() const { return shaderType_; }
@@ -68,10 +99,12 @@ public:
     bool IsFailed() const { return failed_; }
     /// Return whether requires Shader Model 3.
     bool IsSM3() const { return isSM3_; }
-    /// Return whether uses a specific shader parameter.
-    bool HasParameter(StringHash param) const { return useParameter_.Contains(param); }
+    /// Return whether uses a parameter.
+    bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+    /// Return the parameter definition.
+    const ShaderParameter& GetParameter(StringHash param) const;
     
 private:
     /// Shader type.
@@ -84,8 +117,8 @@ private:
     bool isSM3_;
     /// Compile failed flag.
     bool failed_;
-    /// Parameter use flags.
-    HashSet<StringHash> useParameter_;
+    /// Shader parameters.
+    HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
 };

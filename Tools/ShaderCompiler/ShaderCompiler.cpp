@@ -53,17 +53,17 @@ struct Parameter
     {
     }
     
-    Parameter(const String& name, unsigned index, unsigned regCount) :
+    Parameter(const String& name, unsigned reg, unsigned regCount) :
         name_(name),
-        index_(index),
+        register_(reg),
         regCount_(regCount)
     {
     }
     
     bool operator < (const Parameter& rhs) const
     {
-        if (index_ != rhs.index_)
-            return index_ < rhs.index_;
+        if (register_ != rhs.register_)
+            return register_ < rhs.register_;
         else if (name_ != rhs.name_)
             return name_ < rhs.name_;
         else
@@ -72,20 +72,20 @@ struct Parameter
     
     bool operator > (const Parameter& rhs) const
     {
-        if (index_ != rhs.index_)
-            return index_ > rhs.index_;
+        if (register_ != rhs.register_)
+            return register_ > rhs.register_;
         else if (name_ != rhs.name_)
             return name_ > rhs.name_;
         else
             return regCount_ > rhs.regCount_;
     }
     
-    bool operator == (const Parameter& rhs) const { return index_ == rhs.index_ && name_ == rhs.name_ && regCount_ == rhs.regCount_; }
+    bool operator == (const Parameter& rhs) const { return register_ == rhs.register_ && name_ == rhs.name_ && regCount_ == rhs.regCount_; }
     
-    bool operator != (const Parameter& rhs) const { return index_ != rhs.index_ || name_ != rhs.name_ || regCount_ != rhs.regCount_; }
+    bool operator != (const Parameter& rhs) const { return register_ != rhs.register_ || name_ != rhs.name_ || regCount_ != rhs.regCount_; }
     
     String name_;
-    unsigned index_;
+    unsigned register_;
     unsigned regCount_;
 };
 
@@ -140,16 +140,16 @@ SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String inDir_;
 String inFile_;
 String outDir_;
-Set<Parameter> constants_;
-Set<Parameter> textureUnits_;
 Vector<String> defines_;
 bool useSM3_ = false;
 volatile bool compileFailed_ = false;
 
 List<CompiledVariation*> workList_;
-Mutex workMutex_;
 Mutex globalParamMutex_;
+Mutex workMutex_;
 String hlslCode_;
+Set<String> constants_;
+Set<String> textureUnits_;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -368,9 +368,6 @@ void Run(const Vector<String>& arguments)
 
 void CompileVariations(const Shader& baseShader, XMLElement& shaders)
 {
-    constants_.Clear();
-    textureUnits_.Clear();
-    
     unsigned combinations = 1;
     PODVector<unsigned> usedCombinations;
     Map<String, unsigned> nameToIndex;
@@ -559,43 +556,38 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     if (!outFile.IsOpen())
         ErrorExit("Could not open output file " + outFileName);
     
-    // Convert the global parameters to vectors for index based search
-    Vector<Parameter> constants;
-    Vector<Parameter> textureUnits;
-    
-    for (Set<Parameter>::ConstIterator i = constants_.Begin(); i != constants_.End(); ++i)
-        constants.Push(*i);
-    for (Set<Parameter>::ConstIterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
-        textureUnits.Push(*i);
-    
     outFile.WriteFileID("USHD");
     outFile.WriteShort(baseShader.type_);
     outFile.WriteShort(useSM3_ ? 3 : 2);
     
-    outFile.WriteUInt(constants.Size());
-    for (unsigned i = 0; i < constants.Size(); ++i)
-    {
-        outFile.WriteString(constants[i].name_);
-        outFile.WriteUByte(constants[i].index_);
-        outFile.WriteUByte(constants[i].regCount_);
-    }
+    outFile.WriteUInt(constants_.Size());
+    for (Set<String>::ConstIterator i = constants_.Begin(); i != constants_.End(); ++i)
+        outFile.WriteString(*i);
     
-    outFile.WriteUInt(textureUnits.Size());
-    for (unsigned i = 0; i < textureUnits.Size(); ++i)
-    {
-        outFile.WriteString(textureUnits[i].name_);
-        outFile.WriteUByte(textureUnits[i].index_);
-    }
+    outFile.WriteUInt(textureUnits_.Size());
+    for (Set<String>::ConstIterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
+        outFile.WriteString(*i);
     
     outFile.WriteUInt(compiledVariations.Size());
     for (unsigned i = 0; i < compiledVariations.Size(); ++i)
     {
         CompiledVariation& variation = compiledVariations[i];
         outFile.WriteString(variation.name_);
-        for (unsigned j = 0; j < constants.Size(); ++j)
-            outFile.WriteBool(variation.constants_.Contains(constants[j]));
-        for (unsigned j = 0; j < textureUnits.Size(); ++j)
-            outFile.WriteBool(variation.textureUnits_.Contains(textureUnits[j]));
+        
+        outFile.WriteUInt(variation.constants_.Size());
+        for (Set<Parameter>::ConstIterator i = variation.constants_.Begin(); i != variation.constants_.End(); ++i)
+        {
+            outFile.WriteStringHash(StringHash(i->name_));
+            outFile.WriteUByte(i->register_);
+            outFile.WriteUByte(i->regCount_);
+        }
+        
+        outFile.WriteUInt(variation.textureUnits_.Size());
+        for (Set<Parameter>::ConstIterator i = variation.textureUnits_.Begin(); i != variation.textureUnits_.End(); ++i)
+        {
+            outFile.WriteStringHash(StringHash(i->name_));
+            outFile.WriteUByte(i->register_);
+        }
         
         unsigned dataSize = variation.byteCode_.Size();
         outFile.WriteUInt(dataSize);
@@ -689,7 +681,7 @@ void Compile(CompiledVariation* variation)
             constantTable->GetConstantDesc(handle, &constantDesc, &numElements);
             
             String name(constantDesc.Name);
-            unsigned index = constantDesc.RegisterIndex;
+            unsigned reg = constantDesc.RegisterIndex;
             unsigned regCount = constantDesc.RegisterCount;
             
             // Check if the parameter is a constant or a texture sampler
@@ -703,16 +695,16 @@ void Compile(CompiledVariation* variation)
                 // Skip if it's a G-buffer sampler
                 if (name.Find("Buffer") == String::NPOS)
                 {
-                    Parameter newTextureUnit(name, index, 1);
+                    Parameter newTextureUnit(name, reg, 1);
                     variation->textureUnits_.Insert(newTextureUnit);
-                    textureUnits_.Insert(newTextureUnit);
+                    textureUnits_.Insert(name);
                 }
             }
             else
             {
-                Parameter newParam(name, index, regCount);
+                Parameter newParam(name, reg, regCount);
                 variation->constants_.Insert(newParam);
-                constants_.Insert(newParam);
+                constants_.Insert(name);
             }
         }
     }

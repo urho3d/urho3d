@@ -31,6 +31,8 @@
 
 #include "DebugNew.h"
 
+static ShaderParameter emptyShaderParameter;
+
 ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
     GPUObject(shader->GetSubsystem<Graphics>()),
     shaderType_(type),
@@ -113,32 +115,35 @@ void ShaderVariation::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
         Create();
 }
 
-void ShaderVariation::SetUseParameter(StringHash param, bool enable)
+void ShaderVariation::AddParameter(StringHash param, const ShaderParameter& definition)
 {
-    if (enable)
-        useParameter_.Insert(param);
-    else
-        useParameter_.Erase(param);
+    parameters_[param] = definition;
 }
 
-void ShaderVariation::SetUseTextureUnit(TextureUnit unit, bool enable)
+void ShaderVariation::AddTextureUnit(TextureUnit unit)
 {
-    useTextureUnit_[unit] = enable;
-}
-
-void ShaderVariation::OptimizeParameters()
-{
-    useParameter_.Rehash(NextPowerOfTwo(useParameter_.Size()));
+    useTextureUnit_[unit] = true;
 }
 
 void ShaderVariation::ClearParameters()
 {
-    useParameter_.Clear();
+    parameters_.Clear();
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
+}
+
+void ShaderVariation::OptimizeParameters()
+{
+    parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
 }
 
 bool ShaderVariation::IsCreated() const
 {
     return object_ != 0;
+}
+
+const ShaderParameter& ShaderVariation::GetParameter(StringHash param) const
+{
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Find(param);
+    return i != parameters_.End() ? i->second_ : emptyShaderParameter;
 }

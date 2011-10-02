@@ -437,12 +437,12 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<Stri
         
         for (unsigned i = 0; i < instances_.Size(); ++i)
         {
-            if (graphics->NeedParameterUpdate(VSP_MODEL, instances_[i].worldTransform_))
-                graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
-            
+            graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
             graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                 geometry_->GetVertexStart(), geometry_->GetVertexCount());
         }
+        
+        graphics->ClearTransformSources();
     }
     else
     {
