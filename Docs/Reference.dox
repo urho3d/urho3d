@@ -425,11 +425,11 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
 
-- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed. This includes also frame-global parameters, which on Direct3D9 need to be set only once per frame.
+- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed. This includes also frame-global parameters, which on Direct3D9 need to be set only once per frame, if the uniform register assignments are fixed.
 
 - On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
 
-- On Direct3D9 the depth stencil surface can be equal size or larger than the color render target. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the system depth stencil buffer when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth stencil buffers on demand whenever a texture is set as a color render target, and a null depth stencil is specified.
+- On Direct3D9 the depth stencil surface can be equal or larger in size than the color render target. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the system depth stencil buffer when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth stencil buffers on demand whenever a texture is set as a color render target, and a null depth stencil is specified.
 
 - On Direct3D9 setting the first color render target resets the viewport dimensions. On OpenGL there is no such mechanism, but as sometimes (for example in shadow rendering) only a depth stencil buffer is set for rendering, Graphics will instead reset the viewport when the depth stencil buffer is set. To ensure correct operation on both APIs, first set the render targets, then the depth stencil buffer, and finally the viewport, if you need it to be less than the whole render target.
 

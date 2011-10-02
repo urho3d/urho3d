@@ -103,8 +103,8 @@ public:
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
-    /// Return the parameter definition.
-    const ShaderParameter& GetParameter(StringHash param) const;
+    /// Return all parameter definitions.
+    const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
     
 private:
     /// Shader type.

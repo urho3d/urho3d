@@ -31,8 +31,6 @@
 
 #include "DebugNew.h"
 
-static ShaderParameter emptyShaderParameter;
-
 ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
     GPUObject(shader->GetSubsystem<Graphics>()),
     shaderType_(type),
@@ -140,10 +138,4 @@ void ShaderVariation::OptimizeParameters()
 bool ShaderVariation::IsCreated() const
 {
     return object_ != 0;
-}
-
-const ShaderParameter& ShaderVariation::GetParameter(StringHash param) const
-{
-    HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Find(param);
-    return i != parameters_.End() ? i->second_ : emptyShaderParameter;
 }

@@ -352,8 +352,6 @@ private:
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
-    /// Return the hardware register index of a shader parameter in the current shader and update the register assignments.
-    unsigned GetParameterRegister(HashMap<StringHash, ShaderParameter>::Iterator i, unsigned regCount);
     /// Handle operating system window message.
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
 
