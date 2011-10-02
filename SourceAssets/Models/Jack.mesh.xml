@@ -58960,7 +58960,7 @@
   </submeshes>
   <skeletonlink name="Jack.skeleton" />
   <levelofdetail strategy="Distance" numlevels="7" manual="false">
-    <lodgenerated value="25">
+    <lodgenerated value="15">
       <lodfacelist submeshindex="0" numfaces="2826">
         <face v1="82" v2="4" v3="320" />
         <face v1="320" v2="3" v3="82" />
@@ -63459,7 +63459,7 @@
         <face v1="64" v2="700" v3="1614" />
       </lodfacelist>
     </lodgenerated>
-    <lodgenerated value="100">
+    <lodgenerated value="30">
       <lodfacelist submeshindex="0" numfaces="1695">
         <face v1="308" v2="344" v3="320" />
         <face v1="308" v2="15" v3="344" />
@@ -66140,7 +66140,7 @@
         <face v1="20" v2="699" v3="1614" />
       </lodfacelist>
     </lodgenerated>
-    <lodgenerated value="225">
+    <lodgenerated value="60">
       <lodfacelist submeshindex="0" numfaces="1015">
         <face v1="208" v2="213" v3="20" />
         <face v1="43" v2="1361" v3="67" />
@@ -67734,7 +67734,7 @@
         <face v1="18" v2="1017" v3="1762" />
       </lodfacelist>
     </lodgenerated>
-    <lodgenerated value="400">
+    <lodgenerated value="120">
       <lodfacelist submeshindex="0" numfaces="608">
         <face v1="68" v2="69" v3="67" />
         <face v1="67" v2="1362" v3="71" />
@@ -68681,7 +68681,7 @@
         <face v1="18" v2="1017" v3="1762" />
       </lodfacelist>
     </lodgenerated>
-    <lodgenerated value="625">
+    <lodgenerated value="240">
       <lodfacelist submeshindex="0" numfaces="364">
         <face v1="67" v2="1362" v3="71" />
         <face v1="51" v2="103" v3="629" />
@@ -69237,7 +69237,7 @@
         <face v1="1782" v2="1822" v3="1823" />
       </lodfacelist>
     </lodgenerated>
-    <lodgenerated value="900">
+    <lodgenerated value="480">
       <lodfacelist submeshindex="0" numfaces="218">
         <face v1="67" v2="1362" v3="71" />
         <face v1="51" v2="103" v3="1284" />
