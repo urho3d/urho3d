@@ -239,22 +239,26 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                         0.5f * (float)(viewport.bottom_ - viewport.top_) / height
                     );
                     
+                    #ifdef USE_OPENGL
+                    offset.x_ += scale.x_;
+                    offset.y_ += scale.y_;
+                    offset.y_ = 1.0f - offset.y_;
                     // If using 4 shadow samples, offset the position diagonally by half pixel
                     if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
                     {
                         offset.x_ -= 0.5f / width;
                         offset.y_ -= 0.5f / height;
                     }
-                    
-                    #ifdef USE_OPENGL
-                    offset.x_ += scale.x_;
-                    offset.y_ += scale.y_;
-                    offset.y_ = 1.0f - offset.y_;
                     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
                     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
                     #else
                     offset.x_ += scale.x_ + 0.5f / width;
                     offset.y_ += scale.y_ + 0.5f / height;
+                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+                    {
+                        offset.x_ -= 0.5f / width;
+                        offset.y_ -= 0.5f / height;
+                    }
                     scale.y_ = -scale.y_;
                     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
                     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
