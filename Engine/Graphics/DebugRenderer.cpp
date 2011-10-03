@@ -108,12 +108,12 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
     
-    Vector3 v0(max.x_, min.y_, min.z_);
-    Vector3 v1(max.x_, max.y_, min.z_);
-    Vector3 v2(min.x_, max.y_, min.z_);
-    Vector3 v3(min.x_, min.y_, max.z_);
-    Vector3 v4(max.x_, min.y_, max.z_);
-    Vector3 v5(min.x_, max.y_, max.z_);
+    Vector3 v1(max.x_, min.y_, min.z_);
+    Vector3 v2(max.x_, max.y_, min.z_);
+    Vector3 v3(min.x_, max.y_, min.z_);
+    Vector3 v4(min.x_, min.y_, max.z_);
+    Vector3 v5(max.x_, min.y_, max.z_);
+    Vector3 v6(min.x_, max.y_, max.z_);
     
     unsigned uintColor = color.ToUInt();
     
@@ -121,18 +121,18 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->Push(DebugLine(min, v0, uintColor));
-    dest->Push(DebugLine(v0, v1, uintColor));
+    dest->Push(DebugLine(min, v1, uintColor));
     dest->Push(DebugLine(v1, v2, uintColor));
-    dest->Push(DebugLine(v2, min, uintColor));
-    dest->Push(DebugLine(v3, v4, uintColor));
-    dest->Push(DebugLine(v4, max, uintColor));
-    dest->Push(DebugLine(max, v5, uintColor));
-    dest->Push(DebugLine(v5, v3, uintColor));
-    dest->Push(DebugLine(min, v3, uintColor));
-    dest->Push(DebugLine(v0, v4, uintColor));
-    dest->Push(DebugLine(v1, max, uintColor));
-    dest->Push(DebugLine(v2, v5, uintColor));
+    dest->Push(DebugLine(v2, v3, uintColor));
+    dest->Push(DebugLine(v3, min, uintColor));
+    dest->Push(DebugLine(v4, v5, uintColor));
+    dest->Push(DebugLine(v5, max, uintColor));
+    dest->Push(DebugLine(max, v6, uintColor));
+    dest->Push(DebugLine(v6, v4, uintColor));
+    dest->Push(DebugLine(min, v4, uintColor));
+    dest->Push(DebugLine(v1, v5, uintColor));
+    dest->Push(DebugLine(v2, max, uintColor));
+    dest->Push(DebugLine(v3, v6, uintColor));
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
@@ -146,7 +146,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     Vector3 v3(transform * Vector3(min.x_, max.y_, min.z_));
     Vector3 v4(transform * Vector3(min.x_, min.y_, max.z_));
     Vector3 v5(transform * Vector3(max.x_, min.y_, max.z_));
-    Vector3 v6(transform * Vector3(max.x_, max.y_, max.z_));
+    Vector3 v6(transform * Vector3(min.x_, max.y_, max.z_));
     Vector3 v7(transform * max);
     
     unsigned uintColor = color.ToUInt();
@@ -160,13 +160,13 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     dest->Push(DebugLine(v2, v3, uintColor));
     dest->Push(DebugLine(v3, v0, uintColor));
     dest->Push(DebugLine(v4, v5, uintColor));
-    dest->Push(DebugLine(v5, v6, uintColor));
-    dest->Push(DebugLine(v6, v7, uintColor));
-    dest->Push(DebugLine(v7, v4, uintColor));
+    dest->Push(DebugLine(v5, v7, uintColor));
+    dest->Push(DebugLine(v7, v6, uintColor));
+    dest->Push(DebugLine(v6, v4, uintColor));
     dest->Push(DebugLine(v0, v4, uintColor));
     dest->Push(DebugLine(v1, v5, uintColor));
-    dest->Push(DebugLine(v2, v6, uintColor));
-    dest->Push(DebugLine(v3, v7, uintColor));
+    dest->Push(DebugLine(v2, v7, uintColor));
+    dest->Push(DebugLine(v3, v6, uintColor));
 }
 
 void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
