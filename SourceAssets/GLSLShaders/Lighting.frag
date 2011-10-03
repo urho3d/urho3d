@@ -37,11 +37,12 @@ float GetShadow(vec4 shadowPos)
         #else
             float4 offsets = cSampleOffsets;
         #endif
+        shadowPos.xy += offsets.xy;
         vec4 inLight = vec4(
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.zw, shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy - offsets.xy, shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy - offsets.zw, shadowPos.zw)).r
+            shadow2DProj(sShadowMap, shadowPos).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.z, shadowPos.yzw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.w, shadowPos.zw)).r,
+            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.zw, shadowPos.zw)).r
         );
         return cShadowIntensity.z + dot(inLight, vec4(cShadowIntensity.y));
     #else
