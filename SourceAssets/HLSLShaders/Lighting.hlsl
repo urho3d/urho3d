@@ -36,16 +36,15 @@ float GetShadow(float4 shadowPos)
         #ifndef LQSHADOW
             // Take four samples and average them
             #ifndef POINTLIGHT
-                float4 offsets = cSampleOffsets * shadowPos.w;
+                float2 offsets = cSampleOffsets * shadowPos.w;
             #else
-                float4 offsets = cSampleOffsets;
+                float2 offsets = cSampleOffsets;
             #endif
-            shadowPos.xy += offsets.xy;
             float4 inLight = float4(
                 tex2Dproj(sShadowMap, shadowPos).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.z, shadowPos.yzw)).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.w, shadowPos.zw)).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.zw, shadowPos.zw)).r
+                tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
+                tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
+                tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
             );
             #ifdef HWSHADOW
                 return cShadowIntensity.z + dot(inLight, cShadowIntensity.y);

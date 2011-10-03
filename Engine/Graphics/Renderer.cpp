@@ -350,6 +350,8 @@ void Renderer::SetShadowQuality(int quality)
     quality &= SHADOWQUALITY_HIGH_24BIT;
     if (!graphics_->GetHiresShadowSupport())
         quality &= SHADOWQUALITY_HIGH_16BIT;
+    if (graphics_->GetFallback())
+        quality = SHADOWQUALITY_LOW_16BIT;
     
     if (quality != shadowQuality_)
     {

@@ -239,6 +239,13 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                         0.5f * (float)(viewport.bottom_ - viewport.top_) / height
                     );
                     
+                    // If using 4 shadow samples, offset the position diagonally by half pixel
+                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+                    {
+                        offset.x_ -= 0.5f / width;
+                        offset.y_ -= 0.5f / height;
+                    }
+                    
                     #ifdef USE_OPENGL
                     offset.x_ += scale.x_;
                     offset.y_ += scale.y_;
@@ -246,8 +253,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
                     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
                     #else
-                    offset.x_ += scale.x_ + 0.5f / (float)shadowMap->GetWidth();
-                    offset.y_ += scale.y_ + 0.5f / (float)shadowMap->GetHeight();
+                    offset.x_ += scale.x_ + 0.5f / width;
+                    offset.y_ += scale.y_ + 0.5f / height;
                     scale.y_ = -scale.y_;
                     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
                     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
@@ -261,9 +268,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
             
             if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
             {
-                float xOffset = 1.0f / (float)shadowMap->GetWidth();
-                float yOffset = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(-0.5f * xOffset, -0.5f * yOffset, xOffset, yOffset));
+                float addX = 1.0f / (float)shadowMap->GetWidth();
+                float addY = 1.0f / (float)shadowMap->GetHeight();
+                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEADJUST, light))
@@ -283,6 +290,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                     float addX = 2.5f / width;
                     float addY = 2.5f / height;
                 #endif
+                // If using 4 shadow samples, offset the position diagonally by half pixel
+                if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+                {
+                    addX -= 0.5f / width;
+                    addY -= 0.5f / height;
+                }
                 graphics->SetShaderParameter(PSP_SHADOWCUBEADJUST, Vector4(mulX, mulY, addX, addY));
             }
             
