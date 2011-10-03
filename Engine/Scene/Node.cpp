@@ -959,7 +959,7 @@ Node* Node::CreateChild(unsigned id, CreateMode mode)
     // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)
     {
-        if (!id || scene_->GetComponent(id))
+        if (!id || scene_->GetNode(id))
             id = scene_->GetFreeNodeID(mode);
         newNode->SetID(id);
     }
