@@ -46,6 +46,7 @@
 #include "Texture2D.h"
 #include "UI.h"
 #include "UIEvents.h"
+#include "VertexBuffer.h"
 #include "Window.h"
 
 #include "Sort.h"
@@ -220,12 +221,37 @@ void UI::RenderUpdate()
     if (!rootElement_ || !graphics_ || graphics_->IsDeviceLost())
         return;
     
-    PROFILE(GetUIBatches);
+    {
+        PROFILE(GetUIBatches);
+        
+        // Get batches & quads from the UI elements
+        batches_.Clear();
+        quads_.Clear();
+        const IntVector2& rootSize = rootElement_->GetSize();
+        GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
+    }
     
-    batches_.Clear();
-    quads_.Clear();
-    const IntVector2& rootSize = rootElement_->GetSize();
-    GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
+    {
+        PROFILE(UpdateUIGeometry);
+        
+        // Update quad geometry into the vertex buffer
+        unsigned numVertices = quads_.Size() * 6;
+        if (numVertices)
+        {
+            if (vertexBuffer_->GetVertexCount() < numVertices)
+                vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+        
+            unsigned vertexSize = vertexBuffer_->GetVertexSize();
+            unsigned char* lockedData = (unsigned char*)vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
+        
+            if (lockedData)
+            {
+                for (unsigned i = 0; i < batches_.Size(); ++i)
+                    batches_[i].UpdateGeometry(graphics_, lockedData + 6 * batches_[i].quadStart_ * vertexSize);
+                vertexBuffer_->Unlock();
+            }
+        }
+    }
     
     // If no drag, reset cursor shape for next frame
     if (cursor_ && !dragElement_)
@@ -259,6 +285,7 @@ void UI::Render()
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
+    graphics_->SetVertexBuffer(vertexBuffer_);
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
@@ -267,18 +294,21 @@ void UI::Render()
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        // Choose shaders here so that UIBatch does not need to look up shaders each time
-        if (!batches_[i].texture_)
+        const UIBatch& batch = batches_[i];
+        if (!batch.quadCount_)
+            continue;
+        
+        if (!batch.texture_)
         {
             ps = noTexturePS_;
             vs = noTextureVS_;
         }
         else
         {
-            // If texture contains only an alpha channel, interpret it as alpha (for fonts)
+            // If texture contains only an alpha channel, use alpha shader (for fonts)
             vs = diffTextureVS_;
             
-            if (batches_[i].texture_->GetFormat() == alphaFormat)
+            if (batch.texture_->GetFormat() == alphaFormat)
                 ps = alphaTexturePS_;
             else
                 ps = diffTexturePS_;
@@ -292,7 +322,16 @@ void UI::Render()
         if (graphics_->NeedParameterUpdate(PSP_MATDIFFCOLOR, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
         
-        batches_[i].Draw(graphics_);
+        // Use alpha test if not alpha blending
+        if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
+            graphics_->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
+        else
+            graphics_->SetAlphaTest(false);
+        
+        graphics_->SetBlendMode(batch.blendMode_);
+        graphics_->SetScissorTest(true, batch.scissor_);
+        graphics_->SetTexture(0, batch.texture_);
+        graphics_->Draw(TRIANGLE_LIST, batch.quadStart_ * 6, batch.quadCount_ * 6);
     }
 }
 
@@ -432,6 +471,8 @@ void UI::Initialize()
         diffTexturePS_ = basicPS->GetVariation("DiffVCol");
         alphaTexturePS_ = basicPS->GetVariation("AlphaVCol");
     }
+    
+    vertexBuffer_ = new VertexBuffer(context_);
     
     LOGINFO("Initialized user interface");
     initialized_ = true;

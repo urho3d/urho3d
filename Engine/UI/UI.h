@@ -31,6 +31,7 @@ class Graphics;
 class ResourceCache;
 class UIBatch;
 class UIElement;
+class VertexBuffer;
 class XMLElement;
 class XMLFile;
 
@@ -139,6 +140,8 @@ private:
     PODVector<UIBatch> batches_;
     /// UI rendering quads.
     PODVector<UIQuad> quads_;
+    /// UI vertex buffer.
+    SharedPtr<VertexBuffer> vertexBuffer_;
     /// Clipboard text.
     String clipBoard_;
     /// Mouse buttons held down.

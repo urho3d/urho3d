@@ -367,7 +367,7 @@ Graphics implements the low-level functionality:
 - Handling lost device
 - Performing primitive rendering operations
 
-It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
+It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry.
 
 Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.
 

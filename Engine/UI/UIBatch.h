@@ -85,8 +85,8 @@ public:
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    /// Draw.
-    void Draw(Graphics* graphics) const;
+    /// Update the vertex data.
+    void UpdateGeometry(Graphics* graphics, void* lockedData);
     
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);

@@ -165,20 +165,10 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-void UIBatch::Draw(Graphics* graphics) const
+void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
 {
-    if (!quads_ || !quadCount_)
+    if (!quadCount_)
         return;
-    
-    // Use alpha test if not alpha blending
-    if (blendMode_ != BLEND_ALPHA && blendMode_ != BLEND_ADDALPHA && blendMode_ != BLEND_PREMULALPHA)
-        graphics->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
-    else
-        graphics->SetAlphaTest(false);
-    
-    graphics->SetBlendMode(blendMode_);
-    graphics->SetScissorTest(true, scissor_);
-    graphics->SetTexture(0, texture_);
     
     #ifdef USE_OPENGL
     Vector2 posAdjust(Vector2::ZERO);
@@ -187,18 +177,15 @@ void UIBatch::Draw(Graphics* graphics) const
     #endif
     Vector2 invScreenSize(1.0f / (float)graphics->GetWidth(), 1.0f / (float)graphics->GetHeight());
     
-    const PODVector<UIQuad>& quads = *quads_;
+    float* dest = (float*)lockedData;
     
     if (texture_)
     {
         Vector2 invTextureSize(1.0f / (float)texture_->GetWidth(), 1.0f / (float)texture_->GetHeight());
         
-        graphics->BeginImmediate(TRIANGLE_LIST, quadCount_ * 6, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
-        float* dest = (float*)graphics->GetImmediateDataPtr();
-        
-        for (unsigned i = quadStart_; i < quadStart_ + quadCount_; ++i)
+        for (unsigned i = 0; i < quadCount_; ++i)
         {
-            const UIQuad& quad = quads[i];
+            const UIQuad& quad = quads_->At(quadStart_ + i);
             Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
             topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
@@ -207,66 +194,64 @@ void UIBatch::Draw(Graphics* graphics) const
             bottomRightUV = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
             
             *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].topLeftColor_; dest++;
+            *((unsigned*)dest) = quad.topLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = topLeftUV.y_;
             
             *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].topRightColor_; dest++;
+            *((unsigned*)dest) = quad.topRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
             *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
+            *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
             
             *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-
-            *((unsigned*)dest) = quads[i].topRightColor_; dest++;
+            *((unsigned*)dest) = quad.topRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
             *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomRightColor_; dest++;
+            *((unsigned*)dest) = quad.bottomRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = bottomRightUV.y_;
             
             *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
+            *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
         }
-        
-        graphics->EndImmediate();
     }
     else
     {
-        graphics->BeginImmediate(TRIANGLE_LIST, quadCount_ * 6, MASK_POSITION | MASK_COLOR);
-        float* dest = (float*)graphics->GetImmediateDataPtr();
-        
-        for (unsigned i = quadStart_; i < quadStart_ + quadCount_; ++i)
+        for (unsigned i = 0; i < quadCount_; ++i)
         {
-            const UIQuad& quad = quads[i];
+            const UIQuad& quad = quads_->At(quadStart_ + i);
             Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
             topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
             bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
             
             *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].topLeftColor_; dest++;
+            *((unsigned*)dest) = quad.topLeftColor_; dest++;
+            dest += 2; // Jump over unused UV coordinates
             
             *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].topRightColor_; dest++;
+            *((unsigned*)dest) = quad.topRightColor_; dest++;
+            dest += 2;
             
             *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
+            *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
+            dest += 2;
             
             *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].topRightColor_; dest++;
+            *((unsigned*)dest) = quad.topRightColor_; dest++;
+            dest += 2;
             
             *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomRightColor_; dest++;
+            *((unsigned*)dest) = quad.bottomRightColor_; dest++;
+            dest += 2;
             
             *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
-            *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
+            *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
+            dest += 2;
         }
-        
-        graphics->EndImmediate();
     }
 }
 
