@@ -542,7 +542,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
     Light* firstLight = drawable->GetFirstLight();
     
     // Shadows on transparencies can only be rendered if shadow maps are not reused
-    bool allowTransparentShadows = !renderer_->reuseShadowMaps_;
+    bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -597,7 +597,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 void View::RenderBatches()
 {
     // If not reusing shadowmaps, render all of them first
-    if (!renderer_->reuseShadowMaps_)
+    if (!renderer_->GetReuseShadowMaps())
     {
         PROFILE(RenderShadowMaps);
         
@@ -630,7 +630,7 @@ void View::RenderBatches()
             LightBatchQueue& queue = lightQueues_[i];
             
             // If reusing shadowmaps, render each of them before the lit batches
-            if (renderer_->reuseShadowMaps_ && queue.shadowMap_)
+            if (renderer_->GetReuseShadowMaps() && queue.shadowMap_)
                 RenderShadowMap(queue);
             
             graphics_->SetRenderTarget(0, renderTarget_);
@@ -1079,7 +1079,7 @@ void View::OptimizeLightByStencil(Light* light)
         graphics_->SetColorWrite(false);
         graphics_->SetDepthWrite(false);
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-        graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
+        graphics_->SetShaders(renderer_->GetStencilVS(), renderer_->GetStencilPS());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
         graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
         

@@ -390,11 +390,6 @@ void Script::ExceptionCallback(asIScriptContext* context)
     MessageCallback(&msg);
 }
 
-asIScriptContext* Script::GetScriptFileContext() const
-{
-    return scriptNestingLevel_ < scriptFileContexts_.Size() ? scriptFileContexts_[scriptNestingLevel_] : 0;
-}
-
 ScriptFile* Script::GetDefaultScriptFile() const
 {
     return defaultScriptFile_;
@@ -414,6 +409,11 @@ asIObjectType* Script::GetObjectType(const char* declaration)
     asIObjectType* type = scriptEngine_->GetObjectTypeById(scriptEngine_->GetTypeIdByDecl(declaration));
     objectTypes_[declaration] = type;
     return type;
+}
+
+asIScriptContext* Script::GetScriptFileContext() const
+{
+    return scriptNestingLevel_ < scriptFileContexts_.Size() ? scriptFileContexts_[scriptNestingLevel_] : 0;
 }
 
 void Script::OutputAPIRow(const String& row, bool removeReference)

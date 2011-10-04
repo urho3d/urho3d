@@ -101,8 +101,6 @@ class Renderer : public Object
 {
     OBJECT(Object);
     
-    friend class View;
-    
 public:
     /// Construct.
     Renderer(Context* context);
@@ -225,6 +223,10 @@ public:
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name.
     ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
+    /// Return the stencil vertex shader.
+    ShaderVariation* GetStencilVS() const { return stencilVS_; }
+    /// Return the stencil pixel shader.
+    ShaderVariation* GetStencilPS() const { return stencilPS_; }
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
     
@@ -234,6 +236,10 @@ public:
     void Render();
     /// Add debug geometry to the debug graphics(s).
     void DrawDebugGeometry(bool depthTest);
+    /// Add a view. Return true if successful.
+    bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
+    /// Return an occlusion buffer for use.
+    OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Return shadow map for a light. If shadow map reuse is disabled, a different map is returned each time.
@@ -242,16 +248,20 @@ public:
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
-
+    /// Allocate a shadow camera and a scene node for it.
+    Camera* CreateShadowCamera();
+    /// Allocate a temporary scene node for attaching a split light or a shadow camera.
+    Node* CreateTempNode();
+    /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
+    bool ResizeInstancingBuffer(unsigned numInstances);
+    /// Reset shadow map allocation counts.
+    void ResetShadowMapAllocations();
+    
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
     /// Clear views from previous frame.
     void ResetViews();
-    /// Add a view. Return true if successful.
-    bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
-    /// Return an occlusion buffer for use.
-    OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material technique.
@@ -266,20 +276,8 @@ private:
     void CreateGeometries();
     /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
-    /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
-    bool ResizeInstancingBuffer(unsigned numInstances);
     /// Remove all shadow maps. Called when global shadow map resolution or format is changed.
     void ResetShadowMaps();
-    /// Reset shadow map allocation counts.
-    void ResetShadowMapAllocations();
-    /// Split a light into several for shadow mapping.
-    unsigned SplitLight(Light* light);
-    /// Allocate a shadow camera and a scene node for it.
-    Camera* CreateShadowCamera();
-    /// Allocate (if necessary) and clone a light. Attach it to a temporary scene node.
-    Light* CreateSplitLight(Light* original);
-    /// Allocate a temporary scene node for attaching a split light or a shadow camera.
-    Node* CreateTempNode();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.

@@ -50,6 +50,8 @@ class Script : public Object
 {
     OBJECT(Script);
     
+    friend class ScriptFile;
+    
 public:
     /// Construct.
     Script(Context* context);
@@ -77,8 +79,6 @@ public:
     asIScriptEngine* GetScriptEngine() const { return scriptEngine_; }
     /// Return immediate execution script context.
     asIScriptContext* GetImmediateContext() const { return immediateContext_; }
-    /// Return a script function/method execution context for the current execution nesting level.
-    asIScriptContext* GetScriptFileContext() const;
     /// Return immediate mode script file.
     ScriptFile* GetDefaultScriptFile() const;
     /// Return immediate mode scene.
@@ -90,18 +90,20 @@ public:
     /// Return retained mode log messages.
     const String& GetLogMessages() const { return logMessages_; }
     
-    /// Increase script nesting level.
-    void IncScriptNestingLevel() { ++scriptNestingLevel_; }
-    /// Decrease script nesting level.
-    void DecScriptNestingLevel() { --scriptNestingLevel_; }
-    /// Return current script nesting level.
-    unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
     /// Return script module to script file map.
     Map<asIScriptModule*, ScriptFile*>& GetModuleMap() { return moduleMap_; }
     /// Return script object to script instance map.
     Map<void*, ScriptInstance*>& GetObjectMap() { return objectMap_; }
     
 private:
+    /// Increase script nesting level.
+    void IncScriptNestingLevel() { ++scriptNestingLevel_; }
+    /// Decrease script nesting level.
+    void DecScriptNestingLevel() { --scriptNestingLevel_; }
+    /// Return current script nesting level.
+    unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
+    /// Return a script function/method execution context for the current execution nesting level.
+    asIScriptContext* GetScriptFileContext() const;
     /// Output a sanitated row of script API.
     void OutputAPIRow(const String& row, bool removeReference = false);
     

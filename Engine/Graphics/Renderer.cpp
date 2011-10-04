@@ -673,62 +673,6 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void Renderer::Initialize()
-{
-    Graphics* graphics = GetSubsystem<Graphics>();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    if (!graphics || !graphics->IsInitialized() || !cache)
-        return;
-    
-    PROFILE(InitRenderer);
-    
-    graphics_ = graphics;
-    cache_ = cache;
-    
-    // Check shader model support
-    #ifndef USE_OPENGL
-    if (graphics_->GetSM3Support())
-    {
-        shaderPath_ = "Shaders/SM3/";
-        vsFormat_ = ".vs3";
-        psFormat_ = ".ps3";
-    }
-    else
-    {
-        shaderPath_ = "Shaders/SM2/";
-        vsFormat_ = ".vs2";
-        psFormat_ = ".ps2";
-    }
-    
-    #else
-    {
-        shaderPath_ = "Shaders/GLSL/";
-        vsFormat_ = ".vert";
-        psFormat_ = ".frag";
-    }
-    #endif
-    
-    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
-    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
-    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
-    
-    CreateGeometries();
-    CreateInstancingBuffer();
-    
-    viewports_.Resize(1);
-    ResetViews();
-    
-    LOGINFO("Initialized renderer");
-    initialized_ = true;
-}
-
-void Renderer::ResetViews()
-{
-    views_.Clear();
-    numViews_ = 0;
-}
-
 bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
 {
     // If using a render target texture, make sure it will not be rendered to multiple times
@@ -796,6 +740,7 @@ Geometry* Renderer::GetLightGeometry(Light* light)
     else
         return 0;
 }
+
 
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
 {
@@ -1087,6 +1032,116 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
 }
 
+
+Camera* Renderer::CreateShadowCamera()
+{
+    if (numShadowCameras_ >= shadowCameraStore_.Size())
+        shadowCameraStore_.Push(SharedPtr<Camera>(new Camera(context_)));
+    Camera* camera = shadowCameraStore_[numShadowCameras_];
+    camera->SetNode(CreateTempNode());
+    camera->SetOrthographic(false);
+    camera->SetZoom(1.0f);
+    ++numShadowCameras_;
+    return camera;
+}
+
+Node* Renderer::CreateTempNode()
+{
+    if (numTempNodes_ >= tempNodeStore_.Size())
+        tempNodeStore_.Push(SharedPtr<Node>(new Node(context_)));
+    Node* node = tempNodeStore_[numTempNodes_];
+    
+    ++numTempNodes_;
+    return node;
+}
+
+bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
+{
+    if (!instancingBuffer_ || !dynamicInstancing_)
+        return false;
+    
+    unsigned oldSize = instancingBuffer_->GetVertexCount();
+    if (numInstances <= oldSize)
+        return true;
+    
+    unsigned newSize = INSTANCING_BUFFER_DEFAULT_SIZE;
+    while (newSize < numInstances)
+        newSize <<= 1;
+    
+    if (!instancingBuffer_->SetSize(newSize, INSTANCING_BUFFER_MASK, true))
+    {
+        LOGERROR("Failed to resize instancing buffer to " + String(newSize));
+        // If failed, try to restore the old size
+        instancingBuffer_->SetSize(oldSize, INSTANCING_BUFFER_MASK, true);
+        return false;
+    }
+    
+    LOGDEBUG("Resized instancing buffer to " + String(newSize));
+    return true;
+}
+
+void Renderer::ResetShadowMapAllocations()
+{
+    for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
+        i->second_.Clear();
+}
+
+void Renderer::Initialize()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    if (!graphics || !graphics->IsInitialized() || !cache)
+        return;
+    
+    PROFILE(InitRenderer);
+    
+    graphics_ = graphics;
+    cache_ = cache;
+    
+    // Check shader model support
+    #ifndef USE_OPENGL
+    if (graphics_->GetSM3Support())
+    {
+        shaderPath_ = "Shaders/SM3/";
+        vsFormat_ = ".vs3";
+        psFormat_ = ".ps3";
+    }
+    else
+    {
+        shaderPath_ = "Shaders/SM2/";
+        vsFormat_ = ".vs2";
+        psFormat_ = ".ps2";
+    }
+    
+    #else
+    {
+        shaderPath_ = "Shaders/GLSL/";
+        vsFormat_ = ".vert";
+        psFormat_ = ".frag";
+    }
+    #endif
+    
+    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
+    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
+    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
+    
+    CreateGeometries();
+    CreateInstancingBuffer();
+    
+    viewports_.Resize(1);
+    ResetViews();
+    
+    LOGINFO("Initialized renderer");
+    initialized_ = true;
+}
+
+void Renderer::ResetViews()
+{
+    views_.Clear();
+    numViews_ = 0;
+}
+
 void Renderer::LoadShaders()
 {
     LOGINFO("Reloading shaders");
@@ -1318,64 +1373,11 @@ void Renderer::CreateInstancingBuffer()
     }
 }
 
-bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
-{
-    if (!instancingBuffer_ || !dynamicInstancing_)
-        return false;
-    
-    unsigned oldSize = instancingBuffer_->GetVertexCount();
-    if (numInstances <= oldSize)
-        return true;
-    
-    unsigned newSize = INSTANCING_BUFFER_DEFAULT_SIZE;
-    while (newSize < numInstances)
-        newSize <<= 1;
-    
-    if (!instancingBuffer_->SetSize(newSize, INSTANCING_BUFFER_MASK, true))
-    {
-        LOGERROR("Failed to resize instancing buffer to " + String(newSize));
-        // If failed, try to restore the old size
-        instancingBuffer_->SetSize(oldSize, INSTANCING_BUFFER_MASK, true);
-        return false;
-    }
-    
-    LOGDEBUG("Resized instancing buffer to " + String(newSize));
-    return true;
-}
-
 void Renderer::ResetShadowMaps()
 {
     shadowMaps_.Clear();
     colorShadowMaps_.Clear();
     shadowDepthStencil_.Reset();
-}
-
-void Renderer::ResetShadowMapAllocations()
-{
-    for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
-        i->second_.Clear();
-}
-
-Camera* Renderer::CreateShadowCamera()
-{
-    if (numShadowCameras_ >= shadowCameraStore_.Size())
-        shadowCameraStore_.Push(SharedPtr<Camera>(new Camera(context_)));
-    Camera* camera = shadowCameraStore_[numShadowCameras_];
-    camera->SetNode(CreateTempNode());
-    camera->SetOrthographic(false);
-    camera->SetZoom(1.0f);
-    ++numShadowCameras_;
-    return camera;
-}
-
-Node* Renderer::CreateTempNode()
-{
-    if (numTempNodes_ >= tempNodeStore_.Size())
-        tempNodeStore_.Push(SharedPtr<Node>(new Node(context_)));
-    Node* node = tempNodeStore_[numTempNodes_];
-    
-    ++numTempNodes_;
-    return node;
 }
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
