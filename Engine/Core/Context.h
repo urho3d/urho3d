@@ -30,6 +30,8 @@
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context : public RefCounted
 {
+    friend class Object;
+    
 public:
     /// Construct.
     Context();
@@ -48,65 +50,6 @@ public:
     void RemoveAttribute(ShortStringHash objectType, const String& name);
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
-    /// Add event receiver.
-    void AddEventReceiver(Object* receiver, StringHash eventType);
-    /// Add event receiver for specific event.
-    void AddEventReceiver(Object* receiver, Object* sender, StringHash eventType);
-    /// Remove an event sender from all receivers. Called on its destruction.
-    void RemoveEventSender(Object* sender);
-    /// Remove event receiver from specific events.
-    void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
-    /// Remove event receiver from non-specific events.
-    void RemoveEventReceiver(Object* receiver, StringHash eventType);
-    
-    /// %Set current event handler. Called by Object.
-    void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
-    /// Begin event send.
-    void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
-    
-    /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent()
-    {
-        eventSenders_.Pop();
-    
-        // Clean up dirtied event receiver groups when event handling finishes
-        if (eventSenders_.Empty())
-        {
-            if (!dirtySpecificReceivers_.Empty())
-            {
-                for (HashSet<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
-                    i != dirtySpecificReceivers_.End(); ++i)
-                {
-                    PODVector<Object*>& receivers = specificEventReceivers_[*i];
-                    for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
-                    {
-                        if (*j == 0)
-                            j = receivers.Erase(j);
-                        else
-                            ++j;
-                    }
-                }
-                dirtySpecificReceivers_.Clear();
-            }
-            
-            if (!dirtyReceivers_.Empty())
-            {
-                for (HashSet<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
-                {
-                    PODVector<Object*>& receivers = eventReceivers_[*i];
-                    for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
-                    {
-                        if (*j == 0)
-                            j = receivers.Erase(j);
-                        else
-                            ++j;
-                    }
-                }
-                dirtyReceivers_.Clear();
-            }
-        }
-    }
-    
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
     /// Template version of registering an object attribute.
@@ -122,10 +65,6 @@ public:
     const Map<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories.
     const Map<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
-    /// Return attributes for all object types.
-    const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
-    /// Return network replication attributes for all object types.
-    const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllNetworkAttributes() const { return networkAttributes_; }
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling.
@@ -150,7 +89,7 @@ public:
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist.
-    PODVector<Object*>* GetReceivers(Object* sender, StringHash eventType)
+    PODVector<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {
         Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = 
             specificEventReceivers_.Find(MakePair(sender, eventType));
@@ -158,13 +97,30 @@ public:
     }
     
     /// Return event receivers for an event type, or null if they do not exist.
-    PODVector<Object*>* GetReceivers(StringHash eventType)
+    PODVector<Object*>* GetEventReceivers(StringHash eventType)
     {
         Map<StringHash, PODVector<Object*> >::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
     
 private:
+    /// Add event receiver.
+    void AddEventReceiver(Object* receiver, StringHash eventType);
+    /// Add event receiver for specific event.
+    void AddEventReceiver(Object* receiver, Object* sender, StringHash eventType);
+    /// Remove an event sender from all receivers. Called on its destruction.
+    void RemoveEventSender(Object* sender);
+    /// Remove event receiver from specific events.
+    void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
+    /// Remove event receiver from non-specific events.
+    void RemoveEventReceiver(Object* receiver, StringHash eventType);
+    /// %Set current event handler. Called by Object.
+    void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
+    /// Begin event send.
+    void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
+    /// End event send. Clean up event receivers removed in the meanwhile.
+    void EndSendEvent();
+
     /// Object factories.
     Map<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
     /// Subsystems.

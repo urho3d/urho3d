@@ -309,13 +309,13 @@ void SpawnPlayer(Connection@ connection)
     // Set owner connection. Owned nodes are always updated to the owner at full frequency
     Node@ playerNode = gameScene.CreateChild("Player");
     playerNode.owner = connection;
+    if (singlePlayer)
+        playerNode.position = Vector3(0, 90, 0);
+    else
+        playerNode.position = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize);
 
      // Create the logic object as local, as it only needs to run on server
     Ninja@ playerNinja = cast<Ninja>(playerNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
-    if (singlePlayer)
-        playerNinja.Create(Vector3(0, 90, 0), Quaternion());
-    else
-        playerNinja.Create(Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize), Quaternion());
     playerNinja.health = playerNinja.maxHealth = playerHealth;
     playerNinja.side = SIDE_PLAYER;
     // Make sure the player can not shoot on first frame by holding the button down
@@ -680,10 +680,9 @@ void SpawnObjects(float timeStep)
             float xOffset = Random(maxOffset * 2.0f) - maxOffset;
             float zOffset = Random(maxOffset * 2.0f) - maxOffset;
 
-            Vector3 position(xOffset, 5000, zOffset);
             Node@ crateNode = gameScene.CreateChild();
+            crateNode.position = Vector3(xOffset, 5000, zOffset);
             GameObject@ crateObject = cast<GameObject>(crateNode.CreateScriptObject(scriptFile, "SnowCrate", LOCAL));
-            crateObject.Create(position, Quaternion());
         }
     }
 
@@ -708,16 +707,17 @@ void SpawnObjects(float timeStep)
             // Random north/east/south/west direction
             int dir = RandomInt() & 3;
             dir *= 90;
-            Quaternion q(dir, Vector3(0, 1, 0));
-            Vector3 position(q * Vector3(offset, 1000, -12000));
+            Quaternion rotation(0, dir, 0);
 
             Node@ enemyNode = gameScene.CreateChild();
+            enemyNode.position = rotation * Vector3(offset, 1000, -12000);
+            enemyNode.rotation = rotation;
+
             Ninja@ enemyNinja = cast<Ninja>(enemyNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
-            enemyNinja.Create(position, q);
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();
             RigidBody@ enemyBody = enemyNode.GetComponent("RigidBody");
-            enemyBody.linearVelocity = (q * Vector3(0, 1000, 3000));
+            enemyBody.linearVelocity = rotation * Vector3(0, 1000, 3000);
         }
     }
 }

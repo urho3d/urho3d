@@ -33,6 +33,8 @@ class EventHandler;
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class Object : public RefCounted
 {
+    friend class Context;
+    
 public:
     /// Construct.
     Object(Context* context);
@@ -79,19 +81,17 @@ public:
     bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event.
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
-    /// Return active event sender.
-    Object* GetEventSender() const;
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
-    
-    /// Remove event handlers related to a specific sender.
-    void RemoveEventSender(Object* sender);
     
 protected:
     /// Execution context.
     Context* context_;
     
 private:
+    /// Remove event handlers related to a specific sender.
+    void RemoveEventSender(Object* sender);
+    
     /// Event handlers. Sender is null for non-specific handlers.
     Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
 };

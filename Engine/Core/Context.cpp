@@ -122,6 +122,31 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
     }
 }
 
+Object* Context::GetSubsystem(ShortStringHash type) const
+{
+    Map<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    if (i != subsystems_.End())
+        return i->second_;
+    else
+        return 0;
+}
+
+Object* Context::GetEventSender() const
+{
+    if (!eventSenders_.Empty())
+        return eventSenders_.Back();
+    else
+        return 0;
+}
+
+const String& Context::GetTypeName(ShortStringHash type) const
+{
+    // Search factories to find the hash-to-name mapping
+    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
+    return i != factories_.End() ? i->second_->GetTypeName() : noType;
+}
+
+
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
     PODVector<Object*>& receivers = eventReceivers_[eventType];
@@ -162,7 +187,7 @@ void Context::RemoveEventSender(Object* sender)
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 {
-    PODVector<Object*>* group = GetReceivers(eventType);
+    PODVector<Object*>* group = GetEventReceivers(eventType);
     if (!group)
         return;
     
@@ -182,7 +207,7 @@ void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    PODVector<Object*>* group = GetReceivers(sender, eventType);
+    PODVector<Object*>* group = GetEventReceivers(sender, eventType);
     if (!group)
         return;
     
@@ -200,26 +225,44 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
     }
 }
 
-Object* Context::GetSubsystem(ShortStringHash type) const
+void Context::EndSendEvent()
 {
-    Map<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
-    if (i != subsystems_.End())
-        return i->second_;
-    else
-        return 0;
-}
-
-Object* Context::GetEventSender() const
-{
-    if (!eventSenders_.Empty())
-        return eventSenders_.Back();
-    else
-        return 0;
-}
-
-const String& Context::GetTypeName(ShortStringHash type) const
-{
-    // Search factories to find the hash-to-name mapping
-    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
-    return i != factories_.End() ? i->second_->GetTypeName() : noType;
+    eventSenders_.Pop();
+    
+    // Clean up dirtied event receiver groups when event handling finishes
+    if (eventSenders_.Empty())
+    {
+        if (!dirtySpecificReceivers_.Empty())
+        {
+            for (HashSet<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
+                i != dirtySpecificReceivers_.End(); ++i)
+            {
+                PODVector<Object*>& receivers = specificEventReceivers_[*i];
+                for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
+                {
+                    if (*j == 0)
+                        j = receivers.Erase(j);
+                    else
+                        ++j;
+                }
+            }
+            dirtySpecificReceivers_.Clear();
+        }
+        
+        if (!dirtyReceivers_.Empty())
+        {
+            for (HashSet<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
+            {
+                PODVector<Object*>& receivers = eventReceivers_[*i];
+                for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
+                {
+                    if (*j == 0)
+                        j = receivers.Erase(j);
+                    else
+                        ++j;
+                }
+            }
+            dirtyReceivers_.Clear();
+        }
+    }
 }

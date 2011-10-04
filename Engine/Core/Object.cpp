@@ -182,7 +182,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->BeginSendEvent(this);
     
     // Check first the specific event receivers
-    const PODVector<Object*>* group = context->GetReceivers(this, eventType);
+    const PODVector<Object*>* group = context->GetEventReceivers(this, eventType);
     if (group)
     {
         unsigned numReceivers = group->Size();
@@ -204,7 +204,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
     
     // Then the non-specific receivers
-    group = context->GetReceivers(eventType);
+    group = context->GetEventReceivers(eventType);
     if (group)
     {
         unsigned numReceivers = group->Size();
@@ -273,12 +273,7 @@ void Object::SendEvent(Object* receiver, StringHash eventType, VariantMap& event
 
 Object* Object::GetSubsystem(ShortStringHash type) const
 {
-    const Map<ShortStringHash, SharedPtr<Object> >& subsystems = context_->GetSubsystems();
-    Map<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems.Find(type);
-    if (i != subsystems.End())
-        return i->second_;
-    else
-        return 0;
+    return context_->GetSubsystem(type);
 }
 
 bool Object::HasSubscribedToEvent(StringHash eventType) const
@@ -289,11 +284,6 @@ bool Object::HasSubscribedToEvent(StringHash eventType) const
 bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 {
     return eventHandlers_.Find(MakePair(sender, eventType)) != eventHandlers_.End();
-}
-
-Object* Object::GetEventSender() const
-{
-    return context_->GetEventSender();
 }
 
 void Object::RemoveEventSender(Object* sender)

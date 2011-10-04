@@ -23,12 +23,6 @@ class SnowBall : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
-    }
-
-    void Create(const Vector3&in position, const Quaternion&in rotation)
-    {
-        node.position = position;
-        node.rotation = rotation;
 
         // Setup interest management for networking
         NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);

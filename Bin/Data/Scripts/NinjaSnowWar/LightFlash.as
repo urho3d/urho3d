@@ -6,11 +6,8 @@ class LightFlash : GameObject
     {
     }
 
-    void Create(const Vector3&in position, const Quaternion&in rotation)
+    void Start()
     {
-        node.position = position;
-        node.rotation = rotation;
-
         Light@ light = node.CreateComponent("Light");
         light.lightType = LIGHT_POINT;
         light.range = 500.0;
@@ -26,11 +23,7 @@ class LightFlash : GameObject
         Light@ light = node.GetComponent("Light");
         light.color = light.color * Max(1.0 - timeStep * 10.0, 0.0);
 
-        if (duration >= 0)
-        {
-            duration -= timeStep;
-            if (duration <= 0)
-                node.Remove();
-        }
+        // Call superclass to handle lifetime
+        GameObject::FixedUpdate(timeStep);
     }
 }

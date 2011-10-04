@@ -53,12 +53,6 @@ class Ninja : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
-    }
-
-    void Create(const Vector3&in position, const Quaternion&in rotation)
-    {
-        node.position = position;
-        node.rotation = rotation;
 
         // Setup interest management for networking
         NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
@@ -94,7 +88,7 @@ class Ninja : GameObject
         body.mass = ninjaMass;
         body.angularMaxVelocity = 0;
 
-        aimX = rotation.yaw;
+        aimX = node.rotation.yaw;
     }
 
     void SetControls(const Controls&in newControls)
