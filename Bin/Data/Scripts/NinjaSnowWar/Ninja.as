@@ -53,6 +53,12 @@ class Ninja : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
+        aimX = node.rotation.yaw;
+
+        // If components already exist, we are probably (re)executing this after deserialization.
+        // Do not create duplicate components in that case
+        if (node.HasComponent("RigidBody"))
+            return;
 
         // Setup interest management for networking
         NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
@@ -87,8 +93,6 @@ class Ninja : GameObject
         RigidBody@ body = node.CreateComponent("RigidBody");
         body.mass = ninjaMass;
         body.angularMaxVelocity = 0;
-
-        aimX = node.rotation.yaw;
     }
 
     void SetControls(const Controls&in newControls)

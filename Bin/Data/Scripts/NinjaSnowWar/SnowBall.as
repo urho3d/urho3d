@@ -24,6 +24,11 @@ class SnowBall : GameObject
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
 
+        // If components already exist, we are probably (re)executing this after deserialization.
+        // Do not create duplicate components in that case
+        if (node.HasComponent("RigidBody"))
+            return;
+        
         // Setup interest management for networking
         NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
         priority.basePriority = 100.0;
