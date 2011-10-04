@@ -259,6 +259,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                         offset.x_ -= 0.5f / width;
                         offset.y_ -= 0.5f / height;
                     }
+                    // If using 2 shadow samples (fallback mode), offset the position horizontally only
+                    if (graphics->GetFallback())
+                        offset.x_ -= 0.5f / width;
                     scale.y_ = -scale.y_;
                     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
                     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
@@ -300,6 +303,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                     addX -= 0.5f / width;
                     addY -= 0.5f / height;
                 }
+                // If using 2 shadow samples (fallback mode), offset the position horizontally only
+                if (graphics->GetFallback())
+                    addX -= 0.5f / width;
                 graphics->SetShaderParameter(PSP_SHADOWCUBEADJUST, Vector4(mulX, mulY, addX, addY));
             }
             
@@ -334,12 +340,17 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
                 if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                     intensity = Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                 float pcfValues = (1.0f - intensity);
+                float samples = 4.0f;
+                float fallbackBias = 0.0f;
                 // Fallback mode requires manual depth biasing. We do not do proper slope scale biasing,
                 // instead just fudge the bias values together
-                float constantBias = graphics->GetDepthConstantBias();
-                float slopeScaledBias = graphics->GetDepthSlopeScaledBias();
-                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, pcfValues * 0.25f, intensity, constantBias +
-                    slopeScaledBias * constantBias));
+                if (graphics->GetFallback())
+                {
+                    samples = 2.0f;
+                    fallbackBias = graphics->GetDepthConstantBias() + 2.0f * graphics->GetDepthSlopeScaledBias() *
+                        graphics->GetDepthConstantBias();
+                }
+                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, pcfValues / samples, intensity, fallbackBias));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))

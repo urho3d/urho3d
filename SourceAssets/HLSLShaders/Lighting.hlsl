@@ -69,12 +69,20 @@ float GetShadow(float4 shadowPos)
             #endif
         #endif
     #else
-        // Fallback mode: decode depth and take one sample
-        float inLight = DecodeDepth(tex2Dproj(sShadowMap, shadowPos).rg);
+        // Fallback mode: take two samples, depth needs to be decoded from RG channels
         #ifndef POINTLIGHT
-            return cShadowIntensity.z + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
+            float2 offsets = cSampleOffsets * shadowPos.w;
         #else
-            return cShadowIntensity.z + cShadowIntensity.x * (inLight > shadowPos.z);
+            float2 offsets = cSampleOffsets;
+        #endif
+        float2 inLight = float2(
+            DecodeDepth(tex2Dproj(sShadowMap, shadowPos).rg),
+            DecodeDepth(tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).rg)
+        );
+        #ifndef POINTLIGHT
+            return cShadowIntensity.z + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.y);
+        #else
+            return cShadowIntensity.z + dot(inLight > shadowPos.z, cShadowIntensity.y);
         #endif
     #endif
 }
