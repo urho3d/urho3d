@@ -439,6 +439,9 @@ void Network::PostUpdate(float timeStep)
             serverConnection_->SendClientUpdate();
             serverConnection_->SendRemoteEvents();
         }
+        
+        // Notify that the update was sent
+        SendEvent(E_NETWORKUPDATESENT);
     }
 }
 

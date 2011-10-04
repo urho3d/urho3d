@@ -198,6 +198,7 @@ void InitNetworking()
         SubscribeToEvent("PlayerSpawned", "HandlePlayerSpawned");
         SubscribeToEvent("UpdateScore", "HandleUpdateScore");
         SubscribeToEvent("UpdateHiscores", "HandleUpdateHiscores");
+        SubscribeToEvent("NetworkUpdateSent", "HandleNetworkUpdateSent");
     }
 }
 
@@ -550,7 +551,14 @@ void HandleUpdateHiscores(StringHash eventType, VariantMap& eventData)
         allHiscores += hiscores[i].name + " " + hiscores[i].score + "\n";
     hiscoreText.text = allHiscores;    
 }
-                      
+
+void HandleNetworkUpdateSent()
+{
+    // Clear accumulated buttons from the network controls
+    if (network.serverConnection !is null)
+        network.serverConnection.controls.Set(CTRL_ALL, false);
+}
+
 int FindPlayerIndex(uint nodeID)
 {
     for (uint i = 0; i < players.length; ++i)
@@ -741,6 +749,8 @@ void UpdateControls()
         prevPlayerControls = playerControls;
         playerControls.Set(CTRL_ALL, false);
 
+        // For the triggered actions (fire & jump) check also for press, in case the FPS is low
+        // and the key was already released
         if ((console is null) || (!console.visible))
         {
             if (input.keyDown['W'])
@@ -751,15 +761,15 @@ void UpdateControls()
                 playerControls.Set(CTRL_LEFT, true);
             if (input.keyDown['D'])
                 playerControls.Set(CTRL_RIGHT, true);
-            if (input.keyDown[KEY_LCTRL])
+            if (input.keyDown[KEY_LCTRL] || input.keyPress[KEY_LCTRL])
                 playerControls.Set(CTRL_FIRE, true);
-            if (input.keyDown[' '])
+            if (input.keyDown[' '] || input.keyPress[' '])
                 playerControls.Set(CTRL_JUMP, true);
         }
 
-        if (input.mouseButtonDown[MOUSEB_LEFT])
+        if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
             playerControls.Set(CTRL_FIRE, true);
-        if (input.mouseButtonDown[MOUSEB_RIGHT])
+        if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
             playerControls.Set(CTRL_JUMP, true);
 
         playerControls.yaw += mouseSensitivity * input.mouseMoveX;
@@ -778,7 +788,11 @@ void UpdateControls()
         }
         else if (network.serverConnection !is null)
         {
-            network.serverConnection.controls = playerControls;
+            // Set the latest yaw & pitch to server controls, and accumulate the buttons so that we do not miss any presses
+            network.serverConnection.controls.yaw = playerControls.yaw;
+            network.serverConnection.controls.pitch = playerControls.pitch;
+            network.serverConnection.controls.buttons |= playerControls.buttons;
+
             // Tell the camera position to server for interest management
             network.serverConnection.position = gameCameraNode.worldPosition;
         }

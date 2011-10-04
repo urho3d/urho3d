@@ -102,15 +102,13 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "bool get_connected() const", asMETHOD(Connection, IsConnected), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connectPending() const", asMETHOD(Connection, IsConnectPending), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "void set_controls(const Controls&in)", asMETHOD(Connection, SetControls), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "const Controls& get_controls() const", asMETHOD(Connection, GetControls), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "void set_position(const Vector3&in)", asMETHOD(Connection, SetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "const Vector3& get_position() const", asMETHOD(Connection, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint get_numDownloads() const", asMETHOD(Connection, GetNumDownloads), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const String& get_downloadName() const", asMETHOD(Connection, GetDownloadName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_downloadProgress() const", asMETHOD(Connection, GetDownloadProgress), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Connection", "Vector3 position", offsetof(Connection, position_));
+    engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     
     // Register Variant GetPtr() for Connection

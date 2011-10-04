@@ -78,6 +78,11 @@ EVENT(E_NETWORKUPDATE, NetworkUpdate)
 {
 }
 
+/// Network update has been sent on the client or server.
+EVENT(E_NETWORKUPDATESENT, NetworkUpdateSent)
+{
+}
+
 /// Scene load failed, either due to file not found or checksum error.
 EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
 {

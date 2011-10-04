@@ -114,7 +114,7 @@ public:
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
-    /// %Set new controls. Moves the current controls as previous.
+    /// %Set new controls.
     void SetControls(const Controls& newControls);
     /// %Set the observer position for interest management.
     void SetPosition(const Vector3& position);
@@ -184,6 +184,10 @@ public:
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
     
+    /// Observer position for interest management.
+    Vector3 position_;
+    /// Current controls.
+    Controls controls_;
     /// Identity map.
     VariantMap identity_;
     
@@ -235,10 +239,6 @@ private:
     Vector<RemoteEvent> remoteEvents_;
     /// Scene file to load once all packages (if any) have been downloaded.
     String sceneFileName_;
-    /// Current controls.
-    Controls controls_;
-    /// Observer position for interest management.
-    Vector3 position_;
     /// Statistics timer.
     Timer statsTimer_;
     /// Update frame number.
