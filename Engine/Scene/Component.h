@@ -34,7 +34,6 @@ class Component : public Serializable
     OBJECT(Component);
     
     friend class Node;
-    friend class Renderer;
     friend class Scene;
     
 public:

@@ -248,10 +248,8 @@ public:
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
-    /// Allocate a shadow camera and a scene node for it.
+    /// Allocate a temporary shadow camera and a scene node for it.
     Camera* CreateShadowCamera();
-    /// Allocate a temporary scene node for attaching a split light or a shadow camera.
-    Node* CreateTempNode();
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
     /// Reset shadow map allocation counts.
@@ -309,10 +307,8 @@ private:
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
     SharedPtr<ShaderVariation> stencilPS_;
-    /// Reusable shadow cameras.
-    Vector<SharedPtr<Camera> > shadowCameraStore_;
-    /// Reusable temporary scene nodes.
-    Vector<SharedPtr<Node> > tempNodeStore_;
+    /// Reusable scene nodes with shadow camera components.
+    Vector<SharedPtr<Node> > shadowCameraNodes_;
     /// Occlusion buffers.
     HashMap<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
     /// Shadow maps by resolution.
@@ -367,10 +363,8 @@ private:
     float occluderSizeThreshold_;
     /// Number of views.
     unsigned numViews_;
-    /// Number of shadow cameras.
+    /// Number of temporary shadow cameras.
     unsigned numShadowCameras_;
-    /// Number of temporary scene nodes.
-    unsigned numTempNodes_;
     /// Number of primitives (3D geometry only.)
     unsigned numPrimitives_;
     /// Number of batches (3D geometry only.)

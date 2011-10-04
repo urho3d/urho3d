@@ -236,7 +236,6 @@ Renderer::Renderer(Context* context) :
     defaultZone_(new Zone(context)),
     numViews_(0),
     numShadowCameras_(0),
-    numTempNodes_(0),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -549,7 +548,6 @@ void Renderer::Update(float timeStep)
     frame_.timeStep_ = timeStep;
     frame_.camera_ = 0;
     numShadowCameras_ = 0;
-    numTempNodes_ = 0;
     updateOctrees_.Clear();
     
     // Reload shaders if needed
@@ -1032,27 +1030,20 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
 }
 
-
 Camera* Renderer::CreateShadowCamera()
 {
-    if (numShadowCameras_ >= shadowCameraStore_.Size())
-        shadowCameraStore_.Push(SharedPtr<Camera>(new Camera(context_)));
-    Camera* camera = shadowCameraStore_[numShadowCameras_];
-    camera->SetNode(CreateTempNode());
+    if (numShadowCameras_ >= shadowCameraNodes_.Size())
+    {
+        SharedPtr<Node> newNode(new Node(context_));
+        newNode->CreateComponent<Camera>();
+        shadowCameraNodes_.Push(newNode);
+    }
+    
+    Camera* camera = shadowCameraNodes_[numShadowCameras_]->GetComponent<Camera>();
     camera->SetOrthographic(false);
     camera->SetZoom(1.0f);
     ++numShadowCameras_;
     return camera;
-}
-
-Node* Renderer::CreateTempNode()
-{
-    if (numTempNodes_ >= tempNodeStore_.Size())
-        tempNodeStore_.Push(SharedPtr<Node>(new Node(context_)));
-    Node* node = tempNodeStore_[numTempNodes_];
-    
-    ++numTempNodes_;
-    return node;
 }
 
 bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
