@@ -285,7 +285,6 @@ void UI::Render()
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
-    graphics_->SetVertexBuffer(vertexBuffer_);
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
@@ -331,6 +330,7 @@ void UI::Render()
         graphics_->SetBlendMode(batch.blendMode_);
         graphics_->SetScissorTest(true, batch.scissor_);
         graphics_->SetTexture(0, batch.texture_);
+        graphics_->SetVertexBuffer(vertexBuffer_);
         graphics_->Draw(TRIANGLE_LIST, batch.quadStart_ * 6, batch.quadCount_ * 6);
     }
 }
