@@ -26,17 +26,16 @@
 #include "Color.h"
 #include "Component.h"
 #include "Frustum.h"
-#include "Ptr.h"
 
 class BoundingBox;
 class Camera;
 class Polyhedron;
-class Frustum;
 class Drawable;
 class Light;
 class Matrix3x4;
 class Renderer;
 class Skeleton;
+class VertexBuffer;
 
 /// Debug rendering line.
 struct DebugLine
@@ -93,7 +92,7 @@ public:
     void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
-    /// Render all debug lines. The viewport and rendertarget should be set before.
+    /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
     
     /// Return the view transform.
@@ -119,4 +118,6 @@ private:
     Matrix4 projection_;
     /// View frustum.
     Frustum frustum_;
+    /// Vertex buffer.
+    SharedPtr<VertexBuffer> vertexBuffer_;
 };

@@ -130,7 +130,6 @@ Graphics::Graphics(Context* context_) :
     flushGPU_(true),
     numPrimitives_(0),
     numBatches_(0),
-    immediateVertexCount_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
@@ -1587,156 +1586,6 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     }
 }
 
-bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned elementMask)
-{
-    if (immediateVertexCount_)
-    {
-        LOGERROR("New immediate draw operation started before ending the last one");
-        return false;
-    }
-    if (!(elementMask & MASK_POSITION))
-    {
-        LOGERROR("Immediate draw operation must contain vertex positions");
-        return false;
-    }
-    if (!vertexCount)
-        return true;
-    
-    // Resize the buffer if it is too small
-    unsigned vertexSize = VertexBuffer::GetVertexSize(elementMask);
-    if (immediateVertexData_.Size() < vertexCount * vertexSize)
-        immediateVertexData_.Resize(vertexCount * vertexSize);
-    
-    // Note: the data pointer gets pre-decremented here, because the first call to DefineVertex() will increment it
-    immediateDataPtr_ = &immediateVertexData_[0] - vertexSize;
-    immediateType_= type;
-    immediateVertexCount_ = vertexCount;
-    immediateVertexSize_ = vertexSize;
-    immediateElementMask_ = elementMask;
-    immediateCurrentVertex_ = 0;
-    
-    unsigned dataOffset = 0;
-    for (unsigned i = ELEMENT_POSITION; i <= ELEMENT_TEXCOORD1; ++i)
-    {
-        immediateElementOffsets_[i] = dataOffset;
-        if (elementMask & (1 << i))
-            dataOffset += VertexBuffer::elementSize[i];
-    }
-    
-    return true;
-}
-
-bool Graphics::DefineVertex(const Vector3& vertex)
-{
-    if (!immediateVertexCount_ || immediateCurrentVertex_ >= immediateVertexCount_)
-        return false;
-    
-    immediateDataPtr_ += immediateVertexSize_;
-    ++immediateCurrentVertex_;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_POSITION]);
-    const float* src = vertex.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    
-    return true;
-}
-
-bool Graphics::DefineNormal(const Vector3& normal)
-{
-    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_NORMAL) || !immediateCurrentVertex_)
-        return false;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_NORMAL]);
-    const float* src = normal.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    
-    return true;
-}
-
-bool Graphics::DefineTexCoord(const Vector2& texCoord)
-{
-    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_TEXCOORD1) || !immediateCurrentVertex_)
-        return false;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_TEXCOORD1]);
-    const float* src = texCoord.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    
-    return true;
-}
-
-bool Graphics::DefineColor(const Color& color)
-{
-    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_COLOR) || !immediateCurrentVertex_)
-        return false;
-    
-    unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_COLOR]);
-    *dest = color.ToUInt();
-    
-    return true;
-}
-
-bool Graphics::DefineColor(unsigned color)
-{
-    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_COLOR) || !immediateCurrentVertex_)
-        return false;
-    
-    unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_COLOR]);
-    *dest = color;
-    
-    return true;
-}
-
-void Graphics::EndImmediate()
-{
-    if (immediateVertexCount_)
-    {
-        SetVertexBuffer(0);
-        SetIndexBuffer(0);
-        
-        if (shaderProgram_)
-        {
-            const int* attributeLocations = shaderProgram_->GetAttributeLocations();
-            unsigned vertexSize = VertexBuffer::GetVertexSize(immediateElementMask_);
-            
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            
-            for (unsigned i = ELEMENT_POSITION; i <= ELEMENT_TEXCOORD1; ++i)
-            {
-                unsigned attributeIndex = attributeLocations[i];
-                unsigned attributeBit = 1 << attributeIndex;
-                unsigned elementBit = 1 << i;
-                
-                if (immediateElementMask_ & elementBit)
-                {
-                    if ((impl_->enabledAttributes_ & attributeBit) == 0)
-                    {
-                        glEnableVertexAttribArray(attributeIndex);
-                        impl_->enabledAttributes_ |= attributeBit;
-                    }
-                    
-                    glVertexAttribPointer(attributeIndex, VertexBuffer::elementComponents[i], VertexBuffer::elementType[i],
-                        VertexBuffer::elementNormalize[i], vertexSize, (const GLvoid*)&immediateVertexData_[immediateElementOffsets_[i]]);
-                }
-                else if (impl_->enabledAttributes_ & attributeBit)
-                {
-                    glDisableVertexAttribArray(attributeIndex);
-                    impl_->enabledAttributes_ &= ~attributeBit;
-                }
-            }
-            
-            Draw(immediateType_, 0, immediateVertexCount_);
-        }
-        
-        immediateVertexCount_ = 0;
-    }
-}
-
 void Graphics::SetForceSM2(bool enable)
 {
 }
@@ -1748,17 +1597,6 @@ void Graphics::SetForceFallback(bool enable)
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0;
-}
-
-unsigned char* Graphics::GetImmediateDataPtr() const
-{
-    if (!immediateVertexCount_)
-    {
-        LOGERROR("Immediate draw operation not started");
-        return 0;
-    }
-    
-    return const_cast<unsigned char*>(&immediateVertexData_[0]);
 }
 
 void* Graphics::GetWindowHandle() const

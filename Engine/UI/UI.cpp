@@ -218,40 +218,16 @@ void UI::Update(float timeStep)
 
 void UI::RenderUpdate()
 {
-    if (!rootElement_ || !graphics_ || graphics_->IsDeviceLost())
+    if (!rootElement_ || !graphics_)
         return;
     
-    {
-        PROFILE(GetUIBatches);
-        
-        // Get batches & quads from the UI elements
-        batches_.Clear();
-        quads_.Clear();
-        const IntVector2& rootSize = rootElement_->GetSize();
-        GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
-    }
+    PROFILE(GetUIBatches);
     
-    {
-        PROFILE(UpdateUIGeometry);
-        
-        // Update quad geometry into the vertex buffer
-        unsigned numVertices = quads_.Size() * 6;
-        if (numVertices)
-        {
-            if (vertexBuffer_->GetVertexCount() < numVertices)
-                vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-        
-            unsigned vertexSize = vertexBuffer_->GetVertexSize();
-            unsigned char* lockedData = (unsigned char*)vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
-        
-            if (lockedData)
-            {
-                for (unsigned i = 0; i < batches_.Size(); ++i)
-                    batches_[i].UpdateGeometry(graphics_, lockedData + 6 * batches_[i].quadStart_ * vertexSize);
-                vertexBuffer_->Unlock();
-            }
-        }
-    }
+    // Get batches & quads from the UI elements
+    batches_.Clear();
+    quads_.Clear();
+    const IntVector2& rootSize = rootElement_->GetSize();
+    GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
     
     // If no drag, reset cursor shape for next frame
     if (cursor_ && !dragElement_)
@@ -262,8 +238,23 @@ void UI::Render()
 {
     PROFILE(RenderUI);
     
-    if (!graphics_)
+    if (!graphics_ || graphics_->IsDeviceLost() || !quads_.Size())
         return;
+    
+    // Update quad geometry into the vertex buffer
+    unsigned numVertices = quads_.Size() * 6;
+    if (vertexBuffer_->GetVertexCount() < numVertices)
+        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+    
+    unsigned vertexSize = vertexBuffer_->GetVertexSize();
+    void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
+    if (!lockedData)
+        return;
+    
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+        batches_[i].UpdateGeometry(graphics_, ((unsigned char*)lockedData) + batches_[i].quadStart_ * vertexSize * 6);
+    
+    vertexBuffer_->Unlock();
     
     Vector2 scale(2.0f, -2.0f);
     Vector2 offset(-1.0f, 1.0f);

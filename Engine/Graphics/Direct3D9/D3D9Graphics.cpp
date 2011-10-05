@@ -174,7 +174,6 @@ Graphics::Graphics(Context* context) :
     queryIndex_(0),
     numPrimitives_(0),
     numBatches_(0),
-    immediateBuffer_(0),
     shaderParametersOverlap_(false),
     defaultTextureFilterMode_(FILTER_BILINEAR)
 {
@@ -410,8 +409,6 @@ void Graphics::Close()
 {
     if (impl_->window_)
     {
-        immediateVertexBuffers_.Clear();
-        
         DestroyWindow(impl_->window_);
         impl_->window_ = 0;
     }
@@ -544,10 +541,6 @@ bool Graphics::BeginFrame()
     
     // Cleanup stream frequencies from previous frame
     ResetStreamFrequencies();
-    
-    // Reset immediate mode vertex buffer positions
-    for (HashMap<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
-        i->second_ = 0;
     
     numPrimitives_ = 0;
     numBatches_ = 0;
@@ -1689,148 +1682,6 @@ void Graphics::ResetStreamFrequencies()
     }
 }
 
-bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned elementMask)
-{
-    if (immediateBuffer_)
-    {
-        LOGERROR("New immediate draw operation started before ending the last one");
-        return false;
-    }
-    if (!(elementMask & MASK_POSITION))
-    {
-        LOGERROR("Immediate draw operation must contain vertex positions");
-        return false;
-    }
-    if (!vertexCount)
-        return true;
-    
-    // Start from default size, ensure that buffer is big enough to hold the immediate draw operation
-    unsigned newSize = IMMEDIATE_BUFFER_DEFAULT_SIZE;
-    while (newSize < vertexCount)
-        newSize <<= 1;
-        
-    // See if buffer exists for this vertex format. If not, create new
-    if (!immediateVertexBuffers_.Contains(elementMask))
-    {
-        LOGDEBUG("Created immediate vertex buffer");
-        VertexBuffer* newBuffer = new VertexBuffer(context_);
-        newBuffer->SetSize(newSize, elementMask, true);
-        immediateVertexBuffers_[elementMask] = newBuffer;
-        immediateVertexBufferPos_[elementMask] = 0;
-    }
-    
-    // Resize buffer if it is too small
-    VertexBuffer* buffer = immediateVertexBuffers_[elementMask];
-    if (buffer->GetVertexCount() < newSize)
-    {
-        LOGDEBUG("Resized immediate vertex buffer to " + String(newSize));
-        buffer->SetSize(newSize, elementMask, true);
-        immediateVertexBufferPos_[elementMask] = 0;
-    }
-    
-    // Get the current lock position for the buffer
-    unsigned bufferPos = immediateVertexBufferPos_[elementMask];
-    if (bufferPos + vertexCount >= buffer->GetVertexCount())
-        bufferPos = 0;
-    
-    LockMode lockMode = LOCK_DISCARD;
-    if (bufferPos != 0)
-        lockMode = LOCK_NOOVERWRITE;
-    
-    // Note: the data pointer gets pre-decremented here, because the first call to DefineVertex() will increment it
-    immediateDataPtr_ = ((unsigned char*)buffer->Lock(bufferPos, vertexCount, lockMode)) - buffer->GetVertexSize();
-    immediateBuffer_ = buffer;
-    immediateType_= type;
-    immediateStartPos_ = bufferPos;
-    immediateVertexCount_ = vertexCount;
-    immediateCurrentVertex_ = 0;
-    
-    // Store new buffer position for next lock into the same buffer
-    bufferPos += vertexCount;
-    if (bufferPos >= buffer->GetVertexCount())
-        bufferPos = 0;
-    immediateVertexBufferPos_[elementMask] = bufferPos;
-    
-    return true;
-}
-
-bool Graphics::DefineVertex(const Vector3& vertex)
-{
-    if (!immediateBuffer_ || immediateCurrentVertex_ >= immediateVertexCount_)
-        return false;
-    
-    immediateDataPtr_ += immediateBuffer_->GetVertexSize();
-    ++immediateCurrentVertex_;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_POSITION));
-    const float* src = vertex.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    
-    return true;
-}
-
-bool Graphics::DefineNormal(const Vector3& normal)
-{
-    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_NORMAL) || !immediateCurrentVertex_)
-        return false;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_NORMAL));
-    const float* src = normal.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    
-    return true;
-}
-
-bool Graphics::DefineTexCoord(const Vector2& texCoord)
-{
-    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_TEXCOORD1) || !immediateCurrentVertex_)
-        return false;
-    
-    float* dest = (float*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_TEXCOORD1));
-    const float* src = texCoord.GetData();
-    dest[0] = src[0];
-    dest[1] = src[1];
-    
-    return true;
-}
-
-bool Graphics::DefineColor(const Color& color)
-{
-    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_COLOR) || !immediateCurrentVertex_)
-        return false;
-    
-    unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_COLOR));
-    *dest = color.ToUInt();
-    
-    return true;
-}
-
-bool Graphics::DefineColor(unsigned color)
-{
-    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_COLOR) || !immediateCurrentVertex_)
-        return false;
-    
-    unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_COLOR));
-    *dest = color;
-    
-    return true;
-}
-
-void Graphics::EndImmediate()
-{
-    if (immediateBuffer_)
-    {
-        immediateBuffer_->Unlock();
-        SetVertexBuffer(immediateBuffer_);
-        Draw(immediateType_, immediateStartPos_, immediateVertexCount_);
-        immediateBuffer_ = 0;
-    }
-}
-
 void Graphics::SetForceSM2(bool enable)
 {
     // Note: this only has effect before calling SetMode() for the first time
@@ -1846,17 +1697,6 @@ void Graphics::SetForceFallback(bool enable)
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
-}
-
-unsigned char* Graphics::GetImmediateDataPtr() const
-{
-    if (!immediateBuffer_)
-    {
-        LOGERROR("Immediate draw operation not started");
-        return 0;
-    }
-    // Pointer was pre-decremented in BeginImmediate(). Undo that now
-    return immediateDataPtr_ + immediateBuffer_->GetVertexSize();
 }
 
 unsigned Graphics::GetWindowHandle() const
@@ -2253,8 +2093,6 @@ void Graphics::OnDeviceReset()
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
     impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
-    
-    immediateBuffer_ = 0;
 }
 
 void Graphics::ResetCachedState()

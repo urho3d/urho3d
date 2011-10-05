@@ -35,6 +35,7 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "ShaderVariation.h"
+#include "VertexBuffer.h"
 
 #include "DebugNew.h"
 
@@ -43,6 +44,8 @@ OBJECTTYPESTATIC(DebugRenderer);
 DebugRenderer::DebugRenderer(Context* context) :
     Component(context)
 {
+    vertexBuffer_ = new VertexBuffer(context_);
+    
     SubscribeToEvent(E_ENDFRAME, HANDLER(DebugRenderer, HandleEndFrame));
 }
 
@@ -248,17 +251,52 @@ void DebugRenderer::Render()
     if (lines_.Empty() && noDepthLines_.Empty())
         return;
     
-    PROFILE(RenderDebugGeometry);
-    
     Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
+    
+    if (!graphics || graphics->IsDeviceLost())
+        return;
+    
+    PROFILE(RenderDebugGeometry);
+    
+    unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
+    if (vertexBuffer_->GetVertexCount() < numVertices)
+        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
+    void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
+    if (!lockedData)
+        return;
+    
+    float* dest = (float*)lockedData;
+    
+    for (unsigned i = 0; i < lines_.Size(); ++i)
+    {
+        const DebugLine& line = lines_[i];
+            
+        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
+        *((unsigned*)dest) = line.color_; dest++;
+            
+        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
+        *((unsigned*)dest) = line.color_; dest++;
+    }
+    
+    for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
+    {
+        const DebugLine& line = noDepthLines_[i];
+            
+        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
+        *((unsigned*)dest) = line.color_; dest++;
+            
+        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
+        *((unsigned*)dest) = line.color_; dest++;
+    }
+    
+    vertexBuffer_->Unlock();
     
     graphics->SetAlphaTest(false);
     graphics->SetBlendMode(BLEND_REPLACE);
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
     graphics->SetDepthWrite(true);
-    graphics->SetDepthTest(CMP_LESSEQUAL);
     graphics->SetFillMode(FILL_SOLID);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
@@ -266,46 +304,17 @@ void DebugRenderer::Render()
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
+    graphics->SetVertexBuffer(vertexBuffer_);
     
-    // Draw all line geometry with depth testing
     if (lines_.Size())
     {
-        graphics->BeginImmediate(LINE_LIST, lines_.Size() * 2, MASK_POSITION | MASK_COLOR);
-        float* dest = (float*)graphics->GetImmediateDataPtr();
-        
-        for (unsigned i = 0; i < lines_.Size(); ++i)
-        {
-            const DebugLine& line = lines_[i];
-            
-            *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-            *((unsigned*)dest) = line.color_; dest++;
-            
-            *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-            *((unsigned*)dest) = line.color_; dest++;
-        }
-        
-        graphics->EndImmediate();
+        graphics->SetDepthTest(CMP_LESSEQUAL);
+        graphics->Draw(LINE_LIST, 0, lines_.Size() * 2);
     }
-    
-    // Draw all line geometry without depth testing
-    graphics->SetDepthTest(CMP_ALWAYS);
     if (noDepthLines_.Size())
     {
-        graphics->BeginImmediate(LINE_LIST, noDepthLines_.Size() * 2, MASK_POSITION | MASK_COLOR);
-        float* dest = (float*)graphics->GetImmediateDataPtr();
-        
-        for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
-        {
-            const DebugLine& line = noDepthLines_[i];
-            
-            *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-            *((unsigned*)dest) = line.color_; dest++;
-            
-            *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-            *((unsigned*)dest) = line.color_; dest++;
-        }
-        
-        graphics->EndImmediate();
+        graphics->SetDepthTest(CMP_ALWAYS);
+        graphics->Draw(LINE_LIST, lines_.Size() * 2, noDepthLines_.Size() * 2);
     }
 }
 

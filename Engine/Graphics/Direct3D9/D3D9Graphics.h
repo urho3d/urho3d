@@ -48,7 +48,6 @@ class VertexDeclaration;
 
 struct ShaderParameter;
 
-static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 static const unsigned NUM_QUERIES = 2;
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
@@ -173,20 +172,6 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
-    /// Begin immediate rendering command.
-    bool BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned elementMask);
-    /// Define immediate vertex.
-    bool DefineVertex(const Vector3& vertex);
-    /// Define immediate normal.
-    bool DefineNormal(const Vector3& normal);
-    /// Define immediate texture coordinate.
-    bool DefineTexCoord(const Vector2& texCoord);
-    /// Define immediate color.
-    bool DefineColor(const Color& color);
-    /// Define immediate color.
-    bool DefineColor(unsigned color);
-    /// End immediate rendering command and render.
-    void EndImmediate();
     /// %Set force Shader Model 2 flag. Needs to be set before setting initial screen mode to have effect.
     void SetForceSM2(bool enable);
     /// %Set force fallback shaders flag. Needs to be set before setting initial screen mode to have effect.
@@ -214,8 +199,6 @@ public:
     bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
-    /// Return immediate rendering data pointer.
-    unsigned char* GetImmediateDataPtr() const;
     /// Return window handle.
     unsigned GetWindowHandle() const;
     /// Return number of primitives drawn this frame.
@@ -401,26 +384,10 @@ private:
     unsigned numPrimitives_;
     /// Number of batches this frame.
     unsigned numBatches_;
-    /// Immediate rendering primitive type.
-    PrimitiveType immediateType_;
-    /// Immediate vertex buffer start position.
-    unsigned immediateStartPos_;
-    /// Immediate rendering total number of vertices.
-    unsigned immediateVertexCount_;
-    /// Immediate rendering current vertex number.
-    unsigned immediateCurrentVertex_;
-    /// Immediate rendering vertex buffer in use.
-    VertexBuffer* immediateBuffer_;
-    /// Immediate rendering data pointer.
-    unsigned char* immediateDataPtr_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
     /// Vertex declarations.
     HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
-    /// Immediate rendering vertex buffers by vertex declaration.
-    HashMap<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
-    /// Immediate rendering vertex buffer start positions.
-    HashMap<unsigned, unsigned> immediateVertexBufferPos_;
     /// Shadow map dummy color texture format.
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format.

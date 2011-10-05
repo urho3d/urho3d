@@ -291,7 +291,7 @@ ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 
 \section Script_ScriptAPI The script API
 
-Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access or immediate rendering) are not. Also for scripting convenience some things have been changed from the C++ API:
+Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access) are not. Also for scripting convenience some things have been changed from the C++ API:
 
 - The template array and string classes are exposed as Array<type> and String.
 
@@ -366,8 +366,6 @@ Graphics implements the low-level functionality:
 - Keeping track of rendering context state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
 - Handling lost device
 - Performing primitive rendering operations
-
-It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry.
 
 Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.
 

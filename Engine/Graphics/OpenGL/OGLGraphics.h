@@ -176,20 +176,6 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
     void ResetStreamFrequencies();
-    /// Begin immediate rendering command.
-    bool BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned elementMask);
-    /// Define immediate vertex.
-    bool DefineVertex(const Vector3& vertex);
-    /// Define immediate normal.
-    bool DefineNormal(const Vector3& normal);
-    /// Define immediate texture coordinate.
-    bool DefineTexCoord(const Vector2& texCoord);
-    /// Define immediate color.
-    bool DefineColor(const Color& color);
-    /// Define immediate color.
-    bool DefineColor(unsigned color);
-    /// End immediate rendering command and render.
-    void EndImmediate();
     /// Set force Shader Model 2 flag. No effect on OpenGL.
     void SetForceSM2(bool enable);
     /// %Set force fallback shaders flag. No effect on OpenGL.
@@ -217,8 +203,6 @@ public:
     bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether device is lost, and can not yet render. Always false on OpenGL.
     bool IsDeviceLost() const { return false; }
-    /// Return immediate rendering data pointer.
-    unsigned char* GetImmediateDataPtr() const;
     /// Return window handle.
     void* GetWindowHandle() const;
     /// Return number of primitives drawn this frame.
@@ -368,22 +352,6 @@ private:
     unsigned numPrimitives_;
     /// Number of batches this frame.
     unsigned numBatches_;
-    /// Immediate rendering primitive type.
-    PrimitiveType immediateType_;
-    /// Immediate rendering total number of vertices.
-    unsigned immediateVertexCount_;
-    /// Immediate rendering vertex size.
-    unsigned immediateVertexSize_;
-    /// Immediate rendering vertex element mask.
-    unsigned immediateElementMask_;
-    /// Immediate rendering current vertex number.
-    unsigned immediateCurrentVertex_;
-    /// Immediate rendering data pointer.
-    unsigned char* immediateDataPtr_;
-    /// Immediate rendering data buffer.
-    PODVector<unsigned char> immediateVertexData_;
-    /// Immediate rendering element offsets.
-    unsigned immediateElementOffsets_[MAX_IMMEDIATE_ELEMENTS];
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
     /// Shadow map depth texture format.
