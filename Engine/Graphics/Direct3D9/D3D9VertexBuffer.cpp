@@ -289,6 +289,21 @@ void VertexBuffer::UpdateOffsets()
     vertexSize_ = elementOffset;
 }
 
+unsigned long long VertexBuffer::GetHash(unsigned streamIndex, unsigned useMask)
+{
+    unsigned long long bufferHash = elementMask_;
+    unsigned long long maskHash;
+    if (useMask == MASK_DEFAULT)
+        maskHash = ((unsigned long long)elementMask_) * 0x100000000ULL;
+    else
+        maskHash = ((unsigned long long)useMask) * 0x100000000ULL;
+    
+    bufferHash |= maskHash;
+    bufferHash <<= streamIndex * MAX_VERTEX_ELEMENTS;
+    
+    return bufferHash;
+}
+
 unsigned VertexBuffer::GetVertexSize(unsigned mask)
 {
     unsigned vertexSize = 0;
