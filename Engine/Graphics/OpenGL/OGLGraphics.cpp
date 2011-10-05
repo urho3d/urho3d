@@ -526,9 +526,6 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-
-
-
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
             continue;
         
@@ -586,6 +583,8 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         disableAttributes >>= 1;
         ++disableIndex;
     }
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     return true;
 }

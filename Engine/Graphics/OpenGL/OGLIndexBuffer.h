@@ -78,6 +78,8 @@ private:
     SharedArrayPtr<unsigned char> fallbackData_;
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
+    /// Double buffer object for avoiding GPU stall.
+    unsigned doubleBufferObject_;
     /// Number of indices.
     unsigned indexCount_;
     /// Index size.

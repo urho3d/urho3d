@@ -39,6 +39,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
+    doubleBufferObject_(0),
     dynamic_(false),
     locked_(false)
 {
@@ -93,6 +94,12 @@ void IndexBuffer::Release()
         object_ = 0;
     }
     
+    if (doubleBufferObject_)
+    {
+        glDeleteBuffers(1, &doubleBufferObject_);
+        doubleBufferObject_ = 0;
+    }
+    
     fallbackData_.Reset();
 }
 
@@ -118,8 +125,10 @@ bool IndexBuffer::SetData(const void* data)
     
     if (object_)
     {
-        graphics_->SetIndexBuffer(this);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        graphics_->SetIndexBuffer(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexCount_ * indexSize_, data);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         return true;
     }
     else if (fallbackData_)
@@ -150,8 +159,10 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
     
     if (object_)
     {
-        graphics_->SetIndexBuffer(this);
+        graphics_->SetIndexBuffer(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, indexCount_ * indexSize_, data);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         return true;
     }
     else if (fallbackData_)
@@ -189,12 +200,24 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     
     if (object_)
     {
-        graphics_->SetIndexBuffer(this);
-        // If locking the whole buffer in discard mode, create a new data store
-        if (mode == LOCK_DISCARD && count == indexCount_)
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        graphics_->SetIndexBuffer(0);
         
+        // In discard mode, create a double buffer VBO and swap to it to avoid stall
+        if (mode == LOCK_DISCARD)
+        {
+            if (!doubleBufferObject_)
+            {
+                glGenBuffers(1, &doubleBufferObject_);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, doubleBufferObject_);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            }
+            
+            Swap(object_, doubleBufferObject_);
+        }
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         hwData = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, glLockMode);
+        
         if (!hwData)
             return 0;
         hwData = (unsigned char*)hwData + start * indexSize_;
@@ -212,8 +235,10 @@ void IndexBuffer::Unlock()
     {
         if (object_)
         {
-            graphics_->SetIndexBuffer(this);
+            graphics_->SetIndexBuffer(0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
             glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
         locked_ = false;
     }
@@ -273,11 +298,14 @@ bool IndexBuffer::Create()
     
     if (graphics_)
     {
+        graphics_->SetIndexBuffer(0);
+        
         if (!object_)
             glGenBuffers(1, &object_);
         
-        graphics_->SetIndexBuffer(this);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
     else
         fallbackData_ = new unsigned char[indexCount_ * indexSize_];

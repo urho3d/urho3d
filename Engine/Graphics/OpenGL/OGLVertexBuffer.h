@@ -87,7 +87,7 @@ public:
     /// Return whether has a morph vertex range defined.
     bool HasMorphRange() const { return morphRangeCount_ > 0; }
     /// Return buffer hash for state sorting.
-    unsigned long long GetHash(unsigned streaindex_, unsigned useMask);
+    unsigned long long GetHash(unsigned streamIndex, unsigned useMask);
     
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
@@ -115,6 +115,8 @@ private:
     SharedArrayPtr<unsigned char> morphRangeResetData_;
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
+    /// Double buffer object for avoiding GPU stall.
+    unsigned doubleBufferObject_;
     /// Number of vertices.
     unsigned vertexCount_;
     /// Vertex size.
