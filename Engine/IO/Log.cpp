@@ -117,7 +117,10 @@ void Log::WriteRaw(const String& message)
     printf("%s", message.CString());
     
     if (logFile_)
+    {
         logFile_->Write(message.CString(), message.Length());
+        logFile_->Flush();
+    }
     
     using namespace LogMessage;
     

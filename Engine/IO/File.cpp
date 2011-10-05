@@ -245,6 +245,12 @@ void File::Close()
     }
 }
 
+void File::Flush()
+{
+    if (handle_)
+        fflush((FILE*)handle_);
+}
+
 void File::SetName(const String& name)
 {
     fileName_ = name;

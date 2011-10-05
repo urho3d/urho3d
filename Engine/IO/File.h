@@ -69,6 +69,8 @@ public:
     bool Open(PackageFile* package, const String& fileName);
     /// Close the file.
     void Close();
+    /// Flush any buffered output to the file.
+    void Flush();
     /// Change the file name. Used by the resource system.
     void SetName(const String& name);
     
