@@ -223,8 +223,7 @@ bool VertexBuffer::SetData(const void* data)
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexCount_ * vertexSize_, data);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         return true;
     }
     else if (fallbackData_)
@@ -257,7 +256,6 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, vertexCount_ * vertexSize_, data);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         return true;
     }
     else if (fallbackData_)
@@ -305,14 +303,15 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     }
     
     void* hwData = 0;
-    GLenum glLockMode = GL_WRITE_ONLY;
-    if (mode == LOCK_READONLY)
-        glLockMode = GL_READ_ONLY;
-    else if (mode == LOCK_NORMAL)
-        glLockMode = GL_READ_WRITE;
     
     if (object_)
     {
+        GLenum glLockMode = GL_WRITE_ONLY;
+        if (mode == LOCK_READONLY)
+            glLockMode = GL_READ_ONLY;
+        else if (mode == LOCK_NORMAL)
+            glLockMode = GL_READ_WRITE;
+        
         // In discard mode, create a double buffer VBO and swap to it to avoid stall
         if (mode == LOCK_DISCARD)
         {
@@ -347,7 +346,6 @@ void VertexBuffer::Unlock()
         {
             glBindBuffer(GL_ARRAY_BUFFER, object_);
             glUnmapBuffer(GL_ARRAY_BUFFER);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         locked_ = false;
     }
@@ -392,21 +390,6 @@ void VertexBuffer::UpdateOffsets()
     vertexSize_ = elementOffset;
 }
 
-unsigned long long VertexBuffer::GetHash(unsigned streamIndex, unsigned useMask)
-{
-    unsigned long long bufferHash = elementMask_;
-    unsigned long long maskHash;
-    if (useMask == MASK_DEFAULT)
-        maskHash = ((unsigned long long)elementMask_) * 0x100000000ULL;
-    else
-        maskHash = ((unsigned long long)useMask) * 0x100000000ULL;
-    
-    bufferHash |= maskHash;
-    bufferHash <<= streamIndex * MAX_VERTEX_ELEMENTS;
-    
-    return bufferHash;
-}
-
 unsigned VertexBuffer::GetVertexSize(unsigned mask)
 {
     unsigned vertexSize = 0;
@@ -435,14 +418,12 @@ bool VertexBuffer::Create()
         
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         
         // If double buffer object has already been created, ensure its size matches
         if (doubleBufferObject_)
         {
             glBindBuffer(GL_ARRAY_BUFFER, doubleBufferObject_);
             glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
     else

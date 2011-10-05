@@ -86,9 +86,7 @@ public:
     const SharedArrayPtr<unsigned char>& GetMorphRangeResetData() { return morphRangeResetData_; }
     /// Return whether has a morph vertex range defined.
     bool HasMorphRange() const { return morphRangeCount_ > 0; }
-    /// Return buffer hash for state sorting.
-    unsigned long long GetHash(unsigned streaindex_, unsigned useMask);
-    
+
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
     

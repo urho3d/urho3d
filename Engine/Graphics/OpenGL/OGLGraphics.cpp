@@ -584,8 +584,6 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         ++disableIndex;
     }
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
     return true;
 }
 

@@ -127,8 +127,7 @@ bool IndexBuffer::SetData(const void* data)
     {
         graphics_->SetIndexBuffer(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexCount_ * indexSize_, data);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         return true;
     }
     else if (fallbackData_)
@@ -162,7 +161,6 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
         graphics_->SetIndexBuffer(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, indexCount_ * indexSize_, data);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         return true;
     }
     else if (fallbackData_)
@@ -192,14 +190,15 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     }
     
     void* hwData = 0;
-    GLenum glLockMode = GL_WRITE_ONLY;
-    if (mode == LOCK_READONLY)
-        glLockMode = GL_READ_ONLY;
-    else if (mode == LOCK_NORMAL)
-        glLockMode = GL_READ_WRITE;
     
     if (object_)
     {
+        GLenum glLockMode = GL_WRITE_ONLY;
+        if (mode == LOCK_READONLY)
+            glLockMode = GL_READ_ONLY;
+        else if (mode == LOCK_NORMAL)
+            glLockMode = GL_READ_WRITE;
+        
         graphics_->SetIndexBuffer(0);
         
         // In discard mode, create a double buffer VBO and swap to it to avoid stall
@@ -238,7 +237,6 @@ void IndexBuffer::Unlock()
             graphics_->SetIndexBuffer(0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
             glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
         locked_ = false;
     }
@@ -305,7 +303,13 @@ bool IndexBuffer::Create()
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        
+        // If double buffer object has already been created, ensure its size matches
+        if (doubleBufferObject_)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, doubleBufferObject_);
+            glBufferData(GL_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        }
     }
     else
         fallbackData_ = new unsigned char[indexCount_ * indexSize_];
