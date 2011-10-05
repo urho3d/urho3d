@@ -196,8 +196,7 @@ bool Technique::Load(Deserializer& source)
     }
     
     // Calculate memory use
-    unsigned memoryUse = 0;
-    memoryUse += sizeof(Technique);
+    unsigned memoryUse = sizeof(Technique);
     for (unsigned i = 0; i < MAX_PASSES; ++i)
     {
         if (passes_[i])

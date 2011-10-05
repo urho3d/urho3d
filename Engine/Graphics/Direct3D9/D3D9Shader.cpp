@@ -68,6 +68,8 @@ bool Shader::Load(Deserializer& source)
         return false;
     }
     
+    unsigned memoryUse = sizeof(Shader);
+    
     String fileName = GetFileName(source.GetName());
     shaderType_ = (ShaderType)source.ReadShort();
     isSM3_ = (source.ReadShort() == 3);
@@ -145,10 +147,11 @@ bool Shader::Load(Deserializer& source)
         if (variations_.Contains(nameHash))
             LOGERROR("Shader variation name hash collision: " + variationName);
         variations_[nameHash] = variation;
+        
+        memoryUse += sizeof(ShaderVariation) + dataSize;
     }
     
-    // This is not exactly accurate, but a reasonable estimate
-    SetMemoryUse(source.GetSize());
+    SetMemoryUse(memoryUse);
     return true;
 }
 

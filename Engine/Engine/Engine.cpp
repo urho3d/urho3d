@@ -341,7 +341,7 @@ void Engine::DumpResources()
         if (num)
         {
             LOGRAW("Resource type " + i->second_.resources_.Begin()->second_->GetTypeName() +
-                ": count " + num + " memory use " + String(memoryUse) + "\n");
+                ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
         }
     }
     

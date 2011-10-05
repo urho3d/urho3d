@@ -68,7 +68,7 @@ bool Animation::Load(Deserializer& source)
 {
     PROFILE(LoadAnimation);
     
-    unsigned memoryUse = 0;
+    unsigned memoryUse = sizeof(Animation);
     
     // Check ID
     if (source.ReadFileID() != "UANI")

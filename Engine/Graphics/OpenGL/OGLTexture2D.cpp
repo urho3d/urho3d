@@ -244,7 +244,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         return false;
     }
     
-    unsigned memoryUse = 0;
+    unsigned memoryUse = sizeof(Texture2D);
     
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();

@@ -186,8 +186,8 @@ bool Material::Load(Deserializer& source)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetString("value"), cullModeNames, CULL_CCW));
     
     // Calculate memory use
-    unsigned memoryUse = 0;
-    memoryUse += sizeof(Material);
+    unsigned memoryUse = sizeof(Material);
+    
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
     memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
     memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
@@ -195,7 +195,6 @@ bool Material::Load(Deserializer& source)
     SetMemoryUse(memoryUse);
     CheckOcclusion();
     CheckSpecular();
-    
     return true;
 }
 

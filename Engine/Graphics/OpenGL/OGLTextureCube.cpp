@@ -431,7 +431,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
     }
     
     faceMemoryUse_[face] = memoryUse;
-    unsigned totalMemoryUse = 0;
+    unsigned totalMemoryUse = sizeof(TextureCube);
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         totalMemoryUse += faceMemoryUse_[i];
     SetMemoryUse(totalMemoryUse);

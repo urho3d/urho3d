@@ -62,9 +62,12 @@ bool Shader::Load(Deserializer& source)
     if (!graphics)
         return false;
     
+    unsigned memoryUse = sizeof(Shader);
+    
     sourceCodeLength_ = source.GetSize();
     sourceCode_ = new char[sourceCodeLength_];
     source.Read(&sourceCode_[0], sourceCodeLength_);
+    memoryUse += sourceCodeLength_;
     
     String fileName = GetFileName(source.GetName());
     String xmlName = source.GetName() + ".xml";
@@ -93,8 +96,10 @@ bool Shader::Load(Deserializer& source)
         variations_[nameHash] = newVariation;
         
         variationElem = variationElem.GetNext();
+        memoryUse += sizeof(ShaderVariation);
     }
     
+    SetMemoryUse(memoryUse);
     return true;
 }
 

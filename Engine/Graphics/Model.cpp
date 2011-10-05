@@ -92,7 +92,7 @@ bool Model::Load(Deserializer& source)
     vertexBuffers_.Clear();
     indexBuffers_.Clear();
     
-    SetMemoryUse(source.GetSize());
+    unsigned memoryUse = sizeof(Model);
     
     Vector<SharedArrayPtr<unsigned char> > rawVertexDatas;
     Vector<SharedArrayPtr<unsigned char> > rawIndexDatas;
@@ -112,6 +112,8 @@ bool Model::Load(Deserializer& source)
         
         unsigned vertexSize = buffer->GetVertexSize();
         unsigned char* data = (unsigned char*)buffer->Lock(0, vertexCount, LOCK_NORMAL);
+        memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
+        
         if (data)
         {
             source.Read(data, vertexCount * vertexSize);
@@ -121,6 +123,7 @@ bool Model::Load(Deserializer& source)
                 SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
                 memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
                 buffer->SetMorphRangeResetData(morphResetData);
+                memoryUse += morphCount * vertexSize;
             }
             
             // Copy the raw position data for CPU-side operations
@@ -154,6 +157,8 @@ bool Model::Load(Deserializer& source)
         buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
         
         unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
+        memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
+        
         if (data)
         {
             source.Read(data, indexCount * indexSize);
@@ -215,6 +220,7 @@ bool Model::Load(Deserializer& source)
             geometry->SetRawData(rawVertexDatas[vertexBufferRef], rawIndexDatas[indexBufferRef]);
             
             geometryLodLevels.Push(geometry);
+            memoryUse += sizeof(Geometry);
         }
         
         geometries_.Push(geometryLodLevels);
@@ -253,17 +259,21 @@ bool Model::Load(Deserializer& source)
             source.Read(&newBuffer.morphData_[0], newBuffer.vertexCount_ * vertexSize);
             
             newMorph.buffers_[bufferIndex] = newBuffer;
+            memoryUse += sizeof(VertexBufferMorph) + newBuffer.vertexCount_ * vertexSize;
         }
         
         morphs_.Push(newMorph);
+        memoryUse += sizeof(ModelMorph);
     }
     
     // Read skeleton
     skeleton_.Load(source);
+    memoryUse += skeleton_.GetNumBones() * sizeof(Bone);
     
     // Read bounding box
     boundingBox_ = source.ReadBoundingBox();
     
+    SetMemoryUse(memoryUse);
     return true;
 }
 
