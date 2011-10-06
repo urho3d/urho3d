@@ -69,8 +69,14 @@ void TextureCube::OnDeviceReset()
 {
     if (pool_ == D3DPOOL_DEFAULT)
     {
-        Create();
-        dataLost_ = true;
+        // If has a file name, reload through the resource cache. Otherwise recreate and mark the data lost
+        if (!GetName().Trimmed().Empty())
+            GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+        {
+            Create();
+            dataLost_ = true;
+        }
     }
 }
 
@@ -195,7 +201,8 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
     
-    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, flags)))
+    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, (flags &
+        D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
     {
         LOGERROR("Could not lock texture");
         return false;
@@ -388,15 +395,12 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
             }
         }
         
-        // Make sure manual mip creation is never attempted for D3DPOOL_DEFAULT resources
-        unsigned manualLevels = (pool_ == D3DPOOL_DEFAULT) ? 1 : levels_;
-        
-        for (unsigned i = 0; i < manualLevels; ++i)
+        for (unsigned i = 0; i < levels_; ++i)
         {
             SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
 
-            if (i < manualLevels - 1)
+            if (i < levels_ - 1)
             {
                 image = image->GetNextLevel();
                 levelData = image->GetData();
@@ -560,12 +564,6 @@ bool TextureCube::Create()
     
     if (!width_ || !height_)
         return false;
-    
-    // If using a default pool texture, must generate mipmaps automatically
-    if (pool_ == D3DPOOL_DEFAULT && requestedLevels_ != 1)
-        usage_ |= D3DUSAGE_AUTOGENMIPMAP;
-    else
-        usage_ &= ~D3DUSAGE_AUTOGENMIPMAP;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     if (!device || FAILED(device->CreateCubeTexture(

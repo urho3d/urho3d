@@ -83,8 +83,14 @@ void Texture2D::OnDeviceReset()
 {
     if (pool_ == D3DPOOL_DEFAULT || followWindowSize_)
     {
-        Create();
-        dataLost_ = true;
+        // If has a file name, reload through the resource cache. Otherwise recreate and mark the data lost
+        if (!GetName().Trimmed().Empty() && !followWindowSize_)
+            GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+        {
+            Create();
+            dataLost_ = true;
+        }
     }
 }
 
@@ -202,7 +208,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
     
-    if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, flags)))
+    if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
     {
         LOGERROR("Could not lock texture");
         return false;
@@ -317,15 +323,13 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         }
         
         SetSize(levelWidth, levelHeight, format);
-        // Make sure manual mip creation is never attempted for D3DPOOL_DEFAULT resources
-        unsigned manualLevels = (pool_ == D3DPOOL_DEFAULT) ? 1 : levels_;
         
-        for (unsigned i = 0; i < manualLevels; ++i)
+        for (unsigned i = 0; i < levels_; ++i)
         {
             SetData(i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
-
-            if (i < manualLevels - 1)
+            
+            if (i < levels_ - 1)
             {
                 image = image->GetNextLevel();
                 levelData = image->GetData();
@@ -467,12 +471,6 @@ bool Texture2D::Create()
     
     if (!width_ || !height_)
         return false;
-    
-    // If using a default pool texture, must generate mipmaps automatically
-    if (pool_ == D3DPOOL_DEFAULT && requestedLevels_ != 1)
-        usage_ |= D3DUSAGE_AUTOGENMIPMAP;
-    else
-        usage_ &= ~D3DUSAGE_AUTOGENMIPMAP;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth stencil texture, and it is not supported, create a depth stencil surface instead
