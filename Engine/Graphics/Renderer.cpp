@@ -1145,9 +1145,6 @@ void Renderer::LoadShaders()
     stencilVS_ = GetVertexShader("Stencil");
     stencilPS_ = GetPixelShader("Stencil");
     
-    // Remove shaders that are no longer referenced from the cache
-    cache_->ReleaseResources(Shader::GetTypeStatic());
-    
     shadersDirty_ = false;
 }
 
