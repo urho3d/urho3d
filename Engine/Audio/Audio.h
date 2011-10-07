@@ -23,12 +23,12 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "AudioDefs.h"
 #include "Mutex.h"
 #include "Object.h"
 #include "Quaternion.h"
 #include "Thread.h"
-#include "ArrayPtr.h"
 
 class AudioImpl;
 class Sound;

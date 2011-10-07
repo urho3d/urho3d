@@ -21,9 +21,9 @@
 // THE SOFTWARE.
 //
 
+#include "ArrayPtr.h"
 #include "MathDefs.h"
 #include "ProcessUtils.h"
-#include "ArrayPtr.h"
 #include "StringUtils.h"
 
 #include <stb_image.h>

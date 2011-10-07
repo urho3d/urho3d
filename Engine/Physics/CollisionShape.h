@@ -24,10 +24,10 @@
 #pragma once
 
 #include "BoundingBox.h"
+#include "ArrayPtr.h"
 #include "Component.h"
 #include "Quaternion.h"
 #include "PhysicsDefs.h"
-#include "ArrayPtr.h"
 
 class DebugRenderer;
 class Geometry;

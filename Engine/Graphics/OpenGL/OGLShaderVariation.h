@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
 #include "RefCounted.h"
-#include "ArrayPtr.h"
 
 class Shader;
 class ShaderProgram;

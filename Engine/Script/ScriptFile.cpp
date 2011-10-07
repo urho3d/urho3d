@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "ArrayPtr.h"
 #include "Context.h"
 #include "FileSystem.h"
 #include "Log.h"
@@ -30,7 +31,6 @@
 #include "Script.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
-#include "ArrayPtr.h"
 
 #include <angelscript.h>
 #include <cstring>

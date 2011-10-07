@@ -37,9 +37,9 @@ OBJECTTYPESTATIC(IndexBuffer);
 IndexBuffer::IndexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),
+    discardLockData_(0),
     indexCount_(0),
     indexSize_(0),
-    discardLockSize_(0),
     dynamic_(false),
     locked_(false),
     mapped_(false)
@@ -197,14 +197,9 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         // In discard mode, use a CPU side buffer to avoid stalling
         if (mode == LOCK_DISCARD)
         {
-            if (discardLockSize_ < count * indexSize_)
-            {
-                discardLockData_ = new unsigned char[count * indexSize_];
-                discardLockSize_ = count * indexSize_;
-            }
+            hwData = discardLockData_ = graphics_->ReserveDiscardLockBuffer(count * indexSize_);
             discardLockStart_ = start;
             discardLockCount_ = count;
-            hwData = discardLockData_.Get();
         }
         else
         {
@@ -237,15 +232,20 @@ void IndexBuffer::Unlock()
                 glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
                 mapped_ = false;
             }
-            else if (discardLockCount_ < indexCount_)
-            {
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, discardLockStart_ * indexSize_, discardLockCount_ * indexSize_,
-                    discardLockData_.Get());
-            }
             else
             {
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, discardLockCount_ * indexSize_, discardLockData_.Get(), dynamic_ ?
-                    GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                if (discardLockCount_ < indexCount_)
+                {
+                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, discardLockStart_ * indexSize_, discardLockCount_ * indexSize_,
+                        discardLockData_);
+                }
+                else
+                {
+                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, discardLockCount_ * indexSize_, discardLockData_, dynamic_ ?
+                        GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                }
+                graphics_->FreeDiscardLockBuffer(discardLockData_);
+                discardLockData_ = 0;
             }
         }
         locked_ = false;

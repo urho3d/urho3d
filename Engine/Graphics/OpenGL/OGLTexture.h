@@ -23,12 +23,12 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Color.h"
 #include "GPUObject.h"
-#include "Image.h"
 #include "GraphicsDefs.h"
+#include "Image.h"
 #include "Resource.h"
-#include "ArrayPtr.h"
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 

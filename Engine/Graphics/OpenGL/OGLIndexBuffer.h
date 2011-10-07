@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "GPUObject.h"
 #include "Object.h"
 #include "GraphicsDefs.h"
-#include "ArrayPtr.h"
 
 /// Hardware index buffer.
 class IndexBuffer : public Object, public GPUObject
@@ -79,13 +79,11 @@ private:
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
     /// Memory area for discard locking.
-    SharedArrayPtr<unsigned char> discardLockData_;
+    void* discardLockData_;
     /// Number of indices.
     unsigned indexCount_;
     /// Index size.
     unsigned indexSize_;
-    /// Discard lock data size.
-    unsigned discardLockSize_;
     /// Discard lock range start.
     unsigned discardLockStart_;
     /// Discard lock vertex count.

@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Resource.h"
 #include "ArrayPtr.h"
+#include "Resource.h"
 
 /// %Sound resource.
 class Sound : public Resource

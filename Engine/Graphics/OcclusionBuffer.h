@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Frustum.h"
 #include "Object.h"
 #include "GraphicsDefs.h"
-#include "ArrayPtr.h"
 
 class BoundingBox;
 class Camera;

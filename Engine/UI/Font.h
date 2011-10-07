@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Resource.h"
 #include "ArrayPtr.h"
+#include "Resource.h"
 
 class Graphics;
 class Texture;

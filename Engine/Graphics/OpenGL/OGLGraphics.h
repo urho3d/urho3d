@@ -23,12 +23,13 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Color.h"
+#include "GraphicsDefs.h"
 #include "HashMap.h"
 #include "Matrix3x4.h"
 #include "Object.h"
 #include "Rect.h"
-#include "GraphicsDefs.h"
 
 class Image;
 class IndexBuffer;
@@ -50,6 +51,23 @@ class VertexBuffer;
 typedef Map<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 static const unsigned NUM_SCREEN_BUFFERS = 2;
+
+/// CPU-side buffer for VBO discard locking.
+struct DiscardLockBuffer
+{
+    DiscardLockBuffer() :
+        size_(0),
+        reserved_(false)
+    {
+    }
+    
+    /// Buffer data.
+    SharedArrayPtr<unsigned char> data_;
+    /// Data size.
+    unsigned size_;
+    /// Reserved flag.
+    bool reserved_;
+};
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
@@ -304,7 +322,11 @@ public:
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
     void RemoveGPUObject(GPUObject* object);
-
+    /// Reserve a CPU side discard locking buffer.
+    void* ReserveDiscardLockBuffer(unsigned size);
+    /// Free a CPU side discard locking buffer.
+    void FreeDiscardLockBuffer(void* buffer);
+    
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
     /// Return the API-specific luminance texture format.
@@ -354,6 +376,8 @@ private:
     unsigned numBatches_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
+    /// Discard lock buffers.
+    Vector<DiscardLockBuffer> discardLockBuffers_;
     /// Shadow map depth texture format.
     unsigned shadowMapFormat_;
     /// Shadow map 24-bit depth texture format.

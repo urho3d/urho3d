@@ -46,6 +46,7 @@
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
+#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -1709,6 +1710,53 @@ void Graphics::RemoveGPUObject(GPUObject* object)
     Vector<GPUObject*>::Iterator i = gpuObjects_.Find(object);
     if (i != gpuObjects_.End())
         gpuObjects_.Erase(i);
+}
+
+void* Graphics::ReserveDiscardLockBuffer(unsigned size)
+{
+    // First check for a free buffer that is large enough
+    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    {
+        if (!i->reserved_ && i->size_ >= size)
+        {
+            i->reserved_ = true;
+            return i->data_.Get();
+        }
+    }
+    
+    // Then check if a free buffer can be resized
+    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    {
+        if (!i->reserved_)
+        {
+            i->data_ = new unsigned char[size];
+            i->size_ = size;
+            i->reserved_ = true;
+            return i->data_.Get();
+        }
+    }
+    
+    // Finally allocate a new buffer
+    DiscardLockBuffer newBuffer;
+    newBuffer.data_ = new unsigned char[size];
+    newBuffer.size_ = size;
+    newBuffer.reserved_ = true;
+    discardLockBuffers_.Push(newBuffer);
+    return newBuffer.data_.Get();
+}
+
+void Graphics::FreeDiscardLockBuffer(void* buffer)
+{
+    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    {
+        if (i->reserved_ && i->data_.Get() == buffer)
+        {
+            i->reserved_ = false;
+            return;
+        }
+    }
+    
+    LOGWARNING("Reserved discard lock buffer " + ToStringHex((unsigned)buffer) + " not found");
 }
 
 unsigned Graphics::GetAlphaFormat()

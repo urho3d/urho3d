@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "GraphicsDefs.h"
 #include "Object.h"
-#include "ArrayPtr.h"
 
 class IndexBuffer;
 class Ray;

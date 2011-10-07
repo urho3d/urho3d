@@ -24,8 +24,8 @@
 #pragma once
 
 #include "Color.h"
-#include "Rect.h"
 #include "GraphicsDefs.h"
+#include "Rect.h"
 
 class PixelShader;
 class Graphics;

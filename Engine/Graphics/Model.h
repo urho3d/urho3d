@@ -23,11 +23,11 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "BoundingBox.h"
 #include "Skeleton.h"
 #include "Resource.h"
 #include "Ptr.h"
-#include "ArrayPtr.h"
 
 class Geometry;
 class IndexBuffer;

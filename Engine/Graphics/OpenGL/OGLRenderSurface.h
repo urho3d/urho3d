@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Rect.h"
 #include "GraphicsDefs.h"
+#include "Rect.h"
 #include "Ptr.h"
 
 class Camera;

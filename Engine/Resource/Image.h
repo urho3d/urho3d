@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Resource.h"
 #include "ArrayPtr.h"
+#include "Resource.h"
 
 /// Supported compressed image formats.
 enum CompressedFormat
