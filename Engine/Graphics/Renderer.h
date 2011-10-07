@@ -145,7 +145,7 @@ public:
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
     void SetOcclusionBufferSize(int size);
-    /// %Set required size (1.0 = full screen) for occluders.
+    /// %Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
     /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }

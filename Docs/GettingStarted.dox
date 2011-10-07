@@ -154,7 +154,7 @@ The third-party libraries are used for the following functionality:
 - kNet: UDP networking
 - Open Asset Import Library: reading various 3D file formats
 - Open Dynamics %Engine: physics simulation implementation
-- PortAudio: audio playback
+- PortAudio: audio playback on Linux and Mac OS X
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
 - stb_vorbis: Ogg Vorbis decoding

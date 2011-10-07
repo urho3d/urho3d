@@ -383,6 +383,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
         if (graphics->NeedTextureUnit(TU_NORMAL))
             graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
+        if (graphics->NeedTextureUnit(TU_SPECULAR))
+            graphics->SetTexture(TU_NORMAL, textures[TU_SPECULAR]);
         if (graphics->NeedTextureUnit(TU_DETAIL))
             graphics->SetTexture(TU_DETAIL, textures[TU_DETAIL]);
         if (graphics->NeedTextureUnit(TU_ENVIRONMENT))

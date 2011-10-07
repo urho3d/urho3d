@@ -44,10 +44,6 @@ void main()
         diffColor *= vColor;
     #endif
 
-    #ifdef NORMALMAP
-        vec4 normalInput = texture2D(sNormalMap, vTexCoord);
-    #endif
-
     #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         vec3 lightColor;
@@ -55,7 +51,7 @@ void main()
         float diff;
 
         #ifdef NORMALMAP
-            vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
+            vec3 normal = DecodeNormal(texture2D(sNormalMap, vTexCoord));
         #else
             vec3 normal = normalize(vNormal);
         #endif
@@ -100,7 +96,7 @@ void main()
 
         #ifdef SPECULAR
             #ifdef SPECMAP
-                float specStrength = cMatSpecProperties.x * normalInput.a;
+                float specStrength = cMatSpecProperties.x * texture2D(sSpecMap, vTexCoord).g;
             #else
                 float specStrength = cMatSpecProperties.x;
             #endif

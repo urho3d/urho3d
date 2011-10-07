@@ -113,8 +113,8 @@ private:
     SharedArrayPtr<unsigned char> morphRangeResetData_;
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
-    /// Double buffer object for avoiding GPU stall.
-    unsigned doubleBufferObject_;
+    /// Memory area for discard locking.
+    SharedArrayPtr<unsigned char> discardLockData_;
     /// Number of vertices.
     unsigned vertexCount_;
     /// Vertex size.
@@ -127,8 +127,16 @@ private:
     unsigned morphRangeStart_;
     /// Number of vertices in the morph range.
     unsigned morphRangeCount_;
+    /// Discard lock data size.
+    unsigned discardLockSize_;
+    /// Discard lock range start.
+    unsigned discardLockStart_;
+    /// Discard lock vertex count.
+    unsigned discardLockCount_;
     /// Dynamic flag.
     bool dynamic_;
     /// Locked flag.
     bool locked_;
+    /// Mapped flag.
+    bool mapped_;
 };

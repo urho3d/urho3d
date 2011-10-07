@@ -191,10 +191,6 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    #ifdef NORMALMAP
-        float4 normalInput = tex2D(sNormalMap, iTexCoord);
-    #endif
-
     #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         float3 lightColor;
@@ -202,7 +198,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float diff;
 
         #ifdef NORMALMAP
-            float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
+            float3 normal = DecodeNormal(tex2D(sNormalMap, iTexCoord));
         #else
             float3 normal = normalize(iNormal);
         #endif
@@ -247,7 +243,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
         #ifdef SPECULAR
             #ifdef SPECMAP
-                float specStrength = cMatSpecProperties.x * normalInput.a;
+                float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord).g;
             #else
                 float specStrength = cMatSpecProperties.x;
             #endif

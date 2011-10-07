@@ -37,7 +37,7 @@
     <shader name="Forward" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" require="LIGHT" />
-        <option name="SpecMap" define="SPECMAP" require="NORMALMAP" />
+        <option name="SpecMap" define="SPECMAP" require="LIGHT" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Volume" define="VOLUMETRIC">
             <exclude name="Additive" />

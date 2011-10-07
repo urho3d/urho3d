@@ -2,10 +2,11 @@
 sampler2D sDiffMap : register(S0);
 samplerCUBE sDiffCubeMap : register(S0);
 sampler2D sNormalMap : register(S1);
-sampler2D sEmissiveMap : register(S2);
-sampler2D sDetailMap : register(S3);
-sampler2D sEnvMap : register(S4);
-samplerCUBE sEnvCubeMap : register(S4);
+sampler2D sSpecMap : register(S2);
+sampler2D sEmissiveMap : register(S3);
+sampler2D sDetailMap : register(S4);
+sampler2D sEnvMap : register(S5);
+samplerCUBE sEnvCubeMap : register(S5);
 
 // Shadow and light shape samplers
 sampler2D sShadowMap : register(S6);
@@ -35,4 +36,12 @@ float DecodeDepth(float2 depth)
 {
     const float2 dotValues = float2(1.0, 1.0 / 255.0);
     return dot(depth, dotValues);
+}
+
+float3 DecodeNormal(float4 normalInput)
+{
+    float3 normal;
+    normal.xy = normalInput.ag * 2.0 - 1.0;
+    normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
+    return normal;
 }

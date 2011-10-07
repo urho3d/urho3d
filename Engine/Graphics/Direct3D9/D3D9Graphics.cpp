@@ -2164,6 +2164,7 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["DiffMap"] = TU_DIFFUSE;
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
     textureUnits_["NormalMap"] = TU_NORMAL;
+    textureUnits_["SpecMap"] = TU_SPECULAR;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
     textureUnits_["DetailMap"] = TU_DETAIL;
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;

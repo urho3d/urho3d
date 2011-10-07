@@ -384,7 +384,6 @@ The scene, camera and screen rectangle to use are set with Renderer's \ref Rende
 The steps for rendering each viewport on each frame are roughly the following:
 
 - Query the octree for visible objects and lights in the camera's view frustum.
-- Optimize the visible objects using software rasterized occlusion (can be switched off if this sounds scary and time-wasting, but practically it allows for a huge performance increase in more complex & occluded scenes.)
 - Check the influence of each visible light on the objects. If the light casts shadows, query the octree for shadowcaster geometries.
 - Construct render operations (batches) for the visible objects.
 - Perform these render operations during the rendering step at the end of the frame.
@@ -394,7 +393,7 @@ For opaque, non-skinned geometry, batches using the same material and same verte
 The rendering operations are divided into passes in the following order:
 
 - Opaque geometry ambient pass.
-- Lighting opaque geometry. For shadow casting lights, the shadow map is rendered first.
+- Opaque geometry lighting passes. For shadow casting lights, the shadow map is rendered first.
 - Post-opaque or "extra" rendering pass for materials that define that.
 - Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
 
@@ -413,6 +412,18 @@ The rendering-related components defined by the %Graphics library are:
 - ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
 - Light: illuminates the scene. Can optionally cast shadows.
 - Zone: defines global properties like fogging and background color. The active zone is the one the Camera is currently in.
+
+\section Rendering_Optimizations Optimizations
+
+The following techniques will be used to reduce the amount of GPU and driver work. By default they are all on:
+
+- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Occlusion will also be used to optimize away directional light shadow casters that are behind another shadow caster. Use \ref Renderer::SetMaxOccluderTriangles() "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold() "SetOccluderSizeThreshold()" to configure the occlusion rendering.
+
+- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold.
+
+- %Light stencil masking: before rendering objects lit by a spot or point light, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
+
+Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
 
 \section Rendering_Further Further details
 
@@ -455,7 +466,7 @@ A material definition looks like this:
 \code
 <material>
     <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
-    <texture unit="diffuse|normal|detail|environment|emissive" name="TextureName" />
+    <texture unit="diffuse|normal|specular|detail|environment|emissive" name="TextureName" />
     <texture ... />
     <parameter name="name" value="x y z w" />
     <parameter ... />
@@ -464,13 +475,9 @@ A material definition looks like this:
 </material>
 \endcode
 
-Note the lack of a dedicated specular map texture: specular intensity is instead read from the alpha channel of the normal map.
+%Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality() "SetMaterialQuality()". If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
 
-The shadowcull element is optional and specifies the culling mode to use in the shadow pass. If omitted, the culling mode when drawing shadows is the same as the normal culling mode.
-
-%Material quality levels are specified from 0 (low) to 2 (high). The quality level that will be chosen is the highest available according to the Renderer's material quality setting (see \ref Renderer::SetMaterialQuality() SetMaterialQuality()). If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
-
-When a material defines several techniques for LOD levels and quality settings, they must appear in a specific order:
+When a material defines several techniques for different LOD levels and quality settings, they must appear in a specific order:
 
 - Most distant & highest quality
 - ...
@@ -478,11 +485,25 @@ When a material defines several techniques for LOD levels and quality settings, 
 - Second most distant & highest quality
 - ...
 
+%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported.
+
+Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. If omitted, shadow rendering will use the same culling mode as other passes.
+
+\section Materials_Textures Material textures
+
+Diffuse maps specify the surface color in the RGB channels. Optionally they can use the alpha channel for blending and alpha testing. They should preferably be compressed to DXT1 (no alpha or 1-bit alpha) or DXT5 (smooth alpha) format.
+
+Normal maps encode the tangent-space surface normal for normal mapping. They need to be stored as xGxR, ie. Y-component in the green channel, and X-component in the alpha (Z will be reconstructed in the pixel shader.) This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/tools/compressonator/pages/default.aspx
+
+Specular maps use only the G channel to specify specular intensity. DXT1 format should suit these well.
+
+\section Materials_Techniques Techniques and passes
+
 A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|extra|shadow" vs="VertexShaderName" ps="PixelShaderName" 
+    <pass name="base|litbase|light|extra|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
     <pass ... />
@@ -492,13 +513,13 @@ A technique definition looks like this:
 
 The passes are:
 
-- base: forward rendering base pass. Renders the ambient light.
-- litbase: forward rendering lit base pass. Renders both the ambient light and the first light affecting the object for optimization.
-- light: forward rendering light pass. Renders one light's contribution additively.
-- extra: custom rendering pass. Rendered after the opaque geometry.
+- base: renders the ambient light and fog.
+- litbase: renders both the ambient light and the first light affecting the object for optimization.
+- light: renders one light's contribution additively.
+- extra: custom rendering pass. Rendered after the opaque geometry. Can be used for example to render the skybox.
 - shadow: shadow map rendering pass. Renders depth only.
 
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, specular and no specular, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist.
+Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, specular and no specular, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist. See the file Forward.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders for all the shader variations.
 
 
 \page Lights Lights and shadows
@@ -1049,8 +1070,7 @@ Like with ordinary events, in script event types are strings instead of name has
 
 \section Tools_AssetImporter AssetImporter
 
-Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at
-http://assimp.sourceforge.net/main_features_formats.html.
+Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
 
 Usage:
 
@@ -1273,12 +1293,12 @@ byte[4]    Identifier "USHD"
 short      Shader type (0 = vertex, 1 = pixel)
 short      Shader model (2 or 3)
 
-uint       Number of all constant parameters
+uint       Number of constant parameters
 
     For each constant parameter:
     cstring    Parameter name
 
-uint       Number of all texture units
+uint       Number of texture units
 
     For each texture unit:
     cstring    Texture unit name

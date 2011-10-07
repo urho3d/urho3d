@@ -125,9 +125,10 @@ VertexBuffer::VertexBuffer(Context* context) :
     elementMask_(0),
     morphRangeStart_(0),
     morphRangeCount_(0),
-    doubleBufferObject_(0),
+    discardLockSize_(0),
     dynamic_(false),
-    locked_(false)
+    locked_(false),
+    mapped_(false)
 {
     UpdateOffsets();
 }
@@ -182,12 +183,6 @@ void VertexBuffer::Release()
         
         glDeleteBuffers(1, &object_);
         object_ = 0;
-    }
-    
-    if (doubleBufferObject_)
-    {
-        glDeleteBuffers(1, &doubleBufferObject_);
-        doubleBufferObject_ = 0;
     }
     
     fallbackData_.Reset();
@@ -312,24 +307,27 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         else if (mode == LOCK_NORMAL)
             glLockMode = GL_READ_WRITE;
         
-        // In discard mode, create a double buffer VBO and swap to it to avoid stall
+        // In discard mode, use a CPU side buffer to avoid stalling
         if (mode == LOCK_DISCARD)
         {
-            if (!doubleBufferObject_)
+            if (discardLockSize_ < count * vertexSize_)
             {
-                glGenBuffers(1, &doubleBufferObject_);
-                glBindBuffer(GL_ARRAY_BUFFER, doubleBufferObject_);
-                glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+                discardLockData_ = new unsigned char[count * vertexSize_];
+                discardLockSize_ = count * vertexSize_;
             }
-            
-            Swap(object_, doubleBufferObject_);
+            discardLockStart_ = start;
+            discardLockCount_ = count;
+            hwData = discardLockData_.Get();
         }
-        
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
-        if (!hwData)
-            return 0;
-        hwData = (unsigned char*)hwData + start * vertexSize_;
+        else
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
+            if (!hwData)
+                return 0;
+            hwData = (unsigned char*)hwData + start * vertexSize_;
+            mapped_ = true;
+        }
     }
     else
         hwData = fallbackData_.Get() + start * vertexSize_;
@@ -345,7 +343,21 @@ void VertexBuffer::Unlock()
         if (object_)
         {
             glBindBuffer(GL_ARRAY_BUFFER, object_);
-            glUnmapBuffer(GL_ARRAY_BUFFER);
+            if (mapped_)
+            {
+                glUnmapBuffer(GL_ARRAY_BUFFER);
+                mapped_ = false;
+            }
+            else if (discardLockCount_ < vertexCount_)
+            {
+                glBufferSubData(GL_ARRAY_BUFFER, discardLockStart_ * vertexSize_, discardLockCount_ * vertexSize_,
+                    discardLockData_.Get());
+            }
+            else
+            {
+                glBufferData(GL_ARRAY_BUFFER, discardLockCount_ * vertexSize_, discardLockData_.Get(), dynamic_ ?
+                    GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            }
         }
         locked_ = false;
     }
@@ -418,13 +430,6 @@ bool VertexBuffer::Create()
         
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        
-        // If double buffer object has already been created, ensure its size matches
-        if (doubleBufferObject_)
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, doubleBufferObject_);
-            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        }
     }
     else
         fallbackData_ = new unsigned char[vertexCount_ * vertexSize_];

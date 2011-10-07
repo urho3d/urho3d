@@ -243,7 +243,8 @@ void UI::Render()
     
     // Update quad geometry into the vertex buffer
     unsigned numVertices = quads_.Size() * 6;
-    if (vertexBuffer_->GetVertexCount() < numVertices)
+    // Resize the vertex buffer if too small or much too large
+    if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
     
     unsigned vertexSize = vertexBuffer_->GetVertexSize();

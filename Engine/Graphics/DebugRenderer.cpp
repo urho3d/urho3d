@@ -260,7 +260,8 @@ void DebugRenderer::Render()
     PROFILE(RenderDebugGeometry);
     
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
-    if (vertexBuffer_->GetVertexCount() < numVertices)
+    // Resize the vertex buffer if too small or much too large
+    if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
     void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
     if (!lockedData)

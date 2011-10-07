@@ -78,14 +78,22 @@ private:
     SharedArrayPtr<unsigned char> fallbackData_;
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
-    /// Double buffer object for avoiding GPU stall.
-    unsigned doubleBufferObject_;
+    /// Memory area for discard locking.
+    SharedArrayPtr<unsigned char> discardLockData_;
     /// Number of indices.
     unsigned indexCount_;
     /// Index size.
     unsigned indexSize_;
+    /// Discard lock data size.
+    unsigned discardLockSize_;
+    /// Discard lock range start.
+    unsigned discardLockStart_;
+    /// Discard lock vertex count.
+    unsigned discardLockCount_;
     /// Dynamic flag.
     bool dynamic_;
     /// Buffer locked flag.
     bool locked_;
+    /// Buffer mapped flag.
+    bool mapped_;
 };

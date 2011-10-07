@@ -42,6 +42,7 @@ static const String textureUnitNames[] =
 {
     "diffuse",
     "normal",
+    "specular",
     "emissive",
     "detail",
     "environment",
@@ -150,6 +151,8 @@ bool Material::Load(Deserializer& source)
                 unit = TU_DIFFUSE;
             if (unitName == "norm")
                 unit = TU_NORMAL;
+            if (unitName == "spec")
+                unit = TU_SPECULAR;
             if (unitName == "env")
                 unit = TU_ENVIRONMENT;
             if (unit == MAX_MATERIAL_TEXTURE_UNITS)
