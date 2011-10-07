@@ -127,8 +127,7 @@ VertexBuffer::VertexBuffer(Context* context) :
     morphRangeStart_(0),
     morphRangeCount_(0),
     dynamic_(false),
-    locked_(false),
-    mapped_(false)
+    locked_(false)
 {
     UpdateOffsets();
 }
@@ -250,12 +249,12 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, vertexCount_ * vertexSize_, data);
+        glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
         return true;
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.Get() + start * vertexSize_, data, vertexCount_ * vertexSize_);
+        memcpy(fallbackData_.Get() + start * vertexSize_, data, count * vertexSize_);
         return true;
     }
     
@@ -321,7 +320,6 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
             if (!hwData)
                 return 0;
             hwData = (unsigned char*)hwData + start * vertexSize_;
-            mapped_ = true;
         }
     }
     else
@@ -335,31 +333,25 @@ void VertexBuffer::Unlock()
 {
     if (locked_)
     {
+        locked_ = false;
+        
         if (object_)
         {
-            glBindBuffer(GL_ARRAY_BUFFER, object_);
-            if (mapped_)
+            if (!discardLockData_)
             {
+                glBindBuffer(GL_ARRAY_BUFFER, object_);
                 glUnmapBuffer(GL_ARRAY_BUFFER);
-                mapped_ = false;
             }
             else
             {
                 if (discardLockCount_ < vertexCount_)
-                {
-                    glBufferSubData(GL_ARRAY_BUFFER, discardLockStart_ * vertexSize_, discardLockCount_ * vertexSize_,
-                        discardLockData_);
-                }
+                    SetDataRange(discardLockData_, discardLockStart_, discardLockCount_);
                 else
-                {
-                    glBufferData(GL_ARRAY_BUFFER, discardLockCount_ * vertexSize_, discardLockData_, dynamic_ ?
-                        GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-                }
+                    SetData(discardLockData_);
                 graphics_->FreeDiscardLockBuffer(discardLockData_);
                 discardLockData_ = 0;
             }
         }
-        locked_ = false;
     }
 }
 

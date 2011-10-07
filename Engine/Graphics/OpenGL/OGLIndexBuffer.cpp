@@ -41,8 +41,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     indexCount_(0),
     indexSize_(0),
     dynamic_(false),
-    locked_(false),
-    mapped_(false)
+    locked_(false)
 {
 }
 
@@ -155,12 +154,12 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
     {
         graphics_->SetIndexBuffer(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, indexCount_ * indexSize_, data);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
         return true;
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.Get() + start * indexSize_, data, indexCount_ * indexSize_);
+        memcpy(fallbackData_.Get() + start * indexSize_, data, count * indexSize_);
         return true;
     }
     
@@ -209,7 +208,6 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
             if (!hwData)
                 return 0;
             hwData = (unsigned char*)hwData + start * indexSize_;
-            mapped_ = true;
         }
     }
     else
@@ -223,32 +221,26 @@ void IndexBuffer::Unlock()
 {
     if (locked_)
     {
+        locked_ = false;
+        
         if (object_)
         {
-            graphics_->SetIndexBuffer(0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-            if (mapped_)
+            if (!discardLockData_)
             {
+                graphics_->SetIndexBuffer(0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
                 glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-                mapped_ = false;
             }
             else
             {
                 if (discardLockCount_ < indexCount_)
-                {
-                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, discardLockStart_ * indexSize_, discardLockCount_ * indexSize_,
-                        discardLockData_);
-                }
+                    SetDataRange(discardLockData_, discardLockStart_, discardLockCount_);
                 else
-                {
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, discardLockCount_ * indexSize_, discardLockData_, dynamic_ ?
-                        GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-                }
+                    SetData(discardLockData_);
                 graphics_->FreeDiscardLockBuffer(discardLockData_);
                 discardLockData_ = 0;
             }
         }
-        locked_ = false;
     }
 }
 

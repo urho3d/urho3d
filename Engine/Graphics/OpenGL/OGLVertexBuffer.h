@@ -135,6 +135,4 @@ private:
     bool dynamic_;
     /// Locked flag.
     bool locked_;
-    /// Mapped flag.
-    bool mapped_;
 };

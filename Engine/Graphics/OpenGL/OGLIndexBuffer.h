@@ -92,6 +92,4 @@ private:
     bool dynamic_;
     /// Buffer locked flag.
     bool locked_;
-    /// Buffer mapped flag.
-    bool mapped_;
 };
