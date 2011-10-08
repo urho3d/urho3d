@@ -64,6 +64,7 @@ ListView::ListView(Context* context) :
     UIElement* container = new UIElement(context_);
     container->SetActive(true);
     container->SetLayout(LM_VERTICAL);
+    container->SetSortingEnabled(false);
     SetContentElement(container);
     
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
@@ -633,7 +634,9 @@ UIElement* ListView::GetItem(unsigned index) const
 
 PODVector<UIElement*> ListView::GetItems() const
 {
-    return contentElement_->GetChildren();
+    PODVector<UIElement*> items;
+    contentElement_->GetChildren(items);
+    return items;
 }
 
 unsigned ListView::GetSelection() const

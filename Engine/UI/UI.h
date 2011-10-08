@@ -142,6 +142,8 @@ private:
     PODVector<UIQuad> quads_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// UI element query vector.
+    PODVector<UIElement*> tempElements_;
     /// Clipboard text.
     String clipBoard_;
     /// Mouse buttons held down.

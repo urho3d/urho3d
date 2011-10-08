@@ -324,8 +324,10 @@ public:
     UIElement* GetChild(unsigned index) const;
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
-    /// Return all child elements.
-    PODVector<UIElement*> GetChildren(bool recursive = false) const;
+    /// Return immediate child elements.
+    const Vector<SharedPtr<UIElement> >& GetChildren() const { return children_; }
+    /// Return child elements either recursively or non-recursively.
+    void GetChildren(PODVector<UIElement*>& dest, bool recursive = false) const;
     /// Return parent element.
     UIElement* GetParent() const { return parent_; }
     /// Return root element.
@@ -345,9 +347,15 @@ public:
     bool IsInsideCombined(IntVector2 position, bool isScreen);
     /// Return combined screen coordinate rect of element and its children.
     IntRect GetCombinedScreenRect();
+    /// Sort child elements if sort order dirty. Called by UI.
+    void SortChildren();
     
     /// %Set child offset.
     void SetChildOffset(const IntVector2& offset);
+    /// %Set whether child elements should be sorted according to priority.
+    void SetSortingEnabled(bool enable);
+    /// Return whether child elements are sorted according to priority.
+    bool GetSortingEnabled() const { return sortingEnabled_; }
     /// %Set hovering state.
     void SetHovering(bool enable);
     /// Adjust scissor for rendering.
@@ -442,6 +450,10 @@ private:
     bool opacityDirty_;
     /// Derived color dirty flag (only used when no gradient.)
     bool derivedColorDirty_;
+    /// Child priority sorting dirty flag.
+    bool sortOrderDirty_;
+    /// Child priority sorting enabled flag.
+    bool sortingEnabled_;
     /// Has color gradient flag.
     bool colorGradient_;
 };

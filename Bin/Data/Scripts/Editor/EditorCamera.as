@@ -11,6 +11,12 @@ enum ObjectMoveMode
     OBJ_SCALE
 }
 
+enum AxisMode
+{
+    AXIS_WORLD = 0,
+    AXIS_LOCAL
+}
+
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
@@ -24,6 +30,7 @@ bool moveSnap = false;
 bool rotateSnap = false;
 bool scaleSnap = false;
 ObjectMoveMode moveMode = OBJ_MOVE;
+AxisMode axisMode = AXIS_WORLD;
 
 Text@ renderStatsText;
 Text@ cameraPosText;
@@ -33,6 +40,11 @@ Array<String> moveModeText = {
     "Move    ",
     "Rotate  ",
     "Scale   "
+};
+
+Array<String> axisModeText = {
+    "World   ",
+    "Local   "
 };
 
 void CreateCamera()
@@ -389,7 +401,7 @@ void UpdateStats(float timeStep)
     yText.Resize(8);
     zText.Resize(8);
 
-    cameraPosText.text = moveModeText[moveMode] + "Updates: " + (runUpdate ? "Running " : "Paused  ") + " Camera pos: " + xText
+    cameraPosText.text = moveModeText[moveMode] + axisModeText[axisMode] + "Updates: " + (runUpdate ? "Running " : "Paused  ") + " Camera pos: " + xText
         + " " + yText + " " + zText + " ";
 
     renderStatsText.size = renderStatsText.minSize;
@@ -469,6 +481,8 @@ void MoveCamera(float timeStep)
             case OBJ_MOVE:
                 if (!moveSnap)
                 {
+                    if (axisMode == AXIS_LOCAL)
+                        adjust = selectedNode.rotation * adjust;
                     selectedNode.position = selectedNode.position + adjust * moveStep;
                     changed = true;
                 }
@@ -542,6 +556,9 @@ void SteppedObjectManipulation(int key)
     {
     case OBJ_MOVE:
         {
+            if (axisMode == AXIS_LOCAL)
+                adjust = selectedNode.rotation * adjust;
+
             Vector3 pos = selectedNode.position;
             if (adjust.x != 0)
             {

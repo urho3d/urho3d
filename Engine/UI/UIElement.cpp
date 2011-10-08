@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "ResourceCache.h"
+#include "Sort.h"
 #include "StringUtils.h"
 #include "UI.h"
 #include "UIElement.h"
@@ -65,6 +66,11 @@ static const String dragDropModes[] =
     ""
 };
 
+static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
+{
+    return lhs->GetPriority() < rhs->GetPriority();
+}
+
 OBJECTTYPESTATIC(UIElement);
 
 UIElement::UIElement(Context* context) :
@@ -97,6 +103,8 @@ UIElement::UIElement(Context* context) :
     positionDirty_(true),
     opacityDirty_(true),
     derivedColorDirty_(true),
+    sortOrderDirty_(false),
+    sortingEnabled_(true),
     colorGradient_(false)
 {
 }
@@ -488,6 +496,8 @@ void UIElement::SetColor(Corner corner, const Color& color)
 void UIElement::SetPriority(int priority)
 {
     priority_ = priority;
+    if (parent_)
+        parent_->sortOrderDirty_ = true;
 }
 
 void UIElement::SetOpacity(float opacity)
@@ -747,8 +757,8 @@ void UIElement::BringToFront()
     // and decrease others' priority by one. However, take into account only active (enabled) elements
     // and those which have the BringToBack flag set
     int maxPriority = M_MIN_INT;
-    PODVector<UIElement*> topLevelElements = root->GetChildren();
-    for (PODVector<UIElement*>::Iterator i = topLevelElements.Begin(); i != topLevelElements.End(); ++i)
+    const Vector<SharedPtr<UIElement> >& rootChildren = root->GetChildren();
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
     {
         UIElement* other = *i;
         if (other->IsActive() && other->bringToBack_ && other != ptr)
@@ -789,6 +799,9 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     
     if (element->parent_)
         element->parent_->RemoveChild(element);
+    
+    if (sortingEnabled_)
+        sortOrderDirty_ = true;
     
     element->parent_ = this;
     element->MarkDirty();
@@ -914,23 +927,17 @@ bool UIElement::HasFocus() const
         return ui->GetFocusElement() == this;
 }
 
-PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
+void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
 {
+    dest.Clear();
+    
     if (!recursive)
     {
-        PODVector<UIElement*> ret;
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
-            ret.Push(*i);
-        
-        return ret;
+            dest.Push(*i);
     }
     else
-    {
-        PODVector<UIElement*> allChildren;
-        GetChildrenRecursive(allChildren);
-        
-        return allChildren;
-    }
+        GetChildrenRecursive(dest);
 }
 
 unsigned UIElement::GetNumChildren(bool recursive) const
@@ -1046,6 +1053,15 @@ IntRect UIElement::GetCombinedScreenRect()
     return combined;
 }
 
+void UIElement::SortChildren()
+{
+    if (sortingEnabled_ && sortOrderDirty_)
+    {
+        Sort(children_.Begin(), children_.End(), CompareUIElements);
+        sortOrderDirty_ = false;
+    }
+}
+
 void UIElement::SetChildOffset(const IntVector2& offset)
 {
     if (offset != childOffset_)
@@ -1054,6 +1070,11 @@ void UIElement::SetChildOffset(const IntVector2& offset)
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->MarkDirty();
     }
+}
+
+void UIElement::SetSortingEnabled(bool enable)
+{
+    sortingEnabled_ = enable;
 }
 
 void UIElement::SetHovering(bool enable)
@@ -1113,8 +1134,10 @@ void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
 {
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        dest.Push(*i);
-        (*i)->GetChildrenRecursive(dest);
+        UIElement* element = *i;
+        dest.Push(element);
+        if (!element->children_.Empty())
+            element->GetChildrenRecursive(dest);
     }
 }
 

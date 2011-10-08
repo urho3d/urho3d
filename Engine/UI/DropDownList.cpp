@@ -192,7 +192,9 @@ UIElement* DropDownList::GetItem(unsigned index) const
 
 PODVector<UIElement*> DropDownList::GetItems() const
 {
-    return listView_->GetContentElement()->GetChildren();
+    PODVector<UIElement*> items;
+    listView_->GetContentElement()->GetChildren(items);
+    return items;
 }
 
 unsigned DropDownList::GetSelection() const

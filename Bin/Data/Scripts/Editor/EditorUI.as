@@ -17,13 +17,14 @@ void CreateUI()
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     CreateCursor();
-    CreateMenuBar();                                                                              
+    CreateMenuBar();
     CreateSceneWindow();
     CreateNodeWindow();
     CreateEditorSettingsDialog();
     CreateStatsBar();
     CreateConsole();
-    
+    CreateDebugHud();
+
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
     SubscribeToEvent("KeyDown", "HandleKeyDown");
@@ -167,6 +168,13 @@ void CreateConsole()
     Console@ console = engine.CreateConsole();
     console.style = uiStyle;
     console.numRows = 16;
+}
+
+void CreateDebugHud()
+{
+    engine.CreateDebugHud();
+    debugHud.style = uiStyle;
+    debugHud.mode = DEBUGHUD_SHOW_NONE;
 }
 
 void CenterDialog(UIElement@ element)
@@ -411,6 +419,8 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             moveMode = OBJ_ROTATE;
         else if (key == '3')
             moveMode = OBJ_SCALE;
+        else if (key == '4')
+            axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
         else
             SteppedObjectManipulation(key);
     }

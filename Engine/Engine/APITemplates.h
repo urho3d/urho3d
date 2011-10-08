@@ -462,7 +462,7 @@ static CScriptArray* NodeGetChildrenWithScript(bool recursive, Node* ptr)
 static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
-    PODVector<Node*> ret;
+    PODVector<Node*> result;
     
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
@@ -475,12 +475,12 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
             {
                 ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
                 if (instance->GetClassName() == className)
-                    ret.Push(node);
+                    result.Push(node);
             }
         }
     }
     
-    return VectorToHandleArray<Node>(ret, "Array<Node@>");
+    return VectorToHandleArray<Node>(result, "Array<Node@>");
 }
 
 /// Template function for registering a class derived from Node.
@@ -671,6 +671,13 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHOD(T, IsDataLost), asCALL_THISCALL);
 }
 
+static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
+{
+    PODVector<UIElement*> elements;
+    ptr->GetChildren(elements, recursive);
+    return VectorToHandleArray<UIElement>(elements, "Array<UIElement@>");
+}
+
 static unsigned UIElementGetNumChildrenNonRecursive(UIElement* ptr)
 {
     return ptr->GetNumChildren(false);
@@ -710,6 +717,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "IntVector2 ScreenToElement(const IntVector2&in)", asMETHOD(T, ScreenToElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 ElementToScreen(const IntVector2&in)", asMETHOD(T, ElementToScreen), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool IsInside(IntVector2, bool)", asMETHOD(T, IsInside), asCALL_THISCALL);

@@ -53,11 +53,6 @@
 
 #include "DebugNew.h"
 
-static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
-{
-    return lhs->GetPriority() < rhs->GetPriority();
-}
-
 OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :
@@ -402,7 +397,7 @@ UIElement* UI::GetFrontElement() const
     if (!rootElement_)
         return 0;
     
-    PODVector<UIElement*> rootChildren = rootElement_->GetChildren(false);
+    const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;
     
@@ -474,8 +469,8 @@ void UI::Update(float timeStep, UIElement* element)
 {
     element->Update(timeStep);
     
-    const PODVector<UIElement*> children = element->GetChildren();
-    for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
         Update(timeStep, *i);
 }
 
@@ -486,18 +481,17 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
         return;
     
-    PODVector<UIElement*> children = element->GetChildren();
+    element->SortChildren();
+    const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
     if (children.Empty())
         return;
     
-    Sort(children.Begin(), children.End(), CompareUIElements);
-    
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
-    PODVector<UIElement*>::ConstIterator i = children.Begin();
+    Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin();
     if (element != rootElement_)
     {
-        PODVector<UIElement*>::ConstIterator j = i;
+        Vector<SharedPtr<UIElement> >::ConstIterator j = i;
         int currentPriority = children.Front()->GetPriority();
         while (i != children.End())
         {
@@ -554,13 +548,14 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     if (!current)
         return;
     
-    // Get children from lowest priority to highest
-    PODVector<UIElement*> children = current->GetChildren(false);
-    Sort(children.Begin(), children.End(), CompareUIElements);
+    current->SortChildren();
+    const Vector<SharedPtr<UIElement> >& children = current->GetChildren();
     
-    for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
         UIElement* element = *i;
+        bool hasChildren = element->GetNumChildren() > 0;
+        
         if (element != cursor_.Get() && element->IsVisible())
         {
             if (element->IsInside(position, true))
@@ -569,10 +564,15 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 // are sorted from lowest to highest priority, the topmost match should remain
                 if (element->IsActive() || !activeOnly)
                     result = element;
+                
+                if (hasChildren)
+                    GetElementAt(result, element, position, activeOnly);
             }
-            
-            if (element->IsInsideCombined(position, true))
-                GetElementAt(result, element, position, activeOnly);
+            else
+            {
+                if (hasChildren && element->IsInsideCombined(position, true))
+                    GetElementAt(result, element, position, activeOnly);
+            }
         }
     }
 }
@@ -812,19 +812,19 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 topLevel = topLevel->GetParent();
             if (topLevel)
             {
-                PODVector<UIElement*> children = topLevel->GetChildren(true);
-                for (PODVector<UIElement*>::Iterator i = children.Begin(); i != children.End();)
+                topLevel->GetChildren(tempElements_, true);
+                for (PODVector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
                 {
                     if ((*i)->GetFocusMode() < FM_FOCUSABLE)
-                        i = children.Erase(i);
+                        i = tempElements_.Erase(i);
                     else
                         ++i;
                 }
-                for (unsigned i = 0; i < children.Size(); ++i)
+                for (unsigned i = 0; i < tempElements_.Size(); ++i)
                 {
-                    if (children[i] == element)
+                    if (tempElements_[i] == element)
                     {
-                        UIElement* next = children[(i + 1) % children.Size()];
+                        UIElement* next = tempElements_[(i + 1) % tempElements_.Size()];
                         SetFocusElement(next);
                         return;
                     }
