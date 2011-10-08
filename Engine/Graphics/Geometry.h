@@ -88,6 +88,10 @@ public:
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
+    /// Return the raw vertex data array.
+    const SharedArrayPtr<unsigned char>& GetRawVertexData() const { return rawVertexData_; }
+    /// Return the raw index data array.
+    const SharedArrayPtr<unsigned char>& GetRawIndexData() const { return rawIndexData_; }
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
     float GetDistance(const Ray& ray);
     

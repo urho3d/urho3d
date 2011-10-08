@@ -812,7 +812,7 @@ void AnimatedModel::CloneGeometries()
         {
             SharedPtr<VertexBuffer> clone(new VertexBuffer(context_));
             clone->SetSize(original->GetVertexCount(), original->GetElementMask(), true);
-            void* originalData = original->Lock(0, original->GetVertexCount(), LOCK_NORMAL);
+            void* originalData = original->Lock(0, original->GetVertexCount(), LOCK_READONLY);
             if (originalData)
             {
                 clone->SetData(originalData);
@@ -837,8 +837,8 @@ void AnimatedModel::CloneGeometries()
             const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
             
             SharedPtr<Geometry> clone(new Geometry(context_));
-            clone->SetNumVertexBuffers(originalVertexBuffers.Size());
-            for (unsigned k = 0; k < originalVertexBuffers.Size(); ++k)
+            clone->SetNumVertexBuffers(originalBuffers.Size());
+            for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
                 if (clonedVertexBuffers.Contains(originalBuffer))
@@ -850,6 +850,7 @@ void AnimatedModel::CloneGeometries()
             clone->SetIndexBuffer(original->GetIndexBuffer());
             clone->SetDrawRange(original->GetPrimitiveType(), original->GetIndexStart(), original->GetIndexCount());
             clone->SetLodDistance(original->GetLodDistance());
+            clone->SetRawData(original->GetRawVertexData(), original->GetRawIndexData());
             
             geometries_[i][j] = clone;
         }

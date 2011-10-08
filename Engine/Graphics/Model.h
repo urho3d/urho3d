@@ -119,10 +119,6 @@ public:
     const ModelMorph* GetMorph(const String& name) const;
     /// Return vertex morph by name hash.
     const ModelMorph* GetMorph(StringHash nameHash) const;
-    /// Return CPU copy of vertices.
-    const PODVector<Vector3>& GetVertices() const { return vertices_; }
-    /// Return CPU copy of indices.
-    const PODVector<unsigned>& GetIndices() const { return indices_; }
     
 private:
     /// Bounding box.
@@ -139,8 +135,4 @@ private:
     Vector<PODVector<unsigned> > geometryBoneMappings_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
-    /// CPU copy of vertex positions.
-    PODVector<Vector3> vertices_;
-    /// CPU copy of indices.
-    PODVector<unsigned> indices_;
 };
