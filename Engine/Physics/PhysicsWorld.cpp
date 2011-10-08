@@ -133,29 +133,15 @@ PhysicsWorld::~PhysicsWorld()
 {
     if (scene_)
     {
-        // Force all remaining joints, rigidbodies and collisionshapes to release themselves
-        PODVector<Node*> nodes;
-        PODVector<Joint*> joints;
-        PODVector<CollisionShape*> collisionShapes;
-        
-        scene_->GetChildrenWithComponent(nodes, Joint::GetTypeStatic(), true);
-        for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
-        {
-            (*i)->GetComponents<Joint>(joints);
-            for (PODVector<Joint*>::Iterator j = joints.Begin(); j != joints.End(); ++j)
-                (*j)->Clear();
-        }
+        // Force all remaining joints, rigid bodies and collision shapes to release themselves
+        for (PODVector<Joint*>::Iterator i = joints_.Begin(); i != joints_.End(); ++i)
+            (*i)->Clear();
         
         for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
             (*i)->ReleaseBody();
         
-        scene_->GetChildrenWithComponent(nodes, CollisionShape::GetTypeStatic(), true);
-        for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
-        {
-            (*i)->GetComponents<CollisionShape>(collisionShapes);
-            for (PODVector<CollisionShape*>::Iterator j = collisionShapes.Begin(); j != collisionShapes.End(); ++j)
-                (*j)->Clear();
-        }
+        for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
+            (*i)->Clear();
     }
     
     // Remove any cached geometries that still remain
@@ -447,6 +433,18 @@ void PhysicsWorld::RemoveCollisionShape(CollisionShape* shape)
     PODVector<CollisionShape*>::Iterator i = collisionShapes_.Find(shape);
     if (i != collisionShapes_.End())
         collisionShapes_.Erase(i);
+}
+
+void PhysicsWorld::AddJoint(Joint* joint)
+{
+    joints_.Push(joint);
+}
+
+void PhysicsWorld::RemoveJoint(Joint* joint)
+{
+    PODVector<Joint*>::Iterator i = joints_.Find(joint);
+    if (i != joints_.End())
+        joints_.Erase(i);
 }
 
 void PhysicsWorld::SendCollisionEvents()

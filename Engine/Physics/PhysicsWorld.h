@@ -31,6 +31,7 @@
 class CollisionShape;
 class DebugRenderer;
 class Deserializer;
+class Joint;
 class Node;
 class Ray;
 class RigidBody;
@@ -178,6 +179,10 @@ public:
     void AddCollisionShape(CollisionShape* shape);
     /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
+    /// Add a joint to keep track of. Called by Joint.
+    void AddJoint(Joint* joint);
+    /// Remove a joint. Called by Joint.
+    void RemoveJoint(Joint* joint);
     /// Send accumulated collision events.
     void SendCollisionEvents();
     /// Add debug geometry to the debug graphics.
@@ -224,10 +229,12 @@ private:
     float timeAcc_;
     /// Simulation random seed.
     unsigned randomSeed_;
-    /// Rigid bodies.
+    /// Rigid bodies in the world.
     PODVector<RigidBody*> rigidBodies_;
-    /// Collision shapes.
+    /// Collision shapes in the world.
     PODVector<CollisionShape*> collisionShapes_;
+    /// Joints in the world.
+    PODVector<Joint*> joints_;
     /// Collision contacts (PODVector<dContact>.)
     void* contacts_;
     /// Collision pairs on this frame.

@@ -56,6 +56,9 @@ Joint::Joint(Context* context) :
 Joint::~Joint()
 {
     Clear();
+    
+    if (physicsWorld_)
+        physicsWorld_->RemoveJoint(this);
 }
 
 void Joint::RegisterObject(Context* context)
@@ -287,6 +290,10 @@ void Joint::OnNodeSet(Node* node)
     {
         Scene* scene = node->GetScene();
         if (scene)
+        {
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();
+            if (physicsWorld_)
+                physicsWorld_->AddJoint(this);
+        }
     }
 }
