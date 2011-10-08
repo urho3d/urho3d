@@ -320,6 +320,9 @@ CollisionShape::CollisionShape(Context* context) :
 CollisionShape::~CollisionShape()
 {
     Clear();
+    
+    if (physicsWorld_)
+        physicsWorld_->RemoveCollisionShape(this);
 }
 
 void CollisionShape::RegisterObject(Context* context)
@@ -813,7 +816,11 @@ void CollisionShape::OnNodeSet(Node* node)
     {
         Scene* scene = node->GetScene();
         if (scene)
+        {
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();
+            if (physicsWorld_)
+                physicsWorld_->AddCollisionShape(this);
+        }
         node->AddListener(this);
     }
 }

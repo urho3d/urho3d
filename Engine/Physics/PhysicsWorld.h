@@ -174,6 +174,10 @@ public:
     void AddRigidBody(RigidBody* body);
     /// Remove a rigid body. Called by RigidBody.
     void RemoveRigidBody(RigidBody* body);
+    /// Add a collision shape to keep track of. Called by CollisionShape.
+    void AddCollisionShape(CollisionShape* shape);
+    /// Remove a collision shape. Called by CollisionShape.
+    void RemoveCollisionShape(CollisionShape* shape);
     /// Send accumulated collision events.
     void SendCollisionEvents();
     /// Add debug geometry to the debug graphics.
@@ -222,6 +226,8 @@ private:
     unsigned randomSeed_;
     /// Rigid bodies.
     PODVector<RigidBody*> rigidBodies_;
+    /// Collision shapes.
+    PODVector<CollisionShape*> collisionShapes_;
     /// Collision contacts (PODVector<dContact>.)
     void* contacts_;
     /// Collision pairs on this frame.

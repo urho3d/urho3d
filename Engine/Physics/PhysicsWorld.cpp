@@ -437,6 +437,18 @@ void PhysicsWorld::RemoveRigidBody(RigidBody* body)
         rigidBodies_.Erase(i);
 }
 
+void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
+{
+    collisionShapes_.Push(shape);
+}
+
+void PhysicsWorld::RemoveCollisionShape(CollisionShape* shape)
+{
+    PODVector<CollisionShape*>::Iterator i = collisionShapes_.Find(shape);
+    if (i != collisionShapes_.End())
+        collisionShapes_.Erase(i);
+}
+
 void PhysicsWorld::SendCollisionEvents()
 {
     PROFILE(SendCollisionEvents);
@@ -515,17 +527,8 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
     if (!debug)
         return;
     
-    // Get all geometries, also those that have no rigid bodies
-    PODVector<Node*> nodes;
-    PODVector<CollisionShape*> shapes;
-    node_->GetChildrenWithComponent<CollisionShape>(nodes, true);
-    
-    for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
-    {
-        (*i)->GetComponents<CollisionShape>(shapes);
-        for (Vector<CollisionShape*>::Iterator j = shapes.Begin(); j != shapes.End(); ++j)
-            (*j)->DrawDebugGeometry(debug, depthTest);
-    }
+    for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
+        (*i)->DrawDebugGeometry(debug, depthTest);
 }
 
 void PhysicsWorld::CleanupGeometryCache()
