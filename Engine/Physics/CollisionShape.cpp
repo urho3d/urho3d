@@ -735,24 +735,10 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     case dTriMeshClass:
         {
             TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.Get());
-            if (!data)
-                return;
-            
-            const Vector3* vertices = data->vertexData_;
-            const unsigned* indices = data->indexData_;
-            const unsigned* indicesEnd = indices + data->indexCount_;
-            
-            while (indices < indicesEnd)
+            if (data)
             {
-                Vector3 v0 = transform * vertices[indices[0]];
-                Vector3 v1 = transform * vertices[indices[1]];
-                Vector3 v2 = transform * vertices[indices[2]];
-                
-                debug->AddLine(v0, v1, uintColor, depthTest);
-                debug->AddLine(v1, v2, uintColor, depthTest);
-                debug->AddLine(v2, v0, uintColor, depthTest);
-                
-                indices += 3;
+                debug->AddTriangleMesh(data->vertexData_.Get(), sizeof(Vector3), data->indexData_.Get(), sizeof(unsigned), 0,
+                    data->indexCount_, transform, *color, depthTest);
             }
         }
         break;
@@ -769,6 +755,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             float xSpacing = xWidth / (xPoints - 1);
             float zSpacing = zWidth / (zPoints - 1);
             float* heights = (float*)heightData->m_pHeightData;
+            
             for (unsigned z = 0; z < zPoints - 1; ++z)
             {
                 for (unsigned x = 0; x < xPoints - 1; ++x)
@@ -783,7 +770,6 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             for (unsigned z = 0; z < zPoints - 1; ++z)
             {
                 unsigned x = xPoints - 1;
-                
                 Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                 Vector3 b = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
                 debug->AddLine(a, b, uintColor, depthTest);
@@ -791,7 +777,6 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             for (unsigned x = 0; x < xPoints - 1; ++x)
             {
                 unsigned z = zPoints - 1;
-                
                 Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                 Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
                 debug->AddLine(a, b, uintColor, depthTest);

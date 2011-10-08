@@ -153,10 +153,12 @@ void OcclusionBuffer::Clear()
     depthHierarchyDirty_ = true;
 }
 
-bool OcclusionBuffer::Draw(const Matrix3x4& model, const unsigned char* vertexData, unsigned vertexSize,
-    const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount)
+bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData,
+    unsigned indexSize, unsigned indexStart, unsigned indexCount)
 {
     PROFILE(DrawOcclusion);
+    
+    const unsigned char* vertexDataChar = (const unsigned char*)vertexData;
     
     Matrix4 modelViewProj = viewProj_ * model;
     depthHierarchyDirty_ = true;
@@ -175,9 +177,9 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const unsigned char* vertexDa
             if (numTriangles_ >= max_Triangles)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);
@@ -197,9 +199,9 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const unsigned char* vertexDa
             if (numTriangles_ >= max_Triangles)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexData[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexData[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexData[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);

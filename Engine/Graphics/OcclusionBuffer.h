@@ -75,7 +75,7 @@ public:
     /// Clear the buffer.
     void Clear();
     /// Draw a triangle mesh to the buffer.
-    bool Draw(const Matrix3x4& model, const unsigned char* vertexData, unsigned vertexSize, const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
+    bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
     /// Build reduced size mip levels.
     void BuildDepthHierarchy();
     

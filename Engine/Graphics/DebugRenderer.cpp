@@ -245,6 +245,76 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     }
 }
 
+void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
+    unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
+{
+    unsigned uintColor = color.ToUInt();
+    
+    PODVector<DebugLine>* dest = &lines_;
+    if (!depthTest)
+        dest = &noDepthLines_;
+    
+    const unsigned char* vertexDataChar = (const unsigned char*)vertexData;
+    unsigned oldSize = dest->Size();
+    dest->Resize(oldSize + indexCount);
+    DebugLine* destLines = &dest->At(oldSize);
+    
+    // 16-bit indices
+    if (indexSize == sizeof(unsigned short))
+    {
+        const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
+        const unsigned short* indicesEnd = indices + indexCount;
+        
+        while (indices < indicesEnd)
+        {
+            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            
+            destLines[0].start_ = transform * v0;
+            destLines[0].end_ = transform * v1;
+            destLines[0].color_ = uintColor;
+            
+            destLines[1].start_ = destLines[0].end_;
+            destLines[1].end_ = transform * v2;
+            destLines[1].color_ = uintColor;
+            
+            destLines[2].start_ = destLines[1].end_;
+            destLines[2].end_ = destLines[0].start_;
+            destLines[2].color_ = uintColor;
+            
+            indices += 3;
+            destLines += 3;
+        }
+    }
+    else
+    {
+        const unsigned* indices = ((const unsigned*)indexData) + indexStart;
+        const unsigned* indicesEnd = indices + indexCount;
+        
+        while (indices < indicesEnd)
+        {
+            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            
+            destLines[0].start_ = transform * v0;
+            destLines[0].end_ = transform * v1;
+            destLines[0].color_ = uintColor;
+            
+            destLines[1].start_ = destLines[0].end_;
+            destLines[1].end_ = transform * v2;
+            destLines[1].color_ = uintColor;
+            
+            destLines[2].start_ = destLines[1].end_;
+            destLines[2].end_ = destLines[0].start_;
+            destLines[2].color_ = uintColor;
+            
+            indices += 3;
+            destLines += 3;
+        }
+    }
+}
 
 void DebugRenderer::Render()
 {
