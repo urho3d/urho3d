@@ -10,7 +10,6 @@ XMLFile copyBuffer;
 bool copyBufferLocal = false;
 bool copyBufferExpanded = false;
 bool pickComponents = false;
-bool pickUsingPhysics = false;
 
 void CreateSceneWindow()
 {

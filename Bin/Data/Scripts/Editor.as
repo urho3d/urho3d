@@ -89,7 +89,7 @@ void LoadConfig()
         scaleSnap = objectElem.GetBool("scalesnap");
         useLocalIDs = objectElem.GetBool("uselocalids");
         pickComponents = objectElem.GetBool("pickcomponents");
-        pickUsingPhysics = objectElem.GetBool("pickusingphysics");
+        pickMode = objectElem.GetInt("pickmode");
     }
 
     if (!renderingElem.isNull)
@@ -131,7 +131,7 @@ void SaveConfig()
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
     objectElem.SetBool("pickcomponents", pickComponents);
-    objectElem.SetBool("pickusingphysics", pickUsingPhysics);
+    objectElem.SetInt("pickmode", pickMode);
 
     renderingElem.SetInt("texturequality", renderer.textureQuality);
     renderingElem.SetInt("materialquality", renderer.materialQuality);

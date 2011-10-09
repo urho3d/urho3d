@@ -3,6 +3,12 @@
 #include "Scripts/Editor/EditorSceneWindow.as"
 #include "Scripts/Editor/EditorNodeWindow.as"
 
+const int PICK_GEOMETRIES = 0;
+const int PICK_LIGHTS = 1;
+const int PICK_ZONES = 2;
+const int PICK_COLLISIONSHAPES = 3;
+const int MAX_PICK_MODES = 4;
+
 Scene@ editorScene;
 
 String sceneFileName;
@@ -12,10 +18,16 @@ bool runUpdate = false;
 bool renderingDebug = false;
 bool physicsDebug = false;
 bool octreeDebug = false;
-bool subscribedToSceneSettingsEdits = false;
+int pickMode = PICK_GEOMETRIES;
 
 Component@ selectedComponent;
 Node@ selectedNode;
+
+Array<int> pickModeDrawableFlags = {
+    DRAWABLE_GEOMETRY,
+    DRAWABLE_LIGHT,
+    DRAWABLE_ZONE
+};
 
 void CreateScene()
 {
@@ -298,26 +310,37 @@ void SceneRaycast(bool mouseClick)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
 
-        if (!pickUsingPhysics)
+        if (pickMode != PICK_COLLISIONSHAPES)
         {
             if (editorScene.octree is null)
                 return;
-            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY);
+
+            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
+                pickModeDrawableFlags[pickMode]);
             if (!result.empty)
             {
-                Drawable@ drawable = result[0].drawable;
-                if (debug !is null)
+                for (uint i = 0; i < result.length; ++i)
                 {
-                    debug.AddNode(drawable.node, false);
-                    drawable.DrawDebugGeometry(debug, false);
+                    Drawable@ drawable = result[i].drawable;
+                    // Skip directional lights, which always block other selections
+                    Light@ light = cast<Light>(drawable);
+                    if (light !is null && light.lightType == LIGHT_DIRECTIONAL)
+                        continue;
+                    if (debug !is null)
+                    {
+                        debug.AddNode(drawable.node, false);
+                        drawable.DrawDebugGeometry(debug, false);
+                    }
+                    selected = drawable;
+                    break;
                 }
-                selected = drawable;
             }
         }
         else
         {
             if (editorScene.physicsWorld is null)
                 return;
+
             Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
             if (!result.empty)
             {

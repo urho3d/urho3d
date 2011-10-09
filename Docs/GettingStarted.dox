@@ -509,6 +509,9 @@ Right mouse     - Hold down and move mouse to rotate camera
 WSAD or arrows  - Move
 Shift+WSAD      - Move faster
 Ctrl+1,2,3      - Select manipulation mode: move/rotate/scale
+Ctrl+4          - Toggle between world and local axes manipulation
+Ctrl+5,6        - Cycle through components to pick: geometries, lights, zones,
+                  collision shapes
 Ctrl+arrows     - Manipulate node in X & Z directions
 Ctrl+pgup/pgdn  - Manipulate node in Y direction
 Ctrl+plus/minus - Scale node uniformly (scale mode only)

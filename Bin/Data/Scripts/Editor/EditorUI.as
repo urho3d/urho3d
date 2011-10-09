@@ -421,6 +421,18 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             moveMode = OBJ_SCALE;
         else if (key == '4')
             axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+        else if (key == '5')
+        {
+            --pickMode;
+            if (pickMode < PICK_GEOMETRIES)
+                pickMode = MAX_PICK_MODES - 1;
+        }
+        else if (key == '6')
+        {
+            ++pickMode;
+            if (pickMode >= MAX_PICK_MODES)
+                pickMode = PICK_GEOMETRIES;
+        }
         else
             SteppedObjectManipulation(key);
     }

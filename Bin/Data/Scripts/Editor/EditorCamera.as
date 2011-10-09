@@ -17,6 +17,13 @@ enum AxisMode
     AXIS_LOCAL
 }
 
+Text@ editorModeText;
+Text@ renderStatsText;
+Text@ cameraPosText;
+
+ObjectMoveMode moveMode = OBJ_MOVE;
+AxisMode axisMode = AXIS_WORLD;
+
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
@@ -29,22 +36,24 @@ float scaleStep = 0.1;
 bool moveSnap = false;
 bool rotateSnap = false;
 bool scaleSnap = false;
-ObjectMoveMode moveMode = OBJ_MOVE;
-AxisMode axisMode = AXIS_WORLD;
-
-Text@ renderStatsText;
-Text@ cameraPosText;
-bool subscribedToCameraEdits = false;
+bool subscribedToEditorSettings = false;
 
 Array<String> moveModeText = {
-    "Move    ",
-    "Rotate  ",
-    "Scale   "
+    "Move",
+    "Rotate",
+    "Scale"
 };
 
 Array<String> axisModeText = {
-    "World   ",
-    "Local   "
+    "World",
+    "Local"
+};
+
+Array<String> pickModeText = {
+    "Geometries",
+    "Lights",
+    "Zones",
+    "Col.shapes"
 };
 
 void CreateCamera()
@@ -118,8 +127,8 @@ void UpdateEditorSettingsDialog()
     CheckBox@ pickComponentsToggle = settingsDialog.GetChild("PickComponentsToggle", true);
     pickComponentsToggle.checked = pickComponents;
 
-    CheckBox@ pickUsingPhysicsToggle = settingsDialog.GetChild("PickUsingPhysicsToggle", true);
-    pickUsingPhysicsToggle.checked = pickUsingPhysics;
+    DropDownList@ pickModeEdit = settingsDialog.GetChild("PickModeEdit", true);
+    pickModeEdit.selection = pickMode;
 
     DropDownList@ textureQualityEdit = settingsDialog.GetChild("TextureQualityEdit", true);
     textureQualityEdit.selection = renderer.textureQuality;
@@ -148,7 +157,7 @@ void UpdateEditorSettingsDialog()
     CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
 
-    if (!subscribedToCameraEdits)
+    if (!subscribedToEditorSettings)
     {
         SubscribeToEvent(nearClipEdit, "TextChanged", "EditCameraNearClip");
         SubscribeToEvent(nearClipEdit, "TextFinished", "EditCameraNearClip");
@@ -171,7 +180,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
         SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
         SubscribeToEvent(pickComponentsToggle, "Toggled", "EditPickComponents");
-        SubscribeToEvent(pickUsingPhysicsToggle, "Toggled", "EditPickUsingPhysics");
+        SubscribeToEvent(pickModeEdit, "ItemSelected", "EditPickMode");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
         SubscribeToEvent(shadowResolutionEdit, "ItemSelected", "EditShadowResolution");
@@ -183,7 +192,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(lightStencilMaskingToggle, "Toggled", "EditLightStencilMasking");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
-        subscribedToCameraEdits = true;
+        subscribedToEditorSettings = true;
     }
 }
 
@@ -293,10 +302,10 @@ void EditPickComponents(StringHash eventType, VariantMap& eventData)
     pickComponents = edit.checked;
 }
 
-void EditPickUsingPhysics(StringHash eventType, VariantMap& eventData)
+void EditPickMode(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    pickUsingPhysics = edit.checked;
+    DropDownList@ edit = eventData["Element"].GetUIElement();
+    pickMode = edit.selection;
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)
@@ -359,25 +368,29 @@ void CreateStatsBar()
 {
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
 
+    editorModeText = Text();
     renderStatsText = Text();
     cameraPosText = Text();
 
     if (ui.root.width >= 1024)
     {
-        SetupStatsBarText(renderStatsText, font, 0, 20, HA_LEFT);
-        SetupStatsBarText(cameraPosText, font, 0, 20, HA_RIGHT);
+        SetupStatsBarText(editorModeText, font, 0, 20, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 20, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(renderStatsText, font, 0, 20, HA_LEFT);
-        SetupStatsBarText(cameraPosText, font, 0, 32, HA_LEFT);
+        SetupStatsBarText(editorModeText, font, 0, 20, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 32, HA_LEFT, VA_TOP);
     }
+
+    SetupStatsBarText(cameraPosText, font, 0, 0, HA_LEFT, VA_BOTTOM);
 }
 
-void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment align)
+void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
 {
     text.position = IntVector2(x, y);
-    text.horizontalAlignment = align;
+    text.horizontalAlignment = hAlign;
+    text.verticalAlignment = vAlign;
     text.SetFont(font, 11);
     text.color = Color(1, 1, 0);
     text.priority = -100;
@@ -386,12 +399,18 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 
 void UpdateStats(float timeStep)
 {
+    editorModeText.text = String(
+        "Mode: " + moveModeText[moveMode] +
+        "  Axis: " + axisModeText[axisMode] +
+        "  Pick: " + pickModeText[pickMode] +
+        "  Updates: " + (runUpdate ? "Running" : "Paused"));
+
     renderStatsText.text = String(
         "Tris: " + renderer.numPrimitives +
-        " Batches: " + renderer.numBatches +
-        " Lights: " + renderer.numLights[true] +
-        " Shadowmaps: " + renderer.numShadowMaps[true] +
-        " Occluders: " + renderer.numOccluders[true] + " / " + renderer.numShadowOccluders[true]);
+        "  Batches: " + renderer.numBatches +
+        "  Lights: " + renderer.numLights[true] +
+        "  Shadowmaps: " + renderer.numShadowMaps[true] +
+        "  Occluders: " + renderer.numOccluders[true] + " / " + renderer.numShadowOccluders[true]);
 
     Vector3 cameraPos = cameraNode.position;
     String xText(cameraPos.x);
@@ -401,9 +420,10 @@ void UpdateStats(float timeStep)
     yText.Resize(8);
     zText.Resize(8);
 
-    cameraPosText.text = moveModeText[moveMode] + axisModeText[axisMode] + "Updates: " + (runUpdate ? "Running " : "Paused  ") + " Camera pos: " + xText
-        + " " + yText + " " + zText + " ";
+    cameraPosText.text = String(
+        "Pos: " + xText + " " + yText + " " + zText);
 
+    editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;
     cameraPosText.size = cameraPosText.minSize;
 }

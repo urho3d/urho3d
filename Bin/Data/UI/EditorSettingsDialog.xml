@@ -120,11 +120,27 @@
     <element>
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="LocalIDToggle">
-            <fixedsize value="16 16" />
-        </element>
         <element type="Text">
-            <text value="Use local entity IDs on import" />
+            <text value="Pick components of type" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="PickGeometries">
+            <text value="Geometries" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="PickLights">
+            <text value="Lights" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="PickZones">
+            <text value="Zones" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="PickCollisionShapes">
+            <text value="Col.shapes" />
+        </element>
+        <element type="DropDownList" name="PickModeEdit">
+            <fixedwidth value="100" />
+            <popupitem name="PickGeometries" />
+            <popupitem name="PickLights" />
+            <popupitem name="PickZones" />
+            <popupitem name="PickCollisionShapes" />
         </element>
     </element>
     <element>
@@ -134,17 +150,17 @@
             <fixedsize value="16 16" />
         </element>
         <element type="Text">
-            <text value="Pick components instead of nodes" />
+            <text value="Select components instead of nodes" />
         </element>
     </element>
     <element>
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="PickUsingPhysicsToggle">
+        <element type="CheckBox" name="LocalIDToggle">
             <fixedsize value="16 16" />
         </element>
         <element type="Text">
-            <text value="Pick using physics raycast" />
+            <text value="Use local entity IDs on import" />
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
