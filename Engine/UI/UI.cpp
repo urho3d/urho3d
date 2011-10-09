@@ -550,6 +550,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     
     current->SortChildren();
     const Vector<SharedPtr<UIElement> >& children = current->GetChildren();
+    LayoutMode parentLayoutMode = current->GetLayoutMode();
     
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
@@ -567,11 +568,49 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 
                 if (hasChildren)
                     GetElementAt(result, element, position, activeOnly);
+                // Layout optimization: if the element has no children, can break out after the first match
+                else if (parentLayoutMode != LM_FREE)
+                    break;
             }
             else
             {
-                if (hasChildren && element->IsInsideCombined(position, true))
-                    GetElementAt(result, element, position, activeOnly);
+                if (hasChildren)
+                {
+                    if (element->IsInsideCombined(position, true))
+                        GetElementAt(result, element, position, activeOnly);
+                }
+                // Layout optimization: if position is much beyond the visible screen, check how many elements we can skip,
+                // or if we already passed all visible elements
+                else if (parentLayoutMode != LM_FREE)
+                {
+                    if (i == children.Begin())
+                    {
+                        int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
+                            element->GetScreenPosition().y_;
+                        int layoutMinSize = current->GetLayoutMinSize();
+                        
+                        if (screenPos < 0 && layoutMinSize > 0)
+                        {
+                            unsigned toSkip = -screenPos / layoutMinSize;
+                            if (toSkip > 0)
+                            {
+                                i += (toSkip - 1);
+                                if (i >= children.End())
+                                    break;
+                            }
+                        }
+                    }
+                    else if (parentLayoutMode == LM_HORIZONTAL)
+                    {
+                        if (element->GetScreenPosition().x_ >= rootElement_->GetSize().x_)
+                            break;
+                    }
+                    else if (parentLayoutMode == LM_VERTICAL)
+                    {
+                        if (element->GetScreenPosition().y_ >= rootElement_->GetSize().y_)
+                            break;
+                    }
+                }
             }
         }
     }

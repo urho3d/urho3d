@@ -93,6 +93,7 @@ UIElement::UIElement(Context* context) :
     layoutBorder_(IntRect::ZERO),
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
+    layoutMinSize_(0),
     position_(IntVector2::ZERO),
     size_(IntVector2::ZERO),
     minSize_(IntVector2::ZERO),
@@ -104,7 +105,7 @@ UIElement::UIElement(Context* context) :
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
-    sortingEnabled_(true),
+    sortChildren_(true),
     colorGradient_(false)
 {
 }
@@ -521,6 +522,14 @@ void UIElement::SetClipChildren(bool enable)
     clipChildren_ = enable;
 }
 
+void UIElement::SetSortChildren(bool enable)
+{
+    if (!sortChildren_ && enable)
+        sortOrderDirty_ = true;
+    
+    sortChildren_ = enable;
+}
+
 void UIElement::SetActive(bool enable)
 {
     active_ = enable;
@@ -800,7 +809,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     if (element->parent_)
         element->parent_->RemoveChild(element);
     
-    if (sortingEnabled_)
+    if (sortChildren_)
         sortOrderDirty_ = true;
     
     element->parent_ = this;
@@ -1036,18 +1045,21 @@ IntRect UIElement::GetCombinedScreenRect()
     IntVector2 screenPosition(GetScreenPosition());
     IntRect combined(screenPosition.x_, screenPosition.y_, screenPosition.x_ + size_.x_, screenPosition.y_ + size_.y_);
     
-    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+    if (!clipChildren_)
     {
-        IntVector2 childPos = (*i)->GetScreenPosition();
-        const IntVector2& childSize = (*i)->GetSize();
-        if (childPos.x_ < combined.left_)
-            combined.left_ = childPos.x_;
-        if (childPos.y_ < combined.top_)
-            combined.top_ = childPos.y_;
-        if (childPos.x_ + childSize.x_ > combined.right_)
-            combined.right_ = childPos.x_ + childSize.x_;
-        if (childPos.y_ + childSize.y_ > combined.bottom_)
-            combined.bottom_ = childPos.y_ + childSize.y_;
+        for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            IntVector2 childPos = (*i)->GetScreenPosition();
+            const IntVector2& childSize = (*i)->GetSize();
+            if (childPos.x_ < combined.left_)
+                combined.left_ = childPos.x_;
+            if (childPos.y_ < combined.top_)
+                combined.top_ = childPos.y_;
+            if (childPos.x_ + childSize.x_ > combined.right_)
+                combined.right_ = childPos.x_ + childSize.x_;
+            if (childPos.y_ + childSize.y_ > combined.bottom_)
+                combined.bottom_ = childPos.y_ + childSize.y_;
+        }
     }
     
     return combined;
@@ -1055,7 +1067,7 @@ IntRect UIElement::GetCombinedScreenRect()
 
 void UIElement::SortChildren()
 {
-    if (sortingEnabled_ && sortOrderDirty_)
+    if (sortChildren_ && sortOrderDirty_)
     {
         Sort(children_.Begin(), children_.End(), CompareUIElements);
         sortOrderDirty_ = false;
@@ -1070,11 +1082,6 @@ void UIElement::SetChildOffset(const IntVector2& offset)
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->MarkDirty();
     }
-}
-
-void UIElement::SetSortingEnabled(bool enable)
-{
-    sortingEnabled_ = enable;
 }
 
 void UIElement::SetHovering(bool enable)
@@ -1235,13 +1242,16 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         }
     }
     
-    // Calculate final positions
+    // Calculate final positions and store the minimum child element size
+    layoutMinSize_ = M_MAX_INT;
     int position = begin;
     for (int i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i];
         position += spacing;
+        if (sizes[i] < layoutMinSize_)
+            layoutMinSize_ = sizes[i];
     }
 }
 

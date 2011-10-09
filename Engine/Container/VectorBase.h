@@ -65,6 +65,10 @@ public:
     bool operator < (const RandomAccessIterator& rhs) const { return ptr_ < rhs.ptr_; }
     /// Test for greater than with another iterator.
     bool operator > (const RandomAccessIterator& rhs) const { return ptr_ > rhs.ptr_; }
+    /// Test for less than or equal with another iterator.
+    bool operator <= (const RandomAccessIterator& rhs) const { return ptr_ <= rhs.ptr_; }
+    /// Test for greater than or equal with another iterator.
+    bool operator >= (const RandomAccessIterator& rhs) const { return ptr_ >= rhs.ptr_; }
     
     /// Pointer.
     T* ptr_;
@@ -118,6 +122,10 @@ public:
     bool operator < (const RandomAccessConstIterator& rhs) const { return ptr_ < rhs.ptr_; }
     /// Test for greater than with another iterator.
     bool operator > (const RandomAccessConstIterator& rhs) const { return ptr_ > rhs.ptr_; }
+    /// Test for less than or equal with another iterator.
+    bool operator <= (const RandomAccessConstIterator& rhs) const { return ptr_ <= rhs.ptr_; }
+    /// Test for greater than or equal with another iterator.
+    bool operator >= (const RandomAccessConstIterator& rhs) const { return ptr_ >= rhs.ptr_; }
     
     /// Pointer.
     T* ptr_;

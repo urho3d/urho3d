@@ -764,6 +764,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_bringToBack() const", asMETHOD(T, GetBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_clipChildren(bool)", asMETHOD(T, SetClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_clipChildren() const", asMETHOD(T, GetClipChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_sortChildren(bool)", asMETHOD(T, SetSortChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_sortChildren() const", asMETHOD(T, GetSortChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_active(bool)", asMETHOD(T, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_active() const", asMETHOD(T, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);

@@ -64,7 +64,7 @@ ListView::ListView(Context* context) :
     UIElement* container = new UIElement(context_);
     container->SetActive(true);
     container->SetLayout(LM_VERTICAL);
-    container->SetSortingEnabled(false);
+    container->SetSortChildren(false);
     SetContentElement(container);
     
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));

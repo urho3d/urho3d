@@ -203,8 +203,10 @@ public:
     void SetBringToFront(bool enable);
     /// %Set whether should be put to background when another element is focused.
     void SetBringToBack(bool enable);
-    /// %Set whether should clip child elements.
+    /// %Set whether should clip child elements. Default false.
     void SetClipChildren(bool enable);
+    /// %Set whether should sort child elements according to priority. Default true.
+    void SetSortChildren(bool enable);
     /// %Set whether reacts to input.
     void SetActive(bool enable);
     /// %Set whether is focused. Only one element can be focused at a time.
@@ -296,6 +298,8 @@ public:
     bool GetBringToBack() const { return bringToBack_; }
     /// Return whether should clip child elements.
     bool GetClipChildren() const { return clipChildren_; }
+    /// Return whether should sort child elements according to priority.
+    bool GetSortChildren() const { return sortChildren_; }
     /// Return whether has focus.
     bool HasFocus() const;
     /// Return whether reacts to input.
@@ -343,19 +347,17 @@ public:
     IntVector2 ElementToScreen(const IntVector2& position);
     /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
-    /// Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children.
+    /// Return whether a point (either in element or screen coordinates) is inside the combined rect of the element and its children.
     bool IsInsideCombined(IntVector2 position, bool isScreen);
     /// Return combined screen coordinate rect of element and its children.
     IntRect GetCombinedScreenRect();
-    /// Sort child elements if sort order dirty. Called by UI.
+    /// Sort child elements if sorting enabled and order dirty. Called by UI.
     void SortChildren();
+    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
+    int GetLayoutMinSize() const { return layoutMinSize_; }
     
     /// %Set child offset.
     void SetChildOffset(const IntVector2& offset);
-    /// %Set whether child elements should be sorted according to priority.
-    void SetSortingEnabled(bool enable);
-    /// Return whether child elements are sorted according to priority.
-    bool GetSortingEnabled() const { return sortingEnabled_; }
     /// %Set hovering state.
     void SetHovering(bool enable);
     /// Adjust scissor for rendering.
@@ -389,6 +391,8 @@ protected:
     bool bringToBack_;
     /// Clip children flag.
     bool clipChildren_;
+    /// Sort childrenaccording to priority flag.
+    bool sortChildren_;
     /// Input enabled flag.
     bool active_;
     /// Selected flag.
@@ -411,6 +415,8 @@ protected:
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.
     unsigned layoutNestingLevel_;
+    /// Layout element minimum size in layout direction.
+    int layoutMinSize_;
     
 private:
     /// Return child elements recursively.
@@ -452,8 +458,6 @@ private:
     bool derivedColorDirty_;
     /// Child priority sorting dirty flag.
     bool sortOrderDirty_;
-    /// Child priority sorting enabled flag.
-    bool sortingEnabled_;
     /// Has color gradient flag.
     bool colorGradient_;
 };
