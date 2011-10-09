@@ -523,7 +523,7 @@ Ctrl+H	        - Open the scene hierarchy window
 Ctrl+N	        - Open the node / component edit window
 Ctrl+P          - Toggle scene update on/off
 Ctrl+R          - Reload scene resources
-ESC             - Close the topmost window
+ESC             - Close the file selector or editor settings window
 DEL             - Delete node or component
 F1              - Toggle console
 F2              - Toggle rendering debug geometry
@@ -547,7 +547,7 @@ The editor settings will be saved on exit to a file Urho3D\Editor\Config.xml in 
 
 New scene nodes and components are created with the buttons at the bottom of the hierarchy window. Their attributes can then be edited in the node / component edit window. Note that the node transform shown is the local transform (offset from parent.)
 
-%Scene nodes can also be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2 or 3 to change the manipulation mode.
+%Scene nodes can also be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2,3 to change the manipulation mode, and Ctrl+4 to toggle between world relative and scene node relative movement.
 
 To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
 

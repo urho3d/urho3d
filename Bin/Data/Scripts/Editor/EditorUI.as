@@ -397,7 +397,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             console.visible = false;
         else if (uiFileSelector !is null && front is uiFileSelector.window)
             CloseFileSelector();
-        else if (front is settingsDialog || front is sceneWindow || front is nodeWindow)
+        else if (front is settingsDialog)
         {
             ui.focusElement = null;
             front.visible = false;
