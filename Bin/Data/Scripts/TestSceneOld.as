@@ -11,7 +11,6 @@ Scene@ testScene;
 Node@ cameraNode;
 Camera@ camera;
 Node@ cameraLightNode;
-Light@ cameraLight;
 float yaw = 0.0;
 float pitch = 0.0;
 float objectangle = 0.0;
@@ -303,7 +302,7 @@ void CreateCamera()
     cameraNode.position = Vector3(-50, 2, -50);
 
     cameraLightNode = cameraNode.CreateChild("CameraLight");
-    cameraLight = cameraLightNode.CreateComponent("Light");
+    Light@ cameraLight = cameraLightNode.CreateComponent("Light");
     cameraLight.lightType = LIGHT_SPOT;
     cameraLight.range = 50;
     cameraLight.color = Color(2, 2, 2);
@@ -437,7 +436,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 testScene.LoadXML(xmlFile);
                 // Reacquire camera, as it is part of the scene
                 cameraNode = testScene.GetChild("Camera", true);
+                camera = cameraNode.GetComponent("Camera");
                 cameraLightNode = cameraNode.GetChild("CameraLight");
+                renderer.viewports[0] = Viewport(testScene, camera);
             }
         }
     }
