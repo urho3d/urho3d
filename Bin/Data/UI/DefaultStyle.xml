@@ -385,10 +385,10 @@
         <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="EditorAttributeText">
-        <font name="Fonts/BlueHighway.ttf" size="11" />
+        <font name="Fonts/BlueHighway.ttf" size="12" />
     </element>
     <element type="EditorEnumAttributeText">
-        <font name="Fonts/BlueHighway.ttf" size="11" />
+        <font name="Fonts/BlueHighway.ttf" size="12" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="EditorAttributeEdit">

@@ -4,6 +4,8 @@ Window@ nodeWindow;
 
 const uint MIN_NODE_ATTRIBUTES = 4;
 const uint MAX_NODE_ATTRIBUTES = 8;
+const int ATTRNAME_WIDTH = 135;
+const int ATTR_HEIGHT = 19;
 
 class ResourcePicker
 {
@@ -118,10 +120,12 @@ void UpdateNodeWindow()
         nodeTitle.text = "No node";
     else
     {
-        String localText;
+        String idStr;
         if (selectedNode.id >= FIRST_LOCAL_ID)
-            localText = ", Local";
-        nodeTitle.text = selectedNode.typeName + " (ID " + String(selectedNode.id) + localText + ")";
+            idStr = "Local ID " + String(selectedNode.id - FIRST_LOCAL_ID);
+        else
+            idStr = "ID " + String(selectedNode.id);
+        nodeTitle.text = selectedNode.typeName + " (" + idStr + ")";
     }
 
     if (selectedComponent is null)
@@ -165,7 +169,7 @@ void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdat
         if (list.name == "NodeAttributeList")
         {
             uint maxAttrs = Clamp(count, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
-            list.SetFixedHeight(maxAttrs * 18 + 2);
+            list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
         }
     }
 
@@ -258,7 +262,7 @@ UIElement@ CreateAttributeEditorParentTitle(ListView@ list, String name)
 {
     UIElement@ editorParent = UIElement();
     editorParent.SetLayout(LM_HORIZONTAL);
-    editorParent.SetFixedHeight(18);
+    editorParent.SetFixedHeight(ATTR_HEIGHT);
     list.AddItem(editorParent);
 
     Text@ attrNameText = Text();
@@ -275,7 +279,7 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, String name, uint index, 
     editorParent.vars["Index"] = index;
     editorParent.vars["SubIndex"] = subIndex;
     editorParent.SetLayout(LM_HORIZONTAL);
-    editorParent.SetFixedHeight(18);
+    editorParent.SetFixedHeight(ATTR_HEIGHT);
     list.AddItem(editorParent);
 
     if (!name.empty)
@@ -283,7 +287,7 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, String name, uint index, 
         Text@ attrNameText = Text();
         attrNameText.SetStyle(uiStyle, "EditorAttributeText");
         attrNameText.text = name;
-        attrNameText.SetFixedWidth(125);
+        attrNameText.SetFixedWidth(ATTRNAME_WIDTH);
         editorParent.AddChild(attrNameText);
     }
 
@@ -294,7 +298,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Serializable@ serializable,
 {
     LineEdit@ attrEdit = LineEdit();
     attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-    attrEdit.SetFixedHeight(16);
+    attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializable);
@@ -400,16 +404,17 @@ UIElement@ CreateAttributeEditor(ListView@ list, Serializable@ serializable, con
         {
             DropDownList@ attrEdit = DropDownList();
             attrEdit.style = uiStyle;
-            attrEdit.SetFixedHeight(16);
+            attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
             attrEdit.resizePopup = true;
             attrEdit.vars["Index"] = index;
             attrEdit.vars["SubIndex"] = subIndex;
+            attrEdit.SetLayout(LM_HORIZONTAL, 0, IntRect(4, 1, 4, 1));
             SetAttributeEditorID(attrEdit, serializable);
 
             for (uint i = 0; i < enumNames.length; ++i)
             {
                 // Hack: check for certain internal enums and break
-                if (enumNames[i] == "Master" || enumNames[i] == "SplitPoint")
+                if (enumNames[i] == "Master")
                     break;
                 Text@ choice = Text();
                 choice.SetStyle(uiStyle, "EditorEnumAttributeText");
@@ -431,7 +436,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Serializable@ serializable, con
         parent = CreateAttributeEditorParent(list, "", index, subIndex);
 
         UIElement@ spacer = UIElement();
-        spacer.SetFixedSize(10, 16);
+        spacer.SetFixedSize(10, ATTR_HEIGHT - 2);
         parent.AddChild(spacer);
 
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializable, index, subIndex);
@@ -439,12 +444,12 @@ UIElement@ CreateAttributeEditor(ListView@ list, Serializable@ serializable, con
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
         UIElement@ spacer2 = UIElement();
-        spacer2.SetFixedSize(4, 16);
+        spacer2.SetFixedSize(4, ATTR_HEIGHT - 2);
         parent.AddChild(spacer2);
 
         Button@ pickButton = Button();
         pickButton.style = uiStyle;
-        pickButton.SetFixedSize(36, 16);
+        pickButton.SetFixedSize(36, ATTR_HEIGHT - 2);
         pickButton.vars["Index"] = index;
         pickButton.vars["SubIndex"] = subIndex;
         SetAttributeEditorID(pickButton, serializable);

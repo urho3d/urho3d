@@ -75,10 +75,10 @@ void RigidBody::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Lin Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Ang Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Damp Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Damp Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Ang Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Damp Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Damp Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);

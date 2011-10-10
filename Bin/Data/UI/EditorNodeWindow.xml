@@ -4,7 +4,7 @@
     <resizeborder value="6 6 6 6" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element>
-        <fixedheight value="16" />
+        <fixedheight value="17" />
         <layout mode="horizontal" />
         <element type="Text" name="WindowTitle">
             <text value="Node / component edit" />
@@ -15,7 +15,7 @@
         <fixedheight value="4" />
     </element>
     <element type="Text" name="NodeTitle">
-        <fixedheight value="16" />
+        <fixedheight value="17" />
     </element>
     <element type="ListView" name="NodeAttributeList">
         <highlight value="always" />
@@ -25,7 +25,7 @@
         </horizontalscrollbar>
     </element>
     <element>
-        <fixedheight value="16" />
+        <fixedheight value="17" />
         <layout mode="horizontal" spacing="4" />
         <element type="LineEdit" name="VarNameEdit">
         </element>
@@ -48,7 +48,7 @@
             <text value="Color" />
         </element>
         <element type="DropDownList" name="NewVarDropDown">
-            <fixedsize value="50 16" />
+            <fixedsize value="50 17" />
             <layout mode="free" />
             <placeholder>
                 <visible enable="false" />
@@ -68,7 +68,7 @@
             <popupitem name="VarColor" />
         </element>
         <element type="Button" name="DeleteVarButton">
-            <fixedsize value="50 16" />
+            <fixedsize value="50 17" />
             <element type="Text">
                 <text value="Del" />
                 <alignment horizontal="center" vertical="center" />
@@ -79,7 +79,7 @@
         <fixedheight value="4" />
     </element>
     <element type="Text" name="ComponentTitle">
-        <fixedheight value="16" />
+        <fixedheight value="17" />
     </element>
     <element type="ListView" name="ComponentAttributeList">
         <highlight value="always" />

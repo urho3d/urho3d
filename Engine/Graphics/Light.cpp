@@ -122,11 +122,8 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 1 End", shadowCascade_.splits_[0], M_LARGE_VALUE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 2 End", shadowCascade_.splits_[1], M_LARGE_VALUE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 3 End", shadowCascade_.splits_[2], M_LARGE_VALUE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Split 4 End", shadowCascade_.splits_[3], M_LARGE_VALUE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);

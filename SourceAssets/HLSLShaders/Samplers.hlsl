@@ -42,6 +42,6 @@ float3 DecodeNormal(float4 normalInput)
 {
     float3 normal;
     normal.xy = normalInput.ag * 2.0 - 1.0;
-    normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
+    normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
     return normal;
 }

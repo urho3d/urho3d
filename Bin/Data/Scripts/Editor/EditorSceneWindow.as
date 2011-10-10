@@ -334,18 +334,20 @@ int GetNodeIndent(Node@ node)
 String GetNodeTitle(Node@ node, int indent)
 {
     String indentStr;
-    String localStr;
     indentStr.Resize(indent);
     for (int i = 0; i < indent; ++i)
         indentStr[i] = ' ';
 
+    String idStr;
     if (node.id >= FIRST_LOCAL_ID)
-        localStr = ", Local";
+        idStr = "Local " + String(node.id - FIRST_LOCAL_ID);
+    else
+        idStr = String(node.id);
 
     if (node.name.empty)
-        return indentStr + node.typeName + " (" + node.id + localStr + ")";
+        return indentStr + node.typeName + " (" + idStr + ")";
     else
-        return indentStr + node.name + " (" + node.id + localStr + ")";
+        return indentStr + node.name + " (" + idStr + ")";
 }
 
 String GetComponentTitle(Component@ component, int indent)
@@ -355,7 +357,7 @@ String GetComponentTitle(Component@ component, int indent)
     indentStr.Resize(indent);
     for (int i = 0; i < indent; ++i)
         indentStr[i] = ' ';
-    
+
     if (component.id >= FIRST_LOCAL_ID)
         localStr = " (Local)";
 
