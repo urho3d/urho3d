@@ -146,16 +146,6 @@
     <element>
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="PickComponentsToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Select components instead of nodes" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
         <element type="CheckBox" name="LocalIDToggle">
             <fixedsize value="16 16" />
         </element>

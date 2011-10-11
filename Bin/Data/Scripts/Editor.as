@@ -88,7 +88,6 @@ void LoadConfig()
         rotateSnap = objectElem.GetBool("rotatesnap");
         scaleSnap = objectElem.GetBool("scalesnap");
         useLocalIDs = objectElem.GetBool("uselocalids");
-        pickComponents = objectElem.GetBool("pickcomponents");
         pickMode = objectElem.GetInt("pickmode");
     }
 
@@ -130,7 +129,6 @@ void SaveConfig()
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
-    objectElem.SetBool("pickcomponents", pickComponents);
     objectElem.SetInt("pickmode", pickMode);
 
     renderingElem.SetInt("texturequality", renderer.textureQuality);

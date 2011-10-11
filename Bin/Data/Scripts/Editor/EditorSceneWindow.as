@@ -9,7 +9,6 @@ Window@ sceneWindow;
 XMLFile copyBuffer;
 bool copyBufferLocal = false;
 bool copyBufferExpanded = false;
-bool pickComponents = false;
 
 void CreateSceneWindow()
 {

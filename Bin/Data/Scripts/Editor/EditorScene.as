@@ -357,10 +357,10 @@ void SceneRaycast(bool mouseClick)
     
     if (selected !is null && mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
     {
-        if (pickComponents)
-            SelectComponent(selected);
-        else
+        if (input.qualifierDown[QUAL_SHIFT] || input.qualifierDown[QUAL_CTRL])
             SelectNode(selected.node);
+        else
+            SelectComponent(selected);
     }
 }
 
