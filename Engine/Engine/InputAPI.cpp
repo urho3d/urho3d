@@ -33,6 +33,7 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int QUAL_SHIFT", (void*)&QUAL_SHIFT);
     engine->RegisterGlobalProperty("const int QUAL_CTRL", (void*)&QUAL_CTRL);
     engine->RegisterGlobalProperty("const int QUAL_ALT", (void*)&QUAL_ALT);
+    engine->RegisterGlobalProperty("const int QUAL_ANY", (void*)&QUAL_ANY);
     engine->RegisterGlobalProperty("const int KEY_BACKSPACE", (void*)&KEY_BACKSPACE);
     engine->RegisterGlobalProperty("const int KEY_TAB", (void*)&KEY_TAB);
     engine->RegisterGlobalProperty("const int KEY_RETURN", (void*)&KEY_RETURN);

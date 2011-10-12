@@ -226,6 +226,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void SetChildItemsVisible(uint, bool)", asMETHODPR(ListView, SetChildItemsVisible, (unsigned, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetChildItemsVisible(bool)", asMETHODPR(ListView, SetChildItemsVisible, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void ToggleChildItemsVisible(uint)", asMETHOD(ListView, ToggleChildItemsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool IsSelected(uint) const", asMETHOD(ListView, IsSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "Array<UIElement@>@ GetItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "void set_viewPosition(const IntVector2&in)", asMETHODPR(ListView, SetViewPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "const IntVector2& get_viewPosition() const", asMETHOD(ListView, GetViewPosition), asCALL_THISCALL);

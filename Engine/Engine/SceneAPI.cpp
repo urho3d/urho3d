@@ -77,7 +77,7 @@ static bool SceneSaveXML(File* file, Scene* ptr)
 
 static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
 {
-    return SharedPtrVectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
+    return VectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
 }
 
 static CScriptArray* GetAvailableComponents(Scene* ptr)

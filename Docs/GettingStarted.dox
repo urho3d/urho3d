@@ -503,7 +503,7 @@ Hint: to get some content to look at, run the TestScene example, and press F5. T
 \section EditorInstructions_Controls Controls
 
 \verbatim
-Left mouse      - Select objects
+Left mouse      - Select components. Hold Shift to select nodes.
 Right mouse     - Hold down and move mouse to rotate camera
 
 WSAD or arrows  - Move

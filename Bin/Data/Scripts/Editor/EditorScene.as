@@ -22,6 +22,8 @@ int pickMode = PICK_GEOMETRIES;
 
 Component@ selectedComponent;
 Node@ selectedNode;
+Array<Component@> selectedComponents;
+Array<Node@> selectedNodes;
 
 Array<int> pickModeDrawableFlags = {
     DRAWABLE_GEOMETRY,
@@ -29,10 +31,17 @@ Array<int> pickModeDrawableFlags = {
     DRAWABLE_ZONE
 };
 
-void CreateScene()
+void ClearSelection()
 {
     selectedComponent = null;
     selectedNode = null;
+    selectedComponents.Clear();
+    selectedNodes.Clear();
+}
+
+void CreateScene()
+{
+    ClearSelection();
 
     // Create a scene with default values, these will be overridden when loading scenes
     editorScene = Scene("");
@@ -179,8 +188,7 @@ void LoadScene(const String&in fileName)
         return;
 
     // Clear the old scene
-    selectedComponent = null;
-    selectedNode = null;
+    ClearSelection();
     editorScene.Clear();
 
     // Add the new resource path
@@ -254,14 +262,26 @@ void ScenePostRenderUpdate()
     if (debug is null)
         return;
 
-    // Visualize the currently selected node as its local axes
-    if (selectedNode !is null)
-        debug.AddNode(selectedNode, false);
-
-    // Visualize current selection (either drawables or collisionshapes can be visualized)
-    if (selectedComponent !is null)
+    // Visualize the currently selected nodes as their local axes + the first drawable component
+    for (uint i = 0; i < selectedNodes.length; ++i)
     {
-        Drawable@ drawable = cast<Drawable>(selectedComponent);
+        Node@ node = selectedNodes[i];
+        debug.AddNode(node, false);
+        for (uint j = 0; j < node.numComponents; ++j)
+        {
+            Drawable@ drawable = cast<Drawable>(node.components[j]);
+            if (drawable !is null)
+            {
+                drawable.DrawDebugGeometry(debug, false);
+                break;
+            }
+        }
+    }
+
+    // Visualize the currently selected components
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
         if (drawable !is null)
             drawable.DrawDebugGeometry(debug, false);
         else
@@ -269,19 +289,6 @@ void ScenePostRenderUpdate()
             CollisionShape@ shape = cast<CollisionShape>(selectedComponent);
             if (shape !is null)
                 shape.DrawDebugGeometry(debug, false);
-        }
-    }
-    else if (selectedNode !is null)
-    {
-        // If only a node selected, not a component, visualize the first drawable component encountered
-        for (uint i = 0; i < selectedNode.numComponents; ++i)
-        {
-            Drawable@ drawable = cast<Drawable>(selectedNode.components[i]);
-            if (drawable !is null)
-            {
-                drawable.DrawDebugGeometry(debug, false);
-                break;
-            }
         }
     }
 
@@ -357,10 +364,11 @@ void SceneRaycast(bool mouseClick)
     
     if (selected !is null && mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
     {
-        if (input.qualifierDown[QUAL_SHIFT] || input.qualifierDown[QUAL_CTRL])
-            SelectNode(selected.node);
+        bool multiselect = input.qualifierDown[QUAL_CTRL];
+        if (input.qualifierDown[QUAL_SHIFT])
+            SelectNode(selected.node, multiselect);
         else
-            SelectComponent(selected);
+            SelectComponent(selected, multiselect);
     }
 }
 

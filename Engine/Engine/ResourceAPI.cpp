@@ -90,7 +90,7 @@ static CScriptArray* ResourceCacheGetResourceDirs(ResourceCache* ptr)
 
 static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
 {
-    return SharedPtrVectorToHandleArray<PackageFile>(ptr->GetPackageFiles(), "Array<PackageFile@>");
+    return VectorToHandleArray<PackageFile>(ptr->GetPackageFiles(), "Array<PackageFile@>");
 }
 
 static void RegisterResourceCache(asIScriptEngine* engine)

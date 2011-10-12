@@ -117,7 +117,12 @@ void UpdateNodeWindow()
     Text@ componentTitle = nodeWindow.GetChild("ComponentTitle", true);
 
     if (selectedNode is null)
-        nodeTitle.text = "No node";
+    {
+        if (selectedNodes.empty)
+            nodeTitle.text = "No node";
+        else
+            nodeTitle.text = "Multiple nodes";
+    }
     else
     {
         String idStr;
@@ -129,7 +134,12 @@ void UpdateNodeWindow()
     }
 
     if (selectedComponent is null)
-        componentTitle.text = "No component";
+    {
+        if (selectedComponents.empty)
+            componentTitle.text = "No component";
+        else
+            componentTitle.text = "Multiple components";
+    }
     else
         componentTitle.text = GetComponentTitle(selectedComponent, 0);
 

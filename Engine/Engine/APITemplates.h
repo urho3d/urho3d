@@ -145,7 +145,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
 }
 
 /// Template function for shared pointer Vector to handle array conversion.
-template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
+template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
@@ -404,6 +404,11 @@ static Component* NodeGetComponentWithType(const String& typeName, Node* ptr)
     return ptr->GetComponent(ShortStringHash(typeName));
 }
 
+static CScriptArray* NodeGetComponents(Node* ptr)
+{
+    return VectorToHandleArray<Component>(ptr->GetComponents(), "Array<Component@>");
+}
+
 static CScriptArray* NodeGetComponentsWithType(const String& typeName, Node* ptr)
 {
     PODVector<Component*> components;
@@ -515,6 +520,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", asFUNCTION(NodeGetComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);

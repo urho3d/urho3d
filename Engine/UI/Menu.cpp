@@ -233,7 +233,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
     
     // Activate if accelerator key pressed
-    if (eventData[P_KEY].GetInt() == acceleratorKey_ && eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_ &&
-        eventData[P_REPEAT].GetBool() == false)
+    if (eventData[P_KEY].GetInt() == acceleratorKey_ && (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() ==
+        acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
         HandlePressedReleased(eventType, eventData);
 }

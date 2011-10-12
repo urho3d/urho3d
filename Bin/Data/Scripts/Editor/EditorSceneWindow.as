@@ -363,11 +363,11 @@ String GetComponentTitle(Component@ component, int indent)
     return indentStr + component.typeName + localStr;
 }
 
-void SelectNode(Node@ node)
+void SelectNode(Node@ node, bool multiselect)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    if (node is null)
+    if (node is null && !multiselect)
     {
         list.ClearSelection();
         return;
@@ -390,29 +390,40 @@ void SelectNode(Node@ node)
     if (nodeItem < numItems)
     {
         // Expand the node chain now, but do not expand the whole scene in case the component was in the root
-        list.items[nodeItem].visible = true;
-        if (parentItem != 0 && parentItem < numItems)
-            list.SetChildItemsVisible(parentItem, true);
+        if (!multiselect || !list.IsSelected(nodeItem))
+        {
+            list.items[nodeItem].visible = true;
+            if (parentItem != 0 && parentItem < numItems)
+                list.SetChildItemsVisible(parentItem, true);
+        }
         // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
-        list.selection = nodeItem;
+        if (!multiselect)
+            list.selection = nodeItem;
+        else
+            list.ToggleSelection(nodeItem);
     }
     else
-        list.ClearSelection();
+    {
+        if (!multiselect)
+            list.ClearSelection();
+    }
 }
 
-void SelectComponent(Component@ component)
+void SelectComponent(Component@ component, bool multiselect)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     if (component is null)
     {
-        list.ClearSelection();
+        if (!multiselect)
+            list.ClearSelection();
         return;
     }
     Node@ node = component.node;
     if (node is null)
     {
-        list.ClearSelection();
+        if (!multiselect)
+            list.ClearSelection();
         return;
     }
 
@@ -429,27 +440,95 @@ void SelectComponent(Component@ component)
     uint nodeItem = GetNodeListIndex(node);
     uint componentItem = GetComponentListIndex(component);
 
+    if (nodeItem >= list.numItems)
+    {
+        if (!multiselect)
+            list.ClearSelection();
+        return;
+    }
+
     if (nodeItem < numItems && componentItem < numItems)
     {
         // Expand the node chain now, but do not expand the whole scene in case the component was in the root
-        list.items[nodeItem].visible = true;
-        if (nodeItem != 0)
-            list.SetChildItemsVisible(nodeItem, true);
-        list.items[componentItem].visible = true;
+        if (!multiselect || !list.IsSelected(componentItem))
+        {
+            list.items[nodeItem].visible = true;
+            if (nodeItem != 0)
+                list.SetChildItemsVisible(nodeItem, true);
+            list.items[componentItem].visible = true;
+        }
         // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
-        list.selection = componentItem;
+        if (!multiselect)
+            list.selection = componentItem;
+        else
+            list.ToggleSelection(componentItem);
     }
     else
-        list.ClearSelection();
+    {
+        if (!multiselect)
+            list.ClearSelection();
+    }
 }
 
 void HandleNodeListSelectionChange()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    uint index = list.selection;
-    selectedNode = GetListNode(index);
-    selectedComponent = GetListComponent(index);
+    Array<uint> indices = list.selections;
+    ClearSelection();
+    if (indices.length == 1)
+    {
+        uint index = indices[0];
+        selectedNode = GetListNode(index);
+        if (selectedNode !is null)
+            selectedNodes.Push(selectedNode);
+        selectedComponent = GetListComponent(index);
+        if (selectedComponent !is null)
+            selectedComponents.Push(selectedComponent);
+    }
+    else
+    {
+        for (uint i = 0; i < indices.length; ++i)
+        {
+            uint index = indices[i];
+            UIElement@ item = list.items[index];
+            int type = item.vars["Type"].GetInt();
+            if (type == ITEM_COMPONENT)
+            {
+                Component@ comp = GetListComponent(index);
+                if (comp !is null)
+                    selectedComponents.Push(comp);
+            }
+            else if (type == ITEM_NODE)
+            {
+                Node@ node = GetListNode(index);
+                if (node !is null)
+                    selectedNodes.Push(node);
+            }
+        }
+
+        // If only one node is selected in a multi-select, show it in the node window
+        if (selectedNodes.length == 1)
+            selectedNode = selectedNodes[0];
+        else if (selectedComponents.length == 1)
+            selectedComponent = selectedComponents[0];
+        // If selection contains only components, and they have a common node, show it in the node window
+        else if (selectedNodes.empty && selectedComponents.length > 1)
+        {
+            Node@ commonNode;
+            for (uint i = 0; i < selectedComponents.length; ++i)
+            {
+                if (i == 0)
+                    commonNode = selectedComponents[i].node;
+                else
+                {
+                    if (selectedComponents[i].node !is commonNode)
+                        commonNode = null;
+                }
+            }
+            selectedNode = commonNode;
+        }
+    }
 
     UpdateNodeWindow();
 }
@@ -657,7 +736,7 @@ void SceneDelete()
     if (selectedComponent !is null)
     {
         // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
-        if (selectedNode is editorScene && (selectedComponent.typeName == "Octree" || selectedComponent.typeName == 
+        if (selectedNode is editorScene && (selectedComponent.typeName == "Octree" || selectedComponent.typeName ==
             "PhysicsWorld" || selectedComponent.typeName == "DebugRenderer"))
             return;
 
@@ -683,8 +762,7 @@ void SceneDelete()
         selectedNode.Remove();
         EndModify(id);
 
-        selectedComponent = null;
-        selectedNode = null;
+        ClearSelection();
 
         UpdateSceneWindowNode(nodeIndex, null);
 

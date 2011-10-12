@@ -664,6 +664,11 @@ PODVector<UIElement*> ListView::GetSelectedItems() const
     return ret;
 }
 
+bool ListView::IsSelected(unsigned index) const
+{
+    return selections_.Contains(index);
+}
+
 void ListView::UpdateSelectionEffect()
 {
     unsigned numItems = GetNumItems();

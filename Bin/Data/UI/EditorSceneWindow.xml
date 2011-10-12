@@ -38,6 +38,7 @@
     <element type="ListView" name="NodeList">
         <hierarchy enable="true" />
         <highlight value="always" />
+        <multiselect enable="true" />
     </element>
     <element>
         <fixedheight value="22" />

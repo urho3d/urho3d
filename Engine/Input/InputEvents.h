@@ -101,6 +101,7 @@ static const int MOUSEB_MIDDLE = 4;
 static const int QUAL_SHIFT = 1;
 static const int QUAL_CTRL = 2;
 static const int QUAL_ALT = 4;
+static const int QUAL_ANY = 8;
 
 #ifndef USE_OPENGL
 static const int KEY_BACKSPACE = 0x08;

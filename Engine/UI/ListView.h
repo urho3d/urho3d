@@ -120,6 +120,8 @@ public:
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
     PODVector<UIElement*> GetSelectedItems() const;
+    /// Return whether an item at index is seleccted.
+    bool IsSelected(unsigned index) const;
     /// Return highlight mode.
     HighlightMode GetHighlightMode() const { return highlightMode_; }
     /// Return whether multiselect enabled.

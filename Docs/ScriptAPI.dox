@@ -121,6 +121,7 @@
 - int QUAL_SHIFT
 - int QUAL_CTRL
 - int QUAL_ALT
+- int QUAL_ANY
 - int KEY_BACKSPACE
 - int KEY_TAB
 - int KEY_RETURN
@@ -1086,6 +1087,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
@@ -1164,6 +1166,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
@@ -2243,6 +2246,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2271,6 +2275,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2319,6 +2324,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2349,6 +2355,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2401,6 +2408,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2434,6 +2442,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2490,6 +2499,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2521,6 +2531,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2575,6 +2586,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2606,6 +2618,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2659,6 +2672,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2690,6 +2704,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2746,6 +2761,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2777,6 +2793,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2834,6 +2851,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2864,6 +2882,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -2919,6 +2938,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -2963,6 +2983,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3029,6 +3050,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3061,6 +3083,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3121,6 +3144,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3151,6 +3175,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3213,6 +3238,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3248,6 +3274,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3309,6 +3336,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3350,6 +3378,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3416,6 +3445,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3446,6 +3476,7 @@ Properties:<br>
 - bool bringToFront
 - bool bringToBack
 - bool clipChildren
+- bool sortChildren
 - bool active
 - bool focus
 - bool selected
@@ -3581,13 +3612,13 @@ Properties:<br>
 - bool connected (readonly)
 - bool connectPending (readonly)
 - bool sceneLoaded (readonly)
-- Controls& controls
-- Vector3& position
 - String address (readonly)
 - uint16 port (readonly)
 - uint numDownloads (readonly)
 - String& downloadName (readonly)
 - float downloadProgress (readonly)
+- Vector3 position
+- Controls controls
 - VariantMap identity
 
 
