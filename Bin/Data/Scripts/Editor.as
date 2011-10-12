@@ -1,7 +1,8 @@
 // Urho3D editor
 
-#include "Scripts/Editor/EditorCamera.as"
+#include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"
+#include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 
