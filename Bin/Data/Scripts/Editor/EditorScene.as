@@ -20,10 +20,10 @@ bool physicsDebug = false;
 bool octreeDebug = false;
 int pickMode = PICK_GEOMETRIES;
 
-Component@ selectedComponent;
-Node@ selectedNode;
-Array<Component@> selectedComponents;
 Array<Node@> selectedNodes;
+Array<Component@> selectedComponents;
+Node@ editNode;
+Array<Component@> editComponents;
 
 Array<int> pickModeDrawableFlags = {
     DRAWABLE_GEOMETRY,
@@ -33,10 +33,10 @@ Array<int> pickModeDrawableFlags = {
 
 void ClearSelection()
 {
-    selectedComponent = null;
-    selectedNode = null;
-    selectedComponents.Clear();
     selectedNodes.Clear();
+    selectedComponents.Clear();
+    editNode = null;
+    editComponents.Clear();
 }
 
 void CreateScene()
@@ -286,7 +286,7 @@ void ScenePostRenderUpdate()
             drawable.DrawDebugGeometry(debug, false);
         else
         {
-            CollisionShape@ shape = cast<CollisionShape>(selectedComponent);
+            CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
             if (shape !is null)
                 shape.DrawDebugGeometry(debug, false);
         }
@@ -298,7 +298,7 @@ void ScenePostRenderUpdate()
         editorScene.physicsWorld.DrawDebugGeometry(true);
     if (octreeDebug && editorScene.octree !is null)
         editorScene.octree.DrawDebugGeometry(true);
-    
+
     SceneRaycast(false);
 }
 
@@ -366,9 +366,19 @@ void SceneRaycast(bool mouseClick)
     {
         bool multiselect = input.qualifierDown[QUAL_CTRL];
         if (input.qualifierDown[QUAL_SHIFT])
-            SelectNode(selected.node, multiselect);
-        else
+        {
+            // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
+            if (!selectedNodes.empty)
+                multiselect = false;
             SelectComponent(selected, multiselect);
+        }
+        else
+        {
+            // If we are selecting nodes, but have components in existing selection, do not multiselect to prevent confusion
+            if (!selectedComponents.empty)
+                multiselect = false;
+            SelectNode(selected.node, multiselect);
+        }
     }
 }
 

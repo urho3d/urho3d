@@ -396,7 +396,7 @@ void SelectNode(Node@ node, bool multiselect)
             if (parentItem != 0 && parentItem < numItems)
                 list.SetChildItemsVisible(parentItem, true);
         }
-        // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
+        // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
             list.selection = nodeItem;
         else
@@ -457,7 +457,7 @@ void SelectComponent(Component@ component, bool multiselect)
                 list.SetChildItemsVisible(nodeItem, true);
             list.items[componentItem].visible = true;
         }
-        // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
+        // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
             list.selection = componentItem;
         else
@@ -472,62 +472,66 @@ void SelectComponent(Component@ component, bool multiselect)
 
 void HandleNodeListSelectionChange()
 {
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-
-    Array<uint> indices = list.selections;
     ClearSelection();
-    if (indices.length == 1)
-    {
-        uint index = indices[0];
-        selectedNode = GetListNode(index);
-        if (selectedNode !is null)
-            selectedNodes.Push(selectedNode);
-        selectedComponent = GetListComponent(index);
-        if (selectedComponent !is null)
-            selectedComponents.Push(selectedComponent);
-    }
-    else
-    {
-        for (uint i = 0; i < indices.length; ++i)
-        {
-            uint index = indices[i];
-            UIElement@ item = list.items[index];
-            int type = item.vars["Type"].GetInt();
-            if (type == ITEM_COMPONENT)
-            {
-                Component@ comp = GetListComponent(index);
-                if (comp !is null)
-                    selectedComponents.Push(comp);
-            }
-            else if (type == ITEM_NODE)
-            {
-                Node@ node = GetListNode(index);
-                if (node !is null)
-                    selectedNodes.Push(node);
-            }
-        }
 
-        // If only one node is selected in a multi-select, show it in the node window
-        if (selectedNodes.length == 1)
-            selectedNode = selectedNodes[0];
-        else if (selectedComponents.length == 1)
-            selectedComponent = selectedComponents[0];
-        // If selection contains only components, and they have a common node, show it in the node window
-        else if (selectedNodes.empty && selectedComponents.length > 1)
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    Array<uint> indices = list.selections;
+
+    for (uint i = 0; i < indices.length; ++i)
+    {
+        uint index = indices[i];
+        UIElement@ item = list.items[index];
+        int type = item.vars["Type"].GetInt();
+        if (type == ITEM_COMPONENT)
         {
-            Node@ commonNode;
-            for (uint i = 0; i < selectedComponents.length; ++i)
-            {
-                if (i == 0)
-                    commonNode = selectedComponents[i].node;
-                else
-                {
-                    if (selectedComponents[i].node !is commonNode)
-                        commonNode = null;
-                }
-            }
-            selectedNode = commonNode;
+            Component@ comp = GetListComponent(index);
+            if (comp !is null)
+                selectedComponents.Push(comp);
         }
+        else if (type == ITEM_NODE)
+        {
+            Node@ node = GetListNode(index);
+            if (node !is null)
+                selectedNodes.Push(node);
+        }
+    }
+
+    // If only one node selected, use it for editing
+    if (selectedNodes.length == 1)
+        editNode = selectedNodes[0];
+
+    // If selection contains only components, and they have a common node, use it for editing
+    if (selectedNodes.empty && !selectedComponents.empty)
+    {
+        Node@ commonNode;
+        for (uint i = 0; i < selectedComponents.length; ++i)
+        {
+            if (i == 0)
+                commonNode = selectedComponents[i].node;
+            else
+            {
+                if (selectedComponents[i].node !is commonNode)
+                    commonNode = null;
+            }
+        }
+        editNode = commonNode;
+    }
+    
+    // Now check if the component(s) can be edited. If many selected, must have same type
+    if (!selectedComponents.empty)
+    {
+        ShortStringHash compType = selectedComponents[0].type;
+        bool sameType = true;
+        for (uint i = 1; i < selectedComponents.length; ++i)
+        {
+            if (selectedComponents[i].type != compType)
+            {
+                sameType = false;
+                break;
+            }
+        }
+        if (sameType)
+            editComponents = selectedComponents;
     }
 
     UpdateNodeWindow();
@@ -552,8 +556,6 @@ void HandleNodeListItemDoubleClick(StringHash eventType, VariantMap& eventData)
 void HandleNodeListKey(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
-
-    /// \todo Add required functionality
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
@@ -685,7 +687,7 @@ void HandleCreateNode(StringHash eventType, VariantMap& eventData)
 
 void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
 {
-    if (selectedNode is null)
+    if (editNode is null)
         return;
 
     DropDownList@ list = eventData["Element"].GetUIElement();
@@ -694,12 +696,12 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
         return;
 
     // If this is the root node, do not allow to create duplicate scene-global components
-    if (selectedNode is editorScene && CheckForExistingGlobalComponent(selectedNode, text.text))
+    if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, text.text))
         return;
 
     // For now, make a local node's all components local
     /// \todo Allow to specify the createmode
-    Component@ newComponent = selectedNode.CreateComponent(text.text, selectedNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+    Component@ newComponent = editNode.CreateComponent(text.text, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
 
     UpdateAndFocusComponent(newComponent);
 }
@@ -723,90 +725,122 @@ bool CheckForExistingGlobalComponent(Node@ node, const String&in typeName)
         return node.HasComponent(typeName);
 }
 
-void SceneDelete()
+bool SceneDelete()
 {
-    if (selectedNode is null || !CheckSceneWindowFocus())
-        return;
+    if (!CheckSceneWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
+        return false;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    uint index = list.selection;
-    uint nodeIndex = GetNodeListIndex(selectedNode);
 
-    // Remove component
-    if (selectedComponent !is null)
+    // Remove components first
+    for (uint i = 0; i < selectedComponents.length; ++i)
     {
         // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
-        if (selectedNode is editorScene && (selectedComponent.typeName == "Octree" || selectedComponent.typeName ==
-            "PhysicsWorld" || selectedComponent.typeName == "DebugRenderer"))
-            return;
+        Component@ component = selectedComponents[i];
+        Node@ node = component.node;
+        
+        uint index = GetComponentListIndex(component);
+        uint nodeIndex = GetNodeListIndex(node);
+        if (index == NO_ITEM || nodeIndex == NO_ITEM)
+            continue;
 
-        uint id = selectedNode.id;
+        if (node is editorScene && (component.typeName == "Octree" || component.typeName == "PhysicsWorld" ||
+            component.typeName == "DebugRenderer"))
+            continue;
+
+        uint id = node.id;
         BeginModify(id);
-        selectedNode.RemoveComponent(selectedComponent);
+        node.RemoveComponent(component);
         EndModify(id);
 
-        UpdateSceneWindowNode(nodeIndex, selectedNode);
+        UpdateSceneWindowNode(nodeIndex, node);
 
-        // Select the next item in the same index
-        list.selection = index;
+        // If deleting only one component, select the next item in the same index
+        if (selectedComponents.length == 1 && selectedNodes.empty)
+        {
+            list.selection = index;
+            return true;
+        }
     }
-    // Remove (parented) node
-    else
-    {
-        if (selectedNode.parent is null)
-            return;
 
-        uint id = selectedNode.id;
+    // Remove (parented) nodes last
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        Node@ node = selectedNodes[i];
+        if (node.parent is null)
+            continue;
+
+        uint id = node.id;
+        uint nodeIndex = GetNodeListIndex(node);
 
         BeginModify(id);
-        selectedNode.Remove();
+        node.Remove();
         EndModify(id);
-
-        ClearSelection();
 
         UpdateSceneWindowNode(nodeIndex, null);
 
         // Select the next item in the same index
-        list.selection = index;
+
+        // If deleting only one node, select the next item in the same index
+        if (selectedNodes.length == 1 && selectedComponents.empty)
+        {
+            list.selection = nodeIndex;
+            return true;
+        }
     }
+
+    // If any kind of multi-delete was performed, the list selection should be clear now.
+    // Unfortunately that also means we did not get selection change events, so must update the selection arrays manually.
+    // Otherwise nodes/components may be left in the scene even after delete, as the selection arrays keep them alive.
+    HandleNodeListSelectionChange();
+    return true;
 }
 
-void SceneCut()
+bool SceneCut()
 {
-    SceneCopy();
-    SceneDelete();
+    if (SceneCopy())
+        return SceneDelete();
+    else
+        return false;
 }
 
-void SceneCopy()
+bool SceneCopy()
 {
-    if (selectedNode is null || !CheckSceneWindowFocus())
-        return;
+    /// \todo allow multi-copy
+    if (editNode is null || !CheckSceneWindowFocus())
+        return false;
+    Component@ editComponent = editComponents.length == 1 ? editComponents[0] : null;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     // Copy component
-    if (selectedNode !is null && selectedComponent !is null)
+    if (editNode !is null && editComponent !is null)
     {
         XMLElement rootElem = copyBuffer.CreateRoot("component");
-        selectedComponent.SaveXML(rootElem);
+        editComponent.SaveXML(rootElem);
         // Note: component type has to be saved manually
-        rootElem.SetString("type", selectedComponent.typeName);
-        copyBufferLocal = selectedComponent.id >= FIRST_LOCAL_ID;
+        rootElem.SetString("type", editComponent.typeName);
+        copyBufferLocal = editComponent.id >= FIRST_LOCAL_ID;
+        return true;
     }
     // Copy node. The root node can not be copied
-    else if (selectedNode !is null && selectedComponent is null && selectedNode !is editorScene)
+    else if (editNode !is null && editComponent is null && editNode !is editorScene)
     {
         XMLElement rootElem = copyBuffer.CreateRoot("node");
-        selectedNode.SaveXML(rootElem);
-        copyBufferLocal = selectedNode.id >= FIRST_LOCAL_ID;
-        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(selectedNode));
+        editNode.SaveXML(rootElem);
+        copyBufferLocal = editNode.id >= FIRST_LOCAL_ID;
+        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(editNode));
+        return true;
     }
+    
+    return false;
 }
 
-void ScenePaste()
+bool ScenePaste()
 {
-    if (selectedNode is null || !CheckSceneWindowFocus())
-        return;
+    /// \todo allow multi-paste
+    if (editNode is null || !CheckSceneWindowFocus())
+        return false;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     XMLElement rootElem = copyBuffer.root;
@@ -814,26 +848,27 @@ void ScenePaste()
 
     if (mode == "component")
     {
-        BeginModify(selectedNode.id);
+        BeginModify(editNode.id);
 
         // If this is the root node, do not allow to create duplicate scene-global components
-        if (selectedNode is editorScene && CheckForExistingGlobalComponent(selectedNode, rootElem.GetAttribute("type")))
-            return;
+        if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
+            return false;
 
         // If copied component was local, make the new local too
-        Component@ newComponent = selectedNode.CreateComponent(rootElem.GetAttribute("type"), copyBufferLocal ? LOCAL :
+        Component@ newComponent = editNode.CreateComponent(rootElem.GetAttribute("type"), copyBufferLocal ? LOCAL :
             REPLICATED);
         if (newComponent is null)
         {
-            EndModify(selectedNode.id);
-            return;
+            EndModify(editNode.id);
+            return false;
         }
         newComponent.LoadXML(rootElem);
         newComponent.ApplyAttributes();
-        EndModify(selectedNode.id);
+        EndModify(editNode.id);
 
-        UpdateSceneWindowNode(selectedNode);
+        UpdateSceneWindowNode(editNode);
         list.selection = GetComponentListIndex(newComponent);
+        return true;
     }
     else if (mode == "node")
     {
@@ -851,7 +886,10 @@ void ScenePaste()
         UpdateSceneWindowNode(addIndex, newNode);
         RestoreExpandedStatus(addIndex, copyBufferExpanded);
         list.selection = addIndex;
+        return true;
     }
+    
+    return false;
 }
 
 bool SaveExpandedStatus(uint itemIndex)
