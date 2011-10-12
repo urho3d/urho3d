@@ -455,7 +455,7 @@ void MoveCamera(float timeStep)
     }
 
     // Move/rotate/scale object
-    if (editNode !is null && ui.focusElement is null && input.keyDown[KEY_LCTRL])
+    if (!selectedNodes.empty && ui.focusElement is null && input.keyDown[KEY_LCTRL])
     {
         bool changed = false;
         Vector3 adjust(0, 0, 0);
@@ -491,9 +491,14 @@ void MoveCamera(float timeStep)
             case OBJ_MOVE:
                 if (!moveSnap)
                 {
-                    if (axisMode == AXIS_LOCAL)
-                        adjust = editNode.rotation * adjust;
-                    editNode.position = editNode.position + adjust * moveStep;
+                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    {
+                        Node@ node = selectedNodes[i];
+                        Vector3 nodeAdjust = adjust;
+                        if (axisMode == AXIS_LOCAL)
+                            nodeAdjust = node.rotation * nodeAdjust;
+                        node.position = node.position + nodeAdjust * moveStep;
+                    }
                     changed = true;
                 }
                 break;
@@ -501,11 +506,15 @@ void MoveCamera(float timeStep)
             case OBJ_ROTATE:
                 if (!rotateSnap)
                 {
-                    Vector3 euler = editNode.rotation.eulerAngles;
-                    euler.x += adjust.z * rotateStep;
-                    euler.y += adjust.x * rotateStep;
-                    euler.z += adjust.y * rotateStep;
-                    editNode.rotation = Quaternion(euler);
+                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    {
+                        Node@ node = selectedNodes[i];
+                        Vector3 euler = node.rotation.eulerAngles;
+                        euler.x += adjust.z * rotateStep;
+                        euler.y += adjust.x * rotateStep;
+                        euler.z += adjust.y * rotateStep;
+                        node.rotation = Quaternion(euler);
+                    }
                     changed = true;
                 }
                 break;
@@ -513,7 +522,11 @@ void MoveCamera(float timeStep)
             case OBJ_SCALE:
                 if (!scaleSnap)
                 {
-                    editNode.scale = editNode.scale + adjust * scaleStep;
+                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    {
+                        Node@ node = selectedNodes[i];
+                        node.scale = node.scale + adjust * scaleStep;
+                    }
                     changed = true;
                 }
                 break;
@@ -527,7 +540,7 @@ void MoveCamera(float timeStep)
 
 void SteppedObjectManipulation(int key)
 {
-    if (editNode is null)
+    if (selectedNodes.empty)
         return;
 
     // Do not react in non-snapped mode, because that is handled in frame update
@@ -565,11 +578,14 @@ void SteppedObjectManipulation(int key)
     switch (moveMode)
     {
     case OBJ_MOVE:
+        for (uint i = 0; i < selectedNodes.length; ++i)
         {
+            Node@ node = selectedNodes[i];
+            Vector3 nodeAdjust = adjust;
             if (axisMode == AXIS_LOCAL)
-                adjust = editNode.rotation * adjust;
+                nodeAdjust = node.rotation * nodeAdjust;
 
-            Vector3 pos = editNode.position;
+            Vector3 pos = node.position;
             if (adjust.x != 0)
             {
                 pos.x += adjust.x * moveStep;
@@ -585,13 +601,15 @@ void SteppedObjectManipulation(int key)
                 pos.z += adjust.z * moveStep;
                 pos.z = Floor(pos.z / moveStep + 0.5) * moveStep;
             }
-            editNode.position = pos;
+            node.position = pos;
         }
         break;
 
     case OBJ_ROTATE:
+        for (uint i = 0; i < selectedNodes.length; ++i)
         {
-            Vector3 rot = editNode.rotation.eulerAngles;
+            Node@ node = selectedNodes[i];
+            Vector3 rot = node.rotation.eulerAngles;
             if (adjust.z != 0)
             {
                 rot.x += adjust.z * rotateStep;
@@ -607,13 +625,15 @@ void SteppedObjectManipulation(int key)
                 rot.z += adjust.y * rotateStep;
                 rot.z = Floor(rot.z / rotateStep + 0.5) * rotateStep;
             }
-            editNode.rotation = Quaternion(rot);
+            node.rotation = Quaternion(rot);
         }
         break;
 
     case OBJ_SCALE:
+        for (uint i = 0; i < selectedNodes.length; ++i)
         {
-            Vector3 scale = editNode.scale;
+            Node@ node = selectedNodes[i];
+            Vector3 scale = node.scale;
             if (adjust.x != 0)
             {
                 scale.x += adjust.x * scaleStep;
@@ -629,7 +649,7 @@ void SteppedObjectManipulation(int key)
                 scale.z += adjust.z * scaleStep;
                 scale.z = Floor(scale.z / scaleStep + 0.5) * scaleStep;
             }
-            editNode.scale = scale;
+            node.scale = scale;
         }
         break;
     }
