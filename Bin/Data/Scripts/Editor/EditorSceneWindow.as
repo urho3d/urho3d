@@ -60,6 +60,7 @@ void CreateSceneWindow()
     SubscribeToEvent(newComponentList, "ItemSelected", "HandleCreateComponent");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
+    SubscribeToEvent("BoneHierarchyCreated", "HandleBoneHierarchyCreated");
 }
 
 void ShowSceneWindow()
@@ -98,11 +99,17 @@ void CollapseSceneHierarchy()
     list.contentElement.UpdateLayout();
 }
 
-void UpdateSceneWindow()
+void ClearSceneWindow()
 {
+    if (sceneWindow is null)
+        return;
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.RemoveAllItems();
+}
 
+void UpdateSceneWindow()
+{
+    ClearSceneWindow();
     UpdateSceneWindowNode(0, editorScene);
 
     // Clear copybuffer when whole window refreshed
@@ -725,6 +732,13 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
     Component@ newComponent = editNode.CreateComponent(text.text, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
 
     UpdateAndFocusComponent(newComponent);
+}
+
+void HandleBoneHierarchyCreated(StringHash eventType, VariantMap& eventData)
+{
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    if (list.numItems > 0)
+        UpdateSceneWindowNode(eventData["Node"].GetNode());
 }
 
 bool CheckSceneWindowFocus()

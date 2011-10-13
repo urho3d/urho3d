@@ -29,6 +29,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "DrawableEvents.h"
 #include "Geometry.h"
 #include "Graphics.h"
 #include "IndexBuffer.h"
@@ -589,7 +590,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         
         skeleton_.Define(skeleton);
         
-        // Create scene nodes for the bones, or get from the master model if not master
+        // Create scene nodes for the bones
         if (createBones)
         {
             Vector<Bone>& bones = skeleton_.GetModifiableBones();
@@ -609,6 +610,12 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                     bones[parentIndex].node_->AddChild(bones[i].node_);
             }
         }
+        
+        using namespace BoneHierarchyCreated;
+        
+        VariantMap eventData;
+        eventData[P_NODE] = (void*)node_;
+        SendEvent(E_BONEHIERARCHYCREATED, eventData);
     }
     else
     {

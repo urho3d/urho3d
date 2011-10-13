@@ -189,6 +189,7 @@ void LoadScene(const String&in fileName)
 
     // Clear the old scene
     ClearSelection();
+    ClearSceneWindow();
     editorScene.Clear();
 
     // Add the new resource path

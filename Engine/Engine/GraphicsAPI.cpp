@@ -875,6 +875,12 @@ static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned cha
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");
 }
 
+static void OctreeAddDrawable(Drawable* drawable, Octree* ptr)
+{
+    if (drawable && !drawable->GetOctant())
+        ptr->AddDrawable(drawable);
+}
+
 static Octree* SceneGetOctree(Scene* ptr)
 {
     return ptr->GetComponent<Octree>();
@@ -904,6 +910,7 @@ static void RegisterOctree(asIScriptEngine* engine)
     RegisterComponent<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void Resize(const BoundingBox&in, uint)", asMETHOD(Octree, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHOD(Octree, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void AddDrawable(Drawable@+)", asFUNCTION(OctreeAddDrawable), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);

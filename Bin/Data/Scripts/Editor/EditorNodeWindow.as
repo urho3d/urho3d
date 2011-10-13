@@ -237,18 +237,9 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (!intermediateEdit)
         UpdateAttributes(false);
 
-    // If a model was loaded, update the scene hierarchy in case bones were recreated
-    if (serializables[0].attributes[index].GetResourceRef().type == ShortStringHash("Model"))
-    {
-        if (editNode !is null)
-            UpdateSceneWindowNode(editNode);
-    }
-    else
-    {
-        // If node name changed, update it in the scene window also
-        if (serializables[0].attributeInfos[index].name == "Name" && editNode !is null)
-            UpdateSceneWindowNodeOnly(editNode);
-    }
+    // If node name changed, update it in the scene window also
+    if (serializables[0] is editNode && serializables[0].attributeInfos[index].name == "Name")
+        UpdateSceneWindowNodeOnly(editNode);
 }
 
 uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
@@ -958,8 +949,6 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
     if (res is null)
         return;
 
-    bool isModel = false;
-    
     for (uint i = 0; i < resourcePickIDs.length; ++i)
     {
         Component@ target = editorScene.GetComponent(resourcePickIDs[i]);
@@ -972,7 +961,6 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             ref.id = StringHash(resourceName);
             target.attributes[resourcePickIndex] = Variant(ref);
             target.ApplyAttributes();
-            isModel = ref.type == ShortStringHash("Model");
         }
         else if (info.type == VAR_RESOURCEREFLIST)
         {
@@ -987,10 +975,6 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
     }
 
     UpdateAttributes(false);
-
-    // If a model was loaded, update the scene hierarchy in case bones were recreated
-    if (isModel && editNode !is null)
-        UpdateSceneWindowNode(editNode);
 
     resourcePickIDs.Clear();
     @resourcePicker = null;
