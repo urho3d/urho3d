@@ -6,7 +6,7 @@ const int ITEM_COMPONENT = 2;
 const uint NO_ITEM = 0xffffffff;
 
 Window@ sceneWindow;
-XMLFile copyBuffer;
+Array<XMLFile@> copyBuffer;
 bool copyBufferLocal = false;
 bool copyBufferExpanded = false;
 
@@ -113,7 +113,7 @@ void UpdateSceneWindow()
     UpdateSceneWindowNode(0, editorScene);
 
     // Clear copybuffer when whole window refreshed
-    copyBuffer.CreateRoot("none");
+    copyBuffer.Clear();
 }
 
 uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
@@ -841,90 +841,110 @@ bool SceneCut()
 
 bool SceneCopy()
 {
-    /// \todo allow multi-copy
-    if (editNode is null || !CheckSceneWindowFocus())
+    if ((selectedNodes.empty && selectedComponents.empty) || !CheckSceneWindowFocus())
         return false;
-    Component@ editComponent = editComponents.length == 1 ? editComponents[0] : null;
+
+    // Must have either only components, or only nodes
+    if (!selectedNodes.empty && !selectedComponents.empty)
+        return false;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
+    copyBuffer.Clear();
 
-    // Copy component
-    if (editNode !is null && editComponent !is null)
+    // Copy components
+    if (!selectedComponents.empty)
     {
-        XMLElement rootElem = copyBuffer.CreateRoot("component");
-        editComponent.SaveXML(rootElem);
-        // Note: component type has to be saved manually
-        rootElem.SetString("type", editComponent.typeName);
-        copyBufferLocal = editComponent.id >= FIRST_LOCAL_ID;
+        for (uint i = 0; i < selectedComponents.length; ++i)
+        {
+            XMLFile@ xml = XMLFile();
+            XMLElement rootElem = xml.CreateRoot("component");
+            selectedComponents[i].SaveXML(rootElem);
+            // Note: component type has to be saved manually
+            rootElem.SetString("type", selectedComponents[i].typeName);
+            rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
+            copyBuffer.Push(xml);
+        }
         return true;
     }
     // Copy node. The root node can not be copied
-    else if (editNode !is null && editComponent is null && editNode !is editorScene)
+    else
     {
-        XMLElement rootElem = copyBuffer.CreateRoot("node");
-        editNode.SaveXML(rootElem);
-        copyBufferLocal = editNode.id >= FIRST_LOCAL_ID;
-        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(editNode));
+        for (uint i = 0; i < selectedNodes.length; ++i)
+        {
+            if (selectedNodes[i] is editorScene)
+                return false;
+        }
+
+        for (uint i = 0; i < selectedNodes.length; ++i)
+        {
+            XMLFile@ xml = XMLFile();
+            XMLElement rootElem = xml.CreateRoot("node");
+            selectedNodes[i].SaveXML(rootElem);
+            rootElem.SetBool("local", selectedNodes[i].id >= FIRST_LOCAL_ID);
+            copyBuffer.Push(xml);
+        }
+
+        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(selectedNodes[0]));
         return true;
     }
-    
-    return false;
 }
 
 bool ScenePaste()
 {
-    /// \todo allow multi-paste
-    if (editNode is null || !CheckSceneWindowFocus())
+    if (editNode is null || !CheckSceneWindowFocus() || copyBuffer.empty)
         return false;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    XMLElement rootElem = copyBuffer.root;
-    String mode = rootElem.name;
+    bool pasteComponents = false;
 
-    if (mode == "component")
+    for (uint i = 0; i < copyBuffer.length; ++i)
     {
-        BeginModify(editNode.id);
-
-        // If this is the root node, do not allow to create duplicate scene-global components
-        if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
-            return false;
-
-        // If copied component was local, make the new local too
-        Component@ newComponent = editNode.CreateComponent(rootElem.GetAttribute("type"), copyBufferLocal ? LOCAL :
-            REPLICATED);
-        if (newComponent is null)
+        XMLElement rootElem = copyBuffer[i].root;
+        String mode = rootElem.name;
+        if (mode == "component")
         {
+            pasteComponents = true;
+
+            // If this is the root node, do not allow to create duplicate scene-global components
+            if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
+                return false;
+
+            BeginModify(editNode.id);
+
+            // If copied component was local, make the new local too
+            Component@ newComponent = editNode.CreateComponent(rootElem.GetAttribute("type"), rootElem.GetBool("local") ? LOCAL :
+                REPLICATED);
+            if (newComponent is null)
+            {
+                EndModify(editNode.id);
+                return false;
+            }
+            newComponent.LoadXML(rootElem);
+            newComponent.ApplyAttributes();
             EndModify(editNode.id);
-            return false;
         }
-        newComponent.LoadXML(rootElem);
-        newComponent.ApplyAttributes();
-        EndModify(editNode.id);
+        else if (mode == "node")
+        {
+            // Make the paste go always to the root node, no matter of the selected node
+            BeginModify(editorScene.id);
+            // If copied node was local, make the new local too
+            Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+            BeginModify(newNode.id);
+            newNode.LoadXML(rootElem);
+            newNode.ApplyAttributes();
+            EndModify(newNode.id);
+            EndModify(editorScene.id);
 
+            uint addIndex = GetParentAddIndex(newNode);
+            UpdateSceneWindowNode(addIndex, newNode);
+            RestoreExpandedStatus(addIndex, copyBufferExpanded);
+        }
+    }
+
+    if (pasteComponents)
         UpdateSceneWindowNode(editNode);
-        list.selection = GetComponentListIndex(newComponent);
-        return true;
-    }
-    else if (mode == "node")
-    {
-        // Make the paste go always to the root node, no matter of the selected node
-        BeginModify(editorScene.id);
-        // If copied node was local, make the new local too
-        Node@ newNode = editorScene.CreateChild("", copyBufferLocal ? LOCAL : REPLICATED);
-        BeginModify(newNode.id);
-        newNode.LoadXML(rootElem);
-        newNode.ApplyAttributes();
-        EndModify(newNode.id);
-        EndModify(editorScene.id);
 
-        uint addIndex = GetParentAddIndex(newNode);
-        UpdateSceneWindowNode(addIndex, newNode);
-        RestoreExpandedStatus(addIndex, copyBufferExpanded);
-        list.selection = addIndex;
-        return true;
-    }
-    
-    return false;
+    return true;
 }
 
 bool SaveExpandedStatus(uint itemIndex)
