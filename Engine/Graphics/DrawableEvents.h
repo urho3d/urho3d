@@ -25,30 +25,8 @@
 
 #include "Object.h"
 
-/// Operating system window message.
-EVENT(E_WINDOWMESSAGE, WindowMessage)
+/// AnimatedModel bone hierarchy created.
+EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
 {
-    PARAM(P_WINDOW, Window);                // int
-    PARAM(P_MSG, Msg);                      // int
-    PARAM(P_WPARAM, WParam);                // int
-    PARAM(P_LPARAM, LParam);                // int
-    PARAM(P_HANDLED, Handled);              // bool
-}
-
-/// New screen mode set.
-EVENT(E_SCREENMODE, ScreenMode)
-{
-    PARAM(P_WIDTH, Width);                  // int
-    PARAM(P_HEIGHT, Height);                // int
-    PARAM(P_FULLSCREEN, Fullscreen);        // bool
-}
-
-/// Frame rendering started.
-EVENT(E_BEGINRENDERING, BeginRendering)
-{
-}
-
-/// Frame rendering ended.
-EVENT(E_ENDRENDERING, EndRendering)
-{
+    PARAM(P_NODE, Node);                    // Node pointer
 }

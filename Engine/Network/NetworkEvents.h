@@ -43,34 +43,34 @@ EVENT(E_CONNECTFAILED, ConnectFailed)
 /// New client connection established.
 EVENT(E_CLIENTCONNECTED, ClientConnected)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Client connection disconnected.
 EVENT(E_CLIENTDISCONNECTED, ClientDisconnected)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Client has sent identity: identity map is in the event data.
 EVENT(E_CLIENTIDENTITY, ClientIdentity)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
-    PARAM(P_ALLOW, Allow);                // bool
+    PARAM(P_CONNECTION, Connection);        // Connection pointer
+    PARAM(P_ALLOW, Allow);                  // bool
 }
 
 /// Client has informed to have loaded the scene.
 EVENT(E_CLIENTSCENELOADED, ClientSceneLoaded)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Unhandled network message received.
 EVENT(E_NETWORKMESSAGE, NetworkMessage)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
-    PARAM(P_MESSAGEID, MessageID);        // int
-    PARAM(P_DATA, Data);                  // Buffer
+    PARAM(P_CONNECTION, Connection);        // Connection pointer
+    PARAM(P_MESSAGEID, MessageID);          // int
+    PARAM(P_DATA, Data);                    // Buffer
 }
 
 /// About to send network update on the client or server.

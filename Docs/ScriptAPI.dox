@@ -1976,6 +1976,7 @@ Methods:<br>
 - void Remove()
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
+- void AddDrawable(Drawable@)
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Vector3&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
@@ -2958,6 +2959,7 @@ Methods:<br>
 - void SetChildItemsVisible(uint, bool)
 - void SetChildItemsVisible(bool)
 - void ToggleChildItemsVisible(uint)
+- bool IsSelected(uint) const
 - UIElement@[]@ GetItems() const
 
 Properties:<br>

@@ -32,66 +32,66 @@
 /// Mouse button pressed.
 EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {
-    PARAM(P_BUTTON, Button);              // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse button released.
 EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 {
-    PARAM(P_BUTTON, Button);              // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse moved.
 EVENT(E_MOUSEMOVE, MouseMove)
 {
-    PARAM(P_DX, DX);                      // int
-    PARAM(P_DY, DY);                      // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_DX, DX);                        // int
+    PARAM(P_DY, DY);                        // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse wheel moved.
 EVENT(E_MOUSEWHEEL, MouseWheel)
 {
-    PARAM(P_WHEEL, Wheel);                // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_WHEEL, Wheel);                  // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Key pressed.
 EVENT(E_KEYDOWN, KeyDown)
 {
-    PARAM(P_KEY, Key);                    // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
-    PARAM(P_REPEAT, Repeat);              // bool
+    PARAM(P_KEY, Key);                      // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    PARAM(P_REPEAT, Repeat);                // bool
 }
 
 /// Key released.
 EVENT(E_KEYUP, KeyUp)
 {
-    PARAM(P_KEY, Key);                    // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_KEY, Key);                      // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Character typed on the keyboard.
 EVENT(E_CHAR, Char)
 {
-    PARAM(P_CHAR, Char);                  // int
-    PARAM(P_BUTTONS, Buttons);            // int
-    PARAM(P_QUALIFIERS, Qualifiers);      // int
+    PARAM(P_CHAR, Char);                    // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Application activation state changed.
 EVENT(E_ACTIVATION, Activation)
 {
-    PARAM(P_ACTIVE, Active);              // bool
-    PARAM(P_MINIMIZED, Minimized);        // bool
+    PARAM(P_ACTIVE, Active);                // bool
+    PARAM(P_MINIMIZED, Minimized);          // bool
 }
 
 static const int MOUSEB_LEFT = 1;

@@ -28,35 +28,35 @@
 /// Variable timestep scene update.
 EVENT(E_SCENEUPDATE, SceneUpdate)
 {
-    PARAM(P_SCENE, Scene);                // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);          // float
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Scene subsystem update.
 EVENT(E_SCENESUBSYSTEMUPDATE, SceneSubsystemUpdate)
 {
-    PARAM(P_SCENE, Scene);                // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);          // float
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Variable timestep scene post-update.
 EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {
-    PARAM(P_SCENE, Scene);                // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);          // float
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Asynchronous scene loading progress.
 EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
 {
-    PARAM(P_SCENE, Scene);                // Scene pointer
-    PARAM(P_PROGRESS, Progress);          // float
-    PARAM(P_LOADEDNODES, LoadedNodes);    // int
-    PARAM(P_TOTALNODES, TotalNodes);      // int
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_PROGRESS, Progress);            // float
+    PARAM(P_LOADEDNODES, LoadedNodes);      // int
+    PARAM(P_TOTALNODES, TotalNodes);        // int
 };
 
 /// Asynchronous scene loading finished.
 EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
 {
-    PARAM(P_SCENE, Scene);                // Scene pointer
+    PARAM(P_SCENE, Scene);                  // Scene pointer
 };

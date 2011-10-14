@@ -28,5 +28,5 @@
 /// Log message event.
 EVENT(E_LOGMESSAGE, LogMessage)
 {
-    PARAM(P_MESSAGE, Message);          // string
+    PARAM(P_MESSAGE, Message);              // String
 }
