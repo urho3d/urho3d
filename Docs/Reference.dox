@@ -377,9 +377,11 @@ When setting the initial screen mode, Graphics does a few checks:
 
 \section Rendering_Renderer Renderer
 
-Renderer implements the rendering of 3D scene(s) each frame. To do this, it needs a Scene with an Octree component, and a Camera that does not necessarily have to belong to the scene. The octree stores all visible components (derived from Drawable) to allow querying for them in an accelerated manner. Global rendering quality settings such as texture quality, material quality, specular lighting and shadow rendering are controlled from this subsystem.
+Renderer implements the actual rendering of 3D views each frame, and controls global settings such as texture quality, material quality, specular lighting and shadow map base resolution.
 
-The scene, camera and screen rectangle to use are set with Renderer's \ref Renderer::SetViewport "SetViewport()" function. By default there is one viewport, but the amount can be increased with the function \ref Renderer::SetNumViewports "SetNumViewports()". The viewport(s) should cover the entire screen or otherwise hall-of-mirrors artifacts may occur. By specifying a zero screen rectangle the whole window will be used automatically. The viewports will be rendered in ascending order, so if you want for example to have a small overlay window on top of the main viewport, use viewport index 0 for the main view, and 1 for the overlay.
+To render, it needs a Scene with an Octree component, and a Camera that does not necessarily have to belong to the scene. The octree stores all visible components (derived from Drawable) to allow querying for them in an accelerated manner. The scene, camera and screen rectangle to use are set with Renderer's \ref Renderer::SetViewport "SetViewport()" function.
+
+By default there is one viewport, but the amount can be increased with the function \ref Renderer::SetNumViewports "SetNumViewports()". The viewport(s) should cover the entire screen or otherwise hall-of-mirrors artifacts may occur. By specifying a zero screen rectangle the whole window will be used automatically. The viewports will be rendered in ascending order, so if you want for example to have a small overlay window on top of the main viewport, use viewport index 0 for the main view, and 1 for the overlay.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -387,8 +389,6 @@ The steps for rendering each viewport on each frame are roughly the following:
 - Check the influence of each visible light on the objects. If the light casts shadows, query the octree for shadowcaster geometries.
 - Construct render operations (batches) for the visible objects.
 - Perform these render operations during the rendering step at the end of the frame.
-
-For opaque, non-skinned geometry, batches using the same material and same vertex/index buffers are automatically grouped together for hardware instancing when SM3.0 hardware is available. This reduces the actual draw call count needed. Even when instancing is not available, the CPU load is slightly reduced as the rendering state only needs to be checked for each group, not each draw call.
 
 The rendering operations are divided into passes in the following order:
 
@@ -415,11 +415,11 @@ The rendering-related components defined by the %Graphics library are:
 
 \section Rendering_Optimizations Optimizations
 
-The following techniques will be used to reduce the amount of GPU and driver work. By default they are all on:
+The following techniques will be used to reduce the amount of CPU and GPU work when rendering. By default they are all on:
 
 - Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Occlusion will also be used to optimize away directional light shadow casters that are behind another shadow caster. Use \ref Renderer::SetMaxOccluderTriangles() "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold() "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold.
+- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: before rendering objects lit by a spot or point light, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
