@@ -562,6 +562,11 @@ void HandleNodeListSelectionChange()
         }
     }
 
+    if (selectedNodes.empty && editNode !is null)
+        editNodes.Push(editNode);
+    else
+        editNodes = selectedNodes;
+
     UpdateNodeWindow();
 }
 

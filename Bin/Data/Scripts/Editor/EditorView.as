@@ -174,7 +174,7 @@ void MoveCamera(float timeStep)
     }
 
     // Move/rotate/scale object
-    if (!selectedNodes.empty && ui.focusElement is null && input.keyDown[KEY_LCTRL])
+    if (!editNodes.empty && ui.focusElement is null && input.keyDown[KEY_LCTRL])
     {
         bool changed = false;
         Vector3 adjust(0, 0, 0);
@@ -210,9 +210,9 @@ void MoveCamera(float timeStep)
             case OBJ_MOVE:
                 if (!moveSnap)
                 {
-                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    for (uint i = 0; i < editNodes.length; ++i)
                     {
-                        Node@ node = selectedNodes[i];
+                        Node@ node = editNodes[i];
                         Vector3 nodeAdjust = adjust;
                         if (axisMode == AXIS_LOCAL)
                             nodeAdjust = node.rotation * nodeAdjust;
@@ -225,9 +225,9 @@ void MoveCamera(float timeStep)
             case OBJ_ROTATE:
                 if (!rotateSnap)
                 {
-                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    for (uint i = 0; i < editNodes.length; ++i)
                     {
-                        Node@ node = selectedNodes[i];
+                        Node@ node = editNodes[i];
                         Vector3 euler = node.rotation.eulerAngles;
                         euler.x += adjust.z * rotateStep;
                         euler.y += adjust.x * rotateStep;
@@ -241,9 +241,9 @@ void MoveCamera(float timeStep)
             case OBJ_SCALE:
                 if (!scaleSnap)
                 {
-                    for (uint i = 0; i < selectedNodes.length; ++i)
+                    for (uint i = 0; i < editNodes.length; ++i)
                     {
-                        Node@ node = selectedNodes[i];
+                        Node@ node = editNodes[i];
                         node.scale = node.scale + adjust * scaleStep;
                     }
                     changed = true;
@@ -259,7 +259,7 @@ void MoveCamera(float timeStep)
 
 void SteppedObjectManipulation(int key)
 {
-    if (selectedNodes.empty)
+    if (editNodes.empty)
         return;
 
     // Do not react in non-snapped mode, because that is handled in frame update
@@ -297,9 +297,9 @@ void SteppedObjectManipulation(int key)
     switch (moveMode)
     {
     case OBJ_MOVE:
-        for (uint i = 0; i < selectedNodes.length; ++i)
+        for (uint i = 0; i < editNodes.length; ++i)
         {
-            Node@ node = selectedNodes[i];
+            Node@ node = editNodes[i];
             Vector3 nodeAdjust = adjust;
             if (axisMode == AXIS_LOCAL)
                 nodeAdjust = node.rotation * nodeAdjust;
@@ -325,9 +325,9 @@ void SteppedObjectManipulation(int key)
         break;
 
     case OBJ_ROTATE:
-        for (uint i = 0; i < selectedNodes.length; ++i)
+        for (uint i = 0; i < editNodes.length; ++i)
         {
-            Node@ node = selectedNodes[i];
+            Node@ node = editNodes[i];
             Vector3 rot = node.rotation.eulerAngles;
             if (adjust.z != 0)
             {
@@ -349,9 +349,9 @@ void SteppedObjectManipulation(int key)
         break;
 
     case OBJ_SCALE:
-        for (uint i = 0; i < selectedNodes.length; ++i)
+        for (uint i = 0; i < editNodes.length; ++i)
         {
-            Node@ node = selectedNodes[i];
+            Node@ node = editNodes[i];
             Vector3 scale = node.scale;
             if (adjust.x != 0)
             {

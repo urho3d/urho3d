@@ -23,6 +23,7 @@ int pickMode = PICK_GEOMETRIES;
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
+Array<Node@> editNodes;
 Array<Component@> editComponents;
 
 Array<int> pickModeDrawableFlags = {
@@ -36,6 +37,7 @@ void ClearSelection()
     selectedNodes.Clear();
     selectedComponents.Clear();
     editNode = null;
+    editNodes.Clear();
     editComponents.Clear();
 }
 
