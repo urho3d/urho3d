@@ -62,11 +62,6 @@ void Component::SetNode(Node* node)
     OnNodeSet(node_);
 }
 
-bool Component::HasComponent(ShortStringHash type) const
-{
-    return node_ ? node_->HasComponent(type) : false;
-}
-
 Component* Component::GetComponent(ShortStringHash type) const
 {
     return node_ ? node_->GetComponent(type) : 0;
