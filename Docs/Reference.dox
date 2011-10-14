@@ -26,12 +26,12 @@ Classes that derive from Object contain type-identification, they can be created
 
 The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 16-bit hash of the type name (GetType() or GetTypeStatic()).
 
-In addition the OBJECTTYPESTATIC(className) macro must appear in a .cpp file to actually define the type identification data. The reason for doing this instead of defining the data directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
+In addition the OBJECTTYPESTATIC(className) macro must appear in a .cpp file to actually define the type identification data. The reason for this instead of defining the data directly inside the OBJECT macro as function-static data is thread safety: function-static data is initialized on the first use, and if the first call to an object's GetTypeStatic() or GetTypeNameStatic() happened on several threads simultaneously, the results would be undefined.
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
 \code
-context_->RegisterFactory<Camera>();
+context_->RegisterFactory<MyClass>();
 \endcode
 
 To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
@@ -1336,8 +1336,8 @@ uint       Number of shader variations
 
 - Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, Serializer& dest.
 
-- Class definitions in header files proceed in the following order:
-  - public constructors and destructors
+- Class definitions proceed in the following order:
+  - public constructors and the destructor
   - public virtual functions
   - public non-virtual member functions
   - public static functions
@@ -1345,7 +1345,7 @@ uint       Number of shader variations
   - public static variables
   - repeat all of the above in order for protected definitions, and finally private
 
-- Header files are commented using one-line comments beginning with /// to mark the comments for Doxygen.
+- Header files are commented using one-line comments beginning with /// to mark them for Doxygen.
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
