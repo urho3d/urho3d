@@ -102,6 +102,10 @@
 - uint LAST_REPLICATED_ID
 - uint FIRST_LOCAL_ID
 - uint LAST_LOCAL_ID
+- uint VO_NONE
+- uint VO_LOW_MATERIAL_QUALITY
+- uint VO_DISABLE_SHADOWS
+- uint VO_DISABLE_OCCLUSION
 - uint DRAWABLE_GEOMETRY
 - uint DRAWABLE_LIGHT
 - uint DRAWABLE_ZONE
@@ -1263,6 +1267,7 @@ Properties:<br>
 - bool autoAspectRatio
 - Vector2& projectionOffset
 - uint viewMask
+- uint viewOverrideFlags
 - Frustum frustum (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)

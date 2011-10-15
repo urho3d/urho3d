@@ -120,11 +120,11 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     maxOccluderTriangles_ = renderer_->GetMaxOccluderTriangles();
     
     unsigned viewOverrideFlags = camera_->GetViewOverrideFlags();
-    if (viewOverrideFlags & VOF_LOW_MATERIAL_QUALITY)
+    if (viewOverrideFlags & VO_LOW_MATERIAL_QUALITY)
         materialQuality_ = QUALITY_LOW;
-    if (viewOverrideFlags & VOF_DISABLE_SHADOWS)
+    if (viewOverrideFlags & VO_DISABLE_SHADOWS)
         drawShadows_ = false;
-    if (viewOverrideFlags & VOF_DISABLE_OCCLUSION)
+    if (viewOverrideFlags & VO_DISABLE_OCCLUSION)
         maxOccluderTriangles_ = 0;
     
     return true;

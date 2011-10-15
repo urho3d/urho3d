@@ -47,7 +47,7 @@ Camera::Camera(Context* context) :
     orthographic_(false),
     autoAspectRatio_(true),
     viewMask_(DEFAULT_VIEWMASK),
-    viewOverrideFlags_(VOF_NONE),
+    viewOverrideFlags_(VO_NONE),
     projectionOffset_(Vector2::ZERO)
 {
 }
@@ -70,7 +70,7 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VOF_NONE, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", projectionOffset_, Vector2::ZERO, AM_DEFAULT);
 }
 
