@@ -227,6 +227,14 @@ public:
     
     /// Return world-space unsmoothed (target) transform. Is recalculated each time.
     Matrix3x4 GetWorldTargetTransform() const;
+    /// Convert a local-space position to world space.
+    Vector3 LocalToWorld(const Vector3& position) const;
+    /// Convert a local-space position or rotation to world space.
+    Vector3 LocalToWorld(const Vector4& vector) const;
+    /// Convert a world-space position to local space.
+    Vector3 WorldToLocal(const Vector3& position) const;
+    /// Convert a world-space position or rotation to local space.
+    Vector3 WorldToLocal(const Vector4& vector) const;
     /// Return whether transform has changed and world transform needs recalculation.
     bool IsDirty() const { return dirty_; }
     /// Return whether motion smoothing is enabled.

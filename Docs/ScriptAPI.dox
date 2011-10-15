@@ -1095,6 +1095,10 @@ Methods:<br>
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
+- Vector3 LocalToWorld(const Vector3&) const
+- Vector3 LocalToWorld(const Vector4&) const
+- Vector3 WorldToLocal(const Vector3&) const
+- Vector3 WorldToLocal(const Vector4&) const
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
 - ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
 - ScriptObject@ GetScriptObject() const
@@ -1174,6 +1178,10 @@ Methods:<br>
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
+- Vector3 LocalToWorld(const Vector3&) const
+- Vector3 LocalToWorld(const Vector4&) const
+- Vector3 WorldToLocal(const Vector3&) const
+- Vector3 WorldToLocal(const Vector4&) const
 - bool LoadXML(File@)
 - bool SaveXML(File@)
 - bool LoadAsync(File@)

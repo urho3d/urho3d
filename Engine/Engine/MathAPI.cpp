@@ -279,12 +279,18 @@ static void ConstructVector4Init(float x, float y, float z, float w, Vector4* pt
     new(ptr) Vector4(x, y, z, w);
 }
 
+static void ConstructVector4InitVector3(const Vector3& vector, float w, Vector4* ptr)
+{
+    new(ptr) Vector4(vector, w);
+}
+
 static void RegisterVector4(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Vector4", sizeof(Vector4), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVector4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(ConstructVector4Copy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructVector4Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Vector4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(ConstructVector4InitVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Vector4", "Vector4& opAssign(const Vector4&in)", asMETHOD(Vector4, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "Vector4& opAddAssign(const Vector4&in)", asMETHOD(Vector4, operator +=), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "Vector4& opSubAssign(const Vector4&in)", asMETHOD(Vector4, operator -=), asCALL_THISCALL);

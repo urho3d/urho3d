@@ -524,6 +524,10 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(T, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector4&in) const", asMETHODPR(T, LocalToWorld, (const Vector4&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 WorldToLocal(const Vector3&in) const", asMETHODPR(T, WorldToLocal, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 WorldToLocal(const Vector4&in) const", asMETHODPR(T, WorldToLocal, (const Vector4&) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_position(const Vector3&in)", asMETHOD(T, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_position() const", asMETHOD(T, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_rotation(const Quaternion&in)", asMETHOD(T, SetRotation), asCALL_THISCALL);

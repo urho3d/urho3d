@@ -596,6 +596,26 @@ Matrix3x4 Node::GetWorldTargetTransform() const
     return ret;
 }
 
+Vector3 Node::LocalToWorld(const Vector3& position) const
+{
+    return GetWorldTransform() * position;
+}
+
+Vector3 Node::LocalToWorld(const Vector4& vector) const
+{
+    return GetWorldTransform() * vector;
+}
+
+Vector3 Node::WorldToLocal(const Vector3& position) const
+{
+    return GetWorldTransform().Inverse() * position;
+}
+
+Vector3 Node::WorldToLocal(const Vector4& vector) const
+{
+    return GetWorldTransform().Inverse() * vector;
+}
+
 unsigned Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)

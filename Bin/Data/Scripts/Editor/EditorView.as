@@ -215,7 +215,9 @@ void MoveCamera(float timeStep)
                         Node@ node = editNodes[i];
                         Vector3 nodeAdjust = adjust;
                         if (axisMode == AXIS_LOCAL)
-                            nodeAdjust = node.rotation * nodeAdjust;
+                            nodeAdjust = node.worldRotation * nodeAdjust;
+                        if (node.parent !is null)
+                            nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
                         node.position = node.position + nodeAdjust * moveStep;
                     }
                     changed = true;
@@ -302,7 +304,9 @@ void SteppedObjectManipulation(int key)
             Node@ node = editNodes[i];
             Vector3 nodeAdjust = adjust;
             if (axisMode == AXIS_LOCAL)
-                nodeAdjust = node.rotation * nodeAdjust;
+                nodeAdjust = node.worldRotation * nodeAdjust;
+            if (node.parent !is null)
+                nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
 
             Vector3 pos = node.position;
             if (adjust.x != 0)
