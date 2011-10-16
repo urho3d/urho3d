@@ -34,6 +34,34 @@ Vector3 Ray::Project(const Vector3& point) const
     return origin_ + offset.DotProduct(direction_) * direction_;
 }
 
+float Ray::Distance(const Vector3& point) const
+{
+    Vector3 projected = Project(point);
+    return (point - projected).Length();
+}
+
+Vector3 Ray::ClosestPoint(const Ray& ray) const
+{
+    // Algorithm based on http://paulbourke.net/geometry/lineline3d/
+    Vector3 p13 = origin_ - ray.origin_;
+    Vector3 p43 = ray.direction_;
+    Vector3 p21 = direction_;
+    
+    float d1343 = p13.DotProduct(p43);
+    float d4321 = p43.DotProduct(p21);
+    float d1321 = p13.DotProduct(p21);
+    float d4343 = p43.DotProduct(p43);
+    float d2121 = p21.DotProduct(p21);
+    
+    float d = d2121 * d4343 - d4321 * d4321;
+    if (fabsf(d) < M_EPSILON)
+        return origin_;
+    float n = d1343 * d4321 - d1321 * d4343;
+    float a = n / d;
+    
+    return origin_ + a * direction_;
+}
+
 float Ray::HitDistance(const Plane& plane) const
 {
     float d = plane.normal_.DotProduct(direction_);

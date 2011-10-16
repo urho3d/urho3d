@@ -564,6 +564,7 @@ void HandleNodeListSelectionChange()
     else
         editNodes = selectedNodes;
 
+    PositionGizmo();
     UpdateNodeWindow();
 }
 

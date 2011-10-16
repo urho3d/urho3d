@@ -451,7 +451,8 @@ void ViewRaycast(bool mouseClick)
     IntVector2 pos = ui.cursorPosition;
     Component@ selected;
 
-    if (ui.GetElementAt(pos) !is null)
+    // Do not raycast / change selection if hovering over an UI element or the gizmo
+    if (ui.GetElementAt(pos) !is null || IsGizmoSelected())
         return;
 
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
@@ -462,7 +463,7 @@ void ViewRaycast(bool mouseClick)
             return;
 
         Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
-            pickModeDrawableFlags[pickMode]);
+            pickModeDrawableFlags[pickMode], 0x7fffffff);
         if (!result.empty)
         {
             for (uint i = 0; i < result.length; ++i)

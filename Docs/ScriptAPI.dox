@@ -460,6 +460,9 @@ Ray
 
 Methods:<br>
 - void Define(const Vector3&, const Vector3&)
+- Vector3 Project(const Vector3&) const
+- float Distance(const Vector3&) const
+- Vector3 ClosestPoint(const Ray&) const
 - float HitDistance(const Sphere&) const
 - float HitDistance(const BoundingBox&) const
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
@@ -1991,6 +1994,8 @@ Methods:<br>
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
 - void AddDrawable(Drawable@)
+- void AddUnculledDrawable(Drawable@)
+- void RemoveUnculledDrawable(Drawable@)
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Vector3&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)

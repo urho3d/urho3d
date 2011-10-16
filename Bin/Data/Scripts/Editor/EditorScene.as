@@ -59,6 +59,7 @@ void CreateScene()
     sceneFileName = "";
     UpdateWindowTitle();
     CreateCamera();
+    CreateGizmo();
 
     script.defaultScene = editorScene;
 }
@@ -204,6 +205,7 @@ void LoadScene(const String&in fileName)
     UpdateSceneWindow();
     UpdateNodeWindow();
     ResetCamera();
+    CreateGizmo();
 }
 
 void SaveScene(const String&in fileName)

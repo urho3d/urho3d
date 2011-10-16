@@ -416,6 +416,9 @@ static void RegisterRay(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Ray", "Ray& opAssign(const Ray&in)", asMETHOD(Ray, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "bool opEquals(const Ray&in) const", asMETHOD(Ray, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "void Define(const Vector3&in, const Vector3&in)", asMETHOD(Ray, Define), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "Vector3 Project(const Vector3&in) const", asMETHOD(Ray, Project), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "float Distance(const Vector3&in) const", asMETHOD(Ray, Distance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "Vector3 ClosestPoint(const Ray&in) const", asMETHOD(Ray, ClosestPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "float HitDistance(const Sphere&in) const", asMETHODPR(Ray, HitDistance, (const Sphere&) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "float HitDistance(const BoundingBox&in) const", asMETHODPR(Ray, HitDistance, (const BoundingBox&) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "float HitDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, HitDistance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);

@@ -75,6 +75,10 @@ public:
     
     /// Project a point on the ray.
     Vector3 Project(const Vector3& point) const;
+    /// Return distance of a point from the ray
+    float Distance(const Vector3& point) const;
+    /// Return closest point to another ray.
+    Vector3 ClosestPoint(const Ray& ray) const;
     /// Return hit distance to a plane, or infinity if no hit.
     float HitDistance(const Plane& plane) const;
     /// Return hit distance to a bounding box, or infinity if no hit.

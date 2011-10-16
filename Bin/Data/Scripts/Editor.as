@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"
+#include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
@@ -53,6 +54,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
     UpdateStats(timeStep);
     UpdateScene(timeStep);
+    UpdateGizmo();
 }
 
 void LoadConfig()

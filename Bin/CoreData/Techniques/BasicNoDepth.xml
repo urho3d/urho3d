@@ -1,0 +1,3 @@
+<technique>
+    <pass name="extra" vs="Basic" ps="Basic" depthtest="always" depthwrite="false"/>
+</technique>

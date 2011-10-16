@@ -162,11 +162,17 @@ public:
     void Resize(const BoundingBox& box, unsigned numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
+    /// Add a drawable that should not be subject to culling.
+    void AddUnculledDrawable(Drawable* drawable);
+    /// Remove an unculled drawable.
+    void RemoveUnculledDrawable(Drawable* drawable);
     
     /// Return drawable objects by a query.
     void GetDrawables(OctreeQuery& query) const;
     /// Return drawable objects by a ray query.
     void GetDrawables(RayOctreeQuery& query) const;
+    /// Return unculled drawables by drawable type. The destination vector will not be cleared.
+    void GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const;
     /// Return subdivision levels.
     unsigned GetNumLevels() const { return numLevels_; }
     
@@ -186,6 +192,8 @@ private:
     HashSet<Drawable*> drawableUpdates_;
     /// %Set of drawable objects that require reinsertion.
     HashSet<Drawable*> drawableReinsertions_;
+    /// Unculled drawables.
+    Vector<WeakPtr<Drawable> > unculledDrawables_;
     /// Subdivision level.
     unsigned numLevels_;
 };

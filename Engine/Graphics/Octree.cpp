@@ -316,6 +316,15 @@ void Octree::Update(const FrameInfo& frame)
         // Let drawables update themselves before reinsertion
         for (HashSet<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
             (*i)->Update(frame);
+        
+        for (unsigned i = unculledDrawables_.Size() - 1; i < unculledDrawables_.Size(); --i)
+        {
+            // Remove expired unculled drawables at this point
+            if (!unculledDrawables_[i])
+                unculledDrawables_.Erase(i, 1);
+            else
+                unculledDrawables_[i]->Update(frame);
+        }
     }
     
     {
@@ -357,6 +366,35 @@ void Octree::Update(const FrameInfo& frame)
     drawableReinsertions_.Clear();
 }
 
+void Octree::AddUnculledDrawable(Drawable* drawable)
+{
+    if (!drawable)
+        return;
+    
+    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    {
+        if ((*i) == drawable)
+            return;
+    }
+    
+    unculledDrawables_.Push(WeakPtr<Drawable>(drawable));
+}
+
+void Octree::RemoveUnculledDrawable(Drawable* drawable)
+{
+    if (!drawable)
+        return;
+    
+    for (Vector<WeakPtr<Drawable> >::Iterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    {
+        if ((*i) == drawable)
+        {
+            unculledDrawables_.Erase(i);
+            return;
+        }
+    }
+}
+
 void Octree::GetDrawables(OctreeQuery& query) const
 {
     PROFILE(OctreeQuery);
@@ -372,6 +410,15 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
     query.result_.Clear();
     GetDrawablesInternal(query);
     Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
+}
+
+void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const
+{
+    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    {
+        if (*i && (*i)->IsVisible() && (*i)->GetDrawableFlags() & drawableFlags)
+            dest.Push(*i);
+    }
 }
 
 void Octree::QueueUpdate(Drawable* drawable)

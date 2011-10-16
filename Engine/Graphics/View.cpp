@@ -285,6 +285,9 @@ void View::GetDrawables()
         octree_->GetDrawables(query);
     }
     
+    // Add unculled geometries & lights
+    octree_->GetUnculledDrawables(tempDrawables_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+    
     // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
     sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
     sceneBox_.defined_ = false;
