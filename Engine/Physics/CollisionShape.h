@@ -167,6 +167,8 @@ public:
     float GetBounce() const { return bounce_; }
     /// Return phantom flag.
     bool IsPhantom() const { return phantom_; }
+    /// Return the world-space bounding box
+    BoundingBox GetWorldBoundingBox() const;
     
     /// Update geometry transform and associate with rigid body if available.
     void UpdateTransform(bool nodeUpdate = false);

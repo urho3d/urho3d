@@ -35,6 +35,7 @@ class Light;
 class Matrix3x4;
 class Renderer;
 class Skeleton;
+class Sphere;
 class VertexBuffer;
 
 /// Debug rendering line.
@@ -90,6 +91,8 @@ public:
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     /// Add a polyhedron.
     void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
+    /// Add a sphere.
+    void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Add a triangle mesh.

@@ -248,7 +248,7 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
 
     if (!serializables.empty)
     {
-        /// \todo If multi-editing, this only counts the editor count of the first serializable
+        /// \todo When multi-editing, this only counts the editor count of the first serializable
         for (uint i = 0; i < serializables[0].numAttributes; ++i)
         {
             AttributeInfo info = serializables[0].attributeInfos[i];

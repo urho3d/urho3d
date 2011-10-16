@@ -26,6 +26,9 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Light.h"
+#include "Log.h"
+#include "OctreeQuery.h"
+#include "Profiler.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -161,6 +164,58 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     }
 }
 
+void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+{
+    PROFILE(RaycastLight);
+    
+    RayQueryLevel level = query.level_;
+    
+    switch (level)
+    {
+    case RAY_AABB_NOSUBOBJECTS:
+    case RAY_AABB:
+    case RAY_OBB:
+        // Do not record a raycast result for a directional light, as they would overwhelm all other results
+        if (lightType_ != LIGHT_DIRECTIONAL)
+        {
+            RayQueryResult result;
+            result.drawable_ = this;
+            result.node_ = GetNode();
+            result.distance_ = initialDistance;
+            query.result_.Push(result);
+        }
+        break;
+        
+    case RAY_TRIANGLE:
+        if (lightType_ == LIGHT_SPOT)
+        {
+            float distance = query.ray_.HitDistance(GetFrustum());
+            if (distance < query.maxDistance_)
+            {
+                LOGINFO("Frustum hitdistance: " + String(distance));
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = GetNode();
+                result.distance_ = distance;
+                query.result_.Push(result);
+            }
+        }
+        if (lightType_ == LIGHT_POINT)
+        {
+            float distance = query.ray_.HitDistance(Sphere(GetWorldPosition(), range_));
+            if (distance < query.maxDistance_)
+            {
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = GetNode();
+                result.distance_ = distance;
+                query.result_.Push(result);
+            }
+        }
+        break;
+    }
+}
+
 void Light::UpdateDistance(const FrameInfo& frame)
 {
     switch (lightType_)
@@ -185,7 +240,7 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
         
     case LIGHT_POINT:
-        debug->AddBoundingBox(GetWorldBoundingBox(), GetColor(), depthTest);
+        debug->AddSphere(Sphere(GetWorldPosition(), range_), GetColor(), depthTest);
         break;
     }
 }

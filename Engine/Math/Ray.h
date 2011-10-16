@@ -26,6 +26,7 @@
 #include "Vector3.h"
 
 class BoundingBox;
+class Frustum;
 class Plane;
 class Sphere;
 
@@ -76,10 +77,12 @@ public:
     Vector3 Project(const Vector3& point) const;
     /// Return hit distance to a plane, or infinity if no hit.
     float HitDistance(const Plane& plane) const;
-    /// Return hit distance to a sphere, or infinity if no hit.
-    float HitDistance(const Sphere& sphere) const;
     /// Return hit distance to a bounding box, or infinity if no hit.
     float HitDistance(const BoundingBox& box) const;
+    /// Return hit distance to a frustum, or infinity if no hit.
+    float HitDistance(const Frustum& frustum) const;
+    /// Return hit distance to a sphere, or infinity if no hit.
+    float HitDistance(const Sphere& sphere) const;
     /// Return hit distance to a triangle, or infinity if no hit.
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
     /// Return hit distance to a triangle mesh defined by vertex and index data, or infinity if no hit.

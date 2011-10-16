@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "BoundingBox.h"
+#include "Frustum.h"
 #include "Plane.h"
 #include "Ray.h"
 #include "Sphere.h"
@@ -37,37 +38,15 @@ float Ray::HitDistance(const Plane& plane) const
 {
     float d = plane.normal_.DotProduct(direction_);
     if (fabsf(d) >= M_EPSILON)
-        return -(plane.normal_.DotProduct(origin_) - plane.intercept_) / d;
+    {
+        float t = -(plane.normal_.DotProduct(origin_) - plane.intercept_) / d;
+        if (t >= 0.0f)
+            return t;
+        else
+            return M_INFINITY;
+    }
     else
         return M_INFINITY;
-}
-
-float Ray::HitDistance(const Sphere& sphere) const
-{
-    Vector3 centeredOrigin = origin_ - sphere.center_;
-    float squaredRadius = sphere.radius_ * sphere.radius_;
-    
-    // Check if ray originates inside the sphere
-    if (centeredOrigin.LengthSquared() <= squaredRadius)
-        return 0.0f;
-    
-    // Calculate intersection by quadratic equation
-    float a = direction_.DotProduct(direction_);
-    float b = 2.0f * centeredOrigin.DotProduct(direction_);
-    float c = centeredOrigin.DotProduct(centeredOrigin) - squaredRadius;
-    float d = b * b - 4.0f * a * c;
-    
-    // No solution
-    if (d < 0.0f)
-        return M_INFINITY;
-    
-    // Get the nearer solution
-    float dSqrt = sqrtf(d);
-    float dist = (-b - dSqrt) / (2.0f * a);
-    if (dist >= 0.0f)
-        return dist;
-    else
-        return (-b + dSqrt) / (2.0f * a);
 }
 
 float Ray::HitDistance(const BoundingBox& box) const
@@ -147,6 +126,62 @@ float Ray::HitDistance(const BoundingBox& box) const
     }
     
     return dist;
+}
+
+float Ray::HitDistance(const Frustum& frustum) const
+{
+    float maxOutside = 0.0f;
+    float minInside = M_INFINITY;
+    bool allInside = true;
+    
+    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+    {
+        const Plane& plane = frustum.planes_[i];
+        float distance = HitDistance(frustum.planes_[i]);
+        
+        if (plane.Distance(origin_) < 0.0f)
+        {
+            maxOutside = Max(maxOutside, distance);
+            allInside = false;
+        }
+        else
+            minInside = Min(minInside, distance);
+    }
+    
+    if (allInside)
+        return 0.0f;
+    else if (maxOutside <= minInside)
+        return maxOutside;
+    else
+        return M_INFINITY;
+}
+
+float Ray::HitDistance(const Sphere& sphere) const
+{
+    Vector3 centeredOrigin = origin_ - sphere.center_;
+    float squaredRadius = sphere.radius_ * sphere.radius_;
+    
+    // Check if ray originates inside the sphere
+    if (centeredOrigin.LengthSquared() <= squaredRadius)
+        return 0.0f;
+    
+    // Calculate intersection by quadratic equation
+    float a = direction_.DotProduct(direction_);
+    float b = 2.0f * centeredOrigin.DotProduct(direction_);
+    float c = centeredOrigin.DotProduct(centeredOrigin) - squaredRadius;
+    float d = b * b - 4.0f * a * c;
+    
+    // No solution
+    if (d < 0.0f)
+        return M_INFINITY;
+    
+    // Get the nearer solution
+    float dSqrt = sqrtf(d);
+    float dist = (-b - dSqrt) / (2.0f * a);
+    if (dist >= 0.0f)
+        return dist;
+    else
+        return (-b + dSqrt) / (2.0f * a);
 }
 
 float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const

@@ -99,6 +99,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "float get_bounce() const", asMETHOD(CollisionShape, GetBounce), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_phantom(bool)", asMETHOD(CollisionShape, SetPhantom), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "bool get_phantom() const", asMETHOD(CollisionShape, IsPhantom), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "BoundingBox get_worldBoundingBox() const", asMETHOD(CollisionShape, GetWorldBoundingBox), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);

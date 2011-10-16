@@ -15,10 +15,6 @@ String sceneFileName;
 String sceneResourcePath;
 bool sceneModified = false;
 bool runUpdate = false;
-bool renderingDebug = false;
-bool physicsDebug = false;
-bool octreeDebug = false;
-int pickMode = PICK_GEOMETRIES;
 
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
@@ -26,11 +22,9 @@ Node@ editNode;
 Array<Node@> editNodes;
 Array<Component@> editComponents;
 
-Array<int> pickModeDrawableFlags = {
-    DRAWABLE_GEOMETRY,
-    DRAWABLE_LIGHT,
-    DRAWABLE_ZONE
-};
+Array<XMLFile@> copyBuffer;
+bool copyBufferLocal = false;
+bool copyBufferExpanded = false;
 
 void ClearSelection()
 {
@@ -65,9 +59,6 @@ void CreateScene()
     sceneFileName = "";
     UpdateWindowTitle();
     CreateCamera();
-
-    SubscribeToEvent("PostRenderUpdate", "ScenePostRenderUpdate");
-    SubscribeToEvent("UIMouseClick", "SceneMouseClick");
 
     script.defaultScene = editorScene;
 }
@@ -259,148 +250,202 @@ void EndModify(uint nodeID)
     }
 }
 
-void ScenePostRenderUpdate()
+bool SceneDelete()
 {
-    DebugRenderer@ debug = editorScene.debugRenderer;
-    if (debug is null)
-        return;
+    if (!CheckSceneWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
+        return false;
 
-    // Visualize the currently selected nodes as their local axes + the first drawable component
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+
+    // Remove components first
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
+        Component@ component = selectedComponents[i];
+        Node@ node = component.node;
+        
+        uint index = GetComponentListIndex(component);
+        uint nodeIndex = GetNodeListIndex(node);
+        if (index == NO_ITEM || nodeIndex == NO_ITEM)
+            continue;
+
+        if (node is editorScene && (component.typeName == "Octree" || component.typeName == "PhysicsWorld" ||
+            component.typeName == "DebugRenderer"))
+            continue;
+
+        uint id = node.id;
+        BeginModify(id);
+        node.RemoveComponent(component);
+        EndModify(id);
+
+        UpdateSceneWindowNode(nodeIndex, node);
+
+        // If deleting only one component, select the next item in the same index
+        if (selectedComponents.length == 1 && selectedNodes.empty)
+        {
+            list.selection = index;
+            return true;
+        }
+    }
+
+    // Remove (parented) nodes last
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Node@ node = selectedNodes[i];
-        debug.AddNode(node, false);
-        for (uint j = 0; j < node.numComponents; ++j)
+        if (node.parent is null)
+            continue;
+
+        uint id = node.id;
+        uint nodeIndex = GetNodeListIndex(node);
+
+        BeginModify(id);
+        node.Remove();
+        EndModify(id);
+
+        UpdateSceneWindowNode(nodeIndex, null);
+
+        // Select the next item in the same index
+
+        // If deleting only one node, select the next item in the same index
+        if (selectedNodes.length == 1 && selectedComponents.empty)
         {
-            Drawable@ drawable = cast<Drawable>(node.components[j]);
-            if (drawable !is null)
-            {
-                drawable.DrawDebugGeometry(debug, false);
-                break;
-            }
+            list.selection = nodeIndex;
+            return true;
         }
     }
 
-    // Visualize the currently selected components
-    for (uint i = 0; i < selectedComponents.length; ++i)
+    // If any kind of multi-delete was performed, the list selection should be clear now.
+    // Unfortunately that also means we did not get selection change events, so must update the selection arrays manually.
+    // Otherwise nodes/components may be left in the scene even after delete, as the selection arrays keep them alive.
+    HandleNodeListSelectionChange();
+    return true;
+}
+
+bool SceneCut()
+{
+    if (SceneCopy())
+        return SceneDelete();
+    else
+        return false;
+}
+
+bool SceneCopy()
+{
+    if ((selectedNodes.empty && selectedComponents.empty) || !CheckSceneWindowFocus())
+        return false;
+
+    // Must have either only components, or only nodes
+    if (!selectedNodes.empty && !selectedComponents.empty)
+        return false;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    copyBuffer.Clear();
+
+    // Copy components
+    if (!selectedComponents.empty)
     {
-        Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
-        if (drawable !is null)
-            drawable.DrawDebugGeometry(debug, false);
-        else
+        for (uint i = 0; i < selectedComponents.length; ++i)
         {
-            CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
-            if (shape !is null)
-                shape.DrawDebugGeometry(debug, false);
+            XMLFile@ xml = XMLFile();
+            XMLElement rootElem = xml.CreateRoot("component");
+            selectedComponents[i].SaveXML(rootElem);
+            // Note: component type has to be saved manually
+            rootElem.SetString("type", selectedComponents[i].typeName);
+            rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
+            copyBuffer.Push(xml);
         }
+        return true;
     }
-
-    if (renderingDebug)
-        renderer.DrawDebugGeometry(false);
-    if (physicsDebug && editorScene.physicsWorld !is null)
-        editorScene.physicsWorld.DrawDebugGeometry(true);
-    if (octreeDebug && editorScene.octree !is null)
-        editorScene.octree.DrawDebugGeometry(true);
-
-    SceneRaycast(false);
-}
-
-void SceneMouseClick()
-{
-    SceneRaycast(true);
-}
-
-void SceneRaycast(bool mouseClick)
-{
-    DebugRenderer@ debug = editorScene.debugRenderer;
-    IntVector2 pos = ui.cursorPosition;
-    Component@ selected;
-
-    if (ui.GetElementAt(pos, true) is null)
+    // Copy node. The root node can not be copied
+    else
     {
-        Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-
-        if (pickMode != PICK_COLLISIONSHAPES)
+        for (uint i = 0; i < selectedNodes.length; ++i)
         {
-            if (editorScene.octree is null)
-                return;
-
-            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
-                pickModeDrawableFlags[pickMode]);
-            if (!result.empty)
-            {
-                for (uint i = 0; i < result.length; ++i)
-                {
-                    Drawable@ drawable = result[i].drawable;
-                    // Skip directional lights, which always block other selections
-                    Light@ light = cast<Light>(drawable);
-                    if (light !is null && light.lightType == LIGHT_DIRECTIONAL)
-                        continue;
-                    if (debug !is null)
-                    {
-                        debug.AddNode(drawable.node, false);
-                        drawable.DrawDebugGeometry(debug, false);
-                    }
-                    selected = drawable;
-                    break;
-                }
-            }
+            if (selectedNodes[i] is editorScene)
+                return false;
         }
-        else
+
+        for (uint i = 0; i < selectedNodes.length; ++i)
         {
-            if (editorScene.physicsWorld is null)
-                return;
-
-            Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
-            if (!result.empty)
-            {
-                CollisionShape@ shape = result[0].collisionShape;
-                if (debug !is null)
-                {
-                    debug.AddNode(shape.node, false);
-                    shape.DrawDebugGeometry(debug, false);
-                }
-                selected = shape;
-            }
+            XMLFile@ xml = XMLFile();
+            XMLElement rootElem = xml.CreateRoot("node");
+            selectedNodes[i].SaveXML(rootElem);
+            rootElem.SetBool("local", selectedNodes[i].id >= FIRST_LOCAL_ID);
+            copyBuffer.Push(xml);
         }
+
+        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(selectedNodes[0]));
+        return true;
     }
-    
-    if (selected !is null && mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+}
+
+bool ScenePaste()
+{
+    if (editNode is null || !CheckSceneWindowFocus() || copyBuffer.empty)
+        return false;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    bool pasteComponents = false;
+
+    for (uint i = 0; i < copyBuffer.length; ++i)
     {
-        bool multiselect = input.qualifierDown[QUAL_CTRL];
-        if (input.qualifierDown[QUAL_SHIFT])
+        XMLElement rootElem = copyBuffer[i].root;
+        String mode = rootElem.name;
+        if (mode == "component")
         {
-            // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
-            if (!selectedNodes.empty)
-                multiselect = false;
-            SelectComponent(selected, multiselect);
+            pasteComponents = true;
+
+            // If this is the root node, do not allow to create duplicate scene-global components
+            if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
+                return false;
+
+            BeginModify(editNode.id);
+
+            // If copied component was local, make the new local too
+            Component@ newComponent = editNode.CreateComponent(rootElem.GetAttribute("type"), rootElem.GetBool("local") ? LOCAL :
+                REPLICATED);
+            if (newComponent is null)
+            {
+                EndModify(editNode.id);
+                return false;
+            }
+            newComponent.LoadXML(rootElem);
+            newComponent.ApplyAttributes();
+            EndModify(editNode.id);
         }
-        else
+        else if (mode == "node")
         {
-            // If we are selecting nodes, but have components in existing selection, do not multiselect to prevent confusion
-            if (!selectedComponents.empty)
-                multiselect = false;
-            SelectNode(selected.node, multiselect);
+            // Make the paste go always to the root node, no matter of the selected node
+            BeginModify(editorScene.id);
+            // If copied node was local, make the new local too
+            Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
+            BeginModify(newNode.id);
+            newNode.LoadXML(rootElem);
+            newNode.ApplyAttributes();
+            EndModify(newNode.id);
+            EndModify(editorScene.id);
+
+            uint addIndex = GetParentAddIndex(newNode);
+            UpdateSceneWindowNode(addIndex, newNode);
+            RestoreExpandedStatus(addIndex, copyBufferExpanded);
         }
     }
+
+    if (pasteComponents)
+        UpdateSceneWindowNode(editNode);
+
+    return true;
 }
 
-void ToggleRenderingDebug()
+void CalculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion& rot, Vector3& scale)
 {
-    renderingDebug = !renderingDebug;
-}
+    Vector3 sourceWorldPos = source.worldPosition;
+    Quaternion sourceWorldRot = source.worldRotation;
+    Vector3 sourceWorldScale = source.worldScale;
 
-void TogglePhysicsDebug()
-{
-    physicsDebug = !physicsDebug;
-}
-
-void ToggleOctreeDebug()
-{
-    octreeDebug = !octreeDebug;
-}
-
-void ToggleUpdate()
-{
-    runUpdate  = !runUpdate;
+    Quaternion inverseTargetWorldRot = target.worldRotation.Inverse();
+    Vector3 inverseTargetWorldScale = Vector3(1, 1, 1) / target.worldScale;
+    scale = inverseTargetWorldScale * sourceWorldScale;
+    rot = inverseTargetWorldRot * sourceWorldRot;
+    pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.worldPosition));
 }

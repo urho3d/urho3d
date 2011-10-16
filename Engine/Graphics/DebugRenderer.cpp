@@ -172,24 +172,6 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     dest->Push(DebugLine(v3, v6, uintColor));
 }
 
-void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
-{
-    unsigned uintColor = color.ToUInt();
-    
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
-    
-    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
-    {
-        const Vector<Vector3>& face = poly.faces_[i];
-        if (face.Size() >= 3)
-        {
-            for (unsigned j = 0; j < face.Size(); ++j)
-                dest->Push(DebugLine(face[j], face[(j + 1) % face.Size()], uintColor));
-        }
-    }
-}
 
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
@@ -212,6 +194,52 @@ void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool 
     dest->Push(DebugLine(vertices[1], vertices[5], uintColor));
     dest->Push(DebugLine(vertices[2], vertices[6], uintColor));
     dest->Push(DebugLine(vertices[3], vertices[7], uintColor));
+}
+
+void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
+{
+    unsigned uintColor = color.ToUInt();
+    
+    PODVector<DebugLine>* dest = &lines_;
+    if (!depthTest)
+        dest = &noDepthLines_;
+    
+    for (unsigned i = 0; i < poly.faces_.Size(); ++i)
+    {
+        const Vector<Vector3>& face = poly.faces_[i];
+        if (face.Size() >= 3)
+        {
+            for (unsigned j = 0; j < face.Size(); ++j)
+                dest->Push(DebugLine(face[j], face[(j + 1) % face.Size()], uintColor));
+        }
+    }
+}
+
+void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
+{
+    const Vector3& center = sphere.center_;
+    float radius = sphere.radius_;
+    unsigned uintColor = color.ToUInt();
+    
+    for (unsigned i = 0; i < 360; i += 45)
+    {
+        unsigned j = i + 45;
+        float a = radius * sinf(i * M_DEGTORAD);
+        float b = radius * cosf(i * M_DEGTORAD);
+        float c = radius * sinf(j * M_DEGTORAD);
+        float d = radius * cosf(j * M_DEGTORAD);
+        Vector3 start, end;
+        
+        start = center + Vector3(a, b, 0.0f);
+        end = center + Vector3(c, d, 0.0f);
+        AddLine(start, end, uintColor, depthTest);
+        start = center + Vector3(a, 0.0f, b);
+        end = center + Vector3(c, 0.0f, d);
+        AddLine(start, end, uintColor, depthTest);
+        start = center + Vector3(0.0f, a, b);
+        end = center + Vector3(0.0f, c, d);
+        AddLine(start, end, uintColor, depthTest);
+    }
 }
 
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)

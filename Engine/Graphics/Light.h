@@ -158,6 +158,8 @@ public:
     
     /// Handle attribute change.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Process renderer raycast.
+    virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Add debug geometry to the debug graphics.

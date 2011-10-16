@@ -36,6 +36,16 @@ float scaleStep = 0.1;
 bool moveSnap = false;
 bool rotateSnap = false;
 bool scaleSnap = false;
+bool renderingDebug = false;
+bool physicsDebug = false;
+bool octreeDebug = false;
+int pickMode = PICK_GEOMETRIES;
+
+Array<int> pickModeDrawableFlags = {
+    DRAWABLE_GEOMETRY,
+    DRAWABLE_LIGHT,
+    DRAWABLE_ZONE
+};
 
 Array<String> moveModeText = {
     "Move",
@@ -63,6 +73,9 @@ void CreateCamera()
     ResetCamera();
 
     renderer.viewports[0] = Viewport(editorScene, camera);
+
+    SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+    SubscribeToEvent("UIMouseClick", "ViewMouseClick");
 }
 
 void ResetCamera()
@@ -380,6 +393,138 @@ void SteppedObjectManipulation(int key)
     UpdateAttributes(false);
 }
 
+
+void HandlePostRenderUpdate()
+{
+    DebugRenderer@ debug = editorScene.debugRenderer;
+    if (debug is null)
+        return;
+
+    // Visualize the currently selected nodes as their local axes + the first drawable component
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        Node@ node = selectedNodes[i];
+        debug.AddNode(node, false);
+        for (uint j = 0; j < node.numComponents; ++j)
+        {
+            Drawable@ drawable = cast<Drawable>(node.components[j]);
+            if (drawable !is null)
+            {
+                drawable.DrawDebugGeometry(debug, false);
+                break;
+            }
+        }
+    }
+
+    // Visualize the currently selected components
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
+        if (drawable !is null)
+            drawable.DrawDebugGeometry(debug, false);
+        else
+        {
+            CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
+            if (shape !is null)
+                shape.DrawDebugGeometry(debug, false);
+        }
+    }
+
+    if (renderingDebug)
+        renderer.DrawDebugGeometry(false);
+    if (physicsDebug && editorScene.physicsWorld !is null)
+        editorScene.physicsWorld.DrawDebugGeometry(true);
+    if (octreeDebug && editorScene.octree !is null)
+        editorScene.octree.DrawDebugGeometry(true);
+
+    ViewRaycast(false);
+}
+
+void ViewMouseClick()
+{
+    ViewRaycast(true);
+}
+
+void ViewRaycast(bool mouseClick)
+{
+    DebugRenderer@ debug = editorScene.debugRenderer;
+    IntVector2 pos = ui.cursorPosition;
+    Component@ selected;
+
+    if (ui.GetElementAt(pos, true) is null)
+    {
+        Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+
+        if (pickMode != PICK_COLLISIONSHAPES)
+        {
+            if (editorScene.octree is null)
+                return;
+
+            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
+                pickModeDrawableFlags[pickMode]);
+            if (!result.empty)
+            {
+                for (uint i = 0; i < result.length; ++i)
+                {
+                    Drawable@ drawable = result[i].drawable;
+                    if (debug !is null)
+                    {
+                        debug.AddNode(drawable.node, false);
+                        drawable.DrawDebugGeometry(debug, false);
+                    }
+                    selected = drawable;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (editorScene.physicsWorld is null)
+                return;
+
+            Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
+            if (!result.empty)
+            {
+                CollisionShape@ shape = result[0].collisionShape;
+                if (debug !is null)
+                {
+                    debug.AddNode(shape.node, false);
+                    shape.DrawDebugGeometry(debug, false);
+                }
+                selected = shape;
+            }
+        }
+    }
+    
+    if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+    {
+        bool multiselect = input.qualifierDown[QUAL_CTRL];
+        if (selected !is null)
+        {
+            if (input.qualifierDown[QUAL_SHIFT])
+            {
+                // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
+                if (!selectedNodes.empty)
+                    multiselect = false;
+                SelectComponent(selected, multiselect);
+            }
+            else
+            {
+                // If we are selecting nodes, but have components in existing selection, do not multiselect to prevent confusion
+                if (!selectedComponents.empty)
+                    multiselect = false;
+                SelectNode(selected.node, multiselect);
+            }
+        }
+        else
+        {
+            // If clicked on emptiness in non-multiselect mode, clear the selection
+            if (!multiselect)
+               SelectComponent(null, false);
+        }
+    }
+}
+
 Vector3 GetNewNodePosition()
 {
     return cameraNode.position + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
@@ -414,4 +559,24 @@ void SetShadowResolution(int level)
         renderer.drawShadows = true;
         renderer.shadowMapSize = 256 << level;
     }
+}
+
+void ToggleRenderingDebug()
+{
+    renderingDebug = !renderingDebug;
+}
+
+void TogglePhysicsDebug()
+{
+    physicsDebug = !physicsDebug;
+}
+
+void ToggleOctreeDebug()
+{
+    octreeDebug = !octreeDebug;
+}
+
+void ToggleUpdate()
+{
+    runUpdate  = !runUpdate;
 }

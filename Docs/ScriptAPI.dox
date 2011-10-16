@@ -1526,6 +1526,7 @@ Methods:<br>
 - void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
 - void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
 - void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
+- void AddSphere(const Sphere&, const Color&, bool arg2 = true)
 - void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
 
 Properties:<br>
@@ -3702,6 +3703,7 @@ Properties:<br>
 - float friction
 - float bounce
 - bool phantom
+- BoundingBox worldBoundingBox (readonly)
 
 
 RigidBody

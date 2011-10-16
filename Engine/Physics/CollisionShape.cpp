@@ -544,6 +544,25 @@ void CollisionShape::SetPhantom(bool enable)
     phantom_ = enable;
 }
 
+BoundingBox CollisionShape::GetWorldBoundingBox() const
+{
+    if (!geometry_)
+        return BoundingBox(0.0f, 0.0f);
+    
+    float aabb[6];
+    dGeomGetAABB(geometry_, aabb);
+    BoundingBox box;
+    box.min_.x_ = aabb[0];
+    box.max_.x_ = aabb[1];
+    box.min_.y_ = aabb[2];
+    box.max_.y_ = aabb[3];
+    box.min_.z_ = aabb[4];
+    box.max_.z_ = aabb[5];
+    box.defined_ = true;
+    
+    return box;
+}
+
 void CollisionShape::UpdateTransform(bool nodeUpdate)
 {
     if (!geometry_)
@@ -607,17 +626,8 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     unsigned uintColor = color->ToUInt();
     
     // Drawing all the debug geometries of a large world may be expensive (especially triangle meshes)
-    // so check the geometry AABB against the debug geometry frustum first
-    float aabb[6];
-    dGeomGetAABB(geometry_, aabb);
-    BoundingBox box;
-    box.min_.x_ = aabb[0];
-    box.max_.x_ = aabb[1];
-    box.min_.y_ = aabb[2];
-    box.max_.y_ = aabb[3];
-    box.min_.z_ = aabb[4];
-    box.max_.z_ = aabb[5];
-    if (!debug->IsInside(box))
+    // so cull the geometry AABB against the debug geometry frustum first
+    if (!debug->IsInside(GetWorldBoundingBox()))
         return;
     
     const Vector3& position = *reinterpret_cast<const Vector3*>(dGeomGetPosition(geometry_));
