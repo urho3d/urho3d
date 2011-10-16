@@ -451,51 +451,51 @@ void ViewRaycast(bool mouseClick)
     IntVector2 pos = ui.cursorPosition;
     Component@ selected;
 
-    if (ui.GetElementAt(pos, true) is null)
+    if (ui.GetElementAt(pos) !is null)
+        return;
+
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+
+    if (pickMode != PICK_COLLISIONSHAPES)
     {
-        Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+        if (editorScene.octree is null)
+            return;
 
-        if (pickMode != PICK_COLLISIONSHAPES)
+        Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
+            pickModeDrawableFlags[pickMode]);
+        if (!result.empty)
         {
-            if (editorScene.octree is null)
-                return;
-
-            Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
-                pickModeDrawableFlags[pickMode]);
-            if (!result.empty)
+            for (uint i = 0; i < result.length; ++i)
             {
-                for (uint i = 0; i < result.length; ++i)
-                {
-                    Drawable@ drawable = result[i].drawable;
-                    if (debug !is null)
-                    {
-                        debug.AddNode(drawable.node, false);
-                        drawable.DrawDebugGeometry(debug, false);
-                    }
-                    selected = drawable;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if (editorScene.physicsWorld is null)
-                return;
-
-            Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
-            if (!result.empty)
-            {
-                CollisionShape@ shape = result[0].collisionShape;
+                Drawable@ drawable = result[i].drawable;
                 if (debug !is null)
                 {
-                    debug.AddNode(shape.node, false);
-                    shape.DrawDebugGeometry(debug, false);
+                    debug.AddNode(drawable.node, false);
+                    drawable.DrawDebugGeometry(debug, false);
                 }
-                selected = shape;
+                selected = drawable;
+                break;
             }
         }
     }
-    
+    else
+    {
+        if (editorScene.physicsWorld is null)
+            return;
+
+        Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
+        if (!result.empty)
+        {
+            CollisionShape@ shape = result[0].collisionShape;
+            if (debug !is null)
+            {
+                debug.AddNode(shape.node, false);
+                shape.DrawDebugGeometry(debug, false);
+            }
+            selected = shape;
+        }
+    }
+
     if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
     {
         bool multiselect = input.qualifierDown[QUAL_CTRL];

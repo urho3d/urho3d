@@ -437,8 +437,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void Clear()", asMETHOD(UI, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHOD(UI, SetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHOD(UI, GetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition()", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);

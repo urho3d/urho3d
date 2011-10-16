@@ -3556,8 +3556,8 @@ Methods:<br>
 - void Clear()
 - UIElement@ LoadLayout(XMLFile@)
 - UIElement@ LoadLayout(XMLFile@, XMLFile@)
-- UIElement@ GetElementAt(const IntVector2&, bool)
-- UIElement@ GetElementAt(int, int, bool)
+- UIElement@ GetElementAt(const IntVector2&, bool arg1 = true)
+- UIElement@ GetElementAt(int, int, bool arg2 = true)
 
 Properties:<br>
 - ShortStringHash type (readonly)
