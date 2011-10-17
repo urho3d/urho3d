@@ -487,7 +487,7 @@ When a material defines several techniques for different LOD levels and quality 
 
 %Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported.
 
-Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. If omitted, shadow rendering will use the same culling mode as other passes.
+Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass.
 
 \section Materials_Textures Material textures
 
@@ -503,7 +503,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|extra|shadow" vs="VertexShaderName" ps="PixelShaderName"
+    <pass name="base|litbase|light|prealpha|postalpha|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
     <pass ... />
@@ -516,7 +516,8 @@ The passes are:
 - base: renders the ambient light and fog.
 - litbase: renders both the ambient light and the first light affecting the object for optimization.
 - light: renders one light's contribution additively.
-- extra: custom rendering pass. Rendered after the opaque geometry. Can be used for example to render the skybox.
+- prealpha: custom rendering pass after opaque geometry. Can be used for example to render the skybox.
+- postalpha: custom rendering pass after transparent geometry.
 - shadow: shadow map rendering pass. Renders depth only.
 
 Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, specular and no specular, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist. See the file Forward.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders for all the shader variations.

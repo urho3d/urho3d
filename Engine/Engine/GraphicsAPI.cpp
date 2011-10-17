@@ -284,7 +284,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
     engine->RegisterEnumValue("PassType", "PASS_LITBASE", PASS_LITBASE);
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
-    engine->RegisterEnumValue("PassType", "PASS_EXTRA", PASS_EXTRA);
+    engine->RegisterEnumValue("PassType", "PASS_PREALPHA", PASS_PREALPHA);
+    engine->RegisterEnumValue("PassType", "PASS_POSTALPHA", PASS_POSTALPHA);
     engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);
     
     engine->RegisterEnum("BlendMode");

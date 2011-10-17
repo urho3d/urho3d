@@ -78,9 +78,9 @@ OBJECTTYPESTATIC(Material);
 
 Material::Material(Context* context) :
     Resource(context),
+    auxViewFrameNumber_(0),
     cullMode_(CULL_CCW),
     shadowCullMode_(CULL_CCW),
-    auxViewFrameNumber_(0),
     occlusion_(true)
 {
     SetNumTechniques(1);
@@ -238,6 +238,13 @@ bool Material::Save(Serializer& dest)
         parameterElem.SetString("name", j->second_.name_);
         parameterElem.SetVector4("value", j->second_.value_);
     }
+    
+    // Write culling modes
+    XMLElement cullElem = materialElem.CreateChild("cull");
+    cullElem.SetString("value", cullModeNames[cullMode_]);
+    
+    XMLElement shadowCullElem = materialElem.CreateChild("shadowcull");
+    shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
     
     return xml->Save(dest);
 }

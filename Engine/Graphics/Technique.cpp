@@ -36,7 +36,8 @@ static const String passNames[] =
     "base",
     "litbase",
     "light",
-    "extra",
+    "prealpha",
+    "postalpha",
     "shadow",
     ""
 };

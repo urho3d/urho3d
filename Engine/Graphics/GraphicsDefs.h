@@ -168,7 +168,8 @@ enum PassType
     PASS_BASE,
     PASS_LITBASE,
     PASS_LIGHT,
-    PASS_EXTRA,
+    PASS_PREALPHA,
+    PASS_POSTALPHA,
     PASS_SHADOW,
     MAX_PASSES
 };

@@ -148,8 +148,9 @@ void View::Update(const FrameInfo& frame)
     occluders_.Clear();
     shadowOccluders_.Clear();
     baseQueue_.Clear();
-    extraQueue_.Clear();
-    transparentQueue_.Clear();
+    preAlphaQueue_.Clear();
+    alphaQueue_.Clear();
+    postAlphaQueue_.Clear();
     lightQueues_.Clear();
     
     // Do not update if camera projection is illegal
@@ -517,19 +518,25 @@ void View::GetBatches()
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                         baseQueue_.AddBatch(baseBatch);
                     else
-                        transparentQueue_.AddBatch(baseBatch, true);
-                    
+                        alphaQueue_.AddBatch(baseBatch, true);                    
                     continue;
                 }
-                else
+                
+                // If no base pass, finally check for prealpha / postalpha custom passes
+                pass = tech->GetPass(PASS_PREALPHA);
+                if (pass)
                 {
-                    // If no base pass, finally check for extra / custom pass
-                    pass = tech->GetPass(PASS_EXTRA);
-                    if (pass)
-                    {
-                        renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        extraQueue_.AddBatch(baseBatch);
-                    }
+                    renderer_->SetBatchShaders(baseBatch, tech, pass);
+                    preAlphaQueue_.AddBatch(baseBatch);
+                    continue;
+                }
+                
+                pass = tech->GetPass(PASS_POSTALPHA);
+                if (pass)
+                {
+                    renderer_->SetBatchShaders(baseBatch, tech, pass);
+                    postAlphaQueue_.AddBatch(baseBatch);
+                    continue;
                 }
             }
         }
@@ -592,7 +599,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         else
         {
             renderer_->SetBatchShaders(litBatch, tech, pass, allowTransparentShadows);
-            transparentQueue_.AddBatch(litBatch, true);
+            alphaQueue_.AddBatch(litBatch, true);
         }
     }
 }
@@ -613,8 +620,8 @@ void View::RenderBatches()
     }
     
     {
-        // Render opaque objects' base passes
-        PROFILE(RenderBasePass);
+        // Render opaque object base pass
+        PROFILE(RenderAmbient);
         
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
@@ -650,20 +657,28 @@ void View::RenderBatches()
     graphics_->SetDepthStencil(depthStencil_);
     graphics_->SetViewport(screenRect_);
     
-    if (!extraQueue_.IsEmpty())
+    if (!preAlphaQueue_.IsEmpty())
     {
-        // Render extra / custom passes
-        PROFILE(RenderExtraPass);
+        // Render pre-alpha custom pass
+        PROFILE(RenderPreAlpha);
         
-        RenderBatchQueue(extraQueue_);
+        RenderBatchQueue(preAlphaQueue_);
     }
     
-    if (!transparentQueue_.IsEmpty())
+    if (!alphaQueue_.IsEmpty())
     {
-        // Render transparent objects last (both base passes & additive lighting)
-        PROFILE(RenderTransparent);
+        // Render transparent objects (both base passes & additive lighting)
+        PROFILE(RenderAlpha);
         
-        RenderBatchQueue(transparentQueue_, true);
+        RenderBatchQueue(alphaQueue_, true);
+    }
+    
+    if (!postAlphaQueue_.IsEmpty())
+    {
+        // Render pre-alpha custom pass
+        PROFILE(RenderPostAlpha);
+        
+        RenderBatchQueue(postAlphaQueue_);
     }
 }
 
@@ -1452,8 +1467,9 @@ void View::SortBatches()
     PROFILE(SortBatches);
     
     baseQueue_.SortFrontToBack();
-    extraQueue_.SortFrontToBack();
-    transparentQueue_.SortBackToFront();
+    preAlphaQueue_.SortFrontToBack();
+    alphaQueue_.SortBackToFront();
+    postAlphaQueue_.SortFrontToBack();
     
     for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
@@ -1470,7 +1486,8 @@ void View::PrepareInstancingBuffer()
     unsigned totalInstances = 0;
     
     totalInstances += baseQueue_.GetNumInstances(renderer_);
-    totalInstances += extraQueue_.GetNumInstances(renderer_);
+    totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
+    totalInstances += postAlphaQueue_.GetNumInstances(renderer_);
     
     for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
@@ -1488,7 +1505,8 @@ void View::PrepareInstancingBuffer()
         if (lockedData)
         {
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
-            extraQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            preAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
+            postAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
             for (unsigned i = 0; i < lightQueues_.Size(); ++i)
             {

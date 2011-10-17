@@ -212,10 +212,12 @@ private:
     HashMap<Light*, Rect> lightScissorCache_;
     /// Base pass batches.
     BatchQueue baseQueue_;
-    /// Extra pass batches.
-    BatchQueue extraQueue_;
+    /// Pre-transparent pass batches.
+    BatchQueue preAlphaQueue_;
     /// Transparent geometry batches.
-    BatchQueue transparentQueue_;
+    BatchQueue alphaQueue_;
+    /// Post-transparent pass batches.
+    BatchQueue postAlphaQueue_;
     /// Light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Current stencil value for light optimization;

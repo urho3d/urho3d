@@ -238,7 +238,7 @@ bool MoveNodes(Vector3 adjust)
         {
             Node@ node = editNodes[i];
             Vector3 nodeAdjust = adjust;
-            if (axisMode == AXIS_LOCAL)
+            if (axisMode == AXIS_LOCAL && editNodes.length == 1)
                 nodeAdjust = node.worldRotation * nodeAdjust;
 
             Vector3 worldPos = node.worldPosition;
@@ -297,7 +297,9 @@ bool RotateNodes(Vector3 adjust)
         {
             Node@ node = editNodes[i];
             Quaternion rotQuat(adjust);
-            if (axisMode == AXIS_WORLD || editNodes.length > 1)
+            if (axisMode == AXIS_LOCAL && editNodes.length == 1)
+                node.rotation = node.rotation * rotQuat;
+            else
             {
                 Vector3 offset = node.worldPosition - gizmoAxisX.axisRay.origin;
                 if (node.parent !is null && node.parent.worldRotation != Quaternion(1, 0, 0, 0))
@@ -308,8 +310,6 @@ bool RotateNodes(Vector3 adjust)
                     newPosition = node.parent.WorldToLocal(newPosition);
                 node.position = newPosition;
             }
-            else
-                node.rotation = node.rotation * rotQuat;
         }
     }
     

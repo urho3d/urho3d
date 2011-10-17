@@ -146,12 +146,12 @@ private:
     Vector<SharedPtr<Texture> > textures_;
     /// Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
+    /// Last auxiliary view rendered frame number.
+    unsigned auxViewFrameNumber_;
     /// Normal culling mode.
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
     CullMode shadowCullMode_;
-    /// Last auxiliary view rendered frame number.
-    unsigned auxViewFrameNumber_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.

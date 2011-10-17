@@ -1150,11 +1150,12 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadMaterialShaders(Technique* technique)
 {
-    LoadPassShaders(technique, PASS_SHADOW);
-    LoadPassShaders(technique, PASS_EXTRA);
     LoadPassShaders(technique, PASS_BASE);
     LoadPassShaders(technique, PASS_LITBASE);
     LoadPassShaders(technique, PASS_LIGHT);
+    LoadPassShaders(technique, PASS_PREALPHA);
+    LoadPassShaders(technique, PASS_POSTALPHA);
+    LoadPassShaders(technique, PASS_SHADOW);
 }
 
 void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowShadows)
