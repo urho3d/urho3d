@@ -27,17 +27,29 @@ class GizmoAxis
 
     void Update(Ray cameraRay, float scale, bool drag)
     {
-        lastT = t;
-        lastD = d;
-
         Vector3 closest = cameraRay.ClosestPoint(axisRay);
         Vector3 projected = axisRay.Project(closest);
         d = axisRay.Distance(closest);
         t = (projected - axisRay.origin).DotProduct(axisRay.direction);
 
+        // Determine the sign of d from a plane that goes through the camera position to the axis
+        Plane axisPlane(cameraNode.position, axisRay.origin, axisRay.origin + axisRay.direction);
+        if (axisPlane.Distance(closest) < 0.0)
+            d = -d;
+
         // Update selected status only when not dragging
         if (!drag)
-            selected = d < axisMaxD * scale && t >= -axisMaxD * scale && t <= axisMaxT * scale;
+        {
+            selected = Abs(d) < axisMaxD * scale && t >= -axisMaxD * scale && t <= axisMaxT * scale;
+            lastT = t;
+            lastD = d;
+        }
+    }
+    
+    void Moved()
+    {
+        lastT = t;
+        lastD = d;
     }
 }
 
@@ -124,6 +136,13 @@ void CalculateGizmoAxes()
     gizmoAxisZ.axisRay = Ray(gizmoNode.position, gizmoNode.rotation * Vector3(0, 0, 1));
 }
 
+void GizmoMoved()
+{
+    gizmoAxisX.Moved();
+    gizmoAxisY.Moved();
+    gizmoAxisZ.Moved();
+}
+
 void UseGizmo()
 {
     if (gizmo is null || !gizmo.visible)
@@ -150,7 +169,8 @@ void UseGizmo()
 
     if (drag)
     {
-        /// \todo Implement snapping
+        bool moved = false;
+
         if (moveMode == OBJ_MOVE)
         {
             Vector3 adjust(0, 0, 0);
@@ -161,19 +181,7 @@ void UseGizmo()
             if (gizmoAxisZ.selected)
                 adjust += gizmoAxisZ.axisRay.direction * (gizmoAxisZ.t - gizmoAxisZ.lastT);
 
-            if (adjust.length > M_EPSILON)
-            {
-                for (uint i = 0; i < editNodes.length; ++i)
-                {
-                    Node@ node = editNodes[i];
-                    Vector3 nodeAdjust = adjust;
-                    if (node.parent !is null)
-                        nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-                    node.position = node.position + nodeAdjust;
-                }
-
-                UpdateNodeAttributes();
-            }
+            moved = MoveNodes(adjust);
         }
         else if (moveMode == OBJ_ROTATE)
         {
@@ -181,31 +189,11 @@ void UseGizmo()
             if (gizmoAxisX.selected)
                 adjust.x = (gizmoAxisX.d - gizmoAxisX.lastD) * rotSensitivity / scale;
             if (gizmoAxisY.selected)
-                adjust.y = (gizmoAxisY.d - gizmoAxisY.lastD) * rotSensitivity / scale;
+                adjust.y = -(gizmoAxisY.d - gizmoAxisY.lastD) * rotSensitivity / scale;
             if (gizmoAxisZ.selected)
                 adjust.z = (gizmoAxisZ.d - gizmoAxisZ.lastD) * rotSensitivity / scale;
 
-            if (adjust.length > M_EPSILON)
-            {
-                for (uint i = 0; i < editNodes.length; ++i)
-                {
-                    Node@ node = editNodes[i];
-                    Quaternion rotQuat(adjust);
-                    if (axisMode == AXIS_WORLD || editNodes.length > 1)
-                    {
-                        Vector3 offset = node.worldPosition - gizmoAxisX.axisRay.origin;
-                        node.rotation = rotQuat * node.rotation;
-                        Vector3 newPosition = gizmoAxisX.axisRay.origin + rotQuat * offset;
-                        if (node.parent !is null)
-                            newPosition = node.parent.WorldToLocal(newPosition);
-                        node.position = newPosition;
-                    }
-                    else
-                        node.rotation = node.rotation * rotQuat;
-                }
-
-                UpdateNodeAttributes();
-            }
+            moved = RotateNodes(adjust);
         }
         else if (moveMode == OBJ_SCALE)
         {
@@ -217,23 +205,20 @@ void UseGizmo()
             if (gizmoAxisZ.selected)
                 adjust += Vector3(0, 0, 1) * (gizmoAxisZ.t - gizmoAxisZ.lastT);
 
-            // Special handling for uniform scale: use the X-axis movement only
+            // Special handling for uniform scale: use the unmodified X-axis movement only
             if (moveMode == OBJ_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
             {
                 float x = gizmoAxisX.t - gizmoAxisX.lastT;
                 adjust = Vector3(x, x, x);
             }
 
-            if (adjust.length > M_EPSILON)
-            {
-                for (uint i = 0; i < editNodes.length; ++i)
-                {
-                    Node@ node = editNodes[i];
-                    node.scale = node.scale + adjust;
-                }
-
-                UpdateNodeAttributes();
-            }
+            moved = ScaleNodes(adjust);
+        }
+        
+        if (moved)
+        {
+            GizmoMoved();
+            UpdateNodeAttributes();
         }
     }
 }
@@ -241,4 +226,146 @@ void UseGizmo()
 bool IsGizmoSelected()
 {
     return gizmoAxisX.selected || gizmoAxisY.selected || gizmoAxisZ.selected;
+}
+
+bool MoveNodes(Vector3 adjust)
+{
+    bool moved = false;
+
+    if (adjust.length > M_EPSILON)
+    {
+        for (uint i = 0; i < editNodes.length; ++i)
+        {
+            Node@ node = editNodes[i];
+            Vector3 nodeAdjust = adjust;
+            if (axisMode == AXIS_LOCAL)
+                nodeAdjust = node.worldRotation * nodeAdjust;
+
+            Vector3 worldPos = node.worldPosition;
+            Vector3 oldPos = node.position;
+
+            if (!moveSnap)
+                worldPos += nodeAdjust;
+            else
+            {
+                if (nodeAdjust.x != 0)
+                {
+                    worldPos.x += nodeAdjust.x * moveStep;
+                    worldPos.x = Floor(worldPos.x / moveStep + 0.5) * moveStep;
+                }
+                if (nodeAdjust.y != 0)
+                {
+                    worldPos.y += nodeAdjust.y * moveStep;
+                    worldPos.y = Floor(worldPos.y / moveStep + 0.5) * moveStep;
+                }
+                if (nodeAdjust.z != 0)
+                {
+                    worldPos.z += nodeAdjust.z * moveStep;
+                    worldPos.z = Floor(worldPos.z / moveStep + 0.5) * moveStep;
+                }
+            }
+
+            if (node.parent is null)
+                node.position = worldPos;
+            else
+                node.position = node.parent.WorldToLocal(worldPos);
+
+            if (node.position != oldPos)
+                moved = true;
+        }
+    }
+    
+    return moved;
+}
+
+bool RotateNodes(Vector3 adjust)
+{
+    bool moved = false;
+
+    if (rotateSnap)
+    {
+        adjust.x = Floor(adjust.x / rotateStep + 0.5) * rotateStep;
+        adjust.y = Floor(adjust.y / rotateStep + 0.5) * rotateStep;
+        adjust.z = Floor(adjust.z / rotateStep + 0.5) * rotateStep;
+    }
+
+    if (adjust.length > M_EPSILON)
+    {
+        moved = true;
+
+        for (uint i = 0; i < editNodes.length; ++i)
+        {
+            Node@ node = editNodes[i];
+            Quaternion rotQuat(adjust);
+            if (axisMode == AXIS_WORLD || editNodes.length > 1)
+            {
+                Vector3 offset = node.worldPosition - gizmoAxisX.axisRay.origin;
+                if (node.parent !is null && node.parent.worldRotation != Quaternion(1, 0, 0, 0))
+                    rotQuat = node.parent.worldRotation.Inverse() * rotQuat * node.parent.worldRotation;
+                node.rotation = rotQuat * node.rotation;
+                Vector3 newPosition = gizmoAxisX.axisRay.origin + rotQuat * offset;
+                if (node.parent !is null)
+                    newPosition = node.parent.WorldToLocal(newPosition);
+                node.position = newPosition;
+            }
+            else
+                node.rotation = node.rotation * rotQuat;
+                
+            // If snapping is on, perform a final snap on the euler angles to ensure we do not drift
+            if (rotateSnap)
+            {
+                Vector3 euler = node.rotation.eulerAngles;
+                euler.x = Floor(euler.x / rotateStep + 0.5) * rotateStep;
+                euler.y = Floor(euler.y / rotateStep + 0.5) * rotateStep;
+                euler.z = Floor(euler.z / rotateStep + 0.5) * rotateStep;
+                node.rotation = Quaternion(euler);
+            }
+        }
+    }
+    
+    return moved;
+}
+
+bool ScaleNodes(Vector3 adjust)
+{
+    bool moved = false;
+
+    if (adjust.length > M_EPSILON)
+    {
+        for (uint i = 0; i < editNodes.length; ++i)
+        {
+            Node@ node = editNodes[i];
+
+            Vector3 scale = node.scale;
+            Vector3 oldScale = scale;
+            
+            if (!scaleSnap)
+                scale += adjust;
+            else
+            {
+                if (adjust.x != 0)
+                {
+                    scale.x += adjust.x * scaleStep;
+                    scale.x = Floor(scale.x / scaleStep + 0.5) * scaleStep;
+                }
+                if (adjust.y != 0)
+                {
+                    scale.y += adjust.y * scaleStep;
+                    scale.y = Floor(scale.y / scaleStep + 0.5) * scaleStep;
+                }
+                if (adjust.z != 0)
+                {
+                    scale.z += adjust.z * scaleStep;
+                    scale.z = Floor(scale.z / scaleStep + 0.5) * scaleStep;
+                }
+            }
+
+            if (scale != oldScale)
+                moved = true;
+
+            node.scale = scale;
+        }
+    }
+    
+    return moved;
 }

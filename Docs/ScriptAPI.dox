@@ -456,6 +456,19 @@ Properties:<br>
 - bool defined
 
 
+Plane
+
+Methods:<br>
+- void Define(const Vector3&, const Vector3&, const Vector3&)
+- void Define(const Vector3&, const Vector3&)
+- float Distance(const Vector3&) const
+
+Properties:<br>
+- Vector3 normal
+- Vector3 absNormal
+- float intercept
+
+
 Ray
 
 Methods:<br>
@@ -1993,9 +2006,8 @@ Methods:<br>
 - void Remove()
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
-- void AddDrawable(Drawable@)
-- void AddUnculledDrawable(Drawable@)
-- void RemoveUnculledDrawable(Drawable@)
+- void AddManualDrawable(Drawable@, bool)
+- void RemoveManualDrawable(Drawable@)
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Vector3&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)

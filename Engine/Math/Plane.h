@@ -72,7 +72,7 @@ public:
         intercept_ = normal_.DotProduct(point);
     }
     
-    /// Return distance to a point.
+    /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     
     /// Plane normal.

@@ -390,6 +390,41 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Quaternion", "float z", offsetof(Quaternion, z_));
 }
 
+static void ConstructPlane(Plane* ptr)
+{
+    new(ptr) Plane();
+}
+
+static void ConstructPlaneCopy(const Plane& plane, Plane* ptr)
+{
+    new(ptr) Plane(plane);
+}
+
+static void ConstructPlaneInitVertices(const Vector3& v0, const Vector3& v1, const Vector3& v2, Ray* ptr)
+{
+    new(ptr) Plane(v0, v1, v2);
+}
+
+static void ConstructPlaneInitNormalPoint(const Vector3& normal, const Vector3& point, Ray* ptr)
+{
+    new(ptr) Plane(normal, point);
+}
+
+static void RegisterPlane(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Plane", sizeof(Plane), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPlane), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Plane&in)", asFUNCTION(ConstructPlaneCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, const Vector3&in)", asFUNCTION(ConstructPlaneInitVertices), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(ConstructPlaneInitNormalPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "float Distance(const Vector3&in) const", asMETHOD(Plane, Distance), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Plane", "Vector3 normal", offsetof(Plane, normal_));
+    engine->RegisterObjectProperty("Plane", "Vector3 absNormal", offsetof(Plane, absNormal_));
+    engine->RegisterObjectProperty("Plane", "float intercept", offsetof(Plane, intercept_));
+}
+
 static void ConstructRay(Ray* ptr)
 {
     // Initialize to zero because performance is not critical
@@ -753,6 +788,7 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterQuaternion(engine);
     RegisterRect(engine);
     RegisterVolumes(engine);
+    RegisterPlane(engine);
     RegisterRay(engine);
     RegisterColor(engine);
     

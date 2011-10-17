@@ -189,7 +189,6 @@ void MoveCamera(float timeStep)
     // Move/rotate/scale object
     if (!editNodes.empty && ui.focusElement is null && input.keyDown[KEY_LCTRL])
     {
-        bool changed = false;
         Vector3 adjust(0, 0, 0);
         if (input.keyDown[KEY_UP])
             adjust.z = 1;
@@ -211,64 +210,38 @@ void MoveCamera(float timeStep)
                 adjust = Vector3(-1, -1, -1);
         }
 
-        if (adjust != Vector3(0, 0, 0))
+        if (adjust == Vector3(0, 0, 0))
+            return;
+        
+        bool moved = false;
+        adjust *= timeStep * 10;
+
+        switch (moveMode)
         {
-            adjust *= timeStep * 10;
-
-            if (input.keyDown[KEY_LSHIFT])
-                adjust *= cameraShiftSpeedMultiplier;
-
-            switch (moveMode)
+        case OBJ_MOVE:
+            if (!moveSnap)
+                moved = MoveNodes(adjust * moveStep);
+            break;
+            
+        case OBJ_ROTATE:
+            if (!rotateSnap)
             {
-            case OBJ_MOVE:
-                if (!moveSnap)
-                {
-                    for (uint i = 0; i < editNodes.length; ++i)
-                    {
-                        Node@ node = editNodes[i];
-                        Vector3 nodeAdjust = adjust;
-                        if (axisMode == AXIS_LOCAL)
-                            nodeAdjust = node.worldRotation * nodeAdjust;
-                        if (node.parent !is null)
-                            nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-                        node.position = node.position + nodeAdjust * moveStep;
-                    }
-                    changed = true;
-                }
-                break;
-
-            case OBJ_ROTATE:
-                if (!rotateSnap)
-                {
-                    for (uint i = 0; i < editNodes.length; ++i)
-                    {
-                        Node@ node = editNodes[i];
-                        Vector3 euler = node.rotation.eulerAngles;
-                        euler.x += adjust.z * rotateStep;
-                        euler.y += adjust.x * rotateStep;
-                        euler.z += adjust.y * rotateStep;
-                        node.rotation = Quaternion(euler);
-                    }
-                    changed = true;
-                }
-                break;
-
-            case OBJ_SCALE:
-                if (!scaleSnap)
-                {
-                    for (uint i = 0; i < editNodes.length; ++i)
-                    {
-                        Node@ node = editNodes[i];
-                        node.scale = node.scale + adjust * scaleStep;
-                    }
-                    changed = true;
-                }
-                break;
+                Vector3 rotAdjust;
+                rotAdjust.x = adjust.z * rotateStep;
+                rotAdjust.y = adjust.x * rotateStep;
+                rotAdjust.z = adjust.y * rotateStep;
+                moved = RotateNodes(rotAdjust);
             }
+            break;
+
+        case OBJ_SCALE:
+            if (!scaleSnap)
+                moved = ScaleNodes(adjust * scaleStep);
+            break;
         }
 
-        if (changed)
-            UpdateAttributes(false);
+        if (moved)
+            UpdateNodeAttributes();
     }
 }
 
@@ -309,88 +282,31 @@ void SteppedObjectManipulation(int key)
     if (adjust == Vector3(0, 0, 0))
         return;
 
+    bool moved = false;
+
     switch (moveMode)
     {
     case OBJ_MOVE:
-        for (uint i = 0; i < editNodes.length; ++i)
-        {
-            Node@ node = editNodes[i];
-            Vector3 nodeAdjust = adjust;
-            if (axisMode == AXIS_LOCAL)
-                nodeAdjust = node.worldRotation * nodeAdjust;
-            if (node.parent !is null)
-                nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-
-            Vector3 pos = node.position;
-            if (adjust.x != 0)
-            {
-                pos.x += adjust.x * moveStep;
-                pos.x = Floor(pos.x / moveStep + 0.5) * moveStep;
-            }
-            if (adjust.y != 0)
-            {
-                pos.y += adjust.y * moveStep;
-                pos.y = Floor(pos.y / moveStep + 0.5) * moveStep;
-            }
-            if (adjust.z != 0)
-            {
-                pos.z += adjust.z * moveStep;
-                pos.z = Floor(pos.z / moveStep + 0.5) * moveStep;
-            }
-            node.position = pos;
-        }
+        moved = MoveNodes(adjust);
         break;
 
     case OBJ_ROTATE:
-        for (uint i = 0; i < editNodes.length; ++i)
         {
-            Node@ node = editNodes[i];
-            Vector3 rot = node.rotation.eulerAngles;
-            if (adjust.z != 0)
-            {
-                rot.x += adjust.z * rotateStep;
-                rot.x = Floor(rot.x / rotateStep + 0.5) * rotateStep;
-            }
-            if (adjust.x != 0)
-            {
-                rot.y += adjust.x * rotateStep;
-                rot.y = Floor(rot.y / rotateStep + 0.5) * rotateStep;
-            }
-            if (adjust.y != 0)
-            {
-                rot.z += adjust.y * rotateStep;
-                rot.z = Floor(rot.z / rotateStep + 0.5) * rotateStep;
-            }
-            node.rotation = Quaternion(rot);
+            Vector3 rotAdjust;
+            rotAdjust.x = adjust.z * rotateStep;
+            rotAdjust.y = adjust.x * rotateStep;
+            rotAdjust.z = adjust.y * rotateStep;
+            moved = RotateNodes(rotAdjust);
         }
         break;
 
     case OBJ_SCALE:
-        for (uint i = 0; i < editNodes.length; ++i)
-        {
-            Node@ node = editNodes[i];
-            Vector3 scale = node.scale;
-            if (adjust.x != 0)
-            {
-                scale.x += adjust.x * scaleStep;
-                scale.x = Floor(scale.x / scaleStep + 0.5) * scaleStep;
-            }
-            if (adjust.y != 0)
-            {
-                scale.y += adjust.y * scaleStep;
-                scale.y = Floor(scale.y / scaleStep + 0.5) * scaleStep;
-            }
-            if (adjust.z != 0)
-            {
-                scale.z += adjust.z * scaleStep;
-                scale.z = Floor(scale.z / scaleStep + 0.5) * scaleStep;
-            }
-            node.scale = scale;
-        }
+        moved = ScaleNodes(adjust * scaleStep);
         break;
     }
 
-    UpdateAttributes(false);
+    if (moved)
+        UpdateNodeAttributes();
 }
 
 
