@@ -155,6 +155,7 @@ unsigned StaticModel::GetNumBatches()
 
 void StaticModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
+    batch.distance_ = frame.camera_->GetDistance(GetWorldTransform() * geometryCenters_[batchIndex]);
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];
@@ -231,6 +232,7 @@ void StaticModel::SetModel(Model* model)
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
+    geometryCenters_ = model->GetGeometryCenters();
     
     SetBoundingBox(model->GetBoundingBox());
     ResetLodLevels();

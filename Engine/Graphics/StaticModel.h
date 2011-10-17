@@ -46,7 +46,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches.
     virtual unsigned GetNumBatches();
-    /// Return rendering batch.
+    /// Return rendering batch with distance, geometry, material and world transform filled.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
@@ -98,6 +98,8 @@ protected:
     BoundingBox boundingBox_;
     /// Geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
+    /// Geometry centers.
+    PODVector<Vector3> geometryCenters_;
     /// LOD levels.
     PODVector<unsigned> lodLevels_;
     /// Materials.

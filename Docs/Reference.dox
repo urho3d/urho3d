@@ -1262,6 +1262,12 @@ Bounding box data
 
 Vector3    Model bounding box minimum
 Vector3    Model bounding box maximum
+
+Geometry center data
+
+  For each geometry:
+  Vector3    Geometry center
+
 \endverbatim
 
 \section FileFormats_Animation Binary animation format (.ani)

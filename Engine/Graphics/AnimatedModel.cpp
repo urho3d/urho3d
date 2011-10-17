@@ -240,6 +240,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 
 void AnimatedModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
+    batch.distance_ = frame.camera_->GetDistance(GetWorldTransform() * geometryCenters_[batchIndex]);
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.geometryType_ = GEOM_SKINNED;
     batch.worldTransform_ = &GetWorldTransform();
@@ -286,6 +287,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
+    geometryCenters_ = model->GetGeometryCenters();
     
     // Copy geometry bone mappings
     const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();

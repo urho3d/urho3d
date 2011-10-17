@@ -84,6 +84,8 @@ public:
     bool SetNumGeometryLodLevels(unsigned index, unsigned num);
     /// %Set geometry.
     bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
+    /// %Set geometry center.
+    bool SetGeometryCenter(unsigned index, const Vector3& center);
     /// %Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
     /// %Set bone mappings when model has more bones than the skinning shader can handle.
@@ -105,6 +107,8 @@ public:
     unsigned GetNumGeometryLodLevels(unsigned index) const;
     /// Return geometry pointers.
     const Vector<Vector<SharedPtr<Geometry> > >& GetGeometries() const { return geometries_; }
+    /// Return geometry center points.
+    const PODVector<Vector3>& GetGeometryCenters() const { return geometryCenters_; }
     /// Return geometry by index and LOD level.
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
     /// Return geometery bone mappings.
@@ -133,6 +137,8 @@ private:
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Geometry bone mappings.
     Vector<PODVector<unsigned> > geometryBoneMappings_;
+    /// Geometry centers.
+    PODVector<Vector3> geometryCenters_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
 };

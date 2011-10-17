@@ -145,6 +145,7 @@ unsigned BillboardSet::GetNumBatches()
 
 void BillboardSet::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
+    batch.distance_ = frame.camera_->GetDistance(GetWorldPosition());
     batch.geometry_ = geometry_;
     batch.geometryType_ = GEOM_BILLBOARD;
     batch.worldTransform_ = &GetWorldTransform();

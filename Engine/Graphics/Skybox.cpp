@@ -56,6 +56,7 @@ void Skybox::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().Inverse(), Vector3::UNITY);
     customWorldTransform_ = customView * GetWorldTransform();
     
+    batch.distance_ = 0.0f;
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.worldTransform_ = &customWorldTransform_;
     batch.overrideView_ = true;

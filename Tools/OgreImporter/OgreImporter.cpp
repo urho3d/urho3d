@@ -41,6 +41,7 @@ SharedPtr<XMLFile> skelFile_(new XMLFile(context_));
 Vector<ModelIndexBuffer> indexBuffers_;
 Vector<ModelVertexBuffer> vertexBuffers_;
 Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
+Vector<Vector3> subGeometryCenters_;
 Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
 BoundingBox boundingBox_;
@@ -533,6 +534,18 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         else if (boneAssignments)
             PrintLine("No skeleton loaded, skipping skinning information");
         
+        // Calculate center for the subgeometry
+        Vector3 center = Vector3::ZERO;
+        for (unsigned i = 0; i < iBuf->indices_.Size(); i += 3)
+        {
+            center += vBuf->vertices_[iBuf->indices_[i]].position_;
+            center += vBuf->vertices_[iBuf->indices_[i + 1]].position_;
+            center += vBuf->vertices_[iBuf->indices_[i + 2]].position_;
+        }
+        if (iBuf->indices_.Size())
+            center /= (float)iBuf->indices_.Size();
+        subGeometryCenters_.Push(center);
+        
         indexStart += indices;
         vertexStart += vertices;
         
@@ -935,6 +948,10 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         
         // Bounding box
         dest.WriteBoundingBox(boundingBox_);
+        
+        // Geometry centers
+        for (unsigned i = 0; i < subGeometryCenters_.Size(); ++i)
+            dest.WriteVector3(subGeometryCenters_[i]);
     }
     
     XMLElement skeletonRoot = skelFile_->GetRoot("");

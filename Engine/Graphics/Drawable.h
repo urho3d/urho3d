@@ -83,7 +83,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }
-    /// Return rendering batch.
+    /// Return rendering batch with distance, geometry, material and world transform filled.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch) {}
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }

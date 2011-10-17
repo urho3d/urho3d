@@ -88,6 +88,7 @@ bool Model::Load(Deserializer& source)
     
     geometries_.Clear();
     geometryBoneMappings_.Clear();
+    geometryCenters_.Clear();
     morphs_.Clear();
     vertexBuffers_.Clear();
     indexBuffers_.Clear();
@@ -273,6 +274,13 @@ bool Model::Load(Deserializer& source)
     // Read bounding box
     boundingBox_ = source.ReadBoundingBox();
     
+    // Read geometry centers if they exist
+    for (unsigned i = 0; i < geometries_.Size() && !source.IsEof(); ++i)
+        geometryCenters_.Push(source.ReadVector3());
+    while (geometryCenters_.Size() < geometries_.Size())
+        geometryCenters_.Push(Vector3::ZERO);
+    memoryUse += sizeof(Vector3) * geometries_.Size();
+    
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -382,6 +390,15 @@ bool Model::Save(Serializer& dest)
     // Write bounding box
     dest.WriteBoundingBox(boundingBox_);
     
+    // Write geometry centers
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        if (i < geometryCenters_.Size())
+            dest.WriteVector3(geometryCenters_[i]);
+        else
+            dest.WriteVector3(Vector3::ZERO);
+    }
+    
     return true;
 }
 
@@ -394,6 +411,7 @@ void Model::SetNumGeometries(unsigned num)
 {
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
+    geometryCenters_.Resize(num);
 }
 
 bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
@@ -427,6 +445,18 @@ bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
     }
     
     geometries_[index][lodLevel] = geometry;
+    return true;
+}
+
+bool Model::SetGeometryCenter(unsigned index, const Vector3& center)
+{
+    if (index >= geometryCenters_.Size())
+    {
+        LOGERROR("Geometry index out of bounds");
+        return false;
+    }
+    
+    geometryCenters_[index] = center;
     return true;
 }
 

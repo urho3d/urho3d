@@ -705,12 +705,24 @@ void BuildAndSaveModel(OutModel& model)
             ib->Unlock();
             vb->Unlock();
             
+            // Calculate the geometry center
+            Vector3 center = Vector3::ZERO;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+            {
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+            }
+            if (mesh->mNumFaces)
+                center /= (float)mesh->mNumFaces * 3;
+            
             // Define the geometry
             geom->SetIndexBuffer(ib);
             geom->SetVertexBuffer(0, vb);
             geom->SetDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
+            outModel->SetGeometryCenter(i, center);
             if (model.bones_.Size() > MAX_SKIN_MATRICES)
                 allBoneMappings.Push(boneMappings);
         }
@@ -775,12 +787,24 @@ void BuildAndSaveModel(OutModel& model)
             for (unsigned j = 0; j < mesh->mNumVertices; ++j)
                 WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
             
+            // Calculate the geometry center
+            Vector3 center = Vector3::ZERO;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+            {
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
+                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+            }
+            if (mesh->mNumFaces)
+                center /= (float)mesh->mNumFaces * 3;
+            
             // Define the geometry
             geom->SetIndexBuffer(ib);
             geom->SetVertexBuffer(0, vb);
             geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, mesh->mNumFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
+            outModel->SetGeometryCenter(i, center);
             if (model.bones_.Size() > MAX_SKIN_MATRICES)
                 allBoneMappings.Push(boneMappings);
             

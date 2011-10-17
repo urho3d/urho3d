@@ -140,6 +140,8 @@ void View::Update(const FrameInfo& frame)
     frame_.frameNumber_ = frame.frameNumber_;
     frame_.viewSize_ = IntVector2(width_, height_);
     
+    shadowFrame_ = frame_;
+    
     // Clear old light scissor cache, geometry, light, occluder & batch lists
     lightScissorCache_.Clear();
     geometries_.Clear();
@@ -399,6 +401,7 @@ void View::GetBatches()
                 shadowQueue.shadowCamera_ = shadowCameras_[j];
                 shadowQueue.nearSplit_ = shadowNearSplits_[j];
                 shadowQueue.farSplit_ = shadowFarSplits_[j];
+                shadowFrame_.camera_ = shadowCamera;
                 
                 // Setup the shadow split viewport and finalize shadow camera parameters
                 shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
@@ -413,7 +416,7 @@ void View::GetBatches()
                     for (unsigned l = 0; l < numBatches; ++l)
                     {
                         Batch shadowBatch;
-                        drawable->GetBatch(frame_, l, shadowBatch);
+                        drawable->GetBatch(shadowFrame_, l, shadowBatch);
                         
                         Technique* tech = GetTechnique(drawable, shadowBatch.material_);
                         if (!shadowBatch.geometry_ || !tech)
@@ -426,7 +429,6 @@ void View::GetBatches()
                         
                         // Fill the rest of the batch
                         shadowBatch.camera_ = shadowCamera;
-                        shadowBatch.distance_ = shadowCamera->GetDistance(drawable->GetWorldPosition());
                         shadowBatch.lightQueue_ = &lightQueue;
                         
                         renderer_->SetBatchShaders(shadowBatch, tech, pass);
@@ -505,7 +507,6 @@ void View::GetBatches()
                 
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
-                baseBatch.distance_ = drawable->GetDistance();
                 baseBatch.hasPriority_ = true;
                 
                 Pass* pass = 0;
@@ -518,7 +519,7 @@ void View::GetBatches()
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                         baseQueue_.AddBatch(baseBatch);
                     else
-                        alphaQueue_.AddBatch(baseBatch, true);                    
+                        alphaQueue_.AddBatch(baseBatch, true);
                     continue;
                 }
                 
@@ -586,7 +587,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         
         // Fill the rest of the batch
         litBatch.camera_ = camera_;
-        litBatch.distance_ = drawable->GetDistance();
         litBatch.lightQueue_ = &lightQueue;
         
         // Check from the ambient pass whether the object is opaque or transparent

@@ -40,7 +40,7 @@ public:
     
     /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return rendering batch.
+    /// Return rendering batch with distance, geometry, material and world transform filled.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     
 protected:
