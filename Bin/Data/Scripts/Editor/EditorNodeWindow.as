@@ -167,6 +167,17 @@ void UpdateAttributes(bool fullUpdate)
     }
 }
 
+void UpdateNodeAttributes()
+{
+    if (nodeWindow !is null)
+    {
+        Array<Serializable@> nodes;
+        if (editNode !is null)
+            nodes.Push(editNode);
+        UpdateAttributes(nodes, nodeWindow.GetChild("NodeAttributeList", true), false);
+    }
+}
+
 void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool fullUpdate)
 {
     // If attributes have changed structurally, do a full update

@@ -155,13 +155,18 @@ void UseGizmo()
             if (gizmoAxisZ.selected)
                 adjust += gizmoAxisZ.axisRay.direction * (gizmoAxisZ.t - gizmoAxisZ.lastT);
 
-            for (uint i = 0; i < editNodes.length; ++i)
+            if (adjust.length > M_EPSILON)
             {
-                Node@ node = editNodes[i];
-                Vector3 nodeAdjust = adjust;
-                if (node.parent !is null)
-                    nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-                node.position = node.position + nodeAdjust;
+                for (uint i = 0; i < editNodes.length; ++i)
+                {
+                    Node@ node = editNodes[i];
+                    Vector3 nodeAdjust = adjust;
+                    if (node.parent !is null)
+                        nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
+                    node.position = node.position + nodeAdjust;
+                }
+
+                UpdateNodeAttributes();
             }
         }
         else if (moveMode == OBJ_ROTATE)
@@ -174,15 +179,20 @@ void UseGizmo()
             if (gizmoAxisZ.selected)
                 adjust.z = (gizmoAxisZ.d - gizmoAxisZ.lastD) * rotSensitivity / scale;
 
-            for (uint i = 0; i < editNodes.length; ++i)
+            if (adjust.length > M_EPSILON)
             {
-                /// \todo When multiple nodes selected, rotate them around the gizmo
-                Node@ node = editNodes[i];
-                Quaternion rotQuat(adjust);
-                if (axisMode == AXIS_WORLD)
-                    node.rotation = rotQuat * node.rotation;
-                else
-                    node.rotation = node.rotation * rotQuat;
+                for (uint i = 0; i < editNodes.length; ++i)
+                {
+                    /// \todo When multiple nodes selected, rotate them around the gizmo
+                    Node@ node = editNodes[i];
+                    Quaternion rotQuat(adjust);
+                    if (axisMode == AXIS_WORLD)
+                        node.rotation = rotQuat * node.rotation;
+                    else
+                        node.rotation = node.rotation * rotQuat;
+                }
+                
+                UpdateNodeAttributes();
             }
         }
     }
