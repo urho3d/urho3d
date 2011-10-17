@@ -37,7 +37,7 @@ class GizmoAxis
 
         // Update selected status only when not dragging
         if (!drag)
-            selected = d < axisMaxD * scale && t >= 0.0 && t <= axisMaxT * scale;
+            selected = d < axisMaxD * scale && t >= -axisMaxD * scale && t <= axisMaxT * scale;
     }
 }
 
@@ -55,8 +55,9 @@ void CreateGizmo()
     gizmo.materials[2] = cache.GetResource("Material", "Materials/BlueUnlit.xml");
     gizmo.visible = false;
 
+    // Add to the octree without culling. This also makes the gizmo invisible to raycasts
     if (editorScene.octree !is null)
-        editorScene.octree.AddUnculledDrawable(gizmo);
+        editorScene.octree.AddManualDrawable(gizmo, false);
 }
 
 void UpdateGizmo()

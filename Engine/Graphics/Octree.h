@@ -162,10 +162,10 @@ public:
     void Resize(const BoundingBox& box, unsigned numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
-    /// Add a drawable that should not be subject to culling.
-    void AddUnculledDrawable(Drawable* drawable);
-    /// Remove an unculled drawable.
-    void RemoveUnculledDrawable(Drawable* drawable);
+    /// Add a drawable manually, which can optionally be unculled.
+    void AddManualDrawable(Drawable* drawable, bool culling);
+    /// Remove a manually added drawable.
+    void RemoveManualDrawable(Drawable* drawable);
     
     /// Return drawable objects by a query.
     void GetDrawables(OctreeQuery& query) const;

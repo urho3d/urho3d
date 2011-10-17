@@ -366,31 +366,46 @@ void Octree::Update(const FrameInfo& frame)
     drawableReinsertions_.Clear();
 }
 
-void Octree::AddUnculledDrawable(Drawable* drawable)
+void Octree::AddManualDrawable(Drawable* drawable, bool culling)
 {
-    if (!drawable)
+    if (!drawable || drawable->GetOctant())
         return;
     
-    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    if (culling)
+        AddDrawable(drawable);
+    else
     {
-        if ((*i) == drawable)
-            return;
+        for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+        {
+            if ((*i) == drawable)
+                return;
+        }
+        
+        unculledDrawables_.Push(WeakPtr<Drawable>(drawable));
     }
-    
-    unculledDrawables_.Push(WeakPtr<Drawable>(drawable));
 }
 
-void Octree::RemoveUnculledDrawable(Drawable* drawable)
+void Octree::RemoveManualDrawable(Drawable* drawable)
 {
     if (!drawable)
         return;
     
-    for (Vector<WeakPtr<Drawable> >::Iterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    Octant* octant = drawable->GetOctant();
+    if (octant && octant->GetRoot() == this)
     {
-        if ((*i) == drawable)
+        CancelUpdate(drawable);
+        CancelReinsertion(drawable);
+        octant->RemoveDrawable(drawable);
+    }
+    else
+    {
+        for (Vector<WeakPtr<Drawable> >::Iterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
         {
-            unculledDrawables_.Erase(i);
-            return;
+            if ((*i) == drawable)
+            {
+                unculledDrawables_.Erase(i);
+                return;
+            }
         }
     }
 }
