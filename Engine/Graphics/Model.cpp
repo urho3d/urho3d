@@ -274,7 +274,7 @@ bool Model::Load(Deserializer& source)
     // Read bounding box
     boundingBox_ = source.ReadBoundingBox();
     
-    // Read geometry centers if they exist
+    // Read geometry centers
     for (unsigned i = 0; i < geometries_.Size() && !source.IsEof(); ++i)
         geometryCenters_.Push(source.ReadVector3());
     while (geometryCenters_.Size() < geometries_.Size())
@@ -391,13 +391,8 @@ bool Model::Save(Serializer& dest)
     dest.WriteBoundingBox(boundingBox_);
     
     // Write geometry centers
-    for (unsigned i = 0; i < geometries_.Size(); ++i)
-    {
-        if (i < geometryCenters_.Size())
-            dest.WriteVector3(geometryCenters_[i]);
-        else
-            dest.WriteVector3(Vector3::ZERO);
-    }
+    for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
+        dest.WriteVector3(geometryCenters_[i]);
     
     return true;
 }
