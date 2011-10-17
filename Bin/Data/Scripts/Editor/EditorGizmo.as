@@ -310,16 +310,6 @@ bool RotateNodes(Vector3 adjust)
             }
             else
                 node.rotation = node.rotation * rotQuat;
-                
-            // If snapping is on, perform a final snap on the euler angles to ensure we do not drift
-            if (rotateSnap)
-            {
-                Vector3 euler = node.rotation.eulerAngles;
-                euler.x = Floor(euler.x / rotateStep + 0.5) * rotateStep;
-                euler.y = Floor(euler.y / rotateStep + 0.5) * rotateStep;
-                euler.z = Floor(euler.z / rotateStep + 0.5) * rotateStep;
-                node.rotation = Quaternion(euler);
-            }
         }
     }
     
