@@ -143,9 +143,8 @@ void UseGizmo()
 
     if (drag)
     {
-        /// \todo Implement scaling
         /// \todo Implement snapping
-        if (moveMode == OBJ_MOVE)
+        if (moveMode == OBJ_MOVE || moveMode == OBJ_SCALE)
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
@@ -154,16 +153,28 @@ void UseGizmo()
                 adjust += gizmoAxisY.axisRay.direction * (gizmoAxisY.t - gizmoAxisY.lastT);
             if (gizmoAxisZ.selected)
                 adjust += gizmoAxisZ.axisRay.direction * (gizmoAxisZ.t - gizmoAxisZ.lastT);
+                
+            // Special handling for uniform scale: use the X-axis movement only
+            if (moveMode == OBJ_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
+            {
+                float x = gizmoAxisX.t - gizmoAxisX.lastT;
+                adjust = Vector3(x, x, x);
+            }
 
             if (adjust.length > M_EPSILON)
             {
                 for (uint i = 0; i < editNodes.length; ++i)
                 {
                     Node@ node = editNodes[i];
-                    Vector3 nodeAdjust = adjust;
-                    if (node.parent !is null)
-                        nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-                    node.position = node.position + nodeAdjust;
+                    if (moveMode == OBJ_MOVE)
+                    {
+                        Vector3 nodeAdjust = adjust;
+                        if (node.parent !is null)
+                            nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
+                        node.position = node.position + nodeAdjust;
+                    }
+                    else
+                        node.scale = node.scale + adjust;
                 }
 
                 UpdateNodeAttributes();
@@ -183,15 +194,21 @@ void UseGizmo()
             {
                 for (uint i = 0; i < editNodes.length; ++i)
                 {
-                    /// \todo When multiple nodes selected, rotate them around the gizmo
                     Node@ node = editNodes[i];
                     Quaternion rotQuat(adjust);
-                    if (axisMode == AXIS_WORLD)
+                    if (axisMode == AXIS_WORLD || editNodes.length > 1)
+                    {
+                        Vector3 offset = node.worldPosition - gizmoAxisX.axisRay.origin;
                         node.rotation = rotQuat * node.rotation;
+                        Vector3 newPosition = gizmoAxisX.axisRay.origin + rotQuat * offset;
+                        if (node.parent !is null)
+                            newPosition = node.parent.WorldToLocal(newPosition);
+                        node.position = newPosition;
+                    }
                     else
                         node.rotation = node.rotation * rotQuat;
                 }
-                
+
                 UpdateNodeAttributes();
             }
         }
