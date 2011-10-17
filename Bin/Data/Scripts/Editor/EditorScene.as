@@ -33,6 +33,8 @@ void ClearSelection()
     editNode = null;
     editNodes.Clear();
     editComponents.Clear();
+    
+    HideGizmo();
 }
 
 void CreateScene()

@@ -60,6 +60,12 @@ void CreateGizmo()
         editorScene.octree.AddManualDrawable(gizmo, false);
 }
 
+void HideGizmo()
+{
+    if (gizmo !is null)
+        gizmo.visible = false;
+}
+
 void UpdateGizmo()
 {
     PositionGizmo();
@@ -74,7 +80,7 @@ void PositionGizmo()
 
     if (editNodes.empty)
     {
-        gizmo.visible = false;
+        HideGizmo();
         return;
     }
     
@@ -145,7 +151,7 @@ void UseGizmo()
     if (drag)
     {
         /// \todo Implement snapping
-        if (moveMode == OBJ_MOVE || moveMode == OBJ_SCALE)
+        if (moveMode == OBJ_MOVE)
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
@@ -154,28 +160,16 @@ void UseGizmo()
                 adjust += gizmoAxisY.axisRay.direction * (gizmoAxisY.t - gizmoAxisY.lastT);
             if (gizmoAxisZ.selected)
                 adjust += gizmoAxisZ.axisRay.direction * (gizmoAxisZ.t - gizmoAxisZ.lastT);
-                
-            // Special handling for uniform scale: use the X-axis movement only
-            if (moveMode == OBJ_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
-            {
-                float x = gizmoAxisX.t - gizmoAxisX.lastT;
-                adjust = Vector3(x, x, x);
-            }
 
             if (adjust.length > M_EPSILON)
             {
                 for (uint i = 0; i < editNodes.length; ++i)
                 {
                     Node@ node = editNodes[i];
-                    if (moveMode == OBJ_MOVE)
-                    {
-                        Vector3 nodeAdjust = adjust;
-                        if (node.parent !is null)
-                            nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
-                        node.position = node.position + nodeAdjust;
-                    }
-                    else
-                        node.scale = node.scale + adjust;
+                    Vector3 nodeAdjust = adjust;
+                    if (node.parent !is null)
+                        nodeAdjust = node.parent.WorldToLocal(Vector4(nodeAdjust, 0.0));
+                    node.position = node.position + nodeAdjust;
                 }
 
                 UpdateNodeAttributes();
@@ -208,6 +202,34 @@ void UseGizmo()
                     }
                     else
                         node.rotation = node.rotation * rotQuat;
+                }
+
+                UpdateNodeAttributes();
+            }
+        }
+        else if (moveMode == OBJ_SCALE)
+        {
+            Vector3 adjust(0, 0, 0);
+            if (gizmoAxisX.selected)
+                adjust += Vector3(1, 0, 0) * (gizmoAxisX.t - gizmoAxisX.lastT);
+            if (gizmoAxisY.selected)
+                adjust += Vector3(0, 1, 0) * (gizmoAxisY.t - gizmoAxisY.lastT);
+            if (gizmoAxisZ.selected)
+                adjust += Vector3(0, 0, 1) * (gizmoAxisZ.t - gizmoAxisZ.lastT);
+
+            // Special handling for uniform scale: use the X-axis movement only
+            if (moveMode == OBJ_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
+            {
+                float x = gizmoAxisX.t - gizmoAxisX.lastT;
+                adjust = Vector3(x, x, x);
+            }
+
+            if (adjust.length > M_EPSILON)
+            {
+                for (uint i = 0; i < editNodes.length; ++i)
+                {
+                    Node@ node = editNodes[i];
+                    node.scale = node.scale + adjust;
                 }
 
                 UpdateNodeAttributes();
