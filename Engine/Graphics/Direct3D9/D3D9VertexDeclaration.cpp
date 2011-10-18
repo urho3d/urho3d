@@ -33,7 +33,7 @@ const BYTE d3dElementType[] =
 {
     D3DDECLTYPE_FLOAT3, // Position
     D3DDECLTYPE_FLOAT3, // Normal
-    D3DDECLTYPE_D3DCOLOR, // Color
+    D3DDECLTYPE_UBYTE4N, // Color
     D3DDECLTYPE_FLOAT2, // Texcoord1
     D3DDECLTYPE_FLOAT2, // Texcoord2
     D3DDECLTYPE_FLOAT3, // Cubetexcoord1

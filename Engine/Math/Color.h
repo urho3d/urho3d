@@ -121,12 +121,7 @@ public:
         unsigned g = (unsigned)(Clamp(g_ * 255.0f, 0.0f, 255.0f));
         unsigned b = (unsigned)(Clamp(b_ * 255.0f, 0.0f, 255.0f));
         unsigned a = (unsigned)(Clamp(a_ * 255.0f, 0.0f, 255.0f));
-        /// \todo Model data will need to be converted on OpenGL if it has vertex colors
-        #ifdef USE_OPENGL
-            return (((a) & 0xff) << 24) | (((b) & 0xff) << 16) | (((g) & 0xff) << 8) | ((r) & 0xff);
-        #else
-            return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
-        #endif
+        return (((a) & 0xff) << 24) | (((b) & 0xff) << 16) | (((g) & 0xff) << 8) | ((r) & 0xff);
     }
     
     /// Return as a four-dimensional vector.

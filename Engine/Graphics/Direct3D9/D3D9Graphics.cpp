@@ -149,6 +149,15 @@ static const DWORD windowStyle = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXI
 
 static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+static unsigned GetD3DColor(const Color& color)
+{
+    unsigned r = (unsigned)(Clamp(color.r_ * 255.0f, 0.0f, 255.0f));
+    unsigned g = (unsigned)(Clamp(color.g_ * 255.0f, 0.0f, 255.0f));
+    unsigned b = (unsigned)(Clamp(color.b_ * 255.0f, 0.0f, 255.0f));
+    unsigned a = (unsigned)(Clamp(color.a_ * 255.0f, 0.0f, 255.0f));
+    return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
+}
+
 OBJECTTYPESTATIC(Graphics);
 
 Graphics::Graphics(Context* context) :
@@ -592,9 +601,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     if (flags & CLEAR_STENCIL)
         d3dFlags |= D3DCLEAR_STENCIL;
 
-    impl_->device_->Clear(0, 0, d3dFlags, color.ToUInt(), depth, stencil);
+    impl_->device_->Clear(0, 0, d3dFlags, GetD3DColor(color), depth, stencil);
 }
-
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
@@ -1246,7 +1254,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             const Color& borderColor = texture->GetBorderColor();
             if (borderColor != impl_->borderColors_[index])
             {
-                impl_->device_->SetSamplerState(index, D3DSAMP_BORDERCOLOR, borderColor.ToUInt());
+                impl_->device_->SetSamplerState(index, D3DSAMP_BORDERCOLOR, GetD3DColor(borderColor));
                 impl_->borderColors_[index] = borderColor;
             }
         }
