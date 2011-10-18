@@ -552,10 +552,10 @@ void BatchQueue::Clear()
     batchGroups_.Clear();
 }
 
-void BatchQueue::AddBatch(const Batch& batch, bool noInstancing)
+void BatchQueue::AddBatch(const Batch& batch, bool instancing)
 {
     // If batch is something else than static, has custom view, or has per-instance shader data defined, can not instance
-    if (noInstancing || batch.geometryType_ != GEOM_STATIC || batch.overrideView_ || batch.shaderData_)
+    if (!instancing || batch.geometryType_ != GEOM_STATIC || batch.overrideView_ || batch.shaderData_)
         batches_.Push(batch);
     else
     {

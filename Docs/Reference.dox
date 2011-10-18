@@ -520,6 +520,8 @@ The passes are:
 - postalpha: custom rendering pass after transparent geometry.
 - shadow: shadow map rendering pass. Renders depth only.
 
+By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
+
 Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, specular and no specular, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist. See the file Forward.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders for all the shader variations.
 
 

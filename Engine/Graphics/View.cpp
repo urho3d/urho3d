@@ -194,8 +194,6 @@ void View::Render()
     
     graphics_->SetColorWrite(true);
     graphics_->SetFillMode(FILL_SOLID);
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
     
     // Bind the face selection and indirection cube maps for point light shadows
     graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
@@ -519,7 +517,7 @@ void View::GetBatches()
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                         baseQueue_.AddBatch(baseBatch);
                     else
-                        alphaQueue_.AddBatch(baseBatch, true);
+                        alphaQueue_.AddBatch(baseBatch, false);
                     continue;
                 }
                 
@@ -536,7 +534,7 @@ void View::GetBatches()
                 if (pass)
                 {
                     renderer_->SetBatchShaders(baseBatch, tech, pass);
-                    postAlphaQueue_.AddBatch(baseBatch);
+                    postAlphaQueue_.AddBatch(baseBatch, false);
                     continue;
                 }
             }
@@ -1469,7 +1467,7 @@ void View::SortBatches()
     baseQueue_.SortFrontToBack();
     preAlphaQueue_.SortFrontToBack();
     alphaQueue_.SortBackToFront();
-    postAlphaQueue_.SortFrontToBack();
+    postAlphaQueue_.SortBackToFront();
     
     for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
@@ -1487,7 +1485,6 @@ void View::PrepareInstancingBuffer()
     
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
-    totalInstances += postAlphaQueue_.GetNumInstances(renderer_);
     
     for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
@@ -1506,7 +1503,6 @@ void View::PrepareInstancingBuffer()
         {
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             preAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
-            postAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
             for (unsigned i = 0; i < lightQueues_.Size(); ++i)
             {
@@ -1556,8 +1552,7 @@ void View::CalculateShaderParameters()
 
 void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
-    if (useScissor)
-        graphics_->SetScissorTest(false);
+    graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
     // Priority instanced
@@ -1586,7 +1581,6 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        // For the transparent queue, both priority and non-priority batches are copied here, so check the flag
         if (useScissor)
         {
             if (!batch->hasPriority_ && batch->lightQueue_)
@@ -1641,7 +1635,9 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     Texture2D* shadowMap = queue.shadowMap_;
     
+    graphics_->SetStencilTest(false);
     graphics_->SetTexture(TU_SHADOWMAP, 0);
+    
     if (!graphics_->GetFallback())
     {
         graphics_->SetColorWrite(false);
@@ -1660,6 +1656,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     // Set shadow depth bias
     BiasParameters parameters = queue.light_->GetShadowBias();
     // Adjust the light's constant depth bias according to global shadow map resolution
+    /// \todo Should remove this adjustment and find a more flexible solution
     unsigned shadowMapSize = renderer_->GetShadowMapSize();
     if (shadowMapSize <= 512)
         parameters.constantBias_ *= 2.0f;
@@ -1695,5 +1692,4 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
-    graphics_->SetScissorTest(false);
 }

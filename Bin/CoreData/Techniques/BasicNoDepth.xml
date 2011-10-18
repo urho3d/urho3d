@@ -1,3 +1,0 @@
-<technique>
-    <pass name="base" vs="Basic" ps="Basic" blend="alpha" depthtest="always" depthwrite="false"/>
-</technique>

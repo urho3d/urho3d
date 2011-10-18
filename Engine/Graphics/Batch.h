@@ -225,7 +225,7 @@ public:
     /// Clear everything.
     void Clear();
     /// Add a batch, with instancing if possible.
-    void AddBatch(const Batch& batch, bool noInstancing = false);
+    void AddBatch(const Batch& batch, bool instancing = true);
     /// Sort non-instanced draw calls back to front.
     void SortBackToFront();
     /// Sort instanced and non-instanced draw calls front to back.
