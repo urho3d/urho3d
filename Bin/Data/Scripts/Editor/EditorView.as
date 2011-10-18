@@ -4,11 +4,11 @@ Node@ cameraNode;
 Camera@ camera;
 Window@ settingsDialog;
 
-enum ObjectMoveMode
+enum EditMode
 {
-    OBJ_MOVE = 0,
-    OBJ_ROTATE,
-    OBJ_SCALE
+    EDIT_MOVE = 0,
+    EDIT_ROTATE,
+    EDIT_SCALE
 }
 
 enum AxisMode
@@ -21,7 +21,7 @@ Text@ editorModeText;
 Text@ renderStatsText;
 Text@ cameraPosText;
 
-ObjectMoveMode moveMode = OBJ_MOVE;
+EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
 
 float cameraBaseSpeed = 10;
@@ -47,7 +47,7 @@ Array<int> pickModeDrawableFlags = {
     DRAWABLE_ZONE
 };
 
-Array<String> moveModeText = {
+Array<String> editModeText = {
     "Move",
     "Rotate",
     "Scale"
@@ -122,7 +122,7 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 void UpdateStats(float timeStep)
 {
     editorModeText.text = String(
-        "Mode: " + moveModeText[moveMode] +
+        "Mode: " + editModeText[editMode] +
         "  Axis: " + axisModeText[axisMode] +
         "  Pick: " + pickModeText[pickMode] +
         "  Updates: " + (runUpdate ? "Running" : "Paused"));
@@ -202,7 +202,7 @@ void MoveCamera(float timeStep)
             adjust.y = 1;
         if (input.keyDown[KEY_PAGEDOWN])
             adjust.y = -1;
-        if (moveMode == OBJ_SCALE)
+        if (editMode == EDIT_SCALE)
         {
             if (input.keyDown[KEY_ADD])
                 adjust = Vector3(1, 1, 1);
@@ -216,14 +216,14 @@ void MoveCamera(float timeStep)
         bool moved = false;
         adjust *= timeStep * 10;
 
-        switch (moveMode)
+        switch (editMode)
         {
-        case OBJ_MOVE:
+        case EDIT_MOVE:
             if (!moveSnap)
                 moved = MoveNodes(adjust * moveStep);
             break;
             
-        case OBJ_ROTATE:
+        case EDIT_ROTATE:
             if (!rotateSnap)
             {
                 Vector3 rotAdjust;
@@ -234,7 +234,7 @@ void MoveCamera(float timeStep)
             }
             break;
 
-        case OBJ_SCALE:
+        case EDIT_SCALE:
             if (!scaleSnap)
                 moved = ScaleNodes(adjust * scaleStep);
             break;
@@ -251,11 +251,11 @@ void SteppedObjectManipulation(int key)
         return;
 
     // Do not react in non-snapped mode, because that is handled in frame update
-    if (moveMode == OBJ_MOVE && !moveSnap)
+    if (editMode == EDIT_MOVE && !moveSnap)
         return;
-    if (moveMode == OBJ_ROTATE && !rotateSnap)
+    if (editMode == EDIT_ROTATE && !rotateSnap)
         return;
-    if (moveMode == OBJ_SCALE && !scaleSnap)
+    if (editMode == EDIT_SCALE && !scaleSnap)
         return;
 
     Vector3 adjust(0, 0, 0);
@@ -271,7 +271,7 @@ void SteppedObjectManipulation(int key)
         adjust.y = 1;
     if (key == KEY_PAGEDOWN)
         adjust.y = -1;
-    if (moveMode == OBJ_SCALE)
+    if (editMode == EDIT_SCALE)
     {
         if (key == KEY_ADD)
             adjust = Vector3(1, 1, 1);
@@ -284,13 +284,13 @@ void SteppedObjectManipulation(int key)
 
     bool moved = false;
 
-    switch (moveMode)
+    switch (editMode)
     {
-    case OBJ_MOVE:
+    case EDIT_MOVE:
         moved = MoveNodes(adjust);
         break;
 
-    case OBJ_ROTATE:
+    case EDIT_ROTATE:
         {
             Vector3 rotAdjust;
             rotAdjust.x = adjust.z * rotateStep;
@@ -300,7 +300,7 @@ void SteppedObjectManipulation(int key)
         }
         break;
 
-    case OBJ_SCALE:
+    case EDIT_SCALE:
         moved = ScaleNodes(adjust * scaleStep);
         break;
     }

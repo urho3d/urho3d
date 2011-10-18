@@ -414,11 +414,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
         if (key == '1')
-            moveMode = OBJ_MOVE;
+            editMode = EDIT_MOVE;
         else if (key == '2')
-            moveMode = OBJ_ROTATE;
+            editMode = EDIT_ROTATE;
         else if (key == '3')
-            moveMode = OBJ_SCALE;
+            editMode = EDIT_SCALE;
         else if (key == '4')
             axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
         else if (key == '5')

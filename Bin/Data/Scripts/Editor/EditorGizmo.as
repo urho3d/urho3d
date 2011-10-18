@@ -7,10 +7,13 @@ const float axisMaxD = 0.1;
 const float axisMaxT = 1.0;
 const float rotSensitivity = 50.0;
 
+EditMode lastGizmoMode;
+
 class GizmoAxis
 {
     Ray axisRay;
     bool selected;
+    bool lastSelected;
     float t;
     float d;
     float lastT;
@@ -19,6 +22,7 @@ class GizmoAxis
     GizmoAxis()
     {
         selected = false;
+        lastSelected = false;
         t = 0.0;
         d = 0.0;
         lastT = 0.0;
@@ -66,6 +70,11 @@ void CreateGizmo()
     gizmo.materials[1] = cache.GetResource("Material", "Materials/GreenUnlit.xml");
     gizmo.materials[2] = cache.GetResource("Material", "Materials/BlueUnlit.xml");
     gizmo.visible = false;
+    
+    gizmoAxisX.lastSelected = false;
+    gizmoAxisY.lastSelected = false;
+    gizmoAxisZ.lastSelected = false;
+    lastGizmoMode = EDIT_MOVE;
 
     // Add to the octree without culling. This also makes the gizmo invisible to raycasts
     if (editorScene.octree !is null)
@@ -109,6 +118,26 @@ void PositionGizmo()
     else
         gizmoNode.rotation = editNodes[0].worldRotation;
 
+    if (editMode != lastGizmoMode)
+    {
+        switch (editMode)
+        {
+        case EDIT_MOVE:
+            gizmo.model = cache.GetResource("Model", "Models/Axes.mdl");
+            break;
+        
+        case EDIT_ROTATE:
+            gizmo.model = cache.GetResource("Model", "Models/RotateAxes.mdl");
+            break;
+            
+        case EDIT_SCALE:
+            gizmo.model = cache.GetResource("Model", "Models/ScaleAxes.mdl");
+            break;
+        }
+          
+        lastGizmoMode = editMode;
+    }
+    
     gizmo.visible = true;
 }
 
@@ -163,15 +192,27 @@ void UseGizmo()
     gizmoAxisY.Update(cameraRay, scale, drag);
     gizmoAxisZ.Update(cameraRay, scale, drag);
 
-    gizmo.materials[0] = cache.GetResource("Material", gizmoAxisX.selected ? "Materials/BrightRedUnlit.xml" : "Materials/RedUnlit.xml");
-    gizmo.materials[1] = cache.GetResource("Material", gizmoAxisY.selected ? "Materials/BrightGreenUnlit.xml" : "Materials/GreenUnlit.xml");
-    gizmo.materials[2] = cache.GetResource("Material", gizmoAxisZ.selected ? "Materials/BrightBlueUnlit.xml" : "Materials/BlueUnlit.xml");
+    if (gizmoAxisX.selected != gizmoAxisX.lastSelected)
+    {
+        gizmo.materials[0] = cache.GetResource("Material", gizmoAxisX.selected ? "Materials/BrightRedUnlit.xml" : "Materials/RedUnlit.xml");
+        gizmoAxisX.lastSelected = gizmoAxisX.selected;
+    }
+    if (gizmoAxisY.selected != gizmoAxisY.lastSelected)
+    {
+        gizmo.materials[1] = cache.GetResource("Material", gizmoAxisY.selected ? "Materials/BrightGreenUnlit.xml" : "Materials/GreenUnlit.xml");
+        gizmoAxisY.lastSelected = gizmoAxisY.selected;
+    }
+    if (gizmoAxisZ.selected != gizmoAxisZ.lastSelected)
+    {
+        gizmo.materials[2] = cache.GetResource("Material", gizmoAxisZ.selected ? "Materials/BrightBlueUnlit.xml" : "Materials/BlueUnlit.xml");
+        gizmoAxisZ.lastSelected = gizmoAxisZ.selected;
+    };
 
     if (drag)
     {
         bool moved = false;
 
-        if (moveMode == OBJ_MOVE)
+        if (editMode == EDIT_MOVE)
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
@@ -183,7 +224,7 @@ void UseGizmo()
 
             moved = MoveNodes(adjust);
         }
-        else if (moveMode == OBJ_ROTATE)
+        else if (editMode == EDIT_ROTATE)
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
@@ -195,7 +236,7 @@ void UseGizmo()
 
             moved = RotateNodes(adjust);
         }
-        else if (moveMode == OBJ_SCALE)
+        else if (editMode == EDIT_SCALE)
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
@@ -206,7 +247,7 @@ void UseGizmo()
                 adjust += Vector3(0, 0, 1) * (gizmoAxisZ.t - gizmoAxisZ.lastT);
 
             // Special handling for uniform scale: use the unmodified X-axis movement only
-            if (moveMode == OBJ_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
+            if (editMode == EDIT_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
             {
                 float x = gizmoAxisX.t - gizmoAxisX.lastT;
                 adjust = Vector3(x, x, x);
