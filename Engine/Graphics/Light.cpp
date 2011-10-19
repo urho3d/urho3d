@@ -428,8 +428,8 @@ void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
             /// \todo Optimize/correct this
             float angle = 1.0f - node_->GetWorldDirection().DotProduct((position - node_->GetWorldPosition()).NormalizedFast());
             float spotMaxAngle = 1.0f - Vector3::FORWARD.DotProduct(Vector3(0, tanf(fov_ * M_DEGTORAD * 0.5f), 1.0f).NormalizedFast());
-            float spotAtt = Max(FastSqrt(1.0f - Clamp(angle / spotMaxAngle, 0.0f, 1.0f)), M_EPSILON);
-            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, M_EPSILON, 1.0f));
+            float spotAtt = FastSqrt(1.0f - Clamp(angle / spotMaxAngle, 0.0f, 0.9f));
+            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, 0.25f, 1.0f));
             sortValue_ = 1.0f / (color_.Intensity() * spotAtt * pointAtt);
         }
         break;
@@ -437,7 +437,7 @@ void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
     case LIGHT_POINT:
         {
             // Point light: range-based attenuation
-            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, M_EPSILON, 1.0f));
+            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, 0.1f, 1.0f));
             sortValue_ = 1.0f / (color_.Intensity() * pointAtt);
         }
         break;
