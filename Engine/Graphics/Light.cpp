@@ -409,45 +409,60 @@ void Light::OnWorldBoundingBoxUpdate()
     }
 }
 
-void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
+void Light::SetIntensitySortValue(float distance)
 {
-    // Store inverse intensity at point as the sort value
-    // For drawables we are comparing with the bounding box center, so limit the attenuation slightly
-    // to make sure light (particularly spotlights) does not cut off unrealistically early
-    float maxSpotAtt = 0.9f;
-    float maxPointAtt = 0.9f;
-    
+    if (lightType_ != LIGHT_DIRECTIONAL)
+        sortValue_ = (distance + 1.0f) / color_.Intensity();
+    else
+        sortValue_ = 1.0f / color_.Intensity();
+}
+
+void Light::SetIntensitySortValue(const BoundingBox& box)
+{
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        {
-            // Directional light: when sorting lights globally for the view, ensure directional lights always have 
-            // a fixed first priority so that the lit base pass optimization has the most benefit
-            sortValue_ = forDrawable ? 1.0f / color_.Intensity() : 0.0f;
-        }
-        break;
-    
-    case LIGHT_SPOT:
-        {
-            // Spot light: calculate deviation from the spot center, then add range-based attenuation
-            /// \todo Optimize/correct this
-            float scale = tanf(fov_ * M_DEGTORAD * 0.5f);
-            float angle = 1.0f - node_->GetWorldDirection().DotProduct((position - node_->GetWorldPosition()).NormalizedFast());
-            float spotMaxAngle = 1.0f - Vector3::FORWARD.DotProduct(Vector3(scale, scale, 1.0f).NormalizedFast());
-            float spotAtt = Clamp(angle / spotMaxAngle, 0.0f, maxSpotAtt);
-            float pointAtt = Clamp((GetWorldPosition() - position).LengthFast() / range_, 0.0f, maxPointAtt);
-            spotAtt = 1.0f - spotAtt * spotAtt;
-            pointAtt = 1.0f - pointAtt * pointAtt;
-            sortValue_ = 1.0f / (color_.Intensity() * spotAtt * pointAtt);
-        }
+        sortValue_ = 1.0f / (color_.Intensity() + 1.0f);
         break;
         
     case LIGHT_POINT:
         {
-            // Point light: range-based attenuation only
-            float pointAtt = Clamp((GetWorldPosition() - position).LengthFast() / range_, 0.0f, maxPointAtt);
-            pointAtt = 1.0f - pointAtt * pointAtt;
-            sortValue_ = 1.0f / (color_.Intensity() * pointAtt);
+            Vector3 centerPos = box.Center();
+            Vector3 lightPos = GetWorldPosition();
+            Vector3 lightDir = (centerPos - lightPos).NormalizedFast();
+            Ray lightRay(lightPos, lightDir);
+            float distance = lightRay.HitDistance(box);
+            float normDistance = distance / range_;
+            float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
+            sortValue_ = 1.0f / (color_.Intensity() * att + 1.0f);
+        }
+        break;
+        
+    case LIGHT_SPOT:
+        {
+            Vector3 centerPos = box.Center();
+            Vector3 lightPos = GetWorldPosition();
+            Vector3 lightDir = GetWorldRotation() * Vector3::FORWARD;
+            Ray lightRay(lightPos, lightDir);
+            
+            Vector3 centerProj = lightRay.Project(centerPos);
+            float centerDistance = (centerProj - lightPos).LengthFast();
+            Ray centerRay(centerProj, (centerPos - centerProj).NormalizedFast());
+            float centerAngle = centerRay.HitDistance(box) / centerDistance;
+            
+            // Check if a corner of the bounding box is closer to the light ray than the center, use its angle in that case
+            Vector3 cornerPos = centerPos + box.HalfSize() * Vector3(centerPos.x_ < centerProj.x_ ? 1.0f : -1.0f,
+                centerPos.y_ < centerProj.y_ ? 1.0f : -1.0f, centerPos.z_ < centerProj.z_ ? 1.0f : -1.0f);
+            Vector3 cornerProj = lightRay.Project(cornerPos);
+            float cornerDistance = (cornerProj - lightPos).LengthFast();
+            float cornerAngle = (cornerPos - cornerProj).LengthFast() / cornerDistance;
+            
+            float spotAngle = Min(centerAngle, cornerAngle);
+            float maxAngle = tanf(fov_ * M_DEGTORAD * 0.5f);
+            float spotFactor = Min(spotAngle / maxAngle, 1.0f);
+            // We do not know the actual range attenuation ramp, so take only spot attenuation into account
+            float att = Max(1.0f - spotFactor * spotFactor, M_EPSILON);
+            sortValue_ = 1.0f / (color_.Intensity() * att + 1.0f);
         }
         break;
     }

@@ -346,8 +346,11 @@ void View::GetDrawables()
     
     // Sort the lights to brightest/closest first
     for (unsigned i = 0; i < lights_.Size(); ++i)
-        lights_[i]->SetIntensitySortValue(cameraPos);
-    
+	{
+		Light* light = lights_[i];
+        light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
+	}
+
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
 }
 

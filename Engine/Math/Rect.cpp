@@ -45,3 +45,29 @@ String IntRect::ToString() const
     sprintf(tempBuffer, "%d %d %d %d", left_, top_, right_, bottom_);
     return String(tempBuffer);
 }
+
+void Rect::Clip(const Rect& rect)
+{
+    if (rect.min_.x_ > min_.x_)
+        min_.x_ = rect.min_.x_;
+    if (rect.max_.x_ < max_.x_)
+        max_.x_ = rect.max_.x_;
+    if (rect.min_.y_ > min_.y_)
+        min_.y_ = rect.min_.y_;
+    if (rect.max_.y_ < max_.y_)
+        max_.y_ = rect.max_.y_;
+    
+    float temp;
+    if (min_.x_ > max_.x_)
+    {
+        temp = min_.x_;
+        min_.x_ = max_.x_;
+        max_.x_ = temp;
+    }
+    if (min_.y_ > max_.y_)
+    {
+        temp = min_.y_;
+        min_.y_ = max_.y_;
+        max_.y_ = temp;
+    }
+}

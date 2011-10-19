@@ -233,8 +233,10 @@ public:
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     
-    /// %Set sort value based on intensity at given world position.
-    void SetIntensitySortValue(const Vector3& position, bool forDrawable = false);
+    /// %Set sort value based on intensity and view distance.
+    void SetIntensitySortValue(float distance);
+    /// %Set sort value based on overall intensity over a bounding box.
+    void SetIntensitySortValue(const BoundingBox& box);
     /// Return light volume model transform.
     const Matrix3x4& GetVolumeTransform();
     

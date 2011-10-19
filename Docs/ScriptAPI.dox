@@ -361,6 +361,7 @@ Methods:<br>
 - void Define(const Vector2&)
 - void Merge(const Vector2&)
 - void Merge(const Rect&)
+- void Clip(const Rect&)
 - void Clear()
 
 Properties:<br>

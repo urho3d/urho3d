@@ -206,9 +206,8 @@ void Drawable::LimitLights()
     if (!maxLights_)
         return;
     
-    const Vector3& worldPos = GetWorldBoundingBox().Center();
     for (unsigned i = 0; i < lights_.Size(); ++i)
-        lights_[i]->SetIntensitySortValue(worldPos, true);
+        lights_[i]->SetIntensitySortValue(GetWorldBoundingBox());
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     

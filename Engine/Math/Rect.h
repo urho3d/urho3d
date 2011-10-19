@@ -145,6 +145,9 @@ public:
         defined_ = false;
     }
     
+    /// Clip with another rect.
+    void Clip(const Rect& rect);
+    
     /// Return center.
     Vector2 Center() const { return (max_ + min_) * 0.5f; }
     /// Return size.
