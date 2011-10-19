@@ -170,6 +170,7 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/Jack.xml");
         object.drawDistance = 300;
         object.castShadows = true;
+        object.maxLights = 2;
 
         AnimationState@ anim = object.AddAnimationState(cache.GetResource("Animation", "Models/Jack_Walk.ani"));
         anim.useNlerp = true;

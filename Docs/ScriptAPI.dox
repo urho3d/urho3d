@@ -1585,6 +1585,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 
 
@@ -1645,6 +1646,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - LightType lightType
 - Color& color
@@ -1695,6 +1697,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - BoundingBox& boundingBox
 - Color& ambientColor
@@ -1734,6 +1737,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
 - Material@[] materials
@@ -1772,6 +1776,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
 - Material@[] materials
@@ -1838,6 +1843,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
 - Material@[] materials
@@ -1943,6 +1949,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Material@ material
 - uint numBillboards

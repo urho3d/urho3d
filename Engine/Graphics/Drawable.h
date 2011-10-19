@@ -100,7 +100,7 @@ public:
     void SetViewMask(unsigned mask);
     /// %Set light mask. Will be and'ed with light's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// %Set maximum number of lights (forward lighting only). Default 0 is unlimited.
+    /// %Set maximum number of lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
     /// %Set visible flag.
     void SetVisible(bool enable);

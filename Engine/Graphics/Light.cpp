@@ -411,13 +411,35 @@ void Light::OnWorldBoundingBoxUpdate()
 
 void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
 {
-    // Directional lights are always assumed to be "infinitely" close, while point and spot lights take distance into account
-    float invIntensity = 1.0f / color_.Intensity();
-    if (lightType_ == LIGHT_DIRECTIONAL)
-        // If sorting lights for a drawable's maximum lights sorting, use the actual intensity
-        // Else (when sorting lights globally for the view) ensure directional lights always have a fixed first priority
-        // so that the lit base pass optimization has the most benefit
-        sortValue_ = forDrawable ? invIntensity : 0.0f;
-    else
-        sortValue_ = invIntensity * (1.0f + (GetWorldPosition() - position).LengthFast() / range_);
+    // Store inverse intensity at point as the sort value
+    switch (lightType_)
+    {
+    case LIGHT_DIRECTIONAL:
+        {
+            // Directional light: when sorting lights globally for the view, ensure directional lights always have 
+            // a fixed first priority so that the lit base pass optimization has the most benefit
+            sortValue_ = forDrawable ? 1.0f / color_.Intensity() : 0.0f;
+        }
+        break;
+    
+    case LIGHT_SPOT:
+        {
+            // Spot light: calculate deviation from the spot center
+            /// \todo Optimize/correct this
+            float angle = 1.0f - node_->GetWorldDirection().DotProduct((position - node_->GetWorldPosition()).NormalizedFast());
+            float spotMaxAngle = 1.0f - Vector3::FORWARD.DotProduct(Vector3(0, tanf(fov_ * M_DEGTORAD * 0.5f), 1.0f).NormalizedFast());
+            float spotAtt = Max(FastSqrt(1.0f - Clamp(angle / spotMaxAngle, 0.0f, 1.0f)), M_EPSILON);
+            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, M_EPSILON, 1.0f));
+            sortValue_ = 1.0f / (color_.Intensity() * spotAtt * pointAtt);
+        }
+        break;
+        
+    case LIGHT_POINT:
+        {
+            // Point light: range-based attenuation
+            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, M_EPSILON, 1.0f));
+            sortValue_ = 1.0f / (color_.Intensity() * pointAtt);
+        }
+        break;
+    }
 }
