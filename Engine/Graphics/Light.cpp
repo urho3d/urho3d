@@ -412,6 +412,11 @@ void Light::OnWorldBoundingBoxUpdate()
 void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
 {
     // Store inverse intensity at point as the sort value
+    // For drawables we are comparing with the bounding box center, so limit the attenuation slightly
+    // to make sure light (particularly spotlights) does not cut off unrealistically early
+    float maxSpotAtt = 0.9f;
+    float maxPointAtt = 0.9f;
+    
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
@@ -424,20 +429,24 @@ void Light::SetIntensitySortValue(const Vector3& position, bool forDrawable)
     
     case LIGHT_SPOT:
         {
-            // Spot light: calculate deviation from the spot center
+            // Spot light: calculate deviation from the spot center, then add range-based attenuation
             /// \todo Optimize/correct this
+            float scale = tanf(fov_ * M_DEGTORAD * 0.5f);
             float angle = 1.0f - node_->GetWorldDirection().DotProduct((position - node_->GetWorldPosition()).NormalizedFast());
-            float spotMaxAngle = 1.0f - Vector3::FORWARD.DotProduct(Vector3(0, tanf(fov_ * M_DEGTORAD * 0.5f), 1.0f).NormalizedFast());
-            float spotAtt = FastSqrt(1.0f - Clamp(angle / spotMaxAngle, 0.0f, 0.9f));
-            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, 0.25f, 1.0f));
+            float spotMaxAngle = 1.0f - Vector3::FORWARD.DotProduct(Vector3(scale, scale, 1.0f).NormalizedFast());
+            float spotAtt = Clamp(angle / spotMaxAngle, 0.0f, maxSpotAtt);
+            float pointAtt = Clamp((GetWorldPosition() - position).LengthFast() / range_, 0.0f, maxPointAtt);
+            spotAtt = 1.0f - spotAtt * spotAtt;
+            pointAtt = 1.0f - pointAtt * pointAtt;
             sortValue_ = 1.0f / (color_.Intensity() * spotAtt * pointAtt);
         }
         break;
         
     case LIGHT_POINT:
         {
-            // Point light: range-based attenuation
-            float pointAtt = FastSqrt(Clamp(1.0f - (GetWorldPosition() - position).LengthFast() / range_, 0.1f, 1.0f));
+            // Point light: range-based attenuation only
+            float pointAtt = Clamp((GetWorldPosition() - position).LengthFast() / range_, 0.0f, maxPointAtt);
+            pointAtt = 1.0f - pointAtt * pointAtt;
             sortValue_ = 1.0f / (color_.Intensity() * pointAtt);
         }
         break;

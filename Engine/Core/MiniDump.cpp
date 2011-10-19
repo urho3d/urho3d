@@ -41,6 +41,7 @@ static bool miniDumpWritten = false;
 int WriteMiniDump(const char* applicationName, void* exceptionPointers)
 {
     // In case of recursive or repeating exceptions, only write the dump once
+    /// \todo This function should not allocate any dynamic memory
     if (miniDumpWritten)
         return EXCEPTION_EXECUTE_HANDLER;
     
