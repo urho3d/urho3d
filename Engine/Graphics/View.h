@@ -71,8 +71,6 @@ public:
     Octree* GetOctree() const { return octree_; }
     /// Return camera.
     Camera* GetCamera() const { return camera_; }
-    /// Return zone.
-    Zone* GetZone() const { return zone_; }
     /// Return the render target. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
     /// Return the depth stencil. 0 if using the backbuffer's depth stencil.
@@ -125,6 +123,10 @@ private:
     const Rect& GetLightScissor(Light* light);
     /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
+    /// Return the drawable's zone, or camera/default zone if not set.
+    Zone* GetZone(Drawable* drawable);
+    /// Return the drawable's light mask, considering also its zone.
+    unsigned GetLightMask(Drawable* drawable);
     /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material*& material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
@@ -133,8 +135,6 @@ private:
     void SortBatches();
     /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
-    /// Calculate view-global shader parameters.
-    void CalculateShaderParameters();
     /// Render everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
     /// Render batches lit by a specific light.
@@ -150,8 +150,8 @@ private:
     Octree* octree_;
     /// Camera to use.
     Camera* camera_;
-    /// Zone to get global rendering settings from.
-    Zone* zone_;
+    /// Zone the camera is inside, or default zone if not assigned.
+    Zone* cameraZone_;
     /// Color buffer to use.
     RenderSurface* renderTarget_;
     /// Depth buffer to use.
@@ -194,6 +194,8 @@ private:
     PODVector<Drawable*> litGeometries_;
     /// Temporary drawable query result.
     PODVector<Drawable*> tempDrawables_;
+    /// Temporary zone query result.
+    PODVector<Drawable*> tempZones_;
     /// Geometry objects.
     PODVector<Drawable*> geometries_;
     /// Occluder objects.
@@ -208,8 +210,6 @@ private:
     HashSet<Drawable*> maxLightsDrawables_;
     /// Light queue indices of processed lights.
     Map<Light*, unsigned> lightQueueIndex_;
-    /// View-global shader parameters.
-    HashMap<StringHash, Vector4> shaderParameters_;
     /// Cache for light scissor queries.
     HashMap<Light*, Rect> lightScissorCache_;
     /// Base pass batches.
@@ -222,6 +222,8 @@ private:
     BatchQueue postAlphaQueue_;
     /// Light queues.
     Vector<LightBatchQueue> lightQueues_;
-    /// Current stencil value for light optimization;
+    /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
+    /// Camera zone's override flag.
+    bool cameraZoneOverride_;
 };

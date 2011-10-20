@@ -43,6 +43,7 @@ class Renderer;
 class ShaderVariation;
 class Texture2D;
 class VertexBuffer;
+class Zone;
 struct LightBatchQueue;
 
 /// Description of a 3D geometry draw call.
@@ -50,6 +51,7 @@ struct Batch
 {
     /// Construct with defaults.
     Batch() :
+        zone_(0),
         lightQueue_(0),
         shaderData_(0),
         shaderDataSize_(0),
@@ -62,9 +64,9 @@ struct Batch
     /// Calculate sort key, which consists of priority flag, light, pass and geometry.
     void CalculateSortKey();
     /// Prepare for rendering.
-    void Prepare(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform = true) const;
+    void Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransform = true) const;
     /// Prepare and draw.
-    void Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, Renderer* renderer) const;
     
     /// Geometry.
     Geometry* geometry_;
@@ -72,6 +74,8 @@ struct Batch
     const Matrix3x4* worldTransform_;
     /// Camera.
     Camera* camera_;
+    /// Zone.
+    Zone* zone_;
     /// Light properties.
     LightBatchQueue* lightQueue_;
     /// Material.
@@ -138,7 +142,7 @@ struct BatchGroup
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
     void SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex);
     /// Prepare and draw.
-    void Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, Renderer* renderer) const;
     
     /// Geometry.
     Geometry* geometry_;
@@ -146,6 +150,8 @@ struct BatchGroup
     PODVector<InstanceData> instances_;
     /// Camera.
     Camera* camera_;
+    /// Zone.
+    Zone* zone_;
     /// Light properties.
     LightBatchQueue* lightQueue_;
     /// Material.
@@ -165,6 +171,8 @@ struct BatchGroup
 /// Instanced draw call key.
 struct BatchGroupKey
 {
+    /// Zone.
+    Zone* zone_;
     /// Light properties.
     LightBatchQueue* lightQueue_;
     /// Material pass.
@@ -175,46 +183,56 @@ struct BatchGroupKey
     Geometry* geometry_;
     
     /// Test for equality with another batch group key.
-    bool operator == (const BatchGroupKey& rhs) const { return lightQueue_ == rhs.lightQueue_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
+    bool operator == (const BatchGroupKey& rhs) const { return zone_ == rhs.zone_ && lightQueue_ == rhs.lightQueue_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
     /// Test for inequality with another batch group key.
-    bool operator != (const BatchGroupKey& rhs) const { return lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
+    bool operator != (const BatchGroupKey& rhs) const { return zone_ != rhs.zone_ || lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
     /// Test if less than another batch group key.
     bool operator < (const BatchGroupKey& rhs) const
     {
-        if (lightQueue_ == rhs.lightQueue_)
+        if (zone_ == rhs.zone_)
         {
-            if (pass_ == rhs.pass_)
+            if (lightQueue_ == rhs.lightQueue_)
             {
-                if (material_ == rhs.material_)
-                    return geometry_ < rhs.geometry_;
+                if (pass_ == rhs.pass_)
+                {
+                    if (material_ == rhs.material_)
+                        return geometry_ < rhs.geometry_;
+                    else
+                        return material_ < rhs.material_;
+                }
                 else
-                    return material_ < rhs.material_;
+                    return pass_ < rhs.pass_;
             }
             else
-                return pass_ < rhs.pass_;
+                return lightQueue_ < rhs.lightQueue_;
         }
         else
-            return lightQueue_ < rhs.lightQueue_;
+            return zone_ < rhs.zone_;
     }
     
     /// Test if greater than another batch group key.
     bool operator > (const BatchGroupKey& rhs) const
     {
-        if (lightQueue_ == rhs.lightQueue_)
+        if (zone_ == rhs.zone_)
         {
-            if (pass_ == rhs.pass_)
+            if (lightQueue_ == rhs.lightQueue_)
             {
-                if (material_ == rhs.material_)
-                    return geometry_ > rhs.geometry_;
+                if (pass_ == rhs.pass_)
+                {
+                    if (material_ == rhs.material_)
+                        return geometry_ > rhs.geometry_;
+                    else
+                        return material_ > rhs.material_;
+                }
                 else
-                    return material_ > rhs.material_;
+                    return pass_ > rhs.pass_;
             }
             else
-                return pass_ > rhs.pass_;
+                return lightQueue_ > rhs.lightQueue_;
         }
         else
-            return lightQueue_ > rhs.lightQueue_;
+            return zone_ > rhs.zone_;
     }
 };
 

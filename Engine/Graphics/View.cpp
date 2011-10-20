@@ -64,7 +64,7 @@ View::View(Context* context) :
     renderer_(GetSubsystem<Renderer>()),
     octree_(0),
     camera_(0),
-    zone_(0),
+    cameraZone_(0),
     renderTarget_(0),
     depthStencil_(0)
 {
@@ -96,8 +96,6 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
         depthStencil_ = 0;
     else
         depthStencil_ = renderTarget->GetLinkedDepthBuffer();
-    
-    zone_ = renderer_->GetDefaultZone();
     
     // Validate the rect and calculate size. If zero rect, use whole render target size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
@@ -199,9 +197,6 @@ void View::Render()
     graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
     graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     
-    // Calculate view-global shader parameters
-    CalculateShaderParameters();
-    
     // Reset the light optimization stencil reference value
     lightStencilValue_ = 1;
     
@@ -230,7 +225,7 @@ void View::Render()
     // "Forget" the camera, octree and zone after rendering
     camera_ = 0;
     octree_ = 0;
-    zone_ = 0;
+    cameraZone_ = 0;
     frame_.camera_ = 0;
 }
 
@@ -240,19 +235,33 @@ void View::GetDrawables()
     
     Vector3 cameraPos = camera_->GetWorldPosition();
     
-    // Get zones & find the zone camera is in
-    PointOctreeQuery query(tempDrawables_, cameraPos, DRAWABLE_ZONE, camera_->GetViewMask());
-    octree_->GetDrawables(query);
-    
-    int highestZonePriority = M_MIN_INT;
-    for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
+    // Find the camera & farclip zones
     {
-        Zone* zone = static_cast<Zone*>(tempDrawables_[i]);
-        if (zone->IsInside(cameraPos) && zone->GetPriority() > highestZonePriority)
+        PROFILE(FindCameraZone);
+        Vector3 cameraPos = camera_->GetWorldPosition();
+        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * camera_->GetFarClip();
+        // Get default zone in case we do not have anything else
+        Zone* defaultZone = renderer_->GetDefaultZone();
+        cameraZone_ = defaultZone;
+        
+        PointOctreeQuery query(tempZones_, cameraPos, DRAWABLE_ZONE);
+        PODVector<Zone*>& zoneResult = reinterpret_cast<PODVector<Zone*>&>(tempZones_);
+        int bestPriority = M_MIN_INT;
+        Zone* newZone = 0;
+        
+        for (PODVector<Zone*>::Iterator i = zoneResult.Begin(); i != zoneResult.End(); ++i)
         {
-            zone_ = zone;
-            highestZonePriority = zone->GetPriority();
+            Zone* zone = *i;
+            int priority = zone->GetPriority();
+            if (zone->IsInside(cameraPos) && priority > bestPriority)
+            {
+                newZone = zone;
+                bestPriority = priority;
+            }
         }
+        
+        if (newZone)
+            cameraZone_ = newZone;
     }
     
     // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
@@ -309,6 +318,10 @@ void View::GetDrawables()
         unsigned flags = drawable->GetDrawableFlags();
         if (flags & DRAWABLE_GEOMETRY)
         {
+            // Find new zone for the drawable if necessary
+            if (!drawable->GetZone() && !cameraZoneOverride_)
+                drawable->FindZone(tempZones_);
+            
             drawable->ClearLights();
             drawable->MarkInView(frame_);
             drawable->UpdateGeometry(frame_);
@@ -334,11 +347,6 @@ void View::GetDrawables()
         else if (flags & DRAWABLE_LIGHT)
         {
             Light* light = static_cast<Light*>(drawable);
-            
-            // Skip if light is culled by the zone
-            if (!(light->GetViewMask() & zone_->GetViewMask()))
-                continue;
-            
             light->MarkInView(frame_);
             lights_.Push(light);
         }
@@ -346,11 +354,11 @@ void View::GetDrawables()
     
     // Sort the lights to brightest/closest first
     for (unsigned i = 0; i < lights_.Size(); ++i)
-	{
-		Light* light = lights_[i];
+    {
+        Light* light = lights_[i];
         light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
-	}
-
+    }
+    
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
 }
 
@@ -508,6 +516,7 @@ void View::GetBatches()
                 
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
+                baseBatch.zone_ = GetZone(drawable);
                 baseBatch.hasPriority_ = true;
                 
                 Pass* pass = 0;
@@ -589,6 +598,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         // Fill the rest of the batch
         litBatch.camera_ = camera_;
         litBatch.lightQueue_ = &lightQueue;
+        litBatch.zone_ = GetZone(drawable);
         
         // Check from the ambient pass whether the object is opaque or transparent
         Pass* ambientPass = tech->GetPass(PASS_BASE);
@@ -627,7 +637,7 @@ void View::RenderBatches()
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, zone_->GetFogColor());
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, cameraZone_->GetFogColor());
         
         RenderBatchQueue(baseQueue_);
     }
@@ -779,7 +789,7 @@ unsigned View::ProcessLight(Light* light)
     case LIGHT_DIRECTIONAL:
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
-            if (geometries_[i]->GetLightMask() & light->GetLightMask())
+            if (GetLightMask(geometries_[i]) & light->GetLightMask())
                 litGeometries_.Push(geometries_[i]);
         }
         break;
@@ -790,7 +800,7 @@ unsigned View::ProcessLight(Light* light)
             octree_->GetDrawables(query);
             for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
             {
-                if (tempDrawables_[i]->IsInView(frame_) && (tempDrawables_[i]->GetLightMask() & light->GetLightMask()))
+                if (tempDrawables_[i]->IsInView(frame_) && (GetLightMask(tempDrawables_[i]) & light->GetLightMask()))
                     litGeometries_.Push(tempDrawables_[i]);
             }
         }
@@ -803,7 +813,7 @@ unsigned View::ProcessLight(Light* light)
             octree_->GetDrawables(query);
             for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
             {
-                if (tempDrawables_[i]->IsInView(frame_) && (tempDrawables_[i]->GetLightMask() & light->GetLightMask()))
+                if (tempDrawables_[i]->IsInView(frame_) && (GetLightMask(tempDrawables_[i]) & light->GetLightMask()))
                     litGeometries_.Push(tempDrawables_[i]);
             }
         }
@@ -941,7 +951,7 @@ void View::ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVect
             continue;
         
         // Check light mask
-        if (!(drawable->GetLightMask() & light->GetLightMask()))
+        if (!(GetLightMask(drawable) & light->GetLightMask()))
             continue;
         
         // Project shadow caster bounding box to light view space for visibility check
@@ -1251,7 +1261,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
             if (geomBox.Size().LengthFast() < M_LARGE_VALUE)
             {
                 if (geometryDepthBounds_[i].min_ <= farSplit && geometryDepthBounds_[i].max_ >= nearSplit &&
-                    (geometries_[i]->GetLightMask() & light->GetLightMask()))
+                    (GetLightMask(geometries_[i]) & light->GetLightMask()))
                     litGeometriesBox.Merge(geomBox);
             }
         }
@@ -1390,6 +1400,19 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     }
 }
 
+Zone* View::GetZone(Drawable* drawable)
+{
+    if (cameraZoneOverride_)
+        return cameraZone_;
+    Zone* drawableZone = drawable->GetZone();
+    return drawableZone ? drawableZone : cameraZone_;
+}
+
+unsigned View::GetLightMask(Drawable* drawable)
+{
+    return drawable->GetLightMask() & GetZone(drawable)->GetLightMask();
+}
+
 Technique* View::GetTechnique(Drawable* drawable, Material*& material)
 {
     if (!material)
@@ -1519,40 +1542,6 @@ void View::PrepareInstancingBuffer()
     }
 }
 
-void View::CalculateShaderParameters()
-{
-    Time* time = GetSubsystem<Time>();
-    
-    float farClip = camera_->GetFarClip();
-    float nearClip = camera_->GetNearClip();
-    float fogStart = Min(zone_->GetFogStart(), farClip);
-    float fogEnd = Min(zone_->GetFogEnd(), farClip);
-    if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
-        fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
-    float fogRange = Max(fogEnd - fogStart, M_EPSILON);
-    Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
-    
-    Vector4 depthMode = Vector4::ZERO;
-    if (camera_->IsOrthographic())
-    {
-        depthMode.x_ = 1.0f;
-        #ifdef USE_OPENGL
-        depthMode.z_ = 0.5f;
-        depthMode.w_ = 0.5f;
-        #else
-        depthMode.z_ = 1.0f;
-        #endif
-    }
-    else
-        depthMode.w_ = 1.0f / camera_->GetFarClip();
-    
-    shaderParameters_.Clear();
-    shaderParameters_[VSP_DEPTHMODE] = depthMode;
-    shaderParameters_[PSP_AMBIENTCOLOR] = zone_->GetAmbientColor().ToVector4();
-    shaderParameters_[PSP_FOGCOLOR] = zone_->GetFogColor().ToVector4(),
-    shaderParameters_[PSP_FOGPARAMS] = fogParams;
-}
-
 void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
     graphics_->SetScissorTest(false);
@@ -1563,13 +1552,13 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
         queue.sortedPriorityBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
-        group->Draw(graphics_, renderer_, shaderParameters_);
+        group->Draw(graphics_, renderer_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, renderer_, shaderParameters_);
+        batch->Draw(graphics_, renderer_);
     }
     
     // Non-priority instanced
@@ -1578,7 +1567,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
         BatchGroup* group = *i;
         if (useScissor && group->lightQueue_)
             OptimizeLightByScissor(group->lightQueue_->light_);
-        group->Draw(graphics_, renderer_, shaderParameters_);
+        group->Draw(graphics_, renderer_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
@@ -1591,7 +1580,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
             else
                 graphics_->SetScissorTest(false);
         }
-        batch->Draw(graphics_, renderer_, shaderParameters_);
+        batch->Draw(graphics_, renderer_);
     }
 }
 
@@ -1605,13 +1594,13 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
         queue.sortedPriorityBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
-        group->Draw(graphics_, renderer_, shaderParameters_);
+        group->Draw(graphics_, renderer_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, renderer_, shaderParameters_);
+        batch->Draw(graphics_, renderer_);
     }
     
     // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
@@ -1622,13 +1611,13 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBatchGroups_.Begin(); i != queue.sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
-        group->Draw(graphics_, renderer_, shaderParameters_);
+        group->Draw(graphics_, renderer_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_, renderer_, shaderParameters_);
+        batch->Draw(graphics_, renderer_);
     }
 }
 

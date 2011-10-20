@@ -29,6 +29,7 @@
 #include "Octree.h"
 #include "OctreeQuery.h"
 #include "Scene.h"
+#include "Zone.h"
 
 #include "Sort.h"
 
@@ -165,6 +166,54 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
     return worldBoundingBox_;
 }
 
+void Drawable::FindZone(PODVector<Drawable*>& result)
+{
+    // First check if the last zones are still valid, to avoid making a new octree query
+    /// \todo Add zone mask to be able to exclude zones
+    Vector3 center = GetWorldBoundingBox().Center();
+    int bestPriority = M_MIN_INT;
+    Zone* newZone = 0;
+    for (Vector<WeakPtr<Zone> >::Iterator i = lastZones_.Begin(); i != lastZones_.End(); ++i)
+    {
+        Zone* zone = (*i);
+        int priority = zone->GetPriority();
+        if (zone && zone->IsInside(center) && priority > bestPriority)
+        {
+            newZone = zone;
+            bestPriority = priority;
+        }
+    }
+    
+    if (!newZone)
+    {
+        Octree* octree = octant_->GetRoot();
+        PointOctreeQuery query(result, center, DRAWABLE_ZONE);
+        octree->GetDrawables(query);
+        
+        // Store the zone query result for next time
+        lastZones_.Clear();
+        PODVector<Zone*>& zoneResult = reinterpret_cast<PODVector<Zone*>&>(result);
+        for (PODVector<Zone*>::Iterator i = zoneResult.Begin(); i != zoneResult.End(); ++i)
+        {
+            Zone* zone = (*i);
+            int priority = zone->GetPriority();
+            if (zone->IsInside(center) && priority > bestPriority)
+            {
+                newZone = zone;
+                bestPriority = priority;
+            }
+            lastZones_.Push(WeakPtr<Zone>(*i));
+        }
+    }
+    
+    zone_ = newZone;
+}
+
+void Drawable::SetSortValue(float value)
+{
+    sortValue_ = value;
+}
+
 void Drawable::MarkInView(const FrameInfo& frame)
 {
     viewFrameNumber_ = frame.frameNumber_;
@@ -178,11 +227,6 @@ void Drawable::MarkInShadowView(const FrameInfo& frame)
         viewFrameNumber_ = frame.frameNumber_;
         viewCamera_ = 0;
     }
-}
-
-void Drawable::SetSortValue(float value)
-{
-    sortValue_ = value;
 }
 
 void Drawable::ClearLights()
@@ -229,6 +273,11 @@ void Drawable::SetBasePass(unsigned batchIndex)
     basePassFlags_[index] |= (1 << (batchIndex & 31));
 }
 
+Zone* Drawable::GetZone() const
+{
+    return zone_;
+}
+
 bool Drawable::IsInView(unsigned frameNumber) const
 {
     return viewFrameNumber_ == frameNumber;
@@ -265,6 +314,7 @@ void Drawable::OnMarkedDirty(Node* node)
     if (node == node_)
     {
         worldBoundingBoxDirty_ = true;
+        zone_.Reset();
         if (octant_)
             octant_->GetRoot()->QueueReinsertion(this);
     }

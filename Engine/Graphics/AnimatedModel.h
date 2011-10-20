@@ -48,7 +48,7 @@ public:
     
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
-    /// Process renderer raycast.
+    /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Animation is updated here.
     virtual void Update(const FrameInfo& frame);

@@ -44,6 +44,7 @@ class Material;
 class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
+class Zone;
 
 /// Rendering frame update parameters.
 struct FrameInfo
@@ -134,13 +135,13 @@ public:
     /// Return occlusion flag.
     bool IsOccluder() const { return occluder_; }
     
-    /// Return octree octant.
-    Octant* GetOctant() const { return octant_; }
-    /// %Set sorting value. Called by View.
+    /// Find new zone from the octree.
+    void FindZone(PODVector<Drawable*>& result);
+    /// %Set sorting value.
     void SetSortValue(float value);
-    /// Mark in view this frame. Called by View.
+    /// Mark in view this frame.
     void MarkInView(const FrameInfo& frame);
-    /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View.
+    /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it.
     void MarkInShadowView(const FrameInfo& frame);
     /// Clear lights and base pass flags for a new frame.
     void ClearLights();
@@ -150,6 +151,10 @@ public:
     void LimitLights();
     /// %Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex);
+    /// Return octree octant.
+    Octant* GetOctant() const { return octant_; }
+    /// Return current zone.
+    Zone* GetZone() const;
     /// Return distance from camera.
     float GetDistance() const { return distance_; }
     /// Return LOD scaled distance from camera.
@@ -183,6 +188,10 @@ protected:
     
     /// Octree octant.
     Octant* octant_;
+    /// Current zone.
+    WeakPtr<Zone> zone_;
+    /// Last found zones.
+    Vector<WeakPtr<Zone> > lastZones_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
     /// Draw distance.

@@ -40,7 +40,7 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process renderer raycast.
+    /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame);

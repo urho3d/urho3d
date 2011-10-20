@@ -723,14 +723,10 @@ void AnimatedModel::OnNodeSet(Node* node)
 
 void AnimatedModel::OnMarkedDirty(Node* node)
 {
+    Drawable::OnMarkedDirty(node);
+    
     // If the scene node or any of the bone nodes move, mark skinning dirty
     skinningDirty_ = true;
-    if (node == node_)
-    {
-        worldBoundingBoxDirty_ = true;
-        if (octant_)
-            octant_->GetRoot()->QueueReinsertion(this);
-    }
 }
 
 void AnimatedModel::OnWorldBoundingBoxUpdate()

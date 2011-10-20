@@ -35,6 +35,7 @@
 #include "Technique.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
+#include "Zone.h"
 
 #include "DebugNew.h"
 
@@ -76,7 +77,7 @@ void Batch::CalculateSortKey()
         (((unsigned long long)material) << 16) | geometry;
 }
 
-void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform) const
+void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransform) const
 {
     if (!vertexShader_ || !pixelShader_)
         return;
@@ -98,13 +99,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
     // Set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
     
-    // Set global shader parameters
-    for (HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
-    {
-        if (graphics->NeedParameterUpdate(i->first_, &shaderParameters))
-            graphics->SetShaderParameter(i->first_, i->second_);
-    }
-    
     // Set viewport and camera shader parameters
     if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
         graphics->SetShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
@@ -112,6 +106,25 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
     if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
         graphics->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
+    if (graphics->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
+    {
+        Vector4 depthMode = Vector4::ZERO;
+        if (camera_->IsOrthographic())
+        {
+            depthMode.x_ = 1.0f;
+            #ifdef USE_OPENGL
+            depthMode.z_ = 0.5f;
+            depthMode.w_ = 0.5f;
+            #else
+            depthMode.z_ = 1.0f;
+            #endif
+        }
+        else
+            depthMode.w_ = 1.0f / camera_->GetFarClip();
+        
+        graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
+    }
+
     if (overrideView_)
     {
         if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
@@ -139,6 +152,30 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
     {
         if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
             graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
+    }
+    
+    // Set zone-related shader parameters
+    if (zone_)
+    {
+        if (graphics->NeedParameterUpdate(PSP_AMBIENTCOLOR, zone_))
+            graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor().ToVector4());
+        
+        if (graphics->NeedParameterUpdate(PSP_FOGCOLOR, zone_))
+            graphics->SetShaderParameter(PSP_FOGCOLOR, zone_->GetFogColor().ToVector4());
+        
+        if (graphics->NeedParameterUpdate(PSP_FOGPARAMS, zone_))
+        {
+            float farClip = camera_->GetFarClip();
+            float nearClip = camera_->GetNearClip();
+            float fogStart = Min(zone_->GetFogStart(), farClip);
+            float fogEnd = Min(zone_->GetFogEnd(), farClip);
+            if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
+                fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
+            float fogRange = Max(fogEnd - fogStart, M_EPSILON);
+            Vector4 fogParams(fogStart / farClip, fogEnd / farClip, farClip / fogRange, 0.0f);
+            
+            graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
+        }
     }
     
     // Set light-related shader parameters
@@ -413,9 +450,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, const HashMap<String
     }
 }
 
-void Batch::Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const
+void Batch::Draw(Graphics* graphics, Renderer* renderer) const
 {
-    Prepare(graphics, renderer, shaderParameters);
+    Prepare(graphics, renderer);
     geometry_->Draw(graphics);
 }
 
@@ -437,12 +474,13 @@ void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<StringHash, Vector4>& shaderParameters) const
+void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
 {
     if (!instances_.Size())
         return;
     
     // Construct a temporary batch for rendering
+    /// \todo BatchGroup could subclass Batch to avoid this
     Batch batch;
     batch.geometry_ = geometry_;
     batch.material_ = material_;
@@ -450,6 +488,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<Stri
     batch.vertexShader_ = vertexShader_;
     batch.pixelShader_ = pixelShader_;
     batch.camera_ = camera_;
+    batch.zone_ = zone_;
     batch.lightQueue_ = lightQueue_;
     batch.vertexShaderIndex_ = vertexShaderIndex_;
     
@@ -460,7 +499,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<Stri
     VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
     if (!instanceBuffer || instances_.Size() < minGroupSize || geometry_->GetIndexCount() > maxIndexCount)
     {
-        batch.Prepare(graphics, renderer, shaderParameters, false);
+        batch.Prepare(graphics, renderer, false);
         
         graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
         graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -486,7 +525,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer, const HashMap<Stri
         else
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
         
-        batch.Prepare(graphics, renderer, shaderParameters, false);
+        batch.Prepare(graphics, renderer, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
         // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
@@ -560,6 +599,7 @@ void BatchQueue::AddBatch(const Batch& batch, bool instancing)
     else
     {
         BatchGroupKey key;
+        key.zone_ = batch.zone_;
         key.lightQueue_ = batch.lightQueue_;
         key.pass_ = batch.pass_;
         key.material_ = batch.material_;
@@ -570,7 +610,7 @@ void BatchQueue::AddBatch(const Batch& batch, bool instancing)
         Map<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
         if (i == groups->End())
         {
-            // Create new group
+            // Create a new group
             BatchGroup newGroup;
             newGroup.geometry_ = batch.geometry_;
             newGroup.material_ = batch.material_;
@@ -578,6 +618,7 @@ void BatchQueue::AddBatch(const Batch& batch, bool instancing)
             newGroup.vertexShader_ = batch.vertexShader_;
             newGroup.pixelShader_ = batch.pixelShader_;
             newGroup.camera_ = batch.camera_;
+            newGroup.zone_ = batch.zone_;
             newGroup.lightQueue_ = batch.lightQueue_;
             newGroup.vertexShaderIndex_ = batch.vertexShaderIndex_;
             newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));

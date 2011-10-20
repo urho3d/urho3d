@@ -54,6 +54,8 @@ public:
     void SetFogEnd(float end);
     /// %Set zone priority. If camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
+    /// %Set override mode. If camera is inside an override zone, it will also be used for all drawables.
+    void SetOverride(bool enable);
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
@@ -67,6 +69,8 @@ public:
     float GetFogEnd() const { return fogEnd_; }
     /// Return zone priority.
     int GetPriority() const { return priority_; }
+    /// Return override mode.
+    bool GetOverride() const { return override_; }
     
     /// Check whether a point is inside.
     virtual bool IsInside(const Vector3& point);
@@ -87,4 +91,6 @@ protected:
     float fogEnd_;
     /// Zone priority.
     int priority_;
+    /// Override mode.
+    bool override_;
 };
