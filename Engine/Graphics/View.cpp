@@ -235,33 +235,27 @@ void View::GetDrawables()
     
     Vector3 cameraPos = camera_->GetWorldPosition();
     
-    // Find the camera & farclip zones
+    // Get default zone first in case we do not have anything else
+    Zone* defaultZone = renderer_->GetDefaultZone();
+    cameraZone_ = defaultZone;
+    
+    FrustumOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(zones_), frustum_, DRAWABLE_ZONE);
+    octree_->GetDrawables(query);
+    
+    // Find the visible zones, and the zone the camera is in. Determine also the highest zone priority to aid in seeing whether
+    // a zone query result is conclusive
+    int highestZonePriority = M_MIN_INT;
+    int bestPriority = M_MIN_INT;
+    for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
     {
-        PROFILE(FindCameraZone);
-        Vector3 cameraPos = camera_->GetWorldPosition();
-        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * camera_->GetFarClip();
-        // Get default zone in case we do not have anything else
-        Zone* defaultZone = renderer_->GetDefaultZone();
-        cameraZone_ = defaultZone;
-        
-        PointOctreeQuery query(tempZones_, cameraPos, DRAWABLE_ZONE);
-        PODVector<Zone*>& zoneResult = reinterpret_cast<PODVector<Zone*>&>(tempZones_);
-        int bestPriority = M_MIN_INT;
-        Zone* newZone = 0;
-        
-        for (PODVector<Zone*>::Iterator i = zoneResult.Begin(); i != zoneResult.End(); ++i)
+        int priority = (*i)->GetPriority();
+        if (priority > highestZonePriority)
+            highestZonePriority = priority;
+        if ((*i)->IsInside(cameraPos) && priority > bestPriority)
         {
-            Zone* zone = *i;
-            int priority = zone->GetPriority();
-            if (zone->IsInside(cameraPos) && priority > bestPriority)
-            {
-                newZone = zone;
-                bestPriority = priority;
-            }
+            cameraZone_ = *i;
+            bestPriority = priority;
         }
-        
-        if (newZone)
-            cameraZone_ = newZone;
     }
     
     // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
@@ -319,8 +313,9 @@ void View::GetDrawables()
         if (flags & DRAWABLE_GEOMETRY)
         {
             // Find new zone for the drawable if necessary
+            /// \todo Add a zone mask to drawables to be able to exclude zones per-object
             if (!drawable->GetZone() && !cameraZoneOverride_)
-                drawable->FindZone(tempZones_);
+                FindZone(drawable, highestZonePriority);
             
             drawable->ClearLights();
             drawable->MarkInView(frame_);
@@ -1397,6 +1392,51 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
         Vector2 texelSize(viewSize.x_ * invActualSize, viewSize.y_ * invActualSize);
         Vector3 snap(-fmodf(viewPos.x_, texelSize.x_), -fmodf(viewPos.y_, texelSize.y_), 0.0f);
         cameraNode->Translate(rot * snap);
+    }
+}
+
+void View::FindZone(Drawable* drawable, int highestZonePriority)
+{
+    Vector3 center = drawable->GetWorldBoundingBox().Center();
+    
+    // First check if the last zone remains a conclusive result
+    Zone* lastZone = drawable->GetLastZone();
+    if (lastZone && lastZone->IsInside(center) && lastZone->GetPriority() >= highestZonePriority)
+        drawable->SetZone(lastZone);
+    // Then check if the visible zones contain the node center
+    else
+    {
+        int bestPriority = M_MIN_INT;
+        Zone* newZone = 0;
+        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+        {
+            int priority = (*i)->GetPriority();
+            if ((*i)->IsInside(center) && priority > bestPriority)
+            {
+                newZone = *i;
+                bestPriority = priority;
+            }
+        }
+        
+        // If all else fails, query the octree for zones at node center
+        if (!newZone)
+        {
+            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones_), center, DRAWABLE_ZONE);
+            octree_->GetDrawables(query);
+            
+            bestPriority = M_MIN_INT;
+            for (PODVector<Zone*>::Iterator i = tempZones_.Begin(); i != tempZones_.End(); ++i)
+            {
+                int priority = (*i)->GetPriority();
+                if ((*i)->IsInside(center) && priority > bestPriority)
+                {
+                    newZone = *i;
+                    bestPriority = priority;
+                }
+            }
+        }
+        
+        drawable->SetZone(newZone);
     }
 }
 

@@ -123,7 +123,9 @@ private:
     const Rect& GetLightScissor(Light* light);
     /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
-    /// Return the drawable's zone, or camera/default zone if not set.
+    /// Find and set a new zone for a drawable when it has moved.
+    void FindZone(Drawable* drawable, int highestZonePriority);
+    /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable);
     /// Return the drawable's light mask, considering also its zone.
     unsigned GetLightMask(Drawable* drawable);
@@ -195,7 +197,9 @@ private:
     /// Temporary drawable query result.
     PODVector<Drawable*> tempDrawables_;
     /// Temporary zone query result.
-    PODVector<Drawable*> tempZones_;
+    PODVector<Zone*> tempZones_;
+    /// Visible zones query result.
+    PODVector<Zone*> zones_;
     /// Geometry objects.
     PODVector<Drawable*> geometries_;
     /// Occluder objects.

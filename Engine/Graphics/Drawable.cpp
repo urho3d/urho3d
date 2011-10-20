@@ -166,47 +166,10 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
     return worldBoundingBox_;
 }
 
-void Drawable::FindZone(PODVector<Drawable*>& result)
+void Drawable::SetZone(Zone* zone)
 {
-    // First check if the last zones are still valid, to avoid making a new octree query
-    /// \todo Add zone mask to be able to exclude zones
-    Vector3 center = GetWorldBoundingBox().Center();
-    int bestPriority = M_MIN_INT;
-    Zone* newZone = 0;
-    for (Vector<WeakPtr<Zone> >::Iterator i = lastZones_.Begin(); i != lastZones_.End(); ++i)
-    {
-        Zone* zone = (*i);
-        int priority = zone->GetPriority();
-        if (zone && zone->IsInside(center) && priority > bestPriority)
-        {
-            newZone = zone;
-            bestPriority = priority;
-        }
-    }
-    
-    if (!newZone)
-    {
-        Octree* octree = octant_->GetRoot();
-        PointOctreeQuery query(result, center, DRAWABLE_ZONE);
-        octree->GetDrawables(query);
-        
-        // Store the zone query result for next time
-        lastZones_.Clear();
-        PODVector<Zone*>& zoneResult = reinterpret_cast<PODVector<Zone*>&>(result);
-        for (PODVector<Zone*>::Iterator i = zoneResult.Begin(); i != zoneResult.End(); ++i)
-        {
-            Zone* zone = (*i);
-            int priority = zone->GetPriority();
-            if (zone->IsInside(center) && priority > bestPriority)
-            {
-                newZone = zone;
-                bestPriority = priority;
-            }
-            lastZones_.Push(WeakPtr<Zone>(*i));
-        }
-    }
-    
-    zone_ = newZone;
+    zone_ = zone;
+    lastZone_ = zone;
 }
 
 void Drawable::SetSortValue(float value)
@@ -276,6 +239,11 @@ void Drawable::SetBasePass(unsigned batchIndex)
 Zone* Drawable::GetZone() const
 {
     return zone_;
+}
+
+Zone* Drawable::GetLastZone() const
+{
+    return lastZone_;
 }
 
 bool Drawable::IsInView(unsigned frameNumber) const

@@ -135,8 +135,8 @@ public:
     /// Return occlusion flag.
     bool IsOccluder() const { return occluder_; }
     
-    /// Find new zone from the octree.
-    void FindZone(PODVector<Drawable*>& result);
+    /// %Set new zone.
+    void SetZone(Zone* zone);
     /// %Set sorting value.
     void SetSortValue(float value);
     /// Mark in view this frame.
@@ -155,6 +155,8 @@ public:
     Octant* GetOctant() const { return octant_; }
     /// Return current zone.
     Zone* GetZone() const;
+    /// Return previous zone.
+    Zone* GetLastZone() const;
     /// Return distance from camera.
     float GetDistance() const { return distance_; }
     /// Return LOD scaled distance from camera.
@@ -190,8 +192,8 @@ protected:
     Octant* octant_;
     /// Current zone.
     WeakPtr<Zone> zone_;
-    /// Last found zones.
-    Vector<WeakPtr<Zone> > lastZones_;
+    /// Previous zone.
+    WeakPtr<Zone> lastZone_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
     /// Draw distance.
