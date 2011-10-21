@@ -13,11 +13,6 @@
 - float Abs(float)
 - float Sqrt(float)
 - float Pow(float)
-- float Random()
-- float Random(float)
-- int RandomInt()
-- int RandomInt(int)
-- void SetRandomSeed(int)
 - float Min(float, float)
 - float Max(float, float)
 - float Clamp(float, float, float)
@@ -25,6 +20,10 @@
 - float Mod(float, float)
 - float Floor(float)
 - float Ceil(float)
+- float Random()
+- float Random(float)
+- int RandomInt()
+- int RandomInt(int)
 - String ToStringHex(int)
 - void ErrorDialog(const String&, const String&)
 - void OpenConsoleWindow()
@@ -58,6 +57,7 @@
 - void ClearDelayedExecute()
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
+- uint randomSeed
 - String[]@ arguments
 - uint numCpuCores
 - Time@ time

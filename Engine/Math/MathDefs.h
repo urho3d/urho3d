@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "Random.h"
+
 #include <cstdlib>
 #include <cmath>
 
@@ -54,12 +56,6 @@ enum Intersection
 
 /// Linear interpolation between two float values.
 inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
-/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
-inline float Random() { return (rand() & 32767) / 32768.0f; }
-/// Return a random float between 0.0 and range, inclusive.
-inline float Random(float range) { return (rand() & 32767) * range / 32767.0f; }
-/// Return a random integer between 0 and range, inclusive.
-inline int Random(int range) { return ((rand() & 32767) * range + 16384) / 32767; }
 /// Return the smaller of two floats.
 inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
 /// Return the larger of two floats.
@@ -147,3 +143,10 @@ inline float FastInvSqrt(float x)
 
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
+
+/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
+inline float Random() { return (Rand() & 32767) / 32768.0f; }
+/// Return a random float between 0.0 and range, inclusive.
+inline float Random(float range) { return (Rand() & 32767) * range / 32767.0f; }
+/// Return a random integer between 0 and range, inclusive.
+inline int Random(int range) { return ((Rand() & 32767) * range + 16384) / 32767; }

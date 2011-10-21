@@ -81,11 +81,6 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Abs(float)", asFUNCTION(fabsf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Pow(float)", asFUNCTION(powf), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Random()", asFUNCTIONPR(Random, (), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Random(float)", asFUNCTIONPR(Random, (float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("int RandomInt()", asFUNCTION(rand), asCALL_CDECL);
-    engine->RegisterGlobalFunction("int RandomInt(int)", asFUNCTIONPR(Random, (int), int), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SetRandomSeed(int)", asFUNCTION(srand), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Min(float, float)", asFUNCTIONPR(Min, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Max(float, float)", asFUNCTIONPR(Max, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Clamp(float, float, float)", asFUNCTIONPR(Clamp, (float, float, float), float), asCALL_CDECL);
@@ -93,6 +88,12 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Mod(float, float)", asFUNCTION(fmodf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Floor(float)", asFUNCTION(floorf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Ceil(float)", asFUNCTION(ceilf), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Random()", asFUNCTIONPR(Random, (), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Random(float)", asFUNCTIONPR(Random, (float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int RandomInt()", asFUNCTION(Rand), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int RandomInt(int)", asFUNCTIONPR(Random, (int), int), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void set_randomSeed(uint)", asFUNCTION(SetRandomSeed), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint get_randomSeed()", asFUNCTION(GetRandomSeed), asCALL_CDECL);
 }
 
 static void ConstructIntRect(IntRect* ptr)
