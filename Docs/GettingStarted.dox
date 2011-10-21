@@ -118,7 +118,7 @@ Urho3D.exe understands the following command line options:
 -fallback   Force fallback rendering (*)
 \endverbatim
 
-(*) Uses only RGBA rendertargets, and shadows are rendered unfiltered. Implies SM2.0. Relevant only on Direct3D9.
+(*) Uses only RGBA rendertargets, and 2-sample shadow filtering. Implies SM2.0. Relevant only on Direct3D9.
 
 
 \page Structure Overall structure
