@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_module.cpp
@@ -421,6 +421,7 @@ asIScriptFunction *asCModule::GetFunctionByName(const char *name) const
 	if( id < 0 )
 		return 0;
 
+	// Urho3D: fix index / id mixup
 	return engine->GetFunctionById(id);
 }
 
