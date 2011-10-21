@@ -46,7 +46,10 @@ BEGIN_AS_NAMESPACE
 asCConfigGroup::asCConfigGroup()
 {
 	refCount = 0;
+#ifdef AS_DEPRECATED
+	// Deprecated since 2011-10-04
 	defaultAccess = true;
+#endif
 }
 
 asCConfigGroup::~asCConfigGroup()
@@ -207,6 +210,8 @@ void asCConfigGroup::ValidateNoUsage(asCScriptEngine *engine, asCObjectType *typ
 }
 #endif
 
+#ifdef AS_DEPRECATED
+// deprecated since 2011-10-04
 int asCConfigGroup::SetModuleAccess(const char *module, bool hasAccess)
 {
 	if( module == asALL_MODULES )
@@ -240,5 +245,6 @@ bool asCConfigGroup::HasModuleAccess(const char *module)
 	
 	return defaultAccess;
 }
+#endif
 
 END_AS_NAMESPACE

@@ -34,7 +34,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.21.1 (http://www.angelcode.com/angelscript/)
+- AngelScript 2.22.0 WIP (http://www.angelcode.com/angelscript/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
 - GLFW 3.0 WIP (http://www.glfw.org/)
@@ -76,7 +76,7 @@ are system-level dependencies that must be satisfied before Urho3D can be built
 successfully:
 
 - For Windows, the DirectX SDK needs to be installed and its include and library
-  directories set as Visual Studio global directories (Tools -> Options -> 
+  directories set as Visual Studio global directories (Tools -> Options ->
   Projects and Solutions -> VC++ Directories in VS2008.)
 
 - For Linux, the following development packages need to be installed:
@@ -84,7 +84,7 @@ successfully:
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
-  
+
 
 Build process
 -------------

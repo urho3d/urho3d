@@ -139,6 +139,8 @@ protected:
 		asUINT         oldSize;
 	};
 	asCArray<SObjChangeSize>     oldObjectSizes;
+
+	asCMap<void*,bool>           existingShared;
 };
 
 END_AS_NAMESPACE

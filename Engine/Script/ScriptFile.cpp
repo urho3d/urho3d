@@ -177,7 +177,7 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
         return false;
     }
     
-    if (context->Prepare(function->GetId()) < 0)
+    if (context->Prepare(function) < 0)
         return false;
     
     SetParameters(context, function, parameters);
@@ -221,7 +221,7 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
         return false;
     }
     
-    if (context->Prepare(method->GetId()) < 0)
+    if (context->Prepare(method) < 0)
         return false;
     
     context->SetObject(object);
@@ -302,8 +302,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
     if (i != functions_.End())
         return i->second_;
     
-    int id = scriptModule_->GetFunctionIdByDecl(declaration.CString());
-    asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = scriptModule_->GetFunctionByDecl(declaration.CString());
     functions_[declaration] = function;
     return function;
 }
@@ -324,8 +323,7 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
             return j->second_;
     }
     
-    int id = type->GetMethodIdByDecl(declaration.CString());
-    asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = type->GetMethodByDecl(declaration.CString());
     methods_[type][declaration] = function;
     return function;
 }

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -285,9 +285,10 @@ const unsigned int numTokenWords = sizeof(tokenWords)/sizeof(sTokenWord);
 const char * const whiteSpace = " \t\r\n";
 
 // Some keywords that are not considered tokens by the parser
-const char * const THIS_TOKEN = "this";
-const char * const FROM_TOKEN = "from";
-const char * const SUPER_TOKEN = "super";
+const char * const THIS_TOKEN   = "this";
+const char * const FROM_TOKEN   = "from";
+const char * const SUPER_TOKEN  = "super";
+const char * const SHARED_TOKEN = "shared";
 
 END_AS_NAMESPACE
 

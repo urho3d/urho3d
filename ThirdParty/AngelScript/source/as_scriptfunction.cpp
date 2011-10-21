@@ -143,6 +143,7 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	gcFlag                 = false;
 	userData               = 0;
 	id                     = 0;
+	accessMask             = 0xFFFFFFFF;
 
 	// TODO: optimize: The engine could notify the GC just before it wants to
 	//                 discard the function. That way the GC won't waste time
@@ -215,24 +216,6 @@ int asCScriptFunction::Release() const
 	return r;
 }
 
-// interface 
-void asCScriptEngine::SetEngineUserDataCleanupCallback(asCLEANENGINEFUNC_t callback)
-{
-	cleanEngineFunc = callback;
-}
-
-// interface
-void asCScriptEngine::SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback)
-{
-	cleanContextFunc = callback;
-}
-
-// interface
-void asCScriptEngine::SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback)
-{
-	cleanFunctionFunc = callback;
-}
-
 // interface
 const char *asCScriptFunction::GetModuleName() const
 {
@@ -292,6 +275,17 @@ int asCScriptFunction::GetSpaceNeededForArguments()
 int asCScriptFunction::GetSpaceNeededForReturnValue()
 {
 	return returnType.GetSizeOnStackDWords();
+}
+
+// internal
+bool asCScriptFunction::DoesReturnOnStack() const
+{
+	if( returnType.GetObjectType() &&
+		(returnType.GetObjectType()->flags & asOBJ_VALUE) &&
+		!returnType.IsReference() )
+		return true;
+		
+	return false;
 }
 
 // internal

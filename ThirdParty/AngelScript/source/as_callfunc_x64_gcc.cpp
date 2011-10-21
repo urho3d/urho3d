@@ -121,7 +121,7 @@ static asDWORD GetReturnedFloat()
 		"movss    %%xmm0, (%%rax)"
 		: /* no output */
 		: "m" (retval)
-		: "%rax"
+		: "%rax", "%xmm0"
 	);
 
 	// We need to avoid implicit conversions from float to unsigned - we need
@@ -141,7 +141,27 @@ static asQWORD GetReturnedDouble()
 		"movlpd  %%xmm0, (%%rax)"
 		: /* no optput */
 		: "m" (retval)
-		: "%rax"
+		: "%rax", "%xmm0"
+	);
+
+	// We need to avoid implicit conversions from double to unsigned long long - we need
+	// a bit-wise-correct-and-complete copy of the value 
+	memcpy( &ret, &retval, sizeof( ret ) );
+
+	return ret;
+}
+
+static asQWORD GetReturnedHighBytes()
+{
+	double  retval = 0.0f;
+	asQWORD ret    = 0;
+
+	__asm__ __volatile__ (
+		"lea     %0, %%rax\n"
+		"movlpd  %%xmm1, (%%rax)"
+		: /* no optput */
+		: "m" (retval)
+		: "%rax", "%xmm1"
 	);
 
 	// We need to avoid implicit conversions from double to unsigned long long - we need
@@ -283,54 +303,6 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		memcpy( argsType, tempType, totalArgumentCount );
 	}
 	memset( tempType, 0, sizeof( tempType ) );
-
-	// TODO: This should be checked in PrepareSystemFunction
-#ifndef COMPLEX_OBJS_PASSED_BY_REF
-	if( sysFunc->takesObjByVal ) {
-		/* I currently know of no way we can predict register usage for passing complex
-		   objects by value when the compiler does not pass them by reference instead. I
-		   will quote the example from the AMD64 ABI to demonstrate this:
-
-		   (http://www.x86-64.org/documentation/abi.pdf - page 22)
-
-		------------------------------ BEGIN EXAMPLE -------------------------------
-
-		Let us consider the following C code:
-
-		typedef struct {
-			int a, b;
-			double d;
-		} structparm;
-
-		structparm s;
-		int e, f, g, h, i, j, k;
-		long double ld;
-		double m, n;
-
-		extern void func (int e, int f,
-			structparm s, int g, int h,
-			long double ld, double m,
-			double n, int i, int j, int k);
-
-		func (e, f, s, g, h, ld, m, n, i, j, k);
-
-		Register allocation for the call:
-		--------------------------+--------------------------+-------------------
-		General Purpose Registers | Floating Point Registers | Stack Frame Offset
-		--------------------------+--------------------------+-------------------
-		 %rdi: e                  | %xmm0: s.d               | 0:  ld
-		 %rsi: f                  | %xmm1: m                 | 16: j
-		 %rdx: s.a,s.b            | %xmm2: n                 | 24: k
-		 %rcx: g                  |                          |
-		 %r8:  h                  |                          |
-		 %r9:  i                  |                          |
-		--------------------------+--------------------------+-------------------
-		*/
-
-		context->SetInternalException( TXT_INVALID_CALLING_CONVENTION );
-		return 0;
-	}
-#endif
 
 	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ) ) {
 		vftable = *( ( funcptr_t ** )obj );
@@ -517,7 +489,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		if( sysFunc->hostReturnSize == 1 )
 			*(asDWORD*)&retQW = GetReturnedFloat();
 		else
+		{
 			retQW = GetReturnedDouble();
+			if( sysFunc->hostReturnSize > 2 )
+				retQW2 = GetReturnedHighBytes();
+		}
 	}
 
 	return retQW;
