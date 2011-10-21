@@ -1745,6 +1745,7 @@ Properties:<br>
 - BoundingBox& boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint softwareLodLevel
+- Zone@ zone (readonly)
 
 
 Skybox
@@ -1784,6 +1785,7 @@ Properties:<br>
 - BoundingBox& boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint softwareLodLevel
+- Zone@ zone (readonly)
 
 
 AnimationState
@@ -1858,6 +1860,7 @@ Properties:<br>
 - AnimationState@[] animationStates (readonly)
 - uint numMorphs (readonly)
 - float[] morphWeights
+- Zone@ zone (readonly)
 
 
 AnimationController
@@ -1959,6 +1962,7 @@ Properties:<br>
 - bool scaled
 - float animationLodBias
 - Billboard@[] billboards (readonly)
+- Zone@ zone (readonly)
 
 
 ParticleEmitter
@@ -1990,6 +1994,7 @@ Properties:<br>
 - XMLFile@ parameters
 - bool active (readonly)
 - uint numParticles (readonly)
+- Zone@ zone (readonly)
 
 
 RayQueryResult

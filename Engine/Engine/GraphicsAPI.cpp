@@ -526,6 +526,7 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "uint get_numGeometries() const", asMETHOD(StaticModel, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_softwareLodLevel(uint) const", asMETHOD(StaticModel, SetSoftwareLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_softwareLodLevel() const", asMETHOD(StaticModel, GetSoftwareLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
 }
 
 static void RegisterSkybox(asIScriptEngine* engine)
@@ -540,6 +541,7 @@ static void RegisterSkybox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skybox", "uint get_numGeometries() const", asMETHOD(Skybox, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "void set_softwareLodLevel(uint) const", asMETHOD(Skybox, SetSoftwareLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "uint get_softwareLodLevel() const", asMETHOD(Skybox, GetSoftwareLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skybox", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
 }
 
 static void AnimatedModelSetModel(Model* model, AnimatedModel* ptr)
@@ -598,6 +600,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ get_zone() const", asMETHOD(AnimatedModel, GetZone), asCALL_THISCALL);
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)
@@ -658,6 +661,7 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "void set_animationLodBias(float)", asMETHOD(BillboardSet, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "float get_animationLodBias() const", asMETHOD(BillboardSet, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ get_billboards(uint)", asMETHOD(BillboardSet, GetBillboard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHOD(BillboardSet, GetZone), asCALL_THISCALL);
 }
 
 static void RegisterParticleEmitter(asIScriptEngine* engine)
@@ -678,8 +682,8 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_active() const", asMETHOD(ParticleEmitter, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
 }
-
 
 static CScriptArray* GraphicsGetResolutions(Graphics* ptr)
 {
