@@ -87,6 +87,9 @@ struct sObjectTypePair
 //       then it should simply replace the bytecode within the functions without
 //       changing the values of existing global properties, etc.
 
+// TODO: interface: Should have user data in the modules as well. This may be 
+//                  used to store extra information, such as meta-data and source code files
+
 class asCModule : public asIScriptModule
 {
 //-------------------------------------------
@@ -98,25 +101,18 @@ public:
 	virtual const char      *GetName() const;
 
 	// Compilation
-	virtual int     AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset);
-	virtual int     Build();
-	virtual int     CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD reserved, asIScriptFunction **outFunc);
-	virtual int     CompileGlobalVar(const char *sectionName, const char *code, int lineOffset);
-	virtual asDWORD SetAccessMask(asDWORD accessMask);
+	virtual int  AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset);
+	virtual int  Build();
+	virtual int  CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD reserved, asIScriptFunction **outFunc);
+	virtual int  CompileGlobalVar(const char *sectionName, const char *code, int lineOffset);
 
 	// Script functions
 	virtual asUINT             GetFunctionCount() const;
 	virtual int                GetFunctionIdByIndex(asUINT index) const;
 	virtual int                GetFunctionIdByName(const char *name) const;
 	virtual int                GetFunctionIdByDecl(const char *decl) const;
-	virtual asIScriptFunction *GetFunctionByIndex(asUINT index) const;
-	virtual asIScriptFunction *GetFunctionByDecl(const char *decl) const;
-	virtual asIScriptFunction *GetFunctionByName(const char *name) const;
-#ifdef AS_DEPRECATED
-	// deprecated since 2011-10-03
 	virtual asIScriptFunction *GetFunctionDescriptorByIndex(asUINT index) const;
 	virtual asIScriptFunction *GetFunctionDescriptorById(int funcId) const;
-#endif
 	virtual int                RemoveFunction(int funcId);
 
 	// Script global variables
@@ -157,10 +153,6 @@ public:
 	// Bytecode Saving/Loading
 	virtual int SaveByteCode(asIBinaryStream *out) const;
 	virtual int LoadByteCode(asIBinaryStream *in);
-
-	// User data
-	virtual void *SetUserData(void *data);
-	virtual void *GetUserData() const;
 
 //-----------------------------------------------
 // Internal
@@ -204,8 +196,6 @@ public:
 
 	asCScriptEngine *engine;
 	asCBuilder      *builder;
-	void            *userData;
-	asDWORD          accessMask;
 
 	// This array holds all functions, class members, factories, etc that were compiled with the module
 	asCArray<asCScriptFunction *>  scriptFunctions;

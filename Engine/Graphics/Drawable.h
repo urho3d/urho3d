@@ -34,6 +34,7 @@ static const unsigned DRAWABLE_ZONE = 0x4;
 static const unsigned DRAWABLE_ANY = 0xff;
 static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
+static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 
 struct Batch;
 class Camera;
@@ -99,8 +100,10 @@ public:
     void SetLodBias(float bias);
     /// %Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set light mask. Will be and'ed with light's light mask to see if the object should be lit.
+    /// %Set light mask. Will be and'ed with light's and zone's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
+    /// %Set zone mask. Will be and'ed with zone's zone mask to see if the object should belong to the zone.
+    void SetZoneMask(unsigned mask);
     /// %Set maximum number of lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
     /// %Set visible flag.
@@ -126,6 +129,8 @@ public:
     unsigned GetViewMask() const { return viewMask_; }
     /// Return light mask.
     unsigned GetLightMask() const { return lightMask_; }
+    /// Return zone mask.
+    unsigned GetZoneMask() const { return zoneMask_; }
     /// Return maximum number of lights.
     unsigned GetMaxLights() const { return maxLights_; }
     /// Return visible flag.
@@ -206,6 +211,8 @@ protected:
     unsigned viewMask_;
     /// Light mask.
     unsigned lightMask_;
+    /// Zone mask.
+    unsigned zoneMask_;
     /// Maximum lights.
     unsigned maxLights_;
     /// Drawable flags.

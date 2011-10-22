@@ -47,6 +47,7 @@ Drawable::Drawable(Context* context) :
     lodBias_(1.0f),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
+    zoneMask_(DEFAULT_ZONEMASK),
     maxLights_(0),
     drawableFlags_(0),
     visible_(true),
@@ -73,6 +74,7 @@ void Drawable::RegisterObject(Context* context)
     ATTRIBUTE(Drawable, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
     ATTRIBUTE(Drawable, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Drawable, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Drawable, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
@@ -127,6 +129,13 @@ void Drawable::SetViewMask(unsigned mask)
 void Drawable::SetLightMask(unsigned mask)
 {
     lightMask_ = mask;
+}
+
+void Drawable::SetZoneMask(unsigned mask)
+{
+    zoneMask_ = mask;
+    // Mark dirty to reset cached zone
+    OnMarkedDirty(node_);
 }
 
 void Drawable::SetMaxLights(unsigned num)

@@ -39,7 +39,6 @@
 #include "as_restore.h"
 #include "as_bytecode.h"
 #include "as_scriptobject.h"
-#include "as_texts.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -252,39 +251,13 @@ int asCRestore::Restore()
 	{
 		asCObjectType *ot = asNEW(asCObjectType)(engine);
 		ReadObjectTypeDeclaration(ot, 1);
-
-		// If the type is shared, then we should use the original if it exists
-		bool sharedExists = false;
-		if( ot->IsShared() )
-		{
-			for( asUINT n = 0; n < engine->classTypes.GetLength(); n++ )
-			{
-				asCObjectType *t = engine->classTypes[n];
-				if( t &&
-					t->IsShared() &&
-					t->name == ot->name &&
-					t->IsInterface() == ot->IsInterface() )
-				{
-					ot->Release();
-					ot = t;
-					sharedExists = true;
-					break;
-				}
-			}
-		}
-
-		if( sharedExists )
-			existingShared.Insert(ot, true);
-		else
-		{
-			engine->classTypes.PushLast(ot);
-
-			// Add script classes to the GC
-			if( (ot->GetFlags() & asOBJ_SCRIPT_OBJECT) && !ot->IsInterface() )
-				engine->gc.AddScriptObjectToGC(ot, &engine->objectTypeBehaviours);
-		}
+		engine->classTypes.PushLast(ot);
 		module->classTypes.PushLast(ot);
 		ot->AddRef();
+
+		// Add script classes to the GC
+		if( (ot->GetFlags() & asOBJ_SCRIPT_OBJECT) && ot->GetSize() > 0 )
+			engine->gc.AddScriptObjectToGC(ot, &engine->objectTypeBehaviours);
 	}
 
 	// Read func defs
@@ -354,11 +327,6 @@ int asCRestore::Restore()
 
 	// scriptGlobals[]
 	count = ReadEncodedUInt();
-	if( engine->ep.disallowGlobalVars )
-	{
-		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_GLOBAL_VARS_NOT_ALLOWED);
-		error = true;
-	}
 	module->scriptGlobals.Allocate(count, 0);
 	for( i = 0; i < count; ++i ) 
 	{
@@ -991,155 +959,76 @@ void asCRestore::ReadObjectTypeDeclaration(asCObjectType *ot, int phase)
 		}
 		else
 		{
-			// If the type is shared and pre-existing, we should just 
-			// validate that the loaded methods match the original 
-			bool sharedExists = existingShared.MoveTo(0, ot);
-			if( sharedExists )
-			{
-				asCObjectType *dt = ReadObjectType();
-				if( ot->derivedFrom != dt )
-				{
-					// TODO: Write message
-					error = true;
-				}
-			}
-			else
-			{
-				ot->derivedFrom = ReadObjectType();
-				if( ot->derivedFrom )
-					ot->derivedFrom->AddRef();
-			}
+			ot->derivedFrom = ReadObjectType();
+			if( ot->derivedFrom )
+				ot->derivedFrom->AddRef();
 
 			// interfaces[]
 			int size = ReadEncodedUInt();
-			if( sharedExists )
+			ot->interfaces.Allocate(size,0);
+			int n;
+			for( n = 0; n < size; n++ )
 			{
-				for( int n = 0; n < size; n++ )
-				{
-					asCObjectType *intf = ReadObjectType();
-					if( !ot->Implements(intf) )
-					{
-						// TODO: Write message
-						error = true;
-					}
-				}
-			}
-			else
-			{
-				ot->interfaces.Allocate(size,0);
-				for( int n = 0; n < size; n++ )
-				{
-					asCObjectType *intf = ReadObjectType();
-					ot->interfaces.PushLast(intf);
-				}
+				asCObjectType *intf = ReadObjectType();
+				ot->interfaces.PushLast(intf);
 			}
 
 			// behaviours
 			if( !ot->IsInterface() && ot->flags != asOBJ_TYPEDEF && ot->flags != asOBJ_ENUM )
 			{
-				// For existing types we don't want to make any updates
-				asCScriptFunction *func = ReadFunction(!sharedExists, !sharedExists);
+				asCScriptFunction *func = ReadFunction();
 				if( func )
 				{
-					if( sharedExists )
-					{
-						// TODO: shared: Find the real function in the object, and update the savedFunctions array
-						func->Release();
-					}
-					else 
-					{
-						engine->scriptFunctions[ot->beh.construct]->Release();
-						ot->beh.construct = func->id;
-						ot->beh.constructors[0] = func->id;
-						func->AddRef();
-					}
+					engine->scriptFunctions[ot->beh.construct]->Release();
+					ot->beh.construct = func->id;
+					ot->beh.constructors[0] = func->id;
+					func->AddRef();
 				}
 
 				func = ReadFunction();
 				if( func )
 				{
-					if( sharedExists )
-					{
-						// TODO: shared: Find the real function in the object, and update the savedFunctions array
-						func->Release();
-					}
-					else
-					{
-						ot->beh.destruct = func->id;
-						func->AddRef();
-					}
+					ot->beh.destruct = func->id;
+					func->AddRef();
 				}
 
 				func = ReadFunction();
 				if( func )
 				{
-					if( sharedExists )
-					{
-						// TODO: shared: Find the real function in the object, and update the savedFunctions array
-						func->Release();
-					}
-					else
-					{
-						engine->scriptFunctions[ot->beh.factory]->Release();
-						ot->beh.factory = func->id;
-						ot->beh.factories[0] = func->id;
-						func->AddRef();
-					}
+					engine->scriptFunctions[ot->beh.factory]->Release();
+					ot->beh.factory = func->id;
+					ot->beh.factories[0] = func->id;
+					func->AddRef();
 				}
 
 				size = ReadEncodedUInt();
-				for( int n = 0; n < size; n++ )
+				for( n = 0; n < size; n++ )
 				{
 					asCScriptFunction *func = ReadFunction();
 					if( func )
 					{
-						if( sharedExists )
-						{
-							// TODO: shared: Find the real function in the object, and update the savedFunctions array
-							func->Release();
-						}
-						else
-						{
-							ot->beh.constructors.PushLast(func->id);
-							func->AddRef();
-						}
+						ot->beh.constructors.PushLast(func->id);
+						func->AddRef();
 					}
 
 					func = ReadFunction();
 					if( func )
 					{
-						if( sharedExists )
-						{
-							// TODO: shared: Find the real function in the object, and update the savedFunctions array
-							func->Release();
-						}
-						else
-						{
-							ot->beh.factories.PushLast(func->id);
-							func->AddRef();
-						}
+						ot->beh.factories.PushLast(func->id);
+						func->AddRef();
 					}
 				}
 			}
 
 			// methods[]
 			size = ReadEncodedUInt();
-			int n;
 			for( n = 0; n < size; n++ ) 
 			{
 				asCScriptFunction *func = ReadFunction();
 				if( func )
 				{
-					if( sharedExists )
-					{
-						// TODO: shared: Find the real function in the object, and update the savedFunctions array
-						func->Release();
-					}
-					else
-					{
-						ot->methods.PushLast(func->id);
-						func->AddRef();
-					}
+					ot->methods.PushLast(func->id);
+					func->AddRef();
 				}
 			}
 
@@ -1150,16 +1039,8 @@ void asCRestore::ReadObjectTypeDeclaration(asCObjectType *ot, int phase)
 				asCScriptFunction *func = ReadFunction();
 				if( func )
 				{
-					if( sharedExists )
-					{
-						// TODO: shared: Find the real function in the object, and update the savedFunctions array
-						func->Release();
-					}
-					else
-					{
-						ot->virtualFunctionTable.PushLast(func);
-						func->AddRef();
-					}
+					ot->virtualFunctionTable.PushLast(func);
+					func->AddRef();
 				}
 			}
 		}
@@ -1391,10 +1272,7 @@ void asCRestore::ReadObjectProperty(asCObjectType *ot)
 	bool isPrivate;
 	READ_NUM(isPrivate);
 
-	// TODO: shared: If the type is shared and pre-existing, we should just 
-	//               validate that the loaded methods match the original 
-	if( !existingShared.MoveTo(0, ot) )
-		ot->AddPropertyToClass(name, dt, isPrivate);
+	ot->AddPropertyToClass(name, dt, isPrivate);
 }
 
 void asCRestore::WriteDataType(const asCDataType *dt) 
@@ -1472,7 +1350,7 @@ void asCRestore::ReadDataType(asCDataType *dt)
 		ReadFunctionSignature(&func);
 		for( asUINT n = 0; n < engine->registeredFuncDefs.GetLength(); n++ )
 		{
-			// TODO: access: Only return the definitions that the module has access to
+			// TODO: Only return the definitions for the config groups that the module has access to
 			if( engine->registeredFuncDefs[n]->name == func.name )
 			{
 				funcDef = engine->registeredFuncDefs[n];
@@ -1579,8 +1457,9 @@ asCObjectType* asCRestore::ReadObjectType()
 		asCObjectType *tmpl = engine->GetObjectType(typeName.AddressOf());
 		if( tmpl == 0 )
 		{
+			// TODO: Move text to as_texts.h
 			asCString str;
-			str.Format(TXT_TEMPLATE_TYPE_s_DOESNT_EXIST, typeName.AddressOf());
+			str.Format("Template type '%s' doesn't exist", typeName.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 			error = true;
 			return 0;
@@ -1592,8 +1471,9 @@ asCObjectType* asCRestore::ReadObjectType()
 			ot = ReadObjectType();
 			if( ot == 0 )
 			{
+				// TODO: Move text to as_texts.h
 				asCString str;
-				str.Format(TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s, typeName.AddressOf());
+				str.Format("Failed to read subtype of template type '%s'", typeName.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				error = true;
 				return 0;
@@ -1612,8 +1492,9 @@ asCObjectType* asCRestore::ReadObjectType()
 			
 			if( ot == 0 )
 			{
+				// TODO: Move text to as_texts.h
 				asCString str;
-				str.Format(TXT_INSTANCING_INVLD_TMPL_TYPE_s_s, typeName.AddressOf(), dt.Format().AddressOf());
+				str.Format("Attempting to instanciate invalid template type '%s<%s>'", typeName.AddressOf(), dt.Format().AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				error = true;
 				return 0;
@@ -1629,8 +1510,9 @@ asCObjectType* asCRestore::ReadObjectType()
 			
 			if( ot == 0 )
 			{
+				// TODO: Move text to as_texts.h
 				asCString str;
-				str.Format(TXT_INSTANCING_INVLD_TMPL_TYPE_s_s, typeName.AddressOf(), dt.Format().AddressOf());
+				str.Format("Attempting to instanciate invalid template type '%s<%s>'", typeName.AddressOf(), dt.Format().AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				error = true;
 				return 0;
@@ -1656,8 +1538,9 @@ asCObjectType* asCRestore::ReadObjectType()
 
 		if( ot == 0 )
 		{
+			// TODO: Move text to as_texts.h
 			asCString str;
-			str.Format(TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST, typeName.AddressOf());
+			str.Format("Template subtype type '%s' doesn't exist", typeName.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 			error = true;
 			return 0;
@@ -1678,8 +1561,9 @@ asCObjectType* asCRestore::ReadObjectType()
 			
 			if( ot == 0 )
 			{
+				// TODO: Move text to as_texts.h
 				asCString str;
-				str.Format(TXT_OBJECT_TYPE_s_DOESNT_EXIST, typeName.AddressOf());
+				str.Format("Object type '%s' doesn't exist", typeName.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				error = true;
 				return 0;

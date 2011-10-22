@@ -23,6 +23,8 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Octree.h"
+#include "OctreeQuery.h"
 #include "XMLElement.h"
 #include "Zone.h"
 
@@ -63,6 +65,7 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Zone, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -122,6 +125,24 @@ bool Zone::IsInside(const Vector3& point)
     Matrix3x4 inverse(GetWorldTransform().Inverse());
     Vector3 localPoint(inverse * point);
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
+}
+
+void Zone::OnMarkedDirty(Node* node)
+{
+    Drawable::OnMarkedDirty(node);
+    
+    // When marked dirty, clear the cached zone from all drawables inside the zone bounding box
+    if (octant_ && lastBoundingBox_.defined_)
+    {
+        PODVector<Drawable*> result;
+        BoxOctreeQuery query(result, lastBoundingBox_, DRAWABLE_GEOMETRY);
+        octant_->GetRoot()->GetDrawables(query);
+        
+        for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
+            (*i)->SetZone(0);
+    }
+    
+    lastBoundingBox_ = GetWorldBoundingBox();
 }
 
 void Zone::OnWorldBoundingBoxUpdate()

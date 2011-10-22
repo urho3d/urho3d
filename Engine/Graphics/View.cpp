@@ -65,6 +65,7 @@ View::View(Context* context) :
     octree_(0),
     camera_(0),
     cameraZone_(0),
+    farClipZone_(0),
     renderTarget_(0),
     depthStencil_(0)
 {
@@ -226,135 +227,162 @@ void View::Render()
     camera_ = 0;
     octree_ = 0;
     cameraZone_ = 0;
+    farClipZone_ = 0;
     frame_.camera_ = 0;
 }
 
 void View::GetDrawables()
 {
-    PROFILE(GetDrawables);
-    
-    Vector3 cameraPos = camera_->GetWorldPosition();
-    
-    // Get default zone first in case we do not have anything else
-    Zone* defaultZone = renderer_->GetDefaultZone();
-    cameraZone_ = defaultZone;
-    
-    FrustumOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(zones_), frustum_, DRAWABLE_ZONE);
-    octree_->GetDrawables(query);
-    
-    // Find the visible zones, and the zone the camera is in. Determine also the highest zone priority to aid in seeing whether
-    // a zone query result is conclusive
     int highestZonePriority = M_MIN_INT;
-    int bestPriority = M_MIN_INT;
-    for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
-    {
-        int priority = (*i)->GetPriority();
-        if (priority > highestZonePriority)
-            highestZonePriority = priority;
-        if ((*i)->IsInside(cameraPos) && priority > bestPriority)
-        {
-            cameraZone_ = *i;
-            bestPriority = priority;
-        }
-    }
     
-    // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
-    OcclusionBuffer* buffer = 0;
-    
-    if (maxOccluderTriangles_ > 0)
     {
-        FrustumOctreeQuery query(occluders_, frustum_, DRAWABLE_GEOMETRY, camera_->GetViewMask(), true, false);
-        octree_->GetDrawables(query);
-        UpdateOccluders(occluders_, camera_);
+        PROFILE(GetZones);
         
-        if (occluders_.Size())
-        {
-            buffer = renderer_->GetOrCreateOcclusionBuffer(camera_, maxOccluderTriangles_);
-            DrawOccluders(buffer, occluders_);
-            buffer->BuildDepthHierarchy();
-        }
-    }
-    
-    if (!buffer)
-    {
-        // Get geometries & lights without occlusion
-        FrustumOctreeQuery query(tempDrawables_, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
-        octree_->GetDrawables(query);
-    }
-    else
-    {
-        // Get geometries & lights using occlusion
-        OccludedFrustumOctreeQuery query(tempDrawables_, frustum_, buffer, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
-            camera_->GetViewMask());
-        octree_->GetDrawables(query);
-    }
-    
-    // Add unculled geometries & lights
-    octree_->GetUnculledDrawables(tempDrawables_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
-    
-    // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
-    sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
-    sceneBox_.defined_ = false;
-    sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
-    sceneViewBox_.defined_ = false;
-    Matrix3x4 view(camera_->GetInverseWorldTransform());
-    
-    for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
-    {
-        Drawable* drawable = tempDrawables_[i];
-        drawable->UpdateDistance(frame_);
+        // Get default zone first in case we do not have zones defined
+        Zone* defaultZone = renderer_->GetDefaultZone();
+        cameraZone_ = farClipZone_ = defaultZone;
         
-        // If draw distance non-zero, check it
-        float maxDistance = drawable->GetDrawDistance();
-        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
-            continue;
+        FrustumOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(zones_), frustum_, DRAWABLE_ZONE);
+        octree_->GetDrawables(query);
         
-        unsigned flags = drawable->GetDrawableFlags();
-        if (flags & DRAWABLE_GEOMETRY)
+        // Find the visible zones, and the zone the camera is in. Determine also the highest zone priority to aid in seeing
+        // whether a zone query result for a drawable is conclusive
+        int bestPriority = M_MIN_INT;
+        Vector3 cameraPos = camera_->GetWorldPosition();
+        
+        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
-            // Find new zone for the drawable if necessary
-            /// \todo Add a zone mask to drawables to be able to exclude zones per-object
-            if (!drawable->GetZone() && !cameraZoneOverride_)
-                FindZone(drawable, highestZonePriority);
-            
-            drawable->ClearLights();
-            drawable->MarkInView(frame_);
-            drawable->UpdateGeometry(frame_);
-            
-            // Expand the scene bounding boxes. However, do not take "infinite" objects such as the skybox into account,
-            // as the bounding boxes are also used for shadow focusing
-            const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
-            BoundingBox geomViewBox = geomBox.Transformed(view);
-            if (geomBox.Size().LengthFast() < M_LARGE_VALUE)
+            int priority = (*i)->GetPriority();
+            if (priority > highestZonePriority)
+                highestZonePriority = priority;
+            if ((*i)->IsInside(cameraPos) && priority > bestPriority)
             {
-                sceneBox_.Merge(geomBox);
-                sceneViewBox_.Merge(geomViewBox);
+                cameraZone_ = *i;
+                bestPriority = priority;
             }
-            
-            // Store depth info for split directional light queries
-            GeometryDepthBounds bounds;
-            bounds.min_ = geomViewBox.min_.z_;
-            bounds.max_ = geomViewBox.max_.z_;
-            
-            geometryDepthBounds_.Push(bounds);
-            geometries_.Push(drawable);
         }
-        else if (flags & DRAWABLE_LIGHT)
+        
+        // Determine the zone at far clip distance. If not found, or camera zone has override mode, use camera zone
+        cameraZoneOverride_ = cameraZone_->GetOverride();
+        if (!cameraZoneOverride_)
         {
-            Light* light = static_cast<Light*>(drawable);
-            light->MarkInView(frame_);
-            lights_.Push(light);
+            Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0, 0, camera_->GetFarClip());
+            bestPriority = M_MIN_INT;
+            
+            for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+            {
+                int priority = (*i)->GetPriority();
+                if ((*i)->IsInside(farClipPos) && priority > bestPriority)
+                {
+                    farClipZone_ = *i;
+                    bestPriority = priority;
+                }
+            }
         }
+        if (farClipZone_ == defaultZone)
+            farClipZone_ = cameraZone_;
     }
     
-    // Sort the lights to brightest/closest first
-    for (unsigned i = 0; i < lights_.Size(); ++i)
     {
-        Light* light = lights_[i];
-        light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
+        PROFILE(GetDrawables);
+        
+        // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
+        OcclusionBuffer* buffer = 0;
+        
+        if (maxOccluderTriangles_ > 0)
+        {
+            FrustumOctreeQuery query(occluders_, frustum_, DRAWABLE_GEOMETRY, camera_->GetViewMask(), true, false);
+            octree_->GetDrawables(query);
+            UpdateOccluders(occluders_, camera_);
+            
+            if (occluders_.Size())
+            {
+                buffer = renderer_->GetOrCreateOcclusionBuffer(camera_, maxOccluderTriangles_);
+                DrawOccluders(buffer, occluders_);
+                buffer->BuildDepthHierarchy();
+            }
+        }
+        
+        if (!buffer)
+        {
+            // Get geometries & lights without occlusion
+            FrustumOctreeQuery query(tempDrawables_, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+            octree_->GetDrawables(query);
+        }
+        else
+        {
+            // Get geometries & lights using occlusion
+            OccludedFrustumOctreeQuery query(tempDrawables_, frustum_, buffer, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
+                camera_->GetViewMask());
+            octree_->GetDrawables(query);
+        }
+        
+        // Add unculled geometries & lights
+        octree_->GetUnculledDrawables(tempDrawables_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+        
+        // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
+        sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
+        sceneBox_.defined_ = false;
+        sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
+        sceneViewBox_.defined_ = false;
+        Matrix3x4 view(camera_->GetInverseWorldTransform());
+        
+        for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
+        {
+            Drawable* drawable = tempDrawables_[i];
+            drawable->UpdateDistance(frame_);
+            
+            // If draw distance non-zero, check it
+            float maxDistance = drawable->GetDrawDistance();
+            if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
+                continue;
+            
+            unsigned flags = drawable->GetDrawableFlags();
+            if (flags & DRAWABLE_GEOMETRY)
+            {
+                // Find new zone for the drawable if necessary
+                if (!drawable->GetZone() && !cameraZoneOverride_)
+                    FindZone(drawable, highestZonePriority);
+                
+                drawable->ClearLights();
+                drawable->MarkInView(frame_);
+                drawable->UpdateGeometry(frame_);
+                
+                // Expand the scene bounding boxes. However, do not take "infinite" objects such as the skybox into account,
+                // as the bounding boxes are also used for shadow focusing
+                const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
+                BoundingBox geomViewBox = geomBox.Transformed(view);
+                if (geomBox.Size().LengthFast() < M_LARGE_VALUE)
+                {
+                    sceneBox_.Merge(geomBox);
+                    sceneViewBox_.Merge(geomViewBox);
+                }
+                
+                // Store depth info for split directional light queries
+                GeometryDepthBounds bounds;
+                bounds.min_ = geomViewBox.min_.z_;
+                bounds.max_ = geomViewBox.max_.z_;
+                
+                geometryDepthBounds_.Push(bounds);
+                geometries_.Push(drawable);
+            }
+            else if (flags & DRAWABLE_LIGHT)
+            {
+                Light* light = static_cast<Light*>(drawable);
+                light->MarkInView(frame_);
+                lights_.Push(light);
+            }
+        }
+        
+        // Sort the lights to brightest/closest first
+        for (unsigned i = 0; i < lights_.Size(); ++i)
+        {
+            Light* light = lights_[i];
+            light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
+        }
+        
+        Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     }
-    
-    Sort(lights_.Begin(), lights_.End(), CompareDrawables);
 }
 
 void View::GetBatches()
@@ -632,7 +660,7 @@ void View::RenderBatches()
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, cameraZone_->GetFogColor());
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
         
         RenderBatchQueue(baseQueue_);
     }
@@ -1401,7 +1429,8 @@ void View::FindZone(Drawable* drawable, int highestZonePriority)
     
     // First check if the last zone remains a conclusive result
     Zone* lastZone = drawable->GetLastZone();
-    if (lastZone && lastZone->IsInside(center) && lastZone->GetPriority() >= highestZonePriority)
+    if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->GetPriority()
+        >= highestZonePriority)
         drawable->SetZone(lastZone);
     // Then check if the visible zones contain the node center
     else
@@ -1411,14 +1440,14 @@ void View::FindZone(Drawable* drawable, int highestZonePriority)
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
             int priority = (*i)->GetPriority();
-            if ((*i)->IsInside(center) && priority > bestPriority)
+            if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
             {
                 newZone = *i;
                 bestPriority = priority;
             }
         }
         
-        // If all else fails, query the octree for zones at node center
+        // Finally, if no zone found yet, query the octree for zones at node center
         if (!newZone)
         {
             PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones_), center, DRAWABLE_ZONE);
@@ -1428,7 +1457,7 @@ void View::FindZone(Drawable* drawable, int highestZonePriority)
             for (PODVector<Zone*>::Iterator i = tempZones_.Begin(); i != tempZones_.End(); ++i)
             {
                 int priority = (*i)->GetPriority();
-                if ((*i)->IsInside(center) && priority > bestPriority)
+                if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
                 {
                     newZone = *i;
                     bestPriority = priority;

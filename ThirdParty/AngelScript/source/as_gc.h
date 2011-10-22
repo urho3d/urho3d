@@ -60,8 +60,6 @@ public:
 	void GCEnumCallback(void *reference);
 	void AddScriptObjectToGC(void *obj, asCObjectType *objType);
 
-	void ReportUndestroyedObjects();
-
 	asCScriptEngine *engine;
 
 protected:

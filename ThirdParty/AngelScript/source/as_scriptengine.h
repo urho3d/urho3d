@@ -96,18 +96,16 @@ public:
     virtual asIJITCompiler *GetJITCompiler() const;
 
 	// Global functions
-	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
-	virtual asUINT             GetGlobalFunctionCount() const;
-	virtual int                GetGlobalFunctionIdByIndex(asUINT index) const;
-	virtual asIScriptFunction *GetGlobalFunctionByIndex(asUINT index) const;
-	virtual asIScriptFunction *GetGlobalFunctionByDecl(const char *declaration) const;
+	virtual int RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	// TODO: interface: Should return asUINT
+	virtual int GetGlobalFunctionCount() const;
+	virtual int GetGlobalFunctionIdByIndex(asUINT index) const;
 
 	// Global properties
-	virtual int    RegisterGlobalProperty(const char *declaration, void *pointer);
-	virtual asUINT GetGlobalPropertyCount() const;
-	// TODO: access: Return the current access mask
-	virtual int    GetGlobalPropertyByIndex(asUINT index, const char **name, int *typeId = 0, bool *isConst = 0, const char **configGroup = 0, void **pointer = 0) const;
-	// TODO: access: Allow changing the access mask
+	virtual int RegisterGlobalProperty(const char *declaration, void *pointer);
+	// TODO: interface: Should return asUINT
+	virtual int GetGlobalPropertyCount() const;
+	virtual int GetGlobalPropertyByIndex(asUINT index, const char **name, int *typeId = 0, bool *isConst = 0, const char **configGroup = 0, void **pointer = 0) const;
 	
 	// Type registration
 	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags);
@@ -116,7 +114,8 @@ public:
 	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
 	virtual int            RegisterInterface(const char *name);
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration);
-	virtual asUINT         GetObjectTypeCount() const;
+	// TODO: interface: Should return asUINT
+	virtual int            GetObjectTypeCount() const;
 	virtual asIObjectType *GetObjectTypeByIndex(asUINT index) const;
 	
 	// String factory
@@ -130,41 +129,36 @@ public:
 	// Enums
 	virtual int         RegisterEnum(const char *type);
 	virtual int         RegisterEnumValue(const char *type, const char *name, int value);
-	virtual asUINT      GetEnumCount() const;
+	// TODO: interface: Should return asUINT
+	virtual int         GetEnumCount() const;
 	virtual const char *GetEnumByIndex(asUINT index, int *enumTypeId, const char **configGroup = 0) const;
 	virtual int         GetEnumValueCount(int enumTypeId) const;
 	virtual const char *GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const;
 
 	// Funcdefs
 	virtual int                RegisterFuncdef(const char *decl);
-	virtual asUINT             GetFuncdefCount() const;
+	// TODO: interface: Should return asUINT
+	virtual int                GetFuncdefCount() const;
 	virtual asIScriptFunction *GetFuncdefByIndex(asUINT index, const char **configGroup = 0) const;
 
 	// Typedefs
 	virtual int         RegisterTypedef(const char *type, const char *decl);
-	virtual asUINT      GetTypedefCount() const;
+	// TODO: interface: Should return asUINT
+	virtual int         GetTypedefCount() const;
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId, const char **configGroup = 0) const;
 
 	// Configuration groups
-	virtual int     BeginConfigGroup(const char *groupName);
-	virtual int     EndConfigGroup();
-	virtual int     RemoveConfigGroup(const char *groupName);
-	virtual asDWORD SetDefaultAccessMask(asDWORD defaultMask);
-#ifdef AS_DEPRECATED
-	// deprecated since 2011-10-04
+	virtual int BeginConfigGroup(const char *groupName);
+	virtual int EndConfigGroup();
+	virtual int RemoveConfigGroup(const char *groupName);
 	virtual int SetConfigGroupModuleAccess(const char *groupName, const char *module, bool hasAccess);
-#endif
 
 	// Script modules
 	virtual asIScriptModule *GetModule(const char *module, asEGMFlags flag);
 	virtual int              DiscardModule(const char *module);
 
 	// Script functions
-	virtual asIScriptFunction *GetFunctionById(int funcId) const;
-#ifdef AS_DEPRECATED
-	// deprecated since 2011-10-03
 	virtual asIScriptFunction *GetFunctionDescriptorById(int funcId) const;
-#endif
 
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const;
@@ -194,10 +188,8 @@ public:
 	virtual void *SetUserData(void *data);
 	virtual void *GetUserData() const;
 	virtual void  SetEngineUserDataCleanupCallback(asCLEANENGINEFUNC_t callback);
-	virtual void  SetModuleUserDataCleanupCallback(asCLEANMODULEFUNC_t callback);
 	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback);
 	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback);
-	virtual void  SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC_t callback);
 
 //===========================================================
 // internal methods
@@ -235,8 +227,6 @@ public:
 	int   CallObjectMethodRetInt(void *obj, int func);
 	void  CallGlobalFunction(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc);
 	bool  CallGlobalFunctionRetBool(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc);
-
-	void ConstructScriptObjectCopy(void *mem, void *obj, asCObjectType *type);
 
 	void ClearUnusedTypes();
 	void RemoveTemplateInstanceType(asCObjectType *t);
@@ -367,7 +357,6 @@ public:
 	asCConfigGroup             defaultGroup;
 	asCArray<asCConfigGroup*>  configGroups;
 	asCConfigGroup            *currentGroup;
-	asDWORD                    defaultAccessMask;
 
 	// Message callback
 	bool                        msgCallback;
@@ -380,12 +369,10 @@ public:
 	asCArray<asCString*>        stringConstants;
 
 	// User data
-	void                   *userData;
-	asCLEANENGINEFUNC_t     cleanEngineFunc;
-	asCLEANMODULEFUNC_t     cleanModuleFunc;
-	asCLEANCONTEXTFUNC_t    cleanContextFunc;
-	asCLEANFUNCTIONFUNC_t   cleanFunctionFunc;
-	asCLEANOBJECTTYPEFUNC_t cleanObjectTypeFunc;
+	void                  *userData;
+	asCLEANENGINEFUNC_t    cleanEngineFunc;
+	asCLEANCONTEXTFUNC_t   cleanContextFunc;
+	asCLEANFUNCTIONFUNC_t  cleanFunctionFunc;
 
 	// Critical sections for threads
 	DECLARECRITICALSECTION(engineCritical);
@@ -409,7 +396,6 @@ public:
 		int  propertyAccessorMode;
 		bool expandDefaultArrayToTemplate;
 		bool autoGarbageCollect;
-		bool disallowGlobalVars;
 	} ep;
 };
 

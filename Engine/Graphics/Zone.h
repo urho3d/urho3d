@@ -76,11 +76,15 @@ public:
     virtual bool IsInside(const Vector3& point);
     
 protected:
+    /// Transform has changed. Clear cached zone of any contained drawables.
+    virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
     /// Bounding box.
     BoundingBox boundingBox_;
+    /// Last bounding box.
+    BoundingBox lastBoundingBox_;
     /// Ambient color.
     Color ambientColor_;
     /// Fog color.

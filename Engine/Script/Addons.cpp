@@ -96,7 +96,7 @@ static bool ScriptArrayTemplateCallback(asIObjectType* ot)
                 if (beh != asBEHAVE_CONSTRUCT)
                     continue;
                 
-                asIScriptFunction* func = ot->GetEngine()->GetFunctionById(funcId);
+                asIScriptFunction* func = ot->GetEngine()->GetFunctionDescriptorById(funcId);
                 if (func->GetParamCount() == 0)
                 {
                     // Found the default constructor
@@ -113,7 +113,7 @@ static bool ScriptArrayTemplateCallback(asIObjectType* ot)
             for (unsigned n = 0; n < subtype->GetFactoryCount(); ++n)
             {
                 int funcId = subtype->GetFactoryIdByIndex(n);
-                asIScriptFunction* func = ot->GetEngine()->GetFunctionById(funcId);
+                asIScriptFunction* func = ot->GetEngine()->GetFunctionDescriptorById(funcId);
                 if (func->GetParamCount() == 0)
                 {
                     // Found the default factory

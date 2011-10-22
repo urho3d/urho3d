@@ -1586,6 +1586,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 
@@ -1647,6 +1648,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - LightType lightType
@@ -1698,6 +1700,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - BoundingBox& boundingBox
@@ -1738,6 +1741,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
@@ -1778,6 +1782,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
@@ -1846,6 +1851,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Model@ model
@@ -1953,6 +1959,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - Material@ material

@@ -221,7 +221,7 @@ void Script::DumpAPI()
     for (unsigned i = 0; i < functions; ++i)
     {
         unsigned id = scriptEngine_->GetGlobalFunctionIdByIndex(i);
-        asIScriptFunction* function = scriptEngine_->GetFunctionById(id);
+        asIScriptFunction* function = scriptEngine_->GetFunctionDescriptorById(id);
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
         
@@ -279,7 +279,7 @@ void Script::DumpAPI()
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
             {
-                asIScriptFunction* method = type->GetMethodByIndex(j);
+                asIScriptFunction* method = type->GetMethodDescriptorByIndex(j);
                 String methodName(method->GetName());
                 String declaration(method->GetDeclaration());
                 if (methodName.Find("get_") == String::NPOS && methodName.Find("set_") == String::NPOS)
@@ -378,7 +378,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
 void Script::ExceptionCallback(asIScriptContext* context)
 {
     int funcId = context->GetExceptionFunction();
-    const asIScriptFunction *function = scriptEngine_->GetFunctionById(funcId);
+    const asIScriptFunction *function = scriptEngine_->GetFunctionDescriptorById(funcId);
     String message = "Exception '" + String(context->GetExceptionString()) + "' in '" +
         String(function->GetDeclaration()) + "'";
     

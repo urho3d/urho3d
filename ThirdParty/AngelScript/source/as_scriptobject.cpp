@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2010 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -339,9 +339,10 @@ int asCScriptObject::GetTypeId() const
 	return objType->engine->GetTypeIdFromDataType(dt);
 }
 
-asUINT asCScriptObject::GetPropertyCount() const
+int asCScriptObject::GetPropertyCount() const
 {
-	return objType->properties.GetLength();
+	// TODO: interface: Should return asUINT, as the function cannot fail
+	return (int)objType->properties.GetLength();
 }
 
 int asCScriptObject::GetPropertyTypeId(asUINT prop) const

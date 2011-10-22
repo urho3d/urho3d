@@ -335,14 +335,13 @@ asCScriptNode *asCParser::ParseScript()
 	asCScriptNode *node = new(engine->memoryMgr.AllocScriptNode()) asCScriptNode(snScript);
 
 	// Determine type of node
-	sToken t1, t2;
+	sToken t1;
 
 	for(;;)
 	{
 		while( !isSyntaxError )
 		{
 			GetToken(&t1);
-			GetToken(&t2);
 			RewindTo(&t1);
 
 			if( t1.type == ttImport )
@@ -351,9 +350,9 @@ asCScriptNode *asCParser::ParseScript()
 				node->AddChildLast(ParseEnumeration());	//	Handle enumerations
 			else if( t1.type == ttTypedef )
 				node->AddChildLast(ParseTypedef());		//	Handle primitive typedefs
-			else if( t1.type == ttClass || (t1.type == ttIdentifier && t2.type == ttClass) )
+			else if( t1.type == ttClass )
 				node->AddChildLast(ParseClass());
-			else if( t1.type == ttInterface || (t1.type == ttIdentifier && t2.type == ttInterface) )
+			else if( t1.type == ttInterface )
 				node->AddChildLast(ParseInterface());
 			else if( t1.type == ttFuncDef )
 				node->AddChildLast(ParseFuncDef());
@@ -919,23 +918,6 @@ asCScriptNode *asCParser::ParseInterface()
 
 	sToken t;
 	GetToken(&t);
-
-	// Allow keyword 'shared' before 'interface'
-	if( t.type == ttIdentifier )
-	{
-		asCString str;
-		str.Assign(&script->code[t.pos], t.length);
-		if( str != SHARED_TOKEN )
-		{
-			Error(ExpectedToken(SHARED_TOKEN).AddressOf(), &t);
-			return node;
-		}
-
-		RewindTo(&t);
-		node->AddChildLast(ParseIdentifier());
-		GetToken(&t);
-	}
-
 	if( t.type != ttInterface )
 	{
 		Error(ExpectedToken("interface").AddressOf(), &t);
@@ -984,23 +966,6 @@ asCScriptNode *asCParser::ParseClass()
 
 	sToken t;
 	GetToken(&t);
-
-	// Allow the keyword 'shared' before 'class'
-	if( t.type == ttIdentifier )
-	{
-		asCString str;
-		str.Assign(&script->code[t.pos], t.length);
-		if( str != SHARED_TOKEN )
-		{
-			Error(ExpectedToken(SHARED_TOKEN).AddressOf(), &t);
-			return node;
-		}
-
-		RewindTo(&t);
-		node->AddChildLast(ParseIdentifier());
-		GetToken(&t);
-	}
-
 	if( t.type != ttClass )
 	{
 		Error(ExpectedToken("class").AddressOf(), &t);

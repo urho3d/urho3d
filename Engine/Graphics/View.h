@@ -154,6 +154,8 @@ private:
     Camera* camera_;
     /// Zone the camera is inside, or default zone if not assigned.
     Zone* cameraZone_;
+    /// Zone at far clip plane.
+    Zone* farClipZone_;
     /// Color buffer to use.
     RenderSurface* renderTarget_;
     /// Depth buffer to use.

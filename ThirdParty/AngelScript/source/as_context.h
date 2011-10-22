@@ -51,6 +51,8 @@ BEGIN_AS_NAMESPACE
 class asCScriptFunction;
 class asCScriptEngine;
 
+// TODO: The context should be renamed to something that better describes it, e.g. asIVirtualMachine, asIExecuter, asIProcessor, asIScriptThread, or something like that
+
 class asCContext : public asIScriptContext
 {
 public:
@@ -62,9 +64,7 @@ public:
 
 	asEContextState GetState() const;
 
-	int  Prepare(asIScriptFunction *func);
-	// TODO: interface: deprecate this
-	int  Prepare(int functionId);
+	int  Prepare(int functionID);
 	int  Unprepare();
 
 	int SetArgByte(asUINT arg, asBYTE value);
