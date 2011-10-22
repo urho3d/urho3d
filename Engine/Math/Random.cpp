@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Random.h"
 
 static unsigned randomSeed = 1;
