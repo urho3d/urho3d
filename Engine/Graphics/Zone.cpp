@@ -28,10 +28,10 @@
 #include "XMLElement.h"
 #include "Zone.h"
 
-static const float DEFAULT_FOGSTART = 250.0f;
-static const float DEFAULT_FOGEND = 1000.0f;
-static const Color DEFAULT_FOG_COLOR(0.0f, 0.0f, 0.0f);
 static const Color DEFAULT_AMBIENT_COLOR(0.1f, 0.1f, 0.1f);
+static const Color DEFAULT_FOG_COLOR(0.0f, 0.0f, 0.0f);
+static const float DEFAULT_FOG_START = 250.0f;
+static const float DEFAULT_FOG_END = 1000.0f;
 
 OBJECTTYPESTATIC(Zone);
 
@@ -39,8 +39,8 @@ Zone::Zone(Context* context) :
     Drawable(context),
     ambientColor_(DEFAULT_AMBIENT_COLOR),
     fogColor_(DEFAULT_FOG_COLOR),
-    fogStart_(DEFAULT_FOGSTART),
-    fogEnd_(DEFAULT_FOGEND),
+    fogStart_(DEFAULT_FOG_START),
+    fogEnd_(DEFAULT_FOG_END),
     priority_(0),
     override_(false)
 {
@@ -59,8 +59,8 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOGSTART, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOGEND, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
@@ -72,11 +72,12 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);
     
-    // If bounding box changes, dirty the drawable as applicable
+    // If bounding box, override mode or priority changes, dirty the drawable as applicable
     switch (attr.offset_)
     {
     case offsetof(Zone, boundingBox_.min_):
     case offsetof(Zone, boundingBox_.max_):
+    case offsetof(Zone, priority_):
         OnMarkedDirty(node_);
         break;
     }
