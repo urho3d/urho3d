@@ -89,9 +89,9 @@ void HideGizmo()
 
 void UpdateGizmo()
 {
+    UseGizmo();
     PositionGizmo();
     ResizeGizmo();
-    UseGizmo();
 }
 
 void PositionGizmo()
@@ -104,9 +104,9 @@ void PositionGizmo()
         HideGizmo();
         return;
     }
-    
+
     Vector3 center(0, 0, 0);
-    
+
     for (uint i = 0; i < editNodes.length; ++i)
         center += editNodes[i].worldPosition;
 
@@ -125,19 +125,19 @@ void PositionGizmo()
         case EDIT_MOVE:
             gizmo.model = cache.GetResource("Model", "Models/Axes.mdl");
             break;
-        
+
         case EDIT_ROTATE:
             gizmo.model = cache.GetResource("Model", "Models/RotateAxes.mdl");
             break;
-            
+
         case EDIT_SCALE:
             gizmo.model = cache.GetResource("Model", "Models/ScaleAxes.mdl");
             break;
         }
-          
+
         lastGizmoMode = editMode;
     }
-    
+
     gizmo.visible = true;
 }
 
