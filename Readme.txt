@@ -139,8 +139,5 @@ V1.12   - Manipulator gizmo and multi-editing in the editor.
           more work in the vertex shader.
         - Zone system refactoring. Objects check the zone they belong to for
           per-zone light masking, ambient light and fog settings.
-        - Math API improvements.
-        - Lit base pass optimization for all lights.
-        - Render shadowed directional and point lights in one pass.
-        - Improved directional light shadow map fitting.
-        - 2-sample shadow filtering in fallback mode.
+        - Scripting API fixes and improvements.
+

@@ -111,6 +111,13 @@ V1.11
 
 - Bugfixes and performance optimizations.
 - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
-- Added fallback mode, which is used if multiple render targets or hardware shadow maps are not available.
+- Added fallback mode, which is used if multiple render targets or hardware shadow maps are not available.   '
+
+V1.12   
+
+- Manipulator gizmo and multi-editing in the editor.
+- Switched to forward rendering exclusively, which is optimized to do more work in the vertex shader.
+- %Zone system refactoring. Objects check the zone they belong to for per-zone light masking, ambient light and fog settings.
+- Scripting API fixes and improvements.
 
 */
