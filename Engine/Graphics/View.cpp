@@ -653,18 +653,20 @@ void View::RenderBatches()
         }
     }
     
+    graphics_->SetRenderTarget(0, renderTarget_);
+    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetViewport(screenRect_);
+    graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
+    
+    if (!baseQueue_.IsEmpty())
     {
-        // Render opaque object base pass
-        PROFILE(RenderAmbient);
-        
-        graphics_->SetRenderTarget(0, renderTarget_);
-        graphics_->SetDepthStencil(depthStencil_);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
+        // Render opaque object unlit base pass
+        PROFILE(RenderBase);
         
         RenderBatchQueue(baseQueue_);
     }
     
+    if (!lightQueues_.Empty())
     {
         // Render shadow maps + opaque objects' shadowed additive lighting
         PROFILE(RenderLights);
@@ -675,11 +677,12 @@ void View::RenderBatches()
             
             // If reusing shadowmaps, render each of them before the lit batches
             if (renderer_->GetReuseShadowMaps() && queue.shadowMap_)
+            {
                 RenderShadowMap(queue);
-            
-            graphics_->SetRenderTarget(0, renderTarget_);
-            graphics_->SetDepthStencil(depthStencil_);
-            graphics_->SetViewport(screenRect_);
+                graphics_->SetRenderTarget(0, renderTarget_);
+                graphics_->SetDepthStencil(depthStencil_);
+                graphics_->SetViewport(screenRect_);
+            }
             
             RenderLightBatchQueue(queue.litBatches_, queue.light_);
         }
