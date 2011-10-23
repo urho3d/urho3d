@@ -641,7 +641,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 void View::RenderBatches()
 {
     // If not reusing shadowmaps, render all of them first
-    if (!renderer_->GetReuseShadowMaps())
+    if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
     {
         PROFILE(RenderShadowMaps);
         
@@ -810,6 +810,7 @@ unsigned View::ProcessLight(Light* light)
     
     // Get lit geometries. They must match the light mask and be inside the main camera frustum to be considered
     litGeometries_.Clear();
+    
     switch (type)
     {
     case LIGHT_DIRECTIONAL:
@@ -889,6 +890,24 @@ unsigned View::ProcessLight(Light* light)
         shadowCasters_[i].Clear();
         shadowCasterBox_[i].defined_ = false;
         Camera* shadowCamera = shadowCameras_[i];
+        Frustum shadowCameraFrustum = shadowCamera->GetFrustum();
+        
+        // For point light check that the face is visible: if not, can skip the split
+        if (type == LIGHT_POINT)
+        {
+            BoundingBox shadowCameraBox(shadowCameraFrustum);
+            if (frustum_.IsInsideFast(shadowCameraBox) == OUTSIDE)
+                continue;
+        }
+        
+        // For directional light check that the split is inside the visible scene: if not, can skip the split
+        if (type == LIGHT_DIRECTIONAL)
+        {
+            if (sceneViewBox_.min_.z_ > shadowFarSplits_[i])
+                continue;
+            if (sceneViewBox_.max_.z_ < shadowNearSplits_[i])
+                continue;
+        }
         
         if (!useOcclusion)
         {
@@ -896,16 +915,6 @@ unsigned View::ProcessLight(Light* light)
             // lit geometries, whose result still exists in tempDrawables_
             if (type != LIGHT_SPOT)
             {
-                Frustum shadowCameraFrustum = shadowCamera->GetFrustum();
-                // If a point light face, check that the face is visible: if not, there is no need to query and render
-                // the shadow casters
-                if (type == LIGHT_POINT)
-                {
-                    BoundingBox shadowCameraBox(shadowCameraFrustum);
-                    if (frustum_.IsInsideFast(shadowCameraBox) == OUTSIDE)
-                        continue;
-                }
-                
                 FrustumOctreeQuery query(tempDrawables_, shadowCameraFrustum, DRAWABLE_GEOMETRY, camera_->GetViewMask(),
                     false, true);
                 octree_->GetDrawables(query);
