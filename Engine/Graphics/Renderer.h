@@ -230,11 +230,13 @@ public:
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
     
+    /// Initialize when screen mode initially set.
+    void Initialize();
     /// Update for rendering. Called by HandleRenderUpdate().
     void Update(float timeStep);
     /// Render. Called by Engine.
     void Render();
-    /// Add debug geometry to the debug graphics(s).
+    /// Add debug geometry to the debug renderer(s).
     void DrawDebugGeometry(bool depthTest);
     /// Add a view. Return true if successful.
     bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
@@ -256,8 +258,6 @@ public:
     void ResetShadowMapAllocations();
     
 private:
-    /// Initialize when screen mode initially set.
-    void Initialize();
     /// Clear views from previous frame.
     void ResetViews();
     /// Reload shaders.

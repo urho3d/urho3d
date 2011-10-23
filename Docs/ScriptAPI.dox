@@ -2074,6 +2074,8 @@ Properties:<br>
 - bool sm3Support (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
+- bool forceSM2
+- bool forceFallback
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)
 

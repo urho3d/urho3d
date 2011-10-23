@@ -172,9 +172,9 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
-    /// %Set force Shader Model 2 flag. Needs to be set before setting initial screen mode to have effect.
+    /// %Set force Shader Model 2 flag.
     void SetForceSM2(bool enable);
-    /// %Set force fallback shaders flag. Needs to be set before setting initial screen mode to have effect.
+    /// %Set force fallback shaders flag.
     void SetForceFallback(bool enable);
     
     /// Return whether rendering initialized.
@@ -295,6 +295,10 @@ public:
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return render target width and height.
     IntVector2 GetRenderTargetDimensions() const;
+    /// Return force Shader Model 2 flag.
+    bool GetForceSM2() const { return forceSM2_; }
+    /// Return force fallback mode flag.
+    bool GetForceFallback() const { return forceFallback_; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -325,6 +329,8 @@ private:
     bool CreateInterface();
     /// Create the Direct3D device.
     bool CreateDevice(unsigned adapter, unsigned deviceType);
+    /// Check supported graphics features.
+    void CheckFeatureSupport();
     /// Reset the Direct3D device.
     void ResetDevice();
     /// Notify all GPU resources so they can release themselves as needed.

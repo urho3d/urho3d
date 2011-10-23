@@ -131,5 +131,16 @@ V1.1    - Object and scene model refactoring.
 
 V1.11   - Bugfixes and performance optimizations.
         - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
-        - Added fallback mode, which is used if multiple render targets or 
+        - Added fallback mode, which is used if multiple render targets or
           hardware shadow maps are not available.
+
+V1.12   - Manipulator gizmo and multi-editing in the editor.
+        - Switched to forward rendering exclusively, which is optimized to do
+          more work in the vertex shader.
+        - Zone system refactoring. Objects check the zone they belong to for
+          per-zone light masking, ambient light and fog settings.
+        - Math API improvements.
+        - Lit base pass optimization for all lights.
+        - Render shadowed directional and point lights in one pass.
+        - Improved directional light shadow map fitting.
+        - 2-sample shadow filtering in fallback mode.

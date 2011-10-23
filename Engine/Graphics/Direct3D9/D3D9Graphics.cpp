@@ -39,6 +39,7 @@
 #include "Octree.h"
 #include "ParticleEmitter.h"
 #include "Profiler.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
@@ -286,6 +287,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     {
         if (!CreateInterface())
             return false;
+        
+        CheckFeatureSupport();
     }
     
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
@@ -1692,14 +1695,30 @@ void Graphics::ResetStreamFrequencies()
 
 void Graphics::SetForceSM2(bool enable)
 {
-    // Note: this only has effect before calling SetMode() for the first time
     forceSM2_ = enable;
+    
+    // If screen mode has been set, recheck features and reinitialize renderer
+    if (IsInitialized())
+    {
+        CheckFeatureSupport();
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer)
+            renderer->Initialize();
+    }
 }
 
 void Graphics::SetForceFallback(bool enable)
 {
-    // Note: this only has effect before calling SetMode() for the first time
     forceFallback_ = enable;
+    
+    // If screen mode has been set, recheck features and reinitialize renderer
+    if (IsInitialized())
+    {
+        CheckFeatureSupport();
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer)
+            renderer->Initialize();
+    }
 }
 
 bool Graphics::IsInitialized() const
@@ -1943,7 +1962,51 @@ bool Graphics::CreateInterface()
         return false;
     }
     
+    return true;
+}
+
+bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
+{
+    DWORD behaviorFlags = 0;
+    if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
+    {
+        behaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+        if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_PUREDEVICE)
+            behaviorFlags |= D3DCREATE_PUREDEVICE;
+    }
+    else
+        behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    
+    if (FAILED(impl_->interface_->CreateDevice(
+        adapter,                    // adapter
+        (D3DDEVTYPE)deviceType,     // device type
+        impl_->window_,             // window associated with device
+        behaviorFlags,              // vertex processing
+        &impl_->presentParams_,     // present parameters
+        &impl_->device_)))          // return created device
+    {
+        LOGERROR("Could not create Direct3D9 device");
+        return false;
+    }
+    
+    impl_->adapter_ = adapter;
+    impl_->deviceType_ = (D3DDEVTYPE)deviceType;
+    
+    OnDeviceReset();
+    
+    LOGINFO("Created Direct3D9 device");
+    return true;
+}
+
+void Graphics::CheckFeatureSupport()
+{
     // Check supported features: Shader Model 3, shadow map, dummy color surface, stream offset
+    hardwareShadowSupport_ = false;
+    hiresShadowSupport_ = false;
+    streamOffsetSupport_ = false;
+    fallback_ = false;
+    hasSM3_ = false;
+    
     // Prefer NVIDIA style hardware depth compared shadow maps if available
     if (!forceFallback_)
     {
@@ -2014,41 +2077,6 @@ bool Graphics::CreateInterface()
     
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
         streamOffsetSupport_ = true;
-    
-    return true;
-}
-
-bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
-{
-    DWORD behaviorFlags = 0;
-    if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
-    {
-        behaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
-        if (impl_->deviceCaps_.DevCaps & D3DDEVCAPS_PUREDEVICE)
-            behaviorFlags |= D3DCREATE_PUREDEVICE;
-    }
-    else
-        behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-    
-    if (FAILED(impl_->interface_->CreateDevice(
-        adapter,                    // adapter
-        (D3DDEVTYPE)deviceType,     // device type
-        impl_->window_,             // window associated with device
-        behaviorFlags,              // vertex processing
-        &impl_->presentParams_,     // present parameters
-        &impl_->device_)))          // return created device
-    {
-        LOGERROR("Could not create Direct3D9 device");
-        return false;
-    }
-    
-    impl_->adapter_ = adapter;
-    impl_->deviceType_ = (D3DDEVTYPE)deviceType;
-    
-    OnDeviceReset();
-    
-    LOGINFO("Created Direct3D9 device");
-    return true;
 }
 
 void Graphics::ResetDevice()

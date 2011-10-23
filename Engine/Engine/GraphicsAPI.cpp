@@ -726,6 +726,10 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool get_sm3Support() const", asMETHOD(Graphics, GetSM3Support), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hardwareShadowSupport() const", asMETHOD(Graphics, GetHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hiresShadowSupport() const", asMETHOD(Graphics, GetHiresShadowSupport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void set_forceSM2(bool)", asMETHOD(Graphics, SetForceSM2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_forceSM2() const", asMETHOD(Graphics, GetForceSM2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void set_forceFallback(bool)", asMETHOD(Graphics, SetForceFallback), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_forceFallback() const", asMETHOD(Graphics, GetForceFallback), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "Array<IntVector2>@ get_resolutions() const", asFUNCTION(GraphicsGetResolutions), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "Array<int>@ get_multiSampleLevels() const", asFUNCTION(GraphicsGetMultiSampleLevels), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);

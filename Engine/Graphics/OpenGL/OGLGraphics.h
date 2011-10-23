@@ -317,6 +317,10 @@ public:
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
     /// Return render target width and height.
     IntVector2 GetRenderTargetDimensions() const;
+    /// Return force Shader Model 2 flag. Always false on OpenGL.
+    bool GetForceSM2() const { return false; }
+    /// Return force fallback mode flag. Always false on OpenGL.
+    bool GetForceFallback() const { return false; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);

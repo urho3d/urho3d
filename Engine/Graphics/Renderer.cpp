@@ -532,6 +532,59 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
         return 0;
 }
 
+
+void Renderer::Initialize()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    if (!graphics || !graphics->IsInitialized() || !cache)
+        return;
+    
+    PROFILE(InitRenderer);
+    
+    graphics_ = graphics;
+    cache_ = cache;
+    
+    // Check shader model support
+    #ifndef USE_OPENGL
+    if (graphics_->GetSM3Support())
+    {
+        shaderPath_ = "Shaders/SM3/";
+        vsFormat_ = ".vs3";
+        psFormat_ = ".ps3";
+    }
+    else
+    {
+        shaderPath_ = "Shaders/SM2/";
+        vsFormat_ = ".vs2";
+        psFormat_ = ".ps2";
+    }
+    
+    #else
+    {
+        shaderPath_ = "Shaders/GLSL/";
+        vsFormat_ = ".vert";
+        psFormat_ = ".frag";
+    }
+    #endif
+    
+    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
+    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
+    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
+    
+    CreateGeometries();
+    CreateInstancingBuffer();
+    
+    viewports_.Resize(1);
+    ResetViews();
+    ResetShadowMaps();
+    
+    LOGINFO("Initialized renderer");
+    shadersDirty_ = true;
+    initialized_ = true;
+}
+
 void Renderer::Update(float timeStep)
 {
     PROFILE(UpdateViews);
@@ -1077,56 +1130,6 @@ void Renderer::ResetShadowMapAllocations()
         i->second_.Clear();
 }
 
-void Renderer::Initialize()
-{
-    Graphics* graphics = GetSubsystem<Graphics>();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    if (!graphics || !graphics->IsInitialized() || !cache)
-        return;
-    
-    PROFILE(InitRenderer);
-    
-    graphics_ = graphics;
-    cache_ = cache;
-    
-    // Check shader model support
-    #ifndef USE_OPENGL
-    if (graphics_->GetSM3Support())
-    {
-        shaderPath_ = "Shaders/SM3/";
-        vsFormat_ = ".vs3";
-        psFormat_ = ".ps3";
-    }
-    else
-    {
-        shaderPath_ = "Shaders/SM2/";
-        vsFormat_ = ".vs2";
-        psFormat_ = ".ps2";
-    }
-    
-    #else
-    {
-        shaderPath_ = "Shaders/GLSL/";
-        vsFormat_ = ".vert";
-        psFormat_ = ".frag";
-    }
-    #endif
-    
-    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
-    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
-    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
-    
-    CreateGeometries();
-    CreateInstancingBuffer();
-    
-    viewports_.Resize(1);
-    ResetViews();
-    
-    LOGINFO("Initialized renderer");
-    initialized_ = true;
-}
-
 void Renderer::ResetViews()
 {
     views_.Clear();
@@ -1347,6 +1350,7 @@ void Renderer::CreateInstancingBuffer()
     // Do not create buffer if instancing not supported
     if (!graphics_->GetSM3Support())
     {
+        instancingBuffer_.Reset();
         dynamicInstancing_ = false;
         return;
     }
@@ -1375,8 +1379,7 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         Initialize();
     else
     {
-        // When screen mode changes, reload shaders and purge old views and occlusion buffers
-        shadersDirty_ = true;
+        // When screen mode changes, purge old views and occlusion buffers
         occlusionBuffers_.Clear();
         ResetViews();
     }
