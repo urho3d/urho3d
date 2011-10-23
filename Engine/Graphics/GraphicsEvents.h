@@ -43,6 +43,11 @@ EVENT(E_SCREENMODE, ScreenMode)
     PARAM(P_FULLSCREEN, Fullscreen);        // bool
 }
 
+/// Graphics features checked.
+EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
+{
+}
+
 /// Frame rendering started.
 EVENT(E_BEGINRENDERING, BeginRendering)
 {

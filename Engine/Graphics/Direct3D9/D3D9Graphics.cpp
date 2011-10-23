@@ -39,7 +39,6 @@
 #include "Octree.h"
 #include "ParticleEmitter.h"
 #include "Profiler.h"
-#include "Renderer.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
@@ -1697,28 +1696,18 @@ void Graphics::SetForceSM2(bool enable)
 {
     forceSM2_ = enable;
     
-    // If screen mode has been set, recheck features and reinitialize renderer
+    // If screen mode has been set, recheck features
     if (IsInitialized())
-    {
         CheckFeatureSupport();
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->Initialize();
-    }
 }
 
 void Graphics::SetForceFallback(bool enable)
 {
     forceFallback_ = enable;
     
-    // If screen mode has been set, recheck features and reinitialize renderer
+    // If screen mode has been set, recheck features
     if (IsInitialized())
-    {
         CheckFeatureSupport();
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->Initialize();
-    }
 }
 
 bool Graphics::IsInitialized() const
@@ -2077,6 +2066,8 @@ void Graphics::CheckFeatureSupport()
     
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
         streamOffsetSupport_ = true;
+    
+    SendEvent(E_GRAPHICSFEATURES);
 }
 
 void Graphics::ResetDevice()

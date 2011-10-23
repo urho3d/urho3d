@@ -259,6 +259,7 @@ Renderer::Renderer(Context* context) :
     initialized_(false)
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
+    SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
     
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -530,59 +531,6 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
         return i->second_;
     else
         return 0;
-}
-
-
-void Renderer::Initialize()
-{
-    Graphics* graphics = GetSubsystem<Graphics>();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    if (!graphics || !graphics->IsInitialized() || !cache)
-        return;
-    
-    PROFILE(InitRenderer);
-    
-    graphics_ = graphics;
-    cache_ = cache;
-    
-    // Check shader model support
-    #ifndef USE_OPENGL
-    if (graphics_->GetSM3Support())
-    {
-        shaderPath_ = "Shaders/SM3/";
-        vsFormat_ = ".vs3";
-        psFormat_ = ".ps3";
-    }
-    else
-    {
-        shaderPath_ = "Shaders/SM2/";
-        vsFormat_ = ".vs2";
-        psFormat_ = ".ps2";
-    }
-    
-    #else
-    {
-        shaderPath_ = "Shaders/GLSL/";
-        vsFormat_ = ".vert";
-        psFormat_ = ".frag";
-    }
-    #endif
-    
-    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
-    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
-    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
-    
-    CreateGeometries();
-    CreateInstancingBuffer();
-    
-    viewports_.Resize(1);
-    ResetViews();
-    ResetShadowMaps();
-    
-    LOGINFO("Initialized renderer");
-    shadersDirty_ = true;
-    initialized_ = true;
 }
 
 void Renderer::Update(float timeStep)
@@ -1130,6 +1078,59 @@ void Renderer::ResetShadowMapAllocations()
         i->second_.Clear();
 }
 
+void Renderer::Initialize()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    if (!graphics || !graphics->IsInitialized() || !cache)
+        return;
+    
+    PROFILE(InitRenderer);
+    
+    graphics_ = graphics;
+    cache_ = cache;
+    
+    // Check shader model support
+    #ifndef USE_OPENGL
+    if (graphics_->GetSM3Support())
+    {
+        shaderPath_ = "Shaders/SM3/";
+        vsFormat_ = ".vs3";
+        psFormat_ = ".ps3";
+    }
+    else
+    {
+        shaderPath_ = "Shaders/SM2/";
+        vsFormat_ = ".vs2";
+        psFormat_ = ".ps2";
+    }
+    
+    #else
+    {
+        shaderPath_ = "Shaders/GLSL/";
+        vsFormat_ = ".vert";
+        psFormat_ = ".frag";
+    }
+    #endif
+    
+    defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
+    defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
+    defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
+    
+    CreateGeometries();
+    CreateInstancingBuffer();
+    
+    viewports_.Resize(1);
+    ResetViews();
+    ResetShadowMaps();
+    
+    shadersDirty_ = true;
+    initialized_ = true;
+    
+    LOGINFO("Initialized renderer");
+}
+
 void Renderer::ResetViews()
 {
     views_.Clear();
@@ -1383,6 +1384,13 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         occlusionBuffers_.Clear();
         ResetViews();
     }
+}
+
+void Renderer::HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData)
+{
+    // Reinitialize if already initialized
+    if (initialized_)
+        Initialize();
 }
 
 void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)

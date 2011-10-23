@@ -230,8 +230,6 @@ public:
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
     
-    /// Initialize when screen mode initially set.
-    void Initialize();
     /// Update for rendering. Called by HandleRenderUpdate().
     void Update(float timeStep);
     /// Render. Called by Engine.
@@ -258,6 +256,8 @@ public:
     void ResetShadowMapAllocations();
     
 private:
+    /// Initialize when screen mode initially set.
+    void Initialize();
     /// Clear views from previous frame.
     void ResetViews();
     /// Reload shaders.
@@ -278,6 +278,8 @@ private:
     void ResetShadowMaps();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
+    /// Handle graphics features (re)check event.
+    void HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     
