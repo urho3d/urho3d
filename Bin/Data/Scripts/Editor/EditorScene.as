@@ -26,6 +26,8 @@ Array<XMLFile@> copyBuffer;
 bool copyBufferLocal = false;
 bool copyBufferExpanded = false;
 
+bool inSelectionModify = false;
+
 void ClearSelection()
 {
     selectedNodes.Clear();
@@ -254,12 +256,26 @@ void EndModify(uint nodeID)
     }
 }
 
+void BeginSelectionModify()
+{
+    // A large operation on selected nodes is about to begin. Disable intermediate selection updates
+    inSelectionModify = true;
+}
+
+void EndSelectionModify()
+{
+    // The large operation on selected nodes has ended. Update node/component selection now
+    inSelectionModify = false;
+    HandleSceneWindowSelectionChange();
+}
+
 bool SceneDelete()
 {
     if (!CheckSceneWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
         return false;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
+    BeginSelectionModify();
 
     // Remove components first
     for (uint i = 0; i < selectedComponents.length; ++i)
@@ -286,10 +302,7 @@ bool SceneDelete()
 
         // If deleting only one component, select the next item in the same index
         if (selectedComponents.length == 1 && selectedNodes.empty)
-        {
             list.selection = index;
-            return true;
-        }
     }
 
     // Remove (parented) nodes last
@@ -312,16 +325,10 @@ bool SceneDelete()
 
         // If deleting only one node, select the next item in the same index
         if (selectedNodes.length == 1 && selectedComponents.empty)
-        {
             list.selection = nodeIndex;
-            return true;
-        }
     }
 
-    // If any kind of multi-delete was performed, the list selection should be clear now.
-    // Unfortunately that also means we did not get selection change events, so must update the selection arrays manually.
-    // Otherwise nodes/components may be left in the scene even after delete, as the selection arrays keep them alive.
-    HandleNodeListSelectionChange();
+    EndSelectionModify();
     return true;
 }
 
@@ -439,6 +446,25 @@ bool ScenePaste()
         UpdateSceneWindowNode(editNode);
 
     return true;
+}
+
+void SceneSelectAll()
+{
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    if (!list.selections.empty)
+    {
+        BeginSelectionModify();
+        list.ClearSelection();
+        EndSelectionModify();
+    }
+    else
+    {
+        BeginSelectionModify();
+        Array<Node@> rootLevelNodes = editorScene.GetChildren();
+        for (uint i = 0; i < rootLevelNodes.length; ++i)
+            list.AddSelection(GetNodeListIndex(rootLevelNodes[i]));
+        EndSelectionModify();
+    }
 }
 
 void CalculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion& rot, Vector3& scale)

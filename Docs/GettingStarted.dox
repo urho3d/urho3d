@@ -519,6 +519,7 @@ Ctrl+plus/minus - Scale node uniformly (scale mode only)
 Ctrl+O          - Open scene
 Ctrl+S          - Save scene
 Ctrl+Shift+S    - Save scene as
+Ctrl+A          - Select/deselect all root level nodes
 Ctrl+X,C,V      - Cut/copy/paste node or component
 Ctrl+H	        - Open the scene hierarchy window
 Ctrl+N	        - Open the node / component edit window

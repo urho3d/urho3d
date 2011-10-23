@@ -77,6 +77,7 @@ void CreateMenuBar()
         editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
+        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
         editPopup.AddChild(CreateMenuDivider());
         editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
         uiMenuBar.AddChild(editMenu);
@@ -280,7 +281,10 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     
     if (action == "Delete")
         SceneDelete();
-    
+        
+    if (action == "Select all")
+        SceneSelectAll();
+
     if (action == "Toggle update")
         ToggleUpdate();
 

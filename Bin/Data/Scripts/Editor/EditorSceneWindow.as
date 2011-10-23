@@ -49,10 +49,10 @@ void CreateSceneWindow()
     SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
     SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandSceneHierarchy");
     SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "CollapseSceneHierarchy");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemSelected", "HandleNodeListSelectionChange");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDeselected", "HandleNodeListSelectionChange");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDoubleClicked", "HandleNodeListItemDoubleClick");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "UnhandledKey", "HandleNodeListKey");
+    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemSelected", "HandleSceneWindowSelectionChange");
+    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDeselected", "HandleSceneWindowSelectionChange");
+    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDoubleClicked", "HandleSceneWindowItemDoubleClick");
+    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "UnhandledKey", "HandleSceneWindowKey");
     SubscribeToEvent(newNodeList, "ItemSelected", "HandleCreateNode");
     SubscribeToEvent(newComponentList, "ItemSelected", "HandleCreateComponent");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
@@ -100,6 +100,7 @@ void ClearSceneWindow()
 {
     if (sceneWindow is null)
         return;
+
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.RemoveAllItems();
 }
@@ -474,8 +475,11 @@ void SelectComponent(Component@ component, bool multiselect)
     }
 }
 
-void HandleNodeListSelectionChange()
+void HandleSceneWindowSelectionChange()
 {
+    if (inSelectionModify)
+        return;
+
     ClearSelection();
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
@@ -568,7 +572,7 @@ void HandleNodeListSelectionChange()
     UpdateNodeWindow();
 }
 
-void HandleNodeListItemDoubleClick(StringHash eventType, VariantMap& eventData)
+void HandleSceneWindowItemDoubleClick(StringHash eventType, VariantMap& eventData)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
@@ -584,7 +588,7 @@ void HandleNodeListItemDoubleClick(StringHash eventType, VariantMap& eventData)
         list.ToggleChildItemsVisible(index);
 }
 
-void HandleNodeListKey(StringHash eventType, VariantMap& eventData)
+void HandleSceneWindowKey(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 }

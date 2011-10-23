@@ -1017,13 +1017,13 @@ void View::ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVect
 bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView,
     const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox)
 {
-    // If shadow caster is also an occluder, must let it be visible, because it has potentially already culled
-    // away other shadow casters (could also check the actual shadow occluder vector, but that would be slower)
-    if (drawable->IsOccluder())
-        return true;
-    
     if (shadowCamera->IsOrthographic())
     {
+        // If shadow caster is also an occluder, must let it be visible, because it has potentially already culled
+        // away other shadow casters (could also check the actual shadow occluder vector, but that would be slower)
+        if (drawable->IsOccluder())
+            return true;
+        
         // Extrude the light space bounding box up to the far edge of the frustum's light space bounding box
         lightViewBox.max_.z_ = Max(lightViewBox.max_.z_,lightViewFrustumBox.max_.z_);
         return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
