@@ -992,8 +992,7 @@ void View::ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVect
         // Project shadow caster bounding box to light view space for visibility check
         lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
         
-        if (drawable->IsInView(frame_) || IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum,
-            lightViewFrustumBox))
+        if (IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum, lightViewFrustumBox))
         {
             // Update geometry now if not updated yet
             if (!drawable->IsInView(frame_))
