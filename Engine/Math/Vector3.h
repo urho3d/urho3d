@@ -239,7 +239,7 @@ public:
     /// (0,0,-1) vector.
     static const Vector3 BACK;
     /// (1,1,1) vector.
-    static const Vector3 UNITY;
+    static const Vector3 ONE;
 };
 
 /// Multiply Vector3 with a scalar.

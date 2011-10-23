@@ -186,7 +186,7 @@ public:
     /// Zero vector.
     static const Vector4 ZERO;
     /// (1,1,1) vector.
-    static const Vector4 UNITY;
+    static const Vector4 ONE;
 };
 
 /// Multiply Vector4 with a scalar.

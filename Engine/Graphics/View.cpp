@@ -448,7 +448,7 @@ void View::GetBatches()
                     for (unsigned l = 0; l < numBatches; ++l)
                     {
                         Batch shadowBatch;
-                        drawable->GetBatch(shadowFrame_, l, shadowBatch);
+                        drawable->GetBatch(shadowBatch, shadowFrame_, l);
                         
                         Technique* tech = GetTechnique(drawable, shadowBatch.material_);
                         if (!shadowBatch.geometry_ || !tech)
@@ -522,7 +522,7 @@ void View::GetBatches()
             for (unsigned j = 0; j < numBatches; ++j)
             {
                 Batch baseBatch;
-                drawable->GetBatch(frame_, j, baseBatch);
+                drawable->GetBatch(baseBatch, frame_, j);
                 
                 Technique* tech = GetTechnique(drawable, baseBatch.material_);
                 if (!baseBatch.geometry_ || !tech)
@@ -540,7 +540,7 @@ void View::GetBatches()
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
                 baseBatch.zone_ = GetZone(drawable);
-                baseBatch.hasPriority_ = true;
+                baseBatch.isBase_ = true;
                 
                 Pass* pass = 0;
                 
@@ -592,7 +592,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
     for (unsigned i = 0; i < numBatches; ++i)
     {
         Batch litBatch;
-        drawable->GetBatch(frame_, i, litBatch);
+        drawable->GetBatch(litBatch, frame_, i);
         
         Technique* tech = GetTechnique(drawable, litBatch.material_);
         if (!litBatch.geometry_ || !tech)
@@ -606,7 +606,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             pass = tech->GetPass(PASS_LITBASE);
             if (pass)
             {
-                litBatch.hasPriority_ = true;
+                litBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
         }
@@ -754,7 +754,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
             
             for (unsigned j = 0; j < batches; ++j)
             {
-                occluder->GetBatch(frame_, j, tempBatch);
+                occluder->GetBatch(tempBatch, frame_, j);
                 if (tempBatch.geometry_)
                     totalTriangles += tempBatch.geometry_->GetIndexCount() / 3;
             }
@@ -1616,21 +1616,21 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
-    // Priority instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedPriorityBatchGroups_.Begin(); i !=
-        queue.sortedPriorityBatchGroups_.End(); ++i)
+    // Base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBaseBatchGroups_.Begin(); i !=
+        queue.sortedBaseBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         group->Draw(graphics_, renderer_);
     }
-    // Priority non-instanced
-    for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
+    // Base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedBaseBatches_.Begin(); i != queue.sortedBaseBatches_.End(); ++i)
     {
         Batch* batch = *i;
         batch->Draw(graphics_, renderer_);
     }
     
-    // Non-priority instanced
+    // Non-base instanced
     for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBatchGroups_.Begin(); i != queue.sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
@@ -1638,13 +1638,13 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
             OptimizeLightByScissor(group->lightQueue_->light_);
         group->Draw(graphics_, renderer_);
     }
-    // Non-priority non-instanced
+    // Non-base non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         if (useScissor)
         {
-            if (!batch->hasPriority_ && batch->lightQueue_)
+            if (!batch->isBase_ && batch->lightQueue_)
                 OptimizeLightByScissor(batch->lightQueue_->light_);
             else
                 graphics_->SetScissorTest(false);
@@ -1658,15 +1658,15 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
-    // Priority instanced
-    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedPriorityBatchGroups_.Begin(); i !=
-        queue.sortedPriorityBatchGroups_.End(); ++i)
+    // Base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBaseBatchGroups_.Begin(); i !=
+        queue.sortedBaseBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         group->Draw(graphics_, renderer_);
     }
-    // Priority non-instanced
-    for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
+    // Base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedBaseBatches_.Begin(); i != queue.sortedBaseBatches_.End(); ++i)
     {
         Batch* batch = *i;
         batch->Draw(graphics_, renderer_);
@@ -1676,13 +1676,13 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     OptimizeLightByStencil(light);
     OptimizeLightByScissor(light);
     
-    // Non-priority instanced
+    // Non-base instanced
     for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBatchGroups_.Begin(); i != queue.sortedBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
         group->Draw(graphics_, renderer_);
     }
-    // Non-priority non-instanced
+    // Non-base non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;

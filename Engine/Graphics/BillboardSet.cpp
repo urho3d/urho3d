@@ -143,9 +143,9 @@ unsigned BillboardSet::GetNumBatches()
     return 1;
 }
 
-void BillboardSet::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
+void BillboardSet::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
-    batch.distance_ = frame.camera_->GetDistance(GetWorldPosition());
+    batch.distance_ = distance_;
     batch.geometry_ = geometry_;
     batch.geometryType_ = GEOM_BILLBOARD;
     batch.worldTransform_ = &GetWorldTransform();
@@ -167,7 +167,7 @@ void BillboardSet::SetNumBillboards(unsigned num)
     for (unsigned i = oldNum; i < num; ++i)
     {
         billboards_[i].position_ = Vector3::ZERO;
-        billboards_[i].size_ = Vector2::UNITY;
+        billboards_[i].size_ = Vector2::ONE;
         billboards_[i].uv_ = Rect::POSITIVE;
         billboards_[i].color_ = Color(1.0f, 1.0f, 1.0f);
         billboards_[i].rotation_ = 0.0f;
@@ -303,7 +303,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
-    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::UNITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
     
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
@@ -312,7 +312,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
         
         float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
         Vector3 center = billboardTransform * billboards_[i].position_;
-        Vector3 edge = Vector3::UNITY * size;
+        Vector3 edge = Vector3::ONE * size;
         worldBoundingBox_.Merge(BoundingBox(center - edge, center + edge));
         
         ++enabledBillboards;
@@ -381,7 +381,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
-    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::UNITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
     
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)

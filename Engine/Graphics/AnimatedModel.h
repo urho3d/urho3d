@@ -56,8 +56,8 @@ public:
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return rendering batch with distance, geometry, material and world transform filled.
-    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
+    /// Fill rendering batch with distance, geometry, material and world transform.
+    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     /// Add debug geometry to the debug graphics.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     

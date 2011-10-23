@@ -42,8 +42,8 @@ public:
     void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return rendering batch with distance, geometry, material and world transform filled.
-    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
+    /// Fill rendering batch with distance, geometry, material and world transform.
+    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     
 protected:
     /// Recalculate the world-space bounding box.

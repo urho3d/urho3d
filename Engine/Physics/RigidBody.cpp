@@ -459,13 +459,13 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
         if (!node_->IsSmoothed())
         {
             Matrix3x4 newTransform(parent->GetWorldTransform().Inverse() * Matrix3x4(previousPosition_.Lerp(currentPosition, t),
-                previousRotation_.Slerp(currentRotation, t), Vector3::UNITY));
+                previousRotation_.Slerp(currentRotation, t), Vector3::ONE));
             node_->SetTransform(newTransform.Translation(), newTransform.Rotation());
         }
         else
         {
             Matrix3x4 newTransform(parent->GetWorldTargetTransform().Inverse() * Matrix3x4(currentPosition, currentRotation,
-                Vector3::UNITY));
+                Vector3::ONE));
             node_->SetTransform(newTransform.Translation(), newTransform.Rotation());
         }
     }

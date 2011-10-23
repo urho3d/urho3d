@@ -44,7 +44,7 @@ struct Bone
         radius_(0.0f),
         initialPosition_(Vector3::ZERO),
         initialRotation_(Quaternion::IDENTITY),
-        initialScale_(Vector3::UNITY),
+        initialScale_(Vector3::ONE),
         animated_(true)
     {
     }

@@ -85,8 +85,8 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }
-    /// Return rendering batch with distance, geometry, material and world transform filled.
-    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch) {}
+    /// Fill rendering batch with distance, geometry, material and world transform.
+    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
     /// Draw debug geometry.
@@ -195,10 +195,6 @@ protected:
     
     /// Octree octant.
     Octant* octant_;
-    /// Current zone.
-    WeakPtr<Zone> zone_;
-    /// Previous zone.
-    WeakPtr<Zone> lastZone_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
     /// Draw distance.
@@ -215,14 +211,6 @@ protected:
     unsigned zoneMask_;
     /// Maximum lights.
     unsigned maxLights_;
-    /// Drawable flags.
-    unsigned char drawableFlags_;
-    /// Visible flag.
-    bool visible_;
-    /// Shadowcaster flag.
-    bool castShadows_;
-    /// Occluder flag.
-    bool occluder_;
     /// Current distance to camera.
     float distance_;
     /// LOD scaled distance.
@@ -239,6 +227,18 @@ protected:
     PODVector<Light*> lights_;
     /// First light added this frame.
     Light* firstLight_;
+    /// Current zone.
+    WeakPtr<Zone> zone_;
+    /// Previous zone.
+    WeakPtr<Zone> lastZone_;
+    /// Drawable flags.
+    unsigned char drawableFlags_;
+    /// Visible flag.
+    bool visible_;
+    /// Shadowcaster flag.
+    bool castShadows_;
+    /// Occluder flag.
+    bool occluder_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
     /// Lod levels dirty flag.

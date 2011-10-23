@@ -71,7 +71,7 @@ void Batch::CalculateSortKey()
     unsigned pass = (*((unsigned*)&pass_) / sizeof(Pass)) & 0xffff;
     unsigned material = (*((unsigned*)&material_) / sizeof(Material)) & 0xffff;
     unsigned geometry = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
-    if (hasPriority_)
+    if (isBase_)
         lightQueue |= 0x8000;
     sortKey_ = (((unsigned long long)lightQueue) << 48) | (((unsigned long long)pass) << 32) |
         (((unsigned long long)material) << 16) | geometry;
@@ -200,7 +200,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         
         if (graphics->NeedParameterUpdate(VSP_LIGHTVECROT, light))
         {
-            Matrix3x4 lightVecRot(Vector3::ZERO, light->GetWorldRotation(), Vector3::UNITY);
+            Matrix3x4 lightVecRot(Vector3::ZERO, light->GetWorldRotation(), Vector3::ONE);
             graphics->SetShaderParameter(VSP_LIGHTVECROT, lightVecRot);
         }
         
@@ -585,9 +585,9 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
 void BatchQueue::Clear()
 {
     batches_.Clear();
-    sortedPriorityBatches_.Clear();
+    sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
-    priorityBatchGroups_.Clear();
+    baseBatchGroups_.Clear();
     batchGroups_.Clear();
 }
 
@@ -605,7 +605,7 @@ void BatchQueue::AddBatch(const Batch& batch, bool instancing)
         key.material_ = batch.material_;
         key.geometry_ = batch.geometry_;
         
-        Map<BatchGroupKey, BatchGroup>* groups = batch.hasPriority_ ? &priorityBatchGroups_ : &batchGroups_;
+        Map<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &baseBatchGroups_ : &batchGroups_;
         
         Map<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
         if (i == groups->End())
@@ -631,7 +631,7 @@ void BatchQueue::AddBatch(const Batch& batch, bool instancing)
 
 void BatchQueue::SortBackToFront()
 {
-    sortedPriorityBatches_.Clear();
+    sortedBaseBatches_.Clear();
     sortedBatches_.Resize(batches_.Size());
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -640,12 +640,12 @@ void BatchQueue::SortBackToFront()
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
     
     // Do not actually sort batch groups, just list them
-    sortedPriorityBatchGroups_.Resize(priorityBatchGroups_.Size());
+    sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
-        sortedPriorityBatchGroups_[index++] = &i->second_;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+        sortedBaseBatchGroups_[index++] = &i->second_;
     index = 0;
     for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
@@ -653,46 +653,46 @@ void BatchQueue::SortBackToFront()
 
 void BatchQueue::SortFrontToBack()
 {
-    sortedPriorityBatches_.Clear();
+    sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
     
-    // Must explicitly divide into priority batches and non-priority, so that priorities do not get mixed up between
+    // Must explicitly divide into base and non-base batches, so that priorities do not get mixed up between
     // instanced and non-instanced batches
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        if (batches_[i].hasPriority_)
-            sortedPriorityBatches_.Push(&batches_[i]);
+        if (batches_[i].isBase_)
+            sortedBaseBatches_.Push(&batches_[i]);
         else
             sortedBatches_.Push(&batches_[i]);
     }
     
-    Sort(sortedPriorityBatches_.Begin(), sortedPriorityBatches_.End(), CompareBatchesFrontToBack);
+    Sort(sortedBaseBatches_.Begin(), sortedBaseBatches_.End(), CompareBatchesFrontToBack);
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesFrontToBack);
     
     // Sort each group front to back
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
     for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
     
     // Now sort batch groups by the distance of the first batch
-    sortedPriorityBatchGroups_.Resize(priorityBatchGroups_.Size());
+    sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
-        sortedPriorityBatchGroups_[index++] = &i->second_;
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+        sortedBaseBatchGroups_[index++] = &i->second_;
     index = 0;
     for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
     
-    Sort(sortedPriorityBatchGroups_.Begin(), sortedPriorityBatchGroups_.End(), CompareBatchGroupsFrontToBack);
+    Sort(sortedBaseBatchGroups_.Begin(), sortedBaseBatchGroups_.End(), CompareBatchGroupsFrontToBack);
     Sort(sortedBatchGroups_.Begin(), sortedBatchGroups_.End(), CompareBatchGroupsFrontToBack);
 }
 
 void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
 {
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         i->second_.SetTransforms(renderer, lockedData, freeIndex);
     for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         i->second_.SetTransforms(renderer, lockedData, freeIndex);
@@ -706,7 +706,7 @@ unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
     
     // This is for the purpose of calculating how much space is needed in the instancing buffer. Do not add instance counts
     // that are below the minimum threshold for instancing
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
     {
         unsigned instances = i->second_.instances_.Size();
         if (instances >= minGroupSize && i->second_.geometry_->GetIndexCount() <= maxIndexCount)

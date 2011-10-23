@@ -29,9 +29,8 @@
 #include "Octree.h"
 #include "OctreeQuery.h"
 #include "Scene.h"
-#include "Zone.h"
-
 #include "Sort.h"
+#include "Zone.h"
 
 #include "DebugNew.h"
 
@@ -49,16 +48,16 @@ Drawable::Drawable(Context* context) :
     lightMask_(DEFAULT_LIGHTMASK),
     zoneMask_(DEFAULT_ZONEMASK),
     maxLights_(0),
-    drawableFlags_(0),
-    visible_(true),
-    castShadows_(false),
-    occluder_(false),
     distance_(0.0f),
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
     viewCamera_(0),
     firstLight_(0),
+    drawableFlags_(0),
+    visible_(true),
+    castShadows_(false),
+    occluder_(false),
     worldBoundingBoxDirty_(true),
     lodLevelsDirty_(true)
 {
@@ -234,7 +233,7 @@ void Drawable::LimitLights()
 
 void Drawable::SetBasePass(unsigned batchIndex)
 {
-    unsigned index = batchIndex << 5;
+    unsigned index = batchIndex >> 5;
     if (basePassFlags_.Size() <= index)
     {
         unsigned oldSize = basePassFlags_.Size();

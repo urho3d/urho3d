@@ -276,8 +276,8 @@ void Octree::RegisterObject(Context* context)
 {
     context->RegisterFactory<Octree>();
     
-    Vector3 defaultBoundsMin = Vector3::UNITY * DEFAULT_OCTREE_SIZE;
-    Vector3 defaultBoundsMax = -Vector3::UNITY * DEFAULT_OCTREE_SIZE;
+    Vector3 defaultBoundsMin = Vector3::ONE * DEFAULT_OCTREE_SIZE;
+    Vector3 defaultBoundsMax = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     
     ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
     ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);

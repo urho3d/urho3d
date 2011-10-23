@@ -55,10 +55,10 @@ void Skybox::UpdateDistance(const FrameInfo& frame)
     distance_ = 0.0f;
 }
 
-void Skybox::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
+void Skybox::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
     // Follow only the camera rotation, not position
-    Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().Inverse(), Vector3::UNITY);
+    Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().Inverse(), Vector3::ONE);
     customWorldTransform_ = customView * GetWorldTransform();
     
     batch.distance_ = 0.0f;

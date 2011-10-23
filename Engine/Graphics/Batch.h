@@ -57,11 +57,11 @@ struct Batch
         shaderDataSize_(0),
         geometryType_(GEOM_STATIC),
         overrideView_(false),
-        hasPriority_(false)
+        isBase_(false)
     {
     }
     
-    /// Calculate sort key, which consists of priority flag, light, pass and geometry.
+    /// Calculate state sorting key, which consists of base pass flag, light, pass and geometry.
     void CalculateSortKey();
     /// Prepare for rendering.
     void Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransform = true) const;
@@ -100,8 +100,8 @@ struct Batch
     unsigned char vertexShaderIndex_;
     /// Override view transform flag.
     bool overrideView_;
-    /// Priority flag.
-    bool hasPriority_;
+    /// Base batch flag. This tells to draw the object fully without light optimizations.
+    bool isBase_;
 };
 
 /// Data for one geometry instance.
@@ -162,10 +162,10 @@ struct BatchGroup
     ShaderVariation* vertexShader_;
     /// Pixel shader.
     ShaderVariation* pixelShader_;
-    /// Vertex shader index.
-    unsigned char vertexShaderIndex_;
     /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
     unsigned startIndex_;
+    /// Vertex shader index.
+    unsigned char vertexShaderIndex_;
 };
 
 /// Instanced draw call key.
@@ -254,19 +254,19 @@ public:
     /// Return the combined amount of instances.
     unsigned GetNumInstances(Renderer* renderer) const;
     /// Return whether the batch group is empty.
-    bool IsEmpty() const { return batches_.Empty() && priorityBatchGroups_.Empty() && batchGroups_.Empty(); }
+    bool IsEmpty() const { return batches_.Empty() && baseBatchGroups_.Empty() && batchGroups_.Empty(); }
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
-    /// Instanced draw calls with priority flag.
-    Map<BatchGroupKey, BatchGroup> priorityBatchGroups_;
+    /// Instanced draw calls with base flag.
+    Map<BatchGroupKey, BatchGroup> baseBatchGroups_;
     /// Instanced draw calls.
     Map<BatchGroupKey, BatchGroup> batchGroups_;
-    /// Sorted non-instanced draw calls with priority flag.
-    PODVector<Batch*> sortedPriorityBatches_;
+    /// Sorted non-instanced draw calls with base flag.
+    PODVector<Batch*> sortedBaseBatches_;
     /// Sorted non-instanced draw calls.
     PODVector<Batch*> sortedBatches_;
-    /// Sorted instanced draw calls with priority flag.
-    PODVector<BatchGroup*> sortedPriorityBatchGroups_;
+    /// Sorted instanced draw calls with base flag.
+    PODVector<BatchGroup*> sortedBaseBatchGroups_;
     /// Sorted instanced draw calls.
     PODVector<BatchGroup*> sortedBatchGroups_;
 };

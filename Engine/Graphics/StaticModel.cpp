@@ -39,6 +39,8 @@
 
 #include "DebugNew.h"
 
+static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+
 OBJECTTYPESTATIC(StaticModel);
 
 StaticModel::StaticModel(Context* context) :
@@ -142,6 +144,24 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     }
 }
 
+void StaticModel::UpdateDistance(const FrameInfo& frame)
+{
+    const Matrix3x4& worldTransform = GetWorldTransform();
+    distance_ = frame.camera_->GetDistance(worldTransform.Translation());
+    
+    for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
+        geometryDistances_[i] = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+    
+    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
+    float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
+    
+    if (newLodDistance != lodDistance_)
+    {
+        lodDistance_ = newLodDistance;
+        lodLevelsDirty_ = true;
+    }
+}
+
 void StaticModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (lodLevelsDirty_)
@@ -153,9 +173,9 @@ unsigned StaticModel::GetNumBatches()
     return geometries_.Size();
 }
 
-void StaticModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
+void StaticModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
-    batch.distance_ = frame.camera_->GetDistance(GetWorldTransform() * geometryCenters_[batchIndex]);
+    batch.distance_ = geometryDistances_[batchIndex];
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];
@@ -233,6 +253,7 @@ void StaticModel::SetModel(Model* model)
     for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
     geometryCenters_ = model->GetGeometryCenters();
+    geometryDistances_.Resize(geometryCenters_.Size());
     
     SetBoundingBox(model->GetBoundingBox());
     ResetLodLevels();

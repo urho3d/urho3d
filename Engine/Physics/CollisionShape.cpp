@@ -302,12 +302,12 @@ CollisionShape::CollisionShape(Context* context) :
     Component(context),
     geometry_(0),
     shapeType_(SHAPE_NONE),
-    size_(Vector3::UNITY),
+    size_(Vector3::ONE),
     thickness_(0.0f),
     lodLevel_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
-    geometryScale_(Vector3::UNITY),
+    geometryScale_(Vector3::ONE),
     collisionLayer_(M_MAX_UNSIGNED),
     collisionMask_(M_MAX_UNSIGNED),
     friction_(DEFAULT_FRICTION),
@@ -330,7 +330,7 @@ void CollisionShape::RegisterObject(Context* context)
     context->RegisterFactory<CollisionShape>();
     
     ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::UNITY, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);

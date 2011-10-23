@@ -33,7 +33,7 @@ const Vector3 Vector3::UP(0.0f, 1.0f, 0.0f);
 const Vector3 Vector3::DOWN(0.0f, -1.0f, 0.0f);
 const Vector3 Vector3::FORWARD(0.0f, 0.0f, 1.0f);
 const Vector3 Vector3::BACK(0.0f, 0.0f, -1.0f);
-const Vector3 Vector3::UNITY(1.0f, 1.0f, 1.0f);
+const Vector3 Vector3::ONE(1.0f, 1.0f, 1.0f);
 
 String Vector3::ToString() const
 {

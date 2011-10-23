@@ -168,7 +168,7 @@ void LoadSkeleton(const String& skeletonFileName)
             bones_[index].parentIndex_ = index; // Fill in the correct parent later
             bones_[index].bindPosition_ = pos;
             bones_[index].bindRotation_ = rot;
-            bones_[index].bindScale_ = Vector3::UNITY;
+            bones_[index].bindScale_ = Vector3::ONE;
             bones_[index].collisionMask_ = 0;
             bones_[index].radius_ = 0.0f;
             

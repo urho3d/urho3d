@@ -69,8 +69,8 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches.
     virtual unsigned GetNumBatches();
-    /// Return rendering batch with distance, geometry, material and world transform filled.
-    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
+    /// Fill rendering batch with distance, geometry, material and world transform.
+    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     
     /// %Set material.
     void SetMaterial(Material* material);

@@ -958,7 +958,7 @@ void BuildAndSaveAnimations(OutModel& model)
                 kf.time_ = 0.0f;
                 kf.position_ = Vector3::ZERO;
                 kf.rotation_ = Quaternion::IDENTITY;
-                kf.scale_ = Vector3::UNITY;
+                kf.scale_ = Vector3::ONE;
                 
                 // Get time for the keyframe
                 if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)

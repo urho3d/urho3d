@@ -205,7 +205,12 @@ void AnimatedModel::Update(const FrameInfo& frame)
 
 void AnimatedModel::UpdateDistance(const FrameInfo& frame)
 {
-    distance_ = frame.camera_->GetDistance(GetWorldPosition());
+    const Matrix3x4& worldTransform = GetWorldTransform();
+    distance_ = frame.camera_->GetDistance(worldTransform.Translation());
+    
+    // Note: per-geometry distances do not take skinning into account
+    for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
+        geometryDistances_[i] = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -238,9 +243,9 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
         UpdateSkinning();
 }
 
-void AnimatedModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
+void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
-    batch.distance_ = frame.camera_->GetDistance(GetWorldTransform() * geometryCenters_[batchIndex]);
+    batch.distance_ = geometryDistances_[batchIndex];
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.geometryType_ = GEOM_SKINNED;
     batch.worldTransform_ = &GetWorldTransform();
@@ -288,6 +293,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
     geometryCenters_ = model->GetGeometryCenters();
+    geometryDistances_.Resize(geometryCenters_.Size());
     
     // Copy geometry bone mappings
     const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();

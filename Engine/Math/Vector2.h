@@ -203,7 +203,7 @@ public:
     /// (0,-1) vector.
     static const Vector2 DOWN;
     /// (1,1) vector.
-    static const Vector2 UNITY;
+    static const Vector2 ONE;
 };
 
 /// Multiply Vector2 with a scalar

@@ -115,11 +115,11 @@ public:
     /// %Set as a capsule.
     void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a triangle mesh.
-    void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size = Vector3::UNITY, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a heightfield.
-    void SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& size = Vector3::UNITY, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a convex hull (internally an ODE trimesh as well.)
-    void SetConvexHull(Model* model, float skinWidth, unsigned lodLevel, const Vector3& size = Vector3::UNITY, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull(Model* model, float skinWidth, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set offset position.
     void SetPosition(const Vector3& position);
     /// %Set rotation.
