@@ -51,7 +51,6 @@ struct Batch
 {
     /// Construct with defaults.
     Batch() :
-        zone_(0),
         lightQueue_(0),
         shaderData_(0),
         shaderDataSize_(0),
@@ -68,6 +67,10 @@ struct Batch
     /// Prepare and draw.
     void Draw(Graphics* graphics, Renderer* renderer) const;
     
+    /// State sorting key.
+    unsigned long long sortKey_;
+    /// Distance from camera.
+    float distance_;
     /// Geometry.
     Geometry* geometry_;
     /// Model world transform.
@@ -90,14 +93,8 @@ struct Batch
     const float* shaderData_;
     /// Vertex shader data size in floats.
     unsigned shaderDataSize_;
-    /// Distance from camera.
-    float distance_;
-    /// State sorting key.
-    unsigned long long sortKey_;
     /// Geometry type.
     GeometryType geometryType_;
-    /// Vertex shader index.
-    unsigned char vertexShaderIndex_;
     /// Override view transform flag.
     bool overrideView_;
     /// Base batch flag. This tells to draw the object fully without light optimizations.
@@ -126,7 +123,7 @@ struct InstanceData
 };
 
 /// Instanced 3D geometry draw call.
-struct BatchGroup
+struct BatchGroup : public Batch
 {
     /// Construct with defaults.
     BatchGroup() :
@@ -134,6 +131,13 @@ struct BatchGroup
     {
     }
     
+    /// Construct from a batch.
+    BatchGroup(const Batch& batch) :
+        Batch(batch),
+        startIndex_(M_MAX_UNSIGNED)
+    {
+    }
+
     /// Destruct.
     ~BatchGroup()
     {
@@ -144,33 +148,30 @@ struct BatchGroup
     /// Prepare and draw.
     void Draw(Graphics* graphics, Renderer* renderer) const;
     
-    /// Geometry.
-    Geometry* geometry_;
     /// Instance data.
     PODVector<InstanceData> instances_;
-    /// Camera.
-    Camera* camera_;
-    /// Zone.
-    Zone* zone_;
-    /// Light properties.
-    LightBatchQueue* lightQueue_;
-    /// Material.
-    Material* material_;
-    /// Material pass.
-    Pass* pass_;
-    /// Vertex shader.
-    ShaderVariation* vertexShader_;
-    /// Pixel shader.
-    ShaderVariation* pixelShader_;
     /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
     unsigned startIndex_;
-    /// Vertex shader index.
-    unsigned char vertexShaderIndex_;
 };
 
 /// Instanced draw call key.
 struct BatchGroupKey
 {
+    /// Construct undefined.
+    BatchGroupKey()
+    {
+    }
+
+    /// Construct from a batch.
+    BatchGroupKey(const Batch& batch) :
+        zone_(batch.zone_),
+        lightQueue_(batch.lightQueue_),
+        pass_(batch.pass_),
+        material_(batch.material_),
+        geometry_(batch.geometry_)
+    {
+    }
+
     /// Zone.
     Zone* zone_;
     /// Light properties.
@@ -242,8 +243,8 @@ struct BatchQueue
 public:
     /// Clear everything.
     void Clear();
-    /// Add a batch, with instancing if possible.
-    void AddBatch(const Batch& batch, bool instancing = true);
+    /// Add a batch.
+    void AddBatch(const Batch& batch);
     /// Sort non-instanced draw calls back to front.
     void SortBackToFront();
     /// Sort instanced and non-instanced draw calls front to back.

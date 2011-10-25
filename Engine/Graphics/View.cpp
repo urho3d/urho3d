@@ -463,7 +463,7 @@ void View::GetBatches()
                         shadowBatch.camera_ = shadowCamera;
                         shadowBatch.lightQueue_ = &lightQueue;
                         
-                        renderer_->SetBatchShaders(shadowBatch, tech, pass);
+                        FinalizeBatch(shadowBatch, tech, pass);
                         shadowQueue.shadowBatches_.AddBatch(shadowBatch);
                     }
                 }
@@ -548,19 +548,25 @@ void View::GetBatches()
                 pass = tech->GetPass(PASS_BASE);
                 if (pass)
                 {
-                    renderer_->SetBatchShaders(baseBatch, tech, pass);
                     if (pass->GetBlendMode() == BLEND_REPLACE)
+                    {
+                        FinalizeBatch(baseBatch, tech, pass);
                         baseQueue_.AddBatch(baseBatch);
+                    }
                     else
-                        alphaQueue_.AddBatch(baseBatch, false);
+                    {
+                        // Transparent batches can not be instanced
+                        FinalizeBatch(baseBatch, tech, pass, false);
+                        alphaQueue_.AddBatch(baseBatch);
+                    }
                     continue;
                 }
                 
-                // If no base pass, finally check for prealpha / postalpha custom passes
+                // If no base pass, finally check for pre-alpha / post-alpha custom passes
                 pass = tech->GetPass(PASS_PREALPHA);
                 if (pass)
                 {
-                    renderer_->SetBatchShaders(baseBatch, tech, pass);
+                    FinalizeBatch(baseBatch, tech, pass);
                     preAlphaQueue_.AddBatch(baseBatch);
                     continue;
                 }
@@ -568,8 +574,9 @@ void View::GetBatches()
                 pass = tech->GetPass(PASS_POSTALPHA);
                 if (pass)
                 {
-                    renderer_->SetBatchShaders(baseBatch, tech, pass);
-                    postAlphaQueue_.AddBatch(baseBatch, false);
+                    // Post-alpha pass is treated similarly as alpha, and is not instanced
+                    FinalizeBatch(baseBatch, tech, pass, false);
+                    postAlphaQueue_.AddBatch(baseBatch);
                     continue;
                 }
             }
@@ -627,13 +634,14 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         Pass* ambientPass = tech->GetPass(PASS_BASE);
         if (!ambientPass || ambientPass->GetBlendMode() == BLEND_REPLACE)
         {
-            renderer_->SetBatchShaders(litBatch, tech, pass);
+            FinalizeBatch(litBatch, tech, pass);
             lightQueue.litBatches_.AddBatch(litBatch);
         }
         else
         {
-            renderer_->SetBatchShaders(litBatch, tech, pass, allowTransparentShadows);
-            alphaQueue_.AddBatch(litBatch, true);
+            // Transparent batches can not be instanced
+            FinalizeBatch(litBatch, tech, pass, false, allowTransparentShadows);
+            alphaQueue_.AddBatch(litBatch);
         }
     }
 }
@@ -1564,6 +1572,17 @@ void View::CheckMaterialForAuxView(Material* material)
     
     // Set frame number so that we can early-out next time we come across this material on the same frame
     material->MarkForAuxView(frame_.frameNumber_);
+}
+
+void View::FinalizeBatch(Batch& batch, Technique* tech, Pass* pass, bool allowInstancing, bool allowShadows)
+{
+    // Convert to instanced if possible
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && !batch.shaderData_ && !batch.overrideView_)
+        batch.geometryType_ = GEOM_INSTANCED;
+    
+    batch.pass_ = pass;
+    renderer_->SetBatchShaders(batch, tech, pass, allowShadows);
+    batch.CalculateSortKey();
 }
 
 void View::SortBatches()

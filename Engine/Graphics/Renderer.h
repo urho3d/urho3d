@@ -137,8 +137,6 @@ public:
     void SetLightStencilMasking(bool enable);
     /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
-    /// %Set minimum object group size for instancing.
-    void SetMinInstanceGroupSize(int size);
     /// %Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
     /// %Set maximum number of occluder trianges.
@@ -177,8 +175,6 @@ public:
     bool GetLightStencilMasking() const { return lightStencilMasking_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
-    /// Return minimum object group size for instancing.
-    int GetMinInstanceGroupSize() const { return minInstanceGroupSize_; }
     /// Return maximum number of triangles per object for instancing.
     int GetMaxInstanceTriangles() { return maxInstanceTriangles_; }
     /// Return maximum number of occluder triangles.
@@ -353,8 +349,6 @@ private:
     int maxShadowMaps_;
     /// Maximum number of directional light shadow cascades.
     int maxShadowCascades_;
-    /// Minimum object group size for instancing.
-    int minInstanceGroupSize_;
     /// Maximum triangles per object for instancing.
     int maxInstanceTriangles_;
     /// Maximum occluder triangles.

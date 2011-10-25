@@ -244,7 +244,6 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     maxShadowMaps_(1),
     maxShadowCascades_(MAX_CASCADE_SPLITS),
-    minInstanceGroupSize_(4),
     maxInstanceTriangles_(500),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
@@ -408,11 +407,6 @@ void Renderer::SetDynamicInstancing(bool enable)
         enable = false;
     
     dynamicInstancing_ = enable;
-}
-
-void Renderer::SetMinInstanceGroupSize(int size)
-{
-    minInstanceGroupSize_ = Max(size, 2);
 }
 
 void Renderer::SetMaxInstanceTriangles(int triangles)
@@ -922,8 +916,6 @@ ShaderVariation* Renderer::GetShader(const String& name, const String& extension
 
 void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows)
 {
-    batch.pass_ = pass;
-    
     // Check if shaders are unloaded or need reloading
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
@@ -938,7 +930,14 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
     {
-        //  Check whether is a forward lit pass. If not, there is only one pixel shader
+        GeometryType geomType = batch.geometryType_;
+        // If instancing is not supported, but was requested, or the object is too large to be instanced,
+        // choose static geometry vertex shader instead
+        if (geomType == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
+            (unsigned)maxInstanceTriangles_ * 3))
+            geomType = GEOM_STATIC;
+        
+        //  Check whether is a lit pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
         if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
@@ -954,7 +953,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             Light* light = lightQueue->light_;
             unsigned vsi = 0;
             unsigned psi = 0;
-            vsi = batch.geometryType_ * MAX_LIGHT_VS_VARIATIONS;
+            vsi = geomType * MAX_LIGHT_VS_VARIATIONS;
             
             bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
             if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
@@ -1006,19 +1005,14 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
                 batch.vertexShader_ = vertexShaders[vsi];
                 batch.pixelShader_ = pixelShaders[psi];
             }
-            
-            batch.vertexShaderIndex_ = vsi;
         }
         else
         {
-            unsigned vsi = batch.geometryType_;
+            unsigned vsi = geomType;
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[0];
-            batch.vertexShaderIndex_ = vsi;
         }
     }
-    
-    batch.CalculateSortKey();
     
     // Log error if shaders could not be assigned, but only once per technique
     if (!batch.vertexShader_ || !batch.pixelShader_)

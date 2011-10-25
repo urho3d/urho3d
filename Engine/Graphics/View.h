@@ -133,6 +133,8 @@ private:
     Technique* GetTechnique(Drawable* drawable, Material*& material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
     void CheckMaterialForAuxView(Material* material);
+    /// Finalize a batch. Convert it to instanced if possible, choose shaders for it, and calculate the sort key.
+    void FinalizeBatch(Batch& batch, Technique* tech, Pass* pass, bool allowInstancing = true, bool allowShadows = true);
     /// Sort all batches.
     void SortBatches();
     /// Prepare instancing buffer by filling it with all instance transforms.

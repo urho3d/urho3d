@@ -459,9 +459,7 @@ void Batch::Draw(Graphics* graphics, Renderer* renderer) const
 void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
 {
     // Do not use up buffer space if not going to draw as instanced
-    unsigned minGroupSize = renderer->GetMinInstanceGroupSize();
-    unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
-    if (instances_.Size() < minGroupSize || geometry_->GetIndexCount() > maxIndexCount)
+    if (geometry_->GetIndexCount() > (unsigned)renderer->GetMaxInstanceTriangles() * 3)
         return;
     
     startIndex_ = freeIndex;
@@ -479,27 +477,11 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
     if (!instances_.Size())
         return;
     
-    // Construct a temporary batch for rendering
-    /// \todo BatchGroup could subclass Batch to avoid this
-    Batch batch;
-    batch.geometry_ = geometry_;
-    batch.material_ = material_;
-    batch.pass_ = pass_;
-    batch.vertexShader_ = vertexShader_;
-    batch.pixelShader_ = pixelShader_;
-    batch.camera_ = camera_;
-    batch.zone_ = zone_;
-    batch.lightQueue_ = lightQueue_;
-    batch.vertexShaderIndex_ = vertexShaderIndex_;
-    
-    unsigned minGroupSize = renderer->GetMinInstanceGroupSize();
-    unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
-    
-    // Draw as individual instances if below minimum size, or if instancing not supported
+    // Draw as individual objects if instancing not supported
     VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
-    if (!instanceBuffer || instances_.Size() < minGroupSize || geometry_->GetIndexCount() > maxIndexCount)
+    if (!instanceBuffer || geometry_->GetIndexCount() > (unsigned)renderer->GetMaxInstanceTriangles() * 3)
     {
-        batch.Prepare(graphics, renderer, false);
+        Batch::Prepare(graphics, renderer, false);
         
         graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
         graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -515,17 +497,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
     }
     else
     {
-        // Switch to the instancing vertex shader
-        // The indexing is different in the forward lit passes
-        Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass_->GetVertexShaders();
-        Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass_->GetPixelShaders();
-        PassType type = pass_->GetType();
-        if (type == PASS_LIGHT || type == PASS_LITBASE)
-            batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED * MAX_LIGHT_VS_VARIATIONS];
-        else
-            batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
-        
-        batch.Prepare(graphics, renderer, false);
+        Batch::Prepare(graphics, renderer, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
         // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
@@ -591,36 +563,22 @@ void BatchQueue::Clear()
     batchGroups_.Clear();
 }
 
-void BatchQueue::AddBatch(const Batch& batch, bool instancing)
+void BatchQueue::AddBatch(const Batch& batch)
 {
-    // If batch is something else than static, has custom view, or has per-instance shader data defined, can not instance
-    if (!instancing || batch.geometryType_ != GEOM_STATIC || batch.overrideView_ || batch.shaderData_)
+    // Important: this function does not check whether the batch can actually be instanced. It must have been checked before,
+    // including setting the correct vertex shader (non-instanced or instanced)
+    if (batch.geometryType_ != GEOM_INSTANCED)
         batches_.Push(batch);
     else
     {
-        BatchGroupKey key;
-        key.zone_ = batch.zone_;
-        key.lightQueue_ = batch.lightQueue_;
-        key.pass_ = batch.pass_;
-        key.material_ = batch.material_;
-        key.geometry_ = batch.geometry_;
-        
         Map<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &baseBatchGroups_ : &batchGroups_;
+        BatchGroupKey key(batch);
         
         Map<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
         if (i == groups->End())
         {
-            // Create a new group
-            BatchGroup newGroup;
-            newGroup.geometry_ = batch.geometry_;
-            newGroup.material_ = batch.material_;
-            newGroup.pass_ = batch.pass_;
-            newGroup.vertexShader_ = batch.vertexShader_;
-            newGroup.pixelShader_ = batch.pixelShader_;
-            newGroup.camera_ = batch.camera_;
-            newGroup.zone_ = batch.zone_;
-            newGroup.lightQueue_ = batch.lightQueue_;
-            newGroup.vertexShaderIndex_ = batch.vertexShaderIndex_;
+            // Create a new group based on the batch
+            BatchGroup newGroup(batch);
             newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
             groups->Insert(MakePair(key, newGroup));
         }
@@ -701,22 +659,19 @@ void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
 unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
 {
     unsigned total = 0;
-    unsigned minGroupSize = renderer->GetMinInstanceGroupSize();
     unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
     
-    // This is for the purpose of calculating how much space is needed in the instancing buffer. Do not add instance counts
-    // that are below the minimum threshold for instancing
+    // This is for the purpose of calculating how much space is needed in the instancing buffer. Do not add groups
+    // that have too many triangles
     for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
     {
-        unsigned instances = i->second_.instances_.Size();
-        if (instances >= minGroupSize && i->second_.geometry_->GetIndexCount() <= maxIndexCount)
-            total += instances;
+        if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
+            total += i->second_.instances_.Size();
     }
     for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
-        unsigned instances = i->second_.instances_.Size();
-        if (instances >= minGroupSize && i->second_.geometry_->GetIndexCount() <= maxIndexCount)
-            total += instances;
+        if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
+            total += i->second_.instances_.Size();
     }
     
     return total;
