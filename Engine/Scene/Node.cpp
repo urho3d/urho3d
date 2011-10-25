@@ -384,6 +384,23 @@ void Node::Roll(float angle, bool fixedAxis)
     Rotate(Quaternion(angle, Vector3::FORWARD), fixedAxis);
 }
 
+void Node::LookAt(const Vector3& target, const Vector3& upAxis, bool worldSpace)
+{
+    Vector3 targetZ;
+    if (worldSpace)
+        targetZ = (target - GetWorldPosition()).Normalized();
+    else
+        targetZ = (target - position_).Normalized();
+    
+    Vector3 targetX = upAxis.CrossProduct(targetZ).Normalized();
+    Vector3 targetY = targetZ.CrossProduct(targetX).Normalized();
+    
+    if (!worldSpace || !parent_)
+        SetRotation(Quaternion(targetX, targetY, targetZ));
+    else
+        SetRotation(parent_->GetWorldRotation().Inverse() * Quaternion(targetX, targetY, targetZ));
+}
+
 void Node::Scale(float scale)
 {
     scale_ *= scale;

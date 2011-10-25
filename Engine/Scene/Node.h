@@ -107,6 +107,8 @@ public:
     void Yaw(float angle, bool fixedAxis = false);
     /// Rotate around the Z axis.
     void Roll(float angle, bool fixedAxis = false);
+    /// Look at a target position.
+    void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP, bool worldSpace = false);
     /// Modify scale uniformly.
     void Scale(float scale);
     /// Modify scale.

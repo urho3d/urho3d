@@ -83,6 +83,12 @@ public:
         FromRotationTo(start, end);
     }
     
+    /// Construct from orthonormal axes.
+    Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+    {
+        FromAxes(xAxis, yAxis, zAxis);
+    }
+
     /// Construct from a rotation matrix.
     Quaternion(const Matrix3& matrix)
     {
@@ -149,6 +155,8 @@ public:
     void FromEulerAngles(float x, float y, float z);
     /// Define from the rotation difference between two vectors.
     void FromRotationTo(const Vector3& start, const Vector3& end);
+    /// Define from orthonormal axes.
+    void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
     

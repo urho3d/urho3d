@@ -335,6 +335,7 @@ Methods:<br>
 - void FromAngleAxis(float, const Vector3&)
 - void FromEulerAngles(float, float, float)
 - void FromRotationTo(const Vector3&, const Vector3&)
+- void FromAxes(const Vector3&, const Vector3&, const Vector3&)
 - void Normalize()
 - Quaternion Normalized() const
 - Quaternion Inverse() const
@@ -1093,6 +1094,7 @@ Methods:<br>
 - void Pitch(float, bool arg1 = false)
 - void Yaw(float, bool arg1 = false)
 - void Roll(float, bool arg1 = false)
+- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ), bool arg2 = false)
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
@@ -1176,6 +1178,7 @@ Methods:<br>
 - void Pitch(float, bool arg1 = false)
 - void Yaw(float, bool arg1 = false)
 - void Roll(float, bool arg1 = false)
+- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ), bool arg2 = false)
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
@@ -2103,7 +2106,6 @@ Properties:<br>
 - bool reuseShadowMaps
 - bool lightStencilMasking
 - bool dynamicInstancing
-- int minInstanceGroupSize
 - int maxInstanceTriangles
 - int maxOccluderTriangles
 - int occlusionBufferSize

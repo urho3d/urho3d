@@ -505,6 +505,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Pitch(float, bool fixedAxis = false)", asMETHOD(T, Pitch), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Yaw(float, bool fixedAxis = false)", asMETHOD(T, Yaw), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Roll(float, bool fixedAxis = false)", asMETHOD(T, Roll), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void LookAt(const Vector3&in, const Vector3&in upAxis = Vector3(0, 1, 0), bool worldSpace = false)", asMETHOD(T, LookAt), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED)", asMETHODPR(T, CreateChild, (const String&, CreateMode), Node*), asCALL_THISCALL);
