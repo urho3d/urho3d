@@ -75,3 +75,15 @@ float GetShadowFade(float depth)
 {
     return clamp((depth - cShadowFade.x) * cShadowFade.y, 0.0, 1.0);
 }
+
+vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
+{
+    if (depth < cShadowSplits.x)
+        return shadowPos[0];
+    else if (depth < cShadowSplits.y)
+        return shadowPos[1];
+    else if (depth < cShadowSplits.z)
+        return shadowPos[2];
+    else
+        return shadowPos[3];
+}

@@ -154,7 +154,7 @@ bool ShaderProgram::Link()
     }
     
     // Query the vertex attribute bindings
-    attributeLocations_[0] = glGetAttribLocation(object_, "iPosition");
+    attributeLocations_[0] = glGetAttribLocation(object_, "iPos");
     attributeLocations_[1] = glGetAttribLocation(object_, "iNormal");
     attributeLocations_[2] = glGetAttribLocation(object_, "iColor");
     attributeLocations_[3] = glGetAttribLocation(object_, "iTexCoord");

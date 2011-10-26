@@ -6,7 +6,10 @@ void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION,
     out float3 oTexCoord : TEXCOORD0)
 {
-    GetPosition(iPos, oPos);
+    float4x3 modelMatrix = iModelMatrix;
+    float3 worldPos = GetWorldPos(modelMatrix);
+    oPos = GetClipPos(worldPos);
+    
     oPos.z = oPos.w;
     oTexCoord = iPos.xyz;
 }

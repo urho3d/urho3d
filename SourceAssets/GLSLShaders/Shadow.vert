@@ -7,11 +7,9 @@
 
 void main()
 {
-    #if defined(SKINNED)
-        GetPositionSkinned(iPosition, iBlendWeights, iBlendIndices, gl_Position);
-    #else
-        GetPosition(iPosition, gl_Position);
-    #endif
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
 
     #ifdef ALPHAMASK
         vTexCoord = GetTexCoord(iTexCoord);

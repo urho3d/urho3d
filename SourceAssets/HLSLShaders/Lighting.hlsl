@@ -111,3 +111,16 @@ float GetShadowFade(float depth)
 {
     return saturate((depth - cShadowFade.x) * cShadowFade.y);
 }
+
+float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
+{
+    if (depth < cShadowSplits.x)
+        return iShadowPos[0];
+    else if (depth < cShadowSplits.y)
+        return iShadowPos[1];
+    else if (depth < cShadowSplits.z)
+        return iShadowPos[2];
+    else
+        return iShadowPos[3];
+}
+

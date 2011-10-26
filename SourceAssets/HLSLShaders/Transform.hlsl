@@ -11,89 +11,44 @@ float2 GetTexCoord(float2 iTexCoord)
     return float2(dot(iTexCoord, cUOffset.xy) + cUOffset.w, dot(iTexCoord, cVOffset.xy) + cVOffset.w);
 };
 
+float4 GetClipPos(float3 worldPos)
+{
+    return mul(float4(worldPos, 1.0), cViewProj);
+}
+
 float GetDepth(float4 clipPos)
 {
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
-float4 GetPosition(float4 iPos, out float4 oPos)
+float3 GetBillboardPos(float4 iPos, float2 iSize)
 {
-    float4 worldPos = float4(mul(iPos, cModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    return worldPos;
+    return float3(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector);
 }
 
-float4 GetPositionBillboard(float4 iPos, float2 iSize, out float4 oPos)
+float3 GetBillboardNormal()
 {
-    float4 worldPos = float4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0);
-    oPos = mul(worldPos, cViewProj);
-    return worldPos;
+    return float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
 }
 
-float4 GetPositionSkinned(float4 iPos, float4 iBlendWeights, int4 iBlendIndices, out float4 oPos)
-{
-    float4x3 skinMatrix = GetSkinMatrix(iBlendWeights, iBlendIndices);
-    float4 worldPos = float4(mul(iPos, skinMatrix), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    return worldPos;
-}
+#if defined(SKINNED)
+    #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices);
+#elif defined(INSTANCED)
+    #define iModelMatrix iModelInstance
+#else
+    #define iModelMatrix cModel
+#endif
 
-float4 GetPositionInstanced(float4 iPos, float4x3 iModel, out float4 oPos)
-{
-    float4 worldPos = float4(mul(iPos, iModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    return worldPos;
-}
+#ifdef BILLBOARD
+    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize)
+#else
+    #define GetWorldPos(modelMatrix) mul(iPos, modelMatrix)
+#endif
 
-float4 GetPositionNormal(float4 iPos, float3 iNormal, out float4 oPos, out float3 oNormal)
-{
-    float4 worldPos = float4(mul(iPos, cModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)cModel));
-    return worldPos;
-}
+#ifdef BILLBOARD
+    #define GetWorldNormal(modelMatrix) GetBillboardNormal()
+#else
+    #define GetWorldNormal(modelMatrix) normalize(mul(iNormal, (float3x3)modelMatrix))
+#endif
 
-float4 GetPositionNormalSkinned(float4 iPos, float3 iNormal, float4 iBlendWeights, int4 iBlendIndices, out float4 oPos, out float3 oNormal)
-{
-    float4x3 skinMatrix = GetSkinMatrix(iBlendWeights, iBlendIndices);
-    float4 worldPos = float4(mul(iPos, skinMatrix), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)skinMatrix));
-    return worldPos;
-}
-
-float4 GetPositionNormalInstanced(float4 iPos, float3 iNormal, float4x3 iModel, out float4 oPos, out float3 oNormal)
-{
-    float4 worldPos = float4(mul(iPos, iModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)iModel));
-    return worldPos;
-}
-
-float4 GetPositionNormalTangent(float4 iPos, float3 iNormal, float4 iTangent, out float4 oPos, out float3 oNormal, out float3 oTangent)
-{
-    float4 worldPos = float4(mul(iPos, cModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)cModel));
-    oTangent = normalize(mul(iTangent.xyz, (float3x3)cModel));
-    return worldPos;
-}
-
-float4 GetPositionNormalTangentSkinned(float4 iPos, float3 iNormal, float4 iTangent, float4 iBlendWeights, int4 iBlendIndices, out float4 oPos, out float3 oNormal, out float3 oTangent)
-{
-    float4x3 skinMatrix = GetSkinMatrix(iBlendWeights, iBlendIndices);
-    float4 worldPos = float4(mul(iPos, skinMatrix), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)skinMatrix));
-    oTangent = normalize(mul(iTangent.xyz, (float3x3)skinMatrix));
-    return worldPos;
-}
-
-float4 GetPositionNormalTangentInstanced(float4 iPos, float3 iNormal, float4 iTangent, float4x3 iModel, out float4 oPos, out float3 oNormal, out float3 oTangent)
-{
-    float4 worldPos = float4(mul(iPos, iModel), 1.0);
-    oPos = mul(worldPos, cViewProj);
-    oNormal = normalize(mul(iNormal, (float3x3)iModel));
-    oTangent = normalize(mul(iTangent.xyz, (float3x3)iModel));
-    return worldPos;
-}
+#define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))

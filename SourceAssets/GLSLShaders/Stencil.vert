@@ -3,5 +3,7 @@
 
 void main()
 {
-    GetPosition(iPosition, gl_Position);
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
 }

@@ -5,7 +5,10 @@ varying vec3 vTexCoord;
 
 void main()
 {
-    GetPosition(iPosition, gl_Position);
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+
     gl_Position.z = gl_Position.w;
-    vTexCoord = iPosition.xyz;
+    vTexCoord = iPos.xyz;
 }

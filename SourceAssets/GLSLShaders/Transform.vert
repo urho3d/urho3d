@@ -1,4 +1,4 @@
-attribute vec4 iPosition;
+attribute vec4 iPos;
 attribute vec3 iNormal;
 attribute vec4 iColor;
 attribute vec2 iTexCoord;
@@ -29,69 +29,60 @@ vec2 GetTexCoord(vec2 texCoord)
     return vec2(dot(texCoord, cUOffset.xy) + cUOffset.w, dot(texCoord, cVOffset.xy) + cVOffset.w);
 }
 
+vec4 GetClipPos(vec3 worldPos)
+{
+    return cViewProj * vec4(worldPos, 1.0);
+}
+
 float GetDepth(vec4 clipPos)
 {
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
-vec4 GetPosition(vec4 pos, out vec4 oPos)
+vec3 GetBillboardPos(vec4 iPos, vec2 iSize)
 {
-    vec4 worldPos = cModel * pos;
-    oPos = cViewProj * worldPos;
-    return worldPos;
+    return vec3(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector);
 }
 
-vec4 GetPositionBillboard(vec4 pos, vec2 size, out vec4 oPos)
+vec3 GetBillboardNormal()
 {
-    vec4 worldPos = vec4(pos.xyz + size.x * cViewRightVector + size.y * cViewUpVector, 1.0);
-    oPos = cViewProj * worldPos;
-    return worldPos;
+    return vec3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
 }
 
-vec4 GetPositionSkinned(vec4 pos, vec4 blendWeights, vec4 blendIndices, out vec4 oPos)
+#ifdef SKINNED
+    #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
+#else
+    #define iModelMatrix cModel
+#endif
+
+vec3 GetWorldPos(mat4 modelMatrix)
 {
-    mat4 skinMatrix = GetSkinMatrix(blendWeights, blendIndices);
-    vec4 worldPos = pos * skinMatrix;
-    oPos = cViewProj * worldPos;
-    return worldPos;
+    #if defined(BILLBOARD)
+        return GetBillboardPos(iPos, iTexCoord2);
+    #elif defined(SKINNED)
+        return (iPos * modelMatrix).xyz;
+    #else
+        return (modelMatrix * iPos).xyz;
+    #endif
 }
 
-vec4 GetPositionNormal(vec4 pos, vec3 normal, out vec4 oPos, out vec3 oNormal)
+vec3 GetWorldNormal(mat4 modelMatrix)
 {
-    mat3 normalMatrix = GetNormalMatrix(cModel);
-    vec4 worldPos = cModel * pos;
-    oPos = cViewProj * worldPos;
-    oNormal = normalize(normalMatrix * normal);
-    return worldPos;
+    #if defined(BILLBOARD)
+        return GetBillboardNormal();
+    #elif defined(SKINNED)
+        return normalize(iNormal * GetNormalMatrix(modelMatrix));
+    #else
+        return normalize(GetNormalMatrix(modelMatrix) * iNormal);
+    #endif
 }
 
-vec4 GetPositionNormalSkinned(vec4 pos, vec3 normal, vec4 blendWeights, vec4 blendIndices, out vec4 oPos, out vec3 oNormal)
-{
-    mat4 skinMatrix = GetSkinMatrix(blendWeights, blendIndices);
-    mat3 normalMatrix = GetNormalMatrix(skinMatrix);
-    vec4 worldPos = pos * skinMatrix;
-    oPos = cViewProj * worldPos;
-    oNormal = normalize(normal * normalMatrix);
-    return worldPos;
-}
-
-vec4 GetPositionNormalTangent(vec4 pos, vec3 normal, vec4 tangent, out vec4 oPos, out vec3 oNormal, out vec3 oTangent)
-{
-    mat3 normalMatrix = GetNormalMatrix(cModel);
-    vec4 worldPos = cModel * pos;
-    oPos = cViewProj * worldPos;
-    oNormal = normalize(normalMatrix * normal);
-    oTangent = normalize(normalMatrix * tangent.xyz);
-    return worldPos;
-}
-
-vec4 GetPositionNormalTangentSkinned(vec4 pos, vec3 normal, vec4 tangent, vec4 blendWeights, vec4 blendIndices, out vec4 oPos, out vec3 oNormal, out vec3 oTangent)
-{
-    mat4 skinMatrix = GetSkinMatrix(blendWeights, blendIndices);
-    mat3 normalMatrix = GetNormalMatrix(skinMatrix);
-    vec4 worldPos = pos * skinMatrix;
-    oPos = cViewProj * worldPos;
-    oNormal = normalize(normal * normalMatrix);
-    oTangent = normalize(tangent.xyz * normalMatrix);
-    return worldPos;
+vec3 GetWorldTangent(mat4 modelMatrix)
+{   
+    mat3 normalMatrix = GetNormalMatrix(modelMatrix);
+    #ifdef SKINNED
+        return normalize(iTangent.xyz * normalMatrix);
+    #else
+        return normalize(normalMatrix * iTangent.xyz);
+    #endif
 }

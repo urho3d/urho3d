@@ -32,7 +32,10 @@ varying vec4 vLightVec;
 
 void main()
 {
-    vec4 pos;
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetTexCoord(iTexCoord);
 
     #ifndef UNLIT
 
@@ -42,29 +45,14 @@ void main()
             vec3 vBitangent;
         #endif
     
-        #if defined(SKINNED)
-            #ifndef NORMALMAP
-                pos = GetPositionNormalSkinned(iPosition, iNormal, iBlendWeights, iBlendIndices, gl_Position, vNormal);
-            #else
-                pos = GetPositionNormalTangentSkinned(iPosition, iNormal, iTangent, iBlendWeights, iBlendIndices, gl_Position, vNormal, vTangent);
-            #endif
-        #elif defined(BILLBOARD)
-            pos = GetPositionBillboard(iPosition, iTexCoord2, gl_Position);
-            vNormal = vec3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
-        #else
-            #ifndef NORMALMAP
-                pos = GetPositionNormal(iPosition, iNormal, gl_Position, vNormal);
-            #else
-                pos = GetPositionNormalTangent(iPosition, iNormal, iTangent, gl_Position, vNormal, vTangent);
-            #endif
-        #endif
-    
-        vec3 worldPos = pos.xyz - cCameraPos;
-    
+        vNormal = GetWorldNormal(modelMatrix);
+        vec3 centeredWorldPos = worldPos - cCameraPos;
+        vec4 projWorldPos = vec4(worldPos, 1.0);
+
         #if defined(DIRLIGHT)
             vLightVec = vec4(cLightDir, GetDepth(gl_Position));
         #elif defined(LIGHT)
-            vLightVec = vec4((cLightPos - worldPos) * cLightAtten, GetDepth(gl_Position));
+            vLightVec = vec4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(gl_Position));
         #else
             vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
         #endif
@@ -72,20 +60,20 @@ void main()
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             #if defined(DIRLIGHT)
-                vShadowPos[0] = cShadowProj[0] * pos;
-                vShadowPos[1] = cShadowProj[1] * pos;
-                vShadowPos[2] = cShadowProj[2] * pos;
-                vShadowPos[3] = cShadowProj[3] * pos;
+                vShadowPos[0] = cShadowProj[0] * projWorldPos;
+                vShadowPos[1] = cShadowProj[1] * projWorldPos;
+                vShadowPos[2] = cShadowProj[2] * projWorldPos;
+                vShadowPos[3] = cShadowProj[3] * projWorldPos;
             #elif defined(SPOTLIGHT)
-                vShadowPos = cShadowProj[0] * pos;
+                vShadowPos = cShadowProj[0] * projWorldPos;
             #else
-                vWorldLightVec = worldPos - cLightPos;
+                vWorldLightVec = centeredWorldPos - cLightPos;
             #endif
         #endif
     
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            vSpotPos = cSpotProj * pos;
+            vSpotPos = cSpotProj * projWorldPos;
         #endif
     
         #ifdef POINTLIGHT
@@ -93,28 +81,21 @@ void main()
         #endif
 
         #ifdef NORMALMAP
+            vTangent = GetWorldTangent(modelMatrix);
             vBitangent = cross(vTangent, vNormal) * iTangent.w;
             mat3 tbn = mat3(vTangent, vBitangent, vNormal);
             #ifdef LIGHT
                 vLightVec.xyz = vLightVec.xyz * tbn;
             #endif
             #ifdef SPECULAR
-                vEyeVec = -worldPos * tbn;
+                vEyeVec = -centeredWorldPos * tbn;
             #endif
         #elif defined(SPECULAR)
-            vEyeVec = -worldPos;
+            vEyeVec = -centeredWorldPos;
         #endif
         
     #else
     
-        #if defined(SKINNED)
-            pos = GetPositionSkinned(iPosition, iBlendWeights, iBlendIndices, gl_Position);
-        #elif defined(BILLBOARD)
-            pos = GetPositionBillboard(iPosition, iTexCoord2, gl_Position);
-        #else
-            pos = GetPosition(iPosition, gl_Position);
-        #endif
-
         vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
 
     #endif
@@ -122,6 +103,4 @@ void main()
     #ifdef VERTEXCOLOR
         vColor = iColor;
     #endif
-
-    vTexCoord = GetTexCoord(iTexCoord);
 }

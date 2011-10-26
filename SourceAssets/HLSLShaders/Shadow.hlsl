@@ -19,13 +19,9 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : POSITION)
 {
-    #if defined(SKINNED)
-        GetPositionSkinned(iPos, iBlendWeights, iBlendIndices, oPos);
-    #elif defined(INSTANCED)
-        GetPositionInstanced(iPos, iModelInstance, oPos);
-    #else
-        GetPosition(iPos, oPos);
-    #endif
+    float4x3 modelMatrix = iModelMatrix;
+    float3 worldPos = GetWorldPos(modelMatrix);
+    oPos = GetClipPos(worldPos);
 
     #ifdef ALPHAMASK
         oTexCoord = GetTexCoord(iTexCoord);

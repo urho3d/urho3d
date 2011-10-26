@@ -15,7 +15,10 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : POSITION)
 {
-    GetPosition(iPos, oPos);
+    float4x3 modelMatrix = iModelMatrix;
+    float3 worldPos = GetWorldPos(modelMatrix);
+    oPos = GetClipPos(worldPos);
+
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
