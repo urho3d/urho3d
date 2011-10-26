@@ -6,28 +6,26 @@ varying vec2 vTexCoord;
     varying vec4 vColor;
 #endif
 varying vec4 vLightVec;
-#ifdef LIGHT
-    #ifdef SPECULAR
-        varying vec3 vEyeVec;
+#ifdef SPECULAR
+    varying vec3 vEyeVec;
+#endif
+#ifndef NORMALMAP
+    varying vec3 vNormal;
+#endif
+#ifdef SHADOW
+    #if defined(DIRLIGHT)
+        varying vec4 vShadowPos[4];
+    #elif defined(SPOTLIGHT)
+        varying vec4 vShadowPos;
+    #else
+        varying vec3 vShadowPos;
     #endif
-    #ifndef NORMALMAP
-        varying vec3 vNormal;
-    #endif
-    #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            varying vec4 vShadowPos[4];
-        #elif defined(SPOTLIGHT)
-            varying vec4 vShadowPos;
-        #else
-            varying vec3 vShadowPos;
-        #endif
-    #endif
-    #ifdef SPOTLIGHT
-        varying vec4 vSpotPos;
-    #endif
-    #ifdef POINTLIGHT
-        varying vec3 vCubeMaskVec;
-    #endif
+#endif
+#ifdef SPOTLIGHT
+    varying vec4 vSpotPos;
+#endif
+#ifdef POINTLIGHT
+    varying vec3 vCubeMaskVec;
 #endif
 
 void main()
