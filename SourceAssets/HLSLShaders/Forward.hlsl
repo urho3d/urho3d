@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float4 oLightVec : TEXCOORD1,
-    #ifndef UNLIT
+    #ifdef LIGHT
         #ifndef NORMALMAP
             out float3 oNormal : TEXCOORD2,
         #endif
@@ -56,7 +56,7 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
 
-    #ifndef UNLIT
+    #ifdef LIGHT
 
         #ifdef NORMALMAP
             float3 oNormal;

@@ -8,7 +8,7 @@ varying vec2 vTexCoord;
     varying vec4 vColor;
 #endif
 varying vec4 vLightVec;
-#ifndef UNLIT
+#ifdef LIGHT
     #ifdef SPECULAR
         varying vec3 vEyeVec;
     #endif

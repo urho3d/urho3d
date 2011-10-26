@@ -6,7 +6,7 @@ varying vec2 vTexCoord;
     varying vec4 vColor;
 #endif
 varying vec4 vLightVec;
-#ifndef UNLIT
+#ifdef LIGHT
     #ifdef SPECULAR
         varying vec3 vEyeVec;
     #endif
@@ -37,7 +37,7 @@ void main()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
 
-    #ifndef UNLIT
+    #ifdef LIGHT
 
         #ifdef NORMALMAP
             vec3 vNormal;
@@ -86,7 +86,7 @@ void main()
         #endif
         
     #else
-    
+
         vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
 
     #endif

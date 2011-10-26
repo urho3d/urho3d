@@ -1,6 +1,6 @@
 <shaders>
     <shader name="Forward" type="vs">
-        <option name="Normal" define="NORMALMAP" />
+        <option name="Normal" define="NORMALMAP" require="LIGHT" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Dir">
             <define name="LIGHT" />
@@ -20,16 +20,8 @@
             <exclude name="Dir" />
             <exclude name="Spot" />
         </option>
-        <option name="Spec" define="SPECULAR" />
+        <option name="Spec" define="SPECULAR" require="LIGHT" />
         <option name="Shadow" define="SHADOW" require="LIGHT" />
-        <option name="Unlit" define="UNLIT">
-            <exclude name="Normal" />
-            <exclude name="Dir" />
-            <exclude name="Spot" />
-            <exclude name="Point" />
-            <exclude name="Spec" />
-            <exclude name="Shadow" />
-        </option>
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />
