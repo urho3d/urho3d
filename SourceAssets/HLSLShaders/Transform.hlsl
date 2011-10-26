@@ -52,3 +52,27 @@ float3 GetBillboardNormal()
 #endif
 
 #define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))
+
+#ifdef SHADOW
+    #if defined(DIRLIGHT)
+        void GetShadowPos(float3 worldPos, out float4 shadowPos[4])
+        {
+            float4 projWorldPos = float4(worldPos, 1.0);
+            shadowPos[0] = mul(projWorldPos, cShadowProj[0]);
+            shadowPos[1] = mul(projWorldPos, cShadowProj[1]);
+            shadowPos[2] = mul(projWorldPos, cShadowProj[2]);
+            shadowPos[3] = mul(projWorldPos, cShadowProj[3]);
+        }
+    #elif defined(SPOTLIGHT)
+        void GetShadowPos(float3 worldPos, out float4 shadowPos)
+        {
+            float4 projWorldPos = float4(worldPos, 1.0);
+            shadowPos = mul(projWorldPos, cShadowProj[0]);
+        }
+    #else
+        void GetShadowPos(float3 worldPos, out float3 shadowPos)
+        {
+            shadowPos = worldPos - cCameraPos - cLightPos;
+        }
+    #endif
+#endif

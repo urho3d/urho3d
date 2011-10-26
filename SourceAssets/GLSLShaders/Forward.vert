@@ -19,7 +19,7 @@ varying vec4 vLightVec;
         #elif defined(SPOTLIGHT)
             varying vec4 vShadowPos;
         #else
-            varying vec3 vWorldLightVec;
+            varying vec3 vShadowPos;
         #endif
     #endif
     #ifdef SPOTLIGHT
@@ -47,7 +47,6 @@ void main()
     
         vNormal = GetWorldNormal(modelMatrix);
         vec3 centeredWorldPos = worldPos - cCameraPos;
-        vec4 projWorldPos = vec4(worldPos, 1.0);
 
         #if defined(DIRLIGHT)
             vLightVec = vec4(cLightDir, GetDepth(gl_Position));
@@ -56,26 +55,18 @@ void main()
         #else
             vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
         #endif
-    
+
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #if defined(DIRLIGHT)
-                vShadowPos[0] = cShadowProj[0] * projWorldPos;
-                vShadowPos[1] = cShadowProj[1] * projWorldPos;
-                vShadowPos[2] = cShadowProj[2] * projWorldPos;
-                vShadowPos[3] = cShadowProj[3] * projWorldPos;
-            #elif defined(SPOTLIGHT)
-                vShadowPos = cShadowProj[0] * projWorldPos;
-            #else
-                vWorldLightVec = centeredWorldPos - cLightPos;
-            #endif
+            GetShadowPos(worldPos, vShadowPos);
         #endif
-    
+
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
+            vec4 projWorldPos = vec4(worldPos, 1.0);
             vSpotPos = cSpotProj * projWorldPos;
         #endif
-    
+
         #ifdef POINTLIGHT
             vCubeMaskVec = cLightVecRot * vLightVec.xyz;
         #endif

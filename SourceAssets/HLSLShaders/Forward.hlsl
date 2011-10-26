@@ -66,7 +66,6 @@ void VS(float4 iPos : POSITION,
 
         oNormal = GetWorldNormal(modelMatrix);
         float3 centeredWorldPos = worldPos - cCameraPos;
-        float4 projWorldPos = float4(worldPos, 1.0);
 
         #ifdef DIRLIGHT
             oLightVec = float4(cLightDir, GetDepth(oPos));
@@ -78,20 +77,12 @@ void VS(float4 iPos : POSITION,
     
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #if defined(DIRLIGHT)
-                oShadowPos[0] = mul(projWorldPos, cShadowProj[0]);
-                oShadowPos[1] = mul(projWorldPos, cShadowProj[1]);
-                oShadowPos[2] = mul(projWorldPos, cShadowProj[2]);
-                oShadowPos[3] = mul(projWorldPos, cShadowProj[3]);
-            #elif defined(SPOTLIGHT)
-                oShadowPos = mul(projWorldPos, cShadowProj[0]);
-            #else
-                oShadowPos = centeredWorldPos - cLightPos;
-            #endif
+            GetShadowPos(worldPos, oShadowPos);
         #endif
     
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
+            float4 projWorldPos = float4(worldPos, 1.0);
             oSpotPos = mul(projWorldPos, cSpotProj);
         #endif
 

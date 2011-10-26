@@ -86,3 +86,27 @@ vec3 GetWorldTangent(mat4 modelMatrix)
         return normalize(normalMatrix * iTangent.xyz);
     #endif
 }
+
+#ifdef SHADOW
+    #if defined(DIRLIGHT)
+        void GetShadowPos(vec3 worldPos, out vec4 shadowPos[4])
+        {
+            vec4 projWorldPos = vec4(worldPos, 1.0);
+            shadowPos[0] = cShadowProj[0] * projWorldPos;
+            shadowPos[1] = cShadowProj[1] * projWorldPos;
+            shadowPos[2] = cShadowProj[2] * projWorldPos;
+            shadowPos[3] = cShadowProj[3] * projWorldPos;
+        }
+    #elif defined(SPOTLIGHT)
+        void GetShadowPos(vec3 worldPos, out vec4 shadowPos)
+        {
+            vec4 projWorldPos = vec4(worldPos, 1.0);
+            shadowPos = cShadowProj[0] * projWorldPos;
+        }
+    #else
+        void GetShadowPos(vec3 worldPos, out vec3 shadowPos)
+        {
+            shadowPos = worldPos - cCameraPos - cLightPos;
+        }
+    #endif
+#endif

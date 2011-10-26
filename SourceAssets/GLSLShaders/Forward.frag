@@ -21,7 +21,7 @@ varying vec4 vLightVec;
         #elif defined(SPOTLIGHT)
             varying vec4 vShadowPos;
         #else
-            varying vec3 vWorldLightVec;
+            varying vec3 vShadowPos;
         #endif
     #endif
     #ifdef SPOTLIGHT
@@ -74,7 +74,7 @@ void main()
             #elif defined(SPOTLIGHT)
                 diff *= GetShadow(vShadowPos);
             #else
-                diff *= GetCubeShadow(vWorldLightVec);
+                diff *= GetCubeShadow(vShadowPos);
             #endif
         #endif
 
