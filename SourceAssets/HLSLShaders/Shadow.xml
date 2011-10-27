@@ -4,7 +4,7 @@
         <option name="FB" define="FALLBACK" require="SM2" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
+        <variation name="Instanced" define="INSTANCED" require="SM3" />
     </shader>
     <shader name="Shadow" type="ps">
         <option name="Mask" define="ALPHAMASK" />

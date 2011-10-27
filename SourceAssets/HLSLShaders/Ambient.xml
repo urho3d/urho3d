@@ -3,7 +3,7 @@
         <option name="VCol" define="VERTEXCOLOR" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
+        <variation name="Instanced" define="INSTANCED" require="SM3" />
         <variation name="Billboard" define="BILLBOARD" />
     </shader>
     <shader name="Ambient" type="ps">
