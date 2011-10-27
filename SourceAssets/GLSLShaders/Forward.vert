@@ -35,6 +35,10 @@ void main()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
 
+    #ifdef VERTEXCOLOR
+        vColor = iColor;
+    #endif
+
     #ifdef LIGHT
 
         #ifdef NORMALMAP
@@ -45,23 +49,30 @@ void main()
     
         vNormal = GetWorldNormal(modelMatrix);
         vec3 centeredWorldPos = worldPos - cCameraPos;
+        vec4 projWorldPos = vec4(worldPos, 1.0);
 
-        #if defined(DIRLIGHT)
+        #ifdef DIRLIGHT
             vLightVec = vec4(cLightDir, GetDepth(gl_Position));
-        #elif defined(LIGHT)
-            vLightVec = vec4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(gl_Position));
         #else
-            vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
+            vLightVec = vec4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(gl_Position));
         #endif
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(worldPos, vShadowPos);
+            #if defined(DIRLIGHT)
+                vShadowPos[0] = cShadowProj[0] * projWorldPos;
+                vShadowPos[1] = cShadowProj[1] * projWorldPos;
+                vShadowPos[2] = cShadowProj[2] * projWorldPos;
+                vShadowPos[3] = cShadowProj[3] * projWorldPos;
+            #elif defined(SPOTLIGHT)
+                vShadowPos = cShadowProj[0] * projWorldPos;
+            #else
+                vShadowPos = centeredWorldPos - cLightPos;
+            #endif
         #endif
 
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            vec4 projWorldPos = vec4(worldPos, 1.0);
             vSpotPos = cSpotProj * projWorldPos;
         #endif
 
@@ -87,9 +98,5 @@ void main()
 
         vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
 
-    #endif
-
-    #ifdef VERTEXCOLOR
-        vColor = iColor;
     #endif
 }

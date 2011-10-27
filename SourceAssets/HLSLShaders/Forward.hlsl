@@ -56,6 +56,10 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
 
+    #ifdef VERTEXCOLOR
+        oColor = iColor;
+    #endif
+
     #ifdef LIGHT
 
         #ifdef NORMALMAP
@@ -66,23 +70,30 @@ void VS(float4 iPos : POSITION,
 
         oNormal = GetWorldNormal(modelMatrix);
         float3 centeredWorldPos = worldPos - cCameraPos;
+        float4 projWorldPos = float4(worldPos, 1.0);
 
         #ifdef DIRLIGHT
             oLightVec = float4(cLightDir, GetDepth(oPos));
-        #elif defined(LIGHT)
-            oLightVec = float4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(oPos));
         #else
-            oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
+            oLightVec = float4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(oPos));
         #endif
-    
+
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(worldPos, oShadowPos);
+            #if defined(DIRLIGHT)
+                oShadowPos[0] = mul(projWorldPos, cShadowProj[0]);
+                oShadowPos[1] = mul(projWorldPos, cShadowProj[1]);
+                oShadowPos[2] = mul(projWorldPos, cShadowProj[2]);
+                oShadowPos[3] = mul(projWorldPos, cShadowProj[3]);
+            #elif defined(SPOTLIGHT)
+                oShadowPos = mul(projWorldPos, cShadowProj[0]);
+            #else
+                oShadowPos = centeredWorldPos - cLightPos;
+            #endif
         #endif
-    
+
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            float4 projWorldPos = float4(worldPos, 1.0);
             oSpotPos = mul(projWorldPos, cSpotProj);
         #endif
 
@@ -108,10 +119,6 @@ void VS(float4 iPos : POSITION,
 
         oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
 
-    #endif
-
-    #ifdef VERTEXCOLOR
-        oColor = iColor;
     #endif
 }
 
