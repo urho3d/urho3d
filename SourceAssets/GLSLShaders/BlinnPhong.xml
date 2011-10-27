@@ -14,8 +14,8 @@
     </shader>
     <shader name="BlinnPhong" type="ps">
         <option name="Diff" define="DIFFMAP" />
-        <option name="Normal" define="NORMALMAP" />
-        <option name="SpecMap" define="SPECMAP" />
+        <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
+        <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />
