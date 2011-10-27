@@ -55,19 +55,15 @@ static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 /// Light vertex shader variations.
 enum LightVSVariation
 {
-    LVS_NONE = 0,
-    LVS_DIR,
+    LVS_DIR = 0,
     LVS_SPOT,
     LVS_POINT,
     LVS_SPEC,
-    LVS_DIRSPEC,
     LVS_SPOTSPEC,
     LVS_POINTSPEC,
     LVS_SHADOW,
-    LVS_DIRSHADOW,
     LVS_SPOTSHADOW,
     LVS_POINTSHADOW,
-    LVS_SPECSHADOW,
     LVS_DIRSPECSHADOW,
     LVS_SPOTSPECSHADOW,
     LVS_POINTSPECSHADOW,

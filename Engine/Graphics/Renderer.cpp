@@ -188,19 +188,15 @@ static const String geometryVSVariations[] =
 
 static const String lightVSVariations[] =
 {
-    "",
     "Dir",
     "Spot",
     "Point",
-    "Spec",
     "DirSpec",
     "SpotSpec",
     "PointSpec",
-    "Shadow",
     "DirShadow",
     "SpotShadow",
     "PointShadow",
-    "SpecShadow",
     "DirSpecShadow",
     "SpotSpecShadow",
     "PointSpecShadow"
@@ -958,8 +954,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
             if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
             {
-                psi += LPS_SPEC;
                 vsi += LVS_SPEC;
+                psi += LPS_SPEC;
             }
             if (allowShadows && lightQueue->shadowMap_)
             {
@@ -990,18 +986,18 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             batch.vertexShader_ = vertexShaders[vsi];
             batch.pixelShader_ = pixelShaders[psi];
             
-            // If specular or shadow variations do not exist, try without them
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi & LVS_SPEC))
+            // If shadow or specular variations do not exist, try without them
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi >= LVS_SHADOW))
             {
-                vsi &= ~LVS_SPEC;
-                psi &= ~LPS_SPEC;
+                vsi -= LVS_SHADOW;
+                psi -= LPS_SHADOW;
                 batch.vertexShader_ = vertexShaders[vsi];
                 batch.pixelShader_ = pixelShaders[psi];
             }
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi & LVS_SHADOW))
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi >= LVS_SPEC))
             {
-                vsi &= ~LVS_SHADOW;
-                psi &= ~LPS_SHADOW;
+                vsi -= LVS_SPEC;
+                psi -= LPS_SPEC;
                 batch.vertexShader_ = vertexShaders[vsi];
                 batch.pixelShader_ = pixelShaders[psi];
             }
@@ -1205,7 +1201,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         {
             unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-            if (!(l & LVS_SHADOW) || allowShadows)
+            if (l < LVS_SHADOW || allowShadows)
                 vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
             else
                 vertexShaders[j].Reset();

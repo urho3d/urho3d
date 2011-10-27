@@ -1,0 +1,36 @@
+<shaders>
+    <shader name="BlinnPhong" type="vs">
+        <option name="Normal" define="NORMALMAP" />
+        <option name="VCol" define="VERTEXCOLOR" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <option name="Spec" define="SPECULAR" />
+        <option name="Shadow" define="SHADOW" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Instanced" define="INSTANCED" />
+        <variation name="Billboard" define="BILLBOARD" />
+    </shader>
+    <shader name="BlinnPhong" type="ps">
+        <option name="Diff" define="DIFFMAP" />
+        <option name="Normal" define="NORMALMAP" />
+        <option name="SpecMap" define="SPECMAP" />
+        <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Ambient" define="AMBIENT" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Spec" define="SPECULAR" />
+        <option name="Shadow" define="SHADOW" />
+        <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
+        <option name="HW" define="HWSHADOW" require="SHADOW" />
+        <option name="FB" define="FALLBACK">
+            <exclude name="LQ" />
+            <exclude name="HW" />
+            <require name="SHADOW" />
+            <require name="SM2" />
+        </option>
+    </shader>
+</shaders>

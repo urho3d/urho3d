@@ -289,10 +289,10 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     textureUnits_.Clear();
     
     unsigned combinations = 1;
-    PODVector<unsigned> usedCombinations;
+    Set<unsigned> usedCombinations;
     Map<String, unsigned> nameToIndex;
     Vector<ProcessedVariation> processedVariations;
-    bool hasVariations = false;
+    unsigned numVariationGroups = 0;
     
     const Vector<Variation>& variations = baseShader.variations_;
     
@@ -361,14 +361,14 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     {
         combinations *= 2;
         nameToIndex[variations[i].name_] = i;
-        if (!variations[i].option_)
-            hasVariations = true;
+        if (!variations[i].option_ && (i == 0 || variations[i - 1].option_))
+            ++numVariationGroups;
     }
     
     for (unsigned i = 0; i < combinations; ++i)
     {
         unsigned active = i; // Variations/options active on this particular combination
-        bool variationActive = false;
+        unsigned variationsActive = 0;
         bool skipThis = false;
         
         // Check for excludes/includes/requires
@@ -388,16 +388,29 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
                         active &= ~(1 << nameToIndex[variations[j].excludes_[k]]);
                 }
                 
-                // If it's a variation, exclude all other variations
+                // Skip dummy separators (options without name and defines)
+                if (variations[j].name_.Empty() && variations[j].option_ && variations[j].defines_.Empty())
+                    active &= ~(1 << j);
+
+                // If it's a variation, exclude all other variations in the same group
                 if (!variations[j].option_)
                 {
-                    for (unsigned k = 0; k < variations.Size(); ++k)
+                    for (unsigned k = j - 1; k < variations.Size(); --k)
                     {
-                        if (k != j && !variations[k].option_)
+                        if (!variations[k].option_)
                             active &= ~(1 << k);
+                        else
+                            break;
+                    }
+                    for (unsigned k = j + 1; k < variations.Size(); ++k)
+                    {
+                        if (!variations[k].option_)
+                            active &= ~(1 << k);
+                        else
+                            break;
                     }
                     
-                    variationActive = true;
+                    ++variationsActive;
                 }
                 
                 for (unsigned k = 0; k < variations[j].requires_.Size(); ++k)
@@ -441,48 +454,38 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
             }
         }
         
-        // If variations are included, check that one of them is active
-        if (hasVariations && !variationActive)
+        // If variations are included, check that one from each group is active
+        if (variationsActive < numVariationGroups)
             continue;
         
         if (skipThis)
             continue;
         
         // Check that this combination is unique
-        bool unique = true;
-        for (unsigned j = 0; j < usedCombinations.Size(); ++j)
+        if (usedCombinations.Contains(active))
+            continue;
+
+        // Build shader variation name & define active variations
+        String outName;
+        Vector<String> defines;
+        for (unsigned j = 0; j < variations.Size(); ++j)
         {
-            if (usedCombinations[j] == active)
+            if (active & (1 << j))
             {
-                unique = false;
-                break;
+                if (variations[j].name_.Length())
+                    outName += variations[j].name_;
+                for (unsigned k = 0; k < variations[j].defines_.Size(); ++k)
+                    defines.Push(variations[j].defines_[k]);
             }
         }
         
-        if (unique)
-        {
-            // Build shader variation name & define active variations
-            String outName;
-            Vector<String> defines;
-            for (unsigned j = 0; j < variations.Size(); ++j)
-            {
-                if (active & (1 << j))
-                {
-                    if (variations[j].name_.Length())
-                        outName += variations[j].name_;
-                    for (unsigned k = 0; k < variations[j].defines_.Size(); ++k)
-                        defines.Push(variations[j].defines_[k]);
-                }
-            }
-            
-            ProcessedVariation processed;
-            processed.type_ = baseShader.type_;
-            processed.name_ = outName;
-            processed.defines_ = defines;
-            
-            processedVariations.Push(processed);
-            usedCombinations.Push(active);
-        }
+        ProcessedVariation processed;
+        processed.type_ = baseShader.type_;
+        processed.name_ = outName;
+        processed.defines_ = defines;
+        
+        processedVariations.Push(processed);
+        usedCombinations.Insert(active);
     }
     
     // Build the output file
