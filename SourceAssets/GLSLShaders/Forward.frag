@@ -42,7 +42,7 @@ void main()
         diffColor *= vColor;
     #endif
 
-    vec3 finalColor = 0.0;
+    vec3 finalColor = vec3(0.0);
     
     #if !defined(VOLUMETRIC) && defined(LIGHT)
 
@@ -131,8 +131,8 @@ void main()
     #endif
 
     #if defined(LIGHT) && !defined(AMBIENT)
-        gl_FragColor = vec4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+        gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
     #else
-        gl_FragColor = vec4(GetFog(finalColor, iLightVec.w), diffColor.a);
+        gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
     #endif
 }
