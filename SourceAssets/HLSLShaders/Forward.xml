@@ -33,7 +33,6 @@
         <option name="SpecMap" define="SPECMAP" require="LIGHT" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Volume" define="VOLUMETRIC">
-            <exclude name="Additive" />
             <exclude name="Normal" />
             <exclude name="Shadow" />
             <exclude name="Spec" />
@@ -41,7 +40,6 @@
             <exclude name="Unlit" />
         </option>
         <variation name="Unlit" define="UNLIT" />
-        <variation name="Additive" define="ADDITIVE" />
         <variation name="Ambient" define="AMBIENT" />
         <variation name="Dir">
             <define name="DIRLIGHT" />

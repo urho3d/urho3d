@@ -89,7 +89,7 @@ void VS(float4 iPos : POSITION,
         #ifdef POINTLIGHT
             oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
         #endif
-    
+
         #ifdef NORMALMAP
             oTangent = GetWorldTangent(modelMatrix);
             oBitangent = cross(oTangent, oNormal) * iTangent.w;
@@ -153,6 +153,8 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
+    float3 finalColor = 0.0;
+
     #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         float3 lightColor;
@@ -202,16 +204,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
                 float specStrength = cMatSpecProperties.x;
             #endif
             float spec = GetSpecular(normal, iEyeVec, lightDir, cMatSpecProperties.y);
-            float3 finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
+            finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
         #else
-            float3 finalColor = diff * lightColor * diffColor.rgb;
-        #endif
-
-        #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
-            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
-        #else
-            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+            finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
     #elif defined(VOLUMETRIC) && defined(LIGHT)
@@ -233,25 +228,21 @@ void PS(float2 iTexCoord : TEXCOORD0,
             lightColor = cLightColor.rgb;
         #endif
 
-        float3 finalColor = diff * lightColor * diffColor.rgb;
+        finalColor = diff * lightColor * diffColor.rgb;
 
-        #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
-            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
-        #else
-            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
-        #endif
+    #elif defined(UNLIT)
 
+        finalColor = diffColor.rgb;
+
+    #endif
+
+    #ifdef AMBIENT
+        finalColor += cAmbientColor * diffColor.rgb;
+    #endif
+
+    #if defined(LIGHT) && !defined(AMBIENT)
+        oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
     #else
-
-        #if defined(UNLIT)
-            oColor = float4(GetFog(diffColor.rgb, iLightVec.w), diffColor.a);
-        #elif defined(ADDITIVE)
-            oColor = float4(GetLitFog(diffColor.rgb, iLightVec.w), diffColor.a);
-        #elif defined(AMBIENT)
-            float3 finalColor = cAmbientColor * diffColor.rgb;
-            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
-        #endif
-
+        oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
     #endif
 }

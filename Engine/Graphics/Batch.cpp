@@ -160,8 +160,11 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         if (graphics->NeedParameterUpdate(PSP_AMBIENTCOLOR, zone_))
             graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor().ToVector4());
         
-        if (graphics->NeedParameterUpdate(PSP_FOGCOLOR, zone_))
-            graphics->SetShaderParameter(PSP_FOGCOLOR, zone_->GetFogColor().ToVector4());
+        // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
+        BlendMode blend = pass_->GetBlendMode();
+        Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
+        if (graphics->NeedParameterUpdate(PSP_FOGCOLOR, fogColorZone))
+            graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor().ToVector4());
         
         if (graphics->NeedParameterUpdate(PSP_FOGPARAMS, zone_))
         {

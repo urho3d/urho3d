@@ -42,6 +42,8 @@ void main()
         diffColor *= vColor;
     #endif
 
+    vec3 finalColor = 0.0;
+    
     #if !defined(VOLUMETRIC) && defined(LIGHT)
 
         vec3 lightColor;
@@ -91,16 +93,9 @@ void main()
                 float specStrength = cMatSpecProperties.x;
             #endif
             float spec = GetSpecular(normal, vEyeVec, lightDir, cMatSpecProperties.y);
-            vec3 finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
+            finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
         #else
-            vec3 finalColor = diff * lightColor * diffColor.rgb;
-        #endif
-
-        #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
-            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
-        #else
-            gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
+            finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
     #elif defined(VOLUMETRIC) && defined(LIGHT)
@@ -123,25 +118,21 @@ void main()
             lightColor = cLightColor.rgb;
         #endif
 
-        vec3 finalColor = diff * lightColor * diffColor.rgb;
+        finalColor = diff * lightColor * diffColor.rgb;
 
-        #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
-            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
-        #else
-            gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
-        #endif
+    #elif defined(UNLIT)
 
+        finalColor = diffColor.rgb;
+
+    #endif
+    
+    #ifdef AMBIENT
+        finalColor += cAmbientColor * diffColor.rgb;
+    #endif
+
+    #if defined(LIGHT) && !defined(AMBIENT)
+        gl_FragColor = vec4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
     #else
-
-        #if defined(UNLIT)
-            gl_FragColor = vec4(GetFog(diffColor.rgb, vLightVec.w), diffColor.a);
-        #elif defined(ADDITIVE)
-            gl_FragColor = vec4(GetLitFog(diffColor.rgb, vLightVec.w), diffColor.a);
-        #elif defined(AMBIENT)
-            vec3 finalColor = cAmbientColor * diffColor.rgb;
-            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
-        #endif
-
+        gl_FragColor = vec4(GetFog(finalColor, iLightVec.w), diffColor.a);
     #endif
 }
