@@ -158,14 +158,8 @@ void StaticModel::UpdateDistance(const FrameInfo& frame)
     if (newLodDistance != lodDistance_)
     {
         lodDistance_ = newLodDistance;
-        lodLevelsDirty_ = true;
-    }
-}
-
-void StaticModel::UpdateGeometry(const FrameInfo& frame)
-{
-    if (lodLevelsDirty_)
         CalculateLodLevels();
+    }
 }
 
 unsigned StaticModel::GetNumBatches()
@@ -179,6 +173,34 @@ void StaticModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchI
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];
+}
+
+unsigned StaticModel::GetNumOccluderTriangles()
+{
+    unsigned triangles = 0;
+    
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        unsigned lodLevel;
+        // Check whether to use same LOD as visible, or a specific LOD
+        if (softwareLodLevel_ == M_MAX_UNSIGNED)
+            lodLevel = lodLevels_[i];
+        else
+            lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
+        
+        Geometry* geom = geometries_[i][lodLevel];
+        if (!geom)
+            continue;
+        
+        // Check that the material is suitable for occlusion (default material always is)
+        Material* mat = materials_[i];
+        if (mat && !mat->GetOcclusion())
+            continue;
+        
+        triangles += geom->GetIndexCount() / 3;
+    }
+    
+    return triangles;
 }
 
 bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
@@ -340,7 +362,7 @@ void StaticModel::ResetLodLevels()
     }
     
     // Find out the real LOD levels on next geometry update
-    lodLevelsDirty_ = true;
+    lodDistance_ = M_INFINITY;
 }
 
 void StaticModel::CalculateLodLevels()
@@ -355,8 +377,6 @@ void StaticModel::CalculateLodLevels()
         }
         lodLevels_[i] = j - 1;
     }
-    
-    lodLevelsDirty_ = false;
 }
 
 void StaticModel::HandleModelReloadFinished(StringHash eventType, VariantMap& eventData)

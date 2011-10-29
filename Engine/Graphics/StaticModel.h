@@ -42,14 +42,14 @@ public:
     
     /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Calculate distance for rendering.
+    /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare geometry for rendering.
-    virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches.
     virtual unsigned GetNumBatches();
     /// Fill rendering batch with distance, geometry, material and world transform.
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
+    /// Return number of occlusion geometry triangles.
+    virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     

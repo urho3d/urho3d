@@ -63,9 +63,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance for rendering.
+    /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare geometry for rendering.
+    /// Prepare GPU geometry for rendering. Called on the main thread.
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches.
     virtual unsigned GetNumBatches();

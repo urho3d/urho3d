@@ -52,14 +52,14 @@ Drawable::Drawable(Context* context) :
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
+    viewFrame_(0),
     viewCamera_(0),
     firstLight_(0),
     drawableFlags_(0),
     visible_(true),
     castShadows_(false),
     occluder_(false),
-    worldBoundingBoxDirty_(true),
-    lodLevelsDirty_(true)
+    worldBoundingBoxDirty_(true)
 {
 }
 
@@ -94,10 +94,7 @@ void Drawable::UpdateDistance(const FrameInfo& frame)
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     if (newLodDistance != lodDistance_)
-    {
         lodDistance_ = newLodDistance;
-        lodLevelsDirty_ = true;
-    }
 }
 
 void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -185,18 +182,22 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::MarkInView(const FrameInfo& frame)
+void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
 {
-    viewFrameNumber_ = frame.frameNumber_;
-    viewCamera_ = frame.camera_;
-}
-
-void Drawable::MarkInShadowView(const FrameInfo& frame)
-{
-    if (viewFrameNumber_ != frame.frameNumber_)
+    if (mainView)
     {
         viewFrameNumber_ = frame.frameNumber_;
-        viewCamera_ = 0;
+        viewFrame_ = &frame;
+        viewCamera_ = frame.camera_;
+    }
+    else
+    {
+        if (viewFrameNumber_ != frame.frameNumber_ || viewFrame_ != &frame)
+        {
+            viewFrameNumber_ = frame.frameNumber_;
+            viewFrame_ = &frame;
+            viewCamera_ = 0;
+        }
     }
 }
 
@@ -252,16 +253,6 @@ Zone* Drawable::GetZone() const
 Zone* Drawable::GetLastZone() const
 {
     return lastZone_;
-}
-
-bool Drawable::IsInView(unsigned frameNumber) const
-{
-    return viewFrameNumber_ == frameNumber;
-}
-
-bool Drawable::IsInView(const FrameInfo& frame) const
-{
-    return viewFrameNumber_ == frame.frameNumber_ && viewCamera_ == frame.camera_;
 }
 
 bool Drawable::HasBasePass(unsigned batchIndex) const

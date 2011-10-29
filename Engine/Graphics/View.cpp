@@ -144,6 +144,7 @@ void View::Update(const FrameInfo& frame)
     // Clear old light scissor cache, geometry, light, occluder & batch lists
     lightScissorCache_.Clear();
     geometries_.Clear();
+    allGeometries_.Clear();
     geometryDepthBounds_.Clear();
     lights_.Clear();
     occluders_.Clear();
@@ -171,6 +172,7 @@ void View::Update(const FrameInfo& frame)
     
     GetDrawables();
     GetBatches();
+    UpdateGeometries();
 }
 
 void View::Render()
@@ -346,7 +348,6 @@ void View::GetDrawables()
                 
                 drawable->ClearLights();
                 drawable->MarkInView(frame_);
-                drawable->UpdateGeometry(frame_);
                 
                 // Expand the scene bounding boxes. However, do not take "infinite" objects such as the skybox into account,
                 // as the bounding boxes are also used for shadow focusing
@@ -365,6 +366,7 @@ void View::GetDrawables()
                 
                 geometryDepthBounds_.Push(bounds);
                 geometries_.Push(drawable);
+                allGeometries_.Push(drawable);
             }
             else if (flags & DRAWABLE_LIGHT)
             {
@@ -587,6 +589,14 @@ void View::GetBatches()
     SortBatches();
 }
 
+void View::UpdateGeometries()
+{
+    PROFILE(UpdateGeometries);
+    
+    for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
+        (*i)->UpdateGeometry(frame_);
+}
+
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
@@ -737,44 +747,37 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
     for (unsigned i = 0; i < occluders.Size(); ++i)
     {
         Drawable* occluder = occluders[i];
-        occluder->UpdateDistance(frame_);
         bool erase = false;
+        
+        if (!occluder->IsInView(frame_, false))
+            occluder->UpdateDistance(frame_);
         
         // Check occluder's draw distance (in main camera view)
         float maxDistance = occluder->GetDrawDistance();
         if (maxDistance > 0.0f && occluder->GetDistance() > maxDistance)
             erase = true;
-        
-        // Check that occluder is big enough on the screen
-        const BoundingBox& box = occluder->GetWorldBoundingBox();
-        float diagonal = (box.max_ - box.min_).LengthFast();
-        float compare;
-        if (!camera->IsOrthographic())
-            compare = diagonal * halfViewSize / occluder->GetDistance();
         else
-            compare = diagonal * invOrthoSize;
-        
-        if (compare < occluderSizeThreshold_)
-            erase = true;
-        
-        if (!erase)
         {
-            unsigned totalTriangles = 0;
-            unsigned batches = occluder->GetNumBatches();
-            Batch tempBatch;
+            // Check that occluder is big enough on the screen
+            const BoundingBox& box = occluder->GetWorldBoundingBox();
+            float diagonal = (box.max_ - box.min_).LengthFast();
+            float compare;
+            if (!camera->IsOrthographic())
+                compare = diagonal * halfViewSize / occluder->GetDistance();
+            else
+                compare = diagonal * invOrthoSize;
             
-            for (unsigned j = 0; j < batches; ++j)
+            if (compare < occluderSizeThreshold_)
+                erase = true;
+            else
             {
-                occluder->GetBatch(tempBatch, frame_, j);
-                if (tempBatch.geometry_)
-                    totalTriangles += tempBatch.geometry_->GetIndexCount() / 3;
+                // Store amount of triangles divided by screen size as a sorting key
+                // (best occluders are big and have few triangles)
+                occluder->SetSortValue((float)occluder->GetNumOccluderTriangles() / compare);
             }
-            
-            // Store amount of triangles divided by screen size as a sorting key
-            // (best occluders are big and have few triangles)
-            occluder->SetSortValue((float)totalTriangles / compare);
         }
-        else
+        
+        if (erase)
         {
             occluders.Erase(occluders.Begin() + i);
             --i;
@@ -798,7 +801,6 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& oc
                 continue;
         }
         
-        occluder->UpdateGeometry(frame_);
         // Check for running out of triangles
         if (!occluder->DrawOcclusion(buffer))
             return;
@@ -986,7 +988,8 @@ void View::ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVect
         if (!drawable->GetCastShadows())
             continue;
         
-        drawable->UpdateDistance(frame_);
+        if (!drawable->IsInView(frame_, false))
+            drawable->UpdateDistance(frame_);
         
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
@@ -1002,11 +1005,10 @@ void View::ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVect
         
         if (IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum, lightViewFrustumBox))
         {
-            // Update geometry now if not updated yet
-            if (!drawable->IsInView(frame_))
+            if (!drawable->IsInView(frame_, false))
             {
-                drawable->MarkInShadowView(frame_);
-                drawable->UpdateGeometry(frame_);
+                drawable->MarkInView(frame_, false);
+                allGeometries_.Push(drawable);
             }
             
             // Merge to shadow caster bounding box and add to the list
@@ -1445,35 +1447,20 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
 void View::FindZone(Drawable* drawable, int highestZonePriority)
 {
     Vector3 center = drawable->GetWorldBoundingBox().Center();
+    int bestPriority = M_MIN_INT;
+    Zone* newZone = 0;
     
-    // First check if the last zone remains a conclusive result
-    Zone* lastZone = drawable->GetLastZone();
-    if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->GetPriority()
-        >= highestZonePriority)
-        drawable->SetZone(lastZone);
-    // Then check if the visible zones contain the node center
-    else
+    // If bounding box center is in view, can use the visible zones. Else must query via the octree
+    if (frustum_.IsInside(center))
     {
-        int bestPriority = M_MIN_INT;
-        Zone* newZone = 0;
-        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+        // First check if the last zone remains a conclusive result
+        Zone* lastZone = drawable->GetLastZone();
+        if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) &&
+            lastZone->GetPriority() >= highestZonePriority)
+            newZone = lastZone;
+        else
         {
-            int priority = (*i)->GetPriority();
-            if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
-            {
-                newZone = *i;
-                bestPriority = priority;
-            }
-        }
-        
-        // Finally, if no zone found yet, query the octree for zones at node center
-        if (!newZone)
-        {
-            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones_), center, DRAWABLE_ZONE);
-            octree_->GetDrawables(query);
-            
-            bestPriority = M_MIN_INT;
-            for (PODVector<Zone*>::Iterator i = tempZones_.Begin(); i != tempZones_.End(); ++i)
+            for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
             {
                 int priority = (*i)->GetPriority();
                 if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
@@ -1483,9 +1470,25 @@ void View::FindZone(Drawable* drawable, int highestZonePriority)
                 }
             }
         }
-        
-        drawable->SetZone(newZone);
     }
+    else
+    {
+        PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones_), center, DRAWABLE_ZONE);
+        octree_->GetDrawables(query);
+        
+        bestPriority = M_MIN_INT;
+        for (PODVector<Zone*>::Iterator i = tempZones_.Begin(); i != tempZones_.End(); ++i)
+        {
+            int priority = (*i)->GetPriority();
+            if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
+            {
+                newZone = *i;
+                bestPriority = priority;
+            }
+        }
+    }
+    
+    drawable->SetZone(newZone);
 }
 
 Zone* View::GetZone(Drawable* drawable)

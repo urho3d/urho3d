@@ -91,6 +91,8 @@ private:
     void GetDrawables();
     /// Construct batches from the drawable objects.
     void GetBatches();
+    /// Prepare GPU resources of drawable objects. Must be called from the main thread.
+    void UpdateGeometries();
     /// Get lit batches for a certain light and drawable.
     void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
     /// Render batches.
@@ -204,8 +206,10 @@ private:
     PODVector<Zone*> tempZones_;
     /// Visible zones query result.
     PODVector<Zone*> zones_;
-    /// Geometry objects.
+    /// Visible geometry objects.
     PODVector<Drawable*> geometries_;
+    /// All geometry objects, including shadow casters not visible in the main view.
+    PODVector<Drawable*> allGeometries_;
     /// Occluder objects.
     PODVector<Drawable*> occluders_;
     /// Directional light shadow rendering occluders.

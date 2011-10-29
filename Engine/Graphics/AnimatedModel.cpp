@@ -227,15 +227,12 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
     if (newLodDistance != lodDistance_)
     {
         lodDistance_ = newLodDistance;
-        lodLevelsDirty_ = true;
+        CalculateLodLevels();
     }
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
-    if (lodLevelsDirty_)
-        CalculateLodLevels();
-    
     if (morphsDirty_ && morphs_.Size())
         UpdateMorphs();
     

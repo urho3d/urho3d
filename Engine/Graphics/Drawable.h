@@ -79,14 +79,16 @@ public:
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
-    /// Calculate distance for rendering.
+    /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare geometry for rendering.
+    /// Prepare GPU geometry for rendering. Called on the main thread.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }
     /// Fill rendering batch with distance, geometry, material and world transform.
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
+    /// Return number of occlusion geometry triangles.
+    virtual unsigned GetNumOccluderTriangles() { return 0; }
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
     /// Draw debug geometry.
@@ -144,10 +146,8 @@ public:
     void SetZone(Zone* zone);
     /// %Set sorting value.
     void SetSortValue(float value);
-    /// Mark in view this frame.
-    void MarkInView(const FrameInfo& frame);
-    /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it.
-    void MarkInShadowView(const FrameInfo& frame);
+    /// Mark in view (either the main camera, or a shadow camera view) this frame.
+    void MarkInView(const FrameInfo& frame, bool mainView = true);
     /// Clear lights and base pass flags for a new frame.
     void ClearLights();
     /// Add a light.
@@ -169,9 +169,9 @@ public:
     /// Return sorting value.
     float GetSortValue() const { return sortValue_; }
     /// Return whether is in view this frame.
-    bool IsInView(unsigned frameNumber) const;
+    bool IsInView(unsigned frameNumber) const { return viewFrameNumber_ == frameNumber; }
     /// Return whether is visible in a specific view this frame.
-    bool IsInView(const FrameInfo& frame) const;
+    bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
     /// Return whether has a base pass.
     bool HasBasePass(unsigned batchIndex) const;
     /// Return lights.
@@ -221,7 +221,9 @@ protected:
     unsigned viewFrameNumber_;
     /// Base pass flags per batch index.
     PODVector<unsigned> basePassFlags_;
-    /// Last camera rendered from. Not safe to dereference.
+    /// Last view's frameinfo. Not safe to dereference.
+    const FrameInfo* viewFrame_;
+    /// Last view's camera. Not safe to dereference.
     Camera* viewCamera_;
     /// Lights affecting this drawable.
     PODVector<Light*> lights_;
@@ -241,8 +243,6 @@ protected:
     bool occluder_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
-    /// Lod levels dirty flag.
-    bool lodLevelsDirty_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
