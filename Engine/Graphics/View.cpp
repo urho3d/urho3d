@@ -139,8 +139,6 @@ void View::Update(const FrameInfo& frame)
     frame_.frameNumber_ = frame.frameNumber_;
     frame_.viewSize_ = IntVector2(width_, height_);
     
-    shadowFrame_ = frame_;
-    
     // Clear old light scissor cache, geometry, light, occluder & batch lists
     lightScissorCache_.Clear();
     geometries_.Clear();
@@ -435,7 +433,6 @@ void View::GetBatches()
                 shadowQueue.shadowCamera_ = shadowCameras_[j];
                 shadowQueue.nearSplit_ = shadowNearSplits_[j];
                 shadowQueue.farSplit_ = shadowFarSplits_[j];
-                shadowFrame_.camera_ = shadowCamera;
                 
                 // Setup the shadow split viewport and finalize shadow camera parameters
                 shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
@@ -450,7 +447,7 @@ void View::GetBatches()
                     for (unsigned l = 0; l < numBatches; ++l)
                     {
                         Batch shadowBatch;
-                        drawable->GetBatch(shadowBatch, shadowFrame_, l);
+                        drawable->GetBatch(shadowBatch, frame_, l);
                         
                         Technique* tech = GetTechnique(drawable, shadowBatch.material_);
                         if (!shadowBatch.geometry_ || !tech)

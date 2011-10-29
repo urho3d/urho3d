@@ -178,8 +178,6 @@ private:
     int maxOccluderTriangles_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Information of the frame being rendered, with shadow camera.
-    FrameInfo shadowFrame_;
     /// Camera frustum.
     Frustum frustum_;
     /// Combined bounding box of visible geometries.
