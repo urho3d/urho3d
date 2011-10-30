@@ -28,8 +28,7 @@
 
 WorkerThread::WorkerThread(WorkQueue* owner, unsigned index) :
     owner_(owner),
-    index_(index),
-    working_(false)
+    index_(index)
 {
 }
 
@@ -37,7 +36,7 @@ void WorkerThread::ThreadFunction()
 {
     while (shouldRun_)
     {
-        WorkItem* item = owner_->GetNextWorkItem(this);
+        WorkItem* item = owner_->GetNextWorkItem();
         if (item)
             item->Process(index_);
     }

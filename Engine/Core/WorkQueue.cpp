@@ -75,7 +75,9 @@ public:
         #ifdef WIN32
         WaitForSingleObject(eventHandle_, INFINITE);
         #else
+        pthread_mutex_lock(&mutex_);
         pthread_cond_wait(&condition_, &mutex_);
+        pthread_mutex_unlock(&mutex_);
         #endif
     }
     
@@ -97,9 +99,10 @@ WorkQueue::WorkQueue(Context* context) :
     Object(context),
     impl_(new WorkQueueImpl()),
     started_(false),
-    shutDown_(false)
+    shutDown_(false),
+    numWaiting_(0)
 {
-    // Create worker threads and start them
+    // Create worker threads and start them. Leave one core free for the main thread
     unsigned numCores = GetNumCPUCores();
     for (unsigned i = 1; i < numCores; ++i)
     {
@@ -135,8 +138,10 @@ void WorkQueue::AddWorkItem(WorkItem* item)
     {
         queueLock_.Acquire();
         queue_.Push(item);
+        bool isWaiting = numWaiting_ > 0;
         queueLock_.Release();
-        impl_->Signal();
+        if (isWaiting)
+            impl_->Signal();
     }
 }
 
@@ -145,7 +150,8 @@ void WorkQueue::Start()
     if (!threads_.Empty() && !started_)
     {
         started_ = true;
-        for (unsigned i = 0; i < threads_.Size(); ++i)
+        unsigned numSignals = numWaiting_;
+        for (unsigned i = 0; i < numSignals; ++i)
             impl_->Signal();
     }
 }
@@ -165,7 +171,6 @@ void WorkQueue::Finish()
         for (;;)
         {
             WorkItem* item = 0;
-            bool allIdle = false;
             
             queueLock_.Acquire();
             if (!queue_.Empty())
@@ -173,13 +178,11 @@ void WorkQueue::Finish()
                 item = queue_.Front();
                 queue_.PopFront();
             }
-            else
-                allIdle = CheckIdle();
             queueLock_.Release();
             
             if (item)
                 item->Process(0);
-            else if (allIdle)
+            else if (numWaiting_ == threads_.Size())
                 break;
         }
     }
@@ -194,17 +197,16 @@ void WorkQueue::FinishAndStop()
 bool WorkQueue::IsCompleted()
 {
     queueLock_.Acquire();
-    bool queueEmpty = queue_.Empty();
-    bool allIdle = false;
-    if (queueEmpty)
-        allIdle = CheckIdle();
+    bool completed = queue_.Empty() && numWaiting_ == threads_.Size();
     queueLock_.Release();
     
-    return queueEmpty && allIdle;
+    return completed;
 }
 
-WorkItem* WorkQueue::GetNextWorkItem(WorkerThread* thread)
+WorkItem* WorkQueue::GetNextWorkItem()
 {
+    bool wasWaiting = false;
+    
     for (;;)
     {
         if (shutDown_)
@@ -212,34 +214,27 @@ WorkItem* WorkQueue::GetNextWorkItem(WorkerThread* thread)
         
         WorkItem* item = 0;
         queueLock_.Acquire();
+        if (wasWaiting)
+        {
+            --numWaiting_;
+            wasWaiting = false;
+        }
         if (started_ && !queue_.Empty())
         {
             item = queue_.Front();
             queue_.PopFront();
-            thread->SetWorking(true);
         }
-        queueLock_.Release();
-        
         if (item)
+        {
+            queueLock_.Release();
             return item;
+        }
         else
         {
-            thread->SetWorking(false);
+            ++numWaiting_;
+            queueLock_.Release();
             impl_->Wait();
+            wasWaiting = true;
         }
     }
-}
-
-bool WorkQueue::CheckIdle()
-{
-    bool allIdle = true;
-    for (unsigned i = 0; i < threads_.Size(); ++i)
-    {
-        if (threads_[i]->IsWorking())
-        {
-            allIdle = false;
-            break;
-        }
-    }
-    return allIdle;
 }

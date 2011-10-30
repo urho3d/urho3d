@@ -40,16 +40,10 @@ public:
     
     /// Return thread index.
     unsigned GetIndex() const { return index_; }
-    /// Set working flag.
-    void SetWorking(bool enable) { working_ = enable; }
-    /// Return whether is working.
-    bool IsWorking() const { return working_; }
     
 private:
     /// Work queue.
     WorkQueue* owner_;
     /// Thread index.
     unsigned index_;
-    /// Working flag.
-    volatile bool working_;
 };

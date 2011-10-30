@@ -61,10 +61,8 @@ public:
     bool IsCompleted();
     
 private:
-    /// Block until a work item is available and return it. Item may be null. Called by the worker threads.
-    WorkItem* GetNextWorkItem(WorkerThread* thread);
-    /// Check if all worker threads are idle.
-    bool CheckIdle();
+    /// Block until a work item is available and return it. May return null. Called by the worker threads.
+    WorkItem* GetNextWorkItem();
     
     /// Work queue implementation. Contains the operating system-specific signaling mechanism.
     WorkQueueImpl* impl_;
@@ -74,6 +72,8 @@ private:
     List<WorkItem*> queue_;
     /// Queue spinlock.
     SpinLock queueLock_;
+    /// Number of waiting threads.
+    unsigned numWaiting_;
     /// Started flag.
     volatile bool started_;
     /// Shutting down flag.

@@ -39,7 +39,6 @@
 
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
-static const int DRAWABLES_PER_WORKITEM = 8;
 
 inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
@@ -53,8 +52,9 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     root_(root),
     numDrawables_(0)
 {
-    Vector3 halfSize = worldBoundingBox_.Size() * 0.5f;
-    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize, worldBoundingBox_.max_ + halfSize);
+    center_ = worldBoundingBox_.Center();
+    halfSize_ = worldBoundingBox_.Size() * 0.5f;
+    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         children_[i] = 0;
@@ -112,15 +112,15 @@ void Octant::DeleteChild(Octant* octant)
     }
 }
 
-void Octant::InsertDrawable(Drawable* drawable)
+void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize)
 {
     // If size OK or outside, stop recursion & insert here
-    if (CheckDrawableSize(drawable) || cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
+    if (CheckDrawableSize(boxSize) || cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
     {
-        if (drawable->octant_ != this)
+        Octant* oldOctant = drawable->octant_;
+        if (oldOctant != this)
         {
             // Add first, then remove, because drawable count going to zero deletes the octree branch in question
-            Octant* oldOctant = drawable->octant_;
             AddDrawable(drawable);
             if (oldOctant)
                 oldOctant->RemoveDrawable(drawable, false);
@@ -128,25 +128,19 @@ void Octant::InsertDrawable(Drawable* drawable)
         return;
     }
     
-    Vector3 octantCenter = worldBoundingBox_.Center();
-    Vector3 drawableCenter = drawable->GetWorldBoundingBox().Center();
-    unsigned x = drawableCenter.x_ < octantCenter.x_ ? 0 : 1;
-    unsigned y = drawableCenter.y_ < octantCenter.y_ ? 0 : 2;
-    unsigned z = drawableCenter.z_ < octantCenter.z_ ? 0 : 4;
-    GetOrCreateChild(x + y + z)->InsertDrawable(drawable);
+    unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
+    unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
+    unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
+    GetOrCreateChild(x + y + z)->InsertDrawable(drawable, boxCenter, boxSize);
 }
 
-bool Octant::CheckDrawableSize(Drawable* drawable) const
+bool Octant::CheckDrawableSize(const Vector3& boxSize) const
 {
     // If max split level, size always OK
-    if (level_ == root_->GetNumLevels())
+    if (level_ != root_->GetNumLevels())
+        return boxSize.x_ >= halfSize_.x_ || boxSize.y_ >= halfSize_.y_ || boxSize.z_ >= halfSize_.z_;
+    else
         return true;
-    
-    Vector3 octantHalfSize = worldBoundingBox_.Size() * 0.5;
-    Vector3 drawableSize = drawable->GetWorldBoundingBox().Size();
-    
-    return drawableSize.x_ >= octantHalfSize.x_ || drawableSize.y_ >= octantHalfSize.y_ || drawableSize.z_ >=
-        octantHalfSize.z_;
 }
 
 void Octant::ResetRoot()
@@ -390,27 +384,21 @@ void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char draw
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    if (!drawable->updateQueued_)
-    {
-        drawableUpdates_.Push(drawable);
-        drawable->updateQueued_ = true;
-    }
+    drawableUpdates_.Push(drawable);
+    drawable->updateQueued_ = true;
 }
 
 void Octree::QueueReinsertion(Drawable* drawable)
 {
-    if (!drawable->reinsertionQueued_)
+    if (scene_ && scene_->IsThreadedUpdate())
     {
-        if (scene_ && scene_->IsThreadedUpdate())
-        {
-            reinsertionLock_.Acquire();
-            drawableReinsertions_.Push(drawable);
-            reinsertionLock_.Release();
-        }
-        else
-            drawableReinsertions_.Push(drawable);
-        drawable->reinsertionQueued_ = true;
+        reinsertionLock_.Acquire();
+        drawableReinsertions_.Push(drawable);
+        reinsertionLock_.Release();
     }
+    else
+        drawableReinsertions_.Push(drawable);
+    drawable->reinsertionQueued_ = true;
 }
 
 void Octree::CancelUpdate(Drawable* drawable)
@@ -474,12 +462,8 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
         }
         
         PODVector<Drawable*>::Iterator end = start;
-        int count = 0;
-        while (count < DRAWABLES_PER_WORKITEM && end != drawableUpdates_.End())
-        {
-            ++count;
+        while (end - start < DRAWABLES_PER_WORK_ITEM && end != drawableUpdates_.End())
             ++end;
-        }
         
         item->frame_ = &frame;
         item->start_ = start;
@@ -515,31 +499,28 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     for (PODVector<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;
-        Octant* octant = drawable->GetOctant();
+        const BoundingBox& box = drawable->GetWorldBoundingBox();
+        Vector3 boxCenter = box.Center();
+        Vector3 boxSize = box.Size();
         
+        Octant* octant = drawable->GetOctant();
         if (octant)
         {
-            bool reinsert = false;
-            
             if (octant == this)
             {
                 // Handle root octant as special case: if outside the root, do not reinsert
-                if (GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) == INSIDE && !CheckDrawableSize(drawable))
-                    reinsert = true;
+                if (GetCullingBox().IsInside(box) == INSIDE && !CheckDrawableSize(boxSize))
+                    InsertDrawable(drawable, boxCenter, boxSize);
             }
             else
             {
                 // Otherwise reinsert if outside current octant or if size does not fit octant size
-                if (octant->GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) != INSIDE ||
-                    !octant->CheckDrawableSize(drawable))
-                    reinsert = true;
+                if (octant->GetCullingBox().IsInside(box) != INSIDE || !octant->CheckDrawableSize(boxSize))
+                    InsertDrawable(drawable, boxCenter, boxSize);
             }
-            
-            if (reinsert)
-                InsertDrawable(drawable);
         }
         else
-            InsertDrawable(drawable);
+            InsertDrawable(drawable, boxCenter, boxSize);
         
         drawable->reinsertionQueued_ = false;
     }

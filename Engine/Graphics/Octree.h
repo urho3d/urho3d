@@ -73,9 +73,9 @@ public:
     /// Delete child octant by pointer.
     void DeleteChild(Octant* octant);
     /// Insert a drawable object by checking for fit recursively.
-    void InsertDrawable(Drawable* drawable);
+    void InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize);
     /// Check if a drawable object fits.
-    bool CheckDrawableSize(Drawable* drawable) const;
+    bool CheckDrawableSize(const Vector3& boxSize) const;
     
     /// Add a drawable object to this octant.
     void AddDrawable(Drawable* drawable)
@@ -152,6 +152,10 @@ protected:
     BoundingBox worldBoundingBox_;
     /// Bounding box used for drawable object fitting.
     BoundingBox cullingBox_;
+    /// World bounding box center.
+    Vector3 center_;
+    /// World bounding box half size.
+    Vector3 halfSize_;
     /// Subdivision level.
     unsigned level_;
     /// Parent octant.

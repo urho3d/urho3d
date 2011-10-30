@@ -158,7 +158,7 @@ void Drawable::SetOccluder(bool enable)
 
 void Drawable::MarkForUpdate()
 {
-    if (octant_)
+    if (octant_ && !updateQueued_)
         octant_->GetRoot()->QueueUpdate(this);
 }
 
@@ -284,7 +284,7 @@ void Drawable::OnMarkedDirty(Node* node)
     {
         worldBoundingBoxDirty_ = true;
         zone_.Reset();
-        if (octant_)
+        if (octant_ && !reinsertionQueued_)
             octant_->GetRoot()->QueueReinsertion(this);
     }
 }

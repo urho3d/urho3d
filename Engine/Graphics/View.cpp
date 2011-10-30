@@ -57,8 +57,6 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, -1.0f)
 };
 
-static const int DRAWABLES_PER_WORKITEM = 8;
-
 OBJECTTYPESTATIC(View);
 
 View::View(Context* context) :
@@ -622,12 +620,8 @@ void View::UpdateGeometries()
             }
             
             PODVector<Drawable*>::Iterator end = start;
-            int count = 0;
-            while (count < DRAWABLES_PER_WORKITEM && end != threadedGeometries_.End())
-            {
-                ++count;
+            while (end - start < DRAWABLES_PER_WORK_ITEM && end != threadedGeometries_.End())
                 ++end;
-            }
             
             item->frame_ = &frame_;
             item->start_ = start;
