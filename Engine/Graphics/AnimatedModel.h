@@ -54,10 +54,10 @@ public:
     virtual void Update(const FrameInfo& frame);
     /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return whether the next geometry update will touch actual GPU resources.
-    virtual bool GetUpdateOnGPU();
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
+    /// Return whether a geometry update is necessary, and if it should happen threaded.
+    virtual UpdateGeometryType GetUpdateGeometryType();
     /// Fill rendering batch with distance, geometry, material and world transform.
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     /// Add debug geometry to the debug graphics.

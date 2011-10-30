@@ -57,7 +57,7 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, -1.0f)
 };
 
-static const int DRAWABLES_PER_WORKITEM = 4;
+static const int DRAWABLES_PER_WORKITEM = 8;
 
 OBJECTTYPESTATIC(View);
 
@@ -594,10 +594,14 @@ void View::UpdateGeometries()
     PROFILE(UpdateGeometries);
     
     // Split into threaded and non-threaded geometries.
+    nonThreadedGeometries_.Clear();
     threadedGeometries_.Clear();
     for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
     {
-        if (!(*i)->GetUpdateOnGPU())
+        UpdateGeometryType type = (*i)->GetUpdateGeometryType();
+        if (type == UPDATE_MAIN_THREAD)
+            nonThreadedGeometries_.Push(*i);
+        else if (type == UPDATE_WORKER_THREAD)
             threadedGeometries_.Push(*i);
     }
     
@@ -638,11 +642,8 @@ void View::UpdateGeometries()
     }
     
     // While the work queue is processed, update non-threaded geometries
-    for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
-    {
-        if ((*i)->GetUpdateOnGPU())
-            (*i)->UpdateGeometry(frame_);
-    }
+    for (PODVector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
+        (*i)->UpdateGeometry(frame_);
     
     queue->FinishAndStop();
 }

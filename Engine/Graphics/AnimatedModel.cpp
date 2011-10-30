@@ -231,18 +231,23 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
     }
 }
 
-bool AnimatedModel::GetUpdateOnGPU()
-{
-    return morphsDirty_ && morphs_.Size();
-}
-
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
-    if (morphsDirty_ && morphs_.Size())
+    if (morphsDirty_)
         UpdateMorphs();
     
     if (skinningDirty_)
         UpdateSkinning();
+}
+
+UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
+{
+    if (morphsDirty_)
+        return UPDATE_MAIN_THREAD;
+    else if (skinningDirty_)
+        return UPDATE_WORKER_THREAD;
+    else
+        return UPDATE_NONE;
 }
 
 void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)

@@ -47,6 +47,14 @@ class Octant;
 class RayOctreeQuery;
 class Zone;
 
+/// Geometry update type.
+enum UpdateGeometryType
+{
+    UPDATE_NONE = 0,
+    UPDATE_MAIN_THREAD,
+    UPDATE_WORKER_THREAD
+};
+
 /// Rendering frame update parameters.
 struct FrameInfo
 {
@@ -81,8 +89,6 @@ public:
     virtual void Update(const FrameInfo& frame) {}
     /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return whether the next geometry update will touch actual GPU resources. If not, it can be threaded.
-    virtual bool GetUpdateOnGPU() { return true; }
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches.
@@ -91,6 +97,8 @@ public:
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
+    /// Return whether a geometry update is necessary, and if it should happen threaded.
+    virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
     /// Draw debug geometry.

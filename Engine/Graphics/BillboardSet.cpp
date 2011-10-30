@@ -131,11 +131,20 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
     if (vertexBuffer_->IsDataLost())
     {
         vertexBuffer_->ClearDataLost();
+        bufferDirty_ = true;
         forceUpdate_ = true;
     }
     
-    if (bufferDirty_ || forceUpdate_)
+    if (bufferDirty_)
         UpdateVertexBuffer(frame);
+}
+
+UpdateGeometryType BillboardSet::GetUpdateGeometryType()
+{
+    if (bufferDirty_ || bufferSizeDirty_ || (vertexBuffer_ && vertexBuffer_->IsDataLost()))
+        return UPDATE_MAIN_THREAD;
+    else
+        return UPDATE_NONE;
 }
 
 unsigned BillboardSet::GetNumBatches()

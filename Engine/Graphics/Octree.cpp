@@ -39,7 +39,7 @@
 
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
-static const int DRAWABLES_PER_WORKITEM = 4;
+static const int DRAWABLES_PER_WORKITEM = 8;
 
 inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {

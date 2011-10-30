@@ -1,10 +1,10 @@
 // GraphicsTest rewrite from Urho3D 1.0
 
-const uint NUM_OBJECTS = 250;
+const uint NUM_OBJECTS = 2500;
 const uint NUM_LIGHTS = 20;
 const uint NUM_INSTANCENODES = 20;
 const uint NUM_INSTANCES = 50;
-const uint NUM_BILLBOARDNODES = 20;
+const uint NUM_BILLBOARDNODES = 0;
 const uint NUM_BILLBOARDS = 15;
 
 Scene@ testScene;

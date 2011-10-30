@@ -69,6 +69,8 @@ public:
     virtual bool GetUpdateOnGPU() { return true; }
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
+    /// Return whether a geometry update is necessary, and if it should happen threaded.
+    virtual UpdateGeometryType GetUpdateGeometryType();
     /// Return number of batches.
     virtual unsigned GetNumBatches();
     /// Fill rendering batch with distance, geometry, material and world transform.
