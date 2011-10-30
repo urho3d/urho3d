@@ -591,12 +591,10 @@ void View::GetBatches()
 
 void View::UpdateGeometries()
 {
-    PROFILE(UpdateGeometries);
-    
     // Split into threaded and non-threaded geometries.
     nonThreadedGeometries_.Clear();
     threadedGeometries_.Clear();
-    for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
+    for (PODVector<Drawable*>::Iterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
     {
         UpdateGeometryType type = (*i)->GetUpdateGeometryType();
         if (type == UPDATE_MAIN_THREAD)
@@ -604,6 +602,8 @@ void View::UpdateGeometries()
         else if (type == UPDATE_WORKER_THREAD)
             threadedGeometries_.Push(*i);
     }
+    
+    PROFILE_MULTIPLE(UpdateGeometry, nonThreadedGeometries_.Size() + threadedGeometries_.Size());
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     

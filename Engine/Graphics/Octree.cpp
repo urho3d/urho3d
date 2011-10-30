@@ -390,29 +390,47 @@ void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char draw
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    drawableUpdates_.Insert(drawable);
+    if (!drawable->updateQueued_)
+    {
+        drawableUpdates_.Push(drawable);
+        drawable->updateQueued_ = true;
+    }
 }
 
 void Octree::QueueReinsertion(Drawable* drawable)
 {
-    if (scene_ && scene_->IsThreadedUpdate())
+    if (!drawable->reinsertionQueued_)
     {
-        reinsertionLock_.Acquire();
-        drawableReinsertions_.Insert(drawable);
-        reinsertionLock_.Release();
+        if (scene_ && scene_->IsThreadedUpdate())
+        {
+            reinsertionLock_.Acquire();
+            drawableReinsertions_.Push(drawable);
+            reinsertionLock_.Release();
+        }
+        else
+            drawableReinsertions_.Push(drawable);
+        drawable->reinsertionQueued_ = true;
     }
-    else
-        drawableReinsertions_.Insert(drawable);
 }
 
 void Octree::CancelUpdate(Drawable* drawable)
 {
-    drawableUpdates_.Erase(drawable);
+    PODVector<Drawable*>::Iterator i = drawableUpdates_.Find(drawable);
+    if (i != drawableUpdates_.End())
+    {
+        (*i)->updateQueued_ = false;
+        drawableUpdates_.Erase(i);
+    }
 }
 
 void Octree::CancelReinsertion(Drawable* drawable)
 {
-    drawableReinsertions_.Erase(drawable);
+    PODVector<Drawable*>::Iterator i = drawableReinsertions_.Find(drawable);
+    if (i != drawableReinsertions_.End())
+    {
+        (*i)->reinsertionQueued_ = false;
+        drawableReinsertions_.Erase(i);
+    }
 }
 
 void Octree::DrawDebugGeometry(bool depthTest)
@@ -437,14 +455,14 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     if (drawableUpdates_.Empty())
         return;
     
-    PROFILE(UpdateDrawables);
+    PROFILE_MULTIPLE(UpdateDrawable, drawableUpdates_.Size());
     
     Scene* scene = node_->GetScene();
     scene->BeginThreadedUpdate();
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     List<DrawableUpdate>::Iterator item = drawableUpdateItems_.Begin();
-    HashSet<Drawable*>::Iterator start = drawableUpdates_.Begin();
+    PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
     
     while (start != drawableUpdates_.End())
     {
@@ -455,7 +473,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
             item = --drawableUpdateItems_.End();
         }
         
-        HashSet<Drawable*>::Iterator end = start;
+        PODVector<Drawable*>::Iterator end = start;
         int count = 0;
         while (count < DRAWABLES_PER_WORKITEM && end != drawableUpdates_.End())
         {
@@ -491,10 +509,10 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     if (drawableReinsertions_.Empty())
         return;
     
-    PROFILE(ReinsertDrawables);
+    PROFILE_MULTIPLE(ReinsertDrawable, drawableReinsertions_.Size());
     
     // Reinsert drawables into the octree
-    for (HashSet<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
+    for (PODVector<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;
         Octant* octant = drawable->GetOctant();
@@ -522,6 +540,8 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
         }
         else
             InsertDrawable(drawable);
+        
+        drawable->reinsertionQueued_ = false;
     }
     
     drawableReinsertions_.Clear();

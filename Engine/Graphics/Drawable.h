@@ -73,7 +73,9 @@ class Drawable : public Component
 {
     OBJECT(Drawable);
     
+    friend class DrawableUpdate;
     friend class Octant;
+    friend class Octree;
     
 public:
     /// Construct.
@@ -91,14 +93,14 @@ public:
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
+    /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
+    virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
     /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }
     /// Fill rendering batch with distance, geometry, material and world transform.
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
-    /// Return whether a geometry update is necessary, and if it should happen threaded.
-    virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
     /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
     /// Draw debug geometry.
@@ -253,6 +255,10 @@ protected:
     bool occluder_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
+    /// Octree update queued flag.
+    bool updateQueued_;
+    /// Octree reinsertion queued flag.
+    bool reinsertionQueued_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

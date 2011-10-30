@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Drawable.h"
-#include "HashSet.h"
 #include "List.h"
 #include "SpinLock.h"
 #include "WorkItem.h"
@@ -43,16 +42,19 @@ public:
     /// Do the work.
     virtual void Process(unsigned threadIndex)
     {
-        for (HashSet<Drawable*>::Iterator i = start_; i != end_; ++i)
+        for (PODVector<Drawable*>::Iterator i = start_; i != end_; ++i)
+        {
             (*i)->Update(*frame_);
+            (*i)->updateQueued_ = false;
+        }
     }
     
     /// Frame info.
     const FrameInfo* frame_;
     /// Start iterator.
-    HashSet<Drawable*>::Iterator start_;
+    PODVector<Drawable*>::Iterator start_;
     /// End iterator.
-    HashSet<Drawable*>::Iterator end_;
+    PODVector<Drawable*>::Iterator end_;
 };
 
 /// %Octree octant
@@ -221,10 +223,10 @@ private:
     
     /// Scene.
     Scene* scene_;
-    /// %Set of drawable objects that require update.
-    HashSet<Drawable*> drawableUpdates_;
-    /// %Set of drawable objects that require reinsertion.
-    HashSet<Drawable*> drawableReinsertions_;
+    /// Drawable objects that require update.
+    PODVector<Drawable*> drawableUpdates_;
+    /// Drawable objects that require reinsertion.
+    PODVector<Drawable*> drawableReinsertions_;
     /// Pool for drawable update work items.
     List<DrawableUpdate> drawableUpdateItems_;
     /// Lock for octree reinsertions.

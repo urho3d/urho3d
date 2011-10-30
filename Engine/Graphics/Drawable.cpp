@@ -59,7 +59,9 @@ Drawable::Drawable(Context* context) :
     visible_(true),
     castShadows_(false),
     occluder_(false),
-    worldBoundingBoxDirty_(true)
+    worldBoundingBoxDirty_(true),
+    updateQueued_(false),
+    reinsertionQueued_(false)
 {
 }
 
