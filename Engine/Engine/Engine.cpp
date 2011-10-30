@@ -172,6 +172,17 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
+    // Check amount of worker threads
+    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    unsigned numWorkerThreads = queue->GetNumThreads();
+    if (numWorkerThreads)
+    {
+        String workerThreadString = "Created " + String(numWorkerThreads) + " worker thread";
+        if (numWorkerThreads > 1)
+            workerThreadString += "s";
+        LOGINFO(workerThreadString);
+    }
+        
     // Add default resource paths: CoreData package or directory, Data package or directory
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();

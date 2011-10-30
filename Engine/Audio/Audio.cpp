@@ -28,6 +28,7 @@
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "Log.h"
+#include "Mutex.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Sound.h"
@@ -478,9 +479,10 @@ int AudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long fra
     Audio* audio = static_cast<Audio*>(userData);
     
     {
-        audioLock_.Acquire();
+        SpinLock& lock = audio->GetLock();
+        lock.Acquire();
         audio->MixOutput(outputBuffer, framesPerBuffer);
-        audioLock_.Release();
+        lock.Release();
     }
     
     return 0;

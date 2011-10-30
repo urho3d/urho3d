@@ -67,7 +67,7 @@ private:
             lock xchg eax, dword ptr [edx]
         }
         #else
-        return __sync_lock_test_and_set(ptr, newValue);
+        return __sync_lock_test_and_set(dest, newValue);
         #endif
     }
     
