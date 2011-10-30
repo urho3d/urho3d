@@ -23,35 +23,10 @@
 
 #pragma once
 
-/// Operating system mutual exclusion primitive.
-class Mutex
+/// Work queue item base class.
+class WorkItem
 {
 public:
-    /// Construct.
-    Mutex();
-    /// Destruct.
-    ~Mutex();
-    
-    /// Acquire the mutex. Block if already acquired.
-    void Acquire();
-    /// Release the mutex.
-    void Release();
-    
-private:
-    /// Mutex handle.
-    void* handle_;
-};
-
-/// Lock that automatically acquires and releases a mutex.
-class MutexLock
-{
-public:
-    /// Construct and acquire the mutex.
-    MutexLock(Mutex& mutex);
-    /// Destruct. Release the mutex.
-    ~MutexLock();
-    
-private:
-    /// Mutex reference.
-    Mutex& mutex_;
+    /// Do the work. Main thread has index 0, while worker threads have indices 1 - n.
+    virtual void Process(unsigned threadIndex) = 0;
 };

@@ -351,6 +351,14 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 
 void RigidBody::OnMarkedDirty(Node* node)
 {
+    // Physics operations are not safe from worker threads
+    Scene* scene = node->GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
     // If the node is smoothed, do not use the dirty callback, but rather update manually during prestep
     if (node_->IsSmoothed())
         return;

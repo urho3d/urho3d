@@ -59,7 +59,12 @@ public:
     class Iterator : public TreeIteratorBase
     {
     public:
-        // Construct.
+        /// Construct.
+        Iterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         Iterator(Node* ptr) :
             TreeIteratorBase(ptr)
         {
@@ -85,6 +90,11 @@ public:
     {
     public:
         /// Construct.
+        ConstIterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         ConstIterator(Node* ptr) :
             TreeIteratorBase(ptr)
         {

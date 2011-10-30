@@ -375,8 +375,6 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         }
     }
     
-    PROFILE(UpdateBillboardSet);
-    
     unsigned numBillboards = billboards_.Size();
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();

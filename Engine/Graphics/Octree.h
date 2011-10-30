@@ -25,6 +25,9 @@
 
 #include "Drawable.h"
 #include "HashSet.h"
+#include "List.h"
+#include "SpinLock.h"
+#include "WorkItem.h"
 
 class Drawable;
 class Octree;
@@ -32,6 +35,25 @@ class OctreeQuery;
 class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
+
+/// Drawable update work item.
+class DrawableUpdate : public WorkItem
+{
+public:
+    /// Do the work.
+    virtual void Process(unsigned threadIndex)
+    {
+        for (HashSet<Drawable*>::Iterator i = start_; i != end_; ++i)
+            (*i)->Update(*frame_);
+    }
+    
+    /// Frame info.
+    const FrameInfo* frame_;
+    /// Start iterator.
+    HashSet<Drawable*>::Iterator start_;
+    /// End iterator.
+    HashSet<Drawable*>::Iterator end_;
+};
 
 /// %Octree octant
 class Octant
@@ -178,7 +200,7 @@ public:
     
     /// Mark drawable object as requiring an update.
     void QueueUpdate(Drawable* drawable);
-    /// Mark drawable object as requiring a reinsertion.
+    /// Mark drawable object as requiring a reinsertion. Is thread-safe.
     void QueueReinsertion(Drawable* drawable);
     /// Remove drawable object from update list.
     void CancelUpdate(Drawable* drawable);
@@ -187,11 +209,26 @@ public:
     /// Add debug geometry to the debug graphics.
     void DrawDebugGeometry(bool depthTest);
     
+protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
+    
 private:
+    /// Update drawable objects marked for update. Updates are executed in worker threads.
+    void UpdateDrawables(const FrameInfo& frame);
+    /// Reinsert moved drawable objects into the octree.
+    void ReinsertDrawables(const FrameInfo& frame);
+    
+    /// Scene.
+    Scene* scene_;
     /// %Set of drawable objects that require update.
     HashSet<Drawable*> drawableUpdates_;
     /// %Set of drawable objects that require reinsertion.
     HashSet<Drawable*> drawableReinsertions_;
+    /// Pool for drawable update work items.
+    List<DrawableUpdate> drawableUpdateItems_;
+    /// Lock for octree reinsertions.
+    SpinLock reinsertionLock_;
     /// Unculled drawables.
     Vector<WeakPtr<Drawable> > unculledDrawables_;
     /// Subdivision level.

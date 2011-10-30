@@ -57,6 +57,11 @@ public:
     {
     public:
         /// Construct.
+        Iterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         explicit Iterator(Node* ptr) :
             ListIteratorBase(ptr)
         {
@@ -82,6 +87,11 @@ public:
     {
     public:
         /// Construct.
+        ConstIterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         explicit ConstIterator(Node* ptr) :
             ListIteratorBase(ptr)
         {

@@ -47,6 +47,12 @@ class ListIteratorBase
 {
 public:
     /// Construct.
+    ListIteratorBase() :
+        ptr_(0)
+    {
+    }
+    
+    /// Construct with a node pointer.
     explicit ListIteratorBase(ListNodeBase* ptr) :
         ptr_(ptr)
     {

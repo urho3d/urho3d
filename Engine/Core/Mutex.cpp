@@ -34,33 +34,33 @@
 
 #ifdef WIN32
 Mutex::Mutex() :
-    criticalSection_(new CRITICAL_SECTION)
+    handle_(new CRITICAL_SECTION)
 {
-    InitializeCriticalSection((CRITICAL_SECTION*)criticalSection_);
+    InitializeCriticalSection((CRITICAL_SECTION*)handle_);
 }
 
 Mutex::~Mutex()
 {
-    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)criticalSection_;
+    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)handle_;
     DeleteCriticalSection(cs);
     delete cs;
-    criticalSection_ = 0;
+    handle_ = 0;
 }
 
 void Mutex::Acquire()
 {
-    EnterCriticalSection((CRITICAL_SECTION*)criticalSection_);
+    EnterCriticalSection((CRITICAL_SECTION*)handle_);
 }
 
 void Mutex::Release()
 {
-    LeaveCriticalSection((CRITICAL_SECTION*)criticalSection_);
+    LeaveCriticalSection((CRITICAL_SECTION*)handle_);
 }
 #else
 Mutex::Mutex() :
-    criticalSection_(new pthread_mutex_t)
+    handle_(new pthread_mutex_t)
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)criticalSection_;
+    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -69,20 +69,20 @@ Mutex::Mutex() :
 
 Mutex::~Mutex()
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)criticalSection_;
+    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
     pthread_mutex_destroy(mutex);
     delete mutex;
-    criticalSection_ = 0;
+    handle_ = 0;
 }
 
 void Mutex::Acquire()
 {
-    pthread_mutex_lock((pthread_mutex_t*)criticalSection_);
+    pthread_mutex_lock((pthread_mutex_t*)handle_);
 }
 
 void Mutex::Release()
 {
-    pthread_mutex_unlock((pthread_mutex_t*)criticalSection_);
+    pthread_mutex_unlock((pthread_mutex_t*)handle_);
 }
 #endif
 

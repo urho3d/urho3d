@@ -95,8 +95,10 @@ void SoundSource3D::CalculateAttenuation()
     {
         Vector3 relativePos(audio_->GetListenerRotation().Inverse() * (GetWorldPosition() - audio_->GetListenerPosition()));
         float distance = Clamp(relativePos.Length() - nearDistance_, 0.0f, interval);
+        float attenuation = powf(1.0f - distance / interval, rolloffFactor_);
+        float panning = relativePos.Normalized().x_;
         
-        attenuation_ = powf(1.0f - distance / interval, rolloffFactor_);
-        panning_ = relativePos.Normalized().x_;
+        attenuation_ = attenuation;
+        panning_ = panning;
     }
 }

@@ -69,7 +69,7 @@ public:
     }
     
     /// Construct with a node pointer.
-    TreeIteratorBase(TreeNodeBase* ptr) :
+    explicit TreeIteratorBase(TreeNodeBase* ptr) :
         ptr_(ptr),
         prev_(0)
     {

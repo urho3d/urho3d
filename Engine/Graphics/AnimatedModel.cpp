@@ -63,8 +63,8 @@ AnimatedModel::AnimatedModel(Context* context) :
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
     invisibleLodFactor_(0.0f),
-    animationDirty_(true),
-    animationOrderDirty_(true),
+    animationDirty_(false),
+    animationOrderDirty_(false),
     morphsDirty_(true),
     skinningDirty_(true),
     isMaster_(true),
@@ -229,6 +229,11 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+}
+
+bool AnimatedModel::GetUpdateOnGPU()
+{
+    return morphsDirty_ && morphs_.Size();
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -616,6 +621,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
         
+        MarkAnimationDirty();
+        
         using namespace BoneHierarchyCreated;
         
         VariantMap eventData;
@@ -778,26 +785,28 @@ void AnimatedModel::AssignBoneNodes()
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
     }
+    
+    MarkAnimationDirty();
 }
 
 void AnimatedModel::MarkAnimationDirty()
 {
-    if (!isMaster_)
-        return;
-    
-    animationDirty_ = true;
-    // Mark for octree update, as animation is updated before octree reinsertion
-    MarkForUpdate();
+    if (isMaster_)
+    {
+        animationDirty_ = true;
+        // Mark for pre-octree reinsertion update (threaded)
+        MarkForUpdate();
+    }
 }
 
 void AnimatedModel::MarkAnimationOrderDirty()
 {
-    if (!isMaster_)
-        return;
-    
-    animationOrderDirty_ = true;
-    // Mark for octree update, as animation is updated before octree reinsertion
-    MarkForUpdate();
+    if (isMaster_)
+    {
+        animationOrderDirty_ = true;
+        // Mark for pre-octree reinsertion update (threaded)
+        MarkForUpdate();
+    }
 }
 
 void AnimatedModel::MarkMorphsDirty()
@@ -915,8 +924,6 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
             animationLodTimer_ = 0.0f;
     }
     
-    PROFILE(UpdateAnimation);
-    
     // Make sure animations are in ascending priority order
     if (animationOrderDirty_)
     {
@@ -936,8 +943,6 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
 
 void AnimatedModel::UpdateSkinning()
 {
-    PROFILE(UpdateSkinning);
-    
     // Note: the model's world transform will be baked in the skin matrices
     const Vector<Bone>& bones = skeleton_.GetBones();
     // Use model's world transform in case a bone is missing
@@ -979,8 +984,6 @@ void AnimatedModel::UpdateMorphs()
 {
     if (morphs_.Size())
     {
-        PROFILE(UpdateMorphs);
-        
         // Reset the morph data range from all morphable vertex buffers, then apply morphs
         for (unsigned i = 0; i < morphVertexBuffers_.Size(); ++i)
         {

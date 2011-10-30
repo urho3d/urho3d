@@ -21,37 +21,24 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "Precompiled.h"
+#include "WorkerThread.h"
+#include "WorkItem.h"
+#include "WorkQueue.h"
 
-/// Operating system mutual exclusion primitive.
-class Mutex
+WorkerThread::WorkerThread(WorkQueue* owner, unsigned index) :
+    owner_(owner),
+    index_(index),
+    working_(false)
 {
-public:
-    /// Construct.
-    Mutex();
-    /// Destruct.
-    ~Mutex();
-    
-    /// Acquire the mutex. Block if already acquired.
-    void Acquire();
-    /// Release the mutex.
-    void Release();
-    
-private:
-    /// Mutex handle.
-    void* handle_;
-};
+}
 
-/// Lock that automatically acquires and releases a mutex.
-class MutexLock
+void WorkerThread::ThreadFunction()
 {
-public:
-    /// Construct and acquire the mutex.
-    MutexLock(Mutex& mutex);
-    /// Destruct. Release the mutex.
-    ~MutexLock();
-    
-private:
-    /// Mutex reference.
-    Mutex& mutex_;
-};
+    while (shouldRun_)
+    {
+        WorkItem* item = owner_->GetNextWorkItem(this);
+        if (item)
+            item->Process(index_);
+    }
+}

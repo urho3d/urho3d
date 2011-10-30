@@ -23,35 +23,33 @@
 
 #pragma once
 
-/// Operating system mutual exclusion primitive.
-class Mutex
+#include "RefCounted.h"
+#include "Thread.h"
+
+class WorkQueue;
+
+/// Worker thread managed by the work queue.
+class WorkerThread : public Thread, public RefCounted
 {
 public:
     /// Construct.
-    Mutex();
-    /// Destruct.
-    ~Mutex();
+    WorkerThread(WorkQueue* owner, unsigned index);
     
-    /// Acquire the mutex. Block if already acquired.
-    void Acquire();
-    /// Release the mutex.
-    void Release();
+    /// Process work items until stopped.
+    virtual void ThreadFunction();
     
-private:
-    /// Mutex handle.
-    void* handle_;
-};
-
-/// Lock that automatically acquires and releases a mutex.
-class MutexLock
-{
-public:
-    /// Construct and acquire the mutex.
-    MutexLock(Mutex& mutex);
-    /// Destruct. Release the mutex.
-    ~MutexLock();
+    /// Return thread index.
+    unsigned GetIndex() const { return index_; }
+    /// Set working flag.
+    void SetWorking(bool enable) { working_ = enable; }
+    /// Return whether is working.
+    bool IsWorking() const { return working_; }
     
 private:
-    /// Mutex reference.
-    Mutex& mutex_;
+    /// Work queue.
+    WorkQueue* owner_;
+    /// Thread index.
+    unsigned index_;
+    /// Working flag.
+    volatile bool working_;
 };

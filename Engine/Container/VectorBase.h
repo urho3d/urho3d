@@ -30,6 +30,12 @@ template <class T> class RandomAccessIterator
 {
 public:
     /// Construct.
+    RandomAccessIterator() :
+        ptr_(0)
+    {
+    }
+    
+    /// Construct with an object pointer.
     explicit RandomAccessIterator(T* ptr) :
         ptr_(ptr)
     {
@@ -79,6 +85,12 @@ template <class T> class RandomAccessConstIterator
 {
 public:
     /// Construct.
+    RandomAccessConstIterator() :
+        ptr_(0)
+    {
+    }
+    
+    /// Construct with an object pointer.
     explicit RandomAccessConstIterator(T* ptr) :
         ptr_(ptr)
     {

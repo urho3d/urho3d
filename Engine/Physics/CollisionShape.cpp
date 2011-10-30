@@ -801,6 +801,14 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void CollisionShape::OnMarkedDirty(Node* node)
 {
+    // Physics operations are not safe from worker threads
+    Scene* scene = node->GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
     // If scale has changed, must recreate the geometry
     if (node->GetWorldScale() != geometryScale_)
         CreateGeometry();

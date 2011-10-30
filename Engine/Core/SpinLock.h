@@ -52,7 +52,7 @@ public:
     /// Release the lock.
     void Release()
     {
-        TestAndSet(&locked_, 0);
+        locked_ = 0;
     }
     
 private:

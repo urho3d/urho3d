@@ -42,6 +42,7 @@
 #include "TextureCube.h"
 #include "VertexBuffer.h"
 #include "View.h"
+#include "WorkQueue.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
@@ -55,6 +56,8 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, 1.0f),
     Vector3(0.0f, 0.0f, -1.0f)
 };
+
+static const int DRAWABLES_PER_WORKITEM = 4;
 
 OBJECTTYPESTATIC(View);
 
@@ -590,8 +593,58 @@ void View::UpdateGeometries()
 {
     PROFILE(UpdateGeometries);
     
+    // Split into threaded and non-threaded geometries.
+    threadedGeometries_.Clear();
     for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
-        (*i)->UpdateGeometry(frame_);
+    {
+        if (!(*i)->GetUpdateOnGPU())
+            threadedGeometries_.Push(*i);
+    }
+    
+    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    
+    if (threadedGeometries_.Size())
+    {
+        List<DrawableGeometryUpdate>::Iterator item = drawableGeometryUpdateItems_.Begin();
+        PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
+        
+        while (start != threadedGeometries_.End())
+        {
+            // Create new item to the pool if necessary
+            if (item == drawableGeometryUpdateItems_.End())
+            {
+                drawableGeometryUpdateItems_.Push(DrawableGeometryUpdate());
+                item = --drawableGeometryUpdateItems_.End();
+            }
+            
+            PODVector<Drawable*>::Iterator end = start;
+            int count = 0;
+            while (count < DRAWABLES_PER_WORKITEM && end != threadedGeometries_.End())
+            {
+                ++count;
+                ++end;
+            }
+            
+            item->frame_ = &frame_;
+            item->start_ = start;
+            item->end_ = end;
+            queue->AddWorkItem(&(*item));
+            
+            ++item;
+            start = end;
+        }
+        
+        queue->Start();
+    }
+    
+    // While the work queue is processed, update non-threaded geometries
+    for (PODVector<Drawable*>::ConstIterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
+    {
+        if ((*i)->GetUpdateOnGPU())
+            (*i)->UpdateGeometry(frame_);
+    }
+    
+    queue->FinishAndStop();
 }
 
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)

@@ -573,7 +573,7 @@ void Renderer::Update(float timeStep)
                 debug->SetView(viewport.camera_);
         }
         
-        // Update the viewport's main view and any auxiliary views it Creates
+        // Update the viewport's main view and any auxiliary views it creates
         for (unsigned i = mainView; i < numViews_; ++i)
             views_[i]->Update(frame_);
     }

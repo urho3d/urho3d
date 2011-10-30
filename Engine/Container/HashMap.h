@@ -88,6 +88,11 @@ public:
     {
     public:
         /// Construct.
+        Iterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         Iterator(Node* ptr) :
             HashIteratorBase(ptr)
         {
@@ -113,6 +118,11 @@ public:
     {
     public:
         /// Construct.
+        ConstIterator()
+        {
+        }
+        
+        /// Construct with a node pointer.
         ConstIterator(Node* ptr) :
             HashIteratorBase(ptr)
         {

@@ -51,6 +51,12 @@ class HashIteratorBase
 {
 public:
     /// Construct.
+    HashIteratorBase() :
+        ptr_(0)
+    {
+    }
+    
+    /// Construct with a node pointer.
     explicit HashIteratorBase(HashNodeBase* ptr) :
         ptr_(ptr)
     {

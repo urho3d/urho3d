@@ -77,11 +77,13 @@ public:
     
     /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Update before octree reinsertion. Needs to be requested with MarkForUpdate().
+    /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
     /// Calculate distance and LOD level for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare GPU geometry for rendering. Called on the main thread.
+    /// Return whether the next geometry update will touch actual GPU resources. If not, it can be threaded.
+    virtual bool GetUpdateOnGPU() { return true; }
+    /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }

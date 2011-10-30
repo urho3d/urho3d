@@ -45,6 +45,7 @@
 #include "ScriptAPI.h"
 #include "StringUtils.h"
 #include "UI.h"
+#include "WorkQueue.h"
 
 #include "DebugNew.h"
 
@@ -419,6 +420,7 @@ void Engine::RegisterSubsystems()
     
     // Create and register the rest of the subsystems
     context_->RegisterSubsystem(new Time(context_));
+    context_->RegisterSubsystem(new WorkQueue(context_));
     #ifdef ENABLE_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
     #endif

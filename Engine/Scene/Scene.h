@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Node.h"
+#include "SpinLock.h"
 #include "XMLElement.h"
 
 class File;
@@ -132,6 +133,14 @@ public:
     
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
+    /// Begin a threaded update. During threaded update components can choose to delay dirty processing.
+    void BeginThreadedUpdate();
+    /// End a threaded update. Notify components that marked themselves for delayed dirty processing.
+    void EndThreadedUpdate();
+    /// Add a component to the delayed dirty notify queue. Is thread-safe.
+    void DelayedMarkedDirty(Component* component);
+    /// Return threaded update flag.
+    bool IsThreadedUpdate() const { return threadedUpdate_; }
     /// Get free node ID, either non-local or local.
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
@@ -171,6 +180,10 @@ private:
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
     Map<ShortStringHash, String> varNames_;
+    /// Delayed dirty notification queue for components.
+    PODVector<Component*> delayedDirtyComponents_;
+    /// Lock for the delayed dirty notification queue.
+    SpinLock delayedDirtyLock_;
     /// Next free non-local node ID.
     unsigned replicatedNodeID_;
     /// Next free local node ID.
@@ -189,6 +202,8 @@ private:
     bool active_;
     /// Asynchronous loading flag.
     bool asyncLoading_;
+    /// Threaded update flag.
+    bool threadedUpdate_;
 };
 
 /// Register Scene library objects.

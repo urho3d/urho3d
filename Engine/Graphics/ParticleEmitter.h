@@ -80,8 +80,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Update the particle system. Is called from HandleScenePostUpdate().
-    void Update(float timeStep);
+    /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
+    virtual void Update(const FrameInfo& frame);
+    
     /// Load emitter parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
     /// %Set emitter active/inactive state and optionally reset active/inactive timer.

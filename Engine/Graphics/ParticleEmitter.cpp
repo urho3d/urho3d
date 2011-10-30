@@ -90,17 +90,9 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }
 
-void ParticleEmitter::Update(float timeStep)
+void ParticleEmitter::Update(const FrameInfo& frame)
 {
-    // If no invisible update, check that the billboardset is in view (framenumber has changed)
-    if (!updateInvisible_)
-    {
-        if (viewFrameNumber_ == lastUpdateFrameNumber_)
-            return;
-    }
-    lastUpdateFrameNumber_ = viewFrameNumber_;
-    
-    PROFILE(UpdateParticleEmitter);
+    float timeStep = frame.timeStep_;
     
     // If there is an amount mismatch between particles and billboards, correct it
     if (particles_.Size() != billboards_.Size())
@@ -570,7 +562,10 @@ void ParticleEmitter::GetVector3MinMax(const XMLElement& element, Vector3& minVa
 
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace ScenePostUpdate;
-    
-    Update(eventData[P_TIMESTEP].GetFloat());
+    // If no invisible update, check that the billboardset is in view (framenumber has changed)
+    if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
+    {
+        lastUpdateFrameNumber_ = viewFrameNumber_;
+        MarkForUpdate();
+    }
 }

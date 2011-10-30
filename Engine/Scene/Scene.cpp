@@ -31,6 +31,7 @@
 #include "Profiler.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "WorkQueue.h"
 #include "XMLFile.h"
 
 static const int ASYNC_LOAD_MIN_FPS = 50;
@@ -51,7 +52,8 @@ Scene::Scene(Context* context) :
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     checksum_(0),
     active_(true),
-    asyncLoading_(false)
+    asyncLoading_(false),
+    threadedUpdate_(false)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
     SetID(GetFreeNodeID(REPLICATED));
@@ -391,6 +393,37 @@ void Scene::Update(float timeStep)
     
     // Post-update variable timestep logic
     SendEvent(E_SCENEPOSTUPDATE, eventData);
+}
+
+void Scene::BeginThreadedUpdate()
+{
+    // Check the work queue subsystem whether it actually has created worker threads. If not, do not enter threaded mode.
+    if (GetSubsystem<WorkQueue>()->GetNumThreads())
+        threadedUpdate_ = true;
+}
+
+void Scene::EndThreadedUpdate()
+{
+    if (!threadedUpdate_)
+        return;
+    
+    threadedUpdate_ = false;
+    
+    if (!delayedDirtyComponents_.Empty())
+    {
+        PROFILE(EndThreadedUpdate);
+        
+        for (PODVector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
+            (*i)->OnMarkedDirty((*i)->GetNode());
+        delayedDirtyComponents_.Clear();
+    }
+}
+
+void Scene::DelayedMarkedDirty(Component* component)
+{
+    delayedDirtyLock_.Acquire();
+    delayedDirtyComponents_.Push(component);
+    delayedDirtyLock_.Release();
 }
 
 unsigned Scene::GetFreeNodeID(CreateMode mode)
