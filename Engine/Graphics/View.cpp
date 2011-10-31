@@ -631,15 +631,13 @@ void View::UpdateGeometries()
             ++item;
             start = end;
         }
-        
-        queue->Start();
     }
     
     // While the work queue is processed, update non-threaded geometries
     for (PODVector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
         (*i)->UpdateGeometry(frame_);
     
-    queue->FinishAndStop();
+    queue->Complete();
 }
 
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)

@@ -98,15 +98,18 @@ OBJECTTYPESTATIC(WorkQueue);
 WorkQueue::WorkQueue(Context* context) :
     Object(context),
     impl_(new WorkQueueImpl()),
-    started_(false),
     shutDown_(false),
     numWaiting_(0)
 {
-    // Create worker threads and start them. Leave one core free for the main thread
-    unsigned numCores = GetNumCPUCores();
-    for (unsigned i = 1; i < numCores; ++i)
+    // Create worker threads and start them. Leave one core free for the main thread, and another for GPU & audio.
+    int numCores = GetNumCPUCores();
+    if (numCores == 1)
+        return;
+    int numThreads = Max(numCores - 2, 1);
+    
+    for (int i = 0; i < numThreads; ++i)
     {
-        SharedPtr<WorkerThread> thread(new WorkerThread(this, i));
+        SharedPtr<WorkerThread> thread(new WorkerThread(this, i + 1));
         thread->Start();
         threads_.Push(thread);
     }
@@ -118,7 +121,6 @@ WorkQueue::~WorkQueue()
     if (!threads_.Empty())
     {
         shutDown_ = true;
-        started_ = false;
         
         for (unsigned i = 0; i < threads_.Size(); ++i)
             impl_->Signal();
@@ -132,9 +134,7 @@ WorkQueue::~WorkQueue()
 
 void WorkQueue::AddWorkItem(WorkItem* item)
 {
-    if (!started_)
-        queue_.Push(item);
-    else
+    if (threads_.Size())
     {
         queueLock_.Acquire();
         queue_.Push(item);
@@ -143,29 +143,13 @@ void WorkQueue::AddWorkItem(WorkItem* item)
         if (isWaiting)
             impl_->Signal();
     }
-}
-
-void WorkQueue::Start()
-{
-    if (!threads_.Empty() && !started_)
-    {
-        started_ = true;
-        unsigned numSignals = numWaiting_;
-        for (unsigned i = 0; i < numSignals; ++i)
-            impl_->Signal();
-    }
-}
-
-void WorkQueue::Finish()
-{
-    if (threads_.Empty())
-    {
-        // If no worker threads, do all work now in the main thread
-        for (List<WorkItem*>::Iterator i = queue_.Begin(); i != queue_.End(); ++i)
-            (*i)->Process(0);
-        queue_.Clear();
-    }
     else
+        item->Process(0);
+}
+
+void WorkQueue::Complete()
+{
+    if (threads_.Size())
     {
         // Wait for work to finish while also taking work items in the main thread
         for (;;)
@@ -188,19 +172,17 @@ void WorkQueue::Finish()
     }
 }
 
-void WorkQueue::FinishAndStop()
-{
-    Finish();
-    started_ = false;
-}
-
 bool WorkQueue::IsCompleted()
 {
-    queueLock_.Acquire();
-    bool completed = queue_.Empty() && numWaiting_ == threads_.Size();
-    queueLock_.Release();
-    
-    return completed;
+    if (threads_.Size())
+    {
+        queueLock_.Acquire();
+        bool completed = queue_.Empty() && numWaiting_ == threads_.Size();
+        queueLock_.Release();
+        return completed;
+    }
+    else
+        return true;
 }
 
 WorkItem* WorkQueue::GetNextWorkItem()
@@ -219,7 +201,7 @@ WorkItem* WorkQueue::GetNextWorkItem()
             --numWaiting_;
             wasWaiting = false;
         }
-        if (started_ && !queue_.Empty())
+        if (!queue_.Empty())
         {
             item = queue_.Front();
             queue_.PopFront();

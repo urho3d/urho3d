@@ -44,19 +44,13 @@ public:
     /// Destruct.
     ~WorkQueue();
     
-    /// Add a work item. If work has been started, this incurs synchronization overhead.
+    /// Add a work item. If no threads, will process it immediately.
     void AddWorkItem(WorkItem* item);
-    /// Start working. No-op on single-core systems, which have no worker threads.
-    void Start();
-    /// Finish all current work items without stopping further work. On single-core systems all work will be done here.
-    void Finish();
-    /// Finish all work items and stop further work. On single-core systems all work will be done here.
-    void FinishAndStop();
+    /// Finish all current work items.
+    void Complete();
     
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
-    /// Return whether work has been started. Always false on single-core systems.
-    bool IsStarted() const { return started_; }
     /// Return whether all work is completed.
     bool IsCompleted();
     
@@ -70,12 +64,10 @@ private:
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item queue.
     List<WorkItem*> queue_;
-    /// Queue spinlock.
+    /// Queue lock.
     SpinLock queueLock_;
     /// Number of waiting threads.
     unsigned numWaiting_;
-    /// Started flag.
-    volatile bool started_;
     /// Shutting down flag.
     volatile bool shutDown_;
 };

@@ -474,8 +474,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
         start = end;
     }
     
-    queue->Start();
-    queue->FinishAndStop();
+    queue->Complete();
     drawableUpdates_.Clear();
     
     scene->EndThreadedUpdate();
