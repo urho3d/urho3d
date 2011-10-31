@@ -28,34 +28,11 @@
 #include "SpinLock.h"
 #include "WorkItem.h"
 
-class Drawable;
 class Octree;
 class OctreeQuery;
 class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
-
-/// Drawable update work item.
-class DrawableUpdate : public WorkItem
-{
-public:
-    /// Do the work.
-    virtual void Process(unsigned threadIndex)
-    {
-        for (PODVector<Drawable*>::Iterator i = start_; i != end_; ++i)
-        {
-            (*i)->Update(*frame_);
-            (*i)->updateQueued_ = false;
-        }
-    }
-    
-    /// Frame info.
-    const FrameInfo* frame_;
-    /// Start iterator.
-    PODVector<Drawable*>::Iterator start_;
-    /// End iterator.
-    PODVector<Drawable*>::Iterator end_;
-};
 
 /// %Octree octant
 class Octant
@@ -231,8 +208,6 @@ private:
     PODVector<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.
     PODVector<Drawable*> drawableReinsertions_;
-    /// Pool for drawable update work items.
-    List<DrawableUpdate> drawableUpdateItems_;
     /// Lock for octree reinsertions.
     SpinLock reinsertionLock_;
     /// Unculled drawables.

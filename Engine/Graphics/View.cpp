@@ -57,6 +57,20 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, -1.0f)
 };
 
+void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
+{
+    const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    
+    while (start != end)
+    {
+        Drawable* drawable = *start;
+        drawable->UpdateGeometry(frame);
+        ++start;
+    }
+}
+
 OBJECTTYPESTATIC(View);
 
 View::View(Context* context) :
@@ -607,28 +621,20 @@ void View::UpdateGeometries()
     
     if (threadedGeometries_.Size())
     {
-        List<DrawableGeometryUpdate>::Iterator item = drawableGeometryUpdateItems_.Begin();
         PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
-        
         while (start != threadedGeometries_.End())
         {
-            // Create new item to the pool if necessary
-            if (item == drawableGeometryUpdateItems_.End())
-            {
-                drawableGeometryUpdateItems_.Push(DrawableGeometryUpdate());
-                item = --drawableGeometryUpdateItems_.End();
-            }
-            
             PODVector<Drawable*>::Iterator end = start;
             while (end - start < DRAWABLES_PER_WORK_ITEM && end != threadedGeometries_.End())
                 ++end;
             
-            item->frame_ = &frame_;
-            item->start_ = start;
-            item->end_ = end;
-            queue->AddWorkItem(&(*item));
+            WorkItem item;
+            item.workFunction_ = UpdateDrawableGeometriesWork;
+            item.start_ = &(*start);
+            item.end_ = &(*end);
+            item.aux_ = const_cast<FrameInfo*>(&frame_);
+            queue->AddWorkItem(item);
             
-            ++item;
             start = end;
         }
     }

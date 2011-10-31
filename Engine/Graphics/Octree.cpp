@@ -40,6 +40,21 @@
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
 
+void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
+{
+    const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    
+    while (start != end)
+    {
+        Drawable* drawable = *start;
+        drawable->Update(frame);
+        drawable->updateQueued_ = false;
+        ++start;
+    }
+}
+
 inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
     return lhs.distance_ < rhs.distance_;
@@ -446,31 +461,23 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     PROFILE_MULTIPLE(UpdateDrawable, drawableUpdates_.Size());
     
     Scene* scene = node_->GetScene();
+    WorkQueue* queue = GetSubsystem<WorkQueue>();
     scene->BeginThreadedUpdate();
     
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
-    List<DrawableUpdate>::Iterator item = drawableUpdateItems_.Begin();
     PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
-    
     while (start != drawableUpdates_.End())
     {
-        // Create new item to the pool if necessary
-        if (item == drawableUpdateItems_.End())
-        {
-            drawableUpdateItems_.Push(DrawableUpdate());
-            item = --drawableUpdateItems_.End();
-        }
-        
         PODVector<Drawable*>::Iterator end = start;
         while (end - start < DRAWABLES_PER_WORK_ITEM && end != drawableUpdates_.End())
             ++end;
         
-        item->frame_ = &frame;
-        item->start_ = start;
-        item->end_ = end;
-        queue->AddWorkItem(&(*item));
+        WorkItem item;
+        item.workFunction_ = UpdateDrawablesWork;
+        item.start_ = &(*start);
+        item.end_ = &(*end);
+        item.aux_ = const_cast<FrameInfo*>(&frame);
+        queue->AddWorkItem(item);
         
-        ++item;
         start = end;
     }
     

@@ -132,7 +132,7 @@ WorkQueue::~WorkQueue()
     impl_ = 0;
 }
 
-void WorkQueue::AddWorkItem(WorkItem* item)
+void WorkQueue::AddWorkItem(const WorkItem& item)
 {
     if (threads_.Size())
     {
@@ -144,7 +144,7 @@ void WorkQueue::AddWorkItem(WorkItem* item)
             impl_->Signal();
     }
     else
-        item->Process(0);
+        item.workFunction_(&item, 0);
 }
 
 void WorkQueue::Complete()
@@ -154,20 +154,20 @@ void WorkQueue::Complete()
         // Wait for work to finish while also taking work items in the main thread
         for (;;)
         {
-            WorkItem* item = 0;
-            
             queueLock_.Acquire();
             if (!queue_.Empty())
             {
-                item = queue_.Front();
+                WorkItem item = queue_.Front();
                 queue_.PopFront();
+                queueLock_.Release();
+                item.workFunction_(&item, 0);
             }
-            queueLock_.Release();
-            
-            if (item)
-                item->Process(0);
-            else if (numWaiting_ == threads_.Size())
-                break;
+            else
+            {
+                queueLock_.Release();
+                if (numWaiting_ == threads_.Size())
+                    break;
+            }
         }
     }
 }
@@ -185,16 +185,15 @@ bool WorkQueue::IsCompleted()
         return true;
 }
 
-WorkItem* WorkQueue::GetNextWorkItem()
+void WorkQueue::ProcessItems(unsigned threadIndex)
 {
     bool wasWaiting = false;
     
     for (;;)
     {
         if (shutDown_)
-            return 0;
+            return;
         
-        WorkItem* item = 0;
         queueLock_.Acquire();
         if (wasWaiting)
         {
@@ -203,13 +202,10 @@ WorkItem* WorkQueue::GetNextWorkItem()
         }
         if (!queue_.Empty())
         {
-            item = queue_.Front();
+            WorkItem item = queue_.Front();
             queue_.PopFront();
-        }
-        if (item)
-        {
             queueLock_.Release();
-            return item;
+            item.workFunction_(&item, threadIndex);
         }
         else
         {

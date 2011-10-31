@@ -28,8 +28,20 @@
 #include "SpinLock.h"
 
 class WorkerThread;
-class WorkItem;
 class WorkQueueImpl;
+
+/// Work queue item.
+struct WorkItem
+{
+    /// Work function. Called with the work item and thread index (0 = main thread) as parameters.
+    void (*workFunction_)(const WorkItem*, unsigned);
+    /// Data start pointer.
+    void* start_;
+    /// Data end pointer.
+    void* end_;
+    /// Auxiliary data pointer.
+    void* aux_;
+};
 
 /// Work queue subsystem.
 class WorkQueue : public Object
@@ -45,7 +57,7 @@ public:
     ~WorkQueue();
     
     /// Add a work item. If no threads, will process it immediately.
-    void AddWorkItem(WorkItem* item);
+    void AddWorkItem(const WorkItem& item);
     /// Finish all current work items.
     void Complete();
     
@@ -55,15 +67,15 @@ public:
     bool IsCompleted();
     
 private:
-    /// Block until a work item is available and return it. May return null. Called by the worker threads.
-    WorkItem* GetNextWorkItem();
+    /// Process work items until shut down. Called by the worker threads.
+    void ProcessItems(unsigned threadIndex);
     
     /// Work queue implementation. Contains the operating system-specific signaling mechanism.
     WorkQueueImpl* impl_;
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item queue.
-    List<WorkItem*> queue_;
+    List<WorkItem> queue_;
     /// Queue lock.
     SpinLock queueLock_;
     /// Number of waiting threads.

@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Batch.h"
-#include "Drawable.h"
 #include "HashSet.h"
 #include "List.h"
 #include "Object.h"
@@ -50,25 +49,6 @@ struct GeometryDepthBounds
     float min_;
     /// Maximum value.
     float max_;
-};
-
-/// Drawable geometry update work item.
-class DrawableGeometryUpdate : public WorkItem
-{
-public:
-    /// Do the work.
-    virtual void Process(unsigned threadIndex)
-    {
-        for (PODVector<Drawable*>::Iterator i = start_; i != end_; ++i)
-            (*i)->UpdateGeometry(*frame_);
-    }
-    
-    /// Frame info.
-    const FrameInfo* frame_;
-    /// Start iterator.
-    PODVector<Drawable*>::Iterator start_;
-    /// End iterator.
-    PODVector<Drawable*>::Iterator end_;
 };
 
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
@@ -248,8 +228,6 @@ private:
     Map<Light*, unsigned> lightQueueIndex_;
     /// Cache for light scissor queries.
     HashMap<Light*, Rect> lightScissorCache_;
-    /// Pool for drawable geometry update work items.
-    List<DrawableGeometryUpdate> drawableGeometryUpdateItems_;
     /// Base pass batches.
     BatchQueue baseQueue_;
     /// Pre-transparent pass batches.

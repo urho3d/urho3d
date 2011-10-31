@@ -47,6 +47,7 @@ class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
 class Zone;
+struct WorkItem;
 
 /// Geometry update type.
 enum UpdateGeometryType
@@ -74,9 +75,9 @@ class Drawable : public Component
 {
     OBJECT(Drawable);
     
-    friend class DrawableUpdate;
     friend class Octant;
     friend class Octree;
+    friend void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex);
     
 public:
     /// Construct.
