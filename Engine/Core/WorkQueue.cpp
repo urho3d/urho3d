@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "ProcessUtils.h"
-#include "Profiler.h"
 #include "WorkerThread.h"
 #include "WorkQueue.h"
 
@@ -105,7 +104,7 @@ WorkQueue::WorkQueue(Context* context) :
     int numCores = GetNumCPUCores();
     if (numCores == 1)
         return;
-    int numThreads = Max(numCores - 2, 1);
+    int numThreads = Clamp(numCores - 2, 1, 4);
     
     for (int i = 0; i < numThreads; ++i)
     {
@@ -141,10 +140,7 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
         bool isWaiting = numWaiting_ > 0;
         queueLock_.Release();
         if (isWaiting)
-        {
-            PROFILE(SignalWorkerThreads);
             impl_->Signal();
-        }
     }
     else
         item.workFunction_(&item, 0);

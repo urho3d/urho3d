@@ -63,7 +63,7 @@ public:
     
     /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, const Viewport& viewport);
-    /// Update culling and construct rendering batches.
+    /// Update and cull objects and construct rendering batches.
     void Update(const FrameInfo& frame);
     /// Render batches.
     void Render();
@@ -92,7 +92,7 @@ private:
     void GetDrawables();
     /// Construct batches from the drawable objects.
     void GetBatches();
-    /// Prepare GPU resources of drawable objects. Must be called from the main thread.
+    /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get lit batches for a certain light and drawable.
     void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
@@ -138,8 +138,6 @@ private:
     void CheckMaterialForAuxView(Material* material);
     /// Finalize a batch. Convert it to instanced if possible, choose shaders for it, and calculate the sort key.
     void FinalizeBatch(Batch& batch, Technique* tech, Pass* pass, bool allowInstancing = true, bool allowShadows = true);
-    /// Sort all batches.
-    void SortBatches();
     /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
     /// Render everything in a batch queue, priority batches first.

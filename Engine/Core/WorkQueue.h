@@ -79,7 +79,7 @@ private:
     /// Queue lock.
     SpinLock queueLock_;
     /// Number of waiting threads.
-    unsigned numWaiting_;
+    volatile unsigned numWaiting_;
     /// Shutting down flag.
     volatile bool shutDown_;
 };

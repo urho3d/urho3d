@@ -624,53 +624,78 @@ void View::GetBatches()
             }
         }
     }
-    
-    // All batches have been collected. Sort them now
-    SortBatches();
 }
 
 void View::UpdateGeometries()
 {
-    // Split into threaded and non-threaded geometries.
-    nonThreadedGeometries_.Clear();
-    threadedGeometries_.Clear();
-    for (PODVector<Drawable*>::Iterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
-    {
-        UpdateGeometryType type = (*i)->GetUpdateGeometryType();
-        if (type == UPDATE_MAIN_THREAD)
-            nonThreadedGeometries_.Push(*i);
-        else if (type == UPDATE_WORKER_THREAD)
-            threadedGeometries_.Push(*i);
-    }
-    
-    PROFILE_MULTIPLE(UpdateGeometry, nonThreadedGeometries_.Size() + threadedGeometries_.Size());
+    PROFILE(UpdateGeometries);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     
-    if (threadedGeometries_.Size())
+    // Sort batches
     {
-        PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
-        while (start != threadedGeometries_.End())
+        WorkItem item;
+        
+        item.workFunction_ = SortBatchQueueFrontToBackWork;
+        item.start_ = &baseQueue_;
+        queue->AddWorkItem(item);
+        item.start_ = &preAlphaQueue_;
+        queue->AddWorkItem(item);
+        
+        item.workFunction_ = SortBatchQueueBackToFrontWork;
+        item.start_ = &alphaQueue_;
+        queue->AddWorkItem(item);
+        item.start_ = &postAlphaQueue_;
+        queue->AddWorkItem(item);
+
+        if (lightQueues_.Size())
         {
-            PODVector<Drawable*>::Iterator end = start;
-            while (end - start < DRAWABLES_PER_WORK_ITEM && end != threadedGeometries_.End())
-                ++end;
-            
-            WorkItem item;
-            item.workFunction_ = UpdateDrawableGeometriesWork;
-            item.start_ = &(*start);
-            item.end_ = &(*end);
-            item.aux_ = const_cast<FrameInfo*>(&frame_);
+            item.workFunction_ = SortLightQueuesWork;
+            item.start_ = &lightQueues_.Front();
+            item.end_ = &lightQueues_.Back() + 1;
             queue->AddWorkItem(item);
-            
-            start = end;
         }
     }
     
-    // While the work queue is processed, update non-threaded geometries
-    for (PODVector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
-        (*i)->UpdateGeometry(frame_);
+    // Update geometries. Split into threaded and non-threaded updates.
+    {
+        nonThreadedGeometries_.Clear();
+        threadedGeometries_.Clear();
+        for (PODVector<Drawable*>::Iterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
+        {
+            UpdateGeometryType type = (*i)->GetUpdateGeometryType();
+            if (type == UPDATE_MAIN_THREAD)
+                nonThreadedGeometries_.Push(*i);
+            else if (type == UPDATE_WORKER_THREAD)
+                threadedGeometries_.Push(*i);
+        }
+        
+        if (threadedGeometries_.Size())
+        {
+            PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
+            while (start != threadedGeometries_.End())
+            {
+                PODVector<Drawable*>::Iterator end = start;
+                while (end - start < DRAWABLES_PER_WORK_ITEM && end != threadedGeometries_.End())
+                    ++end;
+                
+                WorkItem item;
+                item.workFunction_ = UpdateDrawableGeometriesWork;
+                item.start_ = &(*start);
+                item.end_ = &(*end);
+                item.aux_ = const_cast<FrameInfo*>(&frame_);
+                queue->AddWorkItem(item);
+                
+                start = end;
+            }
+        }
+        
+        // While the work queue is processed, update non-threaded geometries
+        for (PODVector<Drawable*>::ConstIterator i = nonThreadedGeometries_.Begin(); i != nonThreadedGeometries_.End(); ++i)
+            (*i)->UpdateGeometry(frame_);
+    }
     
+    // Finally ensure all threaded work has completed
     queue->Complete();
 }
 
@@ -1663,36 +1688,6 @@ void View::FinalizeBatch(Batch& batch, Technique* tech, Pass* pass, bool allowIn
     batch.pass_ = pass;
     renderer_->SetBatchShaders(batch, tech, pass, allowShadows);
     batch.CalculateSortKey();
-}
-
-void View::SortBatches()
-{
-    PROFILE(SortBatches);
-    
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
-    WorkItem item;
-    
-    item.workFunction_ = SortBatchQueueFrontToBackWork;
-    item.start_ = &baseQueue_;
-    queue->AddWorkItem(item);
-    item.start_ = &preAlphaQueue_;
-    queue->AddWorkItem(item);
-    
-    item.workFunction_ = SortBatchQueueBackToFrontWork;
-    item.start_ = &alphaQueue_;
-    queue->AddWorkItem(item);
-    item.start_ = &postAlphaQueue_;
-    queue->AddWorkItem(item);
-
-    if (lightQueues_.Size())
-    {
-        item.workFunction_ = SortLightQueuesWork;
-        item.start_ = &lightQueues_.Front();
-        item.end_ = &lightQueues_.Back() + 1;
-        queue->AddWorkItem(item);
-    }
-    
-    queue->Complete();
 }
 
 void View::PrepareInstancingBuffer()

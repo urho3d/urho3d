@@ -458,7 +458,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     if (drawableUpdates_.Empty())
         return;
     
-    PROFILE_MULTIPLE(UpdateDrawable, drawableUpdates_.Size());
+    PROFILE(UpdateDrawables);
     
     Scene* scene = node_->GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -499,7 +499,7 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     if (drawableReinsertions_.Empty())
         return;
     
-    PROFILE_MULTIPLE(ReinsertDrawable, drawableReinsertions_.Size());
+    PROFILE(ReinsertDrawables);
     
     // Reinsert drawables into the octree
     for (PODVector<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
