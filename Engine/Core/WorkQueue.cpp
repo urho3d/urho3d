@@ -100,7 +100,8 @@ WorkQueue::WorkQueue(Context* context) :
     shutDown_(false),
     numWaiting_(0)
 {
-    // Create worker threads and start them. Leave one core free for the main thread, and another for GPU & audio.
+    // Create worker threads and start them. For now use a maximum of 4 worker threads, and leave cores free for the main thread
+    // and the GPU driver + audio processing
     int numCores = GetNumCPUCores();
     if (numCores == 1)
         return;
@@ -135,10 +136,10 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
 {
     if (threads_.Size())
     {
-        queueLock_.Acquire();
+        queueMutex_.Acquire();
         queue_.Push(item);
         bool isWaiting = numWaiting_ > 0;
-        queueLock_.Release();
+        queueMutex_.Release();
         if (isWaiting)
             impl_->Signal();
     }
@@ -153,17 +154,17 @@ void WorkQueue::Complete()
         // Wait for work to finish while also taking work items in the main thread
         for (;;)
         {
-            queueLock_.Acquire();
+            queueMutex_.Acquire();
             if (!queue_.Empty())
             {
                 WorkItem item = queue_.Front();
                 queue_.PopFront();
-                queueLock_.Release();
+                queueMutex_.Release();
                 item.workFunction_(&item, 0);
             }
             else
             {
-                queueLock_.Release();
+                queueMutex_.Release();
                 if (numWaiting_ == threads_.Size())
                     break;
             }
@@ -175,9 +176,9 @@ bool WorkQueue::IsCompleted()
 {
     if (threads_.Size())
     {
-        queueLock_.Acquire();
+        queueMutex_.Acquire();
         bool completed = queue_.Empty() && numWaiting_ == threads_.Size();
-        queueLock_.Release();
+        queueMutex_.Release();
         return completed;
     }
     else
@@ -193,7 +194,7 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         if (shutDown_)
             return;
         
-        queueLock_.Acquire();
+        queueMutex_.Acquire();
         if (wasWaiting)
         {
             --numWaiting_;
@@ -203,13 +204,13 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         {
             WorkItem item = queue_.Front();
             queue_.PopFront();
-            queueLock_.Release();
+            queueMutex_.Release();
             item.workFunction_(&item, threadIndex);
         }
         else
         {
             ++numWaiting_;
-            queueLock_.Release();
+            queueMutex_.Release();
             impl_->Wait();
             wasWaiting = true;
         }

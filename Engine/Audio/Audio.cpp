@@ -216,15 +216,11 @@ public:
                 {
                     // Mix sound to locked positions
                     {
-                        SpinLock& lock = owner_->GetLock();
-                        lock.Acquire();
-                        
+                        MutexLock lock(owner_->GetMutex());
                         if (bytes1)
                             owner_->MixOutput(ptr1, bytes1 / sampleSize_);
                         if (bytes2)
                             owner_->MixOutput(ptr2, bytes2 / sampleSize_);
-                        
-                        lock.Release();
                     }
                     
                     // Unlock buffer and update write cursor
@@ -456,9 +452,8 @@ float Audio::GetMasterGain(SoundType type) const
 
 void Audio::AddSoundSource(SoundSource* channel)
 {
-    audioLock_.Acquire();
+    MutexLock lock(audioMutex_);
     soundSources_.Push(channel);
-    audioLock_.Release();
 }
 
 void Audio::RemoveSoundSource(SoundSource* channel)
@@ -466,9 +461,8 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     PODVector<SoundSource*>::Iterator i = soundSources_.Find(channel);
     if (i != soundSources_.End())
     {
-        audioLock_.Acquire();
+        MutexLock lock(audioMutex_);
         soundSources_.Erase(i);
-        audioLock_.Release();
     }
 }
 
@@ -479,10 +473,8 @@ int AudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long fra
     Audio* audio = static_cast<Audio*>(userData);
     
     {
-        SpinLock& lock = audio->GetLock();
-        lock.Acquire();
+        MutexLock lock(audio->GetMutex());
         audio->MixOutput(outputBuffer, framesPerBuffer);
-        lock.Release();
     }
     
     return 0;

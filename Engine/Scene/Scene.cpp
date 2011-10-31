@@ -421,9 +421,8 @@ void Scene::EndThreadedUpdate()
 
 void Scene::DelayedMarkedDirty(Component* component)
 {
-    delayedDirtyLock_.Acquire();
+    MutexLock lock(sceneMutex_);
     delayedDirtyComponents_.Push(component);
-    delayedDirtyLock_.Release();
 }
 
 unsigned Scene::GetFreeNodeID(CreateMode mode)

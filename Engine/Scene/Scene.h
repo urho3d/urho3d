@@ -23,8 +23,8 @@
 
 #pragma once
 
+#include "Mutex.h"
 #include "Node.h"
-#include "SpinLock.h"
 #include "XMLElement.h"
 
 class File;
@@ -182,8 +182,8 @@ private:
     Map<ShortStringHash, String> varNames_;
     /// Delayed dirty notification queue for components.
     PODVector<Component*> delayedDirtyComponents_;
-    /// Lock for the delayed dirty notification queue.
-    SpinLock delayedDirtyLock_;
+    /// Mutex for the delayed dirty notification queue.
+    Mutex sceneMutex_;
     /// Next free non-local node ID.
     unsigned replicatedNodeID_;
     /// Next free local node ID.

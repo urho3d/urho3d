@@ -25,7 +25,7 @@
 
 #include "Drawable.h"
 #include "List.h"
-#include "SpinLock.h"
+#include "Mutex.h"
 
 class Octree;
 class OctreeQuery;
@@ -207,8 +207,8 @@ private:
     PODVector<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.
     PODVector<Drawable*> drawableReinsertions_;
-    /// Lock for octree reinsertions.
-    SpinLock reinsertionLock_;
+    /// Mutex for octree reinsertions.
+    Mutex octreeMutex_;
     /// Unculled drawables.
     Vector<WeakPtr<Drawable> > unculledDrawables_;
     /// Subdivision level.

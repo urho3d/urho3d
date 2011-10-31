@@ -407,9 +407,8 @@ void Octree::QueueReinsertion(Drawable* drawable)
 {
     if (scene_ && scene_->IsThreadedUpdate())
     {
-        reinsertionLock_.Acquire();
+        MutexLock lock(octreeMutex_);
         drawableReinsertions_.Push(drawable);
-        reinsertionLock_.Release();
     }
     else
         drawableReinsertions_.Push(drawable);

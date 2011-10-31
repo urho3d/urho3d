@@ -24,8 +24,8 @@
 #pragma once
 
 #include "List.h"
+#include "Mutex.h"
 #include "Object.h"
-#include "SpinLock.h"
 
 class WorkerThread;
 class WorkQueueImpl;
@@ -76,8 +76,8 @@ private:
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item queue.
     List<WorkItem> queue_;
-    /// Queue lock.
-    SpinLock queueLock_;
+    /// Queue mutex.
+    Mutex queueMutex_;
     /// Number of waiting threads.
     volatile unsigned numWaiting_;
     /// Shutting down flag.

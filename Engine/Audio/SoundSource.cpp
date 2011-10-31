@@ -156,10 +156,8 @@ void SoundSource::Play(Sound* sound)
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
     {
-        SpinLock& lock = audio_->GetLock();
-        lock.Acquire();
+        MutexLock lock(audio_->GetMutex());
         PlayLockless(sound);
-        lock.Release();
     }
     else
         PlayLockless(sound);
@@ -194,10 +192,8 @@ void SoundSource::Stop()
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
     {
-        SpinLock& lock = audio_->GetLock();
-        lock.Acquire();
+        MutexLock lock(audio_->GetMutex());
         StopLockless();
-        lock.Release();
     }
     
     // Free the compressed sound decoder now if any
@@ -248,10 +244,8 @@ void SoundSource::SetPlayPosition(signed char* pos)
     if (!audio_ || !sound_)
         return;
     
-    SpinLock& lock = audio_->GetLock();
-    lock.Acquire();
+    MutexLock lock(audio_->GetMutex());
     SetPlayPositionLockless(pos);
-    lock.Release();
 }
 
 void SoundSource::PlayLockless(Sound* sound)

@@ -25,9 +25,9 @@
 
 #include "ArrayPtr.h"
 #include "AudioDefs.h"
+#include "Mutex.h"
 #include "Object.h"
 #include "Quaternion.h"
-#include "SpinLock.h"
 #include "Thread.h"
 
 class AudioImpl;
@@ -89,8 +89,8 @@ public:
     void AddSoundSource(SoundSource* soundSource);
     /// Remove a sound source. Called by SoundSource.
     void RemoveSoundSource(SoundSource* soundSource);
-    /// Return audio thread spinlock. Note: it is not re-entrant.
-    SpinLock& GetLock() { return audioLock_; }
+    /// Return audio thread mutex
+    Mutex& GetMutex() { return audioMutex_; }
     /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
     
@@ -107,8 +107,8 @@ private:
     void* stream_;
     /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
-    /// Audio thread spinlock.
-    SpinLock audioLock_;
+    /// Audio thread mutex.
+    Mutex audioMutex_;
     /// Sample size.
     unsigned sampleSize_;
     /// Clip buffer size in samples.
