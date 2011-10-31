@@ -63,7 +63,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance and LOD level for rendering.
+    /// Calculate distance and LOD level for rendering.  May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Return whether the next geometry update will touch actual GPU resources.
     virtual bool GetUpdateOnGPU() { return true; }

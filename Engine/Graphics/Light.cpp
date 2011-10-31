@@ -26,7 +26,6 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Light.h"
-#include "Log.h"
 #include "OctreeQuery.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -192,7 +191,6 @@ void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
             float distance = query.ray_.HitDistance(GetFrustum());
             if (distance < query.maxDistance_)
             {
-                LOGINFO("Frustum hitdistance: " + String(distance));
                 RayQueryResult result;
                 result.drawable_ = this;
                 result.node_ = GetNode();

@@ -493,36 +493,6 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
     return numOccluders;
 }
 
-unsigned Renderer::GetNumShadowOccluders(bool allViews) const
-{
-    unsigned numShadowOccluders = 0;
-    unsigned lastView = allViews ? numViews_ : 1;
-    
-    for (unsigned i = 0; i < lastView; ++i)
-        numShadowOccluders += views_[i]->GetShadowOccluders().Size();
-    
-    return numShadowOccluders;
-}
-
-const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool halfResolution)
-{
-    // Return an occlusion buffer for debug output purposes. Do not allocate new
-    int width = occlusionBufferSize_;
-    int height = (int)(occlusionBufferSize_ / aspectRatio);
-    if (halfResolution)
-    {
-        width >>= 1;
-        height >>= 1;
-    }
-    int searchKey = (width << 16) | height;
-    
-    HashMap<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
-    if (i != occlusionBuffers_.End())
-        return i->second_;
-    else
-        return 0;
-}
-
 void Renderer::Update(float timeStep)
 {
     PROFILE(UpdateViews);
@@ -1023,6 +993,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
 
 Camera* Renderer::CreateShadowCamera()
 {
+    MutexLock lock(rendererMutex_);
+    
     if (numShadowCameras_ >= shadowCameraNodes_.Size())
     {
         SharedPtr<Node> newNode(new Node(context_));

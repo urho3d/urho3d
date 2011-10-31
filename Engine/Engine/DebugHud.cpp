@@ -119,7 +119,7 @@ void DebugHud::Update(float timeStep)
             "\nViews " + String(renderer->GetNumViews()) + 
             "\nLights " + String(renderer->GetNumLights(true)) +
             "\nShadowmaps " + String(renderer->GetNumShadowMaps(true)) +
-            "\nOccluders " + String(renderer->GetNumOccluders(true) + renderer->GetNumShadowOccluders(true));
+            "\nOccluders " + String(renderer->GetNumOccluders(true));
         
         statsText_->SetText(stats);
     }

@@ -40,6 +40,7 @@ class Technique;
 class Texture2D;
 class Zone;
 struct Viewport;
+struct WorkItem;
 
 /// %Geometry view space depth minimum and maximum values.
 struct GeometryDepthBounds
@@ -50,9 +51,36 @@ struct GeometryDepthBounds
     float max_;
 };
 
+/// Intermediate light processing result.
+struct LightQueryResult
+{
+    /// Light.
+    Light* light_;
+    /// Threaded processing flag.
+    bool threaded_;
+    /// Octree query result.
+    PODVector<Drawable*> tempDrawables_;
+    /// Lit geometries.
+    PODVector<Drawable*> litGeometries_;
+    /// Shadow casters.
+    PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
+    /// Shadow cameras.
+    Camera* shadowCameras_[MAX_LIGHT_SPLITS];
+    /// Combined bounding box of shadow casters in light view or projection space.
+    BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
+    /// Shadow camera near splits (directional lights only.)
+    float shadowNearSplits_[MAX_LIGHT_SPLITS];
+    /// Shadow camera far splits (directional lights only.)
+    float shadowFarSplits_[MAX_LIGHT_SPLITS];
+    /// Shadow map split count.
+    unsigned numSplits_;
+};
+
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class View : public Object
 {
+    friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
+    
     OBJECT(View);
     
 public:
@@ -80,8 +108,6 @@ public:
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
     /// Return occluder objects.
     const PODVector<Drawable*>& GetOccluders() const { return occluders_; }
-    /// Return directional light shadow rendering occluders.
-    const PODVector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
     /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues.
@@ -103,11 +129,11 @@ private:
     /// Draw occluders to occlusion buffer.
     void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
-    unsigned ProcessLight(Light* light);
+    void ProcessLight(LightQueryResult& query);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
-    void ProcessShadowCasters(Light* light, unsigned splitIndex, const PODVector<Drawable*>& drawables, BoundingBox& shadowCasterBox);
-    /// %Set up initial shadow camera view(s). Returns the number of splits used.
-    unsigned SetupShadowCameras(Light* light);
+    void ProcessShadowCasters(LightQueryResult& query, unsigned splitIndex);
+    /// %Set up initial shadow camera view(s).
+    void SetupShadowCameras(LightQueryResult& query);
     /// %Set up a directional light shadow camera
     void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit, bool shadowOcclusion);
     /// Finalize shadow camera view after shadow casters and the shadow map are known.
@@ -185,23 +211,11 @@ private:
     BoundingBox sceneViewBox_;
     /// Volume for frustum clipping.
     Polyhedron frustumVolume_;
-    /// Current shadow cameras being processed.
-    Camera* shadowCameras_[MAX_LIGHT_SPLITS];
-    /// Current shadow casters being processed.
-    PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
-    /// Combined bounding box of shadow casters in light view or projection space.
-    BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
-    /// Shadow camera near splits (directional lights only.)
-    float shadowNearSplits_[MAX_LIGHT_SPLITS];
-    /// Shadow camera far splits (directional lights only.)
-    float shadowFarSplits_[MAX_LIGHT_SPLITS];
-    /// Current lit geometries being processed.
-    PODVector<Drawable*> litGeometries_;
-    /// Temporary drawable query result.
+    /// Octree query result.
     PODVector<Drawable*> tempDrawables_;
-    /// Temporary zone query result.
+    /// Octree zone query result.
     PODVector<Zone*> tempZones_;
-    /// Visible zones query result.
+    /// Visible zones.
     PODVector<Zone*> zones_;
     /// Visible geometry objects.
     PODVector<Drawable*> geometries_;
@@ -233,6 +247,8 @@ private:
     BatchQueue alphaQueue_;
     /// Post-transparent pass batches.
     BatchQueue postAlphaQueue_;
+    /// Intermediate light processing results.
+    Vector<LightQueryResult> lightQueryResults_;
     /// Light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Current stencil value for light optimization.

@@ -52,7 +52,7 @@ public:
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Animation is updated here.
     virtual void Update(const FrameInfo& frame);
-    /// Calculate distance and LOD level for rendering.
+    /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);

@@ -373,8 +373,6 @@ void Octree::RemoveManualDrawable(Drawable* drawable)
 
 void Octree::GetDrawables(OctreeQuery& query) const
 {
-    PROFILE(OctreeQuery);
-    
     query.result_.Clear();
     GetDrawablesInternal(query, false);
 }

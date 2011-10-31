@@ -42,7 +42,7 @@ public:
     
     /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Calculate distance and LOD level for rendering.
+    /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Return number of batches.
     virtual unsigned GetNumBatches();

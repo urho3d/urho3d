@@ -28,6 +28,7 @@
 #include "Drawable.h"
 #include "HashMap.h"
 #include "HashSet.h"
+#include "Mutex.h"
 #include "RenderSurface.h"
 
 class DebugRenderer;
@@ -193,10 +194,6 @@ public:
     unsigned GetNumShadowMaps(bool allViews = false) const;
     /// Return number of occluders rendered.
     unsigned GetNumOccluders(bool allViews = false) const;
-    /// Return number of directional light shadow occluders rendered.
-    unsigned GetNumShadowOccluders(bool allViews = false) const;
-    /// Return an occlusion buffer for inspection.
-    const OcclusionBuffer* GetOcclusionBuffer(float aspectRatio, bool halfResolution = false);
     /// Return the default zone.
     Zone* GetDefaultZone() const { return defaultZone_; }
     /// Return the default material.
@@ -321,6 +318,8 @@ private:
     HashSet<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed.
     HashSet<Technique*> shaderErrorDisplayed_;
+    /// Mutex for creating shadow camers.
+    Mutex rendererMutex_;
     /// Vertex shader format.
     String vsFormat_;
     /// Pixel shader format.

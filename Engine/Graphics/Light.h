@@ -160,7 +160,7 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Calculate distance for rendering.
+    /// Calculate distance for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Add debug geometry to the debug graphics.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);

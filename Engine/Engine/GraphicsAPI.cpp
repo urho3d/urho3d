@@ -798,7 +798,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "uint get_numLights(bool) const", asMETHOD(Renderer, GetNumLights), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numShadowMaps(bool) const", asMETHOD(Renderer, GetNumShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numOccluders(bool) const", asMETHOD(Renderer, GetNumOccluders), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "uint get_numShadowOccluders(bool) const", asMETHOD(Renderer, GetNumShadowOccluders), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Renderer@+ get_renderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
 }
 
