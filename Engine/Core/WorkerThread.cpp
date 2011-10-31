@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "WorkerThread.h"
-#include "WorkItem.h"
 #include "WorkQueue.h"
 
 WorkerThread::WorkerThread(WorkQueue* owner, unsigned index) :

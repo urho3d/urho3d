@@ -26,7 +26,6 @@
 #include "Drawable.h"
 #include "List.h"
 #include "SpinLock.h"
-#include "WorkItem.h"
 
 class Octree;
 class OctreeQuery;

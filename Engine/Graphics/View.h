@@ -28,7 +28,6 @@
 #include "List.h"
 #include "Object.h"
 #include "Polyhedron.h"
-#include "WorkItem.h"
 
 class Camera;
 class DebugRenderer;

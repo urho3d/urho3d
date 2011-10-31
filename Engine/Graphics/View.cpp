@@ -71,6 +71,34 @@ void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
     }
 }
 
+void SortBatchQueueFrontToBackWork(const WorkItem* item, unsigned threadIndex)
+{
+    BatchQueue* queue = reinterpret_cast<BatchQueue*>(item->start_);
+    
+    queue->SortFrontToBack();
+}
+
+void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
+{
+    BatchQueue* queue = reinterpret_cast<BatchQueue*>(item->start_);
+    
+    queue->SortBackToFront();
+}
+
+void SortLightQueuesWork(const WorkItem* item, unsigned threadIndex)
+{
+    LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
+    LightBatchQueue* end = reinterpret_cast<LightBatchQueue*>(item->end_);
+    
+    while (start != end)
+    {
+        for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
+            start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
+        start->litBatches_.SortFrontToBack();
+        ++start;
+    }
+}
+
 OBJECTTYPESTATIC(View);
 
 View::View(Context* context) :
@@ -1641,17 +1669,30 @@ void View::SortBatches()
 {
     PROFILE(SortBatches);
     
-    baseQueue_.SortFrontToBack();
-    preAlphaQueue_.SortFrontToBack();
-    alphaQueue_.SortBackToFront();
-    postAlphaQueue_.SortBackToFront();
+    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    WorkItem item;
     
-    for (unsigned i = 0; i < lightQueues_.Size(); ++i)
+    item.workFunction_ = SortBatchQueueFrontToBackWork;
+    item.start_ = &baseQueue_;
+    queue->AddWorkItem(item);
+    item.start_ = &preAlphaQueue_;
+    queue->AddWorkItem(item);
+    
+    item.workFunction_ = SortBatchQueueBackToFrontWork;
+    item.start_ = &alphaQueue_;
+    queue->AddWorkItem(item);
+    item.start_ = &postAlphaQueue_;
+    queue->AddWorkItem(item);
+
+    if (lightQueues_.Size())
     {
-        for (unsigned j = 0; j < lightQueues_[i].shadowSplits_.Size(); ++j)
-            lightQueues_[i].shadowSplits_[j].shadowBatches_.SortFrontToBack();
-        lightQueues_[i].litBatches_.SortFrontToBack();
+        item.workFunction_ = SortLightQueuesWork;
+        item.start_ = &lightQueues_.Front();
+        item.end_ = &lightQueues_.Back() + 1;
+        queue->AddWorkItem(item);
     }
+    
+    queue->Complete();
 }
 
 void View::PrepareInstancingBuffer()

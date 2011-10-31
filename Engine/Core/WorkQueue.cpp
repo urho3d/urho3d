@@ -23,8 +23,8 @@
 
 #include "Precompiled.h"
 #include "ProcessUtils.h"
+#include "Profiler.h"
 #include "WorkerThread.h"
-#include "WorkItem.h"
 #include "WorkQueue.h"
 
 #ifdef WIN32
@@ -141,7 +141,10 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
         bool isWaiting = numWaiting_ > 0;
         queueLock_.Release();
         if (isWaiting)
+        {
+            PROFILE(SignalWorkerThreads);
             impl_->Signal();
+        }
     }
     else
         item.workFunction_(&item, 0);
