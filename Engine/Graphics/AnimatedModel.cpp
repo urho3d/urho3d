@@ -943,6 +943,8 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     
     // Animation has changed the bounding box: mark node for octree reinsertion
     Drawable::OnMarkedDirty(node_);
+    // For optimization, recalculate world bounding box already here (during the threaded update)
+    GetWorldBoundingBox();
     animationDirty_ = false;
 }
 
