@@ -58,14 +58,16 @@ struct LightQueryResult
     Light* light_;
     /// Threaded processing flag.
     bool threaded_;
-    /// Octree query result.
-    PODVector<Drawable*> tempDrawables_;
     /// Lit geometries.
     PODVector<Drawable*> litGeometries_;
     /// Shadow casters.
-    PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
+    PODVector<Drawable*> shadowCasters_;
     /// Shadow cameras.
     Camera* shadowCameras_[MAX_LIGHT_SPLITS];
+    /// Shadow caster start indices.
+    unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
+    /// Shadow caster end indices.
+    unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
     /// Combined bounding box of shadow casters in light view or projection space.
     BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
     /// Shadow camera near splits (directional lights only.)
@@ -79,6 +81,7 @@ struct LightQueryResult
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class View : public Object
 {
+    friend void GetZonesWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
     
     OBJECT(View);
@@ -116,6 +119,8 @@ public:
 private:
     /// Query the octree for drawable objects.
     void GetDrawables();
+    /// Query the octree for zones in view, and find the zone the camera is in.
+    void GetZones();
     /// Construct batches from the drawable objects.
     void GetBatches();
     /// Update geometries and sort batches.
@@ -129,9 +134,9 @@ private:
     /// Draw occluders to occlusion buffer.
     void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
-    void ProcessLight(LightQueryResult& query);
+    void ProcessLight(LightQueryResult& query, unsigned threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
-    void ProcessShadowCasters(LightQueryResult& query, unsigned splitIndex);
+    void ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex);
     /// %Set up initial shadow camera view(s).
     void SetupShadowCameras(LightQueryResult& query);
     /// %Set up a directional light shadow camera
@@ -153,7 +158,7 @@ private:
     /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
     /// Find and set a new zone for a drawable when it has moved.
-    void FindZone(Drawable* drawable, int highestZonePriority);
+    void FindZone(Drawable* drawable);
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable);
     /// Return the drawable's light mask, considering also its zone.
@@ -201,6 +206,8 @@ private:
     int materialQuality_;
     /// Maximum number of occluder triangles.
     int maxOccluderTriangles_;
+    /// Highest zone priority currently visible.
+    int highestZonePriority_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
     /// Camera frustum.
@@ -211,8 +218,8 @@ private:
     BoundingBox sceneViewBox_;
     /// Volume for frustum clipping.
     Polyhedron frustumVolume_;
-    /// Octree query result.
-    PODVector<Drawable*> tempDrawables_;
+    /// Per-thread octree query results.
+    Vector<PODVector<Drawable*> > tempDrawables_;
     /// Octree zone query result.
     PODVector<Zone*> tempZones_;
     /// Visible zones.

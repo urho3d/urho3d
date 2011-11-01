@@ -25,7 +25,6 @@
 #include "Camera.h"
 #include "Log.h"
 #include "OcclusionBuffer.h"
-#include "Profiler.h"
 
 #include <cstring>
 
@@ -75,8 +74,6 @@ bool OcclusionBuffer::SetSize(int width, int height)
     // Force the height to an even amount of pixels for better mip generation
     if (height & 1)
         ++height;
-    
-    PROFILE(ResizeOcclusion);
     
     width_ = width;
     height_ = height;
@@ -134,8 +131,6 @@ void OcclusionBuffer::Reset()
 
 void OcclusionBuffer::Clear()
 {
-    PROFILE(ClearOcclusion);
-    
     if (!buffer_)
         return;
     
@@ -156,8 +151,6 @@ void OcclusionBuffer::Clear()
 bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData,
     unsigned indexSize, unsigned indexStart, unsigned indexCount)
 {
-    PROFILE(DrawOcclusion);
-    
     const unsigned char* vertexDataChar = (const unsigned char*)vertexData;
     
     Matrix4 modelViewProj = viewProj_ * model;
@@ -217,8 +210,6 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsig
 
 void OcclusionBuffer::BuildDepthHierarchy()
 {
-    PROFILE(BuildDepthHierarchy);
-    
     if (!buffer_)
         return;
     
