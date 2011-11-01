@@ -227,18 +227,18 @@ public:
     void DrawDebugGeometry(bool depthTest);
     /// Add a view. Return true if successful.
     bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
-    /// Return an occlusion buffer for use.
-    OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
-    /// Return shadow map for a light. If shadow map reuse is disabled, a different map is returned each time.
+    /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
+    /// Allocate an occlusion buffer. Is thread-safe.
+    OcclusionBuffer* GetOcclusionBuffer(Camera* camera, bool halfResolution = false);
+    /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
+    Camera* GetShadowCamera();
     /// Get a shader program.
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
-    /// Allocate a temporary shadow camera and a scene node for it.
-    Camera* CreateShadowCamera();
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
     /// Reset shadow map allocation counts.
@@ -300,8 +300,8 @@ private:
     SharedPtr<ShaderVariation> stencilPS_;
     /// Reusable scene nodes with shadow camera components.
     Vector<SharedPtr<Node> > shadowCameraNodes_;
-    /// Occlusion buffers.
-    HashMap<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
+    /// Reusable occlusion buffers.
+    Vector<SharedPtr<OcclusionBuffer> > occlusionBuffers_;
     /// Shadow maps by resolution.
     HashMap<int, Vector<SharedPtr<Texture2D> > > shadowMaps_;
     /// Shadow map dummy color buffers by resolution.
@@ -318,7 +318,7 @@ private:
     HashSet<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed.
     HashSet<Technique*> shaderErrorDisplayed_;
-    /// Mutex for creating shadow camers.
+    /// Mutex for shadow camera and occlusion buffer allocation.
     Mutex rendererMutex_;
     /// Vertex shader format.
     String vsFormat_;
@@ -354,7 +354,9 @@ private:
     float occluderSizeThreshold_;
     /// Number of views.
     unsigned numViews_;
-    /// Number of temporary shadow cameras.
+    /// Number of occlusion buffers in use.
+    unsigned numOcclusionBuffers_;
+    /// Number of temporary shadow cameras in use.
     unsigned numShadowCameras_;
     /// Number of primitives (3D geometry only.)
     unsigned numPrimitives_;

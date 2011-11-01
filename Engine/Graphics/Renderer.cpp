@@ -232,6 +232,7 @@ Renderer::Renderer(Context* context) :
     defaultZone_(new Zone(context)),
     numViews_(0),
     numShadowCameras_(0),
+    numOcclusionBuffers_(0),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -509,6 +510,7 @@ void Renderer::Update(float timeStep)
     frame_.timeStep_ = timeStep;
     frame_.camera_ = 0;
     numShadowCameras_ = 0;
+    numOcclusionBuffers_ = 0;
     updateOctrees_.Clear();
     
     // Reload shaders if needed
@@ -658,37 +660,6 @@ bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
         return false;
 }
 
-OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution)
-{
-    // Get an occlusion buffer matching the aspect ratio. If not found, allocate new
-    int width = occlusionBufferSize_;
-    int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
-    
-    if (halfResolution)
-    {
-        width >>= 1;
-        height >>= 1;
-    }
-    int searchKey = (width << 16) | height;
-    
-    SharedPtr<OcclusionBuffer> buffer;
-    HashMap<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
-    if (i != occlusionBuffers_.End())
-        buffer = i->second_;
-    else
-    {
-        buffer = new OcclusionBuffer(context_);
-        buffer->SetSize(width, height);
-        occlusionBuffers_[searchKey] = buffer;
-    }
-    
-    buffer->SetView(camera);
-    buffer->SetMaxTriangles(maxOccluderTriangles);
-    buffer->Clear();
-    
-    return buffer;
-}
-
 Geometry* Renderer::GetLightGeometry(Light* light)
 {
     LightType type = light->GetLightType();
@@ -699,7 +670,6 @@ Geometry* Renderer::GetLightGeometry(Light* light)
     else
         return 0;
 }
-
 
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
 {
@@ -853,6 +823,54 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
+OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera, bool halfResolution)
+{
+    OcclusionBuffer* buffer = 0;
+    
+    {
+        MutexLock lock(rendererMutex_);
+        if (numOcclusionBuffers_ >= occlusionBuffers_.Size())
+        {
+            SharedPtr<OcclusionBuffer> newBuffer(new OcclusionBuffer(context_));
+            occlusionBuffers_.Push(newBuffer);
+        }
+        
+        buffer = occlusionBuffers_[numOcclusionBuffers_];
+        ++numOcclusionBuffers_;
+    }
+    
+    int width = occlusionBufferSize_;
+    int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
+    if (halfResolution)
+    {
+        width >>= 1;
+        height >>= 1;
+    }
+    
+    buffer->SetSize(width, height);
+    buffer->SetView(camera);
+    
+    return buffer;
+}
+
+Camera* Renderer::GetShadowCamera()
+{
+    MutexLock lock(rendererMutex_);
+    
+    if (numShadowCameras_ >= shadowCameraNodes_.Size())
+    {
+        SharedPtr<Node> newNode(new Node(context_));
+        newNode->CreateComponent<Camera>();
+        shadowCameraNodes_.Push(newNode);
+    }
+    
+    Camera* camera = shadowCameraNodes_[numShadowCameras_]->GetComponent<Camera>();
+    camera->SetOrthographic(false);
+    camera->SetZoom(1.0f);
+    ++numShadowCameras_;
+    return camera;
+}
+
 ShaderVariation* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
 {
     String shaderName = shaderPath_;
@@ -989,24 +1007,6 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             LOGERROR("Technique " + technique->GetName() + " has missing shaders");
         }
     }
-}
-
-Camera* Renderer::CreateShadowCamera()
-{
-    MutexLock lock(rendererMutex_);
-    
-    if (numShadowCameras_ >= shadowCameraNodes_.Size())
-    {
-        SharedPtr<Node> newNode(new Node(context_));
-        newNode->CreateComponent<Camera>();
-        shadowCameraNodes_.Push(newNode);
-    }
-    
-    Camera* camera = shadowCameraNodes_[numShadowCameras_]->GetComponent<Camera>();
-    camera->SetOrthographic(false);
-    camera->SetZoom(1.0f);
-    ++numShadowCameras_;
-    return camera;
 }
 
 bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
@@ -1342,8 +1342,7 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         Initialize();
     else
     {
-        // When screen mode changes, purge old views and occlusion buffers
-        occlusionBuffers_.Clear();
+        // When screen mode changes, purge old views
         ResetViews();
     }
 }

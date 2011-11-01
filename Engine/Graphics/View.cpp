@@ -315,9 +315,8 @@ void View::GetDrawables()
         {
             PROFILE(DrawOcclusion);
             
-            buffer = renderer_->GetOrCreateOcclusionBuffer(camera_, maxOccluderTriangles_);
+            buffer = renderer_->GetOcclusionBuffer(camera_);
             DrawOccluders(buffer, occluders_);
-            buffer->BuildDepthHierarchy();
         }
     }
     
@@ -472,24 +471,11 @@ void View::GetBatches()
             LightQueryResult& query = lightQueryResults_[i];
             query.light_ = lights_[i];
             
-            // Do not include shadowed directional lights in the work queue, as occlusion can not yet be threaded
-            query.threaded_ = query.light_->GetLightType() != LIGHT_DIRECTIONAL || !query.light_->GetCastShadows();
-            if (query.threaded_)
-            {
-                WorkItem item;
-                item.workFunction_ = ProcessLightWork;
-                item.start_ = &query;
-                item.aux_ = this;
-                queue->AddWorkItem(item);
-            }
-        }
-        
-        // Process shadowed directional lights in the main thread
-        for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
-        {
-            LightQueryResult& query = lightQueryResults_[i];
-            if (!query.threaded_)
-                ProcessLight(query, 0);
+            WorkItem item;
+            item.workFunction_ = ProcessLightWork;
+            item.start_ = &query;
+            item.aux_ = this;
+            queue->AddWorkItem(item);
         }
         
         // Ensure all lights have been processed before proceeding
@@ -965,6 +951,9 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
 
 void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders)
 {
+    buffer->SetMaxTriangles(maxOccluderTriangles_);
+    buffer->Clear();
+    
     for (unsigned i = 0; i < occluders.Size(); ++i)
     {
         Drawable* occluder = occluders[i];
@@ -977,14 +966,16 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& oc
         
         // Check for running out of triangles
         if (!occluder->DrawOcclusion(buffer))
-            return;
+            break;
     }
+    
+    buffer->BuildDepthHierarchy();
 }
 
 void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 {
     Light* light = query.light_;
-    PODVector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
+    LightType type = light->GetLightType();
     
     // Check if light should be shadowed
     bool isShadowed = drawShadows_ && light->GetCastShadows() && light->GetShadowIntensity() < 1.0f;
@@ -992,9 +983,8 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     if (isShadowed && light->GetShadowDistance() > 0.0f && light->GetDistance() > light->GetShadowDistance())
         isShadowed = false;
     
-    LightType type = light->GetLightType();
-    
     // Get lit geometries. They must match the light mask and be inside the main camera frustum to be considered
+    PODVector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
     query.litGeometries_.Clear();
     
     switch (type)
@@ -1051,26 +1041,21 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     if (maxOccluderTriangles_ > 0 && isShadowed && light->GetLightType() == LIGHT_DIRECTIONAL)
     {
         // This shadow camera is never used for actually querying shadow casters, just occluders
-        Camera* shadowCamera = renderer_->CreateShadowCamera();
+        Camera* shadowCamera = renderer_->GetShadowCamera();
         SetupDirLightShadowCamera(shadowCamera, light, 0.0f, Min(light->GetShadowCascade().GetShadowRange(),
             camera_->GetFarClip()), true);
         
         // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery octreeQuery(shadowOccluders_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(),
+        FrustumOctreeQuery octreeQuery(tempDrawables, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(),
             true, true);
         octree_->GetDrawables(octreeQuery);
+        UpdateOccluders(tempDrawables, shadowCamera);
         
-        UpdateOccluders(shadowOccluders_, shadowCamera);
-        
-        if (shadowOccluders_.Size())
+        if (tempDrawables.Size())
         {
-            PROFILE(DrawDirLightOcclusion);
-            
             // Shadow viewport is rectangular and consumes more CPU fillrate, so halve size
-            buffer = renderer_->GetOrCreateOcclusionBuffer(shadowCamera, maxOccluderTriangles_, true);
-            
-            DrawOccluders(buffer, shadowOccluders_);
-            buffer->BuildDepthHierarchy();
+            buffer = renderer_->GetOcclusionBuffer(shadowCamera, true);
+            DrawOccluders(buffer, tempDrawables);
             useOcclusion = true;
         }
     }
@@ -1400,7 +1385,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
                 break;
             
             // Setup the shadow camera for the split
-            Camera* shadowCamera = renderer_->CreateShadowCamera();
+            Camera* shadowCamera = renderer_->GetShadowCamera();
             query.shadowCameras_[splits] = shadowCamera;
             query.shadowNearSplits_[splits] = nearSplit;
             query.shadowFarSplits_[splits] = farSplit;
@@ -1413,7 +1398,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
     
     if (type == LIGHT_SPOT)
     {
-        Camera* shadowCamera = renderer_->CreateShadowCamera();
+        Camera* shadowCamera = renderer_->GetShadowCamera();
         query.shadowCameras_[0] = shadowCamera;
         Node* cameraNode = shadowCamera->GetNode();
         
@@ -1430,7 +1415,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            Camera* shadowCamera = renderer_->CreateShadowCamera();
+            Camera* shadowCamera = renderer_->GetShadowCamera();
             query.shadowCameras_[i] = shadowCamera;
             Node* cameraNode = shadowCamera->GetNode();
             

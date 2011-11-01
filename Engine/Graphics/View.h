@@ -56,8 +56,6 @@ struct LightQueryResult
 {
     /// Light.
     Light* light_;
-    /// Threaded processing flag.
-    bool threaded_;
     /// Lit geometries.
     PODVector<Drawable*> litGeometries_;
     /// Shadow casters.
@@ -234,8 +232,6 @@ private:
     PODVector<Drawable*> threadedGeometries_;
     /// Occluder objects.
     PODVector<Drawable*> occluders_;
-    /// Directional light shadow rendering occluders.
-    PODVector<Drawable*> shadowOccluders_;
     /// Depth minimum and maximum values for visible geometries.
     PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights.
