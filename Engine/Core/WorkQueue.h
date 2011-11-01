@@ -26,9 +26,9 @@
 #include "List.h"
 #include "Mutex.h"
 #include "Object.h"
+#include "Signal.h"
 
 class WorkerThread;
-class WorkQueueImpl;
 
 /// Work queue item.
 struct WorkItem
@@ -56,6 +56,8 @@ public:
     /// Destruct.
     ~WorkQueue();
     
+    /// Create worker threads. Can only be called once.
+    void CreateThreads(unsigned numThreads);
     /// Add a work item. If no threads, will process it immediately.
     void AddWorkItem(const WorkItem& item);
     /// Finish all current work items.
@@ -70,14 +72,14 @@ private:
     /// Process work items until shut down. Called by the worker threads.
     void ProcessItems(unsigned threadIndex);
     
-    /// Work queue implementation. Contains the operating system-specific signaling mechanism.
-    WorkQueueImpl* impl_;
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item queue.
     List<WorkItem> queue_;
     /// Queue mutex.
     Mutex queueMutex_;
+    /// Queue signal.
+    Signal queueSignal_;
     /// Number of waiting threads.
     volatile unsigned numWaiting_;
     /// Shutting down flag.

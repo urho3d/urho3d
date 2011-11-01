@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "ProcessUtils.h"
 #include "WorkerThread.h"
 #include "WorkQueue.h"
 
@@ -32,87 +31,13 @@
 #include <pthread.h>
 #endif
 
-/// Work queue implementation.
-class WorkQueueImpl
-{
-public:
-    /// Construct.
-    WorkQueueImpl()
-    {
-        #ifdef WIN32
-        eventHandle_ = CreateEvent(0, FALSE, FALSE, 0);
-        #else
-        pthread_cond_init(&condition_, 0);
-        pthread_mutex_init(&mutex_, 0);
-        #endif
-    }
-    
-    /// Destruct.
-    ~WorkQueueImpl()
-    {
-        #ifdef WIN32
-        CloseHandle(eventHandle_);
-        #else
-        pthread_cond_destroy(&condition_);
-        pthread_mutex_destroy(&mutex_);
-        #endif
-    }
-    
-    /// Signal one worker thread for available work.
-    void Signal()
-    {
-        #ifdef WIN32
-        SetEvent(eventHandle_);
-        #else
-        pthread_cond_signal(&condition_);
-        #endif
-    }
-    
-    /// Wait for available work.
-    void Wait()
-    {
-        #ifdef WIN32
-        WaitForSingleObject(eventHandle_, INFINITE);
-        #else
-        pthread_mutex_lock(&mutex_);
-        pthread_cond_wait(&condition_, &mutex_);
-        pthread_mutex_unlock(&mutex_);
-        #endif
-    }
-    
-private:
-    #ifdef WIN32
-    /// Event for signaling the worker threads.
-    HANDLE eventHandle_;
-    #else
-    /// Condition variable for signaling the worker threads.
-    pthread_cond_t condition_;
-    /// Mutex for the condition variable.
-    pthread_mutex_t mutex_;
-    #endif
-};
-
 OBJECTTYPESTATIC(WorkQueue);
 
 WorkQueue::WorkQueue(Context* context) :
     Object(context),
-    impl_(new WorkQueueImpl()),
     shutDown_(false),
     numWaiting_(0)
 {
-    // Create worker threads and start them. For now use a maximum of 4 worker threads, and leave cores free for the main thread
-    // and the GPU driver + audio processing
-    int numCores = GetNumCPUCores();
-    if (numCores == 1)
-        return;
-    int numThreads = Clamp(numCores - 2, 1, 4);
-    
-    for (int i = 0; i < numThreads; ++i)
-    {
-        SharedPtr<WorkerThread> thread(new WorkerThread(this, i + 1));
-        thread->Start();
-        threads_.Push(thread);
-    }
 }
 
 WorkQueue::~WorkQueue()
@@ -123,13 +48,25 @@ WorkQueue::~WorkQueue()
         shutDown_ = true;
         
         for (unsigned i = 0; i < threads_.Size(); ++i)
-            impl_->Signal();
+            queueSignal_.Set();
         for (unsigned i = 0; i < threads_.Size(); ++i)
             threads_[i]->Stop();
     }
+}
+
+void WorkQueue::CreateThreads(unsigned numThreads)
+{
+    // Other subsystems may initialize themselves according to the number of threads.
+    // Therefore allow creating the threads only once, after which the amount is fixed.
+    if (!threads_.Empty())
+        return;
     
-    delete impl_;
-    impl_ = 0;
+    for (unsigned i = 0; i < numThreads; ++i)
+    {
+        SharedPtr<WorkerThread> thread(new WorkerThread(this, i + 1));
+        thread->Start();
+        threads_.Push(thread);
+    }
 }
 
 void WorkQueue::AddWorkItem(const WorkItem& item)
@@ -141,7 +78,7 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
         bool isWaiting = numWaiting_ > 0;
         queueMutex_.Release();
         if (isWaiting)
-            impl_->Signal();
+            queueSignal_.Set();
     }
     else
         item.workFunction_(&item, 0);
@@ -211,7 +148,7 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         {
             ++numWaiting_;
             queueMutex_.Release();
-            impl_->Wait();
+            queueSignal_.Wait();
             wasWaiting = true;
         }
     }

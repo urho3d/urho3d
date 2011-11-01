@@ -172,17 +172,21 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
-    // Check amount of worker threads
+    // Set amount of worker threads according to the free CPU cores. Leave one for the main thread and another for
+    // GPU & audio drivers, and clamp currently to a maximum of four.
     WorkQueue* queue = GetSubsystem<WorkQueue>();
-    unsigned numWorkerThreads = queue->GetNumThreads();
-    if (numWorkerThreads)
+    int numCores = GetNumCPUCores();
+    if (numCores > 1)
     {
-        String workerThreadString = "Created " + String(numWorkerThreads) + " worker thread";
-        if (numWorkerThreads > 1)
+        int numThreads = Clamp(numCores - 2, 1, 4);
+        queue->CreateThreads(numThreads);
+        
+        String workerThreadString = "Created " + String(numThreads) + " worker thread";
+        if (numThreads > 1)
             workerThreadString += "s";
         LOGINFO(workerThreadString);
     }
-        
+    
     // Add default resource paths: CoreData package or directory, Data package or directory
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
