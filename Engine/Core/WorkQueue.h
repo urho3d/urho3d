@@ -58,9 +58,9 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
-    /// Add a work item. If no threads, will process it immediately.
+    /// Add a work item and unpause. If no threads, will process it immediately.
     void AddWorkItem(const WorkItem& item);
-    /// Finish all current work items.
+    /// Finish all current work items and pause.
     void Complete();
     
     /// Return number of worker threads.
@@ -78,10 +78,10 @@ private:
     List<WorkItem> queue_;
     /// Queue mutex.
     Mutex queueMutex_;
-    /// Queue signal.
-    Signal queueSignal_;
-    /// Number of waiting threads.
-    volatile unsigned numWaiting_;
+    /// Number of threads working on an item.
+    volatile unsigned numActive_;
     /// Shutting down flag.
     volatile bool shutDown_;
+    /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
+    bool paused_;
 };

@@ -173,7 +173,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     log->Open(logName);
     
     // Set amount of worker threads according to the free CPU cores. Leave one for the main thread and another for
-    // GPU & audio drivers, and clamp currently to a maximum of four.
+    // GPU & audio drivers, and clamp to a maximum of four for now
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     int numCores = GetNumCPUCores();
     if (numCores > 1)

@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Timer.h"
 #include "WorkerThread.h"
 #include "WorkQueue.h"
 
@@ -35,31 +36,37 @@ OBJECTTYPESTATIC(WorkQueue);
 
 WorkQueue::WorkQueue(Context* context) :
     Object(context),
+    numActive_(0),
     shutDown_(false),
-    numWaiting_(0)
+    paused_(false)
 {
 }
 
 WorkQueue::~WorkQueue()
 {
-    // Stop the worker threads. First make sure they are not waiting for work items.
-    if (!threads_.Empty())
+    // Stop the worker threads. First make sure they are not waiting for work items
+    if (paused_)
     {
-        shutDown_ = true;
-        
-        for (unsigned i = 0; i < threads_.Size(); ++i)
-            queueSignal_.Set();
-        for (unsigned i = 0; i < threads_.Size(); ++i)
-            threads_[i]->Stop();
+        queueMutex_.Release();
+        paused_ = false;
     }
+    
+    shutDown_ = true;
+    
+    for (unsigned i = 0; i < threads_.Size(); ++i)
+        threads_[i]->Stop();
 }
 
 void WorkQueue::CreateThreads(unsigned numThreads)
 {
     // Other subsystems may initialize themselves according to the number of threads.
-    // Therefore allow creating the threads only once, after which the amount is fixed.
+    // Therefore allow creating the threads only once, after which the amount is fixed
     if (!threads_.Empty())
         return;
+    
+    // Start threads in paused mode
+    queueMutex_.Acquire();
+    paused_ = true;
     
     for (unsigned i = 0; i < numThreads; ++i)
     {
@@ -73,12 +80,18 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
 {
     if (threads_.Size())
     {
-        queueMutex_.Acquire();
-        queue_.Push(item);
-        bool isWaiting = numWaiting_ > 0;
-        queueMutex_.Release();
-        if (isWaiting)
-            queueSignal_.Set();
+        if (paused_)
+        {
+            queue_.Push(item);
+            queueMutex_.Release();
+            paused_ = false;
+        }
+        else
+        {
+            queueMutex_.Acquire();
+            queue_.Push(item);
+            queueMutex_.Release();
+        }
     }
     else
         item.workFunction_(&item, 0);
@@ -88,7 +101,6 @@ void WorkQueue::Complete()
 {
     if (threads_.Size())
     {
-        // Wait for work to finish while also taking work items in the main thread
         for (;;)
         {
             queueMutex_.Acquire();
@@ -101,9 +113,14 @@ void WorkQueue::Complete()
             }
             else
             {
-                queueMutex_.Release();
-                if (numWaiting_ == threads_.Size())
+                if (numActive_)
+                    queueMutex_.Release();
+                else
+                {
+                    // All work items are done. Leave the mutex locked and re-enter pause mode
+                    paused_ = true;
                     break;
+                }
             }
         }
     }
@@ -112,19 +129,14 @@ void WorkQueue::Complete()
 bool WorkQueue::IsCompleted()
 {
     if (threads_.Size())
-    {
-        queueMutex_.Acquire();
-        bool completed = queue_.Empty() && numWaiting_ == threads_.Size();
-        queueMutex_.Release();
-        return completed;
-    }
+        return !numActive_ && queue_.Empty();
     else
         return true;
 }
 
 void WorkQueue::ProcessItems(unsigned threadIndex)
 {
-    bool wasWaiting = false;
+    bool wasActive = false;
     
     for (;;)
     {
@@ -132,13 +144,13 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
             return;
         
         queueMutex_.Acquire();
-        if (wasWaiting)
-        {
-            --numWaiting_;
-            wasWaiting = false;
-        }
         if (!queue_.Empty())
         {
+            if (!wasActive)
+            {
+                ++numActive_;
+                wasActive = true;
+            }
             WorkItem item = queue_.Front();
             queue_.PopFront();
             queueMutex_.Release();
@@ -146,10 +158,15 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         }
         else
         {
-            ++numWaiting_;
+            if (wasActive)
+            {
+                --numActive_;
+                wasActive = false;
+            }
             queueMutex_.Release();
-            queueSignal_.Wait();
-            wasWaiting = true;
+            // When transitioning from working to waiting, give up the time slice so that it is easier
+            // for the main thread to re-lock the mutex
+            Time::Sleep(0);
         }
     }
 }
