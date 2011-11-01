@@ -45,13 +45,12 @@ WorkQueue::WorkQueue(Context* context) :
 WorkQueue::~WorkQueue()
 {
     // Stop the worker threads. First make sure they are not waiting for work items
+    shutDown_ = true;
     if (paused_)
     {
         queueMutex_.Release();
         paused_ = false;
     }
-    
-    shutDown_ = true;
     
     for (unsigned i = 0; i < threads_.Size(); ++i)
         threads_[i]->Stop();
@@ -65,8 +64,7 @@ void WorkQueue::CreateThreads(unsigned numThreads)
         return;
     
     // Start threads in paused mode
-    queueMutex_.Acquire();
-    paused_ = true;
+    Pause();
     
     for (unsigned i = 0; i < numThreads; ++i)
     {
@@ -97,10 +95,31 @@ void WorkQueue::AddWorkItem(const WorkItem& item)
         item.workFunction_(&item, 0);
 }
 
+void WorkQueue::Pause()
+{
+    if (!paused_)
+    {
+        queueMutex_.Acquire();
+        paused_ = true;
+    }
+}
+
+void WorkQueue::Resume()
+{
+    if (paused_)
+    {
+        queueMutex_.Release();
+        paused_ = false;
+    }
+}
+
+
 void WorkQueue::Complete()
 {
     if (threads_.Size())
     {
+        Resume();
+        
         for (;;)
         {
             queueMutex_.Acquire();
@@ -119,7 +138,7 @@ void WorkQueue::Complete()
                 {
                     // All work items are done. Leave the mutex locked and re-enter pause mode
                     paused_ = true;
-                    break;
+                    return;
                 }
             }
         }

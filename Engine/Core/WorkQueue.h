@@ -58,9 +58,13 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
-    /// Add a work item and unpause. If no threads, will process it immediately.
+    /// Add a work item and resume work. If no threads, will process it immediately.
     void AddWorkItem(const WorkItem& item);
-    /// Finish all current work items and pause.
+    /// Pause work.
+    void Pause();
+    /// Resume work.
+    void Resume();
+    /// Finish all queued work, then pause.
     void Complete();
     
     /// Return number of worker threads.
