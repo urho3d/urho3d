@@ -132,7 +132,7 @@ void UpdateStats(float timeStep)
         "  Batches: " + renderer.numBatches +
         "  Lights: " + renderer.numLights[true] +
         "  Shadowmaps: " + renderer.numShadowMaps[true] +
-        "  Occluders: " + renderer.numOccluders[true] + " / " + renderer.numShadowOccluders[true]);
+        "  Occluders: " + renderer.numOccluders[true]);
 
     Vector3 cameraPos = cameraNode.position;
     String xText(cameraPos.x);
