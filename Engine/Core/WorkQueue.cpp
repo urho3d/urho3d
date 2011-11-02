@@ -22,15 +22,33 @@
 //
 
 #include "Precompiled.h"
+#include "Thread.h"
 #include "Timer.h"
-#include "WorkerThread.h"
 #include "WorkQueue.h"
 
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <pthread.h>
-#endif
+/// Worker thread managed by the work queue.
+class WorkerThread : public Thread, public RefCounted
+{
+public:
+    /// Construct.
+    WorkerThread(WorkQueue* owner, unsigned index) :
+        owner_(owner),
+        index_(index)
+    {
+    }
+    
+    /// Process work items until stopped.
+    virtual void ThreadFunction() { owner_->ProcessItems(index_); }
+    
+    /// Return thread index.
+    unsigned GetIndex() const { return index_; }
+    
+private:
+    /// Work queue.
+    WorkQueue* owner_;
+    /// Thread index.
+    unsigned index_;
+};
 
 OBJECTTYPESTATIC(WorkQueue);
 
