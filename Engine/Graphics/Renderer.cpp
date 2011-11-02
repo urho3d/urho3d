@@ -823,33 +823,22 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera, bool halfResolution)
+OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
 {
-    OcclusionBuffer* buffer = 0;
-    
+    if (numOcclusionBuffers_ >= occlusionBuffers_.Size())
     {
-        MutexLock lock(rendererMutex_);
-        if (numOcclusionBuffers_ >= occlusionBuffers_.Size())
-        {
-            SharedPtr<OcclusionBuffer> newBuffer(new OcclusionBuffer(context_));
-            occlusionBuffers_.Push(newBuffer);
-        }
-        
-        buffer = occlusionBuffers_[numOcclusionBuffers_];
-        ++numOcclusionBuffers_;
+        SharedPtr<OcclusionBuffer> newBuffer(new OcclusionBuffer(context_));
+        occlusionBuffers_.Push(newBuffer);
     }
     
     int width = occlusionBufferSize_;
     int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
-    if (halfResolution)
-    {
-        width >>= 1;
-        height >>= 1;
-    }
     
+    OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_];
     buffer->SetSize(width, height);
     buffer->SetView(camera);
     
+    ++numOcclusionBuffers_;
     return buffer;
 }
 
@@ -867,6 +856,7 @@ Camera* Renderer::GetShadowCamera()
     Camera* camera = shadowCameraNodes_[numShadowCameras_]->GetComponent<Camera>();
     camera->SetOrthographic(false);
     camera->SetZoom(1.0f);
+    
     ++numShadowCameras_;
     return camera;
 }

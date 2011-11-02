@@ -29,7 +29,6 @@
 #include "Ray.h"
 #include "Sphere.h"
 
-class OcclusionBuffer;
 class Drawable;
 class Node;
 
@@ -151,31 +150,6 @@ public:
     
     /// Frustum.
     Frustum frustum_;
-};
-
-/// %Frustum octree query with occlusion.
-class OccludedFrustumOctreeQuery : public OctreeQuery
-{
-public:
-    /// Construct with frustum, occlusion buffer pointer and query parameters.
-    OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
-        unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false,
-        bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
-        frustum_(frustum),
-        buffer_(buffer)
-    {
-    }
-    
-    /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
-    
-    /// Frustum.
-    Frustum frustum_;
-    /// Occlusion buffer.
-    OcclusionBuffer* buffer_;
 };
 
 /// Graphics raycast detail level.

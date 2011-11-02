@@ -231,8 +231,8 @@ public:
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
-    /// Allocate an occlusion buffer. Is thread-safe.
-    OcclusionBuffer* GetOcclusionBuffer(Camera* camera, bool halfResolution = false);
+    /// Allocate an occlusion buffer.
+    OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
     /// Get a shader program.
@@ -318,7 +318,7 @@ private:
     HashSet<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed.
     HashSet<Technique*> shaderErrorDisplayed_;
-    /// Mutex for shadow camera and occlusion buffer allocation.
+    /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
     /// Vertex shader format.
     String vsFormat_;

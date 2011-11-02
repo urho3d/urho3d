@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
 #include "DebugNew.h"
 
@@ -88,37 +87,4 @@ Intersection FrustumOctreeQuery::TestDrawable(const BoundingBox& box, bool insid
         return frustum_.IsInsideFast(box);
     else
         return INSIDE;
-}
-
-Intersection OccludedFrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
-{
-    // First check the frustum
-    Intersection frustumRes;
-    if (!inside)
-    {
-        frustumRes = frustum_.IsInside(box);
-        if (frustumRes == OUTSIDE)
-            return OUTSIDE;
-    }
-    else
-        frustumRes = INSIDE;
-    
-    // Then check occlusion
-    if (buffer_->IsVisible(box))
-        return frustumRes;
-    else
-        return OUTSIDE;
-}
-
-Intersection OccludedFrustumOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
-{
-    // First check the frustum
-    if (!inside && frustum_.IsInsideFast(box) == OUTSIDE)
-        return OUTSIDE;
-    
-    // Then check occlusion
-    if (buffer_->IsVisible(box))
-        return INSIDE;
-    else
-        return OUTSIDE;
 }

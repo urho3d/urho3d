@@ -1064,32 +1064,6 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     // Determine number of shadow cameras and setup their initial positions
     SetupShadowCameras(query);
     
-    // For a shadowed directional light, get occluders once using the whole (non-split) light frustum
-    bool useOcclusion = false;
-    OcclusionBuffer* buffer = 0;
-    
-    if (maxOccluderTriangles_ > 0 && isShadowed && light->GetLightType() == LIGHT_DIRECTIONAL)
-    {
-        // This shadow camera is never used for actually querying shadow casters, just occluders
-        Camera* shadowCamera = renderer_->GetShadowCamera();
-        SetupDirLightShadowCamera(shadowCamera, light, 0.0f, Min(light->GetShadowCascade().GetShadowRange(),
-            camera_->GetFarClip()), true);
-        
-        // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery octreeQuery(tempDrawables, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(),
-            true, true);
-        octree_->GetDrawables(octreeQuery);
-        UpdateOccluders(tempDrawables, shadowCamera);
-        
-        if (tempDrawables.Size())
-        {
-            // Shadow viewport is rectangular and consumes more CPU fillrate, so halve size
-            buffer = renderer_->GetOcclusionBuffer(shadowCamera, true);
-            DrawOccluders(buffer, tempDrawables);
-            useOcclusion = true;
-        }
-    }
-    
     // Process each split for shadow casters
     query.shadowCasters_.Clear();
     for (unsigned i = 0; i < query.numSplits_; ++i)
@@ -1115,21 +1089,12 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
                 continue;
         }
         
-        if (!useOcclusion)
+        // For spot light (which has only one shadow split) we can optimize by reusing the query for
+        // lit geometries, whose result still exists in tempDrawables
+        if (type != LIGHT_SPOT)
         {
-            // For spot light (which has only one shadow split) we can optimize by reusing the query for
-            // lit geometries, whose result still exists in tempDrawables
-            if (type != LIGHT_SPOT)
-            {
-                FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
-                    camera_->GetViewMask(), false, true);
-                octree_->GetDrawables(octreeQuery);
-            }
-        }
-        else
-        {
-            OccludedFrustumOctreeQuery octreeQuery(tempDrawables, shadowCamera->GetFrustum(), buffer,
-                DRAWABLE_GEOMETRY, camera_->GetViewMask(), false, true);
+            FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+                camera_->GetViewMask(), false, true);
             octree_->GetDrawables(octreeQuery);
         }
         
@@ -1222,11 +1187,6 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
 {
     if (shadowCamera->IsOrthographic())
     {
-        // If shadow caster is also an occluder, must let it be visible, because it has potentially already culled
-        // away other shadow casters (could also check the actual shadow occluder vector, but that would be slower)
-        if (drawable->IsOccluder())
-            return true;
-        
         // Extrude the light space bounding box up to the far edge of the frustum's light space bounding box
         lightViewBox.max_.z_ = Max(lightViewBox.max_.z_,lightViewFrustumBox.max_.z_);
         return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
@@ -1419,7 +1379,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
             query.shadowCameras_[splits] = shadowCamera;
             query.shadowNearSplits_[splits] = nearSplit;
             query.shadowFarSplits_[splits] = farSplit;
-            SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit, false);
+            SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit);
             
             nearSplit = farSplit;
             ++splits;
@@ -1464,7 +1424,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
     query.numSplits_ = splits;
 }
 
-void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit, bool shadowOcclusion)
+void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit)
 {
     Node* cameraNode = shadowCamera->GetNode();
     float extrusionDistance = camera_->GetFarClip();
@@ -1478,7 +1438,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     // Calculate main camera shadowed frustum in light's view space
     farSplit = Min(farSplit, camera_->GetFarClip());
     // Use the scene Z bounds to limit frustum size if applicable
-    if (shadowOcclusion || parameters.focus_)
+    if (parameters.focus_)
     {
         nearSplit = Max(sceneViewBox_.min_.z_, nearSplit);
         farSplit = Min(sceneViewBox_.max_.z_, farSplit);
@@ -1487,7 +1447,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     Frustum splitFrustum = camera_->GetSplitFrustum(nearSplit, farSplit);
     frustumVolume_.Define(splitFrustum);
     // If focusing enabled, clip the frustum volume by the combined bounding box of the lit geometries within the frustum
-    if (!shadowOcclusion && parameters.focus_)
+    if (parameters.focus_)
     {
         BoundingBox litGeometriesBox;
         for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -1516,7 +1476,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     
     // Fit the frustum volume inside a bounding box. If uniform size, use a sphere instead
     BoundingBox shadowBox;
-    if (shadowOcclusion || !parameters.nonUniform_)
+    if (!parameters.nonUniform_)
         shadowBox.Define(Sphere(frustumVolume_));
     else
         shadowBox.Define(frustumVolume_);

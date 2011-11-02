@@ -136,7 +136,7 @@ private:
     /// %Set up initial shadow camera view(s).
     void SetupShadowCameras(LightQueryResult& query);
     /// %Set up a directional light shadow camera
-    void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit, bool shadowOcclusion);
+    void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit);
     /// Finalize shadow camera view after shadow casters and the shadow map are known.
     void FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRect& shadowViewport, const BoundingBox& shadowCasterBox);
     /// Quantize a directional light shadow camera view to eliminate swimming.
