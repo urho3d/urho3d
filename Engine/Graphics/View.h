@@ -79,7 +79,6 @@ struct LightQueryResult
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class View : public Object
 {
-    friend void GetZonesWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
     
     OBJECT(View);
@@ -117,8 +116,6 @@ public:
 private:
     /// Query the octree for drawable objects.
     void GetDrawables();
-    /// Query the octree for zones in view, and find the zone the camera is in.
-    void GetZones();
     /// Construct batches from the drawable objects.
     void GetBatches();
     /// Update geometries and sort batches.

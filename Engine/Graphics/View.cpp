@@ -57,12 +57,6 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, -1.0f)
 };
 
-void GetZonesWork(const WorkItem* item, unsigned threadIndex)
-{
-    View* view = reinterpret_cast<View*>(item->aux_);
-    view->GetZones();
-}
-
 void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
 {
     View* view = reinterpret_cast<View*>(item->aux_);
@@ -205,6 +199,7 @@ void View::Update(const FrameInfo& frame)
     allGeometries_.Clear();
     geometryDepthBounds_.Clear();
     lights_.Clear();
+    zones_.Clear();
     occluders_.Clear();
     baseQueue_.Clear();
     preAlphaQueue_.Clear();
@@ -295,22 +290,68 @@ void View::GetDrawables()
     PROFILE(GetDrawables);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
+    PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
     
-    // Get zones in a worker thread while visible drawables are queried
-    WorkItem item;
-    item.workFunction_ = GetZonesWork;
-    item.aux_ = this;
-    queue->AddWorkItem(item);
+    // Perform one octree query to get everything, then examine the results
+    FrustumOctreeQuery query(tempDrawables, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
+    octree_->GetDrawables(query);
+    
+    // Get zones and occluders first
+    highestZonePriority_ = M_MIN_INT;
+    int bestPriority = M_MIN_INT;
+    Vector3 cameraPos = camera_->GetWorldPosition();
+    
+    // Get default zone first in case we do not have zones defined
+    Zone* defaultZone = renderer_->GetDefaultZone();
+    cameraZone_ = farClipZone_ = defaultZone;
+    
+    for (PODVector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
+    {
+        Drawable* drawable = *i;
+        unsigned flags = drawable->GetDrawableFlags();
+        
+        if (flags & DRAWABLE_ZONE)
+        {
+            Zone* zone = static_cast<Zone*>(drawable);
+            zones_.Push(zone);
+            int priority = zone->GetPriority();
+            if (priority > highestZonePriority_)
+                highestZonePriority_ = priority;
+            if (zone->IsInside(cameraPos) && priority > bestPriority)
+            {
+                cameraZone_ = zone;
+                bestPriority = priority;
+            }
+        }
+        else if (flags & DRAWABLE_GEOMETRY && drawable->IsOccluder())
+            occluders_.Push(drawable);
+    }
+    
+    // Determine the zone at far clip distance. If not found, or camera zone has override mode, use camera zone
+    cameraZoneOverride_ = cameraZone_->GetOverride();
+    if (!cameraZoneOverride_)
+    {
+        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0, 0, camera_->GetFarClip());
+        bestPriority = M_MIN_INT;
+        
+        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
+        {
+            int priority = (*i)->GetPriority();
+            if ((*i)->IsInside(farClipPos) && priority > bestPriority)
+            {
+                farClipZone_ = *i;
+                bestPriority = priority;
+            }
+        }
+    }
+    if (farClipZone_ == defaultZone)
+        farClipZone_ = cameraZone_;
     
     // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
     OcclusionBuffer* buffer = 0;
-    
     if (maxOccluderTriangles_ > 0)
     {
-        FrustumOctreeQuery query(occluders_, frustum_, DRAWABLE_GEOMETRY, camera_->GetViewMask(), true, false);
-        octree_->GetDrawables(query);
         UpdateOccluders(occluders_, camera_);
-        
         if (occluders_.Size())
         {
             PROFILE(DrawOcclusion);
@@ -320,23 +361,8 @@ void View::GetDrawables()
         }
     }
     
-    PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
-    
-    if (!buffer)
-    {
-        // Get geometries & lights without occlusion
-        FrustumOctreeQuery query(tempDrawables, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
-        octree_->GetDrawables(query);
-    }
-    else
-    {
-        // Get geometries & lights using occlusion
-        OccludedFrustumOctreeQuery query(tempDrawables, frustum_, buffer, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
-            camera_->GetViewMask());
-        octree_->GetDrawables(query);
-    }
-    
     // Add unculled geometries & lights
+    unsigned unculledDrawablesStart = tempDrawables.Size();
     octree_->GetUnculledDrawables(tempDrawables, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
     
     // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
@@ -346,12 +372,14 @@ void View::GetDrawables()
     sceneViewBox_.defined_ = false;
     Matrix3x4 view(camera_->GetInverseWorldTransform());
     
-    // Wait for GetZones() work to complete
-    queue->Complete();
-    
-    for (PODVector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
+    // Now go through the drawable list again for geometries and lights
+    for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
-        Drawable* drawable = *i;
+        Drawable* drawable = tempDrawables[i];
+        unsigned flags = drawable->GetDrawableFlags();
+        if (!(flags & (DRAWABLE_GEOMETRY | DRAWABLE_LIGHT)))
+            continue;
+        
         drawable->UpdateDistance(frame_);
         
         // If draw distance non-zero, check it
@@ -359,7 +387,10 @@ void View::GetDrawables()
         if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
             continue;
         
-        unsigned flags = drawable->GetDrawableFlags();
+        /// \todo Should test the drawables' octants first, or use threading for the visibility tests
+        if (buffer && i < unculledDrawablesStart && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
+            continue;
+        
         if (flags & DRAWABLE_GEOMETRY)
         {
             // Find new zone for the drawable if necessary
@@ -404,57 +435,6 @@ void View::GetDrawables()
     }
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
-}
-
-void View::GetZones()
-{
-    // Note: called from a worker thread
-    highestZonePriority_ = M_MIN_INT;
-    
-    // Get default zone first in case we do not have zones defined
-    Zone* defaultZone = renderer_->GetDefaultZone();
-    cameraZone_ = farClipZone_ = defaultZone;
-    
-    FrustumOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(zones_), frustum_, DRAWABLE_ZONE);
-    octree_->GetDrawables(query);
-    
-    // Find the visible zones, and the zone the camera is in. Determine also the highest zone priority to aid in seeing
-    // whether a zone query result for a drawable is conclusive
-    int bestPriority = M_MIN_INT;
-    Vector3 cameraPos = camera_->GetWorldPosition();
-    
-    for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
-    {
-        int priority = (*i)->GetPriority();
-        if (priority > highestZonePriority_)
-            highestZonePriority_ = priority;
-        if ((*i)->IsInside(cameraPos) && priority > bestPriority)
-        {
-            cameraZone_ = *i;
-            bestPriority = priority;
-        }
-    }
-    
-    // Determine the zone at far clip distance. If not found, or camera zone has override mode, use camera zone
-    cameraZoneOverride_ = cameraZone_->GetOverride();
-    if (!cameraZoneOverride_)
-    {
-        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0, 0, camera_->GetFarClip());
-        bestPriority = M_MIN_INT;
-            
-        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
-        {
-            int priority = (*i)->GetPriority();
-            if ((*i)->IsInside(farClipPos) && priority > bestPriority)
-            {
-                farClipZone_ = *i;
-                bestPriority = priority;
-            }
-        }
-    }
-    
-    if (farClipZone_ == defaultZone)
-        farClipZone_ = cameraZone_;
 }
 
 void View::GetBatches()
@@ -1040,7 +1020,6 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     SetupShadowCameras(query);
     
     // For a shadowed directional light, get occluders once using the whole (non-split) light frustum
-    // Note: directional light query can not be threaded due to the occlusion
     bool useOcclusion = false;
     OcclusionBuffer* buffer = 0;
     
@@ -1094,7 +1073,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         if (!useOcclusion)
         {
             // For spot light (which has only one shadow split) we can optimize by reusing the query for
-            // lit geometries, whose result still exists in query.tempDrawables_
+            // lit geometries, whose result still exists in tempDrawables
             if (type != LIGHT_SPOT)
             {
                 FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
