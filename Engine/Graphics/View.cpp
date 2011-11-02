@@ -296,7 +296,7 @@ void View::GetDrawables()
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     
-    // Get zones in a worker thread while visibility is processed
+    // Get zones in a worker thread while visible drawables are queried
     WorkItem item;
     item.workFunction_ = GetZonesWork;
     item.aux_ = this;
@@ -493,9 +493,9 @@ void View::GetBatches()
         maxLightsDrawables_.Clear();
         lightQueueIndex_.Clear();
         
-        for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
+        for (Vector<LightQueryResult>::ConstIterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
-            LightQueryResult& query = lightQueryResults_[i];
+            const LightQueryResult& query = *i;
             if (query.litGeometries_.Empty())
                 continue;
             
@@ -535,9 +535,10 @@ void View::GetBatches()
                 FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, query.shadowCasterBox_[j]);
                 
                 // Loop through shadow casters
-                for (unsigned k = query.shadowCasterBegin_[j]; k < query.shadowCasterEnd_[j]; ++k)
+                for (PODVector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
+                    k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                 {
-                    Drawable* drawable = query.shadowCasters_[k];
+                    Drawable* drawable = *k;
                     if (!drawable->IsInView(frame_, false))
                     {
                         drawable->MarkInView(frame_, false);
@@ -571,9 +572,9 @@ void View::GetBatches()
             }
             
             // Loop through lit geometries
-            for (unsigned j = 0; j < query.litGeometries_.Size(); ++j)
+            for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
             {
-                Drawable* drawable = query.litGeometries_[j];
+                Drawable* drawable = *j;
                 drawable->AddLight(light);
                 
                 // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
@@ -615,9 +616,9 @@ void View::GetBatches()
     // Build base pass batches
     {
         PROFILE(GetBaseBatches);
-        for (unsigned i = 0; i < geometries_.Size(); ++i)
+        for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
         {
-            Drawable* drawable = geometries_[i];
+            Drawable* drawable = *i;
             unsigned numBatches = drawable->GetNumBatches();
             
             for (unsigned j = 0; j < numBatches; ++j)
@@ -735,8 +736,10 @@ void View::UpdateGeometries()
             while (start != threadedGeometries_.End())
             {
                 PODVector<Drawable*>::Iterator end = start;
-                while (end - start < DRAWABLES_PER_WORK_ITEM && end != threadedGeometries_.End())
-                    ++end;
+                if (end - start > DRAWABLES_PER_WORK_ITEM)
+                    end += DRAWABLES_PER_WORK_ITEM;
+                else
+                    end = threadedGeometries_.End();
                 
                 WorkItem item;
                 item.workFunction_ = UpdateDrawableGeometriesWork;

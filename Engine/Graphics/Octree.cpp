@@ -465,8 +465,10 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     while (start != drawableUpdates_.End())
     {
         PODVector<Drawable*>::Iterator end = start;
-        while (end - start < DRAWABLES_PER_WORK_ITEM && end != drawableUpdates_.End())
-            ++end;
+        if (end - start > DRAWABLES_PER_WORK_ITEM)
+            end += DRAWABLES_PER_WORK_ITEM;
+        else
+            end = drawableUpdates_.End();
         
         WorkItem item;
         item.workFunction_ = UpdateDrawablesWork;
