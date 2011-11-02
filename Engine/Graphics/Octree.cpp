@@ -461,6 +461,10 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     scene->BeginThreadedUpdate();
     
+    WorkItem item;
+    item.workFunction_ = UpdateDrawablesWork;
+    item.aux_ = const_cast<FrameInfo*>(&frame);
+    
     PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
     while (start != drawableUpdates_.End())
     {
@@ -470,11 +474,8 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
         else
             end = drawableUpdates_.End();
         
-        WorkItem item;
-        item.workFunction_ = UpdateDrawablesWork;
         item.start_ = &(*start);
         item.end_ = &(*end);
-        item.aux_ = const_cast<FrameInfo*>(&frame);
         queue->AddWorkItem(item);
         
         start = end;

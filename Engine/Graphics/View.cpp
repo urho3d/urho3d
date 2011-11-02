@@ -466,15 +466,17 @@ void View::GetBatches()
         PROFILE_MULTIPLE(ProcessLights, lights_.Size());
         
         lightQueryResults_.Resize(lights_.Size());
+        
+        WorkItem item;
+        item.workFunction_ = ProcessLightWork;
+        item.aux_ = this;
+        
         for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
         {
             LightQueryResult& query = lightQueryResults_[i];
             query.light_ = lights_[i];
             
-            WorkItem item;
-            item.workFunction_ = ProcessLightWork;
             item.start_ = &query;
-            item.aux_ = this;
             queue->AddWorkItem(item);
         }
         
@@ -732,6 +734,10 @@ void View::UpdateGeometries()
         
         if (threadedGeometries_.Size())
         {
+            WorkItem item;
+            item.workFunction_ = UpdateDrawableGeometriesWork;
+            item.aux_ = const_cast<FrameInfo*>(&frame_);
+            
             PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
             while (start != threadedGeometries_.End())
             {
@@ -741,11 +747,8 @@ void View::UpdateGeometries()
                 else
                     end = threadedGeometries_.End();
                 
-                WorkItem item;
-                item.workFunction_ = UpdateDrawableGeometriesWork;
                 item.start_ = &(*start);
                 item.end_ = &(*end);
-                item.aux_ = const_cast<FrameInfo*>(&frame_);
                 queue->AddWorkItem(item);
                 
                 start = end;
