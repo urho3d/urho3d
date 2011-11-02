@@ -468,11 +468,9 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
     while (start != drawableUpdates_.End())
     {
-        PODVector<Drawable*>::Iterator end = start;
+        PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
         if (end - start > DRAWABLES_PER_WORK_ITEM)
-            end += DRAWABLES_PER_WORK_ITEM;
-        else
-            end = drawableUpdates_.End();
+            end = start + DRAWABLES_PER_WORK_ITEM;
         
         item.start_ = &(*start);
         item.end_ = &(*end);
@@ -482,9 +480,8 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     }
     
     queue->Complete();
-    drawableUpdates_.Clear();
-    
     scene->EndThreadedUpdate();
+    drawableUpdates_.Clear();
     
     for (unsigned i = unculledDrawables_.Size() - 1; i < unculledDrawables_.Size(); --i)
     {

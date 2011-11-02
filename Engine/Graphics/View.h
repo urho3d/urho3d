@@ -79,6 +79,7 @@ struct LightQueryResult
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class View : public Object
 {
+    friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
     
     OBJECT(View);
@@ -153,7 +154,7 @@ private:
     /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
     /// Find and set a new zone for a drawable when it has moved.
-    void FindZone(Drawable* drawable);
+    void FindZone(Drawable* drawable, unsigned threadIndex);
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable);
     /// Return the drawable's light mask, considering also its zone.
@@ -185,6 +186,8 @@ private:
     Zone* cameraZone_;
     /// Zone at far clip plane.
     Zone* farClipZone_;
+    /// Occlusion buffer for the main camera.
+    OcclusionBuffer* occlusionBuffer_;
     /// Color buffer to use.
     RenderSurface* renderTarget_;
     /// Depth buffer to use.
@@ -203,6 +206,8 @@ private:
     int maxOccluderTriangles_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
+    /// Start index of unculled drawables. These will not be tested for occlusion.
+    unsigned unculledDrawableStart_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
     /// Camera frustum.
@@ -215,8 +220,8 @@ private:
     Polyhedron frustumVolume_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
-    /// Octree zone query result.
-    PODVector<Zone*> tempZones_;
+    /// Per-thread octree zone query results.
+    Vector<PODVector<Zone*> > tempZones_;
     /// Visible zones.
     PODVector<Zone*> zones_;
     /// Visible geometry objects.

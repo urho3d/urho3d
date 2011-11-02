@@ -57,6 +57,48 @@ static const Vector3 directions[] =
     Vector3(0.0f, 0.0f, -1.0f)
 };
 
+static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
+
+void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
+{
+    View* view = reinterpret_cast<View*>(item->aux_);
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    Drawable** unculledStart = &view->tempDrawables_[0][view->unculledDrawableStart_];
+    OcclusionBuffer* buffer = view->occlusionBuffer_;
+    
+    while (start != end)
+    {
+        Drawable* drawable = *start;
+        bool useOcclusion = start < unculledStart;
+        unsigned char flags = drawable->GetDrawableFlags();
+        ++start;
+        
+        if (flags & DRAWABLE_ZONE)
+            continue;
+        
+        drawable->UpdateDistance(view->frame_);
+        
+        // If draw distance non-zero, check it
+        float maxDistance = drawable->GetDrawDistance();
+        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
+            continue;
+        
+        if (buffer && useOcclusion && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
+            continue;
+        
+        drawable->MarkInView(view->frame_);
+        
+        // For geometries, clear lights and find new zone if necessary
+        if (flags & DRAWABLE_GEOMETRY)
+        {
+            drawable->ClearLights();
+            if (!drawable->GetZone() && !view->cameraZoneOverride_)
+                view->FindZone(drawable, threadIndex);
+        }
+    }
+}
+
 void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
 {
     View* view = reinterpret_cast<View*>(item->aux_);
@@ -122,8 +164,9 @@ View::View(Context* context) :
 {
     frame_.camera_ = 0;
     
-    // Create an octree query vector for each thread
+    // Create octree query vectors for each thread
     tempDrawables_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
+    tempZones_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
 }
 
 View::~View()
@@ -282,6 +325,7 @@ void View::Render()
     octree_ = 0;
     cameraZone_ = 0;
     farClipZone_ = 0;
+    occlusionBuffer_ = 0;
     frame_.camera_ = 0;
 }
 
@@ -296,6 +340,10 @@ void View::GetDrawables()
     FrustumOctreeQuery query(tempDrawables, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
     octree_->GetDrawables(query);
     
+    // Add unculled geometries & lights
+    unculledDrawableStart_ = tempDrawables.Size();
+    octree_->GetUnculledDrawables(tempDrawables, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+    
     // Get zones and occluders first
     highestZonePriority_ = M_MIN_INT;
     int bestPriority = M_MIN_INT;
@@ -308,7 +356,7 @@ void View::GetDrawables()
     for (PODVector<Drawable*>::ConstIterator i = tempDrawables.Begin(); i != tempDrawables.End(); ++i)
     {
         Drawable* drawable = *i;
-        unsigned flags = drawable->GetDrawableFlags();
+        unsigned char flags = drawable->GetDrawableFlags();
         
         if (flags & DRAWABLE_ZONE)
         {
@@ -347,8 +395,8 @@ void View::GetDrawables()
     if (farClipZone_ == defaultZone)
         farClipZone_ = cameraZone_;
     
-    // If occlusion in use, get & render the occluders, then build the depth buffer hierarchy
-    OcclusionBuffer* buffer = 0;
+    // If occlusion in use, get & render the occluders
+    occlusionBuffer_ = 0;
     if (maxOccluderTriangles_ > 0)
     {
         UpdateOccluders(occluders_, camera_);
@@ -356,14 +404,33 @@ void View::GetDrawables()
         {
             PROFILE(DrawOcclusion);
             
-            buffer = renderer_->GetOcclusionBuffer(camera_);
-            DrawOccluders(buffer, occluders_);
+            occlusionBuffer_ = renderer_->GetOcclusionBuffer(camera_);
+            DrawOccluders(occlusionBuffer_, occluders_);
         }
     }
     
-    // Add unculled geometries & lights
-    unsigned unculledDrawablesStart = tempDrawables.Size();
-    octree_->GetUnculledDrawables(tempDrawables, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+    // Check visibility and find zones for moved drawables in worker threads
+    {
+        WorkItem item;
+        item.workFunction_ = CheckVisibilityWork;
+        item.aux_ = this;
+        
+        PODVector<Drawable*>::Iterator start = tempDrawables.Begin();
+        while (start != tempDrawables.End())
+        {
+            PODVector<Drawable*>::Iterator end = tempDrawables.End();
+            if (end - start > CHECK_DRAWABLES_PER_WORK_ITEM)
+                end = start + CHECK_DRAWABLES_PER_WORK_ITEM;
+            
+            item.start_ = &(*start);
+            item.end_ = &(*end);
+            queue->AddWorkItem(item);
+            
+            start = end;
+        }
+        
+        queue->Complete();
+    }
     
     // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
     sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
@@ -372,34 +439,15 @@ void View::GetDrawables()
     sceneViewBox_.defined_ = false;
     Matrix3x4 view(camera_->GetInverseWorldTransform());
     
-    // Now go through the drawable list again for geometries and lights
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
         Drawable* drawable = tempDrawables[i];
-        unsigned flags = drawable->GetDrawableFlags();
-        if (!(flags & (DRAWABLE_GEOMETRY | DRAWABLE_LIGHT)))
-            continue;
-        
-        drawable->UpdateDistance(frame_);
-        
-        // If draw distance non-zero, check it
-        float maxDistance = drawable->GetDrawDistance();
-        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
-            continue;
-        
-        /// \todo Should test the drawables' octants first, or use threading for the visibility tests
-        if (buffer && i < unculledDrawablesStart && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
+        unsigned char flags = drawable->GetDrawableFlags();
+        if (flags & DRAWABLE_ZONE || !drawable->IsInView(frame_))
             continue;
         
         if (flags & DRAWABLE_GEOMETRY)
         {
-            // Find new zone for the drawable if necessary
-            if (!drawable->GetZone() && !cameraZoneOverride_)
-                FindZone(drawable);
-            
-            drawable->ClearLights();
-            drawable->MarkInView(frame_);
-            
             // Expand the scene bounding boxes. However, do not take "infinite" objects such as the skybox into account,
             // as the bounding boxes are also used for shadow focusing
             const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
@@ -422,7 +470,6 @@ void View::GetDrawables()
         else if (flags & DRAWABLE_LIGHT)
         {
             Light* light = static_cast<Light*>(drawable);
-            light->MarkInView(frame_);
             lights_.Push(light);
         }
     }
@@ -721,11 +768,9 @@ void View::UpdateGeometries()
             PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
             while (start != threadedGeometries_.End())
             {
-                PODVector<Drawable*>::Iterator end = start;
+                PODVector<Drawable*>::Iterator end = threadedGeometries_.End();
                 if (end - start > DRAWABLES_PER_WORK_ITEM)
-                    end += DRAWABLES_PER_WORK_ITEM;
-                else
-                    end = threadedGeometries_.End();
+                    end = start + DRAWABLES_PER_WORK_ITEM;
                 
                 item.start_ = &(*start);
                 item.end_ = &(*end);
@@ -1591,7 +1636,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     }
 }
 
-void View::FindZone(Drawable* drawable)
+void View::FindZone(Drawable* drawable, unsigned threadIndex)
 {
     Vector3 center = drawable->GetWorldBoundingBox().Center();
     int bestPriority = M_MIN_INT;
@@ -1620,11 +1665,12 @@ void View::FindZone(Drawable* drawable)
     }
     else
     {
-        PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones_), center, DRAWABLE_ZONE);
+        PODVector<Zone*>& tempZones = tempZones_[threadIndex];
+        PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones), center, DRAWABLE_ZONE);
         octree_->GetDrawables(query);
         
         bestPriority = M_MIN_INT;
-        for (PODVector<Zone*>::Iterator i = tempZones_.Begin(); i != tempZones_.End(); ++i)
+        for (PODVector<Zone*>::Iterator i = tempZones.Begin(); i != tempZones.End(); ++i)
         {
             int priority = (*i)->GetPriority();
             if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
