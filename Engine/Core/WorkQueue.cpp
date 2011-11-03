@@ -180,6 +180,9 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         if (shutDown_)
             return;
         
+        if (queue_.Empty())
+            Time::Sleep(0);
+        
         queueMutex_.Acquire();
         if (!queue_.Empty())
         {
@@ -201,9 +204,6 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
                 wasActive = false;
             }
             queueMutex_.Release();
-            // When transitioning from working to waiting, give up the time slice so that it is easier
-            // for the main thread to re-lock the mutex
-            Time::Sleep(0);
         }
     }
 }
