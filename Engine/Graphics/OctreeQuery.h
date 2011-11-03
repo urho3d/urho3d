@@ -37,11 +37,10 @@ class OctreeQuery
 {
 public:
     /// Construct with query parameters.
-    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask, bool occludersOnly, bool shadowCastersOnly) :
+    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask, bool shadowCastersOnly) :
         result_(result),
         drawableFlags_(drawableFlags),
         viewMask_(viewMask),
-        occludersOnly_(occludersOnly),
         shadowCastersOnly_(shadowCastersOnly)
     {
     }
@@ -62,8 +61,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get occluders only flag.
-    bool occludersOnly_;
     /// Get shadowcasters only flag.
     bool shadowCastersOnly_;
 };
@@ -74,8 +71,8 @@ class PointOctreeQuery : public OctreeQuery
 public:
     /// Construct with point and query parameters.
     PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
         point_(point)
     {
     }
@@ -95,8 +92,8 @@ class SphereOctreeQuery : public OctreeQuery
 public:
     /// Construct with sphere and query parameters.
     SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
         sphere_(sphere)
     {
     }
@@ -116,8 +113,8 @@ class BoxOctreeQuery : public OctreeQuery
 public:
     /// Construct with bounding box and query parameters.
     BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
         box_(box)
     {
     }
@@ -137,8 +134,8 @@ class FrustumOctreeQuery : public OctreeQuery
 public:
     /// Construct with frustum and query parameters.
     FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
         frustum_(frustum)
     {
     }
@@ -164,12 +161,6 @@ enum RayQueryLevel
 /// Raycast result.
 struct RayQueryResult
 {
-    /// Construct.
-    RayQueryResult() :
-        subObject_(M_MAX_UNSIGNED)
-    {
-    }
-    
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
@@ -187,14 +178,13 @@ public:
     /// Construct with ray and query parameters.
     RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
         float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, 
-        bool occludersOnly = false, bool shadowCastersOnly = false) :
+        bool shadowCastersOnly = false) :
         result_(result),
         ray_(ray),
         level_(level),
         maxDistance_(maxDistance),
         drawableFlags_(drawableFlags),
         viewMask_(viewMask),
-        occludersOnly_(occludersOnly),
         shadowCastersOnly_(shadowCastersOnly)
     {
     }
@@ -207,8 +197,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get occluders only flag.
-    bool occludersOnly_;
     /// Get shadowcasters only flag.
     bool shadowCastersOnly_;
     /// Maximum ray distance.

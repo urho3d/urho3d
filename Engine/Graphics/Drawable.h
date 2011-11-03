@@ -47,6 +47,7 @@ class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
 class Zone;
+struct RayQueryResult;
 struct WorkItem;
 
 /// Geometry update type.
@@ -87,8 +88,8 @@ public:
     /// Register object attributes. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process octree raycast.
-    virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
+    /// Process octree raycast. May be called from a worker thread.
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
     /// Calculate distance and LOD level for rendering.  May be called from worker thread(s), possibly re-entrantly.

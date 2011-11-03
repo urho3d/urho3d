@@ -40,8 +40,8 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process octree raycast.
-    virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
+    /// Process octree raycast. May be called from a worker thread.
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Return number of batches.

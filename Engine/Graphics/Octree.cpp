@@ -197,7 +197,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
         Drawable* drawable = *i;
         
         if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ && !drawable->GetCastShadows()) ||
+            (query.shadowCastersOnly_ && !drawable->GetCastShadows()) ||
             !drawable->IsVisible())
             continue;
         
@@ -227,14 +227,10 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         unsigned drawableFlags = drawable->GetDrawableFlags();
         
         if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            !drawable->IsVisible() || (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ &&
-            !drawable->GetCastShadows()))
+            !drawable->IsVisible() || (query.shadowCastersOnly_ && !drawable->GetCastShadows()))
             continue;
         
-        float drawableDist = query.ray_.HitDistance(drawable->GetWorldBoundingBox());
-        // The drawable will possibly do more accurate collision testing, then store the result(s)
-        if (drawableDist < query.maxDistance_)
-            drawable->ProcessRayQuery(query, drawableDist);
+        drawable->ProcessRayQuery(query, query.result_);
     }
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)

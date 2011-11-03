@@ -1094,7 +1094,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         if (type != LIGHT_SPOT)
         {
             FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
-                camera_->GetViewMask(), false, true);
+                camera_->GetViewMask(), true);
             octree_->GetDrawables(octreeQuery);
         }
         

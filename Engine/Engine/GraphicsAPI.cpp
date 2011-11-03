@@ -42,6 +42,10 @@
 #include "Skybox.h"
 #include "Zone.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4345)
+#endif
+
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 

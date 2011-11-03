@@ -163,7 +163,7 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     }
 }
 
-void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     PROFILE(RaycastLight);
     
@@ -173,15 +173,26 @@ void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     {
     case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
-    case RAY_OBB:
         // Do not record a raycast result for a directional light, as they would overwhelm all other results
         if (lightType_ != LIGHT_DIRECTIONAL)
+            Drawable::ProcessRayQuery(query, results);
+        break;
+        
+    case RAY_OBB:
+        if (lightType_ != LIGHT_DIRECTIONAL)
         {
-            RayQueryResult result;
-            result.drawable_ = this;
-            result.node_ = GetNode();
-            result.distance_ = initialDistance;
-            query.result_.Push(result);
+            Matrix3x4 inverse(GetWorldTransform().Inverse());
+            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+            float distance = localRay.HitDistance(GetWorldBoundingBox());
+            if (distance < query.maxDistance_)
+            {
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = GetNode();
+                result.distance_ = distance;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
         }
         break;
         
@@ -195,7 +206,8 @@ void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                 result.drawable_ = this;
                 result.node_ = GetNode();
                 result.distance_ = distance;
-                query.result_.Push(result);
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
             }
         }
         if (lightType_ == LIGHT_POINT)
@@ -207,7 +219,8 @@ void Light::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                 result.drawable_ = this;
                 result.node_ = GetNode();
                 result.distance_ = distance;
-                query.result_.Push(result);
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
             }
         }
         break;

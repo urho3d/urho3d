@@ -78,14 +78,18 @@ void Drawable::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Drawable, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
-void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // By default just store the result from the bounding box raycast
-    RayQueryResult result;
-    result.drawable_ = this;
-    result.node_ = GetNode();
-    result.distance_ = initialDistance;
-    query.result_.Push(result);
+    float distance = query.ray_.HitDistance(GetWorldBoundingBox());
+    if (distance < query.maxDistance_)
+    {
+        RayQueryResult result;
+        result.drawable_ = this;
+        result.node_ = GetNode();
+        result.distance_ = distance;
+        result.subObject_ = M_MAX_UNSIGNED;
+        results.Push(result);
+    }
 }
 
 void Drawable::UpdateDistance(const FrameInfo& frame)

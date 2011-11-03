@@ -45,7 +45,7 @@ void Skybox::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(Skybox, StaticModel);
 }
 
-void Skybox::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     // Return no ray hits, as camera rays practically always originate within the bounding box, blocking any other results
 }

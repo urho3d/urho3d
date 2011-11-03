@@ -70,23 +70,15 @@ void StaticModel::RegisterObject(Context* context)
     ATTRIBUTE(StaticModel, VAR_INT, "Ray/Occl. LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
-void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    PROFILE(RaycastStaticModel);
-    
     RayQueryLevel level = query.level_;
     
     switch (level)
     {
     case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
-        {
-            RayQueryResult result;
-            result.drawable_ = this;
-            result.node_ = GetNode();
-            result.distance_ = initialDistance;
-            query.result_.Push(result);
-        }
+        Drawable::ProcessRayQuery(query, results);
         break;
         
     case RAY_OBB:
@@ -100,7 +92,8 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                 result.drawable_ = this;
                 result.node_ = GetNode();
                 result.distance_ = distance;
-                query.result_.Push(result);
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
             }
         }
         break;
@@ -133,7 +126,8 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                             result.drawable_ = this;
                             result.node_ = GetNode();
                             result.distance_ = distance;
-                            query.result_.Push(result);
+                            result.subObject_ = M_MAX_UNSIGNED;
+                            results.Push(result);
                             break;
                         }
                     }

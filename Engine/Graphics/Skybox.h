@@ -38,8 +38,8 @@ public:
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process octree raycast.
-    void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
+    /// Process octree raycast. May be called from a worker thread.
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Fill rendering batch with distance, geometry, material and world transform.

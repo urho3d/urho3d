@@ -104,16 +104,18 @@ void AnimatedModel::ApplyAttributes()
     }
 }
 
-void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
+void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the Drawable test
     if (query.level_ < RAY_AABB || !skeleton_.GetRootBone() || !skeleton_.GetRootBone()->node_)
     {
-        Drawable::ProcessRayQuery(query, initialDistance);
+        Drawable::ProcessRayQuery(query, results);
         return;
     }
     
-    PROFILE(RaycastAnimatedModel);
+    // Check ray hit distance to AABB before proceeding with bone-level tests
+    if (query.ray_.HitDistance(GetWorldBoundingBox()) > query.maxDistance_)
+        return;
     
     const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
@@ -141,7 +143,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                     result.node_ = GetNode();
                     result.distance_ = distance;
                     result.subObject_ = i;
-                    query.result_.Push(result);
+                    results.Push(result);
                 }
                 else
                 {
@@ -156,7 +158,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                         result.node_ = GetNode();
                         result.distance_ = distance;
                         result.subObject_ = i;
-                        query.result_.Push(result);
+                        results.Push(result);
                     }
                 }
             }
@@ -173,7 +175,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                 result.node_ = GetNode();
                 result.subObject_ = i;
                 result.distance_ = distance;
-                query.result_.Push(result);
+                results.Push(result);
             }
         }
     }
