@@ -180,9 +180,6 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         if (shutDown_)
             return;
         
-        if (queue_.Empty())
-            Time::Sleep(0);
-        
         queueMutex_.Acquire();
         if (!queue_.Empty())
         {
@@ -204,6 +201,7 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
                 wasActive = false;
             }
             queueMutex_.Release();
+            Time::Sleep(0);
         }
     }
 }
