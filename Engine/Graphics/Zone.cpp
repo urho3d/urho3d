@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "XMLElement.h"
 #include "Zone.h"
 

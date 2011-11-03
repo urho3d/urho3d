@@ -26,7 +26,6 @@
 #include "DebugRenderer.h"
 #include "Profiler.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "Scene.h"
 #include "Sort.h"
 #include "WorkQueue.h"
@@ -39,6 +38,23 @@
 
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
+static const int RAYCASTS_PER_WORK_ITEM = 4;
+
+void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
+{
+    Octree* octree = reinterpret_cast<Octree*>(item->aux_);
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    const RayOctreeQuery& query = *octree->rayQuery_;
+    PODVector<RayQueryResult>& results = octree->rayQueryResults_[threadIndex];
+    
+    while (start != end)
+    {
+        Drawable* drawable = *start;
+        drawable->ProcessRayQuery(query, results);
+        ++start;
+    }
+}
 
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
@@ -240,6 +256,34 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     }
 }
 
+void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
+{
+    if (!numDrawables_)
+        return;
+    
+    float octantDist = query.ray_.HitDistance(cullingBox_);
+    if (octantDist >= query.maxDistance_)
+        return;
+    
+    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    {
+        Drawable* drawable = *i;
+        unsigned drawableFlags = drawable->GetDrawableFlags();
+        
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
+            !drawable->IsVisible() || (query.shadowCastersOnly_ && !drawable->GetCastShadows()))
+            continue;
+        
+        drawables.Push(drawable);
+    }
+    
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    {
+        if (children_[i])
+            children_[i]->GetDrawablesOnlyInternal(query, drawables);
+    }
+}
+
 void Octant::Release()
 {
     if (root_ && this != root_)
@@ -273,6 +317,8 @@ Octree::Octree(Context* context) :
     scene_(0),
     numLevels_(DEFAULT_OCTREE_LEVELS)
 {
+    // Resize threaded ray query intermediate result vector according to number of worker threads
+    rayQueryResults_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
 }
 
 Octree::~Octree()
@@ -378,7 +424,55 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
     PROFILE(Raycast);
     
     query.result_.Clear();
-    GetDrawablesInternal(query);
+    
+    // If no triangle-level testing, do not thread
+    if (query.level_ < RAY_TRIANGLE)
+        GetDrawablesInternal(query);
+    else
+    {
+        // Threaded ray query: first get the drawables
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        
+        rayQuery_ = &query;
+        rayQueryDrawables_.Clear();
+        GetDrawablesOnlyInternal(query, rayQueryDrawables_);
+        
+        // Check that amount of drawables is large enough to justify threading
+        if (rayQueryDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
+        {
+            for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
+                rayQueryResults_[i].Clear();
+            
+            WorkItem item;
+            item.workFunction_ = RaycastDrawablesWork;
+            item.aux_ = const_cast<Octree*>(this);
+            
+            PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
+            while (start != rayQueryDrawables_.End())
+            {
+                PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
+                if (end - start > RAYCASTS_PER_WORK_ITEM)
+                    end = start + RAYCASTS_PER_WORK_ITEM;
+                
+                item.start_ = &(*start);
+                item.end_ = &(*end);
+                queue->AddWorkItem(item);
+                
+                start = end;
+            }
+            
+            // Merge per-thread results
+            queue->Complete();
+            for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
+                query.result_.Insert(query.result_.End(), rayQueryResults_[i].Begin(), rayQueryResults_[i].End());
+        }
+        else
+        {
+            for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+                (*i)->ProcessRayQuery(query, query.result_);
+        }
+    }
+    
     Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
 }
 

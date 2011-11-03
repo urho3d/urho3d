@@ -165,8 +165,6 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    PROFILE(RaycastLight);
-    
     RayQueryLevel level = query.level_;
     
     switch (level)

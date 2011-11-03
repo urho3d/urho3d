@@ -27,7 +27,6 @@
 #include "DebugRenderer.h"
 #include "Light.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "Scene.h"
 #include "Sort.h"
 #include "Zone.h"

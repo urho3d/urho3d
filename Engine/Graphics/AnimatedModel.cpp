@@ -37,7 +37,6 @@
 #include "Material.h"
 #include "MemoryBuffer.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"

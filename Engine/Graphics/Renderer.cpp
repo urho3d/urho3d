@@ -35,7 +35,6 @@
 #include "Material.h"
 #include "OcclusionBuffer.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"

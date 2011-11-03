@@ -26,10 +26,9 @@
 #include "Drawable.h"
 #include "List.h"
 #include "Mutex.h"
+#include "OctreeQuery.h"
 
 class Octree;
-class OctreeQuery;
-class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
 
@@ -97,6 +96,8 @@ protected:
     void GetDrawablesInternal(OctreeQuery& query, bool inside) const;
     /// Return drawable objects by a ray query, called internally.
     void GetDrawablesInternal(RayOctreeQuery& query) const;
+    /// Return drawable objects only for a threaded ray query, called internally.
+    void GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const;
     /// Free child octants. If drawable objects still exist, move them to root.
     void Release();
     
@@ -149,6 +150,8 @@ protected:
 /// %Octree component. Should be added only to the root scene node
 class Octree : public Component, public Octant
 {
+    friend void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex);
+    
     OBJECT(Octree);
     
 public:
@@ -211,6 +214,12 @@ private:
     Mutex octreeMutex_;
     /// Unculled drawables.
     Vector<WeakPtr<Drawable> > unculledDrawables_;
+    /// Current threaded ray query.
+    mutable RayOctreeQuery* rayQuery_;
+    /// Drawable list for threaded ray query.
+    mutable PODVector<Drawable*> rayQueryDrawables_;
+    /// Threaded ray query intermediate results.
+    mutable Vector<PODVector<RayQueryResult> > rayQueryResults_;
     /// Subdivision level.
     unsigned numLevels_;
 };

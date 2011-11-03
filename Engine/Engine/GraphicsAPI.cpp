@@ -33,7 +33,6 @@
 #include "Light.h"
 #include "Material.h"
 #include "Octree.h"
-#include "OctreeQuery.h"
 #include "ParticleEmitter.h"
 #include "Scene.h"
 #include "Technique.h"
