@@ -425,14 +425,14 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
     
     query.result_.Clear();
     
-    // If no triangle-level testing, do not thread
-    if (query.level_ < RAY_TRIANGLE)
+    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    
+    // If no worker threads or no triangle-level testing, do not create work items
+    if (!queue->GetNumThreads() || query.level_ < RAY_TRIANGLE)
         GetDrawablesInternal(query);
     else
     {
         // Threaded ray query: first get the drawables
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
-        
         rayQuery_ = &query;
         rayQueryDrawables_.Clear();
         GetDrawablesOnlyInternal(query, rayQueryDrawables_);

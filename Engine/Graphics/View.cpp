@@ -63,7 +63,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     View* view = reinterpret_cast<View*>(item->aux_);
     Drawable** start = reinterpret_cast<Drawable**>(item->start_);
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
-    Drawable** unculledStart = &view->tempDrawables_[0][view->unculledDrawableStart_];
+    Drawable** unculledStart = &view->tempDrawables_[0][0] + view->unculledDrawableStart_;
     OcclusionBuffer* buffer = view->occlusionBuffer_;
     
     while (start != end)
