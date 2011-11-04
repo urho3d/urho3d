@@ -105,13 +105,14 @@ Urho3D.exe understands the following command line options:
 -v          Enable vertical sync
 -t          Enable triple buffering
 -w          Start in windowed mode
+-b<length>  Sound buffer length in milliseconds
+-r<freq>    Sound mixing frequency in Hz
 -headless   Headless mode. No application window will be created
 -lqshadows  Use low-quality (1-sample) shadow filtering
--b<length>  Sound buffer length in milliseconds
--r<freq>    Mixing frequency in Hz
--noflush    Disable GPU command queue flushing
--nolimit    Disable frame limiter
 -noshadows  Disable rendering of shadows
+-nolimit    Disable frame limiter
+-noflush    Disable GPU command queue flushing
+-nothreads  Disable worker threads
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering

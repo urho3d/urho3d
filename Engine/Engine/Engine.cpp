@@ -88,6 +88,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool stereo = true;
     bool interpolate = true;
     bool flush = true;
+    bool threads = true;
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
@@ -111,6 +112,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 lqShadows = true;
             else if (argument == "noflush")
                 flush = false;
+            else if (argument == "nothreads")
+                threads = false;
             else if (argument == "sm2")
                 forceSM2 = true;
             else if (argument == "fallback")
@@ -174,12 +177,11 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     
     // Set amount of worker threads according to the free CPU cores. Leave one for the main thread and another for
     // GPU & audio drivers, and clamp to a maximum of four for now
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
     int numCores = GetNumCPUCores();
-    if (numCores > 1)
+    if (threads && numCores > 1)
     {
         int numThreads = Clamp(numCores - 2, 1, 4);
-        queue->CreateThreads(numThreads);
+        GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
         String workerThreadString = "Created " + String(numThreads) + " worker thread";
         if (numThreads > 1)
