@@ -72,8 +72,6 @@ void AnimationController::Update(float timeStep)
     if (!model)
         return;
     
-    PROFILE(UpdateAnimationController);
-    
     // Loop through animations
     for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
     {

@@ -64,11 +64,7 @@ WorkQueue::~WorkQueue()
 {
     // Stop the worker threads. First make sure they are not waiting for work items
     shutDown_ = true;
-    if (paused_)
-    {
-        queueMutex_.Release();
-        paused_ = false;
-    }
+    Resume();
     
     for (unsigned i = 0; i < threads_.Size(); ++i)
         threads_[i]->Stop();
