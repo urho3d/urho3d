@@ -628,6 +628,8 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "uint get_viewMask() const", asMETHOD(T, GetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_lightMask(uint)", asMETHOD(T, SetLightMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_lightMask() const", asMETHOD(T, GetLightMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_shadowMask(uint)", asMETHOD(T, SetShadowMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_shadowMask() const", asMETHOD(T, GetShadowMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_zoneMask(uint)", asMETHOD(T, SetZoneMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_zoneMask() const", asMETHOD(T, GetZoneMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxLights(uint)", asMETHOD(T, SetMaxLights), asCALL_THISCALL);

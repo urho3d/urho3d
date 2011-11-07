@@ -48,6 +48,7 @@ Any Object can be registered to the Context as a subsystem, by using the functio
 After Engine initialization, the following subsystems will always exist:
 
 - Time: manages frame updates, frame number and elapsed time counting, and controls the frequency of the operating system low-resolution timer.
+- WorkQueue: executes background tasks in worker threads.
 - FileSystem: provides directory operations.
 - Log: provides logging services.
 - ResourceCache: loads resources and keeps them cached for later access.
@@ -67,7 +68,7 @@ The following subsystems are optional, so GetSubsystem() may return null if they
 - DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud "CreateDebugHud()".
 
 In script, the subsystems are available through the following global properties:
-time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud. Note that Profiler is not available to script due to its low-level nature.
+time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud. Note that WorkQueue and Profiler are not available to script due to their low-level nature.
 
 
 \page Events Events
@@ -373,7 +374,7 @@ When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()".
 - For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is checked for.
-- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode using a color texture and  minimal shadow filtering will be chosen instead.
+- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode using a color texture and minimal shadow filtering will be chosen instead.
 
 \section Rendering_Renderer Renderer
 
@@ -417,7 +418,7 @@ The rendering-related components defined by the %Graphics library are:
 
 The following techniques will be used to reduce the amount of CPU and GPU work when rendering. By default they are all on:
 
-- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Occlusion will also be used to optimize away directional light shadow casters that are behind another shadow caster. Use \ref Renderer::SetMaxOccluderTriangles() "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold() "SetOccluderSizeThreshold()" to configure the occlusion rendering.
+- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles() "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold() "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
 - Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
@@ -568,6 +569,12 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
 Finally, there are global settings for the shadow map base resolution and shadow map depth (16 or 24 bit) & filtering quality (1 or 4 samples) in Renderer.
+
+\section Lights_ShadowCulling Shadow culling
+
+Similarly to light culling with lightmasks, shadowmasks can be used to select which objects should cast shadows with respect to each light. See \ref Drawable::SetShadowMask "SetShadowMask()". A potential shadow caster's shadow mask will be ANDed with the light's lightmask to see if it should be rendered to the light's shadow map. Also, when an object is inside a zone, its shadowmask will be ANDed with the zone's shadowmask as well. By default all bits are set in the shadowmask.
+
+For an example of shadow culling, imagine a house (which itself is a shadow caster) containing several objects inside, and a shadowed directional light shining in from the windows. In that case shadow map rendering can be avoided for objects already in shadow by clearing the respective bit from their shadowmasks.
 
 \section Lights_ShadowMapReuse Shadow map reuse
 
@@ -1068,6 +1075,19 @@ To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent
 For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed.
 
 Like with ordinary events, in script event types are strings instead of name hashes for convenience.
+
+
+\page Multithreading Multithreading
+
+Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be supplied with tasks described by the WorkItem structure, by calling \ref WorkQueue::AddWorkItem "AddWorkItem()". These will be executed in background worker threads. The function \ref WorkQueue::Complete "Complete()" will complete all currently pending tasks, and execute them also in the main thread to make them finish faster.
+
+On single-core systems no worker threads will be created. In the presence of more cores, worker threads will be created up to a maximum of four. Two cores will be preferably left free to allow one for the main thread, and another for the GPU driver and audio processing.
+
+The work items include a function pointer to call, with the signature "void WorkFunction(const WorkItem* item, unsigned threadIndex)." The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
+
+Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views including lit object and shadow caster queries, occlusion tests, particle system updates and animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
+
+Note that as the Profiler currently manages only a single hierarchy tree, profiling blocks may only appear in main thread code, not in the work functions.
 
 \page Tools Tools
 

@@ -34,6 +34,7 @@ static const unsigned DRAWABLE_ZONE = 0x4;
 static const unsigned DRAWABLE_ANY = 0xff;
 static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
+static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 static const int DRAWABLES_PER_WORK_ITEM = 16;
 
@@ -115,11 +116,13 @@ public:
     void SetShadowDistance(float distance);
     /// %Set LOD bias.
     void SetLodBias(float bias);
-    /// %Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered.
+    /// %Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set light mask. Will be and'ed with light's and zone's light mask to see if the object should be lit.
+    /// %Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// %Set zone mask. Will be and'ed with zone's zone mask to see if the object should belong to the zone.
+    /// %Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
+    void SetShadowMask(unsigned mask);
+    /// %Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     void SetZoneMask(unsigned mask);
     /// %Set maximum number of lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
@@ -146,6 +149,8 @@ public:
     unsigned GetViewMask() const { return viewMask_; }
     /// Return light mask.
     unsigned GetLightMask() const { return lightMask_; }
+    /// Return shadow mask.
+    unsigned GetShadowMask() const { return shadowMask_; }
     /// Return zone mask.
     unsigned GetZoneMask() const { return zoneMask_; }
     /// Return maximum number of lights.
@@ -222,6 +227,8 @@ protected:
     unsigned viewMask_;
     /// Light mask.
     unsigned lightMask_;
+    /// Shadow mask.
+    unsigned shadowMask_;
     /// Zone mask.
     unsigned zoneMask_;
     /// Maximum lights.
@@ -268,4 +275,3 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
 {
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
-

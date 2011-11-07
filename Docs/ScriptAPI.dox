@@ -1589,6 +1589,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1651,6 +1652,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1703,6 +1705,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1744,6 +1747,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1785,6 +1789,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1854,6 +1859,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -1962,6 +1968,7 @@ Properties:<br>
 - float lodBias
 - uint viewMask
 - uint lightMask
+- uint shadowMask
 - uint zoneMask
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
@@ -2117,7 +2124,6 @@ Properties:<br>
 - uint[] numLights (readonly)
 - uint[] numShadowMaps (readonly)
 - uint[] numOccluders (readonly)
-- uint[] numShadowOccluders (readonly)
 
 
 Input

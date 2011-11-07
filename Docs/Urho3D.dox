@@ -31,6 +31,7 @@ For further reference, see:
 \ref UI "User interface" <br>
 \ref Serialization "Serialization" <br>
 \ref Network "Networking" <br>
+\ref Multithreading "Multithreading" <br>
 \ref Tools "Tools" <br>
 \ref FileFormats "Custom file formats" <br>
 \ref CodingConventions "Coding conventions" <br>

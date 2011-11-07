@@ -159,6 +159,8 @@ private:
     Zone* GetZone(Drawable* drawable);
     /// Return the drawable's light mask, considering also its zone.
     unsigned GetLightMask(Drawable* drawable);
+    /// Return the drawable's shadow mask, considering also its zone.
+    unsigned GetShadowMask(Drawable* drawable);
     /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material*& material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)

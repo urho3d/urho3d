@@ -1157,8 +1157,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
             continue;
         
-        // Check light mask
-        if (!(GetLightMask(drawable) & light->GetLightMask()))
+        // Check shadow mask
+        if (!(GetShadowMask(drawable) & light->GetLightMask()))
             continue;
         
         // Project shadow caster bounding box to light view space for visibility check
@@ -1654,6 +1654,11 @@ Zone* View::GetZone(Drawable* drawable)
 unsigned View::GetLightMask(Drawable* drawable)
 {
     return drawable->GetLightMask() & GetZone(drawable)->GetLightMask();
+}
+
+unsigned View::GetShadowMask(Drawable* drawable)
+{
+    return drawable->GetShadowMask() & GetZone(drawable)->GetShadowMask();
 }
 
 Technique* View::GetTechnique(Drawable* drawable, Material*& material)
