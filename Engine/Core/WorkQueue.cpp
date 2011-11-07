@@ -159,7 +159,7 @@ void WorkQueue::Complete()
     }
 }
 
-bool WorkQueue::IsCompleted()
+bool WorkQueue::IsCompleted() const
 {
     if (threads_.Size())
         return !numActive_ && queue_.Empty();

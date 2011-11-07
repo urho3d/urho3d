@@ -43,7 +43,7 @@ struct WorkItem
     void* aux_;
 };
 
-/// Work queue subsystem.
+/// Work queue subsystem for multithreading.
 class WorkQueue : public Object
 {
     OBJECT(WorkQueue);
@@ -70,7 +70,7 @@ public:
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
     /// Return whether all work is completed.
-    bool IsCompleted();
+    bool IsCompleted() const;
     
 private:
     /// Process work items until shut down. Called by the worker threads.
