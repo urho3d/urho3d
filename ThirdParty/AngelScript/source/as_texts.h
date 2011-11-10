@@ -92,6 +92,7 @@
 #define TXT_FUNCTION_s_NOT_FOUND          "Function '%s' not found"
 
 #define TXT_GET_SET_ACCESSOR_TYPE_MISMATCH_FOR_s "The property '%s' has mismatching types for the get and set accessors"
+#define TXT_GLOBAL_VARS_NOT_ALLOWED              "Global variables have been disabled by the application"
 
 #define TXT_HANDLE_ASSIGN_ON_NON_HANDLE_PROP     "It is not allowed to perform a handle assignment on a non-handle property"
 #define TXT_HANDLE_COMPARISON                    "The operand is implicitly converted to handle in order to compare them"
@@ -142,7 +143,7 @@
 #define TXT_NO_CONVERSION_s_TO_MATH_TYPE           "No conversion from '%s' to math type available."
 #define TXT_NO_DEFAULT_ARRAY_TYPE                  "The application doesn't support the default array type."
 #define TXT_NO_DEFAULT_CONSTRUCTOR_FOR_s           "No default constructor for object of type '%s'."
-#define TXT_NO_DEFAULT_COPY_OP                     "There is no copy operator for this type available."
+#define TXT_NO_DEFAULT_COPY_OP_FOR_s               "There is no copy operator for the type '%s' available."
 #define TXT_NO_COPY_CONSTRUCTOR_FOR_s              "No copy constructor for object of type '%s'."
 #define TXT_NO_MATCHING_SIGNATURES_TO_s            "No matching signatures to '%s'"
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPE_s        "No matching operator that takes the type '%s' found"
@@ -180,6 +181,12 @@
 #define TXT_REF_CANT_BE_RETURNED_DEFERRED_PARAM "Resulting reference cannot be returned. There are deferred arguments that may invalidate it."
 #define TXT_REF_CANT_BE_RETURNED_LOCAL_VARS     "Resulting reference cannot be returned. The expression uses objects that during cleanup may invalidate it."
 
+#define TXT_SHARED_CANNOT_ACCESS_NON_SHARED_VAR_s      "Shared code cannot access non-shared global variable '%s'"
+#define TXT_SHARED_CANNOT_CALL_NON_SHARED_FUNC_s       "Shared code cannot call non-shared function '%s'"
+#define TXT_SHARED_CANNOT_IMPLEMENT_NON_SHARED_s       "Shared class cannot implement non-shared interface '%s'"
+#define TXT_SHARED_CANNOT_INHERIT_FROM_NON_SHARED_s    "Shared class cannot inherit from non-shared class '%s'"
+#define TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s        "Shared code cannot use non-shared type '%s'"
+#define TXT_SHARED_DOESNT_MATCH_ORIGINAL               "Shared type doesn't match the original declaration in other module"
 #define TXT_SIGNED_UNSIGNED_MISMATCH                   "Signed/Unsigned mismatch"
 #define TXT_STRINGS_NOT_RECOGNIZED                     "Strings are not recognized by the application"
 #define TXT_SWITCH_CASE_MUST_BE_CONSTANT               "Case expressions must be constants"
@@ -212,7 +219,14 @@
 #define TXT_NON_POD_REQUIRE_CONSTR_DESTR_BEHAVIOUR "A non-pod value type must have the default constructor and destructor behaviours"
 #define TXT_CANNOT_PASS_TYPE_s_BY_VAL              "Can't pass type '%s' by value unless the application type is informed in the registration"
 #define TXT_CANNOT_RET_TYPE_s_BY_VAL               "Can't return type '%s' by value unless the application type is informed in the registration"
-#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL             "Don't support passing type '%s' by value to application"
+#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL             "Don't support passing type '%s' by value to application. Use generic calling convention instead"
+#define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL         "Don't support returning type '%s' by value from application. Use generic calling convention instead"
+#define TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s           "GC cannot free an object of type '%s'. Make sure all types that can form circular references have the GC behaviours"
+#define TXT_OBJECT_TYPE_s_DOESNT_EXIST             "Object type '%s' doesn't exist"
+#define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST           "Template type '%s' doesn't exist"
+#define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST        "Template subtype '%s' doesn't exist"
+#define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s      "Failed to read subtype of template type '%s'"
+#define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s         "Attempting to instanciate invalid template type '%s<%s>'"
 
 // Internal names
 

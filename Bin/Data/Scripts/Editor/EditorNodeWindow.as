@@ -555,7 +555,9 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
     }
     if (type == VAR_VARIANTMAP)
     {
-        VariantMap map = serializables[0].attributes[index].GetVariantMap();
+        // Get the variant first to avoid a crash with AngelScript 2.22.0 if the VariantMap is accessed directly
+        Variant value = serializables[0].attributes[index];
+        VariantMap map = value.GetVariantMap();
         Array<ShortStringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
@@ -768,7 +770,9 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     {
         for (uint i = 0; i < serializables.length; ++i)
         {
-            VariantMap map = serializables[i].attributes[index].GetVariantMap();
+            // Get the variant first to avoid a crash with AngelScript 2.22.0 if the VariantMap is accessed directly
+            Variant value = serializables[0].attributes[index];
+            VariantMap map = value.GetVariantMap();
             ShortStringHash key(parent.vars["Key"].GetUInt());
             Variant newValue = GetEditorValue(parent, map[key].type, null);
             map[key] = newValue;

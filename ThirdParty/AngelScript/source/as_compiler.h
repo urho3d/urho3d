@@ -142,7 +142,7 @@ protected:
 	int  CompileExpressionPreOp(asCScriptNode *node, asSExprContext *out);
 	int  CompileExpressionPostOp(asCScriptNode *node, asSExprContext *out);
 	int  CompileExpressionValue(asCScriptNode *node, asSExprContext *out);
-	void CompileFunctionCall(asCScriptNode *node, asSExprContext *out, asCObjectType *objectType, bool objIsConst, const asCString &scope = "");
+	int  CompileFunctionCall(asCScriptNode *node, asSExprContext *out, asCObjectType *objectType, bool objIsConst, const asCString &scope = "");
 	void CompileConstructCall(asCScriptNode *node, asSExprContext *out);
 	void CompileConversion(asCScriptNode *node, asSExprContext *out);
 	int  CompileOperator(asCScriptNode *node, asSExprContext *l, asSExprContext *r, asSExprContext *out);
@@ -156,8 +156,8 @@ protected:
 
 	void CompileInitList(asCTypeInfo *var, asCScriptNode *node, asCByteCode *bc);
 
-	int  CallDefaultConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, bool isGlobalVar = false);
-	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asSExprContext *arg, asCScriptNode *node, bool isGlobalVar = false);
+	int  CallDefaultConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, bool isGlobalVar = false, bool deferDest = false);
+	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asSExprContext *arg, asCScriptNode *node, bool isGlobalVar = false, bool derefDestination = false);
 	void CallDestructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc);
 	int  CompileArgumentList(asCScriptNode *node, asCArray<asSExprContext *> &args);
 	int  CompileDefaultArgs(asCScriptNode *node, asCArray<asSExprContext*> &args, asCScriptFunction *func);
@@ -172,7 +172,7 @@ protected:
 	void SwapPostFixOperands(asCArray<asCScriptNode *> &postfix, asCArray<asCScriptNode *> &target);
 	void PrepareTemporaryObject(asCScriptNode *node, asSExprContext *ctx, asCArray<int> *reservedVars, bool forceOnHeap = false);
 	void PrepareOperand(asSExprContext *ctx, asCScriptNode *node);
-	void PrepareForAssignment(asCDataType *lvalue, asSExprContext *rvalue, asCScriptNode *node, asSExprContext *lvalueExpr = 0);
+	void PrepareForAssignment(asCDataType *lvalue, asSExprContext *rvalue, asCScriptNode *node, bool toTemporary, asSExprContext *lvalueExpr = 0);
 	void PerformAssignment(asCTypeInfo *lvalue, asCTypeInfo *rvalue, asCByteCode *bc, asCScriptNode *node);
 	bool IsVariableInitialized(asCTypeInfo *type, asCScriptNode *node);
 	void Dereference(asSExprContext *ctx, bool generateCode);

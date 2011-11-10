@@ -76,11 +76,14 @@ struct sGlobalVariableDescription
 
 struct sClassDeclaration
 {
+	sClassDeclaration() {script = 0; node = 0; validState = 0; objType = 0; isExistingShared = false;}
+
 	asCScriptCode *script;
 	asCScriptNode *node;
 	asCString name;
 	int validState;
 	asCObjectType *objType;
+	bool isExistingShared;
 };
 
 struct sFuncDef
@@ -126,9 +129,9 @@ protected:
 	friend class asCParser;
 
 	asCObjectProperty *GetObjectProperty(asCDataType &obj, const char *prop);
-	asCGlobalProperty *GetGlobalProperty(const char *prop, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue);
+	asCGlobalProperty *GetGlobalProperty(const char *prop, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue, bool *isAppProp);
 
-	asCScriptFunction *GetFunctionDescription(int funcID);
+	asCScriptFunction *GetFunctionDescription(int funcId);
 	void GetFunctionDescriptions(const char *name, asCArray<int> &funcs);
 	void GetObjectMethodDescriptions(const char *name, asCObjectType *objectType, asCArray<int> &methods, bool objIsConst, const asCString &scope = "");
 

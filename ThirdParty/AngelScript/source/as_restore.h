@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -77,7 +77,7 @@ protected:
 	void WriteEncodedUInt(asUINT i);
 
 	void ReadString(asCString *str);
-	asCScriptFunction *ReadFunction(bool addToModule = true, bool addToEngine = true);
+	asCScriptFunction *ReadFunction(bool addToModule = true, bool addToEngine = true, bool addToGC = true);
 	void ReadFunctionSignature(asCScriptFunction *func);
 	void ReadGlobalProperty();
 	void ReadObjectProperty(asCObjectType *ot);
@@ -139,6 +139,9 @@ protected:
 		asUINT         oldSize;
 	};
 	asCArray<SObjChangeSize>     oldObjectSizes;
+
+	asCMap<void*,bool>              existingShared;
+	asCMap<asCScriptFunction*,bool> dontTranslate;
 };
 
 END_AS_NAMESPACE

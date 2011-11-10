@@ -427,6 +427,7 @@ void asCBuilder::ParseScripts()
 		for( n = 0; n < interfaceDeclarations.GetLength(); n++ )
 		{
 			sClassDeclaration *decl = interfaceDeclarations[n];
+			if( decl->isExistingShared ) continue; // TODO: shared: Should really verify that the methods match the original
 
 			asCScriptNode *node = decl->node->firstChild->next;
 			while( node )
@@ -450,6 +451,7 @@ void asCBuilder::ParseScripts()
 		for( n = 0; n < classDeclarations.GetLength(); n++ )
 		{
 			sClassDeclaration *decl = classDeclarations[n];
+			if( decl->isExistingShared ) continue; // TODO: shared: Should really verify that the methods match the original
 
 			asCScriptNode *node = decl->node->firstChild->next;
 
@@ -669,22 +671,29 @@ asCObjectProperty *asCBuilder::GetObjectProperty(asCDataType &obj, const char *p
 {
 	asASSERT(obj.GetObjectType() != 0);
 
-	// TODO: Only search in config groups to which the module has access
 	// TODO: optimize: Improve linear search
 	asCArray<asCObjectProperty *> &props = obj.GetObjectType()->properties;
 	for( asUINT n = 0; n < props.GetLength(); n++ )
+	{
 		if( props[n]->name == prop )
-			return props[n];
+		{
+			if( module->accessMask & props[n]->accessMask )
+				return props[n];
+			else
+				return 0;
+		}
+	}
 
 	return 0;
 }
 
-asCGlobalProperty *asCBuilder::GetGlobalProperty(const char *prop, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue)
+asCGlobalProperty *asCBuilder::GetGlobalProperty(const char *prop, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue, bool *isAppProp)
 {
 	asUINT n;
 
 	if( isCompiled ) *isCompiled = true;
 	if( isPureConstant ) *isPureConstant = false;
+	if( isAppProp ) *isAppProp = false;
 
 	// TODO: optimize: Improve linear search
 	// Check application registered properties
@@ -694,14 +703,24 @@ asCGlobalProperty *asCBuilder::GetGlobalProperty(const char *prop, bool *isCompi
 		{
 			if( module )
 			{
-				// Find the config group for the global property
-				asCConfigGroup *group = engine->FindConfigGroupForGlobalVar((*props)[n]->id);
-				if( !group || group->HasModuleAccess(module->name.AddressOf()) )
+				// Determine if the module has access to the property
+				if( module->accessMask & (*props)[n]->accessMask )
+				{
+#ifdef AS_DEPRECATED
+					// deprecated since 2011-10-04
+					// Find the config group for the global property
+					asCConfigGroup *group = engine->FindConfigGroupForGlobalVar((*props)[n]->id);
+					if( !group || group->HasModuleAccess(module->name.AddressOf()) )
+						continue;
+#endif
+					if( isAppProp ) *isAppProp = true;
 					return (*props)[n];
+				}
 			}
 			else
 			{
 				// We're not compiling a module right now, so it must be a registered global property
+				if( isAppProp ) *isAppProp = true;
 				return (*props)[n];
 			}
 		}
@@ -966,7 +985,7 @@ int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScri
 
 	// TODO: Must verify global properties in all config groups, whether the module has access or not
 	// Check against global properties
-	asCGlobalProperty *prop = GetGlobalProperty(name, 0, 0, 0);
+	asCGlobalProperty *prop = GetGlobalProperty(name, 0, 0, 0, 0);
 	if( prop )
 	{
 		if( code )
@@ -1115,6 +1134,14 @@ void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 
 int asCBuilder::RegisterGlobalVar(asCScriptNode *node, asCScriptCode *file)
 {
+	// Has the application disabled global vars?
+	if( engine->ep.disallowGlobalVars )
+	{
+		int r, c;
+		file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+		WriteError(file->name.AddressOf(), TXT_GLOBAL_VARS_NOT_ALLOWED, r, c);
+	}
+
 	// What data type is it?
 	asCDataType type = CreateDataTypeFromNode(node->firstChild, file);
 
@@ -1178,6 +1205,15 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file)
 	asCScriptNode *n = node->firstChild;
 	asCString name(&file->code[n->tokenPos], n->tokenLength);
 
+	bool isShared = false;
+	if( name == SHARED_TOKEN )
+	{
+		isShared = true;
+
+		n = n->next;
+		name.Assign(&file->code[n->tokenPos], n->tokenLength);
+	}
+
 	int r, c;
 	file->ConvertPosToRowCol(n->tokenPos, &r, &c);
 
@@ -1185,13 +1221,39 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file)
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
 	classDeclarations.PushLast(decl);
-	decl->name       = name;
-	decl->script     = file;
-	decl->validState = 0;
-	decl->node       = node;
+	decl->name             = name;
+	decl->script           = file;
+	decl->node             = node;
 
+	// If this type is shared and there already exist another shared 
+	// type of the same name, then that one should be used instead of
+	// creating a new one.
+	if( isShared )
+	{
+		for( asUINT n = 0; n < engine->classTypes.GetLength(); n++ )
+		{
+			asCObjectType *st = engine->classTypes[n];
+			if( st &&
+				st->IsShared() &&
+				st->name == name &&
+				!st->IsInterface() )
+			{
+				// We'll use the existing type
+				decl->isExistingShared = true;
+				decl->objType          = st;
+				module->classTypes.PushLast(st);
+				st->AddRef();
+				return 0;
+			}
+		}
+	}
+
+	// Create a new object type for this class
 	asCObjectType *st = asNEW(asCObjectType)(engine);
 	st->flags = asOBJ_REF | asOBJ_SCRIPT_OBJECT;
+
+	if( isShared )
+		st->flags |= asOBJ_SHARED;
 
 	if( node->tokenType == ttHandle )
 		st->flags |= asOBJ_IMPLICIT_HANDLE;
@@ -1204,6 +1266,7 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file)
 	decl->objType = st;
 
 	// Add script classes to the GC
+	// TODO: optimize: Only add the class to the GC when the module won't use the type anymore
 	engine->gc.AddScriptObjectToGC(st, &engine->objectTypeBehaviours);
 
 	// Use the default script class behaviours
@@ -1231,6 +1294,15 @@ int asCBuilder::RegisterInterface(asCScriptNode *node, asCScriptCode *file)
 	asCScriptNode *n = node->firstChild;
 	asCString name(&file->code[n->tokenPos], n->tokenLength);
 
+	bool isShared = false;
+	if( name == SHARED_TOKEN )
+	{
+		isShared = true;
+
+		n = n->next;
+		name.Assign(&file->code[n->tokenPos], n->tokenLength);
+	}
+
 	int r, c;
 	file->ConvertPosToRowCol(n->tokenPos, &r, &c);
 
@@ -1238,14 +1310,40 @@ int asCBuilder::RegisterInterface(asCScriptNode *node, asCScriptCode *file)
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
 	interfaceDeclarations.PushLast(decl);
-	decl->name       = name;
-	decl->script     = file;
-	decl->validState = 0;
-	decl->node       = node;
+	decl->name             = name;
+	decl->script           = file;
+	decl->node             = node;
+
+	// If this type is shared and there already exist another shared 
+	// type of the same name, then that one should be used instead of
+	// creating a new one.
+	if( isShared )
+	{
+		for( asUINT n = 0; n < engine->classTypes.GetLength(); n++ )
+		{
+			asCObjectType *st = engine->classTypes[n];
+			if( st &&
+				st->IsShared() &&
+				st->name == name &&
+				st->IsInterface() )
+			{
+				// We'll use the existing type
+				decl->isExistingShared = true;
+				decl->objType          = st;
+				module->classTypes.PushLast(st);
+				st->AddRef();
+				return 0;
+			}
+		}
+	}
 
 	// Register the object type for the interface
 	asCObjectType *st = asNEW(asCObjectType)(engine);
 	st->flags = asOBJ_REF | asOBJ_SCRIPT_OBJECT;
+
+	if( isShared )
+		st->flags |= asOBJ_SHARED;
+
 	st->size = 0; // Cannot be instanciated
 	st->name = name;
 	module->classTypes.PushLast(st);
@@ -1550,6 +1648,13 @@ void asCBuilder::CompileClasses()
 		// Find the base class that this class inherits from
 		bool multipleInheritance = false;
 		asCScriptNode *node = decl->node->firstChild->next;
+
+		if( decl->objType->IsShared() )
+		{
+			// Skip the keyword 'shared'
+			node = node->next;
+		}
+
 		while( node && node->nodeType == snIdentifier )
 		{
 			// Get the interface name from the node
@@ -1577,7 +1682,7 @@ void asCBuilder::CompileClasses()
 			else if( objType->size != 0 )
 			{
 				// The class inherits from another script class
-				if( decl->objType->derivedFrom != 0 )
+				if( !decl->isExistingShared && decl->objType->derivedFrom != 0 )
 				{
 					if( !multipleInheritance )
 					{
@@ -1608,15 +1713,43 @@ void asCBuilder::CompileClasses()
 
 					if( !error )
 					{
-						decl->objType->derivedFrom = objType;
-						objType->AddRef();
+						// A shared type may only inherit from other shared types
+						if( (decl->objType->IsShared()) && !(objType->IsShared()) )
+						{
+							int r, c;
+							file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+							asCString msg;
+							msg.Format(TXT_SHARED_CANNOT_INHERIT_FROM_NON_SHARED_s, objType->name.AddressOf());
+							WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+							error = true;
+						}
+					}
+
+					if( !error )
+					{
+						if( decl->isExistingShared )
+						{
+							// Verify that the base class is the same as the original shared type
+							if( decl->objType->derivedFrom != objType )
+							{
+								int r, c;
+								file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+								WriteError(file->name.AddressOf(), TXT_SHARED_DOESNT_MATCH_ORIGINAL, r, c);
+							}
+						}
+						else
+						{
+							// Set the base class
+							decl->objType->derivedFrom = objType;
+							objType->AddRef();
+						}
 					}
 				}
 			}
 			else
 			{
 				// The class implements an interface
-				if( decl->objType->Implements(objType) )
+				if( !decl->isExistingShared && decl->objType->Implements(objType) )
 				{
 					int r, c;
 					file->ConvertPosToRowCol(node->tokenPos, &r, &c);
@@ -1626,7 +1759,32 @@ void asCBuilder::CompileClasses()
 				}
 				else
 				{
-					decl->objType->interfaces.PushLast(objType);
+					// A shared type may only implement from shared interfaces
+					if( (decl->objType->IsShared()) && !(objType->IsShared()) )
+					{
+						int r, c;
+						file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+						asCString msg;
+						msg.Format(TXT_SHARED_CANNOT_IMPLEMENT_NON_SHARED_s, objType->name.AddressOf());
+						WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+					}
+					else
+					{
+						if( decl->isExistingShared )
+						{
+							// Verify that the original implements the same interface
+							if( !decl->objType->Implements(objType) )
+							{
+								int r, c;
+								file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+								WriteError(file->name.AddressOf(), TXT_SHARED_DOESNT_MATCH_ORIGINAL, r, c);
+							}
+						}
+						else
+						{
+							decl->objType->interfaces.PushLast(objType);
+						}
+					}
 				}
 			}
 
@@ -1664,6 +1822,11 @@ void asCBuilder::CompileClasses()
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
 		sClassDeclaration *decl = classDeclarations[n];
+		if( decl->isExistingShared )
+		{
+			// TODO: shared: Should really validate against original
+			continue;
+		}
 
 		// Add all properties and methods from the base class
 		if( decl->objType->derivedFrom )
@@ -1767,6 +1930,15 @@ void asCBuilder::CompileClasses()
 				asCDataType dt = CreateDataTypeFromNode(isPrivate ? node->firstChild->next : node->firstChild, file);
 				asCString name(&file->code[node->lastChild->tokenPos], node->lastChild->tokenLength);
 
+				if( decl->objType->IsShared() && dt.GetObjectType() && !dt.GetObjectType()->IsShared() )
+				{
+					int r, c;
+					file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+					asCString msg;
+					msg.Format(TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s, dt.GetObjectType()->name.AddressOf());
+					WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+				}
+
 				if( dt.IsReadOnly() )
 				{
 					int r, c;
@@ -1793,6 +1965,7 @@ void asCBuilder::CompileClasses()
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
 		sClassDeclaration *decl = classDeclarations[n];
+		if( decl->isExistingShared ) continue;
 		for( asUINT m = 0; m < decl->objType->interfaces.GetLength(); m++ )
 		{
 			asCObjectType *objType = decl->objType->interfaces[m];
@@ -1906,6 +2079,7 @@ void asCBuilder::CompileClasses()
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
 		sClassDeclaration *decl = classDeclarations[n];
+		if( decl->isExistingShared ) continue;
 		asCObjectType *ot = decl->objType;
 
 		// Is there some path in which this structure is involved in circular references?
@@ -2049,6 +2223,10 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	asCCompiler compiler(engine);
 	compiler.CompileFactory(this, file, engine->scriptFunctions[funcId]);
 	engine->scriptFunctions[funcId]->AddRef();
+
+	// If the object is shared, then the factory must also be marked as shared
+	if( objType->flags & asOBJ_SHARED )
+		engine->scriptFunctions[funcId]->isShared = true;
 }
 
 int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file)
@@ -2081,11 +2259,9 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file)
 
 		// Store the location of this declaration for reference in name collisions
 		sClassDeclaration *decl = asNEW(sClassDeclaration);
-		decl->name       = name;
-		decl->script     = file;
-		decl->validState = 0;
-		decl->node       = NULL;
-		decl->objType    = st;
+		decl->name             = name;
+		decl->script           = file;
+		decl->objType          = st;
 		namedTypeDeclarations.PushLast(decl);
 
 		asCDataType type = CreateDataTypeFromNode(tmp, file);
@@ -2201,11 +2377,9 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file)
 
 		// Store the location of this declaration for reference in name collisions
 		sClassDeclaration *decl = asNEW(sClassDeclaration);
-		decl->name       = name;
-		decl->script     = file;
-		decl->validState = 0;
-		decl->node       = NULL;
-		decl->objType    = st;
+		decl->name             = name;
+		decl->script           = file;
+		decl->objType          = st;
 		namedTypeDeclarations.PushLast(decl);
 	}
 
@@ -2405,6 +2579,33 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 		WriteError(file->name.AddressOf(), TXT_DESTRUCTOR_MAY_NOT_HAVE_PARM, r, c);
 	}
 
+	// If class or interface is shared, then only shared types may be used in the method signature
+	if( objType && objType->IsShared() )
+	{
+		asCObjectType *ot = returnType.GetObjectType();
+		if( ot && !ot->IsShared() )
+		{
+			int r, c;
+			file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+			asCString msg;
+			msg.Format(TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s, ot->name.AddressOf());
+			WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+		}
+		
+		for( asUINT p = 0; p < parameterTypes.GetLength(); ++p )
+		{
+			asCObjectType *ot = parameterTypes[p].GetObjectType();
+			if( ot && !ot->IsShared() )
+			{
+				int r, c;
+				file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+				asCString msg;
+				msg.Format(TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s, ot->name.AddressOf());
+				WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+			}
+		}
+	}
+
 	// TODO: Much of this can probably be reduced by using the IsSignatureEqual method
 	// Check that the same function hasn't been registered already
 	asCArray<int> funcs;
@@ -2485,7 +2686,11 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 			asCDataType dt = asCDataType::CreateObjectHandle(objType, false);
 			module->AddScriptFunction(file->idx, factoryId, name.AddressOf(), dt, parameterTypes.AddressOf(), inOutFlags.AddressOf(), defaultArgs.AddressOf(), (asUINT)parameterTypes.GetLength(), false);
 
-			// Add a dummy function to the module so that it doesn't mix up the fund Ids
+			// If the object is shared, then the factory must also be marked as shared
+			if( objType->flags & asOBJ_SHARED )
+				engine->scriptFunctions[factoryId]->isShared = true;
+
+			// Add a dummy function to the builder so that it doesn't mix up the fund Ids
 			functions.PushLast(0);
 
 			// Compile the factory immediately
@@ -2647,10 +2852,17 @@ void asCBuilder::GetFunctionDescriptions(const char *name, asCArray<int> &funcs)
 			engine->scriptFunctions[n]->objectType == 0 &&
 			engine->scriptFunctions[n]->name == name )
 		{
-			// Find the config group for the global function
-			asCConfigGroup *group = engine->FindConfigGroupForFunction(engine->scriptFunctions[n]->id);
-			if( !group || group->HasModuleAccess(module->name.AddressOf()) )
+			// Verify if the module has access to the function
+			if( module->accessMask & engine->scriptFunctions[n]->accessMask )
+			{
+#ifdef AS_DEPRECATED
+				// deprecated since 2011-10-04
+				// Find the config group for the global function
+				asCConfigGroup *group = engine->FindConfigGroupForFunction(engine->scriptFunctions[n]->id);
+				if( !group || group->HasModuleAccess(module->name.AddressOf()) )
+#endif
 				funcs.PushLast(engine->scriptFunctions[n]->id);
+			}
 		}
 	}
 }
@@ -2787,9 +2999,15 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 			if( ot->flags & asOBJ_IMPLICIT_HANDLE )
 				isImplicitHandle = true;
 
+			// Make sure the module has access to the object type
+#ifdef AS_DEPRECATED
+			// deprecated since 2011-10-04
 			// Find the config group for the object type
 			asCConfigGroup *group = engine->FindConfigGroupForObjectType(ot);
-			if( !module || !group || group->HasModuleAccess(module->name.AddressOf()) )
+			if( !module || ((module->accessMask & ot->accessMask) && (!group || group->HasModuleAccess(module->name.AddressOf()))) )
+#else
+			if( !module || (module->accessMask & ot->accessMask) )
+#endif
 			{
 				if(asOBJ_TYPEDEF == (ot->flags & asOBJ_TYPEDEF))
 				{
@@ -2995,7 +3213,6 @@ asCDataType asCBuilder::ModifyDataTypeFromNode(const asCDataType &type, asCScrip
 
 asCObjectType *asCBuilder::GetObjectType(const char *type)
 {
-	// TODO: Only search in config groups to which the module has access
 	asCObjectType *ot = engine->GetObjectType(type);
 	if( !ot && module )
 		ot = module->GetObjectType(type);
@@ -3007,7 +3224,7 @@ asCScriptFunction *asCBuilder::GetFuncDef(const char *type)
 {
 	for( asUINT n = 0; n < engine->registeredFuncDefs.GetLength(); n++ )
 	{
-		// TODO: Only return the definitions for the config groups that the module has access to
+		// TODO: access: Only return the definitions that the module has access to
 		if( engine->registeredFuncDefs[n]->name == type )
 		{
 			return engine->registeredFuncDefs[n];

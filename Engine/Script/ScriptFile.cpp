@@ -302,8 +302,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
     if (i != functions_.End())
         return i->second_;
     
-    int id = scriptModule_->GetFunctionIdByDecl(declaration.CString());
-    asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = scriptModule_->GetFunctionByDecl(declaration.CString());
     functions_[declaration] = function;
     return function;
 }
@@ -324,8 +323,7 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
             return j->second_;
     }
     
-    int id = type->GetMethodIdByDecl(declaration.CString());
-    asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = type->GetMethodByDecl(declaration.CString());
     methods_[type][declaration] = function;
     return function;
 }

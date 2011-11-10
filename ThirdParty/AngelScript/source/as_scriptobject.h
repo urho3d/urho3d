@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -68,7 +68,7 @@ public:
 	asIObjectType *GetObjectType() const;
 
 	// Class properties
-	int         GetPropertyCount() const;
+	asUINT      GetPropertyCount() const;
 	int         GetPropertyTypeId(asUINT prop) const;
 	const char *GetPropertyName(asUINT prop) const;
 	void       *GetAddressOfProperty(asUINT prop);
@@ -115,7 +115,7 @@ void ScriptObject_Assignment_Generic(asIScriptGeneric *gen);
 
 void RegisterScriptObject(asCScriptEngine *engine);
 
-asIScriptObject *ScriptObjectFactory(asCObjectType *objType, asCScriptEngine *engine);
+asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngine *engine);
 
 END_AS_NAMESPACE
 

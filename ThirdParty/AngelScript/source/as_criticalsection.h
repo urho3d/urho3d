@@ -93,6 +93,7 @@ BEGIN_AS_NAMESPACE
 
 // Undefine macros that cause problems in our code
 #undef GetObject
+#undef RegisterClass
 
 class asCThreadCriticalSection
 {

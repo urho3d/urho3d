@@ -1353,8 +1353,7 @@ void asCByteCode::Call(asEBCInstr instr, int funcID, int pop)
 	*((int*)ARG_DW(last->arg)) = funcID;
 
     // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    // TODO: Should this be done by the compiler?
-    InstrWORD(asBC_JitEntry, 0);
+    InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::CallPtr(asEBCInstr instr, int funcPtrVar, int pop)
@@ -1370,8 +1369,7 @@ void asCByteCode::CallPtr(asEBCInstr instr, int funcPtrVar, int pop)
 	last->wArg[0] = (short)funcPtrVar;
 
     // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    // TODO: Should this be done by the compiler?
-    InstrWORD(asBC_JitEntry, 0);
+    InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::Alloc(asEBCInstr instr, void *objID, int funcID, int pop)
@@ -1388,8 +1386,7 @@ void asCByteCode::Alloc(asEBCInstr instr, void *objID, int funcID, int pop)
 	*((int*)(ARG_DW(last->arg)+AS_PTR_SIZE)) = funcID;
 
     // Add a JitEntry instruction after function calls so that JIT's can resume execution
-    // TODO: Should this be done by the compiler?
-    InstrWORD(asBC_JitEntry, 0);
+    InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::Ret(int pop)
@@ -1448,8 +1445,7 @@ void asCByteCode::Line(int line, int column)
 	*((int*)ARG_DW(last->arg)) = (line & 0xFFFFF)|((column & 0xFFF)<<20);
 
     // Add a JitEntry after the line instruction to allow the JIT function to resume after a suspend
-    // TODO: Should this be done by the compiler?
-    InstrWORD(asBC_JitEntry, 0);
+    InstrPTR(asBC_JitEntry, 0);
 }
 
 void asCByteCode::ObjInfo(int offset, int info)

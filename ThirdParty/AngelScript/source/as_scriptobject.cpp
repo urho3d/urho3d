@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -37,7 +37,7 @@
 BEGIN_AS_NAMESPACE
 
 // This helper function will call the default factory, that is a script function
-asIScriptObject *ScriptObjectFactory(asCObjectType *objType, asCScriptEngine *engine)
+asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngine *engine)
 {
 	asIScriptContext *ctx;
 
@@ -339,10 +339,9 @@ int asCScriptObject::GetTypeId() const
 	return objType->engine->GetTypeIdFromDataType(dt);
 }
 
-int asCScriptObject::GetPropertyCount() const
+asUINT asCScriptObject::GetPropertyCount() const
 {
-	// TODO: interface: Should return asUINT, as the function cannot fail
-	return (int)objType->properties.GetLength();
+	return objType->properties.GetLength();
 }
 
 int asCScriptObject::GetPropertyTypeId(asUINT prop) const

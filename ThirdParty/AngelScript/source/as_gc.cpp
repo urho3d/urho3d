@@ -41,6 +41,7 @@
 #include "as_gc.h"
 #include "as_scriptengine.h"
 #include "as_scriptobject.h"
+#include "as_texts.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -365,6 +366,18 @@ int asCGarbageCollector::DestroyNewGarbage()
 	UNREACHABLE_RETURN;
 }
 
+void asCGarbageCollector::ReportUndestroyedObjects()
+{
+	for( asUINT n = 0; n < gcOldObjects.GetLength(); n++ )
+	{
+		asSObjTypePair gcObj = GetOldObjectAtIdx(n);
+
+		asCString msg;
+		msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.type->name.AddressOf());
+		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+	}
+}
+
 int asCGarbageCollector::DestroyOldGarbage()
 {
 	for(;;)
@@ -395,7 +408,24 @@ int asCGarbageCollector::DestroyOldGarbage()
 			if( ++destroyOldIdx < gcOldObjects.GetLength() )
 			{
 				asSObjTypePair gcObj = GetOldObjectAtIdx(destroyOldIdx);
-				if( engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount) == 1 )
+
+				if( gcObj.type->beh.gcGetRefCount == 0 )
+				{
+					// If circular references are formed with registered types that hasn't 
+					// registered the GC behaviours, then the engine may be forced to free
+					// the object type before the actual object instance. In this case we
+					// will be forced to skip the destruction of the objects, so as not to 
+					// crash the application.
+					asCString msg;
+					msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.type->name.AddressOf());
+					engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+
+					// Just remove the object, as we will not bother to destroy it
+					numDestroyed++;
+					RemoveOldObjectAtIdx(destroyOldIdx);
+					destroyOldIdx--;
+				}
+				else if( engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount) == 1 )
 				{
 					// Release the object immediately
 
@@ -510,7 +540,11 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 			{
 				// Add the gc count for this object
 				asSObjTypePair gcObj = GetOldObjectAtIdx(detectIdx);
-				int refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
+	
+				int refCount = 0;
+				if( gcObj.type->beh.gcGetRefCount )
+					refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
+
 				if( refCount > 1 )
 				{
 					asSIntTypePair it = {refCount-1, gcObj.type};

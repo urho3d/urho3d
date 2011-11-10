@@ -54,11 +54,10 @@ BEGIN_AS_NAMESPACE
 // TODO: The type id should have flags for diferenciating between value types and reference types. It should also have a flag for differenciating interface types.
 
 // Additional flag to the class object type
-const asDWORD asOBJ_IMPLICIT_HANDLE  = 0x40000;
+const asDWORD asOBJ_IMPLICIT_HANDLE  = 0x00400000;
 const asDWORD asOBJ_TYPEDEF          = 0x40000000;
 const asDWORD asOBJ_ENUM             = 0x10000000;
 const asDWORD asOBJ_TEMPLATE_SUBTYPE = 0x20000000;
-
 
 
 
@@ -73,10 +72,6 @@ const asDWORD asOBJ_TEMPLATE_SUBTYPE = 0x20000000;
 // behaviours are registered. For script types that contain any such type we 
 // automatically make garbage collected as well, because we cannot know what type
 // of references that object can contain, and must assume the worst.
-
-// TODO: interface: asIObjectType should have methods for setting/getting user data
-//                  this can for example be used to store cached function ids for quicker
-//                  executions of class methods
 
 struct asSTypeBehaviour
 {
@@ -148,28 +143,41 @@ public:
 	// Type info
 	const char      *GetName() const;
 	asIObjectType   *GetBaseType() const;
+	bool             DerivesFrom(const asIObjectType *objType) const;
 	asDWORD          GetFlags() const;
 	asUINT           GetSize() const;
 	int              GetTypeId() const;
 	int              GetSubTypeId() const;
+	asIObjectType   *GetSubType() const;
+	// TODO: access: Get/Set access mask for type
 
 	// Interfaces
 	asUINT           GetInterfaceCount() const;
 	asIObjectType   *GetInterface(asUINT index) const;
+	bool             Implements(const asIObjectType *objType) const;
 
 	// Factories
 	asUINT             GetFactoryCount() const;
 	int                GetFactoryIdByIndex(asUINT index) const;
 	int                GetFactoryIdByDecl(const char *decl) const;
+	asIScriptFunction *GetFactoryByIndex(asUINT index) const;
+	asIScriptFunction *GetFactoryByDecl(const char *decl) const;
 
 	// Methods
 	asUINT             GetMethodCount() const;
 	int                GetMethodIdByIndex(asUINT index, bool getVirtual) const;
 	int                GetMethodIdByName(const char *name, bool getVirtual) const;
 	int                GetMethodIdByDecl(const char *decl, bool getVirtual) const;
+	asIScriptFunction *GetMethodByIndex(asUINT index, bool getVirtual) const;
+	asIScriptFunction *GetMethodByName(const char *name, bool getVirtual) const;
+	asIScriptFunction *GetMethodByDecl(const char *decl, bool getVirtual) const;
+#ifdef AS_DEPRECATED
+	// deprecated since 2011-10-03
 	asIScriptFunction *GetMethodDescriptorByIndex(asUINT index, bool getVirtual) const;
+#endif
 
 	// Properties
+	// TODO: access: Allow getting and setting property access mask
 	asUINT      GetPropertyCount() const;
 	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference) const;
 	const char *GetPropertyDeclaration(asUINT index) const;
@@ -177,6 +185,10 @@ public:
 	// Behaviours
 	asUINT GetBehaviourCount() const;
 	int    GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const;
+
+	// User data
+	void *SetUserData(void *data);
+	void *GetUserData() const;
 
 //===========================================
 // Internal
@@ -194,9 +206,8 @@ public:
 
 	void ReleaseAllFunctions();
 
-	bool Implements(const asCObjectType *objType) const;
-	bool DerivesFrom(const asCObjectType *objType) const;
 	bool IsInterface() const;
+	bool IsShared() const;
 
 	asCObjectProperty *AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate);
 
@@ -210,6 +221,7 @@ public:
 	asCArray<asCScriptFunction*> virtualFunctionTable;
 
 	asDWORD flags;
+	asDWORD accessMask;
 
 	asSTypeBehaviour beh;
 
@@ -219,6 +231,7 @@ public:
 	bool           acceptRefSubType;
 
 	asCScriptEngine *engine;
+	void            *userData;
 
 protected:
 	mutable asCAtomic refCount;

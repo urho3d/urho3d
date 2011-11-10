@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2007 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -324,14 +324,14 @@ bool asCMap<KEY, VAL>::MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key)
 			p = p->left;
 		else if( key == p->key )
 		{
-			*out = p;
+			if( out ) *out = p;
 			return true;
 		}
 		else 
 			p = p->right;
 	}
 
-	*out = 0;
+	if( out ) *out = 0;
 	return false;
 }
 
