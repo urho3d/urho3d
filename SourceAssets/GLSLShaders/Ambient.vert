@@ -5,7 +5,7 @@ varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec4 vLightVec;
+varying vec2 vZonePosDepth;
 
 void main()
 {
@@ -13,7 +13,7 @@ void main()
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
-    vLightVec = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
+    vZonePosDepth = vec2(GetZonePos(worldPos), GetDepth(gl_Position));
 
     #ifdef VERTEXCOLOR
         vColor = iColor;

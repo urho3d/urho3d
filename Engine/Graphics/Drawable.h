@@ -105,9 +105,9 @@ public:
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
-    /// Draw to occlusion buffer.
+    /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
-    /// Draw debug geometry.
+    /// Add debug geometry to the debug renderer.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set draw distance.

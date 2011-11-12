@@ -191,7 +191,7 @@ public:
     void CancelUpdate(Drawable* drawable);
     /// Remove drawable object from reinsertion list.
     void CancelReinsertion(Drawable* drawable);
-    /// Add debug geometry to the debug graphics.
+    /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     
 protected:

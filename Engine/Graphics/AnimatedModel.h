@@ -60,7 +60,7 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
     /// Fill rendering batch with distance, geometry, material and world transform.
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
-    /// Add debug geometry to the debug graphics.
+    /// Add debug geometry to the debug renderer.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set model.

@@ -1,6 +1,7 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
+#include "Lighting.hlsl"
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
@@ -19,7 +20,7 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
-    out float4 oLightVec : TEXCOORD1,
+    out float2 oZonePosDepth : TEXCOORD1,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
@@ -29,7 +30,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
-    oLightVec = float4(0.0, 0.0, 0.0, GetDepth(oPos));
+    oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -37,7 +38,7 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
-    float4 iLightVec : TEXCOORD1,
+    float2 iZonePosDepth : TEXCOORD1,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
@@ -53,5 +54,5 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    oColor = float4(GetFog(cAmbientColor * diffColor.rgb, iLightVec.w), diffColor.a);
+    oColor = float4(GetFog(GetAmbient(iZonePosDepth.x) * diffColor.rgb, iZonePosDepth.y), diffColor.a);
 }

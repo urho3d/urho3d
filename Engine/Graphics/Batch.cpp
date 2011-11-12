@@ -157,8 +157,22 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     // Set zone-related shader parameters
     if (zone_)
     {
-        if (graphics->NeedParameterUpdate(PSP_AMBIENTCOLOR, zone_))
-            graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor().ToVector4());
+        if (graphics->NeedParameterUpdate(VSP_ZONE, zone_))
+        {
+            const BoundingBox& box = zone_->GetBoundingBox();
+            Vector3 boxSize = box.Size();
+            Matrix3x4 adjust(Matrix3x4::IDENTITY);
+            adjust.SetScale(Vector3(1.0f / boxSize.x_, 1.0f / boxSize.y_, 1.0f / boxSize.z_));
+            adjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+            Matrix3x4 zoneTransform = adjust * zone_->GetWorldTransform().Inverse();
+            
+            graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
+        }
+        
+        if (graphics->NeedParameterUpdate(PSP_AMBIENTSTARTCOLOR, zone_))
+            graphics->SetShaderParameter(PSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor().ToVector4());
+        if (graphics->NeedParameterUpdate(PSP_AMBIENTENDCOLOR, zone_))
+            graphics->SetShaderParameter(PSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4());
         
         // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
         BlendMode blend = pass_->GetBlendMode();

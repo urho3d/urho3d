@@ -21,12 +21,13 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
-    out float4 oLightVec : TEXCOORD1,
+    out float3 oLightVec : TEXCOORD1,
+    out float2 oZonePosDepth : TEXCOORD2,
     #ifdef SPOTLIGHT
-        out float4 oSpotPos : TEXCOORD2,
+        out float4 oSpotPos : TEXCOORD3,
     #endif
     #ifdef POINTLIGHT
-        out float3 oCubeMaskVec : TEXCOORD2,
+        out float3 oCubeMaskVec : TEXCOORD3,
     #endif
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
@@ -46,10 +47,12 @@ void VS(float4 iPos : POSITION,
     float4 projWorldPos = float4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
-        oLightVec = float4(cLightDir, GetDepth(oPos));
+        oLightVec = cLightDir;
     #else
-        oLightVec = float4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(oPos));
+        oLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
     #endif
+
+    oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));
 
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
@@ -57,17 +60,18 @@ void VS(float4 iPos : POSITION,
     #endif
 
     #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
+        oCubeMaskVec = mul(oLightVec, cLightVecRot);
     #endif
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
-    float4 iLightVec : TEXCOORD1,
+    float3 iLightVec : TEXCOORD1,
+    float2 iZonePosDepth : TEXCOORD2,
     #ifdef SPOTLIGHT
-        float4 iSpotPos : TEXCOORD2,
+        float4 iSpotPos : TEXCOORD3,
     #endif
     #ifdef CUBEMASK
-        float3 iCubeMaskVec : TEXCOORD2,
+        float3 iCubeMaskVec : TEXCOORD3,
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -91,7 +95,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef DIRLIGHT
         diff = GetDiffuseDirVolumetric();
     #else
-        diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
+        diff = GetDiffusePointOrSpotVolumetric(iLightVec);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -105,9 +109,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
     finalColor = diff * lightColor * diffColor.rgb;
 
     #ifdef AMBIENT
-        finalColor += cAmbientColor * diffColor.rgb;
-        oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
+        finalColor += GetAmbient(iZonePosDepth.x) * diffColor.rgb;
+        oColor = float4(GetFog(finalColor, iZonePosDepth.y), diffColor.a);
     #else
-        oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+        oColor = float4(GetLitFog(finalColor, iZonePosDepth.y), diffColor.a);
     #endif
 }

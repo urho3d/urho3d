@@ -185,7 +185,7 @@ public:
     void RemoveJoint(Joint* joint);
     /// Send accumulated collision events.
     void SendCollisionEvents();
-    /// Add debug geometry to the debug graphics.
+    /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     
     /// Clean up the geometry cache.

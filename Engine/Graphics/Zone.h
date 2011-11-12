@@ -41,11 +41,17 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Add debug geometry to the debug renderer.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set ambient color.
+    /// %Set ambient color, both start and end.
     void SetAmbientColor(const Color& color);
+    /// %Set ambient start color at bounding box Z minimum.
+    void SetAmbientStartColor(const Color& color);
+    /// %Set ambient end color at bounding box Z maximum.
+    void SetAmbientEndColor(const Color& color);
     /// %Set fog color.
     void SetFogColor(const Color& color);
     /// %Set fog start distance.
@@ -59,8 +65,10 @@ public:
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return ambient color.
-    const Color& GetAmbientColor() const { return ambientColor_; }
+    /// Return ambient start color.
+    const Color& GetAmbientStartColor() const { return ambientStartColor_; }
+    /// Return ambient end color.
+    const Color& GetAmbientEndColor() const { return ambientEndColor_; }
     /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
     /// Return fog start distance.
@@ -85,8 +93,10 @@ protected:
     BoundingBox boundingBox_;
     /// Last bounding box.
     BoundingBox lastBoundingBox_;
-    /// Ambient color.
-    Color ambientColor_;
+    /// Ambient start color.
+    Color ambientStartColor_;
+    /// Ambient end start color.
+    Color ambientEndColor_;
     /// Fog color.
     Color fogColor_;
     /// Fog start distance.

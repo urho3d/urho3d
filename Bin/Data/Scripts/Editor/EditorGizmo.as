@@ -216,11 +216,11 @@ void UseGizmo()
         {
             Vector3 adjust(0, 0, 0);
             if (gizmoAxisX.selected)
-                adjust += gizmoAxisX.axisRay.direction * (gizmoAxisX.t - gizmoAxisX.lastT);
+                adjust += Vector3(1, 0, 0) * (gizmoAxisX.t - gizmoAxisX.lastT);
             if (gizmoAxisY.selected)
-                adjust += gizmoAxisY.axisRay.direction * (gizmoAxisY.t - gizmoAxisY.lastT);
+                adjust += Vector3(0, 1, 0) * (gizmoAxisY.t - gizmoAxisY.lastT);
             if (gizmoAxisZ.selected)
-                adjust += gizmoAxisZ.axisRay.direction * (gizmoAxisZ.t - gizmoAxisZ.lastT);
+                adjust += Vector3(0, 0, 1) * (gizmoAxisZ.t - gizmoAxisZ.lastT);
 
             moved = MoveNodes(adjust);
         }

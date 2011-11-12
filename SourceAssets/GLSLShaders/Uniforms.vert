@@ -12,5 +12,6 @@ uniform vec4 cUOffset;
 uniform vec4 cVOffset;
 uniform vec3 cViewRightVector;
 uniform vec3 cViewUpVector;
+uniform mat4 cZone;
 uniform mat4 cShadowProj[4];
 uniform vec4 cSkinMatrices[64*3];

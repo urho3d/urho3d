@@ -1,11 +1,11 @@
 #include "Uniforms.vert"
 #include "Transform.vert"
 
-varying vec2 vTexCoord;
+varying vec4 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec4 vLightVec;
+varying vec3 vLightVec;
 #ifdef SPECULAR
     varying vec3 vEyeVec;
 #endif
@@ -33,7 +33,7 @@ void main()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = GetTexCoord(iTexCoord);
+    vTexCoord = vec4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(gl_Position));
 
     #ifdef VERTEXCOLOR
         vColor = iColor;
@@ -50,9 +50,9 @@ void main()
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
-        vLightVec = vec4(cLightDir, GetDepth(gl_Position));
+        vLightVec = cLightDir;
     #else
-        vLightVec = vec4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(gl_Position));
+        vLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
     #endif
 
     #ifdef SHADOW
@@ -75,14 +75,14 @@ void main()
     #endif
 
     #ifdef POINTLIGHT
-        vCubeMaskVec = cLightVecRot * vLightVec.xyz;
+        vCubeMaskVec = cLightVecRot * vLightVec;
     #endif
 
     #ifdef NORMALMAP
         vTangent = GetWorldTangent(modelMatrix);
         vBitangent = cross(vTangent, vNormal) * iTangent.w;
         mat3 tbn = mat3(vTangent, vBitangent, vNormal);
-        vLightVec.xyz = vLightVec.xyz * tbn;
+        vLightVec = vLightVec * tbn;
         #ifdef SPECULAR
             vEyeVec = -centeredWorldPos * tbn;
         #endif

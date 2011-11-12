@@ -50,7 +50,7 @@ public:
     virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles();
-    /// Draw to occlusion buffer.
+    /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
     /// %Set model.

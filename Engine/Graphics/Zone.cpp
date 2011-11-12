@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "Octree.h"
 #include "XMLElement.h"
 #include "Zone.h"
@@ -36,7 +37,8 @@ OBJECTTYPESTATIC(Zone);
 
 Zone::Zone(Context* context) :
     Drawable(context),
-    ambientColor_(DEFAULT_AMBIENT_COLOR),
+    ambientStartColor_(DEFAULT_AMBIENT_COLOR),
+    ambientEndColor_(DEFAULT_AMBIENT_COLOR),
     fogColor_(DEFAULT_FOG_COLOR),
     fogStart_(DEFAULT_FOG_START),
     fogEnd_(DEFAULT_FOG_END),
@@ -56,7 +58,8 @@ void Zone::RegisterObject(Context* context)
     
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color (Min Z)", ambientStartColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color (Max Z)", ambientEndColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
@@ -83,6 +86,11 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     }
 }
 
+void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    debug->AddBoundingBox(boundingBox_, GetWorldTransform(), Color::GREEN, depthTest);
+}
+
 void Zone::SetBoundingBox(const BoundingBox& box)
 {
     boundingBox_ = box;
@@ -91,7 +99,17 @@ void Zone::SetBoundingBox(const BoundingBox& box)
 
 void Zone::SetAmbientColor(const Color& color)
 {
-    ambientColor_ = Color(color, 1.0f);
+    ambientStartColor_ = ambientEndColor_ = Color(color, 1.0f);
+}
+
+void Zone::SetAmbientStartColor(const Color& color)
+{
+    ambientStartColor_ = Color(color, 1.0f);
+}
+
+void Zone::SetAmbientEndColor(const Color& color)
+{
+    ambientEndColor_ = Color(color, 1.0f);
 }
 
 void Zone::SetFogColor(const Color& color)

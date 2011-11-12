@@ -1,12 +1,13 @@
 #include "Uniforms.frag"
 #include "Samplers.frag"
 #include "Fog.frag"
+#include "Lighting.frag"
 
 varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec4 vLightVec;
+varying vec2 vZonePosDepth;
 
 void main()
 {
@@ -20,5 +21,5 @@ void main()
         diffColor *= vColor;
     #endif
 
-    gl_FragColor = vec4(GetFog(cAmbientColor * diffColor.rgb, vLightVec.w), diffColor.a);
+    gl_FragColor = vec4(GetFog(GetAmbient(vZonePosDepth.x) * diffColor.rgb, vZonePosDepth.y), diffColor.a);
 }

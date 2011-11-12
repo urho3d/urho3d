@@ -29,6 +29,11 @@ float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularP
     return pow(dot(normal, halfVec), specularPower);
 }
 
+float3 GetAmbient(float zonePos)
+{
+    return lerp(cAmbientStartColor, cAmbientEndColor, zonePos);
+}
+
 float GetShadow(float4 shadowPos)
 {
     // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed

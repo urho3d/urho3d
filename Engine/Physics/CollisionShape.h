@@ -172,7 +172,7 @@ public:
     
     /// Update geometry transform and associate with rigid body if available.
     void UpdateTransform(bool nodeUpdate = false);
-    /// Add debug geometry to the debug graphics.
+    /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set model attribute.

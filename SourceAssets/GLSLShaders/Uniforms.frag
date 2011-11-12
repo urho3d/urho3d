@@ -1,4 +1,5 @@
-uniform vec3 cAmbientColor;
+uniform vec3 cAmbientStartColor;
+uniform vec3 cAmbientEndColor;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec4 cLightColor;

@@ -223,7 +223,7 @@ public:
     void Update(float timeStep);
     /// Render. Called by Engine.
     void Render();
-    /// Add debug geometry to the debug renderer(s).
+    /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     /// Add a view. Return true if successful.
     bool AddView(RenderSurface* renderTarget, const Viewport& viewport);

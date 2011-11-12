@@ -506,7 +506,10 @@ static void RegisterZone(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Zone", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Zone, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const BoundingBox& get_boundingBox() const", asMETHOD(Zone, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_ambientColor(const Color&in)", asMETHOD(Zone, SetAmbientColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Zone", "const Color& get_ambientColor() const", asMETHOD(Zone, GetAmbientColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_ambientStartColor(const Color&in)", asMETHOD(Zone, SetAmbientStartColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "const Color& get_ambientStartColor() const", asMETHOD(Zone, GetAmbientStartColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_ambientEndColor(const Color&in)", asMETHOD(Zone, SetAmbientEndColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "const Color& get_ambientEndColor() const", asMETHOD(Zone, GetAmbientEndColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_fogColor(const Color&in)", asMETHOD(Zone, SetFogColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_fogColor() const", asMETHOD(Zone, GetFogColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_fogStart(float)", asMETHOD(Zone, SetFogStart), asCALL_THISCALL);

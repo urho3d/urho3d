@@ -23,8 +23,8 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float2 oTexCoord : TEXCOORD0,
-    out float4 oLightVec : TEXCOORD1,
+    out float4 oTexCoord : TEXCOORD0,
+    out float3 oLightVec : TEXCOORD1,
     #ifndef NORMALMAP
         out float3 oNormal : TEXCOORD2,
     #endif
@@ -54,7 +54,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetTexCoord(iTexCoord);
+    oTexCoord = float4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -71,9 +71,9 @@ void VS(float4 iPos : POSITION,
     float4 projWorldPos = float4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
-        oLightVec = float4(cLightDir, GetDepth(oPos));
+        oLightVec = cLightDir;
     #else
-        oLightVec = float4((cLightPos - centeredWorldPos) * cLightAtten, GetDepth(oPos));
+        oLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
     #endif
 
     #ifdef SHADOW
@@ -96,14 +96,14 @@ void VS(float4 iPos : POSITION,
     #endif
 
     #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec.xyz, cLightVecRot);
+        oCubeMaskVec = mul(oLightVec, cLightVecRot);
     #endif
 
     #ifdef NORMALMAP
         oTangent = GetWorldTangent(modelMatrix);
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
         float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
-        oLightVec.xyz = mul(tbn, oLightVec.xyz);
+        oLightVec = mul(tbn, oLightVec);
         #ifdef SPECULAR
             oEyeVec = mul(tbn, -centeredWorldPos);
         #endif
@@ -112,8 +112,8 @@ void VS(float4 iPos : POSITION,
     #endif
 }
 
-void PS(float2 iTexCoord : TEXCOORD0,
-    float4 iLightVec : TEXCOORD1,
+void PS(float4 iTexCoord : TEXCOORD0,
+    float3 iLightVec : TEXCOORD1,
     #ifndef NORMALMAP
         float3 iNormal : TEXCOORD2,
     #endif
@@ -141,17 +141,19 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord.xy);
     #else
         float4 diffColor = cMatDiffColor;
     #endif
 
+    /*
     #ifdef VERTEXCOLOR
         diffColor *= iColor;
     #endif
+    */
 
     #ifdef NORMALMAP
-        float3 normal = DecodeNormal(tex2D(sNormalMap, iTexCoord));
+        float3 normal = DecodeNormal(tex2D(sNormalMap, iTexCoord.xy));
     #else
         float3 normal = normalize(iNormal);
     #endif
@@ -163,19 +165,19 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
     #ifdef DIRLIGHT
         #ifdef NORMALMAP
-            lightDir = normalize(iLightVec.xyz);
+            lightDir = normalize(iLightVec);
         #else
-            lightDir = iLightVec.xyz;
+            lightDir = iLightVec;
         #endif
         diff = GetDiffuseDir(normal, lightDir);
     #else
-        diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir);
+        diff = GetDiffusePointOrSpot(normal, iLightVec, lightDir);
     #endif
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            float4 shadowPos = GetDirShadowPos(iShadowPos, iLightVec.w);
-            diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iLightVec.w));
+            float4 shadowPos = GetDirShadowPos(iShadowPos, iTexCoord.w);
+            diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iTexCoord.w));
         #elif defined(SPOTLIGHT)
             diff *= GetShadow(iShadowPos);
         #else
@@ -193,7 +195,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
     #ifdef SPECULAR
         #ifdef SPECMAP
-            float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord).g;
+            float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord.xy).g;
         #else
             float specStrength = cMatSpecProperties.x;
         #endif
@@ -204,9 +206,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 
     #ifdef AMBIENT
-        finalColor += cAmbientColor * diffColor.rgb;
-        oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
+        finalColor += GetAmbient(iTexCoord.z) * diffColor.rgb;
+        oColor = float4(GetFog(finalColor, iTexCoord.w), diffColor.a);
     #else
-        oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+        oColor = float4(GetLitFog(finalColor, iTexCoord.w), diffColor.a);
     #endif
 }

@@ -34,6 +34,11 @@ vec4 GetClipPos(vec3 worldPos)
     return cViewProj * vec4(worldPos, 1.0);
 }
 
+float GetZonePos(vec3 worldPos)
+{
+    return clamp((cZone * vec4(worldPos, 1.0)).z, 0.0, 1.0);
+}
+
 float GetDepth(vec4 clipPos)
 {
     return dot(clipPos.zw, cDepthMode.zw);
