@@ -1710,7 +1710,8 @@ Properties:<br>
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - BoundingBox& boundingBox
-- Color& ambientColor
+- Color& ambientStartColor
+- Color& ambientEndColor
 - Color& fogColor
 - float fogStart
 - float fogEnd

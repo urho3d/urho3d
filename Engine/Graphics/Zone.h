@@ -95,7 +95,7 @@ protected:
     BoundingBox lastBoundingBox_;
     /// Ambient start color.
     Color ambientStartColor_;
-    /// Ambient end start color.
+    /// Ambient end color.
     Color ambientEndColor_;
     /// Fog color.
     Color fogColor_;
