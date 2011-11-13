@@ -177,7 +177,7 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
         return false;
     }
     
-    if (context->Prepare(function->GetId()) < 0)
+    if (context->Prepare(function) < 0)
         return false;
     
     SetParameters(context, function, parameters);
@@ -221,7 +221,7 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
         return false;
     }
     
-    if (context->Prepare(method->GetId()) < 0)
+    if (context->Prepare(method) < 0)
         return false;
     
     context->SetObject(object);
@@ -282,8 +282,8 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
     
     // Get the factory function id from the object type
     String factoryName = className + "@ " + className + "()";
-    int factoryId = type->GetFactoryIdByDecl(factoryName.CString());
-    if (factoryId < 0 || context->Prepare(factoryId) < 0 || context->Execute() < 0)
+    asIScriptFunction* factory = type->GetFactoryByDecl(factoryName.CString());
+    if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
         return 0;
     
     asIScriptObject* obj = *(static_cast<asIScriptObject**>(context->GetAddressOfReturnValue()));

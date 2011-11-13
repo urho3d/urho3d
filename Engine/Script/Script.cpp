@@ -175,7 +175,7 @@ bool Script::Execute(const String& line)
     if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
         return false;
     
-    if (immediateContext_->Prepare(function->GetId()) < 0)
+    if (immediateContext_->Prepare(function) < 0)
     {
         function->Release();
         return false;

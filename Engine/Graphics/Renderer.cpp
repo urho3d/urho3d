@@ -748,7 +748,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     unsigned shadowMapFormat = (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() :
         graphics_->GetShadowMapFormat();
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
-    bool hardwarePCF = graphics_->GetHardwareShadowSupport();
     if (!shadowMapFormat)
         return 0;
     
@@ -785,7 +784,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
-            newShadowMap->SetFilterMode(hardwarePCF ? FILTER_BILINEAR : FILTER_NEAREST);
+            newShadowMap->SetFilterMode(FILTER_BILINEAR);
             if (!fallback)
             {
                 // If no dummy color rendertarget for this size exists yet, create one now
