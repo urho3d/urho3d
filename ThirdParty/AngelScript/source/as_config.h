@@ -911,6 +911,7 @@
 #endif
 
 // Urho3D: always use float type, use EMMS to clear FPU stack
+#define AS_OLD
 #define AS_USE_DOUBLE_AS_FLOAT
 #define CLEAR_FPU_STACK emms
 
