@@ -6,7 +6,7 @@ varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec4 vLightVec;
+varying float vDepth;
 
 void main()
 {
@@ -20,6 +20,6 @@ void main()
         diffColor *= vColor;
     #endif
 
-    gl_FragColor = vec4(GetFog(diffColor.rgb, vLightVec.w), diffColor.a);
+    gl_FragColor = vec4(GetFog(diffColor.rgb, vDepth), diffColor.a);
 }
 
