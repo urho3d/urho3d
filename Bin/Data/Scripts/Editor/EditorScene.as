@@ -274,21 +274,45 @@ bool SceneDelete()
     if (!CheckSceneWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
         return false;
 
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
     BeginSelectionModify();
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    list.contentElement.DisableLayoutUpdate();
 
-    // Remove components first
+    // Remove nodes
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        Node@ node = selectedNodes[i];
+        if (node.parent is null || node.scene is null)
+            continue; // Root or already deleted
+
+        uint id = node.id;
+        uint nodeIndex = GetNodeListIndex(node);
+
+        BeginModify(id);
+        node.Remove();
+        EndModify(id);
+
+        UpdateSceneWindowNode(nodeIndex, null);
+
+        // If deleting only one node, select the next item in the same index
+        if (selectedNodes.length == 1 && selectedComponents.empty)
+            list.selection = nodeIndex;
+    }
+
+    // Then remove components, if they still remain
     for (uint i = 0; i < selectedComponents.length; ++i)
     {
-        // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
         Component@ component = selectedComponents[i];
         Node@ node = component.node;
-        
+        if (node is null)
+            continue; // Already deleted
+
         uint index = GetComponentListIndex(component);
         uint nodeIndex = GetNodeListIndex(node);
         if (index == NO_ITEM || nodeIndex == NO_ITEM)
             continue;
 
+        // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
         if (node is editorScene && (component.typeName == "Octree" || component.typeName == "PhysicsWorld" ||
             component.typeName == "DebugRenderer"))
             continue;
@@ -305,29 +329,8 @@ bool SceneDelete()
             list.selection = index;
     }
 
-    // Remove (parented) nodes last
-    for (uint i = 0; i < selectedNodes.length; ++i)
-    {
-        Node@ node = selectedNodes[i];
-        if (node.parent is null)
-            continue;
-
-        uint id = node.id;
-        uint nodeIndex = GetNodeListIndex(node);
-
-        BeginModify(id);
-        node.Remove();
-        EndModify(id);
-
-        UpdateSceneWindowNode(nodeIndex, null);
-
-        // Select the next item in the same index
-
-        // If deleting only one node, select the next item in the same index
-        if (selectedNodes.length == 1 && selectedComponents.empty)
-            list.selection = nodeIndex;
-    }
-
+    list.contentElement.EnableLayoutUpdate();
+    list.contentElement.UpdateLayout();
     EndSelectionModify();
     return true;
 }

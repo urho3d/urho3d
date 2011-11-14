@@ -154,11 +154,17 @@ EVENT(E_ITEMSELECTED, ItemSelected)
     PARAM(P_SELECTION, Selection);          // int
 }
 
-/// Listview item deselected
+/// Listview item deselected.
 EVENT(E_ITEMDESELECTED, ItemDeselected)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
     PARAM(P_SELECTION, Selection);          // int
+}
+
+/// Listview selection change finished.
+EVENT(E_SELECTIONCHANGED, SelectionChanged)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Listview item doubleclicked.

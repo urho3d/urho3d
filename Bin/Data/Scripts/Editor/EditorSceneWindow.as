@@ -49,8 +49,7 @@ void CreateSceneWindow()
     SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
     SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandSceneHierarchy");
     SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "CollapseSceneHierarchy");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemSelected", "HandleSceneWindowSelectionChange");
-    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDeselected", "HandleSceneWindowSelectionChange");
+    SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "SelectionChanged", "HandleSceneWindowSelectionChange");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDoubleClicked", "HandleSceneWindowItemDoubleClick");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "UnhandledKey", "HandleSceneWindowKey");
     SubscribeToEvent(newNodeList, "ItemSelected", "HandleCreateNode");
@@ -479,7 +478,7 @@ void HandleSceneWindowSelectionChange()
 {
     if (inSelectionModify)
         return;
-
+    
     ClearSelection();
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);

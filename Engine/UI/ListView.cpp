@@ -432,6 +432,8 @@ void ListView::SetSelections(const Set<unsigned>& indices)
             break;
     }
     
+    SendEvent(E_SELECTIONCHANGED);
+    
     UpdateSelectionEffect();
 }
 
