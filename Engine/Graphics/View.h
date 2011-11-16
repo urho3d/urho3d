@@ -112,7 +112,7 @@ public:
     /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues.
-    const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+    const List<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
     
 private:
     /// Query the octree for drawable objects.
@@ -242,8 +242,8 @@ private:
     PODVector<Light*> lights_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
-    /// Light queue indices of processed lights.
-    Map<Light*, unsigned> lightQueueIndex_;
+    /// Lookup map for the processed lights' light queues.
+    Map<Light*, LightBatchQueue*> lightQueueMapping_;
     /// Cache for light scissor queries.
     HashMap<Light*, Rect> lightScissorCache_;
     /// Base pass batches.
@@ -257,7 +257,7 @@ private:
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Light queues.
-    Vector<LightBatchQueue> lightQueues_;
+    List<LightBatchQueue> lightQueues_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
     /// Camera zone's override flag.

@@ -134,18 +134,12 @@ void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
     queue->SortBackToFront();
 }
 
-void SortLightQueuesWork(const WorkItem* item, unsigned threadIndex)
+void SortLightQueueWork(const WorkItem* item, unsigned threadIndex)
 {
     LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
-    LightBatchQueue* end = reinterpret_cast<LightBatchQueue*>(item->end_);
-    
-    while (start != end)
-    {
-        for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
-            start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
-        start->litBatches_.SortFrontToBack();
-        ++start;
-    }
+    for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
+        start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
+    start->litBatches_.SortFrontToBack();
 }
 
 OBJECTTYPESTATIC(View);
@@ -512,14 +506,10 @@ void View::GetBatches()
     
     // Build light queues and lit batches
     {
-        // Preallocate enough light queues so that we can store pointers to them without having to worry about the
-        // vector reallocating itself
-        lightQueues_.Resize(lights_.Size());
-        unsigned lightQueueCount = 0;
         bool fallback = graphics_->GetFallback();
         
         maxLightsDrawables_.Clear();
-        lightQueueIndex_.Clear();
+        lightQueueMapping_.Clear();
         
         for (Vector<LightQueryResult>::ConstIterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
@@ -532,9 +522,10 @@ void View::GetBatches()
             Light* light = query.light_;
             unsigned shadowSplits = query.numSplits_;
             
-            // Initialize light queue. Store pointer-to-index mapping so that the queue can be found later
-            LightBatchQueue& lightQueue = lightQueues_[lightQueueCount];
-            lightQueueIndex_[light] = lightQueueCount;
+            // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
+            lightQueues_.Resize(lightQueues_.Size() + 1);
+            LightBatchQueue& lightQueue = lightQueues_.Back();
+            lightQueueMapping_[light] = &lightQueue;
             lightQueue.light_ = light;
             lightQueue.litBatches_.Clear();
             
@@ -611,12 +602,7 @@ void View::GetBatches()
                 else
                     maxLightsDrawables_.Insert(drawable);
             }
-            
-            ++lightQueueCount;
         }
-        
-        // Resize the light queue vector now that final size is known
-        lightQueues_.Resize(lightQueueCount);
     }
     
     // Process drawables with limited light count
@@ -634,9 +620,9 @@ void View::GetBatches()
             {
                 Light* light = lights[i];
                 // Find the correct light queue again
-                Map<Light*, unsigned>::Iterator j = lightQueueIndex_.Find(light);
-                if (j != lightQueueIndex_.End())
-                    GetLitBatches(drawable, lightQueues_[j->second_]);
+                Map<Light*, LightBatchQueue*>::Iterator j = lightQueueMapping_.Find(light);
+                if (j != lightQueueMapping_.End())
+                    GetLitBatches(drawable, *(j->second_));
             }
         }
     }
@@ -735,12 +721,11 @@ void View::UpdateGeometries()
         queue->AddWorkItem(item);
         item.start_ = &postAlphaQueue_;
         queue->AddWorkItem(item);
-
-        if (lightQueues_.Size())
+        
+        for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            item.workFunction_ = SortLightQueuesWork;
-            item.start_ = &lightQueues_.Front();
-            item.end_ = &lightQueues_.Back() + 1;
+            item.workFunction_ = SortLightQueueWork;
+            item.start_ = &(*i);
             queue->AddWorkItem(item);
         }
     }
@@ -854,11 +839,10 @@ void View::RenderBatches()
     {
         PROFILE(RenderShadowMaps);
         
-        for (unsigned i = 0; i < lightQueues_.Size(); ++i)
+        for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            LightBatchQueue& queue = lightQueues_[i];
-            if (queue.shadowMap_)
-                RenderShadowMap(queue);
+            if (i->shadowMap_)
+                RenderShadowMap(*i);
         }
     }
     
@@ -880,20 +864,18 @@ void View::RenderBatches()
         // Render shadow maps + opaque objects' shadowed additive lighting
         PROFILE(RenderLights);
         
-        for (unsigned i = 0; i < lightQueues_.Size(); ++i)
+        for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
-            LightBatchQueue& queue = lightQueues_[i];
-            
             // If reusing shadowmaps, render each of them before the lit batches
-            if (renderer_->GetReuseShadowMaps() && queue.shadowMap_)
+            if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
             {
-                RenderShadowMap(queue);
+                RenderShadowMap(*i);
                 graphics_->SetRenderTarget(0, renderTarget_);
                 graphics_->SetDepthStencil(depthStencil_);
                 graphics_->SetViewport(screenRect_);
             }
             
-            RenderLightBatchQueue(queue.litBatches_, queue.light_);
+            RenderLightBatchQueue(i->litBatches_, i->light_);
         }
     }
     
@@ -1754,11 +1736,11 @@ void View::PrepareInstancingBuffer()
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
     
-    for (unsigned i = 0; i < lightQueues_.Size(); ++i)
+    for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
-        for (unsigned j = 0; j < lightQueues_[i].shadowSplits_.Size(); ++j)
-            totalInstances += lightQueues_[i].shadowSplits_[j].shadowBatches_.GetNumInstances(renderer_);
-        totalInstances += lightQueues_[i].litBatches_.GetNumInstances(renderer_);
+        for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
+            totalInstances += i->shadowSplits_[j].shadowBatches_.GetNumInstances(renderer_);
+        totalInstances += i->litBatches_.GetNumInstances(renderer_);
     }
     
     // If fail to set buffer size, fall back to per-group locking
@@ -1772,11 +1754,11 @@ void View::PrepareInstancingBuffer()
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             preAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
-            for (unsigned i = 0; i < lightQueues_.Size(); ++i)
+            for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
             {
-                for (unsigned j = 0; j < lightQueues_[i].shadowSplits_.Size(); ++j)
-                    lightQueues_[i].shadowSplits_[j].shadowBatches_.SetTransforms(renderer_, lockedData, freeIndex);
-                lightQueues_[i].litBatches_.SetTransforms(renderer_, lockedData, freeIndex);
+                for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
+                    i->shadowSplits_[j].shadowBatches_.SetTransforms(renderer_, lockedData, freeIndex);
+                i->litBatches_.SetTransforms(renderer_, lockedData, freeIndex);
             }
             
             instancingBuffer->Unlock();

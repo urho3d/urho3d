@@ -36,6 +36,7 @@
 #include "DebugNew.h"
 
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
+static const float DEFAULT_RANGE = 10.0f;
 static const float DEFAULT_FOV = 30.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
@@ -82,7 +83,7 @@ Light::Light(Context* context) :
     Drawable(context),
     lightType_(DEFAULT_LIGHTTYPE),
     specularIntensity_(0.0f),
-    range_(0.0f),
+    range_(DEFAULT_RANGE),
     fov_(DEFAULT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
@@ -108,7 +109,7 @@ void Light::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_COLOR, "Color", color_, Color(), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);

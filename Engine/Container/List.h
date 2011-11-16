@@ -276,6 +276,16 @@ public:
             EraseNode(Head());
     }
     
+    /// Resize the list by removing or adding items at the end.
+    void Resize(unsigned newSize)
+    {
+        while (size_ > newSize)
+            Pop();
+        
+        while (size_ < newSize)
+            InsertNode(Tail(), T());
+    }
+    
     /// Return iterator to value, or to the end if not found.
     Iterator Find(const T& value)
     {

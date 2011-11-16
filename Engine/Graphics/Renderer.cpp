@@ -470,11 +470,11 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
     
     for (unsigned i = 0; i < lastView; ++i)
     {
-        const Vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
+        const List<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
         
-        for (unsigned j = 0; j < lightQueues.Size(); ++j)
+        for (List<LightBatchQueue>::ConstIterator i = lightQueues.Begin(); i != lightQueues.End(); ++i)
         {
-            if (lightQueues[j].shadowMap_)
+            if (i->shadowMap_)
                 ++numShadowMaps;
         }
     }

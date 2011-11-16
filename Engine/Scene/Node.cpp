@@ -900,7 +900,7 @@ bool Node::Load(Deserializer& source, bool readChildren)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash newType = compBuffer.ReadShortStringHash();
-        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), REPLICATED);
+        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
             if (!newComponent->Load(compBuffer))
@@ -914,7 +914,7 @@ bool Node::Load(Deserializer& source, bool readChildren)
     unsigned numChildren = source.ReadVLE();
     for (unsigned i = 0; i < numChildren; ++i)
     {
-        Node* newNode = CreateChild(source.ReadUInt(), REPLICATED);
+        Node* newNode = CreateChild(source.ReadUInt(), id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (!newNode->Load(source))
             return false;
     }
@@ -935,7 +935,8 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     while (compElem)
     {
         String typeName = compElem.GetString("type");
-        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), REPLICATED);
+        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"),
+            id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
             if (!newComponent->LoadXML(compElem))
@@ -951,7 +952,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        Node* newNode = CreateChild(childElem.GetInt("id"), REPLICATED);
+        Node* newNode = CreateChild(childElem.GetInt("id"), id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (!newNode->LoadXML(childElem))
             return false;
         
