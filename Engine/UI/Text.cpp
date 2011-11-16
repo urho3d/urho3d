@@ -224,10 +224,13 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
             
             if (c != '\n')
             {
-                const FontGlyph& glyph = face->glyphs_[face->glyphIndex_[c]];
+                const FontGlyph& glyph = face->GetGlyph(c);
                 if (c != ' ')
                     batch.AddQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                
                 x += glyph.advanceX_;
+                if (i < printText_.Length() - 1)
+                    x += face->GetKerning(c, printText_[i + 1]);
             }
             else
             {
@@ -382,7 +385,9 @@ void Text::UpdateText(bool inResize)
                                 nextBreak = j;
                                 break;
                             }
-                            futureRowWidth += face->glyphs_[face->glyphIndex_[text_[j]]].advanceX_;
+                            futureRowWidth += face->GetGlyph(text_[j]).advanceX_;
+                            if (j < text_.Length() - 1)
+                                futureRowWidth += face->GetKerning(text_[j], text_[j + 1]);
                             if (text_[j] == '-' && futureRowWidth <= maxWidth)
                             {
                                 nextBreak = j + 1;
@@ -418,7 +423,9 @@ void Text::UpdateText(bool inResize)
                     if (i < text_.Length())
                     {
                         // When copying a space, position is allowed to be over row width
-                        rowWidth += face->glyphs_[face->glyphIndex_[text_[i]]].advanceX_;
+                        rowWidth += face->GetGlyph(text_[i]).advanceX_;
+                        if (i < text_.Length() - 1)
+                            rowWidth += face->GetKerning(text_[i], text_[i + 1]);
                         if (rowWidth <= maxWidth)
                         {
                             printText_ += text_[i];
@@ -444,8 +451,10 @@ void Text::UpdateText(bool inResize)
             
             if (c != '\n')
             {
-                const FontGlyph& glyph = face->glyphs_[face->glyphIndex_[c]];
+                const FontGlyph& glyph = face->GetGlyph(c);
                 rowWidth += glyph.advanceX_;
+                if (i < printText_.Length() - 1)
+                    rowWidth += face->GetKerning(c, printText_[i + 1]);
             }
             else
             {
@@ -480,9 +489,11 @@ void Text::UpdateText(bool inResize)
             unsigned char c = (unsigned char)printText_[i];
             if (c != '\n')
             {
-                const FontGlyph& glyph = face->glyphs_[face->glyphIndex_[c]];
+                const FontGlyph& glyph = face->GetGlyph(c);
                 charSizes_[printToText[i]] = IntVector2(glyph.advanceX_, rowHeight_);
                 x += glyph.advanceX_;
+                if (i < printText_.Length() - 1)
+                    x += face->GetKerning(c, printText_[i + 1]);
             }
             else
             {

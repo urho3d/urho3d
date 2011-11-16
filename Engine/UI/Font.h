@@ -51,21 +51,36 @@ struct FontGlyph
     short offsetY_;
     /// Horizontal advance.
     short advanceX_;
+    /// Kerning information.
+    PODVector<short> kerning_;
 };
 
 /// %Font face description.
-struct FontFace
+class FontFace : public RefCounted
 {
+public:
+    /// Construct.
+    FontFace();
+    /// Destruct.
+    ~FontFace();
+    
+    /// Return the glyph structure corresponding to a character.
+    const FontGlyph& GetGlyph(unsigned char c) const;
+    /// Return the kerning for a character and the next character.
+    short GetKerning(unsigned char c, unsigned char d) const;
+    
+    /// Texture.
+    SharedPtr<Texture> texture_;
+    /// Glyphs.
+    Vector<FontGlyph> glyphs_;
     /// Point size.
     int pointSize_;
     /// Row height.
     int rowHeight_;
-    /// Texture.
-    SharedPtr<Texture> texture_;
     /// Glyph index mapping.
     unsigned short glyphIndex_[MAX_FONT_CHARS];
-    /// Glyphs.
-    PODVector<FontGlyph> glyphs_;
+    /// Kerning flag.
+    bool hasKerning_;
 };
 
 /// %Font resource.
@@ -89,7 +104,7 @@ public:
     
 private:
     /// Created faces.
-    Map<int, FontFace> faces_;
+    Map<int, SharedPtr<FontFace> > faces_;
     /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.
