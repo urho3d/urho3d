@@ -421,18 +421,20 @@ void Light::OnWorldBoundingBoxUpdate()
 
 void Light::SetIntensitySortValue(float distance)
 {
+    // When sorting lights globally, give priority to directional lights so that they will be combined into the ambient pass
     if (lightType_ != LIGHT_DIRECTIONAL)
-        sortValue_ = (distance + 1.0f) / color_.Intensity();
+        sortValue_ = Max(distance, M_MIN_NEARCLIP) / (color_.Intensity() + M_EPSILON);
     else
-        sortValue_ = 1.0f / color_.Intensity();
+        sortValue_ = M_EPSILON / (color_.Intensity() + M_EPSILON);
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)
 {
+    // When sorting lights for object's maximum light cap, give priority based on attenuation and intensity
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        sortValue_ = 1.0f / (color_.Intensity() + 1.0f);
+        sortValue_ = 1.0f / (color_.Intensity() + M_EPSILON);
         break;
         
     case LIGHT_POINT:
@@ -444,7 +446,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
             float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
-            sortValue_ = 1.0f / (color_.Intensity() * att + 1.0f);
+            sortValue_ = 1.0f / (color_.Intensity() * att + M_EPSILON);
         }
         break;
         
@@ -472,7 +474,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float spotFactor = Min(spotAngle / maxAngle, 1.0f);
             // We do not know the actual range attenuation ramp, so take only spot attenuation into account
             float att = Max(1.0f - spotFactor * spotFactor, M_EPSILON);
-            sortValue_ = 1.0f / (color_.Intensity() * att + 1.0f);
+            sortValue_ = 1.0f / (color_.Intensity() * att + M_EPSILON);
         }
         break;
     }
