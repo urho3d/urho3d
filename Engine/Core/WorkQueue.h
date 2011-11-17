@@ -86,6 +86,8 @@ private:
     volatile unsigned numActive_;
     /// Shutting down flag.
     volatile bool shutDown_;
+    /// Pausing flag. Indicates the worker threads should not contend for the queue mutex.
+    bool pausing_;
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
 };

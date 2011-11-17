@@ -176,11 +176,11 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     log->Open(logName);
     
     // Set amount of worker threads according to the free CPU cores. Leave one for the main thread and another for
-    // GPU & audio drivers, and clamp to a maximum of four for now
+    // GPU & audio drivers, and clamp to a maximum of three for now
     int numCores = GetNumCPUCores();
     if (threads && numCores > 1)
     {
-        int numThreads = Clamp(numCores - 2, 1, 4);
+        int numThreads = Clamp(numCores - 2, 1, 3);
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
         String workerThreadString = "Created " + String(numThreads) + " worker thread";
@@ -232,6 +232,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         if (sound)
             GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolate);
     }
+    
+    // Init FPU state of main thread
+    InitFPU();
     
     frameTimer_.Reset();
     

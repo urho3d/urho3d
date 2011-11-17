@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "ProcessUtils.h"
 #include "Thread.h"
 #include "Timer.h"
 #include "WorkQueue.h"
@@ -38,7 +39,12 @@ public:
     }
     
     /// Process work items until stopped.
-    virtual void ThreadFunction() { owner_->ProcessItems(index_); }
+    virtual void ThreadFunction()
+    {
+        // Init FPU state first
+        InitFPU();
+        owner_->ProcessItems(index_);
+    }
     
     /// Return thread index.
     unsigned GetIndex() const { return index_; }
@@ -56,6 +62,7 @@ WorkQueue::WorkQueue(Context* context) :
     Object(context),
     numActive_(0),
     shutDown_(false),
+    pausing_(false),
     paused_(false)
 {
 }
@@ -113,8 +120,12 @@ void WorkQueue::Pause()
 {
     if (!paused_)
     {
+        pausing_ = true;
+        
         queueMutex_.Acquire();
         paused_ = true;
+        
+        pausing_ = false;
     }
 }
 
@@ -134,7 +145,8 @@ void WorkQueue::Complete()
     {
         Resume();
         
-        for (;;)
+        // Take work items in the main thread until queue empty
+        while (!queue_.Empty())
         {
             queueMutex_.Acquire();
             if (!queue_.Empty())
@@ -145,17 +157,16 @@ void WorkQueue::Complete()
                 item.workFunction_(&item, 0);
             }
             else
-            {
-                if (numActive_)
-                    queueMutex_.Release();
-                else
-                {
-                    // All work items are done. Leave the mutex locked and re-enter pause mode
-                    paused_ = true;
-                    return;
-                }
-            }
+                queueMutex_.Release();
         }
+        
+        // Wait for all work to finish
+        while (!IsCompleted())
+        {
+        }
+        
+        // Pause worker threads by leaving the mutex locked
+        Pause();
     }
 }
 
@@ -176,28 +187,33 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
         if (shutDown_)
             return;
         
-        queueMutex_.Acquire();
-        if (!queue_.Empty())
-        {
-            if (!wasActive)
-            {
-                ++numActive_;
-                wasActive = true;
-            }
-            WorkItem item = queue_.Front();
-            queue_.PopFront();
-            queueMutex_.Release();
-            item.workFunction_(&item, threadIndex);
-        }
+        if (pausing_ && !wasActive)
+            Time::Sleep(0);
         else
         {
-            if (wasActive)
+            queueMutex_.Acquire();
+            if (!queue_.Empty())
             {
-                --numActive_;
-                wasActive = false;
+                if (!wasActive)
+                {
+                    ++numActive_;
+                    wasActive = true;
+                }
+                WorkItem item = queue_.Front();
+                queue_.PopFront();
+                queueMutex_.Release();
+                item.workFunction_(&item, threadIndex);
             }
-            queueMutex_.Release();
-            Time::Sleep(0);
+            else
+            {
+                if (wasActive)
+                {
+                    --numActive_;
+                    wasActive = false;
+                }
+                queueMutex_.Release();
+                Time::Sleep(0);
+            }
         }
     }
 }
