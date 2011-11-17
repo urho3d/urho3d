@@ -28,6 +28,7 @@
 - void ErrorDialog(const String&, const String&)
 - void OpenConsoleWindow()
 - String GetConsoleInput()
+- String[]@ GetArguments()
 - void SendEvent(const String&, VariantMap&)
 - void SendEvent(Object@, const String&, VariantMap&)
 - void SubscribeToEvent(const String&, const String&)
@@ -58,7 +59,6 @@
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
 - uint randomSeed
-- String[]@ arguments
 - uint numCpuCores
 - Time@ time
 - Log@ log

@@ -36,6 +36,8 @@ void Stop()
 
 void ParseArguments()
 {
+    Array<String> arguments = GetArguments();
+    
     // The first argument should be the editor script name. Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
     {
