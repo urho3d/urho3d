@@ -582,6 +582,7 @@ void View::GetBatches()
                         
                         // Fill the rest of the batch
                         shadowBatch.camera_ = shadowCamera;
+                        shadowBatch.zone_ = GetZone(drawable);
                         shadowBatch.lightQueue_ = &lightQueue;
                         
                         FinalizeBatch(shadowBatch, tech, pass);
