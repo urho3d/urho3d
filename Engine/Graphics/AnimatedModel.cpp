@@ -133,7 +133,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
             const BoundingBox& box = bone.boundingBox_;
             const Matrix3x4& transform = bone.node_->GetWorldTransform();
             float distance = query.ray_.HitDistance(box.Transformed(transform));
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 if (level == RAY_AABB)
                 {
@@ -150,7 +150,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
                     Matrix3x4 inverse = transform.Inverse();
                     Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
                     distance = localRay.HitDistance(box);
-                    if (distance < query.maxDistance_)
+                    if (distance <= query.maxDistance_)
                     {
                         RayQueryResult result;
                         result.drawable_ = this;
@@ -167,7 +167,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
             boneSphere.center_ = bone.node_->GetWorldPosition();
             boneSphere.radius_ = bone.radius_;
             float distance = query.ray_.HitDistance(boneSphere);
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
                 result.drawable_ = this;

@@ -176,10 +176,12 @@ public:
     
     /// Return drawable objects by a query.
     void GetDrawables(OctreeQuery& query) const;
-    /// Return drawable objects by a ray query.
-    void GetDrawables(RayOctreeQuery& query) const;
     /// Return unculled drawables by drawable type. The destination vector will not be cleared.
     void GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const;
+    /// Return drawable objects by a ray query.
+    void Raycast(RayOctreeQuery& query) const;
+    /// Return the closest drawable object by a ray query.
+    void RaycastSingle(RayOctreeQuery& query) const;
     /// Return subdivision levels.
     unsigned GetNumLevels() const { return numLevels_; }
     
@@ -217,7 +219,7 @@ private:
     /// Current threaded ray query.
     mutable RayOctreeQuery* rayQuery_;
     /// Drawable list for threaded ray query.
-    mutable PODVector<Drawable*> rayQueryDrawables_;
+    mutable PODVector<Drawable*> rayGetDrawables_;
     /// Threaded ray query intermediate results.
     mutable Vector<PODVector<RayQueryResult> > rayQueryResults_;
     /// Subdivision level.

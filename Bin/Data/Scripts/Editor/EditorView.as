@@ -378,21 +378,17 @@ void ViewRaycast(bool mouseClick)
         if (editorScene.octree is null)
             return;
 
-        Array<RayQueryResult> result = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, camera.farClip,
+        RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
             pickModeDrawableFlags[pickMode], 0x7fffffff);
-        if (!result.empty)
+        if (result.drawable !is null)
         {
-            for (uint i = 0; i < result.length; ++i)
+            Drawable@ drawable = result.drawable;
+            if (debug !is null)
             {
-                Drawable@ drawable = result[i].drawable;
-                if (debug !is null)
-                {
-                    debug.AddNode(drawable.node, false);
-                    drawable.DrawDebugGeometry(debug, false);
-                }
-                selected = drawable;
-                break;
+                debug.AddNode(drawable.node, false);
+                drawable.DrawDebugGeometry(debug, false);
             }
+            selected = drawable;
         }
     }
     else

@@ -183,7 +183,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
             Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(GetWorldBoundingBox());
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
                 result.drawable_ = this;
@@ -199,7 +199,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
         if (lightType_ == LIGHT_SPOT)
         {
             float distance = query.ray_.HitDistance(GetFrustum());
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
                 result.drawable_ = this;
@@ -212,7 +212,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
         if (lightType_ == LIGHT_POINT)
         {
             float distance = query.ray_.HitDistance(Sphere(GetWorldPosition(), range_));
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
                 result.drawable_ = this;

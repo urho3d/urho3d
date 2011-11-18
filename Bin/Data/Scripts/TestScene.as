@@ -454,11 +454,10 @@ void HandlePostRenderUpdate()
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        Array<RayQueryResult> result = testScene.octree.Raycast(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
-        if (result.length > 0)
+        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
+        if (result.drawable !is null)
         {
-            Drawable@ object = result[0].drawable;
-            Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result[0].distance;
+            Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
         }

@@ -234,7 +234,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         return;
     
     float octantDist = query.ray_.HitDistance(cullingBox_);
-    if (octantDist >= query.maxDistance_)
+    if (octantDist > query.maxDistance_)
         return;
     
     for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
@@ -262,7 +262,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         return;
     
     float octantDist = query.ray_.HitDistance(cullingBox_);
-    if (octantDist >= query.maxDistance_)
+    if (octantDist > query.maxDistance_)
         return;
     
     for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
@@ -419,7 +419,16 @@ void Octree::GetDrawables(OctreeQuery& query) const
     GetDrawablesInternal(query, false);
 }
 
-void Octree::GetDrawables(RayOctreeQuery& query) const
+void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const
+{
+    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    {
+        if (*i && (*i)->IsVisible() && (*i)->GetDrawableFlags() & drawableFlags)
+            dest.Push(*i);
+    }
+}
+
+void Octree::Raycast(RayOctreeQuery& query) const
 {
     PROFILE(Raycast);
     
@@ -434,11 +443,11 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
     {
         // Threaded ray query: first get the drawables
         rayQuery_ = &query;
-        rayQueryDrawables_.Clear();
-        GetDrawablesOnlyInternal(query, rayQueryDrawables_);
+        rayGetDrawables_.Clear();
+        GetDrawablesOnlyInternal(query, rayGetDrawables_);
         
         // Check that amount of drawables is large enough to justify threading
-        if (rayQueryDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
+        if (rayGetDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
         {
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 rayQueryResults_[i].Clear();
@@ -447,10 +456,10 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
             item.workFunction_ = RaycastDrawablesWork;
             item.aux_ = const_cast<Octree*>(this);
             
-            PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
-            while (start != rayQueryDrawables_.End())
+            PODVector<Drawable*>::Iterator start = rayGetDrawables_.Begin();
+            while (start != rayGetDrawables_.End())
             {
-                PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
+                PODVector<Drawable*>::Iterator end = rayGetDrawables_.End();
                 if (end - start > RAYCASTS_PER_WORK_ITEM)
                     end = start + RAYCASTS_PER_WORK_ITEM;
                 
@@ -468,7 +477,7 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
         }
         else
         {
-            for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
+            for (PODVector<Drawable*>::Iterator i = rayGetDrawables_.Begin(); i != rayGetDrawables_.End(); ++i)
                 (*i)->ProcessRayQuery(query, query.result_);
         }
     }
@@ -476,12 +485,35 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
     Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
 }
 
-void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const
+void Octree::RaycastSingle(RayOctreeQuery& query) const
 {
-    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
+    PROFILE(Raycast);
+    
+    query.result_.Clear();
+    rayGetDrawables_.Clear();
+    GetDrawablesOnlyInternal(query, rayGetDrawables_);
+    
+    // Sort by increasing hit distance to AABB
+    for (PODVector<Drawable*>::Iterator i = rayGetDrawables_.Begin(); i != rayGetDrawables_.End(); ++i)
     {
-        if (*i && (*i)->IsVisible() && (*i)->GetDrawableFlags() & drawableFlags)
-            dest.Push(*i);
+        Drawable* drawable = *i;
+        drawable->SetSortValue(query.ray_.HitDistance(drawable->GetWorldBoundingBox()));
+    }
+    
+    Sort(rayGetDrawables_.Begin(), rayGetDrawables_.End(), CompareDrawables);
+    
+    // The do the actual test according to the query, and early-out on the first hit or if maximum distance exceeded
+    for (PODVector<Drawable*>::Iterator i = rayGetDrawables_.Begin(); i != rayGetDrawables_.End(); ++i)
+    {
+        Drawable* drawable = *i;
+        if (drawable->GetSortValue() <= query.maxDistance_)
+        {
+            drawable->ProcessRayQuery(query, query.result_);
+            if (!query.result_.Empty())
+                break;
+        }
+        else
+            break;
     }
 }
 

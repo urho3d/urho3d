@@ -2039,7 +2039,8 @@ Methods:<br>
 - void DrawDebugGeometry(bool) const
 - void AddManualDrawable(Drawable@, bool)
 - void RemoveManualDrawable(Drawable@)
-- RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK)
+- RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const
+- RayQueryResult RaycastSingle(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const
 - Node@[]@ GetDrawables(const Vector3&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const BoundingBox&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Frustum&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)

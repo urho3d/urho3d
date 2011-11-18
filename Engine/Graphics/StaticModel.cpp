@@ -86,7 +86,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(boundingBox_);
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
                 result.drawable_ = this;
@@ -104,7 +104,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(boundingBox_);
-            if (distance < query.maxDistance_)
+            if (distance <= query.maxDistance_)
             {
                 // Then the actual test using triangle geometry
                 for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -120,7 +120,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                     if (geom)
                     {
                         distance = geom->GetDistance(localRay);
-                        if (distance < query.maxDistance_)
+                        if (distance <= query.maxDistance_)
                         {
                             RayQueryResult result;
                             result.drawable_ = this;

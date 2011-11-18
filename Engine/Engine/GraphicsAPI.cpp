@@ -859,8 +859,26 @@ static CScriptArray* OctreeRaycast(const Ray& ray, RayQueryLevel level, float ma
 {
     PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
-    ptr->GetDrawables(query);
+    ptr->Raycast(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");
+}
+
+static RayQueryResult OctreeRaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+{
+    PODVector<RayQueryResult> result;
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
+    ptr->RaycastSingle(query);
+    if (!query.result_.Empty())
+        return query.result_[0];
+    else
+    {
+        RayQueryResult empty;
+        empty.drawable_ = 0;
+        empty.node_ = 0;
+        empty.distance_ = M_INFINITY;
+        empty.subObject_ = 0;
+        return empty;
+    }
 }
 
 static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
@@ -926,7 +944,8 @@ static void RegisterOctree(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHOD(Octree, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void AddManualDrawable(Drawable@+, bool)", asMETHOD(Octree, AddManualDrawable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void RemoveManualDrawable(Drawable@+)", asMETHOD(Octree, RemoveManualDrawable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK) const", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "RayQueryResult RaycastSingle(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK) const", asFUNCTION(OctreeRaycastSingle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Frustum&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
