@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2011 Lasse ï¿½ï¿½rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ private:
     /// Shutting down flag.
     volatile bool shutDown_;
     /// Pausing flag. Indicates the worker threads should not contend for the queue mutex.
-    bool pausing_;
+    volatile bool pausing_;
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
 };
