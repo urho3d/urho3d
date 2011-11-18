@@ -502,18 +502,26 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     
     Sort(rayGetDrawables_.Begin(), rayGetDrawables_.End(), CompareDrawables);
     
-    // The do the actual test according to the query, and early-out on the first hit or if maximum distance exceeded
+    // The do the actual test according to the query, and early-out as possible
+    float closestHit = M_INFINITY;
     for (PODVector<Drawable*>::Iterator i = rayGetDrawables_.Begin(); i != rayGetDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
-        if (drawable->GetSortValue() <= query.maxDistance_)
+        if (drawable->GetSortValue() <= Min(closestHit, query.maxDistance_))
         {
+            unsigned oldSize = query.result_.Size();
             drawable->ProcessRayQuery(query, query.result_);
-            if (!query.result_.Empty())
-                break;
+            if (query.result_.Size() > oldSize)
+                closestHit = Min(closestHit, query.result_.Back().distance_);
         }
         else
             break;
+    }
+    
+    if (query.result_.Size() > 1)
+    {
+        Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
+        query.result_.Resize(1);
     }
 }
 
