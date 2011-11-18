@@ -502,7 +502,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     
     Sort(rayGetDrawables_.Begin(), rayGetDrawables_.End(), CompareDrawables);
     
-    // The do the actual test according to the query, and early-out as possible
+    // Then do the actual test according to the query, and early-out as possible
     float closestHit = M_INFINITY;
     for (PODVector<Drawable*>::Iterator i = rayGetDrawables_.Begin(); i != rayGetDrawables_.End(); ++i)
     {
