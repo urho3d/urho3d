@@ -215,9 +215,16 @@ Methods:<br>
 - void Pop()
 - void Resize(uint)
 - void Clear()
+- void Sort()
+- void Sort(uint, uint)
+- void SortReverse()
+- void SortReverse(uint, uint)
+- void Reverse()
+- int Find(const T&) const
+- int Find(uint, const T&) const
 
 Properties:<br>
-- uint length (readonly)
+- uint length
 - bool empty (readonly)
 
 
