@@ -215,7 +215,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     RegisterTexture<Texture>(engine, "Texture");
     
-    engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructViewport), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport&in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);

@@ -37,6 +37,12 @@ public:
     {
     }
     
+    /// Copy-construct from another polyhedron.
+    Polyhedron(const Polyhedron& polyhedron) :
+        faces_(polyhedron.faces_)
+    {
+    }
+    
     /// Construct from a list of faces.
     Polyhedron(const Vector<Vector<Vector3> >& faces) :
         faces_(faces)

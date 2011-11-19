@@ -1122,7 +1122,7 @@ static String StringAddBoolReverse(bool value, const String& str)
 
 void RegisterString(asIScriptEngine *engine)
 {
-    engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterStringFactory("String", asFUNCTION(StringFactory), asCALL_CDECL);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringCopy), asCALL_CDECL_OBJLAST);

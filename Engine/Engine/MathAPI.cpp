@@ -600,6 +600,11 @@ static void ConstructPolyhedron(Polyhedron* ptr)
     new(ptr) Polyhedron();
 }
 
+static void ConstructPolyhedronCopy(const Polyhedron& polyhedron, Polyhedron* ptr)
+{
+    new(ptr) Polyhedron(polyhedron);
+}
+
 static void ConstructPolyhedronBoundingBox(const BoundingBox& box, Polyhedron* ptr)
 {
     new(ptr) Polyhedron(box);
@@ -654,8 +659,8 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
     
     engine->RegisterObjectType("BoundingBox", sizeof(BoundingBox), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
-    engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
-    engine->RegisterObjectType("Polyhedron", sizeof(Polyhedron), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("Polyhedron", sizeof(Polyhedron), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBoundingBox), asCALL_CDECL_OBJLAST);
@@ -702,6 +707,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint) const", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPolyhedron), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(ConstructPolyhedronCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const BoundingBox&in)", asFUNCTION(ConstructPolyhedronBoundingBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(ConstructPolyhedronFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPolyhedron), asCALL_CDECL_OBJLAST);
