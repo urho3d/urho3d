@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2011 Lasse ï¿½ï¿½rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,8 @@ enum VertexLightVSVariation
     VLVS_2LIGHTS,
     VLVS_3LIGHTS,
     VLVS_4LIGHTS,
+    VLVS_5LIGHTS,
+    VLVS_6LIGHTS,
     MAX_VERTEXLIGHT_VS_VARIATIONS
 };
 

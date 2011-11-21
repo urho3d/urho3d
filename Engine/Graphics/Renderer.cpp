@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2011 Lasse ï¿½ï¿½rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -207,7 +207,9 @@ static const String vertexLightVSVariations[] =
     "1VL",
     "2VL",
     "3VL",
-    "4VL"
+    "4VL",
+    "5VL",
+    "6VL"
 };
 
 static const String lightPSVariations[] = 
