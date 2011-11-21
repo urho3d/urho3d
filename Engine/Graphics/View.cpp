@@ -829,6 +829,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         Pass* pass = 0;
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
+        // Also vertex lighting requires the non-lit base pass, so skip if any vertex lights
         if (light == firstLight && drawable->GetVertexLights().Empty() && !drawable->HasBasePass(i))
         {
             pass = tech->GetPass(PASS_LITBASE);

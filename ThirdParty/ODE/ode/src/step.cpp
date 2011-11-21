@@ -366,7 +366,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
               jicurr->joint = j;
               --jicurr;
             } else if (jicurr->info.nub > 0) { // A mixed case
-              if (mix_end = lcp_end) { // no lcp infos yet - just move to opposite side of mixed-s
+              if (mix_end == lcp_end) { // no lcp infos yet - just move to opposite side of mixed-s
                 dJointWithInfo1 *jimixend = jointiinfos + mix_end;
                 lcp_end = mix_end = mix_end + 1;
                 jimixend->info = jicurr->info;

@@ -341,7 +341,7 @@ struct dxTriMesh : public dxGeom{
 #if dTRIMESH_OPCODE
 
 	enum {
-		MERGE_NORMALS__SPHERE_DEFAULT = MERGE_CONTACTS_FULLY,
+		MERGE_NORMALS__SPHERE_DEFAULT = DONT_MERGE_CONTACTS,
 	};
 	bool controlGeometry_SetMergeSphereContacts(int dataValue);
 	bool controlGeometry_GetMergeSphereContacts(int &returnValue);

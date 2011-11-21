@@ -40,7 +40,7 @@ Urho3D uses the following third-party libraries:
 - GLFW 3.0 WIP (http://www.glfw.org/)
 - kNet (https://bitbucket.org/clb/knet)
 - Open Asset Import Library, svn rev 1062 (http://assimp.sourceforge.net/)
-- Open Dynamics Engine, svn rev 1806 (http://www.ode.org/)
+- Open Dynamics Engine, svn rev 1846 (http://www.ode.org/)
 - PortAudio V19 (http://www.portaudio.com/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)

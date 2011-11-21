@@ -47,7 +47,7 @@ stuff common to all spaces
 // NOTE: this assumes that the geom AABBs are valid on entry
 // and that both geoms are enabled.
 
-static void collideAABBs (dxGeom *g1, dxGeom *g2,
+static inline void collideAABBs (dxGeom *g1, dxGeom *g2,
 			  void *data, dNearCallback *callback)
 {
   dIASSERT((g1->gflags & GEOM_AABB_BAD)==0);
@@ -58,7 +58,7 @@ static void collideAABBs (dxGeom *g1, dxGeom *g2,
 
   // test if the category and collide bitfields match
   // Urho3D: modified to allow easier collision exclusion
-  if ((!(g1->category_bits & g2->collide_bits)) || (!(g2->category_bits & g1->collide_bits)))
+  if (!(g1->category_bits & g2->collide_bits) || !(g2->category_bits & g1->collide_bits))
     return;
 
   // if the bounding boxes are disjoint then don't do anything

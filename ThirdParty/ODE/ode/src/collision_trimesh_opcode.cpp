@@ -643,21 +643,21 @@ bool dxTriMesh::controlGeometry_SetMergeSphereContacts(int dataValue)
 
 bool dxTriMesh::controlGeometry_GetMergeSphereContacts(int &returnValue)
 {
-	if (SphereContactsMergeOption = DONT_MERGE_CONTACTS) {
-		returnValue = dGeomColliderMergeContactsValue_None;
-	}
-	else if (SphereContactsMergeOption = MERGE_CONTACT_NORMALS) {
-		returnValue = dGeomColliderMergeContactsValue_Normals;
-	}
-	else if (SphereContactsMergeOption = MERGE_CONTACTS_FULLY) {
-		returnValue = dGeomColliderMergeContactsValue_Full;
-	}
-	else {
-		dIASSERT(false && "Internal error: unexpected contact merge option field value");
-		return false;
-	}
+    if (SphereContactsMergeOption == DONT_MERGE_CONTACTS) {
+        returnValue = dGeomColliderMergeContactsValue_None;
+    }
+    else if (SphereContactsMergeOption == MERGE_CONTACT_NORMALS) {
+        returnValue = dGeomColliderMergeContactsValue_Normals;
+    }
+    else if (SphereContactsMergeOption == MERGE_CONTACTS_FULLY) {
+        returnValue = dGeomColliderMergeContactsValue_Full;
+    }
+    else {
+        dIASSERT(false && "Internal error: unexpected contact merge option field value");
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 int dxTriMesh::AABBTest(dxGeom* g, dReal aabb[6]){

@@ -286,7 +286,7 @@ void _dLDLTAddTL (dReal *L, dReal *d, const dReal *a, int n, int nskip, void *tm
     alpha1 = alphanew;
     alphanew = alpha2 - (W21*W21)*dee;
     dee /= alphanew;
-    dReal gamma2 = W21 * dee;
+    //dReal gamma2 = W21 * dee;
     alpha2 = alphanew;
     dReal k1 = REAL(1.0) - W21*gamma1;
     dReal k2 = W21*gamma1*W11 - W21;

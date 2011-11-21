@@ -160,6 +160,20 @@ int dCollideCapsuleSphere (dxGeom *o1, dxGeom *o2, int flags,
   return dCollideSpheres (p,ccyl->radius,o2->final_posr->pos,sphere->radius,contact);
 }
 
+// use this instead of dCollideSpheres if the spheres are at the same point, 
+//  but the normal is known (e.g. in capsule-box collision)
+int dCollideSpheresZeroDist (dVector3 p1, dReal r1, dVector3 p2, dReal r2, 
+                             dVector3 normal, dContactGeom *c) {
+  c->normal[0] = normal[0];
+  c->normal[1] = normal[1];
+  c->normal[2] = normal[2];
+  c->depth  = r1 + r2;
+  dReal k = REAL(0.5) * (r2 - r1);
+  c->pos[0] = p1[0] + c->normal[0]*k;
+  c->pos[1] = p1[1] + c->normal[1]*k;
+  c->pos[2] = p1[2] + c->normal[2]*k;
+  return 1;
+}
 
 int dCollideCapsuleBox (dxGeom *o1, dxGeom *o2, int flags,
 			  dContactGeom *contact, int skip)
@@ -197,8 +211,23 @@ int dCollideCapsuleBox (dxGeom *o1, dxGeom *o2, int flags,
   dVector3 pl,pb;
   dClosestLineBoxPoints (p1,p2,c,R,side,pl,pb);
 
-  // generate contact point
-  return dCollideSpheres (pl,radius,pb,0,contact);
+  // if the capsule is penetrated further than radius 
+  //  than pl and pb are equal -> unknown normal
+  // use vector to center of box as normal
+#ifdef dSINGLE
+  dReal mindist = REAL(1e-9);
+#else
+  dReal mindist = REAL(1e-18);
+#endif
+  if (dCalcPointsDistance3(pl, pb)<mindist) {
+    dVector3 normal; // pb-c (vector from center of box to pb)
+    for (int i=0; i<3; i++) normal[i] = pb[i]-c[i];
+    dSafeNormalize3(normal);
+    return dCollideSpheresZeroDist (pl,radius,pb,0,normal,contact);
+  } else {
+    // generate contact point
+    return dCollideSpheres (pl,radius,pb,0,contact);
+  }
 }
 
 

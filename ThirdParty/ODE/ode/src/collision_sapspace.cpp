@@ -243,7 +243,7 @@ static void collideGeomsNoAABBs( dxGeom *g1, dxGeom *g2, void *data, dNearCallba
 
 	// test if the category and collide bitfields match
     // Urho3D: modified to allow easier collision exclusion
-    if ((!(g1->category_bits & g2->collide_bits)) || (!(g2->category_bits & g1->collide_bits)))
+    if (!(g1->category_bits & g2->collide_bits) || !(g2->category_bits & g1->collide_bits))
         return;
 
 	dReal *bounds1 = g1->aabb;
