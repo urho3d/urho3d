@@ -16,6 +16,7 @@ uniform float3 cViewUpVector : register(C25);
 uniform float4x3 cZone : register(C26);
 uniform float4x4 cShadowProj[4] : register(C29);
 uniform float4x3 cSkinMatrices[64] : register(C45);
+uniform float4 cVertexLights[12] : register(C237);
 
 // Pixel shader parameters
 uniform float3 cAmbientStartColor : register(C0);

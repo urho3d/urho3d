@@ -103,6 +103,7 @@ struct Variation
     
     String name_;
     Vector<String> defines_;
+    Vector<String> defineValues_;
     Vector<String> excludes_;
     Vector<String> includes_;
     Vector<String> requires_;
@@ -114,6 +115,7 @@ struct CompiledVariation
     ShaderType type_;
     String name_;
     Vector<String> defines_;
+    Vector<String> defineValues_;
     PODVector<unsigned char> byteCode_;
     unsigned byteCodeOffset_;
     Set<Parameter> constants_;
@@ -141,6 +143,7 @@ String inDir_;
 String inFile_;
 String outDir_;
 Vector<String> defines_;
+Vector<String> defineValues_;
 bool useSM3_ = false;
 volatile bool compileFailed_ = false;
 
@@ -171,10 +174,6 @@ public:
                 {
                     workItem = workList_.Front();
                     workList_.Erase(workList_.Begin());
-                    if (!workItem->name_.Empty())
-                        PrintLine("Compiling shader variation " + workItem->name_);
-                    else
-                        PrintLine("Compiling base shader variation");
                 }
             }
             if (!workItem)
@@ -263,7 +262,17 @@ void Run(const Vector<String>& arguments)
         else if (arg == "SM2")
             useSM3_ = false;
         
-        defines_.Push(arg);
+        Vector<String> nameAndValue = arg.Split('=');
+        if (nameAndValue.Size() == 2)
+        {
+            defines_.Push(nameAndValue[0]);
+            defineValues_.Push(nameAndValue[1]);
+        }
+        else
+        {
+            defines_.Push(arg);
+            defineValues_.Push("1");
+        }
     }
     
     XMLFile doc(context_);
@@ -304,8 +313,20 @@ void Run(const Vector<String>& arguments)
                 
                 String simpleDefine = variation.GetString("define");
                 if (!simpleDefine.Empty())
-                    newVar.defines_.Push(simpleDefine);
-                    
+                {
+                    Vector<String> nameAndValue = simpleDefine.Split('=');
+                    if (nameAndValue.Size() == 2)
+                    {
+                        newVar.defines_.Push(nameAndValue[0]);
+                        newVar.defineValues_.Push(nameAndValue[1]);
+                    }
+                    else
+                    {
+                        newVar.defines_.Push(simpleDefine);
+                        newVar.defineValues_.Push("1");
+                    }
+                }
+                
                 String simpleExclude = variation.GetString("exclude");
                 if (!simpleExclude.Empty())
                     newVar.excludes_.Push(simpleExclude);
@@ -321,7 +342,18 @@ void Run(const Vector<String>& arguments)
                 XMLElement define = variation.GetChild("define");
                 while (define)
                 {
-                    newVar.defines_.Push(define.GetString("name"));
+                    String defineName = define.GetString("name");
+                    Vector<String> nameAndValue = defineName.Split('=');
+                    if (nameAndValue.Size() == 2)
+                    {
+                        newVar.defines_.Push(nameAndValue[0]);
+                        newVar.defineValues_.Push(nameAndValue[1]);
+                    }
+                    else
+                    {
+                        newVar.defines_.Push(defineName);
+                        newVar.defineValues_.Push("1");
+                    }
                     define = define.GetNext("define");
                 }
                 
@@ -499,9 +531,10 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         if (usedCombinations.Contains(active))
             continue;
         
-        // Build shader variation name & defines active variations
+        // Build shader variation name & defines for active variations
         String outName;
         Vector<String> defines;
+        Vector<String> defineValues;
         for (unsigned j = 0; j < variations.Size(); ++j)
         {
             if (active & (1 << j))
@@ -509,7 +542,10 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
                 if (variations[j].name_.Length())
                     outName += variations[j].name_;
                 for (unsigned k = 0; k < variations[j].defines_.Size(); ++k)
+                {
                     defines.Push(variations[j].defines_[k]);
+                    defineValues.Push(variations[j].defineValues_[k]);
+                }
             }
         }
         
@@ -517,6 +553,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         compile.type_ = baseShader.type_;
         compile.name_ = outName;
         compile.defines_ = defines;
+        compile.defineValues_ = defineValues;
         
         compiledVariations.Push(compile);
         usedCombinations.Insert(active);
@@ -609,14 +646,14 @@ void Compile(CompiledVariation* variation)
     {
         D3DXMACRO macro;
         macro.Name = variation->defines_[i].CString();
-        macro.Definition = "1";
+        macro.Definition = variation->defineValues_[i].CString();
         macros.Push(macro);
     }
     for (unsigned i = 0; i < defines_.Size(); ++i)
     {
         D3DXMACRO macro;
         macro.Name = defines_[i].CString();
-        macro.Definition = "1";
+        macro.Definition = defineValues_[i].CString();
         macros.Push(macro);
     }
     
@@ -664,14 +701,19 @@ void Compile(CompiledVariation* variation)
     }
     else
     {
+        CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
+        
+        if (!variation->name_.Empty())
+            PrintLine("Compiled shader variation " + variation->name_ + ", code size " + String(variation->byteCode_.Size()));
+        else
+            PrintLine("Compiled base shader variation, code size " + String(variation->byteCode_.Size()));
+            
         // Print warnings if any
         if (errorMsgs && errorMsgs->GetBufferSize())
         {
             String warning((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
-            printf("WARNING: %s\n", warning.CString());
+            PrintLine("WARNING: " + warning);
         }
-        
-        CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
         
         // Parse the constant table for constants and texture units
         D3DXCONSTANTTABLE_DESC desc;

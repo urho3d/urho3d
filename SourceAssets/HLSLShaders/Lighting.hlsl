@@ -29,9 +29,37 @@ float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularP
     return pow(dot(normal, halfVec), specularPower);
 }
 
+float GetVertexLight(int index, float3 worldPos, float3 normal)
+{
+    float3 lightDir = cVertexLights[index * 3 + 1].xyz;
+    float3 lightPos = cVertexLights[index * 3 + 2].xyz;
+    float invRange = cVertexLights[index * 3].w;
+    float cutoff = cVertexLights[index * 3 + 1].w;
+    float invCutoff = cVertexLights[index * 3 + 2].w;
+
+    // Directional light
+    if (invRange == 0.0)
+    {
+        float NdotL = max(dot(normal, lightDir), 0.0);
+        return NdotL;
+    }
+    // Point/spot light
+    else
+    {
+        float3 lightVec = (lightPos - worldPos) * invRange;
+        float lightDist = length(lightVec);
+        float3 localDir = lightVec / lightDist;
+        float NdotL = max(dot(normal, localDir), 0.0);
+        float atten = saturate(1.0 - lightDist * lightDist);
+        float spotEffect = dot(localDir, lightDir);
+        float spotAtten = saturate((spotEffect - cutoff) * invCutoff);
+        return NdotL * atten * spotAtten;
+    }
+}
+
 float3 GetAmbient(float zonePos)
 {
-    return lerp(cAmbientStartColor, cAmbientEndColor, zonePos);
+    return cAmbientStartColor + zonePos * cAmbientEndColor;
 }
 
 float GetShadow(float4 shadowPos)

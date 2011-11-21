@@ -82,6 +82,7 @@ OBJECTTYPESTATIC(Light);
 Light::Light(Context* context) :
     Drawable(context),
     lightType_(DEFAULT_LIGHTTYPE),
+    perVertex_(false),
     specularIntensity_(0.0f),
     range_(DEFAULT_RANGE),
     fov_(DEFAULT_FOV),
@@ -115,6 +116,7 @@ void Light::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Per Vertex", perVertex_, false, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Fade Distance", GetFadeDistance, SetFadeDistance, float, 0.0f, AM_DEFAULT);
@@ -259,6 +261,11 @@ void Light::SetLightType(LightType type)
 {
     lightType_ = type;
     OnMarkedDirty(node_);
+}
+
+void Light::SetPerVertex(bool enable)
+{
+    perVertex_ = enable;
 }
 
 void Light::SetColor(const Color& color)
@@ -426,6 +433,10 @@ void Light::SetIntensitySortValue(float distance)
         sortValue_ = Max(distance, M_MIN_NEARCLIP) / (color_.Intensity() + M_EPSILON);
     else
         sortValue_ = M_EPSILON / (color_.Intensity() + M_EPSILON);
+    
+    // Additionally, give priority to vertex lights so that vertex light base passes can be determined before per pixel lights
+    if (perVertex_)
+        sortValue_ -= M_LARGE_VALUE;
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)

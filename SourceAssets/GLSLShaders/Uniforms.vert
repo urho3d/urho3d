@@ -15,3 +15,4 @@ uniform vec3 cViewUpVector;
 uniform mat4 cZone;
 uniform mat4 cShadowProj[4];
 uniform vec4 cSkinMatrices[64*3];
+uniform vec4 cVertexLights[12];

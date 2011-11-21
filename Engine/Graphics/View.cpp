@@ -242,6 +242,7 @@ void View::Update(const FrameInfo& frame)
     alphaQueue_.Clear();
     postAlphaQueue_.Clear();
     lightQueues_.Clear();
+    vertexLightQueues_.Clear();
     
     // Do not update if camera projection is illegal
     // (there is a possibility of crash if occlusion is used and it can not clip properly)
@@ -520,93 +521,108 @@ void View::GetBatches()
             PROFILE(GetLightBatches);
             
             Light* light = query.light_;
-            unsigned shadowSplits = query.numSplits_;
             
-            // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
-            lightQueues_.Resize(lightQueues_.Size() + 1);
-            LightBatchQueue& lightQueue = lightQueues_.Back();
-            lightQueueMapping_[light] = &lightQueue;
-            lightQueue.light_ = light;
-            lightQueue.litBatches_.Clear();
-            
-            // Allocate shadow map now
-            lightQueue.shadowMap_ = 0;
-            if (shadowSplits > 0)
+            // Per-pixel light
+            if (!light->GetPerVertex())
             {
-                lightQueue.shadowMap_ = renderer_->GetShadowMap(light, camera_, width_, height_);
-                // If did not manage to get a shadow map, convert the light to unshadowed
-                if (!lightQueue.shadowMap_)
-                    shadowSplits = 0;
-            }
-            
-            // Setup shadow batch queues
-            lightQueue.shadowSplits_.Resize(shadowSplits);
-            for (unsigned j = 0; j < shadowSplits; ++j)
-            {
-                ShadowBatchQueue& shadowQueue = lightQueue.shadowSplits_[j];
-                Camera* shadowCamera = query.shadowCameras_[j];
-                shadowQueue.shadowCamera_ = shadowCamera;
-                shadowQueue.nearSplit_ = query.shadowNearSplits_[j];
-                shadowQueue.farSplit_ = query.shadowFarSplits_[j];
+                unsigned shadowSplits = query.numSplits_;
                 
-                // Setup the shadow split viewport and finalize shadow camera parameters
-                shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
-                FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, query.shadowCasterBox_[j]);
+                // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
+                lightQueues_.Resize(lightQueues_.Size() + 1);
+                LightBatchQueue& lightQueue = lightQueues_.Back();
+                lightQueueMapping_[light] = &lightQueue;
+                lightQueue.light_ = light;
+                lightQueue.litBatches_.Clear();
                 
-                // Loop through shadow casters
-                for (PODVector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
-                    k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
+                // Allocate shadow map now
+                lightQueue.shadowMap_ = 0;
+                if (shadowSplits > 0)
                 {
-                    Drawable* drawable = *k;
-                    if (!drawable->IsInView(frame_, false))
-                    {
-                        drawable->MarkInView(frame_, false);
-                        allGeometries_.Push(drawable);
-                    }
+                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, camera_, width_, height_);
+                    // If did not manage to get a shadow map, convert the light to unshadowed
+                    if (!lightQueue.shadowMap_)
+                        shadowSplits = 0;
+                }
+                
+                // Setup shadow batch queues
+                lightQueue.shadowSplits_.Resize(shadowSplits);
+                for (unsigned j = 0; j < shadowSplits; ++j)
+                {
+                    ShadowBatchQueue& shadowQueue = lightQueue.shadowSplits_[j];
+                    Camera* shadowCamera = query.shadowCameras_[j];
+                    shadowQueue.shadowCamera_ = shadowCamera;
+                    shadowQueue.nearSplit_ = query.shadowNearSplits_[j];
+                    shadowQueue.farSplit_ = query.shadowFarSplits_[j];
                     
-                    unsigned numBatches = drawable->GetNumBatches();
+                    // Setup the shadow split viewport and finalize shadow camera parameters
+                    shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
+                    FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, query.shadowCasterBox_[j]);
                     
-                    for (unsigned l = 0; l < numBatches; ++l)
+                    // Loop through shadow casters
+                    for (PODVector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
+                        k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                     {
-                        Batch shadowBatch;
-                        drawable->GetBatch(shadowBatch, frame_, l);
+                        Drawable* drawable = *k;
+                        if (!drawable->IsInView(frame_, false))
+                        {
+                            drawable->MarkInView(frame_, false);
+                            allGeometries_.Push(drawable);
+                        }
                         
-                        Technique* tech = GetTechnique(drawable, shadowBatch.material_);
-                        if (!shadowBatch.geometry_ || !tech)
-                            continue;
+                        unsigned numBatches = drawable->GetNumBatches();
                         
-                        Pass* pass = tech->GetPass(PASS_SHADOW);
-                        // Skip if material has no shadow pass
-                        if (!pass)
-                            continue;
-                        
-                        // Fill the rest of the batch
-                        shadowBatch.camera_ = shadowCamera;
-                        shadowBatch.zone_ = GetZone(drawable);
-                        shadowBatch.lightQueue_ = &lightQueue;
-                        
-                        FinalizeBatch(shadowBatch, tech, pass);
-                        shadowQueue.shadowBatches_.AddBatch(shadowBatch);
+                        for (unsigned l = 0; l < numBatches; ++l)
+                        {
+                            Batch shadowBatch;
+                            drawable->GetBatch(shadowBatch, frame_, l);
+                            
+                            Technique* tech = GetTechnique(drawable, shadowBatch.material_);
+                            if (!shadowBatch.geometry_ || !tech)
+                                continue;
+                            
+                            Pass* pass = tech->GetPass(PASS_SHADOW);
+                            // Skip if material has no shadow pass
+                            if (!pass)
+                                continue;
+                            
+                            // Fill the rest of the batch
+                            shadowBatch.camera_ = shadowCamera;
+                            shadowBatch.zone_ = GetZone(drawable);
+                            shadowBatch.lightQueue_ = &lightQueue;
+                            
+                            FinalizeBatch(shadowBatch, tech, pass);
+                            shadowQueue.shadowBatches_.AddBatch(shadowBatch);
+                        }
                     }
                 }
-            }
-            
-            // Loop through lit geometries
-            for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
-            {
-                Drawable* drawable = *j;
-                drawable->AddLight(light);
                 
-                // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
-                if (!drawable->GetMaxLights())
-                    GetLitBatches(drawable, lightQueue);
-                else
-                    maxLightsDrawables_.Insert(drawable);
+                // Loop through lit geometries
+                for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
+                {
+                    Drawable* drawable = *j;
+                    drawable->AddLight(light);
+                    
+                    // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
+                    if (!drawable->GetMaxLights())
+                        GetLitBatches(drawable, lightQueue);
+                    else
+                        maxLightsDrawables_.Insert(drawable);
+                }
+            }
+            // Per-vertex light
+            else
+            {
+                // Loop through lit geometries
+                for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
+                {
+                    Drawable* drawable = *j;
+                    drawable->AddVertexLight(light);
+                }
             }
         }
     }
     
-    // Process drawables with limited light count
+    // Process drawables with limited per-pixel light count
     if (maxLightsDrawables_.Size())
     {
         PROFILE(GetMaxLightsBatches);
@@ -650,7 +666,7 @@ void View::GetBatches()
                 if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
                     CheckMaterialForAuxView(baseBatch.material_);
                 
-                // If object already has a lit base pass, can skip the unlit base pass
+                // If object already has a pixel lit base pass, can skip the unlit / vertex lit base pass
                 if (drawable->HasBasePass(j))
                     continue;
                 
@@ -661,10 +677,28 @@ void View::GetBatches()
                 
                 Pass* pass = 0;
                 
-                // Check for unlit base pass
+                // Check for unlit or vertex lit base pass
                 pass = tech->GetPass(PASS_BASE);
                 if (pass)
                 {
+                    // Check for vertex lights now
+                    const PODVector<Light*>& vertexLights = drawable->GetVertexLights();
+                    if (!vertexLights.Empty())
+                    {
+                        drawable->LimitVertexLights();
+                        
+                        // Find a vertex light queue. If not found, create new
+                        unsigned hash = GetVertexLightQueueHash(vertexLights);
+                        HashMap<unsigned, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
+                        if (i == vertexLightQueues_.End())
+                        {
+                            vertexLightQueues_[hash].vertexLights_ = vertexLights;
+                            i = vertexLightQueues_.Find(hash);
+                        }
+                        
+                        baseBatch.lightQueue_ = &(i->second_);
+                    }
+                    
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                     {
                         FinalizeBatch(baseBatch, tech, pass);
@@ -795,7 +829,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         Pass* pass = 0;
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
-        if (light == firstLight && !drawable->HasBasePass(i))
+        if (light == firstLight && drawable->GetVertexLights().Empty() && !drawable->HasBasePass(i))
         {
             pass = tech->GetPass(PASS_LITBASE);
             if (pass)
@@ -991,7 +1025,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     LightType type = light->GetLightType();
     
     // Check if light should be shadowed
-    bool isShadowed = drawShadows_ && light->GetCastShadows() && light->GetShadowIntensity() < 1.0f;
+    bool isShadowed = drawShadows_ && light->GetCastShadows() && !light->GetPerVertex() && light->GetShadowIntensity() < 1.0f;
     // If shadow distance non-zero, check it
     if (isShadowed && light->GetShadowDistance() > 0.0f && light->GetDistance() > light->GetShadowDistance())
         isShadowed = false;
@@ -1642,6 +1676,14 @@ unsigned View::GetLightMask(Drawable* drawable)
 unsigned View::GetShadowMask(Drawable* drawable)
 {
     return drawable->GetShadowMask() & GetZone(drawable)->GetShadowMask();
+}
+
+unsigned View::GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
+{
+    unsigned hash = 0;
+    for (PODVector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
+        hash += (unsigned)(*i);
+    return hash;
 }
 
 Technique* View::GetTechnique(Drawable* drawable, Material*& material)

@@ -71,6 +71,17 @@ enum LightVSVariation
     MAX_LIGHT_VS_VARIATIONS
 };
 
+/// Per-vertex light vertex shader variations.
+enum VertexLightVSVariation
+{
+    VLVS_NOLIGHTS = 0,
+    VLVS_1LIGHT,
+    VLVS_2LIGHTS,
+    VLVS_3LIGHTS,
+    VLVS_4LIGHTS,
+    MAX_VERTEXLIGHT_VS_VARIATIONS
+};
+
 /// Light pixel shader variations.
 enum LightPSVariation
 {

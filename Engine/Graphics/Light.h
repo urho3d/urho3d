@@ -167,6 +167,8 @@ public:
     
     /// %Set light type.
     void SetLightType(LightType type);
+    /// %Set vertex lighting mode.
+    void SetPerVertex(bool enable);
     /// %Set color.
     void SetColor(const Color& color);
     /// %Set specular intensity.
@@ -200,6 +202,8 @@ public:
     
     /// Return light type.
     LightType GetLightType() const { return lightType_; }
+    /// Return vertex lighting mode.
+    bool GetPerVertex() const { return perVertex_; }
     /// Return color.
     const Color& GetColor() const { return color_; }
     /// Return specular intensity.
@@ -212,7 +216,7 @@ public:
     float GetAspectRatio() const { return aspectRatio_; }
     /// Return fade start distance.
     float GetFadeDistance() const { return fadeDistance_; }
-   /// Return shadow fade start distance.
+    /// Return shadow fade start distance.
     float GetShadowFadeDistance() const { return shadowFadeDistance_; }
     /// Return shadow depth bias parameters.
     const BiasParameters& GetShadowBias() const { return shadowBias_; }
@@ -256,6 +260,8 @@ protected:
 private:
     /// Light type.
     LightType lightType_;
+    /// Per-vertex lighting flag.
+    bool perVertex_;
     /// Color.
     Color color_;
     /// Specular intensity.

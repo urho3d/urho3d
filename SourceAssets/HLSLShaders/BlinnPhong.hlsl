@@ -146,11 +146,9 @@ void PS(float4 iTexCoord : TEXCOORD0,
         float4 diffColor = cMatDiffColor;
     #endif
 
-    /*
     #ifdef VERTEXCOLOR
         diffColor *= iColor;
     #endif
-    */
 
     #ifdef NORMALMAP
         float3 normal = DecodeNormal(tex2D(sNormalMap, iTexCoord.xy));

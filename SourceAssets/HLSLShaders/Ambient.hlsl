@@ -5,6 +5,9 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
+    #ifdef NUMVERTEXLIGHTS
+        float3 iNormal : NORMAL,
+    #endif
     float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -19,8 +22,8 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float2 oTexCoord : TEXCOORD0,
-    out float2 oZonePosDepth : TEXCOORD1,
+    out float4 oTexCoord : TEXCOORD0,
+    out float3 oVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
@@ -29,23 +32,29 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetTexCoord(iTexCoord);
-    oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));
+    oTexCoord = float4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(oPos));
+
+    oVertexLighting = 0.0;
+    #ifdef NUMVERTEXLIGHTS
+    float3 normal = GetWorldNormal(modelMatrix);
+    for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
+        oVertexLighting += GetVertexLight(i, worldPos, normal) * cVertexLights[i * 3].rgb;
+    #endif
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
 }
 
-void PS(float2 iTexCoord : TEXCOORD0,
-    float2 iZonePosDepth : TEXCOORD1,
+void PS(float4 iTexCoord : TEXCOORD0,
+    float3 iVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord.xy);
     #else
         float4 diffColor = cMatDiffColor;
     #endif
@@ -54,5 +63,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    oColor = float4(GetFog(GetAmbient(iZonePosDepth.x) * diffColor.rgb, iZonePosDepth.y), diffColor.a);
+    float3 finalColor = (GetAmbient(iTexCoord.z) + iVertexLighting) * diffColor.rgb;
+
+    oColor = float4(GetFog(finalColor, iTexCoord.w), diffColor.a);
 }

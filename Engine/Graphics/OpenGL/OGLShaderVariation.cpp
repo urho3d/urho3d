@@ -87,7 +87,13 @@ bool ShaderVariation::Create()
     // Prepend the defines to the shader code
     String shaderCode;
     for (unsigned i = 0; i < defines_.Size(); ++i)
-        shaderCode += "#define " + defines_[i] + "\n";
+    {
+        Vector<String> nameAndValue = defines_[i].Split('=');
+        if (nameAndValue.Size() < 2)
+            shaderCode += "#define " + defines_[i] + "\n";
+        else
+            shaderCode += "#define " + nameAndValue[0] + " " + nameAndValue[1] + "\n";
+    }
     if (!defines_.Empty())
         shaderCode += "\n";
     shaderCode += String(sourceCode_.Get(), sourceCodeLength_);

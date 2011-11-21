@@ -467,6 +467,8 @@ static void RegisterLight(asIScriptEngine* engine)
     RegisterDrawable<Light>(engine, "Light");
     engine->RegisterObjectMethod("Light", "void set_lightType(LightType)", asMETHOD(Light, SetLightType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "LightType get_lightType() const", asMETHOD(Light, GetLightType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void set_perVertex(bool)", asMETHOD(Light, SetPerVertex), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "bool get_perVertex() const", asMETHOD(Light, GetPerVertex), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_color(const Color&in)", asMETHOD(Light, SetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Color& get_color() const", asMETHOD(Light, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_specularIntensity(float)", asMETHOD(Light, SetSpecularIntensity), asCALL_THISCALL);

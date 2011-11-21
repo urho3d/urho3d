@@ -172,7 +172,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         if (graphics->NeedParameterUpdate(PSP_AMBIENTSTARTCOLOR, zone_))
             graphics->SetShaderParameter(PSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor().ToVector4());
         if (graphics->NeedParameterUpdate(PSP_AMBIENTENDCOLOR, zone_))
-            graphics->SetShaderParameter(PSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4());
+            graphics->SetShaderParameter(PSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
         
         // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
         BlendMode blend = pass_->GetBlendMode();
@@ -244,6 +244,56 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             #endif
             
             graphics->SetShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
+        }
+        
+        if (graphics->NeedParameterUpdate(VSP_VERTEXLIGHTS, lightQueue_))
+        {
+            Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
+            const PODVector<Light*>& lights = lightQueue_->vertexLights_;
+            
+            for (unsigned i = 0; i < lights.Size(); ++i)
+            {
+                Light* vertexLight = lights[i];
+                LightType type = vertexLight->GetLightType();
+                
+                // Attenuation
+                float invRange, cutoff, invCutoff;
+                if (type == LIGHT_DIRECTIONAL)
+                    invRange = 0.0f;
+                else
+                    invRange = 1.0f / max(vertexLight->GetRange(), M_EPSILON);
+                if (type == LIGHT_SPOT)
+                {
+                    cutoff = cosf(vertexLight->GetFov() * 0.5f * M_DEGTORAD);
+                    invCutoff = 1.0f / (1.0f - cutoff);
+                }
+                else
+                {
+                    cutoff = -1.0f;
+                    invCutoff = 1.0f;
+                }
+                
+                // Color
+                float fade = 1.0f;
+                float fadeEnd = vertexLight->GetDrawDistance();
+                float fadeStart = vertexLight->GetFadeDistance();
+                
+                // Do fade calculation for light if both fade & draw distance defined
+                if (vertexLight->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
+                    fade = Min(1.0f - (vertexLight->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
+                
+                Color color = vertexLight->GetColor() * fade;
+                vertexLights[i * 3] = Vector4(color.r_, color.g_, color.b_, invRange);
+                
+                // Direction
+                vertexLights[i * 3 + 1] = Vector4(-(vertexLight->GetNode()->GetWorldDirection()), cutoff);
+                
+                // Position
+                vertexLights[i * 3 + 2] = Vector4(vertexLight->GetWorldPosition(), invCutoff);
+            }
+            
+            if (lights.Size())
+                graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].GetData(), lights.Size() * 3 * 4);
         }
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light))

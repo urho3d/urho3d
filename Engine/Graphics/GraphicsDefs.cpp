@@ -43,6 +43,7 @@ StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
 StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 StringHash VSP_ZONE("Zone");
 StringHash VSP_SKINMATRICES("SkinMatrices");
+StringHash VSP_VERTEXLIGHTS("VertexLights");
 StringHash PSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 StringHash PSP_AMBIENTENDCOLOR("AmbientEndColor");
 StringHash PSP_FOGCOLOR("FogColor");

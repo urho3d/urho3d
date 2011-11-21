@@ -1664,6 +1664,7 @@ Properties:<br>
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - LightType lightType
+- bool perVertex
 - Color& color
 - float specularIntensity
 - float range

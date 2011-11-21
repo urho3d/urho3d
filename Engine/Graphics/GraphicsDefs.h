@@ -211,6 +211,7 @@ extern StringHash VSP_VIEWRIGHTVECTOR;
 extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_ZONE;
 extern StringHash VSP_SKINMATRICES;
+extern StringHash VSP_VERTEXLIGHTS;
 extern StringHash PSP_AMBIENTSTARTCOLOR;
 extern StringHash PSP_AMBIENTENDCOLOR;
 extern StringHash PSP_FOGCOLOR;

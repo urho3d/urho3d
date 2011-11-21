@@ -11,6 +11,7 @@ Scene@ testScene;
 Node@ cameraNode;
 Camera@ camera;
 Node@ cameraLightNode;
+Light@ cameraLight;
 float yaw = 0.0;
 float pitch = 0.0;
 float objectangle = 0.0;
@@ -303,7 +304,7 @@ void CreateCamera()
     cameraNode.position = Vector3(-50, 2, -50);
 
     cameraLightNode = cameraNode.CreateChild("CameraLight");
-    Light@ cameraLight = cameraLightNode.CreateComponent("Light");
+    cameraLight = cameraLightNode.CreateComponent("Light");
     cameraLight.lightType = LIGHT_SPOT;
     cameraLight.range = 50;
     cameraLight.color = Color(2, 2, 2);
@@ -416,6 +417,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 cameraLightNode.parent = testScene;
             }
         }
+        
+        if (input.keyPress['V'])
+            cameraLight.perVertex = !cameraLight.perVertex;
 
         if (input.keyPress['C'])
             camera.orthographic = !camera.orthographic;

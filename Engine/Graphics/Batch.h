@@ -290,7 +290,7 @@ struct ShadowBatchQueue
 /// Queue for light related draw calls
 struct LightBatchQueue
 {
-    /// Light drawable.
+    /// Per-pixel light.
     Light* light_;
     /// Lit geometry draw calls.
     BatchQueue litBatches_;
@@ -298,4 +298,6 @@ struct LightBatchQueue
     Texture2D* shadowMap_;
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;
+    /// Per-vertex lights.
+    PODVector<Light*> vertexLights_;
 };

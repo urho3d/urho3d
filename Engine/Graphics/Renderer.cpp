@@ -201,6 +201,15 @@ static const String lightVSVariations[] =
     "PointSpecShadow"
 };
 
+static const String vertexLightVSVariations[] =
+{
+    "",
+    "1VL",
+    "2VL",
+    "3VL",
+    "4VL"
+};
+
 static const String lightPSVariations[] = 
 {
     "Dir",
@@ -980,8 +989,27 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
         }
         else
         {
-            unsigned vsi = geomType;
-            batch.vertexShader_ = vertexShaders[vsi];
+            if (type == PASS_BASE)
+            {
+                unsigned numVertexLights = 0;
+                if (batch.lightQueue_)
+                    numVertexLights = batch.lightQueue_->vertexLights_.Size();
+                
+                unsigned vsi = geomType * MAX_VERTEXLIGHT_VS_VARIATIONS + numVertexLights;
+                batch.vertexShader_ = vertexShaders[vsi];
+                // If vertex lights variations do not exist, try without them
+                if (!batch.vertexShader_)
+                {
+                    unsigned vsi = geomType * MAX_VERTEXLIGHT_VS_VARIATIONS;
+                    batch.vertexShader_ = vertexShaders[vsi];
+                }
+            }
+            else
+            {
+                unsigned vsi = geomType;
+                batch.vertexShader_ = vertexShaders[vsi];
+            }
+            
             batch.pixelShader_ = pixelShaders[0];
         }
     }
@@ -1184,10 +1212,24 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     }
     else
     {
-        vertexShaders.Resize(MAX_GEOMETRYTYPES);
+        if (type == PASS_BASE)
+        {
+            vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)
+            {
+                unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
+                unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
+                vertexShaders[j] = GetVertexShader(vertexShaderName + vertexLightVSVariations[l] + geometryVSVariations[g], g != 0 || l != 0);
+            }
+        }
+        else
+        {
+            vertexShaders.Resize(MAX_GEOMETRYTYPES);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
+                vertexShaders[j] = GetVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
+        }
+        
         pixelShaders.Resize(1);
-        for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
-            vertexShaders[j] = GetVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
         pixelShaders[0] = GetPixelShader(pixelShaderName);
     }
     

@@ -40,6 +40,9 @@ OBJECTTYPESTATIC(Drawable);
 Drawable::Drawable(Context* context) :
     Component(context),
     octant_(0),
+    viewFrame_(0),
+    viewCamera_(0),
+    firstLight_(0),
     drawDistance_(0.0f),
     shadowDistance_(0.0f),
     lodBias_(1.0f),
@@ -52,9 +55,6 @@ Drawable::Drawable(Context* context) :
     lodDistance_(0.0f),
     sortValue_(0.0f),
     viewFrameNumber_(0),
-    viewFrame_(0),
-    viewCamera_(0),
-    firstLight_(0),
     drawableFlags_(0),
     visible_(true),
     castShadows_(false),
@@ -219,6 +219,7 @@ void Drawable::ClearLights()
         basePassFlags_[i] = 0;
     firstLight_ = 0;
     lights_.Clear();
+    vertexLights_.Clear();
 }
 
 void Drawable::AddLight(Light* light)
@@ -226,6 +227,11 @@ void Drawable::AddLight(Light* light)
     if (lights_.Empty())
         firstLight_ = light;
     lights_.Push(light);
+}
+
+void Drawable::AddVertexLight(Light* light)
+{
+    vertexLights_.Push(light);
 }
 
 void Drawable::LimitLights()
@@ -242,6 +248,17 @@ void Drawable::LimitLights()
     // If more lights than allowed, cut the list
     if (lights_.Size() > maxLights_)
         lights_.Resize(maxLights_);
+}
+
+void Drawable::LimitVertexLights()
+{
+    for (unsigned i = 0; i < vertexLights_.Size(); ++i)
+        vertexLights_[i]->SetIntensitySortValue(GetWorldBoundingBox());
+    
+    Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);
+    
+    if (vertexLights_.Size() > MAX_VERTEX_LIGHTS)
+        vertexLights_.Resize(MAX_VERTEX_LIGHTS);
 }
 
 void Drawable::SetBasePass(unsigned batchIndex)

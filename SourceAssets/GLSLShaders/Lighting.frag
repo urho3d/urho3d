@@ -29,7 +29,7 @@ float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 
 vec3 GetAmbient(float zonePos)
 {
-    return mix(cAmbientStartColor, cAmbientEndColor, zonePos);
+    return cAmbientStartColor + zonePos * cAmbientEndColor;
 }
 
 float GetShadow(vec4 shadowPos)

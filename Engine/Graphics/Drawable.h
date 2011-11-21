@@ -37,6 +37,7 @@ static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 static const int DRAWABLES_PER_WORK_ITEM = 16;
+static const int MAX_VERTEX_LIGHTS = 4;
 
 struct Batch;
 class Camera;
@@ -170,10 +171,14 @@ public:
     void MarkInView(const FrameInfo& frame, bool mainView = true);
     /// Clear lights and base pass flags for a new frame.
     void ClearLights();
-    /// Add a light.
+    /// Add a per-pixel light.
     void AddLight(Light* light);
-    /// Sort and limit lights to maximum allowed.
+    /// Add a per-vertex light.
+    void AddVertexLight(Light* light);
+    /// Sort and limit per-pixel lights to maximum allowed.
     void LimitLights();
+    /// Sort and limit per-vertex lights to maximum allowed.
+    void LimitVertexLights();
     /// %Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex);
     /// Return octree octant.
@@ -194,9 +199,11 @@ public:
     bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
     /// Return whether has a base pass.
     bool HasBasePass(unsigned batchIndex) const;
-    /// Return lights.
+    /// Return per-pixel lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
-    /// Return the first added light.
+    /// Return per-vertex lights.
+    const PODVector<Light*>& GetVertexLights() const { return vertexLights_; }
+    /// Return the first added per-pixel light.
     Light* GetFirstLight() const { return firstLight_; }
     
 protected:
@@ -217,6 +224,22 @@ protected:
     Octant* octant_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
+    /// Base pass flags per batch index.
+    PODVector<unsigned> basePassFlags_;
+    /// Last view's frameinfo. Not safe to dereference.
+    const FrameInfo* viewFrame_;
+    /// Last view's camera. Not safe to dereference.
+    Camera* viewCamera_;
+    /// Per-pixel lights affecting this drawable.
+    PODVector<Light*> lights_;
+    /// Per-vertex lights affecting this drawable.
+    PODVector<Light*> vertexLights_;
+    /// First per-pixel light added this frame.
+    Light* firstLight_;
+    /// Current zone.
+    WeakPtr<Zone> zone_;
+    /// Previous zone.
+    WeakPtr<Zone> lastZone_;
     /// Draw distance.
     float drawDistance_;
     /// Shadow distance.
@@ -241,20 +264,6 @@ protected:
     float sortValue_;
     /// Last visible frame number.
     unsigned viewFrameNumber_;
-    /// Base pass flags per batch index.
-    PODVector<unsigned> basePassFlags_;
-    /// Last view's frameinfo. Not safe to dereference.
-    const FrameInfo* viewFrame_;
-    /// Last view's camera. Not safe to dereference.
-    Camera* viewCamera_;
-    /// Lights affecting this drawable.
-    PODVector<Light*> lights_;
-    /// First light added this frame.
-    Light* firstLight_;
-    /// Current zone.
-    WeakPtr<Zone> zone_;
-    /// Previous zone.
-    WeakPtr<Zone> lastZone_;
     /// Drawable flags.
     unsigned char drawableFlags_;
     /// Visible flag.
