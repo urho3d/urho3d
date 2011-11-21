@@ -52,7 +52,7 @@ void main()
     #ifdef DIRLIGHT
         vLightVec = cLightDir;
     #else
-        vLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
+        vLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
     #endif
 
     #ifdef SHADOW
@@ -65,7 +65,7 @@ void main()
         #elif defined(SPOTLIGHT)
             vShadowPos = cShadowProj[0] * projWorldPos;
         #else
-            vShadowPos = centeredWorldPos - cLightPos;
+            vShadowPos = centeredWorldPos - cLightPos.xyz;
         #endif
     #endif
 

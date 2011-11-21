@@ -29,7 +29,6 @@
 StringHash VSP_CAMERAPOS("CameraPos");
 StringHash VSP_CAMERAROT("CameraRot");
 StringHash VSP_DEPTHMODE("DepthMode");
-StringHash VSP_LIGHTATTEN("LightAtten");
 StringHash VSP_LIGHTDIR("LightDir");
 StringHash VSP_LIGHTPOS("LightPos");
 StringHash VSP_LIGHTVECROT("LightVecRot");

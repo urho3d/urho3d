@@ -31,7 +31,7 @@ void main()
     #ifdef DIRLIGHT
         vLightVec = cLightDir;
     #else
-        vLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
+        vLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
     #endif
     
     vZonePosDepth = vec2(GetZonePos(worldPos), GetDepth(gl_Position));

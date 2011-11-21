@@ -688,8 +688,8 @@ void View::GetBatches()
                         drawable->LimitVertexLights();
                         
                         // Find a vertex light queue. If not found, create new
-                        unsigned hash = GetVertexLightQueueHash(vertexLights);
-                        HashMap<unsigned, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
+                        unsigned long long hash = GetVertexLightQueueHash(vertexLights);
+                        HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
                         if (i == vertexLightQueues_.End())
                         {
                             vertexLightQueues_[hash].vertexLights_ = vertexLights;
@@ -1678,11 +1678,11 @@ unsigned View::GetShadowMask(Drawable* drawable)
     return drawable->GetShadowMask() & GetZone(drawable)->GetShadowMask();
 }
 
-unsigned View::GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
+unsigned long long View::GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
 {
-    unsigned hash = 0;
+    unsigned long long hash = 0;
     for (PODVector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
-        hash += (unsigned)(*i);
+        hash += (unsigned long long)(*i);
     return hash;
 }
 

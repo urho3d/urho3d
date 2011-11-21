@@ -162,7 +162,7 @@ private:
     /// Return the drawable's shadow mask, considering also its zone.
     unsigned GetShadowMask(Drawable* drawable);
     /// Return hash code for a vertex light queue.
-    unsigned GetVertexLightQueueHash(const PODVector<Light*>& vertexLights);
+    unsigned long long GetVertexLightQueueHash(const PODVector<Light*>& vertexLights);
     /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material*& material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
@@ -261,7 +261,7 @@ private:
     /// Per-pixel light queues.
     List<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
-    HashMap<unsigned, LightBatchQueue> vertexLightQueues_;
+    HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
     /// Camera zone's override flag.

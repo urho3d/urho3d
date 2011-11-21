@@ -73,7 +73,7 @@ void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT
         oLightVec = cLightDir;
     #else
-        oLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
+        oLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
     #endif
 
     #ifdef SHADOW
@@ -86,7 +86,7 @@ void VS(float4 iPos : POSITION,
         #elif defined(SPOTLIGHT)
             oShadowPos = mul(projWorldPos, cShadowProj[0]);
         #else
-            oShadowPos = centeredWorldPos - cLightPos;
+            oShadowPos = centeredWorldPos - cLightPos.xyz;
         #endif
     #endif
 

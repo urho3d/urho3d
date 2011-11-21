@@ -197,7 +197,6 @@ enum ShaderType
 extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
 extern StringHash VSP_DEPTHMODE;
-extern StringHash VSP_LIGHTATTEN;
 extern StringHash VSP_LIGHTDIR;
 extern StringHash VSP_LIGHTPOS;
 extern StringHash VSP_LIGHTVECROT;

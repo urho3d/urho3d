@@ -49,7 +49,7 @@ void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT
         oLightVec = cLightDir;
     #else
-        oLightVec = (cLightPos - centeredWorldPos) * cLightAtten;
+        oLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
     #endif
 
     oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));

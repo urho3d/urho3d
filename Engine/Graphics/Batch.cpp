@@ -203,17 +203,14 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         light = lightQueue_->light_;
         shadowMap = lightQueue_->shadowMap_;
         
-        if (graphics->NeedParameterUpdate(VSP_LIGHTATTEN, light))
-        {
-            Vector4 lightAtten(1.0f / Max(light->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
-            graphics->SetShaderParameter(VSP_LIGHTATTEN, lightAtten);
-        }
-        
         if (graphics->NeedParameterUpdate(VSP_LIGHTDIR, light))
             graphics->SetShaderParameter(VSP_LIGHTDIR, light->GetWorldRotation() * Vector3::BACK);
         
         if (graphics->NeedParameterUpdate(VSP_LIGHTPOS, light))
-            graphics->SetShaderParameter(VSP_LIGHTPOS, light->GetWorldPosition() - camera_->GetWorldPosition());
+        {
+            float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
+            graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(light->GetWorldPosition() - camera_->GetWorldPosition(), atten));
+        }
         
         if (graphics->NeedParameterUpdate(VSP_LIGHTVECROT, light))
         {
