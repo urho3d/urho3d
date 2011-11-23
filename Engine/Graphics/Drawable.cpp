@@ -245,9 +245,12 @@ void Drawable::LimitLights()
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     
-    // If more lights than allowed, cut the list
+    // If more lights than allowed, move to vertex lights and cut the list
     if (lights_.Size() > maxLights_)
+    {
+        vertexLights_.Insert(vertexLights_.End(), lights_.Begin() + maxLights_, lights_.End());
         lights_.Resize(maxLights_);
+    }
 }
 
 void Drawable::LimitVertexLights()
