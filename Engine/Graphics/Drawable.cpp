@@ -240,8 +240,9 @@ void Drawable::LimitLights()
     if (!maxLights_)
         return;
     
+    const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = 0; i < lights_.Size(); ++i)
-        lights_[i]->SetIntensitySortValue(GetWorldBoundingBox());
+        lights_[i]->SetIntensitySortValue(box);
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     
@@ -255,8 +256,9 @@ void Drawable::LimitLights()
 
 void Drawable::LimitVertexLights()
 {
+    const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = 0; i < vertexLights_.Size(); ++i)
-        vertexLights_[i]->SetIntensitySortValue(GetWorldBoundingBox());
+        vertexLights_[i]->SetIntensitySortValue(box);
     
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);
     

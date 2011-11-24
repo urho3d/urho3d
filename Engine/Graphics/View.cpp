@@ -812,9 +812,9 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
     Light* firstLight = drawable->GetFirstLight();
-    
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
+    bool hasVertexLights = drawable->GetVertexLights().Size() > 0;
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -830,7 +830,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
         // Also vertex lighting requires the non-lit base pass, so skip if any vertex lights
-        if (light == firstLight && drawable->GetVertexLights().Empty() && !drawable->HasBasePass(i))
+        if (light == firstLight && !hasVertexLights && !drawable->HasBasePass(i))
         {
             pass = tech->GetPass(PASS_LITBASE);
             if (pass)
