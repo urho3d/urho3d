@@ -83,9 +83,9 @@ void main()
         mat3 tbn = mat3(vTangent, vBitangent, vNormal);
         vLightVec = vLightVec * tbn;
         #ifdef SPECULAR
-            vEyeVec = (cameraPos - worldPos) * tbn;
+            vEyeVec = (cCameraPos - worldPos) * tbn;
         #endif
     #elif defined(SPECULAR)
-        vEyeVec = cameraPos - worldPos;
+        vEyeVec = cCameraPos - worldPos;
     #endif
 }
