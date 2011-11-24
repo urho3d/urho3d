@@ -414,9 +414,9 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                     if (t == asTC_KEYWORD)
                     {
                         if (buffer[pos] == '{')
-                            level++;
+                            ++level;
                         else if(buffer[pos] == '}')
-                            level--;
+                            --level;
                     }
                     pos += len;
                 }

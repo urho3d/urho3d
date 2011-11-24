@@ -209,7 +209,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         if (graphics->NeedParameterUpdate(VSP_LIGHTPOS, light))
         {
             float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
-            graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(light->GetWorldPosition() - camera_->GetWorldPosition(), atten));
+            graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(light->GetWorldPosition(), atten));
         }
         
         if (graphics->NeedParameterUpdate(VSP_LIGHTVECROT, light))

@@ -46,13 +46,12 @@ void main()
     #endif
 
     vNormal = GetWorldNormal(modelMatrix);
-    vec3 centeredWorldPos = worldPos - cCameraPos;
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
         vLightVec = cLightDir;
     #else
-        vLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
+        vLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
     #endif
 
     #ifdef SHADOW
@@ -65,7 +64,7 @@ void main()
         #elif defined(SPOTLIGHT)
             vShadowPos = cShadowProj[0] * projWorldPos;
         #else
-            vShadowPos = centeredWorldPos - cLightPos.xyz;
+            vShadowPos = worldPos - cLightPos.xyz;
         #endif
     #endif
 
@@ -84,9 +83,9 @@ void main()
         mat3 tbn = mat3(vTangent, vBitangent, vNormal);
         vLightVec = vLightVec * tbn;
         #ifdef SPECULAR
-            vEyeVec = -centeredWorldPos * tbn;
+            vEyeVec = (cameraPos - worldPos) * tbn;
         #endif
     #elif defined(SPECULAR)
-        vEyeVec = -centeredWorldPos;
+        vEyeVec = cameraPos - worldPos;
     #endif
 }

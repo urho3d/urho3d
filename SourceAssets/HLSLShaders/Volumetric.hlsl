@@ -43,13 +43,12 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 
-    float3 centeredWorldPos = worldPos - cCameraPos;
     float4 projWorldPos = float4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
         oLightVec = cLightDir;
     #else
-        oLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
+        oLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
     #endif
 
     oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));

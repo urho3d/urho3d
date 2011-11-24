@@ -67,13 +67,12 @@ void VS(float4 iPos : POSITION,
     #endif
 
     oNormal = GetWorldNormal(modelMatrix);
-    float3 centeredWorldPos = worldPos - cCameraPos;
     float4 projWorldPos = float4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
         oLightVec = cLightDir;
     #else
-        oLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
+        oLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
     #endif
 
     #ifdef SHADOW
@@ -86,7 +85,7 @@ void VS(float4 iPos : POSITION,
         #elif defined(SPOTLIGHT)
             oShadowPos = mul(projWorldPos, cShadowProj[0]);
         #else
-            oShadowPos = centeredWorldPos - cLightPos.xyz;
+            oShadowPos = worldPos - cLightPos.xyz;
         #endif
     #endif
 
@@ -105,10 +104,10 @@ void VS(float4 iPos : POSITION,
         float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
         oLightVec = mul(tbn, oLightVec);
         #ifdef SPECULAR
-            oEyeVec = mul(tbn, -centeredWorldPos);
+            oEyeVec = mul(tbn, cCameraPos - worldPos);
         #endif
     #elif defined(SPECULAR)
-        oEyeVec = -centeredWorldPos;
+        oEyeVec = cCameraPos - worldPos;
     #endif
 }
 

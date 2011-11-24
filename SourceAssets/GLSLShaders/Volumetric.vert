@@ -25,13 +25,12 @@ void main()
         vColor = iColor;
     #endif
 
-    vec3 centeredWorldPos = worldPos - cCameraPos;
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
         vLightVec = cLightDir;
     #else
-        vLightVec = (cLightPos.xyz - centeredWorldPos) * cLightPos.w;
+        vLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
     #endif
     
     vZonePosDepth = vec2(GetZonePos(worldPos), GetDepth(gl_Position));
