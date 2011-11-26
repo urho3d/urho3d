@@ -152,7 +152,7 @@ asCString asCDataType::Format() const
 
 	if( tokenType != ttIdentifier )
 	{
-		str += asGetTokenDefinition(tokenType);
+		str += asCTokenizer::GetDefinition(tokenType);
 	}
 	else if( IsArrayType() && objectType && !objectType->engine->ep.expandDefaultArrayToTemplate )
 	{

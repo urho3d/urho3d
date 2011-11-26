@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22200
-#define ANGELSCRIPT_VERSION_STRING "2.22.0"
+#define ANGELSCRIPT_VERSION        22201
+#define ANGELSCRIPT_VERSION_STRING "2.22.1 WIP"
 
 // Data types
 
@@ -76,23 +76,24 @@ class asIJITCompiler;
 // Engine properties
 enum asEEngineProp
 {
-	asEP_ALLOW_UNSAFE_REFERENCES      = 1,
-	asEP_OPTIMIZE_BYTECODE            = 2,
-	asEP_COPY_SCRIPT_SECTIONS         = 3,
-	asEP_MAX_STACK_SIZE               = 4,
-	asEP_USE_CHARACTER_LITERALS       = 5,
-	asEP_ALLOW_MULTILINE_STRINGS      = 6,
-	asEP_ALLOW_IMPLICIT_HANDLE_TYPES  = 7,
-	asEP_BUILD_WITHOUT_LINE_CUES      = 8,
-	asEP_INIT_GLOBAL_VARS_AFTER_BUILD = 9,
-	asEP_REQUIRE_ENUM_SCOPE           = 10,
-	asEP_SCRIPT_SCANNER               = 11,
-	asEP_INCLUDE_JIT_INSTRUCTIONS     = 12,
-	asEP_STRING_ENCODING              = 13,
-	asEP_PROPERTY_ACCESSOR_MODE       = 14,
-	asEP_EXPAND_DEF_ARRAY_TO_TMPL     = 15,
-	asEP_AUTO_GARBAGE_COLLECT         = 16,
-	asEP_DISALLOW_GLOBAL_VARS         = 17
+	asEP_ALLOW_UNSAFE_REFERENCES       = 1,
+	asEP_OPTIMIZE_BYTECODE             = 2,
+	asEP_COPY_SCRIPT_SECTIONS          = 3,
+	asEP_MAX_STACK_SIZE                = 4,
+	asEP_USE_CHARACTER_LITERALS        = 5,
+	asEP_ALLOW_MULTILINE_STRINGS       = 6,
+	asEP_ALLOW_IMPLICIT_HANDLE_TYPES   = 7,
+	asEP_BUILD_WITHOUT_LINE_CUES       = 8,
+	asEP_INIT_GLOBAL_VARS_AFTER_BUILD  = 9,
+	asEP_REQUIRE_ENUM_SCOPE            = 10,
+	asEP_SCRIPT_SCANNER                = 11,
+	asEP_INCLUDE_JIT_INSTRUCTIONS      = 12,
+	asEP_STRING_ENCODING               = 13,
+	asEP_PROPERTY_ACCESSOR_MODE        = 14,
+	asEP_EXPAND_DEF_ARRAY_TO_TMPL      = 15,
+	asEP_AUTO_GARBAGE_COLLECT          = 16,
+	asEP_DISALLOW_GLOBAL_VARS          = 17,
+	asEP_ALWAYS_IMPL_DEFAULT_CONSTRUCT = 18
 };
 
 // Calling conventions
@@ -143,7 +144,8 @@ enum asEObjTypeFlags
 	asOBJ_APP_CLASS_ALLFLOATS        = 0x10000,
 	asOBJ_MASK_VALID_FLAGS           = 0x1FFFF,
 	asOBJ_SCRIPT_OBJECT              = 0x80000,
-	asOBJ_SHARED                     = 0x100000
+	asOBJ_SHARED                     = 0x100000,
+	asOBJ_NOINHERIT                  = 0x200000
 };
 
 // Behaviours

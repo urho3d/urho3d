@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -47,16 +47,27 @@
 
 BEGIN_AS_NAMESPACE
 
-asCTokenizer::asCTokenizer(const asCScriptEngine *e)
+asCTokenizer::asCTokenizer()
 {
-	engine = e;
+	engine = 0;
+
+	// Initialize the keyword map
+	for( asUINT n = 0; n < numTokenWords; n++ )
+	{
+		if( (tokenWords[n].word[0] >= 'a' && tokenWords[n].word[0] <= 'z') ||
+			(tokenWords[n].word[0] >= 'A' && tokenWords[n].word[0] <= 'Z') )
+			alphaKeywordMap.Insert(asCStringPointer(tokenWords[n].word, strlen(tokenWords[n].word)), tokenWords[n].tokenType);
+		else
+			nonAlphaKeywordMap.Insert(asCStringPointer(tokenWords[n].word, strlen(tokenWords[n].word)), tokenWords[n].tokenType);
+	}
 }
 
 asCTokenizer::~asCTokenizer()
 {
 }
 
-const char *asGetTokenDefinition(int tokenType)
+// static
+const char *asCTokenizer::GetDefinition(int tokenType)
 {
 	if( tokenType == ttUnrecognizedToken			) return "<unrecognized token>";
 	if( tokenType == ttEnd							) return "<end of file>";
@@ -80,41 +91,38 @@ const char *asGetTokenDefinition(int tokenType)
 	return 0;
 }
 
-eTokenType asCTokenizer::GetToken(const char *source, size_t sourceLength, size_t *tokenLength, asETokenClass *tc)
+eTokenType asCTokenizer::GetToken(const char *source, size_t sourceLength, size_t *tokenLength, asETokenClass *tc) const
 {
 	asASSERT(source != 0);
 	asASSERT(tokenLength != 0);
 
-	this->source = source;
-	this->sourceLength = sourceLength;
-
-	asETokenClass t = ParseToken();
-	if( tc ) *tc = t;
-
-	// Copy the output to the token
-	*tokenLength = this->tokenLength;
+	eTokenType tokenType;
+	size_t     tlen;
+	asETokenClass t = ParseToken(source, sourceLength, tlen, tokenType);
+	if( tc          ) *tc          = t;
+	if( tokenLength ) *tokenLength = tlen;
 
 	return tokenType;
 }
 
-asETokenClass asCTokenizer::ParseToken()
+asETokenClass asCTokenizer::ParseToken(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
-	if( IsWhiteSpace() ) return asTC_WHITESPACE;
-	if( IsComment()    ) return asTC_COMMENT;
-	if( IsConstant()   ) return asTC_VALUE;
-	if( IsIdentifier() ) return asTC_IDENTIFIER;
-	if( IsKeyWord()    ) return asTC_KEYWORD;
+	if( IsWhiteSpace(source, sourceLength, tokenLength, tokenType) ) return asTC_WHITESPACE;
+	if( IsComment(source, sourceLength, tokenLength, tokenType)    ) return asTC_COMMENT;
+	if( IsConstant(source, sourceLength, tokenLength, tokenType)   ) return asTC_VALUE;
+	if( IsIdentifier(source, sourceLength, tokenLength, tokenType) ) return asTC_IDENTIFIER;
+	if( IsKeyWord(source, sourceLength, tokenLength, tokenType)    ) return asTC_KEYWORD;
 
 	// If none of the above this is an unrecognized token
 	// We can find the length of the token by advancing
 	// one step and trying to identify a token there
-	tokenType = ttUnrecognizedToken;
+	tokenType   = ttUnrecognizedToken;
 	tokenLength = 1;
 
 	return asTC_UNKNOWN;
 }
 
-bool asCTokenizer::IsWhiteSpace()
+bool asCTokenizer::IsWhiteSpace(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
 	// Treat UTF8 byte-order-mark (EF BB BF) as whitespace
 	if( sourceLength >= 3 && 
@@ -122,7 +130,7 @@ bool asCTokenizer::IsWhiteSpace()
 		asBYTE(source[1]) == 0xBBu &&
 		asBYTE(source[2]) == 0xBFu )
 	{
-		tokenType = ttWhiteSpace;
+		tokenType   = ttWhiteSpace;
 		tokenLength = 3;
 		return true;
 	}
@@ -146,7 +154,7 @@ bool asCTokenizer::IsWhiteSpace()
 
 	if( n > 0 )
 	{
-		tokenType = ttWhiteSpace;
+		tokenType   = ttWhiteSpace;
 		tokenLength = n;
 		return true;
 	}
@@ -154,7 +162,7 @@ bool asCTokenizer::IsWhiteSpace()
 	return false;
 }
 
-bool asCTokenizer::IsComment()
+bool asCTokenizer::IsComment(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
 	if( sourceLength < 2 )
 		return false;
@@ -174,7 +182,7 @@ bool asCTokenizer::IsComment()
 				break;
 		}
 
-		tokenType = ttOnelineComment;
+		tokenType   = ttOnelineComment;
 		tokenLength = n+1;
 
 		return true;
@@ -192,7 +200,7 @@ bool asCTokenizer::IsComment()
 				break;
 		}
 
-		tokenType = ttMultilineComment;
+		tokenType   = ttMultilineComment;
 		tokenLength = n+1;
 
 		return true;
@@ -201,7 +209,7 @@ bool asCTokenizer::IsComment()
 	return false;
 }
 
-bool asCTokenizer::IsConstant()
+bool asCTokenizer::IsConstant(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
 	// Starting with number
 	if( (source[0] >= '0' && source[0] <= '9') || (source[0] == '.' && sourceLength > 1 && source[1] >= '0' && source[1] <= '9') )
@@ -218,7 +226,7 @@ bool asCTokenizer::IsConstant()
 					break;
 			}
 
-			tokenType = ttBitsConstant;
+			tokenType   = ttBitsConstant;
 			tokenLength = n;
 			return true;
 		}
@@ -254,22 +262,22 @@ bool asCTokenizer::IsConstant()
 
 			if( n < sourceLength && (source[n] == 'f' || source[n] == 'F') )
 			{
-				tokenType = ttFloatConstant;
+				tokenType   = ttFloatConstant;
 				tokenLength = n + 1;
 			}
 			else
 			{
 #ifdef AS_USE_DOUBLE_AS_FLOAT
-				tokenType = ttFloatConstant;
+				tokenType   = ttFloatConstant;
 #else
-				tokenType = ttDoubleConstant;
+				tokenType   = ttDoubleConstant;
 #endif
 				tokenLength = n;
 			}
 			return true;
 		}
 
-		tokenType = ttIntConstant;
+		tokenType   = ttIntConstant;
 		tokenLength = n;
 		return true;
 	}
@@ -290,7 +298,7 @@ bool asCTokenizer::IsConstant()
 					break;
 			}
 
-			tokenType = ttHeredocStringConstant;
+			tokenType   = ttHeredocStringConstant;
 			tokenLength = n+3;
 		}
 		else
@@ -323,7 +331,7 @@ bool asCTokenizer::IsConstant()
 				if( source[n] == '\\' ) evenSlashes = !evenSlashes; else evenSlashes = true;
 			}
 
-			tokenType = ttNonTerminatedStringConstant;
+			tokenType   = ttNonTerminatedStringConstant;
 			tokenLength = n;
 		}
 
@@ -333,14 +341,14 @@ bool asCTokenizer::IsConstant()
 	return false;
 }
 
-bool asCTokenizer::IsIdentifier()
+bool asCTokenizer::IsIdentifier(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
 	// Starting with letter or underscore
 	if( (source[0] >= 'a' && source[0] <= 'z') ||
 		(source[0] >= 'A' && source[0] <= 'Z') ||
 		source[0] == '_' )
 	{
-		tokenType = ttIdentifier;
+		tokenType   = ttIdentifier;
 		tokenLength = 1;
 
 		for( size_t n = 1; n < sourceLength; n++ )
@@ -355,17 +363,8 @@ bool asCTokenizer::IsIdentifier()
 		}
 
 		// Make sure the identifier isn't a reserved keyword
-		if( tokenLength > 50 ) return true;
-
-		char test[51];
-		memcpy(test, source, tokenLength);
-		test[tokenLength] = 0;
-
-		for( asUINT i = 0; i < numTokenWords; i++ )
-		{
-			if( strcmp(test, tokenWords[i].word) == 0 )
-				return false;
-		}
+		if( alphaKeywordMap.MoveTo(0, asCStringPointer(source, tokenLength)) )
+			return false;
 
 		return true;
 	}
@@ -373,92 +372,66 @@ bool asCTokenizer::IsIdentifier()
 	return false;
 }
 
-bool asCTokenizer::IsKeyWord()
+bool asCTokenizer::IsKeyWord(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const
 {
-	// Fill the list with all possible keywords
-	// Check each character against all the keywords in the list,
-	// remove keywords that don't match. When only one remains and
-	// it matches the source completely we have found a match.
-	int words[numTokenWords];
-	asUINT n;
-	for( n = 0; n < numTokenWords; n++ )
-		words[n] = n;
+	// TODO: optimize: This can probably be optimized further with a specialized algorithm
+	//                 As most keywords are shorter, then we should start from the shortest
+	//                 to the longest. Only for some of the keywords is it necessary to look
+	//                 for a longer part, e.g. ! and !is.
+	//
+	//                 We can use a map that separates the tokens based on the first character.
+	//                 The highest number of possible tokens would then be 11 for the letter 'i'.
 
-	int numWords = numTokenWords;
-	int lastPossible = -1;
+	// Choose the best map
+	const asCMap<asCStringPointer,eTokenType> *map;
+	int maxLength;
 
-	n = 0;
-	while( n < sourceLength && numWords >= 0 )
+	if( (source[0] >= 'a' && source[0] <= 'z') ||
+		(source[0] >= 'A' && source[0] <= 'Z') )
 	{
-		for( int i = 0; i < numWords; i++ )
+		map = &alphaKeywordMap;
+		// 'interface' is the longest alpha keyword
+		maxLength = sourceLength > 9 ? 9 : sourceLength;
+	}
+	else
+	{
+		map = &nonAlphaKeywordMap;
+		// '>>>=' is the longest non-alpha keyword
+		maxLength = sourceLength > 4 ? 4 : sourceLength;
+	}
+
+	// Find the longest keyword that matches the start of the source string
+	while( maxLength > 0 )
+	{
+		asSMapNode<asCStringPointer, eTokenType> *cursor;
+		if( map->MoveTo(&cursor, asCStringPointer(source, maxLength)) )
 		{
-			if( tokenWords[words[i]].word[n] == '\0' )
+			// Tokens that end with a character that can be part of an 
+			// identifier require an extra verification to guarantee that 
+			// we don't split an identifier token, e.g. the "!is" token 
+			// and the tokens "!" and "isTrue" in the "!isTrue" expression.
+			if( maxLength < int(sourceLength) &&
+				((source[maxLength-1] >= 'a' && source[maxLength-1] <= 'z') ||
+				 (source[maxLength-1] >= 'A' && source[maxLength-1] <= 'Z')) &&
+				((source[maxLength] >= 'a' && source[maxLength] <= 'z') ||
+				 (source[maxLength] >= 'A' && source[maxLength] <= 'Z') ||
+				 (source[maxLength] >= '0' && source[maxLength] <= '9') ||
+				 (source[maxLength] == '_')) )
 			{
-				// tokens that end with a character that can be part of an 
-				// identifier require an extra verification to guarantee that 
-				// we don't split an identifier token, e.g. the "!is" token 
-				// and the "!isTrue" expression.
-				if( ((tokenWords[words[i]].word[n-1] >= 'a' && tokenWords[words[i]].word[n-1] <= 'z') ||
-					 (tokenWords[words[i]].word[n-1] >= 'A' && tokenWords[words[i]].word[n-1] <= 'Z')) &&
-					((source[n] >= 'a' && source[n] <= 'z') ||
-					 (source[n] >= 'A' && source[n] <= 'Z') ||
-					 (source[n] >= '0' && source[n] <= '9') ||
-					 (source[n] == '_')) )
-				{
-					// The token doesn't really match, even though 
-					// the start of the source matches the token
-					words[i--] = words[--numWords];
-				}
-				else if( numWords > 1 )
-				{
-					// It's possible that a longer token matches, so let's 
-					// remember this match and continue searching
-					lastPossible = words[i];
-					words[i--] = words[--numWords];
-					continue;
-				}
-				else
-				{
-					// Only one token matches, so we return it
-					tokenType = tokenWords[words[i]].tokenType;
-					tokenLength = n;
-					return true;
-				}
+				// The token doesn't really match, even though 
+				// the start of the source matches the token
+				maxLength--;
+				continue;
 			}
-			else if( tokenWords[words[i]].word[n] != source[n] )
-			{
-				// The token doesn't match
-				words[i--] = words[--numWords];
-			}
+
+			tokenType   = cursor->value;
+			tokenLength = maxLength;
+			return true;
 		}
-		n++;
+		maxLength--;
 	}
 
-	// The source length ended or there where no more matchable words
-	if( numWords )
-	{
-		// If any of the tokenWords also end at this
-		// position then we have found the matching token
-		for( int i = 0; i < numWords; i++ )
-		{
-			if( tokenWords[words[i]].word[n] == '\0' )
-			{
-				tokenType = tokenWords[words[i]].tokenType;
-				tokenLength = n;
-				return true;
-			}
-		}
-	}
-
-	// It is still possible that a shorter token was found
-	if( lastPossible > -1 )
-	{
-		tokenType = tokenWords[lastPossible].tokenType;
-		tokenLength = strlen(tokenWords[lastPossible].word);
-		return true;
-	}
-
-	return false;
+	return false;	
 }
 
 END_AS_NAMESPACE

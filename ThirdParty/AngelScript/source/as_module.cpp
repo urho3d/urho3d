@@ -763,7 +763,7 @@ int asCModule::GetNextImportedFunctionId()
 }
 
 // internal
-int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate)
+int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride)
 {
 	asASSERT(id >= 0);
 
@@ -782,6 +782,12 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const
 	func->objectType = objType;
 	func->isReadOnly = isConstMethod;
 	func->isPrivate  = isPrivate;
+	func->isFinal    = isFinal;
+	func->isOverride = isOverride;
+
+	// Verify that we are not assigning either the final or override specifier(s) if we are registering a non-member function
+	asASSERT( !(!objType && isFinal) );
+	asASSERT( !(!objType && isOverride) );
 
 	// The script function's refCount was initialized to 1
 	scriptFunctions.PushLast(func);

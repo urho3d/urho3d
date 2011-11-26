@@ -104,6 +104,7 @@ public:
 	int ParseScript(asCScriptCode *script);
 	int ParseFunctionDefinition(asCScriptCode *script);
 	int ParsePropertyDeclaration(asCScriptCode *script);
+	int ParseVirtualPropertyDeclaration(asCScriptCode *script, bool asMethod);
 	int ParseDataType(asCScriptCode *script);
 	int ParseTemplateDecl(asCScriptCode *script);
 
@@ -169,11 +170,14 @@ protected:
 	asCScriptNode *ParseInitList();
 	asCScriptNode *ParseInterface();
 	asCScriptNode *ParseInterfaceMethod();
+	asCScriptNode *ParseVirtualPropertyDecl(bool isMethod, bool isInterface);
 	asCScriptNode *ParseCast();
 	asCScriptNode *ParseEnumeration();				//	Parse enumeration enum { X, Y }
 	asCScriptNode *ParseTypedef();					//	Parse named type declaration
+	void ParseMethodOverrideBehaviors(asCScriptNode *funcNode);
 
 	bool IsVarDecl();
+	bool IsVirtualPropertyDecl();
 	bool IsFuncDecl(bool isMethod);
 	bool IsRealType(int tokenType);
 	bool IsDataType(const sToken &token);
@@ -184,11 +188,14 @@ protected:
 	bool IsAssignOperator(int tokenType);
 	bool IsFunctionCall();
 
+	bool IdentifierIs(const sToken &t, const char *str);
+
 	bool CheckTemplateType(sToken &t);
 
 	asCString ExpectedToken(const char *token);
 	asCString ExpectedTokens(const char *token1, const char *token2);
 	asCString ExpectedOneOf(int *tokens, int count);
+	asCString ExpectedOneOf(const char **tokens, int count);
 
 	bool errorWhileParsing;
 	bool isSyntaxError;
@@ -200,7 +207,6 @@ protected:
 	asCScriptCode   *script;
 	asCScriptNode   *scriptNode;
 
-	asCTokenizer tokenizer;
 	size_t       sourcePos;
 };
 

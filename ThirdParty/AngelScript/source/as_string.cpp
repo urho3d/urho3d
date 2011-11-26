@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2009 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -39,6 +39,7 @@
 #endif
 
 #include "as_string.h"
+#include "as_string_util.h"
 
 asCString::asCString()
 {
@@ -282,43 +283,17 @@ asCString asCString::SubString(size_t start, size_t length) const
 
 int asCString::Compare(const char *str) const
 {
-	return Compare(str, strlen(str));
+	return asCompareStrings(AddressOf(), length, str, strlen(str));
 }
 
 int asCString::Compare(const asCString &str) const
 {
-	return Compare(str.AddressOf(), str.GetLength());
+	return asCompareStrings(AddressOf(), length, str.AddressOf(), str.GetLength());
 }
 
 int asCString::Compare(const char *str, size_t len) const
 {
-	if( length == 0 ) 
-	{
-		if( str == 0 || len == 0 ) return 0; // Equal
-
-		return 1; // The other string is larger than this
-	}
-
-	if( str == 0 )
-	{
-		if( length == 0 ) 
-			return 0; // Equal
-
-		return -1; // The other string is smaller than this
-	}
-
-	if( len < length )
-	{
-		int result = memcmp(AddressOf(), str, len);
-		if( result == 0 ) return -1; // The other string is smaller than this
-
-		return result;
-	}
-
-	int result = memcmp(AddressOf(), str, length);
-	if( result == 0 && length < len ) return 1; // The other string is larger than this
-
-	return result;
+	return asCompareStrings(AddressOf(), length, str, len);
 }
 
 size_t asCString::RecalculateLength()
@@ -390,3 +365,39 @@ asCString operator +(const asCString &a, const char *b)
 	return res;
 }
 
+// wrapper class
+
+asCStringPointer::asCStringPointer()
+	: string(0), length(0), cstring(0)
+{
+}
+
+asCStringPointer::asCStringPointer(const char *str, size_t len)
+	: string(str), length(len), cstring(0)
+{
+}
+
+asCStringPointer::asCStringPointer(asCString *cstr)
+	: string(0), length(0), cstring(cstr)
+{
+}
+
+const char *asCStringPointer::AddressOf() const
+{
+	return string ? string : cstring->AddressOf();
+}
+
+size_t asCStringPointer::GetLength() const
+{
+	return string ? length : cstring->GetLength();
+}
+
+bool asCStringPointer::operator==(const asCStringPointer& other) const
+{
+	return asCompareStrings(AddressOf(), GetLength(), other.AddressOf(), other.GetLength()) == 0;
+}
+
+bool asCStringPointer::operator<(const asCStringPointer& other) const
+{
+	return asCompareStrings(AddressOf(), GetLength(), other.AddressOf(), other.GetLength()) < 0;
+}

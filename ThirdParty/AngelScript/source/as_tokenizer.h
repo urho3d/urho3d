@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -42,36 +42,35 @@
 
 #include "as_config.h"
 #include "as_tokendef.h"
+#include "as_map.h"
+#include "as_string.h"
 
 BEGIN_AS_NAMESPACE
-
-const char *asGetTokenDefinition(int tokenType);
-
-class asCScriptEngine;
 
 class asCTokenizer
 {
 public:
-	asCTokenizer(const asCScriptEngine *engine);
-	~asCTokenizer();
-
-	eTokenType GetToken(const char *source, size_t sourceLength, size_t *tokenLength, asETokenClass *tc = 0);
+	eTokenType GetToken(const char *source, size_t sourceLength, size_t *tokenLength, asETokenClass *tc = 0) const;
+	
+	static const char *GetDefinition(int tokenType);
 
 protected:
-	asETokenClass ParseToken();
-	bool IsWhiteSpace();
-	bool IsComment();
-	bool IsConstant();
-	bool IsKeyWord();
-	bool IsIdentifier();
+	friend class asCScriptEngine;
 
-	const char *source;
-	size_t sourceLength;
+	asCTokenizer();
+	~asCTokenizer();
 
-	eTokenType tokenType;
-	size_t tokenLength;
+	asETokenClass ParseToken(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsWhiteSpace(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsComment(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsConstant(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsKeyWord(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsIdentifier(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
 
 	const asCScriptEngine *engine;
+
+	asCMap<asCStringPointer, eTokenType> alphaKeywordMap;
+	asCMap<asCStringPointer, eTokenType> nonAlphaKeywordMap;
 };
 
 END_AS_NAMESPACE

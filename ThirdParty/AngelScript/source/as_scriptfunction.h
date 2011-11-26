@@ -114,6 +114,7 @@ public:
 	const char          *GetConfigGroup() const;
 	bool                 IsReadOnly() const;
 	bool                 IsPrivate() const;
+	// TODO: interface: Add IsFinal() and IsOverride() as public methods
 	// TODO: access: Get/Set access mask for function
 
 	asUINT               GetParamCount() const;
@@ -158,6 +159,8 @@ public:
 	void      ReleaseReferences();
 
 	bool      IsShared() const;
+	bool      IsFinal() const;
+	bool      IsOverride() const;
 
 	asCGlobalProperty *GetPropertyByGlobalVarPtr(void *gvarPtr);
 
@@ -187,6 +190,8 @@ public:
 	asCArray<asCString *>        defaultArgs;
 	bool                         isReadOnly;
 	bool                         isPrivate;
+	bool                         isFinal;
+	bool                         isOverride;
 	asCObjectType               *objectType;
 	int                          signatureId;
 

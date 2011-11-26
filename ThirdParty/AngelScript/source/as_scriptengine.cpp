@@ -296,6 +296,10 @@ int asCScriptEngine::SetEngineProperty(asEEngineProp property, asPWORD value)
 		ep.disallowGlobalVars = value ? true : false;
 		break;
 
+	case asEP_ALWAYS_IMPL_DEFAULT_CONSTRUCT:
+		ep.alwaysImplDefaultConstruct = value ? true : false;
+		break;
+
 	default:
 		return asINVALID_ARG;
 	}
@@ -357,6 +361,9 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 
 	case asEP_DISALLOW_GLOBAL_VARS:
 		return ep.disallowGlobalVars;
+
+	case asEP_ALWAYS_IMPL_DEFAULT_CONSTRUCT:
+		return ep.alwaysImplDefaultConstruct;
 	}
 
 	return 0;
@@ -368,7 +375,7 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 
 
 
-asCScriptEngine::asCScriptEngine()
+asCScriptEngine::asCScriptEngine() 
 {
 	// Instanciate the thread manager
 	ENTERCRITICALSECTION(engineCritical);
@@ -401,9 +408,11 @@ asCScriptEngine::asCScriptEngine()
 		ep.expandDefaultArrayToTemplate = false;
 		ep.autoGarbageCollect           = true;
 		ep.disallowGlobalVars           = false;
+		ep.alwaysImplDefaultConstruct   = false;
 	}
 
 	gc.engine = this;
+	tok.engine = this;
 
 	refCount.set(1);
 	stringFactory = 0;
@@ -628,6 +637,7 @@ asCScriptEngine::~asCScriptEngine()
 		asDELETE(stringConstants[n],asCString);
 	}
 	stringConstants.SetLength(0);
+	stringToIdMap.EraseAll();
 
 	// Free the script section names
 	for( n = 0; n < scriptSectionNames.GetLength(); n++ )
@@ -755,9 +765,8 @@ asETokenClass asCScriptEngine::ParseToken(const char *string, size_t stringLengt
 		stringLength = strlen(string);
 
 	size_t len;
-	asCTokenizer t(this);
 	asETokenClass tc;
-	t.GetToken(string, stringLength, &len, &tc);
+	tok.GetToken(string, stringLength, &len, &tc);
 
 	if( tokenLength )
 		*tokenLength = (int)len;
@@ -950,7 +959,7 @@ int asCScriptEngine::GetFactoryIdByDecl(const asCObjectType *ot, const char *dec
 
 	// Is this a script class?
 	if( ot->flags & asOBJ_SCRIPT_OBJECT && ot->size > 0 )
-		mod = scriptFunctions[ot->beh.factory]->module;
+		mod = scriptFunctions[ot->beh.factories[0]]->module;
 
 	asCBuilder bld(this, mod);
 
@@ -1109,9 +1118,8 @@ int asCScriptEngine::RegisterInterface(const char *name)
 	if( r >= 0 ) return ConfigError(asERROR);
 
 	// Make sure the name is not a reserved keyword
-	asCTokenizer t(this);
 	size_t tokenLen;
-	int token = t.GetToken(name, strlen(name), &tokenLen);
+	int token = tok.GetToken(name, strlen(name), &tokenLen);
 	if( token != ttIdentifier || strlen(name) != tokenLen )
 		return ConfigError(asINVALID_NAME);
 
@@ -1384,9 +1392,8 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 		if( r < 0 )
 		{
 			// Make sure the name is not a reserved keyword
-			asCTokenizer t(this);
 			size_t tokenLen;
-			int token = t.GetToken(name, typeName.GetLength(), &tokenLen);
+			int token = tok.GetToken(name, typeName.GetLength(), &tokenLen);
 			if( token != ttIdentifier || typeName.GetLength() != tokenLen )
 				return ConfigError(asINVALID_NAME);
 
@@ -3989,13 +3996,12 @@ int asCScriptEngine::RegisterTypedef(const char *type, const char *decl)
 	}
 
 	// Grab the data type
-	asCTokenizer t(this);
 	size_t tokenLen;
 	eTokenType token;
 	asCDataType dataType;
 
 	//	Create the data type
-	token = t.GetToken(decl, strlen(decl), &tokenLen);
+	token = tok.GetToken(decl, strlen(decl), &tokenLen);
 	switch(token)
 	{
 	case ttBool:
@@ -4022,7 +4028,7 @@ int asCScriptEngine::RegisterTypedef(const char *type, const char *decl)
 	dataType = asCDataType::CreatePrimitive(token, false);
 
 	// Make sure the name is not a reserved keyword
-	token = t.GetToken(type, strlen(type), &tokenLen);
+	token = tok.GetToken(type, strlen(type), &tokenLen);
 	if( token != ttIdentifier || strlen(type) != tokenLen )
 		return ConfigError(asINVALID_NAME);
 
@@ -4099,9 +4105,8 @@ int asCScriptEngine::RegisterEnum(const char *name)
 		return ConfigError(asERROR);
 
 	// Make sure the name is not a reserved keyword
-	asCTokenizer t(this);
 	size_t tokenLen;
-	int token = t.GetToken(name, strlen(name), &tokenLen);
+	int token = tok.GetToken(name, strlen(name), &tokenLen);
 	if( token != ttIdentifier || strlen(name) != tokenLen )
 		return ConfigError(asINVALID_NAME);
 
@@ -4288,24 +4293,21 @@ int asCScriptEngine::AddConstantString(const char *str, size_t len)
 {
 	// The str may contain null chars, so we cannot use strlen, or strcmp, or strcpy
 
-	// TODO: optimize: Improve linear search
 	// Has the string been registered before?
-	for( size_t n = 0; n < stringConstants.GetLength(); n++ )
-	{
-		if( stringConstants[n]->Compare(str, len) == 0 )
-		{
-			return (int)n;
-		}
-	}
+	asSMapNode<asCStringPointer, int> *cursor = 0;
+	if (stringToIdMap.MoveTo(&cursor, asCStringPointer(str, len)))
+		return cursor->value;
 
 	// No match was found, add the string
 	asCString *cstr = asNEW(asCString)(str, len);
 	stringConstants.PushLast(cstr);
+	int index = (int)stringConstants.GetLength() - 1;
+	stringToIdMap.Insert(asCStringPointer(cstr), index);
 
 	// The VM currently doesn't handle string ids larger than 65535
 	asASSERT(stringConstants.GetLength() <= 65536);
 
-	return (int)stringConstants.GetLength() - 1;
+	return index;
 }
 
 // internal

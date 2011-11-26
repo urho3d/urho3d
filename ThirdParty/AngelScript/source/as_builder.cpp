@@ -69,6 +69,11 @@ asCBuilder::~asCBuilder()
 				functions[n]->node->Destroy(engine);
 			}
 
+			if( functions[n]->explicitSignature )
+			{
+				asDELETE(functions[n]->explicitSignature,sExplicitSignature);
+			}
+
 			asDELETE(functions[n],sFunctionDescription);
 		}
 
@@ -293,9 +298,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	node = node->firstChild;
 
 	// Create the function
-	bool isConstructor, isDestructor, isPrivate;
+	bool isConstructor, isDestructor, isPrivate, isFinal, isOverride;
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine,module,asFUNC_SCRIPT);
-	GetParsedFunctionDetails(node, scripts[0], 0, func->name, func->returnType, func->parameterTypes, func->inOutFlags, func->defaultArgs, func->isReadOnly, isConstructor, isDestructor, isPrivate);
+	GetParsedFunctionDetails(node, scripts[0], 0, func->name, func->returnType, func->parameterTypes, func->inOutFlags, func->defaultArgs, func->isReadOnly, isConstructor, isDestructor, isPrivate, isFinal, isOverride);
 	func->id               = engine->GetNextScriptFunctionId();
 	func->scriptSectionIdx = engine->GetScriptSectionNameIndex(sectionName ? sectionName : "");
 
@@ -328,13 +333,14 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	node->DisconnectParent();
 	sFunctionDescription *funcDesc = asNEW(sFunctionDescription);
 	functions.PushLast(funcDesc);
-	funcDesc->script = scripts[0];
-	funcDesc->node   = node;
-	funcDesc->name   = func->name;
-	funcDesc->funcId = func->id;
+	funcDesc->script            = scripts[0];
+	funcDesc->node              = node;
+	funcDesc->name              = func->name;
+	funcDesc->funcId            = func->id;
+	funcDesc->explicitSignature = 0;
 
 	asCCompiler compiler(engine);
-	if( compiler.CompileFunction(this, functions[0]->script, functions[0]->node, func) >= 0 )
+	if( compiler.CompileFunction(this, functions[0]->script, 0, functions[0]->node, func) >= 0 )
 	{
 		// Return the function
 		*outFunc = func;
@@ -438,6 +444,11 @@ void asCBuilder::ParseScripts()
 					node->DisconnectParent();
 					RegisterScriptFunction(engine->GetNextScriptFunctionId(), node, decl->script, decl->objType, true);
 				}
+				else if( node->nodeType == snVirtualProperty )
+				{
+					node->DisconnectParent();
+					RegisterVirtualProperty(node, decl->script, decl->objType, true, false);
+				}
 
 				node = next;
 			}
@@ -467,6 +478,11 @@ void asCBuilder::ParseScripts()
 					node->DisconnectParent();
 					RegisterScriptFunction(engine->GetNextScriptFunctionId(), node, decl->script, decl->objType);
 				}
+				else if( node->nodeType == snVirtualProperty )
+				{
+					node->DisconnectParent();
+					RegisterVirtualProperty(node, decl->script, decl->objType, false, false);
+				}
 
 				node = next;
 			}
@@ -474,7 +490,31 @@ void asCBuilder::ParseScripts()
 			// Make sure the default factory & constructor exists for classes
 			if( decl->objType->beh.construct == engine->scriptTypeBehaviours.beh.construct )
 			{
-				AddDefaultConstructor(decl->objType, decl->script);
+				if( decl->objType->beh.constructors.GetLength() == 1 || engine->ep.alwaysImplDefaultConstruct )
+				{
+					AddDefaultConstructor(decl->objType, decl->script);
+				}
+				else
+				{
+					// As the class has another constructor we shouldn't provide the default constructor
+					if( decl->objType->beh.construct )
+					{
+						engine->scriptFunctions[decl->objType->beh.construct]->Release();
+						decl->objType->beh.construct = 0;
+						decl->objType->beh.constructors.RemoveIndex(0);
+					}
+					if( decl->objType->beh.factory )
+					{
+						engine->scriptFunctions[decl->objType->beh.factory]->Release();
+						decl->objType->beh.factory = 0;
+						decl->objType->beh.factories.RemoveIndex(0);
+					}
+					if( decl->objType->beh.copy )
+					{
+						engine->scriptFunctions[decl->objType->beh.copy]->Release();
+						decl->objType->beh.copy = 0;
+					}
+				}
 			}
 		}
 
@@ -496,6 +536,10 @@ void asCBuilder::ParseScripts()
 				else if( node->nodeType == snGlobalVar )
 				{
 					RegisterGlobalVar(node, scripts[n]);
+				}
+				else if( node->nodeType == snVirtualProperty )
+				{
+					RegisterVirtualProperty(node, scripts[n], 0, false, true);
 				}
 				else if( node->nodeType == snImport )
 				{
@@ -528,30 +572,35 @@ void asCBuilder::CompileFunctions()
 	// Compile each function
 	for( asUINT n = 0; n < functions.GetLength(); n++ )
 	{
-		if( functions[n] == 0 ) continue;
+		sFunctionDescription *current = functions[n];
+		if( current == 0 ) continue;
 
 		asCCompiler compiler(engine);
-		asCScriptFunction *func = engine->scriptFunctions[functions[n]->funcId];
+		asCScriptFunction *func = engine->scriptFunctions[current->funcId];
 
-		if( functions[n]->node )
+		if( current->node )
 		{
 			int r, c;
-			functions[n]->script->ConvertPosToRowCol(functions[n]->node->tokenPos, &r, &c);
+			current->script->ConvertPosToRowCol(current->node->tokenPos, &r, &c);
 
 			asCString str = func->GetDeclarationStr();
 			str.Format(TXT_COMPILING_s, str.AddressOf());
-			WriteInfo(functions[n]->script->name.AddressOf(), str.AddressOf(), r, c, true);
+			WriteInfo(current->script->name.AddressOf(), str.AddressOf(), r, c, true);
 
-			compiler.CompileFunction(this, functions[n]->script, functions[n]->node, func);
+			compiler.CompileFunction(this, current->script, current->explicitSignature, current->node, func);
 
 			preMessage.isSet = false;
 		}
-		else
+		else if( current->name == current->objType->name )
 		{
 			// This is the default constructor, that is generated
 			// automatically if not implemented by the user.
-			asASSERT( functions[n]->name == functions[n]->objType->name );
-			compiler.CompileDefaultConstructor(this, functions[n]->script, func);
+			compiler.CompileDefaultConstructor(this, current->script, func);
+		}
+		else
+		{
+			// This is a property accessor, but no implementation was provided for it
+			asASSERT( current->explicitSignature );
 		}
 	}
 }
@@ -1115,8 +1164,10 @@ void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 	bool                       isConstructor;
 	bool                       isDestructor;
 	bool                       isPrivate;
+	bool                       isOverride;
+	bool                       isFinal;
 
-	GetParsedFunctionDetails(funcDef->node, funcDef->script, 0, funcDef->name, returnType, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate);
+	GetParsedFunctionDetails(funcDef->node, funcDef->script, 0, funcDef->name, returnType, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal);
 
 	asCScriptFunction *func = module->funcDefs[funcDef->idx];
 	if( func )
@@ -1203,16 +1254,29 @@ int asCBuilder::RegisterGlobalVar(asCScriptNode *node, asCScriptCode *file)
 int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file)
 {
 	asCScriptNode *n = node->firstChild;
-	asCString name(&file->code[n->tokenPos], n->tokenLength);
-
+	bool isFinal = false;
 	bool isShared = false;
-	if( name == SHARED_TOKEN )
+
+	if( n->tokenType == ttIdentifier && file->TokenEquals(n->tokenPos, n->tokenLength, FINAL_TOKEN) )
+	{
+		isFinal = true;
+		n = n->next;
+	}
+
+	if( n->tokenType == ttIdentifier && file->TokenEquals(n->tokenPos, n->tokenLength, SHARED_TOKEN) )
 	{
 		isShared = true;
-
 		n = n->next;
-		name.Assign(&file->code[n->tokenPos], n->tokenLength);
+
+		// Check for final again
+		if( n->tokenType == ttIdentifier && file->TokenEquals(n->tokenPos, n->tokenLength, FINAL_TOKEN) )
+		{
+			isFinal = true;
+			n = n->next;
+		}
 	}
+
+	asCString name(&file->code[n->tokenPos], n->tokenLength);
 
 	int r, c;
 	file->ConvertPosToRowCol(n->tokenPos, &r, &c);
@@ -1254,6 +1318,9 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file)
 
 	if( isShared )
 		st->flags |= asOBJ_SHARED;
+
+	if( isFinal )
+		st->flags |= asOBJ_NOINHERIT;
 
 	if( node->tokenType == ttHandle )
 		st->flags |= asOBJ_IMPLICIT_HANDLE;
@@ -1647,13 +1714,24 @@ void asCBuilder::CompileClasses()
 
 		// Find the base class that this class inherits from
 		bool multipleInheritance = false;
-		asCScriptNode *node = decl->node->firstChild->next;
+		asCScriptNode *node = decl->node->firstChild;
 
 		if( decl->objType->IsShared() )
 		{
 			// Skip the keyword 'shared'
+			asASSERT(node->tokenType == ttIdentifier);
 			node = node->next;
 		}
+		if( decl->objType->flags & asOBJ_NOINHERIT )
+		{
+			// skip the keyword 'final'
+			asASSERT(node->tokenType == ttIdentifier);
+			node = node->next;
+		}
+
+		// Skip the name of the class
+		asASSERT(node->tokenType == ttIdentifier);
+		node = node->next;
 
 		while( node && node->nodeType == snIdentifier )
 		{
@@ -1671,12 +1749,15 @@ void asCBuilder::CompileClasses()
 				str.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, name.AddressOf());
 				WriteError(file->name.AddressOf(), str.AddressOf(), r, c);
 			}
-			else if( !(objType->flags & asOBJ_SCRIPT_OBJECT) )
+			else if( !(objType->flags & asOBJ_SCRIPT_OBJECT) || 
+					 objType->flags & asOBJ_NOINHERIT )
 			{
+				// Either the class is not a script class or interface
+				// or the class has been declared as 'final'
 				int r, c;
 				file->ConvertPosToRowCol(node->tokenPos, &r, &c);
 				asCString str;
-				str.Format(TXT_CANNOT_INHERIT_FROM_s, objType->name.AddressOf());
+				str.Format(TXT_CANNOT_INHERIT_FROM_s_FINAL, objType->name.AddressOf());
 				WriteError(file->name.AddressOf(), str.AddressOf(), r, c);
 			}
 			else if( objType->size != 0 )
@@ -1874,6 +1955,15 @@ void asCBuilder::CompileClasses()
 					derivedFunc = GetFunctionDescription(decl->objType->methods[d]);
 					if( derivedFunc->IsSignatureEqual(baseFunc) )
 					{
+						if( baseFunc->IsFinal() )
+						{
+							int r, c;
+							decl->script->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
+							asCString msg;
+							msg.Format(TXT_METHOD_CANNOT_OVERRIDE_s, baseFunc->GetDeclaration());
+							WriteError(decl->script->name.AddressOf(), msg.AddressOf(), r, c);
+						}
+
 						// Move the function from the methods array to the virtualFunctionTable
 						decl->objType->methods.RemoveIndex(d);
 						decl->objType->virtualFunctionTable.PushLast(derivedFunc);
@@ -1913,6 +2003,10 @@ void asCBuilder::CompileClasses()
 
 		// Enumerate each of the declared properties
 		asCScriptNode *node = decl->node->firstChild->next;
+		if( decl->objType->IsShared() )
+			node = node->next;
+		if( decl->objType->flags & asOBJ_NOINHERIT )
+			node = node->next;
 
 		// Skip list of classes and interfaces
 		while( node && node->nodeType == snIdentifier )
@@ -1960,18 +2054,33 @@ void asCBuilder::CompileClasses()
 		toValidate.PushLast(decl);
 	}
 
+	// TODO: Warn if a method overrides a base method without marking it as 'override'. 
+	//       It must be possible to turn off this warning through engine property.
+
+	// TODO: A base class should be able to mark a method as 'abstract'. This will
+	//       allow a base class to provide a partial implementation, but still force
+	//       derived classes to implement specific methods.
+
 	// Verify that all interface methods are implemented in the classes
 	// We do this here so the base class' methods have already been inherited 
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
 		sClassDeclaration *decl = classDeclarations[n];
 		if( decl->isExistingShared ) continue;
+
+		asCArray<bool> overrideValidations(decl->objType->GetMethodCount());
+		for( asUINT k = 0; k < decl->objType->methods.GetLength(); k++ )
+		{
+			overrideValidations.PushLast( !static_cast<asCScriptFunction*>(decl->objType->GetMethodByIndex(k, false))->IsOverride() );
+		}
+
 		for( asUINT m = 0; m < decl->objType->interfaces.GetLength(); m++ )
 		{
 			asCObjectType *objType = decl->objType->interfaces[m];
 			for( asUINT i = 0; i < objType->methods.GetLength(); i++ )
 			{
-				if( !DoesMethodExist(decl->objType, objType->methods[i]) )
+				asUINT overrideIndex;
+				if( !DoesMethodExist(decl->objType, objType->methods[i], &overrideIndex) )
 				{
 					int r, c;
 					decl->script->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
@@ -1980,6 +2089,22 @@ void asCBuilder::CompileClasses()
 						engine->GetFunctionDeclaration(objType->methods[i]).AddressOf());
 					WriteError(decl->script->name.AddressOf(), str.AddressOf(), r, c);
 				}
+				else
+					overrideValidations[overrideIndex] = true;
+			}
+		}
+
+		bool hasBaseClass = decl->objType->derivedFrom != 0;
+
+		for( asUINT j = 0; j < overrideValidations.GetLength(); j++ )
+		{
+			if( !overrideValidations[j] && (!hasBaseClass || !DoesMethodExist(decl->objType->derivedFrom, decl->objType->methods[j])) )
+			{
+				int r, c;
+				decl->script->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
+				asCString msg;
+				msg.Format(TXT_METHOD_s_DOES_NOT_OVERRIDE, decl->objType->GetMethodByIndex(j, false)->GetDeclaration());
+				WriteError(decl->script->name.AddressOf(), msg.AddressOf(), r, c);
 			}
 		}
 	}
@@ -2117,19 +2242,22 @@ int asCBuilder::CreateVirtualFunction(asCScriptFunction *func, int idx)
 {
 	asCScriptFunction *vf =  asNEW(asCScriptFunction)(engine, module, asFUNC_VIRTUAL);
 
-	vf->funcType = asFUNC_VIRTUAL;
-	vf->name = func->name;
-	vf->returnType = func->returnType;
-	vf->parameterTypes = func->parameterTypes;
-	vf->inOutFlags = func->inOutFlags;
-	vf->id = engine->GetNextScriptFunctionId();
+	vf->funcType         = asFUNC_VIRTUAL;
+	vf->name             = func->name;
+	vf->returnType       = func->returnType;
+	vf->parameterTypes   = func->parameterTypes;
+	vf->inOutFlags       = func->inOutFlags;
+	vf->id               = engine->GetNextScriptFunctionId();
 	vf->scriptSectionIdx = func->scriptSectionIdx;
-	vf->isReadOnly = func->isReadOnly;
-	vf->objectType = func->objectType;
-	vf->signatureId = func->signatureId;
-	vf->isPrivate = func->isPrivate;
-	vf->vfTableIdx = idx;
-	vf->defaultArgs = func->defaultArgs;
+	vf->isReadOnly       = func->isReadOnly;
+	vf->objectType       = func->objectType;
+	vf->signatureId      = func->signatureId;
+	vf->isPrivate        = func->isPrivate;
+	vf->isFinal          = func->isFinal;
+	vf->isOverride       = func->isOverride;
+	vf->vfTableIdx       = idx;
+	vf->defaultArgs      = func->defaultArgs;
+
 	// Copy the default arg strings to avoid multiple deletes on the same object
 	for( asUINT n = 0; n < vf->defaultArgs.GetLength(); n++ )
 		if( vf->defaultArgs[n] )
@@ -2161,7 +2289,7 @@ asCObjectProperty *asCBuilder::AddPropertyToClass(sClassDeclaration *decl, const
 	return decl->objType->AddPropertyToClass(name, dt, isPrivate);
 }
 
-bool asCBuilder::DoesMethodExist(asCObjectType *objType, int methodId)
+bool asCBuilder::DoesMethodExist(asCObjectType *objType, int methodId, asUINT *methodIndex)
 {
 	asCScriptFunction *method = GetFunctionDescription(methodId);
 
@@ -2174,6 +2302,9 @@ bool asCBuilder::DoesMethodExist(asCObjectType *objType, int methodId)
 		if( m->isReadOnly     != method->isReadOnly     ) continue;
 		if( m->parameterTypes != method->parameterTypes ) continue;
 		if( m->inOutFlags     != method->inOutFlags     ) continue;
+
+		if( methodIndex )
+			*methodIndex = n;
 
 		return true;
 	}
@@ -2205,11 +2336,12 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	sFunctionDescription *func = asNEW(sFunctionDescription);
 	functions.PushLast(func);
 
-	func->script  = file;
-	func->node    = 0;
-	func->name    = objType->name;
-	func->objType = objType;
-	func->funcId  = funcId;
+	func->script            = file;
+	func->node              = 0;
+	func->name              = objType->name;
+	func->objType           = objType;
+	func->funcId            = funcId;
+	func->explicitSignature = 0;
 
 	// Add a default factory as well
 	funcId = engine->GetNextScriptFunctionId();
@@ -2393,7 +2525,7 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file)
 	return 0;
 }
 
-void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, asCArray<asCString *> &defaultArgs, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate)
+void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, asCArray<asCString *> &defaultArgs, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate, bool &isOverride, bool &isFinal)
 {
 	node = node->firstChild;
 
@@ -2436,11 +2568,31 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 	else
 		returnType = asCDataType::CreatePrimitive(ttVoid, false);
 
-	// Is this a const method?
-	if( objType && n->next->next && n->next->next->tokenType == ttConst )
-		isConstMethod = true;
-	else
-		isConstMethod = false;
+	isConstMethod = false;
+	isFinal = false;
+	isOverride = false;
+
+	if( objType && n->next->next )
+	{
+		asCScriptNode *decorator = n->next->next;
+
+		// Is this a const method?
+		if( decorator->tokenType == ttConst )
+		{
+			isConstMethod = true;
+			decorator = decorator->next;
+		}
+
+		while( decorator )
+		{
+			if( decorator->tokenType == ttIdentifier && file->TokenEquals(decorator->tokenPos, decorator->tokenLength, FINAL_TOKEN) )
+				isFinal = true;
+			else if( decorator->tokenType == ttIdentifier && file->TokenEquals(decorator->tokenPos, decorator->tokenLength, OVERRIDE_TOKEN) )
+				isOverride = true;
+
+			decorator = decorator->next;
+		}
+	}
 
 	// Count the number of parameters
 	int count = 0;
@@ -2521,11 +2673,13 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 	asCArray<asETypeModifiers> inOutFlags;
 	asCArray<asCString *>      defaultArgs;
 	bool                       isConstMethod;
+	bool                       isOverride;
+	bool                       isFinal;
 	bool                       isConstructor;
 	bool                       isDestructor;
 	bool                       isPrivate;
 
-	GetParsedFunctionDetails(node, file, objType, name, returnType, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate);
+	GetParsedFunctionDetails(node, file, objType, name, returnType, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal);
 
 	// Check for name conflicts
 	if( !isConstructor && !isDestructor )
@@ -2563,11 +2717,12 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 		sFunctionDescription *func = asNEW(sFunctionDescription);
 		functions.PushLast(func);
 
-		func->script    = file;
-		func->node      = node;
-		func->name      = name;
-		func->objType   = objType;
-		func->funcId    = funcId;
+		func->script            = file;
+		func->node              = node;
+		func->name              = name;
+		func->objType           = objType;
+		func->funcId            = funcId;
+		func->explicitSignature = 0;
 	}
 
 	// Destructors may not have any parameters
@@ -2647,7 +2802,7 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 	}
 
 	// Register the function
-	module->AddScriptFunction(file->idx, funcId, name.AddressOf(), returnType, parameterTypes.AddressOf(), inOutFlags.AddressOf(), defaultArgs.AddressOf(), (asUINT)parameterTypes.GetLength(), isInterface, objType, isConstMethod, isGlobalFunction, isPrivate);
+	module->AddScriptFunction(file->idx, funcId, name.AddressOf(), returnType, parameterTypes.AddressOf(), inOutFlags.AddressOf(), defaultArgs.AddressOf(), (asUINT)parameterTypes.GetLength(), isInterface, objType, isConstMethod, isGlobalFunction, isPrivate, isFinal, isOverride);
 
 	// Make sure the default args are declared correctly
 	ValidateDefaultArgs(file, node, engine->scriptFunctions[funcId]);
@@ -2709,6 +2864,339 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 	{
 		node->Destroy(engine);
 	}
+
+	return 0;
+}
+
+int asCBuilder::RegisterScriptFunctionWithSignature(int funcId, asCScriptNode *node, asCScriptCode *file, asCString &name, sExplicitSignature *signature, asCObjectType *objType, bool isInterface, bool isGlobalFunction, bool isPrivate, bool isConst, bool isFinal, bool isOverride, bool treatAsProperty)
+{
+	bool isConstructor = false;
+	bool isDestructor = false;
+	asCArray<asCDataType> &parameterTypes = signature->argTypes;
+	asCArray<asETypeModifiers> &inOutFlags = signature->argModifiers;
+	asCArray<asCString *> defaultArgs = signature->defaultArgs;
+
+	if( objType && asCDataType::CreatePrimitive(ttVoid, false) == signature->returnType )
+	{
+		if( 0 == name.Compare( objType->name ) )
+			isConstructor = true;
+		else if( 0 == name.Compare( "~" + objType->name ) )
+			isDestructor = true;
+	}
+
+	// Check for name conflicts
+	if( !isConstructor && !isDestructor )
+	{
+		if( objType )
+			CheckNameConflictMember(objType, name.AddressOf(), node, file, treatAsProperty);
+		else
+			CheckNameConflict(name.AddressOf(), node, file);
+	}
+
+	if( isInterface )
+	{
+		asASSERT(!isFinal);
+		asASSERT(!isOverride);
+	}
+	else
+	{
+		sFunctionDescription *func = asNEW(sFunctionDescription);
+		functions.PushLast(func);
+
+		func->script            = file;
+		func->node              = node;
+		func->name              = name;
+		func->objType           = objType;
+		func->funcId            = funcId;
+		func->explicitSignature = signature;
+	}
+
+	// Destructors may not have any parameters
+	if( isDestructor && parameterTypes.GetLength() > 0 )
+	{
+		int r, c;
+		file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+		WriteError(file->name.AddressOf(), TXT_DESTRUCTOR_MAY_NOT_HAVE_PARM, r, c);
+	}
+
+	// If class or interface is shared, then only shared types may be used in the method signature
+	if( objType && (objType->flags & asOBJ_SHARED) )
+	{
+		asCObjectType *ot = signature->returnType.GetObjectType();
+		if( ot && (ot->flags & asOBJ_SCRIPT_OBJECT) && !(ot->flags & asOBJ_SHARED) )
+		{
+			int r, c;
+			file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+			asCString msg;
+			msg.Format(TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s, ot->name.AddressOf());
+			WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+		}
+
+		for( asUINT p = 0; p < parameterTypes.GetLength(); ++p )
+		{
+			asCObjectType *ot = parameterTypes[p].GetObjectType();
+			if( ot && (ot->flags & asOBJ_SCRIPT_OBJECT) && !(ot->flags & asOBJ_SHARED) )
+			{
+				int r, c;
+				file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+				asCString msg;
+				msg.Format(TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s, ot->name.AddressOf());
+				WriteError(file->name.AddressOf(), msg.AddressOf(), r, c);
+			}
+		}
+	}
+
+	// TODO: Much of this can probably be reduced by using the IsSignatureEqual method
+	// Check that the same function hasn't been registered already
+	asCArray<int> funcs;
+	GetFunctionDescriptions(name.AddressOf(), funcs);
+	if( funcs.GetLength() )
+	{
+		for( asUINT n = 0; n < funcs.GetLength(); ++n )
+		{
+			asCScriptFunction *func = GetFunctionDescription(funcs[n]);
+
+			if( parameterTypes.GetLength() == func->parameterTypes.GetLength() )
+			{
+				bool match = true;
+				if( func->objectType != objType )
+				{
+					match = false;
+					break;
+				}
+
+				for( asUINT p = 0; p < parameterTypes.GetLength(); ++p )
+				{
+					if( parameterTypes[p] != func->parameterTypes[p] )
+					{
+						match = false;
+						break;
+					}
+				}
+
+				if( match )
+				{
+					int r, c;
+					file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+					WriteError(file->name.AddressOf(), TXT_FUNCTION_ALREADY_EXIST, r, c);
+					break;
+				}
+			}
+		}
+	}
+
+	// Register the function
+	module->AddScriptFunction(file->idx, funcId, name.AddressOf(), signature->returnType, parameterTypes.AddressOf(), inOutFlags.AddressOf(), defaultArgs.AddressOf(), (asUINT)parameterTypes.GetLength(), isInterface, objType, isConst, isGlobalFunction, isPrivate, isFinal, isOverride);
+
+	// Make sure the default args are declared correctly
+	ValidateDefaultArgs(file, node, engine->scriptFunctions[funcId]);
+
+	if( objType )
+	{
+		engine->scriptFunctions[funcId]->AddRef();
+		if( isConstructor )
+		{
+			int factoryId = engine->GetNextScriptFunctionId();
+			if( parameterTypes.GetLength() == 0 )
+			{
+				// Overload the default constructor
+				engine->scriptFunctions[objType->beh.construct]->Release();
+				objType->beh.construct = funcId;
+				objType->beh.constructors[0] = funcId;
+
+				// Register the default factory as well
+				engine->scriptFunctions[objType->beh.factory]->Release();
+				objType->beh.factory = factoryId;
+				objType->beh.factories[0] = factoryId;
+			}
+			else
+			{
+				objType->beh.constructors.PushLast(funcId);
+
+				// Register the factory as well
+				objType->beh.factories.PushLast(factoryId);
+			}
+
+			// We must copy the default arg strings to avoid deleting the same object multiple times
+			for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+				if( defaultArgs[n] )
+					defaultArgs[n] = asNEW(asCString)(*defaultArgs[n]);
+
+			asCDataType dt = asCDataType::CreateObjectHandle(objType, false);
+			module->AddScriptFunction(file->idx, factoryId, name.AddressOf(), dt, parameterTypes.AddressOf(), inOutFlags.AddressOf(), defaultArgs.AddressOf(), (asUINT)parameterTypes.GetLength(), false);
+
+			// Add a dummy function to the builder so that it doesn't mix up the fund Ids
+			functions.PushLast(0);
+
+			// Compile the factory immediately
+			asCCompiler compiler(engine);
+			compiler.CompileFactory(this, file, engine->scriptFunctions[factoryId]);
+			engine->scriptFunctions[factoryId]->AddRef();
+		}
+		else if( isDestructor )
+			objType->beh.destruct = funcId;
+		else
+			objType->methods.PushLast(funcId);
+	}
+
+	// We need to delete the node already if this is an interface method
+	if( isInterface && node )
+	{
+		node->Destroy(engine);
+	}
+
+	return 0;
+}
+
+int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, bool isInterface, bool isGlobalFunction)
+{
+	if( engine->ep.propertyAccessorMode != 2 )
+	{
+		int r, c;
+		file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+		WriteError(file->name.AddressOf(), TXT_PROPERTY_ACCESSOR_DISABLED, r, c);
+		node->Destroy(engine);
+		return 0;
+	}
+
+	bool isPrivate = false;
+	asCString emulatedName;
+	asCDataType emulatedType;
+	
+	if( !isGlobalFunction && node->tokenType == ttPrivate )
+	{
+		isPrivate = true;
+		node = node->next;
+	}
+
+	asCScriptNode *mainNode = node;
+	node = node->firstChild;
+
+	emulatedType = CreateDataTypeFromNode(node, file);
+	emulatedType = ModifyDataTypeFromNode(emulatedType, node->next, file, 0, 0);
+	node = node->next->next;
+
+	emulatedName.Assign(&file->code[node->tokenPos], node->tokenLength);
+	node = node->next;
+
+	while( node )
+	{
+		asCScriptNode *next           = node->next;
+		asCScriptNode *funcNode       = 0;
+		sExplicitSignature *signature = 0;
+		bool success                  = false;
+		bool isConst                  = false;
+		bool isFinal                  = false;
+		bool isOverride               = false;
+
+		asCString name;
+
+		// TODO: getset: Allow private for individual property accessors
+		// TODO: getset: If the accessor uses its own name, then the property should be automatically declared
+
+		if( node->firstChild->nodeType == snIdentifier && file->TokenEquals(node->firstChild->tokenPos, node->firstChild->tokenLength, GET_TOKEN) )
+		{
+			funcNode  = node->firstChild->next;
+
+			if( funcNode && funcNode->tokenType == ttConst )
+			{
+				isConst = true;
+				funcNode = funcNode->next;
+			}
+
+			while( funcNode && funcNode->nodeType != snStatementBlock )
+			{
+				if( funcNode->tokenType == ttIdentifier && file->TokenEquals(funcNode->tokenPos, funcNode->tokenLength, FINAL_TOKEN) )
+					isFinal = true;
+				else if( funcNode->tokenType == ttIdentifier && file->TokenEquals(funcNode->tokenPos, funcNode->tokenLength, OVERRIDE_TOKEN) )
+					isOverride = true;
+
+				funcNode = funcNode->next;
+			}
+
+			if( funcNode )
+				funcNode->DisconnectParent();
+
+			if( funcNode == 0 && (objType == 0 || !objType->IsInterface()) )
+			{
+				// TODO: getset: If no implementation is supplied the builder should provide an automatically generated implementation
+				//               The compiler needs to be able to handle the different types, primitive, value type, and handle
+				//               The code is also different for global property accessors
+				int r, c;
+				file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+				WriteError(file->name.AddressOf(), TXT_PROPERTY_ACCESSOR_MUST_BE_IMPLEMENTED, r, c);
+			}
+
+			signature = asNEW(sExplicitSignature);
+			
+			signature->returnType = emulatedType;
+
+			name    = "get_" + emulatedName;
+			success = true;
+		}
+		else if( node->firstChild->nodeType == snIdentifier && file->TokenEquals(node->firstChild->tokenPos, node->firstChild->tokenLength, SET_TOKEN) )
+		{
+			funcNode  = node->firstChild->next;
+
+			if( funcNode && funcNode->tokenType == ttConst )
+			{
+				isConst = true;
+				funcNode = funcNode->next;
+			}
+
+			while( funcNode && funcNode->nodeType != snStatementBlock )
+			{
+				if( funcNode->tokenType == ttIdentifier && file->TokenEquals(funcNode->tokenPos, funcNode->tokenLength, FINAL_TOKEN) )
+					isFinal = true;
+				else if( funcNode->tokenType == ttIdentifier && file->TokenEquals(funcNode->tokenPos, funcNode->tokenLength, OVERRIDE_TOKEN) )
+					isOverride = true;
+
+				funcNode = funcNode->next;
+			}
+
+			if( funcNode )
+				funcNode->DisconnectParent();
+
+			if( funcNode == 0 && (objType == 0 || !objType->IsInterface()) )
+			{
+				int r, c;
+				file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+				WriteError(file->name.AddressOf(), TXT_PROPERTY_ACCESSOR_MUST_BE_IMPLEMENTED, r, c);
+			}
+
+			signature = asNEW(sExplicitSignature)(1);
+
+			signature->returnType = asCDataType::CreatePrimitive(ttVoid, false);
+
+			signature->argModifiers.PushLast(asTM_NONE);
+			signature->argNames.PushLast("value");
+			signature->argTypes.PushLast(emulatedType);
+			signature->defaultArgs.PushLast(0);
+
+			name    = "set_" + emulatedName;
+			success = true;
+		}
+		else
+		{
+			int r, c;
+			file->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+			WriteError(file->name.AddressOf(), TXT_UNRECOGNIZED_VIRTUAL_PROPERTY_NODE, r, c);
+		}
+
+		if( success )
+		{
+			RegisterScriptFunctionWithSignature(engine->GetNextScriptFunctionId(), funcNode, file, name, signature, objType, isInterface, isGlobalFunction, isPrivate, isConst, isFinal, isOverride, true);
+		}
+
+		node = next;
+	};
+
+	mainNode->Destroy(engine);
 
 	return 0;
 }
@@ -2827,8 +3315,13 @@ asCScriptFunction *asCBuilder::GetFunctionDescription(int id)
 
 void asCBuilder::GetFunctionDescriptions(const char *name, asCArray<int> &funcs)
 {
+	// TODO: optimize: Improve linear searches in GetFunctionDescriptions
+	//                 A large part of the compilation time seems to be spent in this function
+	//                 I need to have a map with all global functions so that it will be
+	//                 quicker to find them by name. The key should be the function name, and 
+	//                 the value a list with all the functions using that name
+
 	asUINT n;
-	// TODO: optimize: Improve linear search
 	for( n = 0; n < module->scriptFunctions.GetLength(); n++ )
 	{
 		if( module->scriptFunctions[n]->name == name &&
@@ -2836,14 +3329,12 @@ void asCBuilder::GetFunctionDescriptions(const char *name, asCArray<int> &funcs)
 			funcs.PushLast(module->scriptFunctions[n]->id);
 	}
 
-	// TODO: optimize: Improve linear search
 	for( n = 0; n < module->bindInformations.GetLength(); n++ )
 	{
 		if( module->bindInformations[n]->importedFunctionSignature->name == name )
 			funcs.PushLast(module->bindInformations[n]->importedFunctionSignature->id);
 	}
 
-	// TODO: optimize: Improve linear search
 	// TODO: optimize: Use the registeredGlobalFunctions array instead
 	for( n = 0; n < engine->scriptFunctions.GetLength(); n++ )
 	{

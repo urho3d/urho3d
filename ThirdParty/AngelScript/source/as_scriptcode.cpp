@@ -139,4 +139,12 @@ void asCScriptCode::ConvertPosToRowCol(size_t pos, int *row, int *col)
 	if( col ) *col = (int)(pos - linePositions[i]) + 1;
 }
 
+bool asCScriptCode::TokenEquals(size_t pos, size_t len, const char *str)
+{
+	if( pos + len > codeLength ) return false;
+	if( strncmp(code + pos, str, len) == 0 && strlen(str) == len )
+		return true;
+	return false;
+}
+
 END_AS_NAMESPACE

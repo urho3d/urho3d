@@ -121,10 +121,12 @@ protected:
 	asCArray<asCScriptFunction*> usedFunctions;
 	asCArray<void*>              usedGlobalProperties;
 	asCArray<int>                usedStringConstants;
+	asCMap<int, int>             stringIdToIndexMap;
 
 	asCArray<asCScriptFunction*> savedFunctions;
 	asCArray<asCDataType>        savedDataTypes;
 	asCArray<asCString>          savedStrings;
+	asCMap<asCStringPointer, int> stringToIdMap;
 
 	struct SObjProp
 	{

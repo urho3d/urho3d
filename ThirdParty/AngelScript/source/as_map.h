@@ -48,7 +48,7 @@ public:
 	~asCMap();
 
 	int   Insert(const KEY &key, const VAL &value);
-	int   GetCount();
+	int   GetCount() const;
 	
 	const KEY &GetKey(const asSMapNode<KEY,VAL> *cursor) const;
 	const VAL &GetValue(const asSMapNode<KEY,VAL> *cursor) const;
@@ -59,15 +59,15 @@ public:
 
 	// Returns true as long as cursor is valid
 
-	bool MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key);
-	bool MoveFirst(asSMapNode<KEY,VAL> **out);
-	bool MoveLast(asSMapNode<KEY,VAL> **out);
-	bool MoveNext(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor);
-	bool MovePrev(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor);
+	bool MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key) const;
+	bool MoveFirst(asSMapNode<KEY,VAL> **out) const;
+	bool MoveLast(asSMapNode<KEY,VAL> **out) const;
+	bool MoveNext(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor) const;
+	bool MovePrev(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor) const;
 
 	// For debugging only
 
-	int CheckIntegrity(asSMapNode<KEY,VAL> *node);
+	int CheckIntegrity(asSMapNode<KEY,VAL> *node) const;
 
 protected:
 	void BalanceInsert(asSMapNode<KEY,VAL> *node);
@@ -146,7 +146,7 @@ int asCMap<KEY, VAL>::EraseAll(asSMapNode<KEY, VAL> *p)
 }
 
 template <class KEY, class VAL>
-int asCMap<KEY, VAL>::GetCount()
+int asCMap<KEY, VAL>::GetCount() const
 {
 	return count;
 }
@@ -286,7 +286,7 @@ void asCMap<KEY, VAL>::BalanceInsert(asSMapNode<KEY, VAL> *node)
 
 // For debugging purposes only
 template <class KEY, class VAL>
-int asCMap<KEY, VAL>::CheckIntegrity(asSMapNode<KEY, VAL> *node)
+int asCMap<KEY, VAL>::CheckIntegrity(asSMapNode<KEY, VAL> *node) const
 {
 	if( node == 0 ) 
 	{
@@ -315,7 +315,7 @@ int asCMap<KEY, VAL>::CheckIntegrity(asSMapNode<KEY, VAL> *node)
 
 // Returns true if successful
 template <class KEY, class VAL>
-bool asCMap<KEY, VAL>::MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key)
+bool asCMap<KEY, VAL>::MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key) const
 {
 	asSMapNode<KEY,VAL> *p = root;
 	while( p )
@@ -633,7 +633,7 @@ const VAL &asCMap<KEY, VAL>::GetValue(const asSMapNode<KEY,VAL> *cursor) const
 }
 
 template <class KEY, class VAL>
-VAL &asCMap<KEY, VAL>::GetValue(asSMapNode<KEY,VAL> *cursor)
+VAL &asCMap<KEY, VAL>::GetValue(asSMapNode<KEY,VAL> *cursor) 
 {
 	if( cursor == 0 ) 
 		return dummy.value;
@@ -651,7 +651,7 @@ const KEY &asCMap<KEY, VAL>::GetKey(const asSMapNode<KEY,VAL> *cursor) const
 }
 
 template <class KEY, class VAL>
-bool asCMap<KEY, VAL>::MoveFirst(asSMapNode<KEY,VAL> **out)
+bool asCMap<KEY, VAL>::MoveFirst(asSMapNode<KEY,VAL> **out) const
 {
 	*out = root;
 	if( root == 0 ) return false;
@@ -663,7 +663,7 @@ bool asCMap<KEY, VAL>::MoveFirst(asSMapNode<KEY,VAL> **out)
 }
 
 template <class KEY, class VAL>
-bool asCMap<KEY, VAL>::MoveLast(asSMapNode<KEY,VAL> **out)
+bool asCMap<KEY, VAL>::MoveLast(asSMapNode<KEY,VAL> **out) const
 {
 	*out = root;
 	if( root == 0 ) return false;
@@ -675,7 +675,7 @@ bool asCMap<KEY, VAL>::MoveLast(asSMapNode<KEY,VAL> **out)
 }
 
 template <class KEY, class VAL>
-bool asCMap<KEY, VAL>::MoveNext(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor)
+bool asCMap<KEY, VAL>::MoveNext(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor) const
 {
 	if( cursor == 0 )
 	{
@@ -706,7 +706,7 @@ bool asCMap<KEY, VAL>::MoveNext(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *
 }
 
 template <class KEY, class VAL>
-bool asCMap<KEY, VAL>::MovePrev(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor)
+bool asCMap<KEY, VAL>::MovePrev(asSMapNode<KEY,VAL> **out, asSMapNode<KEY,VAL> *cursor) const
 {
 	if( cursor == 0 ) 
 	{

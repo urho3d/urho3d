@@ -52,6 +52,7 @@
 #include "as_configgroup.h"
 #include "as_memory.h"
 #include "as_gc.h"
+#include "as_tokenizer.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -345,6 +346,9 @@ public:
 	asCModule             *lastModule;
 	bool                   isBuilding;
 
+	// Tokenizer is instanciated once to share resources
+	asCTokenizer tok;
+
 	// Stores script declared object types
 	asCArray<asCObjectType *> classTypes;
 	// This array stores the template instances types, that have been generated from template types
@@ -376,7 +380,8 @@ public:
     asIJITCompiler              *jitCompiler;
 
 	// String constants
-	asCArray<asCString*>        stringConstants;
+	asCArray<asCString*>          stringConstants;
+	asCMap<asCStringPointer, int> stringToIdMap;
 
 	// User data
 	void                   *userData;
@@ -409,6 +414,7 @@ public:
 		bool expandDefaultArrayToTemplate;
 		bool autoGarbageCollect;
 		bool disallowGlobalVars;
+		bool alwaysImplDefaultConstruct;
 	} ep;
 };
 

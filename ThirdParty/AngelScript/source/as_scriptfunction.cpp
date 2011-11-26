@@ -133,6 +133,8 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	name                   = ""; 
 	isReadOnly             = false;
 	isPrivate              = false;
+	isFinal                = false;
+	isOverride             = false;
 	stackNeeded            = 0;
 	sysFuncIntf            = 0;
 	signatureId            = 0;
@@ -1060,6 +1062,18 @@ bool asCScriptFunction::IsShared() const
 
 	// Functions that have been specifically marked as shared are shared
 	return isShared;
+}
+
+// internal
+bool asCScriptFunction::IsFinal() const
+{
+	return isFinal;
+}
+
+// internal
+bool asCScriptFunction::IsOverride() const
+{
+	return isOverride;
 }
 
 END_AS_NAMESPACE
