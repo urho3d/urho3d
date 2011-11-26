@@ -175,12 +175,12 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
-    // Set amount of worker threads according to the free CPU cores. Leave one for the main thread and another for
-    // GPU & audio drivers, and clamp to a maximum of three for now
+    // Set amount of worker threads according to the free CPU cores. For the case hyperthreading is in use,
+    // limit to half of the available cores, and reserve one core for the main thread
     int numCores = GetNumCPUCores();
     if (threads && numCores > 1)
     {
-        int numThreads = Clamp(numCores - 2, 1, 3);
+        int numThreads = Max(numCores / 2 - 1, 1);
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
         String workerThreadString = "Created " + String(numThreads) + " worker thread";

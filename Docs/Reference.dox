@@ -1081,7 +1081,7 @@ Like with ordinary events, in script event types are strings instead of name has
 
 Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be supplied with tasks described by the WorkItem structure, by calling \ref WorkQueue::AddWorkItem "AddWorkItem()". These will be executed in background worker threads. The function \ref WorkQueue::Complete "Complete()" will complete all currently pending tasks, and execute them also in the main thread to make them finish faster.
 
-On single-core systems no worker threads will be created. In the presence of more cores, worker threads will be created up to a maximum of four. Two cores will be preferably left free to allow one for the main thread, and another for the GPU driver and audio processing.
+On single-core systems no worker threads will be created. In the presence of more cores, worker threads will be created up to half of the number of CPU cores minus one that is reserved for the main thread.
 
 The work items include a function pointer to call, with the signature "void WorkFunction(const WorkItem* item, unsigned threadIndex)." The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
 
