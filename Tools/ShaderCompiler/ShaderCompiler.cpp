@@ -564,8 +564,8 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     for (unsigned i = 0; i < compiledVariations.Size(); ++i)
         workList_.Push(&compiledVariations[i]);
     
-    // Create and start worker threads. Use all cores except one to not lock up the computer completely
-    unsigned numWorkerThreads = GetNumCPUCores() - 1;
+    // Create and start worker threads. Use all logical CPUs except one to not lock up the computer completely
+    unsigned numWorkerThreads = GetNumLogicalCPUs() - 1;
     if (!numWorkerThreads)
         numWorkerThreads = 1;
     

@@ -8,12 +8,12 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Math
+    ../Container ../Math ../../ThirdParty/LibCpuId/libcpuid
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Math)
+target_link_libraries (${TARGET_NAME} Container LibCpuId Math)
 
 if (WIN32)
     target_link_libraries (${TARGET_NAME} winmm.lib)

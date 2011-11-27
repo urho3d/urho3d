@@ -46,6 +46,8 @@ const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 String GetConsoleInput();
 /// Return the number of physical CPU cores.
-unsigned GetNumCPUCores();
+unsigned GetNumPhysicalCPUs();
+/// Return the number of logical CPUs (different from physical if hyperthreading is used.)
+unsigned GetNumLogicalCPUs();
 /// Return the static library init/shutdown mutex.
 Mutex& GetStaticMutex();

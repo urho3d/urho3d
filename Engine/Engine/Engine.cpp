@@ -175,12 +175,11 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
-    // Set amount of worker threads according to the available CPU cores. GetNumCPUCores() does not report hyperthreaded cores,
-    // as using them leads to worse performance. Also reserve one core for the main thread
-    int numCores = GetNumCPUCores();
-    if (threads && numCores > 1)
+    // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
+    // unpredictable extra synchronization overhead. Also reserve one core for the main thread
+    int numThreads = threads ? GetNumPhysicalCPUs() - 1 : 0;
+    if (numThreads > 0)
     {
-        int numThreads = numCores - 1;
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
         String workerThreadString = "Created " + String(numThreads) + " worker thread";

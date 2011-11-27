@@ -59,7 +59,8 @@
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
 - uint randomSeed
-- uint numCpuCores
+- uint numPhysicalCPUs
+- uint numLogicalCPUs
 - Time@ time
 - Log@ log
 - FileSystem@ fileSystem

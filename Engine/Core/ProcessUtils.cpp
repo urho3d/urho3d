@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <libcpuid.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -38,7 +39,6 @@
 
 #ifdef _MSC_VER
 #include <float.h>
-#include <intrin.h>
 #else
 // From http://stereopsis.com/FPU.html
 
@@ -65,14 +65,6 @@ inline void SetFPUState(unsigned control)
 }
 #endif
 
-void CpuID(int i, int regs[4]) {
-    #ifdef _MSC_VER
-    __cpuid(regs, i);
-    #else
-    __asm__ __volatile__ ("cpuid" : "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3]) : "a" (i), "c" (0));
-    #endif
-}
-
 #include "DebugNew.h"
 
 #ifdef WIN32
@@ -81,6 +73,33 @@ static bool consoleOpened = false;
 static String currentLine;
 static Vector<String> arguments;
 static Mutex staticMutex;
+
+void GetCPUData(struct cpu_id_t* data)
+{
+    if (cpu_identify(0, data) < 0)
+    {
+        data->num_logical_cpus = 1;
+        data->num_cores = 1;
+        return;
+    }
+    
+    // On some Intel processors CPUID will return too many processors.
+    // Sanitate the logical CPU count against the value returned by the OS
+    int logical;
+    #ifdef WIN32
+    SYSTEM_INFO info;
+    GetSystemInfo(&info);
+    logical = info.dwNumberOfProcessors;
+    #else
+    logical = sysconf(_SC_NPROCESSORS_ONLN);
+    #endif
+    
+    while (data->num_logical_cpus > logical)
+    {
+        data->num_logical_cpus >>= 1;
+        data->num_cores >>= 1;
+    }
+}
 
 void InitFPU()
 {
@@ -259,44 +278,18 @@ String GetConsoleInput()
     return ret;
 }
 
-unsigned GetNumCPUCores()
+unsigned GetNumPhysicalCPUs()
 {
-    // Get number of CPU cores without counting hyperthreaded cores, as creating a worker thread for each threaded core results
-    // in extra time spent synchronizing. Code based on
-    // http://stackoverflow.com/questions/2901694/programatically-detect-number-of-physical-processors-cores-or-if-hyper-threading
-    int regs[4];
-    
-    // Get vendor
-    char vendor[12];
-    CpuID(0, regs);
-    ((unsigned*)vendor)[0] = regs[1]; // EBX
-    ((unsigned*)vendor)[1] = regs[3]; // EDX
-    ((unsigned*)vendor)[2] = regs[2]; // ECX
-    String cpuVendor = String(vendor, 12);
-    
-    // Get CPU features
-    CpuID(1, regs);
-    unsigned cpuFeatures = regs[3]; // EDX
-    
-    // Logical core count per CPU
-    CpuID(1, regs);
-    unsigned logical = (regs[1] >> 16) & 0xff; // EBX[23:16]
-    unsigned cores = logical;
-    
-    if (cpuVendor == "GenuineIntel")
-    {
-        // Get DCP cache info
-        CpuID(4, regs);
-        cores = ((regs[0] >> 26) & 0x3f) + 1; // EAX[31:26] + 1
-    }
-    else if (cpuVendor == "AuthenticAMD") 
-    {
-        // Get NC: Number of CPU cores - 1
-        CpuID(0x80000008, regs);
-        cores = ((unsigned)(regs[2] & 0xff)) + 1; // ECX[7:0] + 1
-    }
-    
-    return cores;
+    struct cpu_id_t data;
+    GetCPUData(&data);
+    return data.num_cores;
+}
+
+unsigned GetNumLogicalCPUs()
+{
+    struct cpu_id_t data;
+    GetCPUData(&data);
+    return data.num_logical_cpus;
 }
 
 Mutex& GetStaticMutex()

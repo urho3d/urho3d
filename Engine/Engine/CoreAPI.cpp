@@ -565,7 +565,8 @@ static void RegisterProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void OpenConsoleWindow()", asFUNCTION(OpenConsoleWindow), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetConsoleInput()", asFUNCTION(GetConsoleInput), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetArguments()", asFUNCTION(GetArgumentsToArray), asCALL_CDECL);
-    engine->RegisterGlobalFunction("uint get_numCpuCores()", asFUNCTION(GetNumCPUCores), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint get_numPhysicalCPUs()", asFUNCTION(GetNumPhysicalCPUs), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint get_numLogicalCPUs()", asFUNCTION(GetNumLogicalCPUs), asCALL_CDECL);
 }
 
 static void ConstructAttributeInfo(AttributeInfo* ptr)
