@@ -1,3 +1,5 @@
+#pragma warning(disable:3557)
+
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
