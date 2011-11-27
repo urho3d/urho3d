@@ -36,7 +36,7 @@ public:
     /// Destruct. Reset the low-resolution timer period if set.
     virtual ~Time();
     
-    /// Begin new frame, with (last) frame duration in milliseconds. Send frame start event, then the update events.
+    /// Begin new frame, with (last) frame duration in milliseconds and send frame start event.
     void BeginFrame(unsigned mSec);
     /// End frame. Increment total time and send frame end event.
     void EndFrame();

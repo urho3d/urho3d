@@ -75,33 +75,13 @@ void Time::BeginFrame(unsigned mSec)
     timeStep_ = (float)mSec / 1000.0f;
     timeStepMSec_ = mSec;
     
-    {
-        // Frame begin event
-        using namespace BeginFrame;
-        
-        VariantMap eventData;
-        eventData[P_FRAMENUMBER] = frameNumber_;
-        eventData[P_TIMESTEP] = timeStep_;
-        SendEvent(E_BEGINFRAME, eventData);
-    }
+    // Frame begin event
+    using namespace BeginFrame;
     
-    {
-        // Logic update event
-        using namespace Update;
-        
-        VariantMap eventData;
-        eventData[P_TIMESTEP] = timeStep_;
-        SendEvent(E_UPDATE, eventData);
-        
-        // Logic post-update event
-        SendEvent(E_POSTUPDATE, eventData);
-        
-        // Rendering update event
-        SendEvent(E_RENDERUPDATE, eventData);
-        
-        // Post-render update event
-        SendEvent(E_POSTRENDERUPDATE, eventData);
-    }
+    VariantMap eventData;
+    eventData[P_FRAMENUMBER] = frameNumber_;
+    eventData[P_TIMESTEP] = timeStep_;
+    SendEvent(E_BEGINFRAME, eventData);
 }
 
 void Time::EndFrame()

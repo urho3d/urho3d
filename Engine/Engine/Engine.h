@@ -77,6 +77,8 @@ public:
     /// Return whether the engine has been created in headless mode.
     bool IsHeadless() const { return headless_; }
     
+    /// Send frame update events.
+    void Update();
     /// Render after frame update.
     void Render();
     /// Get the timestep for the next frame and sleep for frame limiting if necessary.

@@ -114,7 +114,7 @@ Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "Uns
 
 \page MainLoop Main loop and frame update
 
-The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3D.exe) responsibility to continuously loop this iteration. The iteration consists of the Engine calling the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, which causes several events to be sent:
+The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3D.exe) responsibility to continuously loop this iteration. The iteration consists of the Engine calling the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, and in between sending various update events. The event order is:
 
 - E_BEGINFRAME: signals the beginning of the new frame. Input and Network react to this to check for operating system window messages and arrived network packets.
 - E_UPDATE: application-wide logic update event. By default each active Scene reacts to this and triggers the scene update (more on this below.)

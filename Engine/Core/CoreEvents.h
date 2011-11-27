@@ -53,7 +53,7 @@ EVENT(E_RENDERUPDATE, RenderUpdate)
 /// Post-render update event.
 EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);          // float
+    PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Frame end event.

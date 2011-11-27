@@ -175,12 +175,12 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
-    // Set amount of worker threads according to the free CPU cores. If hyperthreading is in use,
-    // GetNumCPUCores() reports only the actual physical cores. Also reserve one core for the main thread
+    // Set amount of worker threads according to the available CPU cores. GetNumCPUCores() does not report hyperthreaded cores,
+    // as using them leads to worse performance. Also reserve one core for the main thread
     int numCores = GetNumCPUCores();
     if (threads && numCores > 1)
     {
-        int numThreads = Max(numCores - 1, 1);
+        int numThreads = numCores - 1;
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
         String workerThreadString = "Created " + String(numThreads) + " worker thread";
@@ -291,6 +291,7 @@ void Engine::RunFrame()
     Time* time = GetSubsystem<Time>();
     time->BeginFrame(timeStep_);
     
+    Update();
     Render();
     ApplyFrameLimit();
     
@@ -367,6 +368,25 @@ void Engine::DumpResources()
     }
     
     LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+}
+
+void Engine::Update()
+{
+    // Logic update event
+    using namespace Update;
+    
+    VariantMap eventData;
+    eventData[P_TIMESTEP] = (float)timeStep_ / 1000.f;
+    SendEvent(E_UPDATE, eventData);
+    
+    // Logic post-update event
+    SendEvent(E_POSTUPDATE, eventData);
+    
+    // Rendering update event
+    SendEvent(E_RENDERUPDATE, eventData);
+    
+    // Post-render update event
+    SendEvent(E_POSTRENDERUPDATE, eventData);
 }
 
 void Engine::Render()
