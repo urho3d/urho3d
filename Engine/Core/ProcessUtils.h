@@ -47,5 +47,5 @@ const Vector<String>& ParseArguments(const char* cmdLine);
 const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 String GetConsoleInput();
-/// Return the number of (logical) CPU cores.
+/// Return the number of physical CPU cores.
 unsigned GetNumCPUCores();

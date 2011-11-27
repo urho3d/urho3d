@@ -64,6 +64,25 @@ inline void SetFPUState(unsigned control)
 }
 #endif
 
+// CPUID inline assembly from http://softpixel.com/~cwright/programming/simd/cpuid.php
+inline void PerformCPUID(unsigned& func, unsigned& a, unsigned& b, unsigned& c, unsigned& d)
+{
+    #ifdef _MSC_VER
+    __asm
+    {
+        mov eax, func
+        cpuid
+        mov a, eax
+        mov b, ebx
+        mov c, ecx
+        mov d, edx
+    }
+    #else
+    __asm__ __volatile__ ("cpuid":
+    "=a" (a), "=b" (b), "=c" (c), "=d" (d) : "a" (func));
+    #endif
+}
+
 #include "DebugNew.h"
 
 #ifdef WIN32
@@ -260,8 +279,18 @@ unsigned GetNumCPUCores()
     #ifdef WIN32
     SYSTEM_INFO info;
     GetSystemInfo(&info);
-    return info.dwNumberOfProcessors;
+    unsigned numCores = info.dwNumberOfProcessors;
     #else
-    return sysconf(_SC_NPROCESSORS_ONLN);
+    unsigned numCores = sysconf(_SC_NPROCESSORS_ONLN);
     #endif
+    
+    // If CPU uses hyperthreading, report only half of the cores, as using the "extra" cores for worker threads
+    // seems to result in unstable frame rates and extra time spent synchronizing
+    unsigned func = 1;
+    unsigned a, b, c, d;
+    PerformCPUID(func, a, b, c, d);
+    if (d & 0x10000000)
+        numCores >>= 1;
+    
+    return numCores;
 }
