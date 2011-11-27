@@ -39,8 +39,6 @@ void OpenConsoleWindow();
 void PrintLine(const String& str);
 /// Print to the console. A newline will be added automatically.
 void PrintLine(const char* str);
-/// Return the static library init/shutdown mutex.
-Mutex& GetStaticMutex();
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const char* cmdLine);
 /// Return previously parsed arguments.
@@ -49,3 +47,5 @@ const Vector<String>& GetArguments();
 String GetConsoleInput();
 /// Return the number of physical CPU cores.
 unsigned GetNumCPUCores();
+/// Return the static library init/shutdown mutex.
+Mutex& GetStaticMutex();
