@@ -258,7 +258,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 if (type == LIGHT_DIRECTIONAL)
                     invRange = 0.0f;
                 else
-                    invRange = 1.0f / max(vertexLight->GetRange(), M_EPSILON);
+                    invRange = 1.0f / Max(vertexLight->GetRange(), M_EPSILON);
                 if (type == LIGHT_SPOT)
                 {
                     cutoff = cosf(vertexLight->GetFov() * 0.5f * M_DEGTORAD);
