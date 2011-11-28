@@ -197,3 +197,630 @@ void cpu_rdtsc(uint64_t* result)
 	*result = (uint64_t)low_part + (((uint64_t) hi_part) << 32);
 }
 #endif /* INLINE_ASM_SUPPORTED */
+
+#ifdef INLINE_ASM_SUPPORTED
+void busy_sse_loop(int cycles)
+{
+#ifdef COMPILER_GCC
+#ifndef __APPLE__
+#	define XALIGN ".balign 16\n"
+#else
+#	define XALIGN ".align 4\n"
+#endif
+	__asm __volatile (
+		"	xorps	%%xmm0,	%%xmm0\n"
+		"	xorps	%%xmm1,	%%xmm1\n"
+		"	xorps	%%xmm2,	%%xmm2\n"
+		"	xorps	%%xmm3,	%%xmm3\n"
+		"	xorps	%%xmm4,	%%xmm4\n"
+		"	xorps	%%xmm5,	%%xmm5\n"
+		"	xorps	%%xmm6,	%%xmm6\n"
+		"	xorps	%%xmm7,	%%xmm7\n"
+		XALIGN
+		".bsLoop:\n"
+		// 0:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 1:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 2:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 3:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 4:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 5:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 6:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 7:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 8:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		// 9:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//10:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//11:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//12:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//13:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//14:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//15:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//16:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//17:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//18:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//19:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//20:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//21:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//22:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//23:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//24:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//25:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//26:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//27:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//28:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//29:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//30:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		//31:
+		"	addps	%%xmm1, %%xmm0\n"
+		"	addps	%%xmm2, %%xmm1\n"
+		"	addps	%%xmm3, %%xmm2\n"
+		"	addps	%%xmm4, %%xmm3\n"
+		"	addps	%%xmm5, %%xmm4\n"
+		"	addps	%%xmm6, %%xmm5\n"
+		"	addps	%%xmm7, %%xmm6\n"
+		"	addps	%%xmm0, %%xmm7\n"
+		
+		"	dec	%%eax\n"
+		"	jnz	.bsLoop\n"
+		::"a"(cycles)
+	);
+#else
+#  ifdef COMPILER_MICROSOFT
+	__asm {
+		mov	eax,	cycles
+		xorps	xmm0,	xmm0
+		xorps	xmm1,	xmm1
+		xorps	xmm2,	xmm2
+		xorps	xmm3,	xmm3
+		xorps	xmm4,	xmm4
+		xorps	xmm5,	xmm5
+		xorps	xmm6,	xmm6
+		xorps	xmm7,	xmm7
+		//--
+		align 16
+bsLoop:
+		// 0:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 1:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 2:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 3:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 4:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 5:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 6:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 7:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 8:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 9:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 10:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 11:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 12:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 13:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 14:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 15:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 16:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 17:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 18:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 19:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 20:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 21:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 22:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 23:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 24:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 25:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 26:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 27:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 28:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 29:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 30:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 31:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		//----------------------
+		dec		eax
+		jnz		bsLoop
+	}
+#  else
+#    error "Unsupported compiler"
+#  endif /* COMPILER_MICROSOFT */
+#endif /* COMPILER_GCC */
+}
+#endif /* INLINE_ASSEMBLY_SUPPORTED */

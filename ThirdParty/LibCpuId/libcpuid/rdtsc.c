@@ -26,10 +26,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "libcpuid.h"
+#include "libcpuid_util.h"
+#include "asm-bits.h"
+#include "rdtsc.h"
 
 #ifdef _WIN32
 #include <windows.h>
-static void sys_precise_clock(uint64_t *result)
+void sys_precise_clock(uint64_t *result)
 {
 	double c, f;
 	LARGE_INTEGER freq, counter;
@@ -42,7 +45,7 @@ static void sys_precise_clock(uint64_t *result)
 #else
 /* assuming Linux, Mac OS or other POSIX */
 #include <sys/time.h>
-static void sys_precise_clock(uint64_t *result)
+void sys_precise_clock(uint64_t *result)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -157,6 +160,25 @@ static int busy_loop(int amount)
 	return s;
 }
 
+int busy_loop_delay(int milliseconds)
+{
+	int cycles = 0, r = 0, first = 1;
+	uint64_t a, b, c;
+	sys_precise_clock(&a);
+	while (1) {
+		sys_precise_clock(&c);
+		if ((c - a) / 1000 > milliseconds) return r;
+		r += busy_loop(cycles);
+		if (first) {
+			first = 0;
+		} else {
+			if (c - b < 1000) cycles *= 2;
+			if (c - b > 10000) cycles /= 2;
+		}
+		b = c;
+	}
+}
+
 int cpu_clock_measure(int millis, int quad_check)
 {
 	struct cpu_mark_t begin[4], end[4], temp, temp2;
@@ -202,6 +224,55 @@ int cpu_clock_measure(int millis, int quad_check)
 	}
 	if (results[bi] == -1) return -1;
 	return (results[bi] + results[bj] + _zero) / 2;
+}
+
+int cpu_clock_by_ic(int millis, int runs)
+{
+	int max_value = 0, cur_value, i, ri, cycles_inner, cycles_outer, c;
+	struct cpu_id_t* id;
+	uint64_t t0, t1, tl, hz;
+	int sse_multiplier = 1;
+	if (millis <= 0 || runs <= 0) return -2;
+	id = get_cached_cpuid();
+	if (!id || !id->flags[CPU_FEATURE_SSE]) return -1;
+	//
+	if (id->sse_size < 128) {
+		debugf(1, "SSE execution path is 64-bit\n");
+		sse_multiplier = 2;
+	} else {
+		debugf(1, "SSE execution path is 128-bit\n");
+	}
+	//
+	tl = millis * 125; // (*1000 / 8)
+	cycles_inner = 128;
+	cycles_outer = 1;
+	do {
+		if (cycles_inner < 1000000000) cycles_inner *= 2;
+		else cycles_outer *= 2;
+		sys_precise_clock(&t0);
+		for (i = 0; i < cycles_outer; i++)
+			busy_sse_loop(cycles_inner);
+		sys_precise_clock(&t1);
+	} while (t1 - t0 < tl);
+	debugf(2, "inner: %d, outer: %d\n", cycles_inner, cycles_outer);
+	for (ri = 0; ri < runs; ri++) {
+		sys_precise_clock(&t0);
+		c = 0;
+		do {
+			c++;
+			for (i = 0; i < cycles_outer; i++)
+				busy_sse_loop(cycles_inner);
+			sys_precise_clock(&t1);
+		} while (t1 - t0 < tl * (uint64_t) 8);
+		// cpu_Hz = cycles_inner * cycles_outer * 256 / (t1 - t0) * 1000000
+		debugf(2, "c = %d, td = %llu\n", c, t1 - t0);
+		hz = ((uint64_t) cycles_inner * (uint64_t) 256 + 12) * 
+		     (uint64_t) cycles_outer * (uint64_t) sse_multiplier * (uint64_t) c * (uint64_t) 1000000
+		     / (t1 - t0);
+		cur_value = (int) (hz / 1000000);
+		if (cur_value > max_value) max_value = cur_value;
+	}
+	return max_value;
 }
 
 int cpu_clock(void)

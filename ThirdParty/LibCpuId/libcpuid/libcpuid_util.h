@@ -38,7 +38,7 @@ void match_features(const struct feature_map_t* matchtable, int count,
 
 struct match_entry_t {
 	int family, model, stepping, ext_family, ext_model;
-	int ncores, l2cache, brand_code, model_code;
+	int ncores, l2cache, l3cache, brand_code, model_code;
 	char name[32];
 };
 
@@ -57,6 +57,29 @@ __attribute__((format(printf, 2, 3)))
 ;
 void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
                           struct cpu_list_t* list);
+
+/*
+ * Seek for a pattern in `haystack'.
+ * Pattern may be an fixed string, or contain the special metacharacters
+ * '.' - match any single character
+ * '#' - match any digit
+ * '[<chars>] - match any of the given chars (regex-like ranges are not
+ *              supported)
+ * Return val: 0 if the pattern is not found. Nonzero if it is found (actually,
+ *             x + 1 where x is the index where the match is found).
+ */
+int match_pattern(const char* haystack, const char* pattern);
+
+/*
+ * Gets an initialized cpu_id_t. It is cached, so that internal libcpuid
+ * machinery doesn't need to issue cpu_identify more than once.
+ */
+struct cpu_id_t* get_cached_cpuid(void);
+
+/*
+ * Sets the current errno
+ */
+int set_error(cpu_error_t err);
 
 extern libcpuid_warn_fn_t _warn_fun;
 extern int _current_verboselevel;

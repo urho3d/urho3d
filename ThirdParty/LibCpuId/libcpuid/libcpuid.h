@@ -29,11 +29,20 @@
  * @File     libcpuid.h
  * @Author   Veselin Georgiev
  * @Date     Oct 2008
- * @Version  0.1.0
+ * @Version  0.2.0
  *
  * Version history:
  *
  *  0.1.0 (2008-10-15): initial adaptation from wxfractgui sources
+ *  0.1.1 (2009-07-06): Added intel_fn11 fields to cpu_raw_data_t to handle
+ *                      new processor topology enumeration required on Core i7
+ *  0.1.2 (2009-09-26): Added support for MSR reading through self-extracting
+ *                      kernel driver on Win32.
+ *  0.1.3 (2010-04-20): Added support for greater more accurate CPU clock
+ *                      measurements with cpu_clock_by_ic()
+ *  0.2.0 (2011-10-11): Support for AMD Bulldozer CPUs, 128-bit SSE unit size
+ *                      checking. A backwards-incompatible change, since the
+ *                      sizeof cpu_id_t is now different.
  */
 
 /** @mainpage A simple libcpuid introduction
@@ -62,8 +71,7 @@
 extern "C" {
 #endif
 
-#define VERSION "0.1.0"
-
+#define VERSION "0.2.0"
 /**
  * @brief CPU vendor, as guessed from the Vendor String.
  */
@@ -102,6 +110,11 @@ struct cpu_raw_data_t {
 	    information: this contains the results of CPUID for eax = 4
 	    and ecx = 0, 1, ... */
 	uint32_t intel_fn4[MAX_INTELFN4_LEVEL][4];
+	
+	/** when the CPU is intel and it supports leaf 0Bh (Extended Topology
+	    enumeration leaf), this stores the result of CPUID with 
+	    eax = 11 and ecx = 0, 1, 2... */
+	uint32_t intel_fn11[MAX_INTELFN11_LEVEL][4];
 };
 
 /**
@@ -214,6 +227,15 @@ struct cpu_id_t {
 	 * @endcode
 	 */
 	char cpu_codename[64];
+	
+	/** SSE execution unit size (64 or 128; -1 if N/A) */
+	int32_t sse_size;
+	
+	/**
+	 * contain miscellaneous detection information. Used to test about specifics of
+	 * certain detected features. See CPU_HINT_* macros below. @see Hints
+	 */
+	uint8_t detection_hints[CPU_HINTS_MAX];
 };
 
 /**
@@ -308,7 +330,7 @@ typedef enum {
 	CPU_FEATURE_3DNOWPREFETCH,	/*!< PREFETCH/PREFETCHW support */
 	CPU_FEATURE_OSVW,	/*!< OS Visible Workaround (AMD) */
 	CPU_FEATURE_IBS,	/*!< Instruction-based sampling */
-	CPU_FEATURE_SSE5,	/*!< SSE 5 instructions supported */
+	CPU_FEATURE_SSE5,	/*!< SSE 5 instructions supported (deprecated, will never be 1) */
 	CPU_FEATURE_SKINIT,	/*!< SKINIT / STGI supported */
 	CPU_FEATURE_WDT,	/*!< Watchdog timer support */
 	CPU_FEATURE_TS,		/*!< Temperature sensor */
@@ -320,9 +342,25 @@ typedef enum {
 	CPU_FEATURE_100MHZSTEPS,/*!< 100 MHz multiplier control */
 	CPU_FEATURE_HWPSTATE,	/*!< Hardware P-state control */
 	CPU_FEATURE_CONSTANT_TSC,	/*!< TSC ticks at constant rate */
+	CPU_FEATURE_XOP,	/*!< The XOP instruction set (same as the old CPU_FEATURE_SSE5) */
+	CPU_FEATURE_FMA3,	/*!< The FMA3 instruction set */
+	CPU_FEATURE_FMA4,	/*!< The FMA4 instruction set */
+	CPU_FEATURE_TBM,	/*!< Trailing bit manipulation instruction support */
+	CPU_FEATURE_F16C,	/*!< 16-bit FP convert instruction support */
 	/* termination: */
 	NUM_CPU_FEATURES,
 } cpu_feature_t;
+
+/**
+ * @brief CPU detection hints identifiers
+ *
+ * Usage: similar to the flags usage
+ */
+typedef enum {
+	CPU_HINT_SSE_SIZE_AUTH = 0,	/*!< SSE unit size is authoritative (not only a Family/Model guesswork, but based on an actual CPUID bit) */
+	/* termination */
+	NUM_CPU_HINTS,
+} cpu_hint_t;
 
 /**
  * @brief Describes common library error codes
@@ -336,6 +374,12 @@ typedef enum {
 	ERR_BADFMT   = -5,	/*!< "Bad file format" */
 	ERR_NOT_IMP  = -6,	/*!< "Not implemented" */
 	ERR_CPU_UNKN = -7,	/*!< "Unsupported processor" */
+	ERR_NO_RDMSR = -8,	/*!< "RDMSR instruction is not supported" */
+	ERR_NO_DRIVER= -9,	/*!< "RDMSR driver error (generic)" */
+	ERR_NO_PERMS = -10,	/*!< "No permissions to install RDMSR driver" */
+	ERR_EXTRACT  = -11,	/*!< "Cannot extract RDMSR driver (read only media?)" */
+	ERR_HANDLE   = -12,	/*!< "Bad handle" */
+	ERR_INVMSR   = -13,     /*!< "Invalid MSR" */
 } cpu_error_t;
 
 /**
@@ -603,6 +647,38 @@ int cpu_clock_by_os(void);
 int cpu_clock_measure(int millis, int quad_check);
 
 /**
+ * @brief Measure the CPU clock frequency using instruction-counting
+ *
+ * @param millis - how much time to allocate for each run, in milliseconds
+ * @param runs - how many runs to perform
+ *
+ * The function performs a busy-wait cycle using a known number of "heavy" (SSE)
+ * instructions. These instructions run at (more or less guaranteed) 1 IPC rate,
+ * so by running a busy loop for a fixed amount of time, and measuring the
+ * amount of instructions done, the CPU clock is accurately measured.
+ *
+ * Of course, this function is still affected by the power-saving schemes, so
+ * the warnings as of cpu_clock_measure() still apply. However, this function is
+ * immune to problems with detection, related to the Intel Nehalem's "Turbo"
+ * mode, where the internal clock is raised, but the RDTSC rate is unaffected.
+ *
+ * The function will run for about (millis * runs) milliseconds.
+ * You can make only a single busy-wait run (runs == 1); however, this can
+ * be affected by task scheduling (which will break the counting), so allowing
+ * more than one run is recommended. As run length is not imperative for
+ * accurate readings (e.g., 50ms is sufficient), you can afford a lot of short
+ * runs, e.g. 10 runs of 50ms or 20 runs of 25ms.
+ *
+ * Recommended values - millis = 50, runs = 4. For more robustness,
+ * increase the number of runs.
+ *
+ * @returns the CPU clock frequency in MHz (within some measurement error
+ * margin). If SSE is not supported, the result is -1. If the input parameters
+ * are incorrect, or some other internal fault is detected, the result is -2.
+ */
+int cpu_clock_by_ic(int millis, int runs);
+
+/**
  * @brief Get the CPU clock frequency (all-in-one method)
  *
  * This is an all-in-one method for getting the CPU clock frequency.
@@ -617,7 +693,7 @@ int cpu_clock(void);
 /**
  * @brief Returns the libcpuid version
  *
- * @returns the string representation of the libcpuid version, like "0.1.0"
+ * @returns the string representation of the libcpuid version, like "0.1.1"
  */
 const char* cpuid_lib_version(void);
 
@@ -688,6 +764,93 @@ void cpuid_get_cpu_list(cpu_vendor_t vendor, struct cpu_list_t* list);
  * @param list - the list to be free()'d.
  */
 void cpuid_free_cpu_list(struct cpu_list_t* list);
+
+/**
+ * @brief Starts/opens a driver, needed to read MSRs (Model Specific Registers)
+ *
+ * On systems that support it, this function will create a temporary
+ * system driver, that has privileges to execute the RDMSR instruction.
+ * After the driver is created, you can read MSRs by calling \ref cpu_rdmsr
+ *
+ * @returns a handle to the driver on success, and NULL on error.
+ *          The error message can be obtained by calling \ref cpuid_error.
+ *          @see cpu_error_t
+ */
+struct msr_driver_t;
+struct msr_driver_t* cpu_msr_driver_open(void);
+
+/**
+ * @brief Reads a Model-Specific Register (MSR)
+ *
+ * If the CPU has MSRs (as indicated by the CPU_FEATURE_MSR flag), you can
+ * read a MSR with the given index by calling this function.
+ *
+ * There are several prerequisites you must do before reading MSRs:
+ * 1) You must ensure the CPU has RDMSR. Check the CPU_FEATURE_MSR flag
+ *    in cpu_id_t::flags
+ * 2) You must ensure that the CPU implements the specific MSR you intend to
+ *    read.
+ * 3) You must open a MSR-reader driver. RDMSR is a privileged instruction and
+ *    needs ring-0 access in order to work. This temporary driver is created
+ *    by calling \ref cpu_msr_driver_open
+ *
+ * @param handle - a handle to the MSR reader driver, as created by
+ *                 cpu_msr_driver_open
+ * @param msr_index - the numeric ID of the MSR you want to read
+ * @param result - a pointer to a 64-bit integer, where the MSR value is stored
+ *
+ * @returns zero if successful, and some negative number on error.
+ *          The error message can be obtained by calling \ref cpuid_error.
+ *          @see cpu_error_t
+ */
+int cpu_rdmsr(struct msr_driver_t* handle, int msr_index, uint64_t* result);
+
+
+typedef enum {
+	INFO_MPERF,                /*!< Maximum performance frequency clock. This
+                                    is a counter, which increments as a
+                                    proportion of the actual processor speed */
+	INFO_APERF,                /*!< Actual performance frequency clock. This
+                                    accumulates the core clock counts when the
+                                    core is active. */
+	INFO_CUR_MULTIPLIER,       /*!< Current CPU:FSB ratio, multiplied by 100.
+                                    e.g., a CPU:FSB value of 18.5 reads as
+                                    1850. */
+	INFO_MAX_MULTIPLIER,       /*!< Maxumum CPU:FSB ratio for this CPU,
+                                    multiplied by 100 */
+	INFO_TEMPERATURE,          /*!< The current core temperature in Celsius */
+	INFO_THROTTLING,           /*!< 1 if the current logical processor is
+                                    throttling. 0 if it is running normally. */
+} cpu_msrinfo_request_t;
+
+/**
+ * @brief Reads extended CPU information from Model-Specific Registers.
+ * @param handle - a handle to an open MSR driver, @see cpu_msr_driver_open
+ * @param which - which info field should be returned. A list of
+ *                available information entities is listed in the
+ *                cpu_msrinfo_request_t enum.
+ * @retval - if the requested information is available for the current
+ *           processor model, the respective value is returned.
+ *           if no information is available, or the CPU doesn't support
+ *           the query, the special value CPU_INVALID_VALUE is returned
+ */
+int cpu_msrinfo(struct msr_driver_t* handle, cpu_msrinfo_request_t which);
+#define CPU_INVALID_VALUE 0x3fffffff
+
+/**
+ * @brief Closes an open MSR driver
+ *
+ * This function unloads the MSR driver opened by cpu_msr_driver_open and
+ * frees any resources associated with it.
+ *
+ * @param handle - a handle to the MSR reader driver, as created by
+ *                 cpu_msr_driver_open
+ *
+ * @returns zero if successful, and some negative number on error.
+ *          The error message can be obtained by calling \ref cpuid_error.
+ *          @see cpu_error_t
+ */
+int cpu_msr_driver_close(struct msr_driver_t* handle);
 
 #ifdef __cplusplus
 }; /* extern "C" */

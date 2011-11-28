@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <ctype.h>
 #include "libcpuid.h"
 #include "libcpuid_util.h"
 
@@ -48,7 +49,7 @@ static void default_warn(const char *msg)
 
 libcpuid_warn_fn_t _warn_fun = default_warn;
 
-#if defined(_MSC_VER) && defined(_M_AMD64)
+#if defined(_MSC_VER)
 #	define vsnprintf _vsnprintf
 #endif
 void warnf(const char* format, ...)
@@ -84,6 +85,7 @@ static int score(const struct match_entry_t* entry, const struct cpu_id_t* data,
 	if (entry->ext_model	== data->ext_model ) res++;
 	if (entry->ncores	== data->num_cores ) res++;
 	if (entry->l2cache	== data->l2_cache  ) res++;
+	if (entry->l3cache	== data->l3_cache  ) res++;
 	if (entry->brand_code   == brand_code      ) res++;
 	if (entry->model_code   == model_code      ) res++;
 	return res;
@@ -130,4 +132,51 @@ void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
 		list->names[n++] = strdup(matchtable[i].name);
 	}
 	list->num_entries = n;
+}
+
+static int xmatch_entry(char c, const char* p)
+{
+	int i, j;
+	if (c == 0) return -1;
+	if (c == p[0]) return 1;
+	if (p[0] == '.') return 1;
+	if (p[0] == '#' && isdigit(c)) return 1;
+	if (p[0] == '[') {
+		j = 1;
+		while (p[j] && p[j] != ']') j++;
+		if (!p[j]) return -1;
+		for (i = 1; i < j; i++)
+			if (p[i] == c) return j + 1;
+	}
+	return -1;
+}
+
+int match_pattern(const char* s, const char* p)
+{
+	int i, j, dj, k, n, m;
+	n = (int) strlen(s);
+	m = (int) strlen(p);
+	for (i = 0; i < n; i++) {
+		if (xmatch_entry(s[i], p) != -1) {
+			j = 0;
+			k = 0;
+			while (j < m && ((dj = xmatch_entry(s[i + k], p + j)) != -1)) {
+				k++;
+				j += dj;
+			}
+			if (j == m) return i + 1;
+		}
+	}
+	return 0;
+}
+
+struct cpu_id_t* get_cached_cpuid(void)
+{
+	static int initialized = 0;
+	static struct cpu_id_t id;
+	if (initialized) return &id;
+	if (cpu_identify(NULL, &id))
+		memset(&id, 0, sizeof(id));
+	initialized = 1;
+	return &id;
 }

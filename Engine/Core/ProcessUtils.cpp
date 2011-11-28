@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2011 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,24 +80,6 @@ void GetCPUData(struct cpu_id_t* data)
     {
         data->num_logical_cpus = 1;
         data->num_cores = 1;
-        return;
-    }
-    
-    // On some Intel processors CPUID will return too many processors.
-    // Sanitate the logical CPU count against the value returned by the OS
-    int logical;
-    #ifdef WIN32
-    SYSTEM_INFO info;
-    GetSystemInfo(&info);
-    logical = info.dwNumberOfProcessors;
-    #else
-    logical = sysconf(_SC_NPROCESSORS_ONLN);
-    #endif
-    
-    while (data->num_logical_cpus > logical)
-    {
-        data->num_logical_cpus >>= 1;
-        data->num_cores >>= 1;
     }
 }
 

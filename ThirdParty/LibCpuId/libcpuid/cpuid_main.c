@@ -39,7 +39,7 @@
 
 static int _libcpiud_errno = ERR_OK;
 
-static int set_error(cpu_error_t err)
+int set_error(cpu_error_t err)
 {
 	_libcpiud_errno = (int) err;
 	return (int) err;
@@ -56,6 +56,7 @@ static void cpu_id_t_constructor(struct cpu_id_t* id)
 	id->l1_data_cache = id->l1_instruction_cache = id->l2_cache = id->l3_cache = -1;
 	id->l1_assoc = id->l2_assoc = id->l3_assoc = -1;
 	id->l1_cacheline = id->l2_cacheline = id->l3_cacheline = -1;
+	id->sse_size = -1;
 }
 
 static int parse_token(const char* expected_token, const char *token,
@@ -172,6 +173,7 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 		{ 13, CPU_FEATURE_CX16 },
 		{ 19, CPU_FEATURE_SSE4_1 },
 		{ 23, CPU_FEATURE_POPCNT },
+		{ 29, CPU_FEATURE_F16C },
 	};
 	const struct feature_map_t matchtable_edx81[] = {
 		{ 11, CPU_FEATURE_SYSCALL },
@@ -187,6 +189,21 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	if (raw->ext_cpuid[0][0] >= 1) {
 		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);
 		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][2], data);
+	}
+	if (data->flags[CPU_FEATURE_SSE]) {
+		/* apply guesswork to check if the SSE unit width is 128 bit */
+		switch (data->vendor) {
+			case VENDOR_AMD:
+				data->sse_size = (data->ext_family >= 16 && data->ext_family != 23) ? 128 : 64;
+				break;
+			case VENDOR_INTEL:
+				data->sse_size = (data->family == 6 && data->ext_model >= 15) ? 128 : 64;
+				break;
+			default:
+				break;
+		}
+		/* leave the CPU_FEATURE_128BIT_SSE_AUTH 0; the advanced per-vendor detection routines
+		 * will set it accordingly if they detect the needed bit */
 	}
 }
 
@@ -309,6 +326,12 @@ int cpuid_get_raw_data(struct cpu_raw_data_t* data)
 		data->intel_fn4[i][2] = i;
 		cpu_exec_cpuid_ext(data->intel_fn4[i]);
 	}
+	for (i = 0; i < MAX_INTELFN11_LEVEL; i++) {
+		memset(data->intel_fn11[i], 0, sizeof(data->intel_fn11[i]));
+		data->intel_fn11[i][0] = 11;
+		data->intel_fn11[i][2] = i;
+		cpu_exec_cpuid_ext(data->intel_fn11[i]);
+	}
 	return set_error(ERR_OK);
 }
 
@@ -337,6 +360,10 @@ int cpuid_serialize_raw_data(struct cpu_raw_data_t* data, const char* filename)
 		fprintf(f, "intel_fn4[%d]=%08x %08x %08x %08x\n", i,
 			data->intel_fn4[i][0], data->intel_fn4[i][1],
 			data->intel_fn4[i][2], data->intel_fn4[i][3]);
+	for (i = 0; i < MAX_INTELFN11_LEVEL; i++)
+		fprintf(f, "intel_fn11[%d]=%08x %08x %08x %08x\n", i,
+			data->intel_fn11[i][0], data->intel_fn11[i][1],
+			data->intel_fn11[i][2], data->intel_fn11[i][3]);
 	
 	if (strcmp(filename, ""))
 		fclose(f);
@@ -384,6 +411,7 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 		syntax = syntax && parse_token("basic_cpuid", token, value, data->basic_cpuid, 32, &recognized);
 		syntax = syntax && parse_token("ext_cpuid", token, value, data->ext_cpuid, 32, &recognized);
 		syntax = syntax && parse_token("intel_fn4", token, value, data->intel_fn4,  4, &recognized);
+		syntax = syntax && parse_token("intel_fn11", token, value, data->intel_fn11,  4, &recognized);
 		if (!syntax) {
 			warnf("Error: %s:%d: Syntax error\n", filename, cur_line);
 			fclose(f);
@@ -511,6 +539,12 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_100MHZSTEPS, "100mhzsteps" },
 		{ CPU_FEATURE_HWPSTATE, "hwpstate" },
 		{ CPU_FEATURE_CONSTANT_TSC, "constant_tsc" },
+		{ CPU_FEATURE_XOP, "xop" },
+		{ CPU_FEATURE_FMA3, "fma3" },
+		{ CPU_FEATURE_FMA4, "fma4" },
+		{ CPU_FEATURE_TBM, "tbm" },
+		{ CPU_FEATURE_F16C, "f16c" },
+
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {

@@ -6,9 +6,10 @@ String userName;
 
 void ParseNetworkArguments()
 {
-    Array<String> arguments = GetArguments();
     uint index = 0;
 
+    Array<String>@ arguments = GetArguments();
+    
     for (uint i = 0; i < arguments.length; ++i)
     {
         if (arguments[i][0] != '-')
