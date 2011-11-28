@@ -89,6 +89,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool interpolate = true;
     bool flush = true;
     bool threads = true;
+    bool logDebug = false;
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
@@ -98,6 +99,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             
             if (argument == "headless")
                 headless_ = true;
+            else if (argument == "logdebug")
+                logDebug = true;
             else if (argument == "nolimit")
                 SetMaxFps(0);
             else if (argument == "nosound")
@@ -174,6 +177,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     // Start logging
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
+    if (logDebug)
+        log->SetLevel(LOG_DEBUG);
     
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread

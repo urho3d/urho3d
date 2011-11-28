@@ -97,7 +97,7 @@ public:
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Add a triangle mesh.
     void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
-    /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
+    /// Update vertex buffer and render all debug lines. The viewport and render target should be set before.
     void Render();
     
     /// Return the view transform.

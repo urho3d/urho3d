@@ -543,7 +543,7 @@ bool Graphics::BeginFrame()
     
     impl_->device_->BeginScene();
     
-    // Set default rendertarget and depth buffer
+    // Set default render target and depth buffer
     ResetRenderTargets();
     
     // Cleanup textures from previous frame
@@ -1312,7 +1312,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         impl_->colorSurfaces_[index] = newColorSurface;
     }
     
-    // If the rendertarget is also bound as a texture, replace with backup texture or null
+    // If the render target is also bound as a texture, replace with backup texture or null
     if (renderTarget)
     {
         Texture* parentTexture = renderTarget->GetParentTexture();

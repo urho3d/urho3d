@@ -662,7 +662,7 @@ void View::GetBatches()
                     continue;
                 
                 // Check here if the material technique refers to a render target texture with camera(s) attached
-                // Only check this for the main view (null rendertarget)
+                // Only check this for the main view (null render target)
                 if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
                     CheckMaterialForAuxView(baseBatch.material_);
                 

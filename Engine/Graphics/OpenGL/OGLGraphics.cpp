@@ -279,7 +279,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
     
-    // Reset rendertargets and viewport for the new screen mode
+    // Reset render targets and viewport for the new screen mode
     ResetRenderTargets();
     
     // Clear the window to black now, because GPU object restore may take time
@@ -358,7 +358,7 @@ bool Graphics::BeginFrame()
     if (fullscreen_ && (!glfwGetWindowParam(impl_->window_, GLFW_ACTIVE) || glfwGetWindowParam(impl_->window_, GLFW_ICONIFIED)))
         return false;
     
-    // Set default rendertarget and depth buffer
+    // Set default render target and depth buffer
     ResetRenderTargets();
     
     // Cleanup textures from previous frame
@@ -1129,7 +1129,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     {
         renderTargets_[index] = renderTarget;
         
-        // If the rendertarget is also bound as a texture, replace with backup texture or null
+        // If the render target is also bound as a texture, replace with backup texture or null
         if (renderTarget)
         {
             Texture* parentTexture = renderTarget->GetParentTexture();
@@ -1169,7 +1169,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         // otherwise it is an OpenGL error (incomplete framebuffer)
         SetDrawBuffers();
         
-        // If all rendertargets and the depth buffer are not textures, revert to backbuffer rendering
+        // If all render targets and the depth buffer are not textures, revert to backbuffer rendering
         bool noFBO = (depthStencil_ == 0);
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
@@ -1201,22 +1201,28 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
     if (depthStencil != depthStencil_)
     {
-        // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth stencil
-        // Create a new depth stencil texture as necessary to be able to provide similar behaviour.
+        // If we are using a render target texture, it is required in OpenGL to also have an own depth stencil
+        // Create a new depth stencil texture as necessary to be able to provide similar behaviour as Direct3D9
         if (renderTargets_[0] && !depthStencil)
         {
             int width = renderTargets_[0]->GetWidth();
             int height = renderTargets_[0]->GetHeight();
-            int searchKey = (width << 16) | height;
-            HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
-            if (i != depthTextures_.End())
-                depthStencil = i->second_->GetRenderSurface();
-            else
+            
+            // Direct3D9 default depth stencil can not be used when render target is larger than the window.
+            // Check size similarly
+            if (width <= width_ && height <= height_)
             {
-                SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
-                newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-                depthTextures_[searchKey] = newDepthTexture;
-                depthStencil = newDepthTexture->GetRenderSurface();
+                int searchKey = (width << 16) | height;
+                HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
+                if (i != depthTextures_.End())
+                    depthStencil = i->second_->GetRenderSurface();
+                else
+                {
+                    SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
+                    newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+                    depthTextures_[searchKey] = newDepthTexture;
+                    depthStencil = newDepthTexture->GetRenderSurface();
+                }
             }
         }
         
@@ -1268,7 +1274,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         // otherwise it is an OpenGL error (incomplete framebuffer)
         SetDrawBuffers();
         
-        // If all rendertargets and the depth buffer are not textures, revert to backbuffer rendering
+        // If all render targets and the depth buffer are not textures, revert to backbuffer rendering
         bool noFBO = (depthStencil_ == 0);
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
@@ -1847,7 +1853,7 @@ void Graphics::ResetCachedState()
 
 void Graphics::SetDrawBuffers()
 {
-    // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
+    // Calculate the bit combination of non-zero color render targets to first check if the combination changed
     unsigned newDrawBuffers = 0;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
@@ -1858,7 +1864,7 @@ void Graphics::SetDrawBuffers()
     if (newDrawBuffers == impl_->drawBuffers_)
         return;
     
-    // Check for no color rendertargets (depth rendering only)
+    // Check for no color render targets (depth rendering only)
     if (!newDrawBuffers)
         glDrawBuffer(GL_NONE);
     else

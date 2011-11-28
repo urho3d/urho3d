@@ -200,8 +200,7 @@ int Texture::GetLevelHeight(unsigned level) const
 
 TextureUsage Texture::GetUsage() const
 {
-    /// \todo Check for rendertarget / depthstencil mode
-    
+    /// \todo Check for render target / depth stencil mode
     if (dynamic_)
         return TEXTURE_DYNAMIC;
     

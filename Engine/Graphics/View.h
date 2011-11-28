@@ -90,7 +90,7 @@ public:
     /// Destruct.
     virtual ~View();
     
-    /// Define with rendertarget and viewport. Return true if successful.
+    /// Define with render target and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, const Viewport& viewport);
     /// Update and cull objects and construct rendering batches.
     void Update(const FrameInfo& frame);

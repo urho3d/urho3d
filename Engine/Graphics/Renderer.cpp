@@ -766,7 +766,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     int retries = 3;
     
     #ifdef USE_OPENGL
-    // Create shadow map only. Color rendertarget is not needed
+    // Create shadow map only. Color render target is not needed
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
@@ -783,7 +783,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
     }
     #else
-    // Create shadow map and dummy color rendertarget
+    // Create shadow map and dummy color render target
     bool fallback = graphics_->GetFallback();
     while (retries)
     {
@@ -798,13 +798,13 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             if (!fallback)
             {
-                // If no dummy color rendertarget for this size exists yet, create one now
+                // If no dummy color render target for this size exists yet, create one now
                 if (!colorShadowMaps_.Contains(searchKey))
                 {
                     colorShadowMaps_[searchKey] = new Texture2D(context_);
                     colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
                 }
-                // Link the color rendertarget to the shadow map
+                // Link the color render target to the shadow map
                 newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
             }
             else

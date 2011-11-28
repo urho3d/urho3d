@@ -152,11 +152,11 @@ public:
     void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
-    /// Reset all render targets and depth buffer (render to back buffer and back buffer depth stencil.)
+    /// Reset all render targets and depth stencil buffer (render to back buffer.)
     void ResetRenderTargets();
     /// Reset specific render target.
     void ResetRenderTarget(unsigned index);
-    /// Reset depth stencil.
+    /// Reset depth stencil buffer.
     void ResetDepthStencil();
     /// Set render target.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
@@ -458,7 +458,7 @@ private:
     unsigned stencilMask_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Map for additional depth textures, to emulate Direct3D9 ability to mix rendertarget and backbuffer rendering.
+    /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
     HashMap<int, SharedPtr<Texture2D> > depthTextures_;
 };
 

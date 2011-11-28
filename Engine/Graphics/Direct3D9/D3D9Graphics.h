@@ -130,11 +130,11 @@ public:
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
     /// %Set texture anisotropy.
     void SetTextureAnisotropy(unsigned level);
-    /// Reset all render targets and depth buffer (render to back buffer and back buffer depth stencil.)
+    /// Reset all render targets and depth stencil buffer (render to back buffer.)
     void ResetRenderTargets();
     /// Reset specific render target.
     void ResetRenderTarget(unsigned index);
-    /// Reset depth stencil.
+    /// Reset depth stencil buffer.
     void ResetDepthStencil();
     /// %Set render target.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
