@@ -23,7 +23,7 @@
 
 #pragma once
 
-/// Signal on which a thread can wait.
+/// %Signal on which a thread can wait.
 class Signal
 {
 public:

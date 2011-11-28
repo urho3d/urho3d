@@ -176,8 +176,6 @@ Urho3D uses the following conventions and principles:
 
 - %Audio volume is specified from 0.0 (silence) to 1.0 (full volume)
 
-- Axis aligned bounding boxes are used in all bounding tests, except for raycast into bone collision boxes, and testing whether a Camera is inside a Zone; in those cases oriented bounding boxes are used instead.
-
 - Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
 
 - In the script API, properties are used whenever appropriate instead of %Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.

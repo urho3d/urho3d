@@ -30,8 +30,6 @@
 struct SArrayBuffer;
 
 /// %Script array type.
-struct SArrayBuffer;
-
 class CScriptArray
 {
 public:

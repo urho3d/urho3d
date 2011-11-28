@@ -820,9 +820,9 @@ public:
 
     /// Return the value, template version.
     template <class T> T Get() const;
-    /// Return type.
+    /// Return value's type.
     VariantType GetType() const { return type_; }
-    /// Return type name.
+    /// Return value's type name.
     const String& GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;

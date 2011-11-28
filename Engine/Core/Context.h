@@ -38,7 +38,7 @@ public:
     /// Destruct.
     ~Context();
     
-    /// Create an object by type. Return pointer to it or null if no factory found.
+    /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(ShortStringHash objectType);
     /// Register a factory for an object type. If exists already, will not be replaced.
     void RegisterFactory(ObjectFactory* factory);

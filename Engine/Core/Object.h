@@ -41,7 +41,7 @@ public:
     /// Destruct. Clean up self from event sender & receiver structures.
     virtual ~Object();
     
-    /// Return type.
+    /// Return type hash.
     virtual ShortStringHash GetType() const = 0;
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
@@ -70,8 +70,6 @@ public:
     void SendEvent(Object* receiver, StringHash eventType);
     /// Send event with parameters to a specific receiver.
     void SendEvent(Object* receiver, StringHash eventType, VariantMap& eventData);
-    /// Template version of creating an object.
-    template <class T> SharedPtr<T> CreateObject();
     
     /// Return execution context.
     Context* GetContext() const { return context_; }
@@ -96,7 +94,6 @@ private:
     Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
 };
 
-template <class T> SharedPtr<T> Object::CreateObject() { return StaticCast<T>(CreateObject(T::GetTypeStatic())); }
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 
 /// Base class for object factories.
@@ -115,9 +112,9 @@ public:
     
     /// Return execution context.
     Context* GetContext() const { return context_; }
-    /// Return type.
+    /// Return type hash of objects created by this factory.
     ShortStringHash GetType() const { return type_; }
-    /// Return typename.
+    /// Return type name of objects created by this factory.
     const String& GetTypeName() const { return typeName_; }
     
 protected:
@@ -125,7 +122,7 @@ protected:
     Context* context_;
     /// Object type.
     ShortStringHash type_;
-    /// Object typename.
+    /// Object type name.
     String typeName_;
 };
 
