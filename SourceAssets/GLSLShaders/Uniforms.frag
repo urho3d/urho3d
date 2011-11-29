@@ -8,7 +8,6 @@ uniform vec3 cMatEmissiveColor;
 uniform vec2 cMatSpecProperties;
 uniform vec2 cSampleOffsets;
 uniform vec4 cShadowCubeAdjust;
-uniform vec2 cShadowCubeProj;
+uniform vec4 cShadowDepthFade;
 uniform vec4 cShadowIntensity;
-uniform vec2 cShadowFade;
 uniform vec4 cShadowSplits;

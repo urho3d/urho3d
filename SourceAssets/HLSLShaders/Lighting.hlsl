@@ -136,13 +136,13 @@ float GetCubeShadow(float3 lightVec)
     indirectPos.xy *= cShadowCubeAdjust.xy;
     indirectPos.xy += float2(cShadowCubeAdjust.z + indirectPos.z * 0.5, cShadowCubeAdjust.w + indirectPos.w);
 
-    float4 shadowPos = float4(indirectPos.xy, cShadowCubeProj.x + cShadowCubeProj.y / depth, 1.0);
+    float4 shadowPos = float4(indirectPos.xy, cShadowDepthFade.x + cShadowDepthFade.y / depth, 1.0);
     return GetShadow(shadowPos);
 }
 
 float GetShadowFade(float depth)
 {
-    return saturate((depth - cShadowFade.x) * cShadowFade.y);
+    return saturate((depth - cShadowDepthFade.z) * cShadowDepthFade.w);
 }
 
 float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)

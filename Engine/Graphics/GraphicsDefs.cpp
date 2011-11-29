@@ -53,7 +53,6 @@ StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
 StringHash PSP_MATSPECPROPERTIES("MatSpecProperties");
 StringHash PSP_SAMPLEOFFSETS("SampleOffsets");
 StringHash PSP_SHADOWCUBEADJUST("ShadowCubeAdjust");
-StringHash PSP_SHADOWCUBEPROJ("ShadowCubeProj");
-StringHash PSP_SHADOWFADE("ShadowFade");
+StringHash PSP_SHADOWDEPTHFADE("ShadowDepthFade");
 StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 StringHash PSP_SHADOWSPLITS("ShadowSplits");

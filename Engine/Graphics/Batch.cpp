@@ -410,7 +410,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 graphics->SetShaderParameter(PSP_SHADOWCUBEADJUST, Vector4(mulX, mulY, addX, addY));
             }
             
-            if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEPROJ, light))
+            if (graphics->NeedParameterUpdate(PSP_SHADOWDEPTHFADE, light))
             {
                 // Note: we use the shadow camera of the first cube face. All are assumed to use the same projection
                 Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
@@ -419,18 +419,14 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 float q = farClip / (farClip - nearClip);
                 float r = -q * nearClip;
                 
-                graphics->SetShaderParameter(PSP_SHADOWCUBEPROJ, Vector4(q, r, 0.0f, 0.0f));
-            }
-            
-            if (graphics->NeedParameterUpdate(PSP_SHADOWFADE, light))
-            {
                 const CascadeParameters& parameters = light->GetShadowCascade();
-                float farClip = camera_->GetFarClip();
+                float viewFarClip = camera_->GetFarClip();
                 float shadowRange = parameters.GetShadowRange();
-                float fadeStart = parameters.fadeStart_ * shadowRange / farClip;
-                float fadeEnd = shadowRange / farClip;
+                float fadeStart = parameters.fadeStart_ * shadowRange / viewFarClip;
+                float fadeEnd = shadowRange / viewFarClip;
                 float fadeRange = fadeEnd - fadeStart;
-                graphics->SetShaderParameter(PSP_SHADOWFADE, Vector4(fadeStart, 1.0f / fadeRange, 0.0f, 0.0f));
+                
+                graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeStart, 1.0f / fadeRange));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWINTENSITY, light))

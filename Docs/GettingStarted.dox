@@ -37,7 +37,7 @@ Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-Currently, four example application scripts exist:
+Currently, five example application scripts exist:
 
 \section Running_TestScene TestScene
 
@@ -55,6 +55,7 @@ F5          Save scene
 F7          Load scene
 1 to 9      Toggle rendering options
 T           Toggle profiling display
+C           Toggle orthographic camera
 \endverbatim
 
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
@@ -93,6 +94,24 @@ To connect automatically, the server address can also be given on the command li
 %Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
 
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
+
+\section Running_LightTest LightTest
+
+%Light rendering performance test. To start, run LightTest.bat in the Bin directory, or use the command Urho3D.exe Scripts\LightTest.as
+
+Key and mouse controls:
+
+\verbatim
+WSAD        Move
+ZX          Select model to use
+Arrows      Add and remove lights and objects
+Pageup/down Add or remove 10 lights
+Right mouse Hold and move mouse to rotate view
+F1          Toggle AngelScript console
+1 to 9      Toggle rendering options
+T           Toggle profiling display
+C           Toggle orthographic camera
+\endverbatim
 
 \section Running_Commandline Command line options
 

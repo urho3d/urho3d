@@ -93,9 +93,6 @@ void InitScene()
     testScene.CreateComponent("Octree");
     testScene.CreateComponent("DebugRenderer");
 
-    testScene.RegisterVar("Score");
-    testScene.RegisterVar("Health");
-
     world.gravity = Vector3(0.0, -9.81, 0.0);
     world.fps = 100;
     world.linearRestThreshold = 0.1;

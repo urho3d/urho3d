@@ -221,8 +221,7 @@ extern StringHash PSP_MATEMISSIVECOLOR;
 extern StringHash PSP_MATSPECPROPERTIES;
 extern StringHash PSP_SAMPLEOFFSETS;
 extern StringHash PSP_SHADOWCUBEADJUST;
-extern StringHash PSP_SHADOWCUBEPROJ;
-extern StringHash PSP_SHADOWFADE;
+extern StringHash PSP_SHADOWDEPTHFADE;
 extern StringHash PSP_SHADOWINTENSITY;
 extern StringHash PSP_SHADOWSPLITS;
 

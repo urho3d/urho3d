@@ -217,13 +217,8 @@ void InitScene()
             Random() * 150 - 75
         );
 
-        Color color(
-            (RandomInt() & 1) * 0.5 + 0.5,
-            (RandomInt() & 1) * 0.5 + 0.5,
-            (RandomInt() & 1) * 0.5 + 0.5
-        );
-
-        if ((color.r == 0.5) && (color.g == 0.5) && (color.b == 0.5))
+        Color color((RandomInt() & 1) * 0.5 + 0.5, (RandomInt() & 1) * 0.5 + 0.5, (RandomInt() & 1) * 0.5 + 0.5);
+        if (color.r == 0.5 && color.g == 0.5 && color.b == 0.5)
             color = Color(1, 1, 1);
 
         float angle = Random() * 360;
@@ -245,7 +240,7 @@ void InitScene()
         // for better shadow depth resolution
         light.shadowNearFarRatio = 0.01;
 
-        // Store the original rotation as an entity property
+        // Store the original rotation as a node property
         newNode.vars["rotation"] = Variant(newNode.rotation);
 
         lights.Push(newNode);
