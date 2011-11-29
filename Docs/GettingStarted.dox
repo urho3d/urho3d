@@ -110,7 +110,9 @@ Right mouse Hold and move mouse to rotate view
 F1          Toggle AngelScript console
 1 to 9      Toggle rendering options
 T           Toggle profiling display
+V           Toggle vertex lighting
 C           Toggle orthographic camera
+R           Re-randomize light and object positions
 \endverbatim
 
 \section Running_Commandline Command line options

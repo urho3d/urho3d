@@ -14,6 +14,7 @@ int numObjects = 1;
 
 Array<String> modelNames = {"Models/Box.mdl", "Models/Mushroom.mdl", "Models/Jack.mdl"};
 Array<String> materialNames = {"Materials/Test.xml", "Materials/Mushroom.xml", "Materials/Jack.xml"};
+Array<Vector3> modelScales = {Vector3(0.6, 0.6, 0.6), Vector3(1, 1, 1), Vector3(1, 1, 1)};
 Array<Light@> lights;
 Array<StaticModel@> objects;
 
@@ -76,7 +77,7 @@ void InitScene()
     {
         Node@ objectNode = testScene.CreateChild("Object");
         if (i >= 1)
-            objectNode.position = Vector3(Random(4.0) - 2.0, Random(2.0) - 1.0, Random(4.0) - 2.0);
+            objectNode.position = GetRandomPosition();
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.visible = false;
@@ -87,7 +88,7 @@ void InitScene()
     {
         Node@ lightNode = testScene.CreateChild("Light");
         Light@ light = lightNode.CreateComponent("Light");
-        lightNode.position = Vector3(Random(4.0) - 2.0, Random(4.0) - 2.0, Random(4.0) - 2.0);
+        lightNode.position = GetRandomPosition();
 
         Color color((RandomInt() & 1) * 0.5 + 0.5, (RandomInt() & 1) * 0.5 + 0.5, (RandomInt() & 1) * 0.5 + 0.5);
         if (color.r == 0.5 && color.g == 0.5 && color.b == 0.5)
@@ -123,6 +124,7 @@ void LoadNewModel()
     {
         objects[i].model = cache.GetResource("Model", modelNames[modelIndex]);
         objects[i].material = cache.GetResource("Material", materialNames[modelIndex]);
+        objects[i].node.scale = modelScales[modelIndex];
     }
 }
 
@@ -136,6 +138,26 @@ void EnableObjects()
 {
     for (uint i = 0; i < objects.length; ++i)
         objects[i].visible = i < numObjects;
+}
+
+void RandomizePositions()
+{
+    for (uint i = 0; i < objects.length; ++i)
+        objects[i].node.position = GetRandomPosition();
+
+    for (uint i = 0; i < lights.length; ++i)
+        lights[i].node.position = GetRandomPosition();
+}
+
+void ToggleVertexLighting()
+{
+    for (uint i = 0; i < lights.length; ++i)
+        lights[i].perVertex = !lights[i].perVertex;
+}
+
+Vector3 GetRandomPosition()
+{
+    return Vector3(Random(4.0) - 2.0, Random(3.0) - 1.5, Random(4.0) - 2.0);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -277,6 +299,12 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 numLights = 0;
             EnableLights();
         }
+        
+        if (input.keyPress['R'])
+            RandomizePositions();
+
+        if (input.keyPress['V'])
+            ToggleVertexLighting();
     }
 
     if (input.keyPress[KEY_ESC])
