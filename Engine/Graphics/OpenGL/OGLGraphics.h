@@ -237,6 +237,8 @@ public:
     bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
+    /// Return whether hardware depth texture is supported.
+    bool GetHardwareDepthSupport() const { return false; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether 24-bit shadow maps are supported. Assume true on OpenGL.
@@ -269,6 +271,8 @@ public:
     RenderSurface* GetRenderTarget(unsigned index) const;
     /// Return depth stencil buffer.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
+    /// Return backbuffer depth stencil texture, created if available. Never created on OpenGL.
+    Texture2D* GetDepthTexture() const { return 0; }
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
     /// Return whether alpha testing is enabled.

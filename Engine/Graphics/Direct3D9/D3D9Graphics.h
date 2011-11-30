@@ -217,6 +217,8 @@ public:
     bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
+    /// Return whether hardware depth can be read as a texture.
+    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether 24-bit shadow maps are supported.
@@ -247,6 +249,8 @@ public:
     RenderSurface* GetRenderTarget(unsigned index) const;
     /// Return current depth stencil buffer.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
+    /// Return backbuffer depth stencil texture, created if available.
+    Texture2D* GetDepthTexture() const;
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
     /// Return whether alpha testing is enabled.
@@ -368,6 +372,10 @@ private:
     bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
+    /// System depth stencil flag.
+    bool systemDepthStencil_;
+    /// Hardware depth texture support flag.
+    bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
     /// 24-bit shadow map support flag.
@@ -430,6 +438,8 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use.
     RenderSurface* depthStencil_;
+    /// Backbuffer depth stencil texture.
+    SharedPtr<Texture2D> depthTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
     /// Alpha test enable flag.

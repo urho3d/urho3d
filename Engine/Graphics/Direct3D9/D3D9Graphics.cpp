@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2011 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -173,6 +173,8 @@ Graphics::Graphics(Context* context) :
     tripleBuffer_(false),
     flushGPU_(true),
     deviceLost_(false),
+    systemDepthStencil_(false),
+    hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
     streamOffsetSupport_(false),
@@ -216,7 +218,8 @@ Graphics::~Graphics()
     }
     if (impl_->defaultDepthStencilSurface_)
     {
-        impl_->defaultDepthStencilSurface_->Release();
+        if (systemDepthStencil_)
+            impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
     }
     if (impl_->device_)
@@ -339,6 +342,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         impl_->presentParams_.Windowed         = true;
     }
     
+    // Use AutoDepthStencil normally. However, if INTZ depth is available, create a depth texture instead
+    bool autoDepthStencil = multiSample > 1 || !hardwareDepthSupport_;
+    
     impl_->presentParams_.BackBufferWidth            = width;
     impl_->presentParams_.BackBufferHeight           = height;
     impl_->presentParams_.BackBufferCount            = tripleBuffer ? 2 : 1;
@@ -346,7 +352,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
     impl_->presentParams_.hDeviceWindow              = impl_->window_;
-    impl_->presentParams_.EnableAutoDepthStencil     = true;
+    impl_->presentParams_.EnableAutoDepthStencil     = autoDepthStencil ? TRUE : FALSE;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
     impl_->presentParams_.Flags                      = 0;
     impl_->presentParams_.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -420,6 +426,8 @@ void Graphics::Close()
 {
     if (impl_->window_)
     {
+        depthTexture_.Reset();
+        
         DestroyWindow(impl_->window_);
         impl_->window_ = 0;
     }
@@ -1800,6 +1808,11 @@ RenderSurface* Graphics::GetRenderTarget(unsigned index) const
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
 }
 
+Texture2D* Graphics::GetDepthTexture() const
+{
+    return depthTexture_;
+}
+
 unsigned Graphics::GetStreamFrequency(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? streamFrequencies_[index] : 0;
@@ -1989,7 +2002,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features: Shader Model 3, shadow map, dummy color surface, stream offset
+    // Check supported features: Shader Model 3, hardware depth texture, shadow map, dummy color surface, stream offset
     hardwareShadowSupport_ = false;
     hiresShadowSupport_ = false;
     streamOffsetSupport_ = false;
@@ -2053,6 +2066,14 @@ void Graphics::CheckFeatureSupport()
             hardwareShadowSupport_ = false;
     }
     
+    if (!fallback_ && impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+    {
+        // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs
+        // So, use INTZ buffer only with other vendors
+        if (impl_->adapterIdentifier_.VendorId != 0x1002)
+            hardwareDepthSupport_ = true;
+    }
+    
     dummyColorFormat_ = D3DFMT_A8R8G8B8;
     D3DFORMAT nullFormat = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
     if (impl_->CheckFormatSupport(nullFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
@@ -2098,7 +2119,8 @@ void Graphics::OnDeviceLost()
     }
     if (impl_->defaultDepthStencilSurface_)
     {
-        impl_->defaultDepthStencilSurface_->Release();
+        if (systemDepthStencil_)
+            impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
     }
     
@@ -2119,7 +2141,25 @@ void Graphics::OnDeviceReset()
     
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
-    impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+    if (impl_->presentParams_.EnableAutoDepthStencil)
+    {
+        impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+        systemDepthStencil_ = true;
+    }
+    else
+    {
+        if (!depthTexture_)
+        {
+            depthTexture_ = new Texture2D(context_);
+            depthTexture_->SetSize(0, 0, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
+        }
+        
+        impl_->defaultDepthStencilSurface_ = (IDirect3DSurface9*)depthTexture_->GetRenderSurface()->GetSurface();
+        systemDepthStencil_ = false;
+        
+        // When AutoDepthStencil is not used, depth buffering must be enabled manually
+        impl_->device_->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+    }
 }
 
 void Graphics::ResetCachedState()
