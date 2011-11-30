@@ -171,6 +171,8 @@ enum PassType
     PASS_PREALPHA,
     PASS_POSTALPHA,
     PASS_SHADOW,
+    PASS_GBUFFER,
+    PASS_MATERIAL,
     MAX_PASSES
 };
 

@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse ��rni
+// Copyright (c) 2008-2011 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -256,6 +256,7 @@ Renderer::Renderer(Context* context) :
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
+    lightPrepass_(false),
     specularLighting_(true),
     drawShadows_(true),
     reuseShadowMaps_(true),
@@ -290,6 +291,16 @@ void Renderer::SetViewport(unsigned index, const Viewport& viewport)
     }
     
     viewports_[index] = viewport;
+}
+
+void Renderer::SetLightPrepass(bool enable)
+{
+    // Light prepass is incompatible with hardware multisampling, so disable if enabled.
+    if (graphics_->GetMultiSample() > 1)
+        graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
+            graphics_->GetTripleBuffer(), 1);
+    
+    lightPrepass_ = enable;
 }
 
 void Renderer::SetSpecularLighting(bool enable)

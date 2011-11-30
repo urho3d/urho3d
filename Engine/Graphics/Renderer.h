@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse ��rni
+// Copyright (c) 2008-2011 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,8 @@ public:
     void SetNumViewports(unsigned num);
     /// %Set a viewport.
     void SetViewport(unsigned index, const Viewport& viewport);
+    /// %Set light prepass rendering on/off.
+    void SetLightPrepass(bool enable);
     /// %Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// %Set texture anisotropy.
@@ -159,6 +161,8 @@ public:
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.
     const Viewport& GetViewport(unsigned index) const;
+    /// Return whether light prepass rendering is enabled.
+    bool GetLightPrepass() const { return lightPrepass_; }
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -377,6 +381,8 @@ private:
     unsigned numBatches_;
     /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_;
+    /// Light prepass mode flag.
+    bool lightPrepass_;
     /// Specular lighting flag.
     bool specularLighting_;
     /// Draw shadows flag.

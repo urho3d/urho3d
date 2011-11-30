@@ -39,6 +39,8 @@ static const String passNames[] =
     "prealpha",
     "postalpha",
     "shadow",
+    "gbuffer",
+    "material",
     ""
 };
 

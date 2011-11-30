@@ -765,6 +765,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_viewports(uint, const Viewport&in)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "const Viewport& get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_lightPrepass(bool)", asMETHOD(Renderer, SetLightPrepass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool get_lightPrepass() const", asMETHOD(Renderer, GetLightPrepass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_textureAnisotropy(int)", asMETHOD(Renderer, SetTextureAnisotropy), asCALL_THISCALL);
