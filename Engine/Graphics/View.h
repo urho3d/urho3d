@@ -123,8 +123,10 @@ private:
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
     void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
-    /// Render batches.
-    void RenderBatches();
+    /// Render batches using forward rendering.
+    void RenderBatchesForward();
+    /// Render batches using light pre-pass rendering.
+    void RenderBatchesLightPrepass();
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
@@ -171,10 +173,15 @@ private:
     void FinalizeBatch(Batch& batch, Technique* tech, Pass* pass, bool allowInstancing = true, bool allowShadows = true);
     /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
+    /// %Set up a light volume rendering batch.
+    void SetupLightBatch(Batch& batch);
+    /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
+    void DrawFullscreenQuad(Camera& camera, bool nearQuad);
     /// Render everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
     /// Render batches lit by a specific light.
     void RenderLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
+
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     
@@ -252,6 +259,8 @@ private:
     BatchQueue baseQueue_;
     /// Pre-transparent pass batches.
     BatchQueue preAlphaQueue_;
+    /// Light pre-pass G-buffer batches.
+    BatchQueue gbufferQueue_;
     /// Transparent geometry batches.
     BatchQueue alphaQueue_;
     /// Post-transparent pass batches.

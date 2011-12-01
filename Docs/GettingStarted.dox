@@ -128,6 +128,7 @@ Urho3D.exe understands the following command line options:
 -w          Start in windowed mode
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Sound mixing frequency in Hz
+-prepass    Use light pre-pass rendering
 -headless   Headless mode. No application window will be created
 -logdebug   Display debug level log messages also in release mode
 -lqshadows  Use low-quality (1-sample) shadow filtering

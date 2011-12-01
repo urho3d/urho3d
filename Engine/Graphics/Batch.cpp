@@ -124,7 +124,38 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         
         graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
     }
-
+    
+    if (graphics->NeedParameterUpdate(VSP_FRUSTUMSIZE, camera_))
+    {
+        Vector3 nearVector, farVector;
+        camera_->GetFrustumSize(nearVector, farVector);
+        Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
+        
+        graphics->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
+    }
+    
+    IntRect viewport = graphics->GetViewport();
+    unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
+    if (graphics->NeedParameterUpdate(VSP_GBUFFEROFFSETS, (const void*)viewportHash))
+    {
+        IntVector2 screenSize = graphics->GetRenderTargetDimensions();
+        
+        float gBufferWidth = (float)screenSize.x_;
+        float gBufferHeight = (float)screenSize.y_;
+        float widthRange = 0.5f * (viewport.right_ - viewport.left_) / gBufferWidth;
+        float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / gBufferHeight;
+        
+        #ifdef USE_OPENGL
+        Vector4 bufferUVOffset(((float)viewport.left_) / gBufferWidth + widthRange,
+            ((float)viewport.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #else
+        Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / gBufferWidth + widthRange,
+            (0.5f + (float)viewport.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #endif
+        
+        graphics->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    }
+    
     if (overrideView_)
     {
         if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
@@ -193,6 +224,15 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             
             graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
         }
+    }
+    
+    if (graphics->NeedParameterUpdate(PSP_DEPTHRECONSTRUCT, camera_))
+    {
+        float farClip = camera_->GetFarClip();
+        float nearClip = camera_->GetNearClip();
+        Vector4 depthReconstruct(farClip / (farClip - nearClip), -nearClip / (farClip - nearClip), 0.0f, 0.0f);
+        
+        graphics->SetShaderParameter(PSP_DEPTHRECONSTRUCT, depthReconstruct);
     }
     
     // Set light-related shader parameters

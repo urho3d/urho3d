@@ -3,4 +3,6 @@
     <pass name="litbase" vs="BlinnPhong_Normal" ps="BlinnPhong_DiffNormalAmbient" />
     <pass name="light" vs="BlinnPhong_Normal" ps="BlinnPhong_DiffNormal" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
+    <pass name="gbuffer" vs="GBuffer_Normal" ps="GBuffer_Normal" />
+    <pass name="material" vs="Material" ps="Material_Diff" depthtest="equal" depthwrite="false" />
 </technique>

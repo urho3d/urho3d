@@ -51,6 +51,20 @@
 
 #include "DebugNew.h"
 
+static const float dirLightVertexData[] =
+{
+    -1, 1, 0,
+    1, 1, 0,
+    1, -1, 0,
+    -1, -1, 0,
+};
+
+static const unsigned short dirLightIndexData[] =
+{
+    0, 1, 2,
+    2, 3, 0,
+};
+
 static const float pointLightVertexData[] =
 {
     -0.423169f, -1.000000f, 0.423169f,
@@ -129,14 +143,14 @@ static const unsigned short pointLightIndexData[] =
 
 static const float spotLightVertexData[] =
 {
-    0.001f, 0.001f, 0.001f,
-    0.001f, -0.001f, 0.001f,
-    -0.001f, -0.001f, 0.001f,
-    -0.001f, 0.001f, 0.001f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f,
-    -1.0f,  -1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
+    0.00001f, 0.00001f, 0.00001f,
+    0.00001f, -0.00001f, 0.00001f,
+    -0.00001f, -0.00001f, 0.00001f,
+    -0.00001f, 0.00001f, 0.00001f,
+    1.00000f, 1.00000f, 0.99999f,
+    1.00000f, -1.00000f, 0.99999f,
+    -1.00000f,  -1.00000f, 0.99999f,
+    -1.00000f, 1.00000f, 0.99999f,
 };
 
 static const unsigned short spotLightIndexData[] =
@@ -171,10 +185,22 @@ static const String shadowVariations[] =
     #endif
 };
 
+static const String linearVariations[] =
+{
+    "",
+    "Linear"
+};
+
 static const String fallbackVariations[] =
 {
     "",
     "FB"
+};
+
+static const String hwVariations[] =
+{
+    "",
+    "HW"
 };
 
 static const String geometryVSVariations[] =
@@ -210,6 +236,14 @@ static const String vertexLightVSVariations[] =
     "4VL",
     "5VL",
     "6VL"
+};
+
+static const String deferredLightVSVariations[] =
+{
+    "",
+    "Dir",
+    "Ortho",
+    "OrthoDir"
 };
 
 static const String lightPSVariations[] = 
@@ -295,12 +329,55 @@ void Renderer::SetViewport(unsigned index, const Viewport& viewport)
 
 void Renderer::SetLightPrepass(bool enable)
 {
-    // Light prepass is incompatible with hardware multisampling, so disable if enabled.
-    if (graphics_->GetMultiSample() > 1)
-        graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
-            graphics_->GetTripleBuffer(), 1);
+    if (!initialized_)
+    {
+        LOGERROR("Can not switch light pre-pass rendering before setting initial screen mode");
+        return;
+    }
     
-    lightPrepass_ = enable;
+    if (enable != lightPrepass_)
+    {
+        // Light prepass is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
+        if (graphics_->GetMultiSample() > 1)
+            graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
+                graphics_->GetTripleBuffer(), 1);
+        
+        // Create the G-buffer textures if necessary
+        if (enable)
+        {
+            if (!normalBuffer_)
+            {
+                normalBuffer_ = new Texture2D(context_);
+                normalBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
+            }
+            
+            if (!depthBuffer_)
+            {
+                if (!graphics_->GetHardwareDepthSupport())
+                {
+                    depthBuffer_ = new Texture2D(context_);
+                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
+                }
+                else
+                    depthBuffer_ = graphics_->GetDepthTexture();
+            }
+            
+            if (!lightBuffer_)
+            {
+                lightBuffer_ = new Texture2D(context_);
+                lightBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
+            }
+        }
+        else
+        {
+            normalBuffer_.Reset();
+            depthBuffer_.Reset();
+            lightBuffer_.Reset();
+        }
+        
+        lightPrepass_ = enable;
+        shadersDirty_ = true;
+    }
 }
 
 void Renderer::SetSpecularLighting(bool enable)
@@ -684,6 +761,8 @@ bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
 Geometry* Renderer::GetLightGeometry(Light* light)
 {
     LightType type = light->GetLightType();
+    if (type == LIGHT_DIRECTIONAL)
+        return dirLightGeometry_;
     if (type == LIGHT_SPOT)
         return spotLightGeometry_;
     else if (type == LIGHT_POINT)
@@ -1002,7 +1081,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
         }
         else
         {
-            if (type == PASS_BASE)
+            if (type == PASS_BASE || type == PASS_MATERIAL)
             {
                 unsigned numVertexLights = 0;
                 if (batch.lightQueue_)
@@ -1036,6 +1115,50 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             LOGERROR("Technique " + technique->GetName() + " has missing shaders");
         }
     }
+}
+
+void Renderer::SetLightVolumeShaders(Batch& batch)
+{
+    bool fallback = graphics_->GetFallback();
+    
+    unsigned vsi = DLVS_NONE;
+    unsigned psi = DLPS_NONE;
+    Light* light = batch.lightQueue_->light_;
+    
+    switch (light->GetLightType())
+    {
+    case LIGHT_DIRECTIONAL:
+        vsi += DLVS_DIR;
+        break;
+        
+    case LIGHT_POINT:
+        if (light->GetShapeTexture())
+            psi += DLPS_POINTMASK;
+        else
+            psi += DLPS_POINT;
+        break;
+        
+    case LIGHT_SPOT:
+        psi += DLPS_SPOT;
+        break;
+    }
+    
+    if (batch.lightQueue_->shadowMap_)
+        psi += DLPS_SHADOW;
+    
+    if (!fallback && specularLighting_ && light->GetSpecularIntensity() > 0.0f)
+        psi += DLPS_SPEC;
+    
+    if (batch.camera_->IsOrthographic())
+    {
+        vsi += DLVS_ORTHO;
+        psi += DLPS_ORTHO;
+    }
+    
+    batch.material_ = 0;
+    batch.pass_ = 0;
+    batch.vertexShader_ = lightVS_[vsi];
+    batch.pixelShader_ = lightPS_[psi];
 }
 
 bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
@@ -1139,15 +1262,60 @@ void Renderer::LoadShaders()
     // Load inbuilt shaders
     stencilVS_ = GetVertexShader("Stencil");
     stencilPS_ = GetPixelShader("Stencil");
+    lightVS_.Clear();
+    lightPS_.Clear();
+    
+    if (lightPrepass_)
+    {
+        lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
+        lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+        
+        unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+        unsigned fallback = graphics_->GetFallback() ? 1 : 0;
+        if (fallback)
+            shadows = SHADOWQUALITY_HIGH_16BIT;
+        
+        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
+            lightVS_[i] = GetVertexShader("LightVolume_" + deferredLightVSVariations[i]);
+        
+        for (unsigned i = 0; i < lightPS_.Size(); ++i)
+        {
+            // Specular variations do not exist for fallback shaders, so skip
+            if (fallback && i & DLPS_SPEC)
+                continue;
+            
+            /// \todo Allow specifying the light volume shader name for different lighting models
+            String linearDepth = linearVariations[(!fallback && !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
+            if (i & DLPS_SHADOW)
+            {
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
+                    shadowVariations[shadows] + fallbackVariations[fallback]);
+            }
+            else
+            {
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
+                    fallbackVariations[fallback]);
+            }
+        }
+    }
     
     shadersDirty_ = false;
 }
 
 void Renderer::LoadMaterialShaders(Technique* technique)
 {
-    LoadPassShaders(technique, PASS_BASE);
-    LoadPassShaders(technique, PASS_LITBASE);
-    LoadPassShaders(technique, PASS_LIGHT);
+    if (lightPrepass_ && technique->HasPass(PASS_GBUFFER))
+    {
+        LoadPassShaders(technique, PASS_GBUFFER);
+        LoadPassShaders(technique, PASS_MATERIAL);
+    }
+    else
+    {
+        LoadPassShaders(technique, PASS_BASE);
+        LoadPassShaders(technique, PASS_LITBASE);
+        LoadPassShaders(technique, PASS_LIGHT);
+    }
+    
     LoadPassShaders(technique, PASS_PREALPHA);
     LoadPassShaders(technique, PASS_POSTALPHA);
     LoadPassShaders(technique, PASS_SHADOW);
@@ -1159,6 +1327,11 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     if (!pass)
         return;
     
+    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    unsigned fallback = graphics_->GetFallback() ? 1 : 0;
+    if (fallback)
+        shadows = SHADOWQUALITY_HIGH_16BIT;
+    
     String vertexShaderName = pass->GetVertexShaderName();
     String pixelShaderName = pass->GetPixelShaderName();
     
@@ -1168,10 +1341,15 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
-    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-    unsigned fallback = graphics_->GetFallback() ? 1 : 0;
-    if (fallback)
-        shadows = SHADOWQUALITY_HIGH_16BIT;
+    // If hardware depth is used, do not write depth into a rendertarget in the G-buffer pass
+    // Also check for fallback G-buffer (different layout)
+    if (type == PASS_GBUFFER)
+    {
+        unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
+        vertexShaderName += hwVariations[hwDepth];
+        pixelShaderName += hwVariations[hwDepth];
+        pixelShaderName += fallbackVariations[fallback];
+    }
     
     if (type == PASS_SHADOW)
     {
@@ -1225,7 +1403,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     }
     else
     {
-        if (type == PASS_BASE)
+        if (type == PASS_BASE || type == PASS_MATERIAL)
         {
             vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)
@@ -1273,18 +1451,18 @@ void Renderer::ReloadTextures()
 
 void Renderer::CreateGeometries()
 {
-    SharedPtr<VertexBuffer> plvb(new VertexBuffer(context_));
-    plvb->SetSize(24, MASK_POSITION);
-    plvb->SetData(pointLightVertexData);
+    SharedPtr<VertexBuffer> dlvb(new VertexBuffer(context_));
+    dlvb->SetSize(4, MASK_POSITION);
+    dlvb->SetData(dirLightVertexData);
     
-    SharedPtr<IndexBuffer> plib(new IndexBuffer(context_));
-    plib->SetSize(132, false);
-    plib->SetData(pointLightIndexData);
+    SharedPtr<IndexBuffer> dlib(new IndexBuffer(context_));
+    dlib->SetSize(6, false);
+    dlib->SetData(dirLightIndexData);
     
-    pointLightGeometry_ = new Geometry(context_);
-    pointLightGeometry_->SetVertexBuffer(0, plvb);
-    pointLightGeometry_->SetIndexBuffer(plib);
-    pointLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, plib->GetIndexCount());
+    dirLightGeometry_ = new Geometry(context_);
+    dirLightGeometry_->SetVertexBuffer(0, dlvb);
+    dirLightGeometry_->SetIndexBuffer(dlib);
+    dirLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, dlib->GetIndexCount());
     
     SharedPtr<VertexBuffer> slvb(new VertexBuffer(context_));
     slvb->SetSize(8, MASK_POSITION);
@@ -1298,6 +1476,19 @@ void Renderer::CreateGeometries()
     spotLightGeometry_->SetVertexBuffer(0, slvb);
     spotLightGeometry_->SetIndexBuffer(slib);
     spotLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, slib->GetIndexCount());
+    
+    SharedPtr<VertexBuffer> plvb(new VertexBuffer(context_));
+    plvb->SetSize(24, MASK_POSITION);
+    plvb->SetData(pointLightVertexData);
+    
+    SharedPtr<IndexBuffer> plib(new IndexBuffer(context_));
+    plib->SetSize(132, false);
+    plib->SetData(pointLightIndexData);
+    
+    pointLightGeometry_ = new Geometry(context_);
+    pointLightGeometry_->SetVertexBuffer(0, plvb);
+    pointLightGeometry_->SetIndexBuffer(plib);
+    pointLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, plib->GetIndexCount());
     
     faceSelectCubeMap_ = new TextureCube(context_);
     faceSelectCubeMap_->SetNumLevels(1);

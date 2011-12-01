@@ -82,6 +82,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool tripleBuffer = false;
     bool forceSM2 = false;
     bool forceFallback = false;
+    bool prepass = false;
     bool shadows = true;
     bool lqShadows = false;
     bool sound = true;
@@ -109,6 +110,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 interpolate = false;
             else if (argument == "mono")
                 stereo = false;
+            else if (argument == "prepass")
+                prepass = true;
             else if (argument == "noshadows")
                 shadows = false;
             else if (argument == "lqshadows")
@@ -228,9 +231,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         if (!graphics->SetMode(width, height, fullscreen, vsync, tripleBuffer, multiSample))
             return false;
         
-        if (!shadows)
-            renderer->SetDrawShadows(false);
-        else if (lqShadows)
+        renderer->SetLightPrepass(prepass);
+        renderer->SetDrawShadows(shadows);
+        if (shadows && lqShadows)
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
         
         if (sound)

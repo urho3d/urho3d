@@ -1,5 +1,6 @@
 <shaders>
     <shader name="Material" type="vs">
+        <variation name="" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
         <variation name="3VL" define="NUMVERTEXLIGHTS=3" />

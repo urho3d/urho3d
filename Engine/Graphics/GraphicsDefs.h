@@ -217,6 +217,7 @@ extern StringHash VSP_SKINMATRICES;
 extern StringHash VSP_VERTEXLIGHTS;
 extern StringHash PSP_AMBIENTSTARTCOLOR;
 extern StringHash PSP_AMBIENTENDCOLOR;
+extern StringHash PSP_DEPTHRECONSTRUCT;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
 extern StringHash PSP_LIGHTCOLOR;

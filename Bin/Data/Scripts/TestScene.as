@@ -256,6 +256,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
         if (input.keyPress['1'])
+            renderer.lightPrepass = !renderer.lightPrepass;
+        
+        if (input.keyPress['2'])
         {
             int quality = renderer.textureQuality;
             ++quality;
@@ -264,7 +267,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.textureQuality = quality;
         }
 
-        if (input.keyPress['2'])
+        if (input.keyPress['3'])
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -273,13 +276,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.materialQuality = quality;
         }
 
-        if (input.keyPress['3'])
+        if (input.keyPress['4'])
             renderer.specularLighting = !renderer.specularLighting;
 
-        if (input.keyPress['4'])
+        if (input.keyPress['5'])
             renderer.drawShadows = !renderer.drawShadows;
 
-        if (input.keyPress['5'])
+        if (input.keyPress['6'])
         {
             int size = renderer.shadowMapSize;
             size *= 2;
@@ -288,20 +291,20 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.shadowMapSize = size;
         }
 
-        if (input.keyPress['6'])
+        if (input.keyPress['7'])
             renderer.shadowQuality = renderer.shadowQuality + 1;
 
-        if (input.keyPress['7'])
+        if (input.keyPress['8'])
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
-        
-        if (input.keyPress['8'])
-            renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
         if (input.keyPress['9'])
+            renderer.dynamicInstancing = !renderer.dynamicInstancing;
+
+        if (input.keyPress['0'])
             renderer.lightStencilMasking = !renderer.lightStencilMasking;
 
         if (input.keyPress[' '])

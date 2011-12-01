@@ -128,6 +128,11 @@ void DebugHud::Update(float timeStep)
     {
         String mode;
         
+        if (renderer->GetLightPrepass())
+            mode += "Prepass ";
+        else
+            mode += "Forward ";
+        
         mode += "Tex: " + qualityTexts[renderer->GetTextureQuality()];
         
         mode += " Mat: " + qualityTexts[renderer->GetMaterialQuality()];

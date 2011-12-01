@@ -106,6 +106,81 @@ enum LightPSVariation
     MAX_LIGHT_PS_VARIATIONS
 };
 
+/// Deferred light volume vertex shader variations.
+enum DeferredLightVSVariation
+{
+    DLVS_NONE = 0,
+    DLVS_DIR,
+    DLVS_ORTHO,
+    DLVS_ORTHODIR,
+    MAX_DEFERRED_LIGHT_VS_VARIATIONS
+};
+
+/// Deferred light volume pixels shader variations.
+enum DeferredLightPSVariation
+{
+    DLPS_NONE = 0,
+    DLPS_SPOT,
+    DLPS_POINT,
+    DLPS_POINTMASK,
+    DLPS_SPEC,
+    DLPS_SPOTSPEC,
+    DLPS_POINTSPEC,
+    DLPS_POINTMASKSPEC,
+    DLPS_SHADOW,
+    DLPS_SPOTSHADOW,
+    DLPS_POINTSHADOW,
+    DLPS_POINTMASKSHADOW,
+    DLPS_SHADOWSPEC,
+    DLPS_SPOTSHADOWSPEC,
+    DLPS_POINTSHADOWSPEC,
+    DLPS_POINTMASKSHADOWSPEC,
+    DLPS_ORTHO,
+    DLPS_ORTHOSPOT,
+    DLPS_ORTHOPOINT,
+    DLPS_ORTHOPOINTMASK,
+    DLPS_ORTHOSPEC,
+    DLPS_ORTHOSPOTSPEC,
+    DLPS_ORTHOPOINTSPEC,
+    DLPS_ORTHOPOINTMASKSPEC,
+    DLPS_ORTHOSHADOW,
+    DLPS_ORTHOSPOTSHADOW,
+    DLPS_ORTHOPOINTSHADOW,
+    DLPS_ORTHOPOINTMASKSHADOW,
+    DLPS_ORTHOSHADOWSPEC,
+    DLPS_ORTHOSPOTSHADOWSPEC,
+    DLPS_ORTHOPOINTSHADOWSPEC,
+    DLPS_ORTHOPOINTMASKSHADOWSPEC,
+    MAX_DEFERRED_LIGHT_PS_VARIATIONS
+};
+
+/// Deferred rendering edge filter parameters.
+struct EdgeFilterParameters
+{
+    /// Construct undefined.
+    EdgeFilterParameters()
+    {
+    }
+    
+    /// Construct with initial values.
+    EdgeFilterParameters(float radius, float threshold, float strength) :
+        radius_(radius),
+        threshold_(threshold),
+        strength_(strength)
+    {
+    }
+    
+    //! Validate parameters.
+    void Validate();
+    
+    //! Radius for calculating luminance gradient.
+    float radius_;
+    //! Luminance difference threshold needed to pass pixel.
+    float threshold_;
+    //! Filter strength.
+    float strength_;
+};
+
 /// High-level rendering subsystem. Manages drawing of 3D views.
 class Renderer : public Object
 {
@@ -223,6 +298,12 @@ public:
     TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
     /// Return the shadowed pointlight indirection cube map.
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
+    /// Return the normal buffer for light pre-pass rendering.
+    Texture2D* GetNormalBuffer() const { return normalBuffer_; }
+    /// Return the depth buffer for light pre-pass rendering.
+    Texture2D* GetDepthBuffer() const { return depthBuffer_; }
+    /// Return the light accumulation buffer for light pre-pass rendering.
+    Texture2D* GetLightBuffer() const { return lightBuffer_; }
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a vertex shader by name.
@@ -254,8 +335,10 @@ public:
     Camera* GetShadowCamera();
     /// Get a shader program.
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
-    /// Choose shaders for a batch.
+    /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
+    /// Choose shaders for a light volume batch.
+    void SetLightVolumeShaders(Batch& batch);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
     /// Reset shadow map allocation counts.
@@ -295,10 +378,12 @@ private:
     WeakPtr<ResourceCache> cache_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
-    /// Point light volume geometry.
-    SharedPtr<Geometry> pointLightGeometry_;
+    /// Directional light quad geometry.
+    SharedPtr<Geometry> dirLightGeometry_;
     /// Spot light volume geometry.
     SharedPtr<Geometry> spotLightGeometry_;
+    /// Point light volume geometry.
+    SharedPtr<Geometry> pointLightGeometry_;
     /// Instance stream vertex buffer.
     SharedPtr<VertexBuffer> instancingBuffer_;
     /// Default material.
@@ -311,10 +396,20 @@ private:
     SharedPtr<TextureCube> faceSelectCubeMap_;
     /// Indirection cube map for shadowed pointlights.
     SharedPtr<TextureCube> indirectionCubeMap_;
+    /// Normal buffer for light pre-pass rendering.
+    SharedPtr<Texture2D> normalBuffer_;
+    /// Depth buffer for light pre-pass rendering.
+    SharedPtr<Texture2D> depthBuffer_;
+    /// Light accumulation buffer for light pre-pass rendering.
+    SharedPtr<Texture2D> lightBuffer_;
     /// Stencil rendering vertex shader.
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
     SharedPtr<ShaderVariation> stencilPS_;
+    /// Light vertex shaders.
+    Vector<SharedPtr<ShaderVariation> > lightVS_;
+    /// Light pixel shaders.
+    Vector<SharedPtr<ShaderVariation> > lightPS_;
     /// Reusable scene nodes with shadow camera components.
     Vector<SharedPtr<Node> > shadowCameraNodes_;
     /// Reusable occlusion buffers.

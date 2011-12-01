@@ -358,6 +358,27 @@ Frustum Light::GetFrustum() const
     return ret;
 }
 
+
+Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
+{
+    Vector3 nearVector, farVector;
+    camera.GetFrustumSize(nearVector, farVector);
+    float nearClip = camera.GetNearClip();
+    float farClip = camera.GetFarClip();
+    
+    float distance = getNearQuad ? nearClip : farClip;
+    if (!camera.IsOrthographic())
+        farVector *= (distance / farClip);
+    else
+        farVector.z_ *= (distance / farClip);
+    
+    // Set an epsilon from clip planes due to possible inaccuracy
+    /// \todo Rather set an identity projection matrix
+    farVector.z_ = Clamp(farVector.z_, (1.0f + M_LARGE_EPSILON) * nearClip, (1.0f - M_LARGE_EPSILON) * farClip);
+    
+    return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
+}
+
 const Matrix3x4& Light::GetVolumeTransform()
 {
     const Matrix3x4& transform = GetWorldTransform();

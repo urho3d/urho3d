@@ -10,14 +10,15 @@
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
-        <option name="Shadow" define="SHADOW" />
         <option name="Spec" define="SPECULAR" />
+        <option name="Shadow" define="SHADOW" />
+        <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
         <option name="FB" define="FALLBACK">
-            <exclude name="Linear" />
-            <exclude name="Shadow" />
-            <exclude name="Spec" />
+            <exclude name="LQ" />
             <exclude name="HW" />
+            <exclude name="Spec" />
+            <require name="SM2" />
         </option>
     </shader>
 </shaders>
