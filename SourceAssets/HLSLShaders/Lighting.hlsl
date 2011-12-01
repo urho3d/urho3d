@@ -155,5 +155,21 @@ float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
         return iShadowPos[2];
     else
         return iShadowPos[3];
+}   
+
+float4x4 GetDirShadowMatrix(float depth)
+{
+    float4x4 shadowMatrix;
+
+    if (depth < cShadowSplits.x)
+        shadowMatrix = float4x4(cShadowProjPS[0], cShadowProjPS[1], cShadowProjPS[2], cShadowProjPS[3]);
+    else if (depth < cShadowSplits.y)
+        shadowMatrix = float4x4(cShadowProjPS[4], cShadowProjPS[5], cShadowProjPS[6], cShadowProjPS[7]);
+    else if (depth < cShadowSplits.z)
+        shadowMatrix = float4x4(cShadowProjPS[8], cShadowProjPS[9], cShadowProjPS[10], cShadowProjPS[11]);
+    else
+        shadowMatrix = float4x4(cShadowProjPS[12], cShadowProjPS[13], cShadowProjPS[14], cShadowProjPS[15]);
+
+    return shadowMatrix;
 }
 

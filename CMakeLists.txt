@@ -107,7 +107,7 @@ else()
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2
             COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM2 SM2
-            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
+            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl ScreenPos.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
         )
             
         add_custom_command (

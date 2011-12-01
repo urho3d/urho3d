@@ -16,6 +16,11 @@ samplerCUBE sLightCubeMap : register(S8);
 samplerCUBE sFaceSelectCubeMap : register(S9);
 samplerCUBE sIndirectionCubeMap : register(S10);
 
+// Deferred buffer samplers
+sampler2D sNormalBuffer : register(S0);
+sampler2D sDepthBuffer : register(S1);
+sampler2D sLightBuffer : register(S6);
+
 float4 Sample(sampler2D map, float2 texCoord)
 {
     // Use tex2Dlod if available to avoid divergence and allow branching
@@ -44,4 +49,33 @@ float3 DecodeNormal(float4 normalInput)
     normal.xy = normalInput.ag * 2.0 - 1.0;
     normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
     return normal;
+}
+
+float4 PackNormalDepth(float3 normal, float depth)
+{
+    float4 ret;
+    ret.xy = normal.xz * 0.5 + 0.5;
+    ret.z = (floor(depth * 127.0) + (normal.y < 0.0) * 128.0) * (1.0 / 255.0);
+    ret.w = frac(depth * 127.0);
+    return ret;
+}
+
+void UnpackNormalDepth(float4 input, out float3 normal, out float depth)
+{
+    normal.xz = input.xy * 2.0 - 1.0;
+    normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
+
+    float hiDepth = input.z * 255.0;
+    if (hiDepth > 127.0)
+    {
+        hiDepth -= 128.0;
+        normal.y = -normal.y;
+    }
+
+    depth = (hiDepth + input.w) * (1.0 / 127.0);
+}
+
+float ReconstructDepth(float hwDepth)
+{
+    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
 }

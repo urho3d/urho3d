@@ -199,6 +199,8 @@ enum ShaderType
 extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
 extern StringHash VSP_DEPTHMODE;
+extern StringHash VSP_FRUSTUMSIZE;
+extern StringHash VSP_GBUFFEROFFSETS;
 extern StringHash VSP_LIGHTDIR;
 extern StringHash VSP_LIGHTPOS;
 extern StringHash VSP_LIGHTVECROT;
@@ -218,6 +220,8 @@ extern StringHash PSP_AMBIENTENDCOLOR;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
 extern StringHash PSP_LIGHTCOLOR;
+extern StringHash PSP_LIGHTDIR;
+extern StringHash PSP_LIGHTPOS;
 extern StringHash PSP_MATDIFFCOLOR;
 extern StringHash PSP_MATEMISSIVECOLOR;
 extern StringHash PSP_MATSPECPROPERTIES;
@@ -226,6 +230,7 @@ extern StringHash PSP_SHADOWCUBEADJUST;
 extern StringHash PSP_SHADOWDEPTHFADE;
 extern StringHash PSP_SHADOWINTENSITY;
 extern StringHash PSP_SHADOWSPLITS;
+extern StringHash PSP_SHADOWPROJ;
 
 /// Texture units.
 enum TextureUnit
