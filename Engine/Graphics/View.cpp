@@ -179,6 +179,21 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     if (!octree)
         return false;
     
+    // Check for the render texture being too large
+    if (renderer_->GetLightPrepass() && renderTarget)
+    {
+        if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
+        {
+            // Display message only once per render target, do not spam each frame
+            if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
+            {
+                gBufferErrorDisplayed_.Insert(renderTarget);
+                LOGERROR("Render texture is larger than the G-buffer, can not render");
+            }
+            return false;
+        }
+    }
+    
     octree_ = octree;
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
@@ -535,6 +550,7 @@ void View::GetBatches()
                 lightQueueMapping_[light] = &lightQueue;
                 lightQueue.light_ = light;
                 lightQueue.litBatches_.Clear();
+                lightQueue.volumeBatches_.Clear();
                 
                 // Allocate shadow map now
                 lightQueue.shadowMap_ = 0;
@@ -609,6 +625,24 @@ void View::GetBatches()
                         GetLitBatches(drawable, lightQueue);
                     else
                         maxLightsDrawables_.Insert(drawable);
+                }
+                
+                // In light pre-pass mode, store the light volume batch now
+                if (prepass)
+                {
+                    /// \todo Handle SM2 multiple batches for shadowed directional lights
+                    Batch volumeBatch;
+                    volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
+                    volumeBatch.worldTransform_ = &light->GetVolumeTransform(*camera_);
+                    volumeBatch.overrideView_ = light->GetLightType() == LIGHT_DIRECTIONAL;
+                    volumeBatch.camera_ = camera_;
+                    volumeBatch.lightQueue_ = &lightQueue;
+                    volumeBatch.distance_ = light->GetDistance();
+                    volumeBatch.material_ = 0;
+                    volumeBatch.pass_ = 0;
+                    volumeBatch.zone_ = 0;
+                    renderer_->SetLightVolumeShaders(volumeBatch);
+                    lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
             // Per-vertex light
@@ -997,11 +1031,21 @@ void View::RenderBatchesLightPrepass()
     // Render the G-buffer
     Texture2D* normalBuffer = renderer_->GetNormalBuffer();
     Texture2D* depthBuffer = renderer_->GetDepthBuffer();
+    RenderSurface* depthStencil = 0;
     
-    if (graphics_->GetHardwareDepthSupport())
+    if (graphics_->GetFallback())
     {
         graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetDepthStencil(depthBuffer);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(screenRect_);
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color(0.5f, 0.5f, 1.0f, 1.0f));
+    }
+    if (graphics_->GetHardwareDepthSupport())
+    {
+        depthStencil = depthBuffer->GetRenderSurface();
+        
+        graphics_->SetRenderTarget(0, normalBuffer);
+        graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(screenRect_);
         // Clear depth and stencil only
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
@@ -1009,7 +1053,7 @@ void View::RenderBatchesLightPrepass()
     else
     {
         graphics_->SetRenderTarget(0, depthBuffer);
-        graphics_->ResetDepthStencil();
+        graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(screenRect_);
         // Clear the depth render target to far depth
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color::WHITE);
@@ -1024,12 +1068,17 @@ void View::RenderBatchesLightPrepass()
         RenderBatchQueue(gbufferQueue_);
     }
     
+    // Clear the light accumulation buffer
+    Texture2D* lightBuffer = renderer_->GetLightBuffer();
     graphics_->ResetRenderTarget(1);
+    graphics_->SetRenderTarget(0, lightBuffer);
+    graphics_->SetDepthStencil(depthStencil);
+    graphics_->SetViewport(screenRect_);
+    graphics_->Clear(CLEAR_COLOR);
     
-    /*
     if (!lightQueues_.Empty())
     {
-        // Render shadow maps + opaque objects' shadowed additive lighting
+        // Render shadow maps + light volumes
         PROFILE(RenderLights);
         
         for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1038,20 +1087,26 @@ void View::RenderBatchesLightPrepass()
             if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
             {
                 RenderShadowMap(*i);
-                graphics_->SetRenderTarget(0, renderTarget_);
-                graphics_->SetDepthStencil(depthStencil_);
+                graphics_->SetRenderTarget(0, lightBuffer);
+                graphics_->SetDepthStencil(depthStencil);
                 graphics_->SetViewport(screenRect_);
             }
             
-            RenderLightBatchQueue(i->litBatches_, i->light_);
+            graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
+            graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
+            
+            for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
+            {
+                SetupLightBatch(i->volumeBatches_[j]);
+                i->volumeBatches_[j].Draw(graphics_, renderer_);
+            }
         }
     }
-    */
     
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget_);
-    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
     graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
     
@@ -1059,6 +1114,8 @@ void View::RenderBatchesLightPrepass()
     {
         // Render opaque objects with deferred lighting result
         PROFILE(RenderBase);
+        
+        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);
         
         RenderBatchQueue(baseQueue_);
     }
@@ -1466,7 +1523,7 @@ void View::OptimizeLightByStencil(Light* light)
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
         graphics_->SetShaders(renderer_->GetStencilVS(), renderer_->GetStencilPS());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
-        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform());
+        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(*camera_));
         
         geometry->Draw(graphics_);
         

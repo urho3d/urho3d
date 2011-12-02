@@ -1155,8 +1155,6 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
         psi += DLPS_ORTHO;
     }
     
-    batch.material_ = 0;
-    batch.pass_ = 0;
     batch.vertexShader_ = lightVS_[vsi];
     batch.pixelShader_ = lightPS_[psi];
 }

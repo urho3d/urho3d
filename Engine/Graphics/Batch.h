@@ -300,4 +300,6 @@ struct LightBatchQueue
     Vector<ShadowBatchQueue> shadowSplits_;
     /// Per-vertex lights.
     PODVector<Light*> vertexLights_;
+    /// Light volume draw calls.
+    PODVector<Batch> volumeBatches_;
 };

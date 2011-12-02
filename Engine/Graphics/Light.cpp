@@ -359,7 +359,7 @@ Frustum Light::GetFrustum() const
 }
 
 
-Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
+Matrix3x4 Light::GetDirLightTransform(const Camera& camera, bool getNearQuad)
 {
     Vector3 nearVector, farVector;
     camera.GetFrustumSize(nearVector, farVector);
@@ -379,14 +379,14 @@ Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
     return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
 }
 
-const Matrix3x4& Light::GetVolumeTransform()
+const Matrix3x4& Light::GetVolumeTransform(const Camera& camera)
 {
     const Matrix3x4& transform = GetWorldTransform();
     
     switch (lightType_)
     {
-    case LIGHT_POINT:
-        volumeTransform_ = Matrix3x4(transform.Translation(), Quaternion::IDENTITY, range_);
+    case LIGHT_DIRECTIONAL:
+        volumeTransform_ = GetDirLightTransform(camera);
         break;
         
     case LIGHT_SPOT:
@@ -395,6 +395,10 @@ const Matrix3x4& Light::GetVolumeTransform()
             float xScale = aspectRatio_ * yScale;
             volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), Vector3(xScale, yScale, range_));
         }
+        break;
+        
+    case LIGHT_POINT:
+        volumeTransform_ = Matrix3x4(transform.Translation(), Quaternion::IDENTITY, range_);
         break;
     }
     

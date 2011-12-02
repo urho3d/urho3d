@@ -249,6 +249,8 @@ private:
     PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights.
     PODVector<Light*> lights_;
+    /// Render surfaces for which a G-buffer size error has already been logged, to prevent log spam.
+    HashSet<RenderSurface*> gBufferErrorDisplayed_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Lookup map for the processed lights' light queues.
