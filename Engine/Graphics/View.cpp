@@ -1038,7 +1038,7 @@ void View::RenderBatchesLightPrepass()
         graphics_->SetViewport(screenRect_);
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color(0.5f, 0.5f, 1.0f, 1.0f));
     }
-    if (graphics_->GetHardwareDepthSupport())
+    else if (graphics_->GetHardwareDepthSupport())
     {
         depthStencil = depthBuffer->GetRenderSurface();
         

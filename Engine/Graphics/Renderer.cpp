@@ -351,16 +351,21 @@ void Renderer::SetLightPrepass(bool enable)
                 normalBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
             }
             
-            if (!depthBuffer_)
+            if (!graphics_->GetFallback())
             {
-                if (!graphics_->GetHardwareDepthSupport())
+                if (!depthBuffer_)
                 {
-                    depthBuffer_ = new Texture2D(context_);
-                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
+                    if (!graphics_->GetHardwareDepthSupport())
+                    {
+                        depthBuffer_ = new Texture2D(context_);
+                        depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
+                    }
+                    else
+                        depthBuffer_ = graphics_->GetDepthTexture();
                 }
-                else
-                    depthBuffer_ = graphics_->GetDepthTexture();
             }
+            else
+                depthBuffer_.Reset();
             
             if (!lightBuffer_)
             {
