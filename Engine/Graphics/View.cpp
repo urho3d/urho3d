@@ -712,28 +712,27 @@ void View::GetBatches()
                 // In light prepass mode check for G-buffer and material passes first
                 if (prepass)
                 {
-                    Pass* pass = tech->GetPass(PASS_GBUFFER);
+                    pass = tech->GetPass(PASS_GBUFFER);
                     if (pass)
                     {
                         FinalizeBatch(baseBatch, tech, pass);
                         gbufferQueue_.AddBatch(baseBatch);
                         
+                        // Use PASS_MATERIAL instead of PASS_BASE to distinguish between light pre-pass forward pass (which
+                        // uses the light accumulation result) and actual forward unlit base pass
                         pass = tech->GetPass(PASS_MATERIAL);
-                        if (pass)
-                        {
-                            FinalizeBatch(baseBatch, tech, pass);
-                            baseQueue_.AddBatch(baseBatch);
-                        }
-                        continue;
                     }
                 }
                 
                 // If object already has a pixel lit base pass, can skip the unlit base pass
-                if (drawable->HasBasePass(j))
-                    continue;
+                if (!pass)
+                {
+                    if (drawable->HasBasePass(j))
+                        continue;
+                    // Check for unlit or vertex lit base pass
+                    pass = tech->GetPass(PASS_BASE);
+                }
                 
-                // Check for unlit or vertex lit base pass
-                pass = tech->GetPass(PASS_BASE);
                 if (pass)
                 {
                     // Check for vertex lights now
