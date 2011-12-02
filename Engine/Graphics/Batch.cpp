@@ -65,11 +65,12 @@ inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->instances_[0].distance_ < rhs->instances_[0].distance_;
 }
 
-void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Graphics* graphics, Renderer* renderer)
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Graphics* graphics, Renderer* renderer, const Vector3& translation)
 {
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
     
+    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
     Matrix4 shadowProj(shadowCamera->GetProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -119,11 +120,12 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
     #endif
     
-    dest = texAdjust * shadowProj * shadowView;
+    dest = texAdjust * shadowProj * shadowView * posAdjust;
 }
 
-void CalculateSpotMatrix(Matrix4& dest, Light* light)
+void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation)
 {
+    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 spotView(light->GetWorldPosition(), light->GetWorldRotation(), 1.0f);
     Matrix4 spotProj(Matrix4::ZERO);
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -144,7 +146,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light)
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
     #endif
     
-    dest = texAdjust * spotProj * spotView.Inverse();
+    dest = texAdjust * spotProj * spotView.Inverse() * posAdjust;
 }
 
 void Batch::CalculateSortKey()
@@ -343,7 +345,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         if (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light))
         {
             Matrix4 spotProj;
-            CalculateSpotMatrix(spotProj, light);
+            CalculateSpotMatrix(spotProj, light, Vector3::ZERO);
             
             graphics->SetShaderParameter(VSP_SPOTPROJ, spotProj);
         }
@@ -433,7 +435,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     numSplits = lightQueue_->shadowSplits_.Size();
                 
                 for (unsigned i = 0; i < numSplits; ++i)
-                    CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer);
+                    CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, Vector3::ZERO);
                 
                 graphics->SetShaderParameter(VSP_SHADOWPROJ, shadowMatrices[0].GetData(), 16 * numSplits);
             }
@@ -538,7 +540,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer);
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, -camera_->GetWorldPosition());
                     
                     graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), 16 * numSplits);
                 }
@@ -546,10 +548,10 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 {
                     Matrix4 shadowMatrices[2];
                    
-                    CalculateSpotMatrix(shadowMatrices[0], light);
+                    CalculateSpotMatrix(shadowMatrices[0], light, -camera_->GetWorldPosition());
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer);
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer, -camera_->GetWorldPosition());
                     
                     graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
                 }
