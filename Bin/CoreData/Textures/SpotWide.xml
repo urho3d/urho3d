@@ -2,5 +2,6 @@
     <address coord="u" mode="border" />
     <address coord="v" mode="border" />
     <border color="0 0 0 0" />
+    <mipmap enable="false" /> 
     <quality low="0" />
 </texture>

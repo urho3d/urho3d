@@ -217,6 +217,8 @@ public:
     bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
+    /// Return whether light pre-pass rendering is supported.
+    bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether hardware depth can be read as a texture.
     bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
@@ -374,6 +376,8 @@ private:
     bool deviceLost_;
     /// System depth stencil flag.
     bool systemDepthStencil_;
+    /// Light pre-pass rendering support flag.
+    bool lightPrepassSupport_;
     /// Hardware depth texture support flag.
     bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.

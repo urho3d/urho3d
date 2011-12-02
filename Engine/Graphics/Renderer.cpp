@@ -335,6 +335,9 @@ void Renderer::SetLightPrepass(bool enable)
         return;
     }
     
+    if (!graphics_->GetLightPrepassSupport())
+        enable = false;
+    
     if (enable != lightPrepass_)
     {
         // Light prepass is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
@@ -351,21 +354,16 @@ void Renderer::SetLightPrepass(bool enable)
                 normalBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
             }
             
-            if (!graphics_->GetFallback())
+            if (!depthBuffer_)
             {
-                if (!depthBuffer_)
+                if (!graphics_->GetHardwareDepthSupport())
                 {
-                    if (!graphics_->GetHardwareDepthSupport())
-                    {
-                        depthBuffer_ = new Texture2D(context_);
-                        depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
-                    }
-                    else
-                        depthBuffer_ = graphics_->GetDepthTexture();
+                    depthBuffer_ = new Texture2D(context_);
+                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
                 }
+                else
+                    depthBuffer_ = graphics_->GetDepthTexture();
             }
-            else
-                depthBuffer_.Reset();
             
             if (!lightBuffer_)
             {
@@ -1124,8 +1122,6 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
 
 void Renderer::SetLightVolumeShaders(Batch& batch)
 {
-    bool fallback = graphics_->GetFallback();
-    
     unsigned vsi = DLVS_NONE;
     unsigned psi = DLPS_NONE;
     Light* light = batch.lightQueue_->light_;
@@ -1151,7 +1147,7 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     if (batch.lightQueue_->shadowMap_)
         psi += DLPS_SHADOW;
     
-    if (!fallback && specularLighting_ && light->GetSpecularIntensity() > 0.0f)
+    if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
         psi += DLPS_SPEC;
     
     if (batch.camera_->IsOrthographic())
@@ -1274,30 +1270,22 @@ void Renderer::LoadShaders()
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
         
         unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-        unsigned fallback = graphics_->GetFallback() ? 1 : 0;
-        if (fallback)
-            shadows = SHADOWQUALITY_HIGH_16BIT;
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
             lightVS_[i] = GetVertexShader("LightVolume_" + deferredLightVSVariations[i]);
         
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
-            // Specular variations do not exist for fallback shaders, so skip
-            if (fallback && i & DLPS_SPEC)
-                continue;
-            
             /// \todo Allow specifying the light volume shader name for different lighting models
-            String linearDepth = linearVariations[(!fallback && !graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
+            String linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
             if (i & DLPS_SHADOW)
             {
                 lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
-                    shadowVariations[shadows] + fallbackVariations[fallback]);
+                    shadowVariations[shadows]);
             }
             else
             {
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
-                    fallbackVariations[fallback]);
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
             }
         }
     }

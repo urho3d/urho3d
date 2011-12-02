@@ -237,6 +237,8 @@ public:
     bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
+    /// Return whether light pre-pass rendering is supported.
+    bool GetLightPrepassSupport() const { return true; }
     /// Return whether hardware depth texture is supported.
     bool GetHardwareDepthSupport() const { return false; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.

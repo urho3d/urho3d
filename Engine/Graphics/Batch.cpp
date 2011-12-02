@@ -528,12 +528,13 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
             }
-            
-            if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light))
+        }
+        
+        if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light))
+        {
+            switch (light->GetLightType())
             {
-                LightType type = light->GetLightType();
-                
-                if (type == LIGHT_DIRECTIONAL)
+            case LIGHT_DIRECTIONAL:
                 {
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
@@ -542,10 +543,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     
                     graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), 16 * numSplits);
                 }
-                if (type == LIGHT_SPOT)
+                break;
+                
+            case LIGHT_SPOT:
                 {
                     Matrix4 shadowMatrices[2];
-                   
+                    
                     CalculateSpotMatrix(shadowMatrices[0], light, camera_->GetWorldPosition());
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
@@ -553,11 +556,14 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     
                     graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
                 }
-                if (type == LIGHT_POINT)
+                break;
+                
+            case LIGHT_POINT:
                 {
                     Matrix4 lightVecRot(light->GetWorldRotation().RotationMatrix());
                     graphics->SetShaderParameter(VSP_LIGHTVECROT, lightVecRot.GetData(), 16);
                 }
+                break;
             }
         }
     }

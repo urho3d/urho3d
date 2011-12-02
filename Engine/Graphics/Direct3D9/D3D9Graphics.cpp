@@ -174,6 +174,7 @@ Graphics::Graphics(Context* context) :
     flushGPU_(true),
     deviceLost_(false),
     systemDepthStencil_(false),
+    lightPrepassSupport_(false),
     hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
@@ -2002,7 +2003,9 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features: Shader Model 3, hardware depth texture, shadow map, dummy color surface, stream offset
+    // Check supported features: Shader Model 3, light pre-pass rendering, hardware depth texture, shadow map,
+    // dummy color surface and stream offset
+    lightPrepassSupport_ = false;
     hardwareShadowSupport_ = false;
     hiresShadowSupport_ = false;
     streamOffsetSupport_ = false;
@@ -2066,12 +2069,26 @@ void Graphics::CheckFeatureSupport()
             hardwareShadowSupport_ = false;
     }
     
-    if (!fallback_ && impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+    if (!fallback_)
     {
-        // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs
-        // So, use INTZ buffer only with other vendors
-        if (impl_->adapterIdentifier_.VendorId != 0x1002)
-            hardwareDepthSupport_ = true;
+        if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+        {
+            // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs
+            // So, use INTZ buffer only with other vendors
+            if (impl_->adapterIdentifier_.VendorId != 0x1002)
+            {
+                hardwareDepthSupport_ = true;
+                lightPrepassSupport_ = true;
+            }
+        }
+        
+        if (!hardwareDepthSupport_)
+        {
+            // If hardware depth is not supported, must support 2 render targets and R32F format for light pre-pass
+            if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
+                D3DRTYPE_TEXTURE))
+                lightPrepassSupport_ = true;
+        }
     }
     
     dummyColorFormat_ = D3DFMT_A8R8G8B8;

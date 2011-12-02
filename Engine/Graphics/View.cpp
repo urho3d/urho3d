@@ -1026,34 +1026,26 @@ void View::RenderBatchesLightPrepass()
         }
     }
     
-    // Render the G-buffer
     Texture2D* normalBuffer = renderer_->GetNormalBuffer();
     Texture2D* depthBuffer = renderer_->GetDepthBuffer();
     RenderSurface* depthStencil = 0;
     
-    if (graphics_->GetFallback())
-    {
-        graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color(0.5f, 0.5f, 1.0f, 1.0f));
-    }
-    else if (graphics_->GetHardwareDepthSupport())
+    // Hardware depth support: render to RGBA normal buffer and read hardware depth
+    if (graphics_->GetHardwareDepthSupport())
     {
         depthStencil = depthBuffer->GetRenderSurface();
         
         graphics_->SetRenderTarget(0, normalBuffer);
         graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(screenRect_);
-        // Clear depth and stencil only
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     }
+    // No hardware depth support: render to R32F depth and RGBA normal buffers
     else
     {
         graphics_->SetRenderTarget(0, depthBuffer);
         graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(screenRect_);
-        // Clear the depth render target to far depth
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color::WHITE);
         graphics_->SetRenderTarget(1, normalBuffer);
     }
