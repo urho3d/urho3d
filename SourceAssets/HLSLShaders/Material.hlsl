@@ -73,7 +73,7 @@ void PS(float4 iTexCoord : TEXCOORD0,
 
     // Lights are accumulated at half intensity. Bring back to full intensity now
     float4 lightInput = 2.0 * tex2Dproj(sLightBuffer, iScreenPos);
-    float3 lightSpecColor = lightInput.a * lightInput.rgb;
+    float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
 
     float3 finalColor = (GetAmbient(iTexCoord.z) + iVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specIntensity;
     oColor = float4(GetFog(finalColor, iTexCoord.w), 1.0);

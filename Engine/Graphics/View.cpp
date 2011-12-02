@@ -630,7 +630,6 @@ void View::GetBatches()
                 // In light pre-pass mode, store the light volume batch now
                 if (prepass)
                 {
-                    /// \todo Handle SM2 multiple batches for shadowed directional lights
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
                     volumeBatch.worldTransform_ = &light->GetVolumeTransform(*camera_);
@@ -1438,6 +1437,9 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
     unsigned width = shadowMap->GetWidth();
     unsigned height = shadowMap->GetHeight();
     int maxCascades = renderer_->GetMaxShadowCascades();
+    // Due to instruction count limits, light prepass in SM2.0 can only support up to 3 cascades
+    if (renderer_->GetLightPrepass() && !graphics_->GetSM3Support())
+        maxCascades = Max(maxCascades, 3);
     
     switch (light->GetLightType())
     {
@@ -2045,7 +2047,7 @@ void View::SetupLightBatch(Batch& batch)
     else
     {
         graphics_->SetCullMode(CULL_NONE);
-        graphics_->SetDepthTest(CMP_ALWAYS);
+        graphics_->SetDepthTest(CMP_GREATER);
     }
     
     /// \todo Set stencil test to check for light masks

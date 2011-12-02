@@ -36,4 +36,4 @@ uniform float4 cShadowCubeAdjust : register(C12);
 uniform float4 cShadowDepthFade : register(C13);
 uniform float4 cShadowIntensity : register(C14);
 uniform float4 cShadowSplits : register(C15);
-uniform float4 cShadowProjPS[16] :  register(C16);
+uniform float4x4 cShadowProjPS[4] :  register(C16);

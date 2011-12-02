@@ -118,21 +118,11 @@ void PS(
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            #ifdef SM3
-                float4x4 shadowMatrix = GetDirShadowMatrix(depth);
-                float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
-            #else
-                // PS2.0 runs out of instructions while choosing cascade per pixel. Render cascade per pass instead
-                float4x4 shadowMatrix = float4x4(cShadowProjPS[0], cShadowProjPS[1], cShadowProjPS[2], cShadowProjPS[3]);
-                float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
-                // No light outside cascade limits
-                if (depth < cShadowSplits.x || depth >= cShadowSplits.y)
-                    diff = 0.0;
-            #endif
+            float4x4 shadowMatrix = GetDirShadowMatrix(depth);
+            float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
             diff *= saturate(GetShadow(shadowPos) + GetShadowFade(depth));
         #elif defined(SPOTLIGHT)
-            float4x4 shadowMatrix = float4x4(cShadowProjPS[4], cShadowProjPS[5], cShadowProjPS[6], cShadowProjPS[7]);
-            float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
+            float4 shadowPos = mul(float4(worldPos, 1.0), cShadowProjPS[1]);
             diff *= GetShadow(shadowPos);
         #else
             float3 shadowPos = worldPos - cLightPosPS.xyz;
@@ -141,20 +131,18 @@ void PS(
     #endif
 
     #ifdef SPOTLIGHT
-        float4x4 spotMatrix = float4x4(cShadowProjPS[0], cShadowProjPS[1], cShadowProjPS[2], cShadowProjPS[3]);
-        float4 spotPos = mul(float4(worldPos, 1.0), spotMatrix);
+        float4 spotPos = mul(float4(worldPos, 1.0), cShadowProjPS[0]);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
     #else
         #ifdef CUBEMASK
-            float3x3 lightVecRot = float3x3(cShadowProjPS[0].xyz, cShadowProjPS[1].xyz, cShadowProjPS[2].xyz);
-            lightColor = texCUBE(sLightCubeMap, mul(lightVec, lightVecRot)).rgb * cLightColor.rgb;
+            lightColor = texCUBE(sLightCubeMap, mul(lightVec, (float3x3)cShadowProjPS[0])).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif
     #endif
 
     #ifdef SPECULAR
-        float spec = lightColor.g * GetSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
+        float spec = lightColor.g * GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);
         oColor = diff * float4(lightColor, spec * cLightColor.a);
     #else
         oColor = diff * float4(lightColor, 0.0);
