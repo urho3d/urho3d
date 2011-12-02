@@ -2045,7 +2045,7 @@ void View::SetupLightBatch(Batch& batch)
     else
     {
         graphics_->SetCullMode(CULL_NONE);
-        graphics_->SetDepthTest(CMP_LESSEQUAL);
+        graphics_->SetDepthTest(CMP_ALWAYS);
     }
     
     /// \todo Set stencil test to check for light masks

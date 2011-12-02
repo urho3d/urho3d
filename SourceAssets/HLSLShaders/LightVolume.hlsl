@@ -131,7 +131,7 @@ void PS(
             #endif
             diff *= saturate(GetShadow(shadowPos) + GetShadowFade(depth));
         #elif defined(SPOTLIGHT)
-            float4x4 shadowMatrix = float4x4(cShadowProjPS[0], cShadowProjPS[1], cShadowProjPS[2], cShadowProjPS[3]);
+            float4x4 shadowMatrix = float4x4(cShadowProjPS[4], cShadowProjPS[5], cShadowProjPS[6], cShadowProjPS[7]);
             float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
             diff *= GetShadow(shadowPos);
         #else
@@ -141,7 +141,7 @@ void PS(
     #endif
 
     #ifdef SPOTLIGHT
-        float4x4 spotMatrix = float4x4(cShadowProjPS[4], cShadowProjPS[5], cShadowProjPS[6], cShadowProjPS[7]);
+        float4x4 spotMatrix = float4x4(cShadowProjPS[0], cShadowProjPS[1], cShadowProjPS[2], cShadowProjPS[3]);
         float4 spotPos = mul(float4(worldPos, 1.0), spotMatrix);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
     #else

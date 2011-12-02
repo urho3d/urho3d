@@ -65,6 +65,88 @@ inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->instances_[0].distance_ < rhs->instances_[0].distance_;
 }
 
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Graphics* graphics, Renderer* renderer)
+{
+    Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
+    const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
+    
+    Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
+    Matrix4 shadowProj(shadowCamera->GetProjection());
+    Matrix4 texAdjust(Matrix4::IDENTITY);
+    
+    Texture2D* shadowMap = queue->shadowMap_;
+    if (!shadowMap)
+        return;
+    
+    float width = (float)shadowMap->GetWidth();
+    float height = (float)shadowMap->GetHeight();
+    
+    Vector2 offset(
+        (float)viewport.left_ / width,
+        (float)viewport.top_ / height
+    );
+    
+    Vector2 scale(
+        0.5f * (float)(viewport.right_ - viewport.left_) / width,
+        0.5f * (float)(viewport.bottom_ - viewport.top_) / height
+    );
+    
+    #ifdef USE_OPENGL
+    offset.x_ += scale.x_;
+    offset.y_ += scale.y_;
+    offset.y_ = 1.0f - offset.y_;
+    // If using 4 shadow samples, offset the position diagonally by half pixel
+    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+    {
+        offset.x_ -= 0.5f / width;
+        offset.y_ -= 0.5f / height;
+    }
+    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
+    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
+    #else
+    offset.x_ += scale.x_ + 0.5f / width;
+    offset.y_ += scale.y_ + 0.5f / height;
+    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+    {
+        offset.x_ -= 0.5f / width;
+        offset.y_ -= 0.5f / height;
+    }
+    // If using 2 shadow samples (fallback mode), offset the position horizontally only
+    if (graphics->GetFallback())
+        offset.x_ -= 0.5f / width;
+    scale.y_ = -scale.y_;
+    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
+    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
+    #endif
+    
+    dest = texAdjust * shadowProj * shadowView;
+}
+
+void CalculateSpotMatrix(Matrix4& dest, Light* light)
+{
+    Matrix3x4 spotView(light->GetWorldPosition(), light->GetWorldRotation(), 1.0f);
+    Matrix4 spotProj(Matrix4::ZERO);
+    Matrix4 texAdjust(Matrix4::IDENTITY);
+    
+    // Make the projected light slightly smaller than the shadow map to prevent light spill
+    float h = 1.005f / tanf(light->GetFov() * M_DEGTORAD * 0.5f);
+    float w = h / light->GetAspectRatio();
+    spotProj.m00_ = w;
+    spotProj.m11_ = h;
+    spotProj.m22_ = 1.0f / Max(light->GetRange(), M_EPSILON);
+    spotProj.m32_ = 1.0f;
+    
+    #ifdef USE_OPENGL
+    texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+    texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
+    #else
+    texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
+    texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+    #endif
+    
+    dest = texAdjust * spotProj * spotView.Inverse();
+}
+
 void Batch::CalculateSortKey()
 {
     unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0x7fff;
@@ -260,27 +342,10 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         
         if (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light))
         {
-            Matrix3x4 spotView(light->GetWorldPosition(), light->GetWorldRotation(), 1.0f);
-            Matrix4 spotProj(Matrix4::ZERO);
-            Matrix4 texAdjust(Matrix4::IDENTITY);
+            Matrix4 spotProj;
+            CalculateSpotMatrix(spotProj, light);
             
-            // Make the projected light slightly smaller than the shadow map to prevent light spill
-            float h = 1.005f / tanf(light->GetFov() * M_DEGTORAD * 0.5f);
-            float w = h / light->GetAspectRatio();
-            spotProj.m00_ = w;
-            spotProj.m11_ = h;
-            spotProj.m22_ = 1.0f / Max(light->GetRange(), M_EPSILON);
-            spotProj.m32_ = 1.0f;
-            
-            #ifdef USE_OPENGL
-            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
-            texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
-            #else
-            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
-            texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
-            #endif
-            
-            graphics->SetShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
+            graphics->SetShaderParameter(VSP_SPOTPROJ, spotProj);
         }
         
         if (graphics->NeedParameterUpdate(VSP_VERTEXLIGHTS, lightQueue_))
@@ -347,6 +412,15 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 light->GetSpecularIntensity()) * fade);
         }
         
+        if (graphics->NeedParameterUpdate(PSP_LIGHTDIR, light))
+            graphics->SetShaderParameter(PSP_LIGHTDIR, light->GetWorldRotation() * Vector3::BACK);
+        
+        if (graphics->NeedParameterUpdate(PSP_LIGHTPOS, light))
+        {
+            float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
+            graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(light->GetWorldPosition() - camera_->GetWorldPosition(), atten));
+        }
+        
         // Set shadow mapping shader parameters
         if (shadowMap)
         {
@@ -359,57 +433,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     numSplits = lightQueue_->shadowSplits_.Size();
                 
                 for (unsigned i = 0; i < numSplits; ++i)
-                {
-                    Camera* shadowCamera = lightQueue_->shadowSplits_[i].shadowCamera_;
-                    const IntRect& viewport = lightQueue_->shadowSplits_[i].shadowViewport_;
-                    
-                    Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
-                    Matrix4 shadowProj(shadowCamera->GetProjection());
-                    Matrix4 texAdjust(Matrix4::IDENTITY);
-                    
-                    float width = (float)shadowMap->GetWidth();
-                    float height = (float)shadowMap->GetHeight();
-                    
-                    Vector2 offset(
-                        (float)viewport.left_ / width,
-                        (float)viewport.top_ / height
-                    );
-                    
-                    Vector2 scale(
-                        0.5f * (float)(viewport.right_ - viewport.left_) / width,
-                        0.5f * (float)(viewport.bottom_ - viewport.top_) / height
-                    );
-                    
-                    #ifdef USE_OPENGL
-                    offset.x_ += scale.x_;
-                    offset.y_ += scale.y_;
-                    offset.y_ = 1.0f - offset.y_;
-                    // If using 4 shadow samples, offset the position diagonally by half pixel
-                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
-                    {
-                        offset.x_ -= 0.5f / width;
-                        offset.y_ -= 0.5f / height;
-                    }
-                    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
-                    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
-                    #else
-                    offset.x_ += scale.x_ + 0.5f / width;
-                    offset.y_ += scale.y_ + 0.5f / height;
-                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
-                    {
-                        offset.x_ -= 0.5f / width;
-                        offset.y_ -= 0.5f / height;
-                    }
-                    // If using 2 shadow samples (fallback mode), offset the position horizontally only
-                    if (graphics->GetFallback())
-                        offset.x_ -= 0.5f / width;
-                    scale.y_ = -scale.y_;
-                    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
-                    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
-                    #endif
-                    
-                    shadowMatrices[i] = texAdjust * shadowProj * shadowView;
-                }
+                    CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer);
                 
                 graphics->SetShaderParameter(VSP_SHADOWPROJ, shadowMatrices[0].GetData(), 16 * numSplits);
             }
@@ -492,6 +516,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))
             {
+                /// \todo Handle SM2 light pre-pass case, which draws one cascade per pass
                 Vector4 lightSplits(M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE);
                 if (lightQueue_->shadowSplits_.Size() > 1)
                     lightSplits.x_ = lightQueue_->shadowSplits_[0].farSplit_ / camera_->GetFarClip();
@@ -501,6 +526,38 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera_->GetFarClip();
                 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
+            }
+            
+            if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light))
+            {
+                /// \todo Handle SM2 light pre-pass case, which draws one cascade per pass
+                LightType type = light->GetLightType();
+                
+                if (type == LIGHT_DIRECTIONAL)
+                {
+                    Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
+                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    for (unsigned i = 0; i < numSplits; ++i)
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer);
+                    
+                    graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), 16 * numSplits);
+                }
+                if (type == LIGHT_SPOT)
+                {
+                    Matrix4 shadowMatrices[2];
+                   
+                    CalculateSpotMatrix(shadowMatrices[0], light);
+                    bool isShadowed = lightQueue_->shadowMap_ != 0;
+                    if (isShadowed)
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer);
+                    
+                    graphics->SetShaderParameter(PSP_SHADOWPROJ, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
+                }
+                if (type == LIGHT_POINT)
+                {
+                    Matrix3x4 lightVecRot(Vector3::ZERO, light->GetWorldRotation(), Vector3::ONE);
+                    graphics->SetShaderParameter(VSP_LIGHTVECROT, lightVecRot.GetData(), 12);
+                }
             }
         }
     }

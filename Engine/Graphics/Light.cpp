@@ -386,7 +386,7 @@ const Matrix3x4& Light::GetVolumeTransform(const Camera& camera)
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        volumeTransform_ = GetDirLightTransform(camera);
+        volumeTransform_ = GetDirLightTransform(camera, true);
         break;
         
     case LIGHT_SPOT:
