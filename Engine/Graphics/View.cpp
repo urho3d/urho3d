@@ -1015,21 +1015,18 @@ void View::RenderBatchesLightPrepass()
     if (graphics_->GetHardwareDepthSupport())
     {
         depthStencil = depthBuffer->GetRenderSurface();
-        
         graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     }
-    // No hardware depth support: render to R32F depth and RGBA normal buffers
+    // No hardware depth support: render to RGBA normal buffer and R32F depth
     else
     {
-        graphics_->SetRenderTarget(0, depthBuffer);
-        graphics_->SetRenderTarget(1, normalBuffer);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+        graphics_->SetRenderTarget(0, normalBuffer);
+        graphics_->SetRenderTarget(1, depthBuffer);
     }
+    
+    graphics_->SetDepthStencil(depthStencil);
+    graphics_->SetViewport(screenRect_);
+    graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
     if (!gbufferQueue_.IsEmpty())
     {

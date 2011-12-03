@@ -55,12 +55,10 @@ void PS(
     #else
         float3 iNormal : TEXCOORD2,
     #endif
-    #if !defined(HWDEPTH) && !defined(FALLBACK)
-        out float4 oDepth : COLOR0,
-        out float4 oNormal : COLOR1)
-    #else
-        out float4 oNormal : COLOR0)
+    #ifndef HWDEPTH
+        out float4 oDepth : COLOR1,
     #endif
+    out float4 oNormal : COLOR0)
 {
     #ifdef ALPHAMASK
         float4 diffInput = tex2D(sDiffMap, iTexCoord);
@@ -75,20 +73,15 @@ void PS(
         float3 normal = normalize(iNormal);
     #endif
 
-    #ifdef FALLBACK
-        // Fallback mode uses 15-bit linear depth
-        oNormal = PackNormalDepth(normal, iDepth.x);
+    #ifdef SPECMAP
+        float specStrength = tex2D(sSpecMap, iTexCoord).r * cMatSpecProperties.x;
     #else
-        #ifdef SPECMAP
-            float specStrength = tex2D(sSpecMap, iTexCoord).r * cMatSpecProperties.x;
-        #else
-            float specStrength = cMatSpecProperties.x;
-        #endif
-        float specPower = cMatSpecProperties.y / 255.0;
+        float specStrength = cMatSpecProperties.x;
+    #endif
+    float specPower = cMatSpecProperties.y / 255.0;
 
-        oNormal = float4(normal * 0.5 + 0.5, specPower);
-        #ifndef HWDEPTH
-            oDepth = iDepth;
-        #endif
+    oNormal = float4(normal * 0.5 + 0.5, specPower);
+    #ifndef HWDEPTH
+        oDepth = iDepth;
     #endif
 }
