@@ -1,4 +1,4 @@
 <technique>
     <pass name="base" vs="Ambient" ps="Ambient" depthwrite="false" blend="alpha" />
-    <pass name="light" vs="BlinnPhong" ps="BlinnPhong" depthwrite="false" blend="addalpha" />
+    <pass name="light" vs="ForwardLit" ps="ForwardLit" depthwrite="false" blend="addalpha" />
 </technique>

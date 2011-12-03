@@ -9,7 +9,7 @@
     <shader name="GBuffer" type="ps">
         <option name="Normal" define="NORMALMAP" />
         <option name="Spec" define="SPECMAP" />
-        <option name="Mask" define="ALPHAMASK" include="Diff" />
+        <option name="Mask" define="ALPHAMASK" />
         <option name="HW" define="HWDEPTH" exclude="FB" />
         <option name="FB" define="FALLBACK" exclude="HW" />
     </shader>

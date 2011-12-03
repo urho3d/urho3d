@@ -1184,6 +1184,11 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
     return pixelShader_ && pixelShader_->HasTextureUnit(unit);
 }
 
+void Graphics::ClearParameterSource(StringHash param)
+{
+    shaderParameters_[param].lastSource_ = (const void*)M_MAX_UNSIGNED;
+}
+
 void Graphics::ClearParameterSources()
 {
     for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)

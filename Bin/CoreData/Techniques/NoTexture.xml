@@ -1,7 +1,6 @@
 <technique>
     <pass name="base" vs="Ambient" ps="Ambient" />
-    <pass name="litbase" vs="BlinnPhong" ps="BlinnPhong_Ambient" />
-    <pass name="light" vs="BlinnPhong" ps="BlinnPhong" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="light" vs="ForwardLit" ps="ForwardLit" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
     <pass name="gbuffer" vs="GBuffer" ps="GBuffer" />
     <pass name="material" vs="Material" ps="Material" depthtest="equal" depthwrite="false" />

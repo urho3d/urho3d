@@ -19,7 +19,7 @@ void VS(float4 iPos : POSITION,
         float4x3 iModelInstance : TEXCOORD2,
     #endif
     float2 iTexCoord : TEXCOORD0,
-    out float4 oTexCoord : TEXCOORD0,
+    out float3 oTexCoord : TEXCOORD0,
     out float3 oVertexLighting : TEXCOORD1,
     out float4 oScreenPos : TEXCOORD2,
     #ifdef VERTEXCOLOR
@@ -30,11 +30,10 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-
-    oTexCoord = float4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(oPos));
+    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
     oScreenPos = GetScreenPos(oPos);
-    oVertexLighting = 0.0;
 
+    oVertexLighting = GetAmbient(GetZonePos(worldPos));
     #ifdef NUMVERTEXLIGHTS
     float3 normal = GetWorldNormal(modelMatrix);
     for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
@@ -46,7 +45,7 @@ void VS(float4 iPos : POSITION,
     #endif
 }
 
-void PS(float4 iTexCoord : TEXCOORD0,
+void PS(float3 iTexCoord : TEXCOORD0,
     float3 iVertexLighting : TEXCOORD1,
     float4 iScreenPos : TEXCOORD2,
     #ifdef VERTEXCOLOR
@@ -75,6 +74,6 @@ void PS(float4 iTexCoord : TEXCOORD0,
     float4 lightInput = 2.0 * tex2Dproj(sLightBuffer, iScreenPos);
     float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
 
-    float3 finalColor = (GetAmbient(iTexCoord.z) + iVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specIntensity;
-    oColor = float4(GetFog(finalColor, iTexCoord.w), 1.0);
+    float3 finalColor = (iVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specIntensity;
+    oColor = float4(GetFog(finalColor, iTexCoord.z), 1.0);
 }

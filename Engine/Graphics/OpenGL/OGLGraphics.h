@@ -136,6 +136,8 @@ public:
     bool NeedParameterUpdate(StringHash param, const void* source);
     /// Check whether the current pixel shader uses a texture unit.
     bool NeedTextureUnit(TextureUnit unit);
+    /// Clear remembered shader parameter source.
+    void ClearParameterSource(StringHash param);
     /// Clear remembered shader parameter sources.
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources.

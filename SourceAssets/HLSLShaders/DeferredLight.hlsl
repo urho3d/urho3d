@@ -118,11 +118,11 @@ void PS(
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            float4x4 shadowMatrix = GetDirShadowMatrix(depth);
+            float4x4 shadowMatrix = GetDirShadowMatrix(depth, cLightMatricesPS);
             float4 shadowPos = mul(float4(worldPos, 1.0), shadowMatrix);
             diff *= saturate(GetShadow(shadowPos) + GetShadowFade(depth));
         #elif defined(SPOTLIGHT)
-            float4 shadowPos = mul(float4(worldPos, 1.0), cShadowProjPS[1]);
+            float4 shadowPos = mul(float4(worldPos, 1.0), cLightMatricesPS[1]);
             diff *= GetShadow(shadowPos);
         #else
             float3 shadowPos = worldPos - cLightPosPS.xyz;
@@ -131,11 +131,11 @@ void PS(
     #endif
 
     #ifdef SPOTLIGHT
-        float4 spotPos = mul(float4(worldPos, 1.0), cShadowProjPS[0]);
+        float4 spotPos = mul(float4(worldPos, 1.0), cLightMatricesPS[0]);
         lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
     #else
         #ifdef CUBEMASK
-            lightColor = texCUBE(sLightCubeMap, mul(lightVec, (float3x3)cShadowProjPS[0])).rgb * cLightColor.rgb;
+            lightColor = texCUBE(sLightCubeMap, mul(lightVec, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif

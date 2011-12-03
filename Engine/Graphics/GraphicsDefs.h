@@ -166,13 +166,12 @@ enum TextureUsage
 enum PassType
 {
     PASS_BASE,
-    PASS_LITBASE,
     PASS_LIGHT,
     PASS_PREALPHA,
     PASS_POSTALPHA,
-    PASS_SHADOW,
     PASS_GBUFFER,
     PASS_MATERIAL,
+    PASS_SHADOW,
     MAX_PASSES
 };
 
@@ -195,7 +194,9 @@ enum ShaderType
     PS,
 };
 
-// Inbuilt shader parameters
+// Inbuilt shader parameters.
+extern StringHash VSP_AMBIENTSTARTCOLOR;
+extern StringHash VSP_AMBIENTENDCOLOR;
 extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
 extern StringHash VSP_DEPTHMODE;
@@ -203,20 +204,16 @@ extern StringHash VSP_FRUSTUMSIZE;
 extern StringHash VSP_GBUFFEROFFSETS;
 extern StringHash VSP_LIGHTDIR;
 extern StringHash VSP_LIGHTPOS;
-extern StringHash VSP_LIGHTVECROT;
 extern StringHash VSP_MODEL;
-extern StringHash VSP_SHADOWPROJ;
-extern StringHash VSP_SPOTPROJ;
 extern StringHash VSP_VIEWPROJ;
 extern StringHash VSP_UOFFSET;
 extern StringHash VSP_VOFFSET;
 extern StringHash VSP_VIEWRIGHTVECTOR;
 extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_ZONE;
+extern StringHash VSP_LIGHTMATRICES;
 extern StringHash VSP_SKINMATRICES;
 extern StringHash VSP_VERTEXLIGHTS;
-extern StringHash PSP_AMBIENTSTARTCOLOR;
-extern StringHash PSP_AMBIENTENDCOLOR;
 extern StringHash PSP_DEPTHRECONSTRUCT;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;
@@ -231,7 +228,7 @@ extern StringHash PSP_SHADOWCUBEADJUST;
 extern StringHash PSP_SHADOWDEPTHFADE;
 extern StringHash PSP_SHADOWINTENSITY;
 extern StringHash PSP_SHADOWSPLITS;
-extern StringHash PSP_SHADOWPROJ;
+extern StringHash PSP_LIGHTMATRICES;
 
 /// Texture units.
 enum TextureUnit

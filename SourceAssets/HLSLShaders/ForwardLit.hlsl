@@ -23,7 +23,7 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float4 oTexCoord : TEXCOORD0,
+    out float3 oTexCoord : TEXCOORD0,
     out float3 oLightVec : TEXCOORD1,
     #ifndef NORMALMAP
         out float3 oNormal : TEXCOORD2,
@@ -54,7 +54,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = float4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(oPos));
+    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -78,12 +78,12 @@ void VS(float4 iPos : POSITION,
     #ifdef SHADOW
         // Shadow projection: transform from world space to shadow space
         #if defined(DIRLIGHT)
-            oShadowPos[0] = mul(projWorldPos, cShadowProj[0]);
-            oShadowPos[1] = mul(projWorldPos, cShadowProj[1]);
-            oShadowPos[2] = mul(projWorldPos, cShadowProj[2]);
-            oShadowPos[3] = mul(projWorldPos, cShadowProj[3]);
+            oShadowPos[0] = mul(projWorldPos, cLightMatrices[0]);
+            oShadowPos[1] = mul(projWorldPos, cLightMatrices[1]);
+            oShadowPos[2] = mul(projWorldPos, cLightMatrices[2]);
+            oShadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
         #elif defined(SPOTLIGHT)
-            oShadowPos = mul(projWorldPos, cShadowProj[0]);
+            oShadowPos = mul(projWorldPos, cLightMatrices[1]);
         #else
             oShadowPos = worldPos - cLightPos.xyz;
         #endif
@@ -91,11 +91,11 @@ void VS(float4 iPos : POSITION,
 
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
-        oSpotPos = mul(projWorldPos, cSpotProj);
+        oSpotPos = mul(projWorldPos, cLightMatrices[0]);
     #endif
 
     #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec, cLightVecRot);
+        oCubeMaskVec = mul(oLightVec, (float3x3)cLightMatrices[0]);
     #endif
 
     #ifdef NORMALMAP
@@ -111,7 +111,7 @@ void VS(float4 iPos : POSITION,
     #endif
 }
 
-void PS(float4 iTexCoord : TEXCOORD0,
+void PS(float3 iTexCoord : TEXCOORD0,
     float3 iLightVec : TEXCOORD1,
     #ifndef NORMALMAP
         float3 iNormal : TEXCOORD2,
@@ -173,8 +173,8 @@ void PS(float4 iTexCoord : TEXCOORD0,
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            float4 shadowPos = GetDirShadowPos(iShadowPos, iTexCoord.w);
-            diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iTexCoord.w));
+            float4 shadowPos = GetDirShadowPos(iShadowPos, iTexCoord.z);
+            diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iTexCoord.z));
         #elif defined(SPOTLIGHT)
             diff *= GetShadow(iShadowPos);
         #else
@@ -202,10 +202,5 @@ void PS(float4 iTexCoord : TEXCOORD0,
         finalColor = diff * lightColor * diffColor.rgb;
     #endif
 
-    #ifdef AMBIENT
-        finalColor += GetAmbient(iTexCoord.z) * diffColor.rgb;
-        oColor = float4(GetFog(finalColor, iTexCoord.w), diffColor.a);
-    #else
-        oColor = float4(GetLitFog(finalColor, iTexCoord.w), diffColor.a);
-    #endif
+    oColor = float4(GetLitFog(finalColor, iTexCoord.z), diffColor.a);
 }

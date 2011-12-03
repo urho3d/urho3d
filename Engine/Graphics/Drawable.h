@@ -197,14 +197,10 @@ public:
     bool IsInView(unsigned frameNumber) const { return viewFrameNumber_ == frameNumber; }
     /// Return whether is visible in a specific view this frame.
     bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
-    /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const;
     /// Return per-pixel lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return per-vertex lights.
     const PODVector<Light*>& GetVertexLights() const { return vertexLights_; }
-    /// Return the first added per-pixel light.
-    Light* GetFirstLight() const { return firstLight_; }
     
 protected:
     /// Handle node being assigned.
@@ -224,8 +220,6 @@ protected:
     Octant* octant_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
-    /// Base pass flags per batch index.
-    PODVector<unsigned> basePassFlags_;
     /// Last view's frameinfo. Not safe to dereference.
     const FrameInfo* viewFrame_;
     /// Last view's camera. Not safe to dereference.
@@ -234,8 +228,6 @@ protected:
     PODVector<Light*> lights_;
     /// Per-vertex lights affecting this drawable.
     PODVector<Light*> vertexLights_;
-    /// First per-pixel light added this frame.
-    Light* firstLight_;
     /// Current zone.
     WeakPtr<Zone> zone_;
     /// Previous zone.

@@ -160,6 +160,24 @@
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
         <element type="Text">
+            <text value="Rendering mode" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="RenderForward">
+            <text value="Forward" />
+        </element>
+        <element type="Text" style="FileSelectorFilterText" name="RenderPrepass">
+            <text value="Pre-pass" />
+        </element>
+        <element type="DropDownList" name="RenderModeEdit">
+            <fixedwidth value="100" />
+            <popupitem name="RenderForward" />
+            <popupitem name="RenderPrepass" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
             <text value="Texture quality" />
         </element>
         <element type="Text" style="FileSelectorFilterText" name="TextureLow">

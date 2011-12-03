@@ -975,6 +975,12 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
     return false;
 }
 
+void Graphics::ClearParameterSource(StringHash param)
+{
+    if (shaderProgram_)
+        shaderProgram_->ClearParameterSource(param);
+}
+
 void Graphics::ClearParameterSources()
 {
     ++shaderParameterFrame_;

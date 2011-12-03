@@ -26,6 +26,8 @@
 
 #include "DebugNew.h"
 
+StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
+StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
 StringHash VSP_CAMERAPOS("CameraPos");
 StringHash VSP_CAMERAROT("CameraRot");
 StringHash VSP_DEPTHMODE("DepthMode");
@@ -33,20 +35,16 @@ StringHash VSP_FRUSTUMSIZE("FrustumSize");
 StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
 StringHash VSP_LIGHTDIR("LightDir");
 StringHash VSP_LIGHTPOS("LightPos");
-StringHash VSP_LIGHTVECROT("LightVecRot");
 StringHash VSP_MODEL("Model");
-StringHash VSP_SHADOWPROJ("ShadowProj");
-StringHash VSP_SPOTPROJ("SpotProj");
 StringHash VSP_VIEWPROJ("ViewProj");
 StringHash VSP_UOFFSET("UOffset");
 StringHash VSP_VOFFSET("VOffset");
 StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
 StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 StringHash VSP_ZONE("Zone");
+StringHash VSP_LIGHTMATRICES("LightMatrices");
 StringHash VSP_SKINMATRICES("SkinMatrices");
 StringHash VSP_VERTEXLIGHTS("VertexLights");
-StringHash PSP_AMBIENTSTARTCOLOR("AmbientStartColor");
-StringHash PSP_AMBIENTENDCOLOR("AmbientEndColor");
 StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
 StringHash PSP_FOGCOLOR("FogColor");
 StringHash PSP_FOGPARAMS("FogParams");
@@ -61,4 +59,4 @@ StringHash PSP_SHADOWCUBEADJUST("ShadowCubeAdjust");
 StringHash PSP_SHADOWDEPTHFADE("ShadowDepthFade");
 StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 StringHash PSP_SHADOWSPLITS("ShadowSplits");
-StringHash PSP_SHADOWPROJ("ShadowProjPS");
+StringHash PSP_LIGHTMATRICES("LightMatricesPS");

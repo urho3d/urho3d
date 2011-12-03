@@ -42,7 +42,6 @@ Drawable::Drawable(Context* context) :
     octant_(0),
     viewFrame_(0),
     viewCamera_(0),
-    firstLight_(0),
     drawDistance_(0.0f),
     shadowDistance_(0.0f),
     lodBias_(1.0f),
@@ -215,17 +214,12 @@ void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
 
 void Drawable::ClearLights()
 {
-    for (unsigned i = 0; i < basePassFlags_.Size(); ++i)
-        basePassFlags_[i] = 0;
-    firstLight_ = 0;
     lights_.Clear();
     vertexLights_.Clear();
 }
 
 void Drawable::AddLight(Light* light)
 {
-    if (lights_.Empty())
-        firstLight_ = light;
     lights_.Push(light);
 }
 
@@ -266,19 +260,6 @@ void Drawable::LimitVertexLights()
         vertexLights_.Resize(MAX_VERTEX_LIGHTS);
 }
 
-void Drawable::SetBasePass(unsigned batchIndex)
-{
-    unsigned index = batchIndex >> 5;
-    if (basePassFlags_.Size() <= index)
-    {
-        unsigned oldSize = basePassFlags_.Size();
-        basePassFlags_.Resize(index + 1);
-        for (unsigned i = oldSize; i <= index; ++i)
-            basePassFlags_[i] = 0;
-    }
-    basePassFlags_[index] |= (1 << (batchIndex & 31));
-}
-
 Zone* Drawable::GetZone() const
 {
     return zone_;
@@ -287,15 +268,6 @@ Zone* Drawable::GetZone() const
 Zone* Drawable::GetLastZone() const
 {
     return lastZone_;
-}
-
-bool Drawable::HasBasePass(unsigned batchIndex) const
-{
-    unsigned index = batchIndex >> 5;
-    if (index < basePassFlags_.Size())
-        return (basePassFlags_[index] & (1 << (batchIndex & 31))) != 0;
-    else
-        return false;
 }
 
 void Drawable::OnNodeSet(Node* node)

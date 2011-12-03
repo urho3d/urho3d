@@ -242,9 +242,9 @@ public:
     /// %Set sort value based on overall intensity over a bounding box.
     void SetIntensitySortValue(const BoundingBox& box);
     /// Return directional light quad transform for either near or far split.
-    Matrix3x4 GetDirLightTransform(const Camera& camera, bool getNearQuad = false);
+    Matrix3x4 GetDirLightTransform(Camera* camera, bool getNearQuad = false);
     /// Return light volume model transform.
-    const Matrix3x4& GetVolumeTransform(const Camera& camera);
+    const Matrix3x4& GetVolumeTransform(Camera* camera);
     
     /// %Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);

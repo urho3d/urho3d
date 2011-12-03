@@ -285,10 +285,11 @@ static void RegisterMaterial(asIScriptEngine* engine)
     
     engine->RegisterEnum("PassType");
     engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
-    engine->RegisterEnumValue("PassType", "PASS_LITBASE", PASS_LITBASE);
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
     engine->RegisterEnumValue("PassType", "PASS_PREALPHA", PASS_PREALPHA);
     engine->RegisterEnumValue("PassType", "PASS_POSTALPHA", PASS_POSTALPHA);
+    engine->RegisterEnumValue("PassType", "PASS_GBUFFER", PASS_GBUFFER);
+    engine->RegisterEnumValue("PassType", "PASS_MATERIAL", PASS_MATERIAL);
     engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);
     
     engine->RegisterEnum("BlendMode");
@@ -732,6 +733,8 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "uint get_numBatches() const", asMETHOD(Graphics, GetNumBatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_fallback() const", asMETHOD(Graphics, GetFallback), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sm3Support() const", asMETHOD(Graphics, GetSM3Support), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_lightPrepassSupport() const", asMETHOD(Graphics, GetLightPrepassSupport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_hardwareDepthSupport() const", asMETHOD(Graphics, GetHardwareDepthSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hardwareShadowSupport() const", asMETHOD(Graphics, GetHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hiresShadowSupport() const", asMETHOD(Graphics, GetHiresShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_forceSM2(bool)", asMETHOD(Graphics, SetForceSM2), asCALL_THISCALL);

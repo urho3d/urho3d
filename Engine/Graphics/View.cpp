@@ -632,7 +632,7 @@ void View::GetBatches()
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
-                    volumeBatch.worldTransform_ = &light->GetVolumeTransform(*camera_);
+                    volumeBatch.worldTransform_ = &light->GetVolumeTransform(camera_);
                     volumeBatch.overrideView_ = light->GetLightType() == LIGHT_DIRECTIONAL;
                     volumeBatch.camera_ = camera_;
                     volumeBatch.lightQueue_ = &lightQueue;
@@ -640,7 +640,7 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeShaders(volumeBatch);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
@@ -717,24 +717,17 @@ void View::GetBatches()
                         FinalizeBatch(baseBatch, tech, pass);
                         gbufferQueue_.AddBatch(baseBatch);
                         
-                        // Use PASS_MATERIAL instead of PASS_BASE to distinguish between light pre-pass forward pass (which
-                        // uses the light accumulation result) and actual forward unlit base pass
                         pass = tech->GetPass(PASS_MATERIAL);
                     }
                 }
                 
-                // If object already has a pixel lit base pass, can skip the unlit base pass
+                // Next check for forward base pass
                 if (!pass)
-                {
-                    if (drawable->HasBasePass(j))
-                        continue;
-                    // Check for unlit or vertex lit base pass
                     pass = tech->GetPass(PASS_BASE);
-                }
                 
                 if (pass)
                 {
-                    // Check for vertex lights now
+                    // Check for vertex lights (both forward unlit and light pre-pass material pass)
                     const PODVector<Light*>& vertexLights = drawable->GetVertexLights();
                     if (!vertexLights.Empty())
                     {
@@ -869,11 +862,10 @@ void View::UpdateGeometries()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
-    Light* firstLight = drawable->GetFirstLight();
-    bool prepass = renderer_->GetLightPrepass();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool hasVertexLights = drawable->GetVertexLights().Size() > 0;
+    bool prepass = renderer_->GetLightPrepass();
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -885,27 +877,11 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         if (!litBatch.geometry_ || !tech)
             continue;
         
-        Pass* pass = 0;
-        
-        // Do not create pixel lit passes for materials that render into the G-buffer
+        // Do not create pixel lit forward passes for materials that render into the G-buffer
         if (prepass && tech->HasPass(PASS_GBUFFER))
             continue;
         
-        // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
-        // Also vertex lighting requires the non-lit base pass, so skip if any vertex lights
-        if (light == firstLight && !hasVertexLights && !drawable->HasBasePass(i))
-        {
-            pass = tech->GetPass(PASS_LITBASE);
-            if (pass)
-            {
-                litBatch.isBase_ = true;
-                drawable->SetBasePass(i);
-            }
-        }
-        
-        // If no lit base pass, get ordinary light pass
-        if (!pass)
-            pass = tech->GetPass(PASS_LIGHT);
+        Pass* pass = tech->GetPass(PASS_LIGHT);
         // Skip if material does not receive light at all
         if (!pass)
             continue;
@@ -963,7 +939,7 @@ void View::RenderBatchesForward()
     
     if (!lightQueues_.Empty())
     {
-        // Render shadow maps + opaque objects' shadowed additive lighting
+        // Render shadow maps + opaque objects' additive lighting
         PROFILE(RenderLights);
         
         for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1044,10 +1020,10 @@ void View::RenderBatchesLightPrepass()
     else
     {
         graphics_->SetRenderTarget(0, depthBuffer);
+        graphics_->SetRenderTarget(1, normalBuffer);
         graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, Color::WHITE);
-        graphics_->SetRenderTarget(1, normalBuffer);
+        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     }
     
     if (!gbufferQueue_.IsEmpty())
@@ -1087,12 +1063,13 @@ void View::RenderBatchesLightPrepass()
             
             for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
             {
-                SetupLightBatch(i->volumeBatches_[j]);
+                SetupLightVolumeBatch(i->volumeBatches_[j]);
                 i->volumeBatches_[j].Draw(graphics_, renderer_);
             }
         }
     }
     
+    // Clear destination render target with fog color
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget_);
@@ -1457,7 +1434,7 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
 
 void View::OptimizeLightByScissor(Light* light)
 {
-    if (light)
+    if (light && light->GetLightType() != LIGHT_DIRECTIONAL)
         graphics_->SetScissorTest(true, GetLightScissor(light));
     else
         graphics_->SetScissorTest(false);
@@ -1467,14 +1444,14 @@ void View::OptimizeLightByStencil(Light* light)
 {
     if (light && renderer_->GetLightStencilMasking())
     {
-        Geometry* geometry = renderer_->GetLightGeometry(light);
-        if (!geometry)
+        LightType type = light->GetLightType();
+        if (type == LIGHT_DIRECTIONAL)
         {
             graphics_->SetStencilTest(false);
             return;
         }
         
-        LightType type = light->GetLightType();
+        Geometry* geometry = renderer_->GetLightGeometry(light);
         Matrix3x4 view(camera_->GetInverseWorldTransform());
         Matrix4 projection(camera_->GetProjection());
         float lightDist;
@@ -1516,7 +1493,7 @@ void View::OptimizeLightByStencil(Light* light)
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
         graphics_->SetShaders(renderer_->GetStencilVS(), renderer_->GetStencilPS());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
-        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(*camera_));
+        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera_));
         
         geometry->Draw(graphics_);
         
@@ -2007,7 +1984,7 @@ void View::PrepareInstancingBuffer()
     }
 }
 
-void View::SetupLightBatch(Batch& batch)
+void View::SetupLightVolumeBatch(Batch& batch)
 {
     Light* light = batch.lightQueue_->light_;
     LightType type = light->GetLightType();
@@ -2039,22 +2016,22 @@ void View::SetupLightBatch(Batch& batch)
     else
     {
         graphics_->SetCullMode(CULL_NONE);
-        graphics_->SetDepthTest(CMP_GREATER);
+        graphics_->SetDepthTest(CMP_ALWAYS);
     }
     
-    /// \todo Set stencil test to check for light masks
     graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
+    graphics_->SetStencilTest(true, CMP_LESS, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
 }
 
-void View::DrawFullscreenQuad(Camera& camera, bool nearQuad)
+void View::DrawFullscreenQuad(Camera* camera, bool nearQuad)
 {
     Light quadDirLight(context_);
+    quadDirLight.SetLightType(LIGHT_DIRECTIONAL);
     Matrix3x4 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
     
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetShaderParameter(VSP_MODEL, model);
-    graphics_->SetShaderParameter(VSP_VIEWPROJ, camera.GetProjection());
+    graphics_->SetShaderParameter(VSP_VIEWPROJ, camera->GetProjection());
     graphics_->ClearTransformSources();
     
     renderer_->GetLightGeometry(&quadDirLight)->Draw(graphics_);
@@ -2063,7 +2040,13 @@ void View::DrawFullscreenQuad(Camera& camera, bool nearQuad)
 void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
     graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
+    
+    // During G-buffer rendering, mark opaque pixels to scissor
+    /// \todo Use objects' light masks
+    if (&queue != &gbufferQueue_)
+        graphics_->SetStencilTest(false);
+    else
+        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, 0xff);
     
     // Base instanced
     for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBaseBatchGroups_.Begin(); i !=

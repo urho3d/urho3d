@@ -1013,9 +1013,9 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             (unsigned)maxInstanceTriangles_ * 3))
             geomType = GEOM_STATIC;
         
-        //  Check whether is a lit pass. If not, there is only one pixel shader
+        //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
-        if (type == PASS_LIGHT || type == PASS_LITBASE)
+        if (type == PASS_LIGHT)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
             if (!lightQueue)
@@ -1120,7 +1120,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
 }
 
-void Renderer::SetLightVolumeShaders(Batch& batch)
+void Renderer::SetLightVolumeBatchShaders(Batch& batch)
 {
     unsigned vsi = DLVS_NONE;
     unsigned psi = DLPS_NONE;
@@ -1272,7 +1272,7 @@ void Renderer::LoadShaders()
         unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-            lightVS_[i] = GetVertexShader("LightVolume_" + deferredLightVSVariations[i]);
+            lightVS_[i] = GetVertexShader("DeferredLight_" + deferredLightVSVariations[i]);
         
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
@@ -1280,12 +1280,12 @@ void Renderer::LoadShaders()
             String linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
             if (i & DLPS_SHADOW)
             {
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
+                lightPS_[i] = GetPixelShader("DeferredLight_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
                     shadowVariations[shadows]);
             }
             else
             {
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
+                lightPS_[i] = GetPixelShader("DeferredLight_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
             }
         }
     }
@@ -1303,7 +1303,6 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     else
     {
         LoadPassShaders(technique, PASS_BASE);
-        LoadPassShaders(technique, PASS_LITBASE);
         LoadPassShaders(technique, PASS_LIGHT);
     }
     
@@ -1332,16 +1331,15 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
-    // If hardware depth is used, do not write depth into a rendertarget in the G-buffer pass
-    // Also check for fallback G-buffer (different layout)
+    // If hardware depth is used, choose a G-buffer shader that does not write depth manually
     if (type == PASS_GBUFFER)
     {
         unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
         vertexShaderName += hwVariations[hwDepth];
         pixelShaderName += hwVariations[hwDepth];
-        pixelShaderName += fallbackVariations[fallback];
     }
     
+    // Check for fallback shadow rendering mode (write depth into an RGBA render target)
     if (type == PASS_SHADOW)
     {
         vertexShaderName += fallbackVariations[fallback];
@@ -1355,9 +1353,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (type == PASS_LIGHT || type == PASS_LITBASE)
+    if (type == PASS_LIGHT)
     {
-        // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
+        // Load forward pixel lit variations. If material is transparent, and shadow maps are reused,
+        // do not load shadowed variations
         if (reuseShadowMaps_)
         {
             if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
@@ -1394,6 +1393,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     }
     else
     {
+        // Load vertex light variations for forward ambient pass and pre-pass material pass
         if (type == PASS_BASE || type == PASS_MATERIAL)
         {
             vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
@@ -1401,7 +1401,8 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
             {
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
-                vertexShaders[j] = GetVertexShader(vertexShaderName + vertexLightVSVariations[l] + geometryVSVariations[g], g != 0 || l != 0);
+                vertexShaders[j] = GetVertexShader(vertexShaderName + vertexLightVSVariations[l] + geometryVSVariations[g],
+                    g != 0 || l != 0);
             }
         }
         else

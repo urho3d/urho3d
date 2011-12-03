@@ -359,15 +359,18 @@ Frustum Light::GetFrustum() const
 }
 
 
-Matrix3x4 Light::GetDirLightTransform(const Camera& camera, bool getNearQuad)
+Matrix3x4 Light::GetDirLightTransform(Camera* camera, bool getNearQuad)
 {
+    if (!camera)
+        return Matrix3x4::IDENTITY;
+    
     Vector3 nearVector, farVector;
-    camera.GetFrustumSize(nearVector, farVector);
-    float nearClip = camera.GetNearClip();
-    float farClip = camera.GetFarClip();
+    camera->GetFrustumSize(nearVector, farVector);
+    float nearClip = camera->GetNearClip();
+    float farClip = camera->GetFarClip();
     
     float distance = getNearQuad ? nearClip : farClip;
-    if (!camera.IsOrthographic())
+    if (!camera->IsOrthographic())
         farVector *= (distance / farClip);
     else
         farVector.z_ *= (distance / farClip);
@@ -379,7 +382,7 @@ Matrix3x4 Light::GetDirLightTransform(const Camera& camera, bool getNearQuad)
     return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
 }
 
-const Matrix3x4& Light::GetVolumeTransform(const Camera& camera)
+const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 {
     const Matrix3x4& transform = GetWorldTransform();
     
@@ -453,15 +456,10 @@ void Light::OnWorldBoundingBoxUpdate()
 
 void Light::SetIntensitySortValue(float distance)
 {
-    // When sorting lights globally, give priority to directional lights so that they will be combined into the ambient pass
     if (lightType_ != LIGHT_DIRECTIONAL)
-        sortValue_ = Max(distance, M_MIN_NEARCLIP) / (color_.Intensity() + M_EPSILON);
-    else
         sortValue_ = M_EPSILON / (color_.Intensity() + M_EPSILON);
-    
-    // Additionally, give priority to vertex lights so that vertex light base passes can be determined before per pixel lights
-    if (perVertex_)
-        sortValue_ -= M_LARGE_VALUE;
+    else
+        sortValue_ = distance / (color_.Intensity() + M_EPSILON);
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)

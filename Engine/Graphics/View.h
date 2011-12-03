@@ -174,9 +174,9 @@ private:
     /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
     /// %Set up a light volume rendering batch.
-    void SetupLightBatch(Batch& batch);
+    void SetupLightVolumeBatch(Batch& batch);
     /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
-    void DrawFullscreenQuad(Camera& camera, bool nearQuad);
+    void DrawFullscreenQuad(Camera* camera, bool nearQuad);
     /// Render everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
     /// Render batches lit by a specific light.

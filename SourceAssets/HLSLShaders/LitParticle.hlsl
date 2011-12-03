@@ -20,14 +20,13 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float2 oTexCoord : TEXCOORD0,
+    out float3 oTexCoord : TEXCOORD0,
     out float3 oLightVec : TEXCOORD1,
-    out float2 oZonePosDepth : TEXCOORD2,
     #ifdef SPOTLIGHT
-        out float4 oSpotPos : TEXCOORD3,
+        out float4 oSpotPos : TEXCOORD2,
     #endif
     #ifdef POINTLIGHT
-        out float3 oCubeMaskVec : TEXCOORD3,
+        out float3 oCubeMaskVec : TEXCOORD2,
     #endif
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
@@ -37,7 +36,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetTexCoord(iTexCoord);
+    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -51,26 +50,23 @@ void VS(float4 iPos : POSITION,
         oLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
     #endif
 
-    oZonePosDepth = float2(GetZonePos(worldPos), GetDepth(oPos));
-
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
-        oSpotPos = mul(projWorldPos, cSpotProj);
+        oSpotPos = mul(projWorldPos, cLightMatrices[0]);
     #endif
 
     #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec, cLightVecRot);
+        oCubeMaskVec = mul(oLightVec, (float3x3)cLightMatrices[0]);
     #endif
 }
 
-void PS(float2 iTexCoord : TEXCOORD0,
+void PS(float3 iTexCoord : TEXCOORD0,
     float3 iLightVec : TEXCOORD1,
-    float2 iZonePosDepth : TEXCOORD2,
     #ifdef SPOTLIGHT
-        float4 iSpotPos : TEXCOORD3,
+        float4 iSpotPos : TEXCOORD2,
     #endif
     #ifdef CUBEMASK
-        float3 iCubeMaskVec : TEXCOORD3,
+        float3 iCubeMaskVec : TEXCOORD2,
     #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -78,7 +74,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord.xy);
     #else
         float4 diffColor = cMatDiffColor;
     #endif
@@ -106,11 +102,5 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 
     finalColor = diff * lightColor * diffColor.rgb;
-
-    #ifdef AMBIENT
-        finalColor += GetAmbient(iZonePosDepth.x) * diffColor.rgb;
-        oColor = float4(GetFog(finalColor, iZonePosDepth.y), diffColor.a);
-    #else
-        oColor = float4(GetLitFog(finalColor, iZonePosDepth.y), diffColor.a);
-    #endif
+    oColor = float4(GetLitFog(finalColor, iTexCoord.z), diffColor.a);
 }

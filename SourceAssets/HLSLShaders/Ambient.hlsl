@@ -24,7 +24,7 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float4 oTexCoord : TEXCOORD0,
+    out float3 oTexCoord : TEXCOORD0,
     out float3 oVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
@@ -34,9 +34,9 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = float4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(oPos));
+    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
 
-    oVertexLighting = 0.0;
+    oVertexLighting = GetAmbient(GetZonePos(worldPos));
     #ifdef NUMVERTEXLIGHTS
     float3 normal = GetWorldNormal(modelMatrix);
     for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
@@ -48,7 +48,7 @@ void VS(float4 iPos : POSITION,
     #endif
 }
 
-void PS(float4 iTexCoord : TEXCOORD0,
+void PS(float3 iTexCoord : TEXCOORD0,
     float3 iVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -65,7 +65,7 @@ void PS(float4 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    float3 finalColor = (GetAmbient(iTexCoord.z) + iVertexLighting) * diffColor.rgb;
+    float3 finalColor = iVertexLighting * diffColor.rgb;
 
-    oColor = float4(GetFog(finalColor, iTexCoord.w), diffColor.a);
+    oColor = float4(GetFog(finalColor, iTexCoord.z), diffColor.a);
 }

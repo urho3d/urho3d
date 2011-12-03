@@ -338,7 +338,7 @@ public:
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
-    void SetLightVolumeShaders(Batch& batch);
+    void SetLightVolumeBatchShaders(Batch& batch);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
     /// Reset shadow map allocation counts.

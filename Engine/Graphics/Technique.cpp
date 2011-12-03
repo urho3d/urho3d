@@ -34,13 +34,12 @@
 static const String passNames[] =
 {
     "base",
-    "litbase",
     "light",
     "prealpha",
     "postalpha",
-    "shadow",
     "gbuffer",
     "material",
+    "shadow",
     ""
 };
 

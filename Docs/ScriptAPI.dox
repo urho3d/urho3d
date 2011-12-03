@@ -2093,6 +2093,8 @@ Properties:<br>
 - uint numBatches (readonly)
 - bool fallback (readonly)
 - bool sm3Support (readonly)
+- bool lightPrepassSupport (readonly)
+- bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
 - bool forceSM2
@@ -2111,6 +2113,7 @@ Properties:<br>
 - String& typeName (readonly)
 - uint numViewports
 - Viewport&[] viewports
+- bool lightPrepass
 - bool specularLighting
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
