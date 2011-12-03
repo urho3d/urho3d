@@ -303,16 +303,6 @@
     <element>
         <fixedheight value="17" />
         <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="LightStencilMaskingToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Light stencil masking" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
         <element type="CheckBox" name="FrameLimiterToggle">
             <fixedsize value="16 16" />
         </element>

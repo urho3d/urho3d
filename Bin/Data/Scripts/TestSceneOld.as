@@ -387,9 +387,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyPress['9'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
-        if (input.keyPress['0'])
-            renderer.lightStencilMasking = !renderer.lightStencilMasking;
-
         if (input.keyPress[' '])
         {
             drawDebug++;

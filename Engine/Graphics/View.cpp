@@ -532,6 +532,7 @@ void View::GetBatches()
         for (Vector<LightQueryResult>::ConstIterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
             const LightQueryResult& query = *i;
+            // If light has no affected geometries, no need to process further
             if (query.litGeometries_.Empty())
                 continue;
             
@@ -614,7 +615,7 @@ void View::GetBatches()
                     }
                 }
                 
-                // Loop through lit geometries
+                // Process lit geometries
                 for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
                 {
                     Drawable* drawable = *j;
@@ -647,7 +648,7 @@ void View::GetBatches()
             // Per-vertex light
             else
             {
-                // Loop through lit geometries
+                // Add the vertex light to lit drawables. It will be processed later during base pass batch generation
                 for (PODVector<Drawable*>::ConstIterator j = query.litGeometries_.Begin(); j != query.litGeometries_.End(); ++j)
                 {
                     Drawable* drawable = *j;
@@ -1442,7 +1443,7 @@ void View::OptimizeLightByScissor(Light* light)
 
 void View::OptimizeLightByStencil(Light* light)
 {
-    if (light && renderer_->GetLightStencilMasking())
+    if (light)
     {
         LightType type = light->GetLightType();
         if (type == LIGHT_DIRECTIONAL)

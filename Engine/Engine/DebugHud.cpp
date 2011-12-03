@@ -165,12 +165,6 @@ void DebugHud::Update(float timeStep)
         else
             mode += "Off";
         
-        mode += " Stencil:";
-        if (renderer->GetLightStencilMasking())
-            mode += "On";
-        else
-            mode += "Off";
-        
         mode += " Mode:";
         #ifdef USE_OPENGL
         mode += "OGL";

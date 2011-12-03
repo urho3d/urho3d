@@ -1,9 +1,9 @@
 <shaders>
-    <shader name="DeferredLight" type="vs">
+    <shader name="LightVolume" type="vs">
         <option name="Ortho" define="ORTHO" />
         <option name="Dir" define="DIRLIGHT" />
     </shader>
-    <shader name="DeferredLight" type="ps">
+    <shader name="LightVolume" type="ps">
         <option name="Linear" define="LINEAR" exclude="Ortho" />
         <option name="Ortho" define="ORTHO" exclude="Linear" />
         <variation name="Dir" define="DIRLIGHT" />

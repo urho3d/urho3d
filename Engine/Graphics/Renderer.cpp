@@ -294,7 +294,6 @@ Renderer::Renderer(Context* context) :
     specularLighting_(true),
     drawShadows_(true),
     reuseShadowMaps_(true),
-    lightStencilMasking_(true),
     dynamicInstancing_(true),
     shadersDirty_(true),
     initialized_(false)
@@ -492,11 +491,6 @@ void Renderer::SetMaxShadowCascades(int cascades)
         maxShadowCascades_ = cascades;
         ResetShadowMaps();
     }
-}
-
-void Renderer::SetLightStencilMasking(bool enable)
-{
-    lightStencilMasking_ = enable;
 }
 
 void Renderer::SetDynamicInstancing(bool enable)
@@ -1272,7 +1266,7 @@ void Renderer::LoadShaders()
         unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-            lightVS_[i] = GetVertexShader("DeferredLight_" + deferredLightVSVariations[i]);
+            lightVS_[i] = GetVertexShader("LightVolume_" + deferredLightVSVariations[i]);
         
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
@@ -1280,12 +1274,12 @@ void Renderer::LoadShaders()
             String linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
             if (i & DLPS_SHADOW)
             {
-                lightPS_[i] = GetPixelShader("DeferredLight_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
                     shadowVariations[shadows]);
             }
             else
             {
-                lightPS_[i] = GetPixelShader("DeferredLight_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
             }
         }
     }

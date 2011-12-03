@@ -220,8 +220,6 @@ public:
     void SetMaxShadowMaps(int shadowMaps);
     /// %Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
     void SetMaxShadowCascades(int cascades);
-    /// %Set light stencil optimization on/off.
-    void SetLightStencilMasking(bool enable);
     /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
     /// %Set maximum number of triangles per object for instancing.
@@ -260,8 +258,6 @@ public:
     int GetMaxShadowMaps() const { return maxShadowMaps_; }
     /// Return maximum number of directional light shadow map cascades.
     int GetMaxShadowCascades() const { return maxShadowCascades_; }
-    /// Return whether light stencil optimization is in use.
-    bool GetLightStencilMasking() const { return lightStencilMasking_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.
@@ -484,8 +480,6 @@ private:
     bool drawShadows_;
     /// Shadow map reuse flag.
     bool reuseShadowMaps_;
-    /// Light stencil optimization flag.
-    bool lightStencilMasking_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
     /// Shaders need reloading flag.

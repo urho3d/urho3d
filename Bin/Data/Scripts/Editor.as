@@ -106,7 +106,6 @@ void LoadConfig()
         renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
         renderer.specularLighting = renderingElem.GetBool("specularlighting");
         renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
-        renderer.lightStencilMasking = renderingElem.GetBool("lightstencilmasking");
         engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
     }
 }
@@ -145,7 +144,6 @@ void SaveConfig()
     renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
     renderingElem.SetBool("specularlighting", renderer.specularLighting);
     renderingElem.SetBool("dynamicinstancing", renderer.dynamicInstancing);
-    renderingElem.SetBool("lightstencilmasking", renderer.lightStencilMasking);
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 
     config.Save(File(configFileName, FILE_WRITE));
