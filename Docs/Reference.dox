@@ -433,7 +433,7 @@ The following techniques will be used to reduce the amount of CPU and GPU work w
 
 - Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
-- %Light stencil masking: before rendering objects lit by a spot or point light, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
+- %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
 Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
 
@@ -594,9 +594,9 @@ For an example of shadow culling, imagine a house (which itself is a shadow cast
 
 The Renderer can be configured to either reuse shadow maps, or not. To reuse is the default, use \ref Renderer::SetReuseShadowMaps "SetReuseShadowMaps()" to change.
 
-When reuse is enabled, only one shadow texture of each shadow map size (full, half and quarter) needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
+When reuse is enabled, only one shadow texture of each shadow map size needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
 
-When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the desired number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows. The exception is shadowed point lights: they need stencil masking to split into the 6 shadow map sides, which conflicts with the need to render transparent objects back-to-front, instead of rendering per light.
+When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows.
 
 
 \page Particles %Particle systems

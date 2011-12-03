@@ -99,6 +99,8 @@ struct Batch
     bool overrideView_;
     /// Base batch flag. This tells to draw the object fully without light optimizations.
     bool isBase_;
+    /// 8-bit light mask for stencil marking in light pre-pass rendering.
+    unsigned char lightMask_;
 };
 
 /// Data for one geometry instance.

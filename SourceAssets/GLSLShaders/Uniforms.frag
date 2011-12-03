@@ -1,8 +1,8 @@
-uniform vec3 cAmbientStartColor;
-uniform vec3 cAmbientEndColor;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec4 cLightColor;
+uniform vec3 cLightDirPS;
+uniform vec4 cLightPosPS;
 uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec2 cMatSpecProperties;
@@ -11,3 +11,4 @@ uniform vec4 cShadowCubeAdjust;
 uniform vec4 cShadowDepthFade;
 uniform vec4 cShadowIntensity;
 uniform vec4 cShadowSplits;
+uniform mat4 cLightMatricesPS[4];

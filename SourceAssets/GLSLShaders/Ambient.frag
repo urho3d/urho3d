@@ -3,7 +3,7 @@
 #include "Fog.frag"
 #include "Lighting.frag"
 
-varying vec4 vTexCoord;
+varying vec3 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -21,7 +21,6 @@ void main()
         diffColor *= vColor;
     #endif
 
-    vec3 finalColor = (GetAmbient(vTexCoord.z) + vVertexLighting) * diffColor.rgb;
-
-    gl_FragColor = vec4(GetFog(finalColor, vTexCoord.w), diffColor.a);
+    vec3 finalColor = vVertexLighting * diffColor.rgb;
+    gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), diffColor.a);
 }

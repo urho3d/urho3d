@@ -3,7 +3,7 @@
 #include "Lighting.frag"
 #include "Fog.frag"
 
-varying vec4 vTexCoord;
+varying vec3 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -66,8 +66,8 @@ void main()
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            vec4 shadowPos = GetDirShadowPos(vShadowPos, vTexCoord.w);
-            diff *= min(GetShadow(shadowPos) + GetShadowFade(vTexCoord.w), 1.0);
+            vec4 shadowPos = GetDirShadowPos(vShadowPos, vTexCoord.z);
+            diff *= min(GetShadow(shadowPos) + GetShadowFade(vTexCoord.z), 1.0);
         #elif defined(SPOTLIGHT)
             diff *= GetShadow(vShadowPos);
         #else
@@ -95,10 +95,5 @@ void main()
         finalColor = diff * lightColor * diffColor.rgb;
     #endif
 
-    #ifdef AMBIENT
-        finalColor += GetAmbient(vTexCoord.z) * diffColor.rgb;
-        gl_FragColor = vec4(GetFog(finalColor, vTexCoord.w), diffColor.a);
-    #else
-        gl_FragColor = vec4(GetLitFog(finalColor, vTexCoord.w), diffColor.a);
-    #endif
+    gl_FragColor = vec4(GetLitFog(finalColor, vTexCoord.z), diffColor.a);
 }

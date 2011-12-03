@@ -1,5 +1,5 @@
 <shaders>
-    <shader name="Volumetric" type="vs">
+    <shader name="LitParticle" type="vs">
         <option name="VCol" define="VERTEXCOLOR" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
@@ -10,7 +10,7 @@
         <variation name="Instanced" define="INSTANCED" />
         <variation name="Billboard" define="BILLBOARD" />
     </shader>
-    <shader name="Volumetric" type="ps">
+    <shader name="LitParticle" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Ambient" define="AMBIENT" />

@@ -2,7 +2,7 @@
 #include "Transform.vert"
 #include "Lighting.vert"
 
-varying vec4 vTexCoord;
+varying vec3 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -13,9 +13,9 @@ void main()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = vec4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(gl_Position));
+    vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
 
-    vVertexLighting = vec3(0.0, 0.0, 0.0);
+    vVertexLighting = GetAmbient(GetZonePos(worldPos));
     #ifdef NUMVERTEXLIGHTS
     vec3 normal = GetWorldNormal(modelMatrix);
     for (int i = 0; i < NUMVERTEXLIGHTS; ++i)

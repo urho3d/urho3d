@@ -1,5 +1,5 @@
 <shaders>
-    <shader name="BlinnPhong" type="vs">
+    <shader name="ForwardLit" type="vs">
         <option name="Normal" define="NORMALMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
         <variation name="Dir" define="DIRLIGHT" />
@@ -12,12 +12,11 @@
         <variation name="Instanced" define="INSTANCED" />
         <variation name="Billboard" define="BILLBOARD" />
     </shader>
-    <shader name="BlinnPhong" type="ps">
+    <shader name="ForwardLit" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
-        <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />

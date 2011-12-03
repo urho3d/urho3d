@@ -37,10 +37,10 @@ void main()
 
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
-        vSpotPos = cSpotProj * projWorldPos;
+        vSpotPos = cLightMatrices[0] * projWorldPos;
     #endif
 
     #ifdef POINTLIGHT
-        vCubeMaskVec = cLightVecRot * vLightVec.xyz;
+        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * vLightVec;
     #endif
 }

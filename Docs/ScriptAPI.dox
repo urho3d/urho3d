@@ -2125,7 +2125,6 @@ Properties:<br>
 - int maxShadowCascades
 - int maxShadowMaps
 - bool reuseShadowMaps
-- bool lightStencilMasking
 - bool dynamicInstancing
 - int maxInstanceTriangles
 - int maxOccluderTriangles

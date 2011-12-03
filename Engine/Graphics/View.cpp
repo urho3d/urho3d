@@ -715,7 +715,9 @@ void View::GetBatches()
                     pass = tech->GetPass(PASS_GBUFFER);
                     if (pass)
                     {
-                        FinalizeBatch(baseBatch, tech, pass);
+                        // Allow G-buffer pass instancing only if lightmask matches zone lightmask
+                        baseBatch.lightMask_ = GetLightMask(drawable);
+                        FinalizeBatch(baseBatch, tech, pass, baseBatch.lightMask_ == (baseBatch.zone_->GetLightMask() & 0xff));
                         gbufferQueue_.AddBatch(baseBatch);
                         
                         pass = tech->GetPass(PASS_MATERIAL);
@@ -2042,24 +2044,28 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
 {
     graphics_->SetScissorTest(false);
     
-    // During G-buffer rendering, mark opaque pixels to scissor
-    /// \todo Use objects' light masks
-    if (&queue != &gbufferQueue_)
+    // During G-buffer rendering, mark opaque pixels to stencil buffer
+    bool isGBuffer = &queue == &gbufferQueue_;
+    if (!isGBuffer)
         graphics_->SetStencilTest(false);
-    else
-        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, 0xff);
     
     // Base instanced
     for (PODVector<BatchGroup*>::ConstIterator i = queue.sortedBaseBatchGroups_.Begin(); i !=
         queue.sortedBaseBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
+        if (isGBuffer)
+            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
+        
         group->Draw(graphics_, renderer_);
     }
     // Base non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBaseBatches_.Begin(); i != queue.sortedBaseBatches_.End(); ++i)
     {
         Batch* batch = *i;
+        if (isGBuffer)
+            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
+        
         batch->Draw(graphics_, renderer_);
     }
     
@@ -2069,6 +2075,9 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
         BatchGroup* group = *i;
         if (useScissor && group->lightQueue_)
             OptimizeLightByScissor(group->lightQueue_->light_);
+        if (isGBuffer)
+            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
+        
         group->Draw(graphics_, renderer_);
     }
     // Non-base non-instanced
@@ -2082,6 +2091,9 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor)
             else
                 graphics_->SetScissorTest(false);
         }
+        if (isGBuffer)
+            graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
+        
         batch->Draw(graphics_, renderer_);
     }
 }

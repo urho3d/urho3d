@@ -25,11 +25,11 @@ add_definitions (-DENABLE_PROFILING)
 # If not on Windows, enable use of OpenGL instead of Direct3D9 (so called "Turso3D" mode.) Setting
 # this on Windows is not recommended, as graphics card drivers are usually better optimized for
 # Direct3D.
-if (NOT WIN32)
+#if (NOT WIN32)
     set (USE_OPENGL 1)
     add_definitions (-DUSE_OPENGL)
-    add_definitions (-DUNIX)
-endif ()
+#    add_definitions (-DUNIX)
+#endif ()
 
 # Compiler-specific options
 if (MSVC)
@@ -97,7 +97,7 @@ if (USE_OPENGL)
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
             COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
+            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
         )
         
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)

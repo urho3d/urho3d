@@ -1,7 +1,7 @@
 #include "Uniforms.vert"
 #include "Transform.vert"
 
-varying vec4 vTexCoord;
+varying vec3 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -33,7 +33,7 @@ void main()
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
-    vTexCoord = vec4(GetTexCoord(iTexCoord), GetZonePos(worldPos), GetDepth(gl_Position));
+    vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
 
     #ifdef VERTEXCOLOR
         vColor = iColor;
@@ -57,12 +57,12 @@ void main()
     #ifdef SHADOW
         // Shadow projection: transform from world space to shadow space
         #if defined(DIRLIGHT)
-            vShadowPos[0] = cShadowProj[0] * projWorldPos;
-            vShadowPos[1] = cShadowProj[1] * projWorldPos;
-            vShadowPos[2] = cShadowProj[2] * projWorldPos;
-            vShadowPos[3] = cShadowProj[3] * projWorldPos;
+            vShadowPos[0] = cLightMatrices[0] * projWorldPos;
+            vShadowPos[1] = cLightMatrices[1] * projWorldPos;
+            vShadowPos[2] = cLightMatrices[2] * projWorldPos;
+            vShadowPos[3] = cLightMatrices[3] * projWorldPos;
         #elif defined(SPOTLIGHT)
-            vShadowPos = cShadowProj[0] * projWorldPos;
+            vShadowPos = cLightMatrices[1] * projWorldPos;
         #else
             vShadowPos = worldPos - cLightPos.xyz;
         #endif
@@ -70,11 +70,11 @@ void main()
 
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
-        vSpotPos = cSpotProj * projWorldPos;
+        vSpotPos = cLightMatrices[0] * projWorldPos;
     #endif
 
     #ifdef POINTLIGHT
-        vCubeMaskVec = cLightVecRot * vLightVec;
+        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * vLightVec;
     #endif
 
     #ifdef NORMALMAP
