@@ -16,44 +16,44 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD2,
     #endif
-    out float2 oTexCoord : TEXCOORD0,
-    #ifndef HWDEPTH
-        out float oDepth : TEXCOORD1,
+    #ifdef HWDEPTH
+        out float2 oTexCoord : TEXCOORD0,
+    #else
+        out float3 oTexCoord : TEXCOORD0,
     #endif
-    out float3 oNormal : TEXCOORD2,
+    out float3 oNormal : TEXCOORD1,
     #ifdef NORMALMAP
-        out float3 oTangent : TEXCOORD3,
-        out float3 oBitangent : TEXCOORD4,
+        out float3 oTangent : TEXCOORD2,
+        out float3 oBitangent : TEXCOORD3,
     #endif
     out float4 oPos : POSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
+    #ifdef HWDEPTH
+        oTexCoord = GetTexCoord(iTexCoord);
+    #else
+        oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
+    #endif
 
     oNormal = GetWorldNormal(modelMatrix);
     #ifdef NORMALMAP
         oTangent = GetWorldTangent(modelMatrix);
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
-
-    oTexCoord = GetTexCoord(iTexCoord);
-    #ifndef HWDEPTH
-        oDepth = GetDepth(oPos);
-    #endif
 }
 
 void PS(
-    float2 iTexCoord : TEXCOORD0,
-    #ifndef HWDEPTH
-        float iDepth : TEXCOORD1,
-    #endif
-    #ifdef NORMALMAP
-        float3 iNormal : TEXCOORD2,
-        float3 iTangent : TEXCOORD3,
-        float3 iBitangent : TEXCOORD4,
+    #ifdef HWDEPTH
+        float2 iTexCoord : TEXCOORD0,
     #else
-        float3 iNormal : TEXCOORD2,
+        float3 iTexCoord : TEXCOORD0,
+    #endif
+    float3 iNormal : TEXCOORD1,
+    #ifdef NORMALMAP
+        float3 iTangent : TEXCOORD2,
+        float3 iBitangent : TEXCOORD3,
     #endif
     #ifndef HWDEPTH
         out float4 oDepth : COLOR1,
@@ -61,20 +61,20 @@ void PS(
     out float4 oNormal : COLOR0)
 {
     #ifdef ALPHAMASK
-        float4 diffInput = tex2D(sDiffMap, iTexCoord);
+        float4 diffInput = tex2D(sDiffMap, iTexCoord.xy);
         if (diffInput.a < 0.5)
             discard;
     #endif
 
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
-        float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord)), tbn));
+        float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn));
     #else
         float3 normal = normalize(iNormal);
     #endif
 
     #ifdef SPECMAP
-        float specStrength = tex2D(sSpecMap, iTexCoord).r * cMatSpecProperties.x;
+        float specStrength = tex2D(sSpecMap, iTexCoord.xy).g * cMatSpecProperties.x;
     #else
         float specStrength = cMatSpecProperties.x;
     #endif
@@ -82,6 +82,6 @@ void PS(
 
     oNormal = float4(normal * 0.5 + 0.5, specPower);
     #ifndef HWDEPTH
-        oDepth = iDepth;
+        oDepth = iTexCoord.z;
     #endif
 }

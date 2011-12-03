@@ -336,6 +336,43 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(light->GetWorldPosition(), atten));
         }
         
+        if (graphics->NeedParameterUpdate(VSP_LIGHTMATRICES, light))
+        {
+            switch (light->GetLightType())
+            {
+            case LIGHT_DIRECTIONAL:
+                {
+                    Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
+                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    for (unsigned i = 0; i < numSplits; ++i)
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, Vector3::ZERO);
+                    
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
+                }
+                break;
+                
+            case LIGHT_SPOT:
+                {
+                    Matrix4 shadowMatrices[2];
+                    
+                    CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
+                    bool isShadowed = lightQueue_->shadowMap_ != 0;
+                    if (isShadowed)
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer, Vector3::ZERO);
+                    
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
+                }
+                break;
+                
+            case LIGHT_POINT:
+                {
+                    Matrix4 lightVecRot(light->GetWorldRotation().RotationMatrix());
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.GetData(), 16);
+                }
+                break;
+            }
+        }
+        
         if (graphics->NeedParameterUpdate(VSP_VERTEXLIGHTS, lightQueue_))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
@@ -499,43 +536,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera_->GetFarClip();
                 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
-            }
-        }
-        
-        if (graphics->NeedParameterUpdate(VSP_LIGHTMATRICES, light))
-        {
-            switch (light->GetLightType())
-            {
-            case LIGHT_DIRECTIONAL:
-                {
-                    Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
-                    for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, Vector3::ZERO);
-                    
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
-                }
-                break;
-                
-            case LIGHT_SPOT:
-                {
-                    Matrix4 shadowMatrices[2];
-                    
-                    CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
-                    bool isShadowed = lightQueue_->shadowMap_ != 0;
-                    if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer, Vector3::ZERO);
-                    
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
-                }
-                break;
-                
-            case LIGHT_POINT:
-                {
-                    Matrix4 lightVecRot(light->GetWorldRotation().RotationMatrix());
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.GetData(), 16);
-                }
-                break;
             }
         }
         
