@@ -741,8 +741,10 @@ void View::GetBatches()
                         HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
                         if (i == vertexLightQueues_.End())
                         {
-                            vertexLightQueues_[hash].vertexLights_ = vertexLights;
-                            i = vertexLightQueues_.Find(hash);
+                            i = vertexLightQueues_.Insert(MakePair(hash, LightBatchQueue()));
+                            i->second_.light_ = 0;
+                            i->second_.shadowMap_ = 0;
+                            i->second_.vertexLights_ = vertexLights;
                         }
                         
                         baseBatch.lightQueue_ = &(i->second_);
