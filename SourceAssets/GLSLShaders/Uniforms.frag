@@ -1,3 +1,4 @@
+uniform vec2 cDepthReconstruct;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec4 cLightColor;

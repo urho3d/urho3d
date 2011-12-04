@@ -1820,7 +1820,9 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetDepthFormat()
 {
-    return GL_LUMINANCE32F_ARB;
+    // OpenGL FBO specs state that color attachments must have the same format; therefore must pack linear depth to RGBA manually
+    // if not using a readable hardware depth texture
+    return GL_RGBA;
 }
 
 unsigned Graphics::GetDepthStencilFormat()
