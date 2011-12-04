@@ -1077,7 +1077,8 @@ void View::RenderBatchesLightPrepass()
     #ifndef USE_OPENGL
     graphics_->SetRenderTarget(0, renderTarget_);
     #else
-    // On OpenGL render the final image to the normal buffer first, as FBO and backbuffer rendering can not be mixed
+    // On OpenGL render the final image to the normal buffer first, as FBO and backbuffer rendering can not be mixed,
+    // and we need the depth written in the FBO for proper depth testing
     graphics_->SetRenderTarget(0, normalBuffer);
     #endif
     graphics_->SetDepthStencil(depthStencil);
