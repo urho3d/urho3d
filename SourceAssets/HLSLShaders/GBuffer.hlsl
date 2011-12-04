@@ -1,7 +1,6 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
-#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,

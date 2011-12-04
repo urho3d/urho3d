@@ -1074,7 +1074,12 @@ void View::RenderBatchesLightPrepass()
     // Clear destination render target with fog color
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
+    #ifndef USE_OPENGL
     graphics_->SetRenderTarget(0, renderTarget_);
+    #else
+    // On OpenGL render the final image to the normal buffer first, as FBO and backbuffer rendering can not be mixed
+    graphics_->SetRenderTarget(0, normalBuffer);
+    #endif
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
     graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
@@ -1112,6 +1117,35 @@ void View::RenderBatchesLightPrepass()
         
         RenderBatchQueue(postAlphaQueue_);
     }
+    
+    // Blit the final image to destination render target on OpenGL
+    /// \todo Depth is reset to far plane, so geometry drawn after the view (for example debug geometry) can not be depth tested
+    #ifdef USE_OPENGL
+    graphics_->SetAlphaTest(false);
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetColorWrite(true);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetDepthWrite(true);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
+    graphics_->SetRenderTarget(0, renderTarget_);
+    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetViewport(screenRect_);
+    
+    graphics_->SetShaders(renderer_->GetVertexShader("CopyFramebuffer"), renderer_->GetPixelShader("CopyFramebuffer"));
+    
+    float gBufferWidth = (float)graphics_->GetWidth();
+    float gBufferHeight = (float)graphics_->GetHeight();
+    float widthRange = 0.5f * (screenRect_.right_ - screenRect_.left_) / gBufferWidth;
+    float heightRange = 0.5f * (screenRect_.bottom_ - screenRect_.top_) / gBufferHeight;
+    
+    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
+        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+    
+    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    graphics_->SetTexture(TU_DIFFUSE, normalBuffer);
+    DrawFullscreenQuad(camera_, false);
+    #endif
 }
 
 void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
@@ -1409,8 +1443,10 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
     unsigned height = shadowMap->GetHeight();
     int maxCascades = renderer_->GetMaxShadowCascades();
     // Due to instruction count limits, light prepass in SM2.0 can only support up to 3 cascades
+    #ifndef USE_OPENGL
     if (renderer_->GetLightPrepass() && !graphics_->GetSM3Support())
         maxCascades = Max(maxCascades, 3);
+    #endif
     
     switch (light->GetLightType())
     {

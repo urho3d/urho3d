@@ -222,10 +222,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
     if (graphics->NeedParameterUpdate(VSP_GBUFFEROFFSETS, (const void*)viewportHash))
     {
-        IntVector2 screenSize = graphics->GetRenderTargetDimensions();
-        
-        float gBufferWidth = (float)screenSize.x_;
-        float gBufferHeight = (float)screenSize.y_;
+        float gBufferWidth = (float)graphics->GetWidth();
+        float gBufferHeight = (float)graphics->GetHeight();
         float widthRange = 0.5f * (viewport.right_ - viewport.left_) / gBufferWidth;
         float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / gBufferHeight;
         

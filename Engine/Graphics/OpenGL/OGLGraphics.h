@@ -240,8 +240,8 @@ public:
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
     /// Return whether light pre-pass rendering is supported.
-    bool GetLightPrepassSupport() const { return true; }
-    /// Return whether hardware depth texture is supported.
+    bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
+    /// Return whether hardware depth texture is supported. Always false on OpenGL due to artifacts / slowdown on some GPUs.
     bool GetHardwareDepthSupport() const { return false; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
@@ -349,7 +349,7 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific depth texture format.
+    /// Return the API-specific one-channel linear depth format.
     static unsigned GetDepthFormat();
     /// Return the API-specific depth stencil texture format.
     static unsigned GetDepthStencilFormat();
@@ -382,6 +382,8 @@ private:
     bool tripleBuffer_;
     /// Flush GPU command queue flag.
     bool flushGPU_;
+    /// Light prepass support flag.
+    bool lightPrepassSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

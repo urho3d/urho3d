@@ -231,6 +231,7 @@ unsigned Texture::GetRowDataSize(int width) const
         return width * 3;
 
     case GL_RGBA:
+    case GL_LUMINANCE32F_ARB:
     case GL_DEPTH24_STENCIL8_EXT:
         return width * 4;
 
@@ -270,6 +271,8 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_DEPTH_COMPONENT;
     else if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_DEPTH_STENCIL_EXT;
+    else if (format == GL_LUMINANCE32F_ARB)
+        return GL_LUMINANCE;
     else
         return format;
 }

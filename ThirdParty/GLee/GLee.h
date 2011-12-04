@@ -76,8 +76,11 @@ GLEE_EXTERN GLboolean _GLEE_VERSION_1_3;
 GLEE_EXTERN GLboolean _GLEE_VERSION_1_4;
 GLEE_EXTERN GLboolean _GLEE_VERSION_1_5;
 GLEE_EXTERN GLboolean _GLEE_VERSION_2_0;
+GLEE_EXTERN GLboolean _GLEE_ARB_texture_float;
 GLEE_EXTERN GLboolean _GLEE_EXT_framebuffer_object;
 GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
+GLEE_EXTERN GLboolean _GLEE_EXT_texture_compression_s3tc;
+GLEE_EXTERN GLboolean _GLEE_EXT_texture_filter_anisotropic;
 
 /* Aliases for extension querying variables */
 
@@ -87,8 +90,12 @@ GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
 #define GLEE_VERSION_1_4     GLeeEnabled(&_GLEE_VERSION_1_4)
 #define GLEE_VERSION_1_5     GLeeEnabled(&_GLEE_VERSION_1_5)
 #define GLEE_VERSION_2_0     GLeeEnabled(&_GLEE_VERSION_2_0)
+#define GLEE_ARB_texture_float     GLeeEnabled(&_GLEE_ARB_texture_float)
 #define GLEE_EXT_framebuffer_object     GLeeEnabled(&_GLEE_EXT_framebuffer_object)
 #define GLEE_EXT_packed_depth_stencil     GLeeEnabled(&_GLEE_EXT_packed_depth_stencil)
+#define GLEE_EXT_texture_compression_s3tc     GLeeEnabled(&_GLEE_EXT_texture_compression_s3tc)
+#define GLEE_EXT_texture_filter_anisotropic     GLeeEnabled(&_GLEE_EXT_texture_filter_anisotropic)
+
 
 /*****************************************************************
  * Additional types needed for extensions
@@ -2160,13 +2167,54 @@ GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
 #define GL_TEXTURE_STENCIL_SIZE_EXT                        0x88F1
 #endif
 
+/* GL_EXT_texture_compression_s3tc */
+
+#ifndef GL_EXT_texture_compression_s3tc
+#define GL_EXT_texture_compression_s3tc 1
+#define __GLEE_GL_EXT_texture_compression_s3tc 1
+/* Constants */
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                    0x83F0
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                   0x83F1
 #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT                   0x83F2
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT                   0x83F3
+#endif
+
+/* GL_EXT_texture_filter_anisotropic */
+
+#ifndef GL_EXT_texture_filter_anisotropic
+#define GL_EXT_texture_filter_anisotropic 1
+#define __GLEE_GL_EXT_texture_filter_anisotropic 1
+/* Constants */
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT                      0x84FE
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT                  0x84FF
+#endif
 
+/* GL_ARB_texture_float */
+
+#ifndef GL_ARB_texture_float
+#define GL_ARB_texture_float 1
+#define __GLEE_GL_ARB_texture_float 1
+/* Constants */
+#define GL_TEXTURE_RED_TYPE_ARB                            0x8C10
+#define GL_TEXTURE_GREEN_TYPE_ARB                          0x8C11
+#define GL_TEXTURE_BLUE_TYPE_ARB                           0x8C12
+#define GL_TEXTURE_ALPHA_TYPE_ARB                          0x8C13
+#define GL_TEXTURE_LUMINANCE_TYPE_ARB                      0x8C14
+#define GL_TEXTURE_INTENSITY_TYPE_ARB                      0x8C15
+#define GL_TEXTURE_DEPTH_TYPE_ARB                          0x8C16
+#define GL_UNSIGNED_NORMALIZED_ARB                         0x8C17
+#define GL_RGBA32F_ARB                                     0x8814
+#define GL_RGB32F_ARB                                      0x8815
+#define GL_ALPHA32F_ARB                                    0x8816
+#define GL_INTENSITY32F_ARB                                0x8817
+#define GL_LUMINANCE32F_ARB                                0x8818
+#define GL_LUMINANCE_ALPHA32F_ARB                          0x8819
+#define GL_RGBA16F_ARB                                     0x881A
+#define GL_RGB16F_ARB                                      0x881B
+#define GL_ALPHA16F_ARB                                    0x881C
+#define GL_INTENSITY16F_ARB                                0x881D
+#define GL_LUMINANCE16F_ARB                                0x881E
+#endif
 
 /*****************************************************************
  * GLee functions

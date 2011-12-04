@@ -129,6 +129,7 @@ Graphics::Graphics(Context* context_) :
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(true),
+    lightPrepassSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -244,12 +245,19 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil)
+        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil || !_GLEE_EXT_texture_compression_s3tc ||
+            !_GLEE_EXT_texture_filter_anisotropic)
         {
-            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+            LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and "
+                "EXT_texture_filter_anisotropic OpenGL extensions are required");
             glfwCloseWindow(impl_->window_);
             return false;
         }
+        
+        if (_GLEE_ARB_texture_float)
+            lightPrepassSupport_ = true;
+        else
+            lightPrepassSupport_ = false;
         
         // Set window close callback
         glfwSetWindowCloseCallback(CloseCallback);
@@ -1205,33 +1213,33 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* renderTexture)
 
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
-    if (depthStencil != depthStencil_)
+    // If we are using a render target texture, it is required in OpenGL to also have an own depth stencil
+    // Create a new depth stencil texture as necessary to be able to provide similar behaviour as Direct3D9
+    if (renderTargets_[0] && !depthStencil)
     {
-        // If we are using a render target texture, it is required in OpenGL to also have an own depth stencil
-        // Create a new depth stencil texture as necessary to be able to provide similar behaviour as Direct3D9
-        if (renderTargets_[0] && !depthStencil)
+        int width = renderTargets_[0]->GetWidth();
+        int height = renderTargets_[0]->GetHeight();
+        
+        // Direct3D9 default depth stencil can not be used when render target is larger than the window.
+        // Check size similarly
+        if (width <= width_ && height <= height_)
         {
-            int width = renderTargets_[0]->GetWidth();
-            int height = renderTargets_[0]->GetHeight();
-            
-            // Direct3D9 default depth stencil can not be used when render target is larger than the window.
-            // Check size similarly
-            if (width <= width_ && height <= height_)
+            int searchKey = (width << 16) | height;
+            HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
+            if (i != depthTextures_.End())
+                depthStencil = i->second_->GetRenderSurface();
+            else
             {
-                int searchKey = (width << 16) | height;
-                HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
-                if (i != depthTextures_.End())
-                    depthStencil = i->second_->GetRenderSurface();
-                else
-                {
-                    SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
-                    newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-                    depthTextures_[searchKey] = newDepthTexture;
-                    depthStencil = newDepthTexture->GetRenderSurface();
-                }
+                SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
+                newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+                depthTextures_[searchKey] = newDepthTexture;
+                depthStencil = newDepthTexture->GetRenderSurface();
             }
         }
-        
+    }
+    
+    if (depthStencil != depthStencil_)
+    {
         /// \todo Should check that the texture actually is in depth format
         depthStencil_ = depthStencil;
         
@@ -1798,7 +1806,7 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetDepthFormat()
 {
-    return GL_DEPTH_COMPONENT24;
+    return GL_LUMINANCE32F_ARB;
 }
 
 unsigned Graphics::GetDepthStencilFormat()
@@ -1934,6 +1942,9 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
+    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
+    textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
+    textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
 }
 
 void RegisterGraphicsLibrary(Context* context)

@@ -68,23 +68,12 @@ GLboolean _GLEE_VERSION_1_3 = GL_FALSE;
 GLboolean _GLEE_VERSION_1_4 = GL_FALSE;
 GLboolean _GLEE_VERSION_1_5 = GL_FALSE;
 GLboolean _GLEE_VERSION_2_0 = GL_FALSE;
+GLboolean _GLEE_ARB_texture_float = GL_FALSE;
 GLboolean _GLEE_EXT_framebuffer_object = GL_FALSE;
 GLboolean _GLEE_EXT_packed_depth_stencil = GL_FALSE;
+GLboolean _GLEE_EXT_texture_compression_s3tc = GL_FALSE;
+GLboolean _GLEE_EXT_texture_filter_anisotropic = GL_FALSE;
 
-
-/*  GL Extension names */
-
-char __GLeeGLExtensionNames[8][28]={
-    "GL_VERSION_1_2",
-    "GL_ARB_imaging",
-    "GL_VERSION_1_3",
-    "GL_VERSION_1_4",
-    "GL_VERSION_1_5",
-    "GL_VERSION_2_0",
-    "GL_EXT_framebuffer_object",
-    "GL_EXT_packed_depth_stencil",
-};
-int __GLeeGLNumExtensions=7;
 
 /* GL_VERSION_1_2 */
 
@@ -1482,21 +1471,13 @@ GLuint __GLeeLink_GL_EXT_framebuffer_object(void)
     return GLEE_LINK_PARTIAL;
 }
 
+GLuint __GLeeLink_GL_ARB_texture_float(void) {return GLEE_LINK_COMPLETE;}
+
 GLuint __GLeeLink_GL_EXT_packed_depth_stencil(void) {return GLEE_LINK_COMPLETE;}
 
-GLEE_LINK_FUNCTION __GLeeGLLoadFunction[8];
+GLuint __GLeeLink_GL_EXT_texture_compression_s3tc(void) {return GLEE_LINK_COMPLETE;}
 
-void initGLLoadFunctions(void)
-{
-    __GLeeGLLoadFunction[0]=__GLeeLink_GL_VERSION_1_2;
-    __GLeeGLLoadFunction[1]=__GLeeLink_GL_ARB_imaging;
-    __GLeeGLLoadFunction[2]=__GLeeLink_GL_VERSION_1_3;
-    __GLeeGLLoadFunction[3]=__GLeeLink_GL_VERSION_1_4;
-    __GLeeGLLoadFunction[4]=__GLeeLink_GL_VERSION_1_5;
-    __GLeeGLLoadFunction[5]=__GLeeLink_GL_VERSION_2_0;
-    __GLeeGLLoadFunction[6]=__GLeeLink_GL_EXT_framebuffer_object;
-    __GLeeGLLoadFunction[7]=__GLeeLink_GL_EXT_packed_depth_stencil;
-}
+GLuint __GLeeLink_GL_EXT_texture_filter_anisotropic(void) {return GLEE_LINK_COMPLETE;}
 
 
 /*****************************************************************
@@ -1629,18 +1610,6 @@ GLboolean __GLeeCheckExtension(const char * name, ExtensionList *extensionNames)
 	return GL_FALSE;
 }
 
-GLEE_EXTERN GLint __GLeeGetExtensionNumber(const char *extensionName, int type)
-{
-	int a;
-	switch (type)
-	{
-	case 0:
-		for (a=0;a<__GLeeGLNumExtensions;a++)
-			if (strcmp(extensionName,__GLeeGLExtensionNames[a])==0)	return a;
-		return -1;
-	}
-	return -1;
-}
 
 /*****************************************************************
  * GLee external functions 
@@ -1725,6 +1694,11 @@ GLEE_EXTERN GLboolean GLeeInit( void )
         _GLEE_VERSION_2_0 = GL_TRUE;
         __GLeeLink_GL_VERSION_2_0();
     }
+    if (__GLeeCheckExtension("GL_ARB_texture_float", &extensionNames) )
+    {
+        _GLEE_ARB_texture_float = GL_TRUE;
+        __GLeeLink_GL_ARB_texture_float();
+    }
     if (__GLeeCheckExtension("GL_EXT_framebuffer_object", &extensionNames) )
     {
         _GLEE_EXT_framebuffer_object = GL_TRUE;
@@ -1734,6 +1708,16 @@ GLEE_EXTERN GLboolean GLeeInit( void )
     {
         _GLEE_EXT_packed_depth_stencil = GL_TRUE;
         __GLeeLink_GL_EXT_packed_depth_stencil();
+    }
+    if (__GLeeCheckExtension("GL_EXT_texture_compression_s3tc", &extensionNames) )
+    {
+        _GLEE_EXT_texture_compression_s3tc = GL_TRUE;
+        __GLeeLink_GL_EXT_texture_compression_s3tc();
+    }
+    if (__GLeeCheckExtension("GL_EXT_texture_filter_anisotropic", &extensionNames) )
+    {
+        _GLEE_EXT_texture_filter_anisotropic = GL_TRUE;
+        __GLeeLink_GL_EXT_texture_filter_anisotropic();
     }
     
     __GLeeExtList_clean(&extensionNames);

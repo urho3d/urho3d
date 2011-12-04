@@ -87,3 +87,20 @@ vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
     else
         return shadowPos[3];
 }
+
+mat4 GetDirShadowMatrix(float depth, const mat4 matrices[4])
+{
+    if (depth < cShadowSplits.x)
+        return matrices[0];
+    else if (depth < cShadowSplits.y)
+        return matrices[1];
+    else if (depth < cShadowSplits.z)
+        return matrices[2];
+    else
+        return matrices[3];
+}
+
+float GetIntensity(vec3 color)
+{
+    return dot(color, vec3(0.333, 0.333, 0.333));
+}

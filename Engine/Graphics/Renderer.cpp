@@ -187,8 +187,13 @@ static const String shadowVariations[] =
 
 static const String linearVariations[] =
 {
+    // On OpenGL there is no specific linear depth variation, as it is always used
     "",
+    #ifdef USE_OPENGL
+    ""
+    #else
     "Linear"
+    #endif
 };
 
 static const String fallbackVariations[] =

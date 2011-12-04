@@ -12,6 +12,9 @@ uniform sampler2D sLightSpotMap;
 uniform samplerCube sLightCubeMap;
 uniform samplerCube sFaceSelectCubeMap;
 uniform samplerCube sIndirectionCubeMap;
+uniform sampler2D sNormalBuffer;
+uniform sampler2D sDepthBuffer;
+uniform sampler2D sLightBuffer;
 
 vec3 DecodeNormal(vec4 normalInput)
 {

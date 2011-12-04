@@ -1,0 +1,4 @@
+<shaders>
+    <shader name="CopyFramebuffer" type="vs" />
+    <shader name="CopyFramebuffer" type="ps" />
+</shaders>

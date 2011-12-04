@@ -4,8 +4,8 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
-#include "Fog.hlsl"
 #include "Lighting.hlsl"
+#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,   
     #ifdef NUMVERTEXLIGHTS

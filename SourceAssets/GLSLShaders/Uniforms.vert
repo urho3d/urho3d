@@ -3,6 +3,8 @@ uniform vec3 cAmbientEndColor;
 uniform vec3 cCameraPos;
 uniform mat3 cCameraRot;
 uniform vec4 cDepthMode;
+uniform vec3 cFrustumSize;
+uniform vec4 cGBufferOffsets;
 uniform vec3 cLightDir;
 uniform vec4 cLightPos;
 uniform mat4 cModel;
