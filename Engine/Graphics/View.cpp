@@ -995,6 +995,9 @@ void View::RenderBatchesForward()
 
 void View::RenderBatchesLightPrepass()
 {
+    if (renderTarget_)
+        graphics_->SetViewTexture(renderTarget_->GetParentTexture());
+    
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
     {
@@ -1147,6 +1150,8 @@ void View::RenderBatchesLightPrepass()
     graphics_->SetTexture(TU_DIFFUSE, normalBuffer);
     DrawFullscreenQuad(camera_, false);
     #endif
+    
+    graphics_->SetViewTexture(0);
 }
 
 void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)

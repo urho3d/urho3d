@@ -1209,7 +1209,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
+        if (texture == viewTexture_ || (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture))
             texture = texture->GetBackupTexture();
     }
     
@@ -1349,11 +1349,11 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     }
 }
 
-void Graphics::SetRenderTarget(unsigned index, Texture2D* renderTexture)
+void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
 {
     RenderSurface* renderTarget = 0;
-    if (renderTexture)
-        renderTarget = renderTexture->GetRenderSurface();
+    if (texture)
+        renderTarget = texture->GetRenderSurface();
     
     SetRenderTarget(index, renderTarget);
 }
@@ -1378,13 +1378,27 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
     }
 }
 
-void Graphics::SetDepthStencil(Texture2D* depthTexture)
+void Graphics::SetDepthStencil(Texture2D* texture)
 {
     RenderSurface* depthStencil = 0;
-    if (depthTexture)
-        depthStencil = depthTexture->GetRenderSurface();
+    if (texture)
+        depthStencil = texture->GetRenderSurface();
     
     SetDepthStencil(depthStencil);
+}
+
+void Graphics::SetViewTexture(Texture* texture)
+{
+    viewTexture_ = texture;
+    
+    if (viewTexture_)
+    {
+        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        {
+            if (textures_[i] == viewTexture_)
+                SetTexture(i, textures_[i]->GetBackupTexture());
+        }
+    }
 }
 
 void Graphics::SetViewport(const IntRect& rect)
@@ -2208,8 +2222,10 @@ void Graphics::ResetCachedState()
         renderTargets_[i] = 0;
         impl_->colorSurfaces_[i] = 0;
     }
+    
     depthStencil_ = 0;
     impl_->depthStencilSurface_ = 0;
+    viewTexture_ = 0;
     viewport_ = IntRect(0, 0, width_, height_);
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)

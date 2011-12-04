@@ -163,11 +163,13 @@ public:
     /// Set render target.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
     /// Set render target.
-    void SetRenderTarget(unsigned index, Texture2D* renderTexture);
+    void SetRenderTarget(unsigned index, Texture2D* texture);
     /// Set depth stencil buffer.
     void SetDepthStencil(RenderSurface* depthStencil);
     /// Set depth stencil buffer.
-    void SetDepthStencil(Texture2D* depthTexture);
+    void SetDepthStencil(Texture2D* texture);
+    /// %Set view texture (light pre-pass final output render target) to prevent it from being sampled.
+    void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
     /// Set alpha test.
@@ -422,6 +424,8 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use.
     RenderSurface* depthStencil_;
+    /// View texture.
+    Texture* viewTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
     /// Alpha test enable flag.
