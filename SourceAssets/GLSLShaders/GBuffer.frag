@@ -31,5 +31,5 @@ void main()
     float specPower = cMatSpecProperties.y / 255.0;
 
     gl_FragData[0] = vec4(normal * 0.5 + 0.5, specPower);
-    gl_FragData[1] = vec4(PackDepth(vTexCoord.z), 0.0);
+    gl_FragData[1] = vec4(PackDepthRGB(vTexCoord.z), 0.0);
 }

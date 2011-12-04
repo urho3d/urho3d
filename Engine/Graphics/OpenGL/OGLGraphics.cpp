@@ -254,10 +254,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        if (_GLEE_ARB_texture_float)
+        int numSupportedRTs = 1;
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+        if (numSupportedRTs >= 2)
             lightPrepassSupport_ = true;
-        else
-            lightPrepassSupport_ = false;
         
         // Set window close callback
         glfwSetWindowCloseCallback(CloseCallback);

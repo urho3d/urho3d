@@ -24,21 +24,21 @@ vec3 DecodeNormal(vec4 normalInput)
     return normal;
 }
 
-vec3 PackDepth(float depth)
+vec3 PackDepthRGB(float depth)
 {
     vec3 ret;
-    depth *= 255;
+    depth *= 255.0;
     ret.x = floor(depth);
-    depth = (depth - ret.x) * 255;
+    depth = (depth - ret.x) * 255.0;
     ret.y = floor(depth);
     ret.z = (depth - ret.y);
-    ret.xy *= 1.0 / 255;
+    ret.xy *= 1.0 / 255.0;
     return ret;
 }
 
-float UnpackDepth(vec3 depth)
+float UnpackDepthRGB(vec3 depth)
 {
-    const vec3 dotValues = vec3(1.0, 1.0 / 255, 1.0 / (255 * 255));
+    const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
     return dot(depth, dotValues);
 }
 
