@@ -1893,14 +1893,14 @@ unsigned Graphics::GetRGBAFormat()
     return D3DFMT_A8R8G8B8;
 }
 
-unsigned Graphics::GetDepthFormat()
+unsigned Graphics::GetLinearDepthFormat()
 {
     return D3DFMT_R32F;
 }
 
 unsigned Graphics::GetDepthStencilFormat()
 {
-    return D3DFMT_D24S8;
+    return MAKEFOURCC('I', 'N', 'T', 'Z');
 }
 
 bool Graphics::OpenWindow(int width, int height)

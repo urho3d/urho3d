@@ -277,8 +277,8 @@ public:
     RenderSurface* GetRenderTarget(unsigned index) const;
     /// Return depth stencil buffer.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return readable depth stencil texture, created if available.
-    Texture2D* GetDepthTexture() const { return depthTexture_; }
+    /// Return readable depth stencil texture. Not created automatically on OpenGL.
+    Texture2D* GetDepthTexture() const { return 0; }
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
     /// Return whether alpha testing is enabled.
@@ -351,9 +351,9 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific one-channel linear depth format.
-    static unsigned GetDepthFormat();
-    /// Return the API-specific depth stencil texture format.
+    /// Return the API-specific linear depth texture format.
+    static unsigned GetLinearDepthFormat();
+    /// Return the API-specific readable hardware depth stencil texture format.
     static unsigned GetDepthStencilFormat();
     
 private:
@@ -430,8 +430,6 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use.
     RenderSurface* depthStencil_;
-    /// Readable depth stencil texture.
-    SharedPtr<Texture2D> depthTexture_;
     /// View texture.
     Texture* viewTexture_;
     /// Viewport coordinates.

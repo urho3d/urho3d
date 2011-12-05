@@ -341,8 +341,10 @@ void Renderer::SetLightPrepass(bool enable)
     {
         // Light prepass is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
         if (graphics_->GetMultiSample() > 1)
+        {
             graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
                 graphics_->GetTripleBuffer(), 1);
+        }
         
         // Create the G-buffer textures if necessary
         if (enable)
@@ -355,13 +357,22 @@ void Renderer::SetLightPrepass(bool enable)
             
             if (!depthBuffer_)
             {
-                if (!graphics_->GetHardwareDepthSupport())
+                // If reading the hardware depth buffer is supported, create a depth stencil texture. Otherwise create an
+                // ordinary render target for writing linear depth manually
+                if (graphics_->GetHardwareDepthSupport())
                 {
+                    #ifdef USE_OPENGL
                     depthBuffer_ = new Texture2D(context_);
-                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthFormat(), TEXTURE_RENDERTARGET);
+                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+                    #else
+                    depthBuffer = graphics_->GetDepthTexture();
+                    #endif
                 }
                 else
-                    depthBuffer_ = graphics_->GetDepthTexture();
+                {
+                    depthBuffer_ = new Texture2D(context_);
+                    depthBuffer_->SetSize(0, 0, Graphics::GetLinearDepthFormat(), TEXTURE_RENDERTARGET);
+                }
             }
             
             if (!lightBuffer_)

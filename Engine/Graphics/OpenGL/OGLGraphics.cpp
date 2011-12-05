@@ -1823,7 +1823,7 @@ unsigned Graphics::GetRGBAFormat()
     return GL_RGBA;
 }
 
-unsigned Graphics::GetDepthFormat()
+unsigned Graphics::GetLinearDepthFormat()
 {
     // OpenGL FBO specs state that color attachments must have the same format; therefore must encode linear depth to RGBA
     // manually if not using a readable hardware depth texture
@@ -1837,7 +1837,7 @@ unsigned Graphics::GetDepthStencilFormat()
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features:  light pre-pass rendering and hardware depth texture
+    // Check supported features: light pre-pass rendering and hardware depth texture
     lightPrepassSupport_ = false;
     hardwareDepthSupport_ = false;
     
@@ -1845,21 +1845,18 @@ void Graphics::CheckFeatureSupport()
     String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
     if (vendorString.Find("NVIDIA") != String::NPOS)
     {
-        if (!depthTexture_)
-            depthTexture_ = new Texture2D(context_);
+        SharedPtr<Texture2D> depthTexture(new Texture2D(context_));
         
         hardwareDepthSupport_ = true;
         // Note: Texture2D::SetSize() requires hardwareDepthSupport_ == true to create a texture instead of a renderbuffer
-        depthTexture_->SetSize(width_, height_, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-        SetDepthStencil(depthTexture_);
+        depthTexture->SetSize(256, 256, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+        SetDepthStencil(depthTexture);
         
+        // If hardware depth textures work, this means also light pre-pass is automatically supported
         if (CheckFramebuffer())
             lightPrepassSupport_ = true;
         else
-        {
-            depthTexture_.Reset();
             hardwareDepthSupport_ = false;
-        }
         
         ResetDepthStencil();
     }
