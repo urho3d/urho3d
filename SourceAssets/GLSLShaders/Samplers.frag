@@ -24,7 +24,7 @@ vec3 DecodeNormal(vec4 normalInput)
     return normal;
 }
 
-vec3 PackDepthRGB(float depth)
+vec3 EncodeDepth(float depth)
 {
     vec3 ret;
     depth *= 255.0;
@@ -36,7 +36,7 @@ vec3 PackDepthRGB(float depth)
     return ret;
 }
 
-float UnpackDepthRGB(vec3 depth)
+float DecodeDepth(vec3 depth)
 {
     const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
     return dot(depth, dotValues);

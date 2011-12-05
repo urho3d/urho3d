@@ -1,4 +1,3 @@
-// Material map samplers
 sampler2D sDiffMap : register(S0);
 samplerCUBE sDiffCubeMap : register(S0);
 sampler2D sNormalMap : register(S1);
@@ -7,19 +6,15 @@ sampler2D sEmissiveMap : register(S3);
 sampler2D sDetailMap : register(S4);
 sampler2D sEnvMap : register(S5);
 samplerCUBE sEnvCubeMap : register(S5);
-
-// Shadow and light shape samplers
 sampler2D sShadowMap : register(S6);
 sampler1D sLightRampMap : register(S7);
 sampler2D sLightSpotMap : register(S8);
 samplerCUBE sLightCubeMap : register(S8);
 samplerCUBE sFaceSelectCubeMap : register(S9);
 samplerCUBE sIndirectionCubeMap : register(S10);
-
-// Deferred buffer samplers
 sampler2D sDepthBuffer : register(S0);
 sampler2D sNormalBuffer : register(S1);
-sampler2D sLightBuffer : register(S6);
+sampler2D sLightBuffer : register(S7);
 
 float4 Sample(sampler2D map, float2 texCoord)
 {
