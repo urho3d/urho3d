@@ -125,7 +125,7 @@ public:
     void SetShadowMask(unsigned mask);
     /// %Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     void SetZoneMask(unsigned mask);
-    /// %Set maximum number of lights. Default 0 is unlimited.
+    /// %Set maximum number of per-pixel lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
     /// %Set visible flag.
     void SetVisible(bool enable);
@@ -154,7 +154,7 @@ public:
     unsigned GetShadowMask() const { return shadowMask_; }
     /// Return zone mask.
     unsigned GetZoneMask() const { return zoneMask_; }
-    /// Return maximum number of lights.
+    /// Return maximum number of per-pixel lights.
     unsigned GetMaxLights() const { return maxLights_; }
     /// Return visible flag.
     bool IsVisible() const { return visible_; }
