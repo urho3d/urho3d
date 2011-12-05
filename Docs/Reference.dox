@@ -444,7 +444,7 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 Urho3D implements both forward and light pre-pass rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
 
-Forward rendering first renders the ambient light pass for an object; this also adds any per-vertex lights. Then, the object is re-rendered for each per-pixel light affecting it (basic multipass rendering), up to the maximum per-pixel light count, which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights() "SetMaxLights()". The render operations are sorted by lights, ie. render the effect of the first light to all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
+Forward rendering first renders the ambient light pass for an object; this also adds any per-vertex lights. Then, the object is re-rendered for each per-pixel light affecting it (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights() "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
 
 %Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth stencil texture format is available, the second color render target will be omitted:
 
@@ -452,19 +452,19 @@ Forward rendering first renders the ambient light pass for an object; this also 
 - RT1: Linear depth (D3DFMT_R32F)
 - DS: Hardware depth and lightmask (D3DFMT_D24S8 or INTZ)
 
-After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse light color and specular light intensity at each opaque pixel. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
+After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse and specular light at each opaque pixel. Specular light is stored as intensity only. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
 
-Finally, the opaque geometry material pass re-renders the objects, combining ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
+Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
 
 \section ForwardPrepass_Comparision Advantages and disadvantages
 
 Whether using forward or light pre-pass rendering is more advantageous depends on the scene and lighting complexity. 
 
-If the scene contains a large number of complex objects lit by multiple lights, forward rendering has to re-transform the vertices for each light, which quickly increases the total vertex count. However, light pre-pass rendering has a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in light pre-pass all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
+If the scene contains a large number of complex objects lit by multiple lights, forward rendering quickly increases the total draw call and vertex count due to re-rendering objects for each light. However, light pre-pass rendering has a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in light pre-pass all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
 
-Forward rendering also enables hardware multisampling and using different lighting models in different materials if needed, while neither is possible in light pre-pass rendering.
+Forward rendering also enables hardware multisampling and using different shading models in different materials if needed, while neither is possible in light pre-pass rendering.
 
-Finally note that due to OpenGL frame buffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also due to the FBO specification - color render targets must have the same format - R32F texture format can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
+Finally note that due to OpenGL frame buffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple render targets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
