@@ -185,12 +185,6 @@ static const String shadowVariations[] =
     #endif
 };
 
-static const String linearVariations[] =
-{
-    "",
-    "Linear"
-};
-
 static const String fallbackVariations[] =
 {
     "",
@@ -365,7 +359,7 @@ void Renderer::SetLightPrepass(bool enable)
                     depthBuffer_ = new Texture2D(context_);
                     depthBuffer_->SetSize(0, 0, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
                     #else
-                    depthBuffer = graphics_->GetDepthTexture();
+                    depthBuffer_ = graphics_->GetDepthTexture();
                     #endif
                 }
                 else
@@ -1282,20 +1276,23 @@ void Renderer::LoadShaders()
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
             /// \todo Allow specifying the light volume shader name for different lighting models
-            String linearDepth, hwDepth;
+            String ortho, hwDepth;
             #ifdef USE_OPENGL
             hwDepth = hwVariations[graphics_->GetHardwareDepthSupport() ? 1 : 0];
             #else
-            linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
+            if (!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO)
+                ortho = "Linear";
             #endif
+            if (i >= DLPS_ORTHO)
+                ortho = "Ortho";
             
             if (i & DLPS_SHADOW)
             {
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
+                lightPS_[i] = GetPixelShader("LightVolume_" + ortho + lightPSVariations[i % DLPS_ORTHO] +
                     shadowVariations[shadows] + hwDepth);
             }
             else
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
+                lightPS_[i] = GetPixelShader("LightVolume_" + ortho + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
         }
     }
     
