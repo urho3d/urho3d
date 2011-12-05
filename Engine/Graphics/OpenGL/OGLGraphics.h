@@ -243,8 +243,8 @@ public:
     bool GetSM3Support() const { return false; }
     /// Return whether light pre-pass rendering is supported.
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
-    /// Return whether hardware depth texture is supported. Always false on OpenGL due to artifacts / slowdown on some GPUs.
-    bool GetHardwareDepthSupport() const { return false; }
+    /// Return whether hardware depth texture is supported.
+    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether 24-bit shadow maps are supported. Assume true on OpenGL.
@@ -277,8 +277,8 @@ public:
     RenderSurface* GetRenderTarget(unsigned index) const;
     /// Return depth stencil buffer.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return backbuffer depth stencil texture, created if available. Never created on OpenGL.
-    Texture2D* GetDepthTexture() const { return 0; }
+    /// Return readable depth stencil texture, created if available.
+    Texture2D* GetDepthTexture() const { return depthTexture_; }
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
     /// Return whether alpha testing is enabled.
@@ -357,10 +357,14 @@ public:
     static unsigned GetDepthStencilFormat();
     
 private:
-    /// Reset cached rendering state.
-    void ResetCachedState();
+    /// Check supported rendering features.
+    void CheckFeatureSupport();
     /// Set draw buffer(s) on the FBO.
     void SetDrawBuffers();
+    /// Check FBO completeness.
+    bool CheckFramebuffer();
+    /// Reset cached rendering state.
+    void ResetCachedState();
     /// Release GPU objects and close the window.
     void Release();
     /// Initialize texture unit mappings.
@@ -386,6 +390,8 @@ private:
     bool flushGPU_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
+    /// Hardware depth support flag.
+    bool hardwareDepthSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.
@@ -424,6 +430,8 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use.
     RenderSurface* depthStencil_;
+    /// Readable depth stencil texture.
+    SharedPtr<Texture2D> depthTexture_;
     /// View texture.
     Texture* viewTexture_;
     /// Viewport coordinates.

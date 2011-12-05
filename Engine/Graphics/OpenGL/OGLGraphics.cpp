@@ -130,6 +130,7 @@ Graphics::Graphics(Context* context_) :
     tripleBuffer_(false),
     flushGPU_(true),
     lightPrepassSupport_(false),
+    hardwareDepthSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -254,11 +255,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        int numSupportedRTs = 1;
-        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
-        if (numSupportedRTs >= 2)
-            lightPrepassSupport_ = true;
-        
         // Set window close callback
         glfwSetWindowCloseCallback(CloseCallback);
         
@@ -297,6 +293,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
+    
+    CheckFeatureSupport();
     
     if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
@@ -1253,11 +1251,11 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         if (depthStencil)
         {
             // Bind either a renderbuffer or a depth texture, depending on what is available
+            Texture* texture = depthStencil->GetParentTexture();
+            bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
             unsigned renderBufferID = depthStencil->GetRenderBuffer();
             if (!renderBufferID)
             {
-                Texture* texture = depthStencil->GetParentTexture();
-                
                 // If texture's parameters are dirty, update before attaching
                 if (texture->GetParametersDirty())
                 {
@@ -1267,13 +1265,20 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
                 }
                 
                 glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+                if (hasStencil)
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
+                else
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+                
                 impl_->depthBits_ = texture->GetDepthBits();
             }
             else
             {
                 glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
-                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
+                if (hasStencil)
+                    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
+                else
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
                 impl_->depthBits_ = 24;
             }
         }
@@ -1820,14 +1825,90 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetDepthFormat()
 {
-    // OpenGL FBO specs state that color attachments must have the same format; therefore must pack linear depth to RGBA manually
-    // if not using a readable hardware depth texture
+    // OpenGL FBO specs state that color attachments must have the same format; therefore must encode linear depth to RGBA
+    // manually if not using a readable hardware depth texture
     return GL_RGBA;
 }
 
 unsigned Graphics::GetDepthStencilFormat()
 {
     return GL_DEPTH24_STENCIL8_EXT;
+}
+
+void Graphics::CheckFeatureSupport()
+{
+    // Check supported features:  light pre-pass rendering and hardware depth texture
+    lightPrepassSupport_ = false;
+    hardwareDepthSupport_ = false;
+    
+    // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
+    String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
+    if (vendorString.Find("NVIDIA") != String::NPOS)
+    {
+        if (!depthTexture_)
+            depthTexture_ = new Texture2D(context_);
+        
+        hardwareDepthSupport_ = true;
+        // Note: Texture2D::SetSize() requires hardwareDepthSupport_ == true to create a texture instead of a renderbuffer
+        depthTexture_->SetSize(width_, height_, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+        SetDepthStencil(depthTexture_);
+        
+        if (CheckFramebuffer())
+            lightPrepassSupport_ = true;
+        else
+        {
+            depthTexture_.Reset();
+            hardwareDepthSupport_ = false;
+        }
+        
+        ResetDepthStencil();
+    }
+    
+    if (!hardwareDepthSupport_)
+    {
+        // If hardware depth is not supported, must support 2 render targets for light pre-pass
+        int numSupportedRTs = 1;
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+        if (numSupportedRTs >= 2)
+            lightPrepassSupport_ = true;
+    }
+}
+
+void Graphics::SetDrawBuffers()
+{
+    // Calculate the bit combination of non-zero color render targets to first check if the combination changed
+    unsigned newDrawBuffers = 0;
+    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+    {
+        if (renderTargets_[i])
+            newDrawBuffers |= 1 << i;
+    }
+
+    if (newDrawBuffers == impl_->drawBuffers_)
+        return;
+    
+    // Check for no color render targets (depth rendering only)
+    if (!newDrawBuffers)
+        glDrawBuffer(GL_NONE);
+    else
+    {
+        int drawBufferIds[4];
+        unsigned drawBufferCount = 0;
+        
+        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        {
+            if (renderTargets_[i])
+                drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+        }
+        glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
+    }
+    
+    glReadBuffer(GL_NONE);
+}
+
+bool Graphics::CheckFramebuffer()
+{
+    return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
 }
 
 void Graphics::ResetCachedState()
@@ -1880,38 +1961,6 @@ void Graphics::ResetCachedState()
     impl_->drawBuffers_ = M_MAX_UNSIGNED;
     impl_->enabledAttributes_ = 0;
     impl_->fboBound_ = false;
-}
-
-void Graphics::SetDrawBuffers()
-{
-    // Calculate the bit combination of non-zero color render targets to first check if the combination changed
-    unsigned newDrawBuffers = 0;
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-    {
-        if (renderTargets_[i])
-            newDrawBuffers |= 1 << i;
-    }
-
-    if (newDrawBuffers == impl_->drawBuffers_)
-        return;
-    
-    // Check for no color render targets (depth rendering only)
-    if (!newDrawBuffers)
-        glDrawBuffer(GL_NONE);
-    else
-    {
-        int drawBufferIds[4];
-        unsigned drawBufferCount = 0;
-        
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        {
-            if (renderTargets_[i])
-                drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
-        }
-        glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
-    }
-    
-    glReadBuffer(GL_NONE);
 }
 
 void Graphics::Release()

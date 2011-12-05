@@ -339,7 +339,7 @@ private:
     bool CreateInterface();
     /// Create the Direct3D device.
     bool CreateDevice(unsigned adapter, unsigned deviceType);
-    /// Check supported graphics features.
+    /// Check supported rendering features.
     void CheckFeatureSupport();
     /// Reset the Direct3D device.
     void ResetDevice();

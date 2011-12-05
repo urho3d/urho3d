@@ -187,13 +187,8 @@ static const String shadowVariations[] =
 
 static const String linearVariations[] =
 {
-    // On OpenGL there is no specific linear depth variation, as it is always used
     "",
-    #ifdef USE_OPENGL
-    ""
-    #else
     "Linear"
-    #endif
 };
 
 static const String fallbackVariations[] =
@@ -1276,16 +1271,20 @@ void Renderer::LoadShaders()
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
             /// \todo Allow specifying the light volume shader name for different lighting models
-            String linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
+            String linearDepth, hwDepth;
+            #ifdef USE_OPENGL
+            hwDepth = hwVariations[graphics_->GetHardwareDepthSupport() ? 1 : 0];
+            #else
+            linearDepth = linearVariations[(!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO) ? 1 : 0];
+            #endif
+            
             if (i & DLPS_SHADOW)
             {
                 lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] +
-                    shadowVariations[shadows]);
+                    shadowVariations[shadows] + hwDepth);
             }
             else
-            {
-                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO]);
-            }
+                lightPS_[i] = GetPixelShader("LightVolume_" + linearDepth + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
         }
     }
     
