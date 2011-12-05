@@ -1074,6 +1074,9 @@ void View::RenderBatchesLightPrepass()
         }
     }
     
+    graphics_->SetTexture(TU_DEPTHBUFFER, 0);
+    graphics_->SetTexture(TU_NORMALBUFFER, 0);    
+
     // Clear destination render target with fog color
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -1093,9 +1096,11 @@ void View::RenderBatchesLightPrepass()
         // Render opaque objects with deferred lighting result
         PROFILE(RenderBase);
         
-        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);
+        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);        
         
         RenderBatchQueue(baseQueue_);
+        
+        graphics_->SetTexture(TU_LIGHTBUFFER, 0);
     }
     
     if (!preAlphaQueue_.IsEmpty())
