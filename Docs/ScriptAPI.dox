@@ -1719,12 +1719,15 @@ Properties:<br>
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - BoundingBox& boundingBox
-- Color& ambientStartColor
-- Color& ambientEndColor
+- Color& ambientColor
+- Color& ambientStartColor (readonly)
+- Color& ambientEndColor (readonly)
 - Color& fogColor
 - float fogStart
 - float fogEnd
 - int priority
+- bool override
+- bool ambientGradient
 
 
 StaticModel

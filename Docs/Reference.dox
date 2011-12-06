@@ -433,7 +433,7 @@ Note that many more optimization opportunities are possible at the content level
 
 \section Rendering_Further Further details
 
-See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems" and \ref AuxiliaryViews "Auxiliary views".
+See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
 See \ref ForwardPrepass "Forward and light pre-pass rendering" for detailed discussion on the two rendering modes.
 
@@ -464,7 +464,7 @@ If the scene contains a large number of complex objects lit by multiple lights, 
 
 Forward rendering also enables hardware multisampling and using different shading models in different materials if needed, while neither is possible in light pre-pass rendering.
 
-Finally note that due to OpenGL frame buffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple render targets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
+Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple render targets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
@@ -656,6 +656,17 @@ Most of the parameters can take either a single value, or minimum and maximum va
 \endcode
 
 Note: zero active or inactive time period means infinite. Instead of defining a single color element, several colorfade elements can be defined in time order to describe how the particles change color over time.
+
+
+\page Zones Zones
+
+A Zone controls ambient lighting and fogging. Each geometry object determines the zone it is inside (by testing against the zone's oriented bounding box) and uses that zone's ambient light color, fog color and fog start/end distance for rendering. For the case of multiple overlapping zones, zones also have an integer priority value, and objects will choose the highest priority zone they touch.
+
+The viewport will be initially cleared to the fog color of the zone found at the camera's far clip distance. If no zone is found either for the far clip or an object, a default zone with black ambient and fog color will be used.
+
+Zones have two special flags: override mode and ambient gradient. If the camera is inside a zone with override mode enabled, all rendered objects will use that zone's ambient and fog settings, instead of the zone they belong to. This can be used for example to implement an underwater effect. When ambient gradient mode is enabled, the zone's own ambient color value is not used, but instead it will look for two highest-priority neighbor zones that touch it at the minimum and maximum Z face of its oriented bounding box: any objects inside will then get a per-vertex ambient color fade between the neighbor zones' ambient colors.
+
+Zones also define a lightmask and a shadowmask (with all bits set by default.) An object's final lightmask for light culling is determined by ANDing the object lightmask and the zone lightmask. The final shadowmask is also calculated in the same way.
 
 
 \page AuxiliaryViews Auxiliary views

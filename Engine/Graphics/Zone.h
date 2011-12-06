@@ -44,31 +44,31 @@ public:
     /// Add debug geometry to the debug renderer.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside.
+    /// %Set bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set ambient color, both start and end.
+    /// %Set ambient color
     void SetAmbientColor(const Color& color);
-    /// %Set ambient start color at bounding box Z minimum.
-    void SetAmbientStartColor(const Color& color);
-    /// %Set ambient end color at bounding box Z maximum.
-    void SetAmbientEndColor(const Color& color);
     /// %Set fog color.
     void SetFogColor(const Color& color);
     /// %Set fog start distance.
     void SetFogStart(float start);
     /// %Set fog end distance.
     void SetFogEnd(float end);
-    /// %Set zone priority. If camera is inside several zones, the one with highest priority is used.
+    /// %Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
     /// %Set override mode. If camera is inside an override zone, it will also be used for all drawables.
     void SetOverride(bool enable);
+    /// %Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
+    void SetAmbientGradient(bool enable);
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return zone's own ambient color, disregarding gradient mode.
+    const Color& GetAmbientColor() const { return ambientColor_; }
     /// Return ambient start color.
-    const Color& GetAmbientStartColor() const { return ambientStartColor_; }
+    const Color& GetAmbientStartColor();
     /// Return ambient end color.
-    const Color& GetAmbientEndColor() const { return ambientEndColor_; }
+    const Color& GetAmbientEndColor();
     /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
     /// Return fog start distance.
@@ -79,6 +79,8 @@ public:
     int GetPriority() const { return priority_; }
     /// Return override mode.
     bool GetOverride() const { return override_; }
+    /// Return whether ambient gradient mode is enabled.
+    bool GetAmbientGradient() const { return ambientGradient_; }
     
     /// Check whether a point is inside.
     virtual bool IsInside(const Vector3& point);
@@ -88,14 +90,22 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Recalculate the ambient gradient colors from neighbor zones.
+    void UpdateAmbientGradient();
     
+    /// Last zone used for ambient gradient start color.
+    WeakPtr<Zone> lastAmbientStartZone_;
+    /// Last zone used for ambient gradient end color.
+    WeakPtr<Zone> lastAmbientEndZone_;
     /// Bounding box.
     BoundingBox boundingBox_;
-    /// Last bounding box.
-    BoundingBox lastBoundingBox_;
-    /// Ambient start color.
+    /// Last world-space bounding box.
+    BoundingBox lastWorldBoundingBox_;
+    /// Ambient color.
+    Color ambientColor_;
+    /// Cached ambient start color.
     Color ambientStartColor_;
-    /// Ambient end color.
+    /// Cached ambient end color.
     Color ambientEndColor_;
     /// Fog color.
     Color fogColor_;
@@ -105,6 +115,8 @@ protected:
     float fogEnd_;
     /// Zone priority.
     int priority_;
-    /// Override mode.
+    /// Override mode flag.
     bool override_;
+    /// Ambient gradient mode flag.
+    bool ambientGradient_;
 };

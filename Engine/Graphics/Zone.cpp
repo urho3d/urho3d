@@ -28,6 +28,8 @@
 #include "XMLElement.h"
 #include "Zone.h"
 
+static const Vector3 DEFAULT_BOUNDING_BOX_MIN(-10.0f, -10.0f, -10.0f);
+static const Vector3 DEFAULT_BOUNDING_BOX_MAX(10.0f, 10.0f, 10.0f);
 static const Color DEFAULT_AMBIENT_COLOR(0.1f, 0.1f, 0.1f);
 static const Color DEFAULT_FOG_COLOR(0.0f, 0.0f, 0.0f);
 static const float DEFAULT_FOG_START = 250.0f;
@@ -37,13 +39,14 @@ OBJECTTYPESTATIC(Zone);
 
 Zone::Zone(Context* context) :
     Drawable(context),
-    ambientStartColor_(DEFAULT_AMBIENT_COLOR),
-    ambientEndColor_(DEFAULT_AMBIENT_COLOR),
+    boundingBox_(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX),
+    ambientColor_(DEFAULT_AMBIENT_COLOR),
     fogColor_(DEFAULT_FOG_COLOR),
     fogStart_(DEFAULT_FOG_START),
     fogEnd_(DEFAULT_FOG_END),
     priority_(0),
-    override_(false)
+    override_(false),
+    ambientGradient_(false)
 {
     drawableFlags_ =  DRAWABLE_ZONE;
 }
@@ -56,15 +59,15 @@ void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>();
     
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color (Min Z)", ambientStartColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color (Max Z)", ambientEndColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, 0, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
@@ -75,11 +78,12 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);
     
-    // If bounding box, override mode or priority changes, dirty the drawable as applicable
+    // If bounding box, override mode, visibility or priority changes, dirty the drawable as applicable
     switch (attr.offset_)
     {
     case offsetof(Zone, boundingBox_.min_):
     case offsetof(Zone, boundingBox_.max_):
+    case offsetof(Zone, visible_):
     case offsetof(Zone, priority_):
         OnMarkedDirty(node_);
         break;
@@ -99,17 +103,7 @@ void Zone::SetBoundingBox(const BoundingBox& box)
 
 void Zone::SetAmbientColor(const Color& color)
 {
-    ambientStartColor_ = ambientEndColor_ = Color(color, 1.0f);
-}
-
-void Zone::SetAmbientStartColor(const Color& color)
-{
-    ambientStartColor_ = Color(color, 1.0f);
-}
-
-void Zone::SetAmbientEndColor(const Color& color)
-{
-    ambientEndColor_ = Color(color, 1.0f);
+    ambientColor_ = Color(color, 1.0f);
 }
 
 void Zone::SetFogColor(const Color& color)
@@ -138,6 +132,38 @@ void Zone::SetPriority(int priority)
     priority_ = priority;
 }
 
+void Zone::SetOverride(bool enable)
+{
+    override_ = enable;
+}
+
+void Zone::SetAmbientGradient(bool enable)
+{
+    ambientGradient_ = enable;
+}
+
+const Color& Zone::GetAmbientStartColor()
+{
+    if (!ambientGradient_)
+        return ambientColor_;
+    
+    if (!lastAmbientStartZone_ || !lastAmbientEndZone_)
+        UpdateAmbientGradient();
+    
+    return ambientStartColor_;
+}
+
+const Color& Zone::GetAmbientEndColor()
+{
+    if (!ambientGradient_)
+        return ambientColor_;
+    
+    if (!lastAmbientStartZone_ || !lastAmbientEndZone_)
+        UpdateAmbientGradient();
+    
+    return ambientEndColor_;
+}
+
 bool Zone::IsInside(const Vector3& point)
 {
     // Use an oriented bounding box test
@@ -150,21 +176,103 @@ void Zone::OnMarkedDirty(Node* node)
 {
     Drawable::OnMarkedDirty(node);
     
-    // When marked dirty, clear the cached zone from all drawables inside the zone bounding box
-    if (octant_ && lastBoundingBox_.defined_)
+    // When marked dirty, clear the cached zone from all drawables inside the zone bounding box,
+    // and mark gradient dirty in all neighbor zones
+    if (octant_ && lastWorldBoundingBox_.defined_)
     {
         PODVector<Drawable*> result;
-        BoxOctreeQuery query(result, lastBoundingBox_, DRAWABLE_GEOMETRY);
+        BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
         octant_->GetRoot()->GetDrawables(query);
         
         for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
-            (*i)->SetZone(0);
+        {
+            Drawable* drawable = *i;
+            unsigned drawableFlags = drawable->GetDrawableFlags();
+            if (drawableFlags & DRAWABLE_GEOMETRY)
+                (*i)->SetZone(0);
+            if (drawableFlags & DRAWABLE_ZONE)
+            {
+                Zone* zone = static_cast<Zone*>(drawable);
+                zone->lastAmbientStartZone_.Reset();
+                zone->lastAmbientEndZone_.Reset();
+            }
+        }
     }
     
-    lastBoundingBox_ = GetWorldBoundingBox();
+    lastWorldBoundingBox_ = GetWorldBoundingBox();
+    lastAmbientStartZone_.Reset();
+    lastAmbientEndZone_.Reset();
 }
 
 void Zone::OnWorldBoundingBoxUpdate()
 {
     worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
+}
+
+void Zone::UpdateAmbientGradient()
+{
+    // In case no neighbor zones are found, reset ambient start/end with own ambient color
+    ambientStartColor_ = ambientColor_;
+    ambientEndColor_ = ambientColor_;
+    lastAmbientStartZone_ = this;
+    lastAmbientEndZone_ = this;
+    
+    if (octant_)
+    {
+        const Matrix3x4& worldTransform = GetWorldTransform();
+        Vector3 center = boundingBox_.Center();
+        Vector3 minZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.min_.z_);
+        Vector3 maxZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.max_.z_);
+        
+        PODVector<Zone*> result;
+        {
+            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
+            octant_->GetRoot()->GetDrawables(query);
+        }
+        
+        // Gradient start position: get the highest priority zone that is not this zone
+        int bestPriority = M_MIN_INT;
+        Zone* bestZone = 0;
+        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        {
+            Zone* zone = *i;
+            int priority = zone->GetPriority();
+            if (zone != this && priority > bestPriority && zone->IsInside(minZPosition))
+            {
+                bestZone = zone;
+                bestPriority = priority;
+            }
+        }
+        
+        if (bestZone)
+        {
+            ambientStartColor_ = bestZone->GetAmbientColor();
+            lastAmbientStartZone_ = bestZone;
+        }
+        
+        // Do the same for gradient end position
+        {
+            PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
+            octant_->GetRoot()->GetDrawables(query);
+        }
+        bestPriority = M_MIN_INT;
+        bestZone = 0;
+        
+        for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
+        {
+            Zone* zone = *i;
+            int priority = zone->GetPriority();
+            if (zone != this && priority > bestPriority && zone->IsInside(maxZPosition))
+            {
+                bestZone = zone;
+                bestPriority = priority;
+            }
+        }
+        
+        if (bestZone)
+        {
+            ambientEndColor_ = bestZone->GetAmbientColor();
+            lastAmbientEndZone_ = bestZone;
+        }
+    }
 }
