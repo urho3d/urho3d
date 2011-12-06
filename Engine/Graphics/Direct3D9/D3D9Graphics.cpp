@@ -1614,10 +1614,6 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
-    // Full scissor is same as disabling the test
-    if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
-        enable = false;
-    
     if (enable)
     {
         IntRect intRect;

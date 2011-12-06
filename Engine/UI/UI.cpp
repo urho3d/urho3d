@@ -267,7 +267,7 @@ void UI::Render()
     graphics_->ResetRenderTargets();
     graphics_->ResetDepthStencil();
     graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
-       
+    
     graphics_->ClearParameterSources();
     graphics_->ResetRenderTargets();
     graphics_->SetAlphaTest(false);

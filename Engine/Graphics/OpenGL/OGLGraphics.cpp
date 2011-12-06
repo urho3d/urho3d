@@ -404,7 +404,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         SetColorWrite(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite(true);
-
+    
     unsigned glFlags = 0;
     if (flags & CLEAR_COLOR)
     {
@@ -422,8 +422,16 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         glClearStencil(stencil);
     }
     
+    // If viewport is less than full screen, set a scissor to limit the clear
+    /// \todo Any user-set scissor test will be lost
+    if (viewport_.left_ != 0 || viewport_.top_ != 0 || viewport_.right_ != width_ || viewport_.bottom_ != height_)
+        SetScissorTest(true, IntRect(0, 0, viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_));
+    else
+        SetScissorTest(false);
+    
     glClear(glFlags);
     
+    SetScissorTest(false);
     SetColorWrite(oldColorWrite);
     SetDepthWrite(oldDepthWrite);
 }
@@ -1492,7 +1500,7 @@ void Graphics::SetFillMode(FillMode mode)
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
-     // During some light rendering loops, a full rect is toggled on/off repeatedly.
+    // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
     if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.x_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
@@ -1544,10 +1552,6 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
-    // Full scissor is same as disabling the test
-    if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
-        enable = false;
-    
     if (enable)
     {
         IntRect intRect;
@@ -1557,7 +1561,6 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         intRect.bottom_ = Clamp(rect.bottom_ + viewPos.y_, 0, rtSize.y_);
         
         if (intRect.right_ == intRect.left_)
-
             intRect.right_++;
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
