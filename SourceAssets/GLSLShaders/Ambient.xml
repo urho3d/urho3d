@@ -11,7 +11,6 @@
         <option name="" /> <!-- Dummy option to separate the two variation groups -->
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" require="SM3" />
         <variation name="Billboard" define="BILLBOARD" />
     </shader>
     <shader name="Ambient" type="ps">

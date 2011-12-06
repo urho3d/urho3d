@@ -726,7 +726,12 @@ void View::GetBatches()
                 
                 // Next check for forward base pass
                 if (!pass)
+                {
+                    // Skip if a lit base pass already exists
+                    if (j < 32 && drawable->HasBasePass(j))
+                        continue;
                     pass = tech->GetPass(PASS_BASE);
+                }
                 
                 if (pass)
                 {
@@ -867,9 +872,12 @@ void View::UpdateGeometries()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
+    Light* firstLight = drawable->GetFirstLight();
+    Zone* zone = GetZone(drawable);
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool hasVertexLights = drawable->GetVertexLights().Size() > 0;
+    bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     bool prepass = renderer_->GetLightPrepass();
     unsigned numBatches = drawable->GetNumBatches();
     
@@ -886,7 +894,23 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         if (prepass && tech->HasPass(PASS_GBUFFER))
             continue;
         
-        Pass* pass = tech->GetPass(PASS_LIGHT);
+        Pass* pass = 0;
+        
+        // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
+        // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
+        if (i < 32 && light == firstLight && !hasVertexLights && !hasAmbientGradient && !drawable->HasBasePass(i))
+        {
+            pass = tech->GetPass(PASS_LITBASE);
+            if (pass)
+            {
+                litBatch.isBase_ = true;
+                drawable->SetBasePass(i);
+            }
+        }
+        
+        // If no lit base pass, get ordinary light pass
+        if (!pass)
+            pass = tech->GetPass(PASS_LIGHT);
         // Skip if material does not receive light at all
         if (!pass)
             continue;

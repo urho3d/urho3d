@@ -1,5 +1,6 @@
 <technique>
     <pass name="base" vs="Ambient" ps="Ambient_Diff" alphatest="true" />
+    <pass name="litbase" vs="ForwardLit" ps="ForwardLit_DiffAmbient"  alphatest="true" />
     <pass name="light" vs="ForwardLit" ps="ForwardLit_Diff"  alphatest="true" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="shadow" vs="Shadow_Mask" ps="Shadow_Mask" alphatest="true" />
     <pass name="gbuffer" vs="GBuffer" ps="GBuffer_Mask" />

@@ -13,6 +13,7 @@
     <shader name="LitParticle" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />

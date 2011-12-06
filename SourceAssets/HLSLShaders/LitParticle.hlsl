@@ -102,5 +102,11 @@ void PS(float3 iTexCoord : TEXCOORD0,
     #endif
 
     finalColor = diff * lightColor * diffColor.rgb;
-    oColor = float4(GetLitFog(finalColor, iTexCoord.z), diffColor.a);
+    
+    #ifdef AMBIENT
+        finalColor += cAmbientColor * diffColor.rgb;
+        oColor = float4(GetFog(finalColor, iTexCoord.z), diffColor.a);
+    #else
+        oColor = float4(GetLitFog(finalColor, iTexCoord.z), diffColor.a);
+    #endif
 }

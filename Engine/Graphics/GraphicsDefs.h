@@ -166,6 +166,7 @@ enum TextureUsage
 enum PassType
 {
     PASS_BASE,
+    PASS_LITBASE,
     PASS_LIGHT,
     PASS_PREALPHA,
     PASS_POSTALPHA,
@@ -214,6 +215,7 @@ extern StringHash VSP_ZONE;
 extern StringHash VSP_LIGHTMATRICES;
 extern StringHash VSP_SKINMATRICES;
 extern StringHash VSP_VERTEXLIGHTS;
+extern StringHash PSP_AMBIENTCOLOR;
 extern StringHash PSP_DEPTHRECONSTRUCT;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;

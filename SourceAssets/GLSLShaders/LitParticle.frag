@@ -50,7 +50,7 @@ void main()
     finalColor = diff * lightColor * diffColor.rgb;
     
     #ifdef AMBIENT
-        finalColor += GetAmbient(vZonePosDepth.x) * diffColor.rgb;
+        finalColor += cAmbientColor * diffColor.rgb;
         gl_FragColor = vec4(GetFog(finalColor, vZonePosDepth.y), diffColor.a);
     #else
         gl_FragColor = vec4(GetLitFog(finalColor, vZonePosDepth.y), diffColor.a);

@@ -9,7 +9,6 @@
         <option name="Shadow" define="SHADOW" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
         <variation name="Billboard" define="BILLBOARD" />
     </shader>
     <shader name="ForwardLit" type="ps">
@@ -17,6 +16,7 @@
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />

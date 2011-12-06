@@ -45,6 +45,7 @@ StringHash VSP_ZONE("Zone");
 StringHash VSP_LIGHTMATRICES("LightMatrices");
 StringHash VSP_SKINMATRICES("SkinMatrices");
 StringHash VSP_VERTEXLIGHTS("VertexLights");
+StringHash PSP_AMBIENTCOLOR("AmbientColor");
 StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
 StringHash PSP_FOGCOLOR("FogColor");
 StringHash PSP_FOGPARAMS("FogParams");

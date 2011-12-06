@@ -10,7 +10,6 @@
         <option name="" /> <!-- Dummy option to separate the two variation groups -->
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
     </shader>
     <shader name="Material" type="ps">
         <option name="Diff" define="DIFFMAP" />

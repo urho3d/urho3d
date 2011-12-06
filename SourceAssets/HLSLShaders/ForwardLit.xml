@@ -17,6 +17,7 @@
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />

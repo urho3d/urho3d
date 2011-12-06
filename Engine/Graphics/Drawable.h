@@ -180,7 +180,7 @@ public:
     /// Sort and limit per-vertex lights to maximum allowed.
     void LimitVertexLights();
     /// %Set base pass flag for a batch.
-    void SetBasePass(unsigned batchIndex);
+    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
     /// Return current zone.
@@ -197,10 +197,14 @@ public:
     bool IsInView(unsigned frameNumber) const { return viewFrameNumber_ == frameNumber; }
     /// Return whether is visible in a specific view this frame.
     bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
+    /// Return whether has a base pass.
+    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return per-pixel lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return per-vertex lights.
     const PODVector<Light*>& GetVertexLights() const { return vertexLights_; }
+    /// Return the first added per-pixel light.
+    Light* GetFirstLight() const { return firstLight_; }
     
 protected:
     /// Handle node being assigned.
@@ -228,6 +232,8 @@ protected:
     PODVector<Light*> lights_;
     /// Per-vertex lights affecting this drawable.
     PODVector<Light*> vertexLights_;
+    /// First per-pixel light added this frame.
+    Light* firstLight_;
     /// Current zone.
     WeakPtr<Zone> zone_;
     /// Previous zone.
@@ -256,6 +262,8 @@ protected:
     float sortValue_;
     /// Last visible frame number.
     unsigned viewFrameNumber_;
+    /// Base pass flags.
+    unsigned basePassFlags_;
     /// Drawable flags.
     unsigned char drawableFlags_;
     /// Visible flag.

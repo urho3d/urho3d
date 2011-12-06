@@ -456,10 +456,15 @@ void Light::OnWorldBoundingBoxUpdate()
 
 void Light::SetIntensitySortValue(float distance)
 {
+    // When sorting lights globally, give priority to directional lights so that they will be combined into the ambient pass
     if (lightType_ != LIGHT_DIRECTIONAL)
-        sortValue_ = M_EPSILON / (color_.Intensity() + M_EPSILON);
+        sortValue_ = Max(distance, M_MIN_NEARCLIP) / (color_.Intensity() + M_EPSILON);
     else
-        sortValue_ = distance / (color_.Intensity() + M_EPSILON);
+        sortValue_ = M_EPSILON / (color_.Intensity() + M_EPSILON);
+    
+    // Additionally, give priority to vertex lights so that vertex light base passes can be determined before per pixel lights
+    if (perVertex_)
+        sortValue_ -= M_LARGE_VALUE;
 }
 
 void Light::SetIntensitySortValue(const BoundingBox& box)

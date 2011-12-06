@@ -538,7 +538,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|light|prealpha|postalpha|gbuffer|material|shadow" vs="VertexShaderName" ps="PixelShaderName"
+    <pass name="base|litbase|light|prealpha|postalpha|gbuffer|material|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
     <pass ... />
@@ -549,16 +549,19 @@ A technique definition looks like this:
 The passes are:
 
 - base: renders the ambient light, per-vertex lights and fog.
+- litbase: renders the first per-pixel light, ambient light and fog. This is an optional pass for optimization.
 - light: renders one per-pixel light's contribution additively.
 - prealpha: custom rendering pass after opaque geometry. Can be used for example to render the skybox.
 - postalpha: custom rendering pass after transparent geometry.
 - gbuffer: (light pre-pass only) renders normals, specular power and depth to prepare for opaque geometry light accumulation.
 - material: (light pre-pass only) renders the opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
-- shadow: shadow map rendering pass. Renders depth only.
+- shadow: renders depth only for shadow map generation.
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
 
 Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the files Ambient.xml and ForwardLit.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders to see which variations are required.
+
+The optional "litbase" pass reduces draw call count by combining ambient light rendering with the first per-pixel light. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is likely better to not define it, but instead allow the computationally light ambient-only pass to initialize the Z buffer for later passes.
 
 
 \page Lights Lights and shadows
@@ -1129,11 +1132,11 @@ Like with ordinary events, in script event types are strings instead of name has
 
 Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be supplied with tasks described by the WorkItem structure, by calling \ref WorkQueue::AddWorkItem "AddWorkItem()". These will be executed in background worker threads. The function \ref WorkQueue::Complete "Complete()" will complete all currently pending tasks, and execute them also in the main thread to make them finish faster.
 
-On single-core systems no worker threads will be created. In the presence of more cores, a worker thread will be created for each hardware core except one which is reserved for the main thread. Hyperthreaded cores are not included, as creating worker threads also for them leads to unpredictable extra synchronization overhead.
+On single-core systems no worker threads will be created, and tasks are immediately processed by the main thread instead. In the presence of more cores, a worker thread will be created for each hardware core except one which is reserved for the main thread. Hyperthreaded cores are not included, as creating worker threads also for them leads to unpredictable extra synchronization overhead.
 
 The work items include a function pointer to call, with the signature "void WorkFunction(const WorkItem* item, unsigned threadIndex)." The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
 
-Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests, particle system updates and animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
+Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
 
 Note that as the Profiler currently manages only a single hierarchy tree, profiling blocks may only appear in main thread code, not in the work functions.
 

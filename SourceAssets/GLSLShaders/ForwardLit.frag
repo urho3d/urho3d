@@ -95,5 +95,10 @@ void main()
         finalColor = diff * lightColor * diffColor.rgb;
     #endif
 
-    gl_FragColor = vec4(GetLitFog(finalColor, vTexCoord.z), diffColor.a);
+    #ifdef AMBIENT
+        finalColor += cAmbientColor * diffColor.rgb;
+        gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), diffColor.a);
+    #else
+        gl_FragColor = vec4(GetLitFog(finalColor, vTexCoord.z), diffColor.a);
+    #endif
 }

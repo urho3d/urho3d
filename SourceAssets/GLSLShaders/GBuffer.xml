@@ -4,7 +4,6 @@
         <option name="HW" define="HWDEPTH" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
     </shader>
     <shader name="GBuffer" type="ps">
         <option name="Normal" define="NORMALMAP" />

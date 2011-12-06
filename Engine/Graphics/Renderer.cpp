@@ -1014,7 +1014,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
-        if (type == PASS_LIGHT)
+        if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
             if (!lightQueue)
@@ -1309,6 +1309,7 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     else
     {
         LoadPassShaders(technique, PASS_BASE);
+        LoadPassShaders(technique, PASS_LITBASE);
         LoadPassShaders(technique, PASS_LIGHT);
     }
     
@@ -1359,7 +1360,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (type == PASS_LIGHT)
+    if (type == PASS_LIGHT || type == PASS_LITBASE)
     {
         // Load forward pixel lit variations. If material is transparent, and shadow maps are reused,
         // do not load shadowed variations

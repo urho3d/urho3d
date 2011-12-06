@@ -271,7 +271,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     if (zone_)
     {
         if (graphics->NeedParameterUpdate(VSP_AMBIENTSTARTCOLOR, zone_))
-            graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor().ToVector4());
+            graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
         if (graphics->NeedParameterUpdate(VSP_AMBIENTENDCOLOR, zone_))
             graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
         
@@ -287,11 +287,14 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
         }
         
+        if (graphics->NeedParameterUpdate(PSP_AMBIENTCOLOR, zone_))
+            graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
+        
         // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
         BlendMode blend = pass_->GetBlendMode();
         Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
         if (graphics->NeedParameterUpdate(PSP_FOGCOLOR, fogColorZone))
-            graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor().ToVector4());
+            graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
         
         if (graphics->NeedParameterUpdate(PSP_FOGPARAMS, zone_))
         {
