@@ -546,22 +546,22 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The passes are:
+The purposes of the different passes are:
 
-- base: renders the ambient light, per-vertex lights and fog.
-- litbase: renders the first per-pixel light, ambient light and fog. This is an optional pass for optimization.
-- light: renders one per-pixel light's contribution additively.
-- prealpha: custom rendering pass after opaque geometry. Can be used for example to render the skybox.
-- postalpha: custom rendering pass after transparent geometry.
-- gbuffer: (light pre-pass only) renders normals, specular power and depth to prepare for opaque geometry light accumulation.
-- material: (light pre-pass only) renders the opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
-- shadow: renders depth only for shadow map generation.
+- base: Renders ambient light, per-vertex lights and fog.
+- litbase: Renders the first per-pixel light, ambient light and fog. This is an optional pass for optimization.
+- light: Renders one per-pixel light's contribution additively.
+- prealpha: Custom rendering pass after opaque geometry. Can be used for example to render the skybox.
+- postalpha: Custom rendering pass after transparent geometry.
+- gbuffer: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
+- material: %Light pre-pass only - renders opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
+- shadow: Renders depth only for shadow map generation.
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
 
 Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the files Ambient.xml and ForwardLit.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders to see which variations are required.
 
-The optional "litbase" pass reduces draw call count by combining ambient light rendering with the first per-pixel light. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is likely better to not define it, but instead allow the computationally light ambient-only pass to initialize the Z buffer for later passes.
+The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
 
 \page Lights Lights and shadows

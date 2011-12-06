@@ -78,7 +78,7 @@ F3          Toggle profiling display
 F4          Toggle octree debug geometry
 \endverbatim
 
-NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
+NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
 
 \section Running_Chat Chat
 
@@ -104,7 +104,7 @@ Key and mouse controls:
 \verbatim
 WSAD        Move
 ZX          Select model to use
-Arrows      Add and remove lights and objects
+Arrows      Add or remove lights and objects
 Pageup/down Add or remove 10 lights
 Right mouse Hold and move mouse to rotate view
 F1          Toggle AngelScript console
@@ -132,7 +132,7 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -logdebug   Display debug level log messages also in release mode
 -lqshadows  Use low-quality (1-sample) shadow filtering
--noshadows  Disable rendering of shadows
+-noshadows  Disable shadow rendering
 -nolimit    Disable frame limiter
 -noflush    Disable GPU command queue flushing
 -nothreads  Disable worker threads
@@ -142,7 +142,7 @@ Urho3D.exe understands the following command line options:
 -fallback   Force fallback rendering (*)
 \endverbatim
 
-(*) Uses only RGBA rendertargets, and 2-sample shadow filtering. Implies SM2.0. Relevant only on Direct3D9.
+(*) Uses only RGBA render targets, and 2-sample shadow filtering. Implies SM2.0. Relevant only on Direct3D9.
 
 
 \page Structure Overall structure
