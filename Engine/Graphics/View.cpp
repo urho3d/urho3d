@@ -1156,7 +1156,6 @@ void View::RenderBatchesLightPrepass()
     #ifdef USE_OPENGL
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
-    graphics_->SetColorWrite(true);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(true);
     graphics_->SetScissorTest(false);
