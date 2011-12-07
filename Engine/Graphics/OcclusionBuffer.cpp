@@ -45,7 +45,7 @@ OcclusionBuffer::OcclusionBuffer(Context* context) :
     width_(0),
     height_(0),
     numTriangles_(0),
-    max_Triangles(OCCLUSION_DEFAULT_MAX_TRIANGLES),
+    maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES),
     cullMode_(CULL_CCW),
     depthHierarchyDirty_(true),
     nearClip_(0.0f),
@@ -116,7 +116,7 @@ void OcclusionBuffer::SetView(Camera* camera)
 
 void OcclusionBuffer::SetMaxTriangles(unsigned triangles)
 {
-    max_Triangles = triangles;
+    maxTriangles_ = triangles;
 }
 
 void OcclusionBuffer::SetCullMode(CullMode mode)
@@ -167,7 +167,7 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsig
         
         while (indices < indicesEnd)
         {
-            if (numTriangles_ >= max_Triangles)
+            if (numTriangles_ >= maxTriangles_)
                 return false;
             
             const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
@@ -189,7 +189,7 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsig
         
         while (indices < indicesEnd)
         {
-            if (numTriangles_ >= max_Triangles)
+            if (numTriangles_ >= maxTriangles_)
                 return false;
             
             const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));

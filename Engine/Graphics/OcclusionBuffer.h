@@ -92,7 +92,7 @@ public:
     /// Return number of rendered triangles.
     unsigned GetNumTriangles() const { return numTriangles_; }
     /// Return maximum number of triangles.
-    unsigned GetMaxTriangles() const { return max_Triangles; }
+    unsigned GetMaxTriangles() const { return maxTriangles_; }
     /// Return culling mode.
     CullMode GetCullMode() const { return cullMode_; }
     /// Test a bounding box for visibility. For best performance, build depth hierarchy first.
@@ -125,7 +125,7 @@ private:
     /// Number of rendered triangles.
     unsigned numTriangles_;
     /// Maximum number of triangles.
-    unsigned max_Triangles;
+    unsigned maxTriangles_;
     /// Culling mode.
     CullMode cullMode_;
     /// Depth hierarchy needs update flag.
