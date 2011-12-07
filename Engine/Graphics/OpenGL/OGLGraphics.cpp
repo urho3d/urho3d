@@ -424,7 +424,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     
     // If viewport is less than full screen, set a scissor to limit the clear
     /// \todo Any user-set scissor test will be lost
-    if (viewport_.left_ != 0 || viewport_.top_ != 0 || viewport_.right_ != width_ || viewport_.bottom_ != height_)
+    IntVector2 viewSize = GetRenderTargetDimensions();
+    if (viewport_.left_ != 0 || viewport_.top_ != 0 || viewport_.right_ != viewSize.x_ || viewport_.bottom_ != viewSize.y_)
         SetScissorTest(true, IntRect(0, 0, viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_));
     else
         SetScissorTest(false);
