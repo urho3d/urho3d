@@ -687,6 +687,7 @@ void View::GetBatches()
         {
             Drawable* drawable = *i;
             unsigned numBatches = drawable->GetNumBatches();
+            bool vertexLightsProcessed = false;
             
             for (unsigned j = 0; j < numBatches; ++j)
             {
@@ -743,8 +744,11 @@ void View::GetBatches()
                         // due to overflowing the pixel light count. These need to be skipped as the per-pixel accumulation
                         // already renders the light
                         /// \todo Sub-geometries might need different interpretation if opaque & alpha are mixed
-                        if (!j)
+                        if (!vertexLightsProcessed)
+                        {
                             drawable->LimitVertexLights(prepass && pass->GetBlendMode() == BLEND_REPLACE);
+                            vertexLightsProcessed = true;
+                        }
                         
                         // The vertex light vector possibly became empty, so re-check
                         if (!vertexLights.Empty())
