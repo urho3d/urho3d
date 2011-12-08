@@ -56,6 +56,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 - Euler Angle Formulas by David Eberly (http://www.geometrictools.com/Documentation/EulerAngles.pdf)
 - Red Black Trees by Julienne Walker (http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx)
 - Comparison of several sorting algorithms by Juha Nieminen (http://warp.povusers.org/SortComparison/)
+- NVIDIA FXAA II for Consoles by Timothy Lottes (http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html)
 
 Urho3D uses the following third-party libraries:
 
@@ -113,13 +114,19 @@ V1.11
 
 - Bugfixes and performance optimizations.
 - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
-- Added fallback mode, which is used if multiple render targets or hardware shadow maps are not available.   '
+- Added fallback mode, which is used if multiple render targets or hardware shadow maps are not available.
 
-V1.12   
+V1.12
 
 - Manipulator gizmo and multi-editing in the editor.
 - Switched to forward rendering exclusively, which is optimized to do more work in the vertex shader.
 - %Zone system refactoring. Objects check the zone they belong to for per-zone light masking, ambient light and fog settings.
 - Scripting API fixes and improvements.
+
+V1.13   
+
+- Task-based multithreading.
+- Vertex lighting option.
+- Forward and light pre-pass rendering pipelines.
 
 */

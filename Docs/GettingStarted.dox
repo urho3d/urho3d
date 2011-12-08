@@ -112,6 +112,7 @@ F1          Toggle AngelScript console
 T           Toggle profiling display
 V           Toggle vertex lighting
 C           Toggle orthographic camera
+F           Toggle FXAA edge filter
 R           Re-randomize light and object positions
 \endverbatim
 
@@ -128,9 +129,10 @@ Urho3D.exe understands the following command line options:
 -w          Start in windowed mode
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Sound mixing frequency in Hz
--prepass    Use light pre-pass rendering
 -headless   Headless mode. No application window will be created
 -logdebug   Display debug level log messages also in release mode
+-prepass    Use light pre-pass rendering
+-edgefilter Use FXAA edge filter
 -lqshadows  Use low-quality (1-sample) shadow filtering
 -noshadows  Disable shadow rendering
 -nolimit    Disable frame limiter

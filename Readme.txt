@@ -32,6 +32,8 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 - Comparison of several sorting algorithms by Juha Nieminen 
   http://warp.povusers.org/SortComparison/
+- NVIDIA FXAA II for Consoles by Timothy Lottes
+  http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
 - AngelScript 2.22.1 WIP (http://www.angelcode.com/angelscript/)
@@ -142,3 +144,6 @@ V1.12   - Manipulator gizmo and multi-editing in the editor.
           per-zone light masking, ambient light and fog settings.
         - Scripting API fixes and improvements.
 
+V1.13   - Task-based multithreading.
+        - Vertex lighting option.
+        - Forward and light pre-pass rendering pipelines.

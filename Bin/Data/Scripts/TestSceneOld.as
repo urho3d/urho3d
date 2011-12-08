@@ -419,6 +419,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyPress['C'])
             camera.orthographic = !camera.orthographic;
 
+        if (input.keyPress['F'])
+            renderer.edgeFilter = !renderer.edgeFilter;
+            
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 

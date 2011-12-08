@@ -311,6 +311,14 @@ void View::Render()
     else
         RenderBatchesForward();
     
+    // Blit if necessary (OpenGL light pre-pass, or edge filter)
+    #ifdef USE_OPENGL
+    if (renderer_->GetEdgeFilter() || renderer_->GetLightPrepass())
+    #else
+    if (renderer_->GetEdgeFilter())
+    #endif
+        BlitFramebuffer();
+    
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetStreamFrequencies();
@@ -954,6 +962,10 @@ void View::RenderBatchesForward()
     // Reset the light optimization stencil reference value
     lightStencilValue_ = 1;
     
+    bool needBlit = renderer_->GetEdgeFilter();
+    RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
+    RenderSurface* depthStencil = needBlit ? 0 : depthStencil_;
+    
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
     {
@@ -966,8 +978,8 @@ void View::RenderBatchesForward()
         }
     }
     
-    graphics_->SetRenderTarget(0, renderTarget_);
-    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetRenderTarget(0, renderTarget);
+    graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
     graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
     
@@ -990,8 +1002,8 @@ void View::RenderBatchesForward()
             if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
             {
                 RenderShadowMap(*i);
-                graphics_->SetRenderTarget(0, renderTarget_);
-                graphics_->SetDepthStencil(depthStencil_);
+                graphics_->SetRenderTarget(0, renderTarget);
+                graphics_->SetDepthStencil(depthStencil);
                 graphics_->SetViewport(screenRect_);
             }
             
@@ -1001,8 +1013,8 @@ void View::RenderBatchesForward()
     
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetRenderTarget(0, renderTarget_);
-    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetRenderTarget(0, renderTarget);
+    graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
     
     if (!preAlphaQueue_.IsEmpty())
@@ -1049,6 +1061,13 @@ void View::RenderBatchesLightPrepass()
     
     Texture2D* normalBuffer = renderer_->GetNormalBuffer();
     Texture2D* depthBuffer = renderer_->GetDepthBuffer();
+    
+    #ifdef USE_OPENGL
+    bool needBlit = true;
+    #else
+    bool needBlit = renderer_->GetEdgeFilter();
+    #endif
+    RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = 0;
     
     // Hardware depth support: render to RGBA normal buffer and read hardware depth
@@ -1112,18 +1131,12 @@ void View::RenderBatchesLightPrepass()
     }
     
     graphics_->SetTexture(TU_DEPTHBUFFER, 0);
-    graphics_->SetTexture(TU_NORMALBUFFER, 0);    
+    graphics_->SetTexture(TU_NORMALBUFFER, 0);
 
     // Clear destination render target with fog color
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    #ifndef USE_OPENGL
-    graphics_->SetRenderTarget(0, renderTarget_);
-    #else
-    // On OpenGL render the final image to the normal buffer first, as FBO and backbuffer rendering can not be mixed,
-    // and we need the depth written in the FBO for proper depth testing
-    graphics_->SetRenderTarget(0, normalBuffer);
-    #endif
+    graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
     graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
@@ -1133,7 +1146,7 @@ void View::RenderBatchesLightPrepass()
         // Render opaque objects with deferred lighting result
         PROFILE(RenderBase);
         
-        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);        
+        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);
         
         RenderBatchQueue(baseQueue_);
         
@@ -1164,9 +1177,13 @@ void View::RenderBatchesLightPrepass()
         RenderBatchQueue(postAlphaQueue_);
     }
     
-    // Blit the final image to destination render target on OpenGL
+    graphics_->SetViewTexture(0);
+}
+
+void View::BlitFramebuffer()
+{
+    // Blit the final image to destination render target
     /// \todo Depth is reset to far plane, so geometry drawn after the view (for example debug geometry) can not be depth tested
-    #ifdef USE_OPENGL
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -1177,22 +1194,41 @@ void View::RenderBatchesLightPrepass()
     graphics_->SetDepthStencil(depthStencil_);
     graphics_->SetViewport(screenRect_);
     
-    graphics_->SetShaders(renderer_->GetVertexShader("CopyFramebuffer"), renderer_->GetPixelShader("CopyFramebuffer"));
+    String shaderName = renderer_->GetEdgeFilter() ? "EdgeFilter" : "CopyFramebuffer";
+    graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
     
     float gBufferWidth = (float)graphics_->GetWidth();
     float gBufferHeight = (float)graphics_->GetHeight();
-    float widthRange = 0.5f * (screenRect_.right_ - screenRect_.left_) / gBufferWidth;
-    float heightRange = 0.5f * (screenRect_.bottom_ - screenRect_.top_) / gBufferHeight;
     
-    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
-        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+    {
+        float widthRange = 0.5f * (screenRect_.right_ - screenRect_.left_) / gBufferWidth;
+        float heightRange = 0.5f * (screenRect_.bottom_ - screenRect_.top_) / gBufferHeight;
+        
+        #ifdef USE_OPENGL
+        Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
+            ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #else
+        Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
+            (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        #endif
+        
+        graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    }
     
-    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetTexture(TU_DIFFUSE, normalBuffer);
+    if (renderer_->GetEdgeFilter())
+    {
+        const EdgeFilterParameters& parameters = renderer_->GetEdgeFilterParameters();
+        graphics_->SetShaderParameter(PSP_EDGEFILTERPARAMS, Vector4(parameters.radius_, parameters.threshold_,
+            parameters.strength_, 0.0f));
+        
+        float addX = 1.0f / (float)gBufferWidth;
+        float addY = 1.0f / (float)gBufferHeight;
+        graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
+    }
+    
+    graphics_->SetTexture(TU_DIFFUSE, renderer_->GetScreenBuffer());
     DrawFullscreenQuad(camera_, false);
-    #endif
-    
-    graphics_->SetViewTexture(0);
+    graphics_->SetTexture(TU_DIFFUSE, 0);
 }
 
 void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)

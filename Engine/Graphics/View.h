@@ -127,6 +127,8 @@ private:
     void RenderBatchesForward();
     /// Render batches using light pre-pass rendering.
     void RenderBatchesLightPrepass();
+    /// Blit the framebuffer to destination. Used in OpenGL light pre-pass mode and when applying edge filter.
+    void BlitFramebuffer();
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.

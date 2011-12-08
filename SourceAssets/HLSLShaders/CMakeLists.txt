@@ -2,6 +2,7 @@ set (ALL_SHADERS)
 
 add_shader (Ambient)
 add_shader (Basic)
+add_shader (EdgeFilter)
 add_shader (ForwardLit)
 add_shader (GBuffer)
 add_shader (LitParticle)

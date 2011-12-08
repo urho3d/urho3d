@@ -154,7 +154,7 @@ enum DeferredLightPSVariation
     MAX_DEFERRED_LIGHT_PS_VARIATIONS
 };
 
-/// Deferred rendering edge filter parameters.
+/// Edge filter parameters.
 struct EdgeFilterParameters
 {
     /// Construct undefined.
@@ -224,6 +224,10 @@ public:
     void SetDynamicInstancing(bool enable);
     /// %Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
+    /// %Set edge filter on/off.
+    void SetEdgeFilter(bool enable);
+    /// %Set edge filter parameters.
+    void SetEdgeFilterParameters(const EdgeFilterParameters& parameters);
     /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
@@ -262,6 +266,10 @@ public:
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.
     int GetMaxInstanceTriangles() { return maxInstanceTriangles_; }
+    /// Return whether edge filter is enabled.
+    bool GetEdgeFilter() const { return edgeFilter_; }
+    /// Return edge filter parameters.
+    const EdgeFilterParameters& GetEdgeFilterParameters() const { return edgeFilterParameters_; }
     /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
@@ -300,6 +308,8 @@ public:
     Texture2D* GetDepthBuffer() const { return depthBuffer_; }
     /// Return the light accumulation buffer for light pre-pass rendering.
     Texture2D* GetLightBuffer() const { return lightBuffer_; }
+    /// Return the screen buffer for postprocessing, created on demand.
+    Texture2D* GetScreenBuffer();
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a vertex shader by name.
@@ -361,6 +371,8 @@ private:
     void CreateInstancingBuffer();
     /// Remove all shadow maps. Called when global shadow map resolution or format is changed.
     void ResetShadowMaps();
+    /// Remove the screen buffer if no longer needed.
+    void CheckScreenBuffer();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle graphics features (re)check event.
@@ -398,6 +410,8 @@ private:
     SharedPtr<Texture2D> depthBuffer_;
     /// Light accumulation buffer for light pre-pass rendering.
     SharedPtr<Texture2D> lightBuffer_;
+    /// Screen buffer for post-processing.
+    SharedPtr<Texture2D> screenBuffer_;
     /// Stencil rendering vertex shader.
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
@@ -428,6 +442,8 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
+    /// Edge filter parameters.
+    EdgeFilterParameters edgeFilterParameters_;
     /// Vertex shader format.
     String vsFormat_;
     /// Pixel shader format.
@@ -482,6 +498,8 @@ private:
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
+    /// Edge filter flag.
+    bool edgeFilter_;
     /// Shaders need reloading flag.
     bool shadersDirty_;
     /// Initialized flag.

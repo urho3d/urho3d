@@ -263,11 +263,19 @@ static const String lightPSVariations[] =
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
 static const Viewport noViewport;
 
+void EdgeFilterParameters::Validate()
+{
+    radius_ = Max(radius_, 0.0f);
+    threshold_ = Max(threshold_, 0.0f);
+    strength_ = Max(strength_, 0.0f);
+}
+
 OBJECTTYPESTATIC(Renderer);
 
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
+    edgeFilterParameters_(EdgeFilterParameters(0.4f, 0.5f, 0.9f)),
     numViews_(0),
     numShadowCameras_(0),
     numOcclusionBuffers_(0),
@@ -289,6 +297,7 @@ Renderer::Renderer(Context* context) :
     drawShadows_(true),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
+    edgeFilter_(false),
     shadersDirty_(true),
     initialized_(false)
 {
@@ -384,6 +393,7 @@ void Renderer::SetLightPrepass(bool enable)
         
         lightPrepass_ = enable;
         shadersDirty_ = true;
+        CheckScreenBuffer();
     }
 }
 
@@ -511,6 +521,28 @@ void Renderer::SetMaxInstanceTriangles(int triangles)
     maxInstanceTriangles_ = Max(triangles, 0);
 }
 
+void Renderer::SetEdgeFilter(bool enable)
+{
+    if (enable)
+    {
+        // Edge filter is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
+        if (graphics_->GetMultiSample() > 1)
+        {
+            graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
+                graphics_->GetTripleBuffer(), 1);
+        }
+    }
+    
+    edgeFilter_ = enable;
+    CheckScreenBuffer();
+}
+
+void Renderer::SetEdgeFilterParameters(const EdgeFilterParameters& parameters)
+{
+    edgeFilterParameters_ = parameters;
+    edgeFilterParameters_.Validate();
+}
+
 void Renderer::SetMaxOccluderTriangles(int triangles)
 {
     maxOccluderTriangles_ = Max(triangles, 0);
@@ -592,6 +624,18 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
         numOccluders += views_[i]->GetOccluders().Size();
     
     return numOccluders;
+}
+
+Texture2D* Renderer::GetScreenBuffer()
+{
+    if (!screenBuffer_)
+    {
+        screenBuffer_ = new Texture2D(context_);
+        screenBuffer_->SetSize(0, 0, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
+        screenBuffer_->SetFilterMode(FILTER_BILINEAR);
+    }
+    
+    return screenBuffer_;
 }
 
 void Renderer::Update(float timeStep)
@@ -1567,6 +1611,18 @@ void Renderer::ResetShadowMaps()
     shadowMaps_.Clear();
     colorShadowMaps_.Clear();
     shadowDepthStencil_.Reset();
+}
+
+void Renderer::CheckScreenBuffer()
+{
+    bool needScreenBuffer = edgeFilter_;
+    #ifdef USE_OPENGL
+    if (lightPrepass_)
+        needScreenBuffer = true;
+    #endif
+    
+    if (!needScreenBuffer)
+        screenBuffer_.Reset();
 }
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)

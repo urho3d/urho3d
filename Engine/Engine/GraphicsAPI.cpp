@@ -754,6 +754,21 @@ static Renderer* GetRenderer()
     return GetScriptContext()->GetSubsystem<Renderer>();
 }
 
+static void ConstructEdgeFilterParameters(EdgeFilterParameters* ptr)
+{
+    new(ptr) EdgeFilterParameters(0.0f, 0.0f, 0.0f);
+}
+
+static void ConstructEdgeFilterParametersCopy(EdgeFilterParameters& parameters, EdgeFilterParameters* ptr)
+{
+    new(ptr) EdgeFilterParameters(parameters);
+}
+
+static void ConstructEdgeFilterParametersInit(float radius, float threshold, float strength, BiasParameters* ptr)
+{
+    new(ptr) EdgeFilterParameters(radius, threshold, strength);
+}
+
 static void RegisterRenderer(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
@@ -764,6 +779,13 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_24BIT", (void*)&SHADOWQUALITY_LOW_24BIT);
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_16BIT", (void*)&SHADOWQUALITY_HIGH_16BIT);
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_24BIT", (void*)&SHADOWQUALITY_HIGH_24BIT);
+    engine->RegisterObjectType("EdgeFilterParameters", sizeof(EdgeFilterParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructEdgeFilterParameters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f(const EdgeFilterParameters&in)", asFUNCTION(ConstructEdgeFilterParametersCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructEdgeFilterParametersInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("EdgeFilterParameters", "float radius", offsetof(EdgeFilterParameters, radius_));
+    engine->RegisterObjectProperty("EdgeFilterParameters", "float threshold", offsetof(EdgeFilterParameters, threshold_));
+    engine->RegisterObjectProperty("EdgeFilterParameters", "float strength", offsetof(EdgeFilterParameters, strength_));
     
     RegisterObject<Renderer>(engine, "Renderer");
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
@@ -799,6 +821,10 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "bool get_dynamicInstancing() const", asMETHOD(Renderer, GetDynamicInstancing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxInstanceTriangles(int)", asMETHOD(Renderer, SetMaxInstanceTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxInstanceTriangles() const", asMETHOD(Renderer, GetMaxInstanceTriangles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool get_edgeFilter() const", asMETHOD(Renderer, GetEdgeFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_edgeFilter(bool)", asMETHOD(Renderer, SetEdgeFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "const EdgeFilterParameters& get_edgeFilterParameters() const", asMETHOD(Renderer, GetEdgeFilterParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_edgeFilterParameters(const EdgeFilterParameters& in)", asMETHOD(Renderer, SetEdgeFilterParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxOccluderTriangles(int)", asMETHOD(Renderer, SetMaxOccluderTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxOccluderTriangles() const", asMETHOD(Renderer, GetMaxOccluderTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_occlusionBufferSize(int)", asMETHOD(Renderer, SetOcclusionBufferSize), asCALL_THISCALL);

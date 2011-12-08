@@ -2106,6 +2106,14 @@ Properties:<br>
 - int[]@ multiSampleLevels (readonly)
 
 
+EdgeFilterParameters
+
+Properties:<br>
+- float radius
+- float threshold
+- float strength
+
+
 Renderer
 
 Methods:<br>
@@ -2130,6 +2138,8 @@ Properties:<br>
 - bool reuseShadowMaps
 - bool dynamicInstancing
 - int maxInstanceTriangles
+- bool edgeFilter
+- EdgeFilterParameters& edgeFilterParameters
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold
