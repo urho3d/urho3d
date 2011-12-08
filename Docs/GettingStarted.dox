@@ -132,7 +132,7 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -logdebug   Display debug level log messages also in release mode
 -prepass    Use light pre-pass rendering
--edgefilter Use FXAA edge filter
+-fxaa       Use FXAA edge filter
 -lqshadows  Use low-quality (1-sample) shadow filtering
 -noshadows  Disable shadow rendering
 -nolimit    Disable frame limiter
