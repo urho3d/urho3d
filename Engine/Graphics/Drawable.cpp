@@ -254,11 +254,17 @@ void Drawable::LimitLights()
     }
 }
 
-void Drawable::LimitVertexLights()
+void Drawable::LimitVertexLights(bool removeConvertedLights)
 {
     const BoundingBox& box = GetWorldBoundingBox();
-    for (unsigned i = 0; i < vertexLights_.Size(); ++i)
-        vertexLights_[i]->SetIntensitySortValue(box);
+    for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+    {
+        // If necessary (light pre-pass rendering), remove lights that were converted to per-vertex
+        if (removeConvertedLights && !vertexLights_[i]->GetPerVertex())
+            vertexLights_.Erase(i);
+        else
+            vertexLights_[i]->SetIntensitySortValue(box);
+    }
     
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);
     

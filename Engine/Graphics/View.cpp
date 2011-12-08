@@ -739,20 +739,29 @@ void View::GetBatches()
                     const PODVector<Light*>& vertexLights = drawable->GetVertexLights();
                     if (!vertexLights.Empty())
                     {
-                        drawable->LimitVertexLights();
+                        // In light pre-pass mode, check if this is an opaque object that has converted its lights to per-vertex
+                        // due to overflowing the pixel light count. These need to be skipped as the per-pixel accumulation
+                        // already renders the light
+                        /// \todo Sub-geometries might need different interpretation if opaque & alpha are mixed
+                        if (!j)
+                            drawable->LimitVertexLights(prepass && pass->GetBlendMode() == BLEND_REPLACE);
                         
-                        // Find a vertex light queue. If not found, create new
-                        unsigned long long hash = GetVertexLightQueueHash(vertexLights);
-                        HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
-                        if (i == vertexLightQueues_.End())
+                        // The vertex light vector possibly became empty, so re-check
+                        if (!vertexLights.Empty())
                         {
-                            i = vertexLightQueues_.Insert(MakePair(hash, LightBatchQueue()));
-                            i->second_.light_ = 0;
-                            i->second_.shadowMap_ = 0;
-                            i->second_.vertexLights_ = vertexLights;
+                            // Find a vertex light queue. If not found, create new
+                            unsigned long long hash = GetVertexLightQueueHash(vertexLights);
+                            HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
+                            if (i == vertexLightQueues_.End())
+                            {
+                                i = vertexLightQueues_.Insert(MakePair(hash, LightBatchQueue()));
+                                i->second_.light_ = 0;
+                                i->second_.shadowMap_ = 0;
+                                i->second_.vertexLights_ = vertexLights;
+                            }
+                            
+                            baseBatch.lightQueue_ = &(i->second_);
                         }
-                        
-                        baseBatch.lightQueue_ = &(i->second_);
                     }
                     
                     if (pass->GetBlendMode() == BLEND_REPLACE)

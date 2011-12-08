@@ -94,7 +94,7 @@ public:
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
-    /// Calculate distance and LOD level for rendering.  May be called from worker thread(s), possibly re-entrantly.
+    /// Calculate distance and LOD level for rendering.May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
@@ -178,7 +178,7 @@ public:
     /// Sort and limit per-pixel lights to maximum allowed.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
-    void LimitVertexLights();
+    void LimitVertexLights(bool removeConvertedLights);
     /// %Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
     /// Return octree octant.
