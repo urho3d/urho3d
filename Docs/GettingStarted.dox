@@ -56,6 +56,7 @@ F7          Load scene
 1 to 9      Toggle rendering options
 T           Toggle profiling display
 C           Toggle orthographic camera
+F           Toggle FXAA edge filter
 \endverbatim
 
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
@@ -307,7 +308,7 @@ void SubscribeToEvents()
 
 The event handler function needs to have a specific signature. If event type and parameters are not needed, "void HandleEvent()", or if they are, "void HandleEvent(StringHash eventType, VariantMap& eventData)". We might want to expand the application later, so we use the latter form.
 
-The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's \ref Engine::Exit() "Exit()" function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
+The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's \ref Engine::Exit "Exit()" function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
 
 To get the ESC keypress without having to poll it for each frame, we could also subscribe to the "KeyDown" event sent by the Input subsystem.
 
@@ -406,7 +407,7 @@ public:
 
 Before the actual HelloWorld implementation, we define WinMain. First, we need to create the Context object, which holds all subsystems and object factories, and keeps track of event senders and receivers. All Object subclasses need to be supplied a pointer to that context. When using an object factory (such as when creating components) that is automatic, but when creating objects manually, the pointer also needs to be passed manually.
 
-With the context at hand, we create the Engine and initialize it. The arguments for the \ref Engine::Initialize() "Initialize()" function are the initial window title, the log file name, and command line parameters, which are parsed using the ParseArguments() helper function.
+With the context at hand, we create the Engine and initialize it. The arguments for the \ref Engine::Initialize "Initialize()" function are the initial window title, the log file name, and command line parameters, which are parsed using the ParseArguments() helper function.
 
 After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
 
@@ -453,7 +454,7 @@ void HelloWorld::Start()
 }
 \endcode
 
-Like in the script example, CreateObjects() does the actual scene object creation and defines the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of \ref Node::CreateComponent() "CreateComponent()":
+Like in the script example, CreateObjects() does the actual scene object creation and defines the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of \ref Node::CreateComponent "CreateComponent()":
 
 \code
 void HelloWorld::CreateObjects()

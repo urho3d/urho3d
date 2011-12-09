@@ -171,7 +171,7 @@ There is no inbuilt concept of an entity or a game object; rather it is up to th
 
 Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details.
 
-%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
+%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
 It is also legal to create a Node that does not belong to a scene. This is particularly useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted.
 
@@ -372,7 +372,7 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()".
+- For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
 - For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode using a color texture and minimal shadow filtering will be chosen instead.
 - Is light pre-pass rendering supported? This requires either readable hardware depth stencil texture, or multiple render target and R32F texture format support.
@@ -385,7 +385,7 @@ To render, it needs a Scene with an Octree component, and a Camera that does not
 
 By default there is one viewport, but the amount can be increased with the function \ref Renderer::SetNumViewports "SetNumViewports()". The viewport(s) should cover the entire screen or otherwise hall-of-mirrors artifacts may occur. By specifying a zero screen rectangle the whole window will be used automatically. The viewports will be rendered in ascending order, so if you want for example to have a small overlay window on top of the main viewport, use viewport index 0 for the main view, and 1 for the overlay.
 
-Either forward or light pre-pass rendering can be chosen, see \ref Renderer::SetLightPrepass "SetLightPrepass()". %Light pre-pass will be advantageous once there is a large number of per-pixel lights affecting each object, but its disadvantages are the lack of hardware antialiasing and inability to choose the lighting model per material.
+Either forward or light pre-pass rendering can be chosen, see \ref Renderer::SetLightPrepass "SetLightPrepass()". %Light pre-pass will be advantageous once there is a large number of per-pixel lights affecting each object, but its disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, the FXAA post-processing edge filter can be used, see \ref Renderer::SetEdgeFilter "SetEdgeFilter()" and \ref Renderer::SetEdgeFilterParameters "SetEdgeFilterParameters()".
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -423,9 +423,9 @@ The rendering-related components defined by the %Graphics library are:
 
 The following techniques will be used to reduce the amount of CPU and GPU work when rendering. By default they are all on:
 
-- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles() "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold() "SetOccluderSizeThreshold()" to configure the occlusion rendering.
+- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles() "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
@@ -444,7 +444,7 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 Urho3D implements both forward and light pre-pass rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
 
-Forward rendering first renders the ambient light pass for an object; this also adds any per-vertex lights. Then, the object is re-rendered for each per-pixel light affecting it (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights() "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
+Forward rendering first renders the ambient light pass for an object; this also adds any per-vertex lights. Then, the object is re-rendered for each per-pixel light affecting it (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
 
 %Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth stencil texture format is available, the second color render target will be omitted:
 
@@ -510,7 +510,7 @@ A material definition looks like this:
 </material>
 \endcode
 
-%Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality() "SetMaterialQuality()". If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
+%Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
 
 When a material defines several techniques for different LOD levels and quality settings, they must appear in a specific order:
 
@@ -715,7 +715,7 @@ The Audio subsystem implements an audio output stream using DirectSound. DirectS
 - Playing raw audio, Ogg Vorbis or WAV Sound resources using the SoundSource component. This allows manual stereo panning of mono sounds; stereo sounds will be output with their original stereo mix.
 - Playing the above sound formats in pseudo-3D using the SoundSource3D component. It has stereo positioning and distance attenuation, but does not (at least yet) filter the sound depending on the direction.
 
-For pseudo-3D positional sounds, the listener position and rotation have to be updated by calling \ref Audio::SetListenerPosition() "SetListenerPosition()" and \ref Audio::SetListenerRotation() "SetListenerRotation()".
+For pseudo-3D positional sounds, the listener position and rotation have to be updated by calling \ref Audio::SetListenerPosition "SetListenerPosition()" and \ref Audio::SetListenerRotation "SetListenerRotation()".
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 

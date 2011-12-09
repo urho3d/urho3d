@@ -56,7 +56,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     #else
     Run(cmdLine);
     #endif
-    
+
     return 0;
 }
 #else
@@ -69,8 +69,9 @@ int main(int argc, char** argv)
             cmdLine += ' ';
         cmdLine += String(argv[i]);
     }
-    
+
     Run(cmdLine.CString());
+    return 0;
 }
 #endif
 
@@ -94,9 +95,8 @@ void Run(const char* cmdLine)
         if (scriptFileName.Empty())
         {
             ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
-                "The script file should implement the function void Start(), "
-                "which should create the scene content and subscribe to "
-                "all necessary events, such as the application update."
+                "The script file should implement the function void Start() for creating the scene "
+                "content and subscribing to all necessary events, such as the application update."
             );
             return;
         }

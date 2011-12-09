@@ -175,7 +175,7 @@ struct EdgeFilterParameters
     
     //! Radius for calculating luminance gradient.
     float radius_;
-    //! Luminance difference threshold needed to pass pixel.
+    //! Luminance difference threshold needed before filtering occurs.
     float threshold_;
     //! Filter strength.
     float strength_;
