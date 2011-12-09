@@ -251,6 +251,13 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "void SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurface(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
+    
+    engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetLuminanceFormat()", asFUNCTION(Graphics::GetLuminanceFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetLuminanceAlphaFormat()", asFUNCTION(Graphics::GetLuminanceAlphaFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetRGBFormat()", asFUNCTION(Graphics::GetRGBFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetRGBAFormat()", asFUNCTION(Graphics::GetRGBAFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetDepthStencilFormat()", asFUNCTION(Graphics::GetDepthStencilFormat), asCALL_CDECL);
 }
 
 static Vector4 MaterialGetShaderParameter(const String& name, Material* ptr)

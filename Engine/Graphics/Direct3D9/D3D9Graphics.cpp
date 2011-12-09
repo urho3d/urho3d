@@ -1896,7 +1896,7 @@ unsigned Graphics::GetLinearDepthFormat()
 
 unsigned Graphics::GetDepthStencilFormat()
 {
-    return MAKEFOURCC('I', 'N', 'T', 'Z');
+    return D3DFMT_D24S8;
 }
 
 bool Graphics::OpenWindow(int width, int height)

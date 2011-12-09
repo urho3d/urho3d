@@ -2136,6 +2136,9 @@ void View::SetupLightVolumeBatch(Batch& batch)
     }
     else
     {
+        // In case the same camera is used for multiple views with differing aspect ratios (not recommended)
+        // refresh the directional light's model transform before rendering
+        light->GetVolumeTransform(camera_);
         graphics_->SetCullMode(CULL_NONE);
         graphics_->SetDepthTest(CMP_ALWAYS);
     }

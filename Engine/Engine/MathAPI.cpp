@@ -92,8 +92,8 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Random(float)", asFUNCTIONPR(Random, (float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("int RandomInt()", asFUNCTION(Rand), asCALL_CDECL);
     engine->RegisterGlobalFunction("int RandomInt(int)", asFUNCTIONPR(Random, (int), int), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void set_randomSeed(uint)", asFUNCTION(SetRandomSeed), asCALL_CDECL);
-    engine->RegisterGlobalFunction("uint get_randomSeed()", asFUNCTION(GetRandomSeed), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetRandomSeed(uint)", asFUNCTION(SetRandomSeed), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetRandomSeed()", asFUNCTION(GetRandomSeed), asCALL_CDECL);
 }
 
 static void ConstructIntRect(IntRect* ptr)

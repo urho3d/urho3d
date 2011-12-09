@@ -24,11 +24,15 @@
 - float Random(float)
 - int RandomInt()
 - int RandomInt(int)
+- void SetRandomSeed(uint)
+- uint GetRandomSeed()
 - String ToStringHex(int)
 - void ErrorDialog(const String&, const String&)
 - void OpenConsoleWindow()
 - String GetConsoleInput()
 - String[]@ GetArguments()
+- uint GetNumPhysicalCPUs()
+- uint GetNumLogicalCPUs()
 - void SendEvent(const String&, VariantMap&)
 - void SendEvent(Object@, const String&, VariantMap&)
 - void SubscribeToEvent(const String&, const String&)
@@ -53,14 +57,17 @@
 - String GetParentPath(const String&)
 - String GetInternalPath(const String&)
 - String[]@ GetAvailableComponents()
+- uint GetAlphaFormat()
+- uint GetLuminanceFormat()
+- uint GetLuminanceAlphaFormat()
+- uint GetRGBFormat()
+- uint GetRGBAFormat()
+- uint GetDepthStencilFormat()
 - void DelayedExecute(float, const String&, const Variant[]@)
 - void DelayedExecute(float, const String&)
 - void ClearDelayedExecute()
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
-- uint randomSeed
-- uint numPhysicalCPUs
-- uint numLogicalCPUs
 - Time@ time
 - Log@ log
 - FileSystem@ fileSystem
