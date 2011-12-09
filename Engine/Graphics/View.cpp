@@ -179,8 +179,9 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     if (!octree)
         return false;
     
-    // Check for the render texture being too large
-    if (renderer_->GetLightPrepass() && renderTarget)
+    // Check for the render texture being larger than the G-buffer in light pre-pass mode
+    lightPrepass_ = renderer_->GetLightPrepass();
+    if (lightPrepass_ && renderTarget)
     {
         if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
         {
@@ -218,11 +219,13 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     width_ = screenRect_.right_ - screenRect_.left_;
     height_ = screenRect_.bottom_ - screenRect_.top_;
     
-    // Set possible quality overrides from the camera
     drawShadows_ = renderer_->GetDrawShadows();
     materialQuality_ = renderer_->GetMaterialQuality();
     maxOccluderTriangles_ = renderer_->GetMaxOccluderTriangles();
+    // Use edge filter only when final target is the backbuffer
+    edgeFilter_ = !renderTarget_ && renderer_->GetEdgeFilter();
     
+    // Set possible quality overrides from the camera
     unsigned viewOverrideFlags = camera_->GetViewOverrideFlags();
     if (viewOverrideFlags & VO_LOW_MATERIAL_QUALITY)
         materialQuality_ = QUALITY_LOW;
@@ -296,7 +299,7 @@ void View::Render()
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // again to ensure correct projection will be used
     if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatio((float)(screenRect_.right_ - screenRect_.left_) / (float)(screenRect_.bottom_ - screenRect_.top_));
+        camera_->SetAspectRatio((float)(width_) / (float)(height_));
     
     graphics_->SetColorWrite(true);
     graphics_->SetFillMode(FILL_SOLID);
@@ -306,16 +309,16 @@ void View::Render()
     graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     
     // Render
-    if (renderer_->GetLightPrepass())
+    if (lightPrepass_)
         RenderBatchesLightPrepass();
     else
         RenderBatchesForward();
     
     // Blit if necessary (OpenGL light pre-pass, or edge filter)
     #ifdef USE_OPENGL
-    if (renderer_->GetEdgeFilter() || renderer_->GetLightPrepass())
+    if (lightPrepass_ || edgeFilter_)
     #else
-    if (renderer_->GetEdgeFilter())
+    if (edgeFilter_)
     #endif
         BlitFramebuffer();
     
@@ -505,7 +508,6 @@ void View::GetDrawables()
 void View::GetBatches()
 {
     WorkQueue* queue = GetSubsystem<WorkQueue>();
-    bool prepass = renderer_->GetLightPrepass();
     
     // Process lit geometries and shadow casters for each light
     {
@@ -637,7 +639,7 @@ void View::GetBatches()
                 }
                 
                 // In light pre-pass mode, store the light volume batch now
-                if (prepass)
+                if (lightPrepass_)
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
@@ -719,7 +721,7 @@ void View::GetBatches()
                 Pass* pass = 0;
                 
                 // In light prepass mode check for G-buffer and material passes first
-                if (prepass)
+                if (lightPrepass_)
                 {
                     pass = tech->GetPass(PASS_GBUFFER);
                     if (pass)
@@ -754,7 +756,7 @@ void View::GetBatches()
                         /// \todo Sub-geometries might need different interpretation if opaque & alpha are mixed
                         if (!vertexLightsProcessed)
                         {
-                            drawable->LimitVertexLights(prepass && pass->GetBlendMode() == BLEND_REPLACE);
+                            drawable->LimitVertexLights(lightPrepass_ && pass->GetBlendMode() == BLEND_REPLACE);
                             vertexLightsProcessed = true;
                         }
                         
@@ -827,7 +829,7 @@ void View::UpdateGeometries()
         queue->AddWorkItem(item);
         item.start_ = &preAlphaQueue_;
         queue->AddWorkItem(item);
-        if (renderer_->GetLightPrepass())
+        if (lightPrepass_)
         {
             item.start_ = &gbufferQueue_;
             queue->AddWorkItem(item);
@@ -899,7 +901,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool hasVertexLights = drawable->GetVertexLights().Size() > 0;
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
-    bool prepass = renderer_->GetLightPrepass();
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -912,7 +913,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (prepass && tech->HasPass(PASS_GBUFFER))
+        if (lightPrepass_ && tech->HasPass(PASS_GBUFFER))
             continue;
         
         Pass* pass = 0;
@@ -962,7 +963,7 @@ void View::RenderBatchesForward()
     // Reset the light optimization stencil reference value
     lightStencilValue_ = 1;
     
-    bool needBlit = renderer_->GetEdgeFilter();
+    bool needBlit = edgeFilter_;
     RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = needBlit ? 0 : depthStencil_;
     
@@ -1065,7 +1066,7 @@ void View::RenderBatchesLightPrepass()
     #ifdef USE_OPENGL
     bool needBlit = true;
     #else
-    bool needBlit = renderer_->GetEdgeFilter();
+    bool needBlit = edgeFilter_;
     #endif
     RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = 0;
@@ -1194,15 +1195,15 @@ void View::BlitFramebuffer()
     graphics_->SetDepthStencil(depthStencil_);
     graphics_->SetViewport(screenRect_);
     
-    String shaderName = renderer_->GetEdgeFilter() ? "EdgeFilter" : "CopyFramebuffer";
+    String shaderName = edgeFilter_ ? "EdgeFilter" : "CopyFramebuffer";
     graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
     
     float gBufferWidth = (float)graphics_->GetWidth();
     float gBufferHeight = (float)graphics_->GetHeight();
     
     {
-        float widthRange = 0.5f * (screenRect_.right_ - screenRect_.left_) / gBufferWidth;
-        float heightRange = 0.5f * (screenRect_.bottom_ - screenRect_.top_) / gBufferHeight;
+        float widthRange = 0.5f * width_ / gBufferWidth;
+        float heightRange = 0.5f * height_ / gBufferHeight;
         
         #ifdef USE_OPENGL
         Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
@@ -1215,7 +1216,7 @@ void View::BlitFramebuffer()
         graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
     }
     
-    if (renderer_->GetEdgeFilter())
+    if (edgeFilter_)
     {
         const EdgeFilterParameters& parameters = renderer_->GetEdgeFilterParameters();
         graphics_->SetShaderParameter(PSP_EDGEFILTERPARAMS, Vector4(parameters.radius_, parameters.threshold_,
@@ -1527,7 +1528,7 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
     int maxCascades = renderer_->GetMaxShadowCascades();
     // Due to instruction count limits, light prepass in SM2.0 can only support up to 3 cascades
     #ifndef USE_OPENGL
-    if (renderer_->GetLightPrepass() && !graphics_->GetSM3Support())
+    if (lightPrepass_ && !graphics_->GetSM3Support())
         maxCascades = Max(maxCascades, 3);
     #endif
     
@@ -2066,11 +2067,10 @@ void View::PrepareInstancingBuffer()
     PROFILE(PrepareInstancingBuffer);
     
     unsigned totalInstances = 0;
-    bool prepass = renderer_->GetLightPrepass();
     
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
-    if (prepass)
+    if (lightPrepass_)
         totalInstances += gbufferQueue_.GetNumInstances(renderer_);
     
     for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -2090,7 +2090,7 @@ void View::PrepareInstancingBuffer()
         {
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             preAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
-            if (prepass)
+            if (lightPrepass_)
                 gbufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
             for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)

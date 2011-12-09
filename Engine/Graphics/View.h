@@ -207,20 +207,6 @@ private:
     RenderSurface* depthStencil_;
     /// Screen rectangle.
     IntRect screenRect_;
-    /// Render target width.
-    int width_;
-    /// Render target height.
-    int height_;
-    /// Draw shadows flag.
-    bool drawShadows_;
-    /// Material quality level.
-    int materialQuality_;
-    /// Maximum number of occluder triangles.
-    int maxOccluderTriangles_;
-    /// Highest zone priority currently visible.
-    int highestZonePriority_;
-    /// Start index of unculled drawables. These will not be tested for occlusion.
-    unsigned unculledDrawableStart_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
     /// Camera frustum.
@@ -275,8 +261,26 @@ private:
     List<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
+    /// Render target width.
+    int width_;
+    /// Render target height.
+    int height_;
+    /// Material quality level.
+    int materialQuality_;
+    /// Maximum number of occluder triangles.
+    int maxOccluderTriangles_;
+    /// Highest zone priority currently visible.
+    int highestZonePriority_;
+    /// Start index of unculled drawables. These will not be tested for occlusion.
+    unsigned unculledDrawableStart_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
+    /// Light prepass flag.
+    bool lightPrepass_;
+    /// Edge filter flag.
+    bool edgeFilter_;
     /// Camera zone's override flag.
     bool cameraZoneOverride_;
+    /// Draw shadows flag.
+    bool drawShadows_;
 };
