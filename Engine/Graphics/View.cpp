@@ -314,14 +314,6 @@ void View::Render()
     else
         RenderBatchesForward();
     
-    // Blit if necessary (OpenGL light pre-pass, or edge filter)
-    #ifdef USE_OPENGL
-    if (lightPrepass_ || edgeFilter_)
-    #else
-    if (edgeFilter_)
-    #endif
-        BlitFramebuffer();
-    
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetStreamFrequencies();
@@ -340,6 +332,14 @@ void View::Render()
             }
         }
     }
+    
+    // Blit if necessary (OpenGL light pre-pass, or edge filter)
+    #ifdef USE_OPENGL
+    if (lightPrepass_ || edgeFilter_)
+    #else
+    if (edgeFilter_)
+    #endif
+        BlitFramebuffer();
     
     // "Forget" the camera, octree and zone after rendering
     camera_ = 0;
@@ -1184,7 +1184,7 @@ void View::RenderBatchesLightPrepass()
 void View::BlitFramebuffer()
 {
     // Blit the final image to destination render target
-    /// \todo Depth is reset to far plane, so geometry drawn after the view (for example debug geometry) can not be depth tested
+    /// \todo Depth is reset to far plane, so geometry drawn after the view can not be depth tested
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
