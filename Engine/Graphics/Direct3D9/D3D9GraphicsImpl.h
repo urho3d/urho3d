@@ -59,7 +59,7 @@ private:
     IDirect3DDevice9* device_;
     /// Default color surface.
     IDirect3DSurface9* defaultColorSurface_;
-    /// Default depth stencil surface.
+    /// Default depth-stencil surface.
     IDirect3DSurface9* defaultDepthStencilSurface_;
     /// Frame query for flushing the GPU command queue.
     IDirect3DQuery9* frameQueries_[NUM_QUERIES];
@@ -91,7 +91,7 @@ private:
     Color borderColors_[MAX_TEXTURE_UNITS];
     /// Color surfaces in use.
     IDirect3DSurface9* colorSurfaces_[MAX_RENDERTARGETS];
-    /// Depth stencil buffer in use.
+    /// Depth-stencil surface in use.
     IDirect3DSurface9* depthStencilSurface_;
     /// Blending enabled flag.
     DWORD blendEnable_;

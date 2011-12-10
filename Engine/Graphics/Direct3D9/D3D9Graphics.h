@@ -80,7 +80,7 @@ public:
     bool BeginFrame();
     /// End frame rendering and swap buffers.
     void EndFrame();
-    /// Clear any or all of render target, depth buffer and stencil buffer.
+    /// Clear any or all of rendertarget, depth buffer and stencil buffer.
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
@@ -132,21 +132,21 @@ public:
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
     /// %Set texture anisotropy.
     void SetTextureAnisotropy(unsigned level);
-    /// Reset all render targets and depth stencil buffer (render to back buffer.)
+    /// Reset all rendertargets and depth-stencil surface (render to back buffer.)
     void ResetRenderTargets();
-    /// Reset specific render target.
+    /// Reset specific rendertarget.
     void ResetRenderTarget(unsigned index);
-    /// Reset depth stencil buffer.
+    /// Reset depth-stencil surface.
     void ResetDepthStencil();
-    /// %Set render target.
+    /// %Set rendertarget.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
-    /// %Set render target.
+    /// %Set rendertarget.
     void SetRenderTarget(unsigned index, Texture2D* texture);
-    /// %Set depth stencil buffer.
+    /// %Set depth-stencil surface.
     void SetDepthStencil(RenderSurface* depthStencil);
-    /// %Set depth stencil buffer.
+    /// %Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// %Set view texture (light pre-pass final output render target) to prevent it from being sampled.
+    /// %Set view texture (light pre-pass final output rendertarget) to prevent it from being sampled.
     void SetViewTexture(Texture* texture);
     /// %Set viewport.
     void SetViewport(const IntRect& rect);
@@ -215,7 +215,7 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether texture render targets are supported. Always true on Direct3D9
+    /// Return whether texture rendertargets are supported. Always true on Direct3D9
     bool GetRenderTargetSupport() const { return true; }
     /// Return whether fallback shaders are required.
     bool GetFallback() const { return fallback_; }
@@ -251,11 +251,11 @@ public:
     Texture* GetTexture(unsigned index) const;
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
-    /// Return current render target by index.
+    /// Return current rendertarget by index.
     RenderSurface* GetRenderTarget(unsigned index) const;
-    /// Return current depth stencil buffer.
+    /// Return current depth-stencil surface.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return backbuffer depth stencil texture, created if available.
+    /// Return backbuffer depth-stencil texture, created if available.
     Texture2D* GetDepthTexture() const;
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
@@ -303,7 +303,7 @@ public:
     unsigned GetStencilMask() const { return stencilMask_; }
     /// Return stream frequency by vertex buffer index.
     unsigned GetStreamFrequency(unsigned index) const;
-    /// Return render target width and height.
+    /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
     /// Return force Shader Model 2 flag.
     bool GetForceSM2() const { return forceSM2_; }
@@ -327,7 +327,7 @@ public:
     static unsigned GetRGBAFormat();
     /// Return the API-specific linear depth texture format.
     static unsigned GetLinearDepthFormat();
-    /// Return the API-specific readable hardware depth stencil texture format.
+    /// Return the API-specific readable hardware depth-stencil texture format.
     static unsigned GetDepthStencilFormat();
     
 private:
@@ -378,7 +378,7 @@ private:
     bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
-    /// System depth stencil flag.
+    /// System depth-stencil flag.
     bool systemDepthStencil_;
     /// Light pre-pass rendering support flag.
     bool lightPrepassSupport_;
@@ -442,11 +442,11 @@ private:
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
-    /// Render targets in use.
+    /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
-    /// Depth stencil buffer in use.
+    /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
-    /// Backbuffer depth stencil texture.
+    /// Backbuffer depth-stencil texture.
     SharedPtr<Texture2D> depthTexture_;
     /// View texture.
     Texture* viewTexture_;

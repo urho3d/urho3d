@@ -473,7 +473,7 @@ bool Texture2D::Create()
         return false;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-    // If creating a depth stencil texture, and it is not supported, create a depth stencil surface instead
+    // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
     if (usage_ & D3DUSAGE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE))
     {
         if (!device || FAILED(device->CreateDepthStencilSurface(
@@ -486,7 +486,7 @@ bool Texture2D::Create()
             (IDirect3DSurface9**)&renderSurface_->surface_,
             0)))
         {
-            LOGERROR("Could not create depth stencil surface");
+            LOGERROR("Could not create depth-stencil surface");
             return false;
         }
         

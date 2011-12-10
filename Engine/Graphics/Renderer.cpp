@@ -360,8 +360,8 @@ void Renderer::SetLightPrepass(bool enable)
             
             if (!depthBuffer_)
             {
-                // If reading the hardware depth buffer is supported, create a depth stencil texture. Otherwise create an
-                // ordinary render target for writing linear depth manually
+                // If reading the hardware depth buffer is supported, create a depth-stencil texture. Otherwise create an
+                // ordinary rendertarget for writing linear depth manually
                 if (graphics_->GetHardwareDepthSupport())
                 {
                     #ifdef USE_OPENGL
@@ -780,7 +780,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
 
 bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
 {
-    // If using a render target texture, make sure it will not be rendered to multiple times
+    // If using a rendertarget texture, make sure it will not be rendered to multiple times
     if (renderTarget)
     {
         for (unsigned i = 0; i < numViews_; ++i)
@@ -902,7 +902,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     int retries = 3;
     
     #ifdef USE_OPENGL
-    // Create shadow map only. Color render target is not needed
+    // Create shadow map only. Color rendertarget is not needed
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
@@ -919,7 +919,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
     }
     #else
-    // Create shadow map and dummy color render target
+    // Create shadow map and dummy color rendertarget
     bool fallback = graphics_->GetFallback();
     while (retries)
     {
@@ -934,18 +934,18 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             if (!fallback)
             {
-                // If no dummy color render target for this size exists yet, create one now
+                // If no dummy color rendertarget for this size exists yet, create one now
                 if (!colorShadowMaps_.Contains(searchKey))
                 {
                     colorShadowMaps_[searchKey] = new Texture2D(context_);
                     colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
                 }
-                // Link the color render target to the shadow map
+                // Link the color rendertarget to the shadow map
                 newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
             }
             else
             {
-                // In fallback mode link the shared shadow map depth stencil to the shadow map instead.
+                // In fallback mode link the shared shadow map depth-stencil to the shadow map instead.
                 // Create it first if not created yet, and resize larger if necessary
                 if (!shadowDepthStencil_)
                     shadowDepthStencil_ = new Texture2D(context_);
@@ -1404,7 +1404,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         pixelShaderName += hwVariations[hwDepth];
     }
     
-    // Check for fallback shadow rendering mode (write depth into an RGBA render target)
+    // Check for fallback shadow rendering mode (write depth into an RGBA rendertarget)
     if (type == PASS_SHADOW)
     {
         vertexShaderName += fallbackVariations[fallback];

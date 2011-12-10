@@ -385,7 +385,7 @@ bool Texture2D::Create()
     if (!width_ || !height_)
         return false;
     
-    // For packed depth stencil, create a renderbuffer instead of a texture if depth texture is not properly supported
+    // For packed depth-stencil, create a renderbuffer instead of a texture if depth texture is not properly supported
     if (!graphics_->GetHardwareDepthSupport() && format_ == Graphics::GetDepthStencilFormat())
     {
         if (renderSurface_)

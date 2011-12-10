@@ -113,7 +113,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     }
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
-        LOGERROR("Depth stencil usage not supported for cube maps");
+        LOGERROR("Depth-stencil usage not supported for cube maps");
         return false;
     }
     

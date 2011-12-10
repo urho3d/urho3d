@@ -90,7 +90,7 @@ public:
     /// Destruct.
     virtual ~View();
     
-    /// Define with render target and viewport. Return true if successful.
+    /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, const Viewport& viewport);
     /// Update and cull objects and construct rendering batches.
     void Update(const FrameInfo& frame);
@@ -101,9 +101,9 @@ public:
     Octree* GetOctree() const { return octree_; }
     /// Return camera.
     Camera* GetCamera() const { return camera_; }
-    /// Return the render target. 0 if using the backbuffer.
+    /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
-    /// Return the depth stencil. 0 if using the backbuffer's depth stencil.
+    /// Return the depth-stencil. 0 if using the backbuffer's depth-stencil.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
@@ -261,9 +261,9 @@ private:
     List<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Render target width.
+    /// Rendertarget width.
     int width_;
-    /// Render target height.
+    /// Rendertarget height.
     int height_;
     /// Material quality level.
     int materialQuality_;

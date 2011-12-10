@@ -283,7 +283,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
     
-    // Reset render targets and viewport for the new screen mode
+    // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
     
     // Clear the window to black now, because GPU object restore may take time
@@ -364,7 +364,7 @@ bool Graphics::BeginFrame()
     if (fullscreen_ && (!glfwGetWindowParam(impl_->window_, GLFW_ACTIVE) || glfwGetWindowParam(impl_->window_, GLFW_ICONIFIED)))
         return false;
     
-    // Set default render target and depth buffer
+    // Set default rendertarget and depth buffer
     ResetRenderTargets();
     
     // Cleanup textures from previous frame
@@ -1028,7 +1028,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     if (index >= MAX_TEXTURE_UNITS)
         return;
     
-    // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
+    // Check if texture is currently bound as a rendertarget. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
         if (texture == viewTexture_ || (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture))
@@ -1150,7 +1150,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     {
         renderTargets_[index] = renderTarget;
         
-        // If the render target is also bound as a texture, replace with backup texture or null
+        // If the rendertarget is also bound as a texture, replace with backup texture or null
         if (renderTarget)
         {
             Texture* parentTexture = renderTarget->GetParentTexture();
@@ -1190,7 +1190,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         // otherwise it is an OpenGL error (incomplete framebuffer)
         SetDrawBuffers();
         
-        // If all render targets and the depth buffer are not textures, revert to backbuffer rendering
+        // If all rendertargets and the depth buffer are not textures, revert to backbuffer rendering
         bool noFBO = (depthStencil_ == 0);
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
@@ -1207,6 +1207,16 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             impl_->fboBound_ = false;
         }
     }
+    
+    // Emulate Direct3D behaviour and reset the viewport when the first rendertarget is set
+    if (!index)
+    {
+        IntVector2 viewSize = GetRenderTargetDimensions();
+        SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
+        
+        // Disable scissor test, needs to be re-enabled by the user
+        SetScissorTest(false);
+    }
 }
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
@@ -1220,14 +1230,14 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
 
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
-    // If we are using a render target texture, it is required in OpenGL to also have an own depth stencil
-    // Create a new depth stencil texture as necessary to be able to provide similar behaviour as Direct3D9
+    // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth-stencil
+    // Create a new depth-stencil texture as necessary to be able to provide similar behaviour as Direct3D9
     if (renderTargets_[0] && !depthStencil)
     {
         int width = renderTargets_[0]->GetWidth();
         int height = renderTargets_[0]->GetHeight();
         
-        // Direct3D9 default depth stencil can not be used when render target is larger than the window.
+        // Direct3D9 default depth-stencil can not be used when rendertarget is larger than the window.
         // Check size similarly
         if (width <= width_ && height <= height_)
         {
@@ -1302,7 +1312,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         // otherwise it is an OpenGL error (incomplete framebuffer)
         SetDrawBuffers();
         
-        // If all render targets and the depth buffer are not textures, revert to backbuffer rendering
+        // If all rendertargets and the depth buffer are not textures, revert to backbuffer rendering
         bool noFBO = (depthStencil_ == 0);
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
@@ -1319,10 +1329,6 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             impl_->fboBound_ = false;
         }
     }
-    
-    // Reset viewport and scissor test
-    IntVector2 viewSize = GetRenderTargetDimensions();
-    SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
 }
 
 void Graphics::SetDepthStencil(Texture2D* texture)
@@ -1447,7 +1453,7 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         if (constantBias != 0.0f || slopeScaledBias != 0.0f)
         {
             // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
-            // Zero depth bits may be returned if using the packed depth stencil format. Assume 24bit in that case
+            // Zero depth bits may be returned if using the packed depth-stencil format. Assume 24bit in that case
             int depthBits = Min(impl_->depthBits_, 23);
             if (!depthBits)
                 depthBits = 23;
@@ -1864,7 +1870,7 @@ void Graphics::CheckFeatureSupport()
     
     if (!hardwareDepthSupport_)
     {
-        // If hardware depth is not supported, must support 2 render targets for light pre-pass
+        // If hardware depth is not supported, must support 2 rendertargets for light pre-pass
         int numSupportedRTs = 1;
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
         if (numSupportedRTs >= 2)
@@ -1874,7 +1880,7 @@ void Graphics::CheckFeatureSupport()
 
 void Graphics::SetDrawBuffers()
 {
-    // Calculate the bit combination of non-zero color render targets to first check if the combination changed
+    // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
     unsigned newDrawBuffers = 0;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
@@ -1885,7 +1891,7 @@ void Graphics::SetDrawBuffers()
     if (newDrawBuffers == impl_->drawBuffers_)
         return;
     
-    // Check for no color render targets (depth rendering only)
+    // Check for no color rendertargets (depth rendering only)
     if (!newDrawBuffers)
         glDrawBuffer(GL_NONE);
     else

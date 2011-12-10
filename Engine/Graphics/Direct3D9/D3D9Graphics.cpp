@@ -552,7 +552,7 @@ bool Graphics::BeginFrame()
     
     impl_->device_->BeginScene();
     
-    // Set default render target and depth buffer
+    // Set default rendertarget and depth buffer
     ResetRenderTargets();
     
     // Cleanup textures from previous frame
@@ -1206,7 +1206,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     if (index >= MAX_TEXTURE_UNITS)
         return;
     
-    // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
+    // Check if texture is currently bound as a rendertarget. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
         if (texture == viewTexture_ || (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture))
@@ -1326,7 +1326,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         impl_->colorSurfaces_[index] = newColorSurface;
     }
     
-    // If the render target is also bound as a texture, replace with backup texture or null
+    // If the rendertarget is also bound as a texture, replace with backup texture or null
     if (renderTarget)
     {
         Texture* parentTexture = renderTarget->GetParentTexture();
@@ -2099,7 +2099,7 @@ void Graphics::CheckFeatureSupport()
         
         if (!hardwareDepthSupport_)
         {
-            // If hardware depth is not supported, must support 2 render targets and R32F format for light pre-pass
+            // If hardware depth is not supported, must support 2 rendertargets and R32F format for light pre-pass
             if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
                 D3DRTYPE_TEXTURE))
                 lightPrepassSupport_ = true;

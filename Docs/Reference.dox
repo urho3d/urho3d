@@ -375,7 +375,7 @@ When setting the initial screen mode, Graphics does a few checks:
 - For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
 - For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, a fallback mode using a color texture and minimal shadow filtering will be chosen instead.
-- Is light pre-pass rendering supported? This requires either readable hardware depth stencil texture, or multiple render target and R32F texture format support.
+- Is light pre-pass rendering supported? This requires either readable hardware depth-stencil texture, or multiple rendertarget and R32F texture format support.
 
 \section Rendering_Renderer Renderer
 
@@ -444,9 +444,15 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 Urho3D implements both forward and light pre-pass rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
 
-Forward rendering first renders the ambient light pass for an object; this also adds any per-vertex lights. Then, the object is re-rendered for each per-pixel light affecting it (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
+\section ForwardPrepass_Forward Forward rendering
 
-%Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth stencil texture format is available, the second color render target will be omitted:
+Forward rendering begins with an ambient light pass for the objects; this also adds any per-vertex lights. Then, the objects are re-rendered for each per-pixel light affecting them (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
+
+Materials can also define an optimization pass for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
+
+\section ForwardPrepass_Prepass Light pre-pass rendering
+
+%Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth-stencil texture format is available, the second color rendertarget will be omitted:
 
 - RT0: World-space normal and specular power (D3DFMT_A8R8G8B8)
 - RT1: Linear depth (D3DFMT_R32F)
@@ -460,11 +466,11 @@ Finally the opaque objects are re-rendered during the material pass, which combi
 
 Whether using forward or light pre-pass rendering is more advantageous depends on the scene and lighting complexity. 
 
-If the scene contains a large number of complex objects lit by multiple lights, forward rendering quickly increases the total draw call and vertex count due to re-rendering objects for each light. However, light pre-pass rendering has a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in light pre-pass all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
+If the scene contains a large number of complex objects lit by multiple lights, forward rendering quickly increases the total draw call and vertex count due to re-rendering the objects for each light. However, light pre-pass rendering has a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in light pre-pass all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
 
 Forward rendering also enables hardware multisampling and using different shading models in different materials if needed, while neither is possible in light pre-pass rendering.
 
-Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple render targets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
+Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
@@ -473,9 +479,9 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 - On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
 
-- On Direct3D9 the depth stencil surface can be equal or larger in size than the color render target. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the system depth stencil buffer when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth stencil buffers on demand whenever a texture is set as a color render target, and a null depth stencil is specified.
+- On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 setting the first color render target resets the viewport dimensions. On OpenGL there is no such mechanism, but as sometimes (for example in shadow rendering) only a depth stencil buffer is set for rendering, Graphics will instead reset the viewport when the depth stencil buffer is set. To ensure correct operation on both APIs, first set the render targets, then the depth stencil buffer, and finally the viewport, if you need it to be less than the whole render target.
+- On Direct3D9 setting the first color rendertarget resets the viewport dimensions. On OpenGL there is no such mechanism, but it is emulated by Graphics. However, as sometimes (for example in OpenGL shadow rendering) only a depth-stencil texture will be used for rendering, it is best to set the viewport manually, in the following sequence: first set the rendertargets, then the depth-stencil surface, and finally the viewport, if you need it to be less than the whole rendertarget.
 
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
@@ -676,9 +682,9 @@ Zones also define a lightmask and a shadowmask (with all bits set by default.) A
 
 Auxiliary views are viewports defined into a RenderSurface. These will be rendered whenever the texture containing the surface is visible, and can be typically used to implement for example reflections. The texture in question must have been created in rendertarget mode, see Texture's \ref Texture2D::SetSize "SetSize()" function.
 
-The viewport is not assigned directly to the texture because of cube map support: a cubic rendertarget has 6 render surfaces, and done this way, a different camera could be assigned to each.
+The viewport is not assigned directly to the texture because of cube map support: a renderable cube map has 6 render surfaces, and done this way, a different camera could be assigned to each.
 
-A "backup texture" can be assigned to the rendertarget texture: because it is illegal to sample a texture that is also being simultaneously rendered to (in cases where the rendertarget texture becomes "recursively" visible in the auxiliary view), the backup texture can be used to specify which texture should be used in place instead.
+A "backup texture" can be assigned to the rendertarget texture: because it is illegal to sample a texture that is also being simultaneously rendered to (in cases where the texture becomes "recursively" visible in the auxiliary view), the backup texture can be used to specify which texture should be used in place instead.
 
 Rendering detailed auxiliary views can easily have a large performance impact. Some things you can do for optimization with the auxiliary view camera:
 

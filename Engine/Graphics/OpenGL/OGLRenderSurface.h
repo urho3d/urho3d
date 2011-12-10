@@ -49,7 +49,7 @@ struct Viewport
     IntRect rect_;
 };
 
-/// %Color or depth stencil surface that can be rendered into.
+/// %Color or depth-stencil surface that can be rendered into.
 class RenderSurface : public RefCounted
 {
     friend class Texture2D;

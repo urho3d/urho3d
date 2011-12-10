@@ -185,7 +185,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     {
         if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
         {
-            // Display message only once per render target, do not spam each frame
+            // Display message only once per rendertarget, do not spam each frame
             if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
             {
                 gBufferErrorDisplayed_.Insert(renderTarget);
@@ -204,7 +204,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     else
         depthStencil_ = renderTarget->GetLinkedDepthBuffer();
     
-    // Validate the rect and calculate size. If zero rect, use whole render target size
+    // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
     int rtHeight = renderTarget ? renderTarget->GetHeight() : graphics_->GetHeight();
     if (viewport.rect_ != IntRect::ZERO)
@@ -726,8 +726,8 @@ void View::GetBatches()
                 if (!baseBatch.geometry_ || !tech)
                     continue;
                 
-                // Check here if the material technique refers to a render target texture with camera(s) attached
-                // Only check this for the main view (null render target)
+                // Check here if the material technique refers to a rendertarget texture with camera(s) attached
+                // Only check this for the main view (null rendertarget)
                 if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
                     CheckMaterialForAuxView(baseBatch.material_);
                 
@@ -1149,7 +1149,7 @@ void View::RenderBatchesLightPrepass()
     graphics_->SetTexture(TU_DEPTHBUFFER, 0);
     graphics_->SetTexture(TU_NORMALBUFFER, 0);
 
-    // Clear destination render target with fog color
+    // Clear destination rendertarget with fog color
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget);
@@ -1196,7 +1196,7 @@ void View::RenderBatchesLightPrepass()
 
 void View::BlitFramebuffer()
 {
-    // Blit the final image to destination render target
+    // Blit the final image to destination rendertarget
     /// \todo Depth is reset to far plane, so geometry drawn after the view can not be depth tested
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);

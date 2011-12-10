@@ -98,7 +98,7 @@ public:
     bool BeginFrame();
     /// End frame rendering and swap buffers.
     void EndFrame();
-    /// Clear any or all of render target, depth buffer and stencil buffer.
+    /// Clear any or all of rendertarget, depth buffer and stencil buffer.
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
@@ -154,21 +154,21 @@ public:
     void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
-    /// Reset all render targets and depth stencil buffer (render to back buffer.)
+    /// Reset all rendertargets and depth-stencil surface (render to back buffer.)
     void ResetRenderTargets();
-    /// Reset specific render target.
+    /// Reset specific rendertarget.
     void ResetRenderTarget(unsigned index);
-    /// Reset depth stencil buffer.
+    /// Reset depth-stencil surface.
     void ResetDepthStencil();
-    /// Set render target.
+    /// Set rendertarget.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
-    /// Set render target.
+    /// Set rendertarget.
     void SetRenderTarget(unsigned index, Texture2D* texture);
-    /// Set depth stencil buffer.
+    /// Set depth-stencil surface.
     void SetDepthStencil(RenderSurface* depthStencil);
-    /// Set depth stencil buffer.
+    /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// %Set view texture (light pre-pass final output render target) to prevent it from being sampled.
+    /// %Set view texture (light pre-pass final output rendertarget) to prevent it from being sampled.
     void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
@@ -273,11 +273,11 @@ public:
     Texture* GetTexture(unsigned index) const;
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
-    /// Return render target by index.
+    /// Return rendertarget by index.
     RenderSurface* GetRenderTarget(unsigned index) const;
-    /// Return depth stencil buffer.
+    /// Return depth-stencil surface.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return readable depth stencil texture. Not created automatically on OpenGL.
+    /// Return readable depth-stencil texture. Not created automatically on OpenGL.
     Texture2D* GetDepthTexture() const { return 0; }
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
@@ -325,7 +325,7 @@ public:
     unsigned GetStencilMask() const { return stencilMask_; }
     /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
-    /// Return render target width and height.
+    /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
     /// Return force Shader Model 2 flag. Always false on OpenGL.
     bool GetForceSM2() const { return false; }
@@ -353,7 +353,7 @@ public:
     static unsigned GetRGBAFormat();
     /// Return the API-specific linear depth texture format.
     static unsigned GetLinearDepthFormat();
-    /// Return the API-specific readable hardware depth stencil texture format.
+    /// Return the API-specific readable hardware depth-stencil texture format.
     static unsigned GetDepthStencilFormat();
     
 private:
@@ -426,9 +426,9 @@ private:
     unsigned textureTypes_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
     Map<String, TextureUnit> textureUnits_;
-    /// Render targets in use.
+    /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
-    /// Depth stencil buffer in use.
+    /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
     /// View texture.
     Texture* viewTexture_;
