@@ -1207,16 +1207,6 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             impl_->fboBound_ = false;
         }
     }
-    
-    // Emulate Direct3D behaviour and reset the viewport when the first rendertarget is set
-    if (!index)
-    {
-        IntVector2 viewSize = GetRenderTargetDimensions();
-        SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
-        
-        // Disable scissor test, needs to be re-enabled by the user
-        SetScissorTest(false);
-    }
 }
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
@@ -1329,6 +1319,10 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             impl_->fboBound_ = false;
         }
     }
+    
+    // Reset viewport to default when the depth-stencil changes
+    IntVector2 viewSize = GetRenderTargetDimensions();
+    SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
 }
 
 void Graphics::SetDepthStencil(Texture2D* texture)
