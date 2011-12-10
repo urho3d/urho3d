@@ -1389,7 +1389,7 @@ Properties:<br>
 - TextureUsage usage (readonly)
 - Viewport& viewport
 - RenderSurface@ linkedRenderTarget
-- RenderSurface@ linkedDepthBuffer
+- RenderSurface@ linkedDepthStencil
 
 
 Texture2D

@@ -239,8 +239,8 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "const Viewport& get_viewport() const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHOD(RenderSurface, GetLinkedRenderTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthBuffer(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthBuffer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthBuffer() const", asMETHOD(RenderSurface, GetLinkedDepthBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHOD(RenderSurface, GetLinkedDepthStencil), asCALL_THISCALL);
     
     RegisterTexture<Texture2D>(engine, "Texture2D");
     engine->RegisterObjectMethod("Texture2D", "void SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);

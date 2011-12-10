@@ -63,10 +63,10 @@ public:
     
     /// %Set viewport for auxiliary view rendering.
     void SetViewport(const Viewport& viewport);
-    /// %Set linked color buffer.
+    /// %Set linked color rendertarget.
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// %Set linked depth buffer.
-    void SetLinkedDepthBuffer(RenderSurface* depthBuffer);
+    /// %Set linked depth-stencil surface.
+    void SetLinkedDepthStencil(RenderSurface* depthStencil);
     /// Release surface.
     void Release();
     
@@ -82,10 +82,10 @@ public:
     TextureUsage GetUsage() const;
     /// Return auxiliary view rendering viewport.
     const Viewport& GetViewport() const { return viewport_; }
-    /// Return linked color buffer.
+    /// Return linked color rendertarget.
     RenderSurface* GetLinkedRenderTarget() const { return linkedRenderTarget_; }
-    /// Return linked depth buffer.
-    RenderSurface* GetLinkedDepthBuffer() const { return linkedDepthBuffer_; }
+    /// Return linked depth-stencil surface.
+    RenderSurface* GetLinkedDepthStencil() const { return linkedDepthStencil_; }
     
 private:
     /// Parent texture.
@@ -97,5 +97,5 @@ private:
     /// Linked color buffer.
     WeakPtr<RenderSurface> linkedRenderTarget_;
     /// Linked depth buffer.
-    WeakPtr<RenderSurface> linkedDepthBuffer_;
+    WeakPtr<RenderSurface> linkedDepthStencil_;
 };

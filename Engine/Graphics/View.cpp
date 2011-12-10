@@ -202,7 +202,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     if (!renderTarget)
         depthStencil_ = 0;
     else
-        depthStencil_ = renderTarget->GetLinkedDepthBuffer();
+        depthStencil_ = renderTarget->GetLinkedDepthStencil();
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
@@ -2289,7 +2289,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     {
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface());
-        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthBuffer());
+        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthStencil());
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, Color::WHITE);
     }
     

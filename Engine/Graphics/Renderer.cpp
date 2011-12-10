@@ -951,7 +951,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
                     shadowDepthStencil_ = new Texture2D(context_);
                 if (shadowDepthStencil_->GetWidth() < width || shadowDepthStencil_->GetHeight() < height)
                     shadowDepthStencil_->SetSize(width, height, D3DFMT_D16, TEXTURE_DEPTHSTENCIL);
-                newShadowMap->GetRenderSurface()->SetLinkedDepthBuffer(shadowDepthStencil_->GetRenderSurface());
+                newShadowMap->GetRenderSurface()->SetLinkedDepthStencil(shadowDepthStencil_->GetRenderSurface());
             }
             break;
         }

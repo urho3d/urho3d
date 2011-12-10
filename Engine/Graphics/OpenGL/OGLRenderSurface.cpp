@@ -70,16 +70,14 @@ void RenderSurface::SetViewport(const Viewport& viewport)
 
 void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
 {
-    if (renderTarget == this)
-        return;
-    linkedRenderTarget_ = renderTarget;
+    if (renderTarget != this)
+        linkedRenderTarget_ = renderTarget;
 }
 
-void RenderSurface::SetLinkedDepthBuffer(RenderSurface* depthBuffer)
+void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
 {
-    if (depthBuffer == this)
-        return;
-    linkedDepthBuffer_ = depthBuffer;
+    if (depthStencil != this)
+        linkedDepthStencil_ = depthStencil;
 }
 
 bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
