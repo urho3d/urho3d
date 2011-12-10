@@ -1203,6 +1203,20 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch)
     batch.pixelShader_ = lightPS_[psi];
 }
 
+void Renderer::SetCullMode(CullMode mode, Camera* camera)
+{
+    // If a camera is specified, check for vertical flipping and reverse culling in that case
+    if (camera && camera->GetFlipVertical())
+    {
+        if (mode == CULL_CW)
+            mode = CULL_CCW;
+        else if (mode == CULL_CCW)
+            mode = CULL_CW;
+    }
+    
+    graphics_->SetCullMode(mode);
+}
+
 bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
 {
     if (!instancingBuffer_ || !dynamicInstancing_)

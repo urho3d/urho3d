@@ -308,11 +308,29 @@ void View::Render()
     graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
     graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     
+    // Set "view texture" to prevent destination texture sampling in case we do not render to the destination directly
+    // ie. when using light pre-pass and/or doing edge filtering
+    if (renderTarget_)
+        graphics_->SetViewTexture(renderTarget_->GetParentTexture());
+    
+    // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
+    // as a render texture produced on Direct3D9
+    #ifdef USE_OPENGL
+    if (renderTarget_)
+        camera_->SetFlipVertical(true);
+    #endif
+    
     // Render
     if (lightPrepass_)
         RenderBatchesLightPrepass();
     else
         RenderBatchesForward();
+    
+    #ifdef USE_OPENGL
+    camera_->SetFlipVertical(false);
+    #endif
+    
+    graphics_->SetViewTexture(0);
     
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -1045,9 +1063,6 @@ void View::RenderBatchesForward()
 
 void View::RenderBatchesLightPrepass()
 {
-    if (renderTarget_)
-        graphics_->SetViewTexture(renderTarget_->GetParentTexture());
-    
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
     {
@@ -1177,8 +1192,6 @@ void View::RenderBatchesLightPrepass()
         
         RenderBatchQueue(postAlphaQueue_);
     }
-    
-    graphics_->SetViewTexture(0);
 }
 
 void View::BlitFramebuffer()
@@ -1207,7 +1220,7 @@ void View::BlitFramebuffer()
         
         #ifdef USE_OPENGL
         Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
-            ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+            1.0f - (((float)screenRect_.top_) / gBufferHeight + heightRange), widthRange, heightRange);
         #else
         Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
             (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
@@ -1598,15 +1611,15 @@ void View::OptimizeLightByStencil(Light* light)
         }
         
         // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
-        // to avoid clipping the front faces.
+        // to avoid clipping.
         if (lightDist < camera_->GetNearClip() * 2.0f)
         {
-            graphics_->SetCullMode(CULL_CW);
+            renderer_->SetCullMode(CULL_CW, camera_);
             graphics_->SetDepthTest(CMP_GREATER);
         }
         else
         {
-            graphics_->SetCullMode(CULL_CCW);
+            renderer_->SetCullMode(CULL_CCW, camera_);
             graphics_->SetDepthTest(CMP_LESSEQUAL);
         }
         
@@ -2125,12 +2138,12 @@ void View::SetupLightVolumeBatch(Batch& batch)
         // Draw front faces if not inside light volume
         if (lightDist < camera_->GetNearClip() * 2.0f)
         {
-            graphics_->SetCullMode(CULL_CW);
+            renderer_->SetCullMode(CULL_CW, camera_);
             graphics_->SetDepthTest(CMP_GREATER);
         }
         else
         {
-            graphics_->SetCullMode(CULL_CCW);
+            renderer_->SetCullMode(CULL_CCW, camera_);
             graphics_->SetDepthTest(CMP_LESSEQUAL);
         }
     }

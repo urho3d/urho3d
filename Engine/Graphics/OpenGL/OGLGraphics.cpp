@@ -1363,12 +1363,9 @@ void Graphics::SetViewport(const IntRect& rect)
     rectCopy.right_ = Clamp(rectCopy.right_, 0, rtSize.x_);
     rectCopy.bottom_ = Clamp(rectCopy.bottom_, 0, rtSize.y_);
     
-    if (rectCopy != viewport_)
-    {
-        // Use Direct3D convention with the vertical coordinates ie. 0 is top
-        glViewport(rectCopy.left_, rtSize.y_ - rectCopy.bottom_, rectCopy.right_ - rectCopy.left_, rectCopy.bottom_ - rectCopy.top_);
-        viewport_ = rectCopy;
-    }
+    // Use Direct3D convention with the vertical coordinates ie. 0 is top
+    glViewport(rectCopy.left_, rtSize.y_ - rectCopy.bottom_, rectCopy.right_ - rectCopy.left_, rectCopy.bottom_ - rectCopy.top_);
+    viewport_ = rectCopy;
     
     // Disable scissor test, needs to be re-enabled by the user
     SetScissorTest(false);

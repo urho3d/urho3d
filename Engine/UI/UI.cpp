@@ -235,26 +235,26 @@ void UI::Render()
     
     if (!graphics_ || graphics_->IsDeviceLost() || !quads_.Size())
         return;
-
+    
     // Update quad geometry into the vertex buffer
     unsigned numVertices = quads_.Size() * 6;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-
+    
     unsigned vertexSize = vertexBuffer_->GetVertexSize();
     void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
     if (!lockedData)
         return;
-
+    
     for (unsigned i = 0; i < batches_.Size(); ++i)
         batches_[i].UpdateGeometry(graphics_, ((unsigned char*)lockedData) + batches_[i].quadStart_ * vertexSize * 6);
-
+    
     vertexBuffer_->Unlock();
-
+    
     Vector2 scale(2.0f, -2.0f);
     Vector2 offset(-1.0f, 1.0f);
-
+    
     Matrix4 projection(Matrix4::IDENTITY);
     projection.m00_ = scale.x_;
     projection.m03_ = offset.x_;
@@ -263,7 +263,7 @@ void UI::Render()
     projection.m22_ = 1.0f;
     projection.m23_ = 0.0f;
     projection.m33_ = 1.0f;
-
+    
     graphics_->ResetRenderTargets();
     graphics_->ResetDepthStencil();
     graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));

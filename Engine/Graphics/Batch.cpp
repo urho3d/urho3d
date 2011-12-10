@@ -175,7 +175,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             graphics->SetAlphaTest(false);
         
         graphics->SetBlendMode(pass_->GetBlendMode());
-        graphics->SetCullMode(pass_->GetType() != PASS_SHADOW ? material_->GetCullMode() : material_->GetShadowCullMode());
+        renderer->SetCullMode(pass_->GetType() != PASS_SHADOW ? material_->GetCullMode() : material_->GetShadowCullMode(),
+            camera_);
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite());
     }
@@ -229,7 +230,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         
         #ifdef USE_OPENGL
         Vector4 bufferUVOffset(((float)viewport.left_) / gBufferWidth + widthRange,
-            ((float)viewport.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+            1.0f - (((float)viewport.top_) / gBufferHeight + heightRange), widthRange, heightRange);
         #else
         Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / gBufferWidth + widthRange,
             (0.5f + (float)viewport.top_) / gBufferHeight + heightRange, widthRange, heightRange);

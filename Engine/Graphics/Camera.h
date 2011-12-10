@@ -72,6 +72,8 @@ public:
     void SetAutoAspectRatio(bool enable);
     /// %Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
+    /// %Set vertical flipping mode.
+    void SetFlipVertical(bool enable);
     
     /// Return far clip distance.
     float GetFarClip() const { return farClip_; }
@@ -119,6 +121,8 @@ public:
     Vector3 GetUpVector();
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
+    /// Return vertical flipping mode.
+    bool GetFlipVertical() const { return flipVertical_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos);
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.
@@ -132,6 +136,8 @@ public:
     Matrix3x4 GetInverseWorldTransform() const { return GetWorldTransform().Inverse(); }
     
 private:
+    /// Projection offset.
+    Vector2 projectionOffset_;
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.
@@ -154,6 +160,6 @@ private:
     bool orthographic_;
     /// Auto aspect ratio flag.
     bool autoAspectRatio_;
-    /// Projection offset.
-    Vector2 projectionOffset_;
+    /// Flip vertical flag.
+    bool flipVertical_;
 };

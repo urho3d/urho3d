@@ -345,6 +345,8 @@ public:
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
     void SetLightVolumeBatchShaders(Batch& batch);
+    /// Set cull mode while taking possible projection flipping into account.
+    void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
     /// Reset shadow map allocation counts.

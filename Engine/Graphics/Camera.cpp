@@ -37,6 +37,7 @@ OBJECTTYPESTATIC(Camera);
 
 Camera::Camera(Context* context) :
     Component(context),
+    projectionOffset_(Vector2::ZERO),
     nearClip_(DEFAULT_NEARCLIP),
     farClip_(DEFAULT_FARCLIP),
     fov_(DEFAULT_FOV),
@@ -44,11 +45,11 @@ Camera::Camera(Context* context) :
     aspectRatio_(1.0f),
     zoom_(1.0f),
     lodBias_(1.0f),
-    orthographic_(false),
-    autoAspectRatio_(true),
     viewMask_(DEFAULT_VIEWMASK),
     viewOverrideFlags_(VO_NONE),
-    projectionOffset_(Vector2::ZERO)
+    orthographic_(false),
+    autoAspectRatio_(true),
+    flipVertical_(false)
 {
 }
 
@@ -139,6 +140,11 @@ void Camera::SetAutoAspectRatio(bool enable)
 void Camera::SetProjectionOffset(const Vector2& offset)
 {
     projectionOffset_ = offset;
+}
+
+void Camera::SetFlipVertical(bool enable)
+{
+    flipVertical_ = enable;
 }
 
 float Camera::GetNearClip() const
@@ -287,6 +293,18 @@ Matrix4 Camera::GetProjection() const
         ret.m33_ = 1.0f;
     }
     
+    if (flipVertical_)
+    {
+        Matrix4 flip(
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, -1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        );
+        
+        ret = flip * ret;
+    }
+    
     return ret;
 }
 
@@ -308,6 +326,12 @@ void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
         float halfViewSize = orthoSize_ * 0.5f / zoom_;
         near.y_ = far.y_ = halfViewSize;
         near.x_ = far.x_ = near.y_ * aspectRatio_;
+    }
+    
+    if (flipVertical_)
+    {
+        near.y_ = -near.y_;
+        far.y_ = -far.y_;
     }
 }
 
