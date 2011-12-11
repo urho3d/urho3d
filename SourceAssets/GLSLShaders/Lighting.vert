@@ -1,3 +1,9 @@
+vec3 GetAmbient(float zonePos)
+{
+    return cAmbientStartColor + zonePos * cAmbientEndColor;
+}
+
+#ifdef NUMVERTEXLIGHTS
 float GetVertexLight(int index, vec3 worldPos, vec3 normal)
 {
     vec3 lightDir = cVertexLights[index * 3 + 1].xyz;
@@ -41,8 +47,4 @@ float GetVertexLight(int index, vec3 worldPos, vec3 normal)
         }
     #endif
 }
-
-vec3 GetAmbient(float zonePos)
-{
-    return cAmbientStartColor + zonePos * cAmbientEndColor;
-}
+#endif

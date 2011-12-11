@@ -29,6 +29,17 @@ float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularP
     return pow(dot(normal, halfVec), specularPower);
 }
 
+float3 GetAmbient(float zonePos)
+{
+    return cAmbientStartColor + zonePos * cAmbientEndColor;
+}
+
+float GetIntensity(float3 color)
+{
+    return dot(color, float3(0.333, 0.333, 0.333));
+}
+
+#ifdef NUMVERTEXLIGHTS
 float GetVertexLight(int index, float3 worldPos, float3 normal)
 {
     float3 lightDir = cVertexLights[index * 3 + 1].xyz;
@@ -73,16 +84,7 @@ float GetVertexLight(int index, float3 worldPos, float3 normal)
         }
     #endif
 }
-
-float3 GetAmbient(float zonePos)
-{
-    return cAmbientStartColor + zonePos * cAmbientEndColor;
-}
-
-float GetIntensity(float3 color)
-{
-    return dot(color, float3(0.333, 0.333, 0.333));
-}
+#endif
 
 #ifdef SHADOW
 float GetShadow(float4 shadowPos)

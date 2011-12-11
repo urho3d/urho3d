@@ -97,7 +97,7 @@ if (USE_OPENGL)
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
             COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
+            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
         )
         
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)
