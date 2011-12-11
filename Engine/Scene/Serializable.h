@@ -26,6 +26,8 @@
 #include "Attribute.h"
 #include "Object.h"
 
+#include <cstddef>
+
 class Deserializer;
 class Serializer;
 class XMLElement;
