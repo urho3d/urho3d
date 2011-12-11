@@ -27,11 +27,6 @@ void main()
         vec3 normal = normalize(vNormal);
     #endif
 
-    #ifdef SPECMAP
-        float specStrength = texture2D(sSpecMap, vTexCoord.xy).g * cMatSpecProperties.x;
-    #else
-        float specStrength = cMatSpecProperties.x;
-    #endif
     float specPower = cMatSpecProperties.y / 255.0;
 
     #ifdef HWDEPTH

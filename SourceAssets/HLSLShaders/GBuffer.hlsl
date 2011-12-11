@@ -72,11 +72,6 @@ void PS(
         float3 normal = normalize(iNormal);
     #endif
 
-    #ifdef SPECMAP
-        float specStrength = tex2D(sSpecMap, iTexCoord.xy).g * cMatSpecProperties.x;
-    #else
-        float specStrength = cMatSpecProperties.x;
-    #endif
     float specPower = cMatSpecProperties.y / 255.0;
 
     oNormal = float4(normal * 0.5 + 0.5, specPower);
