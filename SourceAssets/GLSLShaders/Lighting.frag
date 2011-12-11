@@ -27,6 +27,12 @@ float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
     return pow(max(dot(normal, halfVec), 0.0), specularPower);
 }
 
+float GetIntensity(vec3 color)
+{
+    return dot(color, vec3(0.333, 0.333, 0.333));
+}
+
+#ifdef SHADOW
 float GetShadow(vec4 shadowPos)
 {
     // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
@@ -99,8 +105,5 @@ mat4 GetDirShadowMatrix(float depth, const mat4 matrices[4])
     else
         return matrices[3];
 }
+#endif
 
-float GetIntensity(vec3 color)
-{
-    return dot(color, vec3(0.333, 0.333, 0.333));
-}

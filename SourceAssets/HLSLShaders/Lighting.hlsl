@@ -79,6 +79,12 @@ float3 GetAmbient(float zonePos)
     return cAmbientStartColor + zonePos * cAmbientEndColor;
 }
 
+float GetIntensity(float3 color)
+{
+    return dot(color, float3(0.333, 0.333, 0.333));
+}
+
+#ifdef SHADOW
 float GetShadow(float4 shadowPos)
 {
     // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
@@ -194,8 +200,4 @@ float4x4 GetDirShadowMatrix(float depth, const float4x4 matrices[4])
             return matrices[2];
     #endif
 }
-
-float GetIntensity(float3 color)
-{
-    return dot(color, float3(0.333, 0.333, 0.333));
-}
+#endif
