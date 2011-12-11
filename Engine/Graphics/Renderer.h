@@ -439,7 +439,7 @@ private:
     /// Views.
     Vector<SharedPtr<View> > views_;
     /// Octrees that have been updated during the frame.
-    HashSet<Octree*> updateOctrees_;
+    HashSet<Octree*> updatedOctrees_;
     /// Techniques for which missing shader error has been displayed.
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.

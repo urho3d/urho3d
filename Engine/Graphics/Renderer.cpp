@@ -649,20 +649,20 @@ void Renderer::Update(float timeStep)
     if (!graphics_ || !graphics_->IsInitialized() || graphics_->IsDeviceLost())
         return;
     
-    // Advance frame number & time, set up the frameinfo structure, and reset views & stats
+    // Set up the frameinfo structure for this frame
     frame_.frameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     frame_.timeStep_ = timeStep;
     frame_.camera_ = 0;
     numShadowCameras_ = 0;
     numOcclusionBuffers_ = 0;
-    updateOctrees_.Clear();
+    updatedOctrees_.Clear();
     
-    // Reload shaders if needed
+    // Reload shaders now if needed
     if (shadersDirty_)
         LoadShaders();
     
-    // Process all viewports. Use reverse order, because during rendering the order will be reversed again to handle auxiliary
-    // view dependencies correctly
+    // Process all viewports. Use reverse order, because during rendering the order will be reversed again
+    // to handle auxiliary view dependencies correctly
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
     {
         unsigned mainView = numViews_;
@@ -670,31 +670,29 @@ void Renderer::Update(float timeStep)
         if (!AddView(0, viewport))
             continue;
         
-        // Update octree (perform early update for nodes which need that, and reinsert moved nodes.)
+        // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
         Octree* octree = viewport.scene_->GetComponent<Octree>();
-        DebugRenderer* debug = viewport.scene_->GetComponent<DebugRenderer>();
-        if (!updateOctrees_.Contains(octree))
+        if (!updatedOctrees_.Contains(octree))
         {
             frame_.camera_ = viewport.camera_;
             frame_.viewSize_ = IntVector2(viewport.rect_.right_ - viewport.rect_.left_, viewport.rect_.bottom_ - viewport.rect_.top_);
             if (frame_.viewSize_ == IntVector2::ZERO)
                 frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
             octree->Update(frame_);
-            updateOctrees_.Insert(octree);
+            updatedOctrees_.Insert(octree);
             
             // Set also the view for the debug graphics already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
+            DebugRenderer* debug = viewport.scene_->GetComponent<DebugRenderer>();
             if (debug)
                 debug->SetView(viewport.camera_);
         }
         
-        // Update the viewport's main view and any auxiliary views it creates
+        // Update the viewport's main view and any auxiliary views it has created
         for (unsigned i = mainView; i < numViews_; ++i)
             views_[i]->Update(frame_);
     }
-    
-    return;
 }
 
 void Renderer::Render()
