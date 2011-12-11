@@ -22,9 +22,9 @@ void main()
 
     #ifdef NORMALMAP
         mat3 tbn = mat3(vTangent, vBitangent, vNormal);
-        vec3 normal = normalize(tbn * DecodeNormal(texture2D(sNormalMap, vTexCoord.xy)));
+        vec3 normal = tbn * DecodeNormal(texture2D(sNormalMap, vTexCoord.xy));
     #else
-        vec3 normal = normalize(vNormal);
+        vec3 normal = vNormal;
     #endif
 
     float specPower = cMatSpecColor.a / 255.0;

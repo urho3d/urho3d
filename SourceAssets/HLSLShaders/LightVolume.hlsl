@@ -75,14 +75,7 @@ void PS(
         float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
     #endif
 
-    // With specular, normalization greatly improves stability of reflections,
-    // considering input is only 8 bits per axis
-    #ifdef SPECULAR
-        float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
-    #else
-        float3 normal = normalInput.rgb * 2.0 - 1.0;
-    #endif
-
+    float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;
     float3 lightDir;

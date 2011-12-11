@@ -45,14 +45,7 @@ void main()
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);
     #endif
 
-    // With specular, normalization greatly improves stability of reflections,
-    // considering input is only 8 bits per axis
-    #ifdef SPECULAR
-        vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
-    #else
-        vec3 normal = normalInput.rgb * 2.0 - 1.0;
-    #endif
-
+    vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     vec4 projWorldPos = vec4(worldPos, 1.0);
     vec3 lightColor;
     vec3 lightDir;

@@ -67,9 +67,9 @@ void PS(
 
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
-        float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn));
+        float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn);
     #else
-        float3 normal = normalize(iNormal);
+        float3 normal = iNormal;
     #endif
 
     float specPower = cMatSpecColor.a / 255.0;
