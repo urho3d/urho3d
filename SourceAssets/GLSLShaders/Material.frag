@@ -24,15 +24,15 @@ void main()
     #endif
 
     #ifdef SPECMAP
-        float specIntensity = cMatSpecProperties.x * texture2D(sSpecMap, vTexCoord.xy).g;
+        vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord.xy).g;
     #else
-        float specIntensity = cMatSpecProperties.x;
+        vec3 specColor = cMatSpecColor.rgb;
     #endif
 
     // Lights are accumulated at half intensity. Bring back to full intensity now
     vec4 lightInput = 2.0 * texture2DProj(sLightBuffer, vScreenPos);
     vec3 lightSpecColor = lightInput.a * max(lightInput.rgb / GetIntensity(lightInput.rgb), vec3(0.0, 0.0, 0.0));
 
-    vec3 finalColor = (vVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specIntensity;
+    vec3 finalColor = (vVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specColor;
     gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), 1.0);
 }

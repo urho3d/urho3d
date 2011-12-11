@@ -91,7 +91,8 @@ Material::Material(Context* context) :
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
     SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
-    SetShaderParameter("MatSpecProperties", Vector4::ZERO);
+    SetShaderParameter("MatEnvMapColor", Vector4::ONE);
+    SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
     
     CheckSpecular();
 }
@@ -409,9 +410,9 @@ void Material::CheckOcclusion()
 
 void Material::CheckSpecular()
 {
-    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(PSP_MATSPECPROPERTIES);
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(PSP_MATSPECCOLOR);
     if (i != shaderParameters_.End())
-        specular_ = i->second_.value_.x_ > 0.0f;
+        specular_ = i->second_.value_.x_ > 0.0f || i->second_.value_.y_ > 0.0f || i->second_.value_.z_ > 0.0f;
     else
         specular_ = false;
 }

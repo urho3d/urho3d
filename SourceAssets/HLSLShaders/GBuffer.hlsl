@@ -72,7 +72,7 @@ void PS(
         float3 normal = normalize(iNormal);
     #endif
 
-    float specPower = cMatSpecProperties.y / 255.0;
+    float specPower = cMatSpecColor.a / 255.0;
 
     oNormal = float4(normal * 0.5 + 0.5, specPower);
     #ifndef HWDEPTH

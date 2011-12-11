@@ -27,7 +27,7 @@ void main()
         vec3 normal = normalize(vNormal);
     #endif
 
-    float specPower = cMatSpecProperties.y / 255.0;
+    float specPower = cMatSpecColor.a / 255.0;
 
     #ifdef HWDEPTH
         gl_FragColor = vec4(normal * 0.5 + 0.5, specPower);

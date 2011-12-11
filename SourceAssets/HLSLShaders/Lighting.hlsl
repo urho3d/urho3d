@@ -105,24 +105,24 @@ float GetShadow(float4 shadowPos)
                 tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
             );
             #ifdef HWSHADOW
-                return cShadowIntensity.z + dot(inLight, cShadowIntensity.y);
+                return cShadowIntensity.y + dot(inLight, cShadowIntensity.x);
             #else
                 #ifndef POINTLIGHT
-                    return cShadowIntensity.z + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.y);
+                    return cShadowIntensity.y + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.x);
                 #else
-                    return cShadowIntensity.z + dot(inLight > shadowPos.z, cShadowIntensity.y);
+                    return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
                 #endif
             #endif
         #else
             // Take one sample
             float inLight = tex2Dproj(sShadowMap, shadowPos).r;
             #ifdef HWSHADOW
-                return cShadowIntensity.z + cShadowIntensity.x * inLight;
+                return cShadowIntensity.y + cShadowIntensity.x * inLight;
             #else
                 #ifndef POINTLIGHT
-                    return cShadowIntensity.z + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
+                    return cShadowIntensity.y + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
                 #else
-                    return cShadowIntensity.z + cShadowIntensity.x * (inLight > shadowPos.z);
+                    return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
                 #endif
             #endif
         #endif
@@ -138,9 +138,9 @@ float GetShadow(float4 shadowPos)
             DecodeDepth(tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).rg)
         );
         #ifndef POINTLIGHT
-            return cShadowIntensity.z + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.y);
+            return cShadowIntensity.y + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.x);
         #else
-            return cShadowIntensity.z + dot(inLight > shadowPos.z, cShadowIntensity.y);
+            return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
         #endif
     #endif
 }
@@ -182,24 +182,27 @@ float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
         return iShadowPos[3];
 }
 
+#ifdef SM3
 float4x4 GetDirShadowMatrix(float depth, const float4x4 matrices[4])
 {
-    #ifdef SM3
-        if (depth < cShadowSplits.x)
-            return matrices[0];
-        else if (depth < cShadowSplits.y)
-            return matrices[1];
-        else if (depth < cShadowSplits.z)
-            return matrices[2];
-        else
-            return matrices[3];
-    #else
-        if (depth < cShadowSplits.x)
-            return matrices[0];
-        else if (depth < cShadowSplits.y)
-            return matrices[1];
-        else
-            return matrices[2];
-    #endif
+    if (depth < cShadowSplits.x)
+        return matrices[0];
+    else if (depth < cShadowSplits.y)
+        return matrices[1];
+    else if (depth < cShadowSplits.z)
+        return matrices[2];
+    else
+        return matrices[3];
 }
+#else
+float4x4 GetDirShadowMatrix(float depth, const float4x4 matrices[3])
+{
+    if (depth < cShadowSplits.x)
+        return matrices[0];
+    else if (depth < cShadowSplits.y)
+        return matrices[1];
+    else
+        return matrices[2];
+}
+#endif
 #endif

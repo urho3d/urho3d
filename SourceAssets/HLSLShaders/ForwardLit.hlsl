@@ -192,12 +192,12 @@ void PS(float3 iTexCoord : TEXCOORD0,
 
     #ifdef SPECULAR
         #ifdef SPECMAP
-            float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord.xy).g;
+            float3 specColor = cMatSpecColor.rgb * tex2D(sSpecMap, iTexCoord.xy).g;
         #else
-            float specStrength = cMatSpecProperties.x;
+            float3 specColor = cMatSpecColor.rgb;
         #endif
-        float spec = GetSpecular(normal, iEyeVec, lightDir, cMatSpecProperties.y);
-        finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
+        float spec = GetSpecular(normal, iEyeVec, lightDir, cMatSpecColor.a);
+        finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
     #else
         finalColor = diff * lightColor * diffColor.rgb;
     #endif

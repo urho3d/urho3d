@@ -514,7 +514,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                     intensity = Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                 float pcfValues = (1.0f - intensity);
-                float samples = 4.0f;
+                float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
                 float fallbackBias = 0.0f;
                 // Fallback mode requires manual depth biasing. We do not do proper slope scale biasing,
                 // instead just fudge the bias values together
@@ -524,7 +524,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     fallbackBias = graphics->GetDepthConstantBias() + 2.0f * graphics->GetDepthSlopeScaledBias() *
                         graphics->GetDepthConstantBias();
                 }
-                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, pcfValues / samples, intensity, fallbackBias));
+                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, fallbackBias, 0.0f));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))

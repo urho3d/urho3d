@@ -65,15 +65,15 @@ void PS(float3 iTexCoord : TEXCOORD0,
     #endif
 
     #ifdef SPECMAP
-        float specIntensity = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord.xy).g;
+        float3 specColor = cMatSpecColor.rgb * tex2D(sSpecMap, iTexCoord.xy).g;
     #else
-        float specIntensity = cMatSpecProperties.x;
+        float3 specColor = cMatSpecColor.rgb;
     #endif
 
     // Lights are accumulated at half intensity. Bring back to full intensity now
     float4 lightInput = 2.0 * tex2Dproj(sLightBuffer, iScreenPos);
     float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
 
-    float3 finalColor = (iVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specIntensity;
+    float3 finalColor = (iVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specColor;
     oColor = float4(GetFog(finalColor, iTexCoord.z), 1.0);
 }

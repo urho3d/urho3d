@@ -85,12 +85,12 @@ void main()
 
     #ifdef SPECULAR
         #ifdef SPECMAP
-            float specStrength = cMatSpecProperties.x * texture2D(sSpecMap, vTexCoord.xy).g;
+            vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord.xy).g;
         #else
-            float specStrength = cMatSpecProperties.x;
+            vec3 specColor = cMatSpecColor.rgb;
         #endif
-        float spec = GetSpecular(normal, vEyeVec, lightDir, cMatSpecProperties.y);
-        finalColor = diff * lightColor * (diffColor.rgb + spec * specStrength * cLightColor.a);
+        float spec = GetSpecular(normal, vEyeVec, lightDir, cMatSpecColor.a);
+        finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
     #else
         finalColor = diff * lightColor * diffColor.rgb;
     #endif

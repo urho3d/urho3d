@@ -49,11 +49,11 @@ float GetShadow(vec4 shadowPos)
             shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
             shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
         );
-        return cShadowIntensity.z + dot(inLight, vec4(cShadowIntensity.y));
+        return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
     #else
         // Take one sample
         float inLight = shadow2DProj(sShadowMap, shadowPos).r;
-        return cShadowIntensity.z + cShadowIntensity.x * inLight;
+        return cShadowIntensity.y + cShadowIntensity.x * inLight;
     #endif
 }
 
