@@ -95,6 +95,26 @@ public:
     void SnapPosition(const Vector3& position);
     /// Snap rotation immediately, even if smoothing enabled.
     void SnapRotation(const Quaternion& rotation);
+    /// %Set world position.
+    void SetWorldPosition(const Vector3& position);
+    /// %Set world rotation.
+    void SetWorldRotation(const Quaternion& rotation);
+    /// %Set world direction.
+    void SetWorldDirection(const Vector3& direction);
+    /// %Set uniform world scale.
+    void SetWorldScale(float scale);
+    /// %Set world scale.
+    void SetWorldScale(const Vector3& scale);
+    /// %Set world transform.
+    void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
+    /// %Set world transform.
+    void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
+    /// %Set world transform.
+    void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Snap world position immediately, even if smoothing enabled.
+    void SnapWorldPosition(const Vector3& position);
+    /// Snap world rotation immediately, even if smoothing enabled.
+    void SnapWorldRotation(const Quaternion& rotation);
     /// Move the scene node.
     void Translate(const Vector3& delta);
     /// Move the scene node relative to its rotation.
@@ -141,7 +161,7 @@ public:
     void RemoveListener(Component* component);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// %Set parent scene node. Same as parent->AddChild(this).
+    /// %Set parent scene node. Retains the world transform.
     void SetParent(Node* parent);
     /// Template version of creating a component.
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED);
@@ -273,6 +293,8 @@ public:
     VariantMap& GetVars() { return vars_; }
     /// Return the depended on nodes to order network updates.
     void GetDependencyNodes(PODVector<Node*>& dest) const;
+    /// Return first component derived from class.
+    template <class T> T* GetDerivedComponent() const;
     /// Template version of returning child nodes with a specific component.
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
@@ -368,3 +390,15 @@ template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, b
 template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Node::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
 template <class T> bool Node::HasComponent() const { return HasComponent(T::GetTypeStatic()); }
+
+template <class T> T* Node::GetDerivedComponent() const
+{
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        T* component = dynamic_cast<T*>(i->Get());
+        if (component)
+            return component;
+    }
+    
+    return 0;
+}

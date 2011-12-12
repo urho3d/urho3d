@@ -396,21 +396,17 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress['P'])
             paused = !paused;
-            
+
         if (input.keyPress['L'])
         {
             if (cameraLightNode.parent is testScene)
             {
+                cameraLightNode.parent = cameraNode;
                 cameraLightNode.position = Vector3(0, 0, 0);
                 cameraLightNode.rotation = Quaternion();
-                cameraLightNode.parent = cameraNode;
             }
             else
-            {
-                cameraLightNode.position = cameraNode.position;
-                cameraLightNode.rotation = cameraNode.rotation;
                 cameraLightNode.parent = testScene;
-            }
         }
         
         if (input.keyPress['V'])
@@ -421,7 +417,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress['F'])
             renderer.edgeFilter = !renderer.edgeFilter;
-            
+
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 

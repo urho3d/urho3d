@@ -619,26 +619,14 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     // Set transform so that the world transform stays through the parent change
     BeginModify(targetNode.id);
     BeginModify(sourceNode.id);
-
-    Vector3 newPos;
-    Quaternion newRot;
-    Vector3 newScale;
-    CalculateNewTransform(sourceNode, targetNode, newPos, newRot, newScale);
     sourceNode.parent = targetNode;
-
-    // Verify success
-    if (sourceNode.parent !is targetNode)
-    {
-        EndModify(sourceNode.id);
-        EndModify(targetNode.id);
-        return;
-    }
-
-    sourceNode.SetTransform(newPos, newRot, newScale);
-
     EndModify(sourceNode.id);
     EndModify(targetNode.id);
 
+    // Verify success
+    if (sourceNode.parent !is targetNode)
+        return;
+    
     // Update the node list now. If a node was moved into the root, this potentially refreshes the whole scene window.
     // Therefore disable layout update first
     ListView@ list = sceneWindow.GetChild("NodeList", true);
@@ -648,6 +636,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     list.RemoveItem(sourceIndex);
     uint addIndex = GetParentAddIndex(sourceNode);
     UpdateSceneWindowNode(addIndex, sourceNode);
+    UpdateNodeAttributes();
     RestoreExpandedStatus(addIndex, expanded);
 }
 

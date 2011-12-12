@@ -499,6 +499,11 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SnapPosition(const Vector3&in)", asMETHODPR(T, SnapPosition, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SnapRotation(const Quaternion&in)", asMETHODPR(T, SnapRotation, (const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetWorldTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetWorldTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetWorldTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(T, SetWorldTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetWorldTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetWorldTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SnapWorldPosition(const Vector3&in)", asMETHODPR(T, SnapWorldPosition, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SnapWorldRotation(const Quaternion&in)", asMETHODPR(T, SnapWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Translate(const Vector3&in)", asMETHOD(T, Translate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void TranslateRelative(const Vector3&in)", asMETHOD(T, TranslateRelative), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, bool fixedAxis = false)", asMETHOD(T, Rotate), asCALL_THISCALL);
@@ -537,9 +542,13 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", asMETHOD(T, GetDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_scale(const Vector3&in)", asMETHODPR(T, SetScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_scale() const", asMETHOD(T, GetScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldPosition(const Vector3&in)", asMETHOD(T, SetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldPosition()", asMETHOD(T, GetWorldPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldRotation(const Quaternion&in)", asMETHOD(T, SetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldDirection(const Vector3&in)", asMETHOD(T, SetWorldDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldDirection()", asMETHOD(T, GetWorldDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldScale(const Vector3&in)", asMETHODPR(T, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_targetPosition() const", asMETHOD(T, GetTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Quaternion& get_targetRotation() const", asMETHOD(T, GetTargetRotation), asCALL_THISCALL);

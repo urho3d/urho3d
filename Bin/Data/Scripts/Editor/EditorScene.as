@@ -451,6 +451,45 @@ bool ScenePaste()
     return true;
 }
 
+void SceneUnparent()
+{
+    if (!CheckSceneWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+        return;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    list.contentElement.DisableLayoutUpdate();
+
+    // Parent selected nodes to root
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        Node@ sourceNode = selectedNodes[i];
+        if (sourceNode.parent is null || sourceNode.parent is editorScene)
+            continue; // Root or already parented to root
+
+        Node@ targetNode = editorScene;
+
+        // Perform the reparenting
+        BeginModify(targetNode.id);
+        BeginModify(sourceNode.id);
+        sourceNode.parent = targetNode;
+        EndModify(sourceNode.id);
+        EndModify(targetNode.id);
+
+        ListView@ list = sceneWindow.GetChild("NodeList", true);
+
+        uint sourceIndex = GetNodeListIndex(sourceNode);
+        bool expanded = SaveExpandedStatus(sourceIndex);
+        list.RemoveItem(sourceIndex);
+        uint addIndex = GetParentAddIndex(sourceNode);
+        UpdateSceneWindowNode(addIndex, sourceNode);
+        UpdateNodeAttributes();
+        RestoreExpandedStatus(addIndex, expanded);
+    }
+
+    list.contentElement.EnableLayoutUpdate();
+    list.contentElement.UpdateLayout();
+}
+
 void SceneSelectAll()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
@@ -468,17 +507,4 @@ void SceneSelectAll()
             list.AddSelection(GetNodeListIndex(rootLevelNodes[i]));
         EndSelectionModify();
     }
-}
-
-void CalculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion& rot, Vector3& scale)
-{
-    Vector3 sourceWorldPos = source.worldPosition;
-    Quaternion sourceWorldRot = source.worldRotation;
-    Vector3 sourceWorldScale = source.worldScale;
-
-    Quaternion inverseTargetWorldRot = target.worldRotation.Inverse();
-    Vector3 inverseTargetWorldScale = Vector3(1, 1, 1) / target.worldScale;
-    scale = inverseTargetWorldScale * sourceWorldScale;
-    rot = inverseTargetWorldRot * sourceWorldRot;
-    pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.worldPosition));
 }

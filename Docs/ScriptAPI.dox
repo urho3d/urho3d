@@ -1103,6 +1103,11 @@ Methods:<br>
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SnapPosition(const Vector3&)
 - void SnapRotation(const Quaternion&)
+- void SetWorldTransform(const Vector3&, const Quaternion&)
+- void SetWorldTransform(const Vector3&, const Quaternion&, float)
+- void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
+- void SnapWorldPosition(const Vector3&)
+- void SnapWorldRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -1148,10 +1153,10 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
-- Vector3 worldPosition (readonly)
-- Quaternion worldRotation (readonly)
-- Vector3 worldDirection (readonly)
-- Vector3 worldScale (readonly)
+- Vector3 worldPosition
+- Quaternion worldRotation
+- Vector3 worldDirection
+- Vector3 worldScale
 - Vector3& targetPosition (readonly)
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
@@ -1187,6 +1192,11 @@ Methods:<br>
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SnapPosition(const Vector3&)
 - void SnapRotation(const Quaternion&)
+- void SetWorldTransform(const Vector3&, const Quaternion&)
+- void SetWorldTransform(const Vector3&, const Quaternion&, float)
+- void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
+- void SnapWorldPosition(const Vector3&)
+- void SnapWorldRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -1243,10 +1253,10 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
-- Vector3 worldPosition (readonly)
-- Quaternion worldRotation (readonly)
-- Vector3 worldDirection (readonly)
-- Vector3 worldScale (readonly)
+- Vector3 worldPosition
+- Quaternion worldRotation
+- Vector3 worldDirection
+- Vector3 worldScale
 - Vector3& targetPosition (readonly)
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)

@@ -547,6 +547,7 @@ Ctrl+S          - Save scene
 Ctrl+Shift+S    - Save scene as
 Ctrl+A          - Select/deselect all root level nodes
 Ctrl+X,C,V      - Cut/copy/paste node or component
+Ctrl+U          - Unparent scene node
 Ctrl+H	        - Open the scene hierarchy window
 Ctrl+N	        - Open the node / component edit window
 Ctrl+P          - Toggle scene update on/off

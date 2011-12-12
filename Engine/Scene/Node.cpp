@@ -307,6 +307,88 @@ void Node::SnapRotation(const Quaternion& rotation)
         MarkDirty();
 }
 
+void Node::SetWorldPosition(const Vector3& position)
+{
+    if (!parent_)
+        SetPosition(position);
+    else
+        SetPosition(parent_->GetWorldTransform().Inverse() * position);
+}
+
+void Node::SetWorldRotation(const Quaternion& rotation)
+{
+    if (!parent_)
+        SetRotation(rotation);
+    else
+        SetRotation(parent_->GetWorldRotation().Inverse() * rotation);
+}
+
+void Node::SetWorldDirection(const Vector3& direction)
+{
+    Vector3 localDirection;
+    if (!parent_)
+        localDirection = direction;
+    else
+        localDirection = parent_->GetWorldTransform().Inverse() * direction;
+    
+    SetRotation(Quaternion(Vector3::FORWARD, localDirection));
+}
+
+void Node::SetWorldScale(float scale)
+{
+    if (!parent_)
+        SetScale(scale);
+    else
+    {
+        Vector3 parentWorldScale = parent_->GetWorldScale();
+        SetScale(Vector3(scale / parentWorldScale.x_, scale / parentWorldScale.y_, scale / parentWorldScale.z_));
+    }
+}
+
+void Node::SetWorldScale(const Vector3& scale)
+{
+    if (!parent_)
+        SetScale(scale);
+    else
+        SetScale(scale / parent_->GetWorldScale());
+}
+
+void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation)
+{
+    SetWorldPosition(position);
+    SetWorldRotation(rotation);
+}
+
+void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
+{
+    SetWorldPosition(position);
+    SetWorldRotation(rotation);
+    SetWorldScale(scale);
+}
+
+void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+{
+    SetWorldPosition(position);
+    SetWorldRotation(rotation);
+    SetWorldScale(scale);
+}
+
+void Node::SnapWorldPosition(const Vector3& position)
+{
+    if (!parent_)
+        SnapPosition(position);
+    else
+        SnapPosition(parent_->GetWorldTransform().Inverse() * position);
+}
+
+void Node::SnapWorldRotation(const Quaternion& rotation)
+{
+    if (!parent_)
+        SnapRotation(rotation);
+    else
+        SnapRotation(parent_->GetWorldRotation().Inverse() * rotation);
+}
+
 void Node::Translate(const Vector3& delta)
 {
     if (!smoothed_)
@@ -594,7 +676,15 @@ void Node::Remove()
 void Node::SetParent(Node* parent)
 {
     if (parent)
+    {
+        Vector3 worldPosition;
+        Quaternion worldRotation;
+        Vector3 worldScale;
+        GetWorldTransform().Decompose(worldPosition, worldRotation, worldScale);
+        
         parent->AddChild(this);
+        SetWorldTransform(worldPosition, worldRotation, worldScale);
+    }
 }
 
 Matrix3x4 Node::GetWorldTargetTransform() const
