@@ -1,7 +1,7 @@
 uniform vec3 cAmbientColor;
 uniform vec2 cDepthReconstruct;
 uniform vec3 cEdgeFilterParams;
-uniform vec4 cFogParams;
+uniform vec3 cFogParams;
 uniform vec3 cFogColor;
 uniform vec4 cLightColor;
 uniform vec3 cLightDirPS;

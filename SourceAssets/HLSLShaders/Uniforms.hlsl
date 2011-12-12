@@ -23,7 +23,7 @@ uniform float4 cVertexLights[6*3] : register(C233);
 uniform float3 cAmbientColor : register(C0);
 uniform float2 cDepthReconstruct : register(C1);
 uniform float3 cEdgeFilterParams : register(C2);
-uniform float4 cFogParams : register(C3);
+uniform float3 cFogParams : register(C3);
 uniform float3 cFogColor : register(C4);
 uniform float4 cLightColor : register(C5);
 uniform float4 cLightPosPS : register(C6);
