@@ -25,6 +25,7 @@
 
 #include "Mutex.h"
 #include "Node.h"
+#include "SceneResolver.h"
 #include "XMLElement.h"
 
 class File;
@@ -174,6 +175,8 @@ private:
     Map<unsigned, Component*> allComponents_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
+    /// Node and component ID resolver for asynchronous loading.
+    SceneResolver resolver_;
     /// Source file name.
     String fileName_;
     /// Required package files for networking.

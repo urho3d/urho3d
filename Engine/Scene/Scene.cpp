@@ -200,7 +200,7 @@ bool Scene::LoadAsync(File* file)
     
     // Clear the previous scene and load the root level components first
     Clear();
-    if (!Node::Load(*file, false))
+    if (!Node::Load(*file, false, &resolver_))
         return false;
     
     // Then prepare for loading all root level child nodes in the async update
@@ -233,7 +233,7 @@ bool Scene::LoadAsyncXML(File* file)
     // Clear the previous scene and load the root level components first
     Clear();
     XMLElement rootElement = xmlFile->GetRoot();
-    if (!Node::LoadXML(rootElement, false))
+    if (!Node::LoadXML(rootElement, false, &resolver_))
         return false;
     
     // Then prepare for loading all root level child nodes in the async update
@@ -270,6 +270,7 @@ void Scene::Clear()
     RemoveAllComponents();
     fileName_ = String();
     checksum_ = 0;
+    resolver_.Reset();
 }
 
 void Scene::SetActive(bool enable)
@@ -582,16 +583,16 @@ void Scene::UpdateAsyncLoading()
             return;
         }
         
-        // Read one child node either from binary or XML
+        // Read one child node with its full sub-hierarchy from either from binary or XML
         if (!asyncProgress_.xmlFile_)
         {
             Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), REPLICATED);
-            newNode->Load(*asyncProgress_.file_);
+            newNode->Load(*asyncProgress_.file_, true, &resolver_);
         }
         else
         {
             Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), REPLICATED);
-            newNode->LoadXML(asyncProgress_.xmlElement_);
+            newNode->LoadXML(asyncProgress_.xmlElement_, true, &resolver_);
             asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNext("node");
         }
         
@@ -614,6 +615,7 @@ void Scene::UpdateAsyncLoading()
 
 void Scene::FinishAsyncLoading()
 {
+    resolver_.Resolve();
     FinishLoading(asyncProgress_.file_);
     StopAsyncLoading();
     

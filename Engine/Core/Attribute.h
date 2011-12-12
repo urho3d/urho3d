@@ -36,6 +36,10 @@ static const unsigned AM_DEFAULT = 0x3;
 static const unsigned AM_LATESTDATA = 0x4;
 /// Attribute should not be shown in the editor.
 static const unsigned AM_NOEDIT = 0x8;
+/// Attribute is a node ID and may need rewriting.
+static const unsigned AM_NODEID = 0x10;
+/// Attribute is a component ID and may need rewriting.
+static const unsigned AM_COMPONENTID = 0x20;
 
 class Serializable;
 

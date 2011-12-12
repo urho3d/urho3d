@@ -30,6 +30,7 @@
 class Component;
 class Connection;
 class Scene;
+class SceneResolver;
 
 /// Component and child node creation mode for networking.
 enum CreateMode
@@ -318,15 +319,15 @@ public:
     const PODVector<unsigned char>& GetNetParentAttr() const;
     /// Update motion smoothing. Called by Scene.
     void UpdateSmoothing(float constant, float squaredSnapThreshold);
+    /// Load components and optionally load child nodes.
+    bool Load(Deserializer& source, bool loadChildren, SceneResolver* resolver);
+    /// Load components from XML data and optionally load child nodes.
+    bool LoadXML(const XMLElement& source, bool loadChildren, SceneResolver* resolver);
     
     /// User variables.
     VariantMap vars_;
     
 protected:
-    /// Load components and optionally load child nodes.
-    bool Load(Deserializer& source, bool loadChildren);
-    /// Load components from XML data and optionally load child nodes.
-    bool LoadXML(const XMLElement& source, bool loadChildren);
     /// Create a component with specific ID.
     Component* CreateComponent(ShortStringHash type, unsigned id, CreateMode mode);
     /// Create a child node with specific ID.
