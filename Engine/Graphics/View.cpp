@@ -1111,13 +1111,17 @@ void View::RenderBatchesLightPrepass()
         RenderBatchQueue(gbufferQueue_);
     }
     
-    // Clear the light accumulation buffer
+    // Clear the light accumulation buffer. However, skip the clear if the first light is a directional light with full mask
+    bool optimizeLightBuffer = !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() == LIGHT_DIRECTIONAL &&
+        (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
+    
     Texture2D* lightBuffer = renderer_->GetLightBuffer();
     graphics_->ResetRenderTarget(1);
     graphics_->SetRenderTarget(0, lightBuffer);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
-    graphics_->Clear(CLEAR_COLOR);
+    if (!optimizeLightBuffer)
+        graphics_->Clear(CLEAR_COLOR);
     
     if (!lightQueues_.Empty())
     {
@@ -2133,8 +2137,9 @@ void View::SetupLightVolumeBatch(Batch& batch)
     LightType type = light->GetLightType();
     float lightDist;
     
+    // Use replace blend mode for the first light volume, and additive for the rest
     graphics_->SetAlphaTest(false);
-    graphics_->SetBlendMode(BLEND_ADD);
+    graphics_->SetBlendMode(light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
     graphics_->SetDepthWrite(false);
     
     if (type != LIGHT_DIRECTIONAL)
