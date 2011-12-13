@@ -711,6 +711,9 @@ void View::GetBatches()
     // Build base pass batches
     {
         PROFILE(GetBaseBatches);
+        
+        hasZeroLightMask_ = false;
+        
         for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
         {
             Drawable* drawable = *i;
@@ -744,6 +747,10 @@ void View::GetBatches()
                     pass = tech->GetPass(PASS_GBUFFER);
                     if (pass)
                     {
+                        // If the opaque object has a zero lightmask, have to skip light buffer optimization
+                        if (!hasZeroLightMask_ && (!(GetLightMask(drawable) & 0xff)))
+                            hasZeroLightMask_ = true;
+                        
                         // Allow G-buffer pass instancing only if lightmask matches zone lightmask
                         baseBatch.lightMask_ = GetLightMask(drawable);
                         FinalizeBatch(baseBatch, tech, pass, baseBatch.lightMask_ == (baseBatch.zone_->GetLightMask() & 0xff));
@@ -1112,8 +1119,8 @@ void View::RenderBatchesLightPrepass()
     }
     
     // Clear the light accumulation buffer. However, skip the clear if the first light is a directional light with full mask
-    bool optimizeLightBuffer = !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() == LIGHT_DIRECTIONAL &&
-        (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
+    bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
+        LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
     
     Texture2D* lightBuffer = renderer_->GetLightBuffer();
     graphics_->ResetRenderTarget(1);
@@ -1164,7 +1171,6 @@ void View::RenderBatchesLightPrepass()
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
-    
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
     graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);

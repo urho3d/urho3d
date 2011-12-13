@@ -283,4 +283,6 @@ private:
     bool cameraZoneOverride_;
     /// Draw shadows flag.
     bool drawShadows_;
+    /// Whether objects with zero lightmask exist. In light pre-pass mode this means skipping some optimizations.
+    bool hasZeroLightMask_;
 };
