@@ -370,6 +370,93 @@ Properties:<br>
 - float z
 
 
+Matrix3
+
+Methods:<br>
+- Vector3 Scale() const
+- Matrix3 Scaled(const Vector3&) const
+- void SetScale(const Vector3&)
+- void SetScale(float)
+- Matrix3 Transpose() const
+- Matrix3 Inverse() const
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m10
+- float m11
+- float m12
+- float m20
+- float m21
+- float m22
+
+
+Matrix4
+
+Methods:<br>
+- Quaternion Rotation() const
+- Matrix3 RotationMatrix() const
+- Vector3 Scale() const
+- void SetRotation(const Matrix3&)
+- void SetScale(const Vector3&)
+- void SetScale(float)
+- void SetTranslation(const Vector3&)
+- Matrix3 ToMatrix3() const
+- Vector3 Translation() const
+- Matrix4 Transpose() const
+- void Decompose(Vector3&, Quaternion&, Vector3&) const
+- Matrix4 Inverse() const
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m03
+- float m10
+- float m11
+- float m12
+- float m13
+- float m20
+- float m21
+- float m22
+- float m23
+- float m30
+- float m31
+- float m32
+- float m33
+
+
+Matrix3x4
+
+Methods:<br>
+- Quaternion Rotation() const
+- Matrix3 RotationMatrix() const
+- Vector3 Scale() const
+- void SetRotation(const Matrix3&)
+- void SetScale(const Vector3&)
+- void SetScale(float)
+- void SetTranslation(const Vector3&)
+- Matrix3 ToMatrix3() const
+- Vector3 Translation() const
+- void Decompose(Vector3&, Quaternion&, Vector3&) const
+- Matrix3x4 Inverse() const
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m03
+- float m10
+- float m11
+- float m12
+- float m13
+- float m20
+- float m21
+- float m22
+- float m23
+
+
 Rect
 
 Methods:<br>
@@ -406,9 +493,14 @@ Methods:<br>
 - void Merge(const Sphere&)
 - void Clip(const BoundingBox&)
 - void Clear()
+- void Transform(const Matrix3&)
+- void Transform(const Matrix3x4&)
 - Intersection IsInside(const Vector3&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const BoundingBox&) const
+- BoundingBox Transformed(const Matrix3&) const
+- BoundingBox Transformed(const Matrix3x4&) const
+- Rect Projected(const Matrix4&) const
 
 Properties:<br>
 - Vector3 center (readonly)
@@ -422,10 +514,14 @@ Properties:<br>
 Frustum
 
 Methods:<br>
+- void Transform(const Matrix3&)
+- void Transform(const Matrix3x4&)
 - Intersection IsInside(const Vector3&)
 - Intersection IsInside(const BoundingBox&)
 - Intersection IsInside(const Sphere&)
 - float Distance(const Vector3&) const
+- Frustum Transformed(const Matrix3&) const
+- Frustum Transformed(const Matrix3x4&) const
 
 Properties:<br>
 - Vector3[] vertices (readonly)
@@ -443,6 +539,10 @@ Methods:<br>
 - void Clip(const BoundingBox&)
 - void Clip(const Frustum&)
 - void Clear()
+- void Transform(const Matrix3&)
+- void Transform(const Matrix3x4&)
+- Polyhedron Transformed(const Matrix3&) const
+- Polyhedron Transformed(const Matrix3x4&) const
 
 Properties:<br>
 - uint numFaces (readonly)
@@ -1161,6 +1261,9 @@ Properties:<br>
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
 - Quaternion worldTargetRotation (readonly)
+- Matrix3x4 transform (readonly)
+- Matrix3x4 targetTransform (readonly)
+- Matrix3x4& worldTransform (readonly)
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -1261,6 +1364,9 @@ Properties:<br>
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
 - Quaternion worldTargetRotation (readonly)
+- Matrix3x4 transform (readonly)
+- Matrix3x4 targetTransform (readonly)
+- Matrix3x4& worldTransform (readonly)
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -1322,6 +1428,7 @@ Properties:<br>
 - uint viewMask
 - uint viewOverrideFlags
 - Frustum frustum (readonly)
+- Matrix4 projection (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
 - Vector3 forwardVector (readonly)
