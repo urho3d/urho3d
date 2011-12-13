@@ -229,6 +229,16 @@ void Polyhedron::Clear()
     faces_.Clear();
 }
 
+void Polyhedron::Transform(const Matrix3& transform)
+{
+    for (unsigned i = 0; i < faces_.Size(); ++i)
+    {
+        Vector<Vector3>& face = faces_[i];
+        for (unsigned j = 0; j < face.Size(); ++j)
+            face[j] = transform * face[j];
+    }
+}
+
 void Polyhedron::Transform(const Matrix3x4& transform)
 {
     for (unsigned i = 0; i < faces_.Size(); ++i)
@@ -237,6 +247,24 @@ void Polyhedron::Transform(const Matrix3x4& transform)
         for (unsigned j = 0; j < face.Size(); ++j)
             face[j] = transform * face[j];
     }
+}
+
+Polyhedron Polyhedron::Transformed(const Matrix3& transform) const
+{
+    Polyhedron ret;
+    ret.faces_.Resize(faces_.Size());
+    
+    for (unsigned i = 0; i < faces_.Size(); ++i)
+    {
+        const Vector<Vector3>& face = faces_[i];
+        Vector<Vector3>& newFace = ret.faces_[i];
+        newFace.Resize(face.Size());
+        
+        for (unsigned j = 0; j < face.Size(); ++j)
+            newFace[j] = transform * face[j];
+    }
+    
+    return ret;
 }
 
 Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const

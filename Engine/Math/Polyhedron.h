@@ -25,6 +25,7 @@
 
 class BoundingBox;
 class Frustum;
+class Matrix3;
 class Matrix3x4;
 class Plane;
 
@@ -82,10 +83,14 @@ public:
     void Clip(const Frustum& box);
     /// Clear all faces.
     void Clear();
-    /// Transform by a 3x4 matrix.
+    /// Transform with a 3x3 matrix.
+    void Transform(const Matrix3& transform);
+    /// Transform with a 3x4 matrix.
     void Transform(const Matrix3x4& transform);
     
-    /// Return transformed by a 3x4 matrix.
+    /// Return transformed with a 3x3 matrix.
+    Polyhedron Transformed(const Matrix3& transform) const;
+    /// Return transformed with a 3x4 matrix.
     Polyhedron Transformed(const Matrix3x4& transform) const;
     /// Return whether is empty.
     bool Empty() const { return faces_.Empty(); }

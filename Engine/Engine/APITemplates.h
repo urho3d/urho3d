@@ -554,6 +554,9 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Quaternion& get_targetRotation() const", asMETHOD(T, GetTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldTargetPosition() const", asMETHOD(T, GetWorldTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldTargetRotation() const", asMETHOD(T, GetWorldTargetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Matrix3x4 get_transform() const", asMETHOD(T, GetTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Matrix3x4 get_targetTransform() const", asMETHOD(T, GetTargetTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Matrix3x4& get_worldTransform() const", asMETHOD(T, GetWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_smoothed(bool)", asMETHOD(T, SetSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_smoothed() const", asMETHOD(T, IsSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);

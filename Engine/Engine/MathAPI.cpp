@@ -398,6 +398,188 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Quaternion", "float z", offsetof(Quaternion, z_));
 }
 
+static void ConstructMatrix3(Matrix3* ptr)
+{
+    new(ptr) Matrix3();
+}
+
+static void ConstructMatrix3Copy(const Matrix3& mat, Matrix3* ptr)
+{
+    new(ptr) Matrix3(mat);
+}
+
+static void ConstructMatrix3Init(float v00, float v01, float v02, float v10, float v11, float v12, float v20, float v21, float v22, Matrix3* ptr)
+{
+    new(ptr) Matrix3(v00, v01, v02, v10, v11, v12, v20, v21, v22);
+}
+
+static void RegisterMatrix3(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Matrix3", sizeof(Matrix3), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix3), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructMatrix3Copy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float)", asFUNCTION(ConstructMatrix3Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 opMul(const Matrix3&in) const", asMETHODPR(Matrix3, operator *, (const Matrix3&) const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 opMul(float) const", asMETHODPR(Matrix3, operator *, (float) const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Vector3 opMul(const Vector3&in) const", asMETHODPR(Matrix3, operator *, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 opAdd(const Matrix3&in) const", asMETHODPR(Matrix3, operator +, (const Matrix3 &) const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 opSub(const Matrix3&in) const", asMETHODPR(Matrix3, operator -, (const Matrix3 &) const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3& opAssign(const Matrix3&in)", asMETHODPR(Matrix3, operator =, (const Matrix3 &), Matrix3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Vector3 Scale() const", asMETHODPR(Matrix3, Scale, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 Scaled(const Vector3&in) const", asMETHODPR(Matrix3, Scaled, (const Vector3 &) const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "void SetScale(const Vector3&in)", asMETHODPR(Matrix3,SetScale, (const Vector3 &), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "void SetScale(float)", asMETHODPR(Matrix3,SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 Transpose() const", asMETHODPR(Matrix3, Transpose, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "Matrix3 Inverse() const", asMETHODPR(Matrix3, Inverse, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Matrix3", "float m00", offsetof(Matrix3, m00_));
+    engine->RegisterObjectProperty("Matrix3", "float m01", offsetof(Matrix3, m01_));
+    engine->RegisterObjectProperty("Matrix3", "float m02", offsetof(Matrix3, m02_));
+    engine->RegisterObjectProperty("Matrix3", "float m10", offsetof(Matrix3, m10_));
+    engine->RegisterObjectProperty("Matrix3", "float m11", offsetof(Matrix3, m11_));
+    engine->RegisterObjectProperty("Matrix3", "float m12", offsetof(Matrix3, m12_));
+    engine->RegisterObjectProperty("Matrix3", "float m20", offsetof(Matrix3, m20_));
+    engine->RegisterObjectProperty("Matrix3", "float m21", offsetof(Matrix3, m21_));
+    engine->RegisterObjectProperty("Matrix3", "float m22", offsetof(Matrix3, m22_));
+}
+
+static void ConstructMatrix4(Matrix4* ptr)
+{
+    new(ptr) Matrix4();
+}
+
+static void ConstructMatrix4Copy(const Matrix4& mat, Matrix4* ptr)
+{
+    new(ptr) Matrix4(mat);
+}
+
+static void ConstructMatrix4CopyMatrix3(const Matrix3& mat, Matrix4* ptr)
+{
+    new(ptr) Matrix4(mat);
+}
+
+static void ConstructMatrix4Init(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, float v30, float v31, float v32, float v33, Matrix3* ptr)
+{
+    new(ptr) Matrix4(v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33);
+}
+
+static void RegisterMatrix4(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Matrix4", sizeof(Matrix4), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix4), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(const Matrix4&in)", asFUNCTION(ConstructMatrix4Copy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructMatrix4CopyMatrix3), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)", asFUNCTION(ConstructMatrix4Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 opMul(const Matrix4&) const", asMETHODPR(Matrix4, operator *, (const Matrix4&) const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 opMul(float) const", asMETHODPR(Matrix4, operator *, (float) const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Vector3 opMul(const Vector3&) const", asMETHODPR(Matrix4, operator *, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Vector4 opMul(const Vector4&) const", asMETHODPR(Matrix4, operator *, (const Vector4&) const, Vector4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 opAdd(const Matrix4&) const", asMETHODPR(Matrix4, operator +, (const Matrix4&) const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 opSub(const Matrix4&) const", asMETHODPR(Matrix4, operator -, (const Matrix4&) const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4& opAssign(const Matrix3&)", asMETHODPR(Matrix4, operator =, (const Matrix3&), Matrix4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4& opAssign(const Matrix4&)", asMETHODPR(Matrix4, operator =, (const Matrix4&), Matrix4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Quaternion Rotation() const", asMETHODPR(Matrix4, Rotation, () const, Quaternion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Vector3 Scale() const", asMETHODPR(Matrix4, Scale, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "void SetRotation(const Matrix3&in)", asMETHODPR(Matrix4, SetRotation, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "void SetScale(const Vector3&in)", asMETHODPR(Matrix4, SetScale, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "void SetScale(float)", asMETHODPR(Matrix4, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "void SetTranslation(const Vector3&in)", asMETHODPR(Matrix4, SetTranslation, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix3 ToMatrix3() const", asMETHODPR(Matrix4, ToMatrix3, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Vector3 Translation() const", asMETHODPR(Matrix4, Translation, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 Transpose() const", asMETHODPR(Matrix4, Transpose, () const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "void Decompose(Vector3&in, Quaternion&in, Vector3&in) const", asMETHODPR(Matrix4,Decompose, (Vector3 &, Quaternion &, Vector3 &) const, void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "Matrix4 Inverse() const", asMETHODPR(Matrix4, Inverse, () const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Matrix4", "float m00", offsetof(Matrix4, m00_));
+    engine->RegisterObjectProperty("Matrix4", "float m01", offsetof(Matrix4, m01_));
+    engine->RegisterObjectProperty("Matrix4", "float m02", offsetof(Matrix4, m02_));
+    engine->RegisterObjectProperty("Matrix4", "float m03", offsetof(Matrix4, m03_));
+    engine->RegisterObjectProperty("Matrix4", "float m10", offsetof(Matrix4, m10_));
+    engine->RegisterObjectProperty("Matrix4", "float m11", offsetof(Matrix4, m11_));
+    engine->RegisterObjectProperty("Matrix4", "float m12", offsetof(Matrix4, m12_));
+    engine->RegisterObjectProperty("Matrix4", "float m13", offsetof(Matrix4, m13_));
+    engine->RegisterObjectProperty("Matrix4", "float m20", offsetof(Matrix4, m20_));
+    engine->RegisterObjectProperty("Matrix4", "float m21", offsetof(Matrix4, m21_));
+    engine->RegisterObjectProperty("Matrix4", "float m22", offsetof(Matrix4, m22_));
+    engine->RegisterObjectProperty("Matrix4", "float m23", offsetof(Matrix4, m23_));
+    engine->RegisterObjectProperty("Matrix4", "float m30", offsetof(Matrix4, m30_));
+    engine->RegisterObjectProperty("Matrix4", "float m31", offsetof(Matrix4, m31_));
+    engine->RegisterObjectProperty("Matrix4", "float m32", offsetof(Matrix4, m32_));
+    engine->RegisterObjectProperty("Matrix4", "float m33", offsetof(Matrix4, m33_));
+}
+
+static void ConstructMatrix3x4(Matrix3x4* ptr)
+{
+    new(ptr) Matrix3x4();
+}
+
+static void ConstructMatrix3x4Copy(const Matrix3x4& mat, Matrix3x4* ptr)
+{
+    new(ptr) Matrix3x4(mat);
+}
+
+static void ConstructMatrix3x4CopyMatrix3(const Matrix3& mat, Matrix3x4* ptr)
+{
+    new(ptr) Matrix3x4(mat);
+}
+
+static void ConstructMatrix3x4Init(float v00, float v01, float v02, float v03, float v10, float v11, float v12, float v13, float v20, float v21, float v22, float v23, Matrix3* ptr)
+{
+    new(ptr) Matrix3x4(v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23);
+}
+
+static void ConstructMatrix3x4InitTransform(const Vector3& pos, const Quaternion& rot, const Vector3& scale, Matrix3x4* ptr)
+{
+    new(ptr) Matrix3x4(pos, rot, scale);
+}
+
+static void ConstructMatrix3x4InitTransformUniform(const Vector3& pos, const Quaternion& rot, float scale, Matrix3x4* ptr)
+{
+    new(ptr) Matrix3x4(pos, rot, scale);
+}
+
+static void RegisterMatrix3x4(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Matrix3x4", sizeof(Matrix3x4), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix3x4), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(const Matrix3x4&in)", asFUNCTION(ConstructMatrix3x4Copy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructMatrix3x4CopyMatrix3), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(float, float, float, float, float, float, float, float, float, float, float, float)", asFUNCTION(ConstructMatrix3x4Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Quaternion&in, const Vector3&in)", asFUNCTION(ConstructMatrix3x4InitTransform), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix3x4", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Quaternion&in, float)", asFUNCTION(ConstructMatrix3x4InitTransformUniform), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 opMul(const Matrix3x4&in) const", asMETHODPR(Matrix3x4, operator *, (const Matrix3x4&) const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 opMul(float) const", asMETHODPR(Matrix3x4, operator *, (float) const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix4 opMul(const Matrix4&in) const", asMETHODPR(Matrix3x4, operator *, (const Matrix4&) const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Vector3 opMul(const Vector3&in) const", asMETHODPR(Matrix3x4, operator *, (const Vector3&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Vector3 opMul(const Vector4&in) const", asMETHODPR(Matrix3x4, operator *, (const Vector4&) const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 opAdd(const Matrix3x4&in) const", asMETHODPR(Matrix3x4, operator +, (const Matrix3x4&) const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 opSub(const Matrix3x4&in) const", asMETHODPR(Matrix3x4, operator -, (const Matrix3x4&) const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix3&in)", asMETHODPR(Matrix3x4, operator =, (const Matrix3&), Matrix3x4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix3x4&in)", asMETHODPR(Matrix3x4, operator =, (const Matrix3x4&), Matrix3x4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Quaternion Rotation() const", asMETHODPR(Matrix3x4, Rotation, () const, Quaternion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix3x4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Vector3 Scale() const", asMETHODPR(Matrix3x4, Scale, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "void SetRotation(const Matrix3&in)", asMETHODPR(Matrix3x4, SetRotation, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "void SetScale(const Vector3&in)", asMETHODPR(Matrix3x4, SetScale, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "void SetScale(float)", asMETHODPR(Matrix3x4, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "void SetTranslation(const Vector3&in)", asMETHODPR(Matrix3x4, SetTranslation, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3 ToMatrix3() const", asMETHODPR(Matrix3x4, ToMatrix3, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Vector3 Translation() const", asMETHODPR(Matrix3x4, Translation, () const, Vector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "void Decompose(Vector3&in, Quaternion&in, Vector3&in) const", asMETHODPR(Matrix3x4, Decompose, (Vector3&, Quaternion&, Vector3&) const, void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 Inverse() const", asMETHODPR(Matrix3x4, Inverse, () const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Matrix3x4", "float m00", offsetof(Matrix3x4, m00_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m01", offsetof(Matrix3x4, m01_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m02", offsetof(Matrix3x4, m02_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m03", offsetof(Matrix3x4, m03_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m10", offsetof(Matrix3x4, m10_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m11", offsetof(Matrix3x4, m11_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m12", offsetof(Matrix3x4, m12_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m13", offsetof(Matrix3x4, m13_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m20", offsetof(Matrix3x4, m20_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m21", offsetof(Matrix3x4, m21_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m22", offsetof(Matrix3x4, m22_));
+    engine->RegisterObjectProperty("Matrix3x4", "float m23", offsetof(Matrix3x4, m23_));
+}
+
 static void ConstructPlane(Plane* ptr)
 {
     new(ptr) Plane();
@@ -685,9 +867,14 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BoundingBox", "void Merge(const Sphere&in)", asMETHODPR(BoundingBox, Merge, (const Sphere&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Clip(const BoundingBox&in)", asMETHODPR(BoundingBox, Clip, (const BoundingBox&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Clear()", asMETHOD(BoundingBox, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "void Transform(const Matrix3&in)", asMETHODPR(BoundingBox, Transform, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "void Transform(const Matrix3x4&in)", asMETHODPR(BoundingBox, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Vector3&in) const", asMETHODPR(BoundingBox, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Sphere&in) const", asMETHODPR(BoundingBox, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(BoundingBox, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "BoundingBox Transformed(const Matrix3&in) const", asMETHODPR(BoundingBox, Transformed, (const Matrix3&) const, BoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "BoundingBox Transformed(const Matrix3x4&in) const", asMETHODPR(BoundingBox, Transformed, (const Matrix3x4&) const, BoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "Rect Projected(const Matrix4&in) const", asMETHODPR(BoundingBox, Projected, (const Matrix4&) const, Rect), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_center() const", asMETHOD(BoundingBox, Center), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_size() const", asMETHOD(BoundingBox, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_halfSize() const", asMETHOD(BoundingBox, HalfSize), asCALL_THISCALL);
@@ -699,10 +886,14 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(ConstructFrustumCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Frustum", "Frustum& opAssign(const Frustum&in)", asMETHODPR(Frustum, operator =, (const Frustum&), Frustum&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3&in)", asMETHODPR(Frustum, Transform, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Frustum", "void Transform(const Matrix3x4&in)", asMETHODPR(Frustum, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Vector3&in)", asMETHODPR(Frustum, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const BoundingBox&in)", asMETHODPR(Frustum, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Intersection IsInside(const Sphere&in)", asMETHODPR(Frustum, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "float Distance(const Vector3&in) const", asMETHOD(Frustum, Distance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3&) const, Frustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4&) const, Frustum), asCALL_THISCALL);
     engine->RegisterObjectProperty("Frustum", "bool defined", offsetof(Frustum, defined_));
     engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint) const", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
     
@@ -720,6 +911,10 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Polyhedron", "void Clip(const BoundingBox&in)", asMETHODPR(Polyhedron, Clip, (const BoundingBox&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Polyhedron", "void Clip(const Frustum&in)", asMETHODPR(Polyhedron, Clip, (const Frustum&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Polyhedron", "void Clear()", asMETHOD(Polyhedron, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Polyhedron", "void Transform(const Matrix3&in)", asMETHODPR(Polyhedron, Transform, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Polyhedron", "void Transform(const Matrix3x4&in)", asMETHODPR(Polyhedron, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Polyhedron", "Polyhedron Transformed(const Matrix3&in) const", asMETHODPR(Polyhedron, Transformed, (const Matrix3&) const, Polyhedron), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Polyhedron", "Polyhedron Transformed(const Matrix3x4&in) const", asMETHODPR(Polyhedron, Transformed, (const Matrix3x4&) const, Polyhedron), asCALL_THISCALL);
     engine->RegisterObjectMethod("Polyhedron", "uint get_numFaces() const", asFUNCTION(PolyhedronGetNumFaces), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Polyhedron", "Array<Vector3>@ get_face(uint) const", asFUNCTION(PolyhedronGetFace), asCALL_CDECL_OBJLAST);
     
@@ -801,11 +996,12 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterVector3(engine);
     RegisterVector4(engine);
     RegisterQuaternion(engine);
+    RegisterMatrix3(engine);
+    RegisterMatrix4(engine);
+    RegisterMatrix3x4(engine);
     RegisterRect(engine);
     RegisterVolumes(engine);
     RegisterPlane(engine);
     RegisterRay(engine);
     RegisterColor(engine);
-    
-    /// \todo Register matrix types
 }
