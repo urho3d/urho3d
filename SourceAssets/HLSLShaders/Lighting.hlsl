@@ -90,57 +90,39 @@ float GetVertexLight(int index, float3 worldPos, float3 normal)
 float GetShadow(float4 shadowPos)
 {
     // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
-    #ifndef FALLBACK
-        #ifndef LQSHADOW
-            // Take four samples and average them
-            #ifndef POINTLIGHT
-                float2 offsets = cSampleOffsets * shadowPos.w;
-            #else
-                float2 offsets = cSampleOffsets;
-            #endif
-            float4 inLight = float4(
-                tex2Dproj(sShadowMap, shadowPos).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
-                tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
-            );
-            #ifdef HWSHADOW
-                return cShadowIntensity.y + dot(inLight, cShadowIntensity.x);
-            #else
-                #ifndef POINTLIGHT
-                    return cShadowIntensity.y + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.x);
-                #else
-                    return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
-                #endif
-            #endif
-        #else
-            // Take one sample
-            float inLight = tex2Dproj(sShadowMap, shadowPos).r;
-            #ifdef HWSHADOW
-                return cShadowIntensity.y + cShadowIntensity.x * inLight;
-            #else
-                #ifndef POINTLIGHT
-                    return cShadowIntensity.y + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
-                #else
-                    return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
-                #endif
-            #endif
-        #endif
-    #else
-        // Fallback mode: take two samples, depth needs to be decoded from RG channels
+    #ifndef LQSHADOW
+        // Take four samples and average them
         #ifndef POINTLIGHT
             float2 offsets = cSampleOffsets * shadowPos.w;
         #else
             float2 offsets = cSampleOffsets;
         #endif
-        float2 inLight = float2(
-            DecodeDepth(tex2Dproj(sShadowMap, shadowPos).rg),
-            DecodeDepth(tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).rg)
+        float4 inLight = float4(
+            tex2Dproj(sShadowMap, shadowPos).r,
+            tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
+            tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
+            tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
         );
-        #ifndef POINTLIGHT
-            return cShadowIntensity.y + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.x);
+        #ifdef HWSHADOW
+            return cShadowIntensity.y + dot(inLight, cShadowIntensity.x);
         #else
-            return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
+            #ifndef POINTLIGHT
+                return cShadowIntensity.y + dot(inLight * shadowPos.w > shadowPos.z, cShadowIntensity.x);
+            #else
+                return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
+            #endif
+        #endif
+    #else
+        // Take one sample
+        float inLight = tex2Dproj(sShadowMap, shadowPos).r;
+        #ifdef HWSHADOW
+            return cShadowIntensity.y + cShadowIntensity.x * inLight;
+        #else
+            #ifndef POINTLIGHT
+                return cShadowIntensity.y + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
+            #else
+                return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
+            #endif
         #endif
     #endif
 }

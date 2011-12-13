@@ -13,6 +13,6 @@ uniform vec4 cMatSpecColor;
 uniform vec2 cSampleOffsets;
 uniform vec4 cShadowCubeAdjust;
 uniform vec4 cShadowDepthFade;
-uniform vec3 cShadowIntensity;
+uniform vec2 cShadowIntensity;
 uniform vec4 cShadowSplits;
 uniform mat4 cLightMatricesPS[4];

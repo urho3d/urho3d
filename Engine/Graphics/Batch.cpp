@@ -65,7 +65,7 @@ inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->instances_[0].distance_ < rhs->instances_[0].distance_;
 }
 
-void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Graphics* graphics, Renderer* renderer, const Vector3& translation)
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
 {
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
@@ -112,9 +112,6 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
         offset.x_ -= 0.5f / width;
         offset.y_ -= 0.5f / height;
     }
-    // If using 2 shadow samples (fallback mode), offset the position horizontally only
-    if (graphics->GetFallback())
-        offset.x_ -= 0.5f / width;
     scale.y_ = -scale.y_;
     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
@@ -347,7 +344,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, Vector3::ZERO);
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
                     
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
                 }
@@ -360,7 +357,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer, Vector3::ZERO);
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
                     
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
                 }
@@ -481,9 +478,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     addX -= 0.5f / width;
                     addY -= 0.5f / height;
                 }
-                // If using 2 shadow samples (fallback mode), offset the position horizontally only
-                if (graphics->GetFallback())
-                    addX -= 0.5f / width;
                 graphics->SetShaderParameter(PSP_SHADOWCUBEADJUST, Vector4(mulX, mulY, addX, addY));
             }
             
@@ -515,16 +509,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     intensity = Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                 float pcfValues = (1.0f - intensity);
                 float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
-                float fallbackBias = 0.0f;
-                // Fallback mode requires manual depth biasing. We do not do proper slope scale biasing,
-                // instead just fudge the bias values together
-                if (graphics->GetFallback())
-                {
-                    samples = 2.0f;
-                    fallbackBias = graphics->GetDepthConstantBias() + 2.0f * graphics->GetDepthSlopeScaledBias() *
-                        graphics->GetDepthConstantBias();
-                }
-                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, fallbackBias, 0.0f));
+                graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))
@@ -550,7 +535,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, graphics, renderer, camera_->GetWorldPosition());
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, camera_->GetWorldPosition());
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
                 }
@@ -563,7 +548,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     CalculateSpotMatrix(shadowMatrices[0], light, camera_->GetWorldPosition());
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, graphics, renderer, camera_->GetWorldPosition());
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, camera_->GetWorldPosition());
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
                 }

@@ -35,7 +35,7 @@ uniform float4 cMatSpecColor : register(C11);
 uniform float2 cSampleOffsets : register(C12);
 uniform float4 cShadowCubeAdjust : register(C13);
 uniform float4 cShadowDepthFade : register(C14);
-uniform float3 cShadowIntensity : register(C15);
+uniform float2 cShadowIntensity : register(C15);
 uniform float4 cShadowSplits : register(C16);
 #ifdef SM3
     uniform float4x4 cLightMatricesPS[4] : register(C17);

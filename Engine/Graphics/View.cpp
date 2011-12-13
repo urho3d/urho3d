@@ -552,8 +552,6 @@ void View::GetBatches()
     
     // Build light queues and lit batches
     {
-        bool fallback = graphics_->GetFallback();
-        
         maxLightsDrawables_.Clear();
         lightQueueMapping_.Clear();
         
@@ -2294,24 +2292,13 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     PROFILE(RenderShadowMap);
     
     Texture2D* shadowMap = queue.shadowMap_;
-    
-    graphics_->SetStencilTest(false);
     graphics_->SetTexture(TU_SHADOWMAP, 0);
     
-    if (!graphics_->GetFallback())
-    {
-        graphics_->SetColorWrite(false);
-        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
-        graphics_->SetDepthStencil(shadowMap);
-        graphics_->Clear(CLEAR_DEPTH);
-    }
-    else
-    {
-        graphics_->SetColorWrite(true);
-        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface());
-        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthStencil());
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, Color::WHITE);
-    }
+    graphics_->SetColorWrite(false);
+    graphics_->SetStencilTest(false);
+    graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+    graphics_->SetDepthStencil(shadowMap);
+    graphics_->Clear(CLEAR_DEPTH);
     
     // Set shadow depth bias
     BiasParameters parameters = queue.light_->GetShadowBias();

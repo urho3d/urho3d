@@ -14,9 +14,6 @@ void VS(float4 iPos : POSITION,
         float2 iTexCoord : TEXCOORD0,
         out float2 oTexCoord : TEXCOORD0,
     #endif
-    #ifdef FALLBACK
-        out float4 oClipPos : TEXCOORD1,
-    #endif
     out float4 oPos : POSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
@@ -26,17 +23,11 @@ void VS(float4 iPos : POSITION,
     #ifdef ALPHAMASK
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
-    #ifdef FALLBACK
-        oClipPos = oPos;
-    #endif
 }
 
 void PS(
     #ifdef ALPHAMASK
         float2 iTexCoord : TEXCOORD0,
-    #endif
-    #ifdef FALLBACK
-        float4 iClipPos : TEXCOORD1,
     #endif
     out float4 oColor : COLOR0)
 {
@@ -46,10 +37,5 @@ void PS(
         const float alpha = 1.0;
     #endif
 
-    #ifdef FALLBACK
-        float depth = min(iClipPos.z / iClipPos.w + cShadowIntensity.z, 1.0);
-        oColor = float4(EncodeDepth(depth), 1.0, alpha);
-    #else
-        oColor = alpha;
-    #endif
+    oColor = alpha;
 }

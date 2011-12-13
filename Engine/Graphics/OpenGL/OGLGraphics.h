@@ -200,9 +200,7 @@ public:
     void ResetStreamFrequencies();
     /// Set force Shader Model 2 flag. No effect on OpenGL.
     void SetForceSM2(bool enable);
-    /// %Set force fallback shaders flag. No effect on OpenGL.
-    void SetForceFallback(bool enable);
-    
+
     /// Return whether rendering initialized.
     bool IsInitialized() const;
     /// Return graphics implementation, which holds the actual API-specific resources.
@@ -237,8 +235,6 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether fallback shaders are required. Always false on OpenGL.
-    bool GetFallback() const { return false; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
     /// Return whether light pre-pass rendering is supported.
@@ -329,9 +325,7 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
     /// Return force Shader Model 2 flag. Always false on OpenGL.
     bool GetForceSM2() const { return false; }
-    /// Return force fallback mode flag. Always false on OpenGL.
-    bool GetForceFallback() const { return false; }
-    
+
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.

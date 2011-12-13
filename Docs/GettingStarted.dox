@@ -142,10 +142,7 @@ Urho3D.exe understands the following command line options:
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering
--fallback   Force fallback rendering (*)
 \endverbatim
-
-(*) Uses only RGBA render targets, and 2-sample shadow filtering. Implies SM2.0. Relevant only on Direct3D9.
 
 
 \page Structure Overall structure

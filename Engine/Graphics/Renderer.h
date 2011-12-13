@@ -432,8 +432,6 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
-    /// Shadow map stencil buffer, fallback mode only.
-    SharedPtr<Texture2D> shadowDepthStencil_;
     /// Viewports.
     Vector<Viewport> viewports_;
     /// Views.

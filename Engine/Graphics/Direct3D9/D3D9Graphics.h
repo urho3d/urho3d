@@ -178,8 +178,6 @@ public:
     void ResetStreamFrequencies();
     /// %Set force Shader Model 2 flag.
     void SetForceSM2(bool enable);
-    /// %Set force fallback shaders flag.
-    void SetForceFallback(bool enable);
     
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -217,8 +215,6 @@ public:
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether texture rendertargets are supported. Always true on Direct3D9
     bool GetRenderTargetSupport() const { return true; }
-    /// Return whether fallback shaders are required.
-    bool GetFallback() const { return fallback_; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
     /// Return whether light pre-pass rendering is supported.
@@ -307,8 +303,6 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
     /// Return force Shader Model 2 flag.
     bool GetForceSM2() const { return forceSM2_; }
-    /// Return force fallback mode flag.
-    bool GetForceFallback() const { return forceFallback_; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -390,14 +384,10 @@ private:
     bool hiresShadowSupport_;
     /// Stream offset support flag.
     bool streamOffsetSupport_;
-    /// Fallback shader mode flag.
-    bool fallback_;
     /// Shader Model 3 flag.
     bool hasSM3_;
     /// Force Shader Model 2 flag.
     bool forceSM2_;
-    /// Force fallback shaders flag.
-    bool forceFallback_;
     /// Query (used to flush the GPU command queue) issued flags.
     bool queryIssued_[NUM_QUERIES];
     /// Current query index

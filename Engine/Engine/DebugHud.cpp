@@ -172,12 +172,7 @@ void DebugHud::Update(float timeStep)
         if (graphics->GetSM3Support())
             mode += "SM3";
         else
-        {
-            if (graphics->GetFallback())
-                mode += "SM2 (FB)";
-            else
-                mode += "SM2";
-        }
+            mode += "SM2";
         #endif
         
         modeText_->SetText(mode);

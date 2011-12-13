@@ -185,12 +185,6 @@ static const String shadowVariations[] =
     #endif
 };
 
-static const String fallbackVariations[] =
-{
-    "",
-    "FB"
-};
-
 static const String hwVariations[] =
 {
     "",
@@ -432,7 +426,7 @@ void Renderer::SetMaterialQuality(int quality)
 
 void Renderer::SetDrawShadows(bool enable)
 {
-    if (!graphics_)
+    if (!graphics_ || !graphics_->GetShadowMapFormat())
         return;
     
     drawShadows_ = enable;
@@ -465,8 +459,6 @@ void Renderer::SetShadowQuality(int quality)
         quality |= SHADOWQUALITY_HIGH_16BIT;
     if (!graphics_->GetHiresShadowSupport())
         quality &= SHADOWQUALITY_HIGH_16BIT;
-    if (graphics_->GetFallback())
-        quality = SHADOWQUALITY_LOW_16BIT;
     
     if (quality != shadowQuality_)
     {
@@ -918,10 +910,9 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     }
     #else
     // Create shadow map and dummy color rendertarget
-    bool fallback = graphics_->GetFallback();
     while (retries)
     {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, fallback ? TEXTURE_RENDERTARGET : TEXTURE_DEPTHSTENCIL))
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
         {
             width >>= 1;
             height >>= 1;
@@ -930,27 +921,14 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         else
         {
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
-            if (!fallback)
+            // If no dummy color rendertarget for this size exists yet, create one now
+            if (!colorShadowMaps_.Contains(searchKey))
             {
-                // If no dummy color rendertarget for this size exists yet, create one now
-                if (!colorShadowMaps_.Contains(searchKey))
-                {
-                    colorShadowMaps_[searchKey] = new Texture2D(context_);
-                    colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
-                }
-                // Link the color rendertarget to the shadow map
-                newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
+                colorShadowMaps_[searchKey] = new Texture2D(context_);
+                colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
             }
-            else
-            {
-                // In fallback mode link the shared shadow map depth-stencil to the shadow map instead.
-                // Create it first if not created yet, and resize larger if necessary
-                if (!shadowDepthStencil_)
-                    shadowDepthStencil_ = new Texture2D(context_);
-                if (shadowDepthStencil_->GetWidth() < width || shadowDepthStencil_->GetHeight() < height)
-                    shadowDepthStencil_->SetSize(width, height, D3DFMT_D16, TEXTURE_DEPTHSTENCIL);
-                newShadowMap->GetRenderSurface()->SetLinkedDepthStencil(shadowDepthStencil_->GetRenderSurface());
-            }
+            // Link the color rendertarget to the shadow map
+            newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
             break;
         }
     }
@@ -1282,6 +1260,9 @@ void Renderer::Initialize()
     }
     #endif
     
+    if (!graphics_->GetShadowMapFormat())
+        drawShadows_ = false;
+    
     defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
     defaultLightSpot_ = cache->GetResource<Texture2D>("Textures/Spot.png");
     defaultMaterial_ = cache->GetResource<Material>("Materials/Default.xml");
@@ -1381,9 +1362,6 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         return;
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-    unsigned fallback = graphics_->GetFallback() ? 1 : 0;
-    if (fallback)
-        shadows = SHADOWQUALITY_HIGH_16BIT;
     
     String vertexShaderName = pass->GetVertexShaderName();
     String pixelShaderName = pass->GetPixelShaderName();
@@ -1400,13 +1378,6 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
         vertexShaderName += hwVariations[hwDepth];
         pixelShaderName += hwVariations[hwDepth];
-    }
-    
-    // Check for fallback shadow rendering mode (write depth into an RGBA rendertarget)
-    if (type == PASS_SHADOW)
-    {
-        vertexShaderName += fallbackVariations[fallback];
-        pixelShaderName += fallbackVariations[fallback];
     }
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
@@ -1443,10 +1414,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
             if (j & LPS_SHADOW)
             {
                 if (allowShadows)
-                {
-                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows] +
-                        fallbackVariations[fallback]);
-                }
+                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows]);
                 else
                     pixelShaders[j].Reset();
             }
@@ -1622,7 +1590,6 @@ void Renderer::ResetShadowMaps()
 {
     shadowMaps_.Clear();
     colorShadowMaps_.Clear();
-    shadowDepthStencil_.Reset();
 }
 
 void Renderer::CheckScreenBuffer()

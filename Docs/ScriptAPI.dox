@@ -2218,14 +2218,12 @@ Properties:<br>
 - bool deviceLost (readonly)
 - uint numPrimitives (readonly)
 - uint numBatches (readonly)
-- bool fallback (readonly)
 - bool sm3Support (readonly)
 - bool lightPrepassSupport (readonly)
 - bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
 - bool forceSM2
-- bool forceFallback
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)
 
