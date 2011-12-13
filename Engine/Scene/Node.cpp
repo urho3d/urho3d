@@ -100,9 +100,12 @@ void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, Variant
 bool Node::Load(Deserializer& source)
 {
     SceneResolver resolver;
-    bool success = Load(source, true, &resolver);
+    bool success = Load(source, resolver);
     if (success)
+    {
         resolver.Resolve();
+        ApplyAttributes();
+    }
     
     return success;
 }
@@ -142,9 +145,12 @@ bool Node::LoadXML(const XMLElement& source)
 {
     SceneResolver resolver;
     
-    bool success = LoadXML(source, true, &resolver);
+    bool success = LoadXML(source, resolver);
     if (success)
+    {
         resolver.Resolve();
+        ApplyAttributes();
+    }
     
     return success;
 }
@@ -986,7 +992,7 @@ void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
         MarkDirty();
 }
 
-bool Node::Load(Deserializer& source, bool readChildren, SceneResolver* resolver)
+bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1005,8 +1011,7 @@ bool Node::Load(Deserializer& source, bool readChildren, SceneResolver* resolver
         Component* newComponent = CreateComponent(compType, compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
-            if (resolver)
-                resolver->AddComponent(compID, newComponent);
+            resolver.AddComponent(compID, newComponent);
             if (!newComponent->Load(compBuffer))
                 return false;
         }
@@ -1020,16 +1025,15 @@ bool Node::Load(Deserializer& source, bool readChildren, SceneResolver* resolver
     {
         unsigned nodeID = source.ReadUInt();
         Node* newNode = CreateChild(nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-        if (resolver)
-            resolver->AddNode(nodeID, newNode);
-        if (!newNode->Load(source, true, resolver))
+        resolver.AddNode(nodeID, newNode);
+        if (!newNode->Load(source, resolver))
             return false;
     }
     
     return true;
 }
 
-bool Node::LoadXML(const XMLElement& source, bool readChildren, SceneResolver* resolver)
+bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readChildren)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1046,8 +1050,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren, SceneResolver* r
         Component* newComponent = CreateComponent(ShortStringHash(typeName), compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
-            if (resolver)
-                resolver->AddComponent(compID, newComponent);
+            resolver.AddComponent(compID, newComponent);
             if (!newComponent->LoadXML(compElem))
                 return false;
         }
@@ -1063,9 +1066,8 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren, SceneResolver* r
     {
         unsigned nodeID = childElem.GetInt("id");
         Node* newNode = CreateChild(nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-        if (resolver)
-            resolver->AddNode(nodeID, newNode);
-        if (!newNode->LoadXML(childElem, true, resolver))
+        resolver.AddNode(nodeID, newNode);
+        if (!newNode->LoadXML(childElem, resolver))
             return false;
         
         childElem = childElem.GetNext("node");

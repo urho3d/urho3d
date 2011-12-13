@@ -166,7 +166,7 @@ private:
     void UpdateAsyncLoading();
     /// Finish asynchronous loading.
     void FinishAsyncLoading();
-    /// Finish loading. Calls ApplyAttributes() recursively to the whole scene.
+    /// Finish loading. Sets the scene filename and checksum.
     void FinishLoading(Deserializer* source);
     
     /// Map of scene nodes by ID.

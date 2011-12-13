@@ -320,9 +320,9 @@ public:
     /// Update motion smoothing. Called by Scene.
     void UpdateSmoothing(float constant, float squaredSnapThreshold);
     /// Load components and optionally load child nodes.
-    bool Load(Deserializer& source, bool loadChildren, SceneResolver* resolver);
+    bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true);
     /// Load components from XML data and optionally load child nodes.
-    bool LoadXML(const XMLElement& source, bool loadChildren, SceneResolver* resolver);
+    bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true);
     
     /// User variables.
     VariantMap vars_;
