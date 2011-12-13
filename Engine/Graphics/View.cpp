@@ -1148,14 +1148,23 @@ void View::RenderBatchesLightPrepass()
     
     graphics_->SetTexture(TU_DEPTHBUFFER, 0);
     graphics_->SetTexture(TU_NORMALBUFFER, 0);
-
+    
     // Clear destination rendertarget with fog color
+    graphics_->SetAlphaTest(false);
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetColorWrite(true);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetDepthWrite(false);
     graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
+    graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(screenRect_);
-    graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
+    
+    graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
+    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
+    graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
+    DrawFullscreenQuad(camera_, false);
     
     if (!baseQueue_.IsEmpty())
     {
