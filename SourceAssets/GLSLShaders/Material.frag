@@ -3,17 +3,17 @@
 #include "Lighting.frag"
 #include "Fog.frag"
 
-varying vec3 vTexCoord;
+varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec3 vVertexLighting;
+varying vec4 vVertexLighting;
 varying vec4 vScreenPos;
 
 void main()
 {
     #ifdef DIFFMAP
-        vec4 diffInput = texture2D(sDiffMap, vTexCoord.xy);
+        vec4 diffInput = texture2D(sDiffMap, vTexCoord);
         #ifdef ALPHAMASK
             if (diffInput.a < 0.5)
                 discard;
@@ -24,7 +24,7 @@ void main()
     #endif
 
     #ifdef SPECMAP
-        vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord.xy).g;
+        vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord).g;
     #else
         vec3 specColor = cMatSpecColor.rgb;
     #endif
@@ -33,6 +33,6 @@ void main()
     vec4 lightInput = 2.0 * texture2DProj(sLightBuffer, vScreenPos);
     vec3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
-    vec3 finalColor = (vVertexLighting + lightInput.rgb) * diffColor + lightSpecColor * specColor;
-    gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), 1.0);
+    vec3 finalColor = (vVertexLighting.rgb + lightInput.rgb) * diffColor + lightSpecColor * specColor;
+    gl_FragColor = vec4(GetFog(finalColor, vVertexLighting.a), 1.0);
 }

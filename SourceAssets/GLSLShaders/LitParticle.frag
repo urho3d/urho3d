@@ -7,8 +7,7 @@ varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec3 vLightVec;
-varying vec2 vZonePosDepth;
+varying vec4 vLightVec;
 #ifdef SPOTLIGHT
     varying vec4 vSpotPos;
 #endif
@@ -36,7 +35,7 @@ void main()
     #ifdef DIRLIGHT
         diff = GetDiffuseDirVolumetric();
     #else
-        diff = GetDiffusePointOrSpotVolumetric(vLightVec);
+        diff = GetDiffusePointOrSpotVolumetric(vLightVec.xyz);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -51,8 +50,8 @@ void main()
     
     #ifdef AMBIENT
         finalColor += cAmbientColor * diffColor.rgb;
-        gl_FragColor = vec4(GetFog(finalColor, vZonePosDepth.y), diffColor.a);
+        gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
     #else
-        gl_FragColor = vec4(GetLitFog(finalColor, vZonePosDepth.y), diffColor.a);
+        gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
     #endif
 }

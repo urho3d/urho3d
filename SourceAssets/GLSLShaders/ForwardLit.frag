@@ -3,11 +3,11 @@
 #include "Lighting.frag"
 #include "Fog.frag"
 
-varying vec3 vTexCoord;
+varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec3 vLightVec;
+varying vec4 vLightVec;
 #ifdef SPECULAR
     varying vec3 vEyeVec;
 #endif
@@ -33,7 +33,7 @@ varying vec3 vLightVec;
 void main()
 {
     #ifdef DIFFMAP
-        vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord.xy);
+        vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord);
     #else
         vec4 diffColor = cMatDiffColor;
     #endif
@@ -48,26 +48,26 @@ void main()
     float diff;
 
     #ifdef NORMALMAP
-        vec3 normal = DecodeNormal(texture2D(sNormalMap, vTexCoord.xy));
+        vec3 normal = DecodeNormal(texture2D(sNormalMap, vTexCoord));
     #else
         vec3 normal = normalize(vNormal);
     #endif
 
     #ifdef DIRLIGHT
         #ifdef NORMALMAP
-            lightDir = normalize(vLightVec);
+            lightDir = normalize(vLightVec.xyz);
         #else
-            lightDir = vLightVec;
+            lightDir = vLightVec.xyz;
         #endif
         diff = GetDiffuseDir(normal, lightDir);
     #else
-        diff = GetDiffusePointOrSpot(normal, vLightVec, lightDir);
+        diff = GetDiffusePointOrSpot(normal, vLightVec.xyz, lightDir);
     #endif
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            vec4 shadowPos = GetDirShadowPos(vShadowPos, vTexCoord.z);
-            diff *= min(GetShadow(shadowPos) + GetShadowFade(vTexCoord.z), 1.0);
+            vec4 shadowPos = GetDirShadowPos(vShadowPos, vLightVec.w);
+            diff *= min(GetShadow(shadowPos) + GetShadowFade(vLightVec.w), 1.0);
         #elif defined(SPOTLIGHT)
             diff *= GetShadow(vShadowPos);
         #else
@@ -85,7 +85,7 @@ void main()
 
     #ifdef SPECULAR
         #ifdef SPECMAP
-            vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord.xy).g;
+            vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord).g;
         #else
             vec3 specColor = cMatSpecColor.rgb;
         #endif
@@ -97,8 +97,8 @@ void main()
 
     #ifdef AMBIENT
         finalColor += cAmbientColor * diffColor.rgb;
-        gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), diffColor.a);
+        gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
     #else
-        gl_FragColor = vec4(GetLitFog(finalColor, vTexCoord.z), diffColor.a);
+        gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
     #endif
 }

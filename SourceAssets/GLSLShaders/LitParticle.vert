@@ -5,8 +5,7 @@ varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec3 vLightVec;
-varying vec2 vZonePosDepth;
+varying vec4 vLightVec;
 #ifdef SPOTLIGHT
     varying vec4 vSpotPos;
 #endif
@@ -28,12 +27,10 @@ void main()
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
-        vLightVec = cLightDir;
+        vLightVec = vec4(cLightDir, GetDepth(gl_Position));
     #else
-        vLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
+        vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
     #endif
-    
-    vZonePosDepth = vec2(GetZonePos(worldPos), GetDepth(gl_Position));
 
     #ifdef SPOTLIGHT
         // Spotlight projection: transform from world space to projector texture coordinates
@@ -41,6 +38,6 @@ void main()
     #endif
 
     #ifdef POINTLIGHT
-        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * vLightVec;
+        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * vLightVec.xyz;
     #endif
 }

@@ -24,8 +24,8 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float3 oTexCoord : TEXCOORD0,
-    out float3 oVertexLighting : TEXCOORD1,
+    out float2 oTexCoord : TEXCOORD0,
+    out float4 oVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
@@ -34,13 +34,13 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
+    oTexCoord = GetTexCoord(iTexCoord);
 
-    oVertexLighting = GetAmbient(GetZonePos(worldPos));
+    oVertexLighting = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
     #ifdef NUMVERTEXLIGHTS
     float3 normal = GetWorldNormal(modelMatrix);
     for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-        oVertexLighting += GetVertexLight(i, worldPos, normal) * cVertexLights[i * 3].rgb;
+        oVertexLighting.rgb += GetVertexLight(i, worldPos, normal) * cVertexLights[i * 3].rgb;
     #endif
 
     #ifdef VERTEXCOLOR
@@ -48,15 +48,15 @@ void VS(float4 iPos : POSITION,
     #endif
 }
 
-void PS(float3 iTexCoord : TEXCOORD0,
-    float3 iVertexLighting : TEXCOORD1,
+void PS(float2 iTexCoord : TEXCOORD0,
+    float4 iVertexLighting : TEXCOORD1,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord.xy);
+        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
     #else
         float4 diffColor = cMatDiffColor;
     #endif
@@ -65,7 +65,7 @@ void PS(float3 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    float3 finalColor = iVertexLighting * diffColor.rgb;
+    float3 finalColor = iVertexLighting.rgb * diffColor.rgb;
 
-    oColor = float4(GetFog(finalColor, iTexCoord.z), diffColor.a);
+    oColor = float4(GetFog(finalColor, iVertexLighting.a), diffColor.a);
 }

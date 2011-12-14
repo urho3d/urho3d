@@ -20,8 +20,8 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
-    out float3 oTexCoord : TEXCOORD0,
-    out float3 oLightVec : TEXCOORD1,
+    out float2 oTexCoord : TEXCOORD0,
+    out float4 oLightVec : TEXCOORD1,
     #ifdef SPOTLIGHT
         out float4 oSpotPos : TEXCOORD2,
     #endif
@@ -36,7 +36,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
+    oTexCoord = GetTexCoord(iTexCoord);
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -45,9 +45,9 @@ void VS(float4 iPos : POSITION,
     float4 projWorldPos = float4(worldPos, 1.0);
 
     #ifdef DIRLIGHT
-        oLightVec = cLightDir;
+        oLightVec = float4(cLightDir, GetDepth(oPos));
     #else
-        oLightVec = (cLightPos.xyz - worldPos) * cLightPos.w;
+        oLightVec = float4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(oPos));
     #endif
 
     #ifdef SPOTLIGHT
@@ -56,12 +56,12 @@ void VS(float4 iPos : POSITION,
     #endif
 
     #ifdef POINTLIGHT
-        oCubeMaskVec = mul(oLightVec, (float3x3)cLightMatrices[0]);
+        oCubeMaskVec = mul(oLightVec.xyz, (float3x3)cLightMatrices[0]);
     #endif
 }
 
-void PS(float3 iTexCoord : TEXCOORD0,
-    float3 iLightVec : TEXCOORD1,
+void PS(float2 iTexCoord : TEXCOORD0,
+    float4 iLightVec : TEXCOORD1,
     #ifdef SPOTLIGHT
         float4 iSpotPos : TEXCOORD2,
     #endif
@@ -74,7 +74,7 @@ void PS(float3 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord.xy);
+        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
     #else
         float4 diffColor = cMatDiffColor;
     #endif
@@ -90,7 +90,7 @@ void PS(float3 iTexCoord : TEXCOORD0,
     #ifdef DIRLIGHT
         diff = GetDiffuseDirVolumetric();
     #else
-        diff = GetDiffusePointOrSpotVolumetric(iLightVec);
+        diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -105,8 +105,8 @@ void PS(float3 iTexCoord : TEXCOORD0,
     
     #ifdef AMBIENT
         finalColor += cAmbientColor * diffColor.rgb;
-        oColor = float4(GetFog(finalColor, iTexCoord.z), diffColor.a);
+        oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
     #else
-        oColor = float4(GetLitFog(finalColor, iTexCoord.z), diffColor.a);
+        oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
     #endif
 }

@@ -3,16 +3,16 @@
 #include "Fog.frag"
 #include "Lighting.frag"
 
-varying vec3 vTexCoord;
+varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
-varying vec3 vVertexLighting;
+varying vec4 vVertexLighting;
 
 void main()
 {
     #ifdef DIFFMAP
-        vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord.xy);
+        vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord);
     #else
         vec4 diffColor = cMatDiffColor;
     #endif
@@ -21,6 +21,6 @@ void main()
         diffColor *= vColor;
     #endif
 
-    vec3 finalColor = vVertexLighting * diffColor.rgb;
-    gl_FragColor = vec4(GetFog(finalColor, vTexCoord.z), diffColor.a);
+    vec3 finalColor = vVertexLighting.rgb * diffColor.rgb;
+    gl_FragColor = vec4(GetFog(finalColor, vVertexLighting.a), diffColor.a);
 }
