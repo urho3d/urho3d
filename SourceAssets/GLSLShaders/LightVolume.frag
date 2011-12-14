@@ -62,8 +62,7 @@ void main()
 
     #ifdef SHADOW
         #if defined(DIRLIGHT)
-            mat4 shadowMatrix = GetDirShadowMatrix(depth, cLightMatricesPS);
-            vec4 shadowPos = shadowMatrix * projWorldPos;
+            vec4 shadowPos = GetDirShadowPosDeferred(cLightMatricesPS, projWorldPos, depth);
             diff *= min(GetShadow(shadowPos) + GetShadowFade(depth), 1.0);
         #elif defined(SPOTLIGHT)
             vec4 shadowPos = cLightMatricesPS[1] * projWorldPos;

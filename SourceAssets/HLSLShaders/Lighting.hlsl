@@ -165,26 +165,26 @@ float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
 }
 
 #ifdef SM3
-float4x4 GetDirShadowMatrix(float depth, const float4x4 matrices[4])
+float4 GetDirShadowPosDeferred(const float4x4 matrices[4], float4 projWorldPos, float depth)
 {
     if (depth < cShadowSplits.x)
-        return matrices[0];
+        return mul(projWorldPos, matrices[0]);
     else if (depth < cShadowSplits.y)
-        return matrices[1];
+        return mul(projWorldPos, matrices[1]);
     else if (depth < cShadowSplits.z)
-        return matrices[2];
+        return mul(projWorldPos, matrices[2]);
     else
-        return matrices[3];
+        return mul(projWorldPos, matrices[3]);
 }
 #else
-float4x4 GetDirShadowMatrix(float depth, const float4x4 matrices[3])
+float4 GetDirShadowPosDeferred(const float4x4 matrices[3], float4 projWorldPos, float depth)
 {
     if (depth < cShadowSplits.x)
-        return matrices[0];
+        return mul(projWorldPos, matrices[0]);
     else if (depth < cShadowSplits.y)
-        return matrices[1];
+        return mul(projWorldPos, matrices[1]);
     else
-        return matrices[2];
+        return mul(projWorldPos, matrices[2]);
 }
 #endif
 #endif

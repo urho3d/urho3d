@@ -94,16 +94,16 @@ vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
         return shadowPos[3];
 }
 
-mat4 GetDirShadowMatrix(float depth, const mat4 matrices[4])
+vec4 GetDirShadowPosDeferred(const mat4 shadowMatrix[4], vec4 projWorldPos, float depth)
 {
     if (depth < cShadowSplits.x)
-        return matrices[0];
+        return shadowMatrix[0] * projWorldPos;
     else if (depth < cShadowSplits.y)
-        return matrices[1];
+        return shadowMatrix[1] * projWorldPos;
     else if (depth < cShadowSplits.z)
-        return matrices[2];
+        return shadowMatrix[2] * projWorldPos;
     else
-        return matrices[3];
+        return shadowMatrix[3] * projWorldPos;
 }
 #endif
 
