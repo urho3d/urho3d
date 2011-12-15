@@ -1820,6 +1820,11 @@ unsigned Graphics::GetRGBAFormat()
     return GL_RGBA;
 }
 
+unsigned Graphics::GetFloatFormat()
+{
+    return GL_LUMINANCE32F_ARB;
+}
+
 unsigned Graphics::GetLinearDepthFormat()
 {
     // OpenGL FBO specs state that color attachments must have the same format; therefore must encode linear depth to RGBA

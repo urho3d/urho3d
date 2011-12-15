@@ -1878,6 +1878,11 @@ unsigned Graphics::GetRGBAFormat()
     return D3DFMT_A8R8G8B8;
 }
 
+unsigned Graphics::GetFloatFormat()
+{
+    return D3DFMT_R32F;
+}
+
 unsigned Graphics::GetLinearDepthFormat()
 {
     return D3DFMT_R32F;

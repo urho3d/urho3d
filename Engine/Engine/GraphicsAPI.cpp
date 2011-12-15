@@ -258,6 +258,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint GetLuminanceAlphaFormat()", asFUNCTION(Graphics::GetLuminanceAlphaFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetRGBFormat()", asFUNCTION(Graphics::GetRGBFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetRGBAFormat()", asFUNCTION(Graphics::GetRGBAFormat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetFloatFormat()", asFUNCTION(Graphics::GetFloatFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetDepthStencilFormat()", asFUNCTION(Graphics::GetDepthStencilFormat), asCALL_CDECL);
 }
 

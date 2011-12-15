@@ -62,6 +62,7 @@
 - uint GetLuminanceAlphaFormat()
 - uint GetRGBFormat()
 - uint GetRGBAFormat()
+- uint GetFloatFormat()
 - uint GetDepthStencilFormat()
 - void DelayedExecute(float, const String&, const Variant[]@)
 - void DelayedExecute(float, const String&)

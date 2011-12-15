@@ -345,6 +345,8 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
+    /// Return the API-specific single channel float texture format.
+    static unsigned GetFloatFormat();
     /// Return the API-specific linear depth texture format.
     static unsigned GetLinearDepthFormat();
     /// Return the API-specific readable hardware depth-stencil texture format.
