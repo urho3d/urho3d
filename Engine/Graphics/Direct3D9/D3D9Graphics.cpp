@@ -1143,7 +1143,7 @@ void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& 
             else if (!shaderParametersOverlap_ && vsRegisterAssignments_[j] != param)
             {
                 shaderParametersOverlap_ = true;
-                LOGINFO("Shader parameters overlap");
+                LOGDEBUG("Shader parameters overlap");
             }
         }
     }
@@ -1156,7 +1156,7 @@ void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& 
             else if (!shaderParametersOverlap_ && psRegisterAssignments_[j] != param)
             {
                 shaderParametersOverlap_ = true;
-                LOGINFO("Shader parameters overlap");
+                LOGDEBUG("Shader parameters overlap");
             }
         }
     }

@@ -483,7 +483,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWDEPTHFADE, light))
             {
-                // Note: we use the shadow camera of the first cube face. All are assumed to use the same projection
                 Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
                 float nearClip = shadowCamera->GetNearClip();
                 float farClip = shadowCamera->GetFarClip();
