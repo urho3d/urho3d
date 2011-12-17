@@ -42,6 +42,10 @@ public:
     /// Destruct.
     virtual ~Component();
     
+    /// Save as binary data. Return true if successful.
+    virtual bool Save(Serializer& dest);
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest);
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied.

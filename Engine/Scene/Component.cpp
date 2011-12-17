@@ -40,6 +40,30 @@ Component::~Component()
 {
 }
 
+bool Component::Save(Serializer& dest)
+{
+    // Write type and ID
+    if (!dest.WriteShortStringHash(GetType()))
+        return false;
+    if (!dest.WriteUInt(id_))
+        return false;
+    
+    // Write attributes
+    return Serializable::Save(dest);
+}
+
+bool Component::SaveXML(XMLElement& dest)
+{
+    // Write type and ID
+    if (!dest.SetString("type", GetTypeName()))
+        return false;
+    if (!dest.SetInt("id", id_))
+        return false;
+    
+    // Write attributes
+    return Serializable::SaveXML(dest);
+}
+
 void Component::Remove()
 {
     if (node_)

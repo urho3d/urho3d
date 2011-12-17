@@ -52,7 +52,8 @@ static const String typeNames[] =
     "ResourceRef",
     "ResourceRefList",
     "VariantVector",
-    "VariantMap"
+    "VariantMap",
+    ""
 };
 
 Variant& Variant::operator = (const Variant& rhs)
@@ -155,67 +156,95 @@ bool Variant::operator == (const Variant& rhs) const
 
 void Variant::FromString(const String& type, const String& value)
 {
-    String typeLower = type.ToLower();
-    
-    if (typeLower == "none")
-        SetType(VAR_NONE);
-    else if (typeLower == "int")
+    return FromString(GetTypeFromName(type), value);
+}
+
+void Variant::FromString(VariantType type, const String& value)
+{
+    switch (type)
+    {
+    case VAR_INT:
         *this = ToInt(value);
-    else if (typeLower == "bool")
+        break;
+        
+    case VAR_BOOL:
         *this = ToBool(value);
-    else if (typeLower == "float")
+        break;
+        
+    case VAR_FLOAT:
         *this = ToFloat(value);
-    else if (typeLower == "vector2")
+        break;
+        
+    case VAR_VECTOR2:
         *this = ToVector2(value);
-    else if (typeLower == "vector3")
+        break;
+        
+    case VAR_VECTOR3:
         *this = ToVector3(value);
-    else if (typeLower == "vector4")
+        break;
+        
+    case VAR_VECTOR4:
         *this = ToVector4(value);
-    else if (typeLower == "quaternion")
+        break;
+        
+    case VAR_QUATERNION:
         *this = ToQuaternion(value);
-    else if (typeLower == "color")
+        break;
+        
+    case VAR_COLOR:
         *this = ToColor(value);
-    else if (typeLower == "string")
+        break;
+        
+    case VAR_STRING:
         *this = value;
-    else if (typeLower == "buffer")
-    {
-        SetType(VAR_BUFFER);
-        PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(&value_));
-        Vector<String> values = value.Split(' ');
-        buffer.Resize(values.Size());
-        for (unsigned i = 0; i < values.Size(); ++i)
-            buffer[i] = ToInt(values[i]);
-    }
-    else if (typeLower == "pointer")
-    {
+        break;
+        
+    case VAR_BUFFER:
+        {
+            SetType(VAR_BUFFER);
+            PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(&value_));
+            Vector<String> values = value.Split(' ');
+            buffer.Resize(values.Size());
+            for (unsigned i = 0; i < values.Size(); ++i)
+                buffer[i] = ToInt(values[i]);
+        }
+        break;
+        
+    case VAR_PTR:
         *this = (void*)0;
-    }
-    else if (typeLower == "objectref")
-    {
-        Vector<String> values = value.Split(';');
-        if (values.Size() == 2)
+        break;
+        
+    case VAR_RESOURCEREF:
         {
-            SetType(VAR_RESOURCEREF);
-            ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(&value_));
-            ref.type_ = ShortStringHash(values[0]);
-            ref.id_ = StringHash(values[1]);
+            Vector<String> values = value.Split(';');
+            if (values.Size() == 2)
+            {
+                SetType(VAR_RESOURCEREF);
+                ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(&value_));
+                ref.type_ = ShortStringHash(values[0]);
+                ref.id_ = StringHash(values[1]);
+            }
         }
-    }
-    else if (typeLower == "objectreflist")
-    {
-        Vector<String> values = value.Split(';');
-        if (values.Size() >= 1)
+        break;
+        
+    case VAR_RESOURCEREFLIST:
         {
-            SetType(VAR_RESOURCEREFLIST);
-            ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(&value_));
-            refList.type_ = ShortStringHash(values[0]);
-            refList.ids_.Resize(values.Size() - 1);
-            for (unsigned i = 1; i < values.Size(); ++i)
-                refList.ids_[i - 1] = StringHash(values[i]);
+            Vector<String> values = value.Split(';');
+            if (values.Size() >= 1)
+            {
+                SetType(VAR_RESOURCEREFLIST);
+                ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(&value_));
+                refList.type_ = ShortStringHash(values[0]);
+                refList.ids_.Resize(values.Size() - 1);
+                for (unsigned i = 1; i < values.Size(); ++i)
+                    refList.ids_[i - 1] = StringHash(values[i]);
+            }
         }
-    }
-    else
+        break;
+        
+    default:
         SetType(VAR_NONE);
+    }
 }
 
 void Variant::SetBuffer(const void* data, unsigned size)
@@ -290,7 +319,7 @@ String Variant::ToString() const
         // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String();
-
+        
     default:
         return String();
     }
@@ -492,4 +521,17 @@ template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() co
 const String& Variant::GetTypeName(VariantType type)
 {
     return typeNames[type];
+}
+
+VariantType Variant::GetTypeFromName(const String& typeName)
+{
+    unsigned index = 0;
+    while (!typeNames[index].Empty())
+    {
+        if (!typeNames[index].Compare(typeName, false))
+            return (VariantType)index;
+        ++index;
+    }
+    
+    return VAR_NONE;
 }

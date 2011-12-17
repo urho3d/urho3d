@@ -57,7 +57,6 @@ void SceneResolver::AddComponent(unsigned oldID, Component* component)
 void SceneResolver::Resolve()
 {
     // Nodes do not have component or node ID attributes, so only have to go through components
-    /// \todo The root node does not currently save its own ID, so it is unknown to the resolving process
     HashSet<ShortStringHash> noIDAttributes;
     for (HashMap<unsigned, WeakPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {

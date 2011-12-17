@@ -297,7 +297,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                         LOGWARNING("Unknown enum value " + value + " in attribute " + String(attr.name_));
                 }
                 else
-                    OnSetAttribute(attr, attrElem.GetVariant());
+                    OnSetAttribute(attr, attrElem.GetVariantValue(attr.type_));
                 
                 found = true;
                 break;
@@ -345,7 +345,7 @@ bool Serializable::SaveXML(XMLElement& dest)
             attrElem.SetString("value", String(attr.enumNames_[enumValue]));
         }
         else
-            attrElem.SetVariant(value);
+            attrElem.SetVariantValue(value);
     }
     
     return true;

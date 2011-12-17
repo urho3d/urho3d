@@ -78,6 +78,8 @@ public:
     bool SetString(const String& name, const String& value);
     /// %Set a variant attribute.
     bool SetVariant(const Variant& value);
+    /// %Set a variant attribute excluding the type.
+    bool SetVariantValue(const Variant& value);
     /// %Set a resource reference attribute.
     bool SetResourceRef(const ResourceRef& value);
     /// %Set a resource referene list attribute.
@@ -149,6 +151,8 @@ public:
     String GetStringUpper(const String& name) const;
     /// Return a variant attribute, or empty if missing.
     Variant GetVariant() const;
+    /// Return a variant attribute with static type.
+    Variant GetVariantValue(VariantType type) const;
     /// Return a resource reference attribute, or empty if missing.
     ResourceRef GetResourceRef() const;
     /// Return a resource reference list attribute, or empty if missing.

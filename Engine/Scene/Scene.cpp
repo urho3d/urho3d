@@ -198,8 +198,13 @@ bool Scene::LoadAsync(File* file)
     
     LOGINFO("Loading scene from " + file->GetName());
     
-    // Clear the previous scene and load the root level components first
     Clear();
+    
+    // Store own old ID for resolving possible root node references
+    unsigned nodeID = file->ReadUInt();
+    resolver_.AddNode(nodeID, this);
+    
+    // Load root level components first
     if (!Node::Load(*file, resolver_, false))
         return false;
     
@@ -230,9 +235,14 @@ bool Scene::LoadAsyncXML(File* file)
     
     LOGINFO("Loading scene from " + file->GetName());
     
-    // Clear the previous scene and load the root level components first
     Clear();
     XMLElement rootElement = xmlFile->GetRoot();
+    
+    // Store own old ID for resolving possible root node references
+    unsigned nodeID = rootElement.GetInt("id");
+    resolver_.AddNode(nodeID, this);
+    
+    // Load the root level components first
     if (!Node::LoadXML(rootElement, resolver_, false))
         return false;
     
@@ -261,6 +271,7 @@ void Scene::StopAsyncLoading()
     asyncProgress_.file_.Reset();
     asyncProgress_.xmlFile_.Reset();
     asyncProgress_.xmlElement_ = XMLElement();
+    resolver_.Reset();
 }
 
 void Scene::Clear()
@@ -270,7 +281,6 @@ void Scene::Clear()
     RemoveAllComponents();
     fileName_ = String();
     checksum_ = 0;
-    resolver_.Reset();
 }
 
 void Scene::SetActive(bool enable)
@@ -586,12 +596,16 @@ void Scene::UpdateAsyncLoading()
         // Read one child node with its full sub-hierarchy from either from binary or XML
         if (!asyncProgress_.xmlFile_)
         {
-            Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), REPLICATED);
+            unsigned nodeID = asyncProgress_.file_->ReadUInt();
+            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            resolver_.AddNode(nodeID, newNode);
             newNode->Load(*asyncProgress_.file_, resolver_);
         }
         else
         {
-            Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), REPLICATED);
+            unsigned nodeID = asyncProgress_.xmlElement_.GetInt("id");
+            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
             asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNext("node");
         }

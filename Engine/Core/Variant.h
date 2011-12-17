@@ -293,6 +293,13 @@ public:
         FromString(type, value);
     }
     
+    /// Construct from type and value.
+    Variant(VariantType type, const String& value) :
+        type_(VAR_NONE)
+    {
+        FromString(type, value);
+    }
+    
     /// Copy-construct from another variant.
     Variant(const Variant& value) :
         type_(VAR_NONE)
@@ -669,8 +676,10 @@ public:
     /// Test for inequality with a ShortStringHash.
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     
-    /// %Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// %Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
+    /// %Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    void FromString(VariantType type, const String& value);
     /// %Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
     
@@ -827,8 +836,10 @@ public:
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     
-    /// Return type name for enum value.
+    /// Return name for variant type.
     static const String& GetTypeName(VariantType type);
+    /// Return variant type from type name.
+    static VariantType GetTypeFromName(const String& typeName);
     
     /// Empty variant.
     static const Variant EMPTY;

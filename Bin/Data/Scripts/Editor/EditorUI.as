@@ -4,7 +4,7 @@ XMLFile@ uiStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
-Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
+Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
 Array<String> uiAllFilter = {"*.*"};
 Array<String> uiScriptFilter = {"*.as", "*.*"};
 uint uiSceneFilter = 0;

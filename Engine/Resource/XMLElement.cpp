@@ -195,6 +195,11 @@ bool XMLElement::SetVariant(const Variant& value)
     if (!SetAttribute("type", value.GetTypeName()))
         return false;
     
+    return SetVariantValue(value);
+}
+
+bool XMLElement::SetVariantValue(const Variant& value)
+{
     switch (value.GetType())
     {
     case VAR_RESOURCEREF:
@@ -510,16 +515,21 @@ String XMLElement::GetStringUpper(const String& name) const
 
 Variant XMLElement::GetVariant() const
 {
+    VariantType type = Variant::GetTypeFromName(GetAttribute("type"));  
+    return GetVariantValue(type);
+}
+
+Variant XMLElement::GetVariantValue(VariantType type) const
+{
     Variant ret;
     
-    String type = GetAttribute("type").ToLower();
-    if (type == "resourceref")
+    if (type == VAR_RESOURCEREF)
         ret = GetResourceRef();
-    else if (type == "resourcereflist")
+    else if (type == VAR_RESOURCEREFLIST)
         ret = GetResourceRefList();
-    else if (type == "variantvector")
+    else if (type == VAR_VARIANTVECTOR)
         ret = GetVariantVector();
-    else if (type == "variantmap")
+    else if (type == VAR_VARIANTMAP)
         ret = GetVariantMap();
     else
         ret.FromString(type, GetAttribute("value"));

@@ -676,6 +676,7 @@ Methods:<br>
 - Variant[]@ GetVariantVector() const
 - const VariantMap& GetVariantMap() const
 - void FromString(const String&, const String&)
+- void FromString(VariantType, const String&)
 - String ToString() const
 - VectorBuffer GetBuffer() const
 - Node@ GetNode() const
