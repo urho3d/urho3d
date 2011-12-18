@@ -13,7 +13,8 @@ Scene@ editorScene;
 
 String sceneFileName;
 String sceneResourcePath;
-String nodeFileName;
+String instantiateFileName;
+CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
 bool runUpdate = false;
 
@@ -71,20 +72,19 @@ void CreateScene()
 
 void SetResourcePath(String newPath)
 {
-    newPath = AddTrailingSlash(newPath);
+    newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
 
     if (newPath == sceneResourcePath)
         return;
 
     cache.ReleaseAllResources(false);
-
     // Remove the old scene resource path if any. However make sure that the default data paths do not get removed
     if (!sceneResourcePath.empty && sceneResourcePath.Find(fileSystem.programDir) < 0)
         cache.RemoveResourceDir(sceneResourcePath);
 
     cache.AddResourceDir(newPath);
     sceneResourcePath = newPath;
-    
+
     // If scenes were not loaded yet, default load/save to the resource path
     if (uiScenePath.empty)
         uiScenePath = newPath;
@@ -192,7 +192,7 @@ void LoadScene(const String&in fileName)
     editorScene.Clear();
 
     // Add the new resource path
-    SetResourcePath(cache.GetPreferredResourceDir(GetPath(fileName)));
+    SetResourcePath(GetPath(fileName));
 
     String extension = GetExtension(fileName);
     if (extension != ".xml")
@@ -247,19 +247,23 @@ void InstantiateNode(const String&in fileName)
     if (!file.open)
         return;
 
+    // Before instantiating, set resource path if empty
+    if (sceneResourcePath.empty)
+        SetResourcePath(GetPath(fileName));
+
     Vector3 position = GetNewNodePosition();
     Node@ newNode;
 
     String extension = GetExtension(fileName);
     if (extension != ".xml")
-        newNode = editorScene.Instantiate(file, position, Quaternion());
+        newNode = editorScene.Instantiate(file, position, Quaternion(), instantiateMode);
     else
-        newNode = editorScene.InstantiateXML(file, position, Quaternion());
+        newNode = editorScene.InstantiateXML(file, position, Quaternion(), instantiateMode);
 
     if (newNode !is null)
     {
         UpdateAndFocusNode(newNode);
-        nodeFileName = fileName;
+        instantiateFileName = fileName;
     }
 }
 
@@ -282,7 +286,7 @@ void SaveNode(const String&in fileName)
             xml.Save(file);
         }
 
-        nodeFileName = fileName;
+        instantiateFileName = fileName;
     }
 }
 

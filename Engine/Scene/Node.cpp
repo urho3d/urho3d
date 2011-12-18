@@ -1009,7 +1009,7 @@ void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
         MarkDirty();
 }
 
-bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren)
+bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1025,7 +1025,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        Component* newComponent = CreateComponent(compType, compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Component* newComponent = CreateComponent(compType, rewriteIDs ? 0 : compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1041,16 +1041,16 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     for (unsigned i = 0; i < numChildren; ++i)
     {
         unsigned nodeID = source.ReadUInt();
-        Node* newNode = CreateChild(nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         resolver.AddNode(nodeID, newNode);
-        if (!newNode->Load(source, resolver))
+        if (!newNode->Load(source, resolver, readChildren, rewriteIDs))
             return false;
     }
     
     return true;
 }
 
-bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readChildren)
+bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs)
 {
     // Remove all children and components first in case this is not a fresh load
     RemoveAllChildren();
@@ -1064,7 +1064,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetString("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(ShortStringHash(typeName), compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Component* newComponent = CreateComponent(ShortStringHash(typeName), rewriteIDs ? 0 : compID, id_ < FIRST_LOCAL_ID ?
+            REPLICATED : LOCAL);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1082,9 +1083,9 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     while (childElem)
     {
         unsigned nodeID = childElem.GetInt("id");
-        Node* newNode = CreateChild(nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         resolver.AddNode(nodeID, newNode);
-        if (!newNode->LoadXML(childElem, resolver))
+        if (!newNode->LoadXML(childElem, resolver, readChildren, rewriteIDs))
             return false;
         
         childElem = childElem.GetNext("node");

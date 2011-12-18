@@ -278,9 +278,10 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
 {
     SceneResolver resolver;
     unsigned nodeID = source.ReadInt();
-    Node* node = CreateChild(nodeID, mode);
+    // Rewrite IDs when instantiating
+    Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
-    if (node->Load(source, resolver))
+    if (node->Load(source, resolver, true, true))
     {
         resolver.Resolve();
         node->ApplyAttributes();
@@ -307,9 +308,10 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
 {
     SceneResolver resolver;
     unsigned nodeID = source.GetInt("id");
-    Node* node = CreateChild(nodeID, mode);
+    // Rewrite IDs when instantiating
+    Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
-    if (node->LoadXML(source, resolver))
+    if (node->LoadXML(source, resolver, true, true))
     {
         resolver.Resolve();
         node->ApplyAttributes();

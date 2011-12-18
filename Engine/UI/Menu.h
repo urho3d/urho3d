@@ -82,7 +82,7 @@ protected:
 private:
     /// Handle press and release for selection and toggling popup visibility.
     void HandlePressedReleased(StringHash eventType, VariantMap& eventData);
-    /// Handle UI focus change to check for hiding the popup.
+    /// Handle global focus change to check for hiding the popup.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle keypress for checking accelerator.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);

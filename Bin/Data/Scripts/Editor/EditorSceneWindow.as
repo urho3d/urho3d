@@ -186,6 +186,9 @@ void UpdateSceneWindowNodeOnly(uint itemIndex, Node@ node)
 void UpdateSceneWindowNode(Node@ node)
 {
     uint index = GetNodeListIndex(node);
+    if (index == NO_ITEM)
+        index = GetParentAddIndex(node);
+
     UpdateSceneWindowNode(index, node);
 }
 

@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "InputEvents.h"
+#include "Log.h"
 #include "Menu.h"
 #include "UIEvents.h"
 
@@ -133,17 +134,24 @@ void Menu::ShowPopup(bool enable)
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
         popup_->vars_[originHash] = (void*)this;
-        root->AddChild(popup_);
-        
-        // Set fixed high priority
-        popup_->SetBringToFront(false);
-        popup_->SetBringToBack(false);
+        if (popup_->GetParent() != root)
+            root->AddChild(popup_);
         popup_->BringToFront();
     }
     else
     {
         popup_->vars_[originHash].Clear();
-        root->RemoveChild(popup_);
+        popup_->SetVisible(false);
+        
+        // If the popup has child menus, hide their popups as well
+        PODVector<UIElement*> children;
+        popup_->GetChildren(children, true);
+        for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        {
+            Menu* menu = dynamic_cast<Menu*>(*i);
+            if (menu)
+                menu->ShowPopup(false);
+        }
     }
     
     showPopup_ = enable;
@@ -200,7 +208,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     UIElement* root = GetRoot();
     
     // If another element was focused due to the menu button being clicked, do not hide the popup
-    if (eventType == E_FOCUSCHANGED && static_cast<UIElement*>(eventData[P_ORIGINALELEMENT].GetPtr()))
+    if (eventType == E_FOCUSCHANGED && static_cast<UIElement*>(eventData[P_CLICKEDELEMENT].GetPtr()))
         return;
     
     // If clicked emptiness or defocused, hide the popup

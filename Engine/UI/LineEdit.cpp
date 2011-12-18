@@ -56,6 +56,9 @@ LineEdit::LineEdit(Context* context) :
     cursor_->SetPriority(1); // Show over text
     AddChild(text_);
     AddChild(cursor_);
+    
+    SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
+    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
 }
 
 LineEdit::~LineEdit()
@@ -428,16 +431,6 @@ void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
     }
 }
 
-void LineEdit::OnFocus()
-{
-    UpdateCursor();
-}
-
-void LineEdit::OnDefocus()
-{
-    text_->ClearSelection();
-}
-
 void LineEdit::SetText(const String& text)
 {
     if (text != line_)
@@ -561,4 +554,14 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     }
     
     return M_MAX_UNSIGNED;
+}
+
+void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
+{
+    UpdateCursor();
+}
+
+void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
+{
+    text_->ClearSelection();
 }

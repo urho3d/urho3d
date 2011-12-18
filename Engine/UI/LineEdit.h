@@ -62,10 +62,6 @@ public:
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to a key press translated to a character.
     virtual void OnChar(unsigned char c, int buttons, int qualifiers);
-    /// React to gaining focus.
-    virtual void OnFocus();
-    /// React to losing focus.
-    virtual void OnDefocus();
     
     /// %Set text.
     void SetText(const String& text);
@@ -141,4 +137,10 @@ protected:
     bool textSelectable_;
     /// Copy-paste enable flag.
     bool textCopyable_;
+    
+private:
+    /// Handle being focused.
+    void HandleFocused(StringHash eventType, VariantMap& eventData);
+    /// Handle being defocused.
+    void HandleDefocused(StringHash eventType, VariantMap& eventData);
 };

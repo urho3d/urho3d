@@ -60,10 +60,6 @@ public:
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
-    /// React to defocus.
-    virtual void OnDefocus();
-    /// React to focus.
-    virtual void OnFocus();
     
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
@@ -161,6 +157,10 @@ protected:
 private:
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
-    /// Handle focus change to check whether an invisible item was focused.
+    /// Handle global focus change to check whether an invisible item was focused.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle being focused.
+    void HandleFocused(StringHash eventType, VariantMap& eventData);
+    /// Handle being defocused.
+    void HandleDefocused(StringHash eventType, VariantMap& eventData);
 };

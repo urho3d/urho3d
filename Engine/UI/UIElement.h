@@ -140,10 +140,6 @@ public:
     virtual void OnChar(unsigned char c, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
-    /// React to gaining focus.
-    virtual void OnFocus();
-    /// React to losing focus.
-    virtual void OnDefocus();
     
     /// %Set name.
     void SetName(const String& name);

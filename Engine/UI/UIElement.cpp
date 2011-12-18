@@ -302,14 +302,6 @@ void UIElement::OnResize()
 {
 }
 
-void UIElement::OnFocus()
-{
-}
-
-void UIElement::OnDefocus()
-{
-}
-
 void UIElement::SetName(const String& name)
 {
     name_ = name;

@@ -1339,7 +1339,7 @@ Methods:<br>
 - void StopAsyncLoading()
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
+- Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - void Clear()
 - void AddRequiredPackageFile(PackageFile@)
 - void ClearRequiredPackageFiles()

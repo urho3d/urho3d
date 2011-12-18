@@ -111,7 +111,7 @@ void UI::SetFocusElement(UIElement* element)
     using namespace FocusChanged;
     
     VariantMap eventData;
-    eventData[P_ORIGINALELEMENT] = (void*)element;
+    eventData[P_CLICKEDELEMENT] = (void*)element;
     
     if (element)
     {
@@ -130,7 +130,6 @@ void UI::SetFocusElement(UIElement* element)
     {
         UIElement* oldFocusElement = focusElement_;
         focusElement_.Reset();
-        oldFocusElement->OnDefocus();
         
         VariantMap focusEventData;
         focusEventData[Defocused::P_ELEMENT] = oldFocusElement;
@@ -141,7 +140,6 @@ void UI::SetFocusElement(UIElement* element)
     if (element && element->GetFocusMode() >= FM_FOCUSABLE)
     {
         focusElement_ = element;
-        element->OnFocus();
         
         VariantMap focusEventData;
         focusEventData[Focused::P_ELEMENT] = element;

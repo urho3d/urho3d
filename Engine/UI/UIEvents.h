@@ -56,7 +56,7 @@ EVENT(E_DRAGDROPFINISH, DragDropFinish)
 EVENT(E_FOCUSCHANGED, FocusChanged)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_ORIGINALELEMENT, Element);      // UIElement pointer
+    PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
 }
 
 /// UI element resized.

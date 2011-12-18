@@ -69,6 +69,8 @@ ListView::ListView(Context* context) :
     
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
+    SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocused));
+    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
 }
 
 ListView::~ListView()
@@ -256,19 +258,6 @@ void ListView::OnResize()
     
     // Set the content element width to match the scrollpanel
     contentElement_->SetWidth(scrollPanel_->GetWidth());
-}
-
-void ListView::OnFocus()
-{
-    UpdateSelectionEffect();
-}
-
-void ListView::OnDefocus()
-{
-    if (clearSelectionOnDefocus_)
-        ClearSelection();
-    
-    UpdateSelectionEffect();
 }
 
 void ListView::AddItem(UIElement* item)
@@ -815,4 +804,17 @@ void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
         }
         element = parent;
     }
+}
+
+void ListView::HandleFocused(StringHash eventType, VariantMap& eventData)
+{
+    UpdateSelectionEffect();
+}
+
+void ListView::HandleDefocused(StringHash eventType, VariantMap& eventData)
+{
+    if (clearSelectionOnDefocus_)
+        ClearSelection();
+    
+    UpdateSelectionEffect();
 }
