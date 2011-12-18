@@ -1783,7 +1783,8 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     }
     
     Frustum splitFrustum = camera_->GetSplitFrustum(nearSplit, farSplit);
-    frustumVolume_.Define(splitFrustum);
+    Polyhedron frustumVolume;
+    frustumVolume.Define(splitFrustum);
     // If focusing enabled, clip the frustum volume by the combined bounding box of the lit geometries within the frustum
     if (parameters.focus_)
     {
@@ -1801,23 +1802,23 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         }
         if (litGeometriesBox.defined_)
         {
-            frustumVolume_.Clip(litGeometriesBox);
+            frustumVolume.Clip(litGeometriesBox);
             // If volume became empty, restore it to avoid zero size
-            if (frustumVolume_.Empty())
-                frustumVolume_.Define(splitFrustum);
+            if (frustumVolume.Empty())
+                frustumVolume.Define(splitFrustum);
         }
     }
     
     // Transform frustum volume to light space
     Matrix3x4 lightView(shadowCamera->GetInverseWorldTransform());
-    frustumVolume_.Transform(lightView);
+    frustumVolume.Transform(lightView);
     
     // Fit the frustum volume inside a bounding box. If uniform size, use a sphere instead
     BoundingBox shadowBox;
     if (!parameters.nonUniform_)
-        shadowBox.Define(Sphere(frustumVolume_));
+        shadowBox.Define(Sphere(frustumVolume));
     else
-        shadowBox.Define(frustumVolume_);
+        shadowBox.Define(frustumVolume);
     
     shadowCamera->SetOrthographic(true);
     shadowCamera->SetAspectRatio(1.0f);

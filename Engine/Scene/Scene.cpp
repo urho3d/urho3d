@@ -229,14 +229,14 @@ bool Scene::LoadAsyncXML(File* file)
     
     StopAsyncLoading();
     
-    SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
-    if (!xmlFile->Load(*file))
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    if (!xml->Load(*file))
         return false;
     
     LOGINFO("Loading scene from " + file->GetName());
     
     Clear();
-    XMLElement rootElement = xmlFile->GetRoot();
+    XMLElement rootElement = xml->GetRoot();
     
     // Store own old ID for resolving possible root node references
     unsigned nodeID = rootElement.GetInt("id");
@@ -250,7 +250,7 @@ bool Scene::LoadAsyncXML(File* file)
     XMLElement childNodeElement = rootElement.GetChild("node");
     asyncLoading_ = true;
     asyncProgress_.file_ = file;
-    asyncProgress_.xmlFile_ = xmlFile;
+    asyncProgress_.xmlFile_ = xml;
     asyncProgress_.xmlElement_ = childNodeElement;
     asyncProgress_.loadedNodes_ = 0;
     asyncProgress_.totalNodes_ = 0;
@@ -272,6 +272,55 @@ void Scene::StopAsyncLoading()
     asyncProgress_.xmlFile_.Reset();
     asyncProgress_.xmlElement_ = XMLElement();
     resolver_.Reset();
+}
+
+Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    SceneResolver resolver;
+    unsigned nodeID = source.ReadInt();
+    Node* node = CreateChild(nodeID, mode);
+    resolver.AddNode(nodeID, node);
+    if (node->Load(source, resolver))
+    {
+        resolver.Resolve();
+        node->ApplyAttributes();
+        node->SetTransform(position, rotation);
+        return node;
+    }
+    else
+    {
+        node->Remove();
+        return 0;
+    }
+}
+
+Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    if (!xml->Load(source))
+        return false;
+    
+    return InstantiateXML(xml->GetRoot(), position, rotation, mode);
+}
+
+Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    SceneResolver resolver;
+    unsigned nodeID = source.GetInt("id");
+    Node* node = CreateChild(nodeID, mode);
+    resolver.AddNode(nodeID, node);
+    if (node->LoadXML(source, resolver))
+    {
+        resolver.Resolve();
+        node->ApplyAttributes();
+        node->SetTransform(position, rotation);
+        return node;
+    }
+    else
+    {
+        node->Remove();
+        return 0;
+    }
 }
 
 void Scene::Clear()

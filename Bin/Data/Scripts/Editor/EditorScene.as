@@ -13,6 +13,7 @@ Scene@ editorScene;
 
 String sceneFileName;
 String sceneResourcePath;
+String nodeFileName;
 bool sceneModified = false;
 bool runUpdate = false;
 
@@ -35,7 +36,7 @@ void ClearSelection()
     editNode = null;
     editNodes.Clear();
     editComponents.Clear();
-    
+
     HideGizmo();
 }
 
@@ -232,6 +233,57 @@ void SaveScene(const String&in fileName)
     sceneFileName = fileName;
     sceneModified = false;
     UpdateWindowTitle();
+}
+
+void InstantiateNode(const String&in fileName)
+{
+    if (!fileSystem.FileExists(fileName))
+    {
+        log.Error("No such node file " + fileName);
+        return;
+    }
+
+    File file(fileName, FILE_READ);
+    if (!file.open)
+        return;
+
+    Vector3 position = GetNewNodePosition();
+    Node@ newNode;
+
+    String extension = GetExtension(fileName);
+    if (extension != ".xml")
+        newNode = editorScene.Instantiate(file, position, Quaternion());
+    else
+        newNode = editorScene.InstantiateXML(file, position, Quaternion());
+
+    if (newNode !is null)
+    {
+        UpdateAndFocusNode(newNode);
+        nodeFileName = fileName;
+    }
+}
+
+void SaveNode(const String&in fileName)
+{
+    if (selectedNodes.length == 1)
+    {
+        File file(fileName, FILE_WRITE);
+        if (!file.open)
+            return;
+
+        String extension = GetExtension(fileName);
+        if (extension != ".xml")
+            selectedNodes[0].Save(file);
+        else
+        {
+            XMLFile xml;
+            XMLElement root = xml.CreateRoot("node");
+            selectedNodes[0].SaveXML(root);
+            xml.Save(file);
+        }
+
+        nodeFileName = fileName;
+    }
 }
 
 void UpdateScene(float timeStep)

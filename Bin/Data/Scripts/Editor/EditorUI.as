@@ -9,6 +9,7 @@ Array<String> uiAllFilter = {"*.*"};
 Array<String> uiScriptFilter = {"*.as", "*.*"};
 uint uiSceneFilter = 0;
 String uiScenePath;
+String uiNodePath;
 String uiImportPath;
 String uiScriptPath;
 
@@ -59,6 +60,9 @@ void CreateMenuBar()
         filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
+        filePopup.AddChild(CreateMenuItem("Load node", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Save node", 0, 0));
+        filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Import model", 0, 0));
         filePopup.AddChild(CreateMenuItem("Import scene", 0, 0));
         filePopup.AddChild(CreateMenuItem("Run script", 0, 0));
@@ -84,7 +88,7 @@ void CreateMenuBar()
         editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
         uiMenuBar.AddChild(editMenu);
     }
-    
+
     {
         Menu@ fileMenu = CreateMenu("View");
         Window@ filePopup = fileMenu.popup;
@@ -149,7 +153,7 @@ Menu@ CreateMenu(const String&in title)
 void CreateFileSelector(const String&in title, const String&in ok, const String&in cancel, const String&in initialPath, Array<String>@ filters,
     uint initialFilter)
 {
-    // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also 
+    // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also
     // the events subscribed from it are disconnected, so new ones are safe to subscribe.
     uiFileSelector = FileSelector();
     uiFileSelector.style = uiStyle;
@@ -193,7 +197,7 @@ void UpdateWindowTitle()
         sceneName = "Untitled";
     if (sceneModified)
         sceneName += "*";
-    
+
     graphics.windowTitle = "Urho3D editor - " + sceneName;
 }
 
@@ -206,7 +210,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     String action = menu.name;
     if (action.empty)
         return;
-        
+
     // Close the menu now
     UIElement@ menuParent = menu.parent;
     Menu@ topLevelMenu = menuParent.vars["Origin"].GetUIElement();
@@ -217,7 +221,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     {
         if (action == "New scene")
             CreateScene();
-            
+
         if (action == "Open scene")
         {
             CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
@@ -234,6 +238,19 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
         }
 
+        if (action == "Load node")
+        {
+            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiSceneFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
+        }
+
+        if (action == "Save node" && selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+        {
+            CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiSceneFilter);
+            uiFileSelector.fileName = GetFileNameAndExtension(nodeFileName);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
+        }
+
         if (action == "Import model")
         {
             CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
@@ -245,7 +262,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
             CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
         }
-        
+
         if (action == "Run script")
         {
             CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilter, 0);
@@ -271,19 +288,19 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Editor settings")
         ShowEditorSettingsDialog();
-    
+
     if (action == "Cut")
         SceneCut();
-    
+
     if (action == "Copy")
         SceneCopy();
-    
+
     if (action == "Paste")
         ScenePaste();
-    
+
     if (action == "Delete")
         SceneDelete();
-        
+
     if (action == "Unparent")
         SceneUnparent();
 
@@ -325,6 +342,36 @@ void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 
     String fileName = eventData["FileName"].GetString();
     SaveScene(fileName);
+}
+
+void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
+{
+    // Save filter for next time
+    uiSceneFilter = uiFileSelector.filterIndex;
+    uiNodePath = uiFileSelector.path;
+    CloseFileSelector();
+
+    // Check for cancel
+    if (!eventData["OK"].GetBool())
+        return;
+
+    String fileName = eventData["FileName"].GetString();
+    InstantiateNode(fileName);
+}
+
+void HandleSaveNodeFile(StringHash eventType, VariantMap& eventData)
+{
+    // Save filter for next time
+    uiSceneFilter = uiFileSelector.filterIndex;
+    uiNodePath = uiFileSelector.path;
+    CloseFileSelector();
+
+    // Check for cancel
+    if (!eventData["OK"].GetBool())
+        return;
+
+    String fileName = eventData["FileName"].GetString();
+    SaveNode(fileName);
 }
 
 void HandleImportModel(StringHash eventType, VariantMap& eventData)

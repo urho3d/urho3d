@@ -84,6 +84,12 @@ public:
     bool LoadAsyncXML(File* file);
     /// Stop asynchronous loading.
     void StopAsyncLoading();
+    /// Instantiate scene content from binary data. Return root node if successful.
+    Node* Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from XML data. Return root node if successful.
+    Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from XML data. Return root node if successful.
+    Node* InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Clear scene completely of nodes and components.
     void Clear();
     /// %Set active flag. Only active scenes will be updated automatically.

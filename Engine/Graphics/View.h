@@ -215,8 +215,6 @@ private:
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space.
     BoundingBox sceneViewBox_;
-    /// Volume for frustum clipping.
-    Polyhedron frustumVolume_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
     /// Per-thread octree zone query results.
