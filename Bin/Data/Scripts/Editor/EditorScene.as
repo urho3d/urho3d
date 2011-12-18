@@ -235,7 +235,7 @@ void SaveScene(const String&in fileName)
     UpdateWindowTitle();
 }
 
-void InstantiateNode(const String&in fileName)
+void LoadNode(const String&in fileName)
 {
     if (!fileSystem.FileExists(fileName))
     {

@@ -671,6 +671,39 @@ void Node::RemoveAllComponents()
     }
 }
 
+Node* Node::Clone(CreateMode mode)
+{
+    // The scene itself can not be cloned
+    if (this == scene_ || !parent_)
+        return 0;
+    
+    SceneResolver resolver;
+    Node* clone = CloneRecursive(parent_, resolver, mode);
+    resolver.Resolve();
+    clone->ApplyAttributes();
+    return clone;
+}
+
+void Node::Remove()
+{
+    if (parent_)
+        parent_->RemoveChild(this);
+}
+
+void Node::SetParent(Node* parent)
+{
+    if (parent)
+    {
+        Vector3 worldPosition;
+        Quaternion worldRotation;
+        Vector3 worldScale;
+        GetWorldTransform().Decompose(worldPosition, worldRotation, worldScale);
+        
+        parent->AddChild(this);
+        SetWorldTransform(worldPosition, worldRotation, worldScale);
+    }
+}
+
 void Node::AddListener(Component* component)
 {
     if (!component)
@@ -698,26 +731,6 @@ void Node::RemoveListener(Component* component)
             listeners_.Erase(i);
             return;
         }
-    }
-}
-
-void Node::Remove()
-{
-    if (parent_)
-        parent_->RemoveChild(this);
-}
-
-void Node::SetParent(Node* parent)
-{
-    if (parent)
-    {
-        Vector3 worldPosition;
-        Quaternion worldRotation;
-        Vector3 worldScale;
-        GetWorldTransform().Decompose(worldPosition, worldRotation, worldScale);
-        
-        parent->AddChild(this);
-        SetWorldTransform(worldPosition, worldRotation, worldScale);
     }
 }
 
@@ -1182,4 +1195,42 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
         if (!node->children_.Empty())
             node->GetChildrenRecursive(dest);
     }
+}
+
+Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)
+{
+    // Create clone node
+    Node* cloneNode = parent->CreateChild(0, mode);
+    resolver.AddNode(id_, cloneNode);
+    
+    // Copy attributes
+    unsigned numAttributes = GetNumAttributes();
+    for (unsigned j = 0; j < numAttributes; ++j)
+        cloneNode->SetAttribute(j, GetAttribute(j));
+    
+    // Clone components
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        Component* component = *i;
+        Component* cloneComponent = cloneNode->CreateComponent(component->GetType(), mode);
+        if (!cloneComponent)
+        {
+            LOGERROR("Could not clone component " + component->GetTypeName());
+            continue;
+        }
+        resolver.AddComponent(component->GetID(), cloneComponent);
+        
+        numAttributes = component->GetNumAttributes();
+        for (unsigned j = 0; j < numAttributes; ++j)
+            cloneComponent->SetAttribute(j, component->GetAttribute(j));
+    }
+    
+    // Clone child nodes recursively
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        Node* node = *i;
+        node->CloneRecursive(cloneNode, resolver, mode);
+    }
+    
+    return cloneNode;
 }

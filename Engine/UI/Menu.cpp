@@ -50,17 +50,7 @@ Menu::Menu(Context* context) :
 Menu::~Menu()
 {
     if (popup_)
-    {
         ShowPopup(false);
-        
-        // Make sure the popup is removed from hierarchy if still visible
-        UIElement* parent = popup_->GetParent();
-        if (parent)
-        {
-            popup_->vars_[originHash].Clear();
-            parent->RemoveChild(popup_);
-        }
-    }
 }
 
 void Menu::RegisterObject(Context* context)
@@ -100,11 +90,7 @@ void Menu::SetPopup(UIElement* popup)
     
     // Detach from current parent (if any) to only show when it is time
     if (popup_)
-    {
-        UIElement* parent = popup_->GetParent();
-        if (parent)
-            parent->RemoveChild(popup_);
-    }
+        popup_->Remove();
 }
 
 void Menu::SetPopupOffset(const IntVector2& offset)
@@ -122,27 +108,24 @@ void Menu::ShowPopup(bool enable)
     if (!popup_)
         return;
     
-    // Find the UI root element for showing the popup
-    UIElement* root = GetRoot();
-    if (!root)
-        return;
-    
     if (enable)
     {
+        // Find the UI root element for showing the popup
+        UIElement* root = GetRoot();
+        if (!root)
+            return;
+        
         OnShowPopup();
         
+        if (popup_->GetParent() != root)
+            root->AddChild(popup_);
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
         popup_->vars_[originHash] = (void*)this;
-        if (popup_->GetParent() != root)
-            root->AddChild(popup_);
         popup_->BringToFront();
     }
     else
     {
-        popup_->vars_[originHash].Clear();
-        popup_->SetVisible(false);
-        
         // If the popup has child menus, hide their popups as well
         PODVector<UIElement*> children;
         popup_->GetChildren(children, true);
@@ -152,6 +135,10 @@ void Menu::ShowPopup(bool enable)
             if (menu)
                 menu->ShowPopup(false);
         }
+        
+        popup_->vars_[originHash].Clear();
+        popup_->SetVisible(false);
+        popup_->Remove();
     }
     
     showPopup_ = enable;

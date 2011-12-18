@@ -156,14 +156,16 @@ public:
     void RemoveComponent(Component* component);
     /// Remove all components from this node.
     void RemoveAllComponents();
-    /// Add listener component that is notified of node being dirtied. Can either be in the same node or another.
-    void AddListener(Component* component);
-    /// Remove listener component.
-    void RemoveListener(Component* component);
+    /// Clone scene node, components and child nodes. Return the clone.
+    Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
     /// %Set parent scene node. Retains the world transform.
     void SetParent(Node* parent);
+    /// Add listener component that is notified of node being dirtied. Can either be in the same node or another.
+    void AddListener(Component* component);
+    /// Remove listener component.
+    void RemoveListener(Component* component);
     /// Template version of creating a component.
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED);
     /// Template version of getting or creating a component.
@@ -342,6 +344,8 @@ private:
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const;
+    /// Clone node recursively.
+    Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     
     /// Unique ID within the scene.
     unsigned id_;

@@ -47,6 +47,7 @@ static void RegisterNode(asIScriptEngine* engine)
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false);
     RegisterNode<Node>(engine, "Node");
+    engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);
     RegisterObjectConstructor<Node>(engine, "Node");
     RegisterNamedObjectConstructor<Node>(engine, "Node");
     engine->RegisterGlobalFunction("Node@+ get_node()", asFUNCTION(GetScriptContextNode), asCALL_CDECL);

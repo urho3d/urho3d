@@ -60,7 +60,7 @@ void CreateMenuBar()
         filePopup.AddChild(CreateMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
 
-        Menu@ loadNodeMenu = CreateMenuItem("Instantiate node", 0, 0);
+        Menu@ loadNodeMenu = CreateMenuItem("Load node", 0, 0);
         Window@ loadNodePopup = CreatePopup(loadNodeMenu);
         loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
         loadNodePopup.AddChild(CreateMenuItem("As replicated", 0, 0));
@@ -240,7 +240,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     Menu@ topLevelMenu = GetTopLevelMenu(menu);
     // Close the top level menu now
-    if (topLevelMenu !is null && action != "Instantiate node") // Instantiate has a submenu, so do not close in that case
+    if (topLevelMenu !is null && action != "Load node") // Instantiate has a submenu, so do not close in that case
         topLevelMenu.showPopup = false;
 
     if (uiFileSelector is null)
@@ -267,15 +267,15 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         if (action == "As replicated")
         {
             instantiateMode = REPLICATED;
-            CreateFileSelector("Instantiate node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleInstantiateNodeFile");
+            CreateFileSelector("Load node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
         }
 
         if (action == "As local")
         {
             instantiateMode = LOCAL;
-            CreateFileSelector("Instantiate node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleInstantiateNodeFile");
+            CreateFileSelector("Load node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
         }
 
         if (action == "Save node as" && selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
@@ -378,7 +378,7 @@ void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)
     SaveScene(fileName);
 }
 
-void HandleInstantiateNodeFile(StringHash eventType, VariantMap& eventData)
+void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
 {
     // Save filter for next time
     uiSceneFilter = uiFileSelector.filterIndex;
@@ -390,7 +390,7 @@ void HandleInstantiateNodeFile(StringHash eventType, VariantMap& eventData)
         return;
 
     String fileName = eventData["FileName"].GetString();
-    InstantiateNode(fileName);
+    LoadNode(fileName);
 }
 
 void HandleSaveNodeFile(StringHash eventType, VariantMap& eventData)
