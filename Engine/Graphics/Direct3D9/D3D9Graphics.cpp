@@ -184,7 +184,6 @@ Graphics::Graphics(Context* context) :
     queryIndex_(0),
     numPrimitives_(0),
     numBatches_(0),
-    shaderParametersOverlap_(false),
     defaultTextureFilterMode_(FILTER_BILINEAR)
 {
     ResetCachedState();
@@ -876,14 +875,13 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
     if (vs != vertexShader_)
     {
-        // Clear all previous register mappings. If shader parameters overlap, also clear remembered sources
+        // Clear all previous vertex shader register mappings
         for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
         {
             if (i->second_.type_ == VS)
             {
                 i->second_.register_ = M_MAX_UNSIGNED;
-                if (shaderParametersOverlap_)
-                    i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
+                i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
             }
         }
         
@@ -936,8 +934,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (i->second_.type_ == PS)
             {
                 i->second_.register_ = M_MAX_UNSIGNED;
-                if (shaderParametersOverlap_)
-                    i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
+                i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
             }
         }
         
@@ -1131,34 +1128,6 @@ void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& 
         // The same parameter is possibly defined with different sizes in different shaders. Use the highest size
         if (i->second_.regCount_ < definition.regCount_)
             i->second_.regCount_ = definition.regCount_;
-    }
-    
-    // Check if parameter overlaps any other parameters
-    if (definition.type_ == VS)
-    {
-        for (unsigned j = definition.register_; j < definition.register_ + definition.regCount_; ++j)
-        {
-            if (!vsRegisterAssignments_[j].GetValue())
-                vsRegisterAssignments_[j] = param;
-            else if (!shaderParametersOverlap_ && vsRegisterAssignments_[j] != param)
-            {
-                shaderParametersOverlap_ = true;
-                LOGDEBUG("Shader parameters overlap");
-            }
-        }
-    }
-    else
-    {
-        for (unsigned j = definition.register_; j < definition.register_ + definition.regCount_; ++j)
-        {
-            if (!psRegisterAssignments_[j].GetValue())
-                psRegisterAssignments_[j] = param;
-            else if (!shaderParametersOverlap_ && psRegisterAssignments_[j] != param)
-            {
-                shaderParametersOverlap_ = true;
-                LOGDEBUG("Shader parameters overlap");
-            }
-        }
     }
 }
 

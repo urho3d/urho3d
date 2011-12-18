@@ -114,7 +114,7 @@ bool Shader::Load(Deserializer& source)
             ShaderParameter newParameter(shaderType_, reg, regCount);
             variation->AddParameter(param, newParameter);
             // Remember the parameter globally. The parameter is only stored the first time; it can have different register
-            // index in different shaders, but must have same shader type (either vertex or pixel) and register count
+            // index in different shaders, but must have same shader type (either vertex or pixel)
             graphics->RegisterShaderParameter(param, newParameter);
         }
         

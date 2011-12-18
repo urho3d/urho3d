@@ -424,12 +424,6 @@ private:
     ShaderVariation* pixelShader_;
     /// All known shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
-    /// Initial assignment of vertex shader constant registers for testing overlap.
-    StringHash vsRegisterAssignments_[MAX_CONSTANT_REGISTERS];
-    /// Initial assignment of pixel shader constant registers for testing overlap.
-    StringHash psRegisterAssignments_[MAX_CONSTANT_REGISTERS];
-    /// Overlapping shader parameters flag. If false, overlap checks can be skipped.
-    bool shaderParametersOverlap_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
