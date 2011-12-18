@@ -154,7 +154,7 @@ enum DeferredLightPSVariation
     MAX_DEFERRED_LIGHT_PS_VARIATIONS
 };
 
-/// Edge filter parameters.
+/// %Edge filter parameters.
 struct EdgeFilterParameters
 {
     /// Construct undefined.
