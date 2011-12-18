@@ -912,11 +912,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             // Update the parameter-to-register mappings
             const HashMap<StringHash, ShaderParameter>& parameters = vs->GetParameters();
             for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
-            {
-                HashMap<StringHash, ShaderParameter>::Iterator j = shaderParameters_.Find(i->first_);
-                if (j != parameters.End())
-                    j->second_.register_ = i->second_.register_;
-            }
+                shaderParameters_[i->first_].register_ = i->second_.register_;
         }
         else
         {
@@ -963,11 +959,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             
             const HashMap<StringHash, ShaderParameter>& parameters = ps->GetParameters();
             for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
-            {
-                HashMap<StringHash, ShaderParameter>::Iterator j = shaderParameters_.Find(i->first_);
-                if (j != parameters.End())
-                    j->second_.register_ = i->second_.register_;
-            }
+                shaderParameters_[i->first_].register_ = i->second_.register_;
         }
         else
         {
