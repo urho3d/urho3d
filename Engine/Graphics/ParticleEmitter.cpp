@@ -220,10 +220,11 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     if (!file || !cache)
         return false;
     
-    parameterSource_ = file;
     XMLElement rootElem = parameterSource_->GetRoot();
     if (!rootElem)
         return false;
+    
+    parameterSource_ = file;
     
     if (rootElem.HasChild("material"))
         SetMaterial(cache->GetResource<Material>(rootElem.GetChild("material").GetString("name")));

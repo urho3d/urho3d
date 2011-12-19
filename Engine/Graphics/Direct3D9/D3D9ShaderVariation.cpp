@@ -31,8 +31,8 @@
 
 #include "DebugNew.h"
 
-ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
-    GPUObject(shader->GetSubsystem<Graphics>()),
+ShaderVariation::ShaderVariation(Shader* owner, ShaderType type, bool isSM3) :
+    GPUObject(owner->GetSubsystem<Graphics>()),
     shaderType_(type),
     isSM3_(isSM3),
     failed_(false)

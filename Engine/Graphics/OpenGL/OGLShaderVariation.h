@@ -36,7 +36,7 @@ class ShaderVariation : public RefCounted, public GPUObject
 {
 public:
     /// Construct.
-    ShaderVariation(Shader* shader, ShaderType type);
+    ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
     virtual ~ShaderVariation();
     

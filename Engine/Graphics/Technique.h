@@ -63,9 +63,9 @@ public:
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return vertex shader name.
-    const String& GetVertexShaderName() const { return vertexShaderName_; }
+    const String& GetVertexShader() const { return vertexShaderName_; }
     /// Return pixel shader name.
-    const String& GetPixelShaderName() const { return pixelShaderName_; }
+    const String& GetPixelShader() const { return pixelShaderName_; }
     /// Return vertex shaders.
     Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
     /// Return pixel shaders.

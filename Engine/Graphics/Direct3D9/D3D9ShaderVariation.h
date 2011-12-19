@@ -67,7 +67,7 @@ class ShaderVariation : public RefCounted, public GPUObject
 {
 public:
     /// Construct.
-    ShaderVariation(Shader* shader, ShaderType type, bool isSM3);
+    ShaderVariation(Shader* owner, ShaderType type, bool isSM3);
     /// Destruct.
     virtual ~ShaderVariation();
     

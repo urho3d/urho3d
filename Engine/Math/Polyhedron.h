@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 
+#pragma once
+
 #include "Vector3.h"
 
 class BoundingBox;

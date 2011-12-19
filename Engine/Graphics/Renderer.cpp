@@ -1363,8 +1363,8 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
     
-    String vertexShaderName = pass->GetVertexShaderName();
-    String pixelShaderName = pass->GetPixelShaderName();
+    String vertexShaderName = pass->GetVertexShader();
+    String pixelShaderName = pass->GetPixelShader();
     
     // Check if the shader name is already a variation in itself
     if (vertexShaderName.Find('_') == String::NPOS)

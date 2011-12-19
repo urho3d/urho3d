@@ -38,7 +38,7 @@
 
 #include "DebugNew.h"
 
-static const String textureUnitNames[] =
+const String textureUnitNames[] =
 {
     "diffuse",
     "normal",
@@ -56,6 +56,21 @@ static const String cullModeNames[] =
     "cw",
     ""
 };
+
+TextureUnit ParseTextureUnitName(const String& name)
+{
+    TextureUnit unit = (TextureUnit)GetStringListIndex(name, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS);
+    if (name == "diff")
+        unit = TU_DIFFUSE;
+    if (name == "norm")
+        unit = TU_NORMAL;
+    if (name == "spec")
+        unit = TU_SPECULAR;
+    if (name == "env")
+        unit = TU_ENVIRONMENT;
+    
+    return unit;
+}
 
 TechniqueEntry::TechniqueEntry() :
     qualityLevel_(0),
@@ -147,15 +162,7 @@ bool Material::Load(Deserializer& source)
         if (textureElem.HasAttribute("unit"))
         {
             String unitName = textureElem.GetStringLower("unit");
-            unit = (TextureUnit)GetStringListIndex(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS);
-            if (unitName == "diff")
-                unit = TU_DIFFUSE;
-            if (unitName == "norm")
-                unit = TU_NORMAL;
-            if (unitName == "spec")
-                unit = TU_SPECULAR;
-            if (unitName == "env")
-                unit = TU_ENVIRONMENT;
+            unit = ParseTextureUnitName(unitName);
             if (unit == MAX_MATERIAL_TEXTURE_UNITS)
                 LOGERROR("Unknown texture unit " + unitName);
         }

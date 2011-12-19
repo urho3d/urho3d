@@ -30,8 +30,8 @@
 
 #include "DebugNew.h"
 
-ShaderVariation::ShaderVariation(Shader* shader, ShaderType type) :
-    GPUObject(shader->GetSubsystem<Graphics>()),
+ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
+    GPUObject(owner->GetSubsystem<Graphics>()),
     shaderType_(type),
     sourceCodeLength_(0),
     compiled_(false)
