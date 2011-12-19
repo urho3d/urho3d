@@ -355,7 +355,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     Matrix4 shadowMatrices[2];
                     
                     CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
-                    bool isShadowed = lightQueue_->shadowMap_ != 0;
+                    bool isShadowed = shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP);
                     if (isShadowed)
                         CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
                     
@@ -366,7 +366,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             case LIGHT_POINT:
                 {
                     Matrix4 lightVecRot(light->GetWorldRotation().RotationMatrix());
-                    // HLSL compiler will pack the parameters as if the matrix is only 3x3, so must be careful to not overwrite
+                    // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
                     #ifdef USE_OPENGL
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.GetData(), 16);

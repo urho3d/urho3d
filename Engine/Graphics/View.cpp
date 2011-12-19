@@ -2271,6 +2271,10 @@ void View::RenderLightBatchQueue(const BatchQueue& queue, Light* light)
     }
     
     // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
+    // However, if there are no non-base batches, just exit
+    if (queue.sortedBatchGroups_.Empty() && queue.sortedBatches_.Empty())
+        return;
+    
     OptimizeLightByStencil(light);
     OptimizeLightByScissor(light);
     
