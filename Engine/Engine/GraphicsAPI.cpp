@@ -34,6 +34,7 @@
 #include "Material.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
+#include "PostProcess.h"
 #include "Scene.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -262,16 +263,6 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint GetDepthStencilFormat()", asFUNCTION(Graphics::GetDepthStencilFormat), asCALL_CDECL);
 }
 
-static Vector4 MaterialGetShaderParameter(const String& name, Material* ptr)
-{
-    const HashMap<StringHash, MaterialShaderParameter>& parameters = ptr->GetShaderParameters();
-    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Find(StringHash(name));
-    if (i == parameters.End())
-        return Vector4::ZERO;
-    else
-        return i->second_.value_;
-}
-
 static Material* MaterialClone(const String& cloneName, Material* ptr)
 {
     SharedPtr<Material> clonedMaterial = ptr->Clone(cloneName);
@@ -354,8 +345,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_shaderParameter(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_shaderParameter(const String&in) const", asFUNCTION(MaterialGetShaderParameter), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);
@@ -363,6 +354,32 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHOD(Material, GetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shadowCullMode(CullMode)", asMETHOD(Material, SetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
+}
+
+static void RegisterPostProcess(asIScriptEngine* engine)
+{
+    RegisterRefCounted<PostProcessPass>(engine, "PostProcessPass");
+    engine->RegisterObjectMethod("PostProcessPass", "void RemoveShaderParameter(const String&in)", asMETHOD(PostProcessPass, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "void set_vertexShader(const String&in)", asMETHOD(PostProcessPass, SetVertexShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "const String& get_vertexShader() const", asMETHOD(PostProcessPass, GetVertexShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "void set_pixelShader(const String&in)", asMETHOD(PostProcessPass, SetPixelShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "const String& get_pixelShader() const", asMETHOD(PostProcessPass, GetPixelShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "void set_output(const String&in)", asMETHOD(PostProcessPass, SetOutput), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "const String& get_output() const", asMETHOD(PostProcessPass, GetOutput), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "void set_textures(uint, const String&in)", asMETHOD(PostProcessPass, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "const String& get_textures(uint) const", asMETHOD(PostProcessPass, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(PostProcessPass, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcessPass", "Vector4 get_shaderParameters(const String&in) const", asMETHOD(PostProcessPass, GetShaderParameter), asCALL_THISCALL);
+    
+    RegisterObject<PostProcess>(engine, "PostProcess");
+    RegisterObjectConstructor<PostProcess>(engine, "PostProcess");
+    engine->RegisterObjectMethod("PostProcess", "bool LoadParameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "void RemoveRenderTarget(const String&in)", asMETHOD(PostProcess, RemoveRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "void set_numPasses(uint)", asMETHOD(PostProcess, SetNumPasses), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "uint get_numPasses() const", asMETHOD(PostProcess, GetNumPasses), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "PostProcessPass@+ get_passes(uint) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "Texture2D@+ get_renderTargets(const String&in) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
 }
 
 static void RegisterModel(asIScriptEngine* engine)
@@ -1002,6 +1019,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterSkeleton(engine);
     RegisterTextures(engine);
     RegisterMaterial(engine);
+    RegisterPostProcess(engine);
     RegisterModel(engine);
     RegisterAnimation(engine);
     RegisterDebugRenderer(engine);

@@ -306,8 +306,12 @@ void Texture::LoadParameters(XMLFile* file)
         return;
     
     XMLElement rootElem = file->GetRoot();
-    XMLElement paramElem = rootElem.GetChild("");
-    
+    LoadParameters(rootElem);
+}
+
+void Texture::LoadParameters(const XMLElement& elem)
+{
+    XMLElement paramElem = elem.GetChild();
     while (paramElem)
     {
         String name = paramElem.GetName();

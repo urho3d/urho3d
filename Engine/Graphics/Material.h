@@ -95,7 +95,7 @@ public:
     void SetCullMode(CullMode mode);
     /// %Set culling mode for shadows.
     void SetShadowCullMode(CullMode mode);
-    /// Remove a shader parameter.
+    /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers.
     void ReleaseShaders();
@@ -118,6 +118,8 @@ public:
     const Vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
     /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
+    /// Return shader parameter.
+    const Vector4& GetShaderParameter(const String& name) const;
     /// Return all shader parameters.
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode.

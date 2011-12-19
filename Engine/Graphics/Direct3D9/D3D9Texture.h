@@ -31,6 +31,7 @@
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
+class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
@@ -86,11 +87,14 @@ public:
     /// Return API-specific DXT compressed texture format.
     static unsigned GetDXTFormat(CompressedFormat format);
     
-protected:
     /// Load parameters.
     void LoadParameters();
     /// Load parameters from an XML file.
     void LoadParameters(XMLFile* xml);
+    /// Load parameters from an XML element.
+    void LoadParameters(const XMLElement& elem);
+    
+protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(ShortStringHash type);
     

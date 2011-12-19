@@ -301,7 +301,7 @@ void Run(const Vector<String>& arguments)
         
         Shader baseShader(source, compileType);
         
-        XMLElement variation = shader.GetChild("");
+        XMLElement variation = shader.GetChild();
         while (variation)
         {
             String value = variation.GetName();

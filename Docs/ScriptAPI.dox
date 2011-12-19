@@ -1625,11 +1625,39 @@ Properties:<br>
 - uint useTimer (readonly)
 - uint numTechniques
 - Technique@[] technique (readonly)
-- Vector4[] shaderParameter
+- Vector4&[] shaderParameters
 - Texture@[] textures
 - bool occlusion (readonly)
 - CullMode cullMode
 - CullMode shadowCullMode
+
+
+PostProcessPass
+
+Methods:<br>
+- void RemoveShaderParameter(const String&)
+
+Properties:<br>
+- String& vertexShader
+- String& pixelShader
+- String& output
+- String&[] textures
+- Vector4[] shaderParameters
+
+
+PostProcess
+
+Methods:<br>
+- bool LoadParameters(XMLFile@)
+- bool CreateRenderTarget(const String&, uint, uint, uint, bool)
+- void RemoveRenderTarget(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numPasses
+- PostProcessPass@[] passes (readonly)
+- Texture2D@[] renderTargets (readonly)
 
 
 Model

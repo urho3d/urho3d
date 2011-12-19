@@ -95,6 +95,8 @@ struct PostProcessRenderTarget
 /// Post-processing effect.
 class PostProcess : public Object
 {
+    OBJECT(PostProcess);
+    
 public:
     /// Construct.
     PostProcess(Context* context);
@@ -112,10 +114,12 @@ public:
     
     /// Return parameter XML file.
     XMLFile* GetParameters() const { return parameterSource_; }
+    /// Return number of passes.
+    unsigned GetNumPasses() const { return passes_.Size(); }
     /// Return pass by index.
     PostProcessPass* GetPass(unsigned index) const;
     /// Return rendertarget by name.
-    const PostProcessRenderTarget* GetRenderTarget(const String& name) const;
+    Texture2D* GetRenderTarget(const String& name) const;
     
 private:
     /// Parameter XML file.

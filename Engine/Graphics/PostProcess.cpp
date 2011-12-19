@@ -29,6 +29,8 @@
 #include "Texture2D.h"
 #include "XMLFile.h"
 
+static const String emptyName;
+
 TextureUnit ParseTextureUnitName(const String& name);
 
 PostProcessPass::PostProcessPass()
@@ -51,7 +53,8 @@ void PostProcessPass::SetPixelShader(const String& name)
 
 void PostProcessPass::SetTexture(TextureUnit unit, const String& name)
 {
-    textureNames_[unit] = name;
+    if (unit < MAX_TEXTURE_UNITS)
+        textureNames_[unit] = name;
 }
 
 void PostProcessPass::SetShaderParameter(const String& name, const Vector4& value)
@@ -71,21 +74,20 @@ void PostProcessPass::SetOutput(const String& name)
 
 const String& PostProcessPass::GetTexture(TextureUnit unit) const
 {
-    return textureNames_[unit];
+    return unit < MAX_TEXTURE_UNITS ? textureNames_[unit] : emptyName;
 }
 
 const Vector4& PostProcessPass::GetShaderParameter(const String& name) const
 {
     HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(StringHash(name));
-    if (i != shaderParameters_.End())
-        return i->second_;
-    else
-        return Vector4::ZERO;
+    return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
 }
 
 PostProcessRenderTarget::~PostProcessRenderTarget()
 {
 }
+
+OBJECTTYPESTATIC(PostProcess);
 
 PostProcess::PostProcess(Context* context) :
     Object(context)
@@ -117,12 +119,18 @@ bool PostProcess::LoadParameters(XMLFile* file)
         unsigned height = rtElem.GetInt("height");
         unsigned format = Graphics::GetRGBFormat();
         bool relativeSize = rtElem.GetBool("relativesize");
+        
         String formatName = rtElem.GetString("format").ToLower();
         if (formatName == "rgba")
             format = Graphics::GetRGBAFormat();
         else if (formatName == "float")
             format = Graphics::GetFloatFormat();
-        CreateRenderTarget(name, width, height, format, relativeSize);
+        
+        if (CreateRenderTarget(name, width, height, format, relativeSize))
+        {
+            // Process additional texture parameters (for example filtering)
+            renderTargets_[StringHash(name)].texture_->LoadParameters(rtElem);
+        }
         
         rtElem = rtElem.GetNext("rendertarget");
     }
@@ -218,11 +226,11 @@ PostProcessPass* PostProcess::GetPass(unsigned index) const
         return 0;
 }
 
-const PostProcessRenderTarget* PostProcess::GetRenderTarget(const String& name) const
+Texture2D* PostProcess::GetRenderTarget(const String& name) const
 {
     HashMap<StringHash, PostProcessRenderTarget>::ConstIterator i = renderTargets_.Find(StringHash(name));
     if (i != renderTargets_.End())
-        return &i->second_;
+        return i->second_.texture_;
     else
         return 0;
 }

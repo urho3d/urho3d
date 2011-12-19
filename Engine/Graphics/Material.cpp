@@ -394,6 +394,12 @@ Texture* Material::GetTexture(TextureUnit unit) const
     return (unsigned)unit < textures_.Size() ? textures_[unit] : (Texture*)0;
 }
 
+const Vector4& Material::GetShaderParameter(const String& name) const
+{
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(StringHash(name));
+    return i != shaderParameters_.End() ? i->second_.value_ : Vector4::ZERO;
+}
+
 const String& Material::GetTextureUnitName(TextureUnit unit)
 {
     return textureUnitNames[unit];
