@@ -1088,7 +1088,7 @@ void View::RenderBatchesLightPrepass()
     if (needBlit)
         screenBuffer_ = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBFormat(), true);
     RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil;
+    RenderSurface* depthStencil = 0;
     
     // Hardware depth support: render to RGBA normal buffer and read hardware depth
     if (hwDepth)
@@ -1099,7 +1099,6 @@ void View::RenderBatchesLightPrepass()
     // No hardware depth support: render to RGBA normal buffer and R32F depth
     else
     {
-        depthStencil = renderer_->GetDepthStencil(0, 0);
         graphics_->SetRenderTarget(0, normalBuffer);
         graphics_->SetRenderTarget(1, depthBuffer);
     }

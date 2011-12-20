@@ -916,7 +916,11 @@ Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, boo
     
     // Return the default depth-stencil if applicable
     if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && depthStencil)
-        return graphics_->GetDepthTexture();
+    {
+        Texture2D* depthTexture = graphics_->GetDepthTexture();
+        if (depthTexture)
+            graphics_->GetDepthTexture();
+    }
     
     bool needNew = false;
     
@@ -949,9 +953,11 @@ Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, boo
 
 RenderSurface* Renderer::GetDepthStencil(int width, int height)
 {
-    // GetRenderBuffer() may return 0 if using the default depth-stencil, so watch out
-    Texture2D* depthTexture = GetRenderBuffer(width, height, Graphics::GetDepthStencilFormat());
-    return depthTexture ? depthTexture->GetRenderSurface() : 0;
+    // Return the default depth-stencil surface if applicable
+    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight())
+        return 0;
+    else
+        return GetRenderBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();
 }
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)

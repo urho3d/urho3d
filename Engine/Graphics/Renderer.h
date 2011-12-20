@@ -329,7 +329,7 @@ public:
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for light pre-pass rendering or postprocessing. Should only be called during actual rendering, not before.
     Texture2D* GetRenderBuffer(int width, int height, unsigned format, bool filtered = false);
-    /// Allocate a depth-stencil surface. May return the backbuffer depth-stencil if applicable. Should only be called during actual rendering, not before.
+    /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);

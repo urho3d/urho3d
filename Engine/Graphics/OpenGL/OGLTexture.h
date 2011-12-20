@@ -32,6 +32,7 @@
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
+class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
