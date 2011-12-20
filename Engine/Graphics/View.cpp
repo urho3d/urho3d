@@ -2346,10 +2346,10 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
 
 RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
 {
-    // If using the backbuffer, return the backbuffer stencil
+    // If using the backbuffer, return the backbuffer depth-stencil
     if (!renderTarget)
         return 0;
-    // Then check for linked depth stencil
+    // Then check for linked depth-stencil
     RenderSurface* depthStencil = renderTarget->GetLinkedDepthStencil();
     // Finally get one from Renderer
     if (!depthStencil)

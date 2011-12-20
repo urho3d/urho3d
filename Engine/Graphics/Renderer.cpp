@@ -1242,7 +1242,7 @@ void Renderer::ResetShadowMapAllocations()
 
 void Renderer::ResetRenderBufferAllocations(bool remove)
 {
-    // Optionally remove ´buffers that were not used at all (at the beginning of each frame's rendering step)
+    // Optionally remove buffers that were not used at all
     if (remove)
     {
         for (HashMap<long long, unsigned>::Iterator i = renderBufferMaxAllocations_.Begin(); i != renderBufferMaxAllocations_.End();)
