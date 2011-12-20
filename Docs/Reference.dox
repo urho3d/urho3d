@@ -644,9 +644,10 @@ Most of the parameters can take either a single value, or minimum and maximum va
 \code
 <particleemitter>
     <material name="MaterialName" />
-    <sorting enable="true|false" />
     <updateinvisible enable="true|false" />
     <relative enable="true|false" />
+    <scaled enable="true|false" />
+    <sorted enable="true|false" />
     <emittertype value="point|box|sphere" />
     <emittersize value="x y z" />
     <direction min="x1 y1 z1" max="x2 y2 z2" />

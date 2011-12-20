@@ -85,7 +85,6 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", occludee_, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", scaled_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
@@ -237,14 +236,17 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     if (rootElem.HasChild("numparticles"))
         SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));
     
-    if (rootElem.HasChild("sorted"))
-        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
-    
     if (rootElem.HasChild("updateinvisible"))
         updateInvisible_ = rootElem.GetChild("updateinvisible").GetBool("enable");
     
     if (rootElem.HasChild("relative"))
         relative_ = rootElem.GetChild("relative").GetBool("enable");
+    
+    if (rootElem.HasChild("scaled"))
+        scaled_ = rootElem.GetChild("scaled").GetBool("enable");
+    
+    if (rootElem.HasChild("sorted"))
+        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
     
     if (rootElem.HasChild("animlodbias"))
         SetAnimationLodBias(rootElem.GetChild("relative").GetFloat("value"));
