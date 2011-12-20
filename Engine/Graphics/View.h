@@ -103,8 +103,6 @@ public:
     Camera* GetCamera() const { return camera_; }
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
-    /// Return the depth-stencil. 0 if using the backbuffer's depth-stencil.
-    RenderSurface* GetDepthStencil() const { return depthStencil_; }
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
     /// Return occluder objects.
@@ -183,9 +181,10 @@ private:
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
     /// Render batches lit by a specific light.
     void RenderLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
-
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
+    /// Return the proper depth-stencil surface to use for a rendertarget.
+    RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -201,10 +200,10 @@ private:
     Zone* farClipZone_;
     /// Occlusion buffer for the main camera.
     OcclusionBuffer* occlusionBuffer_;
-    /// Color buffer to use.
+    /// Color rendertarget to use.
     RenderSurface* renderTarget_;
-    /// Depth buffer to use.
-    RenderSurface* depthStencil_;
+    /// Intermediate screen buffer used in postprocessing and OpenGL light pre-pass framebuffer blit.
+    Texture2D* screenBuffer_;
     /// Screen rectangle.
     IntRect screenRect_;
     /// Information of the frame being rendered.

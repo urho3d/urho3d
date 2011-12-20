@@ -153,7 +153,7 @@ View::View(Context* context) :
     cameraZone_(0),
     farClipZone_(0),
     renderTarget_(0),
-    depthStencil_(0)
+    screenBuffer_(0)
 {
     frame_.camera_ = 0;
     
@@ -198,11 +198,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     octree_ = octree;
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
-    
-    if (!renderTarget)
-        depthStencil_ = 0;
-    else
-        depthStencil_ = renderTarget->GetLinkedDepthStencil();
+    screenBuffer_ = 0;
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
@@ -274,9 +270,6 @@ void View::Update(const FrameInfo& frame)
     
     // Cache the camera frustum to avoid recalculating it constantly
     frustum_ = camera_->GetFrustum();
-    
-    // Reset shadow map allocations; they can be reused between views as each is rendered completely at a time
-    renderer_->ResetShadowMapAllocations();
     
     GetDrawables();
     GetBatches();
@@ -987,8 +980,10 @@ void View::RenderBatchesForward()
     lightStencilValue_ = 1;
     
     bool needBlit = edgeFilter_;
-    RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil = needBlit ? 0 : depthStencil_;
+    if (needBlit)
+        screenBuffer_ = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBFormat(), true);
+    RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
+    RenderSurface* depthStencil = GetDepthStencil(renderTarget);
     
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
@@ -1080,19 +1075,23 @@ void View::RenderBatchesLightPrepass()
         }
     }
     
-    Texture2D* normalBuffer = renderer_->GetNormalBuffer();
-    Texture2D* depthBuffer = renderer_->GetDepthBuffer();
+    bool hwDepth = graphics_->GetHardwareDepthSupport();
+    Texture2D* normalBuffer = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBAFormat());
+    Texture2D* depthBuffer = renderer_->GetRenderBuffer(0, 0, hwDepth ? Graphics::GetDepthStencilFormat() : Graphics::GetLinearDepthFormat());
+    Texture2D* lightBuffer = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBAFormat());
     
     #ifdef USE_OPENGL
     bool needBlit = true;
     #else
     bool needBlit = edgeFilter_;
     #endif
-    RenderSurface* renderTarget = needBlit ? renderer_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil = 0;
+    if (needBlit)
+        screenBuffer_ = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBFormat(), true);
+    RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
+    RenderSurface* depthStencil;
     
     // Hardware depth support: render to RGBA normal buffer and read hardware depth
-    if (graphics_->GetHardwareDepthSupport())
+    if (hwDepth)
     {
         depthStencil = depthBuffer->GetRenderSurface();
         graphics_->SetRenderTarget(0, normalBuffer);
@@ -1100,6 +1099,7 @@ void View::RenderBatchesLightPrepass()
     // No hardware depth support: render to RGBA normal buffer and R32F depth
     else
     {
+        depthStencil = renderer_->GetDepthStencil(0, 0);
         graphics_->SetRenderTarget(0, normalBuffer);
         graphics_->SetRenderTarget(1, depthBuffer);
     }
@@ -1120,7 +1120,6 @@ void View::RenderBatchesLightPrepass()
     bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
         LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
     
-    Texture2D* lightBuffer = renderer_->GetLightBuffer();
     graphics_->ResetRenderTarget(1);
     graphics_->SetRenderTarget(0, lightBuffer);
     graphics_->SetDepthStencil(depthStencil);
@@ -1222,7 +1221,7 @@ void View::BlitFramebuffer()
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget_);
-    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
     graphics_->SetViewport(screenRect_);
     
     String shaderName = edgeFilter_ ? "EdgeFilter" : "CopyFramebuffer";
@@ -1257,7 +1256,7 @@ void View::BlitFramebuffer()
         graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
     }
     
-    graphics_->SetTexture(TU_DIFFUSE, renderer_->GetScreenBuffer());
+    graphics_->SetTexture(TU_DIFFUSE, screenBuffer_);
     DrawFullscreenQuad(camera_, false);
     graphics_->SetTexture(TU_DIFFUSE, 0);
 }
@@ -2344,4 +2343,17 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
+}
+
+RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
+{
+    // If using the backbuffer, return the backbuffer stencil
+    if (!renderTarget)
+        return 0;
+    // Then check for linked depth stencil
+    RenderSurface* depthStencil = renderTarget->GetLinkedDepthStencil();
+    // Finally get one from Renderer
+    if (!depthStencil)
+        depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
+    return depthStencil;
 }

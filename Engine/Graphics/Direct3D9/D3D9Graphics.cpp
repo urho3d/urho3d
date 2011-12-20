@@ -2133,7 +2133,7 @@ void Graphics::OnDeviceReset()
         if (!depthTexture_)
         {
             depthTexture_ = new Texture2D(context_);
-            depthTexture_->SetSize(0, 0, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
+            depthTexture_->SetSize(width_, height_, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
         }
         
         impl_->defaultDepthStencilSurface_ = (IDirect3DSurface9*)depthTexture_->GetRenderSurface()->GetSurface();

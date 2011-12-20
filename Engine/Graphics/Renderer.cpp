@@ -343,51 +343,8 @@ void Renderer::SetLightPrepass(bool enable)
                 graphics_->GetTripleBuffer(), 1);
         }
         
-        // Create the G-buffer textures if necessary
-        if (enable)
-        {
-            if (!normalBuffer_)
-            {
-                normalBuffer_ = new Texture2D(context_);
-                normalBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
-            }
-            
-            if (!depthBuffer_)
-            {
-                // If reading the hardware depth buffer is supported, create a depth-stencil texture. Otherwise create an
-                // ordinary rendertarget for writing linear depth manually
-                if (graphics_->GetHardwareDepthSupport())
-                {
-                    #ifdef USE_OPENGL
-                    depthBuffer_ = new Texture2D(context_);
-                    depthBuffer_->SetSize(0, 0, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-                    #else
-                    depthBuffer_ = graphics_->GetDepthTexture();
-                    #endif
-                }
-                else
-                {
-                    depthBuffer_ = new Texture2D(context_);
-                    depthBuffer_->SetSize(0, 0, Graphics::GetLinearDepthFormat(), TEXTURE_RENDERTARGET);
-                }
-            }
-            
-            if (!lightBuffer_)
-            {
-                lightBuffer_ = new Texture2D(context_);
-                lightBuffer_->SetSize(0, 0, Graphics::GetRGBAFormat(), TEXTURE_RENDERTARGET);
-            }
-        }
-        else
-        {
-            normalBuffer_.Reset();
-            depthBuffer_.Reset();
-            lightBuffer_.Reset();
-        }
-        
         lightPrepass_ = enable;
         shadersDirty_ = true;
-        CheckScreenBuffer();
     }
 }
 
@@ -526,7 +483,6 @@ void Renderer::SetEdgeFilter(bool enable)
     }
     
     edgeFilter_ = enable;
-    CheckScreenBuffer();
 }
 
 void Renderer::SetEdgeFilterParameters(const EdgeFilterParameters& parameters)
@@ -618,18 +574,6 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
     return numOccluders;
 }
 
-Texture2D* Renderer::GetScreenBuffer()
-{
-    if (!screenBuffer_)
-    {
-        screenBuffer_ = new Texture2D(context_);
-        screenBuffer_->SetSize(0, 0, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
-        screenBuffer_->SetFilterMode(FILTER_BILINEAR);
-    }
-    
-    return screenBuffer_;
-}
-
 void Renderer::Update(float timeStep)
 {
     PROFILE(UpdateViews);
@@ -683,7 +627,11 @@ void Renderer::Update(float timeStep)
         
         // Update the viewport's main view and any auxiliary views it has created
         for (unsigned i = mainView; i < numViews_; ++i)
+        {
+            // Reset shadow map allocations; they can be reused between views as each is rendered completely at a time
+            ResetShadowMapAllocations();
             views_[i]->Update(frame_);
+        }
     }
 }
 
@@ -693,6 +641,9 @@ void Renderer::Render()
         return;
     
     PROFILE(RenderViews);
+    
+    // Remove unused buffers from last frame
+    ResetRenderBufferAllocations(true);
     
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy(textureAnisotropy_);
@@ -715,7 +666,11 @@ void Renderer::Render()
     
     // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
     for (unsigned i = numViews_ - 1; i < numViews_; --i)
+    {
+        // Buffers can be reused between views, as each is rendered completely
+        ResetRenderBufferAllocations();
         views_[i]->Render();
+    }
     
     // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
     numPrimitives_ = graphics_->GetNumPrimitives();
@@ -942,6 +897,61 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         shadowMapAllocations_[searchKey].Push(light);
     
     return newShadowMap;
+}
+
+Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, bool filtered)
+{
+    if (!width)
+        width = graphics_->GetWidth();
+    if (!height)
+        height = graphics_->GetHeight();
+    
+    bool depthStencil = (format == Graphics::GetDepthStencilFormat());
+    if (depthStencil)
+        filtered = false;
+    
+    long long searchKey = ((long long)format << 32) | (width << 16) | height;
+    if (filtered)
+        searchKey |= 0x8000000000000000LL;
+    
+    // Return the default depth-stencil if applicable
+    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && depthStencil)
+        return graphics_->GetDepthTexture();
+    
+    bool needNew = false;
+    
+    // If new size or format, initialize the allocation stats
+    if (renderBuffers_.Find(searchKey) == renderBuffers_.End())
+    {
+        renderBufferAllocations_[searchKey] = 0;
+        renderBufferMaxAllocations_[searchKey] = 0;
+    }
+    
+    unsigned& allocations = renderBufferAllocations_[searchKey];
+    unsigned& maxAllocations = renderBufferMaxAllocations_[searchKey];
+    ++allocations;
+    if (allocations > maxAllocations)
+        maxAllocations = allocations;
+    
+    if (allocations > renderBuffers_[searchKey].Size())
+    {
+        SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
+        newBuffer->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
+        if (filtered)
+            newBuffer->SetFilterMode(FILTER_BILINEAR);
+        renderBuffers_[searchKey].Push(newBuffer);
+        LOGDEBUG("Allocated new renderbuffer, size " + String(width) + "x" + String(height) + " format " + String(format));
+        return newBuffer;
+    }
+    else
+        return renderBuffers_[searchKey][allocations - 1];
+}
+
+RenderSurface* Renderer::GetDepthStencil(int width, int height)
+{
+    // GetRenderBuffer() may return 0 if using the default depth-stencil, so watch out
+    Texture2D* depthTexture = GetRenderBuffer(width, height, Graphics::GetDepthStencilFormat());
+    return depthTexture ? depthTexture->GetRenderSurface() : 0;
 }
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
@@ -1222,6 +1232,33 @@ void Renderer::ResetShadowMapAllocations()
 {
     for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
         i->second_.Clear();
+}
+
+void Renderer::ResetRenderBufferAllocations(bool remove)
+{
+    // Optionally remove ´buffers that were not used at all (at the beginning of each frame's rendering step)
+    if (remove)
+    {
+        for (HashMap<long long, unsigned>::Iterator i = renderBufferMaxAllocations_.Begin(); i != renderBufferMaxAllocations_.End();)
+        {
+            HashMap<long long, unsigned>::Iterator current = i++;
+            if (!current->second_)
+            {
+                renderBuffers_.Erase(current->first_);
+                renderBufferAllocations_.Erase(current->first_);
+                renderBufferMaxAllocations_.Erase(current);
+            }
+            else
+            {
+                renderBuffers_[current->first_].Resize(current->second_);
+                current->second_ = 0;
+            }
+        }
+    }
+    
+    // Then reset allocation value of remaining buffer sizes
+    for (HashMap<long long, unsigned>::Iterator i = renderBufferAllocations_.Begin(); i != renderBufferAllocations_.End(); ++i)
+        i->second_ = 0;
 }
 
 void Renderer::Initialize()
@@ -1589,19 +1626,8 @@ void Renderer::CreateInstancingBuffer()
 void Renderer::ResetShadowMaps()
 {
     shadowMaps_.Clear();
+    shadowMapAllocations_.Clear();
     colorShadowMaps_.Clear();
-}
-
-void Renderer::CheckScreenBuffer()
-{
-    bool needScreenBuffer = edgeFilter_;
-    #ifdef USE_OPENGL
-    if (lightPrepass_)
-        needScreenBuffer = true;
-    #endif
-    
-    if (!needScreenBuffer)
-        screenBuffer_.Reset();
 }
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)

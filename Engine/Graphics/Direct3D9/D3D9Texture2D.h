@@ -69,6 +69,4 @@ private:
     
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
-    /// Follow window size flag.
-    bool followWindowSize_;
 };

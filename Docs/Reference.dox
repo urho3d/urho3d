@@ -475,13 +475,13 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
 
-- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed. This includes also frame-global parameters, which on Direct3D9 need to be set only once per frame, if the uniform register assignments are fixed.
+- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed.
 
 - On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
 
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 setting the first color rendertarget resets the viewport dimensions. On OpenGL there is no such mechanism. However, as sometimes (for example in OpenGL shadow rendering) only a depth-stencil texture will be used for rendering, in OpenGL mode Graphics instead resets the viewport when the depth-stencil is set. The following sequence will produce reliable results on both APIs: first set the rendertargets, then the depth-stencil surface, and finally the viewport, if you need it to be less than the whole rendertarget.
+- On Direct3D9 setting the first color rendertarget resets the viewport dimensions. On OpenGL there is no such mechanism. However, as sometimes (for example in OpenGL shadow rendering) only a depth-stencil texture will be used for rendering, in OpenGL mode Graphics instead resets the viewport when the depth-stencil is set. The following sequence will produce reliable results on both APIs: first set the rendertarget(s), then the depth-stencil surface, and finally the viewport, if you need it to be less than the whole rendertarget.
 
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
@@ -492,6 +492,8 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 - On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change.
 
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
+
+- To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
 Note that these differences only need to be observed when writing custom rendering functionality and accessing Graphics directly. When using Renderer and the Drawable components, they are taken care of automatically.
 

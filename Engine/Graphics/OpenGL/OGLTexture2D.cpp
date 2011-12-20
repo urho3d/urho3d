@@ -36,8 +36,7 @@
 OBJECTTYPESTATIC(Texture2D);
 
 Texture2D::Texture2D(Context* context) :
-    Texture(context),
-    followWindowSize_(false)
+    Texture(context)
 {
     target_ = GL_TEXTURE_2D;
 }
@@ -96,9 +95,7 @@ void Texture2D::OnDeviceLost()
 
 void Texture2D::OnDeviceReset()
 {
-    if (followWindowSize_)
-        Create();
-    else if (!object_)
+    if (!object_)
     {
         Create();
         
@@ -162,16 +159,9 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         dynamic_ = true;
     else
         dynamic_ = false;
-    
-    if (width <= 0 || height <= 0)
-        followWindowSize_ = true;
-    else
-    {
-        width_ = width;
-        height_ = height;
-        followWindowSize_ = false;
-    }
-    
+
+    width_ = width;
+    height_ = height;
     format_ = format;
     
     return Create();
@@ -375,12 +365,6 @@ bool Texture2D::Create()
     
     if (!graphics_)
         return false;
-    
-    if (followWindowSize_)
-    {
-        width_ = graphics_->GetWidth();
-        height_ = graphics_->GetHeight();
-    }
     
     if (!width_ || !height_)
         return false;

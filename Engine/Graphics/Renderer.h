@@ -302,14 +302,6 @@ public:
     TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
     /// Return the shadowed pointlight indirection cube map.
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
-    /// Return the normal buffer for light pre-pass rendering.
-    Texture2D* GetNormalBuffer() const { return normalBuffer_; }
-    /// Return the depth buffer for light pre-pass rendering.
-    Texture2D* GetDepthBuffer() const { return depthBuffer_; }
-    /// Return the light accumulation buffer for light pre-pass rendering.
-    Texture2D* GetLightBuffer() const { return lightBuffer_; }
-    /// Return the screen buffer for postprocessing, created on demand.
-    Texture2D* GetScreenBuffer();
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a vertex shader by name.
@@ -335,6 +327,10 @@ public:
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
+    /// Allocate a rendertarget or depth-stencil texture for light pre-pass rendering or postprocessing. Should only be called during actual rendering, not before.
+    Texture2D* GetRenderBuffer(int width, int height, unsigned format, bool filtered = false);
+    /// Allocate a depth-stencil surface. May return the backbuffer depth-stencil if applicable. Should only be called during actual rendering, not before.
+    RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
@@ -349,8 +345,6 @@ public:
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
-    /// Reset shadow map allocation counts.
-    void ResetShadowMapAllocations();
     
 private:
     /// Initialize when screen mode initially set.
@@ -371,10 +365,12 @@ private:
     void CreateGeometries();
     /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
+    /// Reset shadow map allocation counts.
+    void ResetShadowMapAllocations();
+    /// Reset renderbuffer allocation counts. Optionally also remove buffers which were not requested at all during last frame.
+    void ResetRenderBufferAllocations(bool remove = false);
     /// Remove all shadow maps. Called when global shadow map resolution or format is changed.
     void ResetShadowMaps();
-    /// Remove the screen buffer if no longer needed.
-    void CheckScreenBuffer();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle graphics features (re)check event.
@@ -406,14 +402,6 @@ private:
     SharedPtr<TextureCube> faceSelectCubeMap_;
     /// Indirection cube map for shadowed pointlights.
     SharedPtr<TextureCube> indirectionCubeMap_;
-    /// Normal buffer for light pre-pass rendering.
-    SharedPtr<Texture2D> normalBuffer_;
-    /// Depth buffer for light pre-pass rendering.
-    SharedPtr<Texture2D> depthBuffer_;
-    /// Light accumulation buffer for light pre-pass rendering.
-    SharedPtr<Texture2D> lightBuffer_;
-    /// Screen buffer for post-processing.
-    SharedPtr<Texture2D> screenBuffer_;
     /// Stencil rendering vertex shader.
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
@@ -432,6 +420,12 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
+    /// Renderbuffers by resolution and format.
+    HashMap<long long, Vector<SharedPtr<Texture2D> > > renderBuffers_;
+    /// Renderbuffer current allocations by resolution and format.
+    HashMap<long long, unsigned> renderBufferAllocations_;
+    /// Renderbuffer maximum allocations by resolution and format.
+    HashMap<long long, unsigned> renderBufferMaxAllocations_;
     /// Viewports.
     Vector<Viewport> viewports_;
     /// Views.

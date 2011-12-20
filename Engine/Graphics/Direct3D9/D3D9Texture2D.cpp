@@ -36,8 +36,7 @@
 OBJECTTYPESTATIC(Texture2D);
 
 Texture2D::Texture2D(Context* context) :
-    Texture(context),
-    followWindowSize_(false)
+    Texture(context)
 {
 }
 
@@ -75,16 +74,16 @@ bool Texture2D::Load(Deserializer& source)
 
 void Texture2D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT || followWindowSize_)
+    if (pool_ == D3DPOOL_DEFAULT)
         Release();
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || followWindowSize_)
+    if (pool_ == D3DPOOL_DEFAULT)
     {
         // If has a file name, reload through the resource cache. Otherwise recreate and mark the data lost
-        if (!GetName().Trimmed().Empty() && !followWindowSize_)
+        if (!GetName().Trimmed().Empty())
             GetSubsystem<ResourceCache>()->ReloadResource(this);
         else
         {
@@ -148,15 +147,8 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         pool_ = D3DPOOL_DEFAULT;
     }
     
-    if (width <= 0 || height <= 0)
-        followWindowSize_ = true;
-    else
-    {
-        width_ = width;
-        height_ = height;
-        followWindowSize_ = false;
-    }
-    
+    width_ = width;
+    height_ = height;
     format_ = format;
     
     return Create();
@@ -462,12 +454,6 @@ bool Texture2D::Create()
     
     if (!graphics_)
         return false;
-    
-    if (followWindowSize_)
-    {
-        width_ = graphics_->GetWidth();
-        height_ = graphics_->GetHeight();
-    }
     
     if (!width_ || !height_)
         return false;
