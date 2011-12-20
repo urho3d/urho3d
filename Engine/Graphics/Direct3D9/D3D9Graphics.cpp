@@ -158,6 +158,8 @@ static unsigned GetD3DColor(const Color& color)
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }
 
+static unsigned depthStencilFormat = D3DFMT_D24S8;
+
 OBJECTTYPESTATIC(Graphics);
 
 Graphics::Graphics(Context* context) :
@@ -1851,7 +1853,7 @@ unsigned Graphics::GetLinearDepthFormat()
 
 unsigned Graphics::GetDepthStencilFormat()
 {
-    return D3DFMT_D24S8;
+    return depthStencilFormat;
 }
 
 bool Graphics::OpenWindow(int width, int height)
@@ -1973,15 +1975,15 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features: Shader Model 3, light pre-pass rendering, hardware depth texture, shadow map,
-    // dummy color surface and stream offset
+    // Reset features first
     lightPrepassSupport_ = false;
     hardwareShadowSupport_ = false;
     hiresShadowSupport_ = false;
     streamOffsetSupport_ = false;
     hasSM3_ = false;
+    depthStencilFormat = D3DFMT_D24S8;
     
-    // Prefer NVIDIA style hardware depth compared shadow maps if available
+    // Check hardware shadow map support: prefer NVIDIA style hardware depth compared shadow maps if available
     shadowMapFormat_ = D3DFMT_D16;
     if (impl_->CheckFormatSupport((D3DFORMAT)shadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
     {
@@ -2015,14 +2017,7 @@ void Graphics::CheckFeatureSupport()
         }
     }
     
-    if (!forceSM2_)
-    {
-        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
-            D3DPS_VERSION(3, 0))
-            hasSM3_ = true;
-    }
-    
-    // Check for Intel 4 Series with an old driver, enable manual shadow map compare in that case
+   // Check for Intel 4 Series with an old driver, enable manual shadow map compare in that case
     if (shadowMapFormat_ == D3DFMT_D16)
     {
         if (impl_->adapterIdentifier_.VendorId == 0x8086 && impl_->adapterIdentifier_.DeviceId == 0x2a42 &&
@@ -2030,6 +2025,27 @@ void Graphics::CheckFeatureSupport()
             hardwareShadowSupport_ = false;
     }
     
+    // Check for dummy color rendertarget format used with hardware shadow maps
+    dummyColorFormat_ = D3DFMT_A8R8G8B8;
+    D3DFORMAT nullFormat = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+    if (impl_->CheckFormatSupport(nullFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+        dummyColorFormat_ = nullFormat;
+    else if (impl_->CheckFormatSupport(D3DFMT_R16F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+        dummyColorFormat_ = D3DFMT_R16F;
+    else if (impl_->CheckFormatSupport(D3DFMT_R5G6B5, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+        dummyColorFormat_ = D3DFMT_R5G6B5;
+    else if (impl_->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
+        dummyColorFormat_ = D3DFMT_A4R4G4B4;
+        
+    // Check for Shader Model 3
+    if (!forceSM2_)
+    {
+        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
+            D3DPS_VERSION(3, 0))
+            hasSM3_ = true;
+    }
+    
+    // Check for readable hardware depth-stencil format (INTZ) and light pre-pass support
     if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
     {
         // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs,
@@ -2038,6 +2054,7 @@ void Graphics::CheckFeatureSupport()
         {
             hardwareDepthSupport_ = true;
             lightPrepassSupport_ = true;
+            depthStencilFormat = MAKEFOURCC('I', 'N', 'T', 'Z');
         }
     }
     
@@ -2049,17 +2066,7 @@ void Graphics::CheckFeatureSupport()
             lightPrepassSupport_ = true;
     }
     
-    dummyColorFormat_ = D3DFMT_A8R8G8B8;
-    D3DFORMAT nullFormat = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
-    if (impl_->CheckFormatSupport(nullFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
-        dummyColorFormat_ = nullFormat;
-    else if (impl_->CheckFormatSupport(D3DFMT_R16F, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
-        dummyColorFormat_ = D3DFMT_R16F;
-    else if (impl_->CheckFormatSupport(D3DFMT_R5G6B5, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
-        dummyColorFormat_ = D3DFMT_R5G6B5;
-    else if (impl_->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
-        dummyColorFormat_ = D3DFMT_A4R4G4B4;
-    
+    // Check for stream offset (needed for instancing)
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
         streamOffsetSupport_ = true;
     

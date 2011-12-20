@@ -349,7 +349,7 @@ public:
     static unsigned GetFloatFormat();
     /// Return the API-specific linear depth texture format.
     static unsigned GetLinearDepthFormat();
-    /// Return the API-specific readable hardware depth-stencil texture format.
+    /// Return the API-specific hardware depth-stencil texture format.
     static unsigned GetDepthStencilFormat();
     
 private:
