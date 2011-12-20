@@ -624,12 +624,14 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     RegisterSubclass<Drawable, T>(engine, "Drawable", className);
     engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(T, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_inView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_castShadows(bool)", asMETHOD(T, SetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_castShadows() const", asMETHOD(T, GetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", asMETHOD(T, SetOccluder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_occluder() const", asMETHOD(T, IsOccluder), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_occludee(bool)", asMETHOD(T, SetOccludee), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_occludee() const", asMETHOD(T, IsOccludee), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_drawDistance(float)", asMETHOD(T, SetDrawDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_drawDistance() const", asMETHOD(T, GetDrawDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_shadowDistance(float)", asMETHOD(T, SetShadowDistance), asCALL_THISCALL);

@@ -60,6 +60,7 @@ Drawable::Drawable(Context* context) :
     visible_(true),
     castShadows_(false),
     occluder_(false),
+    occludee_(true),
     worldBoundingBoxDirty_(true),
     updateQueued_(false),
     reinsertionQueued_(false)
@@ -165,6 +166,11 @@ void Drawable::SetCastShadows(bool enable)
 void Drawable::SetOccluder(bool enable)
 {
     occluder_ = enable;
+}
+
+void Drawable::SetOccludee(bool enable)
+{
+    occludee_ = enable;
 }
 
 void Drawable::MarkForUpdate()

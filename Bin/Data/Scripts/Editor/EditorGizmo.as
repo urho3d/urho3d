@@ -70,15 +70,17 @@ void CreateGizmo()
     gizmo.materials[1] = cache.GetResource("Material", "Materials/GreenUnlit.xml");
     gizmo.materials[2] = cache.GetResource("Material", "Materials/BlueUnlit.xml");
     gizmo.visible = false;
-    
+    gizmo.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
+    gizmo.occludee = false;
+
     gizmoAxisX.lastSelected = false;
     gizmoAxisY.lastSelected = false;
     gizmoAxisZ.lastSelected = false;
     lastGizmoMode = EDIT_MOVE;
 
-    // Add to the octree without culling. This also makes the gizmo invisible to raycasts
+    // Add to the octree manually
     if (editorScene.octree !is null)
-        editorScene.octree.AddManualDrawable(gizmo, false);
+        editorScene.octree.AddManualDrawable(gizmo);
 }
 
 void HideGizmo()

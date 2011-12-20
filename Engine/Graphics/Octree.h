@@ -169,15 +169,13 @@ public:
     void Resize(const BoundingBox& box, unsigned numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
-    /// Add a drawable manually, which can optionally be unculled.
-    void AddManualDrawable(Drawable* drawable, bool culling);
+    /// Add a drawable manually.
+    void AddManualDrawable(Drawable* drawable);
     /// Remove a manually added drawable.
     void RemoveManualDrawable(Drawable* drawable);
     
     /// Return drawable objects by a query.
     void GetDrawables(OctreeQuery& query) const;
-    /// Return unculled drawables by drawable type. The destination vector will not be cleared.
-    void GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const;
     /// Return drawable objects by a ray query.
     void Raycast(RayOctreeQuery& query) const;
     /// Return the closest drawable object by a ray query.
@@ -214,8 +212,6 @@ private:
     PODVector<Drawable*> drawableReinsertions_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
-    /// Unculled drawables.
-    Vector<WeakPtr<Drawable> > unculledDrawables_;
     /// Current threaded ray query.
     mutable RayOctreeQuery* rayQuery_;
     /// Drawable list for threaded ray query.

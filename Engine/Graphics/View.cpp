@@ -63,13 +63,11 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     View* view = reinterpret_cast<View*>(item->aux_);
     Drawable** start = reinterpret_cast<Drawable**>(item->start_);
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
-    Drawable** unculledStart = &view->tempDrawables_[0][0] + view->unculledDrawableStart_;
     OcclusionBuffer* buffer = view->occlusionBuffer_;
     
     while (start != end)
     {
         Drawable* drawable = *start;
-        bool useOcclusion = start < unculledStart;
         unsigned char flags = drawable->GetDrawableFlags();
         ++start;
         
@@ -83,7 +81,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
         if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
             continue;
         
-        if (buffer && useOcclusion && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
+        if (buffer && drawable->IsOccludee() && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
             continue;
         
         drawable->MarkInView(view->frame_);
@@ -371,10 +369,6 @@ void View::GetDrawables()
     // Perform one octree query to get everything, then examine the results
     FrustumOctreeQuery query(tempDrawables, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
     octree_->GetDrawables(query);
-    
-    // Add unculled geometries & lights
-    unculledDrawableStart_ = tempDrawables.Size();
-    octree_->GetUnculledDrawables(tempDrawables, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
     
     // Get zones and occluders first
     highestZonePriority_ = M_MIN_INT;

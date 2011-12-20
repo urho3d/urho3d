@@ -133,6 +133,8 @@ public:
     void SetCastShadows(bool enable);
     /// %Set occlusion flag.
     void SetOccluder(bool enable);
+    /// %Set occludee flag.
+    void SetOccludee(bool enable);
     /// Mark for update before octree reinsertion.
     void MarkForUpdate();
     
@@ -160,8 +162,10 @@ public:
     bool IsVisible() const { return visible_; }
     /// Return shadowcaster flag.
     bool GetCastShadows() const { return castShadows_; }
-    /// Return occlusion flag.
+    /// Return occluder flag.
     bool IsOccluder() const { return occluder_; }
+    /// Return occludee flag.
+    bool IsOccludee() const { return occludee_; }
     
     /// %Set new zone.
     void SetZone(Zone* zone);
@@ -272,6 +276,8 @@ protected:
     bool castShadows_;
     /// Occluder flag.
     bool occluder_;
+    /// Occludee flag.
+    bool occludee_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
     /// Octree update queued flag.

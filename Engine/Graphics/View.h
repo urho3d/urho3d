@@ -268,8 +268,6 @@ private:
     int maxOccluderTriangles_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
-    /// Start index of unculled drawables. These will not be tested for occlusion.
-    unsigned unculledDrawableStart_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
     /// Light prepass flag.

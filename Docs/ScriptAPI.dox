@@ -1747,9 +1747,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -1810,9 +1811,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -1864,9 +1866,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -1910,9 +1913,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -1952,9 +1956,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -2022,9 +2027,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -2131,9 +2137,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
+- bool visible
 - bool castShadows
 - bool occluder
-- bool visible
+- bool occludee
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -2207,7 +2214,7 @@ Methods:<br>
 - void Remove()
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
-- void AddManualDrawable(Drawable@, bool)
+- void AddManualDrawable(Drawable@)
 - void RemoveManualDrawable(Drawable@)
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const
 - RayQueryResult RaycastSingle(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const

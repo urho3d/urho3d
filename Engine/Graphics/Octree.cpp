@@ -369,23 +369,12 @@ void Octree::Update(const FrameInfo& frame)
     ReinsertDrawables(frame);
 }
 
-void Octree::AddManualDrawable(Drawable* drawable, bool culling)
+void Octree::AddManualDrawable(Drawable* drawable)
 {
     if (!drawable || drawable->GetOctant())
         return;
     
-    if (culling)
-        AddDrawable(drawable);
-    else
-    {
-        for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
-        {
-            if ((*i) == drawable)
-                return;
-        }
-        
-        unculledDrawables_.Push(WeakPtr<Drawable>(drawable));
-    }
+    AddDrawable(drawable);
 }
 
 void Octree::RemoveManualDrawable(Drawable* drawable)
@@ -400,32 +389,12 @@ void Octree::RemoveManualDrawable(Drawable* drawable)
         CancelReinsertion(drawable);
         octant->RemoveDrawable(drawable);
     }
-    else
-    {
-        for (Vector<WeakPtr<Drawable> >::Iterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
-        {
-            if ((*i) == drawable)
-            {
-                unculledDrawables_.Erase(i);
-                return;
-            }
-        }
-    }
 }
 
 void Octree::GetDrawables(OctreeQuery& query) const
 {
     query.result_.Clear();
     GetDrawablesInternal(query, false);
-}
-
-void Octree::GetUnculledDrawables(PODVector<Drawable*>& dest, unsigned char drawableFlags) const
-{
-    for (Vector<WeakPtr<Drawable> >::ConstIterator i = unculledDrawables_.Begin(); i != unculledDrawables_.End(); ++i)
-    {
-        if (*i && (*i)->IsVisible() && (*i)->GetDrawableFlags() & drawableFlags)
-            dest.Push(*i);
-    }
 }
 
 void Octree::Raycast(RayOctreeQuery& query) const
@@ -612,13 +581,6 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     queue->Complete();
     scene->EndThreadedUpdate();
     drawableUpdates_.Clear();
-    
-    for (unsigned i = unculledDrawables_.Size() - 1; i < unculledDrawables_.Size(); --i)
-    {
-        // Remove expired unculled drawables at this point
-        if (!unculledDrawables_[i])
-            unculledDrawables_.Erase(i, 1);
-    }
 }
 
 void Octree::ReinsertDrawables(const FrameInfo& frame)
