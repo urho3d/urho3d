@@ -518,7 +518,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
 
         Button@ openButton = Button();
         openButton.style = uiStyle;
-        openButton.SetFixedSize(36, 16);
+        openButton.SetFixedSize(36, ATTR_HEIGHT - 2);
         openButton.vars["Index"] = index;
         openButton.vars["SubIndex"] = subIndex;
         SetAttributeEditorID(openButton, serializables);
