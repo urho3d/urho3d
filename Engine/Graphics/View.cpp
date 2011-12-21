@@ -177,22 +177,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     if (!octree)
         return false;
     
-    // Check for the render texture being larger than the G-buffer in light pre-pass mode
     lightPrepass_ = renderer_->GetLightPrepass();
-    if (lightPrepass_ && renderTarget)
-    {
-        if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
-        {
-            // Display message only once per rendertarget, do not spam each frame
-            if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
-            {
-                gBufferErrorDisplayed_.Insert(renderTarget);
-                LOGERROR("Render texture is larger than the G-buffer, can not render");
-            }
-            return false;
-        }
-    }
-    
     octree_ = octree;
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
@@ -203,15 +188,25 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     int rtHeight = renderTarget ? renderTarget->GetHeight() : graphics_->GetHeight();
     if (viewport.rect_ != IntRect::ZERO)
     {
-        screenRect_.left_ = Clamp(viewport.rect_.left_, 0, rtWidth - 1);
-        screenRect_.top_ = Clamp(viewport.rect_.top_, 0, rtHeight - 1);
-        screenRect_.right_ = Clamp(viewport.rect_.right_, screenRect_.left_ + 1, rtWidth);
-        screenRect_.bottom_ = Clamp(viewport.rect_.bottom_, screenRect_.top_ + 1, rtHeight);
+        viewRect_.left_ = Clamp(viewport.rect_.left_, 0, rtWidth - 1);
+        viewRect_.top_ = Clamp(viewport.rect_.top_, 0, rtHeight - 1);
+        viewRect_.right_ = Clamp(viewport.rect_.right_, viewRect_.left_ + 1, rtWidth);
+        viewRect_.bottom_ = Clamp(viewport.rect_.bottom_, viewRect_.top_ + 1, rtHeight);
     }
     else
-        screenRect_ = IntRect(0, 0, rtWidth, rtHeight);
-    width_ = screenRect_.right_ - screenRect_.left_;
-    height_ = screenRect_.bottom_ - screenRect_.top_;
+        viewRect_ = IntRect(0, 0, rtWidth, rtHeight);
+    
+    viewSize_ = IntVector2(viewRect_.right_ - viewRect_.left_, viewRect_.bottom_ - viewRect_.top_);
+    rtSize_ = IntVector2(rtWidth, rtHeight);
+    
+    // On OpenGL flip the viewport if rendering to a texture for consistent UV addressing with Direct3D9
+    #ifdef USE_OPENGL
+    if (renderTarget_)
+    {
+        viewRect_.bottom_ = rtSize_.y - viewRect_.top_;
+        viewRect_.top_ = viewRect.bottom_ - viewSize_.y;
+    }
+    #endif
     
     drawShadows_ = renderer_->GetDrawShadows();
     materialQuality_ = renderer_->GetMaterialQuality();
@@ -239,7 +234,7 @@ void View::Update(const FrameInfo& frame)
     frame_.camera_ = camera_;
     frame_.timeStep_ = frame.timeStep_;
     frame_.frameNumber_ = frame.frameNumber_;
-    frame_.viewSize_ = IntVector2(width_, height_);
+    frame_.viewSize_ = viewSize_;
     
     // Clear old light scissor cache, geometry, light, occluder & batch lists
     lightScissorCache_.Clear();
@@ -290,7 +285,7 @@ void View::Render()
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // again to ensure correct projection will be used
     if (camera_->GetAutoAspectRatio())
-        camera_->SetAspectRatio((float)(width_) / (float)(height_));
+        camera_->SetAspectRatio((float)(viewSize_.x_) / (float)(viewSize_.y_));
     
     graphics_->SetColorWrite(true);
     graphics_->SetFillMode(FILL_SOLID);
@@ -570,7 +565,7 @@ void View::GetBatches()
                 lightQueue.shadowMap_ = 0;
                 if (shadowSplits > 0)
                 {
-                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, camera_, width_, height_);
+                    lightQueue.shadowMap_ = renderer_->GetShadowMap(light, camera_, viewSize_.x_, viewSize_.y_);
                     // If did not manage to get a shadow map, convert the light to unshadowed
                     if (!lightQueue.shadowMap_)
                         shadowSplits = 0;
@@ -975,7 +970,7 @@ void View::RenderBatchesForward()
     
     bool needBlit = edgeFilter_;
     if (needBlit)
-        screenBuffer_ = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBFormat(), true);
+        screenBuffer_ = renderer_->GetRenderBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true);
     RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = GetDepthStencil(renderTarget);
     
@@ -993,7 +988,7 @@ void View::RenderBatchesForward()
     
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
     
     if (!baseQueue_.IsEmpty())
@@ -1017,7 +1012,7 @@ void View::RenderBatchesForward()
                 RenderShadowMap(*i);
                 graphics_->SetRenderTarget(0, renderTarget);
                 graphics_->SetDepthStencil(depthStencil);
-                graphics_->SetViewport(screenRect_);
+                graphics_->SetViewport(viewRect_);
             }
             
             RenderLightBatchQueue(i->litBatches_, i->light_);
@@ -1028,7 +1023,7 @@ void View::RenderBatchesForward()
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     
     if (!preAlphaQueue_.IsEmpty())
     {
@@ -1070,9 +1065,10 @@ void View::RenderBatchesLightPrepass()
     }
     
     bool hwDepth = graphics_->GetHardwareDepthSupport();
-    Texture2D* normalBuffer = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBAFormat());
-    Texture2D* depthBuffer = renderer_->GetRenderBuffer(0, 0, hwDepth ? Graphics::GetDepthStencilFormat() : Graphics::GetLinearDepthFormat());
-    Texture2D* lightBuffer = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBAFormat());
+    Texture2D* normalBuffer = renderer_->GetRenderBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
+    Texture2D* depthBuffer = renderer_->GetRenderBuffer(rtSize_.x_, rtSize_.y_, hwDepth ? Graphics::GetDepthStencilFormat() :
+        Graphics::GetLinearDepthFormat());
+    Texture2D* lightBuffer = renderer_->GetRenderBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
     
     #ifdef USE_OPENGL
     bool needBlit = true;
@@ -1080,7 +1076,7 @@ void View::RenderBatchesLightPrepass()
     bool needBlit = edgeFilter_;
     #endif
     if (needBlit)
-        screenBuffer_ = renderer_->GetRenderBuffer(0, 0, Graphics::GetRGBFormat(), true);
+        screenBuffer_ = renderer_->GetRenderBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true);
     RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = 0;
     
@@ -1098,7 +1094,7 @@ void View::RenderBatchesLightPrepass()
     }
     
     graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
     if (!gbufferQueue_.IsEmpty())
@@ -1116,7 +1112,7 @@ void View::RenderBatchesLightPrepass()
     graphics_->ResetRenderTarget(1);
     graphics_->SetRenderTarget(0, lightBuffer);
     graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     if (!optimizeLightBuffer)
         graphics_->Clear(CLEAR_COLOR);
     
@@ -1133,7 +1129,7 @@ void View::RenderBatchesLightPrepass()
                 RenderShadowMap(*i);
                 graphics_->SetRenderTarget(0, lightBuffer);
                 graphics_->SetDepthStencil(depthStencil);
-                graphics_->SetViewport(screenRect_);
+                graphics_->SetViewport(viewRect_);
             }
             
             graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
@@ -1160,7 +1156,7 @@ void View::RenderBatchesLightPrepass()
     graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
     graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
@@ -1215,24 +1211,24 @@ void View::BlitFramebuffer()
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, renderTarget_);
     graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
-    graphics_->SetViewport(screenRect_);
+    graphics_->SetViewport(viewRect_);
     
     String shaderName = edgeFilter_ ? "EdgeFilter" : "CopyFramebuffer";
     graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
     
-    float gBufferWidth = (float)graphics_->GetWidth();
-    float gBufferHeight = (float)graphics_->GetHeight();
+    float rtWidth = (float)rtSize_.x_;
+    float rtHeight = (float)rtSize_.y_;
     
     {
-        float widthRange = 0.5f * width_ / gBufferWidth;
-        float heightRange = 0.5f * height_ / gBufferHeight;
+        float widthRange = 0.5f * viewSize_.x_ / rtWidth;
+        float heightRange = 0.5f * viewSize_.y_ / rtHeight;
         
         #ifdef USE_OPENGL
-        Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
-            1.0f - (((float)screenRect_.top_) / gBufferHeight + heightRange), widthRange, heightRange);
+        Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
+            1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
         #else
-        Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
-            (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
+            (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
         #endif
         
         graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
@@ -1244,8 +1240,8 @@ void View::BlitFramebuffer()
         graphics_->SetShaderParameter(PSP_EDGEFILTERPARAMS, Vector4(parameters.radius_, parameters.threshold_,
             parameters.strength_, 0.0f));
         
-        float addX = 1.0f / (float)gBufferWidth;
-        float addY = 1.0f / (float)gBufferHeight;
+        float addX = 1.0f / rtWidth;
+        float addY = 1.0f / rtHeight;
         graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
     }
     

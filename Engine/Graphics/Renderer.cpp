@@ -901,11 +901,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
 Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, bool filtered)
 {
-    if (!width)
-        width = graphics_->GetWidth();
-    if (!height)
-        height = graphics_->GetHeight();
-    
     bool depthStencil = (format == Graphics::GetDepthStencilFormat());
     if (depthStencil)
         filtered = false;
@@ -914,12 +909,12 @@ Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, boo
     if (filtered)
         searchKey |= 0x8000000000000000LL;
     
-    // Return the default depth-stencil if applicable
+    // Return the default depth-stencil if applicable (Direct3D9 only)
     if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && depthStencil)
     {
         Texture2D* depthTexture = graphics_->GetDepthTexture();
         if (depthTexture)
-            graphics_->GetDepthTexture();
+            return depthTexture;
     }
     
     bool needNew = false;
@@ -944,7 +939,7 @@ Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, boo
         if (filtered)
             newBuffer->SetFilterMode(FILTER_BILINEAR);
         renderBuffers_[searchKey].Push(newBuffer);
-        LOGDEBUG("Allocated new renderbuffer, size " + String(width) + "x" + String(height) + " format " + String(format));
+        LOGDEBUG("Allocated new renderbuffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
     else

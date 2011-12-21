@@ -220,17 +220,18 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
     if (graphics->NeedParameterUpdate(VSP_GBUFFEROFFSETS, (const void*)viewportHash))
     {
-        float gBufferWidth = (float)graphics->GetWidth();
-        float gBufferHeight = (float)graphics->GetHeight();
-        float widthRange = 0.5f * (viewport.right_ - viewport.left_) / gBufferWidth;
-        float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / gBufferHeight;
+        IntVector2 rtSize = graphics->GetRenderTargetDimensions();
+        float rtWidth = (float)rtSize.x_;
+        float rtHeight = (float)rtSize.y_;
+        float widthRange = 0.5f * (viewport.right_ - viewport.left_) / rtWidth;
+        float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / rtHeight;
         
         #ifdef USE_OPENGL
-        Vector4 bufferUVOffset(((float)viewport.left_) / gBufferWidth + widthRange,
-            1.0f - (((float)viewport.top_) / gBufferHeight + heightRange), widthRange, heightRange);
+        Vector4 bufferUVOffset(((float)viewport.left_) / rttWidth + widthRange,
+            1.0f - (((float)viewport.top_) / rtHeight + heightRange), widthRange, heightRange);
         #else
-        Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / gBufferWidth + widthRange,
-            (0.5f + (float)viewport.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+        Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / rtWidth + widthRange,
+            (0.5f + (float)viewport.top_) / rtHeight + heightRange, widthRange, heightRange);
         #endif
         
         graphics->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);

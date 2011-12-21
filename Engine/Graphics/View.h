@@ -204,8 +204,12 @@ private:
     RenderSurface* renderTarget_;
     /// Intermediate screen buffer used in postprocessing and OpenGL light pre-pass framebuffer blit.
     Texture2D* screenBuffer_;
-    /// Screen rectangle.
-    IntRect screenRect_;
+    /// Viewport rectangle.
+    IntRect viewRect_;
+    /// Viewport size.
+    IntVector2 viewSize_;
+    /// Rendertarget size.
+    IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
     /// Camera frustum.
@@ -234,8 +238,6 @@ private:
     PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights.
     PODVector<Light*> lights_;
-    /// Render surfaces for which a G-buffer size error has already been logged, to prevent log spam.
-    HashSet<RenderSurface*> gBufferErrorDisplayed_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Lookup map for the processed lights' light queues.
@@ -258,10 +260,6 @@ private:
     List<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Rendertarget width.
-    int width_;
-    /// Rendertarget height.
-    int height_;
     /// Material quality level.
     int materialQuality_;
     /// Maximum number of occluder triangles.
