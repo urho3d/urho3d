@@ -262,18 +262,16 @@ void UI::Render()
     projection.m23_ = 0.0f;
     projection.m33_ = 1.0f;
     
-    graphics_->ResetRenderTargets();
-    graphics_->ResetDepthStencil();
-    graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
-    
     graphics_->ClearParameterSources();
-    graphics_->ResetRenderTargets();
     graphics_->SetAlphaTest(false);
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
+    graphics_->ResetRenderTargets();
+    graphics_->ResetDepthStencil();
+    graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;

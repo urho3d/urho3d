@@ -27,6 +27,7 @@
 #include "Frustum.h"
 #include "Object.h"
 #include "GraphicsDefs.h"
+#include "Timer.h"
 
 class BoundingBox;
 class Camera;
@@ -78,6 +79,8 @@ public:
     bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
     /// Build reduced size mip levels.
     void BuildDepthHierarchy();
+    /// Reset last used timer.
+    void ResetUseTimer();
     
     /// Return highest level depth values.
     int* GetBuffer() const { return buffer_; }
@@ -97,6 +100,8 @@ public:
     CullMode GetCullMode() const { return cullMode_; }
     /// Test a bounding box for visibility. For best performance, build depth hierarchy first.
     bool IsVisible(const BoundingBox& worldSpaceBox) const;
+    /// Return time since last use in milliseconds.
+    unsigned GetUseTimer();
     
 private:
     /// Apply modelview transform to vertex.
@@ -136,6 +141,8 @@ private:
     Matrix4 projection_;
     /// Combined view and projection matrix.
     Matrix4 viewProj_;
+    /// Last used timer.
+    Timer useTimer_;
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.

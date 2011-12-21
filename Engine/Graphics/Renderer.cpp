@@ -255,6 +255,7 @@ static const String lightPSVariations[] =
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
+static const unsigned MAX_BUFFER_AGE = 2000;
 static const Viewport noViewport;
 
 void EdgeFilterParameters::Validate()
@@ -642,17 +643,13 @@ void Renderer::Render()
     
     PROFILE(RenderViews);
     
-    // Remove unused buffers from last frame
-    ResetRenderBufferAllocations(true);
-    
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy(textureAnisotropy_);
+    graphics_->ClearParameterSources();
     
     // If no views, just clear the screen
     if (!numViews_)
     {
-        numPrimitives_ = 0;
-        numBatches_ = 0;
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
@@ -660,21 +657,31 @@ void Renderer::Render()
         graphics_->SetFillMode(FILL_SOLID);
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
+        graphics_->ResetRenderTargets();
+        graphics_->ResetDepthStencil();
+        graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
-        return;
+        
+        numPrimitives_ = 0;
+        numBatches_ = 0;
     }
-    
-    // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
-    for (unsigned i = numViews_ - 1; i < numViews_; --i)
+    else
     {
-        // Buffers can be reused between views, as each is rendered completely
-        ResetRenderBufferAllocations();
-        views_[i]->Render();
+        // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
+        for (unsigned i = numViews_ - 1; i < numViews_; --i)
+        {
+            // Screen buffers can be reused between views, as each is rendered completely
+            ResetScreenBufferAllocations();
+            views_[i]->Render();
+        }
+        
+        // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
+        numPrimitives_ = graphics_->GetNumPrimitives();
+        numBatches_ = graphics_->GetNumBatches();
     }
     
-    // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
-    numPrimitives_ = graphics_->GetNumPrimitives();
-    numBatches_ = graphics_->GetNumBatches();
+    // Remove unused occlusion buffers and renderbuffers
+    RemoveUnusedBuffers();
 }
 
 void Renderer::DrawDebugGeometry(bool depthTest)
@@ -899,7 +906,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, bool filtered)
+Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat());
     if (depthStencil)
@@ -917,42 +924,38 @@ Texture2D* Renderer::GetRenderBuffer(int width, int height, unsigned format, boo
             return depthTexture;
     }
     
-    bool needNew = false;
-    
     // If new size or format, initialize the allocation stats
-    if (renderBuffers_.Find(searchKey) == renderBuffers_.End())
-    {
-        renderBufferAllocations_[searchKey] = 0;
-        renderBufferMaxAllocations_[searchKey] = 0;
-    }
+    if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
+        screenBufferAllocations_[searchKey] = 0;
     
-    unsigned& allocations = renderBufferAllocations_[searchKey];
-    unsigned& maxAllocations = renderBufferMaxAllocations_[searchKey];
-    ++allocations;
-    if (allocations > maxAllocations)
-        maxAllocations = allocations;
-    
-    if (allocations > renderBuffers_[searchKey].Size())
+    unsigned allocations = screenBufferAllocations_[searchKey]++;
+    if (allocations >= screenBuffers_[searchKey].Size())
     {
         SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
         newBuffer->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
         if (filtered)
             newBuffer->SetFilterMode(FILTER_BILINEAR);
-        renderBuffers_[searchKey].Push(newBuffer);
-        LOGDEBUG("Allocated new renderbuffer size " + String(width) + "x" + String(height) + " format " + String(format));
+        newBuffer->ResetUseTimer();
+        screenBuffers_[searchKey].Push(newBuffer);
+        LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
     else
-        return renderBuffers_[searchKey][allocations - 1];
+    {
+        Texture2D* buffer = screenBuffers_[searchKey][allocations];
+        buffer->ResetUseTimer();
+        return buffer;
+    }
 }
 
 RenderSurface* Renderer::GetDepthStencil(int width, int height)
 {
     // Return the default depth-stencil surface if applicable
+    // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
     if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight())
         return 0;
     else
-        return GetRenderBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();
+        return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();
 }
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
@@ -969,6 +972,7 @@ OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
     OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_];
     buffer->SetSize(width, height);
     buffer->SetView(camera);
+    buffer->ResetUseTimer();
     
     ++numOcclusionBuffers_;
     return buffer;
@@ -1229,36 +1233,47 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     return true;
 }
 
+void Renderer::RemoveUnusedBuffers()
+{
+    for (unsigned i = occlusionBuffers_.Size() - 1; i < occlusionBuffers_.Size(); --i)
+    {
+        if (occlusionBuffers_[i]->GetUseTimer() > MAX_BUFFER_AGE)
+        {
+            LOGDEBUG("Removed unused occlusion buffer");
+            occlusionBuffers_.Erase(i);
+        }
+    }
+    
+    for (HashMap<long long, Vector<SharedPtr<Texture2D> > >::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
+    {
+        HashMap<long long, Vector<SharedPtr<Texture2D> > >::Iterator current = i++;
+        Vector<SharedPtr<Texture2D> >& buffers = current->second_;
+        for (unsigned j = buffers.Size() - 1; j < buffers.Size(); --j)
+        {
+            Texture2D* buffer = buffers[j];
+            if (buffer->GetUseTimer() > MAX_BUFFER_AGE)
+            {
+                LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) + " format " + String(buffer->GetFormat()));
+                buffers.Erase(j);
+            }
+        }
+        if (buffers.Empty())
+        {
+            screenBufferAllocations_.Erase(current->first_);
+            screenBuffers_.Erase(current);
+        }
+    }
+}
+
 void Renderer::ResetShadowMapAllocations()
 {
     for (HashMap<int, PODVector<Light*> >::Iterator i = shadowMapAllocations_.Begin(); i != shadowMapAllocations_.End(); ++i)
         i->second_.Clear();
 }
 
-void Renderer::ResetRenderBufferAllocations(bool remove)
+void Renderer::ResetScreenBufferAllocations()
 {
-    // Optionally remove buffers that were not used at all
-    if (remove)
-    {
-        for (HashMap<long long, unsigned>::Iterator i = renderBufferMaxAllocations_.Begin(); i != renderBufferMaxAllocations_.End();)
-        {
-            HashMap<long long, unsigned>::Iterator current = i++;
-            if (!current->second_)
-            {
-                renderBuffers_.Erase(current->first_);
-                renderBufferAllocations_.Erase(current->first_);
-                renderBufferMaxAllocations_.Erase(current);
-            }
-            else
-            {
-                renderBuffers_[current->first_].Resize(current->second_);
-                current->second_ = 0;
-            }
-        }
-    }
-    
-    // Then reset allocation value of remaining buffer sizes
-    for (HashMap<long long, unsigned>::Iterator i = renderBufferAllocations_.Begin(); i != renderBufferAllocations_.End(); ++i)
+    for (HashMap<long long, unsigned>::Iterator i = screenBufferAllocations_.Begin(); i != screenBufferAllocations_.End(); ++i)
         i->second_ = 0;
 }
 
@@ -1311,6 +1326,7 @@ void Renderer::Initialize()
     viewports_.Resize(1);
     ResetViews();
     ResetShadowMaps();
+    ResetBuffers();
     
     shadersDirty_ = true;
     initialized_ = true;
@@ -1629,6 +1645,13 @@ void Renderer::ResetShadowMaps()
     shadowMaps_.Clear();
     shadowMapAllocations_.Clear();
     colorShadowMaps_.Clear();
+}
+
+void Renderer::ResetBuffers()
+{
+    occlusionBuffers_.Clear();
+    screenBuffers_.Clear();
+    screenBufferAllocations_.Clear();
 }
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)

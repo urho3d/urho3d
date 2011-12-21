@@ -328,7 +328,7 @@ public:
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for light pre-pass rendering or postprocessing. Should only be called during actual rendering, not before.
-    Texture2D* GetRenderBuffer(int width, int height, unsigned format, bool filtered = false);
+    Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered = false);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
@@ -365,12 +365,16 @@ private:
     void CreateGeometries();
     /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
+    /// Remove unused occlusion and screen buffers.
+    void RemoveUnusedBuffers();
     /// Reset shadow map allocation counts.
     void ResetShadowMapAllocations();
-    /// Reset renderbuffer allocation counts. Optionally also remove buffers which were not requested at all during last frame.
-    void ResetRenderBufferAllocations(bool remove = false);
+    /// Reset screem buffer allocation counts.
+    void ResetScreenBufferAllocations();
     /// Remove all shadow maps. Called when global shadow map resolution or format is changed.
     void ResetShadowMaps();
+    /// Remove all occlusion and screen buffers.
+    void ResetBuffers();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle graphics features (re)check event.
@@ -421,11 +425,9 @@ private:
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
     /// Renderbuffers by resolution and format.
-    HashMap<long long, Vector<SharedPtr<Texture2D> > > renderBuffers_;
+    HashMap<long long, Vector<SharedPtr<Texture2D> > > screenBuffers_;
     /// Renderbuffer current allocations by resolution and format.
-    HashMap<long long, unsigned> renderBufferAllocations_;
-    /// Renderbuffer maximum allocations by resolution and format.
-    HashMap<long long, unsigned> renderBufferMaxAllocations_;
+    HashMap<long long, unsigned> screenBufferAllocations_;
     /// Viewports.
     Vector<Viewport> viewports_;
     /// Views.

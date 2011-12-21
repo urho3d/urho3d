@@ -227,7 +227,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / rtHeight;
         
         #ifdef USE_OPENGL
-        Vector4 bufferUVOffset(((float)viewport.left_) / rttWidth + widthRange,
+        Vector4 bufferUVOffset(((float)viewport.left_) / rtWidth + widthRange,
             1.0f - (((float)viewport.top_) / rtHeight + heightRange), widthRange, heightRange);
         #else
         Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / rtWidth + widthRange,

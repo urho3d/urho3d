@@ -303,6 +303,11 @@ void OcclusionBuffer::BuildDepthHierarchy()
     depthHierarchyDirty_ = false;
 }
 
+void OcclusionBuffer::ResetUseTimer()
+{
+    useTimer_.Reset();
+}
+
 bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
 {
     if (!buffer_)
@@ -426,6 +431,11 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     }
     
     return false;
+}
+
+unsigned OcclusionBuffer::GetUseTimer()
+{
+    return useTimer_.GetMSec(false);
 }
 
 inline Vector4 OcclusionBuffer::ModelTransform(const Matrix4& transform, const Vector3& vertex) const
