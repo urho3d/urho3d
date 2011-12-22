@@ -7,7 +7,7 @@
     <component type="ScriptInstance" id="16777219">
         <attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
         <attribute name="Class Name" value="Potion" />
-        <attribute name="Active" value="true" />
+        <attribute name="Is Active" value="true" />
         <attribute name="Fixed Update FPS" value="0" />
         <attribute name="Time Accumulator" value="0" />
         <attribute name="Delayed Method Calls" value="0" />
@@ -55,8 +55,8 @@
         <attribute name="Mass Axis" value="1" />
         <attribute name="Physics Position" value="0 0 0" />
         <attribute name="Physics Rotation" value="1 0 0 0" />
-        <attribute name="Lin Velocity" value="0 0 0" />
-        <attribute name="Ang Velocity" value="0 0 0" />
+        <attribute name="Linear Velocity" value="0 0 0" />
+        <attribute name="Angular Velocity" value="0 0 0" />
         <attribute name="Lin Rest Threshold" value="0.1" />
         <attribute name="Lin Damp Threshold" value="0" />
         <attribute name="Lin Damp Scale" value="0.001" />

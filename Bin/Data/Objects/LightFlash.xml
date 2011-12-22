@@ -7,7 +7,7 @@
     <component type="ScriptInstance" id="16777217">
         <attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
         <attribute name="Class Name" value="LightFlash" />
-        <attribute name="Active" value="true" />
+        <attribute name="Is Active" value="true" />
         <attribute name="Fixed Update FPS" value="0" />
         <attribute name="Time Accumulator" value="0" />
         <attribute name="Delayed Method Calls" value="0" />
