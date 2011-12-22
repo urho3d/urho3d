@@ -5,10 +5,10 @@
     <attribute name="Scale" value="1 1 1" />
     <attribute name="Smoothing Constant" value="50" />
     <attribute name="Snap Threshold" value="100" />
-    <attribute name="Next Replicated Node ID" value="5" />
-    <attribute name="Next Replicated Component ID" value="8" />
-    <attribute name="Next Local Node ID" value="16777216" />
-    <attribute name="Next Local Component ID" value="16777216" />
+    <attribute name="Next Replicated Node ID" value="2" />
+    <attribute name="Next Replicated Component ID" value="1" />
+    <attribute name="Next Local Node ID" value="16777220" />
+    <attribute name="Next Local Component ID" value="16777223" />
     <attribute name="Variables" />
     <attribute name="Variable Names" value="" />
     <component type="Octree" id="16777216">
@@ -35,7 +35,7 @@
         <attribute name="Random Seed" value="0" />
     </component>
     <component type="DebugRenderer" id="16777218" />
-    <node id="2">
+    <node id="16777216">
         <attribute name="Name" value="Zone" />
         <attribute name="Position" value="0 0 0" />
         <attribute name="Rotation" value="1 0 0 0" />
@@ -57,7 +57,7 @@
             <attribute name="Zone Mask" value="-1" />
         </component>
     </node>
-    <node id="16777216">
+    <node id="16777217">
         <attribute name="Name" value="GlobalLight" />
         <attribute name="Position" value="0 0 0" />
         <attribute name="Rotation" value="0.888074 0.325058 -0.325058 0" />
@@ -96,7 +96,7 @@
             <attribute name="Light Mask" value="-1" />
         </component>
     </node>
-    <node id="16777217">
+    <node id="16777218">
         <attribute name="Name" value="Static" />
         <attribute name="Position" value="0 0 0" />
         <attribute name="Rotation" value="1 0 0 0" />
@@ -134,7 +134,7 @@
             <attribute name="Is Phantom" value="false" />
         </component>
     </node>
-    <node id="16777218">
+    <node id="16777219">
         <attribute name="Name" value="Sky" />
         <attribute name="Position" value="0 3000 0" />
         <attribute name="Rotation" value="1 0 0 0" />
