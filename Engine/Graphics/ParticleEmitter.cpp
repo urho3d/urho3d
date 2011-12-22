@@ -224,7 +224,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     if (!file || !cache)
         return false;
     
-    XMLElement rootElem = parameterSource_->GetRoot();
+    XMLElement rootElem = file->GetRoot();
     if (!rootElem)
         return false;
     

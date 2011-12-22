@@ -114,7 +114,7 @@ void InitConsole()
 void InitScene()
 {
     gameScene = Scene("NinjaSnowWar");
-    
+
     // Set network snap threshold higher, as the world unit is centimeter
     gameScene.snapThreshold = 100.0;
 
@@ -122,56 +122,11 @@ void InitScene()
     script.defaultScene = gameScene;
     script.defaultScriptFile = scriptFile;
 
-    // For the multiplayer client, do not create the scene, let it load from the server
+    // For the multiplayer client, do not load the scene, let it load from the server
     if (runClient)
         return;
 
-    // Create the static level programmatically
-    Octree@ octree = gameScene.CreateComponent("Octree");
-    octree.Resize(BoundingBox(-20000, 20000), 7);
-
-    PhysicsWorld@ world = gameScene.CreateComponent("PhysicsWorld");
-    world.fps = 200;
-    world.gravity = Vector3(0, -981, 0);
-    world.linearRestThreshold = 0.1;
-    world.linearDampingThreshold = 0;
-    world.linearDampingScale = 0.001;
-
-    gameScene.CreateComponent("DebugRenderer");
-
-    Node@ zoneNode = gameScene.CreateChild("Zone");
-    Zone@ zone = zoneNode.CreateComponent("Zone");
-    zone.boundingBox = BoundingBox(-100000, 100000);
-    zone.ambientColor = Color(0.2, 0.2, 0.7);
-    zone.fogColor = Color(0.2, 0.2, 0.7);
-    zone.fogStart = 5000;
-    zone.fogEnd = 15000;
-
-    Node@ lightNode = gameScene.CreateChild("GlobalLight");
-    lightNode.rotation = Quaternion(0.888074, 0.325058, -0.325058, 0);
-    Light@ light = lightNode.CreateComponent("Light");
-    light.lightType = LIGHT_DIRECTIONAL;
-    light.castShadows = true;
-    light.shadowNearFarRatio = 0.002;
-    light.shadowBias = BiasParameters(0.00025, 0.001);
-    light.shadowCascade = CascadeParameters(1000.0, 2000.0, 5000.0, 0.0, 0.8);
-    light.shadowFocus = FocusParameters(true, true, true, 25, 500);
-
-    Node@ staticNode = gameScene.CreateChild("Static");
-    StaticModel@ staticModel = staticNode.CreateComponent("StaticModel");
-    staticModel.model = cache.GetResource("Model", "Models/Level.mdl");
-    staticModel.material = cache.GetResource("Material", "Materials/Snow.xml");
-    CollisionShape@ shape = staticNode.CreateComponent("CollisionShape");
-    shape.SetTriangleMesh(cache.GetResource("Model", "Models/Level.mdl"), 0);
-    shape.collisionLayer = 2;
-    shape.collisionMask = 3;
-
-    Node@ skyNode = gameScene.CreateChild("Sky");
-    skyNode.position = Vector3(0, 3000, 0);
-    skyNode.scale = Vector3(30000, 1, 30000);
-    Skybox@ skybox = skyNode.CreateComponent("Skybox");
-    skybox.model = cache.GetResource("Model", "Models/CloudPlane.mdl");
-    skybox.material = cache.GetResource("Material", "Materials/CloudPlane.xml");
+    gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
 }
 
 void InitNetworking()
@@ -306,16 +261,19 @@ void StartGame(Connection@ connection)
 
 void SpawnPlayer(Connection@ connection)
 {
-    // Set owner connection. Owned nodes are always updated to the owner at full frequency
-    Node@ playerNode = gameScene.CreateChild("Player");
-    playerNode.owner = connection;
+    Vector3 spawnPosition;
     if (singlePlayer)
-        playerNode.position = Vector3(0, 90, 0);
+        spawnPosition = Vector3(0, 90, 0);
     else
-        playerNode.position = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize);
+        spawnPosition = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize);
 
-     // Create the logic object as local, as it only needs to run on server
-    Ninja@ playerNinja = cast<Ninja>(playerNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
+    Node@ playerNode = SpawnObject(spawnPosition, Quaternion(), "Ninja");
+    // Set owner connection. Owned nodes are always updated to the owner at full frequency
+    playerNode.owner = connection;
+    playerNode.name = "Player";    
+
+    // Initialize variables
+    Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
     playerNinja.health = playerNinja.maxHealth = playerHealth;
     playerNinja.side = SIDE_PLAYER;
     // Make sure the player can not shoot on first frame by holding the button down
@@ -658,6 +616,12 @@ void SendHiscores(int playerIndex)
         network.BroadcastRemoteEvent(gameScene, "UpdateHiscores", true, eventData); // Send to all in scene
 }
 
+Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
+{
+    XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
+    return gameScene.InstantiateXML(xml.root, position, rotation);
+}
+
 void SpawnObjects(float timeStep)
 {
     // If game not running, run only the random generator
@@ -680,9 +644,7 @@ void SpawnObjects(float timeStep)
             float xOffset = Random(maxOffset * 2.0f) - maxOffset;
             float zOffset = Random(maxOffset * 2.0f) - maxOffset;
 
-            Node@ crateNode = gameScene.CreateChild();
-            crateNode.position = Vector3(xOffset, 5000, zOffset);
-            GameObject@ crateObject = cast<GameObject>(crateNode.CreateScriptObject(scriptFile, "SnowCrate", LOCAL));
+            SpawnObject(Vector3(xOffset, 5000, zOffset), Quaternion(), "SnowCrate");
         }
     }
 
@@ -709,11 +671,10 @@ void SpawnObjects(float timeStep)
             dir *= 90;
             Quaternion rotation(0, dir, 0);
 
-            Node@ enemyNode = gameScene.CreateChild();
-            enemyNode.position = rotation * Vector3(offset, 1000, -12000);
-            enemyNode.rotation = rotation;
+            Node@ enemyNode = SpawnObject(rotation * Vector3(offset, 1000, -12000), rotation, "Ninja");
 
-            Ninja@ enemyNinja = cast<Ninja>(enemyNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
+            // Initialize variables
+            Ninja@ enemyNinja = cast<Ninja>(enemyNode.scriptObject);
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();
             RigidBody@ enemyBody = enemyNode.GetComponent("RigidBody");
@@ -831,7 +792,6 @@ void UpdateCamera()
         UpdateFreelookCamera();
         return;
     }
-
 
     Node@ playerNode = FindOwnNode();
     if (playerNode is null)

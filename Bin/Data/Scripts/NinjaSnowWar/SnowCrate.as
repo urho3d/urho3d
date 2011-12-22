@@ -16,35 +16,6 @@ class SnowCrate : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
-        
-        // If components already exist, we are probably (re)executing this after deserialization.
-        // Do not create duplicate components in that case
-        if (node.HasComponent("RigidBody"))
-            return;
-                
-        // Setup interest management for networking
-        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
-        priority.basePriority = 100.0;
-        priority.distanceFactor = 0.04;
-        priority.minPriority = 15.0;
-
-        // Create model
-        StaticModel@ model = node.CreateComponent("StaticModel");
-        model.model = cache.GetResource("Model", "Models/SnowCrate.mdl");
-        model.material = cache.GetResource("Material", "Materials/SnowCrate.xml");
-        model.drawDistance = snowcrateDrawDistance;
-        model.castShadows = true;
-
-        // Create collision shape
-        CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(80, 80, 80));
-        shape.collisionLayer = 2;
-        shape.collisionMask = 3;
-        shape.friction = snowcrateFriction;
-
-        // Create body
-        RigidBody@ body = node.CreateComponent("RigidBody");
-        body.mass = snowcrateMass;
     }
     
     void FixedUpdate(float timeStep)

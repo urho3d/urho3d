@@ -23,34 +23,6 @@ class SnowBall : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
-
-        // If components already exist, we are probably (re)executing this after deserialization.
-        // Do not create duplicate components in that case
-        if (node.HasComponent("RigidBody"))
-            return;
-        
-        // Setup interest management for networking
-        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
-        priority.basePriority = 100.0;
-        priority.distanceFactor = 0.02;
-        priority.minPriority = 25.0;
-
-        // Create model
-        StaticModel@ model = node.CreateComponent("StaticModel");
-        model.model = cache.GetResource("Model", "Models/SnowBall.mdl");
-        model.material = cache.GetResource("Material", "Materials/Snow.xml");
-        model.drawDistance = snowballDrawDistance;
-        model.castShadows = true;
-
-        CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(15, 15, 15));
-        shape.collisionLayer = 1;
-        shape.collisionMask = 3;
-        shape.friction = snowballFriction;
-
-        // Create body
-        RigidBody@ body = node.CreateComponent("RigidBody");
-        body.mass = snowballMass;
     }
     
     void FixedUpdate(float timeStep)

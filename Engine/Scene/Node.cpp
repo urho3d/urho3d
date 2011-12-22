@@ -1038,7 +1038,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        Component* newComponent = CreateComponent(compType, rewriteIDs ? 0 : compID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Component* newComponent = CreateComponent(compType, rewriteIDs ? 0 : compID, compID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1054,7 +1054,7 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
     for (unsigned i = 0; i < numChildren; ++i)
     {
         unsigned nodeID = source.ReadUInt();
-        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         resolver.AddNode(nodeID, newNode);
         if (!newNode->Load(source, resolver, readChildren, rewriteIDs))
             return false;
@@ -1077,7 +1077,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetString("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(ShortStringHash(typeName), rewriteIDs ? 0 : compID, id_ < FIRST_LOCAL_ID ?
+        Component* newComponent = CreateComponent(ShortStringHash(typeName), rewriteIDs ? 0 : compID, compID < FIRST_LOCAL_ID ?
             REPLICATED : LOCAL);
         if (newComponent)
         {
@@ -1096,7 +1096,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     while (childElem)
     {
         unsigned nodeID = childElem.GetInt("id");
-        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, id_ < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
         resolver.AddNode(nodeID, newNode);
         if (!newNode->LoadXML(childElem, resolver, readChildren, rewriteIDs))
             return false;

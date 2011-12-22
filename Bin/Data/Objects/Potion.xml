@@ -1,0 +1,69 @@
+<node id="7">
+    <attribute name="Name" value="Potion" />
+    <attribute name="Position" value="0 0 0" />
+    <attribute name="Rotation" value="1 0 0 0" />
+    <attribute name="Scale" value="1 1 1" />
+    <attribute name="Variables" />
+    <component type="ScriptInstance" id="16777219">
+        <attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
+        <attribute name="Class Name" value="Potion" />
+        <attribute name="Active" value="true" />
+        <attribute name="Fixed Update FPS" value="0" />
+        <attribute name="Time Accumulator" value="0" />
+        <attribute name="Delayed Method Calls" value="0" />
+        <attribute name="Script Data" value="" />
+    </component>
+    <component type="NetworkPriority" id="16777220">
+        <attribute name="Base Priority" value="100" />
+        <attribute name="Distance Factor" value="0.04" />
+        <attribute name="Minimum Priority" value="15" />
+        <attribute name="Always Update Owner" value="true" />
+    </component>
+    <component type="StaticModel" id="16">
+        <attribute name="Model" value="Model;Models/Potion.mdl" />
+        <attribute name="Material" value="Material;Materials/Potion.xml" />
+        <attribute name="Is Visible" value="true" />
+        <attribute name="Is Occluder" value="false" />
+        <attribute name="Can Be Occluded" value="true" />
+        <attribute name="Cast Shadows" value="true" />
+        <attribute name="Draw Distance" value="15000" />
+        <attribute name="Shadow Distance" value="0" />
+        <attribute name="LOD Bias" value="1" />
+        <attribute name="Max Lights" value="0" />
+        <attribute name="View Mask" value="-1" />
+        <attribute name="Light Mask" value="-1" />
+        <attribute name="Shadow Mask" value="-1" />
+        <attribute name="Zone Mask" value="-1" />
+        <attribute name="Ray/Occl. LOD Level" value="-1" />
+    </component>
+    <component type="CollisionShape" id="17">
+        <attribute name="Shape Type" type="Enum" value="Box" />
+        <attribute name="Size" value="20 40 20" />
+        <attribute name="Offset Position" value="0 0 0" />
+        <attribute name="Offset Rotation" value="1 0 0 0" />
+        <attribute name="Model" value="Model;" />
+        <attribute name="LOD Level" value="0" />
+        <attribute name="Hull Thickness" value="0" />
+        <attribute name="Friction" value="0.5" />
+        <attribute name="Bounce" value="0" />
+        <attribute name="Collision Group" value="1" />
+        <attribute name="Collision Mask" value="3" />
+        <attribute name="Is Phantom" value="false" />
+    </component>
+    <component type="RigidBody" id="18">
+        <attribute name="Mass" value="10" />
+        <attribute name="Mass Axis" value="1" />
+        <attribute name="Physics Position" value="0 0 0" />
+        <attribute name="Physics Rotation" value="1 0 0 0" />
+        <attribute name="Lin Velocity" value="0 0 0" />
+        <attribute name="Ang Velocity" value="0 0 0" />
+        <attribute name="Lin Rest Threshold" value="0.1" />
+        <attribute name="Lin Damp Threshold" value="0" />
+        <attribute name="Lin Damp Scale" value="0.001" />
+        <attribute name="Ang Rest Threshold" value="0.01" />
+        <attribute name="Ang Damp Threshold" value="0.01" />
+        <attribute name="Ang Damp Scale" value="0" />
+        <attribute name="Ang Max Velocity" value="1.#INF" />
+        <attribute name="Is Active" value="true" />
+    </component>
+</node>

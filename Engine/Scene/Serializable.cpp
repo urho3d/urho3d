@@ -341,7 +341,6 @@ bool Serializable::SaveXML(XMLElement& dest)
         if (attr.enumNames_)
         {
             int enumValue = value.GetInt();
-            attrElem.SetString("type", "Enum");
             attrElem.SetString("value", String(attr.enumNames_[enumValue]));
         }
         else

@@ -778,13 +778,22 @@ void AnimatedModel::AssignBoneNodes()
     
     // Find the bone nodes from the node hierarchy and add listeners
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
+    bool boneFound = false;
     for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
     {
         Node* boneNode = node_->GetChild(i->name_, true);
         if (boneNode)
+        {
+            boneFound = true;
             boneNode->AddListener(this);
+        }
         i->node_ = boneNode;
     }
+    
+    // If no bones found, this may be a prefab where the bone information was left out.
+    // In that case reassign the skeleton now if possible
+    if (!boneFound && model_)
+        SetSkeleton(model_->GetSkeleton(), true);
     
     // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)

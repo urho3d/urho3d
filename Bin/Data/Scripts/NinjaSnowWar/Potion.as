@@ -17,35 +17,6 @@ class Potion : GameObject
     void Start()
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
-
-        // If components already exist, we are probably (re)executing this after deserialization.
-        // Do not create duplicate components in that case
-        if (node.HasComponent("RigidBody"))
-            return;
-        
-        // Setup interest management for networking
-        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
-        priority.basePriority = 100.0;
-        priority.distanceFactor = 0.04;
-        priority.minPriority = 15.0;
-
-        // Create model
-        StaticModel@ model = node.CreateComponent("StaticModel");
-        model.model = cache.GetResource("Model", "Models/Potion.mdl");
-        model.material = cache.GetResource("Material", "Materials/Potion.xml");
-        model.drawDistance = potionDrawDistance;
-        model.castShadows = true;
-
-        // Create collision shape
-        CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(20, 40, 20));
-        shape.collisionLayer = 1;
-        shape.collisionMask = 3;
-        shape.friction = potionFriction;
-
-        // Create body
-        RigidBody@ body = node.CreateComponent("RigidBody");
-        body.mass = potionMass;
     }
     
     void ObjectCollision(GameObject@ otherObject, VariantMap& eventData)

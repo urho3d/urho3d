@@ -1274,7 +1274,7 @@ void Connection::OnPackagesReady()
     {
         // Otherwise start the async loading process
         String extension = GetExtension(sceneFileName_);
-        SharedPtr<File> file(new File(context_, sceneFileName_));
+        SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(sceneFileName_);
         bool success;
         
         if (extension == ".xml")

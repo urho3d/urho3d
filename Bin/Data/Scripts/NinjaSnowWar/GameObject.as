@@ -81,14 +81,8 @@ class GameObject : ScriptObject
 
     Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
     {
-        Node@ newNode = scene.CreateChild();
-        newNode.position = position;
-        newNode.rotation = rotation;
-
-        // Create the script object with specified class
-        newNode.CreateScriptObject(scriptFile, className, LOCAL);
-
-        return newNode;
+        XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
+        return scene.InstantiateXML(xml.root, position, rotation);
     }
 
     Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration)

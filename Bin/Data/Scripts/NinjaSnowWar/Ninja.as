@@ -54,45 +54,6 @@ class Ninja : GameObject
     {
         SubscribeToEvent("NodeCollision", "HandleNodeCollision");
         aimX = node.rotation.yaw;
-
-        // If components already exist, we are probably (re)executing this after deserialization.
-        // Do not create duplicate components in that case
-        if (node.HasComponent("RigidBody"))
-            return;
-
-        // Setup interest management for networking
-        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
-        priority.basePriority = 110.0;
-        priority.distanceFactor = 0.03;
-        priority.minPriority = 20.0;
-
-        // Create child node for the model. Copy the owner connection in case it is set
-        Node@ modelNode = node.CreateChild();
-        modelNode.owner = node.owner;
-        modelNode.position = Vector3(0, -90, 0);
-
-        // Create animated model
-        AnimatedModel@ model = modelNode.CreateComponent("AnimatedModel");
-        model.model = cache.GetResource("Model", "Models/Ninja.mdl");
-        model.material = cache.GetResource("Material", "Materials/Ninja.xml");
-        model.drawDistance = ninjaDrawDistance;
-        model.castShadows = true;
-        model.invisibleLodFactor = 3.0f;
-
-        // Create animation controller
-        AnimationController@ controller = modelNode.CreateComponent("AnimationController");
-
-        // Create collision shape
-        CollisionShape@ shape = node.CreateComponent("CollisionShape");
-        shape.SetCapsule(70, 180);
-        shape.collisionLayer = 1;
-        shape.collisionMask = 3;
-        shape.friction = ninjaFriction;
-
-        // Create body
-        RigidBody@ body = node.CreateComponent("RigidBody");
-        body.mass = ninjaMass;
-        body.angularMaxVelocity = 0;
     }
 
     void SetControls(const Controls&in newControls)
