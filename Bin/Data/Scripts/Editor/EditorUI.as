@@ -87,8 +87,11 @@ void CreateMenuBar()
         editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
-        editPopup.AddChild(CreateMenuDivider());
         editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuDivider());
+        editPopup.AddChild(CreateMenuItem("Reset position", 0, 0));
+        editPopup.AddChild(CreateMenuItem("Reset rotation", 0, 0));
+        editPopup.AddChild(CreateMenuItem("Reset scale", 0, 0));
         editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
         editPopup.AddChild(CreateMenuDivider());
         editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
@@ -334,6 +337,15 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Delete")
         SceneDelete();
+
+    if (action == "Reset position")
+        SceneResetPosition();
+    
+    if (action == "Reset rotation")
+        SceneResetRotation();
+    
+    if (action == "Reset scale")
+        SceneResetScale();
 
     if (action == "Unparent")
         SceneUnparent();

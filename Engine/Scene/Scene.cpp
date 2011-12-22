@@ -281,7 +281,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
-    if (node->Load(source, resolver, true, true))
+    if (node->Load(source, resolver, true, true, mode))
     {
         resolver.Resolve();
         node->ApplyAttributes();
@@ -311,7 +311,7 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
-    if (node->LoadXML(source, resolver, true, true))
+    if (node->LoadXML(source, resolver, true, true, mode))
     {
         resolver.Resolve();
         node->ApplyAttributes();

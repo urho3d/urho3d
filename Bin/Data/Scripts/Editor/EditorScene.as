@@ -546,6 +546,33 @@ void SceneUnparent()
     list.contentElement.UpdateLayout();
 }
 
+void SceneResetPosition()
+{
+    if (editNode !is null)
+    {
+        editNode.position = Vector3(0.0, 0.0, 0.0);
+        UpdateNodeAttributes();
+    }
+}
+
+void SceneResetRotation()
+{
+    if (editNode !is null)
+    {
+        editNode.rotation = Quaternion();
+        UpdateNodeAttributes();
+    }
+}
+
+void SceneResetScale()
+{
+    if (editNode !is null)
+    {
+        editNode.scale = Vector3(1.0, 1.0, 1.0);
+        UpdateNodeAttributes();
+    }
+}
+
 void SceneSelectAll()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
