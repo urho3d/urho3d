@@ -102,6 +102,19 @@ enum EImplicitConv
 	asIC_EXPLICIT_VAL_CAST
 };
 
+enum EConvCost
+{
+	asCC_NO_CONV               = 0,
+	asCC_CONST_CONV            = 1,
+	asCC_PRIMITIVE_SIZE_CONV   = 2,
+	asCC_SIGNED_CONV           = 3,
+	asCC_INT_FLOAT_CONV        = 4,
+	asCC_REF_CONV              = 5,
+	asCC_OBJ_TO_PRIMITIVE_CONV = 6,
+	asCC_TO_OBJECT_CONV        = 7,
+	asCC_VARIABLE_CONV         = 8
+};
+
 class asCCompiler
 {
 public:
@@ -109,7 +122,7 @@ public:
 	~asCCompiler();
 
 	int CompileFunction(asCBuilder *builder, asCScriptCode *script, sExplicitSignature *signature, asCScriptNode *func, asCScriptFunction *outFunc);
-	int CompileDefaultConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptFunction *outFunc);
+	int CompileDefaultConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptNode *node, asCScriptFunction *outFunc);
 	int CompileFactory(asCBuilder *builder, asCScriptCode *script, asCScriptFunction *outFunc);
 	int CompileTemplateFactoryStub(asCBuilder *builder, int trueFactoryId, asCObjectType *objType, asCScriptFunction *outFunc);
 	int CompileGlobalVariable(asCBuilder *builder, asCScriptCode *script, asCScriptNode *expr, sGlobalVariableDescription *gvar, asCScriptFunction *outFunc);
@@ -162,7 +175,7 @@ protected:
 	void CallDestructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc);
 	int  CompileArgumentList(asCScriptNode *node, asCArray<asSExprContext *> &args);
 	int  CompileDefaultArgs(asCScriptNode *node, asCArray<asSExprContext*> &args, asCScriptFunction *func);
-	void MatchFunctions(asCArray<int> &funcs, asCArray<asSExprContext*> &args, asCScriptNode *node, const char *name, asCObjectType *objectType = NULL, bool isConstMethod = false, bool silent = false, bool allowObjectConstruct = true, const asCString &scope = "");
+	asUINT MatchFunctions(asCArray<int> &funcs, asCArray<asSExprContext*> &args, asCScriptNode *node, const char *name, asCObjectType *objectType = NULL, bool isConstMethod = false, bool silent = false, bool allowObjectConstruct = true, const asCString &scope = "");
 	int  CompileVariableAccess(const asCString &name, const asCString &scope, asSExprContext *ctx, asCScriptNode *errNode, bool isOptional = false, bool noFunction = false, asCObjectType *objType = 0);
 
 	// Helper functions
@@ -178,7 +191,7 @@ protected:
 	bool IsVariableInitialized(asCTypeInfo *type, asCScriptNode *node);
 	void Dereference(asSExprContext *ctx, bool generateCode);
 	bool CompileRefCast(asSExprContext *ctx, const asCDataType &to, bool isExplicit, asCScriptNode *node, bool generateCode = true);
-	int  MatchArgument(asCArray<int> &funcs, asCArray<int> &matches, const asCTypeInfo *argType, int paramNum, bool allowObjectConstruct = true);
+	asUINT MatchArgument(asCArray<int> &funcs, asCArray<int> &matches, const asCTypeInfo *argType, int paramNum, bool allowObjectConstruct = true);
 	void PerformFunctionCall(int funcId, asSExprContext *out, bool isConstructor = false, asCArray<asSExprContext*> *args = 0, asCObjectType *objTypeForConstruct = 0, bool useVariable = false, int varOffset = 0, int funcPtrVar = 0);
 	void MoveArgsToStack(int funcId, asCByteCode *bc, asCArray<asSExprContext *> &args, bool addOneToOffset);
 	void MakeFunctionCall(asSExprContext *ctx, int funcId, asCObjectType *objectType, asCArray<asSExprContext*> &args, asCScriptNode *node, bool useVariable = false, int stackOffset = 0, int funcPtrVar = 0);
@@ -201,12 +214,15 @@ protected:
 	asCString GetScopeFromNode(asCScriptNode *node);
 	void DestroyVariables(asCByteCode *bc);
 
-	void ImplicitConversion(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
-	void ImplicitConvPrimitiveToPrimitive(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true);
-	void ImplicitConvObjectToPrimitive(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true);
-	void ImplicitConvPrimitiveToObject(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
-	void ImplicitConvObjectToObject(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
-	void ImplicitConversionConstant(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType);
+	// Returns the cost of the conversion (the sum of the EConvCost performed)
+	asUINT ImplicitConversion(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
+	asUINT ImplicitConvPrimitiveToPrimitive(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true);
+	asUINT ImplicitConvObjectToPrimitive(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true);
+	asUINT ImplicitConvPrimitiveToObject(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
+	asUINT ImplicitConvObjectToObject(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true, bool allowObjectConstruct = true);
+	asUINT ImplicitConvObjectRef(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode);
+	asUINT ImplicitConvObjectValue(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode);
+	void   ImplicitConversionConstant(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType);
 
 	void LineInstr(asCByteCode *bc, size_t pos);
 

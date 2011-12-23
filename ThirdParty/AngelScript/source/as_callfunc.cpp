@@ -156,7 +156,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			asCString str;
 			str.Format(TXT_CANNOT_RET_TYPE_s_BY_VAL, func->returnType.GetObjectType()->name.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
-			engine->ConfigError(asINVALID_CONFIGURATION);
+			engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 		}
 		else if( objType & asOBJ_APP_CLASS )
 		{
@@ -223,14 +223,14 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			// Ref: http://www.agner.org/optimize/calling_conventions.pdf
 			// If the application informs that the class should be treated as all integers, then we allow it
 			if( !internal->hostReturnInMemory &&
-				!(func->returnType.GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )	
+			    !(func->returnType.GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )	
 			{
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
 				asCString str;
 				str.Format(TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL, func->returnType.Format().AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
-				engine->ConfigError(asINVALID_CONFIGURATION);
+				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
 #endif
 		}
@@ -306,7 +306,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 				asCString str;
 				str.Format(TXT_CANNOT_PASS_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->name.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
-				engine->ConfigError(asINVALID_CONFIGURATION);
+				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
 
 
@@ -315,16 +315,21 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			// will be used depending on the memory layout of the object
 			// Ref: http://www.x86-64.org/documentation/abi.pdf
 			// Ref: http://www.agner.org/optimize/calling_conventions.pdf
+			if( 
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
-			if( !(func->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) )	
+			    !(func->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) &&	
 #endif
+#ifdef LARGE_OBJS_PASS_BY_REF
+			    func->parameterTypes[n].GetSizeInMemoryDWords() < AS_LARGE_OBJ_MIN_SIZE &&
+#endif
+			    !(func->parameterTypes[n].GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )
 			{
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
 				asCString str;
 				str.Format(TXT_DONT_SUPPORT_TYPE_s_BY_VAL, func->parameterTypes[n].GetObjectType()->name.AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
-				engine->ConfigError(asINVALID_CONFIGURATION);
+				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
 #endif
 			break;

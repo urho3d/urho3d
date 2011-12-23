@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -57,6 +57,8 @@ public:
 	asCDataType();
 	asCDataType(const asCDataType &);
 	~asCDataType();
+
+	bool IsValid() const;
 
 	asCString Format() const;
 

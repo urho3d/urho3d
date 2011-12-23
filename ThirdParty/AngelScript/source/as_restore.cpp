@@ -223,6 +223,8 @@ int asCRestore::Save()
 
 int asCRestore::Restore() 
 {
+	engine->deferValidationOfTemplateTypes = true;
+
 	// Before starting the load, make sure that 
 	// any existing resources have been freed
 	module->InternalReset();
@@ -451,6 +453,25 @@ int asCRestore::Restore()
 	// usedObjectProperties
 	ReadUsedObjectProps();
 
+	// Validate the template types
+	for( i = 0; i < usedTypes.GetLength(); i++ )
+	{
+		if( (usedTypes[i]->flags & asOBJ_TEMPLATE) && 
+			usedTypes[i]->templateSubType.IsValid() &&
+			usedTypes[i]->beh.templateCallback )
+		{
+			asCScriptFunction *callback = engine->scriptFunctions[usedTypes[i]->beh.templateCallback];
+			if( !engine->CallGlobalFunctionRetBool(usedTypes[i], 0, callback->sysFuncIntf, callback) )
+			{
+				asCString str;
+				str.Format(TXT_INSTANCING_INVLD_TMPL_TYPE_s_s, usedTypes[i]->name.AddressOf(), usedTypes[i]->templateSubType.Format().AddressOf());
+				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
+				error = true;
+			}
+		}
+	}
+	engine->deferValidationOfTemplateTypes = false;
+
 	for( i = 0; i < module->scriptFunctions.GetLength(); i++ )
 		TranslateFunction(module->scriptFunctions[i]);
 	for( i = 0; i < module->scriptGlobals.GetLength(); i++ )
@@ -475,6 +496,16 @@ int asCRestore::Restore()
 			int r = module->ResetGlobalVars(0);
 			if( r < 0 ) error = true;
 		}
+	}
+	else
+	{
+		// Make sure none of the loaded functions attempt to release references that have not yet been increased
+		for( i = 0; i < module->scriptFunctions.GetLength(); i++ )
+			if( !dontTranslate.MoveTo(0, module->scriptFunctions[i]) )
+				module->scriptFunctions[i]->byteCode.SetLength(0);
+		for( i = 0; i < module->scriptGlobals.GetLength(); i++ )
+			if( module->scriptGlobals[i]->GetInitFunc() )
+				module->scriptGlobals[i]->GetInitFunc()->byteCode.SetLength(0);
 	}
 
 	return error ? asERROR : asSUCCESS;
@@ -2325,7 +2356,10 @@ void asCRestore::WriteUsedTypeIds()
 	asUINT count = (asUINT)usedTypeIds.GetLength();
 	WriteEncodedUInt(count);
 	for( asUINT n = 0; n < count; n++ )
-		WriteDataType(engine->GetDataTypeFromTypeId(usedTypeIds[n]));
+	{
+		asCDataType dt = engine->GetDataTypeFromTypeId(usedTypeIds[n]);
+		WriteDataType(&dt);
+	}
 }
 
 void asCRestore::ReadUsedTypeIds()
@@ -2619,14 +2653,14 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 
 			// COPY is used to copy POD types that don't have the opAssign method
 			// Update the number of dwords to copy as it may be different on the target platform
-			const asCDataType *dt = engine->GetDataTypeFromTypeId(*tid);
-			if( dt == 0 )
+			asCDataType dt = engine->GetDataTypeFromTypeId(*tid);
+			if( !dt.IsValid() )
 			{
 				// TODO: Write error to message
 				error = true;
 			}
 			else
-				asBC_SWORDARG0(&bc[n]) = (short)dt->GetSizeInMemoryDWords();
+				asBC_SWORDARG0(&bc[n]) = (short)dt.GetSizeInMemoryDWords();
 		}
 		else if( c == asBC_CALL ||
 				 c == asBC_CALLINTF ||

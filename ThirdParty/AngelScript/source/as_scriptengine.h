@@ -273,10 +273,10 @@ public:
 	void SetScriptFunction(asCScriptFunction *func);
 	void FreeScriptFunctionId(int id);
 
-	int ConfigError(int err);
+	int ConfigError(int err, const char *funcName, const char *arg1, const char *arg2);
 
 	int                GetTypeIdFromDataType(const asCDataType &dt) const;
-	const asCDataType *GetDataTypeFromTypeId(int typeId) const;
+	asCDataType        GetDataTypeFromTypeId(int typeId) const;
 	asCObjectType     *GetObjectTypeFromTypeId(int typeId) const;
 	void               RemoveFromTypeIdMap(asCObjectType *type);
 
@@ -345,6 +345,7 @@ public:
 	asCArray<asCModule *>  scriptModules;
 	asCModule             *lastModule;
 	bool                   isBuilding;
+	bool                   deferValidationOfTemplateTypes;
 
 	// Tokenizer is instanciated once to share resources
 	asCTokenizer tok;

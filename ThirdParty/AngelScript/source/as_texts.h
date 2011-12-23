@@ -215,7 +215,7 @@
 
 // Engine message
 
-#define TXT_INVALID_CONFIGURATION                  "Invalid configuration"
+#define TXT_INVALID_CONFIGURATION                  "Invalid configuration. Verify the registered application interface."
 #define TXT_VALUE_TYPE_MUST_HAVE_SIZE              "A value type must be registered with a non-zero size"
 #define TXT_TYPE_s_IS_MISSING_BEHAVIOURS           "Type '%s' is missing behaviours"
 #define TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE             "The behaviour is not compatible with the type"
@@ -225,14 +225,19 @@
 #define TXT_NON_POD_REQUIRE_CONSTR_DESTR_BEHAVIOUR "A non-pod value type must have the default constructor and destructor behaviours"
 #define TXT_CANNOT_PASS_TYPE_s_BY_VAL              "Can't pass type '%s' by value unless the application type is informed in the registration"
 #define TXT_CANNOT_RET_TYPE_s_BY_VAL               "Can't return type '%s' by value unless the application type is informed in the registration"
-#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL             "Don't support passing type '%s' by value to application. Use generic calling convention instead"
-#define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL         "Don't support returning type '%s' by value from application. Use generic calling convention instead"
+// TODO: Should be something like "This platform requires that AngelScript knows the exact content of the type '%s' in order to pass by value to application in native calling convention"
+#define TXT_DONT_SUPPORT_TYPE_s_BY_VAL             "Don't support passing type '%s' by value to application in native calling convention on this platform"
+// TODO: Should be something like "This platform requires that AngelScript knows the exact content of the type '%s' in order to return by value from application in native calling convention"
+#define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL         "Don't support returning type '%s' by value from application in native calling convention on this platform"
 #define TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s           "GC cannot free an object of type '%s'. Make sure all types that can form circular references have the GC behaviours"
 #define TXT_OBJECT_TYPE_s_DOESNT_EXIST             "Object type '%s' doesn't exist"
 #define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST           "Template type '%s' doesn't exist"
 #define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST        "Template subtype '%s' doesn't exist"
 #define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s      "Failed to read subtype of template type '%s'"
 #define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s         "Attempting to instanciate invalid template type '%s<%s>'"
+#define TXT_FAILED_IN_FUNC_s                       "Failed in call to function '%s'"
+#define TXT_FAILED_IN_FUNC_s_WITH_s                "Failed in call to function '%s' with '%s'"
+#define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s          "Failed in call to function '%s' with '%s' and '%s'"
 
 // Internal names
 

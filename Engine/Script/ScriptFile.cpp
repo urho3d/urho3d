@@ -524,7 +524,7 @@ void ScriptFile::ReleaseModule()
 {
     if (scriptModule_)
     {
-        // Clear search caches, event handlers and function-to-file mappings
+        // Clear search caches and event handlers
         includeFiles_.Clear();
         checkedClasses_.Clear();
         functions_.Clear();

@@ -593,9 +593,29 @@ void asCBuilder::CompileFunctions()
 		}
 		else if( current->name == current->objType->name )
 		{
+			asCScriptNode *node = 0;
+			for( asUINT n = 0; n < classDeclarations.GetLength(); n++ )
+			{
+				if( classDeclarations[n]->name == current->name )
+				{
+					node = classDeclarations[n]->node;
+					break;
+				}
+			}
+
+			int r = 0, c = 0;
+			if( node )
+				current->script->ConvertPosToRowCol(node->tokenPos, &r, &c);
+
+			asCString str = func->GetDeclarationStr();
+			str.Format(TXT_COMPILING_s, str.AddressOf());
+			WriteInfo(current->script->name.AddressOf(), str.AddressOf(), r, c, true);
+
 			// This is the default constructor, that is generated
 			// automatically if not implemented by the user.
-			compiler.CompileDefaultConstructor(this, current->script, func);
+			compiler.CompileDefaultConstructor(this, current->script, node, func);
+
+			preMessage.isSet = false;
 		}
 		else
 		{
@@ -2387,6 +2407,9 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file)
 
 		module->enumTypes.PushLast(st);
 		st->AddRef();
+
+		// TODO: cleanup: Should the enum type really be stored in the engine->classTypes? 
+		//                http://www.gamedev.net/topic/616912-c-header-file-shared-with-scripts/page__gopid__4895940
 		engine->classTypes.PushLast(st);
 
 		// Store the location of this declaration for reference in name collisions
@@ -2517,12 +2540,7 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file)
 
 	node->Destroy(engine);
 
-	if( r < 0 )
-	{
-		engine->ConfigError(r);
-	}
-
-	return 0;
+	return r;
 }
 
 void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, asCArray<asCString *> &defaultArgs, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate, bool &isOverride, bool &isFinal)

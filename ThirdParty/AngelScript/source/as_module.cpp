@@ -619,8 +619,7 @@ void *asCModule::GetAddressOfGlobalVar(asUINT index)
 
 	// For object variables it's necessary to dereference the pointer to get the address of the value
 	if( scriptGlobals[index]->type.IsObject() && 
-		(!scriptGlobals[index]->type.IsObjectHandle() || 
-		 (scriptGlobals[index]->type.GetObjectType()->flags & asOBJ_ASHANDLE)) )
+		!scriptGlobals[index]->type.IsObjectHandle() )
 		return *(void**)(scriptGlobals[index]->GetAddressOfValue());
 
 	return (void*)(scriptGlobals[index]->GetAddressOfValue());
@@ -708,8 +707,8 @@ const char *asCModule::GetEnumByIndex(asUINT index, int *enumTypeId) const
 // interface
 int asCModule::GetEnumValueCount(int enumTypeId) const
 {
-	const asCDataType *dt = engine->GetDataTypeFromTypeId(enumTypeId);
-	asCObjectType *t = dt->GetObjectType();
+	asCDataType dt = engine->GetDataTypeFromTypeId(enumTypeId);
+	asCObjectType *t = dt.GetObjectType();
 	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) ) 
 		return asINVALID_TYPE;
 
@@ -719,8 +718,8 @@ int asCModule::GetEnumValueCount(int enumTypeId) const
 // interface
 const char *asCModule::GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const
 {
-	const asCDataType *dt = engine->GetDataTypeFromTypeId(enumTypeId);
-	asCObjectType *t = dt->GetObjectType();
+	asCDataType dt = engine->GetDataTypeFromTypeId(enumTypeId);
+	asCObjectType *t = dt.GetObjectType();
 	if( t == 0 || !(t->GetFlags() & asOBJ_ENUM) ) 
 		return 0;
 

@@ -86,7 +86,7 @@ double asStringScanDouble(const char *string, size_t *numScanned)
     // locale is ",".
 #if !defined(_WIN32_WCE) && !defined(ANDROID)
 	// Set the locale to C so that we are guaranteed to parse the float value correctly
-	asCString orig = setlocale(LC_NUMERIC, 0);
+	char *orig = setlocale(LC_NUMERIC, 0);
 	setlocale(LC_NUMERIC, "C");
 #endif
 
@@ -94,7 +94,7 @@ double asStringScanDouble(const char *string, size_t *numScanned)
 
 #if !defined(_WIN32_WCE) && !defined(ANDROID)
 	// Restore the locale
-	setlocale(LC_NUMERIC, orig.AddressOf());
+	setlocale(LC_NUMERIC, orig);
 #endif
 
 	if( numScanned )
