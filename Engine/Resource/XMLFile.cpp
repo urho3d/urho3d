@@ -120,8 +120,7 @@ XMLElement XMLFile::GetRoot(const String& name)
     if (root.empty())
         return XMLElement();
     
-    String rootName(root.name());
-    if (!name.Empty() && rootName != name)
+    if (!name.Empty() && name != root.name())
         return XMLElement();
     else
         return XMLElement(this, root.internal_object());

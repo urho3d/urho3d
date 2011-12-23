@@ -26,6 +26,7 @@
 #include "FileSystem.h"
 #include "Log.h"
 #include "PackageFile.h"
+#include "Profiler.h"
 
 #include <cstdio>
 
@@ -221,12 +222,19 @@ unsigned File::GetChecksum()
     if (!handle_)
         return 0;
     
+    PROFILE(CalculateFileChecksum);
+    
     unsigned oldPos = position_;
     checksum_ = 0;
     
     Seek(0);
     while (!IsEof())
-        checksum_ = SDBMHash(checksum_, ReadUByte());
+    {
+        unsigned char block[1024];
+        unsigned readBytes = Read(block, 1024);
+        for (unsigned i = 0; i < readBytes; ++i)
+            checksum_ = SDBMHash(checksum_, block[i]);
+    }
     
     Seek(oldPos);
     return checksum_;
