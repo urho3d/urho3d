@@ -34,6 +34,9 @@
 
 // Normalize rotation quaternion after this many incremental updates to prevent distortion
 static const int NORMALIZE_ROTATION_EVERY = 32;
+static const String componentStr("component");
+static const String idStr("id");
+static const String nodeStr("node");
 
 OBJECTTYPESTATIC(Node);
 
@@ -157,7 +160,7 @@ bool Node::LoadXML(const XMLElement& source)
     SceneResolver resolver;
     
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.GetInt("id");
+    unsigned nodeID = source.GetInt(idStr);
     resolver.AddNode(nodeID, this);
     
     // Read attributes, components and child nodes
@@ -174,7 +177,7 @@ bool Node::LoadXML(const XMLElement& source)
 bool Node::SaveXML(XMLElement& dest)
 {
     // Write node ID
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetInt(idStr, id_))
         return false;
     
     // Write attributes
@@ -185,7 +188,7 @@ bool Node::SaveXML(XMLElement& dest)
     for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
-        XMLElement compElem = dest.CreateChild("component");
+        XMLElement compElem = dest.CreateChild(componentStr);
         if (!component->SaveXML(compElem))
             return false;
     }
@@ -194,7 +197,7 @@ bool Node::SaveXML(XMLElement& dest)
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
-        XMLElement childElem = dest.CreateChild("node");
+        XMLElement childElem = dest.CreateChild(nodeStr);
         if (!node->SaveXML(childElem))
             return false;
     }
@@ -214,7 +217,7 @@ void Node::ApplyAttributes()
 bool Node::SaveXML(Serializer& dest)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
-    XMLElement rootElem = xml->CreateRoot("node");
+    XMLElement rootElem = xml->CreateRoot(nodeStr);
     if (!SaveXML(rootElem))
         return false;
     

@@ -63,7 +63,6 @@ FileSystem::~FileSystem()
 {
 }
 
-
 bool FileSystem::SetCurrentDir(const String& pathName)
 {
     if (!CheckAccess(pathName))

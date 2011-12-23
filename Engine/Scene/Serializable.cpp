@@ -31,6 +31,10 @@
 
 #include "DebugNew.h"
 
+static const String attributeStr("attribute");
+static const String nameStr("name");
+static const String valueStr("value");
+
 OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
@@ -262,12 +266,12 @@ bool Serializable::LoadXML(const XMLElement& source)
     
     loading_ = true;
     
-    XMLElement attrElem = source.GetChild("attribute");
+    XMLElement attrElem = source.GetChild(attributeStr);
     unsigned startIndex = 0;
     
     while (attrElem)
     {
-        String name = attrElem.GetString("name");
+        String name = attrElem.GetString(nameStr);
         
         unsigned i = startIndex;
         unsigned attempts = attributes->Size();
@@ -280,7 +284,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
-                    String value = attrElem.GetString("value");
+                    String value = attrElem.GetString(valueStr);
                     const String* enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
@@ -315,7 +319,7 @@ bool Serializable::LoadXML(const XMLElement& source)
         if (!attempts)
             LOGWARNING("Unknown attribute " + name + " in XML data");
         
-        attrElem = attrElem.GetNext("attribute");
+        attrElem = attrElem.GetNext(attributeStr);
     }
     
     loading_ = false;
@@ -342,14 +346,14 @@ bool Serializable::SaveXML(XMLElement& dest)
         if (!(attr.mode_ & AM_FILE))
             continue;
         
-        XMLElement attrElem = dest.CreateChild("attribute");
-        attrElem.SetString("name", String(attr.name_));
+        XMLElement attrElem = dest.CreateChild(attributeStr);
+        attrElem.SetString(nameStr, String(attr.name_));
         OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
             int enumValue = value.GetInt();
-            attrElem.SetString("value", String(attr.enumNames_[enumValue]));
+            attrElem.SetString(valueStr, String(attr.enumNames_[enumValue]));
         }
         else
             attrElem.SetVariantValue(value);

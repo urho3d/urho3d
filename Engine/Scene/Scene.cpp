@@ -39,6 +39,7 @@ static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 1.0f;
 static const String emptyVarName;
+static const String sceneStr("scene");
 
 OBJECTTYPESTATIC(Scene);
 
@@ -177,7 +178,7 @@ bool Scene::SaveXML(Serializer& dest)
     PROFILE(SaveSceneXML);
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
-    XMLElement rootElem = xml->CreateRoot("scene");
+    XMLElement rootElem = xml->CreateRoot(sceneStr);
     if (!SaveXML(rootElem))
         return false;
     
