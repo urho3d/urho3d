@@ -1,7 +1,0 @@
-digraph UnrelReplaceUnrel
-{
-      node [shape=record, fontname=Helvetica, fontsize=10];
-      a [ label="Message A", style="dashed"];
-      b [ label="Message B", style="dashed"];
-      a -> b [ arrowhead="diamond"];
-}

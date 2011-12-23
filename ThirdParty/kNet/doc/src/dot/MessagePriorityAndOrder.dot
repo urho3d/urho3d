@@ -1,7 +1,0 @@
-digraph MessagePriority
-{
-      node [shape=record, fontname=Helvetica, fontsize=10];
-      a [ label="Message A\nPriority 100"];
-      b [ label="Message B\nPriority 300"];
-      a -> b [ arrowhead="empty"];
-}

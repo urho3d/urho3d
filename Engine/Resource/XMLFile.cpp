@@ -28,15 +28,39 @@
 #include "Log.h"
 #include "XMLFile.h"
 
-#include <tinyxml.h>
+#include <pugixml.hpp>
 
 #include "DebugNew.h"
+
+/// XML writer for pugixml.
+class XMLWriter : public pugi::xml_writer
+{
+public:
+    /// Construct.
+    XMLWriter(Serializer& dest) :
+        dest_(dest),
+        success_(true)
+    {
+    }
+    
+    /// Write bytes to output.
+    void XMLWriter::write(const void* data, size_t size)
+    {
+        if (dest_.Write(data, size) != size)
+            success_ = false;
+    }
+    
+    /// Destination serializer.
+    Serializer& dest_;
+    /// Success flag.
+    bool success_;
+};
 
 OBJECTTYPESTATIC(XMLFile);
 
 XMLFile::XMLFile(Context* context) :
     Resource(context),
-    document_(new TiXmlDocument())
+    document_(new pugi::xml_document())
 {
 }
 
@@ -57,17 +81,12 @@ bool XMLFile::Load(Deserializer& source)
     if (!dataSize)
         return false;
     
-    SharedArrayPtr<char> buffer(new char[dataSize + 1]);
+    SharedArrayPtr<char> buffer(new char[dataSize]);
     if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;
     
-    buffer[dataSize] = 0;
-    
-    document_->Clear();
-    document_->Parse(buffer.Get());
-    if (document_->Error())
+    if (!document_->load_buffer(buffer.Get(), dataSize))
     {
-        document_->ClearError();
         LOGERROR("Could not parse XML data from " + source.GetName());
         return false;
     }
@@ -79,37 +98,27 @@ bool XMLFile::Load(Deserializer& source)
 
 bool XMLFile::Save(Serializer& dest)
 {
-    // Only support saving to a File
-    File* file = dynamic_cast<File*>(&dest);
-    if (!file)
-    {
-        LOGERROR("XML data destination is not a File");
-        return false;
-    }
-    if (!file->IsOpen())
-        return false;
-    if (!document_->SaveFile((FILE*)file->GetHandle()))
-    {
-        LOGERROR("Failed to save XML data to " + file->GetName());
-        return false;
-    }
-    
-    return true;
+    XMLWriter writer(dest);
+    document_->save(writer);
+    return writer.success_;
 }
 
 XMLElement XMLFile::CreateRoot(const String& name)
 {
-    TiXmlElement newRoot(name.CString());
-    document_->Clear();
-    document_->InsertEndChild(newRoot);
-    return GetRoot();
+    document_->reset();
+    pugi::xml_node root = document_->append_child(name.CString());
+    return XMLElement(this, root.internal_object());
 }
 
 XMLElement XMLFile::GetRoot(const String& name)
 {
-    XMLElement rootElem = XMLElement(this, document_->RootElement());
-    
-    if (rootElem.IsNull() || (!name.Empty() && rootElem.GetName() != name))
+    pugi::xml_node root = document_->first_child();
+    if (root.empty())
         return XMLElement();
-    return rootElem;
+    
+    String rootName(root.name());
+    if (!name.Empty() && rootName != name)
+        return XMLElement();
+    else
+        return XMLElement(this, root.internal_object());
 }

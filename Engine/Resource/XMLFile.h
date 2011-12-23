@@ -26,7 +26,10 @@
 #include "Resource.h"
 #include "XMLElement.h"
 
-class TiXmlDocument;
+namespace pugi
+{
+    class xml_document;
+}
 
 /// XML document resource.
 class XMLFile : public Resource
@@ -51,10 +54,10 @@ public:
     
     /// Return the root element, with optionally specified name. Return null element if not found.
     XMLElement GetRoot(const String& name = String());
-    /// Return the TinyXML document.
-    TiXmlDocument* GetDocument() const { return document_; }
+    /// Return the pugixml document.
+    pugi::xml_document* GetDocument() const { return document_; }
     
 private:
-    /// TinyXML document.
-    TiXmlDocument* document_;
+    /// Pugixml document.
+    pugi::xml_document* document_;
 };

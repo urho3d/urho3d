@@ -27,22 +27,22 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
-#include <tinyxml.h>
+#include <pugixml.hpp>
 
 XMLElement::XMLElement() :
-    element_(0)
+    node_(0)
 {
 }
 
-XMLElement::XMLElement(XMLFile* file, TiXmlElement* element) :
+XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
     file_(file),
-    element_(element)
+    node_(node)
 {
 }
 
 XMLElement::XMLElement(const XMLElement& rhs) :
     file_(rhs.file_),
-    element_(rhs.file_ ? rhs.element_ : 0)
+    node_(rhs.file_ ? rhs.node_ : 0)
 {
 }
 
@@ -52,59 +52,58 @@ XMLElement::~XMLElement()
 
 XMLElement XMLElement::CreateChild(const String& name)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return XMLElement();
     
-    TiXmlElement newElement(name.CString());
-    element_->InsertEndChild(newElement);
-    return XMLElement(file_, static_cast<TiXmlElement*>(element_->LastChild()));
+    pugi::xml_node node(node_);
+    pugi::xml_node child = node.append_child(name.CString());
+    return XMLElement(file_, child.internal_object());
 }
 
-bool XMLElement::RemoveChild(const String& name, bool last)
+bool XMLElement::RemoveChild(const XMLElement& element)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_ || element.node_)
         return false;
     
-    TiXmlNode* element;
-    if (name.Empty())
-    {
-        if (last)
-            element = element_->LastChild();
-        else
-            element = element_->FirstChild();
-    }
-    else
-    {
-        if (last)
-            element = element_->LastChild(name.CString());
-        else
-            element = element_->FirstChild(name.CString());
-    }
+    pugi::xml_node node(node_);
+    pugi::xml_node child(element.node_);
+    return node.remove_child(child);
+}
+
+bool XMLElement::RemoveChild(const String& name)
+{
+    if (!file_ || !node_)
+        return false;
     
-    if (element)
-    {
-        element_->RemoveChild(element);
-        return true;
-    }
-    
-    return false;
+    pugi::xml_node node(node_);
+    return node.remove_child(name.CString());
 }
 
 bool XMLElement::RemoveChildren(const String& name)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
-    TiXmlNode* element;
+    pugi::xml_node node(node_);
     if (name.Empty())
     {
-        while (element = element_->LastChild())
-            element_->RemoveChild(element);
+        for (;;)
+        {
+            pugi::xml_node child = node.last_child();
+            if (child.empty())
+                break;
+            node.remove_child(child);
+        }
     }
     else
     {
-        while (element = element_->LastChild(name.CString()))
-            element_->RemoveChild(element);
+        for (;;)
+        {
+            pugi::xml_node child = node.child(name.CString());
+            if (child.empty())
+                break;
+            node.remove_child(child);
+        }
     }
     
     return true;
@@ -112,10 +111,14 @@ bool XMLElement::RemoveChildren(const String& name)
 
 bool XMLElement::SetAttribute(const String& name, const String& value)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
-    element_->SetAttribute(name.CString(), value.CString());
+    pugi::xml_node node(node_);
+    pugi::xml_attribute attr = node.attribute(name.CString());
+    if (attr.empty())
+        attr = node.append_attribute(name.CString());
+    attr.set_value(value.CString());
     return true;
 }
 
@@ -221,7 +224,7 @@ bool XMLElement::SetVariantValue(const Variant& value)
 
 bool XMLElement::SetResourceRef(const ResourceRef& value)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
     // Need the context & resource cache to query for reverse hash mappings
@@ -234,7 +237,7 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
 
 bool XMLElement::SetResourceRefList(const ResourceRefList& value)
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
     // Need the context & resource cache to query for reverse hash mappings
@@ -303,79 +306,68 @@ bool XMLElement::SetVector4(const String& name, const Vector4& value)
 
 String XMLElement::GetName() const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return String();
     
-    return String(element_->Value());
-}
-
-String XMLElement::GetText() const
-{
-    if (!file_ || !element_)
-        return String();
-    
-    TiXmlNode* node = element_->FirstChild();
-    if (node)
-        return String(node->Value());
-    else
-        return String();
+    pugi::xml_node node(node_);
+    return String(node.name());
 }
 
 bool XMLElement::HasChild(const String& name) const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
-    if (element_->FirstChildElement(name.CString()) != 0)
-        return true;
-    else
-        return false;
+    pugi::xml_node node(node_);
+    return !node.child(name.CString()).empty();
 }
 
 XMLElement XMLElement::GetChild(const String& name) const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return XMLElement();
+    
+    pugi::xml_node node(node_);
+    if (name.Empty())
+        return XMLElement(file_, node.first_child().internal_object());
     else
-    {
-        if (name.Empty())
-            return XMLElement(file_, element_->FirstChildElement());
-        else
-            return XMLElement(file_, element_->FirstChildElement(name.CString()));
-    }
+        return XMLElement(file_, node.child(name.CString()).internal_object());
 }
 
 XMLElement XMLElement::GetNext(const String& name) const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return XMLElement();
     
+    pugi::xml_node node(node_);
     if (name.Empty())
-        return XMLElement(file_, element_->NextSiblingElement());
+        return XMLElement(file_, node.next_sibling().internal_object());
     else
-        return XMLElement(file_, element_->NextSiblingElement(name.CString()));
+        return XMLElement(file_, node.next_sibling(name.CString()).internal_object());
 }
 
 XMLElement XMLElement::GetParent() const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return XMLElement();
     
-    return XMLElement(file_, dynamic_cast<TiXmlElement*>(element_->Parent()));
+    pugi::xml_node node(node_);
+    return XMLElement(file_, node.parent().internal_object());
 }
 
 unsigned XMLElement::GetNumAttributes() const
 {
+    if (!file_ || !node_)
+        return 0;
+    
+    pugi::xml_node node(node_);
     unsigned ret = 0;
     
-    if (file_ && element_)
+    pugi::xml_attribute attr = node.first_attribute();
+    while (!attr.empty())
     {
-        const TiXmlAttribute* attribute = element_->FirstAttribute();
-        while (attribute)
-        {
-            ++ret;
-            attribute = attribute->Next();
-        }
+        ++ret;
+        attr = attr.next_attribute();
     }
     
     return ret;
@@ -383,42 +375,35 @@ unsigned XMLElement::GetNumAttributes() const
 
 bool XMLElement::HasAttribute(const String& name) const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return false;
     
-    if (element_->Attribute(name.CString()) != 0)
-        return true;
-    else
-        return false;
+    pugi::xml_node node(node_);
+    return !node.attribute(name.CString()).empty();
 }
 
 String XMLElement::GetAttribute(const String& name) const
 {
-    if (!file_ || !element_)
+    if (!file_ || !node_)
         return String();
-    else
-    {
-        const char* data = element_->Attribute(name.CString());
-        
-        if (!data)
-            return String();
-        else
-            return String(data);
-    }
+    
+    pugi::xml_node node(node_);
+    return String(node.attribute(name.CString()).value());
 }
 
 Vector<String> XMLElement::GetAttributeNames() const
 {
+    if (!file_ || !node_)
+        return Vector<String>();
+    
+    pugi::xml_node node(node_);
     Vector<String> ret;
     
-    if (file_ && element_)
+    pugi::xml_attribute attr = node.first_attribute();
+    while (!attr.empty())
     {
-        const TiXmlAttribute* attribute = element_->FirstAttribute();
-        while (attribute)
-        {
-            ret.Push(String(attribute->Name()));
-            attribute = attribute->Next();
-        }
+        ret.Push(String(attr.name()));
+        attr = attr.next_attribute();
     }
     
     return ret;

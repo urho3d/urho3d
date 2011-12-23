@@ -1,6 +1,0 @@
-digraph Legend
-{
-      node [shape=record, fontname=Helvetica, fontsize=10];
-      a [ label="Reliable Message"];
-      b [ label="Unreliable Message", style="dashed"];
-}

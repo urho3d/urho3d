@@ -45,11 +45,11 @@ Urho3D uses the following third-party libraries:
 - Open Asset Import Library, svn rev 1062 (http://assimp.sourceforge.net/)
 - Open Dynamics Engine, svn rev 1846 (http://www.ode.org/)
 - PortAudio V19 (http://www.portaudio.com/)
+- pugixml 1.0 (http://pugixml.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
-- TinyXML 2.6.1 (http://www.grinninglizard.com/tinyxml/)
 
 Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
 

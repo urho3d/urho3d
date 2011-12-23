@@ -28,7 +28,11 @@
 #include "Ptr.h"
 #include "Variant.h"
 
-class TiXmlElement;
+namespace pugi
+{
+    struct xml_node_struct;
+}
+
 class XMLFile;
 
 /// Element in an XML file.
@@ -37,8 +41,8 @@ class XMLElement
 public:
     /// Construct null element.
     XMLElement();
-    /// Construct with document and element pointers.
-    XMLElement(XMLFile* file, TiXmlElement* element);
+    /// Construct with document and node pointers.
+    XMLElement(XMLFile* file, pugi::xml_node_struct* node);
     /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
     /// Destruct.
@@ -46,9 +50,11 @@ public:
     
     /// Create a child element.
     XMLElement CreateChild(const String& name);
-    /// Remove a child element, either first or last of them if several exist.
-    bool RemoveChild(const String& name = String(), bool last = true);
-    /// Remove child elements of certain name, or all child elements if name is empty.
+    /// Remove a child element. Return true if successful.
+    bool RemoveChild(const XMLElement& element);
+    /// Remove a child element by name. Return true if successful.
+    bool RemoveChild(const String& name);
+    /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
     bool RemoveChildren(const String& name = String());
     /// %Set an attribute.
     bool SetAttribute(const String& name, const String& value);
@@ -96,15 +102,13 @@ public:
     bool SetVector4(const String& name, const Vector4& value);
     
     /// Return whether does not refer to an element.
-    bool IsNull() const { return element_ == 0; }
+    bool IsNull() const { return node_ == 0; }
     /// Return whether refers to an element.
-    bool NotNull() const { return element_ != 0; }
+    bool NotNull() const { return node_ != 0; }
     /// Return true if refers to an element.
-    operator bool () const { return element_ != 0; }
+    operator bool () const { return node_ != 0; }
     /// Return element name.
     String GetName() const;
-    /// Return element contents.
-    String GetText() const;
     /// Return whether has a child element.
     bool HasChild(const String& name) const;
     /// Return child element, or null if missing.
@@ -171,12 +175,12 @@ public:
     Vector4 GetVector(const String& name) const;
     /// Return XML file.
     XMLFile* GetFile() const;
-    /// Return TinyXML element.
-    TiXmlElement* GetElement() const { return element_; }
+    /// Return pugixml node.
+    pugi::xml_node_struct* GetNode() const { return node_; }
     
 private:
     /// XML file.
     WeakPtr<XMLFile> file_;
-    /// TinyXML element.
-    TiXmlElement* element_;
+    /// Pugixml node.
+    pugi::xml_node_struct* node_;
 };
