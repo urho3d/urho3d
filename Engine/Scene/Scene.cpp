@@ -93,6 +93,8 @@ void Scene::RegisterObject(Context* context)
 
 bool Scene::Load(Deserializer& source)
 {
+    PROFILE(LoadScene);
+    
     StopAsyncLoading();
     
     // Check ID
@@ -116,6 +118,8 @@ bool Scene::Load(Deserializer& source)
 
 bool Scene::Save(Serializer& dest)
 {
+    PROFILE(SaveScene);
+    
     // Write ID first
     if (!dest.WriteFileID("USCN"))
     {
@@ -132,6 +136,8 @@ bool Scene::Save(Serializer& dest)
 
 bool Scene::LoadXML(const XMLElement& source)
 {
+    PROFILE(LoadSceneXML);
+    
     StopAsyncLoading();
     
     // Load the whole scene, then perform post-load if successfully loaded
@@ -147,26 +153,19 @@ bool Scene::LoadXML(const XMLElement& source)
 
 bool Scene::LoadXML(Deserializer& source)
 {
-    StopAsyncLoading();
-    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
     
     LOGINFO("Loading scene from " + source.GetName());
     
-    // Load the whole scene, then perform post-load if successfully loaded
-    if (Node::LoadXML(xml->GetRoot()))
-    {
-        FinishLoading(&source);
-        return true;
-    }
-    else
-        return false;
+    return LoadXML(xml->GetRoot());
 }
 
 bool Scene::SaveXML(Serializer& dest)
 {
+    PROFILE(SaveSceneXML);
+    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("scene");
     if (!SaveXML(rootElem))
@@ -276,12 +275,37 @@ void Scene::StopAsyncLoading()
 
 Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
+    PROFILE(Instantiate);
+    
     SceneResolver resolver;
     unsigned nodeID = source.ReadInt();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
     if (node->Load(source, resolver, true, true, mode))
+    {
+        resolver.Resolve();
+        node->ApplyAttributes();
+        node->SetTransform(position, rotation);
+        return node;
+    }
+    else
+    {
+        node->Remove();
+        return 0;
+    }
+}
+
+Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    PROFILE(InstantiateXML);
+    
+    SceneResolver resolver;
+    unsigned nodeID = source.GetInt("id");
+    // Rewrite IDs when instantiating
+    Node* node = CreateChild(0, mode);
+    resolver.AddNode(nodeID, node);
+    if (node->LoadXML(source, resolver, true, true, mode))
     {
         resolver.Resolve();
         node->ApplyAttributes();
@@ -302,27 +326,6 @@ Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const
         return false;
     
     return InstantiateXML(xml->GetRoot(), position, rotation, mode);
-}
-
-Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
-{
-    SceneResolver resolver;
-    unsigned nodeID = source.GetInt("id");
-    // Rewrite IDs when instantiating
-    Node* node = CreateChild(0, mode);
-    resolver.AddNode(nodeID, node);
-    if (node->LoadXML(source, resolver, true, true, mode))
-    {
-        resolver.Resolve();
-        node->ApplyAttributes();
-        node->SetTransform(position, rotation);
-        return node;
-    }
-    else
-    {
-        node->Remove();
-        return 0;
-    }
 }
 
 void Scene::Clear()

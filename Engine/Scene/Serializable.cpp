@@ -262,17 +262,20 @@ bool Serializable::LoadXML(const XMLElement& source)
     
     loading_ = true;
     
-    for (unsigned i = 0; i < attributes->Size(); ++i)
+    XMLElement attrElem = source.GetChild("attribute");
+    unsigned startIndex = 0;
+    
+    while (attrElem)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_FILE))
-            continue;
+        String name = attrElem.GetString("name");
         
-        XMLElement attrElem = source.GetChild("attribute");
-        bool found = false;
-        while (attrElem)
+        unsigned i = startIndex;
+        unsigned attempts = attributes->Size();
+        
+        while (attempts)
         {
-            if (attrElem.GetString("name") == attr.name_)
+            const AttributeInfo& attr = attributes->At(i);
+            if ((attr.mode_ & AM_FILE) && attr.name_ == name)
             {
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
@@ -299,15 +302,20 @@ bool Serializable::LoadXML(const XMLElement& source)
                 else
                     OnSetAttribute(attr, attrElem.GetVariantValue(attr.type_));
                 
-                found = true;
+                startIndex = (i + 1) % attributes->Size();
                 break;
             }
-            
-            attrElem = attrElem.GetNext("attribute");
+            else
+            {
+                i = (i + 1) % attributes->Size();
+                --attempts;
+            }
         }
         
-        if (!found)
-            LOGWARNING("Attribute " + String(attr.name_) + " not found in XML data");
+        if (!attempts)
+            LOGWARNING("Unknown attribute " + name + " in XML data");
+        
+        attrElem = attrElem.GetNext("attribute");
     }
     
     loading_ = false;

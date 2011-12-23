@@ -91,7 +91,10 @@ String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal) 
     if (!showTotal)
         output += String("Block                          Count   Average   Total\n \n");
     else
-        output += String("Block                             Frame average (msec)      Accumulated total (sec)\n \n");
+    {
+        output += String("Block                                       Frame average                    Accumulated total\n\n");
+        output += String("                                    Count     Average       Total      Count     Average       Total\n\n");
+    }
     
     GetData(root_, output, 0, showUnused, showAccumulated, showTotal);
     
@@ -156,9 +159,9 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
                     avgFrameTotalTime = 0.0f;
                 }
                 
-                sprintf(line, "%s %5u %8.3f %8.3f %10u %8.3f %8.3f\n",
+                sprintf(line, "%s %10u %11.3f %11.3f %10u %11.3f %11.3f\n",
                     indentedName, avgFrameCount, avgFrameTime, avgFrameTotalTime,
-                    totalCount, avgTotalTime / 1000.0f, totalTime / 1000.0);
+                    totalCount, avgTotalTime, totalTime);
             }
             output += String(line);
             

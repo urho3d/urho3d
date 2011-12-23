@@ -1100,8 +1100,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 
 void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& definition)
 {
-    PROFILE(RegisterShaderParameter);
-    
     HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
     
     if (i == shaderParameters_.End())
