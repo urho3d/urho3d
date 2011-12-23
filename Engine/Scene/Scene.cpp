@@ -153,13 +153,23 @@ bool Scene::LoadXML(const XMLElement& source)
 
 bool Scene::LoadXML(Deserializer& source)
 {
+    PROFILE(LoadSceneXML);
+    
+    StopAsyncLoading();
+    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
     
     LOGINFO("Loading scene from " + source.GetName());
     
-    return LoadXML(xml->GetRoot());
+    if (Node::LoadXML(xml->GetRoot()))
+    {
+        FinishLoading(&source);
+        return true;
+    }
+    else
+        return false;
 }
 
 bool Scene::SaveXML(Serializer& dest)

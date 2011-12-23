@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "Profiler.h"
 #include "Scene.h"
 #include "XMLFile.h"
 
@@ -686,6 +687,8 @@ Node* Node::Clone(CreateMode mode)
     // The scene itself can not be cloned
     if (this == scene_ || !parent_)
         return 0;
+    
+    PROFILE(CloneNode);
     
     SceneResolver resolver;
     Node* clone = CloneRecursive(parent_, resolver, mode);

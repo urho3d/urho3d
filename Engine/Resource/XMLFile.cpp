@@ -24,8 +24,10 @@
 #include "Precompiled.h"
 #include "ArrayPtr.h"
 #include "Context.h"
-#include "File.h"
+#include "Deserializer.h"
 #include "Log.h"
+#include "Profiler.h"
+#include "Serializer.h"
 #include "XMLFile.h"
 
 #include <pugixml.hpp>
@@ -77,6 +79,8 @@ void XMLFile::RegisterObject(Context* context)
 
 bool XMLFile::Load(Deserializer& source)
 {
+    PROFILE(LoadXMLFile);
+    
     unsigned dataSize = source.GetSize();
     if (!dataSize)
         return false;
