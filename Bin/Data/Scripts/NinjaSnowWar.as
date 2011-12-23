@@ -270,7 +270,7 @@ void SpawnPlayer(Connection@ connection)
     Node@ playerNode = SpawnObject(spawnPosition, Quaternion(), "Ninja");
     // Set owner connection. Owned nodes are always updated to the owner at full frequency
     playerNode.owner = connection;
-    playerNode.name = "Player";    
+    playerNode.name = "Player";
 
     // Initialize variables
     Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
@@ -619,7 +619,7 @@ void SendHiscores(int playerIndex)
 Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
 {
     XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
-    return gameScene.InstantiateXML(xml.root, position, rotation);
+    return gameScene.InstantiateXML(xml, position, rotation);
 }
 
 void SpawnObjects(float timeStep)

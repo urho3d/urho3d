@@ -27,7 +27,7 @@
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Scene.h"
-#include "XMLElement.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
 
@@ -208,6 +208,16 @@ void Node::ApplyAttributes()
     
     for (unsigned i = 0; i < children_.Size(); ++i)
         children_[i]->ApplyAttributes();
+}
+
+bool Node::SaveXML(Serializer& dest)
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    XMLElement rootElem = xml->CreateRoot("node");
+    if (!SaveXML(rootElem))
+        return false;
+    
+    return xml->Save(dest);
 }
 
 void Node::SetName(const String& name)
@@ -1203,7 +1213,7 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
 Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)
 {
     // Create clone node
-    Node* cloneNode = parent->CreateChild(0, mode);
+    Node* cloneNode = parent->CreateChild(0, (mode == REPLICATED && id_ < FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
     resolver.AddNode(id_, cloneNode);
     
     // Copy attributes
@@ -1215,7 +1225,8 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->CreateComponent(component->GetType(), mode);
+        Component* cloneComponent = cloneNode->CreateComponent(component->GetType(), (mode == REPLICATED && component->GetID() <
+            FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
         if (!cloneComponent)
         {
             LOGERROR("Could not clone component " + component->GetTypeName());

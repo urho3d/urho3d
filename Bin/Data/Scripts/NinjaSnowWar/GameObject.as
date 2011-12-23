@@ -82,7 +82,7 @@ class GameObject : ScriptObject
     Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
     {
         XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
-        return scene.InstantiateXML(xml.root, position, rotation);
+        return scene.InstantiateXML(xml, position, rotation);
     }
 
     Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration)

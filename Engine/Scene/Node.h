@@ -74,6 +74,8 @@ public:
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
     
+    /// Save to an XML file. Return true if successful.
+    bool SaveXML(Serializer& dest);
     /// %Set name.
     void SetName(const String& name);
     /// %Set position.

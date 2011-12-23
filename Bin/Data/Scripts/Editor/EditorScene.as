@@ -279,12 +279,7 @@ void SaveNode(const String&in fileName)
         if (extension != ".xml")
             selectedNodes[0].Save(file);
         else
-        {
-            XMLFile xml;
-            XMLElement root = xml.CreateRoot("node");
-            selectedNodes[0].SaveXML(root);
-            xml.Save(file);
-        }
+            selectedNodes[0].SaveXML(file);
 
         instantiateFileName = fileName;
     }

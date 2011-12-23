@@ -38,6 +38,14 @@ static void RegisterSerializable(asIScriptEngine* engine)
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
+static bool NodeSaveXML(File* file, Node* ptr)
+{
+    if (file)
+        return ptr->SaveXML(*file);
+    else
+        return false;
+}
+
 static void RegisterNode(asIScriptEngine* engine)
 {
     engine->RegisterEnum("CreateMode");
@@ -47,6 +55,7 @@ static void RegisterNode(asIScriptEngine* engine)
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false);
     RegisterNode<Node>(engine, "Node");
+    engine->RegisterObjectMethod("Node", "bool SaveXML(File@+)", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);
     RegisterObjectConstructor<Node>(engine, "Node");
     RegisterNamedObjectConstructor<Node>(engine, "Node");
@@ -92,6 +101,14 @@ static Node* SceneInstantiateXML(File* file, const Vector3& position, const Quat
         return 0;
 }
 
+static Node* SceneInstantiateXMLFile(XMLFile* xml, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
+{
+    if (xml)
+        return ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode);
+    else
+        return 0;
+}
+
 static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
 {
     return VectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
@@ -132,6 +149,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHOD(Scene, StopAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiate), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(XMLFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXMLFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(const XMLElement&in, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (const XMLElement&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Clear()", asMETHOD(Scene, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
