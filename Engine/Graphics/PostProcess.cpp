@@ -83,10 +83,6 @@ const Vector4& PostProcessPass::GetShaderParameter(const String& name) const
     return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
 }
 
-PostProcessRenderTarget::~PostProcessRenderTarget()
-{
-}
-
 OBJECTTYPESTATIC(PostProcess);
 
 PostProcess::PostProcess(Context* context) :
@@ -115,23 +111,40 @@ bool PostProcess::LoadParameters(XMLFile* file)
     while (rtElem)
     {
         String name = rtElem.GetString("name");
-        unsigned width = rtElem.GetInt("width");
-        unsigned height = rtElem.GetInt("height");
-        unsigned format = Graphics::GetRGBFormat();
-        bool relativeSize = rtElem.GetBool("relativesize");
         
+        unsigned format = Graphics::GetRGBFormat();
         String formatName = rtElem.GetString("format").ToLower();
         if (formatName == "rgba")
             format = Graphics::GetRGBAFormat();
         else if (formatName == "float")
             format = Graphics::GetFloatFormat();
         
-        if (CreateRenderTarget(name, width, height, format, relativeSize))
+        bool sizeDivisor = false;
+        bool filtered = false;
+        unsigned width = 0;
+        unsigned height = 0;
+        
+        if (rtElem.HasAttribute("filter"))
+            filtered = rtElem.GetBool("filter");
+        if (rtElem.HasAttribute("size"))
         {
-            // Process additional texture parameters (for example filtering)
-            renderTargets_[StringHash(name)].texture_->LoadParameters(rtElem);
+            IntVector2 size = rtElem.GetIntVector2("size");
+            width = size.x_;
+            height = size.y_;
+        }
+        if (rtElem.HasAttribute("width"))
+            width = rtElem.GetInt("width");
+        if (rtElem.HasAttribute("height"))
+            height = rtElem.GetInt("height");
+        if (rtElem.HasAttribute("sizedivisor"))
+        {
+            IntVector2 size = rtElem.GetIntVector2("sizedivisor");
+            width = size.x_;
+            height = size.y_;
+            sizeDivisor = true;
         }
         
+        CreateRenderTarget(name, width, height, format, sizeDivisor, filtered);
         rtElem = rtElem.GetNext("rendertarget");
     }
     
@@ -190,24 +203,16 @@ void PostProcess::SetNumPasses(unsigned passes)
     }
 }
 
-bool PostProcess::CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool relativeSize)
+bool PostProcess::CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered)
 {
     if (name.Trimmed().Empty())
         return false;
     
     PostProcessRenderTarget target;
-    target.texture_ = new Texture2D(context_);
     target.format_ = format;
-    target.relativeSize_ = relativeSize;
-    // If size is absolute, can reserve the texture now. Otherwise must defer to later
-    if (!relativeSize)
-    {
-        target.sizeDivisor_ = IntVector2(1, 1);
-        if (!target.texture_->SetSize(width, height, format, TEXTURE_RENDERTARGET))
-            return false;
-    }
-    else
-        target.sizeDivisor_ = IntVector2(Max((int)width, 1), Max((int)height, 1));
+    target.size_ = IntVector2(width, height),
+    target.sizeDivisor_ = sizeDivisor;
+    target.filtered_ = filtered;
     
     renderTargets_[StringHash(name)] = target;
     return true;
@@ -226,11 +231,7 @@ PostProcessPass* PostProcess::GetPass(unsigned index) const
         return 0;
 }
 
-Texture2D* PostProcess::GetRenderTarget(const String& name) const
+bool PostProcess::HasRenderTarget(const String& name) const
 {
-    HashMap<StringHash, PostProcessRenderTarget>::ConstIterator i = renderTargets_.Find(StringHash(name));
-    if (i != renderTargets_.End())
-        return i->second_.texture_;
-    else
-        return 0;
+    return renderTargets_.Contains(StringHash(name));
 }

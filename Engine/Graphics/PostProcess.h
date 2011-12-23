@@ -79,17 +79,14 @@ private:
 /// Post-processing rendertarget.
 struct PostProcessRenderTarget
 {
-    /// Destruct.
-    ~PostProcessRenderTarget();
-    
-    /// Rendertarget texture.
-    SharedPtr<Texture2D> texture_;
     /// Texture format.
     unsigned format_;
-    /// Size divisor.
-    IntVector2 sizeDivisor_;
-    /// Relative size (divisor mode) flag.
-    bool relativeSize_;
+    /// Size.
+    IntVector2 size_;
+    /// Divisor mode flag.
+    bool sizeDivisor_;
+    /// Filtering flag.
+    bool filtered_;
 };
 
 /// Post-processing effect.
@@ -108,7 +105,7 @@ public:
     /// Set number of passes.
     void SetNumPasses(unsigned passes);
     /// Create a rendertarget. Width and height are either absolute pixels or viewport size divisors. Return true if successful.
-    bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool relativeSize);
+    bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered);
     /// Remove a rendertarget.
     void RemoveRenderTarget(const String& name);
     
@@ -118,8 +115,8 @@ public:
     unsigned GetNumPasses() const { return passes_.Size(); }
     /// Return pass by index.
     PostProcessPass* GetPass(unsigned index) const;
-    /// Return rendertarget by name.
-    Texture2D* GetRenderTarget(const String& name) const;
+    /// Return if has a specific rendertarget.
+    bool HasRenderTarget(const String& name) const;
     
 private:
     /// Parameter XML file.

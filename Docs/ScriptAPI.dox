@@ -1649,15 +1649,15 @@ PostProcess
 
 Methods:<br>
 - bool LoadParameters(XMLFile@)
-- bool CreateRenderTarget(const String&, uint, uint, uint, bool)
+- bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
 - void RemoveRenderTarget(const String&)
+- bool HasRenderTarget(const String&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - uint numPasses
 - PostProcessPass@[] passes (readonly)
-- Texture2D@[] renderTargets (readonly)
 
 
 Model

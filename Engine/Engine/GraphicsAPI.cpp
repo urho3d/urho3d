@@ -374,12 +374,12 @@ static void RegisterPostProcess(asIScriptEngine* engine)
     RegisterObject<PostProcess>(engine, "PostProcess");
     RegisterObjectConstructor<PostProcess>(engine, "PostProcess");
     engine->RegisterObjectMethod("PostProcess", "bool LoadParameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "void RemoveRenderTarget(const String&in)", asMETHOD(PostProcess, RemoveRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "bool HasRenderTarget(const String&in) const", asMETHOD(PostProcess, HasRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "void set_numPasses(uint)", asMETHOD(PostProcess, SetNumPasses), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "uint get_numPasses() const", asMETHOD(PostProcess, GetNumPasses), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "PostProcessPass@+ get_passes(uint) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "Texture2D@+ get_renderTargets(const String&in) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
 }
 
 static void RegisterModel(asIScriptEngine* engine)
