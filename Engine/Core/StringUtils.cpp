@@ -23,11 +23,63 @@
 
 #include "Precompiled.h"
 #include "StringUtils.h"
+#include "../../ThirdParty/Assimp/code/pstdint.h"
+#include "../../ThirdParty/Assimp/code/fast_atof.h"
 
 #include <cstdio>
 #include <ctype.h>
 
 #include "DebugNew.h"
+
+unsigned CountElements(const String& str, char separator)
+{
+    const char* buffer = str.CString();
+    unsigned length = str.Length();
+    unsigned pos = 0;
+    unsigned ret = 0;
+    
+    while (pos < length)
+    {
+        unsigned start = pos;
+        
+        while (start < length)
+        {
+            if (buffer[start] == separator)
+                break;
+            
+            ++start;
+        }
+        
+        if (start == length)
+        {
+            ++ret;
+            break;
+        }
+        
+        unsigned end = start;
+        
+        while (end < length)
+        {
+            if (buffer[end] != separator)
+                break;
+            
+            ++end;
+        }
+        
+        ++ret;
+        pos = end;
+    }
+    
+    return ret;
+}
+
+void SkipSeparator(const char** str, char separator)
+{
+    const char*& ptr = *str;
+    
+    while (ptr && *ptr && *ptr == separator)
+        ++ptr;
+}
 
 bool ToBool(const String& source)
 {
@@ -47,116 +99,233 @@ int ToInt(const String& source)
 {
     if (!source.Length())
         return 0;
-    return atoi(source.CString());
+    return Assimp::strtol10(source.CString(), 0);
 }
 
 unsigned ToUInt(const String& source)
 {
     if (!source.Length())
         return 0;
-    return (unsigned)atoi(source.CString());
+    return Assimp::strtoul10(source.CString(), 0);
 }
 
 float ToFloat(const String& source)
 {
     if (!source.Length())
         return 0.0f;
-    return (float)atof(source.CString());
+    return Assimp::fast_atof(source.CString());
 }
 
 Color ToColor(const String& source)
 {
-    Vector<String> colors = source.Split(' ');
-    if (colors.Size() < 3)
-        return Color();
+    Color ret;
     
-    Color ret(ToFloat(colors[0]), ToFloat(colors[1]), ToFloat(colors[2]));
-    if (colors.Size() > 3)
-        ret.a_ = ToFloat(colors[3]);
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 3)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.r_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.g_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.b_ = Assimp::fast_atof(&ptr);
+    if (elements > 3)
+    {
+        SkipSeparator(&ptr, ' ');
+        ret.a_ = Assimp::fast_atof(&ptr);
+    }
     
     return ret;
 }
 
 IntRect ToIntRect(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 4)
-        return IntRect::ZERO;
-    else
-        return IntRect(ToInt(coords[0]), ToInt(coords[1]), ToInt(coords[2]), ToInt(coords[3]));
+    IntRect ret(IntRect::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 4)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.left_ = Assimp::strtol10(ptr, &ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.top_ = Assimp::strtol10(ptr, &ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.right_ = Assimp::strtol10(ptr, &ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.bottom_ = Assimp::strtol10(ptr, &ptr);
+    
+    return ret;
 }
 
 IntVector2 ToIntVector2(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 2)
-        return IntVector2::ZERO;
-    else
-        return IntVector2(ToInt(coords[0]), ToInt(coords[1]));
+    IntVector2 ret(IntVector2::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 2)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.x_ = Assimp::strtol10(ptr, &ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.y_ = Assimp::strtol10(ptr, &ptr);
+    
+    return ret;
 }
 
 Rect ToRect(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 4)
-        return Rect::ZERO;
-    else
-        return Rect(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3]));
+    Rect ret(Rect::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 4)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.min_.x_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.min_.y_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.max_.x_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.max_.y_ = Assimp::fast_atof(&ptr);
+    
+    return ret;
 }
 
 Quaternion ToQuaternion(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 3)
+    unsigned elements = CountElements(source, ' ');
+    const char* ptr = source.CString();
+    const char* end = ptr + source.Length();
+    
+    if (elements < 3)
         return Quaternion::IDENTITY;
-    else if (coords.Size() < 4)
+    else if (elements < 4)
+    {
         // 3 coords specified: conversion from Euler angles
-        return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]));
+        float x, y, z;
+        SkipSeparator(&ptr, ' ');
+        x = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        y = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        z = Assimp::fast_atof(&ptr);
+        
+        return Quaternion(x, y, z);
+    }
     else
+    {
         // 4 coords specified: full quaternion
-        return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3])).Normalized();
+        Quaternion ret;
+        
+        SkipSeparator(&ptr, ' ');
+        ret.w_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.x_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.y_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.z_ = Assimp::fast_atof(&ptr);
+        
+        return ret;
+    }
 }
 
 Vector2 ToVector2(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 2)
-        return Vector2::ZERO;
-    else
-        return Vector2(ToFloat(coords[0]), ToFloat(coords[1]));
+    Vector2 ret(Vector2::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 2)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.x_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.y_ = Assimp::fast_atof(&ptr);
+    
+    return ret;
 }
 
 Vector3 ToVector3(const String& source)
 {
-    Vector<String> coords = source.Split(' ');
-    if (coords.Size() < 3)
-        return Vector3::ZERO;
-    else
-        return Vector3(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]));
+    Vector3 ret(Vector3::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 3)
+        return ret;
+    
+    const char* ptr = source.CString();
+    
+    SkipSeparator(&ptr, ' ');
+    ret.x_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.y_ = Assimp::fast_atof(&ptr);
+    SkipSeparator(&ptr, ' ');
+    ret.z_ = Assimp::fast_atof(&ptr);
+    
+    return ret;
 }
 
 Vector4 ToVector4(const String& source, bool allowMissingCoords)
 {
-    Vector<String> coords = source.Split(' ');
+    Vector4 ret(Vector4::ZERO);
+    
+    unsigned elements = CountElements(source, ' ');
+    const char* ptr = source.CString();
+    
     if (!allowMissingCoords)
     {
-        if (coords.Size() < 4)
-            return Vector4::ZERO;
+        if (elements < 4)
+            return ret;
         
-        return Vector4(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3]));
+        SkipSeparator(&ptr, ' ');
+        ret.x_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.y_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.z_ = Assimp::fast_atof(&ptr);
+        SkipSeparator(&ptr, ' ');
+        ret.w_ = Assimp::fast_atof(&ptr);
+        
+        return ret;
     }
     else
     {
-        unsigned num = coords.Size();
-        Vector4 ret(Vector4::ZERO);
-        if (num > 0)
-            ret.x_ = ToFloat(coords[0]);
-        if (num > 1)
-            ret.y_ = ToFloat(coords[1]);
-        if (num > 2)
-            ret.z_ = ToFloat(coords[2]);
-        if (num > 3)
-            ret.w_ = ToFloat(coords[3]);
+        if (elements > 0)
+        {
+            SkipSeparator(&ptr, ' ');
+            ret.x_ = Assimp::fast_atof(&ptr);
+        }
+        if (elements > 1)
+        {
+            SkipSeparator(&ptr, ' ');
+            ret.y_ = Assimp::fast_atof(&ptr);
+        }
+        if (elements > 2)
+        {
+            SkipSeparator(&ptr, ' ');
+            ret.z_ = Assimp::fast_atof(&ptr);
+        }
+        if (elements > 3)
+        {
+            SkipSeparator(&ptr, ' ');
+            ret.w_ = Assimp::fast_atof(&ptr);
+        }
+        
         return ret;
     }
 }

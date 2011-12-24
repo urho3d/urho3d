@@ -1161,21 +1161,23 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model     Export a model and animations
-scene     Export a scene and its models
-dumpnodes Dump scene node structure. No output file is generated
-lod       Combine several Urho3D models as LOD levels of the output model
-          Syntax: lod <dist0> <mdl0> <dist1> <mdl1> ... <output file>
+model Export a model
+scene Export a scene
+dump  Dump scene node structure. No output file is generated
+lod   Combine several Urho3D models as LOD levels of the output model
+      Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
 
 Options:
--b        Save scene in binary format, default format is XML
--i        Use local IDs for scene nodes
--na       Do not export animations
--ne       Do not create Octree & PhysicsWorld extensions to the scene
--nm       Do not export materials
--pX       Use base path X for resources in the scene file
--rX       Use scene node X as root node
--t        Generate tangents to model(s)
+-b    Save scene in binary format, default format is XML
+-i    Use local ID's for scene nodes
+-mX   Output a material list file X (model mode only)
+-na   Do not export animations
+-nm   Do not export materials
+-ns   Do not create subdirectories for resources
+-nz   Do not create a zone and a directional light (scene mode only)
+-pX   Set path X for scene resources. Default is output file path
+-rX   Use scene node X as root node
+-t    Generate tangents to model(s)
 \endverbatim
 
 \section Tools_GLShaderProcessor GLShaderProcessor

@@ -468,7 +468,7 @@ Vector<String> String::Split(char separator) const
             if (buffer_[start] == separator)
                 break;
             
-            start++;
+            ++start;
         }
         
         if (start == length_)
@@ -484,7 +484,7 @@ Vector<String> String::Split(char separator) const
             if (buffer_[end] != separator)
                 break;
             
-            end++;
+            ++end;
         }
         
         ret.Push(Substring(pos, start - pos));
