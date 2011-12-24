@@ -1096,7 +1096,8 @@ XMLElement
 
 Methods:<br>
 - XMLElement CreateChild(const String&)
-- bool RemoveChild(const String& arg0 = String ( ), bool arg1 = true)
+- bool RemoveChild(const XMLElement&)
+- bool RemoveChild(const String&)
 - bool RemoveChildren(const String& arg0 = String ( ))
 - bool SetAttribute(const String&, const String&)
 - bool SetBool(const String&, bool)
@@ -1141,7 +1142,6 @@ Methods:<br>
 
 Properties:<br>
 - String name (readonly)
-- String text (readonly)
 - bool isNull (readonly)
 - bool notNull (readonly)
 - XMLElement parent (readonly)
@@ -1240,6 +1240,7 @@ Methods:<br>
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector3 WorldToLocal(const Vector3&) const
 - Vector3 WorldToLocal(const Vector4&) const
+- bool SaveXML(File@)
 - Node@ Clone(CreateMode arg0 = REPLICATED)
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
 - ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
@@ -1340,6 +1341,7 @@ Methods:<br>
 - void StopAsyncLoading()
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
+- Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - void Clear()
 - void AddRequiredPackageFile(PackageFile@)
