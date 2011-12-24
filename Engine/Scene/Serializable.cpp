@@ -267,7 +267,7 @@ bool Serializable::LoadXML(const XMLElement& source)
     
     while (attrElem)
     {
-        String name = attrElem.GetString("name");
+        String name = attrElem.GetAttribute("name");
         
         unsigned i = startIndex;
         unsigned attempts = attributes->Size();
@@ -280,7 +280,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
-                    String value = attrElem.GetString("value");
+                    String value = attrElem.GetAttribute("value");
                     const String* enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
@@ -343,13 +343,13 @@ bool Serializable::SaveXML(XMLElement& dest)
             continue;
         
         XMLElement attrElem = dest.CreateChild("attribute");
-        attrElem.SetString("name", String(attr.name_));
+        attrElem.SetAttribute("name", String(attr.name_).CString());
         OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
             int enumValue = value.GetInt();
-            attrElem.SetString("value", String(attr.enumNames_[enumValue]));
+            attrElem.SetAttribute("value", String(attr.enumNames_[enumValue]).CString());
         }
         else
             attrElem.SetVariantValue(value);

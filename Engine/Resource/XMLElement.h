@@ -50,14 +50,22 @@ public:
     
     /// Create a child element.
     XMLElement CreateChild(const String& name);
+    /// Create a child element.
+    XMLElement CreateChild(const char* name);
     /// Remove a child element. Return true if successful.
     bool RemoveChild(const XMLElement& element);
     /// Remove a child element by name. Return true if successful.
     bool RemoveChild(const String& name);
+    /// Remove a child element by name. Return true if successful.
+    bool RemoveChild(const char* name);
     /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
     bool RemoveChildren(const String& name = String());
+    /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
+    bool RemoveChildren(const char* name);
     /// %Set an attribute.
     bool SetAttribute(const String& name, const String& value);
+    /// %Set an attribute.
+    bool SetAttribute(const char* name, const char* value);
     /// %Set a bool attribute.
     bool SetBool(const String& name, bool value);
     /// %Set a BoundingBox attribute.
@@ -111,18 +119,28 @@ public:
     String GetName() const;
     /// Return whether has a child element.
     bool HasChild(const String& name) const;
+    /// Return whether has a child element.
+    bool HasChild(const char* name) const;
     /// Return child element, or null if missing.
     XMLElement GetChild(const String& name = String()) const;
+    /// Return child element, or null if missing.
+    XMLElement GetChild(const char* name) const;
     /// Return next sibling element.
     XMLElement GetNext(const String& name = String()) const;
+    /// Return next sibling element.
+    XMLElement GetNext(const char* name) const;
     /// Return parent element.
     XMLElement GetParent() const;
     /// Return number of attributes.
     unsigned GetNumAttributes() const;
     /// Return whether has an attribute.
     bool HasAttribute(const String& name) const;
+    /// Return whether has an attribute.
+    bool HasAttribute(const char* name) const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const String& name) const;
+    /// Return attribute, or empty if missing.
+    const char* GetAttribute(const char* name) const;
     /// Return names of all attributes.
     Vector<String> GetAttributeNames() const;
     /// Return bool attribute, or false if missing.
@@ -175,7 +193,7 @@ public:
     Vector4 GetVector(const String& name) const;
     /// Return XML file.
     XMLFile* GetFile() const;
-    /// Return pugixml node.
+    /// Return pugixml node.s
     pugi::xml_node_struct* GetNode() const { return node_; }
     
 private:

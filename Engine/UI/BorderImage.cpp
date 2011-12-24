@@ -53,7 +53,7 @@ void BorderImage::SetStyle(const XMLElement& element)
     UIElement::SetStyle(element);
     
     if (element.HasChild("texture"))
-        SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>(element.GetChild("texture").GetString("name")));
+        SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>(element.GetChild("texture").GetAttribute("name")));
     if (element.HasChild("imagerect"))
     {
         XMLElement imageElem = element.GetChild("imagerect");

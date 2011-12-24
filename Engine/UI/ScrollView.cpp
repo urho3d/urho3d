@@ -97,7 +97,7 @@ void ScrollView::SetStyle(const XMLElement& element)
     
     UIElement* root = GetRoot();
     if (root && element.HasChild("contentelement"))
-        SetContentElement(root->GetChild(element.GetChild("contentelement").GetString("name"), true));
+        SetContentElement(root->GetChild(element.GetChild("contentelement").GetAttribute("name"), true));
     
     // Set the scrollbar orientations again and perform size update now that the style is known
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);

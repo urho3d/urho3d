@@ -133,7 +133,7 @@ void UIElement::RegisterObject(Context* context)
 void UIElement::SetStyle(const XMLElement& element)
 {
     if (element.HasAttribute("name"))
-        name_ = element.GetString("name");
+        name_ = element.GetAttribute("name");
     if (element.HasChild("position"))
         SetPosition(element.GetChild("position").GetIntVector2("value"));
     if (element.HasChild("size"))
@@ -591,7 +591,7 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
     XMLElement childElem = rootElem.GetChild("element");
     while (childElem)
     {
-        if (childElem.GetString("type") == typeName)
+        if (typeName == childElem.GetAttribute("type"))
         {
             SetStyle(childElem);
             return;

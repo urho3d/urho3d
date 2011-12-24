@@ -168,10 +168,10 @@ bool Technique::Load(Deserializer& source)
             Pass* newPass = CreatePass(type);
             
             if (passElem.HasAttribute("vs"))
-                newPass->SetVertexShader(passElem.GetString("vs"));
+                newPass->SetVertexShader(passElem.GetAttribute("vs"));
             
             if (passElem.HasAttribute("ps"))
-                newPass->SetPixelShader(passElem.GetString("ps"));
+                newPass->SetPixelShader(passElem.GetAttribute("ps"));
             
             if (passElem.HasAttribute("alphatest"))
                 newPass->SetAlphaTest(passElem.GetBool("alphatest"));

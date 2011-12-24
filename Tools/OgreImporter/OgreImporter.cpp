@@ -144,7 +144,7 @@ void LoadSkeleton(const String& skeletonFileName)
         while (bone)
         {
             unsigned index = bone.GetInt("id");
-            String name = bone.GetString("name");
+            String name = bone.GetAttribute("name");
             if (index >= bones_.Size())
                 bones_.Resize(index + 1);
             
@@ -180,8 +180,8 @@ void LoadSkeleton(const String& skeletonFileName)
         XMLElement boneParent = boneHierarchy.GetChild("boneparent");
         while (boneParent)
         {
-            String bone = boneParent.GetString("bone");
-            String parent = boneParent.GetString("parent");
+            String bone = boneParent.GetAttribute("bone");
+            String parent = boneParent.GetAttribute("parent");
             unsigned i = 0, j = 0;
             for (i = 0; i < bones_.Size() && bones_[i].name_ != bone; ++i)
             for (j = 0; j < bones_.Size() && bones_[j].name_ != parent; ++j)
@@ -237,7 +237,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     XMLElement subMeshes = root.GetChild("submeshes");
     XMLElement skeletonLink = root.GetChild("skeletonlink");
     
-    String skeletonName = skeletonLink.GetString("name");
+    String skeletonName = skeletonLink.GetAttribute("name");
     if (!skeletonName.Empty())
         LoadSkeleton(GetPath(inputFileName) + GetFileName(skeletonName) + ".skeleton.xml");
     
@@ -661,7 +661,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 XMLElement anim = animsRoot.GetChild("animation");
                 while (anim)
                 {
-                    String name = anim.GetString("name");
+                    String name = anim.GetAttribute("name");
                     float length = anim.GetFloat("length");
                     HashSet<unsigned> usedPoses;
                     XMLElement tracks = anim.GetChild("tracks");
@@ -965,14 +965,14 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             while (animation)
             {
                 ModelAnimation newAnimation;
-                newAnimation.name_ = animation.GetString("name");
+                newAnimation.name_ = animation.GetAttribute("name");
                 newAnimation.length_ = animation.GetFloat("length");
                 
                 XMLElement tracksRoot = animation.GetChild("tracks");
                 XMLElement track = tracksRoot.GetChild("track");
                 while (track)
                 {
-                    String trackName = track.GetString("bone");
+                    String trackName = track.GetAttribute("bone");
                     ModelBone* bone = 0;
                     for (unsigned i = 0; i < bones_.Size(); ++i)
                     {

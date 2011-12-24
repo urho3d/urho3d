@@ -300,6 +300,20 @@ public:
         FromString(type, value);
     }
     
+    /// Construct from type and value.
+    Variant(const char* type, const char* value) :
+        type_(VAR_NONE)
+    {
+        FromString(type, value);
+    }
+    
+    /// Construct from type and value.
+    Variant(VariantType type, const char* value) :
+        type_(VAR_NONE)
+    {
+        FromString(type, value);
+    }
+    
     /// Copy-construct from another variant.
     Variant(const Variant& value) :
         type_(VAR_NONE)
@@ -678,8 +692,12 @@ public:
     
     /// %Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
+    /// %Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    void FromString(const char* type, const char* value);
     /// %Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(VariantType type, const String& value);
+    /// %Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    void FromString(VariantType type, const char* value);
     /// %Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
     
@@ -840,6 +858,8 @@ public:
     static const String& GetTypeName(VariantType type);
     /// Return variant type from type name.
     static VariantType GetTypeFromName(const String& typeName);
+    /// Return variant type from type name.
+    static VariantType GetTypeFromName(const char* typeName);
     
     /// Empty variant.
     static const Variant EMPTY;

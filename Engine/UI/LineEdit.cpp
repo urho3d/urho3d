@@ -87,7 +87,7 @@ void LineEdit::SetStyle(const XMLElement& element)
     if (textElem)
     {
         if (textElem.HasAttribute("value"))
-            SetText(textElem.GetString("value"));
+            SetText(textElem.GetAttribute("value"));
         text_->SetStyle(textElem);
     }
     
@@ -101,7 +101,7 @@ void LineEdit::SetStyle(const XMLElement& element)
         SetCursorBlinkRate(element.GetChild("cursorblinkrate").GetFloat("value"));
     if (element.HasChild("echocharacter"))
     {
-        String text = element.GetChild("echocharacter").GetString("value");
+        String text = element.GetChild("echocharacter").GetAttribute("value");
         if (text.Length())
             SetEchoCharacter(text[0]);
     }

@@ -131,7 +131,7 @@ public:
     /// Assign a C string.
     String& operator = (const char* rhs)
     {
-        unsigned rhsLength = GetCStringLength(rhs);
+        unsigned rhsLength = CStringLength(rhs);
         Resize(rhsLength);
         CopyChars(buffer_, rhs, rhsLength);
         
@@ -151,7 +151,7 @@ public:
     /// Add-assign a C string.
     String& operator += (const char* rhs)
     {
-        unsigned rhsLength = GetCStringLength(rhs);
+        unsigned rhsLength = CStringLength(rhs);
         unsigned oldLength = length_;
         Resize(length_ + rhsLength);
         CopyChars(buffer_ + oldLength, rhs, rhsLength);
@@ -198,7 +198,7 @@ public:
     /// Add a C string.
     String operator + (const char* rhs) const
     {
-        unsigned rhsLength = GetCStringLength(rhs);
+        unsigned rhsLength = CStringLength(rhs);
         String ret;
         ret.Resize(length_ + rhsLength);
         CopyChars(ret.buffer_, buffer_, length_);
@@ -336,6 +336,7 @@ public:
     int Compare(const String& str, bool caseSensitive = true) const;
     /// Return comparision result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
+    
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const
     {
@@ -348,6 +349,24 @@ public:
         }
         
         return hash;
+    }
+    
+    /// Return substrings split by a separator char.
+    static Vector<String> Split(const char* str, char separator);
+    
+    /// Return length of a C string.
+    static unsigned CStringLength(const char* str)
+    {
+        if (!str)
+            return 0;
+        #ifdef _MSC_VER
+        return strlen(str);
+        #else
+        const char* ptr = str;
+        while (*ptr)
+            ++ptr;
+        return ptr - str;
+        #endif
     }
     
     /// Position for "not found."
@@ -377,21 +396,6 @@ private:
             ++dest;
             ++src;
         }
-        #endif
-    }
-    
-    /// Return length of a C string.
-    static unsigned GetCStringLength(const char* str)
-    {
-        if (!str)
-            return 0;
-        #ifdef _MSC_VER
-        return strlen(str);
-        #else
-        const char* ptr = str;
-        while (*ptr)
-            ++ptr;
-        return ptr - str;
         #endif
     }
     

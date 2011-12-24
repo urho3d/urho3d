@@ -523,17 +523,17 @@ static CScriptArray* StringSplit(char separator, const String* str)
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTION(ToBool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTION(ToFloat), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "int ToInt() const", asFUNCTION(ToInt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "uint ToUInt() const", asFUNCTION(ToUInt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Color ToColor() const", asFUNCTION(ToColor), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "IntRect ToIntRect() const", asFUNCTION(ToIntRect), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "IntVector2 ToIntVector2() const", asFUNCTION(ToIntVector2), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Quaternion ToQuaternion() const", asFUNCTION(ToQuaternion), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTION(ToVector2), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTION(ToVector3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", asFUNCTION(ToVector4), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTIONPR(ToBool, (const String&), bool), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTIONPR(ToFloat, (const String&), float), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "int ToInt() const", asFUNCTIONPR(ToInt, (const String&), int), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "uint ToUInt() const", asFUNCTIONPR(ToUInt, (const String&), unsigned), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Color ToColor() const", asFUNCTIONPR(ToColor, (const String&), Color), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "IntRect ToIntRect() const", asFUNCTIONPR(ToIntRect, (const String&), IntRect), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "IntVector2 ToIntVector2() const", asFUNCTIONPR(ToIntVector2, (const String&), IntVector2), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Quaternion ToQuaternion() const", asFUNCTIONPR(ToQuaternion, (const String&), Quaternion), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTIONPR(ToVector2, (const String&), Vector2), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTIONPR(ToVector3, (const String&), Vector3), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", asFUNCTIONPR(ToVector4, (const String&, bool), Vector4), asCALL_CDECL_OBJFIRST);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
 }
 

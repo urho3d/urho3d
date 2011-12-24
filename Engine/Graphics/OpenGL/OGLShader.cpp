@@ -76,12 +76,12 @@ bool Shader::Load(Deserializer& source)
         return false;
     
     XMLElement shaderElem = file->GetRoot();
-    shaderType_ = shaderElem.GetString("type") == "vs" ? VS : PS;
+    shaderType_ = String(shaderElem.GetAttribute("type")) == "vs" ? VS : PS;
     
     XMLElement variationElem = shaderElem.GetChild("variation");
     while (variationElem)
     {
-        String variationName = variationElem.GetString("name");
+        String variationName = variationElem.GetAttribute("name");
         StringHash nameHash(variationName);
         SharedPtr<ShaderVariation> newVariation(new ShaderVariation(this, shaderType_));
         if (!variationName.Empty())
@@ -89,7 +89,7 @@ bool Shader::Load(Deserializer& source)
         else
             newVariation->SetName(fileName);
         newVariation->SetSourceCode(sourceCode_, sourceCodeLength_);
-        newVariation->SetDefines(variationElem.GetString("defines").Split(' '));
+        newVariation->SetDefines(String(variationElem.GetAttribute("defines")).Split(' '));
         
         if (variations_.Contains(nameHash))
             LOGERROR("Shader variation name hash collision: " + variationName);

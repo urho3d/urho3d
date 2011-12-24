@@ -231,7 +231,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     parameterSource_ = file;
     
     if (rootElem.HasChild("material"))
-        SetMaterial(cache->GetResource<Material>(rootElem.GetChild("material").GetString("name")));
+        SetMaterial(cache->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));
     
     if (rootElem.HasChild("numparticles"))
         SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));

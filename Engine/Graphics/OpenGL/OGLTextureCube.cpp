@@ -265,7 +265,7 @@ bool TextureCube::Load(Deserializer& source)
     unsigned faces = 0;
     while (faceElem && faces < MAX_CUBEMAP_FACES)
     {
-        String name = faceElem.GetString("name");
+        String name = faceElem.GetAttribute("name");
         
         String faceTexPath, faceTexName, faceTexExt;
         SplitPath(name, faceTexPath, faceTexName, faceTexExt);

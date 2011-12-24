@@ -141,7 +141,7 @@ bool Material::Load(Deserializer& source)
     techniques_.Clear();
     while (techniqueElem)
     {
-        Technique* technique = cache->GetResource<Technique>(techniqueElem.GetString("name"));
+        Technique* technique = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
         if (technique)
         {
             TechniqueEntry newTechnique;
@@ -168,7 +168,7 @@ bool Material::Load(Deserializer& source)
         }
         if (unit != MAX_MATERIAL_TEXTURE_UNITS)
         {
-            String name = textureElem.GetString("name");
+            String name = textureElem.GetAttribute("name");
             // Detect cube maps by file extension: they are defined by an XML file
             if (GetExtension(name) == ".xml")
                 SetTexture(unit, cache->GetResource<TextureCube>(name));
@@ -181,7 +181,7 @@ bool Material::Load(Deserializer& source)
     XMLElement parameterElem = rootElem.GetChild("parameter");
     while (parameterElem)
     {
-        String name = parameterElem.GetString("name");
+        String name = parameterElem.GetAttribute("name");
         Vector4 value = parameterElem.GetVector("value");
         SetShaderParameter(name, value);
         
@@ -190,11 +190,11 @@ bool Material::Load(Deserializer& source)
     
     XMLElement cullElem = rootElem.GetChild("cull");
     if (cullElem)
-        SetCullMode((CullMode)GetStringListIndex(cullElem.GetString("value"), cullModeNames, CULL_CCW));
+        SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value"), cullModeNames, CULL_CCW));
     
     XMLElement shadowCullElem = rootElem.GetChild("shadowcull");
     if (shadowCullElem)
-        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetString("value"), cullModeNames, CULL_CCW));
+        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value"), cullModeNames, CULL_CCW));
     
     // Calculate memory use
     unsigned memoryUse = sizeof(Material);

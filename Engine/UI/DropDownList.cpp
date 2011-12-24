@@ -82,7 +82,7 @@ void DropDownList::SetStyle(const XMLElement& element)
         while (itemElem)
         {
             if (itemElem.HasAttribute("name"))
-                AddItem(root->GetChild(itemElem.GetString("name"), true));
+                AddItem(root->GetChild(itemElem.GetAttribute("name"), true));
             itemElem = itemElem.GetNext("popupitem");
         }
     }

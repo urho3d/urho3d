@@ -52,11 +52,16 @@ XMLElement::~XMLElement()
 
 XMLElement XMLElement::CreateChild(const String& name)
 {
+    return CreateChild(name.CString());
+}
+
+XMLElement XMLElement::CreateChild(const char* name)
+{
     if (!file_ || !node_)
         return XMLElement();
     
     pugi::xml_node node(node_);
-    pugi::xml_node child = node.append_child(name.CString());
+    pugi::xml_node child = node.append_child(name);
     return XMLElement(file_, child.internal_object());
 }
 
@@ -72,20 +77,30 @@ bool XMLElement::RemoveChild(const XMLElement& element)
 
 bool XMLElement::RemoveChild(const String& name)
 {
-    if (!file_ || !node_)
-        return false;
-    
-    pugi::xml_node node(node_);
-    return node.remove_child(name.CString());
+    return RemoveChild(name.CString());
 }
 
-bool XMLElement::RemoveChildren(const String& name)
+bool XMLElement::RemoveChild(const char* name)
 {
     if (!file_ || !node_)
         return false;
     
     pugi::xml_node node(node_);
-    if (name.Empty())
+    return node.remove_child(name);
+}
+
+bool XMLElement::RemoveChildren(const String& name)
+{
+    return RemoveChildren(name.CString());
+}
+
+bool XMLElement::RemoveChildren(const char* name)
+{
+    if (!file_ || !node_)
+        return false;
+    
+    pugi::xml_node node(node_);
+    if (!String::CStringLength(name))
     {
         for (;;)
         {
@@ -99,7 +114,7 @@ bool XMLElement::RemoveChildren(const String& name)
     {
         for (;;)
         {
-            pugi::xml_node child = node.child(name.CString());
+            pugi::xml_node child = node.child(name);
             if (child.empty())
                 break;
             node.remove_child(child);
@@ -111,14 +126,19 @@ bool XMLElement::RemoveChildren(const String& name)
 
 bool XMLElement::SetAttribute(const String& name, const String& value)
 {
+    return SetAttribute(name.CString(), value.CString());
+}
+
+bool XMLElement::SetAttribute(const char* name, const char* value)
+{
     if (!file_ || !node_)
         return false;
     
     pugi::xml_node node(node_);
-    pugi::xml_attribute attr = node.attribute(name.CString());
+    pugi::xml_attribute attr = node.attribute(name);
     if (attr.empty())
-        attr = node.append_attribute(name.CString());
-    attr.set_value(value.CString());
+        attr = node.append_attribute(name);
+    attr.set_value(value);
     return true;
 }
 
@@ -218,7 +238,7 @@ bool XMLElement::SetVariantValue(const Variant& value)
         return SetVariantMap(value.GetVariantMap());
         
     default:
-        return SetAttribute("value", value.ToString());
+        return SetAttribute("value", value.ToString().CString());
     }
 }
 
@@ -251,7 +271,7 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
         str += cache->GetResourceName(value.ids_[i]);
     }
     
-    SetAttribute("value", str);
+    SetAttribute("value", str.CString());
     return true;
 }
 
@@ -315,35 +335,50 @@ String XMLElement::GetName() const
 
 bool XMLElement::HasChild(const String& name) const
 {
+    return HasChild(name.CString());
+}
+
+bool XMLElement::HasChild(const char* name) const
+{
     if (!file_ || !node_)
         return false;
     
     pugi::xml_node node(node_);
-    return !node.child(name.CString()).empty();
+    return !node.child(name).empty();
 }
 
 XMLElement XMLElement::GetChild(const String& name) const
 {
-    if (!file_ || !node_)
-        return XMLElement();
-    
-    pugi::xml_node node(node_);
-    if (name.Empty())
-        return XMLElement(file_, node.first_child().internal_object());
-    else
-        return XMLElement(file_, node.child(name.CString()).internal_object());
+    return GetChild(name.CString());
 }
 
-XMLElement XMLElement::GetNext(const String& name) const
+XMLElement XMLElement::GetChild(const char* name) const
 {
     if (!file_ || !node_)
         return XMLElement();
     
     pugi::xml_node node(node_);
-    if (name.Empty())
+    if (!String::CStringLength(name))
+        return XMLElement(file_, node.first_child().internal_object());
+    else
+        return XMLElement(file_, node.child(name).internal_object());
+}
+
+XMLElement XMLElement::GetNext(const String& name) const
+{
+    return GetNext(name.CString());
+}
+
+XMLElement XMLElement::GetNext(const char* name) const
+{
+    if (!file_ || !node_)
+        return XMLElement();
+    
+    pugi::xml_node node(node_);
+    if (!String::CStringLength(name))
         return XMLElement(file_, node.next_sibling().internal_object());
     else
-        return XMLElement(file_, node.next_sibling(name.CString()).internal_object());
+        return XMLElement(file_, node.next_sibling(name).internal_object());
 }
 
 XMLElement XMLElement::GetParent() const
@@ -375,11 +410,16 @@ unsigned XMLElement::GetNumAttributes() const
 
 bool XMLElement::HasAttribute(const String& name) const
 {
+    return HasAttribute(name.CString());
+}
+
+bool XMLElement::HasAttribute(const char* name) const
+{
     if (!file_ || !node_)
         return false;
     
     pugi::xml_node node(node_);
-    return !node.attribute(name.CString()).empty();
+    return !node.attribute(name).empty();
 }
 
 String XMLElement::GetAttribute(const String& name) const
@@ -389,6 +429,15 @@ String XMLElement::GetAttribute(const String& name) const
     
     pugi::xml_node node(node_);
     return String(node.attribute(name.CString()).value());
+}
+
+const char* XMLElement::GetAttribute(const char* name) const
+{
+    if (!file_ || !node_)
+        return 0;
+    
+    pugi::xml_node node(node_);
+    return node.attribute(name).value();
 }
 
 Vector<String> XMLElement::GetAttributeNames() const
@@ -526,7 +575,7 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
     
-    Vector<String> values = GetAttribute("value").Split(';');
+    Vector<String> values = String::Split(GetAttribute("value"), ';');
     if (values.Size() == 2)
     {
         ret.type_ = ShortStringHash(values[0]);
@@ -545,7 +594,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    Vector<String> values = GetAttribute("value").Split(';');
+    Vector<String> values = String::Split(GetAttribute("value"), ';');
     if (values.Size() >= 1)
     {
         // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to

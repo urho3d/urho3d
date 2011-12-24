@@ -1090,7 +1090,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     XMLElement compElem = source.GetChild("component");
     while (compElem)
     {
-        String typeName = compElem.GetString("type");
+        String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
         Component* newComponent = CreateComponent(ShortStringHash(typeName), rewriteIDs ? 0 : compID, (mode == REPLICATED &&
             compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL);

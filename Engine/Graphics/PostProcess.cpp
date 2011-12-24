@@ -110,10 +110,10 @@ bool PostProcess::LoadParameters(XMLFile* file)
     XMLElement rtElem = rootElem.GetChild("rendertarget");
     while (rtElem)
     {
-        String name = rtElem.GetString("name");
+        String name = rtElem.GetAttribute("name");
         
         unsigned format = Graphics::GetRGBFormat();
-        String formatName = rtElem.GetString("format").ToLower();
+        String formatName = rtElem.GetStringLower("format");
         if (formatName == "rgba")
             format = Graphics::GetRGBAFormat();
         else if (formatName == "float")
@@ -152,9 +152,9 @@ bool PostProcess::LoadParameters(XMLFile* file)
     while (passElem)
     {
         SharedPtr<PostProcessPass> pass(new PostProcessPass());
-        pass->SetVertexShader(passElem.GetString("vs"));
-        pass->SetPixelShader(passElem.GetString("ps"));
-        pass->SetOutput(passElem.GetString("output"));
+        pass->SetVertexShader(passElem.GetAttribute("vs"));
+        pass->SetPixelShader(passElem.GetAttribute("ps"));
+        pass->SetOutput(passElem.GetAttribute("output"));
         
         XMLElement textureElem = passElem.GetChild("texture");
         while (textureElem)
@@ -169,7 +169,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
             }
             if (unit != MAX_MATERIAL_TEXTURE_UNITS)
             {
-                String name = textureElem.GetString("name");
+                String name = textureElem.GetAttribute("name");
                 pass->SetTexture(unit, name);
             }
             textureElem = textureElem.GetNext("texture");
@@ -178,7 +178,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
         XMLElement parameterElem = passElem.GetChild("parameter");
         while (parameterElem)
         {
-            String name = parameterElem.GetString("name");
+            String name = parameterElem.GetAttribute("name");
             Vector4 value = parameterElem.GetVector("value");
             pass->SetShaderParameter(name, value);
             

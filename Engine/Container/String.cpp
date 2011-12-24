@@ -456,42 +456,7 @@ String String::ToUpper() const
 
 Vector<String> String::Split(char separator) const
 {
-    Vector<String> ret;
-    unsigned pos = 0;
-    
-    while (pos < length_)
-    {
-        unsigned start = pos;
-        
-        while (start < length_)
-        {
-            if (buffer_[start] == separator)
-                break;
-            
-            ++start;
-        }
-        
-        if (start == length_)
-        {
-            ret.Push(Substring(pos));
-            break;
-        }
-        
-        unsigned end = start;
-        
-        while (end < length_)
-        {
-            if (buffer_[end] != separator)
-                break;
-            
-            ++end;
-        }
-        
-        ret.Push(Substring(pos, start - pos));
-        pos = end;
-    }
-    
-    return ret;
+    return Split(CString(), separator);
 }
 
 unsigned String::Find(char c, unsigned startPos) const
@@ -626,6 +591,55 @@ int String::Compare(const char* str, bool caseSensitive) const
             ++rhs;
         }
     }
+}
+
+
+Vector<String> String::Split(const char* str, char separator)
+{
+    Vector<String> ret;
+    unsigned pos = 0;
+    unsigned length = CStringLength(str);
+    
+    while (pos < length)
+    {
+        if (str[pos] != separator)
+            break;
+        ++pos;
+    }
+    
+    while (pos < length)
+    {
+        unsigned start = pos;
+        
+        while (start < length)
+        {
+            if (str[start] == separator)
+                break;
+            
+            ++start;
+        }
+        
+        if (start == length)
+        {
+            ret.Push(String(&str[pos]));
+            break;
+        }
+        
+        unsigned end = start;
+        
+        while (end < length)
+        {
+            if (str[end] != separator)
+                break;
+            
+            ++end;
+        }
+        
+        ret.Push(String(&str[pos], start - pos));
+        pos = end;
+    }
+    
+    return ret;
 }
 
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)

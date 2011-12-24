@@ -78,7 +78,7 @@ void Text::SetStyle(const XMLElement& element)
     if (element.HasChild("font"))
     {
         XMLElement fontElem = element.GetChild("font");
-        String fontName = fontElem.GetString("name");
+        String fontName = fontElem.GetAttribute("name");
         
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(fontName))
@@ -94,7 +94,7 @@ void Text::SetStyle(const XMLElement& element)
         else if (element.HasChild("fallbackfont"))
         {
             fontElem = element.GetChild("fallbackfont");
-            String fontName = fontElem.GetString("name");
+            String fontName = fontElem.GetAttribute("name");
             Font* font = cache->GetResource<Font>(fontName);
             if (font)
             {
@@ -106,7 +106,7 @@ void Text::SetStyle(const XMLElement& element)
     }
     if (element.HasChild("text"))
     {
-        text_ = element.GetChild("text").GetString("value").Replaced("\\n", "\n");
+        text_ = String(element.GetChild("text").GetAttribute("value")).Replaced("\\n", "\n");
         changed = true;
     }
     if (element.HasChild("textalignment"))

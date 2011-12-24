@@ -156,10 +156,20 @@ bool Variant::operator == (const Variant& rhs) const
 
 void Variant::FromString(const String& type, const String& value)
 {
+    return FromString(GetTypeFromName(type), value.CString());
+}
+
+void Variant::FromString(const char* type, const char* value)
+{
     return FromString(GetTypeFromName(type), value);
 }
 
 void Variant::FromString(VariantType type, const String& value)
+{
+    return FromString(type, value.CString());
+}
+
+void Variant::FromString(VariantType type, const char* value)
 {
     switch (type)
     {
@@ -203,7 +213,7 @@ void Variant::FromString(VariantType type, const String& value)
         {
             SetType(VAR_BUFFER);
             PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(&value_));
-            Vector<String> values = value.Split(' ');
+            Vector<String> values = String::Split(value, ' ');
             buffer.Resize(values.Size());
             for (unsigned i = 0; i < values.Size(); ++i)
                 buffer[i] = ToInt(values[i]);
@@ -216,7 +226,7 @@ void Variant::FromString(VariantType type, const String& value)
         
     case VAR_RESOURCEREF:
         {
-            Vector<String> values = value.Split(';');
+            Vector<String> values = String::Split(value, ';');
             if (values.Size() == 2)
             {
                 SetType(VAR_RESOURCEREF);
@@ -229,7 +239,7 @@ void Variant::FromString(VariantType type, const String& value)
         
     case VAR_RESOURCEREFLIST:
         {
-            Vector<String> values = value.Split(';');
+            Vector<String> values = String::Split(value, ';');
             if (values.Size() >= 1)
             {
                 SetType(VAR_RESOURCEREFLIST);
@@ -524,6 +534,11 @@ const String& Variant::GetTypeName(VariantType type)
 }
 
 VariantType Variant::GetTypeFromName(const String& typeName)
+{
+    return GetTypeFromName(typeName.CString());
+}
+
+VariantType Variant::GetTypeFromName(const char* typeName)
 {
     unsigned index = 0;
     while (!typeNames[index].Empty())

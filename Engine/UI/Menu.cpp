@@ -67,7 +67,7 @@ void Menu::SetStyle(const XMLElement& element)
     {
         UIElement* root = GetRoot();
         if (root)
-            SetPopup(root->GetChild(popupElem.GetString("name"), true));
+            SetPopup(root->GetChild(popupElem.GetAttribute("name"), true));
     }
     
     if (element.HasChild("popupoffset"))

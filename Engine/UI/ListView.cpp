@@ -94,7 +94,7 @@ void ListView::SetStyle(const XMLElement& element)
         {
             if (itemElem.HasAttribute("name"))
             {
-                UIElement* item = root->GetChild(itemElem.GetString("name"), true);
+                UIElement* item = root->GetChild(itemElem.GetAttribute("name"), true);
                 AddItem(item);
                 if (itemElem.HasAttribute("indent"))
                     item->vars_[indentHash] = itemElem.GetInt("indent");

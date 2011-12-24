@@ -29,36 +29,45 @@
 
 #include "DebugNew.h"
 
-unsigned CountElements(const String& str, char separator)
+unsigned CountElements(const char* buffer, char separator)
 {
-    const char* buffer = str.CString();
-    unsigned length = str.Length();
-    unsigned pos = 0;
+    if (!buffer)
+        return 0;
+    
+    const char* endPos = buffer + String::CStringLength(buffer);
+    const char* pos = buffer;
     unsigned ret = 0;
     
-    while (pos < length)
+    while (pos < endPos)
     {
-        unsigned start = pos;
+        if (*pos != separator)
+            break;
+        ++pos;
+    }
+    
+    while (pos < endPos)
+    {
+        const char* start = pos;
         
-        while (start < length)
+        while (start < endPos)
         {
-            if (buffer[start] == separator)
+            if (*start == separator)
                 break;
             
             ++start;
         }
         
-        if (start == length)
+        if (start == endPos)
         {
             ++ret;
             break;
         }
         
-        unsigned end = start;
+        const char* end = start;
         
-        while (end < length)
+        while (end < endPos)
         {
-            if (buffer[end] != separator)
+            if (*end != separator)
                 break;
             
             ++end;
@@ -73,9 +82,16 @@ unsigned CountElements(const String& str, char separator)
 
 bool ToBool(const String& source)
 {
-    for (unsigned i = 0; i < source.Length(); ++i)
+    return ToBool(source.CString());
+}
+
+bool ToBool(const char* source)
+{
+    unsigned length = String::CStringLength(source);
+    
+    for (unsigned i = 0; i < length; ++i)
     {
-        char c = tolower(source[0]);
+        char c = tolower(source[i]);
         if (c == 't' || c == 'y' || c == '1')
             return true;
         else if (c != ' ' && c != '\t')
@@ -87,26 +103,49 @@ bool ToBool(const String& source)
 
 int ToInt(const String& source)
 {
-    if (!source.Length())
+    return ToInt(source.CString());
+}
+
+int ToInt(const char* source)
+{
+    if (!source)
         return 0;
-    return strtol(source.CString(), 0, 0);
+    
+    return strtol(source, 0, 0);
 }
 
 unsigned ToUInt(const String& source)
 {
-    if (!source.Length())
+    return ToUInt(source.CString());
+}
+
+unsigned ToUInt(const char* source)
+{
+    if (!source)
         return 0;
-    return strtoul(source.CString(), 0, 0);
+    
+    return strtoul(source, 0, 0);
 }
 
 float ToFloat(const String& source)
 {
-    if (!source.Length())
-        return 0.0f;
-    return (float)strtod(source.CString(), 0);
+    return ToFloat(source.CString());
+}
+
+float ToFloat(const char* source)
+{
+    if (!source)
+        return 0;
+    
+    return (float)strtod(source, 0);
 }
 
 Color ToColor(const String& source)
+{
+    return ToColor(source.CString());
+}
+
+Color ToColor(const char* source)
 {
     Color ret;
     
@@ -114,7 +153,7 @@ Color ToColor(const String& source)
     if (elements < 3)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.r_ = (float)strtod(ptr, &ptr);
     ret.g_ = (float)strtod(ptr, &ptr);
     ret.b_ = (float)strtod(ptr, &ptr);
@@ -126,13 +165,18 @@ Color ToColor(const String& source)
 
 IntRect ToIntRect(const String& source)
 {
+    return ToIntRect(source.CString());
+}
+
+IntRect ToIntRect(const char* source)
+{
     IntRect ret(IntRect::ZERO);
     
     unsigned elements = CountElements(source, ' ');
     if (elements < 4)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.left_ = strtol(ptr, &ptr, 0);
     ret.top_ = strtol(ptr, &ptr, 0);
     ret.right_ = strtol(ptr, &ptr, 0);
@@ -143,13 +187,18 @@ IntRect ToIntRect(const String& source)
 
 IntVector2 ToIntVector2(const String& source)
 {
+    return ToIntVector2(source.CString());
+}
+
+IntVector2 ToIntVector2(const char* source)
+{
     IntVector2 ret(IntVector2::ZERO);
     
     unsigned elements = CountElements(source, ' ');
     if (elements < 2)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.x_ = strtol(ptr, &ptr, 0);
     ret.y_ = strtol(ptr, &ptr, 0);
     
@@ -158,13 +207,18 @@ IntVector2 ToIntVector2(const String& source)
 
 Rect ToRect(const String& source)
 {
+    return ToRect(source.CString());
+}
+
+Rect ToRect(const char* source)
+{
     Rect ret(Rect::ZERO);
     
     unsigned elements = CountElements(source, ' ');
     if (elements < 4)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.min_.x_ = (float)strtod(ptr, &ptr);
     ret.min_.y_ = (float)strtod(ptr, &ptr);
     ret.max_.x_ = (float)strtod(ptr, &ptr);
@@ -175,8 +229,13 @@ Rect ToRect(const String& source)
 
 Quaternion ToQuaternion(const String& source)
 {
+    return ToQuaternion(source.CString());
+}
+
+Quaternion ToQuaternion(const char* source)
+{
     unsigned elements = CountElements(source, ' ');
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     
     if (elements < 3)
         return Quaternion::IDENTITY;
@@ -205,13 +264,18 @@ Quaternion ToQuaternion(const String& source)
 
 Vector2 ToVector2(const String& source)
 {
+    return ToVector2(source.CString());
+}
+
+Vector2 ToVector2(const char* source)
+{
     Vector2 ret(Vector2::ZERO);
     
     unsigned elements = CountElements(source, ' ');
     if (elements < 2)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.x_ = (float)strtod(ptr, &ptr);
     ret.y_ = (float)strtod(ptr, &ptr);
     
@@ -220,13 +284,18 @@ Vector2 ToVector2(const String& source)
 
 Vector3 ToVector3(const String& source)
 {
+    return ToVector3(source.CString());
+}
+
+Vector3 ToVector3(const char* source)
+{
     Vector3 ret(Vector3::ZERO);
     
     unsigned elements = CountElements(source, ' ');
     if (elements < 3)
         return ret;
     
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     ret.x_ = (float)strtod(ptr, &ptr);
     ret.y_ = (float)strtod(ptr, &ptr);
     ret.z_ = (float)strtod(ptr, &ptr);
@@ -236,10 +305,15 @@ Vector3 ToVector3(const String& source)
 
 Vector4 ToVector4(const String& source, bool allowMissingCoords)
 {
+    return ToVector4(source.CString(), allowMissingCoords);
+}
+
+Vector4 ToVector4(const char* source, bool allowMissingCoords)
+{
     Vector4 ret(Vector4::ZERO);
     
     unsigned elements = CountElements(source, ' ');
-    char* ptr = (char*)source.CString();
+    char* ptr = (char*)source;
     
     if (!allowMissingCoords)
     {
@@ -287,6 +361,20 @@ unsigned GetStringListIndex(const String& value, const String* strings, unsigned
     while (!strings[i].Empty())
     {
         if (!value.Compare(strings[i], caseSensitive))
+            return i;
+        ++i;
+    }
+    
+    return defaultIndex;
+}
+
+unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive)
+{
+    unsigned i = 0;
+    
+    while (!strings[i].Empty())
+    {
+        if (!strings[i].Compare(value, caseSensitive))
             return i;
         ++i;
     }
