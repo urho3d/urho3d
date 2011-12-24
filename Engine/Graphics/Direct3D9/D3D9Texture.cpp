@@ -230,11 +230,11 @@ void Texture::LoadParameters(const XMLElement& elem)
         
         if (name == "address")
         {
-            String coord = paramElem.GetStringLower("coord");
+            String coord = paramElem.GetAttributeLower("coord");
             if (coord.Length() >= 1)
             {
                 TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
-                String mode = paramElem.GetStringLower("mode");
+                String mode = paramElem.GetAttributeLower("mode");
                 SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode, addressModeNames, ADDRESS_WRAP));
             }
         }
@@ -244,7 +244,7 @@ void Texture::LoadParameters(const XMLElement& elem)
         
         if (name == "filter")
         {
-            String mode = paramElem.GetStringLower("mode");
+            String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode, filterModeNames, FILTER_DEFAULT));
         }
         

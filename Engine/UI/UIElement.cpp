@@ -167,13 +167,13 @@ void UIElement::SetStyle(const XMLElement& element)
         String horiz;
         String vert;
         if (alignElem.HasAttribute("horizontal"))
-            horiz = alignElem.GetStringLower("horizontal");
+            horiz = alignElem.GetAttributeLower("horizontal");
         if (alignElem.HasAttribute("vertical"))
-            vert = alignElem.GetStringLower("vertical");
+            vert = alignElem.GetAttributeLower("vertical");
         if (alignElem.HasAttribute("h"))
-            horiz = alignElem.GetStringLower("h");
+            horiz = alignElem.GetAttributeLower("h");
         if (alignElem.HasAttribute("v"))
-            vert = alignElem.GetStringLower("v");
+            vert = alignElem.GetAttributeLower("v");
         if (!horiz.Empty())
             SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT));
         if (!vert.Empty())
@@ -213,20 +213,20 @@ void UIElement::SetStyle(const XMLElement& element)
         SetVisible(element.GetChild("visible").GetBool("enable"));
     if (element.HasChild("focusmode"))
     {
-        String focusMode = element.GetChild("focusmode").GetStringLower("value");
+        String focusMode = element.GetChild("focusmode").GetAttributeLower("value");
         SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, FM_NOTFOCUSABLE));
         if (focusMode == "defocusable")
             SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
     if (element.HasChild("dragdropmode"))
     {
-        String dragDropMode = element.GetChild("dragdropmode").GetStringLower("value");
+        String dragDropMode = element.GetChild("dragdropmode").GetAttributeLower("value");
         SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, DD_DISABLED));
     }
     if (element.HasChild("layout"))
     {
         XMLElement layoutElem = element.GetChild("layout");
-        String mode = layoutElem.GetStringLower("mode");
+        String mode = layoutElem.GetAttributeLower("mode");
         if (mode == "free")
             layoutMode_ = LM_FREE;
         if (mode == "horizontal" || mode == "h")

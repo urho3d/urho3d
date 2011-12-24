@@ -105,7 +105,7 @@ void ListView::SetStyle(const XMLElement& element)
     
     if (element.HasChild("highlight"))
     {
-        String highlight = element.GetChild("highlight").GetStringLower("value");
+        String highlight = element.GetChild("highlight").GetAttributeLower("value");
         SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, HM_FOCUS));
     }
     if (element.HasChild("multiselect"))

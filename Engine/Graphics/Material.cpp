@@ -161,7 +161,7 @@ bool Material::Load(Deserializer& source)
         TextureUnit unit = TU_DIFFUSE;
         if (textureElem.HasAttribute("unit"))
         {
-            String unitName = textureElem.GetStringLower("unit");
+            String unitName = textureElem.GetAttributeLower("unit");
             unit = ParseTextureUnitName(unitName);
             if (unit == MAX_MATERIAL_TEXTURE_UNITS)
                 LOGERROR("Unknown texture unit " + unitName);

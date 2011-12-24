@@ -356,16 +356,7 @@ String ToStringHex(unsigned value)
 
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
 {
-    unsigned i = 0;
-    
-    while (!strings[i].Empty())
-    {
-        if (!value.Compare(strings[i], caseSensitive))
-            return i;
-        ++i;
-    }
-    
-    return defaultIndex;
+    return GetStringListIndex(value.CString(), strings, defaultIndex, caseSensitive);
 }
 
 unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive)

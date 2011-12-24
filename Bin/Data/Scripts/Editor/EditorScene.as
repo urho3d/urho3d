@@ -414,8 +414,6 @@ bool SceneCopy()
             XMLFile@ xml = XMLFile();
             XMLElement rootElem = xml.CreateRoot("component");
             selectedComponents[i].SaveXML(rootElem);
-            // Note: component type has to be saved manually
-            rootElem.SetString("type", selectedComponents[i].typeName);
             rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
             copyBuffer.Push(xml);
         }

@@ -111,7 +111,7 @@ void Text::SetStyle(const XMLElement& element)
     }
     if (element.HasChild("textalignment"))
     {
-        String horiz = element.GetChild("textalignment").GetStringLower("value");
+        String horiz = element.GetChild("textalignment").GetAttributeLower("value");
         if (!horiz.Empty())
         {
             textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT);

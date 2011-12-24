@@ -440,6 +440,26 @@ const char* XMLElement::GetAttribute(const char* name) const
     return node.attribute(name).value();
 }
 
+String XMLElement::GetAttributeLower(const String& name) const
+{
+    return GetAttribute(name).ToLower();
+}
+
+String XMLElement::GetAttributeLower(const char* name) const
+{
+    return String(GetAttribute(name)).ToLower();
+}
+
+String XMLElement::GetAttributeUpper(const String& name) const
+{
+    return GetAttribute(name).ToUpper();
+}
+
+String XMLElement::GetAttributeUpper(const char* name) const
+{
+    return String(GetAttribute(name)).ToUpper();
+}
+
 Vector<String> XMLElement::GetAttributeNames() const
 {
     if (!file_ || !node_)
@@ -530,21 +550,6 @@ Quaternion XMLElement::GetQuaternion(const String& name) const
 Rect XMLElement::GetRect(const String& name) const
 {
     return ToRect(GetAttribute(name));
-}
-
-String XMLElement::GetString(const String& name) const
-{
-    return GetAttribute(name);
-}
-
-String XMLElement::GetStringLower(const String& name) const
-{
-    return GetAttribute(name).ToLower();
-}
-
-String XMLElement::GetStringUpper(const String& name) const
-{
-    return GetAttribute(name).ToUpper();
 }
 
 Variant XMLElement::GetVariant() const

@@ -155,7 +155,7 @@ bool Technique::Load(Deserializer& source)
         PassType type = MAX_PASSES;
         if (passElem.HasAttribute("name"))
         {
-            String name = passElem.GetStringLower("name");
+            String name = passElem.GetAttributeLower("name");
             type = (PassType)GetStringListIndex(name, passNames, MAX_PASSES);
             if (type == MAX_PASSES)
                 LOGERROR("Unknown pass " + name);
@@ -178,13 +178,13 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("blend"))
             {
-                String blend = passElem.GetStringLower("blend");
+                String blend = passElem.GetAttributeLower("blend");
                 newPass->SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, BLEND_REPLACE));
             }
             
             if (passElem.HasAttribute("depthtest"))
             {
-                String depthTest = passElem.GetStringLower("depthtest");
+                String depthTest = passElem.GetAttributeLower("depthtest");
                 if (depthTest == "false")
                     newPass->SetDepthTestMode(CMP_ALWAYS);
                 else

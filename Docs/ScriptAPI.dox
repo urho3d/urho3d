@@ -1106,7 +1106,6 @@ Methods:<br>
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
 - bool SetQuaternion(const String&, const Quaternion&)
-- bool SetString(const String&, const String&)
 - bool SetVariant(const Variant&)
 - bool SetResourceRef(const String&, const ResourceRef&)
 - bool SetResourceRefList(const String&, const ResourceRefList&)
@@ -1118,6 +1117,8 @@ Methods:<br>
 - uint GetNumAttributes() const
 - bool HasAttribute(const String&) const
 - String GetAttribute(const String&) const
+- String GetAttributeLower(const String&) const
+- String GetAttributeUpper(const String&) const
 - String[]@ GetAttributeNames() const
 - bool HasChild(const String&) const
 - XMLElement GetChild(const String& arg0 = String ( )) const
@@ -1128,9 +1129,6 @@ Methods:<br>
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
 - Quaternion GetQuaternion(const String&) const
-- String GetString(const String&) const
-- String GetStringLower(const String&) const
-- String GetStringUpper(const String&) const
 - Variant GetVariant() const
 - ResourceRef GetResourceRef() const
 - ResourceRefList GetResourceRefList() const

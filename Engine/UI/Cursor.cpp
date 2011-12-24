@@ -75,7 +75,7 @@ void Cursor::SetStyle(const XMLElement& element)
     XMLElement shapeElem = element.GetChild("shape");
     while (shapeElem)
     {
-        CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetStringLower("name"), shapeNames, CS_NORMAL);
+        CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetAttributeLower("name"), shapeNames, CS_NORMAL);
         DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(shapeElem.GetAttribute("texture")),
             shapeElem.GetIntRect("imagerect"), shapeElem.GetIntVector2("hotspot"));
         shapeElem = shapeElem.GetNext("shape");

@@ -253,7 +253,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     
     if (rootElem.HasChild("emittertype"))
     {
-        String type = rootElem.GetChild("emittertype").GetStringLower("value");
+        String type = rootElem.GetChild("emittertype").GetAttributeLower("value");
         if (type == "point")
             emitterType_ = EMITTER_POINT;
         else if (type == "box")

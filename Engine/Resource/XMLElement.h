@@ -141,6 +141,14 @@ public:
     String GetAttribute(const String& name) const;
     /// Return attribute, or empty if missing.
     const char* GetAttribute(const char* name) const;
+    /// Return attribute in lowercase, or empty if missing.
+    String GetAttributeLower(const String& name) const;
+    /// Return attribute in lowercase, or empty if missing.
+    String GetAttributeLower(const char* name) const;
+    /// Return attribute in lowercase, or empty if missing.
+    String GetAttributeUpper(const String& name) const;
+    /// Return attribute in lowercase, or empty if missing.
+    String GetAttributeUpper(const char* name) const;
     /// Return names of all attributes.
     Vector<String> GetAttributeNames() const;
     /// Return bool attribute, or false if missing.
@@ -165,12 +173,6 @@ public:
     Rect GetRect(const String& name) const;
     /// Return a quaternion attribute, or default if missing.
     Quaternion GetQuaternion(const String& name) const;
-    /// Return a string attribute, or empty if missing.
-    String GetString(const String& name) const;
-    /// Return a string attribute in lowercase, or empty if missing.
-    String GetStringLower(const String& name) const;
-    /// Return a string attribute in uppercase, or empty if missing.
-    String GetStringUpper(const String& name) const;
     /// Return a variant attribute, or empty if missing.
     Variant GetVariant() const;
     /// Return a variant attribute with static type.

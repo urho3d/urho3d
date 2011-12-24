@@ -113,7 +113,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
         String name = rtElem.GetAttribute("name");
         
         unsigned format = Graphics::GetRGBFormat();
-        String formatName = rtElem.GetStringLower("format");
+        String formatName = rtElem.GetAttributeLower("format");
         if (formatName == "rgba")
             format = Graphics::GetRGBAFormat();
         else if (formatName == "float")
@@ -162,7 +162,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
             TextureUnit unit = TU_DIFFUSE;
             if (textureElem.HasAttribute("unit"))
             {
-                String unitName = textureElem.GetStringLower("unit");
+                String unitName = textureElem.GetAttributeLower("unit");
                 unit = ParseTextureUnitName(unitName);
                 if (unit == MAX_MATERIAL_TEXTURE_UNITS)
                     LOGERROR("Unknown texture unit " + unitName);
