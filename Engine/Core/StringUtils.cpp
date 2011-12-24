@@ -23,8 +23,6 @@
 
 #include "Precompiled.h"
 #include "StringUtils.h"
-#include "../../ThirdParty/Assimp/code/pstdint.h"
-#include "../../ThirdParty/Assimp/code/fast_atof.h"
 
 #include <cstdio>
 #include <ctype.h>
@@ -73,14 +71,6 @@ unsigned CountElements(const String& str, char separator)
     return ret;
 }
 
-void SkipSeparator(const char** str, char separator)
-{
-    const char*& ptr = *str;
-    
-    while (ptr && *ptr && *ptr == separator)
-        ++ptr;
-}
-
 bool ToBool(const String& source)
 {
     for (unsigned i = 0; i < source.Length(); ++i)
@@ -99,21 +89,21 @@ int ToInt(const String& source)
 {
     if (!source.Length())
         return 0;
-    return Assimp::strtol10(source.CString(), 0);
+    return strtol(source.CString(), 0, 0);
 }
 
 unsigned ToUInt(const String& source)
 {
     if (!source.Length())
         return 0;
-    return Assimp::strtoul10(source.CString(), 0);
+    return strtoul(source.CString(), 0, 0);
 }
 
 float ToFloat(const String& source)
 {
     if (!source.Length())
         return 0.0f;
-    return Assimp::fast_atof(source.CString());
+    return (float)strtod(source.CString(), 0);
 }
 
 Color ToColor(const String& source)
@@ -124,19 +114,12 @@ Color ToColor(const String& source)
     if (elements < 3)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.r_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.g_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.b_ = Assimp::fast_atof(&ptr);
+    char* ptr = (char*)source.CString();
+    ret.r_ = (float)strtod(ptr, &ptr);
+    ret.g_ = (float)strtod(ptr, &ptr);
+    ret.b_ = (float)strtod(ptr, &ptr);
     if (elements > 3)
-    {
-        SkipSeparator(&ptr, ' ');
-        ret.a_ = Assimp::fast_atof(&ptr);
-    }
+        ret.a_ = (float)strtod(ptr, &ptr);
     
     return ret;
 }
@@ -149,16 +132,11 @@ IntRect ToIntRect(const String& source)
     if (elements < 4)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.left_ = Assimp::strtol10(ptr, &ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.top_ = Assimp::strtol10(ptr, &ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.right_ = Assimp::strtol10(ptr, &ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.bottom_ = Assimp::strtol10(ptr, &ptr);
+    char* ptr = (char*)source.CString();
+    ret.left_ = strtol(ptr, &ptr, 0);
+    ret.top_ = strtol(ptr, &ptr, 0);
+    ret.right_ = strtol(ptr, &ptr, 0);
+    ret.bottom_ = strtol(ptr, &ptr, 0);
     
     return ret;
 }
@@ -171,12 +149,9 @@ IntVector2 ToIntVector2(const String& source)
     if (elements < 2)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.x_ = Assimp::strtol10(ptr, &ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.y_ = Assimp::strtol10(ptr, &ptr);
+    char* ptr = (char*)source.CString();
+    ret.x_ = strtol(ptr, &ptr, 0);
+    ret.y_ = strtol(ptr, &ptr, 0);
     
     return ret;
 }
@@ -189,16 +164,11 @@ Rect ToRect(const String& source)
     if (elements < 4)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.min_.x_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.min_.y_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.max_.x_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.max_.y_ = Assimp::fast_atof(&ptr);
+    char* ptr = (char*)source.CString();
+    ret.min_.x_ = (float)strtod(ptr, &ptr);
+    ret.min_.y_ = (float)strtod(ptr, &ptr);
+    ret.max_.x_ = (float)strtod(ptr, &ptr);
+    ret.max_.y_ = (float)strtod(ptr, &ptr);
     
     return ret;
 }
@@ -206,8 +176,7 @@ Rect ToRect(const String& source)
 Quaternion ToQuaternion(const String& source)
 {
     unsigned elements = CountElements(source, ' ');
-    const char* ptr = source.CString();
-    const char* end = ptr + source.Length();
+    char* ptr = (char*)source.CString();
     
     if (elements < 3)
         return Quaternion::IDENTITY;
@@ -215,12 +184,9 @@ Quaternion ToQuaternion(const String& source)
     {
         // 3 coords specified: conversion from Euler angles
         float x, y, z;
-        SkipSeparator(&ptr, ' ');
-        x = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        y = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        z = Assimp::fast_atof(&ptr);
+        x = (float)strtod(ptr, &ptr);
+        y = (float)strtod(ptr, &ptr);
+        z = (float)strtod(ptr, &ptr);
         
         return Quaternion(x, y, z);
     }
@@ -228,15 +194,10 @@ Quaternion ToQuaternion(const String& source)
     {
         // 4 coords specified: full quaternion
         Quaternion ret;
-        
-        SkipSeparator(&ptr, ' ');
-        ret.w_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.x_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.y_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.z_ = Assimp::fast_atof(&ptr);
+        ret.w_ = (float)strtod(ptr, &ptr);
+        ret.x_ = (float)strtod(ptr, &ptr);
+        ret.y_ = (float)strtod(ptr, &ptr);
+        ret.z_ = (float)strtod(ptr, &ptr);
         
         return ret;
     }
@@ -250,12 +211,9 @@ Vector2 ToVector2(const String& source)
     if (elements < 2)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.x_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.y_ = Assimp::fast_atof(&ptr);
+    char* ptr = (char*)source.CString();
+    ret.x_ = (float)strtod(ptr, &ptr);
+    ret.y_ = (float)strtod(ptr, &ptr);
     
     return ret;
 }
@@ -268,14 +226,10 @@ Vector3 ToVector3(const String& source)
     if (elements < 3)
         return ret;
     
-    const char* ptr = source.CString();
-    
-    SkipSeparator(&ptr, ' ');
-    ret.x_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.y_ = Assimp::fast_atof(&ptr);
-    SkipSeparator(&ptr, ' ');
-    ret.z_ = Assimp::fast_atof(&ptr);
+    char* ptr = (char*)source.CString();
+    ret.x_ = (float)strtod(ptr, &ptr);
+    ret.y_ = (float)strtod(ptr, &ptr);
+    ret.z_ = (float)strtod(ptr, &ptr);
     
     return ret;
 }
@@ -285,46 +239,30 @@ Vector4 ToVector4(const String& source, bool allowMissingCoords)
     Vector4 ret(Vector4::ZERO);
     
     unsigned elements = CountElements(source, ' ');
-    const char* ptr = source.CString();
+    char* ptr = (char*)source.CString();
     
     if (!allowMissingCoords)
     {
         if (elements < 4)
             return ret;
         
-        SkipSeparator(&ptr, ' ');
-        ret.x_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.y_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.z_ = Assimp::fast_atof(&ptr);
-        SkipSeparator(&ptr, ' ');
-        ret.w_ = Assimp::fast_atof(&ptr);
+        ret.x_ = (float)strtod(ptr, &ptr);
+        ret.y_ = (float)strtod(ptr, &ptr);
+        ret.z_ = (float)strtod(ptr, &ptr);
+        ret.w_ = (float)strtod(ptr, &ptr);
         
         return ret;
     }
     else
     {
         if (elements > 0)
-        {
-            SkipSeparator(&ptr, ' ');
-            ret.x_ = Assimp::fast_atof(&ptr);
-        }
+            ret.x_ = (float)strtod(ptr, &ptr);
         if (elements > 1)
-        {
-            SkipSeparator(&ptr, ' ');
-            ret.y_ = Assimp::fast_atof(&ptr);
-        }
+            ret.y_ = (float)strtod(ptr, &ptr);
         if (elements > 2)
-        {
-            SkipSeparator(&ptr, ' ');
-            ret.z_ = Assimp::fast_atof(&ptr);
-        }
+            ret.z_ = (float)strtod(ptr, &ptr);
         if (elements > 3)
-        {
-            SkipSeparator(&ptr, ' ');
-            ret.w_ = Assimp::fast_atof(&ptr);
-        }
+            ret.w_ = (float)strtod(ptr, &ptr);
         
         return ret;
     }

@@ -29,13 +29,6 @@
 
 #include <pugixml.hpp>
 
-static const String hashStr("hash");
-static const String maxStr("max");
-static const String minStr("min");
-static const String typeStr("type");
-static const String valueStr("value");
-static const String variantStr("variant");
-
 XMLElement::XMLElement() :
     node_(0)
 {
@@ -136,9 +129,9 @@ bool XMLElement::SetBool(const String& name, bool value)
 
 bool XMLElement::SetBoundingBox(const BoundingBox& value)
 {
-    if (!SetVector3(minStr, value.min_))
+    if (!SetVector3("min", value.min_))
         return false;
-    return SetVector3(maxStr, value.max_);
+    return SetVector3("max", value.max_);
 }
 
 bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
@@ -202,7 +195,7 @@ bool XMLElement::SetString(const String& name, const String& value)
 
 bool XMLElement::SetVariant(const Variant& value)
 {
-    if (!SetAttribute(typeStr, value.GetTypeName()))
+    if (!SetAttribute("type", value.GetTypeName()))
         return false;
     
     return SetVariantValue(value);
@@ -225,7 +218,7 @@ bool XMLElement::SetVariantValue(const Variant& value)
         return SetVariantMap(value.GetVariantMap());
         
     default:
-        return SetAttribute(valueStr, value.ToString());
+        return SetAttribute("value", value.ToString());
     }
 }
 
@@ -238,7 +231,7 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
     Context* context = file_->GetContext();
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
     
-    SetAttribute(valueStr, String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
+    SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
     return true;
 }
 
@@ -258,19 +251,19 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
         str += cache->GetResourceName(value.ids_[i]);
     }
     
-    SetAttribute(valueStr, str);
+    SetAttribute("value", str);
     return true;
 }
 
 bool XMLElement::SetVariantVector(const VariantVector& value)
 {
     // Must remove all existing variant child elements (if they exist) to not cause confusion
-    if (!RemoveChildren(variantStr))
+    if (!RemoveChildren("variant"))
         return false;
     
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        XMLElement variantElem = CreateChild(variantStr);
+        XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
         variantElem.SetVariant(*i);
@@ -281,15 +274,15 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
 
 bool XMLElement::SetVariantMap(const VariantMap& value)
 {
-    if (!RemoveChildren(variantStr))
+    if (!RemoveChildren("variant"))
         return false;
     
     for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        XMLElement variantElem = CreateChild(variantStr);
+        XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
-        variantElem.SetInt(hashStr, i->first_.GetValue());
+        variantElem.SetInt("hash", i->first_.GetValue());
         variantElem.SetVariant(i->second_);
     }
     
@@ -425,8 +418,8 @@ BoundingBox XMLElement::GetBoundingBox() const
 {
     BoundingBox ret;
     
-    ret.min_ = GetVector3(minStr);
-    ret.max_ = GetVector3(maxStr);
+    ret.min_ = GetVector3("min");
+    ret.max_ = GetVector3("max");
     ret.defined_ = true;
     return ret;
 }
@@ -507,7 +500,7 @@ String XMLElement::GetStringUpper(const String& name) const
 
 Variant XMLElement::GetVariant() const
 {
-    VariantType type = Variant::GetTypeFromName(GetAttribute(typeStr));
+    VariantType type = Variant::GetTypeFromName(GetAttribute("type"));
     return GetVariantValue(type);
 }
 
@@ -524,7 +517,7 @@ Variant XMLElement::GetVariantValue(VariantType type) const
     else if (type == VAR_VARIANTMAP)
         ret = GetVariantMap();
     else
-        ret.FromString(type, GetAttribute(valueStr));
+        ret.FromString(type, GetAttribute("value"));
     
     return ret;
 }
@@ -533,7 +526,7 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
     
-    Vector<String> values = GetAttribute(valueStr).Split(';');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() == 2)
     {
         ret.type_ = ShortStringHash(values[0]);
@@ -552,7 +545,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    Vector<String> values = GetAttribute(valueStr).Split(';');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() >= 1)
     {
         // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to
@@ -576,11 +569,11 @@ VariantVector XMLElement::GetVariantVector() const
 {
     VariantVector ret;
     
-    XMLElement variantElem = GetChild(variantStr);
+    XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
         ret.Push(variantElem.GetVariant());
-        variantElem = variantElem.GetNext(variantStr);
+        variantElem = variantElem.GetNext("variant");
     }
     
     return ret;
@@ -590,12 +583,12 @@ VariantMap XMLElement::GetVariantMap() const
 {
     VariantMap ret;
     
-    XMLElement variantElem = GetChild(variantStr);
+    XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
-        ShortStringHash key(variantElem.GetInt(hashStr));
+        ShortStringHash key(variantElem.GetInt("hash"));
         ret[key] = variantElem.GetVariant();
-        variantElem = variantElem.GetNext(variantStr);
+        variantElem = variantElem.GetNext("variant");
     }
     
     return ret;
