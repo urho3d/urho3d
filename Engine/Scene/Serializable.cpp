@@ -267,8 +267,7 @@ bool Serializable::LoadXML(const XMLElement& source)
     
     while (attrElem)
     {
-        String name = attrElem.GetAttribute("name");
-        
+        const char* name = attrElem.GetAttribute("name");
         unsigned i = startIndex;
         unsigned attempts = attributes->Size();
         
@@ -313,7 +312,7 @@ bool Serializable::LoadXML(const XMLElement& source)
         }
         
         if (!attempts)
-            LOGWARNING("Unknown attribute " + name + " in XML data");
+            LOGWARNING("Unknown attribute " + String(name) + " in XML data");
         
         attrElem = attrElem.GetNext("attribute");
     }
@@ -343,13 +342,13 @@ bool Serializable::SaveXML(XMLElement& dest)
             continue;
         
         XMLElement attrElem = dest.CreateChild("attribute");
-        attrElem.SetAttribute("name", String(attr.name_).CString());
+        attrElem.SetAttribute("name", attr.name_.CString());
         OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
             int enumValue = value.GetInt();
-            attrElem.SetAttribute("value", String(attr.enumNames_[enumValue]).CString());
+            attrElem.SetAttribute("value", attr.enumNames_[enumValue].CString());
         }
         else
             attrElem.SetVariantValue(value);
