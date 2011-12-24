@@ -46,7 +46,7 @@ public:
     }
     
     /// Write bytes to output.
-    void XMLWriter::write(const void* data, size_t size)
+    void write(const void* data, size_t size)
     {
         if (dest_.Write(data, size) != size)
             success_ = false;

@@ -199,9 +199,9 @@ void Run(const Vector<String>& arguments)
     XMLElement shader = shaders.GetChild("shader");
     while (shader)
     {
-        String source = shader.GetString("name");
+        String source = shader.GetAttribute("name");
         ShaderType compileType = Both;
-        String type = shader.GetString("type");
+        String type = shader.GetAttribute("type");
         if (type == "VS" || type == "vs")
             compileType = VS;
         if (type == "PS" || type == "ps")
@@ -215,51 +215,51 @@ void Run(const Vector<String>& arguments)
             String value = variation.GetName();
             if (value == "variation" || value == "option")
             {
-                String name = variation.GetString("name");
+                String name = variation.GetAttribute("name");
                 
                 Variation newVar(name, value == "option");
                 
-                String simpleDefine = variation.GetString("define");
+                String simpleDefine = variation.GetAttribute("define");
                 if (!simpleDefine.Empty())
                     newVar.defines_.Push(simpleDefine);
                     
-                String simpleExclude = variation.GetString("exclude");
+                String simpleExclude = variation.GetAttribute("exclude");
                 if (!simpleExclude.Empty())
                     newVar.excludes_.Push(simpleExclude);
                 
-                String simpleInclude = variation.GetString("include");
+                String simpleInclude = variation.GetAttribute("include");
                 if (!simpleInclude.Empty())
                     newVar.includes_.Push(simpleInclude);
                 
-                String simpleRequire = variation.GetString("require");
+                String simpleRequire = variation.GetAttribute("require");
                 if (!simpleRequire.Empty())
                     newVar.requires_.Push(simpleRequire);
                 
                 XMLElement define = variation.GetChild("define");
                 while (define)
                 {
-                    newVar.defines_.Push(define.GetString("name"));
+                    newVar.defines_.Push(define.GetAttribute("name"));
                     define = define.GetNext("define");
                 }
                 
                 XMLElement exclude = variation.GetChild("exclude");
                 while (exclude)
                 {
-                    newVar.excludes_.Push(exclude.GetString("name"));
+                    newVar.excludes_.Push(exclude.GetAttribute("name"));
                     exclude = exclude.GetNext("exclude");
                 }
                 
                 XMLElement include = variation.GetChild("include");
                 while (include)
                 {
-                    newVar.includes_.Push(include.GetString("name"));
+                    newVar.includes_.Push(include.GetAttribute("name"));
                     include = include.GetNext("include");
                 }
                 
                 XMLElement require = variation.GetChild("require");
                 while (require)
                 {
-                    newVar.requires_.Push(require.GetString("name"));
+                    newVar.requires_.Push(require.GetAttribute("name"));
                     require = require.GetNext("require");
                 }
                 
@@ -510,7 +510,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     for (unsigned i = 0; i < processedVariations.Size(); ++i)
     {
         XMLElement variationElem = shaderElem.CreateChild("variation");
-        variationElem.SetString("name", processedVariations[i].name_);
+        variationElem.SetAttribute("name", processedVariations[i].name_);
         
         String allDefines;
         for (unsigned j = 0; j < processedVariations[i].defines_.Size(); ++j)
@@ -520,7 +520,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
             allDefines += processedVariations[i].defines_[j];
         }
         
-        variationElem.SetString("defines", allDefines);
+        variationElem.SetAttribute("defines", allDefines);
     }
     
     outFile.Open(xmlOutFileName, FILE_WRITE);
@@ -529,4 +529,3 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     xmlOutFile.Save(outFile);
     outFile.Close();
 }
-
