@@ -279,7 +279,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
-                    String value = attrElem.GetAttribute("value");
+                    const char* value = attrElem.GetAttribute("value");
                     const String* enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
@@ -296,7 +296,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                     if (enumFound)
                         OnSetAttribute(attr, Variant(enumValue));
                     else
-                        LOGWARNING("Unknown enum value " + value + " in attribute " + String(attr.name_));
+                        LOGWARNING("Unknown enum value " + String(value) + " in attribute " + String(attr.name_));
                 }
                 else
                     OnSetAttribute(attr, attrElem.GetVariantValue(attr.type_));
