@@ -108,7 +108,7 @@ void Light::RegisterObject(Context* context)
     context->RegisterFactory<Light>();
     
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_COLOR, "Color", color_, Color(), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color(), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
@@ -271,7 +271,9 @@ void Light::SetPerVertex(bool enable)
 
 void Light::SetColor(const Color& color)
 {
-    color_ = color;
+    // Clamp RGB values to positive, as negative values behave erratically depending on whether the pass uses
+    // replace or additive blend mode
+    color_ = Color(Max(color.r_, 0.0f), Max(color.g_, 0.0f), Max(color.b_, 0.0f), 1.0f);
 }
 
 void Light::SetRange(float range)

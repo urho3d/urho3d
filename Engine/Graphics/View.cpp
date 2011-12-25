@@ -491,7 +491,9 @@ void View::GetDrawables()
         else if (flags & DRAWABLE_LIGHT)
         {
             Light* light = static_cast<Light*>(drawable);
-            lights_.Push(light);
+            // Skip lights with no intensity
+            if (light->GetColor().Intensity() > 0.0f)
+                lights_.Push(light);
         }
     }
     
