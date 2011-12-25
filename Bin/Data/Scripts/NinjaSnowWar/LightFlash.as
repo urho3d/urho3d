@@ -4,6 +4,7 @@ class LightFlash : GameObject
 {
     LightFlash()
     {
+        duration = 2.0;
     }
 
     void FixedUpdate(float timeStep)
