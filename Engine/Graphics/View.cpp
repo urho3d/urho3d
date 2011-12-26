@@ -181,7 +181,15 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     octree_ = octree;
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
-    postProcesses_ = &viewport.postProcesses_;
+    
+    // Get active post-processing effects on the viewport
+    postProcesses_.Clear();
+    for (unsigned i = 0; i < viewport.postProcesses_.Size(); ++i)
+    {
+        PostProcess* effect = viewport.postProcesses_[i];
+        if (effect && effect->IsActive())
+            postProcesses_.Push(SharedPtr<PostProcess>(effect));
+    }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
@@ -326,7 +334,7 @@ void View::Render()
     // Run post-processes or framebuffer blitting now
     if (screenBuffers_.Size())
     {
-        if (postProcesses_->Size())
+        if (postProcesses_.Size())
             RunPostProcesses();
         else
             BlitFramebuffer();
@@ -1204,24 +1212,20 @@ void View::AllocateScreenBuffers()
 {
     unsigned neededBuffers = 0;
     #ifdef USE_OPENGL
-    if (lightPrepass_)
+    // Due to FBO limitations, in OpenGL light pre-pass mode need to render to texture first and then blit to the backbuffer
+    if (lightPrepass_ && !renderTarget_)
         neededBuffers = 1;
     #endif
     
     unsigned postProcessPasses = 0;
-    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
-    {
-        PostProcess* effect = postProcesses_->At(i);
-        if (effect && effect->IsActive())
-            postProcessPasses += effect->GetNumPasses();
-    }
+    for (unsigned i = 0; i < postProcesses_.Size(); ++i)
+        postProcessPasses += postProcesses_[i]->GetNumPasses();
     
     // If more than one post-process pass, need 2 buffers for ping-pong rendering
     if (postProcessPasses)
         neededBuffers = Min((int)postProcessPasses, 2);
     
     // Allocate screen buffers with filtering active in case the post-processing effects need that
-    screenBuffers_.Clear();
     for (unsigned i = 0; i < neededBuffers; ++i)
         screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true));
 }
@@ -1257,7 +1261,6 @@ void View::BlitFramebuffer()
     #endif
     
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    
     graphics_->SetTexture(TU_DIFFUSE, screenBuffers_[0]);
     DrawFullscreenQuad(camera_, false);
 }
@@ -1276,21 +1279,9 @@ void View::RunPostProcesses()
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
-    // Find out the index of last active effect to see when the final output should be rendered
-    unsigned lastActiveEffect = 0;
-    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
+    for (unsigned i = 0; i < postProcesses_.Size(); ++i)
     {
-        PostProcess* effect = postProcesses_->At(i);
-        if (!effect || !effect->IsActive())
-            continue;
-        lastActiveEffect = i;
-    }
-    
-    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
-    {
-        PostProcess* effect = postProcesses_->At(i);
-        if (!effect || !effect->IsActive())
-            continue;
+        PostProcess* effect = postProcesses_[i];
         
         // For each effect, rendertargets can be re-used. Allocate them now
         renderer_->SaveScreenBufferAllocations();
@@ -1314,7 +1305,7 @@ void View::RunPostProcesses()
         for (unsigned j = 0; j < effect->GetNumPasses(); ++j)
         {
             PostProcessPass* pass = effect->GetPass(j);
-            bool lastPass = (i == lastActiveEffect) && (j == effect->GetNumPasses() - 1);
+            bool lastPass = (i == postProcesses_.Size() - 1) && (j == effect->GetNumPasses() - 1);
             bool swapBuffers = false;
             
             // Write depth on the last pass only

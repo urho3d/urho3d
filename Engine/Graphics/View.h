@@ -207,7 +207,7 @@ private:
     /// Color rendertarget to use.
     RenderSurface* renderTarget_;
     /// Post-processing effects.
-    const Vector<SharedPtr<PostProcess> >* postProcesses_;
+    Vector<SharedPtr<PostProcess> > postProcesses_;
     /// Intermediate screen buffers used in postprocessing and OpenGL light pre-pass framebuffer blit.
     PODVector<Texture2D*> screenBuffers_;
     /// Viewport rectangle.
