@@ -297,7 +297,7 @@ void View::Render()
     graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     
     // Set "view texture" to prevent destination texture sampling in case we do not render to the destination directly
-    // ie. when using light pre-pass and/or doing edge filtering
+    // ie. when using light pre-pass and/or doing post-processing
     if (renderTarget_)
         graphics_->SetViewTexture(renderTarget_->GetParentTexture());
     

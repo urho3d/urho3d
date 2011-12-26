@@ -17,7 +17,7 @@ void VS(float4 iPos : POSITION,
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
-    float3 input = Sample(sDiffMap, iScreenPos).rgb;
-    float intensity = GetIntensity(input);
+    float3 rgb = Sample(sDiffMap, iScreenPos).rgb;
+    float intensity = GetIntensity(rgb);
     oColor = float4(intensity, intensity, intensity, 1.0);
 }

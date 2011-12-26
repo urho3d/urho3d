@@ -270,8 +270,6 @@ void UI::Render()
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
-    graphics_->ResetDepthStencil();
-    graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;

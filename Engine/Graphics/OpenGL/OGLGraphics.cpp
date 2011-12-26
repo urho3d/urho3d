@@ -342,6 +342,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     PROFILE(TakeScreenShot);
     
     ResetRenderTargets();
+    
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
     
@@ -439,7 +440,30 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    /// \todo Implement
+    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
+        destination->GetHeight() != height_)
+        return false;
+    
+    IntRect vpCopy = viewport;
+    if (vpCopy.right_ <= vpCopy.left_)
+        vpCopy.right_ = vpCopy.left_ + 1;
+    if (vpCopy.bottom_ <= vpCopy.top_)
+        vpCopy.bottom_ = vpCopy.top_ + 1;
+    vpCopy.left_ = Clamp(vpCopy.left_, 0, width_);
+    vpCopy.top_ = Clamp(vpCopy.top_, 0, height_);
+    vpCopy.right_ = Clamp(vpCopy.right_, 0, width_);
+    vpCopy.bottom_ = Clamp(vpCopy.bottom_, 0, height_);
+    
+    // Make sure the FBO is not in use
+    ResetRenderTargets();
+    
+    // Use Direct3D convention with the vertical coordinates ie. 0 is top
+    SetTextureForUpdate(destination);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.left_, height_ - vpCopy.bottom_,
+        vpCopy.right_ - vpCopy.left_, vpCopy.bottom_ - vpCopy.top_);
+    SetTexture(0, 0);
+    
+    return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

@@ -159,7 +159,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         dynamic_ = true;
     else
         dynamic_ = false;
-
+    
     width_ = width;
     height_ = height;
     format_ = format;
@@ -204,6 +204,8 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     }
     
     bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
+    // Use Direct3D convention with the vertical coordinates ie. 0 is top
+    y = levelHeight - (y + height);
     
     graphics_->SetTextureForUpdate(this);
     

@@ -127,7 +127,7 @@ private:
     void RenderBatchesLightPrepass();
     /// Allocate needed screen buffers for post-processing and/or framebuffer blitting.
     void AllocateScreenBuffers();
-    /// Blit the framebuffer to destination. Used in OpenGL light pre-pass mode and when applying edge filter.
+    /// Blit the framebuffer to destination. Used in OpenGL light pre-pass mode.
     void BlitFramebuffer();
     /// Run post-processing effects.
     void RunPostProcesses();

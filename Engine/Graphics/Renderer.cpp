@@ -628,8 +628,6 @@ void Renderer::Render()
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();
-        graphics_->ResetDepthStencil();
-        graphics_->SetViewport(IntRect(0, 0, graphics_->GetWidth(), graphics_->GetHeight()));
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
         
         numPrimitives_ = 0;

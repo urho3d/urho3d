@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Ã–Ã¶rni
+// Copyright (c) 2008-2011 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -616,7 +616,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 {
-    if (!destination || destination->GetUsage() != TEXTURE_RENDERTARGET)
+    if (!destination || !destination->GetRenderSurface() || destination->GetWidth() != width_ ||
+        destination->GetHeight() != height_)
         return false;
     
     IntRect vpCopy = viewport;
