@@ -40,6 +40,10 @@ struct Viewport
     Viewport(Scene* scene, Camera* camera);
     /// Construct with a specified rectangle.
     Viewport(Scene* scene, Camera* camera, const IntRect& rect);
+    /// Construct with a full rectangle and post-processing effects.
+    Viewport(Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses);
+    /// Construct with a specified rectangle and post-processing effects.
+    Viewport(Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses);
     
     /// Scene pointer.
     WeakPtr<Scene> scene_;
@@ -47,6 +51,8 @@ struct Viewport
     WeakPtr<Camera> camera_;
     /// Viewport rectangle.
     IntRect rect_;
+    /// Post-processing effects.
+    Vector<SharedPtr<PostProcess> > postProcesses_;
 };
 
 /// %Color or depth-stencil surface that can be rendered into.

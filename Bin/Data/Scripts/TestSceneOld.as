@@ -12,6 +12,7 @@ Node@ cameraNode;
 Camera@ camera;
 Node@ cameraLightNode;
 Light@ cameraLight;
+PostProcess@ edgeFilter;
 float yaw = 0.0;
 float pitch = 0.0;
 float objectangle = 0.0;
@@ -30,7 +31,7 @@ void Start()
         engine.Exit();
         return;
     }
-         
+
     InitConsole();
     InitScene();
     InitUI();
@@ -311,7 +312,13 @@ void CreateCamera()
     cameraLight.rampTexture = cache.GetResource("Texture2D", "Textures/RampWide.png");
     cameraLight.shapeTexture = cache.GetResource("Texture2D", "Textures/SpotWide.png");
 
-    renderer.viewports[0] = Viewport(testScene, camera);
+    Array<PostProcess@> effectChain;
+    edgeFilter = PostProcess();
+    edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
+    edgeFilter.active = false; // Start out disabled
+    effectChain.Push(edgeFilter);
+
+    renderer.viewports[0] = Viewport(testScene, camera, effectChain);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -416,8 +423,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             camera.orthographic = !camera.orthographic;
 
         if (input.keyPress['F'])
-            renderer.edgeFilter = !renderer.edgeFilter;
-
+            edgeFilter.active = !edgeFilter.active;
+        
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 

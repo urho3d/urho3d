@@ -58,8 +58,12 @@ public:
     const String& GetPixelShader() const { return pixelShaderName_; }
     /// Return texture name.
     const String& GetTexture(TextureUnit unit) const;
+    /// Return all texture names.
+    const String* GetTextures() const { return &textureNames_[0]; }
     /// Return shader parameter.
     const Vector4& GetShaderParameter(const String& name) const;
+    /// Return all shader parameters.
+    const HashMap<StringHash, Vector4>& GetShaderParameters() const { return shaderParameters_; }
     /// Return output rendertarget name.
     const String& GetOutput() const { return outputName_; }
     
@@ -69,7 +73,7 @@ private:
     /// Pixel shader name.
     String pixelShaderName_;
     /// Texture names by unit.
-    String textureNames_[MAX_TEXTURE_UNITS];
+    String textureNames_[MAX_MATERIAL_TEXTURE_UNITS];
     /// Shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Output rendertarget name.
@@ -108,6 +112,8 @@ public:
     bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered);
     /// Remove a rendertarget.
     void RemoveRenderTarget(const String& name);
+    /// Set active flag.
+    void SetActive(bool active);
     
     /// Return parameter XML file.
     XMLFile* GetParameters() const { return parameterSource_; }
@@ -117,6 +123,11 @@ public:
     PostProcessPass* GetPass(unsigned index) const;
     /// Return if has a specific rendertarget.
     bool HasRenderTarget(const String& name) const;
+    /// Return all rendertargets.
+    const HashMap<StringHash, PostProcessRenderTarget>& GetRenderTargets() const { return renderTargets_; }
+    
+    /// Return active flag.
+    bool IsActive() const { return active_; }
     
 private:
     /// Parameter XML file.
@@ -125,4 +136,6 @@ private:
     Vector<SharedPtr<PostProcessPass> > passes_;
     /// Rendertargets.
     HashMap<StringHash, PostProcessRenderTarget> renderTargets_;
+    /// Active flag.
+    bool active_;
 };

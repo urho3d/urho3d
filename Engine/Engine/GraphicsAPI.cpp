@@ -144,6 +144,30 @@ static void ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const
     new(ptr) Viewport(scene, camera, rect);
 }
 
+static void ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr, Viewport* ptr)
+{
+    Vector<SharedPtr<PostProcess> > vec;
+    if (arr)
+    {
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
+    }
+    
+    new(ptr) Viewport(scene, camera, vec);
+}
+
+static void ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr, Viewport* ptr)
+{
+    Vector<SharedPtr<PostProcess> > vec;
+    if (arr)
+    {
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
+    }
+    
+    new(ptr) Viewport(scene, camera, rect, vec);
+}
+
 static void DestructViewport(Viewport* ptr)
 {
     ptr->~Viewport();
@@ -167,6 +191,27 @@ static Scene* ViewportGetScene(Viewport* ptr)
 static Camera* ViewportGetCamera(Viewport* ptr)
 {
     return ptr->camera_;
+}
+
+static void ViewportSetPostProcess(unsigned index, PostProcess* effect, Viewport* ptr)
+{
+    if (index < ptr->postProcesses_.Size())
+        ptr->postProcesses_[index] = effect;
+}
+
+static PostProcess* ViewportGetPostProcess(unsigned index, Viewport* ptr)
+{
+    return index < ptr->postProcesses_.Size() ? ptr->postProcesses_[index] : (PostProcess*)0;
+}
+
+static void ViewportSetNumPostProcesses(unsigned num, Viewport* ptr)
+{
+    ptr->postProcesses_.Resize(num);
+}
+
+static unsigned ViewportGetNumPostProcesses(Viewport* ptr)
+{
+    return ptr->postProcesses_.Size();
 }
 
 static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
@@ -217,11 +262,15 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     RegisterTexture<Texture>(engine, "Texture");
     
+    // Must register PostProcess early as Viewport needs it
+    RegisterObject<PostProcess>(engine, "PostProcess");
     engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructViewport), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport&in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructViewport), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "Viewport& opAssign(const Viewport&in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asFUNCTION(ViewportSetScene), asCALL_CDECL_OBJLAST);
@@ -229,6 +278,10 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asFUNCTION(ViewportGetScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asFUNCTION(ViewportGetCamera), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Viewport", "IntRect rect", offsetof(Viewport, rect_));
+    engine->RegisterObjectMethod("Viewport", "void set_postProcesses(uint, PostProcess@+)", asFUNCTION(ViewportSetPostProcess), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "PostProcess@+ get_postProcesses(uint) const", asFUNCTION(ViewportGetPostProcess), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "void set_numPostProcesses(uint)", asFUNCTION(ViewportSetNumPostProcesses), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "uint get_numPostProcesses() const", asFUNCTION(ViewportGetNumPostProcesses), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
@@ -371,14 +424,16 @@ static void RegisterPostProcess(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PostProcessPass", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(PostProcessPass, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcessPass", "Vector4 get_shaderParameters(const String&in) const", asMETHOD(PostProcessPass, GetShaderParameter), asCALL_THISCALL);
     
-    RegisterObject<PostProcess>(engine, "PostProcess");
     RegisterObjectConstructor<PostProcess>(engine, "PostProcess");
-    engine->RegisterObjectMethod("PostProcess", "bool LoadParameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "void RemoveRenderTarget(const String&in)", asMETHOD(PostProcess, RemoveRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "bool HasRenderTarget(const String&in) const", asMETHOD(PostProcess, HasRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "bool set_parameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "XMLFile@+ get_parameters() const", asMETHOD(PostProcess, GetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "void set_numPasses(uint)", asMETHOD(PostProcess, SetNumPasses), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "uint get_numPasses() const", asMETHOD(PostProcess, GetNumPasses), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "void set_active(bool)", asMETHOD(PostProcess, SetActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "bool get_active() const", asMETHOD(PostProcess, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "PostProcessPass@+ get_passes(uint) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
 }
 
@@ -777,21 +832,6 @@ static Renderer* GetRenderer()
     return GetScriptContext()->GetSubsystem<Renderer>();
 }
 
-static void ConstructEdgeFilterParameters(EdgeFilterParameters* ptr)
-{
-    new(ptr) EdgeFilterParameters(0.0f, 0.0f, 0.0f);
-}
-
-static void ConstructEdgeFilterParametersCopy(EdgeFilterParameters& parameters, EdgeFilterParameters* ptr)
-{
-    new(ptr) EdgeFilterParameters(parameters);
-}
-
-static void ConstructEdgeFilterParametersInit(float radius, float threshold, float strength, BiasParameters* ptr)
-{
-    new(ptr) EdgeFilterParameters(radius, threshold, strength);
-}
-
 static void RegisterRenderer(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
@@ -802,13 +842,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_24BIT", (void*)&SHADOWQUALITY_LOW_24BIT);
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_16BIT", (void*)&SHADOWQUALITY_HIGH_16BIT);
     engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_24BIT", (void*)&SHADOWQUALITY_HIGH_24BIT);
-    engine->RegisterObjectType("EdgeFilterParameters", sizeof(EdgeFilterParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
-    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructEdgeFilterParameters), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f(const EdgeFilterParameters&in)", asFUNCTION(ConstructEdgeFilterParametersCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("EdgeFilterParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructEdgeFilterParametersInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("EdgeFilterParameters", "float radius", offsetof(EdgeFilterParameters, radius_));
-    engine->RegisterObjectProperty("EdgeFilterParameters", "float threshold", offsetof(EdgeFilterParameters, threshold_));
-    engine->RegisterObjectProperty("EdgeFilterParameters", "float strength", offsetof(EdgeFilterParameters, strength_));
     
     RegisterObject<Renderer>(engine, "Renderer");
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
@@ -844,10 +877,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "bool get_dynamicInstancing() const", asMETHOD(Renderer, GetDynamicInstancing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxInstanceTriangles(int)", asMETHOD(Renderer, SetMaxInstanceTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxInstanceTriangles() const", asMETHOD(Renderer, GetMaxInstanceTriangles), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "bool get_edgeFilter() const", asMETHOD(Renderer, GetEdgeFilter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_edgeFilter(bool)", asMETHOD(Renderer, SetEdgeFilter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "const EdgeFilterParameters& get_edgeFilterParameters() const", asMETHOD(Renderer, GetEdgeFilterParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_edgeFilterParameters(const EdgeFilterParameters& in)", asMETHOD(Renderer, SetEdgeFilterParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxOccluderTriangles(int)", asMETHOD(Renderer, SetMaxOccluderTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxOccluderTriangles() const", asMETHOD(Renderer, GetMaxOccluderTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_occlusionBufferSize(int)", asMETHOD(Renderer, SetOcclusionBufferSize), asCALL_THISCALL);

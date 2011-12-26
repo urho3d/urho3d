@@ -51,6 +51,22 @@ Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect) :
 {
 }
 
+Viewport::Viewport(Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses) :
+    scene_(scene),
+    camera_(camera),
+    rect_(IntRect::ZERO),
+    postProcesses_(postProcesses)
+{
+}
+
+Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses) :
+    scene_(scene),
+    camera_(camera),
+    rect_(rect),
+    postProcesses_(postProcesses)
+{
+}
+
 RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
     parentTexture_(parentTexture),
     target_(target),

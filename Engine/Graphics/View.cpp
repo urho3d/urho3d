@@ -32,6 +32,7 @@
 #include "OcclusionBuffer.h"
 #include "Octree.h"
 #include "Renderer.h"
+#include "ResourceCache.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "ShaderVariation.h"
@@ -150,8 +151,7 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
-    renderTarget_(0),
-    screenBuffer_(0)
+    renderTarget_(0)
 {
     frame_.camera_ = 0;
     
@@ -181,7 +181,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     octree_ = octree;
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
-    screenBuffer_ = 0;
+    postProcesses_ = &viewport.postProcesses_;
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
@@ -211,8 +211,6 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     drawShadows_ = renderer_->GetDrawShadows();
     materialQuality_ = renderer_->GetMaterialQuality();
     maxOccluderTriangles_ = renderer_->GetMaxOccluderTriangles();
-    // Use edge filter only when final target is the backbuffer
-    edgeFilter_ = !renderTarget_ && renderer_->GetEdgeFilter();
     
     // Set possible quality overrides from the camera
     unsigned viewOverrideFlags = camera_->GetViewOverrideFlags();
@@ -236,7 +234,8 @@ void View::Update(const FrameInfo& frame)
     frame_.frameNumber_ = frame.frameNumber_;
     frame_.viewSize_ = viewSize_;
     
-    // Clear old light scissor cache, geometry, light, occluder & batch lists
+    // Clear screen buffers, old light scissor cache, geometry, light, occluder & batch lists
+    screenBuffers_.Clear();
     lightScissorCache_.Clear();
     geometries_.Clear();
     allGeometries_.Clear();
@@ -273,6 +272,9 @@ void View::Render()
 {
     if (!octree_ || !camera_)
         return;
+    
+    // Allocate screen buffers for post-processing and blitting as necessary
+    AllocateScreenBuffers();
     
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
@@ -337,13 +339,14 @@ void View::Render()
         }
     }
     
-    // Blit if necessary (OpenGL light pre-pass, or edge filter)
-    #ifdef USE_OPENGL
-    if (lightPrepass_ || edgeFilter_)
-    #else
-    if (edgeFilter_)
-    #endif
-        BlitFramebuffer();
+    // Run post-processes or framebuffer blitting now
+    if (screenBuffers_.Size())
+    {
+        if (postProcesses_->Size())
+            RunPostProcesses();
+        else
+            BlitFramebuffer();
+    }
     
     // "Forget" the camera, octree and zone after rendering
     camera_ = 0;
@@ -970,10 +973,7 @@ void View::RenderBatchesForward()
     // Reset the light optimization stencil reference value
     lightStencilValue_ = 1;
     
-    bool needBlit = edgeFilter_;
-    if (needBlit)
-        screenBuffer_ = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true);
-    RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
+    RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = GetDepthStencil(renderTarget);
     
     // If not reusing shadowmaps, render all of them first
@@ -1072,14 +1072,7 @@ void View::RenderBatchesLightPrepass()
     Texture2D* depthBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, hwDepth ? Graphics::GetDepthStencilFormat() :
         Graphics::GetLinearDepthFormat());
     
-    #ifdef USE_OPENGL
-    bool needBlit = true;
-    #else
-    bool needBlit = edgeFilter_;
-    #endif
-    if (needBlit)
-        screenBuffer_ = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true);
-    RenderSurface* renderTarget = needBlit ? screenBuffer_->GetRenderSurface() : renderTarget_;
+    RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil;
     
     // Hardware depth support: render to RGBA normal buffer and read hardware depth
@@ -1202,6 +1195,32 @@ void View::RenderBatchesLightPrepass()
     }
 }
 
+void View::AllocateScreenBuffers()
+{
+    unsigned neededBuffers = 0;
+    #ifdef USE_OPENGL
+    if (lightPrepass_)
+        neededBuffers = 1;
+    #endif
+    
+    unsigned postProcessPasses = 0;
+    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
+    {
+        PostProcess* effect = postProcesses_->At(i);
+        if (effect && effect->IsActive())
+            postProcessPasses += effect->GetNumPasses();
+    }
+    
+    // If more than one post-process pass, need 2 buffers for ping-pong rendering
+    if (postProcessPasses)
+        neededBuffers = Min((int)postProcessPasses, 2);
+    
+    // Allocate screen buffers with filtering active in case the post-processing effects need that
+    screenBuffers_.Clear();
+    for (unsigned i = 0; i < neededBuffers; ++i)
+        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true));
+}
+
 void View::BlitFramebuffer()
 {
     // Blit the final image to destination rendertarget
@@ -1216,41 +1235,174 @@ void View::BlitFramebuffer()
     graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
     graphics_->SetViewport(viewRect_);
     
-    String shaderName = edgeFilter_ ? "EdgeFilter" : "CopyFramebuffer";
+    String shaderName = "CopyFramebuffer";
     graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
+    float widthRange = 0.5f * viewSize_.x_ / rtWidth;
+    float heightRange = 0.5f * viewSize_.y_ / rtHeight;
     
-    {
-        float widthRange = 0.5f * viewSize_.x_ / rtWidth;
-        float heightRange = 0.5f * viewSize_.y_ / rtHeight;
-        
-        #ifdef USE_OPENGL
-        Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
-            1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
-        #else
-        Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
-            (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
-        #endif
-        
-        graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    }
+    #ifdef USE_OPENGL
+    Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
+        1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
+    #else
+    Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
+        (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
+    #endif
     
-    if (edgeFilter_)
-    {
-        const EdgeFilterParameters& parameters = renderer_->GetEdgeFilterParameters();
-        graphics_->SetShaderParameter(PSP_EDGEFILTERPARAMS, Vector4(parameters.radius_, parameters.threshold_,
-            parameters.strength_, 0.0f));
-        
-        float addX = 1.0f / rtWidth;
-        float addY = 1.0f / rtHeight;
-        graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
-    }
+    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
     
-    graphics_->SetTexture(TU_DIFFUSE, screenBuffer_);
+    graphics_->SetTexture(TU_DIFFUSE, screenBuffers_[0]);
     DrawFullscreenQuad(camera_, false);
-    graphics_->SetTexture(TU_DIFFUSE, 0);
+}
+
+void View::RunPostProcesses()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // Ping-pong buffer indices for read and write
+    unsigned readRtIndex = 0;
+    unsigned writeRtIndex = screenBuffers_.Size() - 1;
+    
+    graphics_->SetAlphaTest(false);
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetDepthWrite(true);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
+    
+    // Find out the index of last active effect to see when the final output should be rendered
+    unsigned lastActiveEffect = 0;
+    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
+    {
+        PostProcess* effect = postProcesses_->At(i);
+        if (!effect || !effect->IsActive())
+            continue;
+        lastActiveEffect = i;
+    }
+    
+    for (unsigned i = 0; i < postProcesses_->Size(); ++i)
+    {
+        PostProcess* effect = postProcesses_->At(i);
+        if (!effect || !effect->IsActive())
+            continue;
+        
+        // For each effect, rendertargets can be re-used. Allocate them now
+        renderer_->SaveScreenBufferAllocations();
+        const HashMap<StringHash, PostProcessRenderTarget>& renderTargetInfos = effect->GetRenderTargets();
+        HashMap<StringHash, Texture2D*> renderTargets;
+        for (HashMap<StringHash, PostProcessRenderTarget>::ConstIterator j = renderTargetInfos.Begin(); j !=
+            renderTargetInfos.End(); ++j)
+        {
+            if (j->second_.sizeDivisor_)
+            {
+                renderTargets[j->first_] = renderer_->GetScreenBuffer(rtSize_.x_ / j->second_.size_.x_,
+                    rtSize_.y_ / j->second_.size_.y_, j->second_.format_, j->second_.filtered_);
+            }
+            else
+            {
+                renderTargets[j->first_] = renderer_->GetScreenBuffer(j->second_.size_.x_, j->second_.size_.y_,
+                    j->second_.format_, j->second_.filtered_);
+            }
+        }
+        
+        // Run each effect pass
+        for (unsigned j = 0; j < effect->GetNumPasses(); ++j)
+        {
+            PostProcessPass* pass = effect->GetPass(j);
+            bool lastPass = (i == lastActiveEffect) && (j == effect->GetNumPasses() - 1);
+            bool swapBuffers = false;
+            
+            // Set output rendertarget
+            RenderSurface* rt = 0;
+            String output = pass->GetOutput().ToLower();
+            if (output == "viewport")
+            {
+                if (!lastPass)
+                {
+                    rt = screenBuffers_[writeRtIndex]->GetRenderSurface();
+                    swapBuffers = true;
+                }
+                else
+                    rt = renderTarget_;
+                
+                graphics_->SetRenderTarget(0, rt);
+                graphics_->SetDepthStencil(GetDepthStencil(rt));
+                graphics_->SetViewport(viewRect_);
+            }
+            else
+            {
+                HashMap<StringHash, Texture2D*>::ConstIterator k = renderTargets.Find(StringHash(output));
+                if (k != renderTargets.End())
+                    rt = k->second_->GetRenderSurface();
+                else
+                    continue; // Skip pass if rendertarget can not be found
+                
+                graphics_->SetRenderTarget(0, rt);
+                graphics_->SetDepthStencil(GetDepthStencil(rt));
+            }
+            
+            // Set shaders, shader parameters and textures
+            graphics_->SetShaders(renderer_->GetVertexShader(pass->GetVertexShader()),
+                renderer_->GetPixelShader(pass->GetPixelShader()));
+            
+            const HashMap<StringHash, Vector4>& parameters = pass->GetShaderParameters();
+            for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+                graphics_->SetShaderParameter(k->first_, k->second_);
+            
+            float rtWidth = (float)rtSize_.x_;
+            float rtHeight = (float)rtSize_.y_;
+            float widthRange = 0.5f * viewSize_.x_ / rtWidth;
+            float heightRange = 0.5f * viewSize_.y_ / rtHeight;
+            
+            #ifdef USE_OPENGL
+            Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
+                1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
+            #else
+            Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
+                (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
+            #endif
+            
+            graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+            graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
+            
+            const String* textureNames = pass->GetTextures();
+            for (unsigned k = 0; k < MAX_MATERIAL_TEXTURE_UNITS; ++k)
+            {
+                if (!textureNames[k].Empty())
+                {
+                    // Texture may either refer to a rendertarget or to a texture resource
+                    if (!textureNames[k].Compare("viewport", false))
+                        graphics_->SetTexture(k, screenBuffers_[readRtIndex]);
+                    else
+                    {
+                        HashMap<StringHash, Texture2D*>::ConstIterator l = renderTargets.Find(StringHash(textureNames[k]));
+                        if (l != renderTargets.End())
+                            graphics_->SetTexture(k, l->second_);
+                        else
+                        {
+                            // If requesting a texture fails, clear the texture name to prevent redundant attempts
+                            Texture2D* texture = cache->GetResource<Texture2D>(textureNames[k]);
+                            if (texture)
+                                graphics_->SetTexture(k, texture);
+                            else
+                                pass->SetTexture((TextureUnit)k, String());
+                        }
+                    }
+                }
+            }
+            
+            DrawFullscreenQuad(camera_, false);
+            
+            // Swap the ping-pong buffer sides now if necessary
+            if (swapBuffers)
+                Swap(readRtIndex, writeRtIndex);
+        }
+        
+        // Forget the rendertargets allocated during this effect
+        renderer_->RestoreScreenBufferAllocations();
+    }
 }
 
 void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
@@ -2349,3 +2501,5 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
         depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
     return depthStencil;
 }
+
+

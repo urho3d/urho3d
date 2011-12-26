@@ -154,33 +154,6 @@ enum DeferredLightPSVariation
     MAX_DEFERRED_LIGHT_PS_VARIATIONS
 };
 
-/// %Edge filter parameters.
-struct EdgeFilterParameters
-{
-    /// Construct undefined.
-    EdgeFilterParameters()
-    {
-    }
-    
-    /// Construct with initial values.
-    EdgeFilterParameters(float radius, float threshold, float strength) :
-        radius_(radius),
-        threshold_(threshold),
-        strength_(strength)
-    {
-    }
-    
-    //! Validate parameters.
-    void Validate();
-    
-    //! Radius for calculating luminance gradient.
-    float radius_;
-    //! Luminance difference threshold needed before filtering occurs.
-    float threshold_;
-    //! Filter strength.
-    float strength_;
-};
-
 /// High-level rendering subsystem. Manages drawing of 3D views.
 class Renderer : public Object
 {
@@ -224,10 +197,6 @@ public:
     void SetDynamicInstancing(bool enable);
     /// %Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
-    /// %Set edge filter on/off.
-    void SetEdgeFilter(bool enable);
-    /// %Set edge filter parameters.
-    void SetEdgeFilterParameters(const EdgeFilterParameters& parameters);
     /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
@@ -266,10 +235,6 @@ public:
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.
     int GetMaxInstanceTriangles() { return maxInstanceTriangles_; }
-    /// Return whether edge filter is enabled.
-    bool GetEdgeFilter() const { return edgeFilter_; }
-    /// Return edge filter parameters.
-    const EdgeFilterParameters& GetEdgeFilterParameters() const { return edgeFilterParameters_; }
     /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
@@ -345,6 +310,10 @@ public:
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
+    /// Save the screen buffer allocation status. Called by View.
+    void SaveScreenBufferAllocations();
+    /// Restore the screen buffer allocation status. Called by View.
+    void RestoreScreenBufferAllocations();
     
 private:
     /// Initialize when screen mode initially set.
@@ -424,10 +393,12 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
-    /// Renderbuffers by resolution and format.
+    /// Screen buffers by resolution and format.
     HashMap<long long, Vector<SharedPtr<Texture2D> > > screenBuffers_;
-    /// Renderbuffer current allocations by resolution and format.
+    /// Current screen buffer allocations by resolution and format.
     HashMap<long long, unsigned> screenBufferAllocations_;
+    /// Saved status of screen buffer allocations for restoring.
+    HashMap<long long, unsigned> savedScreenBufferAllocations_;
     /// Viewports.
     Vector<Viewport> viewports_;
     /// Views.
@@ -438,8 +409,6 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
-    /// Edge filter parameters.
-    EdgeFilterParameters edgeFilterParameters_;
     /// Vertex shader format.
     String vsFormat_;
     /// Pixel shader format.
@@ -494,8 +463,6 @@ private:
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
-    /// Edge filter flag.
-    bool edgeFilter_;
     /// Shaders need reloading flag.
     bool shadersDirty_;
     /// Initialized flag.

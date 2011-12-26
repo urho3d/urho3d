@@ -53,7 +53,7 @@ void PostProcessPass::SetPixelShader(const String& name)
 
 void PostProcessPass::SetTexture(TextureUnit unit, const String& name)
 {
-    if (unit < MAX_TEXTURE_UNITS)
+    if (unit < MAX_MATERIAL_TEXTURE_UNITS)
         textureNames_[unit] = name;
 }
 
@@ -74,7 +74,7 @@ void PostProcessPass::SetOutput(const String& name)
 
 const String& PostProcessPass::GetTexture(TextureUnit unit) const
 {
-    return unit < MAX_TEXTURE_UNITS ? textureNames_[unit] : emptyName;
+    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textureNames_[unit] : emptyName;
 }
 
 const Vector4& PostProcessPass::GetShaderParameter(const String& name) const
@@ -86,7 +86,8 @@ const Vector4& PostProcessPass::GetShaderParameter(const String& name) const
 OBJECTTYPESTATIC(PostProcess);
 
 PostProcess::PostProcess(Context* context) :
-    Object(context)
+    Object(context),
+    active_(true)
 {
 }
 
@@ -99,7 +100,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
     if (!file)
         return false;
     
-    XMLElement rootElem = parameterSource_->GetRoot();
+    XMLElement rootElem = file->GetRoot();
     if (!rootElem)
         return false;
     
@@ -172,6 +173,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
                 String name = textureElem.GetAttribute("name");
                 pass->SetTexture(unit, name);
             }
+            
             textureElem = textureElem.GetNext("texture");
         }
         
@@ -221,6 +223,11 @@ bool PostProcess::CreateRenderTarget(const String& name, unsigned width, unsigne
 void PostProcess::RemoveRenderTarget(const String& name)
 {
     renderTargets_.Erase(StringHash(name));
+}
+
+void PostProcess::SetActive(bool active)
+{
+    active_ = active;
 }
 
 PostProcessPass* PostProcess::GetPass(unsigned index) const

@@ -1,6 +1,6 @@
 /*============================================================================
- 
-                  FXAA v2 CONSOLE by TIMOTHY LOTTES @ NVIDIA                                
+
+                  FXAA v2 CONSOLE by TIMOTHY LOTTES @ NVIDIA
 
 ============================================================================*/
 
@@ -10,6 +10,8 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
+
+uniform float4 cEdgeFilterParams;
 
 void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION,

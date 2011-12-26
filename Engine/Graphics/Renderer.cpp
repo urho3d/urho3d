@@ -258,19 +258,11 @@ static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTA
 static const unsigned MAX_BUFFER_AGE = 2000;
 static const Viewport noViewport;
 
-void EdgeFilterParameters::Validate()
-{
-    radius_ = Max(radius_, 0.0f);
-    threshold_ = Max(threshold_, 0.0f);
-    strength_ = Max(strength_, 0.0f);
-}
-
 OBJECTTYPESTATIC(Renderer);
 
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
-    edgeFilterParameters_(EdgeFilterParameters(0.4f, 0.5f, 0.9f)),
     numViews_(0),
     numShadowCameras_(0),
     numOcclusionBuffers_(0),
@@ -292,7 +284,6 @@ Renderer::Renderer(Context* context) :
     drawShadows_(true),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
-    edgeFilter_(false),
     shadersDirty_(true),
     initialized_(false)
 {
@@ -469,27 +460,6 @@ void Renderer::SetDynamicInstancing(bool enable)
 void Renderer::SetMaxInstanceTriangles(int triangles)
 {
     maxInstanceTriangles_ = Max(triangles, 0);
-}
-
-void Renderer::SetEdgeFilter(bool enable)
-{
-    if (enable)
-    {
-        // Edge filter is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
-        if (graphics_->GetMultiSample() > 1)
-        {
-            graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
-                graphics_->GetTripleBuffer(), 1);
-        }
-    }
-    
-    edgeFilter_ = enable;
-}
-
-void Renderer::SetEdgeFilterParameters(const EdgeFilterParameters& parameters)
-{
-    edgeFilterParameters_ = parameters;
-    edgeFilterParameters_.Validate();
 }
 
 void Renderer::SetMaxOccluderTriangles(int triangles)
@@ -1231,6 +1201,16 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     
     LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
+}
+
+void Renderer::SaveScreenBufferAllocations()
+{
+    savedScreenBufferAllocations_ = screenBufferAllocations_;
+}
+
+void Renderer::RestoreScreenBufferAllocations()
+{
+    screenBufferAllocations_ = savedScreenBufferAllocations_;
 }
 
 void Renderer::RemoveUnusedBuffers()

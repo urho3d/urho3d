@@ -125,8 +125,12 @@ private:
     void RenderBatchesForward();
     /// Render batches using light pre-pass rendering.
     void RenderBatchesLightPrepass();
+    /// Allocate needed screen buffers for post-processing and/or framebuffer blitting.
+    void AllocateScreenBuffers();
     /// Blit the framebuffer to destination. Used in OpenGL light pre-pass mode and when applying edge filter.
     void BlitFramebuffer();
+    /// Run post-processing effects.
+    void RunPostProcesses();
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
@@ -202,8 +206,10 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Color rendertarget to use.
     RenderSurface* renderTarget_;
-    /// Intermediate screen buffer used in postprocessing and OpenGL light pre-pass framebuffer blit.
-    Texture2D* screenBuffer_;
+    /// Post-processing effects.
+    const Vector<SharedPtr<PostProcess> >* postProcesses_;
+    /// Intermediate screen buffers used in postprocessing and OpenGL light pre-pass framebuffer blit.
+    PODVector<Texture2D*> screenBuffers_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -270,8 +276,6 @@ private:
     unsigned char lightStencilValue_;
     /// Light prepass flag.
     bool lightPrepass_;
-    /// Edge filter flag.
-    bool edgeFilter_;
     /// Camera zone's override flag.
     bool cameraZoneOverride_;
     /// Draw shadows flag.

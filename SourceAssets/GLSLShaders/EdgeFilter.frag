@@ -1,6 +1,6 @@
 /*============================================================================
- 
-                  FXAA v2 CONSOLE by TIMOTHY LOTTES @ NVIDIA                                
+
+                  FXAA v2 CONSOLE by TIMOTHY LOTTES @ NVIDIA
 
 ============================================================================*/
 
@@ -9,6 +9,7 @@
 #include "Uniforms.frag"
 #include "Samplers.frag"
 
+uniform vec3 cEdgeFilterParams;
 varying vec2 vScreenPos;
 
 void main()

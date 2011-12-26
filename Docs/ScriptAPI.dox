@@ -1495,11 +1495,29 @@ Properties:<br>
 - bool dataLost (readonly)
 
 
+PostProcess
+
+Methods:<br>
+- bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
+- void RemoveRenderTarget(const String&)
+- bool HasRenderTarget(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- XMLFile@ parameters
+- uint numPasses
+- bool active
+- PostProcessPass@[] passes (readonly)
+
+
 Viewport
 
 Properties:<br>
 - Scene@ scene
 - Camera@ camera
+- PostProcess@[] postProcesses
+- uint numPostProcesses
 - IntRect rect
 
 
@@ -1643,21 +1661,6 @@ Properties:<br>
 - String& output
 - String&[] textures
 - Vector4[] shaderParameters
-
-
-PostProcess
-
-Methods:<br>
-- bool LoadParameters(XMLFile@)
-- bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
-- void RemoveRenderTarget(const String&)
-- bool HasRenderTarget(const String&) const
-
-Properties:<br>
-- ShortStringHash type (readonly)
-- String& typeName (readonly)
-- uint numPasses
-- PostProcessPass@[] passes (readonly)
 
 
 Model
@@ -2269,14 +2272,6 @@ Properties:<br>
 - int[]@ multiSampleLevels (readonly)
 
 
-EdgeFilterParameters
-
-Properties:<br>
-- float radius
-- float threshold
-- float strength
-
-
 Renderer
 
 Methods:<br>
@@ -2301,8 +2296,6 @@ Properties:<br>
 - bool reuseShadowMaps
 - bool dynamicInstancing
 - int maxInstanceTriangles
-- bool edgeFilter
-- EdgeFilterParameters& edgeFilterParameters
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold

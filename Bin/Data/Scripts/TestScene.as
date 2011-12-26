@@ -3,6 +3,7 @@
 Scene@ testScene;
 Camera@ camera;
 Node@ cameraNode;
+PostProcess@ edgeFilter;
 
 float yaw = 0.0;
 float pitch = 0.0;
@@ -211,8 +212,14 @@ void InitScene()
     camera = cameraNode.CreateComponent("Camera");
     cameraNode.position = Vector3(0, 2, 0);
 
+    Array<PostProcess@> effectChain;
+    edgeFilter = PostProcess();
+    edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
+    edgeFilter.active = false; // Start out disabled
+    effectChain.Push(edgeFilter);
+
     if (!engine.headless)
-        renderer.viewports[0] = Viewport(testScene, camera);
+        renderer.viewports[0] = Viewport(testScene, camera, effectChain);
 }
 
 bool CheckInLight(Drawable@ drawable)
@@ -315,7 +322,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             camera.orthographic = !camera.orthographic;
 
         if (input.keyPress['F'])
-            renderer.edgeFilter = !renderer.edgeFilter;
+            edgeFilter.active = !edgeFilter.active;
 
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
