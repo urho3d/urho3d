@@ -63,25 +63,26 @@ public:
     
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);
-    /// %Set screen mode.
+    /// %Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
-    /// %Set screen resolution only.
+    /// %Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
-    /// Toggle between full screen and windowed mode.
+    /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
     void Close();
-    /// Take a screenshot.
+    /// Take a screenshot. Return true if successful.
     bool TakeScreenShot(Image& destImage);
     /// %Set whether to flush GPU command queue at the end of each frame. Default true.
     void SetFlushGPU(bool enable);
-    
-    /// Begin frame rendering.
+    /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.
     void EndFrame();
     /// Clear any or all of rendertarget, depth buffer and stencil buffer.
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
+    /// Resolve multisampled backbuffer to a texture rendertarget.
+    bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.

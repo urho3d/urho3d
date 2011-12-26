@@ -437,6 +437,11 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     SetDepthWrite(oldDepthWrite);
 }
 
+bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
+{
+    /// \todo Implement
+}
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount)

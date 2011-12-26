@@ -922,7 +922,7 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
 {
     // Return the default depth-stencil surface if applicable
     // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
-    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight())
+    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
         return 0;
     else
         return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();

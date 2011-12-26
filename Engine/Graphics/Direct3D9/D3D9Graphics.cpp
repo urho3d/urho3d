@@ -614,6 +614,27 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     impl_->device_->Clear(0, 0, d3dFlags, GetD3DColor(color), depth, stencil);
 }
 
+bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
+{
+    if (!destination || destination->GetUsage() != TEXTURE_RENDERTARGET)
+        return false;
+    
+    IntRect vpCopy = viewport;
+    if (vpCopy.right_ <= vpCopy.left_)
+        vpCopy.right_ = vpCopy.left_ + 1;
+    if (vpCopy.bottom_ <= vpCopy.top_)
+        vpCopy.bottom_ = vpCopy.top_ + 1;
+    
+    RECT rect;
+    rect.left = Clamp(vpCopy.left_, 0, width_);
+    rect.top = Clamp(vpCopy.top_, 0, height_);
+    rect.right = Clamp(vpCopy.right_, 0, width_);
+    rect.bottom = Clamp(vpCopy.bottom_, 0, height_);
+    
+    return SUCCEEDED(impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
+        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &rect, D3DTEXF_NONE));
+}
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount)

@@ -319,10 +319,18 @@ void View::Render()
     #endif
     
     graphics_->SetViewTexture(0);
-    
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetStreamFrequencies();
+    
+    // Run post-processes or framebuffer blitting now
+    if (screenBuffers_.Size())
+    {
+        if (postProcesses_->Size())
+            RunPostProcesses();
+        else
+            BlitFramebuffer();
+    }
     
     // If this is a main view, draw the associated debug geometry now
     if (!renderTarget_)
@@ -337,15 +345,6 @@ void View::Render()
                 debug->Render();
             }
         }
-    }
-    
-    // Run post-processes or framebuffer blitting now
-    if (screenBuffers_.Size())
-    {
-        if (postProcesses_->Size())
-            RunPostProcesses();
-        else
-            BlitFramebuffer();
     }
     
     // "Forget" the camera, octree and zone after rendering
@@ -973,7 +972,9 @@ void View::RenderBatchesForward()
     // Reset the light optimization stencil reference value
     lightStencilValue_ = 1;
     
-    RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
+    // If using hardware multisampling with post-processing, render to the backbuffer first and then resolve
+    bool resolve = screenBuffers_.Size() && !renderTarget_ && graphics_->GetMultiSample() > 1;
+    RenderSurface* renderTarget = (screenBuffers_.Size() && !resolve) ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = GetDepthStencil(renderTarget);
     
     // If not reusing shadowmaps, render all of them first
@@ -1050,6 +1051,10 @@ void View::RenderBatchesForward()
         
         RenderBatchQueue(postAlphaQueue_);
     }
+    
+    // Resolve multisampled backbuffer now if necessary
+    if (resolve)
+        graphics_->ResolveToTexture(screenBuffers_[0], viewRect_);
 }
 
 void View::RenderBatchesLightPrepass()
@@ -2502,5 +2507,3 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
         depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
     return depthStencil;
 }
-
-
