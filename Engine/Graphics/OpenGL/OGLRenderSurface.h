@@ -24,6 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "PostProcess.h"
 #include "Rect.h"
 #include "Ptr.h"
 

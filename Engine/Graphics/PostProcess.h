@@ -30,7 +30,7 @@
 class Texture2D;
 class XMLFile;
 
-/// Post-processing effect pass
+/// Post-processing effect pass.
 class PostProcessPass : public RefCounted
 {
 public:
@@ -80,7 +80,7 @@ private:
     String outputName_;
 };
 
-/// Post-processing rendertarget.
+/// Post-processing rendertarget info.
 struct PostProcessRenderTarget
 {
     /// Texture format.
