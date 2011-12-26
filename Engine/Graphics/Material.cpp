@@ -99,7 +99,6 @@ Material::Material(Context* context) :
     occlusion_(true)
 {
     SetNumTechniques(1);
-    textures_.Resize(MAX_MATERIAL_TEXTURE_UNITS);
     
     // Setup often used default parameters
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -200,7 +199,7 @@ bool Material::Load(Deserializer& source)
     unsigned memoryUse = sizeof(Material);
     
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
-    memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
+    memoryUse += MAX_MATERIAL_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
     memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
     
     SetMemoryUse(memoryUse);
@@ -286,10 +285,8 @@ void Material::SetShaderParameter(const String& name, const Vector4& value)
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
 {
-    if (unit >= MAX_MATERIAL_TEXTURE_UNITS)
-        return;
-    
-    textures_[unit] = texture;
+    if (unit < MAX_MATERIAL_TEXTURE_UNITS)
+        textures_[unit] = texture;
 }
 
 void Material::SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat)
@@ -359,7 +356,8 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
-    ret->textures_ = textures_;
+    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        ret->textures_[i] = textures_[i];
     ret->occlusion_ = occlusion_;
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
@@ -391,7 +389,7 @@ Pass* Material::GetPass(unsigned index, PassType pass) const
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
-    return (unsigned)unit < textures_.Size() ? textures_[unit] : (Texture*)0;
+    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textures_[unit] : (Texture*)0;
 }
 
 const Vector4& Material::GetShaderParameter(const String& name) const

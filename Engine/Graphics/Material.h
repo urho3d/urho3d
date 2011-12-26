@@ -114,10 +114,10 @@ public:
     Technique* GetTechnique(unsigned index) const;
     /// Return pass by technique index and pass type.
     Pass* GetPass(unsigned index, PassType pass) const;
-    /// Return all textures.
-    const Vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
     /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
+   /// Return all textures.
+    const SharedPtr<Texture>* GetTextures() const { return &textures_[0]; }
     /// Return shader parameter.
     const Vector4& GetShaderParameter(const String& name) const;
     /// Return all shader parameters.
@@ -145,7 +145,7 @@ private:
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.
-    Vector<SharedPtr<Texture> > textures_;
+    SharedPtr<Texture> textures_[MAX_MATERIAL_TEXTURE_UNITS];
     /// Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// Last auxiliary view rendered frame number.

@@ -580,7 +580,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
         
-        const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
+        const SharedPtr<Texture>* textures = material_->GetTextures();
         if (graphics->NeedTextureUnit(TU_DIFFUSE))
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
         if (graphics->NeedTextureUnit(TU_NORMAL))

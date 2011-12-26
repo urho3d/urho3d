@@ -1268,7 +1268,6 @@ void View::RunPostProcesses()
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(true);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
@@ -1295,16 +1294,15 @@ void View::RunPostProcesses()
         for (HashMap<StringHash, PostProcessRenderTarget>::ConstIterator j = renderTargetInfos.Begin(); j !=
             renderTargetInfos.End(); ++j)
         {
+            unsigned width = j->second_.size_.x_;
+            unsigned height = j->second_.size_.y_;
             if (j->second_.sizeDivisor_)
             {
-                renderTargets[j->first_] = renderer_->GetScreenBuffer(rtSize_.x_ / j->second_.size_.x_,
-                    rtSize_.y_ / j->second_.size_.y_, j->second_.format_, j->second_.filtered_);
+                width = viewSize_.x_ / width;
+                height = viewSize_.y_ / height;
             }
-            else
-            {
-                renderTargets[j->first_] = renderer_->GetScreenBuffer(j->second_.size_.x_, j->second_.size_.y_,
-                    j->second_.format_, j->second_.filtered_);
-            }
+            
+            renderTargets[j->first_] = renderer_->GetScreenBuffer(width, height, j->second_.format_, j->second_.filtered_);
         }
         
         // Run each effect pass
@@ -1313,6 +1311,9 @@ void View::RunPostProcesses()
             PostProcessPass* pass = effect->GetPass(j);
             bool lastPass = (i == lastActiveEffect) && (j == effect->GetNumPasses() - 1);
             bool swapBuffers = false;
+            
+            // Write depth on the last pass only
+            graphics_->SetDepthWrite(lastPass);
             
             // Set output rendertarget
             RenderSurface* rt = 0;
@@ -2185,9 +2186,9 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
 
 void View::CheckMaterialForAuxView(Material* material)
 {
-    const Vector<SharedPtr<Texture> >& textures = material->GetTextures();
+    const SharedPtr<Texture>* textures = material->GetTextures();
     
-    for (unsigned i = 0; i < textures.Size(); ++i)
+    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
     {
         // Have to check cube & 2D textures separately
         Texture* texture = textures[i];

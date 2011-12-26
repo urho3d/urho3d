@@ -1,0 +1,5 @@
+<postprocess>
+    <pass vs="GreyScale" ps="GreyScale" output="viewport">
+        <texture unit="diffuse" name="viewport" />
+    </pass>
+</postprocess>
