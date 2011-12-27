@@ -23,38 +23,10 @@
 
 #pragma once
 
-#include "Rect.h"
 #include "GraphicsDefs.h"
-#include "PostProcess.h"
-#include "Ptr.h"
+#include "Viewport.h"
 
-class Camera;
-class Scene;
 class Texture;
-
-/// %Viewport definition either for a render surface or the backbuffer.
-struct Viewport
-{
-    /// Construct with defaults.
-    Viewport();
-    /// Construct with a full rectangle.
-    Viewport(Scene* scene, Camera* camera);
-    /// Construct with a specified rectangle.
-    Viewport(Scene* scene, Camera* camera, const IntRect& rect);
-    /// Construct with a full rectangle and post-processing effects.
-    Viewport(Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses);
-    /// Construct with a specified rectangle and post-processing effects.
-    Viewport(Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses);
-    
-    /// Scene pointer.
-    WeakPtr<Scene> scene_;
-    /// Camera pointer.
-    WeakPtr<Camera> camera_;
-    /// Viewport rectangle.
-    IntRect rect_;
-    /// Post-processing effects.
-    Vector<SharedPtr<PostProcess> > postProcesses_;
-};
 
 /// %Color or depth-stencil surface that can be rendered into.
 class RenderSurface : public RefCounted
@@ -68,8 +40,8 @@ public:
     /// Destruct.
     ~RenderSurface();
     
-    /// %Set viewport for auxiliary view rendering.
-    void SetViewport(const Viewport& viewport);
+    /// Set viewport for auxiliary view rendering.
+    void SetViewport(Viewport* viewport);
     /// %Set linked color rendertarget.
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
     /// %Set linked depth-stencil surface.
@@ -88,7 +60,7 @@ public:
     /// Return usage.
     TextureUsage GetUsage() const;
     /// Return auxiliary view rendering viewport.
-    const Viewport& GetViewport() const { return viewport_; }
+    Viewport* GetViewport() const { return viewport_; }
     /// Return linked color rendertarget.
     RenderSurface* GetLinkedRenderTarget() const { return linkedRenderTarget_; }
     /// Return linked depth-stencil surface.
@@ -100,7 +72,7 @@ private:
     /// Direct3D surface.
     void* surface_;
     /// Viewport.
-    Viewport viewport_;
+    SharedPtr<Viewport> viewport_;
     /// Linked color buffer.
     WeakPtr<RenderSurface> linkedRenderTarget_;
     /// Linked depth buffer.

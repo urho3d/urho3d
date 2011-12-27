@@ -124,27 +124,22 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bones(uint)", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
 }
 
-static void ConstructViewport(Viewport* ptr)
+static Viewport* ConstructViewport()
 {
-    new(ptr) Viewport();
+    return new Viewport();
 }
 
-static void ConstructViewportCopy(const Viewport& viewport, Viewport* ptr)
+static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera)
 {
-    new(ptr) Viewport(viewport);
+    return new Viewport(scene, camera);
 }
 
-static void ConstructViewportSceneCamera(Scene* scene, Camera* camera, Viewport* ptr)
+static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect)
 {
-    new(ptr) Viewport(scene, camera);
+    return new Viewport(scene, camera, rect);
 }
 
-static void ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, Viewport* ptr)
-{
-    new(ptr) Viewport(scene, camera, rect);
-}
-
-static void ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr, Viewport* ptr)
+static Viewport* ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr)
 {
     Vector<SharedPtr<PostProcess> > vec;
     if (arr)
@@ -153,10 +148,10 @@ static void ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* came
             vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
     }
     
-    new(ptr) Viewport(scene, camera, vec);
+    return new Viewport(scene, camera, vec);
 }
 
-static void ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr, Viewport* ptr)
+static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr)
 {
     Vector<SharedPtr<PostProcess> > vec;
     if (arr)
@@ -165,53 +160,7 @@ static void ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* 
             vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
     }
     
-    new(ptr) Viewport(scene, camera, rect, vec);
-}
-
-static void DestructViewport(Viewport* ptr)
-{
-    ptr->~Viewport();
-}
-
-static void ViewportSetScene(Scene* scene, Viewport* ptr)
-{
-    ptr->scene_ = scene;
-}
-
-static void ViewportSetCamera(Camera* camera, Viewport* ptr)
-{
-    ptr->camera_ = camera;
-}
-
-static Scene* ViewportGetScene(Viewport* ptr)
-{
-    return ptr->scene_;
-}
-
-static Camera* ViewportGetCamera(Viewport* ptr)
-{
-    return ptr->camera_;
-}
-
-static void ViewportSetPostProcess(unsigned index, PostProcess* effect, Viewport* ptr)
-{
-    if (index < ptr->postProcesses_.Size())
-        ptr->postProcesses_[index] = effect;
-}
-
-static PostProcess* ViewportGetPostProcess(unsigned index, Viewport* ptr)
-{
-    return index < ptr->postProcesses_.Size() ? ptr->postProcesses_[index] : (PostProcess*)0;
-}
-
-static void ViewportSetNumPostProcesses(unsigned num, Viewport* ptr)
-{
-    ptr->postProcesses_.Resize(num);
-}
-
-static unsigned ViewportGetNumPostProcesses(Viewport* ptr)
-{
-    return ptr->postProcesses_.Size();
+    return new Viewport(scene, camera, rect, vec);
 }
 
 static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
@@ -264,24 +213,24 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     // Must register PostProcess early as Viewport needs it
     RegisterObject<PostProcess>(engine, "PostProcess");
-    engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructViewport), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport&in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructViewport), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "Viewport& opAssign(const Viewport&in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asFUNCTION(ViewportSetScene), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asFUNCTION(ViewportSetCamera), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asFUNCTION(ViewportGetScene), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asFUNCTION(ViewportGetCamera), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("Viewport", "IntRect rect", offsetof(Viewport, rect_));
-    engine->RegisterObjectMethod("Viewport", "void set_postProcesses(uint, PostProcess@+)", asFUNCTION(ViewportSetPostProcess), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "PostProcess@+ get_postProcesses(uint) const", asFUNCTION(ViewportGetPostProcess), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "void set_numPostProcesses(uint)", asFUNCTION(ViewportSetNumPostProcesses), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "uint get_numPostProcesses() const", asFUNCTION(ViewportGetNumPostProcesses), asCALL_CDECL_OBJLAST);
+    RegisterRefCounted<Viewport>(engine, "Viewport");
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f()", asFUNCTION(ConstructViewport), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL);
+    engine->RegisterObjectMethod("Viewport", "void AddPostProcess(PostProcess@+)", asMETHOD(Viewport, AddPostProcess), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void InsertPostProcess(uint, PostProcess@+)", asMETHOD(Viewport, InsertPostProcess), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void RemovePostProcess(PostProcess@+)", asMETHODPR(Viewport, RemovePostProcess, (PostProcess*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void RemovePostProcess(uint)", asMETHODPR(Viewport, RemovePostProcess, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void RemoveAllPostProcesses()", asMETHOD(Viewport, RemoveAllPostProcesses), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asMETHOD(Viewport, SetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asMETHOD(Viewport, GetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_rect(const IntRect&in)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "const IntRect& get_rect() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "uint get_numPostProcesses() const", asMETHOD(Viewport, GetNumPostProcesses), asCALL_THISCALL);
     
     engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
@@ -290,8 +239,8 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHOD(RenderSurface, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int get_height() const", asMETHOD(RenderSurface, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "TextureUsage get_usage() const", asMETHOD(RenderSurface, GetUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_viewport(const Viewport&in)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "const Viewport& get_viewport() const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_viewport(Viewport@+)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ get_viewport() const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHOD(RenderSurface, GetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
@@ -318,11 +267,11 @@ static void RegisterTextures(asIScriptEngine* engine)
 
 static Material* MaterialClone(const String& cloneName, Material* ptr)
 {
-    SharedPtr<Material> clonedMaterial = ptr->Clone(cloneName);
+    SharedPtr<Material> clone = ptr->Clone(cloneName);
     // The shared pointer will go out of scope, so have to increment the reference count
     // (here an auto handle can not be used)
-    clonedMaterial->AddRef();
-    return clonedMaterial.Get();
+    clone->AddRef();
+    return clone.Get();
 }
 
 static void RegisterMaterial(asIScriptEngine* engine)
@@ -409,6 +358,15 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
 }
 
+static PostProcess* PostProcessClone(PostProcess* ptr)
+{
+    SharedPtr<PostProcess> clone = ptr->Clone();
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
+}
+
 static void RegisterPostProcess(asIScriptEngine* engine)
 {
     RegisterRefCounted<PostProcessPass>(engine, "PostProcessPass");
@@ -427,6 +385,7 @@ static void RegisterPostProcess(asIScriptEngine* engine)
     RegisterObjectConstructor<PostProcess>(engine, "PostProcess");
     engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "void RemoveRenderTarget(const String&in)", asMETHOD(PostProcess, RemoveRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PostProcess", "PostProcess@ Clone() const", asFUNCTION(PostProcessClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PostProcess", "bool HasRenderTarget(const String&in) const", asMETHOD(PostProcess, HasRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "bool set_parameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("PostProcess", "XMLFile@+ get_parameters() const", asMETHOD(PostProcess, GetParameters), asCALL_THISCALL);
@@ -847,8 +806,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_numViewports(uint)", asMETHOD(Renderer, SetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_viewports(uint, const Viewport&in)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "const Viewport& get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_lightPrepass(bool)", asMETHOD(Renderer, SetLightPrepass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_lightPrepass() const", asMETHOD(Renderer, GetLightPrepass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);

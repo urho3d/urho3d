@@ -33,6 +33,7 @@
 #include "Octree.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
+#include "PostProcess.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "ShaderVariation.h"
@@ -164,42 +165,47 @@ View::~View()
 {
 }
 
-bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
+bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {
-    if (!viewport.scene_ || !viewport.camera_)
+    Scene* scene = viewport->GetScene();
+    Camera* camera = viewport->GetCamera();
+    if (!scene || !camera)
         return false;
     
     // If scene is loading asynchronously, it is incomplete and should not be rendered
-    if (viewport.scene_->IsAsyncLoading())
+    if (scene->IsAsyncLoading())
         return false;
     
-    Octree* octree = viewport.scene_->GetComponent<Octree>();
+    Octree* octree = scene->GetComponent<Octree>();
     if (!octree)
         return false;
     
     lightPrepass_ = renderer_->GetLightPrepass();
     octree_ = octree;
-    camera_ = viewport.camera_;
+    camera_ = camera;
     renderTarget_ = renderTarget;
     
     // Get active post-processing effects on the viewport
+    const Vector<SharedPtr<PostProcess> >& postProcesses = viewport->GetPostProcesses();
     postProcesses_.Clear();
-    for (unsigned i = 0; i < viewport.postProcesses_.Size(); ++i)
+    for (Vector<SharedPtr<PostProcess> >::ConstIterator i = postProcesses.Begin(); i != postProcesses.End(); ++i)
     {
-        PostProcess* effect = viewport.postProcesses_[i];
+        PostProcess* effect = i->Get();
         if (effect && effect->IsActive())
-            postProcesses_.Push(SharedPtr<PostProcess>(effect));
+            postProcesses_.Push(*i);
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
     int rtHeight = renderTarget ? renderTarget->GetHeight() : graphics_->GetHeight();
-    if (viewport.rect_ != IntRect::ZERO)
+    const IntRect& rect = viewport->GetRect();
+    
+    if (rect != IntRect::ZERO)
     {
-        viewRect_.left_ = Clamp(viewport.rect_.left_, 0, rtWidth - 1);
-        viewRect_.top_ = Clamp(viewport.rect_.top_, 0, rtHeight - 1);
-        viewRect_.right_ = Clamp(viewport.rect_.right_, viewRect_.left_ + 1, rtWidth);
-        viewRect_.bottom_ = Clamp(viewport.rect_.bottom_, viewRect_.top_ + 1, rtHeight);
+        viewRect_.left_ = Clamp(rect.left_, 0, rtWidth - 1);
+        viewRect_.top_ = Clamp(rect.top_, 0, rtHeight - 1);
+        viewRect_.right_ = Clamp(rect.right_, viewRect_.left_ + 1, rtWidth);
+        viewRect_.bottom_ = Clamp(rect.bottom_, viewRect_.top_ + 1, rtHeight);
     }
     else
         viewRect_ = IntRect(0, 0, rtWidth, rtHeight);
@@ -2196,8 +2202,8 @@ void View::CheckMaterialForAuxView(Material* material)
                 RenderSurface* target = tex2D->GetRenderSurface();
                 if (target)
                 {
-                    const Viewport& viewport = target->GetViewport();
-                    if (viewport.scene_ && viewport.camera_)
+                    Viewport* viewport = target->GetViewport();
+                    if (viewport->GetScene() && viewport->GetCamera())
                         renderer_->AddView(target, viewport);
                 }
             }
@@ -2209,8 +2215,8 @@ void View::CheckMaterialForAuxView(Material* material)
                     RenderSurface* target = texCube->GetRenderSurface((CubeMapFace)j);
                     if (target)
                     {
-                        const Viewport& viewport = target->GetViewport();
-                        if (viewport.scene_ && viewport.camera_)
+                        Viewport* viewport = target->GetViewport();
+                        if (viewport->GetScene() && viewport->GetCamera())
                             renderer_->AddView(target, viewport);
                     }
                 }

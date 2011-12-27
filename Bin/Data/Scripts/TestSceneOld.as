@@ -312,13 +312,15 @@ void CreateCamera()
     cameraLight.rampTexture = cache.GetResource("Texture2D", "Textures/RampWide.png");
     cameraLight.shapeTexture = cache.GetResource("Texture2D", "Textures/SpotWide.png");
 
-    Array<PostProcess@> effectChain;
-    edgeFilter = PostProcess();
-    edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
-    edgeFilter.active = false; // Start out disabled
-    effectChain.Push(edgeFilter);
+    if (!engine.headless)
+    {
+        edgeFilter = PostProcess();
+        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
+        edgeFilter.active = false; // Start out disabled
 
-    renderer.viewports[0] = Viewport(testScene, camera, effectChain);
+        renderer.viewports[0] = Viewport(testScene, camera);
+        renderer.viewports[0].AddPostProcess(edgeFilter);
+    }
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -72,6 +72,19 @@ void PostProcessPass::SetOutput(const String& name)
     outputName_ = name;
 }
 
+SharedPtr<PostProcessPass> PostProcessPass::Clone()
+{
+    SharedPtr<PostProcessPass> clone(new PostProcessPass());
+    clone->vertexShaderName_ = vertexShaderName_;
+    clone->pixelShaderName_ = pixelShaderName_;
+    clone->shaderParameters_ = shaderParameters_;
+    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        clone->textureNames_[i] = textureNames_[i];
+    clone->outputName_ = outputName_;
+    
+    return clone;
+}
+
 const String& PostProcessPass::GetTexture(TextureUnit unit) const
 {
     return unit < MAX_MATERIAL_TEXTURE_UNITS ? textureNames_[unit] : emptyName;
@@ -228,6 +241,18 @@ void PostProcess::RemoveRenderTarget(const String& name)
 void PostProcess::SetActive(bool active)
 {
     active_ = active;
+}
+
+SharedPtr<PostProcess> PostProcess::Clone()
+{
+    SharedPtr<PostProcess> clone(new PostProcess(context_));
+    clone->passes_.Resize(passes_.Size());
+    for (unsigned i = 0; i < passes_.Size(); ++i)
+        clone->passes_[i] = passes_[i]->Clone();
+    clone->renderTargets_ = renderTargets_;
+    clone->active_ = active_;
+    
+    return clone;
 }
 
 PostProcessPass* PostProcess::GetPass(unsigned index) const

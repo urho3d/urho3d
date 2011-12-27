@@ -38,8 +38,8 @@ class Octree;
 class RenderSurface;
 class Technique;
 class Texture2D;
+class Viewport;
 class Zone;
-struct Viewport;
 struct WorkItem;
 
 /// %Geometry view space depth minimum and maximum values.
@@ -91,7 +91,7 @@ public:
     virtual ~View();
     
     /// Define with rendertarget and viewport. Return true if successful.
-    bool Define(RenderSurface* renderTarget, const Viewport& viewport);
+    bool Define(RenderSurface* renderTarget, Viewport* viewport);
     /// Update and cull objects and construct rendering batches.
     void Update(const FrameInfo& frame);
     /// Render batches.

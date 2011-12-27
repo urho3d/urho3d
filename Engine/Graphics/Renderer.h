@@ -29,7 +29,7 @@
 #include "HashMap.h"
 #include "HashSet.h"
 #include "Mutex.h"
-#include "RenderSurface.h"
+#include "Viewport.h"
 
 class DebugRenderer;
 class Geometry;
@@ -40,6 +40,7 @@ class Pass;
 class Technique;
 class Octree;
 class Graphics;
+class RenderSurface;
 class ResourceCache;
 class Skeleton;
 class OcclusionBuffer;
@@ -167,8 +168,8 @@ public:
     
     /// %Set number of viewports to render.
     void SetNumViewports(unsigned num);
-    /// %Set a viewport.
-    void SetViewport(unsigned index, const Viewport& viewport);
+    /// %Set a viewport. Return true if successful.
+    bool SetViewport(unsigned index, Viewport* viewport);
     /// %Set light prepass rendering on/off.
     void SetLightPrepass(bool enable);
     /// %Set specular lighting on/off.
@@ -206,7 +207,7 @@ public:
     /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.
-    const Viewport& GetViewport(unsigned index) const;
+    Viewport* GetViewport(unsigned index) const;
     /// Return whether light prepass rendering is enabled.
     bool GetLightPrepass() const { return lightPrepass_; }
     /// Return whether specular lighting is enabled.
@@ -287,7 +288,7 @@ public:
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     /// Add a view. Return true if successful.
-    bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
+    bool AddView(RenderSurface* renderTarget, Viewport* viewport);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
@@ -400,7 +401,7 @@ private:
     /// Saved status of screen buffer allocations for restoring.
     HashMap<long long, unsigned> savedScreenBufferAllocations_;
     /// Viewports.
-    Vector<Viewport> viewports_;
+    Vector<SharedPtr<Viewport> > viewports_;
     /// Views.
     Vector<SharedPtr<View> > views_;
     /// Octrees that have been updated during the frame.

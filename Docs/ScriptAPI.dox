@@ -1500,6 +1500,7 @@ PostProcess
 Methods:<br>
 - bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
 - void RemoveRenderTarget(const String&)
+- PostProcess@ Clone() const
 - bool HasRenderTarget(const String&) const
 
 Properties:<br>
@@ -1513,12 +1514,18 @@ Properties:<br>
 
 Viewport
 
+Methods:<br>
+- void AddPostProcess(PostProcess@)
+- void InsertPostProcess(uint, PostProcess@)
+- void RemovePostProcess(PostProcess@)
+- void RemovePostProcess(uint)
+- void RemoveAllPostProcesses()
+
 Properties:<br>
 - Scene@ scene
 - Camera@ camera
-- PostProcess@[] postProcesses
-- uint numPostProcesses
-- IntRect rect
+- IntRect& rect
+- uint numPostProcesses (readonly)
 
 
 RenderSurface
@@ -1528,7 +1535,7 @@ Properties:<br>
 - int width (readonly)
 - int height (readonly)
 - TextureUsage usage (readonly)
-- Viewport& viewport
+- Viewport@ viewport
 - RenderSurface@ linkedRenderTarget
 - RenderSurface@ linkedDepthStencil
 
@@ -2281,7 +2288,7 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - uint numViewports
-- Viewport&[] viewports
+- Viewport@[] viewports
 - bool lightPrepass
 - bool specularLighting
 - int textureAnisotropy

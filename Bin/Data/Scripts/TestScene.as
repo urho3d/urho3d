@@ -212,14 +212,15 @@ void InitScene()
     camera = cameraNode.CreateComponent("Camera");
     cameraNode.position = Vector3(0, 2, 0);
 
-    Array<PostProcess@> effectChain;
-    edgeFilter = PostProcess();
-    edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
-    edgeFilter.active = false; // Start out disabled
-    effectChain.Push(edgeFilter);
-
     if (!engine.headless)
-        renderer.viewports[0] = Viewport(testScene, camera, effectChain);
+    {
+        edgeFilter = PostProcess();
+        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
+        edgeFilter.active = false; // Start out disabled
+
+        renderer.viewports[0] = Viewport(testScene, camera);
+        renderer.viewports[0].AddPostProcess(edgeFilter);
+    }
 }
 
 bool CheckInLight(Drawable@ drawable)

@@ -256,7 +256,6 @@ static const String lightPSVariations[] =
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
 static const unsigned MAX_BUFFER_AGE = 2000;
-static const Viewport noViewport;
 
 OBJECTTYPESTATIC(Renderer);
 
@@ -293,6 +292,7 @@ Renderer::Renderer(Context* context) :
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
+    SetNumViewports(1);
 }
 
 Renderer::~Renderer()
@@ -302,17 +302,30 @@ Renderer::~Renderer()
 void Renderer::SetNumViewports(unsigned num)
 {
     viewports_.Resize(num);
+    
+    for (unsigned i = 0; i < viewports_.Size(); ++i)
+    {
+        if (!viewports_[i])
+            viewports_[i] = new Viewport();
+    }
 }
 
-void Renderer::SetViewport(unsigned index, const Viewport& viewport)
+bool Renderer::SetViewport(unsigned index, Viewport* viewport)
 {
     if (index >= viewports_.Size())
     {
         LOGERROR("Viewport index out of bounds");
-        return;
+        return false;
+    }
+    
+    if (!viewport)
+    {
+        LOGERROR("Null viewport");
+        return false;
     }
     
     viewports_[index] = viewport;
+    return true;
 }
 
 void Renderer::SetLightPrepass(bool enable)
@@ -478,9 +491,9 @@ void Renderer::SetOccluderSizeThreshold(float screenSize)
     occluderSizeThreshold_ = Max(screenSize, 0.0f);
 }
 
-const Viewport& Renderer::GetViewport(unsigned index) const
+Viewport* Renderer::GetViewport(unsigned index) const
 {
-    return index < viewports_.Size() ? viewports_[index] : noViewport;
+    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
 }
 
 ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
@@ -573,17 +586,19 @@ void Renderer::Update(float timeStep)
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
     {
         unsigned mainView = numViews_;
-        Viewport& viewport = viewports_[i];
-        if (!AddView(0, viewport))
+        Viewport* viewport = viewports_[i];
+        if (!viewport || !AddView(0, viewport))
             continue;
+        
+        const IntRect& viewRect = viewport->GetRect();
         
         // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
-        Octree* octree = viewport.scene_->GetComponent<Octree>();
+        Octree* octree = viewport->GetScene()->GetComponent<Octree>();
         if (!updatedOctrees_.Contains(octree))
         {
-            frame_.camera_ = viewport.camera_;
-            frame_.viewSize_ = IntVector2(viewport.rect_.right_ - viewport.rect_.left_, viewport.rect_.bottom_ - viewport.rect_.top_);
+            frame_.camera_ = viewport->GetCamera();
+            frame_.viewSize_ = IntVector2(viewRect.right_ - viewRect.left_, viewRect.bottom_ - viewRect.top_);
             if (frame_.viewSize_ == IntVector2::ZERO)
                 frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
             octree->Update(frame_);
@@ -591,9 +606,9 @@ void Renderer::Update(float timeStep)
             
             // Set also the view for the debug graphics already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
-            DebugRenderer* debug = viewport.scene_->GetComponent<DebugRenderer>();
+            DebugRenderer* debug = viewport->GetScene()->GetComponent<DebugRenderer>();
             if (debug)
-                debug->SetView(viewport.camera_);
+                debug->SetView(viewport->GetCamera());
         }
         
         // Update the viewport's main view and any auxiliary views it has created
@@ -698,7 +713,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     }
 }
 
-bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
+bool Renderer::AddView(RenderSurface* renderTarget, Viewport* viewport)
 {
     // If using a rendertarget texture, make sure it will not be rendered to multiple times
     if (renderTarget)

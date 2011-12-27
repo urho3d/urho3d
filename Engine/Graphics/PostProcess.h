@@ -51,6 +51,8 @@ public:
     void RemoveShaderParameter(const String& name);
     /// %Set output rendertarget name.
     void SetOutput(const String& name);
+    /// Clone the post-process pass.
+    SharedPtr<PostProcessPass> Clone();
     
     /// Return vertex shader name.
     const String& GetVertexShader() const { return vertexShaderName_; }
@@ -114,6 +116,8 @@ public:
     void RemoveRenderTarget(const String& name);
     /// Set active flag.
     void SetActive(bool active);
+    /// Clone the post-process.
+    SharedPtr<PostProcess> Clone();
     
     /// Return parameter XML file.
     XMLFile* GetParameters() const { return parameterSource_; }

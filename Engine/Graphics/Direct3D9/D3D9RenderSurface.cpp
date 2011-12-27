@@ -32,44 +32,10 @@
 
 #include "DebugNew.h"
 
-Viewport::Viewport() :
-    rect_(IntRect::ZERO)
-{
-}
-
-Viewport::Viewport(Scene* scene, Camera* camera) :
-    scene_(scene),
-    camera_(camera),
-    rect_(IntRect::ZERO)
-{
-}
-
-Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect) :
-    scene_(scene),
-    camera_(camera),
-    rect_(rect)
-{
-}
-
-Viewport::Viewport(Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses) :
-    scene_(scene),
-    camera_(camera),
-    rect_(IntRect::ZERO),
-    postProcesses_(postProcesses)
-{
-}
-
-Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses) :
-    scene_(scene),
-    camera_(camera),
-    rect_(rect),
-    postProcesses_(postProcesses)
-{
-}
-
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    surface_(0)
+    surface_(0),
+    viewport_(new Viewport())
 {
 }
 
@@ -78,9 +44,10 @@ RenderSurface::~RenderSurface()
     Release();
 }
 
-void RenderSurface::SetViewport(const Viewport& viewport)
+void RenderSurface::SetViewport(Viewport* viewport)
 {
-    viewport_ = viewport;
+    if (viewport)
+        viewport_ = viewport;
 }
 
 void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
