@@ -80,7 +80,7 @@ private:
     /// OpenGL renderbuffer.
     unsigned renderBuffer_;
     /// Viewport.
-    Viewport viewport_;
+    SharedPtr<Viewport> viewport_;
     /// Linked color buffer.
     WeakPtr<RenderSurface> linkedRenderTarget_;
     /// Linked depth buffer.
