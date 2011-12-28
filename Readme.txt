@@ -147,3 +147,9 @@ V1.12   - Manipulator gizmo and multi-editing in the editor.
 V1.13   - Task-based multithreading.
         - Vertex lighting option.
         - Forward and light pre-pass rendering pipelines.
+
+V1.14   - Object (partial scene) load/save.
+        - Post-processing.
+        - Switched to pugixml library, scene load/save optimizations.
+        - Bugfixes to rendertexture views and component attributes.
+
