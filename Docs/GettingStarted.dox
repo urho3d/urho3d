@@ -29,7 +29,7 @@ To actually make Urho3D.exe do something useful, it must be supplied with the na
 
 \page Running Running Urho3D
 
-For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is required.
+For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and EXT_texture_filter_anisotropic extensions is required.
 
 The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
 
@@ -134,7 +134,6 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -logdebug   Display debug level log messages also in release mode
 -prepass    Use light pre-pass rendering
--fxaa       Use FXAA edge filter
 -lqshadows  Use low-quality (1-sample) shadow filtering
 -noshadows  Disable shadow rendering
 -nolimit    Disable frame limiter

@@ -373,7 +373,7 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
-- For OpenGL, version 2.0 with EXT_framebuffer_object and EXT_packed_depth_stencil extensions is checked for.
+- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and EXT_texture_filter_anisotropic extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Is light pre-pass rendering supported? This requires either readable hardware depth-stencil texture, or multiple rendertarget and R32F texture format support.
 
@@ -477,9 +477,7 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
 
-- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed.
-
-- On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
+- On OpenGL vertex attribute bindings depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
 
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
