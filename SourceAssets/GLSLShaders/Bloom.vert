@@ -1,5 +1,3 @@
-#version 120
-
 #include "Uniforms.vert"
 #include "Transform.vert"
 #include "ScreenPos.vert"

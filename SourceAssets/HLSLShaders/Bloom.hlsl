@@ -63,7 +63,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     float3 original = tex2D(sDiffMap, iScreenPos).rgb * cBloomMix.x;
     float3 bloom = tex2D(sNormalMap, iTexCoord).rgb  * cBloomMix.y;
     // Prevent oversaturation
-    original *= (1.0 - saturate(bloom));
+    original *= saturate(1.0 - bloom);
     oColor = float4(original + bloom, 1.0);
     #endif
 }
