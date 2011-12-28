@@ -109,6 +109,7 @@ bool localIDs_ = false;
 bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
+float defaultTicksPerSecond_ = 4800.0f;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -196,6 +197,7 @@ void Run(const Vector<String>& arguments)
             "-nz   Do not create a zone and a directional light (scene mode only)\n"
             "-pX   Set path X for scene resources. Default is output file path\n"
             "-rX   Use scene node X as root node\n"
+            "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
             "-t    Generate tangents to model(s)\n"
         );
     }
@@ -255,6 +257,10 @@ void Run(const Vector<String>& arguments)
                 
             case 't':
                 flags |= aiProcess_CalcTangentSpace;
+                break;
+                
+            case 'f':
+                defaultTicksPerSecond_ = ToFloat(parameter);
                 break;
                 
             case 'n':
@@ -883,7 +889,11 @@ void BuildAndSaveAnimations(OutModel& model)
         String animOutName = GetPath(model.outName_) + GetFileName(model.outName_) + "_" + SanitateAssetName(animName) + ".ani";
         
         SharedPtr<Animation> outAnim(new Animation(context_));
-        float tickConversion = 1.0f / (float)anim->mTicksPerSecond;
+        float ticksPerSecond = (float)anim->mTicksPerSecond;
+        // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
+        if (ticksPerSecond < M_EPSILON)
+            ticksPerSecond = defaultTicksPerSecond_;
+        float tickConversion = 1.0f / ticksPerSecond;
         outAnim->SetAnimationName(animName);
         outAnim->SetLength((float)anim->mDuration * tickConversion);
         

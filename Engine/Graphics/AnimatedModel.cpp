@@ -607,10 +607,20 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         
         skeleton_.Define(skeleton);
         
+        // Remove collision information from dummy bones that do not affect skinning, to prevent them from being merged
+        // to the bounding box
+        Vector<Bone>& bones = skeleton_.GetModifiableBones();
+        for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < M_EPSILON)
+                i->collisionMask_ &= ~BONECOLLISION_BOX;
+            if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_EPSILON)
+                i->collisionMask_ &= ~BONECOLLISION_SPHERE;
+        }
+        
         // Create scene nodes for the bones
         if (createBones)
         {
-            Vector<Bone>& bones = skeleton_.GetModifiableBones();
             for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
                 // Create bones as local, as they are never to be directly synchronized over the network
