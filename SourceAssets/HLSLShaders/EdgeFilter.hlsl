@@ -31,7 +31,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float FXAA_REDUCE_MUL = 1.0/8.0;
     float FXAA_REDUCE_MIN = 1.0/128.0;
 
-    float2 posOffset = cSampleOffsets.xy * cEdgeFilterParams.x;
+    float2 posOffset = cGBufferInvSize.xy * cEdgeFilterParams.x;
 
     float3 rgbNW = Sample(sDiffMap, iScreenPos + float2(-posOffset.x, -posOffset.y)).rgb;
     float3 rgbNE = Sample(sDiffMap, iScreenPos + float2(posOffset.x, -posOffset.y)).rgb;
@@ -61,7 +61,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
         float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
         dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
               max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
-              dir * rcpDirMin)) * cSampleOffsets.xy;
+              dir * rcpDirMin)) * cGBufferInvSize.xy;
     
         dir *= cEdgeFilterParams.z;
     

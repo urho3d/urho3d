@@ -1372,7 +1372,24 @@ void View::RunPostProcesses()
             #endif
             
             graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-            graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
+            graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
+            
+            // Set per-rendertarget inverse size / offset shader parameters as necessary
+            for (HashMap<StringHash, PostProcessRenderTarget>::ConstIterator k = renderTargetInfos.Begin(); k !=
+                renderTargetInfos.End(); ++k)
+            {
+                String invSizeName = k->second_.name_ + "InvSize";
+                String offsetsName = k->second_.name_ + "Offsets";
+                float width = (float)renderTargets[k->first_]->GetWidth();
+                float height = (float)renderTargets[k->first_]->GetHeight();
+                
+                graphics_->SetShaderParameter(StringHash(invSizeName), Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
+                #ifdef USE_OPENGL
+                graphics_->SetShaderParameter(StringHash(offsetsName), Vector4::ZERO);
+                #else
+                graphics_->SetShaderParameter(StringHash(offsetsName), Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
+                #endif
+            }
             
             const String* textureNames = pass->GetTextures();
             for (unsigned k = 0; k < MAX_MATERIAL_TEXTURE_UNITS; ++k)

@@ -39,9 +39,9 @@ float GetShadow(vec4 shadowPos)
     #ifndef LQSHADOW
         // Take four samples and average them
         #ifndef POINTLIGHT
-            vec2 offsets = cSampleOffsets * shadowPos.w;
+            vec2 offsets = cShadowMapInvSize * shadowPos.w;
         #else
-            vec2 offsets = cSampleOffsets;
+            vec2 offsets = cShadowMapInvSize;
         #endif
         vec4 inLight = vec4(
             shadow2DProj(sShadowMap, shadowPos).r,

@@ -5,18 +5,17 @@
 
 uniform float cBloomThreshold;
 uniform vec2 cBloomMix;
-uniform vec2 cBlurOffset;
+uniform vec2 cHBlurInvSize;
 
 varying vec2 vTexCoord;
 varying vec2 vScreenPos;
 
-// We are blurring a 4x downsampled RT, so blur offsets are 4x in terms of the original RT
 float offsets[5] = float[](
-    8.0,
-    4.0,
+    2.0,
+    1.0,
     0.0,
-    -4.0,
-    -8.0
+    -1.0,
+    -2.0
 );
 
 float weights[5] = float[](
@@ -37,14 +36,14 @@ void main()
     #ifdef HBLUR
     vec3 rgb = vec3(0.0, 0.0, 0.0);
     for (int i = 0; i < 5; ++i)
-        rgb += texture2D(sDiffMap, vTexCoord + vec2(offsets[i], 0.0) * cSampleOffsets).rgb * weights[i];
+        rgb += texture2D(sDiffMap, vTexCoord + vec2(offsets[i], 0.0) * cHBlurInvSize).rgb * weights[i];
     gl_FragColor = vec4(rgb, 1.0);
     #endif
 
     #ifdef VBLUR
     vec3 rgb = vec3(0.0, 0.0, 0.0);
     for (int i = 0; i < 5; ++i)
-        rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, offsets[i]) * cSampleOffsets).rgb * weights[i];
+        rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, offsets[i]) * cHBlurInvSize).rgb * weights[i];
     gl_FragColor = vec4(rgb, 1.0);
     #endif
 

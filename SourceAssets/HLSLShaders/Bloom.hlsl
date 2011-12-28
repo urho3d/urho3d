@@ -5,15 +5,15 @@
 
 uniform float cBloomThreshold;
 uniform float2 cBloomMix;
-uniform float2 cBlurOffset;
+uniform float2 cHBlurOffsets;
+uniform float2 cHBlurInvSize;
 
-// We are blurring a 4x downsampled RT, so blur offsets are 4x in terms of the original RT
 static const float offsets[5] = {
-    8.0,
-    4.0,
+    2.0,
+    1.0,
     0.0,
-    -4.0,
-    -8.0,
+    -1.0,
+    -2.0,
 };
 
 static const float weights[5] = {
@@ -32,7 +32,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetQuadTexCoord(oPos);
+    oTexCoord = GetQuadTexCoord(oPos) + cHBlurOffsets;
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
 
@@ -41,27 +41,27 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef BRIGHT
-    float3 rgb = Sample(sDiffMap, iScreenPos + cBlurOffset * cSampleOffsets).rgb;
+    float3 rgb = tex2D(sDiffMap, iScreenPos).rgb;
     oColor = float4((rgb - cBloomThreshold) / (1.0 - cBloomThreshold), 1.0);
     #endif
 
     #ifdef HBLUR
     float3 rgb = 0.0;
     for (int i = 0; i < 5; ++i)
-        rgb += Sample(sDiffMap, iTexCoord + (cBlurOffset + float2(offsets[i], 0.0)) * cSampleOffsets).rgb * weights[i];
+        rgb += tex2D(sDiffMap, iTexCoord + (float2(offsets[i], 0.0)) * cHBlurInvSize).rgb * weights[i];
     oColor = float4(rgb, 1.0);
     #endif
 
     #ifdef VBLUR
     float3 rgb = 0.0;
     for (int i = 0; i < 5; ++i)
-        rgb += Sample(sDiffMap, iTexCoord + (cBlurOffset + float2(0.0, offsets[i])) * cSampleOffsets).rgb * weights[i];
+        rgb += tex2D(sDiffMap, iTexCoord + (float2(0.0, offsets[i])) * cHBlurInvSize).rgb * weights[i];
     oColor = float4(rgb, 1.0);
     #endif
 
     #ifdef COMBINE
-    float3 original = Sample(sDiffMap, iScreenPos).rgb * cBloomMix.x;
-    float3 bloom = Sample(sNormalMap, iTexCoord).rgb  * cBloomMix.y;
+    float3 original = tex2D(sDiffMap, iScreenPos).rgb * cBloomMix.x;
+    float3 bloom = tex2D(sNormalMap, iTexCoord).rgb  * cBloomMix.y;
     // Prevent oversaturation
     original *= (1.0 - saturate(bloom));
     oColor = float4(original + bloom, 1.0);

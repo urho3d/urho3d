@@ -49,17 +49,17 @@ void PS(
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
         #ifdef ORTHO
-            float depth = Sample(sDepthBuffer, iScreenPos).r;
+            float depth = tex2D(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth);
         #else
             #ifdef LINEAR
-                float depth = Sample(sDepthBuffer, iScreenPos).r;
+                float depth = tex2D(sDepthBuffer, iScreenPos).r;
             #else
-                float depth = ReconstructDepth(Sample(sDepthBuffer, iScreenPos).r);
+                float depth = ReconstructDepth(tex2D(sDepthBuffer, iScreenPos).r);
             #endif
             float3 worldPos = iFarRay * depth;
         #endif
-        float4 normalInput = Sample(sNormalBuffer, iScreenPos);
+        float4 normalInput = tex2D(sNormalBuffer, iScreenPos);
     #else
         #ifdef ORTHO
             float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;

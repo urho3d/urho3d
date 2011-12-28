@@ -19,7 +19,7 @@ void main()
     float FXAA_REDUCE_MUL = 1.0/8.0;
     float FXAA_REDUCE_MIN = 1.0/128.0;
 
-    vec2 posOffset = cSampleOffsets.xy * cEdgeFilterParams.x;
+    vec2 posOffset = cGBufferInvSize.xy * cEdgeFilterParams.x;
 
     vec3 rgbNW = texture2D(sDiffMap, vScreenPos + vec2(-posOffset.x, -posOffset.y)).rgb;
     vec3 rgbNE = texture2D(sDiffMap, vScreenPos + vec2(posOffset.x, -posOffset.y)).rgb;
@@ -49,7 +49,7 @@ void main()
         float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
         dir = min(vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
               max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
-              dir * rcpDirMin)) * cSampleOffsets.xy;
+              dir * rcpDirMin)) * cGBufferInvSize.xy;
 
         dir *= cEdgeFilterParams.z;
 

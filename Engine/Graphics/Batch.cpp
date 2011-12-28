@@ -216,13 +216,13 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         graphics->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
     }
     
+    IntVector2 rtSize = graphics->GetRenderTargetDimensions();
     IntRect viewport = graphics->GetViewport();
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
+    float rtWidth = (float)rtSize.x_;
+    float rtHeight = (float)rtSize.y_;
     if (graphics->NeedParameterUpdate(VSP_GBUFFEROFFSETS, (const void*)viewportHash))
     {
-        IntVector2 rtSize = graphics->GetRenderTargetDimensions();
-        float rtWidth = (float)rtSize.x_;
-        float rtHeight = (float)rtSize.y_;
         float widthRange = 0.5f * (viewport.right_ - viewport.left_) / rtWidth;
         float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / rtHeight;
         
@@ -235,6 +235,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         #endif
         
         graphics->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    }
+    if (graphics->NeedParameterUpdate(PSP_GBUFFERINVSIZE, (const void*)viewportHash))
+    {
+        float sizeX = 1.0f / rtWidth;
+        float sizeY = 1.0f / rtHeight;
+        graphics->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
     }
     
     if (overrideView_)
@@ -455,13 +461,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         // Set shadow mapping shader parameters
         if (shadowMap)
         {
-            if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
-            {
-                float addX = 1.0f / (float)shadowMap->GetWidth();
-                float addY = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(addX, addY, 0.0f, 0.0f));
-            }
-            
             if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEADJUST, light))
             {
                 unsigned faceWidth = shadowMap->GetWidth() / 2;
@@ -516,6 +515,13 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 float pcfValues = (1.0f - intensity);
                 float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
                 graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
+            }
+            
+            if (graphics->NeedParameterUpdate(PSP_SHADOWMAPINVSIZE, shadowMap))
+            {
+                float sizeX = 1.0f / (float)shadowMap->GetWidth();
+                float sizeY = 1.0f / (float)shadowMap->GetHeight();
+                graphics->SetShaderParameter(PSP_SHADOWMAPINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
             }
             
             if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))

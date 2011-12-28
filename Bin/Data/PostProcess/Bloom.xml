@@ -3,7 +3,6 @@
     <rendertarget name="hblur" sizedivisor="4 4" format="rgb" filter="true" />
     <parameter name="BloomThreshold" value="0.3" />
     <parameter name="BloomMix" value="0.9 0.4" />
-    <parameter name="BlurOffset" value="2 2" />
     <pass vs="Bloom" ps="Bloom_Bright" output="vblur">
         <texture unit="diffuse" name="viewport" />
     </pass>

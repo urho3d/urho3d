@@ -93,9 +93,9 @@ float GetShadow(float4 shadowPos)
     #ifndef LQSHADOW
         // Take four samples and average them
         #ifndef POINTLIGHT
-            float2 offsets = cSampleOffsets * shadowPos.w;
+            float2 offsets = cShadowMapInvSize * shadowPos.w;
         #else
-            float2 offsets = cSampleOffsets;
+            float2 offsets = cShadowMapInvSize;
         #endif
         float4 inLight = float4(
             tex2Dproj(sShadowMap, shadowPos).r,

@@ -85,6 +85,8 @@ private:
 /// Post-processing rendertarget info.
 struct PostProcessRenderTarget
 {
+    /// Name.
+    String name_;
     /// Texture format.
     unsigned format_;
     /// Size.

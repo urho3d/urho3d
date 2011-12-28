@@ -240,6 +240,7 @@ bool PostProcess::CreateRenderTarget(const String& name, unsigned width, unsigne
         return false;
     
     PostProcessRenderTarget target;
+    target.name_ = name;
     target.format_ = format;
     target.size_ = IntVector2(width, height),
     target.sizeDivisor_ = sizeDivisor;
