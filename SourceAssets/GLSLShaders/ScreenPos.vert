@@ -14,7 +14,7 @@ vec2 GetScreenPosPreDiv(vec4 clipPos)
         clipPos.y / clipPos.w * cGBufferOffsets.w + cGBufferOffsets.y);
 }
 
-vec2 GetQuadTexCoord(float4 clipPos)
+vec2 GetQuadTexCoord(vec4 clipPos)
 {
     return vec2(
         clipPos.x / clipPos.w * 0.5 + 0.5,
