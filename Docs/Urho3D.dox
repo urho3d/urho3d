@@ -131,7 +131,7 @@ V1.13
 
 V1.14   
 
-- Object (partial scene) load/save.
+- %Object (partial scene) load/save.
 - Post-processing.
 - Switched to pugixml library, scene load/save optimizations.
 - Bugfixes to rendertexture views and component attributes.
