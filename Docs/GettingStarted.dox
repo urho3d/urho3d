@@ -57,6 +57,7 @@ F7          Load scene
 T           Toggle profiling display
 C           Toggle orthographic camera
 F           Toggle FXAA edge filter
+B           Toggle bloom post-process
 \endverbatim
 
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1

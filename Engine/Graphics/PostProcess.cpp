@@ -119,6 +119,7 @@ bool PostProcess::LoadParameters(XMLFile* file)
     
     parameterSource_ = file;
     renderTargets_.Clear();
+    shaderParameters_.Clear();
     passes_.Clear();
     
     XMLElement rtElem = rootElem.GetChild("rendertarget");
@@ -162,6 +163,16 @@ bool PostProcess::LoadParameters(XMLFile* file)
         rtElem = rtElem.GetNext("rendertarget");
     }
     
+    XMLElement parameterElem = rootElem.GetChild("parameter");
+    while (parameterElem)
+    {
+        String name = parameterElem.GetAttribute("name");
+        Vector4 value = parameterElem.GetVector("value");
+        SetShaderParameter(name, value);
+        
+        parameterElem = parameterElem.GetNext("parameter");
+    }
+    
     XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
@@ -177,9 +188,14 @@ bool PostProcess::LoadParameters(XMLFile* file)
             if (textureElem.HasAttribute("unit"))
             {
                 String unitName = textureElem.GetAttributeLower("unit");
-                unit = ParseTextureUnitName(unitName);
-                if (unit == MAX_MATERIAL_TEXTURE_UNITS)
-                    LOGERROR("Unknown texture unit " + unitName);
+                if (unitName.Length() > 1)
+                {
+                    unit = ParseTextureUnitName(unitName);
+                    if (unit == MAX_MATERIAL_TEXTURE_UNITS)
+                        LOGERROR("Unknown texture unit " + unitName);
+                }
+                else
+                    unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);
             }
             if (unit != MAX_MATERIAL_TEXTURE_UNITS)
             {
@@ -238,6 +254,16 @@ void PostProcess::RemoveRenderTarget(const String& name)
     renderTargets_.Erase(StringHash(name));
 }
 
+void PostProcess::SetShaderParameter(const String& name, const Vector4& value)
+{
+    shaderParameters_[StringHash(name)] = value;
+}
+
+void PostProcess::RemoveShaderParameter(const String& name)
+{
+    shaderParameters_.Erase(StringHash(name));
+}
+
 void PostProcess::SetActive(bool active)
 {
     active_ = active;
@@ -266,4 +292,10 @@ PostProcessPass* PostProcess::GetPass(unsigned index) const
 bool PostProcess::HasRenderTarget(const String& name) const
 {
     return renderTargets_.Contains(StringHash(name));
+}
+
+const Vector4& PostProcess::GetShaderParameter(const String& name) const
+{
+    HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(StringHash(name));
+    return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
 }

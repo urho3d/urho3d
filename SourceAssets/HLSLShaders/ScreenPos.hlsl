@@ -14,6 +14,13 @@ float2 GetScreenPosPreDiv(float4 clipPos)
         -clipPos.y / clipPos.w * cGBufferOffsets.w + cGBufferOffsets.y);
 }
 
+float2 GetQuadTexCoord(float4 clipPos)
+{
+    return float2(
+        clipPos.x / clipPos.w * 0.5 + 0.5,
+        -clipPos.y / clipPos.w * 0.5 + 0.5);
+}
+
 float3 GetFarRay(float4 clipPos)
 {
     float3 viewRay = float3(

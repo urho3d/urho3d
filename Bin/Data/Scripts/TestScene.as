@@ -4,6 +4,7 @@ Scene@ testScene;
 Camera@ camera;
 Node@ cameraNode;
 PostProcess@ edgeFilter;
+PostProcess@ bloom;
 
 float yaw = 0.0;
 float pitch = 0.0;
@@ -218,8 +219,13 @@ void InitScene()
         edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
         edgeFilter.active = false; // Start out disabled
 
+        bloom = PostProcess();
+        bloom.parameters = cache.GetResource("XMLFile", "PostProcess/Bloom.xml");
+        bloom.active = false;
+
         renderer.viewports[0] = Viewport(testScene, camera);
         renderer.viewports[0].AddPostProcess(edgeFilter);
+        renderer.viewports[0].AddPostProcess(bloom);
     }
 }
 
@@ -321,6 +327,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress['C'])
             camera.orthographic = !camera.orthographic;
+
+        if (input.keyPress['B'])
+            bloom.active = !bloom.active;
 
         if (input.keyPress['F'])
             edgeFilter.active = !edgeFilter.active;

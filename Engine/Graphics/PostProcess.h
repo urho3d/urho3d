@@ -74,9 +74,9 @@ private:
     String vertexShaderName_;
     /// Pixel shader name.
     String pixelShaderName_;
-    /// Texture names by unit.
+    /// Textures.
     String textureNames_[MAX_MATERIAL_TEXTURE_UNITS];
-    /// Shader parameters.
+    /// %Shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Output rendertarget name.
     String outputName_;
@@ -114,6 +114,10 @@ public:
     bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered);
     /// Remove a rendertarget.
     void RemoveRenderTarget(const String& name);
+    /// %Set global shader parameter.
+    void SetShaderParameter(const String& name, const Vector4& value);
+    /// Remove global shader parameter.
+    void RemoveShaderParameter(const String& name);
     /// Set active flag.
     void SetActive(bool active);
     /// Clone the post-process.
@@ -129,6 +133,10 @@ public:
     bool HasRenderTarget(const String& name) const;
     /// Return all rendertargets.
     const HashMap<StringHash, PostProcessRenderTarget>& GetRenderTargets() const { return renderTargets_; }
+    /// Return shader parameter.
+    const Vector4& GetShaderParameter(const String& name) const;
+    /// Return all global shader parameters.
+    const HashMap<StringHash, Vector4>& GetShaderParameters() const { return shaderParameters_; }
     
     /// Return active flag.
     bool IsActive() const { return active_; }
@@ -136,10 +144,12 @@ public:
 private:
     /// Parameter XML file.
     SharedPtr<XMLFile> parameterSource_;
-    /// Effect passes.
-    Vector<SharedPtr<PostProcessPass> > passes_;
     /// Rendertargets.
     HashMap<StringHash, PostProcessRenderTarget> renderTargets_;
+    /// Global shader parameters.
+    HashMap<StringHash, Vector4> shaderParameters_;
+    /// Effect passes.
+    Vector<SharedPtr<PostProcessPass> > passes_;
     /// Active flag.
     bool active_;
 };

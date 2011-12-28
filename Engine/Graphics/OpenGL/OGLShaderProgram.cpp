@@ -145,6 +145,19 @@ bool ShaderProgram::Link()
         {
             // Set the samplers here so that they do not have to be set later
             int unit = graphics_->GetTextureUnit(name.Substring(1));
+            if (unit >= MAX_TEXTURE_UNITS)
+            {
+                // If texture unit name is not recognized, search for a digit in the name and use that as the unit index
+                for (unsigned j = 1; j < name.Length(); ++j)
+                {
+                    if (name[j] >= '0' && name[j] <= '9')
+                    {
+                        unit = name[j] - '0';
+                        break;
+                    }
+                }
+            }
+            
             if (unit < MAX_TEXTURE_UNITS)
             {
                 useTextureUnit_[unit] = true;

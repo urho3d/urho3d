@@ -128,8 +128,8 @@ bool Shader::Load(Deserializer& source)
             TextureUnit tuIndex = graphics->GetTextureUnit(unitName);
             if (tuIndex != MAX_TEXTURE_UNITS)
                 variation->AddTextureUnit(tuIndex);
-            else
-                LOGWARNING("Unknown texture unit " + unitName);
+            else if (sampler < MAX_TEXTURE_UNITS)
+                variation->AddTextureUnit((TextureUnit)sampler);
         }
         
         variation->OptimizeParameters();

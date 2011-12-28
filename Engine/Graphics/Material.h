@@ -146,7 +146,7 @@ private:
     Vector<TechniqueEntry> techniques_;
     /// Textures.
     SharedPtr<Texture> textures_[MAX_MATERIAL_TEXTURE_UNITS];
-    /// Shader parameters.
+    /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// Last auxiliary view rendered frame number.
     unsigned auxViewFrameNumber_;

@@ -14,6 +14,13 @@ vec2 GetScreenPosPreDiv(vec4 clipPos)
         clipPos.y / clipPos.w * cGBufferOffsets.w + cGBufferOffsets.y);
 }
 
+vec22 GetQuadTexCoord(float4 clipPos)
+{
+    return vec2(
+        clipPos.x / clipPos.w * 0.5 + 0.5,
+        clipPos.y / clipPos.w * 0.5 + 0.5);
+}
+
 vec3 GetFarRay(vec4 clipPos)
 {
     vec3 viewRay = vec3(

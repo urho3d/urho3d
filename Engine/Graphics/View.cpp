@@ -1350,6 +1350,10 @@ void View::RunPostProcesses()
             graphics_->SetShaders(renderer_->GetVertexShader(pass->GetVertexShader()),
                 renderer_->GetPixelShader(pass->GetPixelShader()));
             
+            const HashMap<StringHash, Vector4>& globalParameters = effect->GetShaderParameters();
+            for (HashMap<StringHash, Vector4>::ConstIterator k = globalParameters.Begin(); k != globalParameters.End(); ++k)
+                graphics_->SetShaderParameter(k->first_, k->second_);
+            
             const HashMap<StringHash, Vector4>& parameters = pass->GetShaderParameters();
             for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
                 graphics_->SetShaderParameter(k->first_, k->second_);

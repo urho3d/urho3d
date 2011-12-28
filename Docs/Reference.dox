@@ -693,7 +693,8 @@ In addition to configuring programmatically, the PostProcess can be configured w
 
 \code
 <postprocess>
-    <rendertarget name="RenderTargetName" size="x y" | sizedivisor="x y" format="rgb|rgba|float" filtered="true|false" />
+    <rendertarget name="RenderTargetName" size="x y" | sizedivisor="x y" format="rgb|rgba|float" filter="true|false" />
+    <parameter name="GlobalShaderParameterName" value="x y z w" />
     <pass vs="VertexShaderName" ps="PixelShaderName" output="viewport|RenderTargetName" />
         <texture unit="diffuse|normal|specular|detail|environment|emissive" name="viewport|RenderTargetName|TextureName" />
         <parameter name="ShaderParameterName" value="x y z w" />
@@ -703,7 +704,7 @@ In addition to configuring programmatically, the PostProcess can be configured w
 
 Rendertargets can either specify an absolute width and height, or a divisor for the viewport size (for example sizedivisor="2 2" would divide the viewport dimensions by two.) The rendertargets are shared by all passes. A pass can output either into a rendertarget or into the viewport. The current contents of the viewport (either the scene render or a previous post-process pass) can also be read as a texture; this will always use the other half of the ping-pong buffer to avoid sampling the texture being rendered.
 
-In addition to the user-definable shader parameters, the shader parameters GBufferOffsets and SampleOffsets will always be set according to the viewport coordinates and the viewport rendertarget size, so that the GetScreenPos() shader function will operate correctly, and adjacent pixels from the viewport can be sampled. See the EdgeFilter shader for an example.
+Shader parameters can be defined either as global for all passes, or as pass-specific. In addition to the user-defined shader parameters, the shader parameters GBufferOffsets and SampleOffsets will always be set according to the viewport coordinates and the destination rendertarget size, so that the GetScreenPos() shader function will operate correctly, and adjacent pixels can be sampled. See the EdgeFilter shader for an example.
 
 Note that when hardware multisampling is used in conjunction with post-processing, the multisampled backbuffer will first be resolved to the ping-pong buffer before rendering the post-process passes. This has a small performance cost.
 

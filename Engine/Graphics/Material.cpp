@@ -161,9 +161,14 @@ bool Material::Load(Deserializer& source)
         if (textureElem.HasAttribute("unit"))
         {
             String unitName = textureElem.GetAttributeLower("unit");
-            unit = ParseTextureUnitName(unitName);
-            if (unit == MAX_MATERIAL_TEXTURE_UNITS)
-                LOGERROR("Unknown texture unit " + unitName);
+            if (unitName.Length() > 1)
+            {
+                unit = ParseTextureUnitName(unitName);
+                if (unit == MAX_MATERIAL_TEXTURE_UNITS)
+                    LOGERROR("Unknown texture unit " + unitName);
+            }
+            else
+                unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);
         }
         if (unit != MAX_MATERIAL_TEXTURE_UNITS)
         {

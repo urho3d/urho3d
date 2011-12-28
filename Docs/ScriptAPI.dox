@@ -1500,6 +1500,7 @@ PostProcess
 Methods:<br>
 - bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
 - void RemoveRenderTarget(const String&)
+- void RemoveShaderParameter(const String&)
 - PostProcess@ Clone() const
 - bool HasRenderTarget(const String&) const
 
@@ -1508,6 +1509,7 @@ Properties:<br>
 - String& typeName (readonly)
 - XMLFile@ parameters
 - uint numPasses
+- Vector4[] shaderParameters
 - bool active
 - PostProcessPass@[] passes (readonly)
 
