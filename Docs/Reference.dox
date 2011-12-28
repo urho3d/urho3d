@@ -689,7 +689,7 @@ After a viewport's 3D scene content is rendered, post-processing effects can be 
 
 The Viewport contains a vector of PostProcess pointers, into which they can be added, see \ref Viewport::AddPostProcess "AddPostProcess()" or \ref Viewport::InsertPostProcess "InsertPostProcess()". They are applied in order from first to last. Each post-processing effect can consist of a number of passes, represented by the class PostProcessPass. The last pass of the last effect will be rendered to the destination rendertarget, while the passes before will be rendered to an internal ping-pong buffer.
 
-In addition to configuring programmatically, the PostProcess can be configured with a XML file; use \ref PostProcess::LoadParameters "LoadParameters()" to specify the XML file to use. The format is the following:
+In addition to configuring programmatically, the PostProcess can be configured with an XML file; use \ref PostProcess::LoadParameters "LoadParameters()" to specify the XML file to use. The format is the following:
 
 \code
 <postprocess>
