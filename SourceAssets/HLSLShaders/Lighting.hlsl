@@ -130,7 +130,7 @@ float GetShadow(float4 shadowPos)
 float GetCubeShadow(float3 lightVec)
 {
     float3 axis = texCUBE(sFaceSelectCubeMap, lightVec).rgb;
-    float depth = dot(abs(lightVec), axis);
+    float depth = abs(dot(lightVec, axis));
 
     // Expand the maximum component of the light vector to get full 0.0 - 1.0 UV range from the cube map,
     // and to avoid sampling across faces. Some GPU's filter across faces, while others do not, and in this
