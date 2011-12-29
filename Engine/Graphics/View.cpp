@@ -59,6 +59,7 @@ static const Vector3 directions[] =
 };
 
 static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
+static const float LIGHT_INTENSITY_THRESHOLD = 0.001f;
 
 void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
@@ -507,8 +508,8 @@ void View::GetDrawables()
         else if (flags & DRAWABLE_LIGHT)
         {
             Light* light = static_cast<Light*>(drawable);
-            // Skip lights with no intensity
-            if (light->GetColor().Intensity() > 0.0f)
+            // Skip lights which are so dim that they can not contribute to a rendertarget
+            if (light->GetColor().Intensity() > LIGHT_INTENSITY_THRESHOLD)
                 lights_.Push(light);
         }
     }
