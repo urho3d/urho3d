@@ -2344,7 +2344,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     }
     
     graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(true, CMP_LESS, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
+    graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
 }
 
 void View::DrawFullscreenQuad(Camera* camera, bool nearQuad)
