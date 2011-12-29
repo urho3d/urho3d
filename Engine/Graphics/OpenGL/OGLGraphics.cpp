@@ -400,11 +400,13 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 {
     bool oldColorWrite = colorWrite_;
     bool oldDepthWrite = depthWrite_;
-    
+
     if (flags & CLEAR_COLOR && !oldColorWrite)
         SetColorWrite(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite(true);
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_MAX_UNSIGNED)
+        glStencilMask(M_MAX_UNSIGNED);
     
     unsigned glFlags = 0;
     if (flags & CLEAR_COLOR)
@@ -436,6 +438,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     SetScissorTest(false);
     SetColorWrite(oldColorWrite);
     SetDepthWrite(oldDepthWrite);
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_MAX_UNSIGNED)
+        glStencilMask(stencilWriteMask_);
 }
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
@@ -1623,7 +1627,7 @@ void Graphics::ResetStreamFrequencies()
 {
 }
 
-void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned stencilMask)
+void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask)
 {
     if (enable != stencilTest_)
     {
@@ -1636,12 +1640,17 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     
     if (enable)
     {
-        if (mode != stencilTestMode_ || stencilRef != stencilRef_ || stencilMask != stencilMask_)
+        if (mode != stencilTestMode_ || stencilRef != stencilRef_ || compareMask != stencilCompareMask_)
         {
-            glStencilFunc(glCmpFunc[mode], stencilRef, stencilMask);
+            glStencilFunc(glCmpFunc[mode], stencilRef, compareMask);
             stencilTestMode_ = mode;
             stencilRef_ = stencilRef;
-            stencilMask_ = stencilMask;
+            stencilCompareMask_ = compareMask;
+        }
+        if (writeMask != stencilWriteMask_)
+        {
+            glStencilMask(writeMask);
+            stencilWriteMask_ = writeMask;
         }
         if (pass != stencilPass_ || fail != stencilFail_ || zFail != stencilZFail_)
         {
@@ -1983,7 +1992,8 @@ void Graphics::ResetCachedState()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = M_MAX_UNSIGNED;
+    stencilWriteMask_ = M_MAX_UNSIGNED;
     
     impl_->activeTexture_ = 0;
     impl_->drawBuffers_ = M_MAX_UNSIGNED;

@@ -195,7 +195,7 @@ public:
     /// Set scissor test.
     void SetScissorTest(bool enable, const IntRect& rect);
     /// Set stencil test.
-    void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned stencilMask = M_MAX_UNSIGNED);
+    void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
     /// Set vertex buffer stream frequency. No-op on OpenGL.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
@@ -320,7 +320,9 @@ public:
     /// Return stencil reference value.
     unsigned GetStencilRef() const { return stencilRef_; }
     /// Return stencil compare bitmask.
-    unsigned GetStencilMask() const { return stencilMask_; }
+    unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
+    /// Return stencil write bitmask.
+    unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
     /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
     /// Return rendertarget width and height.
@@ -473,7 +475,9 @@ private:
     /// Stencil test reference value.
     unsigned stencilRef_;
     /// Stencil compare bitmask.
-    unsigned stencilMask_;
+    unsigned stencilCompareMask_;
+    /// Stencil write bitmask.
+    unsigned stencilWriteMask_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.

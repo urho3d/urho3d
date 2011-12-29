@@ -1633,7 +1633,7 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     }
 }
 
-void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned stencilMask)
+void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask)
 {
     if (enable != stencilTest_)
     {
@@ -1668,10 +1668,15 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
             impl_->device_->SetRenderState(D3DRS_STENCILREF, stencilRef);
             stencilRef_ = stencilRef;
         }
-        if (stencilMask != stencilMask_)
+        if (compareMask != stencilCompareMask_)
         {
-            impl_->device_->SetRenderState(D3DRS_STENCILMASK, stencilMask);
-            stencilMask_ = stencilMask;
+            impl_->device_->SetRenderState(D3DRS_STENCILMASK, compareMask);
+            stencilCompareMask_ = compareMask;
+        }
+        if (writeMask != stencilWriteMask_)
+        {
+            impl_->device_->SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+            stencilWriteMask_ = writeMask;
         }
     }
 }
@@ -2221,7 +2226,8 @@ void Graphics::ResetCachedState()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = M_MAX_UNSIGNED;
+    stencilWriteMask_ = M_MAX_UNSIGNED;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;

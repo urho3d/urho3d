@@ -172,7 +172,7 @@ public:
     /// %Set scissor test.
     void SetScissorTest(bool enable, const IntRect& rect);
     /// %Set stencil test.
-    void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned stencilMask = M_MAX_UNSIGNED);
+    void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
     /// %Set vertex buffer stream frequency.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
@@ -297,7 +297,9 @@ public:
     /// Return stencil reference value.
     unsigned GetStencilRef() const { return stencilRef_; }
     /// Return stencil compare bitmask.
-    unsigned GetStencilMask() const { return stencilMask_; }
+    unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
+    /// Return stencil write bitmask.
+    unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
     /// Return stream frequency by vertex buffer index.
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
@@ -480,7 +482,9 @@ private:
     /// Stencil test reference value.
     unsigned stencilRef_;
     /// Stencil compare bitmask.
-    unsigned stencilMask_;
+    unsigned stencilCompareMask_;
+    /// Stencil write bitmask.
+    unsigned stencilWriteMask_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
 };
