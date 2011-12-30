@@ -53,7 +53,7 @@ namespace Assimp {
 // ---------------------------------------------------------------------------
 /** The GenFaceNormalsProcess computes vertex normals for all vertizes
 */
-class ASSIMP_API GenVertexNormalsProcess : public BaseProcess
+class ASSIMP_API_WINONLY GenVertexNormalsProcess : public BaseProcess
 {
 public:
 
@@ -91,7 +91,7 @@ public:
 		configMaxAngle =f;
 	}
 
-protected:
+public:
 
 	// -------------------------------------------------------------------
 	/** Computes normals for a specific mesh

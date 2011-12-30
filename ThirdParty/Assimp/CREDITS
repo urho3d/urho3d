@@ -122,3 +122,12 @@ For contributing the De-bone postprocessing step and filing various bug reports.
 - Rosen Diankov
 Contributed patches to build assimp debian packages using cmake.
 
+- Mark Page
+Contributed a patch to fix the VertexTriangleAdjacency postprocessing step.
+
+- IOhannes
+Contributed the Debian build fixes ( architecture macro ).
+
+- gellule
+Several LWO and LWS fixes (pivoting). 
+

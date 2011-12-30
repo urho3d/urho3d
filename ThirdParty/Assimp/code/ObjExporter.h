@@ -55,7 +55,7 @@ namespace Assimp
 // ------------------------------------------------------------------------------------------------
 /** Helper class to export a given scene to an OBJ file. */
 // ------------------------------------------------------------------------------------------------
-class ASSIMP_API ObjExporter
+class ObjExporter
 {
 public:
 	/// Constructor for a specific scene to export
@@ -86,6 +86,7 @@ private:
 	};
 
 	struct Face {
+		char kind;
 		std::vector<FaceVertex> indices;
 	};
 

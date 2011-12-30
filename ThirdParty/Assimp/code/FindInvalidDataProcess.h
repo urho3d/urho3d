@@ -56,7 +56,7 @@ namespace Assimp	{
  *
  *  Originally this was a workaround for some models written by Blender
  *  which have zero normal vectors. */
-class ASSIMP_API FindInvalidDataProcess 
+class FindInvalidDataProcess 
 	: public BaseProcess
 {
 public:
@@ -78,7 +78,7 @@ public:
 	// Run the step
 	void Execute( aiScene* pScene);
 
-protected:
+public:
 
 	// -------------------------------------------------------------------
 	/** Executes the postprocessing step on the given mesh

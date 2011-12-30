@@ -69,7 +69,7 @@ namespace Assimp
 * The other weights on this bone are then renormalized to assure the sum weight
 * to be 1.
 */
-class ASSIMP_API LimitBoneWeightsProcess : public BaseProcess
+class LimitBoneWeightsProcess : public BaseProcess
 {
 public:
 
@@ -93,7 +93,7 @@ public:
 	*/
 	void SetupProperties(const Importer* pImp);
 
-protected:
+public:
 
 	// -------------------------------------------------------------------
 	/** Limits the bone weight count for all vertices in the given mesh.
@@ -109,7 +109,7 @@ protected:
 	void Execute( aiScene* pScene);
 
 
-protected:
+public:
 
 	// -------------------------------------------------------------------
 	/** Describes a bone weight on a vertex */

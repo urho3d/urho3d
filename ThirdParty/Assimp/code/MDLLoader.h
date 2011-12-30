@@ -53,7 +53,7 @@ struct aiNode;
 #include "HalfLifeFileData.h"
 
 namespace Assimp	{
-class MaterialHelper;
+
 
 using namespace MDL;
 
@@ -78,7 +78,7 @@ using namespace MDL;
  *   </ul>
  *  These formats are partially identical and it would be possible to load
  *  them all with a single 1000-line function-beast. However, it has been
- *  splitted to several code paths to make the code easier to read and maintain.
+ *  split into several code paths to make the code easier to read and maintain.
 */
 class MDLImporter : public BaseImporter
 {
@@ -253,7 +253,7 @@ protected:
 	void ParseSkinLump_3DGS_MDL7(
 		const unsigned char* szCurrent,
 		const unsigned char** szCurrentOut,
-		std::vector<MaterialHelper*>& pcMats);
+		std::vector<aiMaterial*>& pcMats);
 
 	// -------------------------------------------------------------------
 	/** Parse a skin lump in a MDL7/HMP7 file with all of its features
@@ -268,7 +268,7 @@ protected:
 	void ParseSkinLump_3DGS_MDL7(
 		const unsigned char* szCurrent,
 		const unsigned char** szCurrentOut,
-		MaterialHelper* pcMatOut,
+		aiMaterial* pcMatOut,
 		unsigned int iType,
 		unsigned int iWidth,
 		unsigned int iHeight);
@@ -309,9 +309,9 @@ protected:
 	 * \param pcMat2 Second input material
 	 * \param pcMatOut Output material instance to be filled. Must be empty
 	 */
-	void JoinSkins_3DGS_MDL7(MaterialHelper* pcMat1,
-		MaterialHelper* pcMat2,
-		MaterialHelper* pcMatOut);
+	void JoinSkins_3DGS_MDL7(aiMaterial* pcMat1,
+		aiMaterial* pcMat2,
+		aiMaterial* pcMatOut);
 
 	// -------------------------------------------------------------------
 	/** Add a bone transformation key to an animation
@@ -401,12 +401,12 @@ protected:
 	 * might create new materials.
 	 * \param groupInfo -> doc of data structure
 	 * \param groupData -> doc of data structure
-	 * \param splittedGroupData -> doc of data structure
+	 * \param splitGroupData -> doc of data structure
 	 */
 	void SortByMaterials_3DGS_MDL7(
 		const MDL::IntGroupInfo_MDL7& groupInfo,
 		MDL::IntGroupData_MDL7& groupData,
-		MDL::IntSplittedGroupData_MDL7& splittedGroupData);
+		MDL::IntSplitGroupData_MDL7& splitGroupData);
 	
 	// -------------------------------------------------------------------
 	/** Read all faces and vertices from a MDL7 group. The function fills
@@ -420,11 +420,11 @@ protected:
 	// -------------------------------------------------------------------
 	/** Generate the final output meshes for a7 models
 	 * \param groupData -> doc of data structure
-	 * \param splittedGroupData -> doc of data structure
+	 * \param splitGroupData -> doc of data structure
 	 */
 	void GenerateOutputMeshes_3DGS_MDL7(
 		MDL::IntGroupData_MDL7& groupData,
-		MDL::IntSplittedGroupData_MDL7& splittedGroupData);
+		MDL::IntSplitGroupData_MDL7& splitGroupData);
 
 protected:
 

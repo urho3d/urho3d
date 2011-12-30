@@ -117,6 +117,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <new>
 #include <cstdio>
 #include <limits.h>
+#include <memory>
 
 // Boost headers
 #include <boost/pointer_cast.hpp>
@@ -141,7 +142,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Internal utility headers
 #include "BaseImporter.h"
-#include "MaterialSystem.h"
 #include "StringComparison.h"
 #include "StreamReader.h"
 #include "qnan.h"

@@ -57,7 +57,7 @@ namespace Assimp
  * into triangles. You usually want this to happen because the graphics cards
  * need their data as triangles.
  */
-class ASSIMP_API TriangulateProcess : public BaseProcess
+class TriangulateProcess : public BaseProcess
 {
 public:
 
@@ -80,7 +80,7 @@ public:
 	*/
 	void Execute( aiScene* pScene);
 
-protected:
+public:
 	// -------------------------------------------------------------------
 	/** Triangulates the given mesh.
 	 * @param pMesh The mesh to triangulate.

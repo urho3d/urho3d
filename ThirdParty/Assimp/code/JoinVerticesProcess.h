@@ -46,8 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BaseProcess.h"
 #include "../include/aiTypes.h"
 
-struct aiMesh;
-
 namespace Assimp
 {
 
@@ -61,7 +59,7 @@ class JoinVerticesTest;
  * erases all but one of the copies. This usually reduces the number of vertices
  * in a mesh by a serious amount and is the standard form to render a mesh.
  */
-class ASSIMP_API JoinVerticesProcess : public BaseProcess
+class ASSIMP_API_WINONLY JoinVerticesProcess : public BaseProcess
 {
 public:
 
@@ -84,7 +82,7 @@ public:
 	*/
 	void Execute( aiScene* pScene);
 
-protected:
+public:
 	// -------------------------------------------------------------------
 	/** Unites identical vertices in the given mesh.
 	 * @param pMesh The mesh to process.
