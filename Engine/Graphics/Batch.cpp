@@ -310,7 +310,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
                 fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
             float fogRange = Max(fogEnd - fogStart, M_EPSILON);
-            Vector4 fogParams(fogStart / farClip, fogEnd / farClip, farClip / fogRange, 0.0f);
+            Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
             
             graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
         }

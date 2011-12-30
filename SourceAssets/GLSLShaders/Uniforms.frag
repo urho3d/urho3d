@@ -1,6 +1,6 @@
 uniform vec3 cAmbientColor;
 uniform vec2 cDepthReconstruct;
-uniform vec3 cFogParams;
+uniform vec2 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;

@@ -1,9 +1,9 @@
 float3 GetFog(float3 color, float depth)
 {
-    return lerp(color, cFogColor, saturate((depth - cFogParams.x) * cFogParams.z));
+    return lerp(cFogColor, color, saturate((cFogParams.x - depth) * cFogParams.y));
 }
 
 float3 GetLitFog(float3 color, float depth)
 {
-    return color * saturate((cFogParams.y - depth) * cFogParams.z);
+    return color * saturate((cFogParams.x - depth) * cFogParams.y);
 }
