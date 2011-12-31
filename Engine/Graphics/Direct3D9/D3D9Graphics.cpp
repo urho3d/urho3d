@@ -177,6 +177,7 @@ Graphics::Graphics(Context* context) :
     deviceLost_(false),
     systemDepthStencil_(false),
     lightPrepassSupport_(false),
+    deferredSupport_(false),
     hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
@@ -2002,6 +2003,7 @@ void Graphics::CheckFeatureSupport()
 {
     // Reset features first
     lightPrepassSupport_ = false;
+    deferredSupport_ = false;
     hardwareShadowSupport_ = false;
     hiresShadowSupport_ = false;
     streamOffsetSupport_ = false;
@@ -2070,7 +2072,7 @@ void Graphics::CheckFeatureSupport()
             hasSM3_ = true;
     }
     
-    // Check for readable hardware depth-stencil format (INTZ) and light pre-pass support
+    // Check for readable hardware depth-stencil format (INTZ), light pre-pass and deferred rendering support
     if (impl_->CheckFormatSupport((D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
     {
         // Sampling INTZ buffer directly while also using it for depth test results in performance loss on ATI GPUs,
@@ -2080,15 +2082,22 @@ void Graphics::CheckFeatureSupport()
             hardwareDepthSupport_ = true;
             lightPrepassSupport_ = true;
             depthStencilFormat = MAKEFOURCC('I', 'N', 'T', 'Z');
+            if (impl_->deviceCaps_.NumSimultaneousRTs >= 3)
+                deferredSupport_ = true;
         }
     }
     
     if (!hardwareDepthSupport_)
     {
-        // If hardware depth is not supported, must support 2 rendertargets and R32F format for light pre-pass
+        // If hardware depth is not supported, must support 2 rendertargets and R32F format for light pre-pass,
+        // and 4 for deferred rendering
         if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
             D3DRTYPE_TEXTURE))
+        {
             lightPrepassSupport_ = true;
+            if (impl_->deviceCaps_.NumSimultaneousRTs >= 4)
+                deferredSupport_ = true;
+        }
     }
     
     // Check for stream offset (needed for instancing)

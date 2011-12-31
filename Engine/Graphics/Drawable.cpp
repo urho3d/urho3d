@@ -265,7 +265,7 @@ void Drawable::LimitVertexLights(bool removeConvertedLights)
     const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
     {
-        // If necessary (light pre-pass rendering), remove lights that were converted to per-vertex
+        // If necessary (deferred rendering), remove lights that were converted to per-vertex
         if (removeConvertedLights && !vertexLights_[i]->GetPerVertex())
             vertexLights_.Erase(i);
         else

@@ -1,5 +1,6 @@
 <shaders>
     <shader name="Material" type="vs">
+        <option name="VCol" define="VERTEXCOLOR" />
         <variation name="" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -15,5 +16,6 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" />
         <option name="Mask" define="ALPHAMASK" include="Diff" />
+        <option name="VCol" define="VERTEXCOLOR" /> 
     </shader>
 </shaders>

@@ -290,8 +290,9 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
     engine->RegisterEnumValue("PassType", "PASS_PREALPHA", PASS_PREALPHA);
     engine->RegisterEnumValue("PassType", "PASS_POSTALPHA", PASS_POSTALPHA);
-    engine->RegisterEnumValue("PassType", "PASS_GBUFFER", PASS_GBUFFER);
+    engine->RegisterEnumValue("PassType", "PASS_PREPASS", PASS_PREPASS);
     engine->RegisterEnumValue("PassType", "PASS_MATERIAL", PASS_MATERIAL);
+    engine->RegisterEnumValue("PassType", "PASS_DEFERRED", PASS_DEFERRED);
     engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);
     
     engine->RegisterEnum("BlendMode");
@@ -779,6 +780,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "uint get_numBatches() const", asMETHOD(Graphics, GetNumBatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sm3Support() const", asMETHOD(Graphics, GetSM3Support), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_lightPrepassSupport() const", asMETHOD(Graphics, GetLightPrepassSupport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool get_deferredSupport() const", asMETHOD(Graphics, GetDeferredSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hardwareDepthSupport() const", asMETHOD(Graphics, GetHardwareDepthSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hardwareShadowSupport() const", asMETHOD(Graphics, GetHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hiresShadowSupport() const", asMETHOD(Graphics, GetHiresShadowSupport), asCALL_THISCALL);
@@ -796,6 +798,11 @@ static Renderer* GetRenderer()
 
 static void RegisterRenderer(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("RenderMode");
+    engine->RegisterEnumValue("RenderMode", "RENDER_FORWARD", RENDER_FORWARD);
+    engine->RegisterEnumValue("RenderMode", "RENDER_PREPASS", RENDER_PREPASS);
+    engine->RegisterEnumValue("RenderMode", "RENDER_DEFERRED", RENDER_DEFERRED);
+    
     engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
     engine->RegisterGlobalProperty("const int QUALITY_MEDIUM", (void*)&QUALITY_MEDIUM);
     engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
@@ -811,8 +818,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_lightPrepass(bool)", asMETHOD(Renderer, SetLightPrepass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "bool get_lightPrepass() const", asMETHOD(Renderer, GetLightPrepass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_renderMode(RenderMode)", asMETHOD(Renderer, SetRenderMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "RenderMode get_renderMode() const", asMETHOD(Renderer, GetRenderMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_textureAnisotropy(int)", asMETHOD(Renderer, SetTextureAnisotropy), asCALL_THISCALL);

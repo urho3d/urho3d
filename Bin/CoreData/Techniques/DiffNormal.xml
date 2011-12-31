@@ -3,6 +3,7 @@
     <pass name="litbase" vs="ForwardLit_Normal" ps="ForwardLit_DiffNormalAmbient" />
     <pass name="light" vs="ForwardLit_Normal" ps="ForwardLit_DiffNormal" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
-    <pass name="gbuffer" vs="GBuffer_Normal" ps="GBuffer_Normal" />
+    <pass name="prepass" vs="Prepass_Normal" ps="Prepass_Normal" />
     <pass name="material" vs="Material" ps="Material_Diff" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="Deferred_Normal" ps="Deferred_DiffNormal" />
 </technique>

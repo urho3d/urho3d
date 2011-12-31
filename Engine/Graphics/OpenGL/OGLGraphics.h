@@ -170,7 +170,7 @@ public:
     void SetDepthStencil(RenderSurface* depthStencil);
     /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// %Set view texture (light pre-pass final output rendertarget) to prevent it from being sampled.
+    /// %Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
     void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
@@ -241,6 +241,8 @@ public:
     bool GetSM3Support() const { return false; }
     /// Return whether light pre-pass rendering is supported.
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
+    /// Return whether deferred rendering is supported.
+    bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether hardware depth texture is supported.
     bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
@@ -390,6 +392,8 @@ private:
     bool flushGPU_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
+    /// Deferred rendering support flag.
+    bool deferredSupport_;
     /// Hardware depth support flag.
     bool hardwareDepthSupport_;
     /// Number of primitives this frame.

@@ -168,10 +168,14 @@
         <element type="Text" style="FileSelectorFilterText" name="RenderPrepass">
             <text value="Pre-pass" />
         </element>
+        <element type="Text" style="FileSelectorFilterText" name="RenderDeferred">
+            <text value="Deferred" />
+        </element>
         <element type="DropDownList" name="RenderModeEdit">
             <fixedwidth value="100" />
             <popupitem name="RenderForward" />
             <popupitem name="RenderPrepass" />
+            <popupitem name="RenderDeferred" />
         </element>
     </element>
     <element>

@@ -375,7 +375,7 @@ When setting the initial screen mode, Graphics does a few checks:
 - For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and EXT_texture_filter_anisotropic extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
-- Is light pre-pass rendering supported? This requires either readable hardware depth-stencil texture, or multiple rendertarget and R32F texture format support.
+- Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and either R32F texture format or readable hardware depth.
 
 \section Rendering_Renderer Renderer
 
@@ -387,7 +387,7 @@ By default there is one viewport, but the amount can be increased with the funct
 
 Viewports can have a chain of post-processing effects. See \ref Postprocessing "Post-processing" for more details.
 
-Either forward or light pre-pass rendering can be chosen, see \ref Renderer::SetLightPrepass "SetLightPrepass()". %Light pre-pass will be advantageous once there is a large number of per-pixel lights affecting each object, but its disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the TestScene script application for an example of how to use.
+Either forward, light pre-pass or deferred rendering can be chosen, see \ref Renderer::SetRenderMode "SetRenderMode()". Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the TestScene script application for an example of how to use.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -398,7 +398,7 @@ The steps for rendering each viewport on each frame are roughly the following:
 
 The rendering operations proceed in the following order:
 
-- Opaque geometry ambient pass, or G-buffer pass in case of light pre-pass rendering.
+- Opaque geometry ambient pass, or G-buffer pass in deferred rendering modes.
 - Opaque geometry per-pixel lighting passes. For shadow casting lights, the shadow map is rendered first.
 - (%Light pre-pass only) Opaque geometry material pass, which renders the objects with accumulated per-pixel lighting.
 - Pre-alpha rendering pass for custom render ordering such as the skybox.
@@ -437,22 +437,22 @@ Note that many more optimization opportunities are possible at the content level
 
 See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems", \ref Postprocessing "Post-processing", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
-See \ref ForwardPrepass "Forward and light pre-pass rendering" for detailed discussion on the two rendering modes.
+See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
 See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
 
 
-\page ForwardPrepass Forward and light pre-pass rendering
+\page RenderingModes Rendering modes
 
-Urho3D implements both forward and light pre-pass rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
+Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
 
-\section ForwardPrepass_Forward Forward rendering
+\section RenderingModes_Forward Forward rendering
 
 Forward rendering begins with an ambient light pass for the objects; this also adds any per-vertex lights. Then, the objects are re-rendered for each per-pixel light affecting them (basic multipass rendering), up to the maximum per-pixel light count which is by default unlimited, but can be reduced with \ref Drawable::SetMaxLights "SetMaxLights()". The render operations are sorted by light, ie. render the effect of the first light on all affected objects first, then the second etc. If shadow maps are re-used (default on), a shadow casting light's shadow map will be updated immediately before rendering the lit objects. When shadow maps are not re-used, all shadow maps are updated first even before drawing the ambient pass.
 
 Materials can also define an optimization pass for forward rendering where the ambient light and the first per-pixel light are combined. This pass can not be used, however, if there are per-vertex lights affecting the object, or if the ambient light has a per-vertex gradient.
 
-\section ForwardPrepass_Prepass Light pre-pass rendering
+\section RenderingModes_Prepass Light pre-pass rendering
 
 %Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth-stencil texture format is available, the second color rendertarget will be omitted:
 
@@ -464,15 +464,29 @@ After the G-buffer is complete, light volumes (spot and point lights) or fullscr
 
 Finally the opaque objects are re-rendered during the material pass, which combines ambient and vertex lighting with per-pixel lighting from the light accumulation buffer. After this rendering proceeds to the pre-alpha pass, transparent object rendering pass, and the post-alpha pass, just like forward rendering.
 
-\section ForwardPrepass_Comparision Advantages and disadvantages
+\section RenderingModes_Deferred Deferred rendering
 
-Whether using forward or light pre-pass rendering is more advantageous depends on the scene and lighting complexity. 
+Deferred rendering needs to render each opaque object only once to the G-buffer, but this rendering pass is much heavier than in light pre-pass rendering, as also ambient, emissive and diffuse albedo information is output at the same time. The G-buffer is the following, with the last color rendertarget omitted if hardware depth can be read:
 
-If the scene contains a large number of complex objects lit by multiple lights, forward rendering quickly increases the total draw call and vertex count due to re-rendering the objects for each light. However, light pre-pass rendering has a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in light pre-pass all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
+- RT0: Final rendertarget with ambient, per-vertex and emissive color (D3DFMT_X8R8G8B8)
+- RT1: Diffuse albedo and specular intensity (D3DFMT_A8R8G8B8)
+- RT2: World-space normal and specular power (D3DFMT_A8R8G8B8)
+- RT3: Linear depth (D3DFMT_R32F)
+- DS: Hardware depth and lightmask (D3DFMT_D24S8 or INTZ)
 
-Forward rendering also enables hardware multisampling and using different shading models in different materials if needed, while neither is possible in light pre-pass rendering.
+After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to pre-alpha, transparent, and post-alpha passes, as in other rendering modes.
 
-Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end of light pre-pass rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
+\section RenderingModes_Comparision Advantages and disadvantages
+
+Whether using forward or deferred rendering modes is more advantageous depends on the scene and lighting complexity.
+
+If the scene contains a large number of complex objects lit by multiple lights, forward rendering quickly increases the total draw call and vertex count due to re-rendering the objects for each light. However, light pre-pass and deferred rendering have a higher fixed cost due to the generation of the G-buffer. Also, in forward per-pixel lighting more calculations (such as light direction and shadow map coordinates) can be done at the vertex shader level, while in deferred all calculations need to happen per-pixel. This means that for a low light count, for example 1-2 per object, forward rendering will run faster based on the more efficient lighting calculations alone.
+
+Forward rendering makes it possible to use hardware multisampling and different shading models in different materials if needed, while neither is possible in the deferred modes. Also, only forward rendering allows to calculate the material's diffuse and specular light response with the most accuracy. %Light pre-pass rendering needs to reconstruct light specular color from the accumulated diffuse light color, which is inaccurate in case of overlapping lights. Deferred rendering on the other hand can not use the material's full specular color, it only stores a monochromatic intensity based on the green component into the G-buffer.
+
+%Light pre-pass rendering has a much more lightweight G-buffer pass, but it must render all opaque geometry twice. %Light accumulation in pre-pass mode is slightly faster than in deferred. Despite this, unless there is significant overdraw, in vertex-heavy scenes deferred rendering will likely be faster than light pre-pass.
+
+Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end in both light pre-pass and deferred rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
@@ -546,7 +560,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|prealpha|postalpha|gbuffer|material|shadow" vs="VertexShaderName" ps="PixelShaderName"
+    <pass name="base|litbase|light|prealpha|postalpha|prepass|material|deferred|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
     <pass ... />
@@ -561,8 +575,9 @@ The purposes of the different passes are:
 - light: Renders one per-pixel light's contribution additively.
 - prealpha: Custom rendering pass after opaque geometry. Can be used for example to render the skybox.
 - postalpha: Custom rendering pass after transparent geometry.
-- gbuffer: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
+- prepass: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
 - material: %Light pre-pass only - renders opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
+- deferred: Deferred rendering only - renders ambient light and per-vertex lights to the output rendertarget, and diffuse albedo, normals, specular intensity + power and depth to the G-buffer.
 - shadow: Renders depth only for shadow map generation.
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
@@ -594,7 +609,7 @@ It is possible to limit which objects are affected by each light, by calling \re
 
 Care must be utilized when doing light culling with lightmasks, because they easily create situations where a light's influence is cut off unnaturally. However, they can be helpful in preventing light spill into undesired areas, for example lights inside one room bleeding into another, without having to resort into shadow-casting lights.
 
-In light pre-pass rendering, light culling happens by writing the objects' lightmasks to the stencil buffer during G-buffer rendering, and comparing the stencil buffer to the light's light mask when rendering light volumes. In this case lightmasks are limited to the low 8 bits only.
+In light pre-pass and deferred rendering, light culling happens by writing the objects' lightmasks to the stencil buffer during G-buffer rendering, and comparing the stencil buffer to the light's light mask when rendering light volumes. In this case lightmasks are limited to the low 8 bits only.
 
 \section Lights_ShadowedLights Shadowed lights
 

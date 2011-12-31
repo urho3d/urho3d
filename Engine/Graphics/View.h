@@ -123,11 +123,11 @@ private:
     void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
     /// Render batches using forward rendering.
     void RenderBatchesForward();
-    /// Render batches using light pre-pass rendering.
-    void RenderBatchesLightPrepass();
+    /// Render batches using light pre-pass or deferred rendering.
+    void RenderBatchesDeferred();
     /// Allocate needed screen buffers for post-processing and/or framebuffer blitting.
     void AllocateScreenBuffers();
-    /// Blit the framebuffer to destination. Used in OpenGL light pre-pass mode.
+    /// Blit the framebuffer to destination. Used in OpenGL deferred rendering modes.
     void BlitFramebuffer();
     /// Run post-processing effects.
     void RunPostProcesses();
@@ -208,7 +208,7 @@ private:
     RenderSurface* renderTarget_;
     /// Post-processing effects.
     Vector<SharedPtr<PostProcess> > postProcesses_;
-    /// Intermediate screen buffers used in postprocessing and OpenGL light pre-pass framebuffer blit.
+    /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
     PODVector<Texture2D*> screenBuffers_;
     /// Viewport rectangle.
     IntRect viewRect_;
@@ -254,7 +254,7 @@ private:
     BatchQueue baseQueue_;
     /// Pre-transparent pass batches.
     BatchQueue preAlphaQueue_;
-    /// Light pre-pass G-buffer batches.
+    /// Deferred rendering G-buffer batches.
     BatchQueue gbufferQueue_;
     /// Transparent geometry batches.
     BatchQueue alphaQueue_;
@@ -274,8 +274,8 @@ private:
     int highestZonePriority_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
-    /// Light prepass flag.
-    bool lightPrepass_;
+    /// Rendering mode.
+    RenderMode renderMode_;
     /// Camera zone's override flag.
     bool cameraZoneOverride_;
     /// Draw shadows flag.

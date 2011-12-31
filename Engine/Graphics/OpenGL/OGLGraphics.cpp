@@ -130,6 +130,7 @@ Graphics::Graphics(Context* context_) :
     tripleBuffer_(false),
     flushGPU_(true),
     lightPrepassSupport_(false),
+    deferredSupport_(false),
     hardwareDepthSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
@@ -1877,10 +1878,14 @@ unsigned Graphics::GetDepthStencilFormat()
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features: light pre-pass rendering and hardware depth texture
+    // Check supported features: light pre-pass and deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
+    deferredSupport_ = false;
     hardwareDepthSupport_ = false;
-    
+
+    int numSupportedRTs = 1;
+    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+
     // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
     String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
     if (vendorString.Find("NVIDIA") != String::NPOS)
@@ -1894,7 +1899,11 @@ void Graphics::CheckFeatureSupport()
         
         // If hardware depth textures work, this means also light pre-pass is automatically supported
         if (CheckFramebuffer())
+        {
             lightPrepassSupport_ = true;
+            if (numSupportedRTs >= 3)
+                deferredSupport_ = true;
+        }
         else
             hardwareDepthSupport_ = false;
         
@@ -1903,11 +1912,11 @@ void Graphics::CheckFeatureSupport()
     
     if (!hardwareDepthSupport_)
     {
-        // If hardware depth is not supported, must support 2 rendertargets for light pre-pass
-        int numSupportedRTs = 1;
-        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+        // If hardware depth is not supported, must support 2 rendertargets for light pre-pass, and 4 for deferred
         if (numSupportedRTs >= 2)
             lightPrepassSupport_ = true;
+        if (numSupportedRTs >= 4)
+            deferredSupport_ = true;
     }
 }
 
@@ -2046,6 +2055,7 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
+    textureUnits_["AlbedoBuffer"] = TU_ALBEDOBUFFER;
     textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
     textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;

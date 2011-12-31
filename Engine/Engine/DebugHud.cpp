@@ -35,6 +35,12 @@
 
 #include "DebugNew.h"
 
+static const String renderModeTexts[] = {
+    "Forward",
+    "Prepass",
+    "Deferred"
+};
+
 static const String qualityTexts[] = {
     "Low",
     "Med",
@@ -128,12 +134,9 @@ void DebugHud::Update(float timeStep)
     {
         String mode;
         
-        if (renderer->GetLightPrepass())
-            mode += "Prepass ";
-        else
-            mode += "Forward ";
+        mode += renderModeTexts[renderer->GetRenderMode()];
         
-        mode += "Tex: " + qualityTexts[renderer->GetTextureQuality()];
+        mode += " Tex: " + qualityTexts[renderer->GetTextureQuality()];
         
         mode += " Mat: " + qualityTexts[renderer->GetMaterialQuality()];
         

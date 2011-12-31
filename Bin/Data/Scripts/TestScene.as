@@ -270,7 +270,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
         if (input.keyPress['1'])
-            renderer.lightPrepass = !renderer.lightPrepass;
+            renderer.renderMode = RenderMode((renderer.renderMode + 1) % 3);
         
         if (input.keyPress['2'])
         {

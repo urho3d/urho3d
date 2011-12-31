@@ -181,7 +181,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (!octree)
         return false;
     
-    lightPrepass_ = renderer_->GetLightPrepass();
+    renderMode_ = renderer_->GetRenderMode();
     octree_ = octree;
     camera_ = camera;
     renderTarget_ = renderTarget;
@@ -312,7 +312,7 @@ void View::Render()
     graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     
     // Set "view texture" to prevent destination texture sampling in case we do not render to the destination directly
-    // ie. when using light pre-pass and/or doing post-processing
+    // ie. when using deferred rendering and/or doing post-processing
     if (renderTarget_)
         graphics_->SetViewTexture(renderTarget_->GetParentTexture());
     
@@ -324,10 +324,10 @@ void View::Render()
     #endif
     
     // Render
-    if (lightPrepass_)
-        RenderBatchesLightPrepass();
-    else
+    if (renderMode_ == RENDER_FORWARD)
         RenderBatchesForward();
+    else
+        RenderBatchesDeferred();
     
     #ifdef USE_OPENGL
     camera_->SetFlipVertical(false);
@@ -655,8 +655,8 @@ void View::GetBatches()
                         maxLightsDrawables_.Insert(drawable);
                 }
                 
-                // In light pre-pass mode, store the light volume batch now
-                if (lightPrepass_)
+                // In deferred modes, store the light volume batch now
+                if (renderMode_ != RENDER_FORWARD)
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
@@ -740,10 +740,10 @@ void View::GetBatches()
                 
                 Pass* pass = 0;
                 
-                // In light prepass mode check for G-buffer and material passes first
-                if (lightPrepass_)
+                // In deferred modes check for G-buffer and material passes first
+                if (renderMode_ == RENDER_PREPASS)
                 {
-                    pass = tech->GetPass(PASS_GBUFFER);
+                    pass = tech->GetPass(PASS_PREPASS);
                     if (pass)
                     {
                         // If the opaque object has a zero lightmask, have to skip light buffer optimization
@@ -759,6 +759,9 @@ void View::GetBatches()
                     }
                 }
                 
+                if (renderMode_ == RENDER_DEFERRED)
+                    pass = tech->GetPass(PASS_DEFERRED);
+                
                 // Next check for forward base pass
                 if (!pass)
                 {
@@ -770,17 +773,17 @@ void View::GetBatches()
                 
                 if (pass)
                 {
-                    // Check for vertex lights (both forward unlit and light pre-pass material pass)
+                    // Check for vertex lights (both forward unlit, light pre-pass material pass, and deferred G-buffer)
                     const PODVector<Light*>& vertexLights = drawable->GetVertexLights();
                     if (!vertexLights.Empty())
                     {
-                        // In light pre-pass mode, check if this is an opaque object that has converted its lights to per-vertex
+                        // In deferred modes, check if this is an opaque object that has converted its lights to per-vertex
                         // due to overflowing the pixel light count. These need to be skipped as the per-pixel accumulation
                         // already renders the light
                         /// \todo Sub-geometries might need different interpretation if opaque & alpha are mixed
                         if (!vertexLightsProcessed)
                         {
-                            drawable->LimitVertexLights(lightPrepass_ && pass->GetBlendMode() == BLEND_REPLACE);
+                            drawable->LimitVertexLights(renderMode_ != RENDER_FORWARD && pass->GetBlendMode() == BLEND_REPLACE);
                             vertexLightsProcessed = true;
                         }
                         
@@ -804,8 +807,18 @@ void View::GetBatches()
                     
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                     {
-                        FinalizeBatch(baseBatch, tech, pass);
-                        baseQueue_.AddBatch(baseBatch);
+                        if (pass->GetType() != PASS_DEFERRED)
+                        {
+                            FinalizeBatch(baseBatch, tech, pass);
+                            baseQueue_.AddBatch(baseBatch);
+                        }
+                        else
+                        {
+                            // Allow G-buffer pass instancing only if lightmask matches zone lightmask
+                            baseBatch.lightMask_ = GetLightMask(drawable);
+                            FinalizeBatch(baseBatch, tech, pass, baseBatch.lightMask_ == (baseBatch.zone_->GetLightMask() & 0xff));
+                            gbufferQueue_.AddBatch(baseBatch);
+                        }
                     }
                     else
                     {
@@ -853,7 +866,7 @@ void View::UpdateGeometries()
         queue->AddWorkItem(item);
         item.start_ = &preAlphaQueue_;
         queue->AddWorkItem(item);
-        if (lightPrepass_)
+        if (renderMode_ != RENDER_FORWARD)
         {
             item.start_ = &gbufferQueue_;
             queue->AddWorkItem(item);
@@ -937,7 +950,8 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (lightPrepass_ && tech->HasPass(PASS_GBUFFER))
+        if ((renderMode_ == RENDER_PREPASS && tech->HasPass(PASS_PREPASS)) || (renderMode_ == RENDER_DEFERRED &&
+            tech->HasPass(PASS_DEFERRED)))
             continue;
         
         Pass* pass = 0;
@@ -1072,7 +1086,7 @@ void View::RenderBatchesForward()
         graphics_->ResolveToTexture(screenBuffers_[0], viewRect_);
 }
 
-void View::RenderBatchesLightPrepass()
+void View::RenderBatchesDeferred()
 {
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
@@ -1087,26 +1101,34 @@ void View::RenderBatchesLightPrepass()
     }
     
     bool hwDepth = graphics_->GetHardwareDepthSupport();
+    // In light prepass mode the albedo buffer is used for light accumulation instead
+    Texture2D* albedoBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
     Texture2D* normalBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
-    Texture2D* lightBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
     Texture2D* depthBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, hwDepth ? Graphics::GetDepthStencilFormat() :
         Graphics::GetLinearDepthFormat());
     
     RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil;
     
+    if (renderMode_ == RENDER_PREPASS)
+        graphics_->SetRenderTarget(0, normalBuffer);
+    else
+    {
+        graphics_->SetRenderTarget(0, renderTarget);
+        graphics_->SetRenderTarget(1, albedoBuffer);
+        graphics_->SetRenderTarget(2, normalBuffer);
+    }
+    
     // Hardware depth support: render to RGBA normal buffer and read hardware depth
     if (hwDepth)
     {
         depthStencil = depthBuffer->GetRenderSurface();
-        graphics_->SetRenderTarget(0, normalBuffer);
     }
     // No hardware depth support: render to RGBA normal buffer and R32F depth
     else
     {
         depthStencil = renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
-        graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetRenderTarget(1, depthBuffer);
+        graphics_->SetRenderTarget(renderMode_ == RENDER_PREPASS ? 1 : 3, depthBuffer);
     }
     
     graphics_->SetDepthStencil(depthStencil);
@@ -1121,16 +1143,41 @@ void View::RenderBatchesLightPrepass()
         RenderBatchQueue(gbufferQueue_);
     }
     
-    // Clear the light accumulation buffer. However, skip the clear if the first light is a directional light with full mask
-    bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
-        LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
-    
-    graphics_->ResetRenderTarget(1);
-    graphics_->SetRenderTarget(0, lightBuffer);
-    graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(viewRect_);
-    if (!optimizeLightBuffer)
-        graphics_->Clear(CLEAR_COLOR);
+    RenderSurface* lightRenderTarget = renderMode_ == RENDER_PREPASS ? albedoBuffer->GetRenderSurface() : renderTarget;
+    if (renderMode_ == RENDER_PREPASS)
+    {
+        // Clear the light accumulation buffer. However, skip the clear if the first light is a directional light with full mask
+        bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
+            LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
+        
+        graphics_->SetRenderTarget(0, lightRenderTarget);
+        graphics_->ResetRenderTarget(1);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
+        if (!optimizeLightBuffer)
+            graphics_->Clear(CLEAR_COLOR);
+    }
+    else
+    {
+        // Clear destination rendertarget with fog color
+        graphics_->SetAlphaTest(false);
+        graphics_->SetBlendMode(BLEND_REPLACE);
+        graphics_->SetColorWrite(true);
+        graphics_->SetDepthTest(CMP_ALWAYS);
+        graphics_->SetDepthWrite(false);
+        graphics_->SetScissorTest(false);
+        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
+        graphics_->SetRenderTarget(0, renderTarget);
+        graphics_->ResetRenderTarget(1);
+        graphics_->ResetRenderTarget(2);
+        graphics_->ResetRenderTarget(3);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
+        graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
+        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
+        graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
+        DrawFullscreenQuad(camera_, false);
+    }
     
     if (!lightQueues_.Empty())
     {
@@ -1143,13 +1190,15 @@ void View::RenderBatchesLightPrepass()
             if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
             {
                 RenderShadowMap(*i);
-                graphics_->SetRenderTarget(0, lightBuffer);
+                graphics_->SetRenderTarget(0, lightRenderTarget);
                 graphics_->SetDepthStencil(depthStencil);
                 graphics_->SetViewport(viewRect_);
             }
             
-            graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
+            if (renderMode_ == RENDER_DEFERRED)
+                graphics_->SetTexture(TU_ALBEDOBUFFER, albedoBuffer);
             graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
+            graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
             
             for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
             {
@@ -1159,31 +1208,36 @@ void View::RenderBatchesLightPrepass()
         }
     }
     
-    graphics_->SetTexture(TU_DEPTHBUFFER, 0);
+    graphics_->SetTexture(TU_ALBEDOBUFFER, 0);
     graphics_->SetTexture(TU_NORMALBUFFER, 0);
+    graphics_->SetTexture(TU_DEPTHBUFFER, 0);
     
-    // Clear destination rendertarget with fog color
-    graphics_->SetAlphaTest(false);
-    graphics_->SetBlendMode(BLEND_REPLACE);
-    graphics_->SetColorWrite(true);
-    graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
-    graphics_->SetRenderTarget(0, renderTarget);
-    graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(viewRect_);
-    graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
-    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-    graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
-    DrawFullscreenQuad(camera_, false);
+    if (renderMode_ == RENDER_PREPASS)
+    {
+        // Clear destination rendertarget with fog color
+        graphics_->SetAlphaTest(false);
+        graphics_->SetBlendMode(BLEND_REPLACE);
+        graphics_->SetColorWrite(true);
+        graphics_->SetDepthTest(CMP_ALWAYS);
+        graphics_->SetDepthWrite(false);
+        graphics_->SetScissorTest(false);
+        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
+        graphics_->SetRenderTarget(0, renderTarget);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
+        graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
+        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
+        graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
+        DrawFullscreenQuad(camera_, false);
+    }
     
     if (!baseQueue_.IsEmpty())
     {
         // Render opaque objects with deferred lighting result
         PROFILE(RenderBase);
         
-        graphics_->SetTexture(TU_LIGHTBUFFER, lightBuffer);
+        if (renderMode_ == RENDER_PREPASS)
+            graphics_->SetTexture(TU_LIGHTBUFFER, albedoBuffer);
         
         RenderBatchQueue(baseQueue_);
         
@@ -1219,8 +1273,8 @@ void View::AllocateScreenBuffers()
 {
     unsigned neededBuffers = 0;
     #ifdef USE_OPENGL
-    // Due to FBO limitations, in OpenGL light pre-pass mode need to render to texture first and then blit to the backbuffer
-    if (lightPrepass_ && !renderTarget_)
+    // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
+    if (renderMode_ != RENDER_FORWARD && !renderTarget_)
         neededBuffers = 1;
     #endif
     
@@ -1724,9 +1778,9 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
     unsigned width = shadowMap->GetWidth();
     unsigned height = shadowMap->GetHeight();
     int maxCascades = renderer_->GetMaxShadowCascades();
-    // Due to instruction count limits, light prepass in SM2.0 can only support up to 3 cascades
+    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
     #ifndef USE_OPENGL
-    if (lightPrepass_ && !graphics_->GetSM3Support())
+    if (renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support())
         maxCascades = Max(maxCascades, 3);
     #endif
     
@@ -2269,7 +2323,7 @@ void View::PrepareInstancingBuffer()
     
     totalInstances += baseQueue_.GetNumInstances(renderer_);
     totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
-    if (lightPrepass_)
+    if (renderMode_ != RENDER_FORWARD)
         totalInstances += gbufferQueue_.GetNumInstances(renderer_);
     
     for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -2289,7 +2343,7 @@ void View::PrepareInstancingBuffer()
         {
             baseQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             preAlphaQueue_.SetTransforms(renderer_, lockedData, freeIndex);
-            if (lightPrepass_)
+            if (renderMode_ != RENDER_FORWARD)
                 gbufferQueue_.SetTransforms(renderer_, lockedData, freeIndex);
             
             for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -2310,9 +2364,9 @@ void View::SetupLightVolumeBatch(Batch& batch)
     LightType type = light->GetLightType();
     float lightDist;
     
-    // Use replace blend mode for the first light volume, and additive for the rest
+    // Use replace blend mode for the first pre-pass light volume, and additive for the rest
     graphics_->SetAlphaTest(false);
-    graphics_->SetBlendMode(light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
+    graphics_->SetBlendMode(renderMode_ == RENDER_PREPASS && light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
     graphics_->SetDepthWrite(false);
     
     if (type != LIGHT_DIRECTIONAL)

@@ -26,6 +26,14 @@
 #include "HashBase.h"
 #include "StringHash.h"
 
+/// Rendering modes.
+enum RenderMode
+{
+    RENDER_FORWARD = 0,
+    RENDER_PREPASS,
+    RENDER_DEFERRED
+};
+
 /// Primitive type.
 enum PrimitiveType
 {
@@ -165,13 +173,14 @@ enum TextureUsage
 /// Rendering passes.
 enum PassType
 {
-    PASS_BASE,
+    PASS_BASE = 0,
     PASS_LITBASE,
     PASS_LIGHT,
     PASS_PREALPHA,
     PASS_POSTALPHA,
-    PASS_GBUFFER,
+    PASS_PREPASS,
     PASS_MATERIAL,
+    PASS_DEFERRED,
     PASS_SHADOW,
     MAX_PASSES
 };
@@ -238,10 +247,11 @@ extern StringHash PSP_LIGHTMATRICES;
 enum TextureUnit
 {
     TU_DIFFUSE = 0,
-    TU_DEPTHBUFFER = 0,
+    TU_ALBEDOBUFFER = 0,
     TU_NORMAL = 1,
     TU_NORMALBUFFER = 1,
     TU_EMISSIVE = 2,
+    TU_DEPTHBUFFER = 2,
     TU_SPECULAR = 3,
     TU_DETAIL = 4,
     TU_ENVIRONMENT = 5,

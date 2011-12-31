@@ -23,6 +23,10 @@ void main()
         vec3 diffColor = cMatDiffColor.rgb;
     #endif
 
+    #ifdef VERTEXCOLOR
+        diffColor *= vColor.rgb;
+    #endif
+    
     #ifdef SPECMAP
         vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord).g;
     #else

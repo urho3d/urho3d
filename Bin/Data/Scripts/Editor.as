@@ -98,7 +98,7 @@ void LoadConfig()
 
     if (!renderingElem.isNull)
     {
-        renderer.lightPrepass = renderingElem.GetInt("rendermode") == 1;
+        renderer.renderMode = RenderMode(renderingElem.GetInt("rendermode"));
         renderer.textureQuality = renderingElem.GetInt("texturequality");
         renderer.materialQuality = renderingElem.GetInt("materialquality");
         SetShadowResolution(renderingElem.GetInt("shadowresolution"));
@@ -136,7 +136,7 @@ void SaveConfig()
     objectElem.SetBool("uselocalids", useLocalIDs);
     objectElem.SetInt("pickmode", pickMode);
 
-    renderingElem.SetInt("rendermode", renderer.lightPrepass ? 1 : 0);
+    renderingElem.SetInt("rendermode", renderer.renderMode);
     renderingElem.SetInt("texturequality", renderer.textureQuality);
     renderingElem.SetInt("materialquality", renderer.materialQuality);
     renderingElem.SetInt("shadowresolution", GetShadowResolution());

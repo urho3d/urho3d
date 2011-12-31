@@ -56,7 +56,7 @@ void UpdateEditorSettingsDialog()
     pickModeEdit.selection = pickMode;
 
     DropDownList@ renderModeEdit = settingsDialog.GetChild("RenderModeEdit", true);
-    renderModeEdit.selection = renderer.lightPrepass ? 1 : 0;
+    renderModeEdit.selection = renderer.renderMode;
 
     DropDownList@ textureQualityEdit = settingsDialog.GetChild("TextureQualityEdit", true);
     textureQualityEdit.selection = renderer.textureQuality;
@@ -229,7 +229,7 @@ void EditPickMode(StringHash eventType, VariantMap& eventData)
 void EditRenderMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetUIElement();
-    renderer.lightPrepass = edit.selection == 1;
+    renderer.renderMode = RenderMode(edit.selection);
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)

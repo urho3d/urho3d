@@ -12,8 +12,9 @@ sampler2D sLightSpotMap : register(S8);
 samplerCUBE sLightCubeMap : register(S8);
 samplerCUBE sFaceSelectCubeMap : register(S9);
 samplerCUBE sIndirectionCubeMap : register(S10);
-sampler2D sDepthBuffer : register(S0);
+sampler2D sAlbedoBuffer : register(S0);
 sampler2D sNormalBuffer : register(S1);
+sampler2D sDepthBuffer : register(S2);
 sampler2D sLightBuffer : register(S7);
 
 float4 Sample(sampler2D map, float2 texCoord)

@@ -1,11 +1,11 @@
 <shaders>
-    <shader name="GBuffer" type="vs">
+    <shader name="Prepass" type="vs">
         <option name="Normal" define="NORMALMAP" />
         <option name="HW" define="HWDEPTH" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
     </shader>
-    <shader name="GBuffer" type="ps">
+    <shader name="Prepass" type="ps">
         <option name="Normal" define="NORMALMAP" />
         <option name="Mask" define="ALPHAMASK" />
         <option name="HW" define="HWDEPTH" />

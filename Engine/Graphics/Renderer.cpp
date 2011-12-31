@@ -278,7 +278,7 @@ Renderer::Renderer(Context* context) :
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
-    lightPrepass_(false),
+    renderMode_(RENDER_FORWARD),
     specularLighting_(true),
     drawShadows_(true),
     reuseShadowMaps_(true),
@@ -328,27 +328,29 @@ bool Renderer::SetViewport(unsigned index, Viewport* viewport)
     return true;
 }
 
-void Renderer::SetLightPrepass(bool enable)
+void Renderer::SetRenderMode(RenderMode mode)
 {
     if (!initialized_)
     {
-        LOGERROR("Can not switch light pre-pass rendering before setting initial screen mode");
+        LOGERROR("Can not switch rendering mode before setting initial screen mode");
         return;
     }
     
-    if (!graphics_->GetLightPrepassSupport())
-        enable = false;
+    if (mode == RENDER_PREPASS && !graphics_->GetLightPrepassSupport())
+        mode = RENDER_FORWARD;
+    if (mode == RENDER_DEFERRED && !graphics_->GetDeferredSupport())
+        mode = RENDER_FORWARD;
     
-    if (enable != lightPrepass_)
+    if (mode != renderMode_)
     {
-        // Light prepass is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
-        if (graphics_->GetMultiSample() > 1)
+        // Deferred rendering is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
+        if (mode != RENDER_FORWARD && graphics_->GetMultiSample() > 1)
         {
             graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
                 graphics_->GetTripleBuffer(), 1);
         }
         
-        lightPrepass_ = enable;
+        renderMode_ = mode;
         shadersDirty_ = true;
     }
 }
@@ -1101,7 +1103,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
         }
         else
         {
-            if (type == PASS_BASE || type == PASS_MATERIAL)
+            // Check if pass has vertex lighting support
+            if (type == PASS_BASE || type == PASS_MATERIAL || type == PASS_DEFERRED)
             {
                 unsigned numVertexLights = 0;
                 if (batch.lightQueue_)
@@ -1347,19 +1350,19 @@ void Renderer::LoadShaders()
     lightVS_.Clear();
     lightPS_.Clear();
     
-    if (lightPrepass_)
+    if (renderMode_ != RENDER_FORWARD)
     {
         lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
         
         unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+        String shaderName = renderMode_ == RENDER_PREPASS ? "PrepassLight_" : "DeferredLight_";
         
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-            lightVS_[i] = GetVertexShader("LightVolume_" + deferredLightVSVariations[i]);
+            lightVS_[i] = GetVertexShader(shaderName + deferredLightVSVariations[i]);
         
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
-            /// \todo Allow specifying the light volume shader name for different lighting models
             String ortho, hwDepth;
             #ifdef USE_OPENGL
             hwDepth = hwVariations[graphics_->GetHardwareDepthSupport() ? 1 : 0];
@@ -1372,11 +1375,11 @@ void Renderer::LoadShaders()
             
             if (i & DLPS_SHADOW)
             {
-                lightPS_[i] = GetPixelShader("LightVolume_" + ortho + lightPSVariations[i % DLPS_ORTHO] +
+                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO] +
                     shadowVariations[shadows] + hwDepth);
             }
             else
-                lightPS_[i] = GetPixelShader("LightVolume_" + ortho + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
+                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
         }
     }
     
@@ -1385,11 +1388,13 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadMaterialShaders(Technique* technique)
 {
-    if (lightPrepass_ && technique->HasPass(PASS_GBUFFER))
+    if (renderMode_ == RENDER_PREPASS && technique->HasPass(PASS_PREPASS))
     {
-        LoadPassShaders(technique, PASS_GBUFFER);
+        LoadPassShaders(technique, PASS_PREPASS);
         LoadPassShaders(technique, PASS_MATERIAL);
     }
+    else if (renderMode_ == RENDER_DEFERRED && technique->HasPass(PASS_DEFERRED))
+        LoadPassShaders(technique, PASS_DEFERRED);
     else
     {
         LoadPassShaders(technique, PASS_BASE);
@@ -1420,7 +1425,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         pixelShaderName += "_";
     
     // If hardware depth is used, choose a G-buffer shader that does not write depth manually
-    if (type == PASS_GBUFFER)
+    if (type == PASS_PREPASS || type == PASS_DEFERRED)
     {
         unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
         vertexShaderName += hwVariations[hwDepth];
@@ -1471,8 +1476,8 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
     }
     else
     {
-        // Load vertex light variations for forward ambient pass and pre-pass material pass
-        if (type == PASS_BASE || type == PASS_MATERIAL)
+        // Load vertex light variations for forward ambient pass, deferred G-buffer pass and pre-pass material pass
+        if (type == PASS_BASE || type == PASS_MATERIAL || type == PASS_DEFERRED)
         {
             vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)

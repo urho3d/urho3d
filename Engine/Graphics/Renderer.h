@@ -170,8 +170,8 @@ public:
     void SetNumViewports(unsigned num);
     /// %Set a viewport. Return true if successful.
     bool SetViewport(unsigned index, Viewport* viewport);
-    /// %Set light prepass rendering on/off.
-    void SetLightPrepass(bool enable);
+    /// %Set rendering mode (forward / light pre-pass / deferred.)
+    void SetRenderMode(RenderMode mode);
     /// %Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// %Set texture anisotropy.
@@ -208,8 +208,8 @@ public:
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.
     Viewport* GetViewport(unsigned index) const;
-    /// Return whether light prepass rendering is enabled.
-    bool GetLightPrepass() const { return lightPrepass_; }
+    /// Return rendering mode.
+    RenderMode GetRenderMode() const { return renderMode_; }
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -293,7 +293,7 @@ public:
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
-    /// Allocate a rendertarget or depth-stencil texture for light pre-pass rendering or postprocessing. Should only be called during actual rendering, not before.
+    /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
     Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered = false);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
@@ -454,8 +454,8 @@ private:
     unsigned numBatches_;
     /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_;
-    /// Light prepass mode flag.
-    bool lightPrepass_;
+    /// Rendering mode.
+    RenderMode renderMode_;
     /// Specular lighting flag.
     bool specularLighting_;
     /// Draw shadows flag.

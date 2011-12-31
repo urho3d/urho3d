@@ -11,6 +11,9 @@ void VS(float4 iPos : POSITION,
     #ifdef NUMVERTEXLIGHTS
         float3 iNormal : NORMAL,
     #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
         int4 iBlendIndices : BLENDINDICES,
@@ -62,6 +65,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 diffColor = cMatDiffColor.rgb * diffInput.rgb;
     #else
         float3 diffColor = cMatDiffColor.rgb;
+    #endif
+
+    #ifdef VERTEXCOLOR
+        diffColor *= iColor.rgb;
     #endif
 
     #ifdef SPECMAP
