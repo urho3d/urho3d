@@ -1,0 +1,18 @@
+<shaders>
+    <shader name="DeferredLight" type="vs">
+        <option name="Ortho" define="ORTHO" />
+        <option name="Dir" define="DIRLIGHT" />
+    </shader>
+    <shader name="DeferredLight" type="ps">
+        <option name="Linear" define="LINEAR" exclude="Ortho" />
+        <option name="Ortho" define="ORTHO" exclude="Linear" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Spec" define="SPECULAR" />
+        <option name="Shadow" define="SHADOW" />
+        <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
+        <option name="HW" define="HWSHADOW" require="SHADOW" />
+    </shader>
+</shaders>

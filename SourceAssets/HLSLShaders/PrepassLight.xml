@@ -1,9 +1,9 @@
 <shaders>
-    <shader name="LightVolume" type="vs">
+    <shader name="PrepassLight" type="vs">
         <option name="Ortho" define="ORTHO" />
         <option name="Dir" define="DIRLIGHT" />
     </shader>
-    <shader name="LightVolume" type="ps">
+    <shader name="PrepassLight" type="ps">
         <option name="Linear" define="LINEAR" exclude="Ortho" />
         <option name="Ortho" define="ORTHO" exclude="Linear" />
         <variation name="Dir" define="DIRLIGHT" />
