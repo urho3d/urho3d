@@ -1269,6 +1269,7 @@ void Graphics::ResetRenderTargets()
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         SetRenderTarget(i, (RenderSurface*)0);
     SetDepthStencil((RenderSurface*)0);
+    SetViewport(IntRect(0, 0, width_, height_));
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
@@ -1318,13 +1319,6 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             if (textures_[i] == parentTexture)
                 SetTexture(i, textures_[i]->GetBackupTexture());
         }
-    }
-    
-    if (!index)
-    {
-        // Reset viewport and scissor test
-        IntVector2 rtSize = GetRenderTargetDimensions();
-        SetViewport(IntRect(0, 0, rtSize.x_, rtSize.y_));
     }
 }
 

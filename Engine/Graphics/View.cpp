@@ -2498,6 +2498,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     graphics_->SetDepthStencil(shadowMap);
+    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
     graphics_->Clear(CLEAR_DEPTH);
     
     // Set shadow depth bias

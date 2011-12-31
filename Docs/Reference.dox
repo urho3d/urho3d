@@ -495,8 +495,6 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 setting the first color rendertarget resets the viewport dimensions. On OpenGL there is no such mechanism. However, as sometimes (for example in OpenGL shadow rendering) only a depth-stencil texture will be used for rendering, in OpenGL mode Graphics instead resets the viewport when the depth-stencil is set. The following sequence will produce reliable results on both APIs: first set the rendertarget(s), then the depth-stencil surface, and finally the viewport, if you need it to be less than the whole rendertarget.
-
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.

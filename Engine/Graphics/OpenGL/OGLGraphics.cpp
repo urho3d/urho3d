@@ -1163,6 +1163,7 @@ void Graphics::ResetRenderTargets()
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         SetRenderTarget(i, (RenderSurface*)0);
     SetDepthStencil((RenderSurface*)0);
+    SetViewport(0, 0, width_, height_);
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
@@ -1353,10 +1354,6 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             impl_->fboBound_ = false;
         }
     }
-    
-    // Reset viewport to default when the depth-stencil changes
-    IntVector2 viewSize = GetRenderTargetDimensions();
-    SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
 }
 
 void Graphics::SetDepthStencil(Texture2D* texture)

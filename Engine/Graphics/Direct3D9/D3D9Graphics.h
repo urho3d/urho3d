@@ -133,7 +133,7 @@ public:
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
     /// %Set texture anisotropy.
     void SetTextureAnisotropy(unsigned level);
-    /// Reset all rendertargets and depth-stencil surface (render to back buffer.)
+    /// Reset all rendertargets, depth-stencil surface and viewport.
     void ResetRenderTargets();
     /// Reset specific rendertarget.
     void ResetRenderTarget(unsigned index);

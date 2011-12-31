@@ -156,7 +156,7 @@ public:
     void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
-    /// Reset all rendertargets and depth-stencil surface (render to back buffer.)
+    /// Reset all rendertargets, depth-stencil surface and viewport.
     void ResetRenderTargets();
     /// Reset specific rendertarget.
     void ResetRenderTarget(unsigned index);
