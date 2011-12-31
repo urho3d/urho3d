@@ -1322,12 +1322,9 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     
     if (!index)
     {
-        // Viewport has been reset
+        // Reset viewport and scissor test
         IntVector2 rtSize = GetRenderTargetDimensions();
-        viewport_ = IntRect(0, 0, rtSize.x_, rtSize.y_);
-        
-        // Disable scissor test, needs to be re-enabled by the user
-        SetScissorTest(false);
+        SetViewport(IntRect(0, 0, rtSize.x_, rtSize.y_));
     }
 }
 

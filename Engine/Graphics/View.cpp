@@ -1108,32 +1108,30 @@ void View::RenderBatchesDeferred()
         Graphics::GetLinearDepthFormat());
     
     RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil;
+    RenderSurface* depthStencil = hwDepth ? depthBuffer->GetRenderSurface() : renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
     
     if (renderMode_ == RENDER_PREPASS)
+    {
         graphics_->SetRenderTarget(0, normalBuffer);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
+        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+        
+        if (!hwDepth)
+            graphics_->SetRenderTarget(1, depthBuffer);
+    }
     else
     {
         graphics_->SetRenderTarget(0, renderTarget);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
+        
         graphics_->SetRenderTarget(1, albedoBuffer);
         graphics_->SetRenderTarget(2, normalBuffer);
+        if (!hwDepth)
+            graphics_->SetRenderTarget(3, depthBuffer);
     }
-    
-    // Hardware depth support: render to RGBA normal buffer and read hardware depth
-    if (hwDepth)
-    {
-        depthStencil = depthBuffer->GetRenderSurface();
-    }
-    // No hardware depth support: render to RGBA normal buffer and R32F depth
-    else
-    {
-        depthStencil = renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
-        graphics_->SetRenderTarget(renderMode_ == RENDER_PREPASS ? 1 : 3, depthBuffer);
-    }
-    
-    graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(viewRect_);
-    graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
     if (!gbufferQueue_.IsEmpty())
     {
@@ -1159,24 +1157,9 @@ void View::RenderBatchesDeferred()
     }
     else
     {
-        // Clear destination rendertarget with fog color
-        graphics_->SetAlphaTest(false);
-        graphics_->SetBlendMode(BLEND_REPLACE);
-        graphics_->SetColorWrite(true);
-        graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetDepthWrite(false);
-        graphics_->SetScissorTest(false);
-        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
-        graphics_->SetRenderTarget(0, renderTarget);
         graphics_->ResetRenderTarget(1);
         graphics_->ResetRenderTarget(2);
         graphics_->ResetRenderTarget(3);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(viewRect_);
-        graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
-        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-        graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
-        DrawFullscreenQuad(camera_, false);
     }
     
     if (!lightQueues_.Empty())
@@ -1215,20 +1198,10 @@ void View::RenderBatchesDeferred()
     if (renderMode_ == RENDER_PREPASS)
     {
         // Clear destination rendertarget with fog color
-        graphics_->SetAlphaTest(false);
-        graphics_->SetBlendMode(BLEND_REPLACE);
-        graphics_->SetColorWrite(true);
-        graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetDepthWrite(false);
-        graphics_->SetScissorTest(false);
-        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
         graphics_->SetRenderTarget(0, renderTarget);
         graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(viewRect_);
-        graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
-        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-        graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
-        DrawFullscreenQuad(camera_, false);
+        graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
     }
     
     if (!baseQueue_.IsEmpty())
