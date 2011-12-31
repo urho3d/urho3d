@@ -146,18 +146,8 @@ public:
         return len;
     }
     
-    /// Normalize to unit length using fast inverse square root.
-    void NormalizeFast()
-    {
-        float invLen = FastInvSqrt(x_ * x_ + y_ * y_);
-        x_ *= invLen;
-        y_ *= invLen;
-    }
-    
     /// Return length.
     float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
-    /// Return length using fast square root.
-    float LengthFast() const { return FastSqrt(x_ * x_ + y_ * y_); }
     /// Return squared length.
     float LengthSquared() const { return x_ * x_ + y_ * y_; }
     /// Calculate dot product.
@@ -178,9 +168,6 @@ public:
         else
             return *this;
     }
-    
-    /// Return normalized to unit length using fast inverse square root.
-    Vector2 NormalizedFast() const { return *this * FastInvSqrt(x_ * x_ + y_ * y_); }
     
     /// Return float data.
     const float* GetData() const { return &x_; }

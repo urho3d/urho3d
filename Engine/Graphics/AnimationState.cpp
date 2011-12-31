@@ -38,8 +38,7 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     looped_(false),
     weight_(0.0f),
     time_(0.0f),
-    layer_(0),
-    useNlerp_(false)
+    layer_(0)
 {
     SetStartBone(0);
     
@@ -162,11 +161,6 @@ void AnimationState::SetLayer(unsigned char layer)
     }
 }
 
-void AnimationState::SetUseNlerp(bool enable)
-{
-    useNlerp_ = enable;
-}
-
 Bone* AnimationState::GetStartBone() const
 {
     return model_ ? startBone_ : 0;
@@ -235,12 +229,7 @@ void AnimationState::Apply()
                 if (channelMask & CHANNEL_POSITION)
                     boneNode->SetPosition(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
                 if (channelMask & CHANNEL_ROTATION)
-                {
-                    if (!useNlerp_)
-                        boneNode->SetRotation(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
-                    else
-                        boneNode->SetRotation(keyFrame->rotation_.NlerpFast(nextKeyFrame->rotation_, t));
-                }
+                    boneNode->SetRotation(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
                 if (channelMask & CHANNEL_SCALE)
                     boneNode->SetScale(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
             }
@@ -282,12 +271,7 @@ void AnimationState::Apply()
                 if (channelMask & CHANNEL_POSITION)
                     boneNode->SetPosition(boneNode->GetPosition().Lerp(keyFrame->position_, weight_));
                 if (channelMask & CHANNEL_ROTATION)
-                {
-                    if (!useNlerp_)
-                        boneNode->SetRotation(boneNode->GetRotation().Slerp(keyFrame->rotation_, weight_));
-                    else
-                        boneNode->SetRotation(boneNode->GetRotation().NlerpFast(keyFrame->rotation_, weight_));
-                }
+                    boneNode->SetRotation(boneNode->GetRotation().Slerp(keyFrame->rotation_, weight_));
                 if (channelMask & CHANNEL_SCALE)
                     boneNode->SetScale(boneNode->GetScale().Lerp(keyFrame->scale_, weight_));
             }
@@ -307,16 +291,8 @@ void AnimationState::Apply()
                 }
                 if (channelMask & CHANNEL_ROTATION)
                 {
-                    if (!useNlerp_)
-                    {
-                        boneNode->SetRotation(boneNode->GetRotation().Slerp(
-                            keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight_));
-                    }
-                    else
-                    {
-                        boneNode->SetRotation(boneNode->GetRotation().NlerpFast(
-                            keyFrame->rotation_.NlerpFast(nextKeyFrame->rotation_, t), weight_));
-                    }
+                    boneNode->SetRotation(boneNode->GetRotation().Slerp(
+                        keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight_));
                 }
                 if (channelMask & CHANNEL_SCALE)
                 {

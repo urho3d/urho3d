@@ -490,7 +490,7 @@ void View::GetDrawables()
             // as the bounding boxes are also used for shadow focusing
             const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
             BoundingBox geomViewBox = geomBox.Transformed(view);
-            if (geomBox.Size().LengthFast() < M_LARGE_VALUE)
+            if (geomBox.Size().LengthSquared() < M_LARGE_VALUE * M_LARGE_VALUE)
             {
                 sceneBox_.Merge(geomBox);
                 sceneViewBox_.Merge(geomViewBox);
@@ -1480,7 +1480,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         {
             // Check that occluder is big enough on the screen
             const BoundingBox& box = occluder->GetWorldBoundingBox();
-            float diagonal = (box.max_ - box.min_).LengthFast();
+            float diagonal = (box.max_ - box.min_).Length();
             float compare;
             if (!camera->IsOrthographic())
                 compare = diagonal * halfViewSize / occluder->GetDistance();
@@ -1730,7 +1730,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         Ray extrusionRay(center, center.Normalized());
         
         float extrusionDistance = shadowCamera->GetFarClip();
-        float originalDistance = Clamp(center.LengthFast(), M_EPSILON, extrusionDistance);
+        float originalDistance = Clamp(center.Length(), M_EPSILON, extrusionDistance);
         
         // Because of the perspective, the bounding box must also grow when it is extruded to the distance
         float sizeFactor = extrusionDistance / originalDistance;
@@ -1804,7 +1804,7 @@ void View::OptimizeLightByStencil(Light* light)
         float lightDist;
         
         if (type == LIGHT_POINT)
-            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).DistanceFast(camera_->GetWorldPosition());
+            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).Distance(camera_->GetWorldPosition());
         else
             lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
         
@@ -1988,7 +1988,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         {
             // Skip "infinite" objects like the skybox
             const BoundingBox& geomBox = geometries_[i]->GetWorldBoundingBox();
-            if (geomBox.Size().LengthFast() < M_LARGE_VALUE)
+            if (geomBox.Size().LengthSquared() < M_LARGE_VALUE * M_LARGE_VALUE)
             {
                 if (geometryDepthBounds_[i].min_ <= farSplit && geometryDepthBounds_[i].max_ >= nearSplit &&
                     (GetLightMask(geometries_[i]) & light->GetLightMask()))
@@ -2345,7 +2345,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     if (type != LIGHT_DIRECTIONAL)
     {
         if (type == LIGHT_POINT)
-            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).DistanceFast(camera_->GetWorldPosition());
+            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).Distance(camera_->GetWorldPosition());
         else
             lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
         

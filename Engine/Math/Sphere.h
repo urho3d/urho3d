@@ -205,9 +205,6 @@ public:
     /// Return distance of a point to the surface, or 0 if inside.
     float Distance(const Vector3& point) const { return Max((point - center_).Length() - radius_, 0.0f); }
     
-    /// Return distance of a point to the surface, or 0 if inside, using fast square root.
-    float DistanceFast(const Vector3& point) const { return Max((point - center_).LengthFast() - radius_, 0.0f); }
-    
     /// Sphere center.
     Vector3 center_;
     /// Sphere radius.

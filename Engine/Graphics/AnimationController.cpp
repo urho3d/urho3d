@@ -39,11 +39,10 @@
 static String noBoneName;
 
 static const unsigned char CTRL_LOOPED = 0x1;
-static const unsigned char CTRL_NLERP = 0x2;
-static const unsigned char CTRL_STARTBONE = 0x4;
-static const unsigned char CTRL_AUTOFADE = 0x8;
-static const unsigned char CTRL_SETTIME = 0x10;
-static const unsigned char CTRL_SETWEIGHT = 0x20;
+static const unsigned char CTRL_STARTBONE = 0x2;
+static const unsigned char CTRL_AUTOFADE = 0x4;
+static const unsigned char CTRL_SETTIME = 0x08;
+static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 
@@ -536,7 +535,6 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         unsigned char ctrl = buf.ReadUByte();
         state->SetLayer(buf.ReadUByte());
         state->SetLooped((ctrl & CTRL_LOOPED) != 0);
-        state->SetUseNlerp((ctrl & CTRL_NLERP) != 0);
         animations_[index].speed_ = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
         animations_[index].targetWeight_ = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
         animations_[index].fadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
@@ -626,8 +624,6 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
         Bone* startBone = state->GetStartBone();
         if (state->IsLooped())
             ctrl |= CTRL_LOOPED;
-        if (state->GetUseNlerp())
-            ctrl |= CTRL_NLERP;
         if (startBone && startBone != model->GetSkeleton().GetRootBone())
             ctrl |= CTRL_STARTBONE;
         if (i->autoFadeTime_ > 0.0f)

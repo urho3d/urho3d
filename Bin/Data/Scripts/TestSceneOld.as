@@ -177,9 +177,8 @@ void InitScene()
         object.maxLights = 2;
 
         AnimationState@ anim = object.AddAnimationState(cache.GetResource("Animation", "Models/Jack_Walk.ani"));
-        anim.useNlerp = true;
         anim.looped = true;
-        anim.weight = 1;
+        anim.weight = 1.0;
 
         animatingObjects.Push(newNode);
     }

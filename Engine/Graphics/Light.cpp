@@ -483,7 +483,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
         {
             Vector3 centerPos = box.Center();
             Vector3 lightPos = GetWorldPosition();
-            Vector3 lightDir = (centerPos - lightPos).NormalizedFast();
+            Vector3 lightDir = (centerPos - lightPos).Normalized();
             Ray lightRay(lightPos, lightDir);
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
@@ -500,16 +500,16 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             Ray lightRay(lightPos, lightDir);
             
             Vector3 centerProj = lightRay.Project(centerPos);
-            float centerDistance = (centerProj - lightPos).LengthFast();
-            Ray centerRay(centerProj, (centerPos - centerProj).NormalizedFast());
+            float centerDistance = (centerProj - lightPos).Length();
+            Ray centerRay(centerProj, (centerPos - centerProj).Normalized());
             float centerAngle = centerRay.HitDistance(box) / centerDistance;
             
             // Check if a corner of the bounding box is closer to the light ray than the center, use its angle in that case
             Vector3 cornerPos = centerPos + box.HalfSize() * Vector3(centerPos.x_ < centerProj.x_ ? 1.0f : -1.0f,
                 centerPos.y_ < centerProj.y_ ? 1.0f : -1.0f, centerPos.z_ < centerProj.z_ ? 1.0f : -1.0f);
             Vector3 cornerProj = lightRay.Project(cornerPos);
-            float cornerDistance = (cornerProj - lightPos).LengthFast();
-            float cornerAngle = (cornerPos - cornerProj).LengthFast() / cornerDistance;
+            float cornerDistance = (cornerProj - lightPos).Length();
+            float cornerAngle = (cornerPos - cornerProj).Length() / cornerDistance;
             
             float spotAngle = Min(centerAngle, cornerAngle);
             float maxAngle = tanf(fov_ * M_DEGTORAD * 0.5f);

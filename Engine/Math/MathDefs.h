@@ -109,41 +109,8 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ret;
 }
 
-/// Fast square root.
-inline float FastSqrt(float x)
-{
-    union
-    {
-        float f;
-        int i;
-    } u;
-    
-    u.f = x;
-    u.i -= 1 << 23;
-    u.i >>= 1;
-    u.i += 1 << 29;
-    return u.f;
-}
-
-/// Fast inverse square root.
-inline float FastInvSqrt(float x)
-{
-    union
-    {
-        float f;
-        int i;
-    } u;
-    
-    float xHalf = 0.5f * x;
-    u.f = x;
-    u.i = 0x5f3759df - (u.i >> 1);
-    x = u.f * (1.5f - xHalf * u.f * u.f);
-    return x;
-}
-
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
-
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
 inline float Random() { return (Rand() & 32767) / 32768.0f; }
 /// Return a random float between 0.0 and range, inclusive.

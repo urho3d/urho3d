@@ -176,16 +176,6 @@ public:
         return len;
     }
     
-    /// Normalize to unit length using fast inverse square root.
-    void NormalizeFast()
-    {
-        float invLen = FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
-        w_ *= invLen;
-        x_ *= invLen;
-        y_ *= invLen;
-        z_ *= invLen;
-    }
-    
     /// Return normalized to unit length.
     Quaternion Normalized() const
     {
@@ -195,9 +185,6 @@ public:
         else
             return IDENTITY;
     }
-    
-    /// Return normalized to unit length, using fast inverse square root.
-    Quaternion NormalizedFast() const { return *this * FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_); }
     
     /// Return inverse.
     Quaternion Inverse() const
@@ -221,10 +208,6 @@ public:
     float LengthSquared() const { return w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_; }
     /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
-    /// Normalized interpolation with another quaternion.
-    Quaternion Nlerp(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).Normalized(); }
-    /// Normalized interpolation with another quaternion, using fast inverse square root.
-    Quaternion NlerpFast(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).NormalizedFast(); }
     
     /// Return Euler angles in degrees.
     Vector3 EulerAngles() const;

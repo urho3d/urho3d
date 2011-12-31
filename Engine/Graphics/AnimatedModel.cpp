@@ -701,7 +701,6 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
             state->SetWeight(value[index++].GetFloat());
             state->SetTime(value[index++].GetFloat());
             state->SetLayer(value[index++].GetInt());
-            state->SetUseNlerp(value[index++].GetBool());
         }
         else
             index += 6;
@@ -735,7 +734,6 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         ret.Push(state->GetWeight());
         ret.Push(state->GetTime());
         ret.Push((int)state->GetLayer());
-        ret.Push(state->GetUseNlerp());
     }
     return ret;
 }

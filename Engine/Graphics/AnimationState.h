@@ -57,8 +57,6 @@ public:
     void AddTime(float delta);
     /// %Set blending layer.
     void SetLayer(unsigned char layer);
-    /// %Set whether to use nlerp instead of slerp for rotation, default false.
-    void SetUseNlerp(bool enable);
     
     /// Return animation.
     Animation* GetAnimation() const { return animation_; }
@@ -76,8 +74,6 @@ public:
     float GetLength() const;
     /// Return blending layer.
     unsigned char GetLayer() const { return layer_; }
-    /// Return whether using nlerp for rotation.
-    bool GetUseNlerp() const { return useNlerp_; }
     
     /// Apply to the animated model's skeleton. Called by AnimatedModel.
     void Apply();
@@ -101,6 +97,4 @@ private:
     float time_;
     /// Blending layer.
     unsigned char layer_;
-    /// Nlerp flag.
-    bool useNlerp_;
 };

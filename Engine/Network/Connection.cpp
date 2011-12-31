@@ -1082,7 +1082,7 @@ void Connection::ProcessExistingNode(Node* node)
     NetworkPriority* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {
-        float distance = (node->GetWorldPosition() - position_).LengthFast();
+        float distance = (node->GetWorldPosition() - position_).Length();
         if (!priority->CheckUpdate(distance, nodeState.priorityAcc_))
             return;
     }
