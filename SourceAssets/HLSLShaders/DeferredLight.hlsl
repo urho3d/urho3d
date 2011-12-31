@@ -121,8 +121,8 @@ void PS(
     #endif
 
     #ifdef SPECULAR
-        float spec = lightColor.g * GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);
-        oColor = diff * float4(lightColor * albedoInput.rgb + spec * cLightColor.a * albedoInput.aaa, 0.0);
+        float spec = GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);
+        oColor = diff * float4(lightColor * (albedoInput.rgb + spec * cLightColor.a * albedoInput.aaa), 0.0);
     #else
         oColor = diff * float4(lightColor * albedoInput.rgb, 0.0);
     #endif
