@@ -356,7 +356,6 @@ Methods:<br>
 - Quaternion Normalized() const
 - Quaternion Inverse() const
 - float DotProduct(const Quaternion&) const
-- Quaternion Nlerp(const Quaternion&, float) const
 - Quaternion Slerp(const Quaternion&, float) const
 - String ToString() const
 
@@ -2001,7 +2000,6 @@ Properties:<br>
 - float weight
 - float time
 - uint8 layer
-- bool useNlerp
 - Animation@ animation (readonly)
 - bool enabled (readonly)
 - float length (readonly)
