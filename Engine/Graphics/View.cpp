@@ -1111,28 +1111,28 @@ void View::RenderBatchesDeferred()
     RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
     RenderSurface* depthStencil = hwDepth ? depthBuffer->GetRenderSurface() : renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
     
+    // Clear destination rendertarget with fog color
+    graphics_->SetRenderTarget(0, renderTarget);
+    graphics_->SetDepthStencil(depthStencil);
+    graphics_->SetViewport(viewRect_);
+    graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
+    
     if (renderMode_ == RENDER_PREPASS)
     {
         graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(viewRect_);
-        graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
-        
         if (!hwDepth)
             graphics_->SetRenderTarget(1, depthBuffer);
     }
     else
     {
-        graphics_->SetRenderTarget(0, renderTarget);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(viewRect_);
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
-        
         graphics_->SetRenderTarget(1, albedoBuffer);
         graphics_->SetRenderTarget(2, normalBuffer);
         if (!hwDepth)
             graphics_->SetRenderTarget(3, depthBuffer);
     }
+    
+    // On Direct3D9 setting the first rendertarget causes viewport to reset. Therefore set it again now
+    graphics_->SetViewport(viewRect_);
     
     if (!gbufferQueue_.IsEmpty())
     {
@@ -1198,11 +1198,9 @@ void View::RenderBatchesDeferred()
     
     if (renderMode_ == RENDER_PREPASS)
     {
-        // Clear destination rendertarget with fog color
         graphics_->SetRenderTarget(0, renderTarget);
         graphics_->SetDepthStencil(depthStencil);
         graphics_->SetViewport(viewRect_);
-        graphics_->Clear(CLEAR_COLOR, farClipZone_->GetFogColor());
     }
     
     if (!baseQueue_.IsEmpty())

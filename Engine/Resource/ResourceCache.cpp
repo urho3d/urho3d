@@ -512,7 +512,18 @@ void ResourceCache::StoreNameHash(const String& name)
     if (name.Empty())
         return;
     
-    hashToName_[StringHash(name)] = name;
+    StringHash hash(name);
+    
+    // If entry exists, check for difference (collision)
+    Map<StringHash, String>::Iterator i = hashToName_.Find(hash);
+    if (i != hashToName_.End())
+    {
+        if (i->second_.Compare(name, false))
+            LOGERROR("Resource hash collision " + i->second_ + " vs " + name);
+        i->second_ = name;
+    }
+    else
+        hashToName_[hash] = name;
 }
 
 const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)

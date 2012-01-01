@@ -1307,6 +1307,12 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     {
         impl_->device_->SetRenderTarget(index, newColorSurface);
         impl_->colorSurfaces_[index] = newColorSurface;
+        // Setting the first rendertarget causes viewport to be reset
+        if (!index)
+        {
+            IntVector2 rtSize = GetRenderTargetDimensions();
+            viewport_ = IntRect(0, 0, rtSize.x_, rtSize.y_);
+        }
     }
     
     // If the rendertarget is also bound as a texture, replace with backup texture or null
