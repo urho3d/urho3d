@@ -1249,7 +1249,7 @@ void View::AllocateScreenBuffers()
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with deferred rendering, it must be RGBA to comply with the rest of the buffers.
-    if (renderMode_ != RENDER_FORWARD && (!renderTarget_ || (renderMode == RENDER_DEFERRED &&
+    if (renderMode_ != RENDER_FORWARD && (!renderTarget_ || (renderMode_ == RENDER_DEFERRED &&
         renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat())))
         neededBuffers = 1;
     #endif
@@ -1264,7 +1264,7 @@ void View::AllocateScreenBuffers()
     
     unsigned format = Graphics::GetRGBFormat();
     #ifdef USE_OPENGL
-    if (renderMode_ == RENDER_DEFERED)
+    if (renderMode_ == RENDER_DEFERRED)
         format = Graphics::GetRGBAFormat();
     #endif
     
