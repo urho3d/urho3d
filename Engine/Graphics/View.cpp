@@ -1248,7 +1248,9 @@ void View::AllocateScreenBuffers()
     unsigned neededBuffers = 0;
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
-    if (renderMode_ != RENDER_FORWARD && !renderTarget_)
+    // Also, if rendering to a texture with deferred rendering, it must be RGBA to comply with the rest of the buffers.
+    if (renderMode_ != RENDER_FORWARD && (!renderTarget_ || (renderMode == RENDER_DEFERRED &&
+        renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat())))
         neededBuffers = 1;
     #endif
     
@@ -1260,9 +1262,15 @@ void View::AllocateScreenBuffers()
     if (postProcessPasses)
         neededBuffers = Min((int)postProcessPasses, 2);
     
+    unsigned format = Graphics::GetRGBFormat();
+    #ifdef USE_OPENGL
+    if (renderMode_ == RENDER_DEFERED)
+        format = Graphics::GetRGBAFormat();
+    #endif
+    
     // Allocate screen buffers with filtering active in case the post-processing effects need that
     for (unsigned i = 0; i < neededBuffers; ++i)
-        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat(), true));
+        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true));
 }
 
 void View::BlitFramebuffer()

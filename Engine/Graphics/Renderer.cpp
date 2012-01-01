@@ -350,6 +350,7 @@ void Renderer::SetRenderMode(RenderMode mode)
                 graphics_->GetTripleBuffer(), 1);
         }
         
+        ResetBuffers();
         renderMode_ = mode;
         shadersDirty_ = true;
     }
