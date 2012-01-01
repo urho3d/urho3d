@@ -25,11 +25,11 @@ add_definitions (-DENABLE_PROFILING)
 # If not on Windows, enable use of OpenGL instead of Direct3D9 (so called "Turso3D" mode.) Setting
 # this on Windows is not recommended, as graphics card drivers are usually better optimized for
 # Direct3D.
-#if (NOT WIN32)
+if (NOT WIN32)
     set (USE_OPENGL 1)
     add_definitions (-DUSE_OPENGL)
-#    add_definitions (-DUNIX)
-#endif ()
+    add_definitions (-DUNIX)
+endif ()
 
 # Compiler-specific options
 if (MSVC)
