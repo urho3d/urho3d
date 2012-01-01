@@ -48,12 +48,6 @@ void main()
     vNormal = GetWorldNormal(modelMatrix);
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
-    #ifdef DIRLIGHT
-        vLightVec = vec4(cLightDir, GetDepth(gl_Position));
-    #else
-        vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
-    #endif
-
     #ifdef SHADOW
         // Shadow projection: transform from world space to shadow space
         #if defined(DIRLIGHT)
@@ -74,18 +68,29 @@ void main()
     #endif
 
     #ifdef POINTLIGHT
-        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * vLightVec.xyz;
+        vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (cLightPos.xyz - worldPos);
     #endif
 
     #ifdef NORMALMAP
         vTangent = GetWorldTangent(modelMatrix);
         vBitangent = cross(vTangent, vNormal) * iTangent.w;
         mat3 tbn = mat3(vTangent, vBitangent, vNormal);
-        vLightVec.xyz = vLightVec.xyz * tbn;
+        #ifdef DIRLIGHT
+            vLightVec = vec4(cLightDir * tbn, GetDepth(gl_Position));
+        #else
+            vLightVec = vec4((cLightPos.xyz - worldPos) * tbn * cLightPos.w, GetDepth(gl_Position));
+        #endif
         #ifdef SPECULAR
             vEyeVec = (cCameraPos - worldPos) * tbn;
         #endif
-    #elif defined(SPECULAR)
-        vEyeVec = cCameraPos - worldPos;
+    #else
+        #ifdef DIRLIGHT
+            vLightVec = vec4(cLightDir, GetDepth(gl_Position));
+        #else
+            vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
+        #endif
+        #ifdef SPECULAR
+            vEyeVec = cCameraPos - worldPos;
+        #endif
     #endif
 }
