@@ -46,6 +46,6 @@ void main()
     gl_FragData[1] = GetFogFactor(vVertexLighting.a) * vec4(diffColor, specIntensity);
     gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
     #ifndef HWDEPTH
-        gl_FragData[3] = vVertexLighting.a;
+        gl_FragData[3] = vec4(EncodeDepth(vTexCoord.z), 0.0);
     #endif
 }
