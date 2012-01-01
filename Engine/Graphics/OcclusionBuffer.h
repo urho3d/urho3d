@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ struct DepthValue
 
 static const int OCCLUSION_MIN_SIZE = 8;
 static const int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
-static const int OCCLUSION_DEPTH_BIAS = 1;
+static const int OCCLUSION_DEPTH_BIAS = 4;
 static const float OCCLUSION_X_SCALE = 65536.0f;
 static const float OCCLUSION_Z_SCALE = 65536.0f;
 

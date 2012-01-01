@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2011 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@
 #include "Profiler.h"
 #include "Scene.h"
 #include "ShaderVariation.h"
+#include "Skybox.h"
 #include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -486,11 +487,11 @@ void View::GetDrawables()
         
         if (flags & DRAWABLE_GEOMETRY)
         {
-            // Expand the scene bounding boxes. However, do not take "infinite" objects such as the skybox into account,
-            // as the bounding boxes are also used for shadow focusing
+            // Expand the scene bounding boxes. However, do not take skyboxes into account, as they have undefinedly large size
+            // and the bounding boxes are also used for shadow focusing
             const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
             BoundingBox geomViewBox = geomBox.Transformed(view);
-            if (geomBox.Size().LengthSquared() < M_LARGE_VALUE * M_LARGE_VALUE)
+            if (drawable->GetType() != Skybox::GetTypeStatic())
             {
                 sceneBox_.Merge(geomBox);
                 sceneViewBox_.Merge(geomViewBox);
@@ -1480,7 +1481,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         {
             // Check that occluder is big enough on the screen
             const BoundingBox& box = occluder->GetWorldBoundingBox();
-            float diagonal = (box.max_ - box.min_).Length();
+            float diagonal = box.Size().Length();
             float compare;
             if (!camera->IsOrthographic())
                 compare = diagonal * halfViewSize / occluder->GetDistance();
@@ -1986,14 +1987,13 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         BoundingBox litGeometriesBox;
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
-            // Skip "infinite" objects like the skybox
-            const BoundingBox& geomBox = geometries_[i]->GetWorldBoundingBox();
-            if (geomBox.Size().LengthSquared() < M_LARGE_VALUE * M_LARGE_VALUE)
-            {
-                if (geometryDepthBounds_[i].min_ <= farSplit && geometryDepthBounds_[i].max_ >= nearSplit &&
-                    (GetLightMask(geometries_[i]) & light->GetLightMask()))
-                    litGeometriesBox.Merge(geomBox);
-            }
+            // Skip skyboxes as they have undefinedly large bounding box size
+            if (geometries_[i]->GetType() == Skybox::GetTypeStatic())
+                continue;
+            
+            if (geometryDepthBounds_[i].min_ <= farSplit && geometryDepthBounds_[i].max_ >= nearSplit &&
+                (GetLightMask(geometries_[i]) & light->GetLightMask()))
+                litGeometriesBox.Merge(geometries_[i]->GetWorldBoundingBox());
         }
         if (litGeometriesBox.defined_)
         {
