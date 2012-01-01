@@ -187,6 +187,9 @@ void Octant::ResetRoot()
 
 void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
+    if (!debug->IsInside(worldBoundingBox_))
+        return;
+    
     debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
