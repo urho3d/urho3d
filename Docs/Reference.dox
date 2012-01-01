@@ -435,7 +435,7 @@ Note that many more optimization opportunities are possible at the content level
 
 \section Rendering_Further Further details
 
-See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems", \ref Postprocessing "Post-processing", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
+See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Postprocessing "Post-processing", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
@@ -646,6 +646,19 @@ The Renderer can be configured to either reuse shadow maps, or not. To reuse is 
 When reuse is enabled, only one shadow texture of each shadow map size needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
 
 When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows.
+
+
+\page SkeletalAnimation Skeletal animation
+
+There are two ways to play skeletal animations. Either manually, by adding or removing animation states to the AnimatedModel, and advancing their time positions & weights, see \ref AnimatedModel::AddAnimationState "AddAnimationState()", \ref AnimatedModel::RemoveAnimationState "RemoveAnimationState()", \ref AnimationState::AddTime "AddTime()" and \ref AnimationState::SetWeight "SetWeight()". Alternatively the helper component AnimationController can be used by adding it into the same Node as the AnimatedModel, and using its functions, such as \ref AnimationController::Play "Play()" and \ref AnimationController::Stop "Stop()". AnimationController will advance the animations automatically during scene update. It also enables automatic network synchronization of animations, which the AnimatedModel does not do on its own.
+
+Note that AnimationController does not by default stop non-looping animations automatically once they reach the end, so their final pose will stay in effect. Rather they must either be stopped manually, or the \ref AnimationController::SetAutoFade "SetAutoFade()" function can be used to make them automatically fade out once reaching the end.
+
+\section SkeletalAnimation_Blending Animation blending
+
+%Animation blending uses the concept of numbered layers. Layer numbers are unsigned 8-bit integers, and the active \ref AnimationState "AnimationStates" on each layer are processed in order from the lowest layer to the highest. As animations are applied by lerp-blending between absolute bone transforms, the effect is that the higher layer numbers have higher priority, as they will remain in effect last.
+
+By default an Animation is played back by using all the available bone tracks. However an animation can be only partially applied by setting a start bone, see \ref AnimationState::SetStartBone "SetStartBone()". Once set, the bone tracks will be applied hierarchically starting from the start bone. For example, to apply an animation only to a bipedal character's upper body, which is typically parented to the spine bone, one could set the spine as the start bone.
 
 
 \page Particles %Particle systems

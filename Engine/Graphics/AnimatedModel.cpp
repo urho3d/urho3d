@@ -93,6 +93,7 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_INT, "Ray/Occl. LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
 }
 
 void AnimatedModel::ApplyAttributes()
@@ -703,8 +704,15 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
             state->SetLayer(value[index++].GetInt());
         }
         else
-            index += 6;
+            index += 5;
     }
+}
+
+void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
+{
+    unsigned index = 0;
+    while (index < value.Size())
+        SetMorphWeight(index, (float)value[index] / 255.0f);
 }
 
 ResourceRef AnimatedModel::GetModelAttr() const
@@ -736,6 +744,15 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         ret.Push((int)state->GetLayer());
     }
     return ret;
+}
+
+const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
+{
+    attrBuffer_.Clear();
+    for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
+        attrBuffer_.WriteUByte((unsigned char)(i->weight_ * 255.0f));
+    
+    return attrBuffer_.GetBuffer();
 }
 
 void AnimatedModel::OnNodeSet(Node* node)

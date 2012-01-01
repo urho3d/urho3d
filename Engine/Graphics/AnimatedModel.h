@@ -129,12 +129,16 @@ public:
     void SetBonesEnabledAttr(VariantVector value);
     /// %Set animation states attribute.
     void SetAnimationStatesAttr(VariantVector value);
+    /// %Set morphs attribute.
+    void SetMorphsAttr(const PODVector<unsigned char>& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return bones' animation enabled attribute.
     VariantVector GetBonesEnabledAttr() const;
     /// Return animation states attribute.
     VariantVector GetAnimationStatesAttr() const;
+    /// Return morphs attribute.
+    const PODVector<unsigned char>& GetMorphsAttr() const;
     
 protected:
     /// Handle node being assigned.
@@ -186,6 +190,8 @@ private:
     Vector<PODVector<Matrix3x4> > geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.
     Vector<PODVector<Matrix3x4*> > geometrySkinMatrixPtrs_;
+   /// Attribute buffer.
+    mutable VectorBuffer attrBuffer_;
     /// The frame number animation LOD distance was last calculated on.
     unsigned animationLodFrameNumber_;
     /// Animation LOD bias.
