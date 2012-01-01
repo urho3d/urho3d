@@ -1373,6 +1373,7 @@ void View::RunPostProcesses()
                 
                 graphics_->SetRenderTarget(0, rt);
                 graphics_->SetDepthStencil(GetDepthStencil(rt));
+                graphics_->SetViewport(IntRect(0, 0, rt->GetWidth(), rt->GetHeight()));
             }
             
             // Set shaders, shader parameters and textures
