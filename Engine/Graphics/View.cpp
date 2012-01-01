@@ -1262,7 +1262,7 @@ void View::AllocateScreenBuffers()
     
     // Allocate screen buffers with filtering active in case the post-processing effects need that
     for (unsigned i = 0; i < neededBuffers; ++i)
-        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBFormat(), true));
+        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat(), true));
 }
 
 void View::BlitFramebuffer()
