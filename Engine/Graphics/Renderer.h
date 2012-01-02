@@ -315,6 +315,12 @@ public:
     void SaveScreenBufferAllocations();
     /// Restore the screen buffer allocation status. Called by View.
     void RestoreScreenBufferAllocations();
+    /// Optimize a light by scissor rectangle.
+    void OptimizeLightByScissor(Light* light, Camera* camera);
+    /// Optimize a light by marking it to the stencil buffer and setting a stencil test.
+    void OptimizeLightByStencil(Light* light, Camera* camera);
+    /// Return a scissor rectangle for a light.
+    const Rect& GetLightScissor(Light* light, Camera* camera);
     
 private:
     /// Initialize when screen mode initially set.
@@ -335,6 +341,8 @@ private:
     void CreateGeometries();
     /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
+    /// Prepare for rendering of a new view.
+    void PrepareViewRender();
     /// Remove unused occlusion and screen buffers.
     void RemoveUnusedBuffers();
     /// Reset shadow map allocation counts.
@@ -400,6 +408,8 @@ private:
     HashMap<long long, unsigned> screenBufferAllocations_;
     /// Saved status of screen buffer allocations for restoring.
     HashMap<long long, unsigned> savedScreenBufferAllocations_;
+    /// Cache for light scissor queries.
+    HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Viewports.
     Vector<SharedPtr<Viewport> > viewports_;
     /// Views.
@@ -418,6 +428,8 @@ private:
     String shaderPath_;
     /// Frame info for rendering.
     FrameInfo frame_;
+    /// Rendering mode.
+    RenderMode renderMode_;
     /// Texture anisotropy level.
     int textureAnisotropy_;
     /// Texture filtering mode.
@@ -454,8 +466,8 @@ private:
     unsigned numBatches_;
     /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_;
-    /// Rendering mode.
-    RenderMode renderMode_;
+    /// Current stencil value for light optimization.
+    unsigned char lightStencilValue_;
     /// Specular lighting flag.
     bool specularLighting_;
     /// Draw shadows flag.

@@ -253,11 +253,15 @@ public:
     void SortFrontToBack();
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
     void SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex);
-    
+    /// Draw.
+    void Draw(Graphics* graphics, Renderer* renderer, bool useScissor = false, bool markToStencil = false) const;
+    /// Draw with forward light optimizations.
+    void Draw(Light* light, Graphics* graphics, Renderer* renderer) const;
     /// Return the combined amount of instances.
     unsigned GetNumInstances(Renderer* renderer) const;
     /// Return whether the batch group is empty.
     bool IsEmpty() const { return batches_.Empty() && baseBatchGroups_.Empty() && batchGroups_.Empty(); }
+    
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
     /// Instanced draw calls with base flag.

@@ -827,6 +827,109 @@ void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
         i->second_.SetTransforms(renderer, lockedData, freeIndex);
 }
 
+void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, bool markToStencil) const
+{
+    graphics->SetScissorTest(false);
+    
+    // During G-buffer rendering, mark opaque pixels to stencil buffer
+    if (!markToStencil)
+        graphics->SetStencilTest(false);
+    
+    // Base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = sortedBaseBatchGroups_.Begin(); i != sortedBaseBatchGroups_.End(); ++i)
+    {
+        BatchGroup* group = *i;
+        if (markToStencil)
+            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
+        
+        group->Draw(graphics, renderer);
+    }
+    // Base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
+    {
+        Batch* batch = *i;
+        if (markToStencil)
+            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
+        
+        batch->Draw(graphics, renderer);
+    }
+    
+    // Non-base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
+    {
+        BatchGroup* group = *i;
+        if (useScissor && group->lightQueue_)
+            renderer->OptimizeLightByScissor(group->lightQueue_->light_, group->camera_);
+        if (markToStencil)
+            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
+        
+        group->Draw(graphics, renderer);
+    }
+    // Non-base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
+    {
+        Batch* batch = *i;
+        if (useScissor)
+        {
+            if (!batch->isBase_ && batch->lightQueue_)
+                renderer->OptimizeLightByScissor(batch->lightQueue_->light_, batch->camera_);
+            else
+                graphics->SetScissorTest(false);
+        }
+        if (markToStencil)
+            graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
+        
+        batch->Draw(graphics, renderer);
+    }
+}
+
+void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) const
+{
+    graphics->SetScissorTest(false);
+    graphics->SetStencilTest(false);
+    
+    // Base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = sortedBaseBatchGroups_.Begin(); i != sortedBaseBatchGroups_.End(); ++i)
+    {
+        BatchGroup* group = *i;
+        group->Draw(graphics, renderer);
+    }
+    // Base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
+    {
+        Batch* batch = *i;
+        batch->Draw(graphics, renderer);
+    }
+    
+    // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
+    bool optimized = false;
+    
+    // Non-base instanced
+    for (PODVector<BatchGroup*>::ConstIterator i = sortedBatchGroups_.Begin(); i != sortedBatchGroups_.End(); ++i)
+    {
+        BatchGroup* group = *i;
+        if (!optimized)
+        {
+            renderer->OptimizeLightByStencil(light, group->camera_);
+            renderer->OptimizeLightByScissor(light, group->camera_);
+            optimized = true;
+        }
+        group->Draw(graphics, renderer);
+    }
+    // Non-base non-instanced
+    for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
+    {
+        Batch* batch = *i;
+        if (!optimized)
+        {
+            renderer->OptimizeLightByStencil(light, batch->camera_);
+            renderer->OptimizeLightByScissor(light, batch->camera_);
+            optimized = true;
+        }
+        batch->Draw(graphics, renderer);
+    }
+}
+
 unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
 {
     unsigned total = 0;

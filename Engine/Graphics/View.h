@@ -181,10 +181,6 @@ private:
     void SetupLightVolumeBatch(Batch& batch);
     /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
     void DrawFullscreenQuad(Camera* camera, bool nearQuad);
-    /// Render everything in a batch queue, priority batches first.
-    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false);
-    /// Render batches lit by a specific light.
-    void RenderLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     /// Return the proper depth-stencil surface to use for a rendertarget.
@@ -206,10 +202,6 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Color rendertarget to use.
     RenderSurface* renderTarget_;
-    /// Post-processing effects.
-    Vector<SharedPtr<PostProcess> > postProcesses_;
-    /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
-    PODVector<Texture2D*> screenBuffers_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -224,6 +216,10 @@ private:
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space.
     BoundingBox sceneViewBox_;
+    /// Post-processing effects.
+    Vector<SharedPtr<PostProcess> > postProcesses_;
+    /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
+    PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
     /// Per-thread octree zone query results.
@@ -248,8 +244,6 @@ private:
     HashSet<Drawable*> maxLightsDrawables_;
     /// Lookup map for the processed lights' light queues.
     Map<Light*, LightBatchQueue*> lightQueueMapping_;
-    /// Cache for light scissor queries.
-    HashMap<Light*, Rect> lightScissorCache_;
     /// Base pass batches.
     BatchQueue baseQueue_;
     /// Pre-transparent pass batches.
@@ -272,8 +266,6 @@ private:
     int maxOccluderTriangles_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
-    /// Current stencil value for light optimization.
-    unsigned char lightStencilValue_;
     /// Rendering mode.
     RenderMode renderMode_;
     /// Camera zone's override flag.

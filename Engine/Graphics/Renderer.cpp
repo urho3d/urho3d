@@ -657,7 +657,7 @@ void Renderer::Render()
         for (unsigned i = numViews_ - 1; i < numViews_; --i)
         {
             // Screen buffers can be reused between views, as each is rendered completely
-            ResetScreenBufferAllocations();
+            PrepareViewRender();
             views_[i]->Render();
         }
         
@@ -1228,6 +1228,120 @@ void Renderer::SaveScreenBufferAllocations()
 void Renderer::RestoreScreenBufferAllocations()
 {
     screenBufferAllocations_ = savedScreenBufferAllocations_;
+}
+
+
+void Renderer::OptimizeLightByScissor(Light* light, Camera* camera)
+{
+    if (light && light->GetLightType() != LIGHT_DIRECTIONAL)
+        graphics_->SetScissorTest(true, GetLightScissor(light, camera));
+    else
+        graphics_->SetScissorTest(false);
+}
+
+void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
+{
+    if (light)
+    {
+        LightType type = light->GetLightType();
+        if (type == LIGHT_DIRECTIONAL)
+        {
+            graphics_->SetStencilTest(false);
+            return;
+        }
+        
+        Geometry* geometry = GetLightGeometry(light);
+        Matrix3x4 view(camera->GetInverseWorldTransform());
+        Matrix4 projection(camera->GetProjection());
+        float lightDist;
+        
+        if (type == LIGHT_POINT)
+            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).Distance(camera->GetWorldPosition());
+        else
+            lightDist = light->GetFrustum().Distance(camera->GetWorldPosition());
+        
+        // If the camera is actually inside the light volume, do not draw to stencil as it would waste fillrate
+        if (lightDist < M_EPSILON)
+        {
+            graphics_->SetStencilTest(false);
+            return;
+        }
+        
+        // If the stencil value has wrapped, clear the whole stencil first
+        if (!lightStencilValue_)
+        {
+            graphics_->Clear(CLEAR_STENCIL);
+            lightStencilValue_ = 1;
+        }
+        
+        // If possible, render the stencil volume front faces. However, close to the near clip plane render back faces instead
+        // to avoid clipping.
+        if (lightDist < camera->GetNearClip() * 2.0f)
+        {
+            SetCullMode(CULL_CW, camera);
+            graphics_->SetDepthTest(CMP_GREATER);
+        }
+        else
+        {
+            SetCullMode(CULL_CCW, camera);
+            graphics_->SetDepthTest(CMP_LESSEQUAL);
+        }
+        
+        graphics_->SetColorWrite(false);
+        graphics_->SetDepthWrite(false);
+        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
+        graphics_->SetShaders(stencilVS_, stencilPS_);
+        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+        graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera));
+        
+        geometry->Draw(graphics_);
+        
+        graphics_->ClearTransformSources();
+        graphics_->SetColorWrite(true);
+        graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, lightStencilValue_);
+        
+        // Increase stencil value for next light
+        ++lightStencilValue_;
+    }
+    else
+        graphics_->SetStencilTest(false);
+}
+
+const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
+{
+    Pair<Light*, Camera*> combination(light, camera);
+    
+    HashMap<Pair<Light*, Camera*>, Rect>::Iterator i = lightScissorCache_.Find(combination);
+    if (i != lightScissorCache_.End())
+        return i->second_;
+    
+    Matrix3x4 view(camera->GetInverseWorldTransform());
+    Matrix4 projection(camera->GetProjection());
+    
+    switch (light->GetLightType())
+    {
+    case LIGHT_POINT:
+        {
+            BoundingBox viewBox(light->GetWorldBoundingBox().Transformed(view));
+            return lightScissorCache_[combination] = viewBox.Projected(projection);
+        }
+        
+    case LIGHT_SPOT:
+        {
+            Frustum viewFrustum(light->GetFrustum().Transformed(view));
+            return lightScissorCache_[combination] = viewFrustum.Projected(projection);
+        }
+        
+    default:
+        return lightScissorCache_[combination] = Rect::FULL;
+    }
+}
+
+void Renderer::PrepareViewRender()
+{
+    ResetScreenBufferAllocations();
+    lightScissorCache_.Clear();
+    lightStencilValue_ = 1;
 }
 
 void Renderer::RemoveUnusedBuffers()
