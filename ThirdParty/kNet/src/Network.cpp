@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-#ifdef UNIX
+#if defined(UNIX) || defined(ANDROID)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -779,6 +779,7 @@ void Network::SendUDPConnectDatagram(Socket &socket, Datagram *connectMessage)
 	if (!sendData)
 	{
 		LOG(LogError, "Network::SendUDPConnectDatagram: socket.BeginSend failed! Cannot send UDP connection datagram!");
+		return;
 	}
 	if (connectMessage)
 	{

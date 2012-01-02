@@ -20,7 +20,7 @@
 
 #include "Types.h"
 
-#ifdef UNIX
+#if defined(UNIX) || defined(ANDROID)
 #include <stdint.h>
 #endif
 

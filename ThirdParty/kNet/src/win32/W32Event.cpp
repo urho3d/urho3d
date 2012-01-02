@@ -64,14 +64,16 @@ void Event::Reset()
 {
 	if (wsaEvent == NULL)
 		LOG(LogError, "Event::Reset called on a null event!");
-	WSAResetEvent(wsaEvent);
+	else
+		WSAResetEvent(wsaEvent);
 }
 
 void Event::Set()
 {
 	if (wsaEvent == NULL)
 		LOG(LogError, "Event::Set called on a null event!");
-	WSASetEvent(wsaEvent);
+	else
+		WSASetEvent(wsaEvent);
 }
 
 bool Event::Test() const

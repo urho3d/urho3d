@@ -61,7 +61,7 @@ private:
 #ifdef WIN32
 	WSAEVENT events[maxEvents]; 
 
-#elif defined(UNIX)
+#elif defined(UNIX) || defined(ANDROID)
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

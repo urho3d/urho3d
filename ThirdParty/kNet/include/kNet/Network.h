@@ -18,7 +18,7 @@
 
 // Modified by Lasse Öörni for Urho3D
 
-#ifdef UNIX
+#if defined(UNIX) || defined(ANDROID)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

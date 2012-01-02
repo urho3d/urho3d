@@ -40,7 +40,7 @@ Urho3D uses the following third-party libraries:
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
 - GLFW 3.0 WIP (http://www.glfw.org/)
-- kNet (https://bitbucket.org/clb/knet)
+- kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Open Asset Import Library, svn rev 1102 (http://assimp.sourceforge.net/)
 - Open Dynamics Engine, svn rev 1846 (http://www.ode.org/)

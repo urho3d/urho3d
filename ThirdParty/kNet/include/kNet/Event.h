@@ -98,7 +98,7 @@ public:
 
 	/// Wraps the given WSAEVENT into this event.
 	explicit Event(WSAEVENT wsaEvent, EventWaitType eventType);
-#elif defined(UNIX)
+#elif defined(UNIX) || defined(ANDROID)
 public:
 	int fd[2]; // fd[0] is used for reading, fd[1] for writing.
 

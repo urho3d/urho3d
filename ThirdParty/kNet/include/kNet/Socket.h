@@ -31,7 +31,7 @@ namespace kNet
 typedef int socklen_t;
 }
 
-#elif defined(UNIX)
+#elif defined(UNIX) || defined(ANDROID)
 
 #include <sys/types.h>
 #include <sys/socket.h>
