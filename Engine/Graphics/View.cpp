@@ -1018,7 +1018,7 @@ void View::RenderBatchesForward()
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(viewRect_);
-    graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, farClipZone_->GetFogColor());
+    graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
     if (!baseQueue_.IsEmpty())
     {
@@ -1050,9 +1050,19 @@ void View::RenderBatchesForward()
     
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetRenderTarget(0, renderTarget);
-    graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(viewRect_);
+    
+    // At this point clear the parts of viewport not occupied by opaque geometry with fog color
+    graphics_->SetAlphaTest(false);
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetColorWrite(true);
+    graphics_->SetDepthTest(CMP_LESSEQUAL);
+    graphics_->SetDepthWrite(false);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
+    graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
+    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
+    graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
+    DrawFullscreenQuad(camera_, false);
     
     if (!preAlphaQueue_.IsEmpty())
     {
