@@ -179,7 +179,7 @@ void Texture::UpdateParameters()
     else
         glTexParameteri(target_, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     
-    glTexParameterfv(target_, GL_TEXTURE_BORDER_COLOR, borderColor_.GetData());
+    glTexParameterfv(target_, GL_TEXTURE_BORDER_COLOR, borderColor_.Data());
     
     parametersDirty_ = false;
 }

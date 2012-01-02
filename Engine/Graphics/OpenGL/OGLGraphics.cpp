@@ -899,7 +899,7 @@ void Graphics::SetShaderParameter(StringHash param, float value)
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
-    SetShaderParameter(param, color.GetData(), 4);
+    SetShaderParameter(param, color.Data(), 4);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
@@ -908,7 +908,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-            glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.GetData());
+            glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.Data());
     }
 }
 
@@ -923,15 +923,15 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
             switch (info->type_)
             {
             case GL_FLOAT:
-                glUniform1fv(info->location_, 1, vector.GetData());
+                glUniform1fv(info->location_, 1, vector.Data());
                 break;
                 
             case GL_FLOAT_VEC2:
-                glUniform2fv(info->location_, 1, vector.GetData());
+                glUniform2fv(info->location_, 1, vector.Data());
                 break;
                 
             case GL_FLOAT_VEC3:
-                glUniform3fv(info->location_, 1, vector.GetData());
+                glUniform3fv(info->location_, 1, vector.Data());
                 break;
             }
         }
@@ -944,7 +944,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-            glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.GetData());
+            glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.Data());
     }
 }
 
@@ -959,19 +959,19 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
             switch (info->type_)
             {
             case GL_FLOAT:
-                glUniform1fv(info->location_, 1, vector.GetData());
+                glUniform1fv(info->location_, 1, vector.Data());
                 break;
                 
             case GL_FLOAT_VEC2:
-                glUniform2fv(info->location_, 1, vector.GetData());
+                glUniform2fv(info->location_, 1, vector.Data());
                 break;
                 
             case GL_FLOAT_VEC3:
-                glUniform3fv(info->location_, 1, vector.GetData());
+                glUniform3fv(info->location_, 1, vector.Data());
                 break;
                 
             case GL_FLOAT_VEC4:
-                glUniform4fv(info->location_, 1, vector.GetData());
+                glUniform4fv(info->location_, 1, vector.Data());
                 break;
             }
         }

@@ -199,7 +199,7 @@ public:
     }
     
     /// Return float data.
-    const float* GetData() const { return &x_; }
+    const float* Data() const { return &x_; }
     /// Return as string.
     String ToString() const;
     

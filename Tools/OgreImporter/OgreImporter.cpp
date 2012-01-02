@@ -937,7 +937,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             
             Matrix3x4 offsetMatrix(bones_[i].derivedPosition_, bones_[i].derivedRotation_, bones_[i].derivedScale_);
             offsetMatrix = offsetMatrix.Inverse();
-            dest.Write(offsetMatrix.GetData(), sizeof(Matrix3x4));
+            dest.Write(offsetMatrix.Data(), sizeof(Matrix3x4));
             
             dest.WriteUByte(bones_[i].collisionMask_);
             if (bones_[i].collisionMask_ & 1)

@@ -96,7 +96,7 @@ public:
     }
     
     /// Return float data.
-    const float* GetData() const { return &r_; }
+    const float* Data() const { return &r_; }
     /// Return RGB values as a Vector3.
     Vector3 RGBValues() const { return Vector3(r_, g_, b_); }
     /// Return approximate intensity.

@@ -86,7 +86,7 @@ bool Skeleton::Save(Serializer& dest)
         dest.WriteVector3(bone.initialPosition_);
         dest.WriteQuaternion(bone.initialRotation_);
         dest.WriteVector3(bone.initialScale_);
-        dest.Write(bone.offsetMatrix_.GetData(), sizeof(Matrix3x4));
+        dest.Write(bone.offsetMatrix_.Data(), sizeof(Matrix3x4));
         
         // Collision info
         dest.WriteUByte(bone.collisionMask_);

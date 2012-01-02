@@ -353,7 +353,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     for (unsigned i = 0; i < numSplits; ++i)
                         CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
                     
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
                 break;
                 
@@ -366,7 +366,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     if (isShadowed)
                         CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
                     
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }
                 break;
                 
@@ -376,9 +376,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
                     #ifdef USE_OPENGL
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.GetData(), 16);
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
                     #else
-                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.GetData(), 12);
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
                     #endif
                 }
                 break;
@@ -432,7 +432,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             }
             
             if (lights.Size())
-                graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].GetData(), lights.Size() * 3 * 4);
+                graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].Data(), lights.Size() * 3 * 4);
         }
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light))
@@ -549,7 +549,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     for (unsigned i = 0; i < numSplits; ++i)
                         CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, camera_->GetWorldPosition());
                     
-                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].GetData(), 16 * numSplits);
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
                 break;
                 
@@ -562,14 +562,20 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     if (isShadowed)
                         CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, camera_->GetWorldPosition());
                     
-                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].GetData(), isShadowed ? 32 : 16);
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }
                 break;
                 
             case LIGHT_POINT:
                 {
                     Matrix4 lightVecRot(light->GetWorldRotation().RotationMatrix());
-                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.GetData(), 16);
+                    // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
+                    // the next parameter
+                    #ifdef USE_OPENGL
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
+                    #else
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
+                    #endif
                 }
                 break;
             }

@@ -266,13 +266,13 @@ void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batc
         // Check if model has per-geometry bone mappings
         if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[batchIndex].Size())
         {
-            batch.shaderData_ = geometrySkinMatrices_[batchIndex][0].GetData();
+            batch.shaderData_ = geometrySkinMatrices_[batchIndex][0].Data();
             batch.shaderDataSize_ = geometrySkinMatrices_[batchIndex].Size() * 12;
         }
         // If not, use the global skin matrices
         else
         {
-            batch.shaderData_ = skinMatrices_[0].GetData();
+            batch.shaderData_ = skinMatrices_[0].Data();
             batch.shaderDataSize_ = skinMatrices_.Size() * 12;
         }
     }

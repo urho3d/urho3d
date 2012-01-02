@@ -81,22 +81,22 @@ bool Serializer::WriteIntRect(const IntRect& value)
 
 bool Serializer::WriteIntVector2(const IntVector2& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteRect(const Rect& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteVector2(const Vector2& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteVector3(const Vector3& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WritePackedVector3(const Vector3& value, float maxAbsCoord)
@@ -112,12 +112,12 @@ bool Serializer::WritePackedVector3(const Vector3& value, float maxAbsCoord)
 
 bool Serializer::WriteVector4(const Vector4& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteQuaternion(const Quaternion& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WritePackedQuaternion(const Quaternion& value)
@@ -134,7 +134,7 @@ bool Serializer::WritePackedQuaternion(const Quaternion& value)
 
 bool Serializer::WriteColor(const Color& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteBoundingBox(const BoundingBox& value)

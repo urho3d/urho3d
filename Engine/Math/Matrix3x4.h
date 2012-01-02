@@ -359,7 +359,7 @@ public:
     Matrix3x4 Inverse() const;
     
     /// Return float data.
-    const float* GetData() const { return &m00_; }
+    const float* Data() const { return &m00_; }
     
     float m00_;
     float m01_;

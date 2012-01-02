@@ -112,7 +112,7 @@ void RigidBody::SetRotation(const Quaternion& rotation)
 {
     if (body_)
     {
-        dBodySetQuaternion(body_, rotation.GetData());
+        dBodySetQuaternion(body_, rotation.Data());
         previousRotation_ = rotation;
     }
 }
@@ -122,7 +122,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     if (body_)
     {
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        dBodySetQuaternion(body_, rotation.GetData());
+        dBodySetQuaternion(body_, rotation.Data());
         previousPosition_ = position;
         previousRotation_ = rotation;
     }
@@ -379,7 +379,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     {
         SetActive(true);
         dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
-        dBodySetQuaternion(body_, newRotation.GetData());
+        dBodySetQuaternion(body_, newRotation.Data());
         previousPosition_ = newPosition;
         previousRotation_ = newRotation;
     }
@@ -427,7 +427,7 @@ void RigidBody::PreStep()
         {
             SetActive(true);
             dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
-            dBodySetQuaternion(body_, newRotation.GetData());
+            dBodySetQuaternion(body_, newRotation.Data());
         }
     }
 }
@@ -500,7 +500,7 @@ void RigidBody::CreateBody()
         const Vector3& position = node_->GetTargetPosition();
         Quaternion rotation(node_->GetTargetRotation());
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        dBodySetQuaternion(body_, rotation.GetData());
+        dBodySetQuaternion(body_, rotation.Data());
         previousPosition_ = position;
         previousRotation_ = rotation;
         
@@ -583,7 +583,7 @@ void RigidBody::UpdateMass()
         }
         
         dMatrix3 rotMatrix;
-        dRfromQ(rotMatrix, shape->GetRotation().GetData());
+        dRfromQ(rotMatrix, shape->GetRotation().Data());
         dMassTranslate(&subMass, offset.x_, offset.y_, offset.z_);
         dMassRotate(&subMass, rotMatrix);
         dMassAdd(&mass, &subMass);

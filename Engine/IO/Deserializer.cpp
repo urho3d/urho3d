@@ -122,28 +122,28 @@ IntRect Deserializer::ReadIntRect()
 IntVector2 Deserializer::ReadIntVector2()
 {
     IntVector2 ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
 Rect Deserializer::ReadRect()
 {
     Rect ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
 Vector2 Deserializer::ReadVector2()
 {
     Vector2 ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
 Vector3 Deserializer::ReadVector3()
 {
     Vector3 ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
@@ -163,14 +163,14 @@ Vector3 Deserializer::ReadPackedVector3(float maxAbsCoord)
 Vector4 Deserializer::ReadVector4()
 {
     Vector4 ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
 Quaternion Deserializer::ReadQuaternion()
 {
     Quaternion ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 
@@ -191,7 +191,7 @@ Quaternion Deserializer::ReadPackedQuaternion()
 Color Deserializer::ReadColor()
 {
     Color ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 

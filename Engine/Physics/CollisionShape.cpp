@@ -592,7 +592,7 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
         {
             Vector3 offset(geometryScale_ * position_);
             dGeomSetOffsetPosition(geometry_, offset.x_, offset.y_, offset.z_);
-            dGeomSetOffsetQuaternion(geometry_, offsetQuaternion.GetData());
+            dGeomSetOffsetQuaternion(geometry_, offsetQuaternion.Data());
         }
         else
             dGeomClearOffset(geometry_);
@@ -608,7 +608,7 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
         Quaternion geomRot(nodeRot * offsetQuaternion);
         
         dGeomSetPosition(geometry_, geomPos.x_, geomPos.y_, geomPos.z_);
-        dGeomSetQuaternion(geometry_, geomRot.GetData());
+        dGeomSetQuaternion(geometry_, geomRot.Data());
     }
 }
 
@@ -632,7 +632,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     
     const Vector3& position = *reinterpret_cast<const Vector3*>(dGeomGetPosition(geometry_));
     Quaternion rotation;
-    dGeomGetQuaternion(geometry_, const_cast<float*>(rotation.GetData()));
+    dGeomGetQuaternion(geometry_, const_cast<float*>(rotation.Data()));
     Matrix3x4 transform(position, rotation, 1.0f);
     
     switch (dGeomGetClass(geometry_))

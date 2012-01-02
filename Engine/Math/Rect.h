@@ -156,7 +156,7 @@ public:
     Vector2 HalfSize() const { return (max_ - min_) * 0.5f; }
     
     /// Return float data.
-    const void* GetData() const { return &min_.x_; }
+    const void* Data() const { return &min_.x_; }
     /// Return as string.
     String ToString() const;
     

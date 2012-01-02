@@ -222,7 +222,7 @@ public:
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(Quaternion rhs, float t) const;
     /// Return float data.
-    const float* GetData() const { return &w_; }
+    const float* Data() const { return &w_; }
     /// Return as string.
     String ToString() const;
     

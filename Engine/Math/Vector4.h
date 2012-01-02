@@ -170,7 +170,7 @@ public:
     Vector4 Lerp(const Vector4& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     
     /// Return float data.
-    const float* GetData() const { return &x_; }
+    const float* Data() const { return &x_; }
     /// Return as string.
     String ToString() const;
     

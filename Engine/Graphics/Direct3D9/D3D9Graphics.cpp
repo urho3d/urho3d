@@ -1034,9 +1034,9 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
         return;
     
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, color.GetData(), 1);
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, color.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, color.GetData(), 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, color.Data(), 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
@@ -1092,9 +1092,9 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
         return;
     
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.GetData(), 4);
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 4);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.GetData(), 4);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 4);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
@@ -1104,9 +1104,9 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
         return;
     
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, vector.GetData(), 1);
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, vector.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, vector.GetData(), 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, vector.Data(), 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
@@ -1116,9 +1116,9 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
         return;
     
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.GetData(), 3);
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.GetData(), 3);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
 }
 
 void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& definition)
