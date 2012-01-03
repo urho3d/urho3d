@@ -350,15 +350,11 @@ void View::Render()
     // If this is a main view, draw the associated debug geometry now
     if (!renderTarget_)
     {
-        Scene* scene = static_cast<Scene*>(octree_->GetNode());
-        if (scene)
+        DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
+        if (debug)
         {
-            DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
-            if (debug)
-            {
-                debug->SetView(camera_);
-                debug->Render();
-            }
+            debug->SetView(camera_);
+            debug->Render();
         }
     }
     

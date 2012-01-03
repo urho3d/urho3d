@@ -594,10 +594,11 @@ void Renderer::Update(float timeStep)
             continue;
         
         const IntRect& viewRect = viewport->GetRect();
+        Scene* scene = viewport->GetScene();
         
         // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
-        Octree* octree = viewport->GetScene()->GetComponent<Octree>();
+        Octree* octree = scene->GetComponent<Octree>();
         if (!updatedOctrees_.Contains(octree))
         {
             frame_.camera_ = viewport->GetCamera();
@@ -609,7 +610,7 @@ void Renderer::Update(float timeStep)
             
             // Set also the view for the debug graphics already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
-            DebugRenderer* debug = viewport->GetScene()->GetComponent<DebugRenderer>();
+            DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
             if (debug)
                 debug->SetView(viewport->GetCamera());
         }
@@ -687,10 +688,7 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         Octree* octree = view->GetOctree();
         if (!octree)
             continue;
-        Scene* scene = static_cast<Scene*>(octree->GetNode());
-        if (!scene)
-            continue;
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        DebugRenderer* debug = octree->GetComponent<DebugRenderer>();
         if (!debug)
             continue;
         
