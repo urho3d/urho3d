@@ -230,16 +230,12 @@ String Deserializer::ReadFileID()
 
 StringHash Deserializer::ReadStringHash()
 {
-    StringHash ret;
-    Read((void*)ret.GetData(), sizeof(unsigned));
-    return ret;
+    return StringHash(ReadUInt());
 }
 
 ShortStringHash Deserializer::ReadShortStringHash()
 {
-    ShortStringHash ret;
-    Read((void*)ret.GetData(), sizeof(unsigned short));
-    return ret;
+    return ShortStringHash(ReadUShort());
 }
 
 PODVector<unsigned char> Deserializer::ReadBuffer()

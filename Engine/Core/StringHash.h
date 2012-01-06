@@ -87,8 +87,6 @@ public:
     operator bool () const { return value_ != 0; }
     /// Return hash value.
     unsigned GetValue() const { return value_; }
-    /// Return unsigned data.
-    const unsigned* GetData() const { return &value_; }
     /// Return as string.
     String ToString() const;
     /// Return hash value for HashSet & HashMap.
@@ -172,8 +170,6 @@ public:
     operator bool () const { return value_ != 0; }
     /// Return hash value.
     unsigned short GetValue() const { return value_; }
-    /// Return unsigned short data.
-    const unsigned short* GetData() const { return &value_; }
     /// Return as string.
     String ToString() const;
     /// Return hash value for HashSet & HashMap.

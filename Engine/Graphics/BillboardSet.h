@@ -65,8 +65,6 @@ public:
     
     /// Calculate distance and LOD level for rendering.  May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return whether the next geometry update will touch actual GPU resources.
-    virtual bool GetUpdateOnGPU() { return true; }
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it should happen in a worker thread.

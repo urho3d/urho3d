@@ -289,7 +289,7 @@ void VertexBuffer::UpdateOffsets()
     vertexSize_ = elementOffset;
 }
 
-unsigned long long VertexBuffer::GetHash(unsigned streamIndex, unsigned useMask)
+unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex, unsigned useMask)
 {
     unsigned long long bufferHash = elementMask_;
     unsigned long long maskHash;

@@ -214,8 +214,6 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether texture rendertargets are supported. Always true on Direct3D9
-    bool GetRenderTargetSupport() const { return true; }
     /// Return whether Shader Model 3 is supported.
     bool GetSM3Support() const { return hasSM3_; }
     /// Return whether light pre-pass rendering is supported.

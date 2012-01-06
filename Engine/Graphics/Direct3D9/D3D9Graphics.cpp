@@ -756,7 +756,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         if (!buffers[i])
             continue;
         
-        hash |= buffers[i]->GetHash(i, elementMasks[i]);
+        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
     }
     
     if (hash)
@@ -830,7 +830,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         if (!buffers[i])
             continue;
         
-        hash |= buffers[i]->GetHash(i, elementMasks[i]);
+        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
     }
     
     if (hash)
