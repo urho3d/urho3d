@@ -158,10 +158,13 @@ endif()
 
 #AddCompilationUnitNameDefines(kNetSourceFiles)
 #TODO: To clean up, move the lines of code below into a macro, like shown above. Disabled for now since passing a list to a CMake macro was problematic.
-foreach(srcFile ${kNetSourceFiles})
-   get_filename_component(baseName ${srcFile} NAME)
-   set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
-endforeach()
+# Urho3D: use only on Windows
+if (WIN32)
+   foreach(srcFile ${kNetSourceFiles})
+      get_filename_component(baseName ${srcFile} NAME)
+      set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
+   endforeach()
+endif()
 
 add_library(kNet STATIC ${kNetSourceFiles} ${kNetHeaderFiles})
 
