@@ -108,6 +108,9 @@ directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9,
 shader compilation requires the D3DX library from the DirectX runtime or SDK to
 be available.
 
+When using Xcode on Mac OS X, select Project -> Set Active Architecture -> i386
+before building. Compiling Urho3D as 64-bit is not supported.
+
 After the build is complete, the programs can be run from the Bin directory.
 
 To run Urho3D from the Visual Studio debugger, set it as a startup project and
