@@ -118,6 +118,8 @@ public:
     const String& GetResourceName(StringHash nameHash) const;
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path);
+    /// Remove unsupported constructs from the resource name to prevent ambiguity.
+    String SanitateResourceName(const String& name);
     /// Store a hash-to-name mapping.
     void StoreNameHash(const String& name);
     

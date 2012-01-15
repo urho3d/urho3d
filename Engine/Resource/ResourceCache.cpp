@@ -313,8 +313,10 @@ void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
     resourceGroups_[type].memoryBudget_ = budget;
 }
 
-SharedPtr<File> ResourceCache::GetFile(const String& name)
+SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
 {
+    String name = SanitateResourceName(nameIn);
+    
     // Check first the packages
     for (unsigned i = 0; i < packages_.Size(); ++i)
     {
@@ -343,8 +345,10 @@ SharedPtr<File> ResourceCache::GetFile(const String& name)
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& name)
+Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
 {
+    String name = SanitateResourceName(nameIn);
+    
     // Add the name to the hash map, so if this is an unknown resource, the error will not be unintelligible
     StoreNameHash(name);
     
@@ -505,6 +509,15 @@ String ResourceCache::GetPreferredResourceDir(const String& path)
     }
     
     return fixedPath;
+}
+
+String ResourceCache::SanitateResourceName(const String& nameIn)
+{
+    // Sanitate unsupported constructs from the resource name
+    String name = GetInternalPath(nameIn);
+    name.Replace("../", "");
+    name.Replace("./", "");
+    return name;
 }
 
 void ResourceCache::StoreNameHash(const String& name)

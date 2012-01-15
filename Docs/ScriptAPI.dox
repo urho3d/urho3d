@@ -1040,6 +1040,7 @@ Methods:<br>
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&)
+- String SanitateResourceName(const String&)
 - const String& GetResourceName(StringHash)
 - Resource@ GetResource(const String&, const String&)
 - Resource@ GetResource(ShortStringHash, StringHash)
