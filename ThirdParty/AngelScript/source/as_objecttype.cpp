@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -453,19 +453,16 @@ asIScriptFunction *asCObjectType::GetMethodByName(const char *name, bool getVirt
 // interface
 int asCObjectType::GetMethodIdByDecl(const char *decl, bool getVirtual) const
 {
-	// Get the module from one of the methods
 	if( methods.GetLength() == 0 )
 		return asNO_FUNCTION;
 
+	// Get the module from one of the methods, but it will only be
+	// used to allow the parsing of types not already known by the object.
+	// It is possible for object types to be orphaned, e.g. by discarding 
+	// the module that created it. In this case it is still possible to 
+	// find the methods, but any type not known by the object will result in
+	// an invalid declaration.
 	asCModule *mod = engine->scriptFunctions[methods[0]]->module;
-	if( mod == 0 )
-	{
-		if( engine->scriptFunctions[methods[0]]->funcType == asFUNC_INTERFACE )
-			return engine->GetMethodIdByDecl(this, decl, 0);
-
-		return asNO_MODULE;
-	}
-
 	int id = engine->GetMethodIdByDecl(this, decl, mod);
 	if( !getVirtual && id >= 0 )
 	{

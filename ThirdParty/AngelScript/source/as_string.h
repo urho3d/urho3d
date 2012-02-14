@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -64,6 +64,8 @@ public:
 	asCString &operator =(char);
 
 	asCString SubString(size_t start, size_t length = (size_t)(-1)) const;
+
+	int FindLast(const char *str) const;
 
 	size_t Format(const char *fmt, ...);
 

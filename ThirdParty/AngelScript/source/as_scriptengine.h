@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -92,6 +92,8 @@ public:
     virtual int SetJITCompiler(asIJITCompiler *compiler);
     virtual asIJITCompiler *GetJITCompiler() const;
 
+	// TODO: interface: namespace: Allow setting the current namespace for registration
+
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
 	virtual asUINT             GetGlobalFunctionCount() const;
@@ -102,7 +104,8 @@ public:
 	// Global properties
 	virtual int    RegisterGlobalProperty(const char *declaration, void *pointer);
 	virtual asUINT GetGlobalPropertyCount() const;
-	// TODO: access: Return the current access mask
+	// TODO: interface: namespace: Return the namespace
+	// TODO: interface: access: Return the current access mask
 	virtual int    GetGlobalPropertyByIndex(asUINT index, const char **name, int *typeId = 0, bool *isConst = 0, const char **configGroup = 0, void **pointer = 0) const;
 	// TODO: access: Allow changing the access mask
 	
@@ -128,6 +131,8 @@ public:
 	virtual int         RegisterEnum(const char *type);
 	virtual int         RegisterEnumValue(const char *type, const char *name, int value);
 	virtual asUINT      GetEnumCount() const;
+	// TODO: interface: namespace: Return namespace
+	// TODO: interface: access: Return access mask
 	virtual const char *GetEnumByIndex(asUINT index, int *enumTypeId, const char **configGroup = 0) const;
 	virtual int         GetEnumValueCount(int enumTypeId) const;
 	virtual const char *GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const;
@@ -138,6 +143,7 @@ public:
 	virtual asIScriptFunction *GetFuncdefByIndex(asUINT index, const char **configGroup = 0) const;
 
 	// Typedefs
+	// TODO: interface: namespace: Return namespace
 	virtual int         RegisterTypedef(const char *type, const char *decl);
 	virtual asUINT      GetTypedefCount() const;
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId, const char **configGroup = 0) const;
@@ -148,6 +154,7 @@ public:
 	virtual int     RemoveConfigGroup(const char *groupName);
 	virtual asDWORD SetDefaultAccessMask(asDWORD defaultMask);
 #ifdef AS_DEPRECATED
+	// TODO: interface: Remove this deprecated function
 	// deprecated since 2011-10-04
 	virtual int SetConfigGroupModuleAccess(const char *groupName, const char *module, bool hasAccess);
 #endif
@@ -166,6 +173,7 @@ public:
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const;
 	virtual int            GetTypeIdByDecl(const char *decl) const;
+	// TODO: interface: namespace: Add flag to allow including namespace or not in declaration
 	virtual const char    *GetTypeDeclaration(int typeId) const;
 	virtual int            GetSizeOfPrimitiveType(int typeId) const;
 

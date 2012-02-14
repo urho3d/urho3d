@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -117,10 +117,18 @@ const char *asCModule::GetName() const
 // interface
 int asCModule::AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset)
 {
+#ifdef AS_NO_COMPILER
+	UNUSED_VAR(name);
+	UNUSED_VAR(code);
+	UNUSED_VAR(codeLength);
+	UNUSED_VAR(lineOffset);
+	return asNOT_SUPPORTED;
+#else
 	if( !builder )
 		builder = asNEW(asCBuilder)(engine, this);
 
 	return builder->AddCode(name, code, (int)codeLength, lineOffset, (int)engine->GetScriptSectionNameIndex(name ? name : ""), engine->ep.copyScriptSections);
+#endif
 }
 
 // internal
@@ -135,6 +143,9 @@ void asCModule::JITCompile()
 // interface
 int asCModule::Build()
 {
+#ifdef AS_NO_COMPILER
+	return asNOT_SUPPORTED;
+#else
 	// Only one thread may build at one time
 	// TODO: It should be possible to have multiple threads perform compilations
 	int r = engine->RequestBuild();
@@ -181,6 +192,7 @@ int asCModule::Build()
 		r = ResetGlobalVars(0);
 
 	return r;
+#endif
 }
 
 // interface
@@ -762,13 +774,14 @@ int asCModule::GetNextImportedFunctionId()
 }
 
 // internal
-int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride)
+int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride, bool isShared, const asCString &ns)
 {
 	asASSERT(id >= 0);
 
 	// Store the function information
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, this, isInterface ? asFUNC_INTERFACE : asFUNC_SCRIPT);
 	func->name             = name;
+	func->nameSpace        = ns;
 	func->id               = id;
 	func->returnType       = returnType;
 	func->scriptSectionIdx = sectionIdx;
@@ -783,6 +796,10 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const
 	func->isPrivate  = isPrivate;
 	func->isFinal    = isFinal;
 	func->isOverride = isOverride;
+	// All methods of shared objects are also shared
+	if( objType && objType->IsShared() )
+		isShared = true;
+	func->isShared   = isShared;
 
 	// Verify that we are not assigning either the final or override specifier(s) if we are registering a non-member function
 	asASSERT( !(!objType && isFinal) );
@@ -815,9 +832,6 @@ int asCModule::AddScriptFunction(asCScriptFunction *func)
 
 	return 0;
 }
-
-
-
 
 // internal
 int asCModule::AddImportedFunction(int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, int paramCount, const asCString &moduleName)
@@ -979,31 +993,35 @@ int asCModule::UnbindAllImportedFunctions()
 }
 
 // internal
-asCObjectType *asCModule::GetObjectType(const char *type)
+asCObjectType *asCModule::GetObjectType(const char *type, const asCString &ns)
 {
 	size_t n;
 
 	// TODO: optimize: Improve linear search
 	for( n = 0; n < classTypes.GetLength(); n++ )
-		if( classTypes[n]->name == type )
+		if( classTypes[n]->name == type &&
+			classTypes[n]->nameSpace == ns )
 			return classTypes[n];
 
 	for( n = 0; n < enumTypes.GetLength(); n++ )
-		if( enumTypes[n]->name == type )
+		if( enumTypes[n]->name == type && 
+			enumTypes[n]->nameSpace == ns )
 			return enumTypes[n];
 
 	for( n = 0; n < typeDefs.GetLength(); n++ )
-		if( typeDefs[n]->name == type )
+		if( typeDefs[n]->name == type && 
+			typeDefs[n]->nameSpace == ns )
 			return typeDefs[n];
 
 	return 0;
 }
 
 // internal
-asCGlobalProperty *asCModule::AllocateGlobalProperty(const char *name, const asCDataType &dt)
+asCGlobalProperty *asCModule::AllocateGlobalProperty(const char *name, const asCDataType &dt, const asCString &ns)
 {
 	asCGlobalProperty *prop = engine->AllocateGlobalProperty();
 	prop->name = name;
+	prop->nameSpace = ns;
 
 	// Allocate the memory for this property based on its type
 	prop->type = dt;
@@ -1108,8 +1126,7 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 		// Remove the old object type from the engine's class types
 		engine->classTypes.RemoveValue(equals[i].a);
 
-		// Substitute all uses of this object type
-		// Only interfaces in the module is using the type so far
+		// Only interfaces in the module are using the type so far
 		for( c = 0; c < classTypes.GetLength(); c++ )
 		{
 			if( classTypes[c]->IsInterface() )
@@ -1120,13 +1137,57 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 					asCScriptFunction *func = engine->GetScriptFunction(intf->methods[m]);
 					if( func )
 					{
+						// Check if it is the same type
 						if( func->returnType.GetObjectType() == equals[i].a )
 							func->returnType.SetObjectType(equals[i].b);
+						// Look for template instances that uses the interface as subtype
+						else if( func->returnType.IsTemplate() && 
+							     func->returnType.GetSubType().GetObjectType() == equals[i].a )
+						{
+							// Find the originating template type
+							asCObjectType *templ = 0;
+							for( asUINT t = 0; t < engine->registeredObjTypes.GetLength(); t++ )
+								if( (engine->registeredObjTypes[t]->flags & asOBJ_TEMPLATE) &&
+									engine->registeredObjTypes[t]->name == func->returnType.GetObjectType()->name &&
+									!engine->templateInstanceTypes.Exists(engine->registeredObjTypes[t]) )
+								{
+									templ = engine->registeredObjTypes[t];
+									break;
+								}
+
+							asASSERT( templ );
+							
+							asCDataType subType = func->returnType.GetSubType();
+							subType.SetObjectType(equals[i].b);
+							func->returnType.SetObjectType(engine->GetTemplateInstanceType(templ, subType));
+						}
 
 						for( asUINT p = 0; p < func->GetParamCount(); p++ )
 						{
+							// Check if it is the same type
 							if( func->parameterTypes[p].GetObjectType() == equals[i].a )
 								func->parameterTypes[p].SetObjectType(equals[i].b);
+							// Look for template instances that uses the interface as subtype
+							else if( func->parameterTypes[p].IsTemplate() &&
+								     func->parameterTypes[p].GetSubType().GetObjectType() == equals[i].a )
+							{
+								// Find the originating template type
+								asCObjectType *templ = 0;
+								for( asUINT t = 0; t < engine->registeredObjTypes.GetLength(); t++ )
+									if( (engine->registeredObjTypes[t]->flags & asOBJ_TEMPLATE) &&
+										engine->registeredObjTypes[t]->name == func->parameterTypes[p].GetObjectType()->name &&
+									    !engine->templateInstanceTypes.Exists(engine->registeredObjTypes[t]) )
+									{
+										templ = engine->registeredObjTypes[t];
+										break;
+									}
+
+								asASSERT( templ );
+
+								asCDataType subType = func->parameterTypes[p].GetSubType();
+								subType.SetObjectType(equals[i].b);
+								func->parameterTypes[p].SetObjectType(engine->GetTemplateInstanceType(templ, subType));
+							}
 						}
 					}
 				}
@@ -1151,6 +1212,17 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 					if( substitutions )
 						substitutions->PushLast(scriptFunctions[c]);
 				}
+			}
+		}
+
+		// If there was a template instance, it needs to be removed first
+		for( asUINT n = 0; n < engine->templateTypes.GetLength(); n++ )
+		{
+			if( engine->templateTypes[n]->templateSubType.GetObjectType() == equals[i].a )
+			{
+				// The use of the template has already been exchanged above
+				engine->RemoveTemplateInstanceType(engine->templateTypes[n]);
+				n--;
 			}
 		}
 
@@ -1195,6 +1267,10 @@ bool asCModule::AreInterfacesEqual(asCObjectType *a, asCObjectType *b, asCArray<
 
 	// Are the names equal?
 	if( a->name != b->name )
+		return false;
+
+	// Are the namespaces equal?
+	if( a->nameSpace != b->nameSpace )
 		return false;
 
 	// Are the number of methods equal?
@@ -1275,6 +1351,12 @@ bool asCModule::AreTypesEqual(const asCDataType &a, const asCDataType &b, asCArr
 	asCObjectType *ai = a.GetObjectType();
 	asCObjectType *bi = b.GetObjectType();
 
+	if( ai && (ai->flags & asOBJ_TEMPLATE) )
+	{
+		ai = ai->templateSubType.GetObjectType();
+		bi = bi->templateSubType.GetObjectType();
+	}
+
 	if( ai && ai->IsInterface() )
 	{
 		// If the interface is in the equals list, then the pair must match the pair in the list
@@ -1309,10 +1391,15 @@ bool asCModule::AreTypesEqual(const asCDataType &a, const asCDataType &b, asCArr
 // interface
 int asCModule::SaveByteCode(asIBinaryStream *out) const
 {
+#ifdef AS_NO_COMPILER
+	UNUSED_VAR(out);
+	return asNOT_SUPPORTED;
+#else
 	if( out == 0 ) return asINVALID_ARG;
 
-	asCRestore rest(const_cast<asCModule*>(this), out, engine);
-	return rest.Save();
+	asCWriter write(const_cast<asCModule*>(this), out, engine);
+	return write.Write();
+#endif
 }
 
 // interface
@@ -1326,8 +1413,8 @@ int asCModule::LoadByteCode(asIBinaryStream *in)
 	if( r < 0 )
 		return r;
 
-	asCRestore rest(this, in, engine);
-	r = rest.Restore();
+	asCReader read(this, in, engine);
+	r = read.Read();
 
     JITCompile();
 
@@ -1339,6 +1426,12 @@ int asCModule::LoadByteCode(asIBinaryStream *in)
 // interface
 int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int lineOffset)
 {
+#ifdef AS_NO_COMPILER
+	UNUSED_VAR(sectionName);
+	UNUSED_VAR(code);
+	UNUSED_VAR(lineOffset);
+	return asNOT_SUPPORTED;
+#else
 	// Validate arguments
 	if( code == 0 )
 		return asINVALID_ARG;
@@ -1389,11 +1482,20 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 	}
 
 	return r;
+#endif
 }
 
 // interface
 int asCModule::CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD compileFlags, asIScriptFunction **outFunc)
 {
+#ifdef AS_NO_COMPILER
+	UNUSED_VAR(sectionName);
+	UNUSED_VAR(code);
+	UNUSED_VAR(lineOffset);
+	UNUSED_VAR(compileFlags);
+	UNUSED_VAR(outFunc);
+	return asNOT_SUPPORTED;
+#else
 	asASSERT(outFunc == 0 || *outFunc == 0);
 
 	// Validate arguments
@@ -1436,6 +1538,7 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 		func->Release();
 
 	return r;
+#endif
 }
 
 // interface
@@ -1461,10 +1564,11 @@ int asCModule::RemoveFunction(int funcId)
 }
 
 // internal
-int asCModule::AddFuncDef(const char *name)
+int asCModule::AddFuncDef(const char *name, const asCString &ns)
 {
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, 0, asFUNC_FUNCDEF);
-	func->name = name;
+	func->name      = name;
+	func->nameSpace = ns;
 
 	funcDefs.PushLast(func);
 

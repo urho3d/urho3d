@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -120,11 +120,14 @@ public:
 	virtual int                RemoveFunction(int funcId);
 
 	// Script global variables
+	// TODO: interface: Should be called InitGlobalVars, and should have a bool to reset in case already initialized
 	virtual int         ResetGlobalVars(asIScriptContext *ctx);
 	virtual asUINT      GetGlobalVarCount() const;
 	virtual int         GetGlobalVarIndexByName(const char *name) const;
 	virtual int         GetGlobalVarIndexByDecl(const char *decl) const;
+	// TODO: interface: Add flag to define whether or not namespace should be included in declaration
 	virtual const char *GetGlobalVarDeclaration(asUINT index) const;
+	// TODO: interface: Add namespace to the return values
 	virtual int         GetGlobalVar(asUINT index, const char **name, int *typeId, bool *isConst) const;
 	virtual void       *GetAddressOfGlobalVar(asUINT index);
 	virtual int         RemoveGlobalVar(asUINT index);
@@ -183,10 +186,10 @@ public:
 
 	void JITCompile();
 
-	int  AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false);
+	int  AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, const asCString &ns = "");
 	int  AddScriptFunction(asCScriptFunction *func);
 	int  AddImportedFunction(int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, int paramCount, const asCString &moduleName);
-	int  AddFuncDef(const char *name);
+	int  AddFuncDef(const char *name, const asCString &ns);
 
 	int  GetNextImportedFunctionId();
 
@@ -196,9 +199,9 @@ public:
 
 	asCScriptFunction *GetImportedFunction(int funcId) const;
 
-	asCObjectType *GetObjectType(const char *type);
+	asCObjectType *GetObjectType(const char *type, const asCString &ns);
 
-	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt);
+	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, const asCString &ns);
 
 
 	asCString name;

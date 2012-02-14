@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -57,6 +57,7 @@ public:
 	int                GetFunctionId() const;
 	asIScriptFunction *GetFunction() const;
 #ifdef AS_DEPRECATED
+	// TODO: interface: Remove this deprecated function
 	// deprecated since 2011-10-03
 	asIScriptFunction *GetFunctionDescriptor() const;
 #endif

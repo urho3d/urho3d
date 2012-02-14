@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -160,37 +160,54 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 // internal
 asCScriptFunction::~asCScriptFunction()
 {
-	// Clean user data
-	if( userData && engine->cleanFunctionFunc )
-		engine->cleanFunctionFunc(this);
-
 	// Imported functions are not reference counted, nor are dummy 
 	// functions that are allocated on the stack
 	asASSERT( funcType == asFUNC_DUMMY    ||
 		      funcType == asFUNC_IMPORTED ||
 		      refCount.get() == 0         );
 
-	ReleaseReferences();
+	// If the engine pointer is 0, then DestroyInternal has already been called and there is nothing more to do
+	if( engine == 0 ) return;
 
-	// Tell engine to free the function id
+	DestroyInternal();
+
+	// Tell engine to free the function id. This will make it impossible to
+	// refer to the function by id. Where this is done, it is quite possible
+	// they will leak.
 	if( funcType != -1 && funcType != asFUNC_IMPORTED && id )
 		engine->FreeScriptFunctionId(id);
+	id = 0;
+
+	// Finally set the engine pointer to 0 because it must not be accessed again
+	engine = 0;
+}
+
+// internal
+void asCScriptFunction::DestroyInternal()
+{
+	// Clean up user data
+	if( userData && engine->cleanFunctionFunc )
+		engine->cleanFunctionFunc(this);
+	userData = 0;
+
+	// Release all references the function holds to other objects
+	ReleaseReferences();
+	parameterTypes.SetLength(0);
+	returnType == asCDataType::CreatePrimitive(ttVoid, false);
+	byteCode.SetLength(0);
 
 	for( asUINT n = 0; n < variables.GetLength(); n++ )
-	{
 		asDELETE(variables[n],asSScriptVariable);
-	}
-
-	if( sysFuncIntf )
-	{
-		asDELETE(sysFuncIntf,asSSystemFunctionInterface);
-	}
-
+	variables.SetLength(0);
+	
 	for( asUINT p = 0; p < defaultArgs.GetLength(); p++ )
-	{
 		if( defaultArgs[p] )
 			asDELETE(defaultArgs[p], asCString);
-	}
+	defaultArgs.SetLength(0);
+
+	if( sysFuncIntf )
+		asDELETE(sysFuncIntf,asSSystemFunctionInterface);
+	sysFuncIntf = 0;
 }
 
 // interface
@@ -213,7 +230,7 @@ int asCScriptFunction::Release() const
 	gcFlag = false;
 	asASSERT( funcType != asFUNC_IMPORTED );
 	int r = refCount.atomicDec();
-	if( r == 0 && funcType != -1 ) // Dummy functions are allocated on the stack and cannot be deleted
+	if( r == 0 && funcType != asFUNC_DUMMY ) // Dummy functions are allocated on the stack and cannot be deleted
 		asDELETE(const_cast<asCScriptFunction*>(this),asCScriptFunction);
 
 	return r;
@@ -509,11 +526,24 @@ bool asCScriptFunction::IsSignatureEqual(const asCScriptFunction *func) const
 // internal
 bool asCScriptFunction::IsSignatureExceptNameEqual(const asCScriptFunction *func) const
 {
-	if( returnType        != func->returnType        ) return false;
-	if( isReadOnly        != func->isReadOnly        ) return false;
-	if( inOutFlags        != func->inOutFlags        ) return false;
-	if( parameterTypes    != func->parameterTypes    ) return false;
-	if( (objectType != 0) != (func->objectType != 0) ) return false;
+	return IsSignatureExceptNameEqual(func->returnType, func->parameterTypes, func->inOutFlags, func->objectType, func->isReadOnly);
+}
+
+// internal
+bool asCScriptFunction::IsSignatureExceptNameEqual(const asCDataType &retType, const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &paramInOut, const asCObjectType *objType, bool readOnly) const
+{
+	if( this->returnType != retType ) return false;
+
+	return IsSignatureExceptNameAndReturnTypeEqual(paramTypes, paramInOut, objType, readOnly);
+}
+
+// internal
+bool asCScriptFunction::IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &paramInOut, const asCObjectType *objType, bool readOnly) const
+{
+	if( this->isReadOnly        != readOnly       ) return false;
+	if( this->inOutFlags        != paramInOut     ) return false;
+	if( this->parameterTypes    != paramTypes     ) return false;
+	if( (this->objectType != 0) != (objType != 0) ) return false;
 
 	return true;
 }
@@ -676,7 +706,17 @@ void asCScriptFunction::ReleaseReferences()
 
 				int func = asBC_INTARG(&byteCode[n]+AS_PTR_SIZE);
 				if( func )
-					engine->scriptFunctions[func]->Release();
+				{
+					asCScriptFunction *fptr = engine->scriptFunctions[func];
+					if( fptr )
+						fptr->Release();
+
+					// The engine may have been forced to destroy the function internals early
+					// and this may will make it impossible to find the function by id anymore.
+					// This should only happen if the engine is released while the application
+					// is still keeping functions alive.
+					// TODO: Fix this possible memory leak
+				}
 			}
 			break;
 
@@ -725,7 +765,17 @@ void asCScriptFunction::ReleaseReferences()
 			{
 				int func = asBC_INTARG(&byteCode[n]);
 				if( func )
-					engine->scriptFunctions[func]->Release();
+				{
+					asCScriptFunction *fptr = engine->scriptFunctions[func];
+					if( fptr )
+						fptr->Release();
+
+					// The engine may have been forced to destroy the function internals early
+					// and this may will make it impossible to find the function by id anymore.
+					// This should only happen if the engine is released while the application
+					// is still keeping functions alive.
+					// TODO: Fix this possible memory leak
+				}
 			}
 			break;
 

@@ -391,13 +391,13 @@ bool asCTokenizer::IsKeyWord(const char *source, size_t sourceLength, size_t &to
 	{
 		map = &alphaKeywordMap;
 		// 'interface' is the longest alpha keyword
-		maxLength = sourceLength > 9 ? 9 : sourceLength;
+		maxLength = sourceLength > 9 ? 9 : int(sourceLength);
 	}
 	else
 	{
 		map = &nonAlphaKeywordMap;
 		// '>>>=' is the longest non-alpha keyword
-		maxLength = sourceLength > 4 ? 4 : sourceLength;
+		maxLength = sourceLength > 4 ? 4 : int(sourceLength);
 	}
 
 	// Find the longest keyword that matches the start of the source string

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -34,10 +34,7 @@
 //
 // Functions for saving and restoring module bytecode
 // asCRestore was originally written by Dennis Bollyn, dennis@gyrbo.be
-
-
-// TODO: This should be split in two, so that an application that doesn't compile any 
-//       code but only loads precompiled code can link with only the bytecode loader
+// It was later split in two classes asCReader and asCWriter by me
 
 #ifndef AS_RESTORE_H
 #define AS_RESTORE_H
@@ -48,13 +45,12 @@
 
 BEGIN_AS_NAMESPACE
 
-class asCRestore 
+class asCReader
 {
 public:
-	asCRestore(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine);
+	asCReader(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine);
 
-	int Save();
-	int Restore();
+	int Read();
 
 protected:
 	asCModule       *module;
@@ -62,8 +58,76 @@ protected:
 	asCScriptEngine *engine;
 	bool             error;
 
+	void               ReadData(void *data, asUINT size);
+	void               ReadString(asCString *str);
+	asCScriptFunction *ReadFunction(bool addToModule = true, bool addToEngine = true, bool addToGC = true);
+	void               ReadFunctionSignature(asCScriptFunction *func);
+	void               ReadGlobalProperty();
+	void               ReadObjectProperty(asCObjectType *ot);
+	void               ReadDataType(asCDataType *dt);
+	asCObjectType *    ReadObjectType();
+	void               ReadObjectTypeDeclaration(asCObjectType *ot, int phase);
+	void               ReadByteCode(asDWORD *bc, int length);
+	asUINT             ReadEncodedUInt();
+
+	void ReadUsedTypeIds();
+	void ReadUsedFunctions();
+	void ReadUsedGlobalProps();
+	void ReadUsedStringConstants();
+	void ReadUsedObjectProps();
+
+	asCObjectType *    FindObjectType(int idx);
+	int                FindTypeId(int idx);
+	short              FindObjectPropOffset(asWORD index);
+	asCScriptFunction *FindFunction(int idx);
+
+	// After loading, each function needs to be translated to update pointers, function ids, etc
+	void TranslateFunction(asCScriptFunction *func);
+
+	// Temporary storage for persisting variable data
+	asCArray<int>                usedTypeIds;
+	asCArray<asCObjectType*>     usedTypes;
+	asCArray<asCScriptFunction*> usedFunctions;
+	asCArray<void*>              usedGlobalProperties;
+	asCArray<int>                usedStringConstants;
+
+	asCArray<asCScriptFunction*>  savedFunctions;
+	asCArray<asCDataType>         savedDataTypes;
+	asCArray<asCString>           savedStrings;
+
+	struct SObjProp
+	{
+		asCObjectType *objType;
+		int            offset;
+	};
+	asCArray<SObjProp> usedObjectProperties;
+
+	struct SObjChangeSize
+	{
+		asCObjectType *objType;
+		asUINT         oldSize;
+	};
+	asCArray<SObjChangeSize> oldObjectSizes;
+
+	asCMap<void*,bool> existingShared;
+	asCMap<asCScriptFunction*,bool> dontTranslate;
+};
+
+#ifndef AS_NO_COMPILER
+
+class asCWriter
+{
+public:
+	asCWriter(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine);
+
+	int Write();
+
+protected:
+	asCModule       *module;
+	asIBinaryStream *stream;
+	asCScriptEngine *engine;
+
 	void WriteData(const void *data, asUINT size);
-	void ReadData(void *data, asUINT size);
 
 	void WriteString(asCString *str);
 	void WriteFunction(asCScriptFunction *func);
@@ -76,28 +140,13 @@ protected:
 	void WriteByteCode(asDWORD *bc, int length);
 	void WriteEncodedUInt(asUINT i);
 
-	void ReadString(asCString *str);
-	asCScriptFunction *ReadFunction(bool addToModule = true, bool addToEngine = true, bool addToGC = true);
-	void ReadFunctionSignature(asCScriptFunction *func);
-	void ReadGlobalProperty();
-	void ReadObjectProperty(asCObjectType *ot);
-	void ReadDataType(asCDataType *dt);
-	asCObjectType *ReadObjectType();
-	void ReadObjectTypeDeclaration(asCObjectType *ot, int phase);
-	void ReadByteCode(asDWORD *bc, int length);
-	asUINT ReadEncodedUInt();
-
 	// Helper functions for storing variable data
 	int FindObjectTypeIdx(asCObjectType*);
-	asCObjectType *FindObjectType(int idx);
 	int FindTypeIdIdx(int typeId);
-	int FindTypeId(int idx);
 	int FindFunctionIndex(asCScriptFunction *func);
-	asCScriptFunction *FindFunction(int idx);
 	int FindGlobalPropPtrIndex(void *);
 	int FindStringConstantIndex(int id);
 	int FindObjectPropIndex(short offset, int typeId);
-	short FindObjectPropOffset(asWORD index);
 
 	// Intermediate data used for storing that which isn't constant, function id's, pointers, etc
 	void WriteUsedTypeIds();
@@ -106,16 +155,7 @@ protected:
 	void WriteUsedStringConstants();
 	void WriteUsedObjectProps();
 
-	void ReadUsedTypeIds();
-	void ReadUsedFunctions();
-	void ReadUsedGlobalProps();
-	void ReadUsedStringConstants();
-	void ReadUsedObjectProps();
-
-	// After loading, each function needs to be translated to update pointers, function ids, etc
-	void TranslateFunction(asCScriptFunction *func);
-
-	// Temporary storage for persisting variable data	
+	// Temporary storage for persisting variable data
 	asCArray<int>                usedTypeIds;
 	asCArray<asCObjectType*>     usedTypes;
 	asCArray<asCScriptFunction*> usedFunctions;
@@ -123,9 +163,9 @@ protected:
 	asCArray<int>                usedStringConstants;
 	asCMap<int, int>             stringIdToIndexMap;
 
-	asCArray<asCScriptFunction*> savedFunctions;
-	asCArray<asCDataType>        savedDataTypes;
-	asCArray<asCString>          savedStrings;
+	asCArray<asCScriptFunction*>  savedFunctions;
+	asCArray<asCDataType>         savedDataTypes;
+	asCArray<asCString>           savedStrings;
 	asCMap<asCStringPointer, int> stringToIdMap;
 
 	struct SObjProp
@@ -134,17 +174,9 @@ protected:
 		int            offset;
 	};
 	asCArray<SObjProp>           usedObjectProperties;
-
-	struct SObjChangeSize
-	{
-		asCObjectType *objType;
-		asUINT         oldSize;
-	};
-	asCArray<SObjChangeSize>     oldObjectSizes;
-
-	asCMap<void*,bool>              existingShared;
-	asCMap<asCScriptFunction*,bool> dontTranslate;
 };
+
+#endif
 
 END_AS_NAMESPACE
 

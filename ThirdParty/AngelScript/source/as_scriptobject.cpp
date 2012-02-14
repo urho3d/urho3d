@@ -341,7 +341,7 @@ int asCScriptObject::GetTypeId() const
 
 asUINT asCScriptObject::GetPropertyCount() const
 {
-	return objType->properties.GetLength();
+	return asUINT(objType->properties.GetLength());
 }
 
 int asCScriptObject::GetPropertyTypeId(asUINT prop) const

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -88,19 +88,21 @@ asCScriptNode *asCParser::GetScriptNode()
 	return scriptNode;
 }
 
+#ifndef AS_NO_COMPILER
 int asCParser::ParseScript(asCScriptCode *script)
 {
 	Reset();
 
 	this->script = script;
 
-	scriptNode = ParseScript();
+	scriptNode = ParseScript(false);
 
 	if( errorWhileParsing )
 		return -1;
 
 	return 0;
 }
+#endif
 
 int asCParser::ParseFunctionDefinition(asCScriptCode *script)
 {
@@ -382,7 +384,8 @@ bool asCParser::IdentifierIs(const sToken &t, const char *str)
 	return script->TokenEquals(t.pos, t.length, str);
 }
 
-asCScriptNode *asCParser::ParseScript()
+#ifndef AS_NO_COMPILER
+asCScriptNode *asCParser::ParseScript(bool inBlock)
 {
 	asCScriptNode *node = new(engine->memoryMgr.AllocScriptNode()) asCScriptNode(snScript);
 
@@ -425,7 +428,16 @@ asCScriptNode *asCParser::ParseScript()
 				// Ignore a semicolon by itself
 				GetToken(&t1);
 			}
+			else if( t1.type == ttNamespace )
+				node->AddChildLast(ParseNamespace());
 			else if( t1.type == ttEnd )
+			{
+				if( inBlock )
+					Error(ExpectedToken(asCTokenizer::GetDefinition(ttEndStatementBlock)).AddressOf(), &t1);
+
+				return node;
+			}
+			else if( inBlock && t1.type == ttEndStatementBlock )
 				return node;
 			else
 			{
@@ -466,6 +478,42 @@ asCScriptNode *asCParser::ParseScript()
 	UNREACHABLE_RETURN;
 }
 
+asCScriptNode *asCParser::ParseNamespace()
+{
+	asCScriptNode *node = new(engine->memoryMgr.AllocScriptNode()) asCScriptNode(snNamespace);
+
+	sToken t1;
+
+	GetToken(&t1);
+	if( t1.type == ttNamespace )
+		node->UpdateSourcePos(t1.pos, t1.length);
+	else
+		Error(ExpectedToken(asCTokenizer::GetDefinition(ttNamespace)).AddressOf(), &t1);
+
+	// TODO: namepace: Allow declaration of multiple nested namespace with namespace A::B::C { }
+	node->AddChildLast(ParseIdentifier());
+	if( isSyntaxError ) return node;
+
+	GetToken(&t1);
+	if( t1.type == ttStartStatementBlock )
+		node->UpdateSourcePos(t1.pos, t1.length);
+	else
+		Error(ExpectedToken(asCTokenizer::GetDefinition(ttStartStatementBlock)).AddressOf(), &t1);
+
+	node->AddChildLast(ParseScript(true));
+
+	if( !isSyntaxError )
+	{
+		GetToken(&t1);
+		if( t1.type == ttEndStatementBlock )
+			node->UpdateSourcePos(t1.pos, t1.length);
+		else
+			Error(ExpectedToken(asCTokenizer::GetDefinition(ttEndStatementBlock)).AddressOf(), &t1);
+	}
+
+	return node;
+}
+
 int asCParser::ParseStatementBlock(asCScriptCode *script, asCScriptNode *block)
 {
 	Reset();
@@ -483,6 +531,7 @@ int asCParser::ParseStatementBlock(asCScriptCode *script, asCScriptNode *block)
 
 	return 0;
 }
+#endif
 
 asCScriptNode *asCParser::ParseEnumeration()
 {
@@ -655,6 +704,20 @@ bool asCParser::IsVarDecl()
 	if( t1.type == ttConst )
 		GetToken(&t1);
 
+	// The type may be initiated with the scope operator
+	if( t1.type == ttScope )
+		GetToken(&t1);
+
+	// The type may be preceeded with a multilevel scope
+	sToken t2;
+	GetToken(&t2);
+	while( t1.type == ttIdentifier && t2.type == ttScope )
+	{
+		GetToken(&t1);
+		GetToken(&t2);
+	}
+	RewindTo(&t2);
+
 	// We don't validate if the identifier is an actual declared type at this moment
 	// as it may wrongly identify the statement as a non-declaration if the user typed
 	// the name incorrectly. The real type is validated in ParseDeclaration where a
@@ -672,7 +735,6 @@ bool asCParser::IsVarDecl()
 	}
 
 	// Object handles can be interleaved with the array brackets
-	sToken t2;
 	GetToken(&t2);
 	while( t2.type == ttHandle || t2.type == ttOpenBracket )
 	{
@@ -972,6 +1034,13 @@ asCScriptNode *asCParser::ParseFunction(bool isMethod)
 	if( isMethod && t1.type == ttPrivate )
 	{
 		node->AddChildLast(ParseToken(ttPrivate));
+		if( isSyntaxError ) return node;
+	}
+
+	// A global function can be marked as shared
+	if( !isMethod && IdentifierIs(t1, SHARED_TOKEN) )
+	{
+		node->AddChildLast(ParseIdentifier());
 		if( isSyntaxError ) return node;
 	}
 
@@ -1392,6 +1461,7 @@ asCScriptNode *asCParser::ParseGlobalVar()
 	UNREACHABLE_RETURN;
 }
 
+#ifndef AS_NO_COMPILER
 int asCParser::ParseGlobalVarInit(asCScriptCode *script, asCScriptNode *init)
 {
 	Reset();
@@ -1430,6 +1500,7 @@ int asCParser::ParseGlobalVarInit(asCScriptCode *script, asCScriptNode *init)
 
 	return 0;
 }
+#endif
 
 asCScriptNode *asCParser::SuperficiallyParseGlobalVarInit()
 {
@@ -1565,6 +1636,28 @@ asCScriptNode *asCParser::ParseType(bool allowConst, bool allowVariableType)
 		}
 	}
 
+
+	// Parse scope prefix
+	sToken t1, t2;
+	GetToken(&t1);
+	if( t1.type == ttScope )
+	{
+		RewindTo(&t1);
+		node->AddChildLast(ParseToken(ttScope));
+		GetToken(&t1);
+	}
+	GetToken(&t2);
+	while( t1.type == ttIdentifier && t2.type == ttScope )
+	{
+		RewindTo(&t1);
+		node->AddChildLast(ParseIdentifier());
+		node->AddChildLast(ParseToken(ttScope));
+		GetToken(&t1);
+		GetToken(&t2);
+	}
+	RewindTo(&t1);
+
+	// Parse the actual type
 	node->AddChildLast(ParseDataType(allowVariableType));
 
 	// If the datatype is a template type, then parse the subtype within the < >
@@ -3161,7 +3254,8 @@ bool asCParser::IsDataType(const sToken &token)
 			// Check if this is a registered type
 			asCString str;
 			str.Assign(&script->code[token.pos], token.length);
-			if( !builder->GetObjectType(str.AddressOf()) && !builder->GetFuncDef(str.AddressOf()) )
+			// TODO: namespace: Should parser really keep track of namespace?
+			if( !builder->GetObjectType(str.AddressOf(), "") && !builder->GetFuncDef(str.AddressOf()) )
 				return false;
 		}
 		return true;

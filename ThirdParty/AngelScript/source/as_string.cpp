@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -301,6 +301,24 @@ size_t asCString::RecalculateLength()
 	SetLength(strlen(AddressOf()));
 
 	return length;
+}
+
+int asCString::FindLast(const char *str) const
+{
+	// There is no strstr that starts from the end, so 
+	// we'll iterate until we find the last occurrance.
+	// This shouldn't cause a performance problem because
+	// it is not expected that this will be done very often,
+	// and then only on quite short strings anyway.
+	const char *last = 0;
+	const char *curr = AddressOf()-1;
+	while( (curr = strstr(curr+1, str)) )
+		last = curr;
+
+	if( last )
+		return last-AddressOf();
+
+	return -1;
 }
 
 //-----------------------------------------------------------------------------

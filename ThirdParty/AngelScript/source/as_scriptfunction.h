@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -109,13 +109,15 @@ public:
 	asIObjectType       *GetObjectType() const;
 	const char          *GetObjectName() const;
 	const char          *GetName() const;
+	// TODO: interface: Allow inclusion of namespace or not in declaration
 	const char          *GetDeclaration(bool includeObjectName = true) const;
 	const char          *GetScriptSectionName() const;
 	const char          *GetConfigGroup() const;
 	bool                 IsReadOnly() const;
 	bool                 IsPrivate() const;
 	// TODO: interface: Add IsFinal() and IsOverride() as public methods
-	// TODO: access: Get/Set access mask for function
+	// TODO: interface: access: Get/Set access mask for function
+	// TODO: interface: namespace: Get namespace
 
 	asUINT               GetParamCount() const;
 	int                  GetParamTypeId(asUINT index, asDWORD *flags = 0) const;
@@ -141,6 +143,8 @@ public:
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
 
+	void      DestroyInternal();
+
 	void      AddVariable(asCString &name, asCDataType &type, int stackOffset);
 
 	int       GetSpaceNeededForArguments();
@@ -150,6 +154,8 @@ public:
 	void      ComputeSignatureId();
 	bool      IsSignatureEqual(const asCScriptFunction *func) const;
 	bool      IsSignatureExceptNameEqual(const asCScriptFunction *func) const;
+	bool      IsSignatureExceptNameEqual(const asCDataType &retType, const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
+	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
 
 	bool      DoesReturnOnStack() const;
 
@@ -200,6 +206,10 @@ public:
 	asEFuncType                  funcType;
 	asDWORD                      accessMask;
 	bool                         isShared;
+
+	// TODO: optimize: The namespace should be stored as an integer id. This  
+	//                 will use less space and provide quicker comparisons.
+	asCString                    nameSpace;
 
 	// Used by asFUNC_SCRIPT
 	asCArray<asDWORD>               byteCode;

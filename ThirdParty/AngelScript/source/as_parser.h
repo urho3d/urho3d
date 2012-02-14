@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -101,17 +101,19 @@ public:
 	asCParser(asCBuilder *builder);
 	~asCParser();
 
-	int ParseScript(asCScriptCode *script);
 	int ParseFunctionDefinition(asCScriptCode *script);
 	int ParsePropertyDeclaration(asCScriptCode *script);
 	int ParseVirtualPropertyDeclaration(asCScriptCode *script, bool asMethod);
 	int ParseDataType(asCScriptCode *script);
 	int ParseTemplateDecl(asCScriptCode *script);
 
+#ifndef AS_NO_COMPILER
+	int ParseScript(asCScriptCode *script);
 	int ParseStatementBlock(asCScriptCode *script, asCScriptNode *block);
 	int ParseGlobalVarInit(asCScriptCode *script, asCScriptNode *init);
+#endif
 	int ParseExpression(asCScriptCode *script);
-
+	
 	asCScriptNode *GetScriptNode();
 
 protected:
@@ -123,8 +125,10 @@ protected:
 
 	asCScriptNode *ParseImport();
 	asCScriptNode *ParseFunctionDefinition();
-
-	asCScriptNode *ParseScript();
+#ifndef AS_NO_COMPILER
+	asCScriptNode *ParseScript(bool inBlock);
+	asCScriptNode *ParseNamespace();
+#endif
 	asCScriptNode *ParseType(bool allowConst, bool allowVariableType = false);
 	asCScriptNode *ParseTypeMod(bool isParam);
 	asCScriptNode *ParseFunction(bool isMethod = false);

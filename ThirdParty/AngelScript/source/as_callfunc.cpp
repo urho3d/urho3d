@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -446,7 +446,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	context->regs.objectType = descr->returnType.GetObjectType();
 	if( descr->returnType.IsObject() && !descr->returnType.IsReference() && !descr->returnType.IsObjectHandle() )
 	{
-#ifndef AS_OLD
 		// Get the address of the location for the return value from the stack
 		retPointer = (void*)*(size_t*)(args);
 		popSize += AS_PTR_SIZE;
@@ -454,10 +453,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 
 		// When returning the value on the location allocated by the called we shouldn't set the object type in the register
 		context->regs.objectType = 0;
-#else
-		// Allocate the memory for the object
-		retPointer = engine->CallAlloc(descr->returnType.GetObjectType());
-#endif
 	}
 
 
@@ -552,7 +547,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 			// Store the object in the register
 			context->regs.objectRegister = retPointer;
 
-#ifndef AS_OLD
 			// If the value is returned on the stack we shouldn't update the object register
 			if( descr->DoesReturnOnStack() )
 			{
@@ -568,7 +562,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 						engine->CallObjectMethod(retPointer, descr->returnType.GetObjectType()->beh.destruct);
 				}
 			}
-#endif
 		}
 	}
 	else

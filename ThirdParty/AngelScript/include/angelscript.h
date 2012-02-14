@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22201
-#define ANGELSCRIPT_VERSION_STRING "2.22.1 WIP"
+#define ANGELSCRIPT_VERSION        22202
+#define ANGELSCRIPT_VERSION_STRING "2.22.2"
 
 // Data types
 
@@ -1151,7 +1151,7 @@ enum asEBCInstr
 	asBC_PshC4			= 2,
 	asBC_PshV4			= 3,
 	asBC_PSF			= 4,
-	asBC_SWAP4			= 5,
+	asBC_SwapPtr		= 5,
 	asBC_NOT			= 6,
 	asBC_PshG4			= 7,
 	asBC_LdGRdR4		= 8,
@@ -1194,8 +1194,8 @@ enum asEBCInstr
 	asBC_BSRA			= 45,
 	asBC_COPY			= 46,
 	asBC_PshC8			= 47,
-	asBC_RDS8			= 48,
-	asBC_SWAP8			= 49,
+	asBC_PshVPtr		= 48,
+	asBC_RDSPtr			= 49,
 	asBC_CMPd			= 50,
 	asBC_CMPu			= 51,
 	asBC_CMPf			= 52,
@@ -1219,8 +1219,8 @@ enum asEBCInstr
 	asBC_CHKREF			= 70,
 	asBC_GETOBJREF		= 71,
 	asBC_GETREF			= 72,
-	asBC_SWAP48			= 73,
-	asBC_SWAP84			= 74,
+	asBC_PshNull		= 73,
+	asBC_ClrVPtr		= 74,
 	asBC_OBJTYPE		= 75,
 	asBC_TYPEID			= 76,
 	asBC_SetV4			= 77,
@@ -1245,7 +1245,7 @@ enum asEBCInstr
 	asBC_LDG			= 96,
 	asBC_LDV			= 97,
 	asBC_PGA			= 98,
-	asBC_RDS4			= 99,
+	asBC_CmpPtr			= 99,
 	asBC_VAR			= 100,
 	asBC_iTOf			= 101,
 	asBC_fTOi			= 102,
@@ -1430,7 +1430,7 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(PshC4,		DW_ARG,			1),
 	asBCINFO(PshV4,		rW_ARG,			1),
 	asBCINFO(PSF,		rW_ARG,			AS_PTR_SIZE),
-	asBCINFO(SWAP4,		NO_ARG,			0),
+	asBCINFO(SwapPtr,	NO_ARG,			0),
 	asBCINFO(NOT,		rW_ARG,			0),
 	asBCINFO(PshG4,		PTR_ARG,		1),
 	asBCINFO(LdGRdR4,	wW_PTR_ARG,		0),
@@ -1473,8 +1473,8 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(BSRA,		wW_rW_rW_ARG,	0),
 	asBCINFO(COPY,		W_DW_ARG,		-AS_PTR_SIZE),
 	asBCINFO(PshC8,		QW_ARG,			2),
-	asBCINFO(RDS8,		NO_ARG,			2-AS_PTR_SIZE),
-	asBCINFO(SWAP8,		NO_ARG,			0),
+	asBCINFO(PshVPtr,	rW_ARG,			AS_PTR_SIZE),
+	asBCINFO(RDSPtr,	NO_ARG,			0),
 	asBCINFO(CMPd,		rW_rW_ARG,		0),
 	asBCINFO(CMPu,		rW_rW_ARG,		0),
 	asBCINFO(CMPf,		rW_rW_ARG,		0),
@@ -1498,8 +1498,8 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(CHKREF,	NO_ARG,			0),
 	asBCINFO(GETOBJREF,	W_ARG,			0),
 	asBCINFO(GETREF,	W_ARG,			0),
-	asBCINFO(SWAP48,	NO_ARG,			0),
-	asBCINFO(SWAP84,	NO_ARG,			0),
+	asBCINFO(PshNull,   NO_ARG,			AS_PTR_SIZE),
+	asBCINFO(ClrVPtr,   rW_ARG,			0),
 	asBCINFO(OBJTYPE,	PTR_ARG,		AS_PTR_SIZE),
 	asBCINFO(TYPEID,	DW_ARG,			1),
 	asBCINFO(SetV4,		wW_DW_ARG,		0),
@@ -1524,7 +1524,7 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(LDG,		PTR_ARG,		0),
 	asBCINFO(LDV,		rW_ARG,			0),
 	asBCINFO(PGA,		PTR_ARG,		AS_PTR_SIZE),
-	asBCINFO(RDS4,		NO_ARG,			1-AS_PTR_SIZE),
+	asBCINFO(CmpPtr,	rW_rW_ARG,		0),
 	asBCINFO(VAR,		rW_ARG,			AS_PTR_SIZE),
 	asBCINFO(iTOf,		rW_ARG,			0),
 	asBCINFO(fTOi,		rW_ARG,			0),

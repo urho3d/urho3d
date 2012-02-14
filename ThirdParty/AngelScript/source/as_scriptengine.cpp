@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -91,6 +91,9 @@ AS_API const char * asGetLibraryOptions()
 #endif
 #ifdef AS_NO_ATOMIC
 		"AS_NO_ATOMIC "
+#endif
+#ifdef AS_NO_COMPILER
+		"AS_NO_COMPILER "
 #endif
 
 	// Target system
@@ -548,6 +551,11 @@ asCScriptEngine::~asCScriptEngine()
 	FreeUnusedGlobalProperties();
 	ClearUnusedTypes();
 
+	// Destroy internals of script functions that may still be kept alive outside of engine
+	for( n = 0; n < scriptFunctions.GetLength(); n++ )
+		if( scriptFunctions[n] && scriptFunctions[n]->funcType == asFUNC_SCRIPT )
+			scriptFunctions[n]->DestroyInternal();
+
 	// There may be instances where one more gc cycle must be run
 	GarbageCollect(asGC_FULL_CYCLE);
 	ClearUnusedTypes();
@@ -555,7 +563,15 @@ asCScriptEngine::~asCScriptEngine()
 	// If the application hasn't registered GC behaviours for all types 
 	// that can form circular references with script types, then there
 	// may still be objects in the GC.
-	gc.ReportUndestroyedObjects();
+	if( gc.ReportAndReleaseUndestroyedObjects() > 0 )
+	{
+		// Some items cannot be destroyed because the application is still holding on to them
+
+		// Make sure the script functions won't attempt to access the engine if they are destroyed later on
+		for( n = 0; n < scriptFunctions.GetLength(); n++ )
+			if( scriptFunctions[n] && scriptFunctions[n]->funcType == asFUNC_SCRIPT )
+				scriptFunctions[n]->engine = 0;
+	}
 
 	asSMapNode<int,asCDataType*> *cursor = 0;
 	while( mapTypeIdToDataType.MoveFirst(&cursor) )
@@ -1077,7 +1093,7 @@ int asCScriptEngine::RegisterObjectProperty(const char *obj, const char *declara
 	asCDataType type;
 	asCString name;
 
-	if( (r = bld.VerifyProperty(&dt, declaration, name, type)) < 0 )
+	if( (r = bld.VerifyProperty(&dt, declaration, name, type, "")) < 0 )
 		return ConfigError(r, "RegisterObjectProperty", obj, declaration);
 
 	// Store the property info
@@ -1124,7 +1140,8 @@ int asCScriptEngine::RegisterInterface(const char *name)
 	if( token != ttIdentifier || strlen(name) != tokenLen )
 		return ConfigError(asINVALID_NAME, "RegisterInterface", name, 0);
 
-	r = bld.CheckNameConflict(name, 0, 0);
+	// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
+	r = bld.CheckNameConflict(name, 0, 0, "");
 	if( r < 0 )
 		return ConfigError(asNAME_TAKEN, "RegisterInterface", name, 0);
 
@@ -1401,7 +1418,8 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 			if( token != ttIdentifier || typeName.GetLength() != tokenLen )
 				return ConfigError(asINVALID_NAME, "RegisterObjectType", name, 0);
 
-			int r = bld.CheckNameConflict(name, 0, 0);
+			// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
+			int r = bld.CheckNameConflict(name, 0, 0, "");
 			if( r < 0 )
 				return ConfigError(asNAME_TAKEN, "RegisterObjectType", name, 0);
 
@@ -1845,7 +1863,7 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 		}
 
-		// TODO: verify that the same cast is not registered already (cosnt or non-const is treated the same for the return type)
+		// TODO: verify that the same cast is not registered already (const or non-const is treated the same for the return type)
 
 		beh->operators.PushLast(behaviour);
 		func.id = AddBehaviourFunction(func, internal);
@@ -1936,12 +1954,17 @@ int asCScriptEngine::AddBehaviourFunction(asCScriptFunction &func, asSSystemFunc
 // interface
 int asCScriptEngine::RegisterGlobalProperty(const char *declaration, void *pointer)
 {
+	// Don't accept a null pointer
+	if( pointer == 0 )
+		return ConfigError(asINVALID_ARG, "RegisterGlobalProperty", declaration, 0);
+
 	asCDataType type;
 	asCString name;
 
 	int r;
 	asCBuilder bld(this, 0);
-	if( (r = bld.VerifyProperty(0, declaration, name, type)) < 0 )
+	// TODO: namespace: Use proper namespace
+	if( (r = bld.VerifyProperty(0, declaration, name, type, "")) < 0 )
 		return ConfigError(r, "RegisterGlobalProperty", declaration, 0);
 
 	// Don't allow registering references as global properties
@@ -2004,7 +2027,7 @@ void asCScriptEngine::FreeUnusedGlobalProperties()
 // interface
 asUINT asCScriptEngine::GetGlobalPropertyCount() const
 {
-	return registeredGlobalProps.GetLength();
+	return asUINT(registeredGlobalProps.GetLength());
 }
 
 // interface
@@ -2199,7 +2222,8 @@ int asCScriptEngine::RegisterGlobalFunction(const char *declaration, const asSFu
 	}
 
 	// Check name conflicts
-	r = bld.CheckNameConflict(func->name.AddressOf(), 0, 0);
+	// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
+	r = bld.CheckNameConflict(func->name.AddressOf(), 0, 0, "");
 	if( r < 0 )
 	{
 		asDELETE(func,asCScriptFunction);
@@ -2235,7 +2259,7 @@ int asCScriptEngine::RegisterGlobalFunction(const char *declaration, const asSFu
 // interface
 asUINT asCScriptEngine::GetGlobalFunctionCount() const
 {
-	return registeredGlobalFuncs.GetLength();
+	return asUINT(registeredGlobalFuncs.GetLength());
 }
 
 // interface
@@ -2298,7 +2322,7 @@ asIScriptFunction *asCScriptEngine::GetGlobalFunctionByDecl(const char *decl) co
 
 	if( id < 0 ) return 0; // No matches
 
-	return registeredGlobalFuncs[id];
+	return scriptFunctions[id];
 }
 
 
@@ -2804,6 +2828,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 	func->name             = "factstub";
 	func->id               = GetNextScriptFunctionId();
 	func->returnType       = asCDataType::CreateObjectHandle(ot, false);
+	func->isShared         = true;
 
 	// Skip the first parameter as this is the object type pointer that the stub will add
 	func->parameterTypes.SetLength(factory->parameterTypes.GetLength()-1);
@@ -3935,7 +3960,8 @@ int asCScriptEngine::RegisterFuncdef(const char *decl)
 	}
 
 	// Check name conflicts
-	r = bld.CheckNameConflict(func->name.AddressOf(), 0, 0);
+	// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
+	r = bld.CheckNameConflict(func->name.AddressOf(), 0, 0, "");
 	if( r < 0 )
 	{
 		asDELETE(func,asCScriptFunction);
@@ -3971,7 +3997,7 @@ int asCScriptEngine::RegisterFuncdef(const char *decl)
 // interface
 asUINT asCScriptEngine::GetFuncdefCount() const
 {
-	return registeredFuncDefs.GetLength();
+	return asUINT(registeredFuncDefs.GetLength());
 }
 
 // interface
@@ -4044,8 +4070,9 @@ int asCScriptEngine::RegisterTypedef(const char *type, const char *decl)
 	if( token != ttIdentifier || strlen(type) != tokenLen )
 		return ConfigError(asINVALID_NAME, "RegisterTypedef", type, decl);
 
+	// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
 	asCBuilder bld(this, 0);
-	int r = bld.CheckNameConflict(type, 0, 0);
+	int r = bld.CheckNameConflict(type, 0, 0, "");
 	if( r < 0 )
 		return ConfigError(asNAME_TAKEN, "RegisterTypedef", type, decl);
 
@@ -4070,7 +4097,7 @@ int asCScriptEngine::RegisterTypedef(const char *type, const char *decl)
 // interface
 asUINT asCScriptEngine::GetTypedefCount() const
 {
-	return registeredTypeDefs.GetLength();
+	return asUINT(registeredTypeDefs.GetLength());
 }
 
 // interface
@@ -4122,7 +4149,8 @@ int asCScriptEngine::RegisterEnum(const char *name)
 	if( token != ttIdentifier || strlen(name) != tokenLen )
 		return ConfigError(asINVALID_NAME, "RegisterEnum", name, 0);
 
-	r = bld.CheckNameConflict(name, 0, 0);
+	// TODO: namespace: Allow application to specify namespace. Probably with a SetDefaultNamespace
+	r = bld.CheckNameConflict(name, 0, 0, "");
 	if( r < 0 )
 		return ConfigError(asNAME_TAKEN, "RegisterEnum", name, 0);
 
@@ -4188,7 +4216,7 @@ int asCScriptEngine::RegisterEnumValue(const char *typeName, const char *valueNa
 // interface
 asUINT asCScriptEngine::GetEnumCount() const
 {
-	return registeredEnums.GetLength();
+	return asUINT(registeredEnums.GetLength());
 }
 
 // interface
@@ -4244,7 +4272,7 @@ const char *asCScriptEngine::GetEnumValueByIndex(int enumTypeId, asUINT index, i
 // interface
 asUINT asCScriptEngine::GetObjectTypeCount() const
 {
-	return registeredObjTypes.GetLength();
+	return asUINT(registeredObjTypes.GetLength());
 }
 
 // interface

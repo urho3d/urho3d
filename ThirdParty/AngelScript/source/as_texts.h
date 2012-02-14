@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -229,7 +229,7 @@
 #define TXT_DONT_SUPPORT_TYPE_s_BY_VAL             "Don't support passing type '%s' by value to application in native calling convention on this platform"
 // TODO: Should be something like "This platform requires that AngelScript knows the exact content of the type '%s' in order to return by value from application in native calling convention"
 #define TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL         "Don't support returning type '%s' by value from application in native calling convention on this platform"
-#define TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s           "GC cannot free an object of type '%s'. Make sure all types that can form circular references have the GC behaviours"
+#define TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s           "GC cannot free an object of type '%s', it is kept alive by the application"
 #define TXT_OBJECT_TYPE_s_DOESNT_EXIST             "Object type '%s' doesn't exist"
 #define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST           "Template type '%s' doesn't exist"
 #define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST        "Template subtype '%s' doesn't exist"

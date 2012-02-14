@@ -457,7 +457,13 @@ bool asCDataType::IsEqualExceptInterfaceType(const asCDataType &dt) const
 	if( objectType != dt.objectType )
 	{
 		if( !objectType || !dt.objectType ) return false;
-		if( !objectType->IsInterface() || !dt.objectType->IsInterface() ) return false;
+
+		// If the types are not interfaces or templates with interfaces then the they are not equal
+		if( !objectType->IsInterface() && !((objectType->flags & asOBJ_TEMPLATE) && objectType->templateSubType.GetObjectType() && objectType->templateSubType.GetObjectType()->IsInterface()) ) return false;
+		if( !dt.objectType->IsInterface() && !((dt.objectType->flags & asOBJ_TEMPLATE) && dt.objectType->templateSubType.GetObjectType() && dt.objectType->templateSubType.GetObjectType()->IsInterface()) ) return false;
+
+		// If one is interface and the other is not, then it is not equal
+		if( objectType->IsInterface() != dt.objectType->IsInterface() ) return false;
 	}
 
 	if( funcDef != dt.funcDef ) return false;

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -474,16 +474,12 @@ int asCGeneric::SetReturnObject(void *obj)
 	}
 	else
 	{
-#ifndef AS_OLD
 		// If function returns object by value the memory is already allocated.
 		// Here we should just initialize that memory by calling the copy constructor
 		// or the default constructor followed by the assignment operator
 		void *mem = (void*)*(size_t*)&stackPointer[-AS_PTR_SIZE];
 		engine->ConstructScriptObjectCopy(mem, obj, dt->GetObjectType());
 		return 0;
-#else
-		obj = engine->CreateScriptObjectCopy(obj, engine->GetTypeIdFromDataType(*dt));
-#endif
 	}
 
 	objectRegister = obj;
@@ -515,25 +511,12 @@ void *asCGeneric::GetAddressOfReturnLocation()
 
 	if( dt.IsObject() && !dt.IsReference() )
 	{
-#ifndef AS_OLD
 		if( sysFunction->DoesReturnOnStack() )
 		{
 			// The memory is already preallocated on the stack,
 			// and the pointer to the location is found before the first arg
 			return (void*)*(size_t*)&stackPointer[-AS_PTR_SIZE];
 		}
-#else
-		if( dt.GetObjectType()->flags & asOBJ_VALUE )
-		{
-			// Allocate the necessary memory for this object, 
-			// but do not initialize it, as the caller will do that.
-			objectRegister = engine->CallAlloc(dt.GetObjectType());
-
-			// TODO: How will we know if the initialization was successful?
-
-			return objectRegister;
-		}
-#endif
 
 		// Reference types store the handle in the objectReference
 		return &objectRegister;
