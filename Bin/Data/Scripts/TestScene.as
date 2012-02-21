@@ -96,7 +96,7 @@ void InitScene()
     testScene.CreateComponent("DebugRenderer");
 
     world.gravity = Vector3(0.0, -9.81, 0.0);
-    world.fps = 100;
+    world.fps = 60;
     world.linearRestThreshold = 0.1;
     world.angularRestThreshold = 0.1;
     world.contactSurfaceLayer = 0.001;

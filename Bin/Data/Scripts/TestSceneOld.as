@@ -60,7 +60,7 @@ void InitScene()
 
     // Set the physics world parameters
     world.gravity = Vector3(0, -9.81, 0);
-    world.fps = 100;
+    world.fps = 60;
     world.linearRestThreshold = 0.1;
     world.angularRestThreshold = 0.1;
     world.contactSurfaceLayer = 0.001;

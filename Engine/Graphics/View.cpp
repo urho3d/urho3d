@@ -1016,17 +1016,16 @@ void View::RenderBatchesForward()
     graphics_->SetViewport(viewRect_);
     graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
+    // Render opaque object unlit base pass
     if (!baseQueue_.IsEmpty())
     {
-        // Render opaque object unlit base pass
         PROFILE(RenderBase);
-        
         baseQueue_.Draw(graphics_, renderer_);
     }
     
+    // Render shadow maps + opaque objects' additive lighting
     if (!lightQueues_.Empty())
     {
-        // Render shadow maps + opaque objects' additive lighting
         PROFILE(RenderLights);
         
         for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1060,27 +1059,24 @@ void View::RenderBatchesForward()
     graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
     DrawFullscreenQuad(camera_, false);
     
+    // Render pre-alpha custom pass
     if (!preAlphaQueue_.IsEmpty())
     {
-        // Render pre-alpha custom pass
         PROFILE(RenderPreAlpha);
-        
         preAlphaQueue_.Draw(graphics_, renderer_);
     }
     
+    // Render transparent objects (both base passes & additive lighting)
     if (!alphaQueue_.IsEmpty())
     {
-        // Render transparent objects (both base passes & additive lighting)
         PROFILE(RenderAlpha);
-        
         alphaQueue_.Draw(graphics_, renderer_, true);
     }
     
+    // Render post-alpha custom pass
     if (!postAlphaQueue_.IsEmpty())
     {
-        // Render pre-alpha custom pass
         PROFILE(RenderPostAlpha);
-        
         postAlphaQueue_.Draw(graphics_, renderer_);
     }
     
@@ -1132,18 +1128,18 @@ void View::RenderBatchesDeferred()
     graphics_->SetViewport(viewRect_);
     graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
+    // Render G-buffer batches
     if (!gbufferQueue_.IsEmpty())
     {
-        // Render G-buffer batches
         PROFILE(RenderGBuffer);
-        
         gbufferQueue_.Draw(graphics_, renderer_, false, true);
     }
     
+    // Clear the light accumulation buffer (light pre-pass only.) However, skip the clear if the first light is a directional
+    // light with full mask
     RenderSurface* lightRenderTarget = renderMode_ == RENDER_PREPASS ? albedoBuffer->GetRenderSurface() : renderTarget;
     if (renderMode_ == RENDER_PREPASS)
     {
-        // Clear the light accumulation buffer. However, skip the clear if the first light is a directional light with full mask
         bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
             LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
         
@@ -1161,9 +1157,9 @@ void View::RenderBatchesDeferred()
         graphics_->ResetRenderTarget(3);
     }
     
+    // Render shadow maps + light volumes
     if (!lightQueues_.Empty())
     {
-        // Render shadow maps + light volumes
         PROFILE(RenderLights);
         
         for (List<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -1214,40 +1210,34 @@ void View::RenderBatchesDeferred()
     graphics_->ClearParameterSource(PSP_MATDIFFCOLOR);
     DrawFullscreenQuad(camera_, false);
     
+    // Render opaque objects with deferred lighting result (light pre-pass only)
     if (!baseQueue_.IsEmpty())
     {
-        // Render opaque objects with deferred lighting result
         PROFILE(RenderBase);
         
-        if (renderMode_ == RENDER_PREPASS)
-            graphics_->SetTexture(TU_LIGHTBUFFER, albedoBuffer);
-        
+        graphics_->SetTexture(TU_LIGHTBUFFER, renderMode_ == RENDER_PREPASS ? albedoBuffer : 0);
         baseQueue_.Draw(graphics_, renderer_);
-        
         graphics_->SetTexture(TU_LIGHTBUFFER, 0);
     }
     
+    // Render pre-alpha custom pass
     if (!preAlphaQueue_.IsEmpty())
     {
-        // Render pre-alpha custom pass
         PROFILE(RenderPreAlpha);
-        
         preAlphaQueue_.Draw(graphics_, renderer_);
     }
     
+    // Render transparent objects (both base passes & additive lighting)
     if (!alphaQueue_.IsEmpty())
     {
-        // Render transparent objects (both base passes & additive lighting)
         PROFILE(RenderAlpha);
-        
         alphaQueue_.Draw(graphics_, renderer_, true);
     }
     
+    // Render post-alpha custom pass
     if (!postAlphaQueue_.IsEmpty())
     {
-        // Render pre-alpha custom pass
         PROFILE(RenderPostAlpha);
-        
         postAlphaQueue_.Draw(graphics_, renderer_);
     }
 }
