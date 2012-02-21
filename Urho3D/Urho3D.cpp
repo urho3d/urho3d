@@ -106,7 +106,7 @@ void Run(const char* cmdLine)
         SharedPtr<Engine> engine(new Engine(context));
         if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
         {
-            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
             return;
         }
         
@@ -129,7 +129,7 @@ void Run(const char* cmdLine)
         else
         {
             engine->Exit(); // Close the rendering window
-            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
         }
     }
     catch (std::bad_alloc&)

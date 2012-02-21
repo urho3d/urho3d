@@ -30,7 +30,7 @@ class Mutex;
 /// Initialize the FPU to round-to-nearest, single precision mode.
 void InitFPU();
 /// Display an error dialog with the specified title and message.
-void ErrorDialog(const char* title, const char* message);
+void ErrorDialog(const String& title, const String& message);
 /// Exit the application with an error message to the console.
 void ErrorExit(const String& message, int exitCode = 1);
 /// Open a console window.

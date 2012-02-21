@@ -76,7 +76,7 @@ int WriteMiniDump(const char* applicationName, void* exceptionPointers)
     CloseHandle(file);
     
     if (success)
-        ErrorDialog(applicationName, String("An unexpected error occurred. A minidump was generated to " + miniDumpName).CString());
+        ErrorDialog(applicationName, "An unexpected error occurred. A minidump was generated to " + miniDumpName);
     else
         ErrorDialog(applicationName, "An unexpected error occurred. Could not write minidump.");
     

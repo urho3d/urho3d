@@ -97,12 +97,12 @@ void InitFPU()
     #endif
 }
 
-void ErrorDialog(const char* title, const char* message)
+void ErrorDialog(const String& title, const String& message)
 {
     #ifdef WIN32
-    MessageBox(0, message, title, 0);
+    MessageBox(0, message.CString(), title.CString(), 0);
     #else
-    printf("%s\n", message);
+    printf("%s\n", message.CString());
     #endif
 }
 
