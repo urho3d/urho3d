@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2009 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -89,11 +89,13 @@ public:
 	void *AllocScriptNode();
 	void FreeScriptNode(void *ptr);
 
+#ifndef AS_NO_COMPILER
 	void *AllocByteInstruction();
 	void FreeByteInstruction(void *ptr);
+#endif
 
 protected:
-	DECLARECRITICALSECTION(cs);
+	DECLARECRITICALSECTION(cs)
 	asCArray<void *> scriptNodePool;
 	asCArray<void *> byteInstructionPool;
 };

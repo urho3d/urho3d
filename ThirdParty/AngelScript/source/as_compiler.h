@@ -41,6 +41,9 @@
 #define AS_COMPILER_H
 
 #include "as_config.h"
+
+#ifndef AS_NO_COMPILER
+
 #include "as_builder.h"
 #include "as_scriptfunction.h"
 #include "as_variablescope.h"
@@ -121,14 +124,10 @@ public:
 	asCCompiler(asCScriptEngine *engine);
 	~asCCompiler();
 
-#ifndef AS_NO_COMPILER
 	int CompileFunction(asCBuilder *builder, asCScriptCode *script, sExplicitSignature *signature, asCScriptNode *func, asCScriptFunction *outFunc);
 	int CompileDefaultConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptNode *node, asCScriptFunction *outFunc);
 	int CompileFactory(asCBuilder *builder, asCScriptCode *script, asCScriptFunction *outFunc);
 	int CompileGlobalVariable(asCBuilder *builder, asCScriptCode *script, asCScriptNode *expr, sGlobalVariableDescription *gvar, asCScriptFunction *outFunc);
-#endif
-
-	int CompileTemplateFactoryStub(asCBuilder *builder, int trueFactoryId, asCObjectType *objType, asCScriptFunction *outFunc);
 
 protected:
 	friend class asCBuilder;
@@ -231,15 +230,12 @@ protected:
 	asUINT ProcessStringConstant(asCString &str, asCScriptNode *node, bool processEscapeSequences = true);
 	void ProcessHeredocStringConstant(asCString &str, asCScriptNode *node);
 	int  GetPrecedence(asCScriptNode *op);
-
 	void Error(const char *msg, asCScriptNode *node);
 	void Warning(const char *msg, asCScriptNode *node);
 	void Information(const char *msg, asCScriptNode *node);
 	void PrintMatchingFuncs(asCArray<int> &funcs, asCScriptNode *node);
-
 	void AddVariableScope(bool isBreakScope = false, bool isContinueScope = false);
 	void RemoveVariableScope();
-
 	void FinalizeFunction();
 
 	asCByteCode byteCode;
@@ -282,5 +278,7 @@ protected:
 };
 
 END_AS_NAMESPACE
+
+#endif // AS_NO_COMPILER
 
 #endif

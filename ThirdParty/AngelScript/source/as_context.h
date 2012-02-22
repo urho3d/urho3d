@@ -93,11 +93,10 @@ public:
 	int  Abort();
 	int  Suspend();
 
-	int  SetException(const char *descr);
-	int  GetExceptionLineNumber(int *column, const char **sectionName);
-	// TODO: interface: GetExceptionFunction should return asIScriptFunction.
-	int  GetExceptionFunction();
-	const char *GetExceptionString();
+	int                SetException(const char *descr);
+	int                GetExceptionLineNumber(int *column, const char **sectionName);
+	asIScriptFunction *GetExceptionFunction();
+	const char *       GetExceptionString();
 
 	int  SetLineCallback(asSFuncPtr callback, void *obj, int callConv);
 	void ClearLineCallback();
@@ -115,6 +114,7 @@ public:
 	bool               IsVarInScope(asUINT varIndex, asUINT stackLevel);
 	int                GetThisTypeId(asUINT stackLevel);
     void              *GetThisPointer(asUINT stackLevel);
+	asIScriptFunction *GetSystemFunction();
 
 	void *SetUserData(void *data);
 	void *GetUserData() const;
@@ -157,9 +157,9 @@ public:
 	bool doSuspend;
 	bool doAbort;
 	bool externalSuspendRequest;
-	bool isCallingSystemFunction;
 
 	asCScriptFunction *currentFunction;
+	asCScriptFunction *callingSystemFunction;
 	bool isStackMemoryNotAllocated;
 
 	asCArray<size_t> callStack;

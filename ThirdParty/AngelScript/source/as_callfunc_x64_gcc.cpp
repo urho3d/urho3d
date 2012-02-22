@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -74,47 +74,6 @@ typedef asQWORD ( *funcptr_t )( void );
 		: name                                   \
 	)
 
-
-static asDWORD GetReturnedFloat()
-{
-	float   retval = 0.0f;
-	asDWORD ret    = 0;
-
-	__asm__ __volatile__ (
-		"lea      %0, %%rax\n"
-		"movss    %%xmm0, (%%rax)"
-		: /* no output */
-		: "m" (retval)
-		: "%rax", "%xmm0"
-	);
-
-	// We need to avoid implicit conversions from float to unsigned - we need
-	// a bit-wise-correct-and-complete copy of the value 
-	memcpy( &ret, &retval, sizeof( ret ) );
-
-	return ( asDWORD )ret;
-}
-
-static asQWORD GetReturnedDouble()
-{
-	double  retval = 0.0f;
-	asQWORD ret    = 0;
-
-	__asm__ __volatile__ (
-		"lea     %0, %%rax\n"
-		"movlpd  %%xmm0, (%%rax)"
-		: /* no optput */
-		: "m" (retval)
-		: "%rax", "%xmm0"
-	);
-
-	// We need to avoid implicit conversions from double to unsigned long long - we need
-	// a bit-wise-correct-and-complete copy of the value 
-	memcpy( &ret, &retval, sizeof( ret ) );
-
-	return ret;
-}
-
 static void __attribute__((noinline)) GetReturnedXmm0Xmm1(asQWORD &a, asQWORD &b)
 {
 	__asm__ __volatile__ (
@@ -128,11 +87,11 @@ static void __attribute__((noinline)) GetReturnedXmm0Xmm1(asQWORD &a, asQWORD &b
 	);
 }
 
-static asQWORD __attribute__((noinline)) X64_CallFunction( const asQWORD *args, int cnt, void *func ) 
+static asQWORD __attribute__((noinline)) X64_CallFunction( const asQWORD *args, int cnt, funcptr_t func ) 
 {
-	asQWORD retval;
-	asQWORD ( *call )() = (asQWORD (*)())func;
-	int     i           = 0;
+	asQWORD   retval;
+	funcptr_t call    = func;
+	int       i       = 0;
 
 	// Backup the stack pointer and then align it to 16 bytes.
 	// The R15 register is guaranteed to maintain its value over function
@@ -198,13 +157,13 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asSSystemFunctionInterface *sysFunc            = descr->sysFuncIntf;
 	int                         callConv           = sysFunc->callConv;
 	asQWORD                     retQW              = 0;
-	void                       *func               = ( void * )sysFunc->func;
 	asDWORD                    *stack_pointer      = args;
 	funcptr_t                  *vftable            = NULL;
 	int                         totalArgumentCount = 0;
 	int                         n                  = 0;
 	int                         param_post         = 0;
 	int                         argIndex           = 0;
+	funcptr_t                   func               = (funcptr_t)sysFunc->func;
 
 	if( sysFunc->hostReturnInMemory ) 
 	{
@@ -215,8 +174,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	// Determine the real function pointer in case of virtual method
 	if ( obj && ( callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ) ) 
 	{
-		vftable = *( ( funcptr_t ** )obj );
-		func    = ( void * )vftable[( asQWORD )func >> 3];
+		vftable = *((funcptr_t**)obj);
+		func = vftable[FuncPtrToUInt(asFUNCTION_t(func)) >> 3];
 	}
 
 	// Determine the type of the arguments, and prepare the input array for the X64_CallFunction 
@@ -228,7 +187,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		case ICC_CDECL_RETURNINMEM:
 		case ICC_STDCALL_RETURNINMEM: 
 		{
-			paramBuffer[0] = (size_t)retPointer;
+			paramBuffer[0] = (asPWORD)retPointer;
 			argsType[0] = x64INTARG;
 
 			argIndex = 1;
@@ -239,7 +198,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		case ICC_VIRTUAL_THISCALL:
 		case ICC_CDECL_OBJFIRST: 
 		{
-			paramBuffer[0] = (size_t)obj;
+			paramBuffer[0] = (asPWORD)obj;
 			argsType[0] = x64INTARG;
 
 			argIndex = 1;
@@ -250,8 +209,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		case ICC_VIRTUAL_THISCALL_RETURNINMEM:
 		case ICC_CDECL_OBJFIRST_RETURNINMEM: 
 		{
-			paramBuffer[0] = (size_t)retPointer;
-			paramBuffer[1] = (size_t)obj;
+			paramBuffer[0] = (asPWORD)retPointer;
+			paramBuffer[1] = (asPWORD)obj;
 			argsType[0] = x64INTARG;
 			argsType[1] = x64INTARG;
 
@@ -264,7 +223,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			break;
 		case ICC_CDECL_OBJLAST_RETURNINMEM: 
 		{
-			paramBuffer[0] = (size_t)retPointer;
+			paramBuffer[0] = (asPWORD)retPointer;
 			argsType[0] = x64INTARG;
 
 			argIndex = 1;
@@ -374,7 +333,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	// For the CDECL_OBJ_LAST calling convention we need to add the object pointer as the last argument
 	if( param_post )
 	{
-		paramBuffer[argIndex] = (size_t)obj;
+		paramBuffer[argIndex] = (asPWORD)obj;
 		argsType[argIndex] = x64INTARG;
 		argIndex++;
 	}
@@ -435,21 +394,12 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 	}
 
-	context->isCallingSystemFunction = true;
-	retQW = X64_CallFunction( tempBuff, used_stack_args, (asDWORD*)func );
+	retQW = X64_CallFunction( tempBuff, used_stack_args, func );
 	ASM_GET_REG( "%rdx", retQW2 );
-	context->isCallingSystemFunction = false;
 
 	// If the return is a float value we need to get the value from the FP register
 	if( sysFunc->hostReturnFloat )
-	{
-		if( sysFunc->hostReturnSize == 1 )
-			*(asDWORD*)&retQW = GetReturnedFloat();
-		else if( sysFunc->hostReturnSize == 2 )
-			retQW = GetReturnedDouble();
-		else
-			GetReturnedXmm0Xmm1(retQW, retQW2);
-	}
+		GetReturnedXmm0Xmm1(retQW, retQW2);
 
 	return retQW;
 }

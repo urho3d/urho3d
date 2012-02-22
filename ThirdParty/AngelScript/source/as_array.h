@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2009 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -69,8 +69,8 @@ public:
 	void Concatenate(const asCArray<T> &);
 	void Concatenate(T*, unsigned int count);
 
-	bool Exists(const T &element);
-	int  IndexOf(const T &element);
+	bool Exists(T &element) const;
+	int  IndexOf(T &element) const;
 	void RemoveIndex(size_t index);     // Removes the entry without reordering the array
 	void RemoveValue(const T &element);
 
@@ -321,13 +321,13 @@ void asCArray<T>::Concatenate(T* array, unsigned int count)
 }
 
 template <class T>
-bool asCArray<T>::Exists(const T &e)
+bool asCArray<T>::Exists(T &e) const
 {
 	return IndexOf(e) == -1 ? false : true;
 }
 
 template <class T>
-int asCArray<T>::IndexOf(const T &e)
+int asCArray<T>::IndexOf(T &e) const
 {
 	for( size_t n = 0; n < length; n++ )
 		if( array[n] == e ) return (int)n;

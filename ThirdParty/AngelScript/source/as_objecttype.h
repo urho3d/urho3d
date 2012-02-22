@@ -135,6 +135,7 @@ public:
 //=====================================
 	asIScriptEngine *GetEngine() const;
 	const char      *GetConfigGroup() const;
+	asDWORD          GetAccessMask() const;
 
 	// Memory management
 	int AddRef() const;
@@ -142,6 +143,7 @@ public:
 
 	// Type info
 	const char      *GetName() const;
+	const char      *GetNamespace() const;
 	asIObjectType   *GetBaseType() const;
 	bool             DerivesFrom(const asIObjectType *objType) const;
 	asDWORD          GetFlags() const;
@@ -149,8 +151,6 @@ public:
 	int              GetTypeId() const;
 	int              GetSubTypeId() const;
 	asIObjectType   *GetSubType() const;
-	// TODO: interface: access: Get/Set access mask for type
-	// TODO: interface: namespace: Get namespace
 
 	// Interfaces
 	asUINT           GetInterfaceCount() const;
@@ -172,16 +172,10 @@ public:
 	asIScriptFunction *GetMethodByIndex(asUINT index, bool getVirtual) const;
 	asIScriptFunction *GetMethodByName(const char *name, bool getVirtual) const;
 	asIScriptFunction *GetMethodByDecl(const char *decl, bool getVirtual) const;
-#ifdef AS_DEPRECATED
-	// TODO: interface: Remove this deprecated function
-	// deprecated since 2011-10-03
-	asIScriptFunction *GetMethodDescriptorByIndex(asUINT index, bool getVirtual) const;
-#endif
 
 	// Properties
-	// TODO: access: Allow getting and setting property access mask
 	asUINT      GetPropertyCount() const;
-	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference) const;
+	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference, asDWORD *accessMask) const;
 	const char *GetPropertyDeclaration(asUINT index) const;
 
 	// Behaviours

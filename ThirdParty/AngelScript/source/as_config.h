@@ -63,6 +63,11 @@
 // This flag can be defined to make the library write some extra output when
 // compiling and executing scripts.
 
+// AS_DEBUG_STATS
+// This flag, combined with AS_DEBUG, make the library write out statistics
+// from the VM, for example how many times each bytecode instruction is executed,
+// etc. It is used to help identify potential code for optimizations.
+
 // AS_DEPRECATED
 // If this flag is defined then some backwards compatibility is maintained.
 // There is no guarantee for how well deprecated functionality will work though
@@ -219,22 +224,23 @@
 // compiler is the same for both, when this is so these flags are used to produce the
 // right code.
 
-// AS_WIN     - Microsoft Windows
-// AS_LINUX   - Linux
-// AS_MAC     - Apple Macintosh
-// AS_BSD     - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
-// AS_XBOX    - Microsoft XBox
-// AS_XBOX360 - Microsoft XBox 360
-// AS_PSP     - Sony Playstation Portable
-// AS_PS2     - Sony Playstation 2
-// AS_PS3     - Sony Playstation 3
-// AS_DC      - Sega Dreamcast
-// AS_GC      - Nintendo GameCube
-// AS_WII     - Nintendo Wii
-// AS_IPHONE  - Apple IPhone
-// AS_ANDROID - Android
-// AS_HAIKU   - Haiku
-// AS_ILLUMOS - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
+// AS_WIN       - Microsoft Windows
+// AS_LINUX     - Linux
+// AS_MAC       - Apple Macintosh
+// AS_BSD       - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
+// AS_XBOX      - Microsoft XBox
+// AS_XBOX360   - Microsoft XBox 360
+// AS_PSP       - Sony Playstation Portable
+// AS_PS2       - Sony Playstation 2
+// AS_PS3       - Sony Playstation 3
+// AS_DC        - Sega Dreamcast
+// AS_GC        - Nintendo GameCube
+// AS_WII       - Nintendo Wii
+// AS_IPHONE    - Apple IPhone
+// AS_ANDROID   - Android
+// AS_HAIKU     - Haiku
+// AS_ILLUMOS   - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
+// AS_MARMALADE - Marmalade cross platform SDK (a layer on top of the OS)
 
 
 
@@ -281,7 +287,6 @@
 // STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 // CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 // Specifies the minimum size in dwords a class/struct needs to be to be passed in memory
-
 
 // CALLEE_POPS_HIDDEN_RETURN_POINTER
 // This constant should be defined if the callee pops the hidden return pointer,
@@ -369,8 +374,6 @@
 	#define AS_X86
 	#define ASM_INTEL
 
-	#define I64(x) x##ll
-
 	#define asVSNPRINTF(a, b, c, d) _vsnprintf(a, b, c, d)
 
 	#define fmodf(a,b) fmod(a,b)
@@ -390,15 +393,33 @@
 	#define HAVE_VIRTUAL_BASE_OFFSET
 	#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 	#define THISCALL_PASS_OBJECT_POINTER_IN_ECX
-	#if _MSC_VER < 1500 // MSVC++ 9 (aka MSVC++ .NET 2008)
-		#define asVSNPRINTF(a, b, c, d) _vsnprintf(a, b, c, d)
+
+	// There doesn't seem to be a standard define to identify Marmalade, so we'll 
+	// look for one of these defines that have to be given by the project settings
+	// http://www.madewithmarmalade.com/
+	#if defined(AS_MARMALADE) || defined (MARMALADE)
+		#ifndef AS_MARMALADE
+			// From now on we'll use the below define
+			#define AS_MARMALADE
+		#endif
+
+		// Marmalade doesn't use the Windows libraries
+		#define asVSNPRINTF(a, b, c, d) vsnprintf(a, b, c, d)
+		#define AS_POSIX_THREADS
+		#define AS_NO_ATOMIC
 	#else
-		#define asVSNPRINTF(a, b, c, d) vsnprintf_s(a, b, _TRUNCATE, c, d)
+		#if _MSC_VER < 1500  // MSVC++ 9 (aka MSVC++ .NET 2008)
+			#define asVSNPRINTF(a, b, c, d) _vsnprintf(a, b, c, d)
+		#else
+			#define asVSNPRINTF(a, b, c, d) vsnprintf_s(a, b, _TRUNCATE, c, d)
+		#endif
+
+		#define AS_WINDOWS_THREADS
 	#endif
+
 	#define THISCALL_CALLEE_POPS_ARGUMENTS
 	#define STDCALL __stdcall
 	#define AS_SIZEOF_BOOL 1
-	#define AS_WINDOWS_THREADS
 
 	#define ASM_INTEL  // Intel style for inline assembly on microsoft compilers
 
@@ -423,12 +444,6 @@
 			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_CONSTRUCTOR | asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#define COMPLEX_MASK (asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 		#endif
-	#endif
-
-	#if _MSC_VER <= 1300 // MSVC++ 7.0 and lower
-		#define I64(x) x##l
-	#else // MSVC++ 7.1 and higher
-		#define I64(x) x##ll
 	#endif
 
 	#ifdef _ARM_
@@ -474,16 +489,10 @@
 		#define ASM_INTEL  // Intel style for inline assembly
 	#endif
 
-	#if _MSC_VER <= 1300 // MSVC++ 7.0 and lower
-		#define I64(x) x##l
-	#else // MSVC++ 7.1 and higher
-		#define I64(x) x##ll
-	#endif
-
 	#define UNREACHABLE_RETURN
 #endif
 
-// SN Systems ProDG (also experimental, let me know if something isn't working)
+// SN Systems ProDG 
 #if defined(__SNC__) || defined(SNSYS)
 	#define GNU_STYLE_VIRTUAL_METHOD
 	#define MULTI_BASE_OFFSET(x) (*((asDWORD*)(&x)+1))
@@ -515,10 +524,12 @@
 		// Support native calling conventions on PS3
 		#define AS_PS3
 		#define AS_PPC_64
+	// PSP
+	#elif defined(__psp__)
+		#define AS_NO_MEMORY_H
+		#define AS_MIPS
+		#define AS_PSP
 	#endif
-
-
-	#define I64(x) x##ll
 
 	#define UNREACHABLE_RETURN
 #endif
@@ -620,6 +631,10 @@
 			#define COMPLEX_MASK asOBJ_APP_CLASS_DESTRUCTOR
 			#undef COMPLEX_RETURN_MASK
 			#define COMPLEX_RETURN_MASK asOBJ_APP_CLASS_DESTRUCTOR
+			
+			// STDCALL is not available on ARM
+			#undef STDCALL
+			#define STDCALL
 		#else
 			// Unknown CPU type
 			#define AS_MAX_PORTABILITY
@@ -793,6 +808,10 @@
 		#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 
 		#if (defined(_ARM_) || defined(__arm__))
+			// The stdcall calling convention is not used on the arm cpu
+			#undef STDCALL
+			#define STDCALL
+
 			#define AS_ARM
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define AS_ALIGN
@@ -847,8 +866,6 @@
 		#endif
 	#endif
 
-	#define I64(x) x##ll
-
 	#define UNREACHABLE_RETURN
 #endif
 
@@ -878,7 +895,7 @@
 		#define AS_USE_DOUBLE_AS_FLOAT
 	#endif
 	// XBox 360
-	#if (_XBOX_VER >= 200 )
+	#if (_XBOX_VER >= 200)
 		#define AS_ALIGN
 	#endif
 	// PS3
@@ -964,13 +981,11 @@
 
 #ifdef AS_64BIT_PTR
 	#define AS_PTR_SIZE  2
-	#define asPTRWORD    asQWORD
 #else
 	#define AS_PTR_SIZE  1
-	#define asPTRWORD    asDWORD
 #endif
-#define ARG_PTR(b)   ((asPTRWORD*)&b)
-#define BCARG_PTR(b) ((asPTRWORD*)&(b)[1])
+#define ARG_PTR(b)   ((asPWORD*)&b)
+#define BCARG_PTR(b) ((asPWORD*)&(b)[1])
 
 // This macro is used to avoid warnings about unused variables.
 // Usually where the variables are only used in debug mode.

@@ -109,15 +109,16 @@ public:
 	asIObjectType       *GetObjectType() const;
 	const char          *GetObjectName() const;
 	const char          *GetName() const;
-	// TODO: interface: Allow inclusion of namespace or not in declaration
-	const char          *GetDeclaration(bool includeObjectName = true) const;
+	const char          *GetNamespace() const;
+	const char          *GetDeclaration(bool includeObjectName = true, bool includeNamespace = false) const;
 	const char          *GetScriptSectionName() const;
 	const char          *GetConfigGroup() const;
+	asDWORD              GetAccessMask() const;
 	bool                 IsReadOnly() const;
 	bool                 IsPrivate() const;
-	// TODO: interface: Add IsFinal() and IsOverride() as public methods
-	// TODO: interface: access: Get/Set access mask for function
-	// TODO: interface: namespace: Get namespace
+	bool                 IsFinal() const;
+	bool                 IsOverride() const;
+	bool                 IsShared() const;
 
 	asUINT               GetParamCount() const;
 	int                  GetParamTypeId(asUINT index, asDWORD *flags = 0) const;
@@ -149,7 +150,7 @@ public:
 
 	int       GetSpaceNeededForArguments();
 	int       GetSpaceNeededForReturnValue();
-	asCString GetDeclarationStr(bool includeObjectName = true) const;
+	asCString GetDeclarationStr(bool includeObjectName = true, bool includeNamespace = false) const;
 	int       GetLineNumber(int programPosition);
 	void      ComputeSignatureId();
 	bool      IsSignatureEqual(const asCScriptFunction *func) const;
@@ -164,9 +165,6 @@ public:
 	void      AddReferences();
 	void      ReleaseReferences();
 
-	bool      IsShared() const;
-	bool      IsFinal() const;
-	bool      IsOverride() const;
 
 	asCGlobalProperty *GetPropertyByGlobalVarPtr(void *gvarPtr);
 

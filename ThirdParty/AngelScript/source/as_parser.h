@@ -37,54 +37,6 @@
 
 
 
-/*
-
-TYPEDEF       = 'typedef' REALTYPE IDENTIFIER ';'
-ENUM          = 'enum' IDENTIFIER '{' ENUMELEMENT? (',' ENUMELEMENT)* '}'
-ENUMELEMENT   = IDENTIFIER ('=' EXPRESSION)
-SCRIPT        = (FUNCTION | GLOBVAR | IMPORT | STRUCT | INTERFACE | TYPEDEF | ENUM)*
-TYPE          = 'const'? DATATYPE
-TYPEMOD       = ('&' ('in' | 'out' | 'inout')?)?
-FUNCDEF       = 'funcdef' FUNCSIG ';'
-FUNCSIG       = TYPE TYPEMOD IDENTIFIER PARAMLIST
-FUNCTION      = FUNCSIG BLOCK
-IMPORT        = 'import' FUNCSIG 'from' STRING ';'
-INTERFACE     = 'interface' IDENTIFIER '{' (FUNCSIG ';')* '}' ';'
-GLOBVAR       = TYPE IDENTIFIER ('=' (INITLIST | ASSIGNMENT))? (',' IDENTIFIER ('=' (INITLIST | ASSIGNMENT))?)* ';'
-DATATYPE      = REALTYPE | IDENTIFIER
-REALTYPE      = 'void' | 'bool' | 'float' | 'int' | 'uint' | 'bits'
-PARAMLIST     = '(' (TYPE TYPEMOD IDENTIFIER? (',' TYPE TYPEMOD IDENTIFIER?)*)? ')'
-BLOCK         = '{' (DECLARATION | STATEMENT)* '}'
-DECLARATION   = TYPE IDENTIFIER ('=' (INITLIST | ASSIGNMENT))? (',' IDENTIFIER ('=' (INITLIST | ASSIGNMENT))?)* ';'
-STATEMENT     = BLOCK | IF | WHILE | DOWHILE | RETURN | EXPRSTATEMENT | BREAK | CONTINUE
-BREAK         = 'break' ';'
-CONTINUE      = 'continue' ';'
-EXPRSTATEMENT = ASSIGNMENT? ';'
-FOR           = 'for' '(' (DECLARATION | EXPRSTATEMENT) EXPRSTATEMENT ASSIGNMENT? ')' STATEMENT
-IF            = 'if' '(' ASSIGNMENT ')' STATEMENT ('else' STATEMENT)?
-WHILE         = 'while' '(' ASSIGNMENT ')' STATEMENT
-DOWHILE       = 'do' STATEMENT 'while' '(' ASSIGNMENT ')' ';'
-RETURN        = 'return' ASSIGNMENT? ';'
-ASSIGNMENT    = CONDITION (ASSIGNOP ASSIGNMENT)?
-CONDITION     = EXPRESSION ('?' ASSIGNMENT ':' ASSIGNMENT)?
-EXPRESSION    = TERM (OP TERM)*
-TERM          = PRE* VALUE POST*
-VALUE         = '(' ASSIGNMENT ')' | CONSTANT | IDENTIFIER | FUNCTIONCALL | CONVERSION | CAST
-PRE           = '-' | '+' | 'not' | '++' | '--' | '~'
-POST          = '++' | '--' | ('.' | '->') (IDENTIFIER | FUNCTIONCALL) | '[' ASSIGNMENT ']'
-FUNCTIONCALL  = IDENTIFIER ARGLIST
-ARGLIST       = '(' (ASSIGNMENT (',' ASSIGNMENT)*)? ')'
-CONSTANT      = "abc" | 123 | 123.1 | 'true' | 'false' | 0xFFFF
-OP            = 'and' | 'or' |
-                '==' | '!=' | '<' | '<=' | '>=' | '>' |
-			    '+' | '-' | '*' | '/' | '%' | '|' | '&' | '^' | '<<' | '>>' | '>>>'
-ASSIGNOP      = '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '|=' | '&=' | '^=' | '<<=' | '>>=' | '>>>='
-CONVERSION    = TYPE '(' ASSIGNMENT ')'
-INITLIST      = '{' ((INITLIST | ASSIGNMENT)? (',' (INITLIST | ASSIGNMENT)?)*)? '}'
-CAST          = 'cast' '<' TYPE '>' '(' ASSIGNMENT ')'
-
-*/
-
 #ifndef AS_PARSER_H
 #define AS_PARSER_H
 
@@ -103,16 +55,17 @@ public:
 
 	int ParseFunctionDefinition(asCScriptCode *script);
 	int ParsePropertyDeclaration(asCScriptCode *script);
-	int ParseVirtualPropertyDeclaration(asCScriptCode *script, bool asMethod);
-	int ParseDataType(asCScriptCode *script);
+	int ParseDataType(asCScriptCode *script, bool isReturnType);
 	int ParseTemplateDecl(asCScriptCode *script);
 
 #ifndef AS_NO_COMPILER
 	int ParseScript(asCScriptCode *script);
+
+	// Called from compiler
 	int ParseStatementBlock(asCScriptCode *script, asCScriptNode *block);
 	int ParseGlobalVarInit(asCScriptCode *script, asCScriptNode *init);
-#endif
 	int ParseExpression(asCScriptCode *script);
+#endif
 	
 	asCScriptNode *GetScriptNode();
 
@@ -123,22 +76,24 @@ protected:
 	void RewindTo(const sToken *token);
 	void Error(const char *text, sToken *token);
 
-	asCScriptNode *ParseImport();
 	asCScriptNode *ParseFunctionDefinition();
-#ifndef AS_NO_COMPILER
-	asCScriptNode *ParseScript(bool inBlock);
-	asCScriptNode *ParseNamespace();
-#endif
+	asCScriptNode *ParseParameterList();
+	asCScriptNode *SuperficiallyParseExpression();
 	asCScriptNode *ParseType(bool allowConst, bool allowVariableType = false);
 	asCScriptNode *ParseTypeMod(bool isParam);
-	asCScriptNode *ParseFunction(bool isMethod = false);
-	asCScriptNode *ParseFuncDef();
-	asCScriptNode *ParseGlobalVar();
-	asCScriptNode *ParseParameterList();
+	void           ParseOptionalScope(asCScriptNode *node);
+	asCScriptNode *ParseRealType();
+	asCScriptNode *ParseDataType(bool allowVariableType = false);
+	asCScriptNode *ParseIdentifier();
+
+	bool IsRealType(int tokenType);
+	bool IsDataType(const sToken &token);
+
+#ifndef AS_NO_COMPILER
+	// Statements
 	asCScriptNode *SuperficiallyParseStatementBlock();
 	asCScriptNode *SuperficiallyParseGlobalVarInit();
 	asCScriptNode *ParseStatementBlock();
-	asCScriptNode *ParseDeclaration();
 	asCScriptNode *ParseStatement();
 	asCScriptNode *ParseExpressionStatement();
 	asCScriptNode *ParseSwitch();
@@ -150,6 +105,28 @@ protected:
 	asCScriptNode *ParseReturn();
 	asCScriptNode *ParseBreak();
 	asCScriptNode *ParseContinue();
+
+	// Declarations
+	asCScriptNode *ParseDeclaration();
+	asCScriptNode *ParseImport();
+	asCScriptNode *ParseScript(bool inBlock);
+	asCScriptNode *ParseNamespace();
+	asCScriptNode *ParseFunction(bool isMethod = false);
+	asCScriptNode *ParseFuncDef();
+	asCScriptNode *ParseGlobalVar();
+	asCScriptNode *ParseClass();
+	asCScriptNode *ParseInitList();
+	asCScriptNode *ParseInterface();
+	asCScriptNode *ParseInterfaceMethod();
+	asCScriptNode *ParseVirtualPropertyDecl(bool isMethod, bool isInterface);
+	asCScriptNode *ParseEnumeration();
+	asCScriptNode *ParseTypedef();
+	void ParseMethodOverrideBehaviors(asCScriptNode *funcNode);
+	bool IsVarDecl();
+	bool IsVirtualPropertyDecl();
+	bool IsFuncDecl(bool isMethod);
+
+	// Expressions
 	asCScriptNode *ParseAssignment();
 	asCScriptNode *ParseAssignOperator();
 	asCScriptNode *ParseCondition();
@@ -160,41 +137,26 @@ protected:
 	asCScriptNode *ParseExprPostOp();
 	asCScriptNode *ParseExprValue();
 	asCScriptNode *ParseArgList();
-	asCScriptNode *ParseDataType(bool allowVariableType = false);
-	asCScriptNode *ParseRealType();
-	asCScriptNode *ParseIdentifier();
-	asCScriptNode *ParseConstant();
-	asCScriptNode *ParseStringConstant();
 	asCScriptNode *ParseFunctionCall();
 	asCScriptNode *ParseVariableAccess();
 	asCScriptNode *ParseConstructCall();
-	asCScriptNode *ParseToken(int token);
-	asCScriptNode *ParseOneOf(int *tokens, int num);
-	asCScriptNode *ParseClass();
-	asCScriptNode *ParseInitList();
-	asCScriptNode *ParseInterface();
-	asCScriptNode *ParseInterfaceMethod();
-	asCScriptNode *ParseVirtualPropertyDecl(bool isMethod, bool isInterface);
 	asCScriptNode *ParseCast();
-	asCScriptNode *ParseEnumeration();				//	Parse enumeration enum { X, Y }
-	asCScriptNode *ParseTypedef();					//	Parse named type declaration
-	void ParseMethodOverrideBehaviors(asCScriptNode *funcNode);
+	asCScriptNode *ParseConstant();
+	asCScriptNode *ParseStringConstant();
 
-	bool IsVarDecl();
-	bool IsVirtualPropertyDecl();
-	bool IsFuncDecl(bool isMethod);
-	bool IsRealType(int tokenType);
-	bool IsDataType(const sToken &token);
+	bool IsConstant(int tokenType);
 	bool IsOperator(int tokenType);
 	bool IsPreOperator(int tokenType);
 	bool IsPostOperator(int tokenType);
-	bool IsConstant(int tokenType);
 	bool IsAssignOperator(int tokenType);
 	bool IsFunctionCall();
 
 	bool IdentifierIs(const sToken &t, const char *str);
-
 	bool CheckTemplateType(sToken &t);
+#endif
+
+	asCScriptNode *ParseToken(int token);
+	asCScriptNode *ParseOneOf(int *tokens, int num);
 
 	asCString ExpectedToken(const char *token);
 	asCString ExpectedTokens(const char *token1, const char *token2);

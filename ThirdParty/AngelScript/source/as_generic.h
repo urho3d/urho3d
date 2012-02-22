@@ -56,11 +56,6 @@ public:
 	asIScriptEngine   *GetEngine() const;
 	int                GetFunctionId() const;
 	asIScriptFunction *GetFunction() const;
-#ifdef AS_DEPRECATED
-	// TODO: interface: Remove this deprecated function
-	// deprecated since 2011-10-03
-	asIScriptFunction *GetFunctionDescriptor() const;
-#endif
 	void              *GetFunctionUserData() const;
 
 	// Object

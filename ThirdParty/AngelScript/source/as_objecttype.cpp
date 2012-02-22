@@ -97,7 +97,8 @@ static void ObjectType_ReleaseAllHandles_Generic(asIScriptGeneric *gen)
 void RegisterObjectTypeGCBehaviours(asCScriptEngine *engine)
 {
 	// Register the gc behaviours for the object types
-	int r;
+	int r = 0;
+	UNUSED_VAR(r); // It is only used in debug mode
 	engine->objectTypeBehaviours.engine = engine;
 	engine->objectTypeBehaviours.flags = asOBJ_REF | asOBJ_GC;
 	engine->objectTypeBehaviours.name = "_builtin_objecttype_";
@@ -270,6 +271,12 @@ bool asCObjectType::IsShared() const
 const char *asCObjectType::GetName() const
 {
 	return name.AddressOf();
+}
+
+// interface
+const char *asCObjectType::GetNamespace() const
+{
+	return nameSpace.AddressOf();
 }
 
 // interface
@@ -480,25 +487,6 @@ asIScriptFunction *asCObjectType::GetMethodByDecl(const char *decl, bool getVirt
 	return engine->GetFunctionById(GetMethodIdByDecl(decl, getVirtual));
 }
 
-#ifdef AS_DEPRECATED
-// deprecated since 2011-10-03
-// interface
-asIScriptFunction *asCObjectType::GetMethodDescriptorByIndex(asUINT index, bool getVirtual) const
-{
-	if( index >= methods.GetLength() ) 
-		return 0;
-
-	if( !getVirtual )
-	{
-		asCScriptFunction *func = engine->scriptFunctions[methods[index]];
-		if( func && func->funcType == asFUNC_VIRTUAL )
-			return virtualFunctionTable[func->vfTableIdx];
-	}
-
-	return engine->scriptFunctions[methods[index]];
-}
-#endif
-
 // interface
 asUINT asCObjectType::GetPropertyCount() const
 {
@@ -506,7 +494,7 @@ asUINT asCObjectType::GetPropertyCount() const
 }
 
 // interface
-int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference) const
+int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference, asDWORD *accessMask) const
 {
 	if( index >= properties.GetLength() )
 		return asINVALID_ARG;
@@ -521,6 +509,8 @@ int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, boo
 		*offset = properties[index]->byteOffset;
 	if( isReference )
 		*isReference = properties[index]->type.IsReference();
+	if( accessMask )
+		*accessMask = properties[index]->accessMask;
 
 	return 0;
 }
@@ -667,6 +657,12 @@ const char *asCObjectType::GetConfigGroup() const
 		return 0;
 
 	return group->groupName.AddressOf();
+}
+
+// interface
+asDWORD asCObjectType::GetAccessMask() const
+{
+	return accessMask;
 }
 
 // internal

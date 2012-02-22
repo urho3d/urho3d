@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -125,7 +125,8 @@ static void ScriptObject_ReleaseAllHandles_Generic(asIScriptGeneric *gen)
 void RegisterScriptObject(asCScriptEngine *engine)
 {
 	// Register the default script class behaviours
-	int r;
+	int r = 0;
+	UNUSED_VAR(r); // It is only used in debug mode
 	engine->scriptTypeBehaviours.engine = engine;
 	engine->scriptTypeBehaviours.flags = asOBJ_SCRIPT_OBJECT | asOBJ_REF | asOBJ_GC;
 	engine->scriptTypeBehaviours.name = "_builtin_object_";
@@ -187,14 +188,14 @@ asCScriptObject::asCScriptObject(asCObjectType *ot)
 		asCObjectProperty *prop = objType->properties[n];
 		if( prop->type.IsObject() )
 		{
-			size_t *ptr = (size_t*)(((char*)this) + prop->byteOffset);
+			asPWORD *ptr = (asPWORD*)(((char*)this) + prop->byteOffset);
 
 			if( prop->type.IsObjectHandle() )
 				*ptr = 0;
 			else
 			{
 				// Allocate the object and call it's constructor
-				*ptr = (size_t)AllocateObject(prop->type.GetObjectType(), engine);
+				*ptr = (asPWORD)AllocateObject(prop->type.GetObjectType(), engine);
 			}
 		}
 	}
@@ -398,7 +399,9 @@ void asCScriptObject::ReleaseAllHandles(asIScriptEngine *engine)
 			void **ptr = (void**)(((char*)this) + prop->byteOffset);
 			if( *ptr )
 			{
-				((asCScriptEngine*)engine)->CallObjectMethod(*ptr, prop->type.GetBehaviour()->release);
+				asASSERT( (prop->type.GetObjectType()->flags & asOBJ_NOCOUNT) || prop->type.GetBehaviour()->release );
+				if( prop->type.GetBehaviour()->release )
+					((asCScriptEngine*)engine)->CallObjectMethod(*ptr, prop->type.GetBehaviour()->release);
 				*ptr = 0;
 			}
 		}
@@ -496,16 +499,18 @@ void *asCScriptObject::AllocateObject(asCObjectType *objType, asCScriptEngine *e
 
 void asCScriptObject::FreeObject(void *ptr, asCObjectType *objType, asCScriptEngine *engine)
 {
-	if( !objType->beh.release )
+	if( objType->flags & asOBJ_REF )
+	{
+		asASSERT( (objType->flags & asOBJ_NOCOUNT) || objType->beh.release );
+		if( objType->beh.release )
+			engine->CallObjectMethod(ptr, objType->beh.release);
+	}
+	else
 	{
 		if( objType->beh.destruct )
 			engine->CallObjectMethod(ptr, objType->beh.destruct);
 
 		engine->CallFree(ptr);
-	}
-	else
-	{
-		engine->CallObjectMethod(ptr, objType->beh.release);
 	}
 }
 

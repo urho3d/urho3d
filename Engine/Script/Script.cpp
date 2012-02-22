@@ -255,7 +255,7 @@ void Script::DumpAPI()
         const char* propertyName;
         const char* propertyDeclaration;
         int typeId;
-        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, &typeId);
+        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, 0, &typeId);
         propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
         
         String type(propertyDeclaration);
@@ -377,8 +377,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
 
 void Script::ExceptionCallback(asIScriptContext* context)
 {
-    int funcId = context->GetExceptionFunction();
-    const asIScriptFunction *function = scriptEngine_->GetFunctionById(funcId);
+    asIScriptFunction *function = context->GetExceptionFunction();
     String message = "Exception '" + String(context->GetExceptionString()) + "' in '" +
         String(function->GetDeclaration()) + "'";
     

@@ -215,7 +215,8 @@ static void GlobalProperty_ReleaseAllHandles_Generic(asIScriptGeneric *gen)
 void asCGlobalProperty::RegisterGCBehaviours(asCScriptEngine *engine)
 {
 	// Register the gc behaviours for the global properties
-	int r;
+	int r = 0;
+	UNUSED_VAR(r); // It is only used in debug mode
 	engine->globalPropertyBehaviours.engine = engine;
 	engine->globalPropertyBehaviours.flags = asOBJ_REF | asOBJ_GC;
 	engine->globalPropertyBehaviours.name = "_builtin_globalprop_";

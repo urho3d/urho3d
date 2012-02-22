@@ -74,15 +74,6 @@ int asCGeneric::GetFunctionId() const
 	return sysFunction->id;
 }
 
-#ifdef AS_DEPRECATED
-// deprecated since 2011-10-03
-// interface
-asIScriptFunction *asCGeneric::GetFunctionDescriptor() const
-{
-	return sysFunction;
-}
-#endif
-
 // interface
 asIScriptFunction *asCGeneric::GetFunction() const
 {
@@ -269,7 +260,7 @@ void *asCGeneric::GetArgAddress(asUINT arg)
 		offset += sysFunction->parameterTypes[n].GetSizeOnStackDWords();
 
 	// Get the value
-	return (void*)*(size_t*)(&stackPointer[offset]);
+	return (void*)*(asPWORD*)(&stackPointer[offset]);
 }
 
 // interface
@@ -477,7 +468,7 @@ int asCGeneric::SetReturnObject(void *obj)
 		// If function returns object by value the memory is already allocated.
 		// Here we should just initialize that memory by calling the copy constructor
 		// or the default constructor followed by the assignment operator
-		void *mem = (void*)*(size_t*)&stackPointer[-AS_PTR_SIZE];
+		void *mem = (void*)*(asPWORD*)&stackPointer[-AS_PTR_SIZE];
 		engine->ConstructScriptObjectCopy(mem, obj, dt->GetObjectType());
 		return 0;
 	}
@@ -515,7 +506,7 @@ void *asCGeneric::GetAddressOfReturnLocation()
 		{
 			// The memory is already preallocated on the stack,
 			// and the pointer to the location is found before the first arg
-			return (void*)*(size_t*)&stackPointer[-AS_PTR_SIZE];
+			return (void*)*(asPWORD*)&stackPointer[-AS_PTR_SIZE];
 		}
 
 		// Reference types store the handle in the objectReference

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -28,7 +28,6 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Öörni for Urho3D
 
 //
 // as_datatype.cpp
@@ -54,8 +53,6 @@ asCDataType::asCDataType()
 	isObjectHandle = false;
 	isConstHandle  = false;
 	funcDef        = 0;
-	// Urho3D: reset cached type ID
-	cachedTypeId   = 0;
 }
 
 asCDataType::asCDataType(const asCDataType &dt)
@@ -67,8 +64,6 @@ asCDataType::asCDataType(const asCDataType &dt)
 	isObjectHandle = dt.isObjectHandle;
 	isConstHandle  = dt.isConstHandle;
 	funcDef        = dt.funcDef;
-	// Urho3D: copy cached type ID
-	cachedTypeId   = dt.cachedTypeId;
 }
 
 asCDataType::~asCDataType()
@@ -149,7 +144,7 @@ bool asCDataType::IsNullHandle() const
 	return false;
 }
 
-asCString asCDataType::Format() const
+asCString asCDataType::Format(bool includeNamespace) const
 {
 	if( IsNullHandle() )
 		return "<null handle>";
@@ -159,13 +154,21 @@ asCString asCDataType::Format() const
 	if( isReadOnly )
 		str = "const ";
 
+	if( includeNamespace )
+	{
+		if( objectType )
+			str += objectType->nameSpace + "::";
+		else if( funcDef )
+			str += objectType->nameSpace + "::";
+	}
+
 	if( tokenType != ttIdentifier )
 	{
 		str += asCTokenizer::GetDefinition(tokenType);
 	}
 	else if( IsArrayType() && objectType && !objectType->engine->ep.expandDefaultArrayToTemplate )
 	{
-		str += objectType->templateSubType.Format();
+		str += objectType->templateSubType.Format(includeNamespace);
 		str += "[]";
 	}
 	else if( funcDef )
@@ -178,7 +181,7 @@ asCString asCDataType::Format() const
 		if( objectType->flags & asOBJ_TEMPLATE )
 		{
 			str += "<";
-			str += objectType->templateSubType.Format();
+			str += objectType->templateSubType.Format(includeNamespace);
 			str += ">";
 		}
 	}
@@ -200,7 +203,6 @@ asCString asCDataType::Format() const
 	return str;
 }
 
-
 asCDataType &asCDataType::operator =(const asCDataType &dt)
 {
 	tokenType        = dt.tokenType;
@@ -210,17 +212,12 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 	isObjectHandle   = dt.isObjectHandle;
 	isConstHandle    = dt.isConstHandle;
 	funcDef          = dt.funcDef;
-	// Urho3D: copy cached type id
-	cachedTypeId     = dt.cachedTypeId;
 
 	return (asCDataType &)*this;
 }
 
 int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 {
-	// Urho3D: reset cached type ID
-	cachedTypeId = 0;
-
 	if( !b )
 	{
 		isObjectHandle = b;
@@ -253,9 +250,6 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 
 int asCDataType::MakeArray(asCScriptEngine *engine)
 {
-	// Urho3D: reset cached type ID
-	cachedTypeId = 0;
-
 	if( engine->defaultArrayObjectType == 0 )
 		return asINVALID_TYPE;
 
@@ -275,9 +269,6 @@ int asCDataType::MakeArray(asCScriptEngine *engine)
 
 int asCDataType::MakeReference(bool b)
 {
-	// Urho3D: reset cached type ID
-	cachedTypeId = 0;
-
 	isReference = b;
 
 	return 0;
@@ -285,9 +276,6 @@ int asCDataType::MakeReference(bool b)
 
 int asCDataType::MakeReadOnly(bool b)
 {
-	// Urho3D: reset cached type ID
-	cachedTypeId = 0;
-
 	if( isObjectHandle )
 	{
 		isConstHandle = b;
@@ -300,9 +288,6 @@ int asCDataType::MakeReadOnly(bool b)
 
 int asCDataType::MakeHandleToConst(bool b)
 {
-	// Urho3D: reset cached type ID
-	cachedTypeId = 0;
-
 	if( !isObjectHandle ) return -1;
 
 	isReadOnly = b;

@@ -119,9 +119,9 @@
 #define TXT_INVALID_UNICODE_VALUE               "Invalid unicode code point"
 #define TXT_INVALID_UNICODE_SEQUENCE_IN_SRC     "Invalid unicode sequence in source"
 
-#define TXT_METHOD_CANNOT_OVERRIDE_s      "Method '%s' declared as final and cannot be overridden"
+#define TXT_METHOD_CANNOT_OVERRIDE_s                "Method '%s' declared as final and cannot be overridden"
 #define TXT_METHOD_CANT_HAVE_NAME_OF_CLASS          "The method cannot be named with the class name"
-#define TXT_METHOD_s_DOES_NOT_OVERRIDE    "Method '%s' marked as override but does not replace any base class or interface method"
+#define TXT_METHOD_s_DOES_NOT_OVERRIDE              "Method '%s' marked as override but does not replace any base class or interface method"
 #define TXT_MISSING_IMPLEMENTATION_OF_s             "Missing implementation of '%s'"
 #define TXT_MORE_THAN_ONE_MATCHING_OP               "Found more than one matching operator"
 #define TXT_MULTIPLE_MATCHING_SIGNATURES_TO_s       "Multiple matching signatures to '%s'"
@@ -169,16 +169,16 @@
 #define TXT_ONLY_ONE_FUNCTION_ALLOWED      "The code must contain one and only one function"
 #define TXT_ONLY_ONE_VARIABLE_ALLOWED      "The code must contain one and only one global variable"
 
-#define TXT_PARAMETER_ALREADY_DECLARED    "Parameter already declared"
-#define TXT_PARAMETER_CANT_BE_s           "Parameter type can't be '%s'"
-#define TXT_POSSIBLE_LOSS_OF_PRECISION    "Conversion from double to float, possible loss of precision"
-#define TXT_PRIVATE_METHOD_CALL_s         "Illegal call to private method '%s'"
-#define TXT_PRIVATE_PROP_ACCESS_s         "Illegal access to private property '%s'"
-#define TXT_PROPERTY_ACCESSOR_DISABLED    "Property accessors have been disabled by the application"
+#define TXT_PARAMETER_ALREADY_DECLARED            "Parameter already declared"
+#define TXT_PARAMETER_CANT_BE_s                   "Parameter type can't be '%s', because the type cannot be instanciated."
+#define TXT_POSSIBLE_LOSS_OF_PRECISION            "Conversion from double to float, possible loss of precision"
+#define TXT_PRIVATE_METHOD_CALL_s                 "Illegal call to private method '%s'"
+#define TXT_PRIVATE_PROP_ACCESS_s                 "Illegal access to private property '%s'"
+#define TXT_PROPERTY_ACCESSOR_DISABLED            "Property accessors have been disabled by the application"
 #define TXT_PROPERTY_ACCESSOR_MUST_BE_IMPLEMENTED "Property accessor must be implemented"
-#define TXT_PROPERTY_CANT_BE_CONST        "Class properties cannot be declared as const"
-#define TXT_PROPERTY_HAS_NO_GET_ACCESSOR  "The property has no get accessor"
-#define TXT_PROPERTY_HAS_NO_SET_ACCESSOR  "The property has no set accessor"
+#define TXT_PROPERTY_CANT_BE_CONST                "Class properties cannot be declared as const"
+#define TXT_PROPERTY_HAS_NO_GET_ACCESSOR          "The property has no get accessor"
+#define TXT_PROPERTY_HAS_NO_SET_ACCESSOR          "The property has no set accessor"
 
 #define TXT_REF_IS_READ_ONLY                    "Reference is read-only"
 #define TXT_REF_IS_TEMP                         "Reference is temporary"
@@ -215,6 +215,7 @@
 
 // Engine message
 
+#define TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT  "Autohandles cannot be used with types that have been registered with NOCOUNT"
 #define TXT_INVALID_CONFIGURATION                  "Invalid configuration. Verify the registered application interface."
 #define TXT_VALUE_TYPE_MUST_HAVE_SIZE              "A value type must be registered with a non-zero size"
 #define TXT_TYPE_s_IS_MISSING_BEHAVIOURS           "Type '%s' is missing behaviours"

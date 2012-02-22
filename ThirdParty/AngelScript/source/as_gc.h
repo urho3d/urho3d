@@ -127,8 +127,8 @@ protected:
 	asSMapNode<void*, asSIntTypePair> *gcMapCursor;
 
 	// Critical section for multithreaded access
-	DECLARECRITICALSECTION(gcCritical);   // Used for adding/removing objects
-	DECLARECRITICALSECTION(gcCollecting); // Used for processing
+	DECLARECRITICALSECTION(gcCritical)   // Used for adding/removing objects
+	DECLARECRITICALSECTION(gcCollecting) // Used for processing
 };
 
 END_AS_NAMESPACE

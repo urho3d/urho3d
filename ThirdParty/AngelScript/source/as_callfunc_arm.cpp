@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -49,11 +49,11 @@
 
 BEGIN_AS_NAMESPACE
 
-extern "C" asQWORD armFunc(const asDWORD *, int, size_t);
-extern "C" asQWORD armFuncR0(const asDWORD *, int, size_t, asDWORD r0);
-extern "C" asQWORD armFuncR0R1(const asDWORD *, int, size_t, asDWORD r0, asDWORD r1);
-extern "C" asQWORD armFuncObjLast(const asDWORD *, int, size_t, asDWORD obj);
-extern "C" asQWORD armFuncR0ObjLast(const asDWORD *, int, size_t, asDWORD r0, asDWORD obj);
+extern "C" asQWORD armFunc(const asDWORD *, int, asFUNCTION_t);
+extern "C" asQWORD armFuncR0(const asDWORD *, int, asFUNCTION_t, asDWORD r0);
+extern "C" asQWORD armFuncR0R1(const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD r1);
+extern "C" asQWORD armFuncObjLast(const asDWORD *, int, asFUNCTION_t, asDWORD obj);
+extern "C" asQWORD armFuncR0ObjLast(const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD obj);
 
 asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
 {
@@ -61,10 +61,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
 	int callConv = sysFunc->callConv;
 
-	asQWORD  retQW             = 0;
-	void    *func              = (void*)sysFunc->func;
-	int      paramSize         = sysFunc->paramSize;
-	asDWORD *vftable;
+	asQWORD       retQW             = 0;
+	asFUNCTION_t  func              = sysFunc->func;
+	int           paramSize         = sysFunc->paramSize;
+	asFUNCTION_t *vftable;
 
 	if( sysFunc->hostReturnInMemory )
 	{
@@ -80,7 +80,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		int dpos = 1;
 		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 		{
-            if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
+			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
 			{
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
 				if( descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK )
@@ -114,54 +114,51 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		args = &paramBuffer[1];
 	}
 
-	context->isCallingSystemFunction = true;
-
 	switch( callConv )
 	{
 	case ICC_CDECL_RETURNINMEM:     // fall through
 	case ICC_STDCALL_RETURNINMEM:
-        retQW = armFuncR0(args, paramSize<<2, (asDWORD)func, (asDWORD) retPointer);
-        break;
-    case ICC_CDECL:     // fall through
-    case ICC_STDCALL:
-		retQW = armFunc(args, paramSize<<2, (asDWORD)func);
+		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)retPointer);
 		break;
-    case ICC_THISCALL:  // fall through
+	case ICC_CDECL:     // fall through
+	case ICC_STDCALL:
+		retQW = armFunc(args, paramSize<<2, func);
+		break;
+	case ICC_THISCALL:  // fall through
 	case ICC_CDECL_OBJFIRST:
-        retQW = armFuncR0(args, paramSize<<2, (asDWORD)func, (asDWORD) obj);
-        break;
-    case ICC_THISCALL_RETURNINMEM:
+		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)obj);
+		break;
+	case ICC_THISCALL_RETURNINMEM:
 #ifndef __GNUC__
-        retQW = armFuncR0R1(args, paramSize<<2, (asDWORD)func, (asDWORD) obj, (asDWORD) retPointer);
+		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)obj, (asDWORD)retPointer);
 		break;
 #endif
-    case ICC_CDECL_OBJFIRST_RETURNINMEM:
-        retQW = armFuncR0R1(args, paramSize<<2, (asDWORD)func, (asDWORD) retPointer, (asDWORD) obj);
+	case ICC_CDECL_OBJFIRST_RETURNINMEM:
+		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
 		break;
 	case ICC_VIRTUAL_THISCALL:
 		// Get virtual function table from the object pointer
-		vftable = *(asDWORD**)obj;
-        retQW = armFuncR0(args, paramSize<<2, vftable[asDWORD(func)>>2], (asDWORD) obj);
-        break;
-    case ICC_VIRTUAL_THISCALL_RETURNINMEM:
+		vftable = *(asFUNCTION_t**)obj;
+		retQW = armFuncR0(args, paramSize<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj);
+		break;
+	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
 		// Get virtual function table from the object pointer
-		vftable = *(asDWORD**)obj;
+		vftable = *(asFUNCTION_t**)obj;
 #ifndef __GNUC__
-        retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[asDWORD(func)>>2], (asDWORD) retPointer, (asDWORD) obj);
+		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)retPointer, (asDWORD)obj);
 #else
-        retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[asDWORD(func)>>2], (asDWORD) obj, (asDWORD) retPointer);
+		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj, (asDWORD)retPointer);
 #endif
 		break;
 	case ICC_CDECL_OBJLAST:
-		retQW = armFuncObjLast(args, paramSize<<2, (asDWORD)func, (asDWORD) obj);
-        break;
-    case ICC_CDECL_OBJLAST_RETURNINMEM:
-		retQW = armFuncR0ObjLast(args, paramSize<<2, (asDWORD)func, (asDWORD) retPointer, (asDWORD) obj);
+		retQW = armFuncObjLast(args, paramSize<<2, func, (asDWORD)obj);
+		break;
+	case ICC_CDECL_OBJLAST_RETURNINMEM:
+		retQW = armFuncR0ObjLast(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
 		break;
 	default:
 		context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
 	}
-	context->isCallingSystemFunction = false;
 
 	return retQW;
 }

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -91,7 +91,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	{
 		// Get the true function pointer from the virtual function table
 		vftable = *(void***)obj;
-		func = vftable[size_t(func)>>2];
+		func = vftable[asPWORD(func)>>2];
 	}
 
 	// Move the arguments to the buffer
@@ -170,9 +170,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		allArgBuffer[paramSize++] = (asQWORD)obj;
 	}
 
-	context->isCallingSystemFunction = true;
-	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (size_t)func);
-	context->isCallingSystemFunction = false;
+	retQW = CallX64(allArgBuffer, floatArgBuffer, paramSize*8, (asPWORD)func);
 
 	// If the return is a float value we need to get the value from the FP register
 	if( sysFunc->hostReturnFloat )

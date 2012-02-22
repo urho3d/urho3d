@@ -70,7 +70,7 @@ protected:
 	void SetLocalData(asPWORD threadId, asCThreadLocalData *tld);
 
 	asCMap<asPWORD,asCThreadLocalData*> tldMap;
-	DECLARECRITICALSECTION(criticalSection);
+	DECLARECRITICALSECTION(criticalSection)
 #else
 	asCThreadLocalData *tld;
 #endif

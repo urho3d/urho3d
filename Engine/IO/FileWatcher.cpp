@@ -108,7 +108,7 @@ void FileWatcher::StopWatching()
 void FileWatcher::ThreadFunction()
 {
 #if defined(WIN32) && defined(ENABLE_FILEWATCHER)
-    char buffer[BUFFERSIZE];
+    unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
     
     while (shouldRun_)
@@ -125,7 +125,7 @@ void FileWatcher::ThreadFunction()
         {
             unsigned offset = 0;
             
-            for (;;)
+            while (offset < bytesFilled)
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
                 
