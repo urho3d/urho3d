@@ -23,31 +23,45 @@
 
 #pragma once
 
-/// Operating system thread.
-class Thread
+#include "List.h"
+#include "Mutex.h"
+#include "Object.h"
+#include "Thread.h"
+
+/// Watches a path and its subdirectories for files being modified
+class FileWatcher : public Object, public Thread
 {
+    OBJECT(FileWatcher);
+    
 public:
-    /// Construct. Does not start the thread yet.
-    Thread();
-    /// Destruct. If running, stop and wait for thread to finish.
-    virtual ~Thread();
+    /// Construct.
+    FileWatcher(Context* context);
+    /// Destruct.
+    virtual ~FileWatcher();
     
-    /// The function to run in the thread.
-    virtual void ThreadFunction() = 0;
+    /// Directory watching loop.
+    virtual void ThreadFunction();
     
-    /// Start running the thread. Return true if successful, or false if already running or if can not create the thread.
-    bool Start();
-    /// %Set the running flag to false and wait for the thread to finish.
-    void Stop();
-    /// %Set thread priority. The thread must have been started first.
-    void SetPriority(int priority);
+    /// Start watching a directory. Return true if successful.
+    bool StartWatching(const String& path, bool watchSubDirs);
+    /// Stop watching the directory.
+    void StopWatching();
+    /// Return a file change (true if was found, false if not.)
+    bool GetNextChange(String& dest);
     
-    /// Return whether thread exists
-    bool IsStarted() const { return handle_ != 0; }
+    /// Return the path being watched, or empty if not watching.
+    const String& GetPath() const { return path_; }
     
-protected:
-    /// Thread handle.
-    void* handle_;
-    /// Running flag.
-    volatile bool shouldRun_;
+private:
+    /// The path being watched.
+    String path_;
+    /// Buffered file changes.
+    List<String> changes_;
+    /// Mutex for the change buffer.
+    Mutex changesMutex_;
+    /// Watch subdirectories flag.
+    bool watchSubDirs_;
+    
+    // Directory handle for the path being watched
+    void* dirHandle_;
 };

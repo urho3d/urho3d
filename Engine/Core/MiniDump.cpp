@@ -28,7 +28,6 @@
 #include "ProcessUtils.h"
 
 #include <cstdio>
-#include <list>
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>

@@ -1053,6 +1053,7 @@ Properties:<br>
 - uint totalMemoryUse (readonly)
 - String[]@ resourceDirs (readonly)
 - PackageFile@[]@ packageFiles (readonly)
+- bool autoReloadResources
 
 
 Image

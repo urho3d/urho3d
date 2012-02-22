@@ -22,6 +22,8 @@ void Start()
     SubscribeToEvent("Update", "HandleUpdate");
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
+    // Enable automatic resource reloading
+    cache.autoReloadResources = true;
 
     CreateScene();
     CreateUI();

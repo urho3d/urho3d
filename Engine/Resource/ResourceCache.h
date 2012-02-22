@@ -26,6 +26,7 @@
 #include "File.h"
 #include "Resource.h"
 
+class FileWatcher;
 class PackageFile;
 
 /// Container of resources with specific type.
@@ -83,6 +84,8 @@ public:
     bool ReloadResource(Resource* resource);
     /// %Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    /// Enable or disable automatic reloading of resources as files are modified.
+    void SetAutoReloadResources(bool enable);
     
     /// Open and return a file from either the resource load paths or from inside a package file. Return null if fails.
     SharedPtr<File> GetFile(const String& name);
@@ -116,6 +119,9 @@ public:
     unsigned GetTotalMemoryUse() const;
     /// Return resource name from hash, or empty if not found.
     const String& GetResourceName(StringHash nameHash) const;
+    /// Return whether automatic resource reloading is enabled.
+    bool GetAutoReloadResources() const { return autoReloadResources_; }
+    
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path);
     /// Remove unsupported constructs from the resource name to prevent ambiguity.
@@ -130,15 +136,21 @@ private:
     void ReleasePackageResources(PackageFile* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
     void UpdateResourceGroup(ShortStringHash type);
+    /// Handle begin frame event. Automatic resource reloads are processed here.
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Resources by type.
     Map<ShortStringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
     Vector<String> resourceDirs_;
+    /// File watchers for resource directories, if automatic reloading enabled.
+    Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames.
     Map<StringHash, String> hashToName_;
+    /// Automatic resource reloading flag.
+    bool autoReloadResources_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name)

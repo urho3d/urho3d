@@ -23,7 +23,9 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "FileSystem.h"
+#include "FileWatcher.h"
 #include "Image.h"
 #include "Log.h"
 #include "PackageFile.h"
@@ -57,8 +59,10 @@ static const SharedPtr<Resource> noResource;
 OBJECTTYPESTATIC(ResourceCache);
 
 ResourceCache::ResourceCache(Context* context) :
-    Object(context)
+    Object(context),
+    autoReloadResources_(false)
 {
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
@@ -90,6 +94,14 @@ bool ResourceCache::AddResourceDir(const String& pathName)
     fileSystem->ScanDir(fileNames, fixedPath, "*.*", SCAN_FILES, true);
     for (unsigned i = 0; i < fileNames.Size(); ++i)
         StoreNameHash(fileNames[i]);
+    
+    // If resource auto-reloading active, create a file watcher for the directory
+    if (autoReloadResources_)
+    {
+        SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
+        watcher->StartWatching(fixedPath, true);
+        fileWatchers_.Push(watcher);
+    }
     
     LOGINFO("Added resource path " + fixedPath);
     return true;
@@ -139,11 +151,13 @@ bool ResourceCache::AddManualResource(Resource* resource)
 void ResourceCache::RemoveResourceDir(const String& path)
 {
     String fixedPath = AddTrailingSlash(path);
-    for (Vector<String>::Iterator i = resourceDirs_.Begin(); i != resourceDirs_.End(); ++i)
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        if (!i->Compare(path, false))
+        if (!resourceDirs_[i].Compare(path, false))
         {
             resourceDirs_.Erase(i);
+            if (fileWatchers_.Size() > i)
+                fileWatchers_.Erase(i);
             LOGINFO("Removed resource path " + fixedPath);
             return;
         }
@@ -311,6 +325,26 @@ bool ResourceCache::ReloadResource(Resource* resource)
 void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
 {
     resourceGroups_[type].memoryBudget_ = budget;
+}
+
+void ResourceCache::SetAutoReloadResources(bool enable)
+{
+    if (enable != autoReloadResources_)
+    {
+        if (enable)
+        {
+            for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+            {
+                SharedPtr<FileWatcher> watcher(new FileWatcher(context_));
+                watcher->StartWatching(resourceDirs_[i], true);
+                fileWatchers_.Push(watcher);
+            }
+        }
+        else
+            fileWatchers_.Clear();
+        
+        autoReloadResources_ = enable;
+    }
 }
 
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
@@ -619,6 +653,30 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
         }
         else
             break;
+    }
+}
+
+void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    if (!autoReloadResources_)
+        return;
+    
+    for (unsigned i = 0; i < fileWatchers_.Size(); ++i)
+    {
+        String fileName;
+        while (fileWatchers_[i]->GetNextChange(fileName))
+        {
+            // If the filename is a resource we keep track of, reload it
+            for (Map<ShortStringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin(); j != resourceGroups_.End(); ++j)
+            {
+                Map<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(StringHash(fileName));
+                if (k != j->second_.resources_.End())
+                {
+                    LOGDEBUG("Reloading changed resource " + fileName);
+                    ReloadResource(k->second_);
+                }
+            }
+        }
     }
 }
 

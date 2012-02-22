@@ -586,7 +586,7 @@ To create a user variable into the current node, or delete it, type the variable
 
 While editing, you can execute script files using the "Run script" item in the %File menu. These are AngelScript files that are executed in immediate mode ie. you do not need to define a function. The editor's scene will be accessible to the script as the global property "scene."
 
-Currently, when you edit for example a material or texture, you need to manually reload scene resources (Ctrl+R) to make the changes visible.
+Automatic resource reloading when changed (for example editing a texture in a paint program while the scene editor is running) is currently supported on Windows only. On other platforms you need to manually reload scene resources (Ctrl+R) after editing to make the changes visible.
 
 Components of same type can be multi-edited. Where attribute values differ, the attribute field will be left blank, but editing the attribute will apply the change to all components.
 
