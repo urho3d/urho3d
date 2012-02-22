@@ -23,8 +23,8 @@
 
 #include "Precompiled.h"
 #include "File.h"
-#include "FileWatcher.h"
 #include "FileSystem.h"
+#include "FileWatcher.h"
 #include "Log.h"
 
 #ifdef WIN32
@@ -51,7 +51,7 @@ bool FileWatcher::StartWatching(const String& path, bool watchSubDirs)
     // Stop any previous watching
     StopWatching();
     
-#ifdef WIN32
+#if defined(WIN32) && defined(ENABLE_FILEWATCHER)
     String nativePath = GetNativePath(RemoveTrailingSlash(path));
     
     dirHandle_ = (void*)CreateFile(
@@ -107,7 +107,7 @@ void FileWatcher::StopWatching()
 
 void FileWatcher::ThreadFunction()
 {
-#ifdef WIN32
+#if defined(WIN32) && defined(ENABLE_FILEWATCHER)
     char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
     

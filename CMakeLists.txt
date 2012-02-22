@@ -18,6 +18,10 @@ if (MSVC)
     add_definitions (-DENABLE_MINIDUMPS)
 endif ()
 
+# Enable file watcher support for automatic resource reloads. On Windows this uses a function that
+# requires Windows XP or newer, so disable it if you want Windows 2000 compatibility.
+add_definitions (-DENABLE_FILEWATCHER)
+
 # Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not
 # instantiated.
 add_definitions (-DENABLE_PROFILING)
