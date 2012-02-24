@@ -194,14 +194,16 @@ const FontFace* Font::GetFace(int pointSize)
     unsigned numGlyphs = 0;
     
     // Build glyph mapping
-    /// \todo Find out the Unicode range more intelligently, and support all characters
-    for (unsigned i = 0; i < 65536; ++i)
+    FT_UInt glyphIndex;
+    FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
+    while (glyphIndex != 0)
     {
-        unsigned index = FT_Get_Char_Index(face, i);
-        numGlyphs = Max((int)index + 1, (int)numGlyphs);
-        if (index)
-            newFace->glyphMapping_[i] = index; // Glyph 0 is default, build a "sparse" map
+        numGlyphs = Max((int)glyphIndex + 1, (int)numGlyphs);
+        newFace->glyphMapping_[charCode] = glyphIndex;
+        charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
+    
+    LOGDEBUG("Font face has " + String(numGlyphs) + " glyphs");
     
     // Load each of the glyphs to see the sizes & store other information
     int maxOffsetY = 0;
