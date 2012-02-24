@@ -355,7 +355,7 @@ public:
     void SetUTF8FromWChar(const wchar_t* str);
     /// Calculate number of characters in UTF8 content.
     unsigned LengthUTF8() const;
-    /// Return byte offset for UTF8 index.
+    /// Return byte offset to char in UTF8 content.
     unsigned ByteOffsetUTF8(unsigned index) const;
     /// Return next Unicode character from UTF8 content and increase byte offset.
     unsigned NextUTF8Char(unsigned& byteOffset) const;
@@ -464,7 +464,7 @@ inline String operator + (const char* lhs, const String& rhs)
     return ret;
 }
 
-/// Wide character string. Only meant for converting from UTF8 String and passing to the operating system where necessary.
+/// Wide character string. Only meant for converting from String and passing to the operating system where necessary.
 class WString
 {
 public:
@@ -475,9 +475,16 @@ public:
     /// Destruct.
     ~WString();
     
-    /// Resize string.
+    /// Return char at index.
+    wchar_t& operator [] (unsigned index) { assert(index < length_); return buffer_[index]; }
+    /// Return const char at index.
+    const wchar_t& operator [] (unsigned index) const { assert(index < length_); return buffer_[index]; }
+    /// Return char at index.
+    wchar_t& At(unsigned index) { assert(index < length_); return buffer_[index]; }
+    /// Return const char at index.
+    const wchar_t& At(unsigned index) const { assert(index < length_); return buffer_[index]; }
+    /// Resize the string.
     void Resize(unsigned newSize);
-    
     /// Return whether the string is empty.
     bool Empty() const { return length_ == 0; }
     /// Return length.

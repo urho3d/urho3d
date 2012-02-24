@@ -40,7 +40,7 @@ void PrintLine(const String& str);
 /// Print to the console. A newline will be added automatically.
 void PrintLine(const char* str);
 /// Parse arguments from the command line.
-const Vector<String>& ParseArguments(const char* cmdLine);
+const Vector<String>& ParseArguments(const String& cmdLine);
 /// Return previously parsed arguments.
 const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.

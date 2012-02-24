@@ -146,29 +146,25 @@ void PrintLine(const char* str)
     printf("%s\n", str);
 }
 
-const Vector<String>& ParseArguments(const char* cmdLine)
+const Vector<String>& ParseArguments(const String& cmdLine)
 {
     arguments.Clear();
     
-    if (!cmdLine)
-        return arguments;
-    
-    String cmdStr(cmdLine);
     unsigned cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
     
-    for (unsigned i = 0; i < cmdStr.Length(); ++i)
+    for (unsigned i = 0; i < cmdLine.Length(); ++i)
     {
-        if (cmdStr[i] == '\"')
+        if (cmdLine[i] == '\"')
             inQuote = !inQuote;
-        if (cmdStr[i] == ' ' && !inQuote)
+        if (cmdLine[i] == ' ' && !inQuote)
         {
             if (inCmd)
             {
                 inCmd = false;
                 cmdEnd = i;
-                arguments.Push(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
+                arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
             }
         }
         else
@@ -182,8 +178,8 @@ const Vector<String>& ParseArguments(const char* cmdLine)
     }
     if (inCmd)
     {
-        cmdEnd = cmdStr.Length();
-        arguments.Push(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
+        cmdEnd = cmdLine.Length();
+        arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
     }
     
     return arguments;

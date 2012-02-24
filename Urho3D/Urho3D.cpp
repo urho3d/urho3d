@@ -38,7 +38,11 @@
 
 #include "DebugNew.h"
 
+#ifdef WIN32
+void Run(const wchar_t* cmdLineW);
+#else
 void Run(const char* cmdLine);
+#endif
 
 #ifdef WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -50,11 +54,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     #if defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
     __try
     {
-        Run(cmdLine);
+        Run(GetCommandLineW());
     }
     __except(WriteMiniDump("Urho3D", GetExceptionInformation())) {}
     #else
-    Run(cmdLine);
+    Run(GetCommandLineW());
     #endif
 
     return 0;
@@ -63,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 int main(int argc, char** argv)
 {
     String cmdLine;
-    for (int i = 1; i < argc; ++i)
+    for (int i = 0; i < argc; ++i)
     {
         if (i > 1)
             cmdLine += ' ';
@@ -75,14 +79,22 @@ int main(int argc, char** argv)
 }
 #endif
 
+#ifdef WIN32
+void Run(const wchar_t* cmdLineW)
+{
+    String cmdLineStr(cmdLineW);
+#else
 void Run(const char* cmdLine)
 {
+    String cmdLineStr(cmdLine);
+#endif
+    
     try
     {
         // Check for script file name
-        const Vector<String>& arguments = ParseArguments(cmdLine);
+        const Vector<String>& arguments = ParseArguments(cmdLineStr);
         String scriptFileName;
-        for (unsigned i = 0; i < arguments.Size(); ++i)
+        for (unsigned i = 1; i < arguments.Size(); ++i)
         {
             if (arguments[i][0] != '-')
             {
