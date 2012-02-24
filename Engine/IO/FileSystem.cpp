@@ -398,13 +398,13 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     
     #ifdef WIN32
     String pathAndFilter = GetNativePath(path + filter);
-    WIN32_FIND_DATA info;
+    WIN32_FIND_DATAW info;
     HANDLE handle = FindFirstFileW(WString(pathAndFilter).CString(), &info);
     if (handle != INVALID_HANDLE_VALUE)
     {
         do
         {
-            String fileName((const char*)&info.cFileName[0]);
+            String fileName(info.cFileName);
             if (!fileName.Empty())
             {
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN && !(flags & SCAN_HIDDEN))

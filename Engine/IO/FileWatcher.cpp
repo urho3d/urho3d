@@ -132,10 +132,10 @@ void FileWatcher::ThreadFunction()
                 if (record->Action == FILE_ACTION_MODIFIED) // Modify
                 {
                     String fileName;
-                    fileName.Resize(record->FileNameLength / 2);
-                    /// \todo Proper Unicode filename support
-                    for (unsigned i = 0; i < record->FileNameLength / 2; ++i)
-                        fileName[i] = (char)record->FileName[i];
+                    const wchar_t* src = record->FileName;
+                    const wchar_t* end = src + record->FileNameLength / 2;
+                    while (src < end)
+                        fileName.AppendUTF8(String::DecodeUTF16(src));
                     
                     fileName = GetInternalPath(fileName);
                     
