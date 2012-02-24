@@ -137,7 +137,7 @@ public:
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to a key press translated to a character.
-    virtual void OnChar(unsigned char c, int buttons, int qualifiers);
+    virtual void OnChar(unsigned c, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
     

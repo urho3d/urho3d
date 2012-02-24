@@ -27,4 +27,4 @@
 #include "HashSet.h"
 #include "Map.h"
 #include "Sort.h"
-#include "StringBase.h"
+#include "Str.h"

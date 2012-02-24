@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "StringBase.h"
+#include "Str.h"
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>

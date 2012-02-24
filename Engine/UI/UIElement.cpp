@@ -294,7 +294,7 @@ void UIElement::OnKey(int key, int buttons, int qualifiers)
 {
 }
 
-void UIElement::OnChar(unsigned char c, int buttons, int qualifiers)
+void UIElement::OnChar(unsigned c, int buttons, int qualifiers)
 {
 }
 

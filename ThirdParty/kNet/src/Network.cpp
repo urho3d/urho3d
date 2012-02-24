@@ -17,7 +17,7 @@
 
 // Modified by Lasse Öörni for Urho3D
 
-#include "StringBase.h"
+#include "Str.h"
 
 #include <cassert>
 

@@ -28,6 +28,7 @@
 #include "Input.h"
 #include "Log.h"
 #include "Profiler.h"
+#include "StringUtils.h"
 
 #include <cstring>
 
@@ -612,17 +613,13 @@ void CharCallback(GLFWwindow window, int key)
     if (!instance)
         return;
     
-    if (key < 256)
-    {
-        using namespace Char;
-        
-        VariantMap keyEventData;
-        keyEventData[P_CHAR] = key;
-        keyEventData[P_BUTTONS] = instance->mouseButtonDown_;
-        keyEventData[P_QUALIFIERS] = instance->GetQualifiers();
-        instance->SendEvent(E_CHAR, keyEventData);
-
-    }
+    using namespace Char;
+    
+    VariantMap keyEventData;
+    keyEventData[P_CHAR] = key;
+    keyEventData[P_BUTTONS] = instance->mouseButtonDown_;
+    keyEventData[P_QUALIFIERS] = instance->GetQualifiers();
+    instance->SendEvent(E_CHAR, keyEventData);
 }
 
 void MouseButtonCallback(GLFWwindow window, int button, int action)

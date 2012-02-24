@@ -256,6 +256,14 @@ Methods:<br>
 - String ToUpper() const
 - String ToLower() const
 - String Trimmed() const
+- void SetUTF8FromLatin1(const String&)
+- uint ByteOffsetUTF8(uint) const
+- uint NextUTF8Char(uint&) const
+- uint AtUTF8(uint) const
+- void ReplaceUTF8(uint, uint)
+- void AppendUTF8(uint)
+- String SubstringUTF8(uint) const
+- String SubstringUTF8(uint, uint) const
 - int Compare(const String&, bool arg1 = true) const
 - String[]@ Split(uint8) const
 - bool ToBool() const
@@ -271,6 +279,7 @@ Methods:<br>
 - Vector4 ToVector4(bool arg0 = false) const
 
 Properties:<br>
+- uint utf8Length (readonly)
 - uint length (readonly)
 - bool empty (readonly)
 

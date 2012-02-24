@@ -23,8 +23,6 @@
 
 #pragma once
 
-// Note: this file is named StringBase.h to prevent conflicts with C headers
-
 #include "Vector.h"
 
 #include <cstring>
@@ -337,6 +335,29 @@ public:
     /// Return comparision result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
     
+    /// Construct UTF8 content from Latin1.
+    void SetUTF8FromLatin1(const char* str);
+    /// Construct UTF8 content from wide characters.
+    void SetUTF8FromWChar(const wchar_t* str);
+    /// Convert UTF8 content to wide characters.
+    void WCharString(wchar_t* dest, unsigned maxLength) const;
+    /// Calculate number of characters in UTF8 content.
+    unsigned LengthUTF8() const;
+    /// Return byte offset for UTF8 index.
+    unsigned ByteOffsetUTF8(unsigned index) const;
+    /// Return next Unicode character from UTF8 content and increase byte offset.
+    unsigned NextUTF8Char(unsigned& byteOffset) const;
+    /// Return Unicode character at index from UTF8 content.
+    unsigned AtUTF8(unsigned index) const;
+    /// Replace Unicode character at index from UTF8 content.
+    void ReplaceUTF8(unsigned index, unsigned unicodeChar);
+    /// Append Unicode character at the end as UTF8.
+    void AppendUTF8(unsigned unicodeChar);
+    /// Return a UTF8 substring from position to end.
+    String SubstringUTF8(unsigned pos) const;
+    /// Return a UTF8 substring with length from position.
+    String SubstringUTF8(unsigned pos, unsigned length) const;
+    
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const
     {
@@ -353,6 +374,16 @@ public:
     
     /// Return substrings split by a separator char.
     static Vector<String> Split(const char* str, char separator);
+    /// Encode Unicode character to UTF8. Pointer will be incremented.
+    static void EncodeUTF8(char*& dest, unsigned unicodeChar);
+    /// Decode Unicode character from UTF8. Pointer will be incremented.
+    static unsigned DecodeUTF8(const char*& src);
+    #ifdef WIN32
+    /// Encode Unicode character to UTF16. Pointer will be incremented.
+    static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
+    /// Decode Unicode character from UTF16. Pointer will be incremented.
+    static unsigned DecodeUTF16(const wchar_t*& src);
+    #endif
     
     /// Return length of a C string.
     static unsigned CStringLength(const char* str)

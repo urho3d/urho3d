@@ -20,7 +20,7 @@
 #include <cassert>
 #include <utility>
 
-#include "StringBase.h"
+#include "Str.h"
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>

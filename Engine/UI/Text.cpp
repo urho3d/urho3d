@@ -218,9 +218,12 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
         
-        for (unsigned i = 0; i < printText_.Length(); ++i)
+        unsigned utf8Length = printText_.LengthUTF8();
+        unsigned charPos = 0;
+        
+        for (unsigned i = 0; i < utf8Length; ++i)
         {
-            unsigned char c = (unsigned char)printText_[i];
+            unsigned c = printText_.NextUTF8Char(charPos);
             
             if (c != '\n')
             {
@@ -355,40 +358,52 @@ void Text::UpdateText(bool inResize)
         int rowWidth = 0;
         int rowHeight = (int)(rowSpacing_ * rowHeight_);
         
+        unsigned utf8Length = text_.LengthUTF8();
+        
         // First see if the text must be split up
         if (!wordWrap_)
         {
             printText_ = text_;
-            printToText.Resize(text_.Length());
-            for (unsigned i = 0; i < text_.Length(); ++i)
+            printToText.Resize(utf8Length);
+            for (unsigned i = 0; i < utf8Length; ++i)
                 printToText[i] = i;
         }
         else
         {
+            /// \todo Optimize AtUTF8() away
             int maxWidth = GetWidth();
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
-            for (unsigned i = 0; i < text_.Length(); ++i)
+            unsigned charPosI = 0;
+            unsigned charPosJ = 0;
+            unsigned oldCharPosI = 0;
+            for (unsigned i = 0; i < utf8Length; ++i)
             {
                 unsigned j;
-                if (text_[i] != '\n')
+                oldCharPosI = charPosI;
+                unsigned charAtI = text_.NextUTF8Char(charPosI);
+                
+                if (charAtI != '\n')
                 {
                     bool ok = true;
                     
                     if (nextBreak <= i)
                     {
                         int futureRowWidth = rowWidth;
-                        for (j = i; j < text_.Length(); ++j)
+                        charPosJ = charPosI;
+                        for (j = i; j < utf8Length; ++j)
                         {
-                            if (text_[j] == ' ' || text_[j] == '\n')
+                            unsigned charAtJ = text_.NextUTF8Char(charPosJ);
+                            unsigned charPosJCopy = charPosJ;
+                            if (charAtJ == ' ' || charAtJ == '\n')
                             {
                                 nextBreak = j;
                                 break;
                             }
-                            futureRowWidth += face->GetGlyph(text_[j]).advanceX_;
-                            if (j < text_.Length() - 1)
-                                futureRowWidth += face->GetKerning(text_[j], text_[j + 1]);
-                            if (text_[j] == '-' && futureRowWidth <= maxWidth)
+                            futureRowWidth += face->GetGlyph(charAtJ).advanceX_;
+                            if (j < utf8Length - 1)
+                                futureRowWidth += face->GetKerning(charAtJ, text_.NextUTF8Char(charPosJCopy));
+                            if (charAtJ == '-' && futureRowWidth <= maxWidth)
                             {
                                 nextBreak = j + 1;
                                 break;
@@ -406,29 +421,33 @@ void Text::UpdateText(bool inResize)
                         // If did not find any breaks on the line, copy until j, or at least 1 char, to prevent infinite loop
                         if (nextBreak == lineStart)
                         {
-                            int copyLength = Max(j - i, 1);
-                            printText_ += text_.Substring(i, copyLength);
-                            for (int k = 0; k < copyLength; ++k)
+                            charPosI = oldCharPosI;
+                            while (i < j)
                             {
+                                printText_.AppendUTF8(text_.NextUTF8Char(charPosI)),
                                 printToText.Push(i);
                                 ++i;
                             }
+                            oldCharPosI = charPosI;
                         }
                         printText_ += '\n';
-                        printToText.Push(Min((int)i, (int)text_.Length() - 1));
+                        printToText.Push(Min((int)i, (int)utf8Length - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
                     
-                    if (i < text_.Length())
+                    if (i < utf8Length)
                     {
+                        charPosI = oldCharPosI;
+                        charAtI = text_.NextUTF8Char(charPosI);
+                        unsigned charPosICopy = charPosI;
                         // When copying a space, position is allowed to be over row width
-                        rowWidth += face->GetGlyph(text_[i]).advanceX_;
+                        rowWidth += face->GetGlyph(charAtI).advanceX_;
                         if (i < text_.Length() - 1)
-                            rowWidth += face->GetKerning(text_[i], text_[i + 1]);
+                            rowWidth += face->GetKerning(charAtI, text_.NextUTF8Char(charPosICopy));
                         if (rowWidth <= maxWidth)
                         {
-                            printText_ += text_[i];
+                            printText_ += charAtI;
                             printToText.Push(i);
                         }
                     }
@@ -436,7 +455,7 @@ void Text::UpdateText(bool inResize)
                 else
                 {
                     printText_ += '\n';
-                    printToText.Push(Min((int)i, (int)text_.Length() - 1));
+                    printToText.Push(Min((int)i, (int)utf8Length - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -445,16 +464,21 @@ void Text::UpdateText(bool inResize)
         
         rowWidth = 0;
         
-        for (unsigned i = 0; i < printText_.Length(); ++i)
+        unsigned printUtf8Length = printText_.LengthUTF8();
+        unsigned charPos = 0;
+        for (unsigned i = 0; i < printUtf8Length; ++i)
         {
-            unsigned char c = (unsigned char)printText_[i];
+            unsigned c = printText_.NextUTF8Char(charPos);
             
             if (c != '\n')
             {
                 const FontGlyph& glyph = face->GetGlyph(c);
                 rowWidth += glyph.advanceX_;
-                if (i < printText_.Length() - 1)
-                    rowWidth += face->GetKerning(c, printText_[i + 1]);
+                if (i < printUtf8Length - 1)
+                {
+                    unsigned charPosCopy = charPos;
+                    rowWidth += face->GetKerning(c, printText_.NextUTF8Char(charPosCopy));
+                }
             }
             else
             {
@@ -477,23 +501,27 @@ void Text::UpdateText(bool inResize)
             height = rowHeight;
         
         // Store position & size of each character
-        charPositions_.Resize(text_.Length() + 1);
-        charSizes_.Resize(text_.Length());
+        charPositions_.Resize(utf8Length + 1);
+        charSizes_.Resize(utf8Length);
         
         unsigned rowIndex = 0;
+        charPos = 0;
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
-        for (unsigned i = 0; i < printText_.Length(); ++i)
+        for (unsigned i = 0; i < printUtf8Length; ++i)
         {
             charPositions_[printToText[i]] = IntVector2(x, y);
-            unsigned char c = (unsigned char)printText_[i];
+            unsigned c = printText_.NextUTF8Char(charPos);
             if (c != '\n')
             {
                 const FontGlyph& glyph = face->GetGlyph(c);
                 charSizes_[printToText[i]] = IntVector2(glyph.advanceX_, rowHeight_);
                 x += glyph.advanceX_;
-                if (i < printText_.Length() - 1)
-                    x += face->GetKerning(c, printText_[i + 1]);
+                if (i < printUtf8Length - 1)
+                {
+                    unsigned charPosCopy = charPos;
+                    x += face->GetKerning(c, printText_.NextUTF8Char(charPosCopy));
+                }
             }
             else
             {
@@ -504,7 +532,7 @@ void Text::UpdateText(bool inResize)
             }
         }
         // Store the ending position
-        charPositions_[text_.Length()] = IntVector2(x, y);
+        charPositions_[utf8Length] = IntVector2(x, y);
     }
     
     // Set minimum and current size according to the text size, but respect fixed width if set
@@ -518,7 +546,7 @@ void Text::UpdateText(bool inResize)
 
 void Text::ValidateSelection()
 {
-    unsigned textLength = text_.Length();
+    unsigned textLength = text_.LengthUTF8();
     
     if (textLength)
     {

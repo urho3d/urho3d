@@ -73,12 +73,16 @@ FontFace::~FontFace()
 {
 }
 
-const FontGlyph& FontFace::GetGlyph(unsigned char c) const
+const FontGlyph& FontFace::GetGlyph(unsigned c) const
 {
-    return glyphs_[glyphIndex_[c]];
+    Map<unsigned, unsigned>::ConstIterator i = glyphMapping_.Find(c);
+    if (i != glyphMapping_.End())
+        return glyphs_[i->second_];
+    else
+        return glyphs_[0];
 }
 
-short FontFace::GetKerning(unsigned char c, unsigned char d) const
+short FontFace::GetKerning(unsigned c, unsigned d) const
 {
     if (!hasKerning_)
         return 0;
@@ -86,9 +90,20 @@ short FontFace::GetKerning(unsigned char c, unsigned char d) const
     if (c == '\n' || d == '\n')
         return 0;
     
-    unsigned short leftIndex = glyphIndex_[c];
-    unsigned short rightIndex = glyphIndex_[d];
-    return glyphs_[leftIndex].kerning_[rightIndex];
+    unsigned leftIndex = 0;
+    unsigned rightIndex = 0;
+    Map<unsigned, unsigned>::ConstIterator leftIt = glyphMapping_.Find(c);
+    Map<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(c);
+    if (leftIt != glyphMapping_.End())
+        leftIndex = leftIt->second_;
+    if (rightIt != glyphMapping_.End())
+        rightIndex = rightIt->second_;
+    
+    Map<unsigned, unsigned>::ConstIterator kerningIt = glyphs_[leftIndex].kerning_.Find(rightIndex);
+    if (kerningIt != glyphs_[leftIndex].kerning_.End())
+        return kerningIt->second_;
+    else
+        return 0;
 }
 
 OBJECTTYPESTATIC(FreeTypeLibrary);
@@ -176,34 +191,27 @@ const FontFace* Font::GetFace(int pointSize)
     SharedPtr<FontFace> newFace(new FontFace());
     
     FT_GlyphSlot slot = face->glyph;
-    unsigned freeIndex = 0;
-    Map<unsigned, unsigned> toRemapped;
-    PODVector<unsigned> toOriginal;
+    unsigned numGlyphs = 0;
     
-    // Build glyph mapping. Only render the glyphs needed by the charset
-    for (unsigned i = 0; i < MAX_FONT_CHARS; ++i)
+    // Build glyph mapping
+    /// \todo Find out the Unicode range more intelligently, and support all characters
+    for (unsigned i = 0; i < 65536; ++i)
     {
         unsigned index = FT_Get_Char_Index(face, i);
-        if (!toRemapped.Contains(index))
-        {
-            newFace->glyphIndex_[i] = freeIndex;
-            toRemapped[index] = freeIndex;
-            toOriginal.Push(index);
-            ++freeIndex;
-        }
-        else
-            newFace->glyphIndex_[i] = toRemapped[index];
+        numGlyphs = Max((int)index + 1, (int)numGlyphs);
+        if (index)
+            newFace->glyphMapping_[i] = index; // Glyph 0 is default, build a "sparse" map
     }
     
     // Load each of the glyphs to see the sizes & store other information
     int maxOffsetY = 0;
     int maxHeight = 0;
     
-    for (unsigned i = 0; i < toOriginal.Size(); ++i)
+    for (unsigned i = 0; i < numGlyphs; ++i)
     {
         FontGlyph newGlyph;
         
-        error = FT_Load_Glyph(face, toOriginal[i], FT_LOAD_DEFAULT);
+        error = FT_Load_Glyph(face, i, FT_LOAD_DEFAULT);
         if (!error)
         {
             // Note: position within texture will be filled later
@@ -236,13 +244,10 @@ const FontFace* Font::GetFace(int pointSize)
         
         for (unsigned i = 0; i < numGlyphs; ++i)
         {
-            newFace->glyphs_[i].kerning_.Resize(numGlyphs);
             for (unsigned j = 0; j < numGlyphs; ++j)
             {
-                unsigned leftIndex = toOriginal[i];
-                unsigned rightIndex = toOriginal[j];
                 FT_Vector vector;
-                FT_Get_Kerning(face, leftIndex, rightIndex, FT_KERNING_DEFAULT, &vector);
+                FT_Get_Kerning(face, i, j, FT_KERNING_DEFAULT, &vector);
                 newFace->glyphs_[i].kerning_[j] = (short)(vector.x >> 6);
             }
         }
@@ -334,7 +339,10 @@ const FontFace* Font::GetFace(int pointSize)
     unsigned samples = 0;
     for (unsigned i = 0; i < newFace->glyphs_.Size(); ++i)
     {
-        FT_Load_Glyph(face, toOriginal[i], FT_LOAD_DEFAULT);
+        if (!newFace->glyphs_[i].width_ || !newFace->glyphs_[i].height_)
+            continue;
+        
+        FT_Load_Glyph(face, i, FT_LOAD_DEFAULT);
         FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
         
         unsigned char glyphOpacity = 0;

@@ -20,7 +20,7 @@
 
 #include <cassert>
 
-#include "StringBase.h"
+#include "Str.h"
 
 #include "kNetBuildConfig.h"
 #include "kNet/SharedPtr.h"

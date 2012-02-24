@@ -26,6 +26,6 @@
 #include "HashMap.h"
 #include "HashSet.h"
 #include "Map.h"
-#include "StringBase.h"
+#include "Str.h"
 
 #include <kNet.h>

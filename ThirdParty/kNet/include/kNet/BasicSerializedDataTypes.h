@@ -19,7 +19,7 @@
 // Modified by Lasse Öörni for Urho3D
 
 #include "List.h"
-#include "StringBase.h"
+#include "Str.h"
 
 #include "Types.h"
 

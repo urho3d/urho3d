@@ -19,7 +19,7 @@
 // Modified by Lasse Öörni for Urho3D
 
 #include "Map.h"
-#include "StringBase.h"
+#include "Str.h"
 
 #include "kNet/WaitFreeQueue.h"
 #include "kNet/Clock.h"

@@ -55,7 +55,7 @@ public:
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// %Set font and font size.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    /// %Set text.
+    /// %Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// %Set row alignment.
     void SetTextAlignment(HorizontalAlignment align);

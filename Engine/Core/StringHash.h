@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "StringBase.h"
+#include "Str.h"
 
 /// 32-bit hash value for a string.
 class StringHash

@@ -18,7 +18,7 @@
 
 // Modified by Lasse Öörni for Urho3D
 
-#include "StringBase.h"
+#include "Str.h"
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread.hpp>

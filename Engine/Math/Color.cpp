@@ -23,7 +23,7 @@
 
 #include "Precompiled.h"
 #include "Color.h"
-#include "StringBase.h"
+#include "Str.h"
 
 #include <cstdio>
 

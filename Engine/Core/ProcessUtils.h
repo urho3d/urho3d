@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "StringBase.h"
+#include "Str.h"
 
 class Mutex;
 

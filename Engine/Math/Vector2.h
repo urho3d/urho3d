@@ -24,7 +24,7 @@
 #pragma once
 
 #include "MathDefs.h"
-#include "StringBase.h"
+#include "Str.h"
 
 /// Two-dimensional vector.
 class Vector2

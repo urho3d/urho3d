@@ -29,7 +29,6 @@
 class Graphics;
 class Texture;
 
-static const int MAX_FONT_CHARS = 256;
 static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
 static const int FONT_DPI = 96;
@@ -52,7 +51,7 @@ struct FontGlyph
     /// Horizontal advance.
     short advanceX_;
     /// Kerning information.
-    PODVector<short> kerning_;
+    Map<unsigned, unsigned> kerning_;
 };
 
 /// %Font face description.
@@ -65,9 +64,9 @@ public:
     ~FontFace();
     
     /// Return the glyph structure corresponding to a character.
-    const FontGlyph& GetGlyph(unsigned char c) const;
+    const FontGlyph& GetGlyph(unsigned c) const;
     /// Return the kerning for a character and the next character.
-    short GetKerning(unsigned char c, unsigned char d) const;
+    short GetKerning(unsigned c, unsigned d) const;
     
     /// Texture.
     SharedPtr<Texture> texture_;
@@ -78,7 +77,7 @@ public:
     /// Row height.
     int rowHeight_;
     /// Glyph index mapping.
-    unsigned short glyphIndex_[MAX_FONT_CHARS];
+    Map<unsigned, unsigned> glyphMapping_;
     /// Kerning flag.
     bool hasKerning_;
 };

@@ -20,7 +20,7 @@
 
 #include <exception>
 
-#include "StringBase.h"
+#include "Str.h"
 
 namespace kNet
 {

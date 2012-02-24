@@ -27,7 +27,7 @@
 #include <cstring>
 #include <cstdio>
 
-#include "StringBase.h"
+#include "Str.h"
 
 namespace kNet
 {

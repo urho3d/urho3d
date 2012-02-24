@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 //
 
-#include "StringBase.h"
+#include "Str.h"
 #include "Swap.h"
 
 #include <cstdio>
@@ -593,6 +593,368 @@ int String::Compare(const char* str, bool caseSensitive) const
     }
 }
 
+void String::SetUTF8FromLatin1(const char* str)
+{
+    char temp[7];
+    
+    Clear();
+    
+    if (!str)
+        return;
+    
+    while (*str)
+    {
+        char* dest = temp;
+        EncodeUTF8(dest, *str++);
+        *dest = 0;
+        Append(temp);
+    }
+}
+
+void String::SetUTF8FromWChar(const wchar_t* str)
+{
+    char temp[7];
+    
+    Clear();
+    
+    if (!str)
+        return;
+    
+    #ifdef WIN32
+    while (*str)
+    {
+        unsigned unicodeChar = DecodeUTF16(str);
+        char* dest = temp;
+        EncodeUTF8(dest, unicodeChar);
+        *dest = 0;
+        Append(temp);
+    }
+    #else
+    while (*str)
+    {
+        char* dest = temp;
+        EncodeUTF8(temp, *str++);
+        *dest = 0;
+        Append(temp);
+    }
+    #endif
+}
+
+void String::WCharString(wchar_t* dest, unsigned maxLength) const
+{
+    if (!buffer_ || !dest || !maxLength)
+        return;
+    
+    const char* src = buffer_;
+    wchar_t* end = dest + maxLength;
+    
+    #ifdef WIN32
+    while (src < buffer_ + length_)
+    {
+        if (dest + 2 >= end)
+        {
+            *dest = 0;
+            return;
+        }
+        unsigned unicodeChar = DecodeUTF8(src);
+        EncodeUTF16(dest, unicodeChar);
+    }
+    *dest = 0;
+    #else
+    while (src < buffer_ + length)
+    {
+        if (dest + 1 >= end)
+        {
+            *dest = 0;
+            return;
+        }
+        *dest++ = DecodeUTF8(src);
+    }
+    *dest = 0;
+    #endif
+}
+
+unsigned String::LengthUTF8() const
+{
+    unsigned ret = 0;
+    
+    const char* src = buffer_;
+    if (!src)
+        return ret;
+    const char* end = buffer_ + length_;
+    
+    while (src < end)
+    {
+        DecodeUTF8(src);
+        ++ret;
+    }
+    
+    return ret;
+}
+
+unsigned String::ByteOffsetUTF8(unsigned index) const
+{
+    unsigned byteOffset = 0;
+    unsigned utfPos = 0;
+    
+    while (utfPos < index && byteOffset < length_)
+    {
+        NextUTF8Char(byteOffset);
+        ++utfPos;
+    }
+    
+    return byteOffset;
+}
+
+unsigned String::NextUTF8Char(unsigned& byteOffset) const
+{
+    if (!buffer_)
+        return 0;
+    
+    const char* src = buffer_ + byteOffset;
+    unsigned ret = DecodeUTF8(src);
+    byteOffset = src - buffer_;
+    
+    return ret;
+}
+
+unsigned String::AtUTF8(unsigned index) const
+{
+    unsigned byteOffset = ByteOffsetUTF8(index);
+    return NextUTF8Char(byteOffset);
+}
+
+void String::ReplaceUTF8(unsigned index, unsigned unicodeChar)
+{
+    unsigned utfPos = 0;
+    unsigned byteOffset = 0;
+    
+    while (utfPos < index && byteOffset < length_)
+    {
+        NextUTF8Char(byteOffset);
+        ++utfPos;
+    }
+    
+    if (utfPos < index)
+        return;
+    
+    unsigned beginCharPos = byteOffset;
+    NextUTF8Char(byteOffset);
+    
+    char temp[7];
+    char* dest = temp;
+    EncodeUTF8(dest, unicodeChar);
+    *dest = 0;
+    
+    Replace(beginCharPos, byteOffset - beginCharPos, temp, dest - temp);
+}
+
+void String::AppendUTF8(unsigned unicodeChar)
+{
+    char temp[7];
+    char* dest = temp;
+    EncodeUTF8(dest, unicodeChar);
+    *dest = 0;
+    Append(temp);
+}
+
+String String::SubstringUTF8(unsigned pos) const
+{
+    unsigned utf8Length = LengthUTF8();
+    unsigned byteOffset = ByteOffsetUTF8(pos);
+    String ret;
+    
+    while (pos < utf8Length)
+    {
+        ret.AppendUTF8(NextUTF8Char(byteOffset));
+        ++pos;
+    }
+    
+    return ret;
+}
+
+String String::SubstringUTF8(unsigned pos, unsigned length) const
+{
+    unsigned utf8Length = LengthUTF8();
+    unsigned byteOffset = ByteOffsetUTF8(pos);
+    unsigned endPos = pos + length;
+    String ret;
+    
+    while (pos < endPos && pos < utf8Length)
+    {
+        ret.AppendUTF8(NextUTF8Char(byteOffset));
+        ++pos;
+    }
+    
+    return ret;
+}
+
+void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
+{
+    if (unicodeChar < 0x80)
+        *dest++ = unicodeChar;
+    else if (unicodeChar < 0x800)
+    {
+        *dest++ = 0xc0 | ((unicodeChar >> 6) & 0x1f);
+        *dest++ = 0x80 | (unicodeChar & 0x3f);
+    }
+    else if (unicodeChar < 0x10000)
+    {
+        *dest++ = 0xe0 | ((unicodeChar >> 12) & 0xf);
+        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        *dest++ = 0x80 | (unicodeChar & 0x3f);
+    }
+    else if (unicodeChar < 0x200000)
+    {
+        *dest++ = 0xf0 | ((unicodeChar >> 18) & 0x7);
+        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        *dest++ = 0x80 | (unicodeChar & 0x3f);
+    }
+    else if (unicodeChar < 0x4000000)
+    {
+        *dest++ = 0xf8 | ((unicodeChar >> 24) & 0x3);
+        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        *dest++ = 0x80 | (unicodeChar & 0x3f);
+    }
+    else
+    {
+        *dest++ = 0xfc | ((unicodeChar >> 30) & 0x1);
+        *dest++ = 0x80 | ((unicodeChar >> 24) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        *dest++ = 0x80 | (unicodeChar & 0x3f);
+    }
+}
+
+unsigned String::DecodeUTF8(const char*& src)
+{
+    if (src == 0)
+        return 0;
+    
+    unsigned char char1;
+    
+    // Skip possible continuation characters
+    for (;;)
+    {
+        char1 = *src++;
+        if (char1 < 0x80 || char1 >= 0xc0)
+            break;
+    }
+    
+    if (char1 < 0x80)
+        return char1;
+    else if (char1 < 0xe0)
+    {
+        unsigned char char2 = *src++;
+        if (!char2)
+            return 0;
+        return (char2 & 0x3f) | ((char1 & 0x1f) << 6);
+    }
+    else if (char1 < 0xf0)
+    {
+        unsigned char char2 = *src++;
+        if (!char2)
+            return 0;
+        unsigned char char3 = *src++;
+        if (!char3)
+            return 0;
+        return (char3 & 0x3f) | ((char2 & 0x3f) << 6) | ((char1 & 0xf) << 12);
+    }
+    else if (char1 < 0xf8)
+    {
+        unsigned char char2 = *src++;
+        if (!char2)
+            return 0;
+        unsigned char char3 = *src++;
+        if (!char3)
+            return 0;
+        unsigned char char4 = *src++;
+        if (!char4)
+            return 0;
+        return (char4 & 0x3f) | ((char3 & 0x3f) << 6) | ((char2 & 0x3f) << 12) | ((char1 & 0x7) << 18);
+    }
+    else if (char1 < 0xfc)
+    {
+        unsigned char char2 = *src++;
+        if (!char2)
+            return 0;
+        unsigned char char3 = *src++;
+        if (!char3)
+            return 0;
+        unsigned char char4 = *src++;
+        if (!char4)
+            return 0;
+        unsigned char char5 = *src++;
+        if (!char5)
+            return 0;
+        return (char5 & 0x3f) | ((char4 & 0x3f) << 6) | ((char3 & 0x3f) << 12) | ((char2 & 0x3f) << 18) | ((char1 & 0x3) << 24);
+    }
+    else
+    {
+        unsigned char char2 = *src++;
+        if (!char2)
+            return 0;
+        unsigned char char3 = *src++;
+        if (!char3)
+            return 0;
+        unsigned char char4 = *src++;
+        if (!char4)
+            return 0;
+        unsigned char char5 = *src++;
+        if (!char5)
+            return 0;
+        unsigned char char6 = *src++;
+        if (!char6)
+            return 0;
+        return (char6 & 0x3f) | ((char5 & 0x3f) << 6) | ((char4 & 0x3f) << 12) | ((char3 & 0x3f) << 18) | ((char2 & 0x3f) << 24) |
+            ((char1 & 0x1) << 30);
+    }
+}
+
+#ifdef WIN32
+void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
+{
+    if (unicodeChar < 0x10000)
+        *dest++ = unicodeChar;
+    else
+    {
+        unicodeChar -= 0x10000;
+        *dest++ = 0xd800 | ((unicodeChar >> 10) & 0x3ff);
+        *dest++ = 0xdc00 | (unicodeChar & 0x3ff);
+    }
+}
+
+unsigned String::DecodeUTF16(const wchar_t*& src)
+{
+    if (src == 0)
+        return 0;
+    
+    unsigned short word1;
+    
+    // Skip possible low surrogate
+    for (;;)
+    {
+        word1 = *src++;
+        if (word1 < 0xdc00 || word1 >= 0xe000)
+            break;
+    }
+    
+    if (word1 < 0xd800 || word1 >= 0xe00)
+        return word1;
+    else
+    {
+        unsigned short word2 = *src++;
+        if (!word2)
+            return 0;
+        else
+            return ((word1 & 0x3ff) << 10) | (word2 & 0x3ff) | 0x10000;
+    }
+}
+#endif
 
 Vector<String> String::Split(const char* str, char separator)
 {
