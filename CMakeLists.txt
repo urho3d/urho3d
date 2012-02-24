@@ -38,7 +38,6 @@ endif ()
 # Compiler-specific options
 if (MSVC)
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions (-DUNICODE -D_UNICODE)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /MT /fp:fast /Zi /GS-")
     set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELWITHDEBINFO} /GL")

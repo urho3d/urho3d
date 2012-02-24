@@ -324,7 +324,7 @@ bool FileSystem::DirExists(const String& pathName)
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
     
     #ifdef WIN32
-    DWORD attributes = GetFileAttributes(WString(fixedName).CString());
+    DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
     #else
@@ -427,7 +427,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                     result.Push(deltaPath + fileName);
             }
         } 
-        while (FindNextFile(handle, &info));
+        while (FindNextFileW(handle, &info));
         
         FindClose(handle);
     }

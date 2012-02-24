@@ -1881,7 +1881,7 @@ unsigned Graphics::GetDepthStencilFormat()
 
 bool Graphics::OpenWindow(int width, int height)
 {
-    WNDCLASS wc;
+    WNDCLASSW wc;
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = wndProc;
     wc.cbClsExtra    = 0;
@@ -1893,7 +1893,7 @@ bool Graphics::OpenWindow(int width, int height)
     wc.lpszMenuName  = 0;
     wc.lpszClassName = L"D3DWindow";
     
-    RegisterClass(&wc);
+    RegisterClassW(&wc);
     
     RECT rect = {0, 0, width, height};
     AdjustWindowRect(&rect, windowStyle, false);
