@@ -73,7 +73,7 @@ macro (finalize_exe)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $(TARGETPATH) ${PROJECT_BINARY_DIR}/Bin)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $(TARGETDIR)$(TARGETNAME).pdb ${PROJECT_BINARY_DIR}/Bin)
     else ()
-        # add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND strip ARGS ${EXECUTABLE_OUTPUT_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX})
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND strip ARGS ${EXECUTABLE_OUTPUT_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX})
     endif ()
 endmacro ()
 
