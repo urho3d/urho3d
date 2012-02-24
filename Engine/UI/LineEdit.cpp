@@ -198,7 +198,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             unsigned length = text_->GetSelectionLength();
             
             if (text_->GetSelectionLength())
-                GetSubsystem<UI>()->SetClipBoardText(line_.Substring(start, length));
+                GetSubsystem<UI>()->SetClipBoardText(line_.SubstringUTF8(start, length));
             
             if (key == 'X')
             {

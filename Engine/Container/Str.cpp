@@ -804,86 +804,58 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
     }
 }
 
+#define GET_NEXT_CONTINUATION_BYTE(ptr) *ptr; if ((unsigned char)*ptr < 0x80 || (unsigned char)*ptr >= 0xc0) return '?'; else ++ptr;
+
 unsigned String::DecodeUTF8(const char*& src)
 {
     if (src == 0)
         return 0;
     
-    unsigned char char1;
+    unsigned char char1 = *src++;
     
-    // Skip possible continuation characters
-    for (;;)
+    // Check if we are in the middle of a UTF8 character
+    if (char1 >= 0x80 && char1 < 0xc0)
     {
-        char1 = *src++;
-        if (char1 < 0x80 || char1 >= 0xc0)
-            break;
+        while ((unsigned char)*src >= 0x80 && (unsigned char)*src < 0xc0)
+            ++src;
+        return '?';
     }
     
     if (char1 < 0x80)
         return char1;
     else if (char1 < 0xe0)
     {
-        unsigned char char2 = *src++;
-        if (!char2)
-            return 0;
+        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
         return (char2 & 0x3f) | ((char1 & 0x1f) << 6);
     }
     else if (char1 < 0xf0)
     {
-        unsigned char char2 = *src++;
-        if (!char2)
-            return 0;
-        unsigned char char3 = *src++;
-        if (!char3)
-            return 0;
+        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
         return (char3 & 0x3f) | ((char2 & 0x3f) << 6) | ((char1 & 0xf) << 12);
     }
     else if (char1 < 0xf8)
     {
-        unsigned char char2 = *src++;
-        if (!char2)
-            return 0;
-        unsigned char char3 = *src++;
-        if (!char3)
-            return 0;
-        unsigned char char4 = *src++;
-        if (!char4)
-            return 0;
+        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
         return (char4 & 0x3f) | ((char3 & 0x3f) << 6) | ((char2 & 0x3f) << 12) | ((char1 & 0x7) << 18);
     }
     else if (char1 < 0xfc)
     {
-        unsigned char char2 = *src++;
-        if (!char2)
-            return 0;
-        unsigned char char3 = *src++;
-        if (!char3)
-            return 0;
-        unsigned char char4 = *src++;
-        if (!char4)
-            return 0;
-        unsigned char char5 = *src++;
-        if (!char5)
-            return 0;
+        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
         return (char5 & 0x3f) | ((char4 & 0x3f) << 6) | ((char3 & 0x3f) << 12) | ((char2 & 0x3f) << 18) | ((char1 & 0x3) << 24);
     }
     else
     {
-        unsigned char char2 = *src++;
-        if (!char2)
-            return 0;
-        unsigned char char3 = *src++;
-        if (!char3)
-            return 0;
-        unsigned char char4 = *src++;
-        if (!char4)
-            return 0;
-        unsigned char char5 = *src++;
-        if (!char5)
-            return 0;
-        unsigned char char6 = *src++;
-        if (!char6)
-            return 0;
+        unsigned char char2 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char3 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char4 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char5 = GET_NEXT_CONTINUATION_BYTE(src);
+        unsigned char char6 = GET_NEXT_CONTINUATION_BYTE(src);
         return (char6 & 0x3f) | ((char5 & 0x3f) << 6) | ((char4 & 0x3f) << 12) | ((char3 & 0x3f) << 18) | ((char2 & 0x3f) << 24) |
             ((char1 & 0x1) << 30);
     }
@@ -907,14 +879,15 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
     if (src == 0)
         return 0;
     
-    unsigned short word1;
+    unsigned short word1 = *src;
     
-    // Skip possible low surrogate
-    for (;;)
+    // Check if we are at a low surrogate
+    word1 = *src++;
+    if (word1 >= 0xdc00 && word1 < 0xe000)
     {
-        word1 = *src++;
-        if (word1 < 0xdc00 || word1 >= 0xe000)
-            break;
+        while (*src >= 0xdc00 && *src < 0xe000)
+            ++src;
+        return '?';
     }
     
     if (word1 < 0xd800 || word1 >= 0xe00)
@@ -922,8 +895,11 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
     else
     {
         unsigned short word2 = *src++;
-        if (!word2)
-            return 0;
+        if (word2 < 0xdc00 || word2 >= 0xe000)
+        {
+            --src;
+            return '?';
+        }
         else
             return ((word1 & 0x3ff) << 10) | (word2 & 0x3ff) | 0x10000;
     }

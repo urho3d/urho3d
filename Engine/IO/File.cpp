@@ -32,12 +32,21 @@
 
 #include "DebugNew.h"
 
+#ifdef WIN32
+static const wchar_t* openMode[] =
+{
+    L"rb",
+    L"wb",
+    L"w+b"
+};
+#else
 static const char* openMode[] =
 {
     "rb",
     "wb",
     "w+b"
 };
+#endif
 
 OBJECTTYPESTATIC(File);
 
@@ -86,7 +95,12 @@ bool File::Open(const String& fileName, FileMode mode)
         return false;
     }
     
+    #ifdef WIN32
+    handle_ = _wfopen(WString(GetNativePath(fileName)).CString(), openMode[mode]);
+    #else
     handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
+    #endif
+    
     if (!handle_)
     {
         LOGERROR("Could not open file " + fileName);
@@ -116,7 +130,11 @@ bool File::Open(PackageFile* package, const String& fileName)
     if (!entry)
         return false;
     
+    #ifdef WIN32
+    handle_ = _wfopen(WString(GetNativePath(package->GetName())).CString(), L"rb");
+    #else
     handle_ = fopen(GetNativePath(package->GetName()).CString(), "rb");
+    #endif
     if (!handle_)
     {
         LOGERROR("Could not open package file " + fileName);
