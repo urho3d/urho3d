@@ -54,8 +54,8 @@ bool FileWatcher::StartWatching(const String& path, bool watchSubDirs)
 #if defined(WIN32) && defined(ENABLE_FILEWATCHER)
     String nativePath = GetNativePath(RemoveTrailingSlash(path));
     
-    dirHandle_ = (void*)CreateFile(
-        nativePath.CString(),
+    dirHandle_ = (void*)CreateFileW(
+        WString(nativePath).CString(),
         FILE_LIST_DIRECTORY,
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
         0,

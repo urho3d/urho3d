@@ -28,6 +28,14 @@
 
 char String::endZero = 0;
 
+String::String(const WString& str) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    SetUTF8FromWChar(str.CString());
+}
+
 String::String(int value) :
     length_(0),
     capacity_(0),
@@ -640,40 +648,6 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     #endif
 }
 
-void String::WCharString(wchar_t* dest, unsigned maxLength) const
-{
-    if (!buffer_ || !dest || !maxLength)
-        return;
-    
-    const char* src = buffer_;
-    wchar_t* end = dest + maxLength;
-    
-    #ifdef WIN32
-    while (src < buffer_ + length_)
-    {
-        if (dest + 2 >= end)
-        {
-            *dest = 0;
-            return;
-        }
-        unsigned unicodeChar = DecodeUTF8(src);
-        EncodeUTF16(dest, unicodeChar);
-    }
-    *dest = 0;
-    #else
-    while (src < buffer_ + length)
-    {
-        if (dest + 1 >= end)
-        {
-            *dest = 0;
-            return;
-        }
-        *dest++ = DecodeUTF8(src);
-    }
-    *dest = 0;
-    #endif
-}
-
 unsigned String::LengthUTF8() const
 {
     unsigned ret = 0;
@@ -1025,4 +999,69 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         Resize(length_ + delta);
     
     CopyChars(buffer_ + pos, srcStart, srcLength);
+}
+
+WString::WString() :
+    length_(0),
+    buffer_(0)
+{
+}
+
+WString::WString(const String& str) :
+    length_(0),
+    buffer_(0)
+{
+    #ifdef WIN32
+    unsigned neededSize = 0;
+    wchar_t temp[3];
+    
+    unsigned byteOffset = 0;
+    while (byteOffset < str.Length())
+    {
+        wchar_t* dest = temp;
+        String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
+        neededSize += dest - temp;
+    }
+    ++neededSize;
+    
+    Resize(neededSize);
+    
+    byteOffset = 0;
+    wchar_t* dest = buffer_;
+    while (byteOffset < str.Length())
+        String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
+    
+    *dest = 0;
+    #else
+    Resize(str.LengthUTF8() + 1);
+    
+    unsigned byteOffset = 0;
+    wchar_t* dest = buffer_;
+    while (byteOffset < str.Length())
+        *dest++ = str.NextUTF8Char(byteOffset);
+    
+    *dest = 0;
+    #endif
+}
+
+WString::~WString()
+{
+    delete[] buffer_;
+}
+
+void WString::Resize(unsigned newSize)
+{
+    if (!newSize)
+    {
+        delete[] buffer_;
+        buffer_ = 0;
+    }
+    else
+    {
+        wchar_t* newBuffer = new wchar_t[newSize];
+        if (buffer_)
+            memcpy(newBuffer, buffer_, length_ * sizeof(wchar_t));
+        buffer_ = newBuffer;
+        length_ = newSize;
+    }
 }

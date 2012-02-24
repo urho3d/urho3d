@@ -60,15 +60,15 @@ int WriteMiniDump(const char* applicationName, void* exceptionPointers)
     dateTimeStr.Replace("/", "");
     dateTimeStr.Replace(' ', '_');
     
-    char pathName[MAX_PATH];
+    wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
-    SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
+    SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
     String applicationNameStr(applicationName);
     String miniDumpDir = String(pathName) + "\\" + applicationNameStr;
     String miniDumpName = miniDumpDir + "\\" + applicationNameStr + "_" + dateTimeStr + ".dmp";
     
-    CreateDirectory(miniDumpDir.CString(), 0);
-    HANDLE file = CreateFile(miniDumpName.CString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,
+    CreateDirectoryW(WString(miniDumpDir).CString(), 0);
+    HANDLE file = CreateFileW(WString(miniDumpName).CString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,
         0, CREATE_ALWAYS, 0, 0);
     
     BOOL success = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file, MiniDumpWithDataSegs, &info, 0, 0);

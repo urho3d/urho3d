@@ -71,7 +71,7 @@ bool FileSystem::SetCurrentDir(const String& pathName)
         return false;
     }
     #ifdef WIN32
-    if (SetCurrentDirectory(GetNativePath(pathName).CString()) == FALSE)
+    if (SetCurrentDirectoryW(WString(GetNativePath(pathName)).CString()) == FALSE)
     {
         LOGERROR("Failed to change directory to " + pathName);
         return false;
@@ -96,7 +96,7 @@ bool FileSystem::CreateDir(const String& pathName)
     }
     
     #ifdef WIN32
-    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
+    bool success = (CreateDirectoryW(WString(GetNativePath(RemoveTrailingSlash(pathName))).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
     #else
     bool success = mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0 || errno == EEXIST;
@@ -179,8 +179,8 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             return false;
         }
         
-        bool success = (int)ShellExecute(0, !mode.Empty() ? (char*)mode.CString() : 0,
-            (char*)GetNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
+        bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
+            WString(GetNativePath(fileName)).CString(), 0, 0, SW_SHOW) > 32;
         if (!success)
             LOGERROR("Failed to open " + fileName + " externally");
         return success;
@@ -253,16 +253,17 @@ bool FileSystem::Delete(const String& fileName)
 
 String FileSystem::GetCurrentDir()
 {
+    #ifdef WIN32
+    wchar_t path[MAX_PATH];
+    path[0] = 0;
+    GetCurrentDirectoryW(MAX_PATH, path);
+    return AddTrailingSlash(String(path));
+    #else
     char path[MAX_PATH];
     path[0] = 0;
-    
-    #ifdef WIN32
-    GetCurrentDirectory(MAX_PATH, path);
-    #else
     getcwd(path, MAX_PATH);
-    #endif
-    
     return AddTrailingSlash(String(path));
+    #endif
 }
 
 bool FileSystem::CheckAccess(const String& pathName)
@@ -296,7 +297,7 @@ bool FileSystem::FileExists(const String& fileName)
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
     
     #ifdef WIN32
-    DWORD attributes = GetFileAttributes(fixedName.CString());
+    DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
         return false;
     #else
@@ -316,7 +317,7 @@ bool FileSystem::DirExists(const String& pathName)
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
     
     #ifdef WIN32
-    DWORD attributes = GetFileAttributes(fixedName.CString());
+    DWORD attributes = GetFileAttributes(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
     #else
@@ -341,37 +342,42 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir()
 {
-    char exeName[MAX_PATH];
-    memset(exeName, 0, MAX_PATH);
-    
     #ifdef WIN32
-    GetModuleFileName(0, exeName, MAX_PATH);
+    wchar_t exeName[MAX_PATH];
+    exeName[0] = 0;
+    GetModuleFileNameW(0, exeName, MAX_PATH);
+    return GetPath(String(exeName));
     #endif
     #ifdef __APPLE__
+    char exeName[MAX_PATH];
+    memset(exeName, 0, MAX_PATH);
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
+    return GetPath(String(exeName));
     #endif
     #ifdef __linux__
+    char exeName[MAX_PATH];
+    memset(exeName, 0, MAX_PATH);
     pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
-    #endif
-
     return GetPath(String(exeName));
+    #endif
 }
 
 String FileSystem::GetUserDocumentsDir()
 {
+    #ifdef WIN32
+    wchar_t pathName[MAX_PATH];
+    pathName[0] = 0;
+    SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
+    return AddTrailingSlash(String(pathName));
+    #else
     char pathName[MAX_PATH];
     pathName[0] = 0;
-    
-    #ifdef WIN32
-    SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
-    #else
     strcpy(pathName, getenv("HOME"));
-    #endif
-    
     return AddTrailingSlash(String(pathName));
+    #endif
 }
 
 void FileSystem::RegisterPath(const String& pathName)
@@ -393,7 +399,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     #ifdef WIN32
     String pathAndFilter = GetNativePath(path + filter);
     WIN32_FIND_DATA info;
-    HANDLE handle = FindFirstFile(pathAndFilter.CString(), &info);
+    HANDLE handle = FindFirstFileW(WString(pathAndFilter).CString(), &info);
     if (handle != INVALID_HANDLE_VALUE)
     {
         do

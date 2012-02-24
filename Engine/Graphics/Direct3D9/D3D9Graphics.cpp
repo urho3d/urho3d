@@ -247,7 +247,7 @@ void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
     if (impl_->window_)
-        SetWindowText(impl_->window_, windowTitle_.CString());
+        SetWindowTextW(impl_->window_, WString(windowTitle_).CString());
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
@@ -1891,13 +1891,13 @@ bool Graphics::OpenWindow(int width, int height)
     wc.hCursor       = LoadCursor(0, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName  = 0;
-    wc.lpszClassName = "D3DWindow";
+    wc.lpszClassName = L"D3DWindow";
     
     RegisterClass(&wc);
     
     RECT rect = {0, 0, width, height};
     AdjustWindowRect(&rect, windowStyle, false);
-    impl_->window_ = CreateWindow("D3DWindow", windowTitle_.CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
+    impl_->window_ = CreateWindowW(L"D3DWindow", WString(windowTitle_).CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right, rect.bottom, 0, 0, impl_->instance_, 0); 
     
     if (!impl_->window_)

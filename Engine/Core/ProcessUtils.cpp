@@ -100,7 +100,7 @@ void InitFPU()
 void ErrorDialog(const String& title, const String& message)
 {
     #ifdef WIN32
-    MessageBox(0, message.CString(), title.CString(), 0);
+    MessageBoxW(0, WString(message).CString(), WString(title).CString(), 0);
     #else
     printf("%s\n", message.CString());
     #endif

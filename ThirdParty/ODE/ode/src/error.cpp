@@ -139,7 +139,7 @@ extern "C" void dError (int num, const char *msg, ...)
     _snprintf (title,sizeof(title),"ODE Error %d",num);
     _vsnprintf (s,sizeof(s),msg,ap);
     s[sizeof(s)-1] = 0;
-    MessageBox(0,s,title,MB_OK | MB_ICONWARNING);
+    MessageBoxA(0,s,title,MB_OK | MB_ICONWARNING);
   }
   exit (1);
 }
@@ -155,7 +155,7 @@ extern "C" void dDebug (int num, const char *msg, ...)
     _snprintf (title,sizeof(title),"ODE INTERNAL ERROR %d",num);
     _vsnprintf (s,sizeof(s),msg,ap);
     s[sizeof(s)-1] = 0;
-    MessageBox(0,s,title,MB_OK | MB_ICONSTOP);
+    MessageBoxA(0,s,title,MB_OK | MB_ICONSTOP);
   }
   abort();
 }

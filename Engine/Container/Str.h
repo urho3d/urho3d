@@ -30,6 +30,8 @@
 
 static const int CONVERSION_BUFFER_LENGTH = 128;
 
+class WString;
+
 /// %String class.
 class String
 {
@@ -81,6 +83,18 @@ public:
         Resize(length);
         CopyChars(buffer_, str, length);
     }
+    
+    /// Construct from a null-terminated wide character array.
+    String(const wchar_t* str) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        SetUTF8FromWChar(str);
+    }
+    
+    /// Construct from a wide character string.
+    String(const WString& str);
     
     /// Construct from an integer.
     explicit String(int value);
@@ -339,8 +353,6 @@ public:
     void SetUTF8FromLatin1(const char* str);
     /// Construct UTF8 content from wide characters.
     void SetUTF8FromWChar(const wchar_t* str);
-    /// Convert UTF8 content to wide characters.
-    void WCharString(wchar_t* dest, unsigned maxLength) const;
     /// Calculate number of characters in UTF8 content.
     unsigned LengthUTF8() const;
     /// Return byte offset for UTF8 index.
@@ -451,3 +463,31 @@ inline String operator + (const char* lhs, const String& rhs)
     ret += rhs;
     return ret;
 }
+
+/// Wide character string. Only meant for converting from UTF8 String and passing to the operating system where necessary.
+class WString
+{
+public:
+    /// Construct empty.
+    WString();
+    /// Construct from a string.
+    WString(const String& str);
+    /// Destruct.
+    ~WString();
+    
+    /// Resize string.
+    void Resize(unsigned newSize);
+    
+    /// Return whether the string is empty.
+    bool Empty() const { return length_ == 0; }
+    /// Return length.
+    unsigned Length() const { return length_; }
+    /// Return character data.
+    const wchar_t* CString() const { return buffer_; }
+    
+private:
+    /// String length.
+    unsigned length_;
+    /// String buffer, null if not allocated.
+    wchar_t* buffer_;
+};
