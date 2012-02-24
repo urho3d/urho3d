@@ -41,6 +41,14 @@ void PrintLine(const String& str);
 void PrintLine(const char* str);
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const String& cmdLine);
+/// Parse arguments from the command line.
+const Vector<String>& ParseArguments(const char* cmdLine);
+/// Parse arguments from a wide char command line.
+const Vector<String>& ParseArguments(const WString& cmdLine);
+/// Parse arguments from a wide char command line.
+const Vector<String>& ParseArguments(const wchar_t* cmdLine);
+/// Parse arguments from argc & argv
+const Vector<String>& ParseArguments(int argc, const char** argv);
 /// Return previously parsed arguments.
 const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.

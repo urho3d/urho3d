@@ -26,6 +26,10 @@
 #include "ProcessUtils.h"
 #include "StringUtils.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -38,8 +42,11 @@ int main(int argc, char** argv)
 {
     Vector<String> arguments;
     
-    for (int i = 1; i < argc; ++i)
-        arguments.Push(String(argv[i]));
+    #ifdef WIN32
+    arguments = ParseArguments(GetCommandLineW());
+    #else
+    arguments = ParseArguments(argc, argv);
+    #endif
     
     Run(arguments);
     return 0;

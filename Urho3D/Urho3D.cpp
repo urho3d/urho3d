@@ -38,11 +38,7 @@
 
 #include "DebugNew.h"
 
-#ifdef WIN32
-void Run(const wchar_t* cmdLineW);
-#else
-void Run(const char* cmdLine);
-#endif
+void Run();
 
 #ifdef WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -51,14 +47,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     #endif
     
+    ParseArguments(GetCommandLineW());
+    
     #if defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
     __try
     {
-        Run(GetCommandLineW());
+        Run();
     }
     __except(WriteMiniDump("Urho3D", GetExceptionInformation())) {}
     #else
-    Run(GetCommandLineW());
+    Run();
     #endif
 
     return 0;
@@ -66,35 +64,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #else
 int main(int argc, char** argv)
 {
-    String cmdLine;
-    for (int i = 0; i < argc; ++i)
-    {
-        if (i > 1)
-            cmdLine += ' ';
-        cmdLine += String(argv[i]);
-    }
-
-    Run(cmdLine.CString());
+    ParseArguments(argc, argv);
+    Run();
     return 0;
 }
 #endif
 
-#ifdef WIN32
-void Run(const wchar_t* cmdLineW)
+void Run()
 {
-    String cmdLineStr(cmdLineW);
-#else
-void Run(const char* cmdLine)
-{
-    String cmdLineStr(cmdLine);
-#endif
-    
     try
     {
         // Check for script file name
-        const Vector<String>& arguments = ParseArguments(cmdLineStr);
+        const Vector<String>& arguments = GetArguments();
         String scriptFileName;
-        for (unsigned i = 1; i < arguments.Size(); ++i)
+        for (unsigned i = 0; i < arguments.Size(); ++i)
         {
             if (arguments[i][0] != '-')
             {

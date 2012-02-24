@@ -153,6 +153,7 @@ const Vector<String>& ParseArguments(const String& cmdLine)
     unsigned cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
+    bool firstArgument = true;
     
     for (unsigned i = 0; i < cmdLine.Length(); ++i)
     {
@@ -164,7 +165,10 @@ const Vector<String>& ParseArguments(const String& cmdLine)
             {
                 inCmd = false;
                 cmdEnd = i;
-                arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
+                // Do not store the first argument (executable name)
+                if (!firstArgument)
+                    arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
+                firstArgument = false;
             }
         }
         else
@@ -179,10 +183,40 @@ const Vector<String>& ParseArguments(const String& cmdLine)
     if (inCmd)
     {
         cmdEnd = cmdLine.Length();
-        arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
+        if (!firstArgument)
+            arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
     }
     
     return arguments;
+}
+
+const Vector<String>& ParseArguments(const char* cmdLine)
+{
+    return ParseArguments(String(cmdLine));
+}
+
+const Vector<String>& ParseArguments(const WString& cmdLine)
+{
+    return ParseArguments(String(cmdLine));
+}
+
+const Vector<String>& ParseArguments(const wchar_t* cmdLine)
+{
+    return ParseArguments(String(cmdLine));
+}
+
+const Vector<String>& ParseArguments(int argc, const char** argv)
+{
+    String cmdLine;
+    
+    for (int i = 0; i < argc; ++i)
+    {
+        cmdLine += argv[i];
+        if (i < argc - 1)
+            cmdLine += ' ';
+    }
+    
+    return ParseArguments(cmdLine);
 }
 
 const Vector<String>& GetArguments()

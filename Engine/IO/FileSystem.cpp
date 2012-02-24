@@ -71,7 +71,7 @@ bool FileSystem::SetCurrentDir(const String& pathName)
         return false;
     }
     #ifdef WIN32
-    if (SetCurrentDirectoryW(WString(GetNativePath(pathName)).CString()) == FALSE)
+    if (SetCurrentDirectoryW(GetWideNativePath(pathName).CString()) == FALSE)
     {
         LOGERROR("Failed to change directory to " + pathName);
         return false;
@@ -96,7 +96,7 @@ bool FileSystem::CreateDir(const String& pathName)
     }
     
     #ifdef WIN32
-    bool success = (CreateDirectoryW(WString(GetNativePath(RemoveTrailingSlash(pathName))).CString(), 0) == TRUE) ||
+    bool success = (CreateDirectoryW(GetWideNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
     #else
     bool success = mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0 || errno == EEXIST;
@@ -180,7 +180,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         }
         
         bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
-            WString(GetNativePath(fileName)).CString(), 0, 0, SW_SHOW) > 32;
+            GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
         if (!success)
             LOGERROR("Failed to open " + fileName + " externally");
         return success;
@@ -236,7 +236,11 @@ bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
         return false;
     }
     
+    #ifdef WIN32
+    return MoveFileW(GetWideNativePath(srcFileName).CString(), GetWideNativePath(destFileName).CString()) != 0;
+    #else
     return rename(GetNativePath(srcFileName).CString(), GetNativePath(destFileName).CString()) == 0;
+    #endif
 }
 
 bool FileSystem::Delete(const String& fileName)
@@ -247,9 +251,12 @@ bool FileSystem::Delete(const String& fileName)
         return false;
     }
     
+    #ifdef WIN32
+    return DeleteFileW(GetWideNativePath(fileName).CString()) != 0;
+    #else
     return remove(GetNativePath(fileName).CString()) == 0;
+    #endif
 }
-
 
 String FileSystem::GetCurrentDir()
 {
@@ -553,5 +560,14 @@ String GetNativePath(const String& pathName)
     return pathName.Replaced('/', '\\');
 #else
     return pathName;
+#endif
+}
+
+WString GetWideNativePath(const String& pathName)
+{
+#ifdef WIN32
+    return WString(pathName.Replaced('/', '\\'));
+#else
+    return WString(pathName);
 #endif
 }

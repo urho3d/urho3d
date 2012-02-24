@@ -49,6 +49,10 @@
 #include "Map.h"
 #include "Set.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <assimp.hpp>
 #include <aiScene.h>
 #include <aiPostProcess.h>
@@ -166,8 +170,11 @@ int main(int argc, char** argv)
 {
     Vector<String> arguments;
     
-    for (int i = 1; i < argc; ++i)
-        arguments.Push(argv[i]);
+    #ifdef WIN32
+    arguments = ParseArguments(GetCommandLineW());
+    #else
+    arguments = ParseArguments(argc, argv);
+    #endif
     
     Run(arguments);
     return 0;

@@ -216,11 +216,11 @@ int main(int argc, char** argv)
 {
     Vector<String> arguments;
     
-    for (int i = 1; i < argc; ++i)
-    {
-        String argument(argv[i]);
-        arguments.Push(GetInternalPath(argument));
-    }
+    #ifdef WIN32
+    arguments = ParseArguments(GetCommandLineW());
+    #else
+    arguments = ParseArguments(argc, argv);
+    #endif
     
     Run(arguments);
     return 0;

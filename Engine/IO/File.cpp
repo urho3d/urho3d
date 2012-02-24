@@ -96,7 +96,7 @@ bool File::Open(const String& fileName, FileMode mode)
     }
     
     #ifdef WIN32
-    handle_ = _wfopen(WString(GetNativePath(fileName)).CString(), openMode[mode]);
+    handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
     #else
     handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
     #endif
@@ -131,7 +131,7 @@ bool File::Open(PackageFile* package, const String& fileName)
         return false;
     
     #ifdef WIN32
-    handle_ = _wfopen(WString(GetNativePath(package->GetName())).CString(), L"rb");
+    handle_ = _wfopen(GetWideNativePath(package->GetName()).CString(), L"rb");
     #else
     handle_ = fopen(GetNativePath(package->GetName()).CString(), "rb");
     #endif
