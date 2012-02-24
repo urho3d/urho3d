@@ -48,7 +48,7 @@ const Vector<String>& ParseArguments(const WString& cmdLine);
 /// Parse arguments from a wide char command line.
 const Vector<String>& ParseArguments(const wchar_t* cmdLine);
 /// Parse arguments from argc & argv
-const Vector<String>& ParseArguments(int argc, const char** argv);
+const Vector<String>& ParseArguments(int argc, char** argv);
 /// Return previously parsed arguments.
 const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.

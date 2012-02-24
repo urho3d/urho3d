@@ -205,13 +205,13 @@ const Vector<String>& ParseArguments(const wchar_t* cmdLine)
     return ParseArguments(String(cmdLine));
 }
 
-const Vector<String>& ParseArguments(int argc, const char** argv)
+const Vector<String>& ParseArguments(int argc, char** argv)
 {
     String cmdLine;
     
     for (int i = 0; i < argc; ++i)
     {
-        cmdLine += argv[i];
+        cmdLine += (const char*)argv[i];
         if (i < argc - 1)
             cmdLine += ' ';
     }

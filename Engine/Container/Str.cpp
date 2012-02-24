@@ -641,7 +641,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     while (*str)
     {
         char* dest = temp;
-        EncodeUTF8(temp, *str++);
+        EncodeUTF8(dest, *str++);
         *dest = 0;
         Append(temp);
     }
