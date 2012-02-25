@@ -880,15 +880,15 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
     if (!createContext(window, wndconfig, fbconfig))
         return GL_FALSE;
 
-    [window->NS.window makeKeyAndOrderFront:nil];
-    [window->NSGL.context setView:[window->NS.window contentView]];
-
     if (wndconfig->mode == GLFW_FULLSCREEN)
     {
         // Urho3D: fade to black during switch
         CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
         if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
             CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
+
+        [window->NS.window makeKeyAndOrderFront:nil];
+        [window->NSGL.context setView:[window->NS.window contentView]];
 
         CGCaptureAllDisplays();
         CGDisplaySwitchToMode(CGMainDisplayID(), fullscreenMode);
@@ -905,6 +905,12 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
         // Urho3D: assume initial input activation for fullscreen
         _glfwInputWindowFocus(window, GL_TRUE);
     }
+    else 
+    {
+        [window->NS.window makeKeyAndOrderFront:nil];
+        [window->NSGL.context setView:[window->NS.window contentView]];
+    }
+
 
     glfwMakeContextCurrent(window);
 
