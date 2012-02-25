@@ -34,6 +34,7 @@
 // Needed for _NSGetProgname
 #include <crt_externs.h>
 
+static GLboolean mouseCursorVisible = GL_TRUE;
 
 //========================================================================
 // Delegate for window related notifications
@@ -1182,13 +1183,21 @@ void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
     switch (mode)
     {
         case GLFW_CURSOR_NORMAL:
-            [NSCursor unhide];
+            if (!mouseCursorVisible)
+            {
+                [NSCursor unhide];
+                mouseCursorVisible = GL_TRUE;
+            }
             CGAssociateMouseAndMouseCursorPosition(true);
             break;
         case GLFW_CURSOR_HIDDEN:
             break;
         case GLFW_CURSOR_CAPTURED:
-            [NSCursor hide];
+            if (mouseCursorVisible)
+            {
+                [NSCursor hide];
+                mouseCursorVisible = GL_FALSE;
+            }
             CGAssociateMouseAndMouseCursorPosition(false);
             break;
     }
