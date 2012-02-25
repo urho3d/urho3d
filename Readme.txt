@@ -100,8 +100,8 @@ cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and
 Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For gcc, execute make (by default, cmake_gcc.sh specifies to make a Release
-build.)
+For gcc, execute make (by default, cmake_gcc.sh specifies to make a 
+RelWithDebInfo build.)
 
 The build process will also compile models and shaders from the Source_Asset
 directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9,
@@ -115,10 +115,10 @@ After the build is complete, the programs can be run from the Bin directory.
 
 To run Urho3D from the Visual Studio debugger, set it as a startup project and
 enter its relative path and filename into Properties -> Debugging -> Command:
-..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into
-Debugging -> Command Arguments is highly recommended. This enables startup in
-windowed mode: without it running into an exception or breakpoint will be
-obnoxious as the mouse cursor will most probably be hidden.
+..\Bin\Urho3D.exe. Additionally, entering -w into Debugging -> Command 
+Arguments is highly recommended. This enables startup in windowed mode: 
+without it running into an exception or breakpoint will be obnoxious as the 
+mouse cursor will likely be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
