@@ -27,6 +27,8 @@
 //
 //========================================================================
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "internal.h"
 
 // Needed for _NSGetProgname
@@ -883,11 +885,26 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 
     if (wndconfig->mode == GLFW_FULLSCREEN)
     {
+        // Urho3D: fade to black during switch
+        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
+        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
+
         CGCaptureAllDisplays();
         CGDisplaySwitchToMode(CGMainDisplayID(), fullscreenMode);
 
+        if (fade != kCGDisplayFadeReservationInvalidToken)
+        {
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
+            CGReleaseDisplayFadeReservation(fade);
+        }
+    }
+
         [[window->NS.window contentView] enterFullScreenMode:[NSScreen mainScreen]
                                                  withOptions:nil];
+            
+        // Urho3D: assume initial input activation for fullscreen
+        _glfwInputWindowFocus(window, GL_TRUE);
     }
 
     glfwMakeContextCurrent(window);
@@ -912,11 +929,22 @@ void _glfwPlatformCloseWindow(_GLFWwindow* window)
 
     if (window->mode == GLFW_FULLSCREEN)
     {
+        // Urho3D: fade to black during switch
+        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
+        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
+
         [[window->NS.window contentView] exitFullScreenModeWithOptions:nil];
 
         CGDisplaySwitchToMode(CGMainDisplayID(),
                               (CFDictionaryRef) _glfwLibrary.NS.desktopMode);
         CGReleaseAllDisplays();
+
+        if (fade != kCGDisplayFadeReservationInvalidToken)
+        {
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
+            CGReleaseDisplayFadeReservation(fade);
+        }
     }
 
     [window->NSGL.pixelFormat release];
