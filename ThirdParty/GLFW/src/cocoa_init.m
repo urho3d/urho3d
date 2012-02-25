@@ -27,8 +27,11 @@
 //
 //========================================================================
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "internal.h"
 
+#include <sys/param.h>
 
 //========================================================================
 // Change to our application bundle's resources directory, if present
