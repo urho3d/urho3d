@@ -144,7 +144,11 @@ void Input::Update()
     #else
     // Pump GLFW events
     glfwPollEvents();
-
+    
+    // In fullscreen mode, activate input automatically
+    if (graphics_->GetFullscreen() && !active_ && glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
+        activated_ = true;
+    
     // Check for input inactivation
     if (active_ && !glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
         MakeInactive();
@@ -350,15 +354,13 @@ void Input::ResetState()
 
 void Input::SetMouseButton(int button, bool newState)
 {
-    // In GLFW mode, activate by a left-click inside the window
-    #ifdef USE_OPENGL
-    if (graphics_ && initialized_)
+    // After deactivation in windowed mode, activate by a left-click inside the window
+    if (initialized_ && !graphics_->GetFullscreen())
     {
-        if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE) && !active_ && newState && button == MOUSEB_LEFT)
+        if (!active_ && newState && button == MOUSEB_LEFT)
             activated_ = true;
     }
-    #endif    
-        
+    
     // If we are not active yet, do not react to the mouse button down
     if (newState && !active_)
         return;
