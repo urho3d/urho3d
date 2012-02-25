@@ -99,6 +99,7 @@ Input::Input(Context* context) :
     activated_(false),
     suppressNextChar_(false),
     suppressNextMouseMove_(false),
+    screenModeSet_(false),
     initialized_(false)
 {
     // Zero the initial state
@@ -145,9 +146,13 @@ void Input::Update()
     // Pump GLFW events
     glfwPollEvents();
     
-    // In fullscreen mode, activate input automatically
-    if (graphics_->GetFullscreen() && !active_ && glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
+    // In fullscreen mode or after a screen mode change, activate input automatically
+    if ((graphics_->GetFullscreen() || screenModeSet_) && !active_ && glfwGetWindowParam(graphics_->GetWindowHandle(),
+        GLFW_ACTIVE))
+    {
         activated_ = true;
+        screenModeSet_ = false;
+    }
     
     // Check for input inactivation
     if (active_ && !glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
@@ -624,9 +629,13 @@ void CharCallback(GLFWwindow window, int key)
     Input* instance = GetInputInstance(window);
     if (!instance)
         return;
-    
+
+    // On OS X we get char events for cursors and function keys. Disregard these
+    if (key >= 0xf700 && key <= 0xf70f)
+        return;
+
     using namespace Char;
-    
+
     VariantMap keyEventData;
     keyEventData[P_CHAR] = key;
     keyEventData[P_BUTTONS] = instance->mouseButtonDown_;
@@ -693,8 +702,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);
     glfwSetScrollCallback(&MouseScrollCallback);
-    lastCursorPosition_ = GetCursorPosition();
-    activated_ = true;
+    screenModeSet_ = true;
     #endif
 }
 

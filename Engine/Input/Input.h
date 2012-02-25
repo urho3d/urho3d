@@ -145,6 +145,8 @@ private:
     bool suppressNextChar_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Screen mode changed flag.
+    bool screenModeSet_;
     /// Initialized flag.
     bool initialized_;
 };

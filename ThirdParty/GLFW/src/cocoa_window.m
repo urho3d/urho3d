@@ -901,6 +901,9 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 
         [[window->NS.window contentView] enterFullScreenMode:[NSScreen mainScreen]
                                                  withOptions:nil];
+        
+        // Urho3D: assume initial input activation
+        _glfwInputWindowFocus(window, GL_TRUE);
     }
     else 
     {
@@ -916,9 +919,6 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
     window->cursorPosY = point.y;
 
     window->resizable = wndconfig->resizable;
-
-    // Urho3D: assume initial input activation
-    _glfwInputWindowFocus(window, GL_TRUE);
         
     return GL_TRUE;
 }
