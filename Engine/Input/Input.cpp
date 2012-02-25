@@ -98,6 +98,7 @@ Input::Input(Context* context) :
     minimized_(false),
     activated_(false),
     suppressNextChar_(false),
+    suppressNextMouseMove_(false),
     initialized_(false)
 {
     // Zero the initial state
@@ -144,20 +145,12 @@ void Input::Update()
     // Pump GLFW events
     glfwPollEvents();
 
-    // Check activation state
-    if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
-    {
-        if (!active_)
-            activated_ = true;
-    }
-    else
-    {
-        if (active_)
-            MakeInactive();
-    }    
+    // Check for input inactivation
+    if (active_ && !glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
+        MakeInactive();
     #endif
     
-    // Activate application now if necessary
+    // Activate input now if necessary
     if (activated_)
         MakeActive();
     
@@ -182,6 +175,12 @@ void Input::Update()
         mouseMove_ = mousePos - lastCursorPosition_;
         lastCursorPosition_ = mousePos;
         #endif
+        
+        if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
+        {
+            mouseMove_ = IntVector2::ZERO;
+            suppressNextMouseMove_ = false;
+        }
         
         if (mouseMove_ != IntVector2::ZERO)
         {
@@ -272,8 +271,7 @@ void Input::Initialize()
     graphics_ = graphics;
     
     // Set the initial activation
-    MakeActive();
-    
+    activated_ = true;
     initialized_ = true;
     
     LOGINFO("Initialized input");
@@ -294,9 +292,9 @@ void Input::MakeActive()
     SetClipCursor(true);
     SetCursorVisible(false);
     #else
-    // Get the current mouse position as a base for movement calculations
     glfwSetInputMode(graphics_->GetWindowHandle(), GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
     lastCursorPosition_ = GetCursorPosition();
+    suppressNextMouseMove_ = true;
     #endif
     
     using namespace Activation;
@@ -352,6 +350,15 @@ void Input::ResetState()
 
 void Input::SetMouseButton(int button, bool newState)
 {
+    // In GLFW mode, activate by a left-click inside the window
+    #ifdef USE_OPENGL
+    if (graphics_ && initialized_)
+    {
+        if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE) && !active_ && newState && button == MOUSEB_LEFT)
+            activated_ = true;
+    }
+    #endif    
+        
     // If we are not active yet, do not react to the mouse button down
     if (newState && !active_)
         return;
@@ -546,7 +553,7 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
             MakeInactive();
         else
         {
-            if (!minimized_)
+            if (!minimized_ && graphics_->GetFullscreen())
                activated_ = true;
         }
         eventData[P_HANDLED] = true;
@@ -679,13 +686,13 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     #else
     // Re-enable GLFW callbacks each time the window has been recreated
     GLFWwindow window = graphics_->GetWindowHandle();
-    glfwSetInputMode(window, GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
     glfwSetInputMode(window, GLFW_KEY_REPEAT, GL_TRUE);
     glfwSetKeyCallback(&KeyCallback);
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);
     glfwSetScrollCallback(&MouseScrollCallback);
     lastCursorPosition_ = GetCursorPosition();
+    activated_ = true;
     #endif
 }
 

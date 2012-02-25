@@ -143,6 +143,8 @@ private:
     bool activated_;
     /// Next char message suppress flag.
     bool suppressNextChar_;
+    /// Next mouse move suppress flag.
+    bool suppressNextMouseMove_;
     /// Initialized flag.
     bool initialized_;
 };
