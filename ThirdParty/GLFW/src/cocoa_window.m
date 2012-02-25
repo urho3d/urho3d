@@ -898,7 +898,6 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
             CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
             CGReleaseDisplayFadeReservation(fade);
         }
-    }
 
         [[window->NS.window contentView] enterFullScreenMode:[NSScreen mainScreen]
                                                  withOptions:nil];
