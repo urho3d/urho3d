@@ -1946,6 +1946,8 @@ void Graphics::SetDrawBuffers()
         glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
     }
     
+    impl_->drawBuffers_ = newDrawBuffers;
+    
     glReadBuffer(GL_NONE);
 }
 
