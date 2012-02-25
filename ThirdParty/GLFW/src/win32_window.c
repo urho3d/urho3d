@@ -35,6 +35,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Urho3D: global flag needed to prevent duplicate ShowCursor calls which "stack"
+static GLboolean mouseCursorVisible = GL_TRUE;
 
 //========================================================================
 // Convert BPP to RGB bits based on "best guess"
@@ -491,10 +493,10 @@ static void captureMouseCursor(_GLFWwindow* window)
 {
     RECT ClipWindowRect;
 
-    if (window->mouseCursorVisible == GL_TRUE)
+    if (mouseCursorVisible)
     {
         ShowCursor(FALSE);
-        window->mouseCursorVisible = GL_FALSE;
+        mouseCursorVisible = GL_FALSE;
     }
     
     // Clip cursor to the window
@@ -518,10 +520,10 @@ static void showMouseCursor(_GLFWwindow* window)
     // Release the cursor from the window
     ClipCursor(NULL);
 
-    if (window->mouseCursorVisible == GL_FALSE)
+    if (!mouseCursorVisible)
     {
         ShowCursor(TRUE);
-        window->mouseCursorVisible = GL_TRUE;
+        mouseCursorVisible = GL_TRUE;
     }
 }
 

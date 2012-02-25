@@ -218,9 +218,6 @@ struct _GLFWwindow
     // These are defined in the current port's platform.h
     _GLFW_PLATFORM_WINDOW_STATE;
     _GLFW_PLATFORM_CONTEXT_STATE;
-    
-    // Mouse cursor visible state; needed on Windows to avoid multiple redundant ShowCursor calls
-    GLboolean mouseCursorVisible;
 };
 
 

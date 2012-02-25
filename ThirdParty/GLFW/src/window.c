@@ -312,7 +312,6 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     window->mode       = mode;
     window->cursorMode = GLFW_CURSOR_NORMAL;
     window->systemKeys = GL_TRUE;
-    window->mouseCursorVisible = GL_TRUE;
     
     // Open the actual window and create its context
     if (!_glfwPlatformOpenWindow(window, &wndconfig, &fbconfig))
