@@ -27,6 +27,8 @@
  *
  *************************************************************************/
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifndef __glfw3_h__
 #define __glfw3_h__
 
@@ -153,17 +155,11 @@ extern "C" {
     #define GL_GLEXT_LEGACY
     #include <OpenGL/gl.h>
   #endif
-  #ifndef GLFW_NO_GLU
-    #include <OpenGL/glu.h>
-  #endif
 #else
   #if defined(GLFW_INCLUDE_GL3)
     #include <GL3/gl3.h>
   #else
     #include <GL/gl.h>
-  #endif
-  #ifndef GLFW_NO_GLU
-    #include <GL/glu.h>
   #endif
 #endif
 
