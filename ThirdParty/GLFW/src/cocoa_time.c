@@ -1,11 +1,10 @@
 //========================================================================
 // GLFW - An OpenGL library
-// Platform:    X11 (Unix)
-// API version: 3.0
+// Platform:    Cocoa/NSOpenGL
+// API Version: 3.0
 // WWW:         http://www.glfw.org/
 //------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) 2009-2010 Camilla Berglund <elmindreda@elmindreda.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -30,35 +29,58 @@
 
 #include "internal.h"
 
+#include <mach/mach_time.h>
+
+
+//========================================================================
+// Return raw time
+//========================================================================
+
+static uint64_t getRawTime(void)
+{
+    return mach_absolute_time();
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//////                       GLFW internal API                      //////
+//////////////////////////////////////////////////////////////////////////
+
+//========================================================================
+// Initialise timer
+//========================================================================
+
+void _glfwInitTimer(void)
+{
+    mach_timebase_info_data_t info;
+    mach_timebase_info(&info);
+
+    _glfwLibrary.NS.timer.resolution = (double) info.numer / (info.denom * 1.0e9);
+    _glfwLibrary.NS.timer.base = getRawTime();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
 //========================================================================
-// Enable system keys
+// Return timer value in seconds
 //========================================================================
 
-void _glfwPlatformEnableSystemKeys(_GLFWwindow* window)
+double _glfwPlatformGetTime(void)
 {
-    if (window->X11.keyboardGrabbed)
-    {
-        XUngrabKeyboard(_glfwLibrary.X11.display, CurrentTime);
-        window->X11.keyboardGrabbed = GL_FALSE;
-    }
+    return (double) (getRawTime() - _glfwLibrary.NS.timer.base) *
+        _glfwLibrary.NS.timer.resolution;
 }
 
 //========================================================================
-// Disable system keys
+// Set timer value in seconds
 //========================================================================
 
-void _glfwPlatformDisableSystemKeys(_GLFWwindow* window)
+void _glfwPlatformSetTime(double time)
 {
-    if (XGrabKeyboard(_glfwLibrary.X11.display, window->X11.handle,
-                      True, GrabModeAsync, GrabModeAsync, CurrentTime)
-        == GrabSuccess)
-    {
-        window->X11.keyboardGrabbed = GL_TRUE;
-    }
+    _glfwLibrary.NS.timer.base = getRawTime() -
+        (uint64_t) (time / _glfwLibrary.NS.timer.resolution);
 }
 

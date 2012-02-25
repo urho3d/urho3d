@@ -56,26 +56,17 @@ static void closeFlaggedWindows(void)
 
     for (window = _glfwLibrary.windowListHead;  window; )
     {
-        // Urho3D: allow the callback to close the window as a response
-        _GLFWwindow* next = window->next;
-
         if (window->closeRequested && _glfwLibrary.windowCloseCallback)
-        {
-            GLboolean closeRequested = _glfwLibrary.windowCloseCallback(window);
-            // Make sure the window is still valid after the callback
-            if (glfwIsWindow(window))
-                window->closeRequested = closeRequested;
-            else
-            {
-                window = next;
-                continue;
-            }
-        }
+            window->closeRequested = _glfwLibrary.windowCloseCallback(window);
 
         if (window->closeRequested)
+        {
+            _GLFWwindow* next = window->next;
             glfwCloseWindow(window);
-
-        window = next;
+            window = next;
+        }
+        else
+            window = window->next;
     }
 }
 
@@ -111,85 +102,9 @@ void _glfwSetDefaultWindowHints(void)
     // The default minimum OpenGL version is 1.0
     _glfwLibrary.hints.glMajor = 1;
     _glfwLibrary.hints.glMinor = 0;
-}
 
-
-//========================================================================
-// Register keyboard activity
-//========================================================================
-
-void _glfwInputKey(_GLFWwindow* window, int key, int action)
-{
-    GLboolean keyrepeat = GL_FALSE;
-
-    if (key < 0 || key > GLFW_KEY_LAST)
-        return;
-
-    // Are we trying to release an already released key?
-    if (action == GLFW_RELEASE && window->key[key] != GLFW_PRESS)
-        return;
-
-    // Register key action
-    if(action == GLFW_RELEASE && window->stickyKeys)
-        window->key[key] = GLFW_STICK;
-    else
-    {
-        keyrepeat = (window->key[key] == GLFW_PRESS) && (action == GLFW_PRESS);
-        window->key[key] = (char) action;
-    }
-
-    // Call user callback function
-    if (_glfwLibrary.keyCallback && (window->keyRepeat || !keyrepeat))
-        _glfwLibrary.keyCallback(window, key, action);
-}
-
-
-//========================================================================
-// Register (keyboard) character activity
-//========================================================================
-
-void _glfwInputChar(_GLFWwindow* window, int character)
-{
-    // Valid Unicode (ISO 10646) character?
-    if (!((character >= 32 && character <= 126) || character >= 160))
-        return;
-
-    if (_glfwLibrary.charCallback)
-        _glfwLibrary.charCallback(window, character);
-}
-
-
-//========================================================================
-// Register scroll events
-//========================================================================
-
-void _glfwInputScroll(_GLFWwindow* window, int xoffset, int yoffset)
-{
-    window->scrollX += xoffset;
-    window->scrollY += yoffset;
-
-    if (_glfwLibrary.scrollCallback)
-        _glfwLibrary.scrollCallback(window, xoffset, yoffset);
-}
-
-
-//========================================================================
-// Register mouse button clicks
-//========================================================================
-
-void _glfwInputMouseClick(_GLFWwindow* window, int button, int action)
-{
-    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
-        return;
-
-    // Register mouse button action
-    if (action == GLFW_RELEASE && window->stickyMouseButtons)
-        window->mouseButton[button] = GLFW_STICK;
-    else
-        window->mouseButton[button] = (char) action;
-
-    if (_glfwLibrary.mouseButtonCallback)
-        _glfwLibrary.mouseButtonCallback(window, button, action);
+    // The default is to allow window resizing
+    _glfwLibrary.hints.resizable = GL_TRUE;
 }
 
 
@@ -238,6 +153,61 @@ void _glfwInputWindowFocus(_GLFWwindow* window, GLboolean activated)
 }
 
 
+//========================================================================
+// Register window position events
+//========================================================================
+
+void _glfwInputWindowPos(_GLFWwindow* window, int x, int y)
+{
+    window->positionX = x;
+    window->positionY = y;
+}
+
+
+//========================================================================
+// Register window size events
+//========================================================================
+
+void _glfwInputWindowSize(_GLFWwindow* window, int width, int height)
+{
+    if (window->width == width && window->height == height)
+        return;
+
+    window->width = width;
+    window->height = height;
+
+    if (_glfwLibrary.windowSizeCallback)
+        _glfwLibrary.windowSizeCallback(window, width, height);
+}
+
+
+//========================================================================
+// Register window size events
+//========================================================================
+
+void _glfwInputWindowIconify(_GLFWwindow* window, int iconified)
+{
+    if (window->iconified == iconified)
+        return;
+
+    window->iconified = iconified;
+
+    if (_glfwLibrary.windowIconifyCallback)
+        _glfwLibrary.windowIconifyCallback(window, iconified);
+}
+
+
+//========================================================================
+// Register window damage events
+//========================================================================
+
+void _glfwInputWindowDamage(_GLFWwindow* window)
+{
+    if (_glfwLibrary.windowRefreshCallback)
+        _glfwLibrary.windowRefreshCallback(window);
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 //////                        GLFW public API                       //////
 //////////////////////////////////////////////////////////////////////////
@@ -282,7 +252,7 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     wndconfig.mode           = mode;
     wndconfig.title          = title;
     wndconfig.refreshRate    = Max(_glfwLibrary.hints.refreshRate, 0);
-    wndconfig.windowNoResize = _glfwLibrary.hints.windowNoResize ? GL_TRUE : GL_FALSE;
+    wndconfig.resizable      = _glfwLibrary.hints.resizable ? GL_TRUE : GL_FALSE;
     wndconfig.glMajor        = _glfwLibrary.hints.glMajor;
     wndconfig.glMinor        = _glfwLibrary.hints.glMinor;
     wndconfig.glForward      = _glfwLibrary.hints.glForward ? GL_TRUE : GL_FALSE;
@@ -300,7 +270,8 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
 
     if (mode != GLFW_WINDOWED && mode != GLFW_FULLSCREEN)
     {
-        _glfwSetError(GLFW_INVALID_ENUM, "glfwOpenWindow: Invalid enum for 'mode' parameter");
+        _glfwSetError(GLFW_INVALID_ENUM,
+                      "glfwOpenWindow: Invalid enum for 'mode' parameter");
         return GL_FALSE;
     }
 
@@ -322,10 +293,11 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
         height = 480;
     }
 
-    window = (_GLFWwindow*) _glfwMalloc(sizeof(_GLFWwindow));
+    window = (_GLFWwindow*) malloc(sizeof(_GLFWwindow));
     if (!window)
     {
-        _glfwSetError(GLFW_OUT_OF_MEMORY, "glfwOpenWindow: Failed to allocate window structure");
+        _glfwSetError(GLFW_OUT_OF_MEMORY,
+                      "glfwOpenWindow: Failed to allocate window structure");
         return NULL;
     }
 
@@ -335,10 +307,13 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     _glfwLibrary.windowListHead = window;
 
     // Remember window settings
-    window->width  = width;
-    window->height = height;
-    window->mode   = mode;
-
+    window->width      = width;
+    window->height     = height;
+    window->mode       = mode;
+    window->cursorMode = GLFW_CURSOR_NORMAL;
+    window->systemKeys = GL_TRUE;
+    window->mouseCursorVisible = GL_TRUE;
+    
     // Open the actual window and create its context
     if (!_glfwPlatformOpenWindow(window, &wndconfig, &fbconfig))
     {
@@ -347,7 +322,7 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     }
 
     // Cache the actual (as opposed to desired) window parameters
-    glfwMakeWindowCurrent(window);
+    glfwMakeContextCurrent(window);
     _glfwPlatformRefreshWindowParams();
 
     if (!_glfwIsValidContext(window, &wndconfig))
@@ -357,9 +332,9 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     }
 
     // The GLFW specification states that fullscreen windows have the cursor
-    // locked by default
+    // captured by default
     if (mode == GLFW_FULLSCREEN)
-        glfwDisable(window, GLFW_MOUSE_CURSOR);
+        glfwSetInputMode(window, GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
 
     // Clearing the front buffer to black to avoid garbage pixels left over
     // from previous uses of our bit of VRAM
@@ -367,28 +342,6 @@ GLFWAPI GLFWwindow glfwOpenWindow(int width, int height,
     _glfwPlatformSwapBuffers();
 
     return window;
-}
-
-
-//========================================================================
-// Make the OpenGL context associated with the specified window current
-//========================================================================
-
-GLFWAPI void glfwMakeWindowCurrent(GLFWwindow handle)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-
-    if (!_glfwInitialized)
-    {
-        _glfwSetError(GLFW_NOT_INITIALIZED, NULL);
-        return;
-    }
-
-    if (_glfwLibrary.currentWindow == window)
-        return;
-
-    _glfwPlatformMakeWindowCurrent(window);
-    _glfwLibrary.currentWindow = window;
 }
 
 
@@ -417,22 +370,6 @@ GLFWAPI int glfwIsWindow(GLFWwindow handle)
     }
 
     return GL_FALSE;
-}
-
-
-//========================================================================
-// Returns GL_TRUE if the specified window handle is an actual window
-//========================================================================
-
-GLFWAPI GLFWwindow glfwGetCurrentWindow(void)
-{
-    if (!_glfwInitialized)
-    {
-        _glfwSetError(GLFW_NOT_INITIALIZED, NULL);
-        return GL_FALSE;
-    }
-
-    return _glfwLibrary.currentWindow;
 }
 
 
@@ -489,8 +426,8 @@ GLFWAPI void glfwOpenWindowHint(int target, int hint)
         case GLFW_STEREO:
             _glfwLibrary.hints.stereo = hint;
             break;
-        case GLFW_WINDOW_NO_RESIZE:
-            _glfwLibrary.hints.windowNoResize = hint;
+        case GLFW_WINDOW_RESIZABLE:
+            _glfwLibrary.hints.resizable = hint;
             break;
         case GLFW_FSAA_SAMPLES:
             _glfwLibrary.hints.samples = hint;
@@ -514,6 +451,7 @@ GLFWAPI void glfwOpenWindowHint(int target, int hint)
             _glfwLibrary.hints.glRobustness = hint;
             break;
         default:
+            _glfwSetError(GLFW_INVALID_ENUM, NULL);
             break;
     }
 }
@@ -537,13 +475,9 @@ GLFWAPI void glfwCloseWindow(GLFWwindow handle)
     if (window == NULL)
         return;
 
-    // Show mouse pointer again (if hidden)
-    if (window == _glfwLibrary.cursorLockWindow)
-        glfwEnable(window, GLFW_MOUSE_CURSOR);
-
     // Clear the current context if this window's context is current
     if (window == _glfwLibrary.currentWindow)
-        glfwMakeWindowCurrent(NULL);
+        glfwMakeContextCurrent(NULL);
 
     // Clear the active window pointer if this is the active window
     if (window == _glfwLibrary.activeWindow)
@@ -561,7 +495,7 @@ GLFWAPI void glfwCloseWindow(GLFWwindow handle)
         *prev = window->next;
     }
 
-    _glfwFree(window);
+    free(window);
 }
 
 
@@ -724,7 +658,6 @@ GLFWAPI void glfwRestoreWindow(GLFWwindow handle)
     if (!window->iconified)
         return;
 
-    // Restore iconified window
     _glfwPlatformRestoreWindow(window);
 
     if (window->mode == GLFW_FULLSCREEN)
@@ -780,8 +713,8 @@ GLFWAPI int glfwGetWindowParam(GLFWwindow handle, int param)
             return window->stereo;
         case GLFW_REFRESH_RATE:
             return window->refreshRate;
-        case GLFW_WINDOW_NO_RESIZE:
-            return window->windowNoResize;
+        case GLFW_WINDOW_RESIZABLE:
+            return window->resizable;
         case GLFW_FSAA_SAMPLES:
             return window->samples;
         case GLFW_OPENGL_VERSION_MAJOR:
@@ -798,10 +731,10 @@ GLFWAPI int glfwGetWindowParam(GLFWwindow handle, int param)
             return window->glProfile;
         case GLFW_OPENGL_ROBUSTNESS:
             return window->glRobustness;
-        default:
-            _glfwSetError(GLFW_INVALID_ENUM, "glfwGetWindowParam: Invalid enum value for 'param' parameter");
-            return 0;
     }
+
+    _glfwSetError(GLFW_INVALID_ENUM, NULL);
+    return 0;
 }
 
 
@@ -865,6 +798,7 @@ GLFWAPI void glfwSetWindowSizeCallback(GLFWwindowsizefun cbfun)
             cbfun(window, window->width, window->height);
     }
 }
+
 
 //========================================================================
 // Set callback function for window close events

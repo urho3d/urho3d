@@ -295,6 +295,7 @@ void Input::MakeActive()
     SetCursorVisible(false);
     #else
     // Get the current mouse position as a base for movement calculations
+    glfwSetInputMode(graphics_->GetWindowHandle(), GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
     lastCursorPosition_ = GetCursorPosition();
     #endif
     
@@ -322,6 +323,8 @@ void Input::MakeInactive()
     ReleaseCapture();
     ClipCursor(0);
     SetCursorVisible(true);
+    #else
+    glfwSetInputMode(graphics_->GetWindowHandle(), GLFW_CURSOR_MODE, GLFW_CURSOR_NORMAL);
     #endif
     
     using namespace Activation;
@@ -676,8 +679,8 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     #else
     // Re-enable GLFW callbacks each time the window has been recreated
     GLFWwindow window = graphics_->GetWindowHandle();
-    glfwDisable(window, GLFW_MOUSE_CURSOR);
-    glfwEnable(window, GLFW_KEY_REPEAT);
+    glfwSetInputMode(window, GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
+    glfwSetInputMode(window, GLFW_KEY_REPEAT, GL_TRUE);
     glfwSetKeyCallback(&KeyCallback);
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);

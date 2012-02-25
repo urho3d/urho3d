@@ -1,10 +1,11 @@
 //========================================================================
 // GLFW - An OpenGL library
-// Platform:    Cocoa/NSOpenGL
-// API Version: 3.0
+// Platform:    X11 (Unix)
+// API version: 3.0
 // WWW:         http://www.glfw.org/
 //------------------------------------------------------------------------
-// Copyright (c) 2009-2010 Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) 2002-2006 Marcus Geelnard
+// Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -35,32 +36,30 @@
 //////////////////////////////////////////////////////////////////////////
 
 //========================================================================
-// Determine joystick capabilities
+// Enable system keys
 //========================================================================
 
-int _glfwPlatformGetJoystickParam( int joy, int param )
+void _glfwPlatformEnableSystemKeys(_GLFWwindow* window)
 {
-    // TODO: Implement this.
-    return 0;
+    if (window->X11.keyboardGrabbed)
+    {
+        XUngrabKeyboard(_glfwLibrary.X11.display, CurrentTime);
+        window->X11.keyboardGrabbed = GL_FALSE;
+    }
 }
 
+
 //========================================================================
-// Get joystick axis positions
+// Disable system keys
 //========================================================================
 
-int _glfwPlatformGetJoystickPos( int joy, float *pos, int numaxes )
+void _glfwPlatformDisableSystemKeys(_GLFWwindow* window)
 {
-    // TODO: Implement this.
-    return 0;
-}
-
-//========================================================================
-// Get joystick button states
-//========================================================================
-
-int _glfwPlatformGetJoystickButtons( int joy, unsigned char *buttons, int numbuttons )
-{
-    // TODO: Implement this.
-    return 0;
+    if (XGrabKeyboard(_glfwLibrary.X11.display, window->X11.handle,
+                      True, GrabModeAsync, GrabModeAsync, CurrentTime)
+        == GrabSuccess)
+    {
+        window->X11.keyboardGrabbed = GL_TRUE;
+    }
 }
 

@@ -27,9 +27,10 @@
 //
 //========================================================================
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "internal.h"
+
+// Needed for _NSGetProgname
+#include <crt_externs.h>
 
 
 //========================================================================
@@ -69,11 +70,8 @@
 
     NSRect contentRect =
         [window->NS.window contentRectForFrameRect:[window->NS.window frame]];
-    window->width = contentRect.size.width;
-    window->height = contentRect.size.height;
 
-    if (_glfwLibrary.windowSizeCallback)
-        _glfwLibrary.windowSizeCallback(window, window->width, window->height);
+    _glfwInputWindowSize(window, contentRect.size.width, contentRect.size.height);
 }
 
 - (void)windowDidMove:(NSNotification *)notification
@@ -89,52 +87,27 @@
                                       mainScreenHeight - contentRect.origin.y -
                                           mainScreenOrigin.y - window->height);
 
-    window->positionX = flippedPos.x;
-    window->positionY = flippedPos.y;
+    _glfwInputWindowPos(window, flippedPos.x, flippedPos.y);
 }
 
 - (void)windowDidMiniaturize:(NSNotification *)notification
 {
-    window->iconified = GL_TRUE;
-
-    if (_glfwLibrary.windowIconifyCallback)
-        _glfwLibrary.windowIconifyCallback(window, window->iconified);
-
-    // Urho3D: tie miniaturization state to being active in fullscreen
-    if (window->mode == GLFW_FULLSCREEN)
-    {
-        _glfwInputWindowFocus(window, GL_FALSE);
-        window->NS.activated = GL_TRUE;
-    }
+    _glfwInputWindowIconify(window, GL_TRUE);
 }
 
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
-    window->iconified = GL_FALSE;
-
-    if (_glfwLibrary.windowIconifyCallback)
-        _glfwLibrary.windowIconifyCallback(window, window->iconified);
-
-    // Urho3D: tie miniaturization state to being active in fullscreen
-    if (window->mode == GLFW_FULLSCREEN)
-        _glfwInputWindowFocus(window, GL_TRUE);
+    _glfwInputWindowIconify(window, GL_FALSE);
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
     _glfwInputWindowFocus(window, GL_TRUE);
-    
-    // Urho3D: set activated flag
-    window->NS.activated = GL_TRUE;
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
     _glfwInputWindowFocus(window, GL_FALSE);
-
-    // Urho3D: re-enable mouse show
-    if (_glfwLibrary.cursorLockWindow == window)
-        _glfwPlatformShowMouseCursor(window);
 }
 
 @end
@@ -177,7 +150,7 @@ static const unsigned int MAC_TO_GLFW_KEYCODE_MAPPING[128] =
     /* 07 */ GLFW_KEY_X,
     /* 08 */ GLFW_KEY_C,
     /* 09 */ GLFW_KEY_V,
-    /* 0a */ -1,
+    /* 0a */ GLFW_KEY_GRAVE_ACCENT,
     /* 0b */ GLFW_KEY_B,
     /* 0c */ GLFW_KEY_Q,
     /* 0d */ GLFW_KEY_W,
@@ -217,7 +190,7 @@ static const unsigned int MAC_TO_GLFW_KEYCODE_MAPPING[128] =
     /* 2f */ GLFW_KEY_PERIOD,
     /* 30 */ GLFW_KEY_TAB,
     /* 31 */ GLFW_KEY_SPACE,
-    /* 32 */ GLFW_KEY_GRAVE_ACCENT,
+    /* 32 */ GLFW_KEY_WORLD_1,
     /* 33 */ GLFW_KEY_BACKSPACE,
     /* 34 */ -1,
     /* 35 */ GLFW_KEY_ESCAPE,
@@ -368,32 +341,16 @@ static int convertMacKeyCode(unsigned int macKeyCode)
 
 - (void)mouseMoved:(NSEvent *)event
 {
-    // Urho3D: check for skip
-    if (window->NS.discardMove)
-    {
-        window->NS.discardMove = GL_FALSE;
-        return;
-    }
-    
-    if (window == _glfwLibrary.cursorLockWindow)
-    {
-        window->mousePosX += [event deltaX];
-        window->mousePosY += [event deltaY];
-    }
+    if (window->cursorMode == GLFW_CURSOR_CAPTURED)
+        _glfwInputCursorMotion(window, [event deltaX], [event deltaY]);
     else
     {
         NSPoint p = [event locationInWindow];
 
         // Cocoa coordinate system has origin at lower left
-        window->mousePosX = p.x;
-        window->mousePosY = [[window->NS.window contentView] bounds].size.height - p.y;
-    }
+        p.y = [[window->NS.window contentView] bounds].size.height - p.y;
 
-    if (_glfwLibrary.mousePosCallback)
-    {
-        _glfwLibrary.mousePosCallback(window,
-                                      window->mousePosX,
-                                      window->mousePosY);
+        _glfwInputCursorMotion(window, p.x, p.y);
     }
 }
 
@@ -439,7 +396,7 @@ static int convertMacKeyCode(unsigned int macKeyCode)
 
         if ([event modifierFlags] & NSCommandKeyMask)
         {
-            if (!window->sysKeysDisabled)
+            if (window->systemKeys)
                 [super keyDown:event];
         }
         else
@@ -489,6 +446,359 @@ static int convertMacKeyCode(unsigned int macKeyCode)
 
 @end
 
+//========================================================================
+// GLFW application class
+//========================================================================
+
+@interface GLFWApplication : NSApplication
+@end
+
+@implementation GLFWApplication
+
+// From http://cocoadev.com/index.pl?GameKeyboardHandlingAlmost
+// This works around an AppKit bug, where key up events while holding
+// down the command key don't get sent to the key window.
+- (void)sendEvent:(NSEvent *)event
+{
+    if ([event type] == NSKeyUp && ([event modifierFlags] & NSCommandKeyMask))
+        [[self keyWindow] sendEvent:event];
+    else
+        [super sendEvent:event];
+}
+
+@end
+
+
+// Prior to Snow Leopard, we need to use this oddly-named semi-private API
+// to get the application menu working properly.  Need to be careful in
+// case it goes away in a future OS update.
+@interface NSApplication (NSAppleMenu)
+- (void)setAppleMenu:(NSMenu*)m;
+@end
+
+//========================================================================
+// Try to figure out what the calling application is called
+//========================================================================
+
+static NSString* findAppName(void)
+{
+    unsigned int i;
+    NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
+
+    // Keys to search for as potential application names
+    NSString* GLFWNameKeys[] =
+    {
+        @"CFBundleDisplayName",
+        @"CFBundleName",
+        @"CFBundleExecutable",
+    };
+
+    for (i = 0;  i < sizeof(GLFWNameKeys) / sizeof(GLFWNameKeys[0]);  i++)
+    {
+        id name = [infoDictionary objectForKey:GLFWNameKeys[i]];
+        if (name &&
+            [name isKindOfClass:[NSString class]] &&
+            ![@"" isEqualToString:name])
+        {
+            return name;
+        }
+    }
+
+    // If we get here, we're unbundled
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+
+    // Having the app in front of the terminal window is also generally
+    // handy.  There is an NSApplication API to do this, but...
+    SetFrontProcess(&psn);
+
+    char** progname = _NSGetProgname();
+    if (progname && *progname)
+    {
+        // TODO: UTF-8?
+        return [NSString stringWithUTF8String:*progname];
+    }
+
+    // Really shouldn't get here
+    return @"GLFW Application";
+}
+
+//========================================================================
+// Set up the menu bar (manually)
+// This is nasty, nasty stuff -- calls to undocumented semi-private APIs that
+// could go away at any moment, lots of stuff that really should be
+// localize(d|able), etc.  Loading a nib would save us this horror, but that
+// doesn't seem like a good thing to require of GLFW's clients.
+//========================================================================
+static void setUpMenuBar(void)
+{
+    NSString* appName = findAppName();
+
+    NSMenu* bar = [[NSMenu alloc] init];
+    [NSApp setMainMenu:bar];
+
+    NSMenuItem* appMenuItem =
+        [bar addItemWithTitle:@"" action:NULL keyEquivalent:@""];
+    NSMenu* appMenu = [[NSMenu alloc] init];
+    [appMenuItem setSubmenu:appMenu];
+
+    [appMenu addItemWithTitle:[NSString stringWithFormat:@"About %@", appName]
+                       action:@selector(orderFrontStandardAboutPanel:)
+                keyEquivalent:@""];
+    [appMenu addItem:[NSMenuItem separatorItem]];
+    NSMenu* servicesMenu = [[NSMenu alloc] init];
+    [NSApp setServicesMenu:servicesMenu];
+    [[appMenu addItemWithTitle:@"Services"
+                       action:NULL
+                keyEquivalent:@""] setSubmenu:servicesMenu];
+    [appMenu addItem:[NSMenuItem separatorItem]];
+    [appMenu addItemWithTitle:[NSString stringWithFormat:@"Hide %@", appName]
+                       action:@selector(hide:)
+                keyEquivalent:@"h"];
+    [[appMenu addItemWithTitle:@"Hide Others"
+                       action:@selector(hideOtherApplications:)
+                keyEquivalent:@"h"]
+        setKeyEquivalentModifierMask:NSAlternateKeyMask | NSCommandKeyMask];
+    [appMenu addItemWithTitle:@"Show All"
+                       action:@selector(unhideAllApplications:)
+                keyEquivalent:@""];
+    [appMenu addItem:[NSMenuItem separatorItem]];
+    [appMenu addItemWithTitle:[NSString stringWithFormat:@"Quit %@", appName]
+                       action:@selector(terminate:)
+                keyEquivalent:@"q"];
+
+    NSMenuItem* windowMenuItem =
+        [bar addItemWithTitle:@"" action:NULL keyEquivalent:@""];
+    NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+    [NSApp setWindowsMenu:windowMenu];
+    [windowMenuItem setSubmenu:windowMenu];
+
+    [windowMenu addItemWithTitle:@"Miniaturize"
+                          action:@selector(performMiniaturize:)
+                   keyEquivalent:@"m"];
+    [windowMenu addItemWithTitle:@"Zoom"
+                          action:@selector(performZoom:)
+                   keyEquivalent:@""];
+    [windowMenu addItem:[NSMenuItem separatorItem]];
+    [windowMenu addItemWithTitle:@"Bring All to Front"
+                          action:@selector(arrangeInFront:)
+                   keyEquivalent:@""];
+
+    // At least guard the call to private API to avoid an exception if it
+    // goes away.  Hopefully that means the worst we'll break in future is to
+    // look ugly...
+    if ([NSApp respondsToSelector:@selector(setAppleMenu:)])
+        [NSApp setAppleMenu:appMenu];
+}
+
+
+//========================================================================
+// Initialize the Cocoa Application Kit
+//========================================================================
+static GLboolean initializeCocoa(void)
+{
+    if (NSApp)
+        return GL_TRUE;
+
+    _glfwLibrary.NS.autoreleasePool = [[NSAutoreleasePool alloc] init];
+
+    // Implicitly create shared NSApplication instance
+    [GLFWApplication sharedApplication];
+
+    // Setting up the menu bar must go between sharedApplication
+    // above and finishLaunching below, in order to properly emulate the
+    // behavior of NSApplicationMain
+    setUpMenuBar();
+
+    [NSApp finishLaunching];
+
+    return GL_TRUE;
+}
+
+//========================================================================
+// Create the Cocoa window
+//========================================================================
+
+static GLboolean createWindow(_GLFWwindow* window,
+                              const _GLFWwndconfig* wndconfig)
+{
+    unsigned int styleMask = 0;
+
+    if (wndconfig->mode == GLFW_WINDOWED)
+    {
+        styleMask = NSTitledWindowMask | NSClosableWindowMask |
+                    NSMiniaturizableWindowMask;
+
+        if (wndconfig->resizable)
+            styleMask |= NSResizableWindowMask;
+    }
+    else
+        styleMask = NSBorderlessWindowMask;
+
+    window->NS.window = [[NSWindow alloc]
+        initWithContentRect:NSMakeRect(0, 0, window->width, window->height)
+                  styleMask:styleMask
+                    backing:NSBackingStoreBuffered
+                      defer:NO];
+
+    if (window->NS.window == nil)
+    {
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "Cocoa/NSOpenGL: Failed to create window");
+        return GL_FALSE;
+    }
+
+    [window->NS.window setTitle:[NSString stringWithUTF8String:wndconfig->title]];
+    [window->NS.window setContentView:[[GLFWContentView alloc]
+                   initWithGlfwWindow:window]];
+    [window->NS.window setDelegate:window->NS.delegate];
+    [window->NS.window setAcceptsMouseMovedEvents:YES];
+    [window->NS.window center];
+
+    return GL_TRUE;
+}
+
+//========================================================================
+// Create the OpenGL context
+//========================================================================
+
+static GLboolean createContext(_GLFWwindow* window,
+                               const _GLFWwndconfig* wndconfig,
+                               const _GLFWfbconfig* fbconfig)
+{
+    unsigned int attributeCount = 0;
+
+    // Mac OS X needs non-zero color size, so set resonable values
+    int colorBits = fbconfig->redBits + fbconfig->greenBits + fbconfig->blueBits;
+    if (colorBits == 0)
+        colorBits = 24;
+    else if (colorBits < 15)
+        colorBits = 15;
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+    // Fail if any OpenGL version above 2.1 other than 3.2 was requested
+    if (wndconfig->glMajor > 3 ||
+        (wndconfig->glMajor == 3 && wndconfig->glMinor != 2))
+    {
+        _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                      "Cocoa/NSOpenGL: The targeted version of Mac OS X does "
+                      "not support any OpenGL version above 2.1 except 3.2");
+        return GL_FALSE;
+    }
+
+    if (wndconfig->glProfile)
+    {
+        // Fail if a profile other than core was explicitly selected
+        if (wndconfig->glProfile != GLFW_OPENGL_CORE_PROFILE)
+        {
+            _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                          "Cocoa/NSOpenGL: The targeted version of Mac OS X "
+                          "only supports the OpenGL core profile");
+            return GL_FALSE;
+        }
+    }
+#else
+    // Fail if OpenGL 3.0 or above was requested
+    if (wndconfig->glMajor > 2)
+    {
+        _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                      "Cocoa/NSOpenGL: The targeted version of Mac OS X does "
+                      "not support OpenGL version 3.0 or above");
+        return GL_FALSE;
+    }
+#endif /*MAC_OS_X_VERSION_MAX_ALLOWED*/
+
+    // Fail if a robustness strategy was requested
+    if (wndconfig->glRobustness)
+    {
+        _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                      "Cocoa/NSOpenGL: Mac OS X does not support OpenGL "
+                      "robustness strategies");
+        return GL_FALSE;
+    }
+
+#define ADD_ATTR(x) { attributes[attributeCount++] = x; }
+#define ADD_ATTR2(x, y) { ADD_ATTR(x); ADD_ATTR(y); }
+
+    // Arbitrary array size here
+    NSOpenGLPixelFormatAttribute attributes[24];
+
+    ADD_ATTR(NSOpenGLPFADoubleBuffer);
+
+    if (wndconfig->mode == GLFW_FULLSCREEN)
+    {
+        ADD_ATTR(NSOpenGLPFAFullScreen);
+        ADD_ATTR(NSOpenGLPFANoRecovery);
+        ADD_ATTR2(NSOpenGLPFAScreenMask,
+                  CGDisplayIDToOpenGLDisplayMask(CGMainDisplayID()));
+    }
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+    if (wndconfig->glMajor > 2)
+        ADD_ATTR2(NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core);
+#endif /*MAC_OS_X_VERSION_MAX_ALLOWED*/
+
+    ADD_ATTR2(NSOpenGLPFAColorSize, colorBits);
+
+    if (fbconfig->alphaBits > 0)
+        ADD_ATTR2(NSOpenGLPFAAlphaSize, fbconfig->alphaBits);
+
+    if (fbconfig->depthBits > 0)
+        ADD_ATTR2(NSOpenGLPFADepthSize, fbconfig->depthBits);
+
+    if (fbconfig->stencilBits > 0)
+        ADD_ATTR2(NSOpenGLPFAStencilSize, fbconfig->stencilBits);
+
+    int accumBits = fbconfig->accumRedBits + fbconfig->accumGreenBits +
+                    fbconfig->accumBlueBits + fbconfig->accumAlphaBits;
+
+    if (accumBits > 0)
+        ADD_ATTR2(NSOpenGLPFAAccumSize, accumBits);
+
+    if (fbconfig->auxBuffers > 0)
+        ADD_ATTR2(NSOpenGLPFAAuxBuffers, fbconfig->auxBuffers);
+
+    if (fbconfig->stereo)
+        ADD_ATTR(NSOpenGLPFAStereo);
+
+    if (fbconfig->samples > 0)
+    {
+        ADD_ATTR2(NSOpenGLPFASampleBuffers, 1);
+        ADD_ATTR2(NSOpenGLPFASamples, fbconfig->samples);
+    }
+
+    ADD_ATTR(0);
+
+#undef ADD_ATTR
+#undef ADD_ATTR2
+
+    window->NSGL.pixelFormat =
+        [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+    if (window->NSGL.pixelFormat == nil)
+    {
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "Cocoa/NSOpenGL: Failed to create OpenGL pixel format");
+        return GL_FALSE;
+    }
+
+    NSOpenGLContext* share = NULL;
+
+    if (wndconfig->share)
+        share = wndconfig->share->NSGL.context;
+
+    window->NSGL.context =
+        [[NSOpenGLContext alloc] initWithFormat:window->NSGL.pixelFormat
+                                   shareContext:share];
+    if (window->NSGL.context == nil)
+    {
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "Cocoa/NSOpenGL: Failed to create OpenGL context");
+        return GL_FALSE;
+    }
+
+    return GL_TRUE;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////
@@ -500,31 +810,11 @@ static int convertMacKeyCode(unsigned int macKeyCode)
 //========================================================================
 
 int _glfwPlatformOpenWindow(_GLFWwindow* window,
-                            const _GLFWwndconfig *wndconfig,
-                            const _GLFWfbconfig *fbconfig)
+                            const _GLFWwndconfig* wndconfig,
+                            const _GLFWfbconfig* fbconfig)
 {
-    // Urho3D: init extra variables
-    window->NS.activated = GL_FALSE;
-    window->NS.leftMouseDown = GL_FALSE;
-    window->NS.discardMove = GL_FALSE;
-    
-    // Fail if OpenGL 3.0 or above was requested
-    if (wndconfig->glMajor > 2)
-    {
-        _glfwSetError(GLFW_VERSION_UNAVAILABLE,
-                      "Cocoa/NSOpenGL: Mac OS X does not support OpenGL "
-                      "version 3.0 or above");
+    if (!initializeCocoa())
         return GL_FALSE;
-    }
-
-    // Fail if a robustness strategy was requested
-    if (wndconfig->glRobustness)
-    {
-        _glfwSetError(GLFW_VERSION_UNAVAILABLE,
-                      "Cocoa/NSOpenGL: Mac OS X does not support OpenGL "
-                      "robustness strategies");
-        return GL_FALSE;
-    }
 
     // We can only have one application delegate, but we only allocate it the
     // first time we create a window to keep all window code in this file
@@ -557,12 +847,6 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
     else if (colorBits < 15)
         colorBits = 15;
 
-    // Ignored hints:
-    // OpenGLMajor, OpenGLMinor, OpenGLForward:
-    //     pending Mac OS X support for OpenGL 3.x
-    // OpenGLDebug
-    //     pending it meaning anything on Mac OS X
-
     // Don't use accumulation buffer support; it's not accelerated
     // Aux buffers probably aren't accelerated either
 
@@ -588,161 +872,33 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
             [[(id)fullscreenMode objectForKey:(id)kCGDisplayHeight] intValue];
     }
 
-    unsigned int styleMask = 0;
-
-    if (wndconfig->mode == GLFW_WINDOWED)
-    {
-        styleMask = NSTitledWindowMask | NSClosableWindowMask |
-                    NSMiniaturizableWindowMask;
-
-        if (!wndconfig->windowNoResize)
-            styleMask |= NSResizableWindowMask;
-    }
-    else
-        styleMask = NSBorderlessWindowMask;
-
-    window->NS.window = [[NSWindow alloc]
-        initWithContentRect:NSMakeRect(0, 0, window->width, window->height)
-                  styleMask:styleMask
-                    backing:NSBackingStoreBuffered
-                      defer:NO];
-
-    [window->NS.window setTitle:[NSString stringWithCString:wndconfig->title
-                                                   encoding:NSISOLatin1StringEncoding]];
-
-    [window->NS.window setContentView:[[GLFWContentView alloc] initWithGlfwWindow:window]];
-    [window->NS.window setDelegate:window->NS.delegate];
-    [window->NS.window setAcceptsMouseMovedEvents:YES];
-    [window->NS.window center];
-
-    if (wndconfig->mode == GLFW_FULLSCREEN)
-    {
-        // Urho3D: fade to black during switch
-        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
-        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
-            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
-
-        CGCaptureAllDisplays();
-        CGDisplaySwitchToMode(CGMainDisplayID(), fullscreenMode);
-
-        if (fade != kCGDisplayFadeReservationInvalidToken)
-        {
-            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
-            CGReleaseDisplayFadeReservation(fade);
-        }
-    }
-
-    unsigned int attribute_count = 0;
-
-#define ADD_ATTR(x) attributes[attribute_count++] = x
-#define ADD_ATTR2(x, y) { ADD_ATTR(x); ADD_ATTR(y); }
-
-    // Arbitrary array size here
-    NSOpenGLPixelFormatAttribute attributes[24];
-
-    ADD_ATTR(NSOpenGLPFADoubleBuffer);
-
-    if (wndconfig->mode == GLFW_FULLSCREEN)
-    {
-        ADD_ATTR(NSOpenGLPFAFullScreen);
-        ADD_ATTR(NSOpenGLPFANoRecovery);
-        ADD_ATTR2(NSOpenGLPFAScreenMask,
-                  CGDisplayIDToOpenGLDisplayMask(CGMainDisplayID()));
-    }
-
-    ADD_ATTR2(NSOpenGLPFAColorSize, colorBits);
-
-    if (fbconfig->alphaBits > 0)
-        ADD_ATTR2(NSOpenGLPFAAlphaSize, fbconfig->alphaBits);
-
-    if (fbconfig->depthBits > 0)
-        ADD_ATTR2(NSOpenGLPFADepthSize, fbconfig->depthBits);
-
-    if (fbconfig->stencilBits > 0)
-        ADD_ATTR2(NSOpenGLPFAStencilSize, fbconfig->stencilBits);
-
-    int accumBits = fbconfig->accumRedBits + fbconfig->accumGreenBits +
-                    fbconfig->accumBlueBits + fbconfig->accumAlphaBits;
-
-    if (accumBits > 0)
-        ADD_ATTR2(NSOpenGLPFAAccumSize, accumBits);
-
-    if (fbconfig->auxBuffers > 0)
-        ADD_ATTR2(NSOpenGLPFAAuxBuffers, fbconfig->auxBuffers);
-
-    if (fbconfig->stereo)
-        ADD_ATTR(NSOpenGLPFAStereo );
-
-    if (fbconfig->samples > 0)
-    {
-        ADD_ATTR2(NSOpenGLPFASampleBuffers, 1);
-        ADD_ATTR2(NSOpenGLPFASamples, fbconfig->samples);
-    }
-
-    ADD_ATTR(0);
-
-#undef ADD_ATTR
-#undef ADD_ATTR2
-
-    window->NSGL.pixelFormat =
-        [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-    if (window->NSGL.pixelFormat == nil)
-    {
-        _glfwSetError(GLFW_PLATFORM_ERROR,
-                      "Cocoa/NSOpenGL: Failed to create pixel format");
+    if (!createWindow(window, wndconfig))
         return GL_FALSE;
-    }
 
-    NSOpenGLContext* share = NULL;
-
-    if (wndconfig->share)
-        share = wndconfig->share->NSGL.context;
-
-    window->NSGL.context =
-        [[NSOpenGLContext alloc] initWithFormat:window->NSGL.pixelFormat
-                                   shareContext:share];
-    if (window->NSGL.context == nil)
-    {
-        _glfwSetError(GLFW_PLATFORM_ERROR,
-                      "Cocoa/NSOpenGL: Failed to create OpenGL context");
+    if (!createContext(window, wndconfig, fbconfig))
         return GL_FALSE;
-    }
 
     [window->NS.window makeKeyAndOrderFront:nil];
     [window->NSGL.context setView:[window->NS.window contentView]];
 
     if (wndconfig->mode == GLFW_FULLSCREEN)
     {
-        // TODO: Make this work on pre-Leopard systems
+        CGCaptureAllDisplays();
+        CGDisplaySwitchToMode(CGMainDisplayID(), fullscreenMode);
+
         [[window->NS.window contentView] enterFullScreenMode:[NSScreen mainScreen]
                                                  withOptions:nil];
-            
-        // Urho3D: assume initial input activation for fullscreen
-        if (window->mode == GLFW_FULLSCREEN)
-            _glfwInputWindowFocus(window, GL_TRUE);
     }
 
-    glfwMakeWindowCurrent(window);
+    glfwMakeContextCurrent(window);
 
     NSPoint point = [[NSCursor currentCursor] hotSpot];
-    window->mousePosX = point.x;
-    window->mousePosY = point.y;
+    window->cursorPosX = point.x;
+    window->cursorPosY = point.y;
 
-    window->windowNoResize = wndconfig->windowNoResize;
+    window->resizable = wndconfig->resizable;
 
     return GL_TRUE;
-}
-
-//========================================================================
-// Make the OpenGL context associated with the specified window current
-//========================================================================
-
-void _glfwPlatformMakeWindowCurrent(_GLFWwindow* window)
-{
-    if (window)
-        [window->NSGL.context makeCurrentContext];
-    else
-        [NSOpenGLContext clearCurrentContext];
 }
 
 
@@ -756,22 +912,11 @@ void _glfwPlatformCloseWindow(_GLFWwindow* window)
 
     if (window->mode == GLFW_FULLSCREEN)
     {
-        // Urho3D: fade to black during switch
-        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
-        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
-            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
-
         [[window->NS.window contentView] exitFullScreenModeWithOptions:nil];
 
         CGDisplaySwitchToMode(CGMainDisplayID(),
                               (CFDictionaryRef) _glfwLibrary.NS.desktopMode);
         CGReleaseAllDisplays();
-
-        if (fade != kCGDisplayFadeReservationInvalidToken)
-        {
-            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
-            CGReleaseDisplayFadeReservation(fade);
-        }
     }
 
     [window->NSGL.pixelFormat release];
@@ -797,8 +942,7 @@ void _glfwPlatformCloseWindow(_GLFWwindow* window)
 
 void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char *title)
 {
-    [window->NS.window setTitle:[NSString stringWithCString:title
-                       encoding:NSISOLatin1StringEncoding]];
+    [window->NS.window setTitle:[NSString stringWithUTF8String:title]];
 }
 
 //========================================================================
@@ -917,10 +1061,9 @@ void _glfwPlatformRefreshWindowParams(void)
                        forVirtualScreen:0];
     window->samples = value;
 
-    // These are forced to false as long as Mac OS X lacks support for OpenGL 3.0+
-    window->glForward = GL_FALSE;
+    // These this is forced to false as long as Mac OS X lacks support for
+    // requesting debug contexts
     window->glDebug = GL_FALSE;
-    window->glProfile = 0;
 }
 
 //========================================================================
@@ -937,36 +1080,14 @@ void _glfwPlatformPollEvents(void)
                                    untilDate:[NSDate distantPast]
                                       inMode:NSDefaultRunLoopMode
                                      dequeue:YES];
- 
-        if (event)
-        {
-            [NSApp sendEvent:event];
 
-            // Urho3D: check for events also outside the client area to detect window drag
-            if (_glfwLibrary.activeWindow && _glfwLibrary.activeWindow->mode == GLFW_WINDOWED)
-            {
-                NSEventType eventType = [event type];
-                if (eventType == NSLeftMouseDown)
-                    _glfwLibrary.activeWindow->NS.leftMouseDown = GL_TRUE;
-                else if (eventType == NSLeftMouseUp)
-                    _glfwLibrary.activeWindow->NS.leftMouseDown = GL_FALSE;
-            }
-        }
+        if (event)
+            [NSApp sendEvent:event];
     }
     while (event);
 
     [_glfwLibrary.NS.autoreleasePool drain];
     _glfwLibrary.NS.autoreleasePool = [[NSAutoreleasePool alloc] init];
-    
-    // Urho3D: when the window has just been activated, and left mouse is not down, re-enable
-    // mouse lock as necessary (this allows dragging the title bar)
-    if (_glfwLibrary.activeWindow && _glfwLibrary.activeWindow->NS.activated &&
-        !_glfwLibrary.activeWindow->NS.leftMouseDown)
-    {
-        if (_glfwLibrary.activeWindow == _glfwLibrary.cursorLockWindow)
-            _glfwPlatformHideMouseCursor(_glfwLibrary.activeWindow);
-        _glfwLibrary.activeWindow->NS.activated = GL_FALSE;
-    }
 }
 
 //========================================================================
@@ -985,31 +1106,6 @@ void _glfwPlatformWaitEvents( void )
     [NSApp sendEvent:event];
 
     _glfwPlatformPollEvents();
-}
-
-//========================================================================
-// Hide mouse cursor (lock it)
-//========================================================================
-
-void _glfwPlatformHideMouseCursor(_GLFWwindow* window)
-{
-    [NSCursor hide];
-    CGAssociateMouseAndMouseCursorPosition(false);
-
-    // Urho3D: when dissociating the mouse cursor position, make sure it is moved inside the window
-    // so we are sure to get mouse button presses correctly, then discard the next move event
-    _glfwPlatformSetMouseCursorPos(window, window->width / 2, window->height / 2);
-    window->NS.discardMove = GL_TRUE;
-}
-
-//========================================================================
-// Show mouse cursor (unlock it)
-//========================================================================
-
-void _glfwPlatformShowMouseCursor(_GLFWwindow* window)
-{
-    [NSCursor unhide];
-    CGAssociateMouseAndMouseCursorPosition(true);
 }
 
 //========================================================================
@@ -1042,5 +1138,26 @@ void _glfwPlatformSetMouseCursorPos(_GLFWwindow* window, int x, int y)
                                       mainScreenHeight - globalPoint.y -
                                           mainScreenOrigin.y);
     CGDisplayMoveCursorToPoint(CGMainDisplayID(), targetPoint);
+}
+
+//========================================================================
+// Set physical mouse cursor mode
+//========================================================================
+
+void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
+{
+    switch (mode)
+    {
+        case GLFW_CURSOR_NORMAL:
+            [NSCursor unhide];
+            CGAssociateMouseAndMouseCursorPosition(true);
+            break;
+        case GLFW_CURSOR_HIDDEN:
+            break;
+        case GLFW_CURSOR_CAPTURED:
+            [NSCursor hide];
+            CGAssociateMouseAndMouseCursorPosition(false);
+            break;
+    }
 }
 

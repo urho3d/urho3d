@@ -38,12 +38,12 @@
 //////////////////////////////////////////////////////////////////////////
 
 //========================================================================
-// Calculate the gamma ramp table from specified values
+// Calculate a gamma ramp from the specified value and set it
 //========================================================================
 
-GLFWAPI void glfwSetGammaFormula(float gamma, float blacklevel, float gain)
+GLFWAPI void glfwSetGamma(float gamma)
 {
-    int i, size = 256;
+    int i, size = GLFW_GAMMA_RAMP_SIZE;
     GLFWgammaramp ramp;
 
     if (!_glfwInitialized)
@@ -52,18 +52,19 @@ GLFWAPI void glfwSetGammaFormula(float gamma, float blacklevel, float gain)
         return;
     }
 
+    if (gamma <= 0.f)
+    {
+        _glfwSetError(GLFW_INVALID_VALUE,
+                      "glfwSetGamma: Gamma value must be greater than zero");
+        return;
+    }
+
     for (i = 0;  i < size;  i++)
     {
         float value = (float) i / ((float) (size - 1));
 
         // Apply gamma
-        value = pow(value, 1.f / gamma) * 65535.f + 0.5f;
-
-        // Apply gain
-        value = gain * (value - 32767.5f) + 32767.5f;
-
-        // Apply black-level
-        value += blacklevel * 65535.f;
+        value = (float) pow(value, 1.f / gamma) * 65535.f + 0.5f;
 
         // Clamp values
         if (value < 0.f)

@@ -105,16 +105,16 @@ static const String noParameter;
 
 int CloseCallback(GLFWwindow window)
 {
-    // Do not let GLFW close the window, rather do it ourselves in a controlled fashion
     Context* context = GetWindowContext(window);
     if (context)
     {
         Graphics* graphics = context->GetSubsystem<Graphics>();
+        // Do not close the window: GLFW will do it for us
         if (graphics)
-            graphics->Close();
+            graphics->Release(true, false);
     }
 
-    return GL_FALSE;
+    return GL_TRUE;
 }
 
 OBJECTTYPESTATIC(Graphics);
@@ -210,8 +210,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         }
     }
     
-    // Close the existing window
-    Release();
+    // Close the existing window, mark GPU objects as lost
+    Release(false, true);
     
     {
         // GLFW window parameters and the window list are static, so need to operate under static lock
@@ -223,7 +223,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         glfwOpenWindowHint(GLFW_ALPHA_BITS, 0);
         glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
         glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
-        glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
+        glfwOpenWindowHint(GLFW_WINDOW_RESIZABLE, GL_FALSE);
         if (multiSample > 1)
             glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
         else
@@ -329,13 +329,8 @@ void Graphics::Close()
     if (!IsInitialized())
         return;
     
-    // Release all GPU objects that still exist
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->Release();
-    gpuObjects_.Clear();
-
     // Actually close the window
-    Release();
+    Release(true, true);
 }
 
 bool Graphics::TakeScreenShot(Image& destImage)
@@ -1831,6 +1826,48 @@ void Graphics::FreeDiscardLockBuffer(void* buffer)
     LOGWARNING("Reserved discard lock buffer " + ToStringHex((unsigned)buffer) + " not found");
 }
 
+void Graphics::Release(bool clearGPUObjects, bool closeWindow)
+{
+    if (!impl_->window_)
+        return;
+    
+    depthTextures_.Clear();
+    
+    if (clearGPUObjects)
+    {
+        // Shutting down: release all GPU objects that still exist
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->Release();
+        gpuObjects_.Clear();
+    }
+    else
+    {
+        // We are not shutting down, but recreating the context: mark GPU objects lost
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceLost();
+    }
+    
+    if (impl_->fbo_)
+    {
+        glDeleteFramebuffersEXT(1, &impl_->fbo_);
+        impl_->fbo_ = 0;
+    }
+    
+    // When the new context is initialized, it will have default state again
+    ResetCachedState();
+    ClearParameterSources();
+    
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        SetWindowContext(impl_->window_, 0);
+        // If in close callback, GLFW will close the window for us, so skip it
+        if (closeWindow)
+            glfwCloseWindow(impl_->window_);
+        impl_->window_ = 0;
+    }
+}
+
 unsigned Graphics::GetAlphaFormat()
 {
     return GL_ALPHA;
@@ -2007,36 +2044,6 @@ void Graphics::ResetCachedState()
     impl_->drawBuffers_ = M_MAX_UNSIGNED;
     impl_->enabledAttributes_ = 0;
     impl_->fboBound_ = false;
-}
-
-void Graphics::Release()
-{
-    if (!impl_->window_)
-        return;
-    
-    depthTextures_.Clear();
-    
-    // If GPU objects exist ie. it's a context delete/recreate, not Close(), tell them to save and release themselves
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->OnDeviceLost();
-    
-    if (impl_->fbo_)
-    {
-        glDeleteFramebuffersEXT(1, &impl_->fbo_);
-        impl_->fbo_ = 0;
-    }
-    
-    // When the new context is initialized, it will have default state again
-    ResetCachedState();
-    ClearParameterSources();
-    
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        SetWindowContext(impl_->window_, 0);
-        glfwCloseWindow(impl_->window_);
-        impl_->window_ = 0;
-    }
 }
 
 void Graphics::SetTextureUnitMappings()

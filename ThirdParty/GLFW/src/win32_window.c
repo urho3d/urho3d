@@ -157,7 +157,9 @@ static int getPixelFormatAttrib(_GLFWwindow* window, int pixelFormat, int attrib
 {
     int value = 0;
 
-    if (!window->WGL.GetPixelFormatAttribivARB(window->WGL.DC, pixelFormat, 0, 1, &attrib, &value))
+    if (!window->WGL.GetPixelFormatAttribivARB(window->WGL.DC,
+                                               pixelFormat,
+                                               0, 1, &attrib, &value))
     {
         // NOTE: We should probably handle this error somehow
         return 0;
@@ -179,10 +181,15 @@ static _GLFWfbconfig* getFBConfigs(_GLFWwindow* window, unsigned int* found)
 
     *found = 0;
 
-    if (window->WGL.has_WGL_ARB_pixel_format)
+    if (window->WGL.ARB_pixel_format)
         count = getPixelFormatAttrib(window, 1, WGL_NUMBER_PIXEL_FORMATS_ARB);
     else
-        count = _glfw_DescribePixelFormat(window->WGL.DC, 1, sizeof(PIXELFORMATDESCRIPTOR), NULL);
+    {
+        count = _glfw_DescribePixelFormat(window->WGL.DC,
+                                          1,
+                                          sizeof(PIXELFORMATDESCRIPTOR),
+                                          NULL);
+    }
 
     if (!count)
     {
@@ -190,16 +197,17 @@ static _GLFWfbconfig* getFBConfigs(_GLFWwindow* window, unsigned int* found)
         return NULL;
     }
 
-    result = (_GLFWfbconfig*) _glfwMalloc(sizeof(_GLFWfbconfig) * count);
+    result = (_GLFWfbconfig*) malloc(sizeof(_GLFWfbconfig) * count);
     if (!result)
     {
-        _glfwSetError(GLFW_OUT_OF_MEMORY, "Win32/WGL: Failed to allocate _GLFWfbconfig array");
+        _glfwSetError(GLFW_OUT_OF_MEMORY,
+                      "Win32/WGL: Failed to allocate _GLFWfbconfig array");
         return NULL;
     }
 
     for (i = 1;  i <= count;  i++)
     {
-        if (window->WGL.has_WGL_ARB_pixel_format)
+        if (window->WGL.ARB_pixel_format)
         {
             // Get pixel format attributes through WGL_ARB_pixel_format
             if (!getPixelFormatAttrib(window, i, WGL_SUPPORT_OPENGL_ARB) ||
@@ -249,7 +257,7 @@ static _GLFWfbconfig* getFBConfigs(_GLFWwindow* window, unsigned int* found)
             result[*found].stereo =
                 getPixelFormatAttrib(window, i, WGL_STEREO_ARB);
 
-            if (window->WGL.has_WGL_ARB_multisample)
+            if (window->WGL.ARB_multisample)
             {
                 result[*found].samples =
                     getPixelFormatAttrib(window, i, WGL_SAMPLES_ARB);
@@ -261,8 +269,13 @@ static _GLFWfbconfig* getFBConfigs(_GLFWwindow* window, unsigned int* found)
         {
             // Get pixel format attributes through old-fashioned PFDs
 
-            if (!_glfw_DescribePixelFormat(window->WGL.DC, i, sizeof(PIXELFORMATDESCRIPTOR), &pfd))
+            if (!_glfw_DescribePixelFormat(window->WGL.DC,
+                                           i,
+                                           sizeof(PIXELFORMATDESCRIPTOR),
+                                           &pfd))
+            {
                 continue;
+            }
 
             if (!(pfd.dwFlags & PFD_DRAW_TO_WINDOW) ||
                 !(pfd.dwFlags & PFD_SUPPORT_OPENGL) ||
@@ -326,17 +339,19 @@ static GLboolean createContext(_GLFWwindow* window,
 
     if (!_glfw_DescribePixelFormat(window->WGL.DC, pixelFormat, sizeof(pfd), &pfd))
     {
-        _glfwSetError(GLFW_OPENGL_UNAVAILABLE, "Win32/WGL: Failed to retrieve PFD for selected pixel format");
+        _glfwSetError(GLFW_OPENGL_UNAVAILABLE,
+                      "Win32/WGL: Failed to retrieve PFD for selected pixel format");
         return GL_FALSE;
     }
 
     if (!_glfw_SetPixelFormat(window->WGL.DC, pixelFormat, &pfd))
     {
-        _glfwSetError(GLFW_OPENGL_UNAVAILABLE, "Win32/WGL: Failed to set selected pixel format");
+        _glfwSetError(GLFW_OPENGL_UNAVAILABLE,
+                      "Win32/WGL: Failed to set selected pixel format");
         return GL_FALSE;
     }
 
-    if (window->WGL.has_WGL_ARB_create_context)
+    if (window->WGL.ARB_create_context)
     {
         // Use the newer wglCreateContextAttribsARB creation method
 
@@ -371,16 +386,20 @@ static GLboolean createContext(_GLFWwindow* window,
         {
             int flags = 0;
 
-            if (!window->WGL.has_WGL_ARB_create_context_profile)
+            if (!window->WGL.ARB_create_context_profile)
             {
-                _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: OpenGL profile requested but WGL_ARB_create_context_profile is unavailable");
+                _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                              "Win32/WGL: OpenGL profile requested but "
+                              "WGL_ARB_create_context_profile is unavailable");
                 return GL_FALSE;
             }
 
             if (wndconfig->glProfile == GLFW_OPENGL_ES2_PROFILE &&
-                !window->WGL.has_WGL_EXT_create_context_es2_profile)
+                !window->WGL.EXT_create_context_es2_profile)
             {
-                _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: OpenGL ES 2.x profile requested but WGL_EXT_create_context_es2_profile is unavailable");
+                _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                              "Win32/WGL: OpenGL ES 2.x profile requested but "
+                              "WGL_EXT_create_context_es2_profile is unavailable");
                 return GL_FALSE;
             }
 
@@ -399,9 +418,12 @@ static GLboolean createContext(_GLFWwindow* window,
         {
             int strategy;
 
-            if (!window->WGL.has_WGL_ARB_create_context_robustness)
+            if (!window->WGL.ARB_create_context_robustness)
             {
-                _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: An OpenGL robustness strategy was requested but WGL_ARB_create_context_robustness is unavailable");
+                _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                              "Win32/WGL: An OpenGL robustness strategy was "
+                              "requested but WGL_ARB_create_context_robustness "
+                              "is unavailable");
                 return GL_FALSE;
             }
 
@@ -421,7 +443,8 @@ static GLboolean createContext(_GLFWwindow* window,
                                                                   attribs);
         if (!window->WGL.context)
         {
-            _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: Failed to create OpenGL context");
+            _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                          "Win32/WGL: Failed to create OpenGL context");
             return GL_FALSE;
         }
     }
@@ -430,7 +453,8 @@ static GLboolean createContext(_GLFWwindow* window,
         window->WGL.context = wglCreateContext(window->WGL.DC);
         if (!window->WGL.context)
         {
-            _glfwSetError(GLFW_PLATFORM_ERROR, "Win32/WGL: Failed to create OpenGL context");
+            _glfwSetError(GLFW_PLATFORM_ERROR,
+                          "Win32/WGL: Failed to create OpenGL context");
             return GL_FALSE;
         }
 
@@ -438,13 +462,67 @@ static GLboolean createContext(_GLFWwindow* window,
         {
             if (!wglShareLists(share, window->WGL.context))
             {
-                _glfwSetError(GLFW_PLATFORM_ERROR, "Win32/WGL: Failed to enable sharing with specified OpenGL context");
+                _glfwSetError(GLFW_PLATFORM_ERROR,
+                              "Win32/WGL: Failed to enable sharing with "
+                              "specified OpenGL context");
                 return GL_FALSE;
             }
         }
     }
 
     return GL_TRUE;
+}
+
+
+//========================================================================
+// Hide mouse cursor
+//========================================================================
+
+static void hideMouseCursor(_GLFWwindow* window)
+{
+}
+
+
+//========================================================================
+// Capture mouse cursor
+//========================================================================
+
+static void captureMouseCursor(_GLFWwindow* window)
+{
+    RECT ClipWindowRect;
+
+    if (window->mouseCursorVisible == GL_TRUE)
+    {
+        ShowCursor(FALSE);
+        window->mouseCursorVisible = GL_FALSE;
+    }
+    
+    // Clip cursor to the window
+    if (GetWindowRect(window->Win32.handle, &ClipWindowRect))
+        ClipCursor(&ClipWindowRect);
+
+    // Capture cursor to user window
+    SetCapture(window->Win32.handle);
+}
+
+
+//========================================================================
+// Show mouse cursor
+//========================================================================
+
+static void showMouseCursor(_GLFWwindow* window)
+{
+    // Un-capture cursor
+    ReleaseCapture();
+
+    // Release the cursor from the window
+    ClipCursor(NULL);
+
+    if (window->mouseCursorVisible == GL_FALSE)
+    {
+        ShowCursor(TRUE);
+        window->mouseCursorVisible = GL_TRUE;
+    }
 }
 
 
@@ -742,13 +820,9 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             {
                 // The window was deactivated (or iconified, see above)
 
-                if (window == _glfwLibrary.cursorLockWindow)
-                {
-                    _glfwPlatformShowMouseCursor(window);
-                    // Urho3D: reset activated flag
-                    window->Win32.activated = GL_FALSE;
-                }
-                
+                if (window->cursorMode == GLFW_CURSOR_CAPTURED)
+                    showMouseCursor(window);
+
                 if (window->mode == GLFW_FULLSCREEN)
                 {
                     if (!iconified)
@@ -768,9 +842,10 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             else if (active && _glfwLibrary.activeWindow != window)
             {
                 // The window was activated
-                // Urho3D: do not re-hide mouse right now, but after all events have been polled, to allow window drag
-                window->Win32.activated = GL_TRUE;
-                
+
+                if (window->cursorMode == GLFW_CURSOR_CAPTURED)
+                    captureMouseCursor(window);
+
                 if (window->mode == GLFW_FULLSCREEN)
                 {
                     if (!_glfwLibrary.Win32.monitor.modeChanged)
@@ -787,15 +862,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             }
 
             _glfwInputWindowFocus(window, active);
-
-            if (iconified != window->iconified)
-            {
-                window->iconified = iconified;
-
-                if (_glfwLibrary.windowIconifyCallback)
-                    _glfwLibrary.windowIconifyCallback(window, window->iconified);
-            }
-
+            _glfwInputWindowIconify(window, iconified);
             return 0;
         }
 
@@ -838,7 +905,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             if (_glfwLibrary.charCallback)
                 translateChar(window, (DWORD) wParam, (DWORD) lParam);
 
-            return 0;
+            break;
         }
 
         case WM_KEYUP:
@@ -853,7 +920,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             else
                 _glfwInputKey(window, translateKey(wParam, lParam), GLFW_RELEASE);
 
-            return 0;
+            break;
         }
 
         case WM_LBUTTONDOWN:
@@ -941,29 +1008,27 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             if (newMouseX != window->Win32.oldMouseX ||
                 newMouseY != window->Win32.oldMouseY)
             {
-                if (window == _glfwLibrary.cursorLockWindow)
+                int x, y;
+
+                if (window->cursorMode == GLFW_CURSOR_CAPTURED)
                 {
-                    window->mousePosX += newMouseX -
-                                         window->Win32.oldMouseX;
-                    window->mousePosY += newMouseY -
-                                         window->Win32.oldMouseY;
+                    if (_glfwLibrary.activeWindow != window)
+                        return 0;
+
+                    x = newMouseX - window->Win32.oldMouseX;
+                    y = newMouseY - window->Win32.oldMouseY;
                 }
                 else
                 {
-                    window->mousePosX = newMouseX;
-                    window->mousePosY = newMouseY;
+                    x = newMouseX;
+                    y = newMouseY;
                 }
 
                 window->Win32.oldMouseX = newMouseX;
                 window->Win32.oldMouseY = newMouseY;
-                window->Win32.mouseMoved = GL_TRUE;
+                window->Win32.cursorCentered = GL_FALSE;
 
-                if (_glfwLibrary.mousePosCallback)
-                {
-                    _glfwLibrary.mousePosCallback(window,
-                                                  window->mousePosX,
-                                                  window->mousePosY);
-                }
+                _glfwInputCursorMotion(window, x, y);
             }
 
             return 0;
@@ -985,44 +1050,36 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_SIZE:
         {
-            window->width  = LOWORD(lParam);
-            window->height = HIWORD(lParam);
-
-            // If the mouse is locked, update the clipping rect
-            if (window == _glfwLibrary.cursorLockWindow)
+            // If window is in cursor capture mode, update clipping rect
+            if (window->cursorMode == GLFW_CURSOR_CAPTURED)
             {
                 RECT ClipWindowRect;
                 if (GetWindowRect(window->Win32.handle, &ClipWindowRect))
                     ClipCursor(&ClipWindowRect);
             }
 
-            if (_glfwLibrary.windowSizeCallback)
-                _glfwLibrary.windowSizeCallback(window, window->width, window->height);
-
+            _glfwInputWindowSize(window, LOWORD(lParam), HIWORD(lParam));
             return 0;
         }
 
         case WM_MOVE:
         {
-            window->positionX = LOWORD(lParam);
-            window->positionY = HIWORD(lParam);
-
-            // If the mouse is locked, update the clipping rect
-            if (window == _glfwLibrary.cursorLockWindow)
+            // If window is in cursor capture mode, update clipping rect
+            if (window->cursorMode == GLFW_CURSOR_CAPTURED)
             {
                 RECT ClipWindowRect;
                 if (GetWindowRect(window->Win32.handle, &ClipWindowRect))
                     ClipCursor(&ClipWindowRect);
             }
+
+            _glfwInputWindowPos(window, LOWORD(lParam), HIWORD(lParam));
             return 0;
         }
 
         // Was the window contents damaged?
         case WM_PAINT:
         {
-            if (_glfwLibrary.windowRefreshCallback)
-                _glfwLibrary.windowRefreshCallback(window);
-
+            _glfwInputWindowDamage(window);
             break;
         }
 
@@ -1083,13 +1140,13 @@ static void initWGLExtensions(_GLFWwindow* window)
 
     // This needs to include every extension used below except for
     // WGL_ARB_extensions_string and WGL_EXT_extensions_string
-    window->WGL.has_WGL_ARB_multisample = GL_FALSE;
-    window->WGL.has_WGL_ARB_create_context = GL_FALSE;
-    window->WGL.has_WGL_ARB_create_context_profile = GL_FALSE;
-    window->WGL.has_WGL_EXT_create_context_es2_profile = GL_FALSE;
-    window->WGL.has_WGL_ARB_create_context_robustness = GL_FALSE;
-    window->WGL.has_WGL_EXT_swap_control = GL_FALSE;
-    window->WGL.has_WGL_ARB_pixel_format = GL_FALSE;
+    window->WGL.ARB_multisample = GL_FALSE;
+    window->WGL.ARB_create_context = GL_FALSE;
+    window->WGL.ARB_create_context_profile = GL_FALSE;
+    window->WGL.EXT_create_context_es2_profile = GL_FALSE;
+    window->WGL.ARB_create_context_robustness = GL_FALSE;
+    window->WGL.EXT_swap_control = GL_FALSE;
+    window->WGL.ARB_pixel_format = GL_FALSE;
 
     window->WGL.GetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC)
         wglGetProcAddress("wglGetExtensionsStringEXT");
@@ -1102,7 +1159,7 @@ static void initWGLExtensions(_GLFWwindow* window)
     }
 
     if (_glfwPlatformExtensionSupported("WGL_ARB_multisample"))
-        window->WGL.has_WGL_ARB_multisample = GL_TRUE;
+        window->WGL.ARB_multisample = GL_TRUE;
 
     if (_glfwPlatformExtensionSupported("WGL_ARB_create_context"))
     {
@@ -1110,26 +1167,26 @@ static void initWGLExtensions(_GLFWwindow* window)
             wglGetProcAddress("wglCreateContextAttribsARB");
 
         if (window->WGL.CreateContextAttribsARB)
-            window->WGL.has_WGL_ARB_create_context = GL_TRUE;
+            window->WGL.ARB_create_context = GL_TRUE;
     }
 
-    if (window->WGL.has_WGL_ARB_create_context)
+    if (window->WGL.ARB_create_context)
     {
         if (_glfwPlatformExtensionSupported("WGL_ARB_create_context_profile"))
-            window->WGL.has_WGL_ARB_create_context_profile = GL_TRUE;
+            window->WGL.ARB_create_context_profile = GL_TRUE;
     }
 
-    if (window->WGL.has_WGL_ARB_create_context &&
-        window->WGL.has_WGL_ARB_create_context_profile)
+    if (window->WGL.ARB_create_context &&
+        window->WGL.ARB_create_context_profile)
     {
         if (_glfwPlatformExtensionSupported("WGL_EXT_create_context_es2_profile"))
-            window->WGL.has_WGL_EXT_create_context_es2_profile = GL_TRUE;
+            window->WGL.EXT_create_context_es2_profile = GL_TRUE;
     }
 
-    if (window->WGL.has_WGL_ARB_create_context)
+    if (window->WGL.ARB_create_context)
     {
         if (_glfwPlatformExtensionSupported("WGL_ARB_create_context_robustness"))
-            window->WGL.has_WGL_ARB_create_context_robustness = GL_TRUE;
+            window->WGL.ARB_create_context_robustness = GL_TRUE;
     }
 
     if (_glfwPlatformExtensionSupported("WGL_EXT_swap_control"))
@@ -1138,7 +1195,7 @@ static void initWGLExtensions(_GLFWwindow* window)
             wglGetProcAddress("wglSwapIntervalEXT");
 
         if (window->WGL.SwapIntervalEXT)
-            window->WGL.has_WGL_EXT_swap_control = GL_TRUE;
+            window->WGL.EXT_swap_control = GL_TRUE;
     }
 
     if (_glfwPlatformExtensionSupported("WGL_ARB_pixel_format"))
@@ -1147,7 +1204,7 @@ static void initWGLExtensions(_GLFWwindow* window)
             wglGetProcAddress("wglGetPixelFormatAttribivARB");
 
         if (window->WGL.GetPixelFormatAttribivARB)
-            window->WGL.has_WGL_ARB_pixel_format = GL_TRUE;
+            window->WGL.ARB_pixel_format = GL_TRUE;
     }
 }
 
@@ -1173,7 +1230,7 @@ static ATOM registerWindowClass(void)
     wc.lpszClassName = _GLFW_WNDCLASSNAME;            // Set class name
 
     // Load user-provided icon if available
-    wc.hIcon = LoadIcon(_glfwLibrary.Win32.instance, "GLFW_ICON");
+    wc.hIcon = LoadIcon(_glfwLibrary.Win32.instance, L"GLFW_ICON");
     if (!wc.hIcon)
     {
         // Load default icon
@@ -1183,7 +1240,8 @@ static ATOM registerWindowClass(void)
     classAtom = RegisterClass(&wc);
     if (!classAtom)
     {
-        _glfwSetError(GLFW_PLATFORM_ERROR, "Win32/WGL: Failed to register window class");
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "Win32/WGL: Failed to register window class");
         return 0;
     }
 
@@ -1209,13 +1267,13 @@ static int choosePixelFormat(_GLFWwindow* window, const _GLFWfbconfig* fbconfig)
     closest = _glfwChooseFBConfig(fbconfig, fbconfigs, fbcount);
     if (!closest)
     {
-        _glfwFree(fbconfigs);
+        free(fbconfigs);
         return 0;
     }
 
     pixelFormat = (int) closest->platformID;
 
-    _glfwFree(fbconfigs);
+    free(fbconfigs);
     fbconfigs = NULL;
     closest = NULL;
 
@@ -1235,6 +1293,7 @@ static int createWindow(_GLFWwindow* window,
     int pixelFormat, fullWidth, fullHeight;
     RECT wa;
     POINT pos;
+    WCHAR* wideTitle;
 
     // Set common window styles
     dwStyle = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
@@ -1261,7 +1320,7 @@ static int createWindow(_GLFWwindow* window,
     {
         dwStyle |= WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
-        if (!wndconfig->windowNoResize)
+        if (wndconfig->resizable)
         {
             dwStyle |= (WS_MAXIMIZEBOX | WS_SIZEBOX);
             dwExStyle |= WS_EX_WINDOWEDGE;
@@ -1283,9 +1342,17 @@ static int createWindow(_GLFWwindow* window,
     else
         SystemParametersInfo(SPI_GETWORKAREA, 0, &wa, 0);
 
+    wideTitle = _glfwCreateWideStringFromUTF8(wndconfig->title);
+    if (!wideTitle)
+    {
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "glfwOpenWindow: Failed to convert title to wide string");
+        return GL_FALSE;
+    }
+
     window->Win32.handle = CreateWindowEx(window->Win32.dwExStyle,
                                           _GLFW_WNDCLASSNAME,
-                                          wndconfig->title,
+                                          wideTitle,
                                           window->Win32.dwStyle,
                                           wa.left, wa.top,       // Window position
                                           fullWidth,             // Decorated window width
@@ -1301,10 +1368,13 @@ static int createWindow(_GLFWwindow* window,
         return GL_FALSE;
     }
 
+    free(wideTitle);
+
     window->WGL.DC = GetDC(window->Win32.handle);
     if (!window->WGL.DC)
     {
-        _glfwSetError(GLFW_PLATFORM_ERROR, "Win32/WGL: Failed to retrieve DC for window");
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "Win32/WGL: Failed to retrieve DC for window");
         return GL_FALSE;
     }
 
@@ -1315,15 +1385,15 @@ static int createWindow(_GLFWwindow* window,
     if (!createContext(window, wndconfig, pixelFormat))
         return GL_FALSE;
 
-    glfwMakeWindowCurrent(window);
+    glfwMakeContextCurrent(window);
 
     initWGLExtensions(window);
 
     // Initialize mouse position data
     GetCursorPos(&pos);
     ScreenToClient(window->Win32.handle, &pos);
-    window->Win32.oldMouseX = window->mousePosX = pos.x;
-    window->Win32.oldMouseY = window->mousePosY = pos.y;
+    window->Win32.oldMouseX = window->cursorPosX = pos.x;
+    window->Win32.oldMouseY = window->cursorPosY = pos.y;
 
     return GL_TRUE;
 }
@@ -1338,7 +1408,7 @@ static void destroyWindow(_GLFWwindow* window)
     // This is duplicated from glfwCloseWindow
     // TODO: Stop duplicating code
     if (window == _glfwLibrary.currentWindow)
-        glfwMakeWindowCurrent(NULL);
+        glfwMakeContextCurrent(NULL);
 
     // This is duplicated from glfwCloseWindow
     // TODO: Stop duplicating code
@@ -1380,10 +1450,6 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 {
     GLboolean recreateContext = GL_FALSE;
 
-    // Urho3D: reset extra flags
-    window->Win32.activated = GL_FALSE;
-    window->Win32.mouseVisible = GL_TRUE;
-    
     window->Win32.desiredRefreshRate = wndconfig->refreshRate;
 
     if (!_glfwLibrary.Win32.classAtom)
@@ -1418,15 +1484,18 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 
     if (wndconfig->glMajor != 1 || wndconfig->glMinor != 0)
     {
-        if (window->WGL.has_WGL_ARB_create_context)
+        if (window->WGL.ARB_create_context)
             recreateContext = GL_TRUE;
     }
 
     if (wndconfig->glForward || wndconfig->glDebug)
     {
-        if (!window->WGL.has_WGL_ARB_create_context)
+        if (!window->WGL.ARB_create_context)
         {
-            _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: A forward compatible or debug OpenGL context requested but WGL_ARB_create_context is unavailable");
+            _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                          "Win32/WGL: A forward compatible or debug OpenGL "
+                          "context requested but WGL_ARB_create_context is "
+                          "unavailable");
             return GL_FALSE;
         }
 
@@ -1435,9 +1504,11 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 
     if (wndconfig->glProfile)
     {
-        if (!window->WGL.has_WGL_ARB_create_context_profile)
+        if (!window->WGL.ARB_create_context_profile)
         {
-            _glfwSetError(GLFW_VERSION_UNAVAILABLE, "Win32/WGL: OpenGL profile requested but WGL_ARB_create_context_profile is unavailable");
+            _glfwSetError(GLFW_VERSION_UNAVAILABLE,
+                          "Win32/WGL: OpenGL profile requested but "
+                          "WGL_ARB_create_context_profile is unavailable");
             return GL_FALSE;
         }
 
@@ -1449,7 +1520,7 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
         // We want FSAA, but can we get it?
         // FSAA is not a hard constraint, so otherwise we just don't care
 
-        if (window->WGL.has_WGL_ARB_multisample && window->WGL.has_WGL_ARB_pixel_format)
+        if (window->WGL.ARB_multisample && window->WGL.ARB_pixel_format)
         {
             // We appear to have both the FSAA extension and the means to ask for it
             recreateContext = GL_TRUE;
@@ -1471,7 +1542,7 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
 
         // Technically, it may be possible to keep the old window around if
         // we're just creating an OpenGL 3.0+ context with the same pixel
-        // format, but it's not worth the potential compatibility problems
+        // format, but it's not worth the added code complexity
 
         destroyWindow(window);
 
@@ -1490,19 +1561,6 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
     SetFocus(window->Win32.handle);
 
     return GL_TRUE;
-}
-
-
-//========================================================================
-// Make the OpenGL context associated with the specified window current
-//========================================================================
-
-void _glfwPlatformMakeWindowCurrent(_GLFWwindow* window)
-{
-    if (window)
-        wglMakeCurrent(window->WGL.DC, window->WGL.context);
-    else
-        wglMakeCurrent(NULL, NULL);
 }
 
 
@@ -1531,7 +1589,17 @@ void _glfwPlatformCloseWindow(_GLFWwindow* window)
 
 void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
 {
-    SetWindowText(window->Win32.handle, title);
+    WCHAR* wideTitle = _glfwCreateWideStringFromUTF8(title);
+    if (!wideTitle)
+    {
+        _glfwSetError(GLFW_PLATFORM_ERROR,
+                      "glfwSetWindowTitle: Failed to convert title to wide string");
+        return;
+    }
+
+    SetWindowText(window->Win32.handle, wideTitle);
+
+    free(wideTitle);
 }
 
 
@@ -1541,7 +1609,8 @@ void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
 
 void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
 {
-    int bpp, newMode = 0, refresh;
+    //int bpp, refresh;
+    int newMode = 0;
     GLboolean sizeChanged = GL_FALSE;
 
     if (window->mode == GLFW_FULLSCREEN)
@@ -1632,14 +1701,14 @@ void _glfwPlatformRefreshWindowParams(void)
 {
     PIXELFORMATDESCRIPTOR pfd;
     DEVMODE dm;
-    int pixelFormat, mode;
+    int pixelFormat;
 
     _GLFWwindow* window = _glfwLibrary.currentWindow;
 
     // Obtain a detailed description of current pixel format
     pixelFormat = _glfw_GetPixelFormat(window->WGL.DC);
 
-    if (window->WGL.has_WGL_ARB_pixel_format)
+    if (window->WGL.ARB_pixel_format)
     {
         if (getPixelFormatAttrib(window, pixelFormat, WGL_ACCELERATION_ARB) !=
             WGL_NO_ACCELERATION_ARB)
@@ -1677,7 +1746,7 @@ void _glfwPlatformRefreshWindowParams(void)
         window->stereo =
             getPixelFormatAttrib(window, pixelFormat, WGL_STEREO_ARB) ? GL_TRUE : GL_FALSE;
 
-        if (window->WGL.has_WGL_ARB_multisample)
+        if (window->WGL.ARB_multisample)
         {
             window->samples = getPixelFormatAttrib(window, pixelFormat, WGL_SAMPLES_ARB);
 
@@ -1739,17 +1808,17 @@ void _glfwPlatformPollEvents(void)
     MSG msg;
     _GLFWwindow* window;
 
-    window = _glfwLibrary.cursorLockWindow;
+    window = _glfwLibrary.activeWindow;
     if (window)
     {
-        window->Win32.mouseMoved = GL_FALSE;
+        window->Win32.cursorCentered = GL_FALSE;
         window->Win32.oldMouseX = window->width / 2;
         window->Win32.oldMouseY = window->height / 2;
     }
     else
     {
-        //window->Win32.oldMouseX = window->mousePosX;
-        //window->Win32.oldMouseY = window->mousePosY;
+        //window->Win32.oldMouseX = window->cursorPosX;
+        //window->Win32.oldMouseY = window->cursorPosY;
     }
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -1797,24 +1866,20 @@ void _glfwPlatformPollEvents(void)
 
         if (!rshift_down && window->key[GLFW_KEY_RIGHT_SHIFT] == 1)
             _glfwInputKey(window, GLFW_KEY_RIGHT_SHIFT, GLFW_RELEASE);
-        
-        // Urho3D: did we become active in cursor lock mode?
-        if (window->Win32.activated)
-        {
-            if (window == _glfwLibrary.cursorLockWindow)
-                _glfwPlatformHideMouseCursor(window);
-            window->Win32.activated = GL_FALSE;
-        }
     }
-    
-    // Did we have mouse movement in locked cursor mode?
-    // Urho3D: check that we are the active window
-    window = _glfwLibrary.cursorLockWindow;
-    if (window && window == _glfwLibrary.activeWindow && window->Win32.mouseMoved)
+
+    // Did the cursor move in an active window that has captured the cursor
+    window = _glfwLibrary.activeWindow;
+    if (window)
     {
-        _glfwPlatformSetMouseCursorPos(window,
-                                       window->width / 2,
-                                       window->height / 2);
+        if (window->cursorMode == GLFW_CURSOR_CAPTURED &&
+            !window->Win32.cursorCentered)
+        {
+            _glfwPlatformSetMouseCursorPos(window,
+                                           window->width / 2,
+                                           window->height / 2);
+            window->Win32.cursorCentered = GL_TRUE;
+        }
     }
 }
 
@@ -1832,56 +1897,6 @@ void _glfwPlatformWaitEvents(void)
 
 
 //========================================================================
-// Hide mouse cursor (lock it)
-//========================================================================
-
-void _glfwPlatformHideMouseCursor(_GLFWwindow* window)
-{
-    RECT ClipWindowRect;
-
-    // Urho3D: track the cursor show/hide status, because it stacks on Win32
-    if (window->Win32.mouseVisible)
-    {
-        ShowCursor(FALSE);
-        window->Win32.mouseVisible = GL_FALSE;
-    }
-    
-    // Clip cursor to the window
-    if (GetWindowRect(window->Win32.handle, &ClipWindowRect))
-        ClipCursor(&ClipWindowRect);
-
-    // Capture cursor to user window
-    SetCapture(window->Win32.handle);
-    
-    // Urho3D: center the mouse cursor now to not get incorrect mouse move
-    _glfwPlatformSetMouseCursorPos(window,
-                                   window->width / 2,
-                                   window->height / 2);
-}
-
-
-//========================================================================
-// Show mouse cursor (unlock it)
-//========================================================================
-
-void _glfwPlatformShowMouseCursor(_GLFWwindow* window)
-{
-    // Un-capture cursor
-    ReleaseCapture();
-
-    // Release the cursor from the window
-    ClipCursor(NULL);
-
-    // Urho3D: track the cursor show/hide status, because it stacks on Win32
-    if (!window->Win32.mouseVisible)
-    {
-        ShowCursor(TRUE);
-        window->Win32.mouseVisible = GL_TRUE;
-    }
-}
-
-
-//========================================================================
 // Set physical mouse cursor position
 //========================================================================
 
@@ -1895,5 +1910,26 @@ void _glfwPlatformSetMouseCursorPos(_GLFWwindow* window, int x, int y)
     ClientToScreen(window->Win32.handle, &pos);
 
     SetCursorPos(pos.x, pos.y);
+}
+
+
+//========================================================================
+// Set physical mouse cursor mode
+//========================================================================
+
+void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
+{
+    switch (mode)
+    {
+        case GLFW_CURSOR_NORMAL:
+            showMouseCursor(window);
+            break;
+        case GLFW_CURSOR_HIDDEN:
+            hideMouseCursor(window);
+            break;
+        case GLFW_CURSOR_CAPTURED:
+            captureMouseCursor(window);
+            break;
+    }
 }
 

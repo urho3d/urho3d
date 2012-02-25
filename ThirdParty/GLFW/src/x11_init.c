@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 //========================================================================
@@ -365,7 +366,7 @@ static void updateKeyCodeLUT(void)
 
 static GLboolean initDisplay(void)
 {
-    _glfwLibrary.X11.display = XOpenDisplay(0);
+    _glfwLibrary.X11.display = XOpenDisplay(NULL);
     if (!_glfwLibrary.X11.display)
     {
         _glfwSetError(GLFW_OPENGL_UNAVAILABLE, "X11/GLX: Failed to open X display");
@@ -401,7 +402,8 @@ static GLboolean initDisplay(void)
                              &_glfwLibrary.X11.RandR.majorVersion,
                              &_glfwLibrary.X11.RandR.minorVersion))
         {
-            _glfwSetError(GLFW_PLATFORM_ERROR, "X11/GLX: Failed to query RandR version");
+            _glfwSetError(GLFW_PLATFORM_ERROR,
+                          "X11/GLX: Failed to query RandR version");
             return GL_FALSE;
         }
     }
@@ -420,7 +422,8 @@ static GLboolean initDisplay(void)
                          &_glfwLibrary.X11.glxMajor,
                          &_glfwLibrary.X11.glxMinor))
     {
-        _glfwSetError(GLFW_OPENGL_UNAVAILABLE, "X11/GLX: Failed to query GLX version");
+        _glfwSetError(GLFW_OPENGL_UNAVAILABLE,
+                      "X11/GLX: Failed to query GLX version");
         return GL_FALSE;
     }
 
@@ -475,7 +478,8 @@ static void initGammaRamp(void)
             // This is probably Nvidia RandR with broken gamma support
             // Flag it as useless and try Xf86VidMode below, if available
             _glfwLibrary.X11.RandR.gammaBroken = GL_TRUE;
-            fprintf(stderr, "Ignoring broken nVidia implementation of RandR 1.2+ gamma\n");
+            fprintf(stderr,
+                    "Ignoring broken nVidia implementation of RandR 1.2+ gamma\n");
         }
 
         XRRFreeScreenResources(rr);
@@ -498,6 +502,7 @@ static void initGammaRamp(void)
 
     // Save the original gamma ramp
     _glfwPlatformGetGammaRamp(&_glfwLibrary.originalRamp);
+    _glfwLibrary.currentRamp = _glfwLibrary.originalRamp;
 }
 
 
@@ -515,14 +520,17 @@ static Cursor createNULLCursor(void)
 
     // TODO: Add error checks
 
-    cursormask = XCreatePixmap(_glfwLibrary.X11.display, _glfwLibrary.X11.root, 1, 1, 1);
+    cursormask = XCreatePixmap(_glfwLibrary.X11.display,
+                               _glfwLibrary.X11.root,
+                               1, 1, 1);
     xgc.function = GXclear;
     gc = XCreateGC(_glfwLibrary.X11.display, cursormask, GCFunction, &xgc);
     XFillRectangle(_glfwLibrary.X11.display, cursormask, gc, 0, 0, 1, 1);
     col.pixel = 0;
     col.red = 0;
     col.flags = 4;
-    cursor = XCreatePixmapCursor(_glfwLibrary.X11.display, cursormask, cursormask,
+    cursor = XCreatePixmapCursor(_glfwLibrary.X11.display,
+                                 cursormask, cursormask,
                                  &col, &col, 0, 0);
     XFreePixmap(_glfwLibrary.X11.display, cursormask);
     XFreeGC(_glfwLibrary.X11.display, gc);
@@ -612,7 +620,7 @@ int _glfwPlatformTerminate(void)
 
 const char* _glfwPlatformGetVersionString(void)
 {
-    const char* version = "GLFW " _GLFW_VERSION_FULL
+    const char* version = _GLFW_VERSION_FULL
 #if defined(_GLFW_HAS_XRANDR)
         " XRandR"
 #endif
@@ -621,6 +629,9 @@ const char* _glfwPlatformGetVersionString(void)
 #endif
 #if !defined(_GLFW_HAS_XRANDR) && !defined(_GLFW_HAS_XF86VIDMODE)
         " no-mode-switching-support"
+#endif
+#if defined(_GLFW_HAS_XKB)
+        " Xkb"
 #endif
 #if defined(_GLFW_HAS_GLXGETPROCADDRESS)
         " glXGetProcAddress"
@@ -632,6 +643,9 @@ const char* _glfwPlatformGetVersionString(void)
         " dlsym(libGL)"
 #else
         " no-extension-support"
+#endif
+#if defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)
+        " clock_gettime"
 #endif
 #if defined(_GLFW_USE_LINUX_JOYSTICKS)
         " Linux-joystick-API"

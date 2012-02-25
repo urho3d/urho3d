@@ -31,30 +31,30 @@
 #include "internal.h"
 
 
-void (*glXGetProcAddress(const GLubyte* procName))();
-void (*glXGetProcAddressARB(const GLubyte* procName))();
+// This is the only glXGetProcAddress variant not declared by glxext.h
 void (*glXGetProcAddressEXT(const GLubyte* procName))();
-
-// We support four different ways for getting addresses for GL/GLX
-// extension functions: glXGetProcAddress, glXGetProcAddressARB,
-// glXGetProcAddressEXT, and dlsym
-#if   defined(_GLFW_HAS_GLXGETPROCADDRESSARB)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddressARB(x)
-#elif defined(_GLFW_HAS_GLXGETPROCADDRESS)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddress(x)
-#elif defined(_GLFW_HAS_GLXGETPROCADDRESSEXT)
- #define _glfw_glXGetProcAddress(x) glXGetProcAddressEXT(x)
-#elif defined(_GLFW_HAS_DLOPEN)
- #define _glfw_glXGetProcAddress(x) dlsym(_glfwLibrary.X11.libGL, x)
- #define _GLFW_DLOPEN_LIBGL
-#else
-#define _glfw_glXGetProcAddress(x) NULL
-#endif
 
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////
 //////////////////////////////////////////////////////////////////////////
+
+//========================================================================
+// Make the OpenGL context associated with the specified window current
+//========================================================================
+
+void _glfwPlatformMakeContextCurrent(_GLFWwindow* window)
+{
+    if (window)
+    {
+        glXMakeCurrent(_glfwLibrary.X11.display,
+                       window->X11.handle,
+                       window->GLX.context);
+    }
+    else
+        glXMakeCurrent(_glfwLibrary.X11.display, None, NULL);
+}
+
 
 //========================================================================
 // Swap OpenGL buffers
@@ -75,13 +75,13 @@ void _glfwPlatformSwapInterval(int interval)
 {
     _GLFWwindow* window = _glfwLibrary.currentWindow;
 
-    if (window->GLX.has_GLX_EXT_swap_control)
+    if (window->GLX.EXT_swap_control)
     {
         window->GLX.SwapIntervalEXT(_glfwLibrary.X11.display,
                                     window->X11.handle,
                                     interval);
     }
-    else if (window->GLX.has_GLX_SGI_swap_control)
+    else if (window->GLX.SGI_swap_control)
         window->GLX.SwapIntervalSGI(interval);
 }
 
@@ -121,7 +121,7 @@ void* _glfwPlatformGetProcAddress(const char* procname)
 // Copies the specified OpenGL state categories from src to dst
 //========================================================================
 
-void _glfwPlatformCopyGLState(_GLFWwindow* src, _GLFWwindow* dst, unsigned long mask)
+void _glfwPlatformCopyContext(_GLFWwindow* src, _GLFWwindow* dst, unsigned long mask)
 {
     glXCopyContext(_glfwLibrary.X11.display,
                    src->GLX.context,

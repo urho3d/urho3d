@@ -340,6 +340,8 @@ public:
     void* ReserveDiscardLockBuffer(unsigned size);
     /// Free a CPU side discard locking buffer.
     void FreeDiscardLockBuffer(void* buffer);
+    /// Release/clear GPU objects and optionally close the window.
+    void Release(bool clearGPUObjects, bool closeWindow);
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -367,8 +369,6 @@ private:
     bool CheckFramebuffer();
     /// Reset cached rendering state.
     void ResetCachedState();
-    /// Release GPU objects and close the window.
-    void Release();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
     

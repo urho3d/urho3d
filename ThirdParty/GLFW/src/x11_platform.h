@@ -28,14 +28,12 @@
 //
 //========================================================================
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifndef _platform_h_
 #define _platform_h_
 
-#include <sys/time.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdint.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -43,14 +41,10 @@
 #define GLX_GLXEXT_LEGACY
 #include <GL/glx.h>
 
-#include "../../include/GL/glxext.h"
-
-
-// We need declarations for GLX version 1.3 or above even if the server doesn't
-// support version 1.3
-#ifndef GLX_VERSION_1_3
- #error "GLX header version 1.3 or above is required"
-#endif
+// This path may need to be changed if you build GLFW using your own setup
+// We ship and use our own copy of glxext.h since GLFW uses fairly new
+// extensions and not all operating systems come with an up-to-date version
+#include "../support/GL/glxext.h"
 
 // With XFree86, we can use the XF86VidMode extension
 #if defined(_GLFW_HAS_XF86VIDMODE)
@@ -69,6 +63,22 @@
 // The Xkb extension provides improved keyboard support
 #if defined(_GLFW_HAS_XKB)
  #include <X11/XKBlib.h>
+#endif
+
+// We support four different ways for getting addresses for GL/GLX
+// extension functions: glXGetProcAddress, glXGetProcAddressARB,
+// glXGetProcAddressEXT, and dlsym
+#if defined(_GLFW_HAS_GLXGETPROCADDRESSARB)
+ #define _glfw_glXGetProcAddress(x) glXGetProcAddressARB(x)
+#elif defined(_GLFW_HAS_GLXGETPROCADDRESS)
+ #define _glfw_glXGetProcAddress(x) glXGetProcAddress(x)
+#elif defined(_GLFW_HAS_GLXGETPROCADDRESSEXT)
+ #define _glfw_glXGetProcAddress(x) glXGetProcAddressEXT(x)
+#elif defined(_GLFW_HAS_DLOPEN)
+ #define _glfw_glXGetProcAddress(x) dlsym(_glfwLibrary.X11.libGL, x)
+ #define _GLFW_DLOPEN_LIBGL
+#else
+ #error "No OpenGL entry point retrieval mechanism was enabled"
 #endif
 
 #define _GLFW_PLATFORM_WINDOW_STATE  _GLFWwindowX11 X11
@@ -103,14 +113,14 @@ typedef struct _GLFWcontextGLX
     PFNGLXCREATECONTEXTWITHCONFIGSGIXPROC CreateContextWithConfigSGIX;
     PFNGLXGETVISUALFROMFBCONFIGSGIXPROC   GetVisualFromFBConfigSGIX;
     PFNGLXCREATECONTEXTATTRIBSARBPROC     CreateContextAttribsARB;
-    GLboolean   has_GLX_SGIX_fbconfig;
-    GLboolean   has_GLX_SGI_swap_control;
-    GLboolean   has_GLX_EXT_swap_control;
-    GLboolean   has_GLX_ARB_multisample;
-    GLboolean   has_GLX_ARB_create_context;
-    GLboolean   has_GLX_ARB_create_context_profile;
-    GLboolean   has_GLX_ARB_create_context_robustness;
-    GLboolean   has_GLX_EXT_create_context_es2_profile;
+    GLboolean   SGIX_fbconfig;
+    GLboolean   SGI_swap_control;
+    GLboolean   EXT_swap_control;
+    GLboolean   ARB_multisample;
+    GLboolean   ARB_create_context;
+    GLboolean   ARB_create_context_profile;
+    GLboolean   ARB_create_context_robustness;
+    GLboolean   EXT_create_context_es2_profile;
 
 } _GLFWcontextGLX;
 
@@ -124,6 +134,8 @@ typedef struct _GLFWwindowX11
     Colormap      colormap;          // Window colormap
     Window        handle;            // Window handle
     Atom          wmDeleteWindow;    // WM_DELETE_WINDOW atom
+    Atom          wmName;            // _NET_WM_NAME atom
+    Atom          wmIconName;        // _NET_WM_ICON_NAME atom
     Atom          wmPing;            // _NET_WM_PING atom
     Atom          wmState;           // _NET_WM_STATE atom
     Atom          wmStateFullscreen; // _NET_WM_STATE_FULLSCREEN atom
@@ -133,13 +145,11 @@ typedef struct _GLFWwindowX11
     GLboolean     hasEWMH;          // True if window manager supports EWMH
     GLboolean     overrideRedirect; // True if window is OverrideRedirect
     GLboolean     keyboardGrabbed;  // True if keyboard is currently grabbed
-    GLboolean     pointerGrabbed;   // True if pointer is currently grabbed
-    GLboolean     pointerHidden;    // True if pointer is currently hidden
-    GLboolean     mouseMoved;
+    GLboolean     cursorGrabbed;    // True if cursor is currently grabbed
+    GLboolean     cursorHidden;     // True if cursor is currently hidden
+    GLboolean     cursorCentered;   // True if cursor was moved since last poll
     int           cursorPosX, cursorPosY;
 
-    // Urho3D: added variable
-    GLboolean     discardMove;
 } _GLFWwindowX11;
 
 
@@ -181,7 +191,7 @@ typedef struct _GLFWlibraryX11
     } Xkb;
 
     // Key code LUT (mapping X11 key codes to GLFW key codes)
-    int         keyCodeLUT[256];
+    int             keyCodeLUT[256];
 
     // Screensaver data
     struct {
@@ -208,8 +218,9 @@ typedef struct _GLFWlibraryX11
 
     // Timer data
     struct {
+        GLboolean   monotonic;
         double      resolution;
-        long long   t0;
+        uint64_t    base;
     } timer;
 
 #if defined(_GLFW_DLOPEN_LIBGL)
