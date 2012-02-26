@@ -3493,9 +3493,15 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 
 
 // TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
+/// Urho3D: modified for type id caching
 int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 {
 	if( dtIn.IsNullHandle() ) return 0;
+
+	/// Urho3D: check cached type id first
+	int typeId = dtIn.GetCachedTypeId();
+	if( typeId )
+		return typeId;
 
 	// Register the base form
 	asCDataType dt(dtIn);
@@ -3509,7 +3515,7 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 	{
 		if( mapTypeIdToDataType.GetValue(cursor)->IsEqualExceptRefAndConst(dt) )
 		{
-			int typeId = mapTypeIdToDataType.GetKey(cursor);
+			typeId = mapTypeIdToDataType.GetKey(cursor);
 			if( dtIn.GetObjectType() && !(dtIn.GetObjectType()->flags & asOBJ_ASHANDLE) )
 			{
 				// The the ASHANDLE types behave like handles, but are really 
@@ -3520,6 +3526,8 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 					typeId |= asTYPEID_HANDLETOCONST;
 			}
 
+			// Urho3D: cache the type id for next query
+			dtIn.SetCachedTypeId(typeId);
 			return typeId;
 		}
 
@@ -3529,7 +3537,7 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 	// The type id doesn't exist, create it
 
 	// Setup the basic type id
-	int typeId = typeIdSeqNbr++;
+	typeId = typeIdSeqNbr++;
 	if( dt.GetObjectType() )
 	{
 		if( dt.GetObjectType()->flags & asOBJ_SCRIPT_OBJECT ) typeId |= asTYPEID_SCRIPTOBJECT;

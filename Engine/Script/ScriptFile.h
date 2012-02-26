@@ -23,9 +23,10 @@
 
 #pragma once
 
+#include "HashMap.h"
+#include "HashSet.h"
 #include "Resource.h"
 #include "ScriptEventListener.h"
-#include "Set.h"
 
 class Script;
 class ScriptInstance;
@@ -96,13 +97,13 @@ private:
     /// Compiled flag.
     bool compiled_;
     /// Encountered include files during script file loading.
-    Set<String> includeFiles_;
+    HashSet<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface.
-    Map<asIObjectType*, bool> checkedClasses_;
+    Map<asIObjectType*, bool> validClasses_;
     /// Search cache for functions.
-    Map<String, asIScriptFunction*> functions_;
+    HashMap<String, asIScriptFunction*> functions_;
     /// Search cache for methods.
-    Map<asIObjectType*, Map<String, asIScriptFunction*> > methods_;
+    Map<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
 };
 
 /// Get currently executing script file.

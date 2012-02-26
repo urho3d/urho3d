@@ -257,8 +257,8 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
     
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found = false;
-    Map<asIObjectType*, bool>::ConstIterator i = checkedClasses_.Find(type);
-    if (i != checkedClasses_.End())
+    Map<asIObjectType*, bool>::ConstIterator i = validClasses_.Find(type);
+    if (i != validClasses_.End())
         found = i->second_;
     else
     {
@@ -272,7 +272,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
                 break;
             }
         }
-        checkedClasses_[type] = found;
+        validClasses_[type] = found;
     }
     if (!found)
     {
@@ -298,7 +298,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
     if (!compiled_)
         return 0;
     
-    Map<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
+    HashMap<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
     if (i != functions_.End())
         return i->second_;
     
@@ -315,10 +315,10 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
-    Map<asIObjectType*, Map<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
+    Map<asIObjectType*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
     {
-        Map<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);
+        HashMap<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);
         if (j != i->second_.End())
             return j->second_;
     }
@@ -526,7 +526,7 @@ void ScriptFile::ReleaseModule()
     {
         // Clear search caches and event handlers
         includeFiles_.Clear();
-        checkedClasses_.Clear();
+        validClasses_.Clear();
         functions_.Clear();
         methods_.Clear();
         UnsubscribeFromAllEventsWithUserData();
