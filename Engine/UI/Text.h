@@ -115,10 +115,12 @@ protected:
     SharedPtr<Font> font_;
     /// Font size.
     int fontSize_;
-    /// Text.
+    /// UTF-8 encoded text.
     String text_;
+    /// Text as Unicode characters.
+    PODVector<unsigned> unicodeText_;
     /// Text modified into printed form.
-    String printText_;
+    PODVector<unsigned> printText_;
     /// Row alignment.
     HorizontalAlignment textAlignment_;
     /// Row spacing.
