@@ -746,8 +746,7 @@ Properties:<br>
 - String& typeName (readonly)
 - uint frameNumber (readonly)
 - float timeStep (readonly)
-- uint timeStepMSec (readonly)
-- uint totalMSec (readonly)
+- float elapsedTime (readonly)
 
 
 Log

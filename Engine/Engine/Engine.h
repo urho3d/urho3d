@@ -91,9 +91,9 @@ private:
     void RegisterSubsystems();
     
     /// Frame update timer.
-    Timer frameTimer_;
-    /// Next frame timestep in milliseconds.
-    unsigned timeStep_;
+    HiresTimer frameTimer_;
+    /// Next frame timestep in seconds.
+    float timeStep_;
     /// Minimum frames per second.
     unsigned minFps_;
     /// Maximum frames per second.

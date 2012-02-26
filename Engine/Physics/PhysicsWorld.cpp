@@ -219,16 +219,16 @@ void PhysicsWorld::Update(float timeStep)
             // Send accumulated collision events
             SendCollisionEvents();
             
-            // Interpolate transforms of physics objects
-            processedBodies_.Clear();
-            float t = Clamp(timeAcc_ / internalTimeStep, 0.0f, 1.0f);
-            for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
-                (*i)->PostStep(t, processedBodies_);
-            
             // Send post-step event
             SendEvent(E_PHYSICSPOSTSTEP, eventData);
         }
     }
+    
+    // Interpolate transforms of physics objects
+    processedBodies_.Clear();
+    float t = Clamp(timeAcc_ / internalTimeStep, 0.0f, 1.0f);
+    for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+        (*i)->PostStep(t, processedBodies_);
 }
 
 void PhysicsWorld::SetFps(int fps)

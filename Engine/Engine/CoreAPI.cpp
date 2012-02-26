@@ -557,8 +557,7 @@ static void RegisterTimer(asIScriptEngine* engine)
     RegisterObject<Time>(engine, "Time");
     engine->RegisterObjectMethod("Time", "uint get_frameNumber() const", asMETHOD(Time, GetFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_timeStep() const", asMETHOD(Time, GetTimeStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Time", "uint get_timeStepMSec() const", asMETHOD(Time, GetTimeStepMSec), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Time", "uint get_totalMSec() const", asMETHOD(Time, GetTotalMSec), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Time", "float get_elapsedTime()", asMETHOD(Time, GetElapsedTime), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Time@+ get_time()", asFUNCTION(GetTime), asCALL_CDECL);
 }
 

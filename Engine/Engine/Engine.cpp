@@ -55,8 +55,8 @@ Engine::Engine(Context* context) :
     Object(context),
     minFps_(10),
     maxFps_(200),
-    maxInactiveFps_(50),
-    timeStep_(0),
+    maxInactiveFps_(60),
+    timeStep_(0.0f),
     initialized_(false),
     exiting_(false),
     headless_(false)
@@ -175,6 +175,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     // Register object factories and attributes first, then subsystems
     RegisterObjects();
     RegisterSubsystems();
+    
+    // Set maximally accurate low res timer for frame limiting
+    GetSubsystem<Time>()->SetTimerPeriod(1);
     
     // Start logging
     Log* log = GetSubsystem<Log>();
@@ -381,7 +384,7 @@ void Engine::Update()
     using namespace Update;
     
     VariantMap eventData;
-    eventData[P_TIMESTEP] = (float)timeStep_ / 1000.f;
+    eventData[P_TIMESTEP] = timeStep_;
     SendEvent(E_UPDATE, eventData);
     
     // Logic post-update event
@@ -416,35 +419,39 @@ void Engine::ApplyFrameLimit()
     if (input && !input->IsActive())
         maxFps = maxInactiveFps_;
     
-    int timeAcc = 0;
+    long long timeAcc = 0;
     
     if (maxFps)
     {
         PROFILE(ApplyFrameLimit);
         
-        int targetMax = 1000 / maxFps;
+        long long targetMax = 1000000LL / maxFps;
+        
         for (;;)
         {
-            timeAcc += frameTimer_.GetMSec(true);
-            if (timeAcc >= targetMax)
+            timeAcc += frameTimer_.GetUSec(true);
+            // Sleep if more than 1 ms off the frame limiting goal
+            if (targetMax - timeAcc > 1000LL)
+            {
+                unsigned sleepTime = (unsigned)((targetMax - timeAcc) / 1000LL);
+                Time::Sleep(sleepTime);
+            }
+            else
                 break;
-            
-            unsigned wait = (targetMax - timeAcc);
-            Time::Sleep(wait / 2);
         }
     }
     else
-        timeAcc = frameTimer_.GetMSec(true);
+        timeAcc = frameTimer_.GetUSec(true);
     
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)
     {
-        int targetMin = 1000 / minFps_;
+        long long targetMin = 1000000LL / minFps_;
         if (timeAcc > targetMin)
             timeAcc = targetMin;
     }
     
-    timeStep_ = timeAcc;
+    timeStep_ = timeAcc / 1000000.0f;
 }
 
 void Engine::RegisterObjects()

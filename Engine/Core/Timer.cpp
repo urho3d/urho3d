@@ -44,8 +44,6 @@ Time::Time(Context* context) :
     Object(context),
     frameNumber_(0),
     timeStep_(0.0f),
-    timeStepMSec_(0),
-    totalMSec_(0),
     timerPeriod_(0)
 {
     #ifdef WIN32
@@ -66,14 +64,13 @@ Time::~Time()
     SetTimerPeriod(0);
 }
 
-void Time::BeginFrame(unsigned mSec)
+void Time::BeginFrame(float timeStep)
 {
     ++frameNumber_;
     if (!frameNumber_)
         ++frameNumber_;
     
-    timeStep_ = (float)mSec / 1000.0f;
-    timeStepMSec_ = mSec;
+    timeStep_ = timeStep;
     
     // Frame begin event
     using namespace BeginFrame;
@@ -86,8 +83,6 @@ void Time::BeginFrame(unsigned mSec)
 
 void Time::EndFrame()
 {
-    totalMSec_ += timeStepMSec_;
-    
     // Frame end event
     SendEvent(E_ENDFRAME);
 }
@@ -103,6 +98,11 @@ void Time::SetTimerPeriod(unsigned mSec)
     if (timerPeriod_ > 0)
         timeBeginPeriod(timerPeriod_);
     #endif
+}
+
+float Time::GetElapsedTime()
+{
+    return elapsedTime_.GetMSec(false) / 1000.0f;
 }
 
 void Time::Sleep(unsigned mSec)

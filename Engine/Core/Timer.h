@@ -25,52 +25,6 @@
 
 #include "Object.h"
 
-/// %Time and frame counter subsystem.
-class Time : public Object
-{
-    OBJECT(Time);
-    
-public:
-    /// Construct.
-    Time(Context* context);
-    /// Destruct. Reset the low-resolution timer period if set.
-    virtual ~Time();
-    
-    /// Begin new frame, with (last) frame duration in milliseconds and send frame start event.
-    void BeginFrame(unsigned mSec);
-    /// End frame. Increment total time and send frame end event.
-    void EndFrame();
-    /// %Set the low-resolution timer period in milliseconds. 0 resets to the default period.
-    void SetTimerPeriod(unsigned mSec);
-    
-    /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
-    unsigned GetFrameNumber() const { return frameNumber_; }
-    /// Return current frame timestep as seconds.
-    float GetTimeStep() const { return timeStep_; }
-    /// Return current frame timestep as milliseconds.
-    unsigned GetTimeStepMSec() const { return timeStepMSec_; }
-    /// Return total elapsed time of frames in milliseconds.
-    unsigned GetTotalMSec() const { return totalMSec_; }
-    /// Return current low-resolution timer period in milliseconds.
-    unsigned GetTimerPeriod() const { return timerPeriod_; }
-    
-    /// Sleep for a number of milliseconds.
-    static void Sleep(unsigned mSec);
-    
-private:
-    /// Frame number.
-    unsigned frameNumber_;
-    /// Timestep in seconds.
-    float timeStep_;
-    /// Timestep in milliseconds.
-    unsigned timeStepMSec_;
-    /// Total elapsed time in milliseconds.
-    unsigned totalMSec_;
-    /// Low-resolution timer period.
-    unsigned timerPeriod_;
-};
-
-
 /// Low-resolution operating system timer.
 class Timer
 {
@@ -115,4 +69,45 @@ private:
     static bool supported;
     /// High-resolution timer frequency.
     static long long frequency;
+};
+
+/// %Time and frame counter subsystem.
+class Time : public Object
+{
+    OBJECT(Time);
+    
+public:
+    /// Construct.
+    Time(Context* context);
+    /// Destruct. Reset the low-resolution timer period if set.
+    virtual ~Time();
+    
+    /// Begin new frame, with (last) frame duration in seconds and send frame start event.
+    void BeginFrame(float timeStep);
+    /// End frame. Increment total time and send frame end event.
+    void EndFrame();
+    /// %Set the low-resolution timer period in milliseconds. 0 resets to the default period.
+    void SetTimerPeriod(unsigned mSec);
+    
+    /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
+    unsigned GetFrameNumber() const { return frameNumber_; }
+    /// Return current frame timestep as seconds.
+    float GetTimeStep() const { return timeStep_; }
+    /// Return current low-resolution timer period in milliseconds.
+    unsigned GetTimerPeriod() const { return timerPeriod_; }
+    /// Return elapsed time from program start as seconds.
+    float GetElapsedTime();
+    
+    /// Sleep for a number of milliseconds.
+    static void Sleep(unsigned mSec);
+    
+private:
+    /// Elapsed time since program start.
+    Timer elapsedTime_;
+    /// Frame number.
+    unsigned frameNumber_;
+    /// Timestep in seconds.
+    float timeStep_;
+    /// Low-resolution timer period.
+    unsigned timerPeriod_;
 };
