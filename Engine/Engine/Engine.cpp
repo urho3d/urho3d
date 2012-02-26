@@ -432,12 +432,6 @@ void Engine::ApplyFrameLimit()
                 unsigned sleepTime = (unsigned)((targetMax - timeAcc) / 1000LL);
                 Time::Sleep(sleepTime);
             }
-            else if (targetMax - timeAcc >= 20LL)
-            {
-                // Hack: calling QueryPerformanceCounter() too often leads to lost time. Perform a dummy calculation instead
-                for (int i = 0; i < 4096; ++i)
-                    waitResult_ = SDBMHash(waitResult_, i & 255);
-            }
             else
                 break;
         }

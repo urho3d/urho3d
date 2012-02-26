@@ -100,8 +100,6 @@ private:
     unsigned maxFps_;
     /// Maximum frames per second when the application is inactive.
     unsigned maxInactiveFps_;
-    /// Dummy calculation result for frame limiter spinwait loop.
-    unsigned waitResult_;
     /// Initialized flag.
     bool initialized_;
     /// Exiting flag.
