@@ -145,7 +145,7 @@ private:
     bool suppressNextChar_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
-    /// Screen mode changed flag.
+    /// Screen mode changed flag. Needed only for GLFW input.
     bool screenModeSet_;
     /// Initialized flag.
     bool initialized_;

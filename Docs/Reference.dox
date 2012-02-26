@@ -1317,6 +1317,16 @@ It is possible to give additional defines from the command line. These will then
 The D3DX library from the DirectX runtime or SDK needs to be installed.
 
 
+\page Unicode Unicode support
+
+The String class supports UTF-8 encoding. However, by default strings are treated as a sequence of bytes without regard to the encoding. There is a separate
+API for operating on Unicode characters, see for example \ref String::LengthUTF8 "LengthUTF8()", \ref String::AtUTF8 "AtUTF8()" and \ref String::SubstringUTF8 "SubstringUTF8()". Urho3D itself needs to be aware of the Unicode characters only in the UI subsystem, when displaying text and manipulating it through user input.
+
+On Windows, wide char strings are used in all calls to the operating system, such accessing the command line, files, and the window title. The WString class is used as a helper for conversion. On Linux & Mac OS X 8-bit strings are used directly and they are assumed to contain UTF-8.
+
+Note that \ref FileSystem::ScanDir "ScanDir()" function may return filenames in unnormalized Unicode on Mac OS X. Unicode re-normalization is not yet implemented.
+
+
 \page FileFormats Custom file formats
 
 Urho3D tries to use existing file formats whenever possible, and define custom file formats only when absolutely necessary. Currently used custom file formats are:

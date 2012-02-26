@@ -33,6 +33,7 @@ For further reference, see:
 \ref Network "Networking" <br>
 \ref Multithreading "Multithreading" <br>
 \ref Tools "Tools" <br>
+\ref Unicode "Unicode support" <br>
 \ref FileFormats "Custom file formats" <br>
 \ref CodingConventions "Coding conventions" <br>
 \ref ScriptAPI "Scripting API (generated)" <br>

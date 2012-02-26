@@ -91,7 +91,7 @@ void Viewport::AddPostProcess(PostProcess* effect)
         postProcesses_.Push(effectPtr);
 }
 
-void Viewport::InsertPostProcess(unsigned int index, PostProcess* effect)
+void Viewport::InsertPostProcess(unsigned index, PostProcess* effect)
 {
     if (!effect)
         return;

@@ -220,19 +220,13 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 \page ScriptQuickstart Quickstart in script
 
-When Urho3D.exe executes the application script's Start() function, all the engine subsystems are already in place, so any initialization that needs to be done is specific to the application. In the following example, a minimal "Hello World" application with 3D content will be built.
+In the following example, a minimal "Hello World" application with both 3D and user interface content will be built.
 
-First we need to declare an object handle for the 3D scene we are going to create. This must be outside the Start() function so that the Scene object will remain even when function's the execution ends. Angelscript uses the @ symbol for object handles, which correspond to SharedPtr's on C++ side (ie. they keep alive the object pointed to.)
+We start by defining the Start() function required in all Urho3D script applications. When Urho3D.exe executes it, all the engine subsystems are already in place, so any initialization that needs to be done is specific to the application itself.
 
 \code
 Scene@ helloScene;
-\endcode
 
-Now we can define the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
-
-Urho3D has modified AngelScript to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the first line of Start() would have to read "@helloScene = Scene()".
-
-\code
 void Start()
 {
     helloScene = Scene();
@@ -243,19 +237,13 @@ void Start()
 }
 \endcode
 
+Even before Start(), we define the object handle for the 3D scene we are going to create. This must be outside the function so that the Scene will remain after the function execution ends. Angelscript uses the @ symbol for object handles, which correspond to SharedPtr's on C++ side (ie. they keep alive the object pointed to.)
+
+In the Start() function itself, first of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be defined below.
+
+Note that Urho3D has modified AngelScript to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the first line of Start() would have to read "@helloScene = Scene()".
+
 In CreateObjects(), which we define next, the scene will be filled with some content. The Urho3D scene model is basically a scene graph; the Scene object serves also as the root node.
-
-Three child nodes will be created: one for a 3D model object, one for a directional light, and one for the camera. The scene nodes themselves display nothing in the 3D world; components need to be created into them for the actual visible content. First, however, we need to create an Octree component into the root node. This is used for accelerated visibility queries to check what the camera "sees", and without it nothing would be visible.
-
-Child nodes can be created with or without names; uniqueness of names is not enforced. In this case we opt to not use names, as we do not need to find the nodes later after creation.
-
-As animation is not needed, we use a StaticModel component for the 3D model. Its scene node remains at the origin (default position of each scene node.) The ResourceCache subsystem is used to load the needed Model & Material resources.
-
-The light scene node also remains at the origin. Position does not matter for directional lights, but the node's forward direction is adjusted so that the light will shine down diagonally.
-
-The camera's scene node will be pulled back along the Z-axis to be able to see the object.
-
-Finally we define a fullscreen Viewport into the Renderer subsystem so that the scene can be shown. The viewport needs Scene and Camera object handles. Note the indexing; multiple viewports could be defined (for example to use split screen rendering) if necessary.
 
 \code
 void CreateObjects()
@@ -281,7 +269,21 @@ void CreateObjects()
 }
 \endcode
 
-Now that the 3D scene is ready, we move on to displaying "Hello World" on the screen with the help of a Text user interface element. We use the included Anonymous Pro font with point size 30. To display the text, it is centered, and then added as a child of the user interface root element (the UI can be thought of as a 2D scene graph.)
+First of all we need to create an Octree component into the root node. This is used for accelerated visibility queries to check what the camera "sees", and without it nothing would be visible.
+
+Three child nodes are then created: one for a 3D model object, one for a directional light, and one for the camera. The scene nodes themselves display nothing in the 3D world; components need to be created into them for the actual visible content.
+
+Child nodes can be created with or without names; uniqueness of names is not enforced. In this case we opt to not use names, as we do not need to find the nodes later after creation.
+
+As animation is not needed, we use a StaticModel component for the 3D model. Its scene node remains at the origin (default position of each scene node.) The ResourceCache subsystem is used to load the needed Model & Material resources.
+
+The light scene node also remains at the origin. Position does not matter for directional lights, but the node's forward direction is adjusted so that the light will shine down diagonally.
+
+The camera's scene node is pulled back along the Z-axis to be able to see the object.
+
+Finally we define a fullscreen Viewport into the Renderer subsystem so that the scene can be shown. The viewport needs Scene and Camera object handles. Note the indexing; multiple viewports could be defined (for example to use split screen rendering) if necessary.
+
+The 3D content is now finished. Next, we create the user interface content in CreateText().
 
 \code
 void CreateText()
@@ -297,7 +299,9 @@ void CreateText()
 }
 \endcode
 
-The final step is to subscribe to the frame update event; otherwise the application would just be left running with no possibility to interact with it, until it was forcibly exited with Alt-F4. The frame update event will be sent on each iteration of the main loop. When subscribing, we need to give the name of the event, and the name of the event handler function. We could also require the event to be sent by a specific sender, but in this case that is unnecessary.
+We display a "Hello World" message on the screen with the help of a Text user interface element. We use the included Anonymous Pro font with point size 30.  For the text to actually become visible, it needs to be added as a child of the user interface root element (the UI can be thought of as a 2D scene graph.) It is also centered both horizontally and vertically in relation to the parent element.
+
+Finally we subscribe to necessary Urho3D events in the SubscribeToEvents() function.
 
 \code
 void SubscribeToEvents()
@@ -306,11 +310,9 @@ void SubscribeToEvents()
 }
 \endcode
 
+If no events would be responded to, the application would just be left running with no possibility to interact with it, until it was forcibly exited with Alt-F4. In this case, we are interested of the frame update event, which will be sent on each iteration of the main loop. When subscribing, we need to give the name of the event, and the name of the event handler function. We could also require the event to be sent by a specific sender, but in this case that is unnecessary.
+
 The event handler function needs to have a specific signature. If event type and parameters are not needed, "void HandleEvent()", or if they are, "void HandleEvent(StringHash eventType, VariantMap& eventData)". We might want to expand the application later, so we use the latter form.
-
-The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's \ref Engine::Exit "Exit()" function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
-
-To get the ESC keypress without having to poll it for each frame, we could also subscribe to the "KeyDown" event sent by the Input subsystem.
 
 \code
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -322,14 +324,20 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
-To try out the application, save it as HelloWorld.as in the Bin/Data/Scripts directory, then run Urho3D.exe Scripts/HelloWorld.as
+The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, it calls the Engine subsystem's \ref Engine::Exit "Exit()" function. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
+
+Note that to get the ESC keypress without having to poll it for each frame, we could also subscribe to the "KeyDown" event sent by the Input subsystem.
+
+The example application is now complete. To try it out, save it as HelloWorld.as in the Bin/Data/Scripts directory, then run Urho3D.exe Scripts/HelloWorld.as
 
 
 \page CppQuickstart Quickstart in C++
 
 This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \ref ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
 
-To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt file:
+For simplicity, the application is assumed to be compiled on Windows and therefore defines the WinMain() function; look at the file Urho3D.cpp in the Urho3D subdirectory on how to handle cross-platform startup. Basically, when not on Windows, you would define a main() function instead.
+
+To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt %file:
 
 \code
 add_subdirectory (HelloWorld)
@@ -354,7 +362,6 @@ include_directories (
 
 # Define target & libraries to link
 add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
-set_target_properties (${TARGET_NAME} PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries (${TARGET_NAME} Container Core Engine Graphics Input IO Math Resource Scene UI)
 finalize_exe ()
 \endcode
@@ -405,18 +412,14 @@ public:
 };
 \endcode
 
-Before the actual HelloWorld implementation, we define WinMain. First, we need to create the Context object, which holds all subsystems and object factories, and keeps track of event senders and receivers. All Object subclasses need to be supplied a pointer to that context. When using an object factory (such as when creating components) that is automatic, but when creating objects manually, the pointer also needs to be passed manually.
-
-With the context at hand, we create the Engine and initialize it. The arguments for the \ref Engine::Initialize "Initialize()" function are the initial window title, the log file name, and command line parameters, which are parsed using the ParseArguments() helper function.
-
-After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
+Before the actual HelloWorld implementation, we define WinMain.
 
 \code
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
-    engine->Initialize("HelloWorld", "HelloWorld.log", ParseArguments(cmdLine));
+    engine->Initialize("HelloWorld", "HelloWorld.log", ParseArguments(GetCommandLineW()));
 
     SharedPtr<HelloWorld> helloWorld(new HelloWorld(context));
     helloWorld->Start();
@@ -427,9 +430,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 }
 \endcode
 
-Now we can start implementing HelloWorld. Note the OBJECTTYPESTATIC(className) macro, which creates the static type name and type name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file.
+First, we create the Context object, which holds all subsystems and object factories, and keeps track of event senders and receivers. All Object subclasses need to be supplied a pointer to that context. When using an object factory (such as when creating components) that is automatic, but when creating objects manually, the pointer also needs to be passed manually.
 
-During construction, we store the ResourceCache subsystem pointer for later access:
+With the context at hand, we create the Engine and initialize it. The arguments for the \ref Engine::Initialize "Initialize()" function are the initial window title, the log file name, and command line parameters, which are parsed using the ParseArguments() helper function.
+
+After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
+
+Now we can start implementing HelloWorld. 
 
 \code
 OBJECTTYPESTATIC(HelloWorld);
@@ -440,6 +447,10 @@ HelloWorld::HelloWorld(Context* context) :
 {
 }
 \endcode
+
+Note the OBJECTTYPESTATIC(className) macro, which creates the static type name and type name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file. 
+
+During construction, we only store the ResourceCache subsystem pointer for later access.
 
 In the Start() function the Scene will be created:
 
@@ -454,7 +465,7 @@ void HelloWorld::Start()
 }
 \endcode
 
-Like in the script example, CreateObjects() does the actual scene object creation and defines the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of \ref Node::CreateComponent "CreateComponent()":
+Like in the script example, CreateObjects() does the actual scene object creation and defines the viewport. 
 
 \code
 void HelloWorld::CreateObjects()
@@ -476,9 +487,11 @@ void HelloWorld::CreateObjects()
     Camera* camera = cameraNode->CreateComponent<Camera>();
     cameraNode->SetPosition(Vector3(0.0f, 0.3f, -3.0f));
 
-    GetSubsystem<Renderer>()->SetViewport(0, Viewport(helloScene_, camera));
+    GetSubsystem<Renderer>()->SetViewport(0, new Viewport(helloScene_, camera));
 }
 \endcode
+
+Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of \ref Node::CreateComponent "CreateComponent()":
 
 The text overlay creation is next. Again, setters are used throughout:
 
@@ -496,7 +509,7 @@ void HelloWorld::CreateText()
 }
 \endcode
 
-Finally we get to event subscribing and handling. The helper macro HANDLER is used to create pointers to the event handler member functions: it takes the class name followed by the function name. Note also that unlike script, where events and event parameters are identified with strings, in C++ precalculated hash constants are used instead. The frame update event is defined in CoreEvents.h.
+Finally we get to event subscribing and handling.
 
 \code
 void HelloWorld::SubscribeToEvents()
@@ -505,7 +518,9 @@ void HelloWorld::SubscribeToEvents()
 }
 \endcode
 
-Unlike in script, in C++ the event handler function must always have the signature "void HandleEvent(StringHash eventType, VariantMap& eventData)". Note that when accessing event parameters, the event's name is used as a namespace to prevent name clashes:
+The helper macro HANDLER is used to create pointers to the event handler member functions: it takes the class name followed by the function name. Note also that unlike script, where events and event parameters are identified with strings, in C++ precalculated hash constants are used instead. The frame update event is defined in CoreEvents.h.
+
+In C++ the event handler function must always have the signature "void HandleEvent(StringHash eventType, VariantMap& eventData)". Note that when accessing event parameters, the event's name is used as a namespace to prevent name clashes:
 
 \code
 void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -517,7 +532,7 @@ void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
-Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than Urho3D.exe, due to leaving out the scripting functionality.
+Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than Urho3D.exe due to leaving out the scripting functionality.
 
 
 \page EditorInstructions Editor instructions

@@ -146,7 +146,7 @@ void Input::Update()
     // Pump GLFW events
     glfwPollEvents();
     
-    // In fullscreen mode or after a screen mode change, activate input automatically
+    // Check for automatic input activation in fullscreen mode or after a screen mode change
     if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
     {
         if (screenModeSet_ || (!active_ && graphics_->GetFullscreen()))
