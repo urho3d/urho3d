@@ -106,7 +106,13 @@ void Text::SetStyle(const XMLElement& element)
     }
     if (element.HasChild("text"))
     {
+        // Do not call SetText() as that would possibly resize the element
         text_ = String(element.GetChild("text").GetAttribute("value")).Replaced("\\n", "\n");
+        
+        unicodeText_.Clear();
+        for (unsigned i = 0; i < text_.Length();)
+            unicodeText_.Push(text_.NextUTF8Char(i));
+        
         changed = true;
     }
     if (element.HasChild("textalignment"))
