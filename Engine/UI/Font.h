@@ -24,6 +24,7 @@
 #pragma once
 
 #include "ArrayPtr.h"
+#include "HashMap.h"
 #include "Resource.h"
 
 class Graphics;
@@ -51,7 +52,7 @@ struct FontGlyph
     /// Horizontal advance.
     short advanceX_;
     /// Kerning information.
-    Map<unsigned, unsigned> kerning_;
+    HashMap<unsigned, unsigned> kerning_;
 };
 
 /// %Font face description.
@@ -77,7 +78,7 @@ public:
     /// Row height.
     int rowHeight_;
     /// Glyph index mapping.
-    Map<unsigned, unsigned> glyphMapping_;
+    HashMap<unsigned, unsigned> glyphMapping_;
     /// Kerning flag.
     bool hasKerning_;
 };
@@ -103,7 +104,7 @@ public:
     
 private:
     /// Created faces.
-    Map<int, SharedPtr<FontFace> > faces_;
+    HashMap<int, SharedPtr<FontFace> > faces_;
     /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.

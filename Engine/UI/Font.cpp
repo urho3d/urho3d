@@ -75,7 +75,7 @@ FontFace::~FontFace()
 
 const FontGlyph& FontFace::GetGlyph(unsigned c) const
 {
-    Map<unsigned, unsigned>::ConstIterator i = glyphMapping_.Find(c);
+    HashMap<unsigned, unsigned>::ConstIterator i = glyphMapping_.Find(c);
     if (i != glyphMapping_.End())
         return glyphs_[i->second_];
     else
@@ -92,14 +92,14 @@ short FontFace::GetKerning(unsigned c, unsigned d) const
     
     unsigned leftIndex = 0;
     unsigned rightIndex = 0;
-    Map<unsigned, unsigned>::ConstIterator leftIt = glyphMapping_.Find(c);
-    Map<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(c);
+    HashMap<unsigned, unsigned>::ConstIterator leftIt = glyphMapping_.Find(c);
+    HashMap<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(c);
     if (leftIt != glyphMapping_.End())
         leftIndex = leftIt->second_;
     if (rightIt != glyphMapping_.End())
         rightIndex = rightIt->second_;
     
-    Map<unsigned, unsigned>::ConstIterator kerningIt = glyphs_[leftIndex].kerning_.Find(rightIndex);
+    HashMap<unsigned, unsigned>::ConstIterator kerningIt = glyphs_[leftIndex].kerning_.Find(rightIndex);
     if (kerningIt != glyphs_[leftIndex].kerning_.End())
         return kerningIt->second_;
     else
@@ -152,7 +152,7 @@ bool Font::Load(Deserializer& source)
 
 const FontFace* Font::GetFace(int pointSize)
 {
-    Map<int, SharedPtr<FontFace> >::ConstIterator i = faces_.Find(pointSize);
+    HashMap<int, SharedPtr<FontFace> >::ConstIterator i = faces_.Find(pointSize);
     if (i != faces_.End())
         return i->second_;
     
