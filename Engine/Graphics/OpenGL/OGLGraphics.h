@@ -92,8 +92,6 @@ public:
     void Close();
     /// Take a screenshot.
     bool TakeScreenShot(Image& destImage);
-    /// Set whether to flush GPU command queue at the end of each frame. Default true.
-    void SetFlushGPU(bool enable);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.
@@ -221,8 +219,6 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
-    /// Return whether GPU command queue is flushed at the end of each frame.
-    bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether device is lost, and can not yet render. Always false on OpenGL.
     bool IsDeviceLost() const { return false; }
     /// Return window handle.
@@ -388,8 +384,6 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
-    /// Flush GPU command queue flag.
-    bool flushGPU_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.

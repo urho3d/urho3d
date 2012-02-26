@@ -173,7 +173,6 @@ Graphics::Graphics(Context* context) :
     fullscreen_(false),
     vsync_(false),
     tripleBuffer_(false),
-    flushGPU_(true),
     deviceLost_(false),
     systemDepthStencil_(false),
     lightPrepassSupport_(false),
@@ -184,7 +183,6 @@ Graphics::Graphics(Context* context) :
     streamOffsetSupport_(false),
     hasSM3_(false),
     forceSM2_(false),
-    queryIndex_(0),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR)
@@ -204,14 +202,6 @@ Graphics::~Graphics()
     
     vertexDeclarations_.Clear();
     
-    for (unsigned i = 0; i < NUM_QUERIES; ++i)
-    {
-        if (impl_->frameQueries_[i])
-        {
-            impl_->frameQueries_[i]->Release();
-            impl_->frameQueries_[i] = 0;
-        }
-    }
     if (impl_->defaultColorSurface_)
     {
         impl_->defaultColorSurface_->Release();
@@ -518,11 +508,6 @@ bool Graphics::TakeScreenShot(Image& destImage)
     return true;
 }
 
-void Graphics::SetFlushGPU(bool enable)
-{
-    flushGPU_ = enable;
-}
-
 bool Graphics::BeginFrame()
 {
     PROFILE(BeginRendering);
@@ -580,26 +565,7 @@ void Graphics::EndFrame()
     SendEvent(E_ENDRENDERING);
     
     impl_->device_->EndScene();
-    
-    // Issue a new GPU flush query now if necessary
-    if (flushGPU_ && impl_->frameQueries_[queryIndex_])
-    {
-        impl_->frameQueries_[queryIndex_]->Issue(D3DISSUE_END);
-        queryIssued_[queryIndex_] = true;
-        
-        ++queryIndex_;
-        if (queryIndex_ >= NUM_QUERIES)
-            queryIndex_ = 0;
-    }
-    
     impl_->device_->Present(0, 0, 0, 0);
-    
-    // If a previous GPU flush query is in progress, wait for it to finish
-    if (queryIssued_[queryIndex_])
-    {
-        while (impl_->frameQueries_[queryIndex_]->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE);
-        queryIssued_[queryIndex_] = false;
-    }
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
@@ -2117,14 +2083,6 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
-    for (unsigned i = 0; i < NUM_QUERIES; ++i)
-    {
-        if (impl_->frameQueries_[i])
-        {
-            impl_->frameQueries_[i]->Release();
-            impl_->frameQueries_[i] = 0;
-        }
-    }
     if (impl_->defaultColorSurface_)
     {
         impl_->defaultColorSurface_->Release();
@@ -2144,10 +2102,6 @@ void Graphics::OnDeviceLost()
 void Graphics::OnDeviceReset()
 {
     ResetCachedState();
-    
-    // Create frame queries for GPU buffer flushing
-    for (unsigned i = 0; i < NUM_QUERIES; ++i)
-        impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQueries_[i]);
     
     for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceReset();
@@ -2237,9 +2191,6 @@ void Graphics::ResetCachedState()
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;
-    
-    for (unsigned i = 0; i < NUM_QUERIES; ++i)
-        queryIssued_[i] = false;
 }
 
 void Graphics::SetTextureUnitMappings()

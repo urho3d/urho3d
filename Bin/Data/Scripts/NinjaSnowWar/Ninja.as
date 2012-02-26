@@ -9,7 +9,7 @@ const float ninjaFriction = 0.5;
 const float ninjaMoveForce = 500000;
 const float ninjaAirMoveForce = 25000;
 const float ninjaDampingForce = 1000;
-const float ninjaJumpForce = 2700000;
+const float ninjaJumpForce = 4500000;
 const Vector3 ninjaThrowVelocity(0, 425, 2000);
 const Vector3 ninjaThrowPosition(0, 20, 100);
 const float ninjaThrowDelay = 0.1;

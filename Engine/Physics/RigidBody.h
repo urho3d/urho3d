@@ -148,10 +148,14 @@ private:
     int massAxis_;
     /// ODE body ID.
     dBodyID body_;
-    /// Previous position for rendering interpolation.
+    /// Previous physics position for rendering interpolation.
     Vector3 previousPosition_;
-    /// Previous rotation for rendering interpolation.
+    /// Previous physics rotation for rendering interpolation.
     Quaternion previousRotation_;
+    /// Last interpolated position set during PostStep.
+    Vector3 lastInterpolatedPosition_;
+    /// Last interpolated rotation set during PostStep.
+    Quaternion lastInterpolatedRotation_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
     /// Poststep flag.

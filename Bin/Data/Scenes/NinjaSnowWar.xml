@@ -18,7 +18,7 @@
     </component>
     <component type="PhysicsWorld" id="16777217">
         <attribute name="Gravity" value="0 -981 0" />
-        <attribute name="Physics FPS" value="60" />
+        <attribute name="Physics FPS" value="100" />
         <attribute name="Max Contacts" value="20" />
         <attribute name="Bounce Threshold" value="0.1" />
         <attribute name="Network Max Ang Vel." value="100" />

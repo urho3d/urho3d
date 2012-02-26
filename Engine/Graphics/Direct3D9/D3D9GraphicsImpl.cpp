@@ -36,9 +36,6 @@ GraphicsImpl::GraphicsImpl() :
     window_(0)
 {
     memset(&presentParams_, 0, sizeof presentParams_);
-    
-    for (unsigned i = 0; i < NUM_QUERIES; ++i)
-        frameQueries_[i] = 0;
 }
 
 bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type)

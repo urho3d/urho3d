@@ -102,19 +102,13 @@ void RigidBody::SetMassAxis(int massAxis)
 void RigidBody::SetPosition(const Vector3& position)
 {
     if (body_)
-    {
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        previousPosition_ = position;
-    }
 }
 
 void RigidBody::SetRotation(const Quaternion& rotation)
 {
     if (body_)
-    {
         dBodySetQuaternion(body_, rotation.Data());
-        previousRotation_ = rotation;
-    }
 }
 
 void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation)
@@ -123,8 +117,6 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     {
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
         dBodySetQuaternion(body_, rotation.Data());
-        previousPosition_ = position;
-        previousRotation_ = rotation;
     }
 }
 
@@ -371,17 +363,22 @@ void RigidBody::OnMarkedDirty(Node* node)
     if (inPostStep_ || !body_)
         return;
     
-    const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
-    const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
     Quaternion newRotation(node_->GetWorldRotation());
     
-    if (newPosition != currentPosition || newRotation != currentRotation)
+    // Check that the node actually moved or rotated from the last transform set during poststep.
+    // If only rotated, do not force the physics position, and vice versa.
+    if (newPosition != lastInterpolatedPosition_)
     {
         SetActive(true);
         dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
+        lastInterpolatedPosition_ = previousPosition_ = newPosition;
+    }
+    
+    if (newRotation != lastInterpolatedRotation_)
+    {
+        SetActive(true);
         dBodySetQuaternion(body_, newRotation.Data());
-        previousPosition_ = newPosition;
-        previousRotation_ = newRotation;
+        lastInterpolatedRotation_ = previousRotation_ = newRotation;
     }
 }
 
@@ -419,14 +416,19 @@ void RigidBody::PreStep()
     else
     {
         // If smoothing is active, get the node's target transform and check manually if it has changed
+        // (as a result of eg. server update from the network)
         Matrix3x4 transform = node_->GetWorldTargetTransform();
         Vector3 newPosition = transform.Translation();
         Quaternion newRotation = transform.Rotation();
         
-        if (newPosition != currentPosition || newRotation != currentRotation)
+        if (newPosition != currentPosition)
         {
             SetActive(true);
             dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
+        }
+        if (newRotation != currentRotation)
+        {
+            SetActive(true);
             dBodySetQuaternion(body_, newRotation.Data());
         }
     }
@@ -478,6 +480,9 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
         }
     }
     
+    lastInterpolatedPosition_ = node_->GetWorldPosition();
+    lastInterpolatedRotation_ = node_->GetWorldRotation();
+    
     inPostStep_ = false;
 }
 
@@ -501,8 +506,8 @@ void RigidBody::CreateBody()
         Quaternion rotation(node_->GetTargetRotation());
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
         dBodySetQuaternion(body_, rotation.Data());
-        previousPosition_ = position;
-        previousRotation_ = rotation;
+        lastInterpolatedPosition_ = previousPosition_ = position;
+        lastInterpolatedRotation_ = previousRotation_ = rotation;
         
         // Associate geometries with the body
         PODVector<CollisionShape*> shapes;

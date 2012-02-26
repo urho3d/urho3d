@@ -56,6 +56,9 @@ void Start()
     if (runServer || runClient)
         singlePlayer = false;
 
+    // Subscribe to Update event before creating the scene to ensure we call HandleUpdate() before the scene is updated
+    SubscribeToEvent("Update", "HandleUpdate");
+
     InitAudio();
     InitConsole();
     InitScene();
@@ -63,10 +66,9 @@ void Start()
     CreateCamera();
     CreateOverlays();
 
-    SubscribeToEvent("Update", "HandleUpdate");
     if (gameScene.physicsWorld !is null)
         SubscribeToEvent(gameScene.physicsWorld, "PhysicsPreStep", "HandleFixedUpdate");
-    SubscribeToEvent(gameScene, "ScenePostUpdate", "HandlePostUpdate");
+    SubscribeToEvent("PostUpdate", "HandlePostUpdate");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
@@ -800,8 +802,8 @@ void UpdateCamera()
     Vector3 pos = playerNode.position;
     Quaternion dir;
     
-    // In multiplayer, make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
-    if (runClient && playerNode.vars["Health"].GetInt() > 0)
+    // Make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
+    if (playerNode.vars["Health"].GetInt() > 0)
         playerNode.SnapRotation(Quaternion(0, playerControls.yaw, 0));
 
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));

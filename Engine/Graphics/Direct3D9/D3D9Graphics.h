@@ -48,8 +48,6 @@ class VertexDeclaration;
 
 struct ShaderParameter;
 
-static const unsigned NUM_QUERIES = 2;
-
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
 {
@@ -73,8 +71,6 @@ public:
     void Close();
     /// Take a screenshot. Return true if successful.
     bool TakeScreenShot(Image& destImage);
-    /// %Set whether to flush GPU command queue at the end of each frame. Default true.
-    void SetFlushGPU(bool enable);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.
@@ -198,8 +194,6 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
-    /// Return whether GPU command queue is flushed at the end of each frame.
-    bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
     /// Return window handle.
@@ -373,8 +367,6 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
-    /// Flush GPU command queue flag.
-    bool flushGPU_;
     /// Direct3D device lost flag.
     bool deviceLost_;
     /// System depth-stencil flag.
@@ -395,10 +387,6 @@ private:
     bool hasSM3_;
     /// Force Shader Model 2 flag.
     bool forceSM2_;
-    /// Query (used to flush the GPU command queue) issued flags.
-    bool queryIssued_[NUM_QUERIES];
-    /// Current query index
-    unsigned queryIndex_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

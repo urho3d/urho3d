@@ -128,7 +128,6 @@ Graphics::Graphics(Context* context_) :
     fullscreen_(false),
     vsync_(false),
     tripleBuffer_(false),
-    flushGPU_(true),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareDepthSupport_(false),
@@ -343,11 +342,6 @@ bool Graphics::TakeScreenShot(Image& destImage)
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
     
     return true;
-}
-
-void Graphics::SetFlushGPU(bool enable)
-{
-    flushGPU_ = enable;
 }
 
 bool Graphics::BeginFrame()
@@ -1912,7 +1906,7 @@ unsigned Graphics::GetDepthStencilFormat()
 
 void Graphics::CheckFeatureSupport()
 {
-    // Check supported features: light pre-pass and deferred rendering and hardware depth texture
+    // Check supported features: light pre-pass, deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     hardwareDepthSupport_ = false;

@@ -140,7 +140,6 @@ Urho3D.exe understands the following command line options:
 -lqshadows  Use low-quality (1-sample) shadow filtering
 -noshadows  Disable shadow rendering
 -nolimit    Disable frame limiter
--noflush    Disable GPU command queue flushing
 -nothreads  Disable worker threads
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation

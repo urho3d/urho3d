@@ -61,8 +61,6 @@ private:
     IDirect3DSurface9* defaultColorSurface_;
     /// Default depth-stencil surface.
     IDirect3DSurface9* defaultDepthStencilSurface_;
-    /// Frame query for flushing the GPU command queue.
-    IDirect3DQuery9* frameQueries_[NUM_QUERIES];
     /// Adapter number.
     DWORD adapter_;
     /// Device type.

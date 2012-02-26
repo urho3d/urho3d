@@ -2267,7 +2267,6 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
-- bool flushGPU
 - String& windowTitle
 - int width (readonly)
 - int height (readonly)

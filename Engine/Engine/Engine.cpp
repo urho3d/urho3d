@@ -87,7 +87,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool sound = true;
     bool stereo = true;
     bool interpolate = true;
-    bool flush = true;
     bool threads = true;
     bool logDebug = false;
     
@@ -117,8 +116,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 shadows = false;
             else if (argument == "lqshadows")
                 lqShadows = true;
-            else if (argument == "noflush")
-                flush = false;
             else if (argument == "nothreads")
                 threads = false;
             else if (argument == "sm2")
@@ -226,7 +223,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         Graphics* graphics = GetSubsystem<Graphics>();
         Renderer* renderer = GetSubsystem<Renderer>();
         
-        graphics->SetFlushGPU(flush);
         graphics->SetForceSM2(forceSM2);
         graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(width, height, fullscreen, vsync, tripleBuffer, multiSample))
