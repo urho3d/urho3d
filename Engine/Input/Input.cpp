@@ -635,10 +635,6 @@ void CharCallback(GLFWwindow window, int key)
     if (!instance)
         return;
 
-    // On OS X we get char events for cursors and function keys. Disregard these
-    if (key >= 0xf700 && key <= 0xf70f)
-        return;
-
     using namespace Char;
 
     VariantMap keyEventData;

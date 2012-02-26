@@ -28,7 +28,7 @@
 #include "Object.h"
 #include "Thread.h"
 
-/// Watches a path and its subdirectories for files being modified
+/// Watches a directory and its subdirectories for files being modified
 class FileWatcher : public Object, public Thread
 {
     OBJECT(FileWatcher);
@@ -43,7 +43,7 @@ public:
     virtual void ThreadFunction();
     
     /// Start watching a directory. Return true if successful.
-    bool StartWatching(const String& path, bool watchSubDirs);
+    bool StartWatching(const String& pathName, bool watchSubDirs);
     /// Stop watching the directory.
     void StopWatching();
     /// Return a file change (true if was found, false if not.)

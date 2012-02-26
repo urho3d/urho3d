@@ -408,7 +408,13 @@ static int convertMacKeyCode(unsigned int macKeyCode)
             length = [characters length];
 
             for (i = 0;  i < length;  i++)
-                _glfwInputChar(window, [characters characterAtIndex:i]);
+            {
+                int c = [characters characterAtIndex:i];
+                // Urho3D: disregard char input for cursors and function keys
+                if (c >= 0xf700 && c <= 0xf70f)
+                    continue;
+                _glfwInputChar(window, c);
+            }
         }
     }
 }

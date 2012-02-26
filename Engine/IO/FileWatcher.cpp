@@ -46,13 +46,13 @@ FileWatcher::~FileWatcher()
     StopWatching();
 }
 
-bool FileWatcher::StartWatching(const String& path, bool watchSubDirs)
+bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 {
     // Stop any previous watching
     StopWatching();
     
 #if defined(WIN32) && defined(ENABLE_FILEWATCHER)
-    String nativePath = GetNativePath(RemoveTrailingSlash(path));
+    String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
     
     dirHandle_ = (void*)CreateFileW(
         WString(nativePath).CString(),
@@ -65,20 +65,21 @@ bool FileWatcher::StartWatching(const String& path, bool watchSubDirs)
     
     if (dirHandle_ != INVALID_HANDLE_VALUE)
     {
-        path_ = AddTrailingSlash(path);
+        path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
         Start();
         
-        LOGDEBUG("Started watching path " + path);
+        LOGDEBUG("Started watching path " + pathName);
         return true;
     }
     else
     {
-        LOGERROR("Failed to start watching path " + path);
+        LOGERROR("Failed to start watching path " + pathName);
         return false;
     }
 #else
-    LOGERROR("Can not start watching path " + path + ", FileWatcher not implemented yet");
+    /// \todo Implement on Unix-like systems
+    LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
 #endif
 }
 
