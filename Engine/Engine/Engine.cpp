@@ -426,11 +426,17 @@ void Engine::ApplyFrameLimit()
         for (;;)
         {
             timeAcc += frameTimer_.GetUSec(true);
-            // Sleep if more than 1 ms off the frame limiting goal
-            if (targetMax - timeAcc > 1000LL)
+            // Sleep if 1 ms or more off the frame limiting goal
+            if (targetMax - timeAcc >= 1000LL)
             {
                 unsigned sleepTime = (unsigned)((targetMax - timeAcc) / 1000LL);
                 Time::Sleep(sleepTime);
+            }
+            else if (targetMax - timeAcc >= 20LL)
+            {
+                // Hack: calling QueryPerformanceCounter() too often leads to lost time. Perform a dummy calculation instead
+                for (int i = 0; i < 4096; ++i)
+                    waitResult_ = SDBMHash(waitResult_, i & 255);
             }
             else
                 break;
