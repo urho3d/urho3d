@@ -83,7 +83,9 @@ successfully:
   Projects and Solutions -> VC++ Directories in VS2008.)
 
 - For Linux, the following development packages need to be installed:
-  libx11-dev, libxrandr-dev, libgl1-mesa-dev, libasound2-dev.
+  libx11-dev, libxrandr-dev, libasound2-dev. Also install the package 
+  libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
+
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
