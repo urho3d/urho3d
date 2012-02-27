@@ -135,6 +135,7 @@ void Texture::UpdateParameters()
     // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[2]]);
     
     TextureFilterMode filterMode = filterMode_;
     if (filterMode == FILTER_DEFAULT)
