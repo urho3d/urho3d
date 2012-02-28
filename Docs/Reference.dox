@@ -495,7 +495,7 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. Furthermore, to circumvent or reduce performance issues related to switching rendertargets, on OpenGL the rendertarget changes are committed only when the depth-stencil surface is set. Therefore, to ensure correct operation on both APIs, always use this sequence: set rendertargets, set the depth-stencil surface and finally set the viewport.
+- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
 
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
@@ -828,7 +828,7 @@ Several collision shapes may exist in the same scene node to create compound sha
 
 Note that static physics objects such as unmoving level geometry should not have RigidBody components at all.
 
-The physics simulation does all calculations in world space. Therefore nodes containing a RigidBody component should only be parented to the Scene (root node) to operate correctly. Hierarchically parented rigid bodies might be supported in the future.
+The physics simulation does all calculations in world space. Therefore nodes containing a RigidBody component should only be parented to the Scene (root node) to operate correctly.
 
 The physics world sends 3 types of events during its update step:
 
@@ -858,7 +858,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - UIElement: container for other elements, renders nothing by itself
 - Window: a movable and resizable window
 
-From the UI subsystem you can query the root element, which is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
+The root UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
@@ -1320,7 +1320,7 @@ The D3DX library from the DirectX runtime or SDK needs to be installed.
 \page Unicode Unicode support
 
 The String class supports UTF-8 encoding. However, by default strings are treated as a sequence of bytes without regard to the encoding. There is a separate
-API for operating on Unicode characters, see for example \ref String::LengthUTF8 "LengthUTF8()", \ref String::AtUTF8 "AtUTF8()" and \ref String::SubstringUTF8 "SubstringUTF8()". Urho3D itself needs to be aware of the Unicode characters only in the UI subsystem, when displaying text and manipulating it through user input.
+API for operating on Unicode characters, see for example \ref String::LengthUTF8 "LengthUTF8()", \ref String::AtUTF8 "AtUTF8()" and \ref String::SubstringUTF8 "SubstringUTF8()". Urho3D itself needs to be aware of the Unicode characters only in the \ref UI "user interface", when displaying text and manipulating it through user input.
 
 On Windows, wide char strings are used in all calls to the operating system, such accessing the command line, files, and the window title. The WString class is used as a helper for conversion. On Linux & Mac OS X 8-bit strings are used directly and they are assumed to contain UTF-8.
 

@@ -158,3 +158,8 @@ V1.14   - Object (partial scene) load/save.
         - Switched to pugixml library, scene load/save optimizations.
         - Bugfixes to rendertexture views and component attributes.
 
+V1.15   - New deferred rendering pipeline.
+        - Unicode support.
+        - Live resource reloading in the editor (Windows only so far.)
+        - More accurate frame timing.
+        - Bugfixes to physics jittering and FBO performance issue on Linux.
