@@ -1155,6 +1155,8 @@ void View::RenderBatchesDeferred()
         graphics_->ResetRenderTarget(1);
         graphics_->ResetRenderTarget(2);
         graphics_->ResetRenderTarget(3);
+        graphics_->SetDepthStencil(depthStencil);
+        graphics_->SetViewport(viewRect_);
     }
     
     // Render shadow maps + light volumes

@@ -49,6 +49,10 @@ private:
     unsigned drawBuffers_;
     /// Frame buffer object. Reused whenever rendering to a texture.
     unsigned fbo_;
+    /// Frame buffer object for depth-only rendering.
+    unsigned depthOnlyFbo_;
+    /// Currently bound frame buffer object.
+    unsigned boundFbo_;
     /// Vertex attributes in use.
     unsigned enabledAttributes_;
     /// Current pixel format.
@@ -57,8 +61,6 @@ private:
     int depthBits_;
     /// Backbuffer depth bits.
     int windowDepthBits_;
-    /// FBO bound flag.
-    bool fboBound_;
 };
 
 /// Store execution context specific to the GLFW window
