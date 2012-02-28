@@ -93,6 +93,9 @@ void RenderSurface::Release()
     if (graphics->GetDepthStencil() == this)
         graphics->ResetDepthStencil();
     
+    // Clean up also from non-active FBOs
+    graphics->CleanupRenderSurface(this);
+    
     if (renderBuffer_)
     {
         glDeleteRenderbuffersEXT(1, &renderBuffer_);

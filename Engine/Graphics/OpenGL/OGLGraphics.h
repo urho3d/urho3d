@@ -338,6 +338,8 @@ public:
     void FreeDiscardLockBuffer(void* buffer);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
+    /// Clean up a render surface from all FBOs.
+    void CleanupRenderSurface(RenderSurface* surface);
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -359,10 +361,12 @@ public:
 private:
     /// Check supported rendering features.
     void CheckFeatureSupport();
-    /// Set draw buffer(s) on the FBO.
-    void SetDrawBuffers();
+    /// Select FBO and commit changes.
+    void CommitFramebuffer();
     /// Check FBO completeness.
     bool CheckFramebuffer();
+    /// Cleanup unused and unbound FBO's.
+    void CleanupFramebuffers(bool deleteAll);
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.

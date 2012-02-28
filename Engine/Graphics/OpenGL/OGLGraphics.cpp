@@ -103,6 +103,8 @@ static unsigned numInstances = 0;
 
 static const String noParameter;
 
+static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
+
 int CloseCallback(GLFWwindow window)
 {
     Context* context = GetWindowContext(window);
@@ -269,17 +271,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
     impl_->depthBits_ = impl_->windowDepthBits_;
     
-    // Create the FBOs and set the read buffer once (FBO will not be read)
-    glGenFramebuffersEXT(1, &impl_->fbo_);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->fbo_);
-    glReadBuffer(GL_NONE);
-    glGenFramebuffersEXT(1, &impl_->depthOnlyFbo_);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->depthOnlyFbo_);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    impl_->boundFbo_ = 0;
-
     // Set initial state to match Direct3D
     glEnable(GL_DEPTH_TEST);
     SetCullMode(CULL_CCW);
@@ -392,10 +383,16 @@ void Graphics::EndFrame()
     SendEvent(E_ENDRENDERING);
     
     glfwSwapBuffers();
+    
+    // Clean up FBO's that have not been used for a long time
+    CleanupFramebuffers(false);
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
 {
+    if (impl_->fboDirty_)
+        CommitFramebuffer();
+    
     bool oldColorWrite = colorWrite_;
     bool oldDepthWrite = depthWrite_;
 
@@ -473,6 +470,9 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     if (!vertexCount)
         return;
     
+    if (impl_->fboDirty_)
+        CommitFramebuffer();
+    
     unsigned primitiveCount = 0;
     
     switch (type)
@@ -496,6 +496,9 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 {
     if (!indexCount || !indexBuffer_)
         return;
+    
+    if (impl_->fboDirty_)
+        CommitFramebuffer();
     
     unsigned primitiveCount = 0;
     unsigned indexSize = indexBuffer_->GetIndexSize();
@@ -565,7 +568,6 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         
         if (i < buffers.Size())
         {
-
             buffer = buffers[i];
             elementMask = elementMasks[i];
             if (elementMask == MASK_DEFAULT && buffer)
@@ -1193,9 +1195,9 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
         }
+        
+        impl_->fboDirty_ = true;
     }
-
-    // Note: the rendertargets are actually committed during SetDepthStencil()
 }
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
@@ -1209,30 +1211,9 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
 
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
-    depthStencil_ = depthStencil;
-
-    unsigned targetFbo = 0;
-    if (renderTargets_[0])
-        targetFbo = impl_->fbo_;
-    else if (depthStencil_)
-        targetFbo = impl_->depthOnlyFbo_;
-
-    if (impl_->boundFbo_ != targetFbo)
-    {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, targetFbo);
-        impl_->boundFbo_ = targetFbo;
-    }
-
-    // If we are returning to backbuffer rendering, no further operations necessary
-    if (!targetFbo)
-    {
-        impl_->depthBits_ = impl_->windowDepthBits_;
-        return;
-    }
-
     // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth-stencil
     // Create a new depth-stencil texture as necessary to be able to provide similar behaviour as Direct3D9
-    if (renderTargets_[0] && !depthStencil_)
+    if (renderTargets_[0] && !depthStencil)
     {
         int width = renderTargets_[0]->GetWidth();
         int height = renderTargets_[0]->GetHeight();
@@ -1244,82 +1225,21 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             int searchKey = (width << 16) | height;
             HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
             if (i != depthTextures_.End())
-                depthStencil_ = i->second_->GetRenderSurface();
+                depthStencil = i->second_->GetRenderSurface();
             else
             {
                 SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
                 newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
                 depthTextures_[searchKey] = newDepthTexture;
-                depthStencil_ = newDepthTexture->GetRenderSurface();
+                depthStencil = newDepthTexture->GetRenderSurface();
             }
         }
     }
     
-    if (targetFbo == impl_->fbo_)
+    if (depthStencil != depthStencil_)
     {
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        {
-            if (renderTargets_[i])
-            {
-                Texture* texture = renderTargets_[i]->GetParentTexture();
-            
-                // If texture's parameters are dirty, update before attaching
-                if (texture->GetParametersDirty())
-                {
-                    SetTextureForUpdate(texture);
-                    texture->UpdateParameters();
-                    SetTexture(0, 0);
-                }
-                
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i, renderTargets_[i]->GetTarget(),
-                    texture->GetGPUObject(), 0);
-            }
-            else
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i, GL_TEXTURE_2D, 0, 0);
-        }        
-    
-        SetDrawBuffers();
-    }
-      
-    if (depthStencil_)
-    {
-        // Bind either a renderbuffer or a depth texture, depending on what is available
-        Texture* texture = depthStencil_->GetParentTexture();
-        bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
-        unsigned renderBufferID = depthStencil_->GetRenderBuffer();
-        if (!renderBufferID)
-        {
-            // If texture's parameters are dirty, update before attaching
-            if (texture->GetParametersDirty())
-            {
-                SetTextureForUpdate(texture);
-                texture->UpdateParameters();
-                SetTexture(0, 0);
-            }
-                
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
-            if (hasStencil)
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
-            else
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-                
-            impl_->depthBits_ = texture->GetDepthBits();
-        }
-        else
-        {
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
-            if (hasStencil)
-                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
-            else
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-            impl_->depthBits_ = 24;
-        }
-    }
-    else
-    {
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-        impl_->depthBits_ = impl_->windowDepthBits_;
+        depthStencil_ = depthStencil;
+        impl_->fboDirty_ = true;
     }
 }
 
@@ -1348,6 +1268,9 @@ void Graphics::SetViewTexture(Texture* texture)
 
 void Graphics::SetViewport(const IntRect& rect)
 {
+    if (impl_->fboDirty_)
+        CommitFramebuffer();
+    
     IntVector2 rtSize = GetRenderTargetDimensions();
     
     IntRect rectCopy = rect;
@@ -1803,6 +1726,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
+    CleanupFramebuffers(true);
+    
     depthTextures_.Clear();
     
     if (clearGPUObjects)
@@ -1819,14 +1744,6 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             (*i)->OnDeviceLost();
     }
     
-    if (impl_->fbo_)
-    {
-        glDeleteFramebuffersEXT(1, &impl_->fbo_);
-        glDeleteFramebuffersEXT(1, &impl_->depthOnlyFbo_);
-        impl_->fbo_ = 0;
-        impl_->depthOnlyFbo_ = 0;
-    }
-    
     // When the new context is initialized, it will have default state again
     ResetCachedState();
     ClearParameterSources();
@@ -1840,6 +1757,50 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             glfwCloseWindow(impl_->window_);
         impl_->window_ = 0;
     }
+}
+
+void Graphics::CleanupRenderSurface(RenderSurface* surface)
+{
+    if (!surface)
+        return;
+    
+    unsigned currentFbo = impl_->boundFbo_;
+    
+    // Go through all FBOs and clean up the surface from them
+    for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();
+        ++i)
+    {
+        for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
+        {
+            if (i->second_.colorAttachments_[j] == surface)
+            {
+                if (currentFbo != i->second_.fbo_)
+                {
+                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                    currentFbo = i->second_.fbo_;
+                }
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
+                i->second_.colorAttachments_[j] = 0;
+                // Mark drawbuffer bits to need recalculation
+                i->second_.drawBuffers_ = M_MAX_UNSIGNED;
+            }
+        }
+        if (i->second_.depthAttachment_ == surface)
+        {
+            if (currentFbo != i->second_.fbo_)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                currentFbo = i->second_.fbo_;
+            }
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            i->second_.depthAttachment_ = 0;
+        }
+    }
+    
+    // Restore previously bound FBO now if needed
+    if (currentFbo != impl_->boundFbo_)
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->boundFbo_);
 }
 
 unsigned Graphics::GetAlphaFormat()
@@ -1928,8 +1889,71 @@ void Graphics::CheckFeatureSupport()
     }
 }
 
-void Graphics::SetDrawBuffers()
+void Graphics::CommitFramebuffer()
 {
+    if (!impl_->fboDirty_)
+        return;
+    
+    impl_->fboDirty_ = false;
+    
+    // First check if no framebuffer is needed. In that case simply return to backbuffer rendering
+    bool noFbo = !depthStencil_;
+    if (noFbo)
+    {
+        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        {
+            if (renderTargets_[i])
+            {
+                noFbo = false;
+                break;
+            }
+        }
+    }
+    
+    if (noFbo)
+    {
+        if (impl_->boundFbo_)
+        {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            impl_->boundFbo_ = 0;
+        }
+        
+        return;
+    }
+    
+    // Search for a new framebuffer based on format & size, or create new
+    IntVector2 rtSize = Graphics::GetRenderTargetDimensions();
+    unsigned format = 0;
+    if (renderTargets_[0])
+        format = renderTargets_[0]->GetParentTexture()->GetFormat();
+    else if (depthStencil_)
+        format = depthStencil_->GetParentTexture()->GetFormat();
+    
+    unsigned long long fboKey = (rtSize.x_ << 16 | rtSize.y_) | (((unsigned long long)format) << 32);
+    
+    Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
+    if (i == impl_->frameBuffers_.End())
+    {
+        FrameBufferObject newFbo;
+        glGenFramebuffersEXT(1, &newFbo.fbo_);
+        i = impl_->frameBuffers_.Insert(MakePair(fboKey, newFbo));
+    }
+    
+    i->second_.useTimer_.Reset();
+    
+    if (impl_->boundFbo_ != i->second_.fbo_)
+    {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+        impl_->boundFbo_ = i->second_.fbo_;
+    }
+    
+    // Setup readbuffers & drawbuffers if needed
+    if (i->second_.readBuffers_ != GL_NONE)
+    {
+        glReadBuffer(GL_NONE);
+        i->second_.readBuffers_ = GL_NONE;
+    }
+    
     // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
     unsigned newDrawBuffers = 0;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -1938,31 +1962,143 @@ void Graphics::SetDrawBuffers()
             newDrawBuffers |= 1 << i;
     }
     
-    if (newDrawBuffers == impl_->drawBuffers_)
-        return;
-    
-    // Check for no color rendertargets (depth rendering only)
-    if (!newDrawBuffers)
-        glDrawBuffer(GL_NONE);
-    else
+    if (newDrawBuffers != i->second_.drawBuffers_)
     {
-        int drawBufferIds[4];
-        unsigned drawBufferCount = 0;
-        
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        // Check for no color rendertargets (depth rendering only)
+        if (!newDrawBuffers)
+            glDrawBuffer(GL_NONE);
+        else
         {
-            if (renderTargets_[i])
-                drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+            int drawBufferIds[4];
+            unsigned drawBufferCount = 0;
+            
+            for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+            {
+                if (renderTargets_[i])
+                    drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+            }
+            glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
         }
-        glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
+        
+        i->second_.drawBuffers_ = newDrawBuffers;
     }
     
-    impl_->drawBuffers_ = newDrawBuffers;
+    for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
+    {
+        if (renderTargets_[j])
+        {
+            Texture* texture = renderTargets_[j]->GetParentTexture();
+            
+            // If texture's parameters are dirty, update before attaching
+            if (texture->GetParametersDirty())
+            {
+                SetTextureForUpdate(texture);
+                texture->UpdateParameters();
+                SetTexture(0, 0);
+            }
+            
+            if (i->second_.colorAttachments_[j] != renderTargets_[j])
+            {
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, renderTargets_[j]->GetTarget(),
+                    texture->GetGPUObject(), 0);
+                i->second_.colorAttachments_[j] = renderTargets_[j];
+            }
+        }
+        else
+        {
+            if (i->second_.colorAttachments_[j])
+            {
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
+                i->second_.colorAttachments_[j] = 0;
+            }
+        }
+    }
+    
+    if (depthStencil_)
+    {
+        // Bind either a renderbuffer or a depth texture, depending on what is available
+        Texture* texture = depthStencil_->GetParentTexture();
+        bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
+        unsigned renderBufferID = depthStencil_->GetRenderBuffer();
+        if (!renderBufferID)
+        {
+            // If texture's parameters are dirty, update before attaching
+            if (texture->GetParametersDirty())
+            {
+                SetTextureForUpdate(texture);
+                texture->UpdateParameters();
+                SetTexture(0, 0);
+            }
+            
+            if (i->second_.depthAttachment_ != depthStencil_)
+            {
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
+                if (hasStencil)
+                {
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D,
+                        texture->GetGPUObject(), 0);
+                }
+                else
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+                
+                i->second_.depthAttachment_ = depthStencil_;
+            }
+            
+            impl_->depthBits_ = texture->GetDepthBits();
+        }
+        else
+        {
+            if (i->second_.depthAttachment_ != depthStencil_)
+            {
+                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
+                if (hasStencil)
+                {
+                    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT,
+                        renderBufferID);
+                }
+                else
+                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+                
+                i->second_.depthAttachment_ = depthStencil_;
+            }
+            
+            impl_->depthBits_ = 24;
+        }
+    }
+    else
+    {
+        if (i->second_.depthAttachment_)
+        {
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            i->second_.depthAttachment_ = 0;
+            impl_->depthBits_ = impl_->windowDepthBits_;
+        }
+    }
 }
 
 bool Graphics::CheckFramebuffer()
 {
     return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
+}
+
+void Graphics::CleanupFramebuffers(bool deleteAll)
+{
+    if (deleteAll && impl_->boundFbo_)
+    {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        impl_->boundFbo_ = 0;
+    }
+    
+    for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();)
+    {
+        Map<unsigned long long, FrameBufferObject>::Iterator current = i++;
+        if (deleteAll || (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) > MAX_FRAMEBUFFER_AGE))
+        {
+            glDeleteFramebuffersEXT(1, &current->second_.fbo_);
+            impl_->frameBuffers_.Erase(current);
+        }
+    }
 }
 
 void Graphics::ResetCachedState()
@@ -2013,7 +2149,6 @@ void Graphics::ResetCachedState()
     stencilWriteMask_ = M_MAX_UNSIGNED;
     
     impl_->activeTexture_ = 0;
-    impl_->drawBuffers_ = M_MAX_UNSIGNED;
     impl_->enabledAttributes_ = 0;
 }
 

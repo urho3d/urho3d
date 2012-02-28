@@ -25,11 +25,39 @@
 
 #include "Color.h"
 #include "Map.h"
+#include "Timer.h"
 
 #include <GLee.h>
 #include <GL/glfw3.h>
 
 class Context;
+
+/// Cached state of a frame buffer object
+struct FrameBufferObject
+{
+    FrameBufferObject() :
+        fbo_(0),
+        readBuffers_(M_MAX_UNSIGNED),
+        drawBuffers_(M_MAX_UNSIGNED),
+        depthAttachment_(0)
+    {
+        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+            colorAttachments_[i] = 0;
+    }
+    
+    /// Frame buffer handle.
+    unsigned fbo_;
+    /// Bound color attachment textures.
+    RenderSurface* colorAttachments_[MAX_RENDERTARGETS];
+    /// Bound depth/stencil attachment.
+    RenderSurface* depthAttachment_;
+    /// Read buffer bits.
+    unsigned readBuffers_;
+    /// Draw buffer bits.
+    unsigned drawBuffers_;
+    /// Use timer for cleaning up.
+    Timer useTimer_;
+};
 
 /// %Graphics subsystem implementation. Holds API-specific objects.
 class GraphicsImpl
@@ -45,22 +73,20 @@ private:
     GLFWwindow window_;
     /// Active texture unit.
     unsigned activeTexture_;
-    /// Active draw buffers.
-    unsigned drawBuffers_;
-    /// Frame buffer object. Reused whenever rendering to a texture.
-    unsigned fbo_;
-    /// Frame buffer object for depth-only rendering.
-    unsigned depthOnlyFbo_;
-    /// Currently bound frame buffer object.
-    unsigned boundFbo_;
     /// Vertex attributes in use.
     unsigned enabledAttributes_;
+    /// Currently bound frame buffer object.
+    unsigned boundFbo_;
     /// Current pixel format.
     int pixelFormat_;
     /// Current depth bits.
     int depthBits_;
     /// Backbuffer depth bits.
     int windowDepthBits_;
+    /// Map for FBO's per resolution and format.
+    Map<unsigned long long, FrameBufferObject> frameBuffers_;
+    /// Need FBO commit flag.
+    bool fboDirty_;
 };
 
 /// Store execution context specific to the GLFW window
