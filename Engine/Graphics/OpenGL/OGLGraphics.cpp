@@ -1764,6 +1764,9 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
     if (!surface)
         return;
     
+    // Flush pending FBO changes first if any
+    CommitFramebuffer();
+    
     unsigned currentFbo = impl_->boundFbo_;
     
     // Go through all FBOs and clean up the surface from them
