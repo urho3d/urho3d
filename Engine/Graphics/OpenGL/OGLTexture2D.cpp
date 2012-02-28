@@ -377,6 +377,7 @@ bool Texture2D::Create()
         if (renderSurface_)
         {
             renderSurface_->CreateRenderBuffer(width_, height_, format_);
+            depthBits_ = 24;
             return true;
         }
         else

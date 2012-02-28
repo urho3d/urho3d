@@ -2043,8 +2043,6 @@ void Graphics::CommitFramebuffer()
                 
                 i->second_.depthAttachment_ = depthStencil_;
             }
-            
-            impl_->depthBits_ = texture->GetDepthBits();
         }
         else
         {
@@ -2061,9 +2059,9 @@ void Graphics::CommitFramebuffer()
                 
                 i->second_.depthAttachment_ = depthStencil_;
             }
-            
-            impl_->depthBits_ = 24;
         }
+        
+        impl_->depthBits_ = texture->GetDepthBits();
     }
     else
     {
