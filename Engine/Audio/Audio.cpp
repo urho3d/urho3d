@@ -303,7 +303,7 @@ Audio::~Audio()
     #endif
 }
 
-bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolate)
+bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation)
 {
     Release();
     
@@ -349,10 +349,10 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     
     mixRate_ = mixRate;
     stereo_ = stereo;
-    interpolate_ = interpolate;
+    interpolation_ = interpolation;
     
     LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
-        (interpolate_ ? "interpolated" : ""));
+        (interpolation_ ? "interpolated" : ""));
     
     return Play();
 }
@@ -497,7 +497,7 @@ void Audio::MixOutput(void *dest, unsigned samples)
         
         // Mix samples to clip buffer
         for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-            (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolate_);
+            (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
         
         // Copy output from clip buffer to destination
         clipPtr = clipBuffer_.Get();

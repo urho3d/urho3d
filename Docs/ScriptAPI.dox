@@ -2463,7 +2463,7 @@ Properties:<br>
 - uint sampleSize (readonly)
 - int mixRate (readonly)
 - bool stereo (readonly)
-- bool interpolated (readonly)
+- bool interpolation (readonly)
 - bool playing (readonly)
 - bool initialized (readonly)
 

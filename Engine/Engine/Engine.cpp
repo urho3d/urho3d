@@ -86,7 +86,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool lqShadows = false;
     bool sound = true;
     bool stereo = true;
-    bool interpolate = true;
+    bool interpolation = true;
     bool threads = true;
     bool logDebug = false;
     
@@ -105,7 +105,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             else if (argument == "nosound")
                 sound = false;
             else if (argument == "noip")
-                interpolate = false;
+                interpolation = false;
             else if (argument == "mono")
                 stereo = false;
             else if (argument == "prepass")
@@ -234,7 +234,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
         
         if (sound)
-            GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolate);
+            GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolation);
     }
     
     // Init FPU state of main thread

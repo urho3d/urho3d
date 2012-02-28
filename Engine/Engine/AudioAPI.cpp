@@ -82,7 +82,7 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "uint get_sampleSize() const", asMETHOD(Audio, GetSampleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "int get_mixRate() const", asMETHOD(Audio, GetMixRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_stereo() const", asMETHOD(Audio, IsStereo), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "bool get_interpolated() const", asMETHOD(Audio, IsInterpolated), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "bool get_interpolation() const", asMETHOD(Audio, GetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_playing() const", asMETHOD(Audio, IsPlaying), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_initialized() const", asMETHOD(Audio, IsInitialized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);

@@ -354,7 +354,7 @@ void SoundSource::Update(float timeStep)
     }
 }
 
-void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolate)
+void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 {
     if (!position_ || !sound_)
         return;
@@ -443,7 +443,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     // Choose the correct mixing routine
     if (!sound->IsStereo())
     {
-        if (interpolate)
+        if (interpolation)
         {
             if (stereo)
                 MixMonoToStereoIP(sound, dest, samples, mixRate);
@@ -460,7 +460,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     }
     else
     {
-        if (interpolate)
+        if (interpolation)
         {
             if (stereo)
                 MixStereoToStereoIP(sound, dest, samples, mixRate);

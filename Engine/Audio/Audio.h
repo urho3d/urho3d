@@ -46,7 +46,7 @@ public:
     virtual ~Audio();
     
     /// Initialize sound output with specified buffer length and output mode.
-    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolate = true);
+    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
     void Update(float timeStep);
     /// Restart sound output.
@@ -68,10 +68,10 @@ public:
     unsigned GetSampleSize() const { return sampleSize_; }
     /// Return mixing rate.
     int GetMixRate() const { return mixRate_; }
+    /// Return whether output is interpolated.
+    bool GetInterpolation() const { return interpolation_; }
     /// Return whether output is stereo.
     bool IsStereo() const { return stereo_; }
-    /// Return whether output is interpolated.
-    bool IsInterpolated() const { return interpolate_; }
     /// Return whether audio is being output.
     bool IsPlaying() const { return playing_; }
     /// Return whether an audio stream has been reserved.
@@ -115,10 +115,10 @@ private:
     unsigned fragmentSize_;
     /// Mixing rate.
     int mixRate_;
+    /// Mixing interpolation flag.
+    bool interpolation_;
     /// Stereo flag.
     bool stereo_;
-    /// Interpolation flag.
-    bool interpolate_;
     /// Playing flag.
     bool playing_;
     /// Master gain by sound source type.

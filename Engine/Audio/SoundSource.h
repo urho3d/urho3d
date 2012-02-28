@@ -97,10 +97,10 @@ public:
     void StopLockless();
     /// %Set new playback position without locking the audio mutex. Called internally.
     void SetPlayPositionLockless(signed char* position);
-    /// Update the sound source. Perform subclass specific operations. Called by Sound.
+    /// Update the sound source. Perform subclass specific operations. Called by Audio.
     virtual void Update(float timeStep);
-    /// Mix sound source output to a 32-bit clipping buffer. Called by Sound.
-    void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolate);
+    /// Mix sound source output to a 32-bit clipping buffer. Called by Audio.
+    void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation);
     
     /// %Set sound attribute.
     void SetSoundAttr(ResourceRef value);
