@@ -270,11 +270,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     impl_->depthBits_ = impl_->windowDepthBits_;
     
     // Create the FBOs and set the read buffer once (FBO will not be read)
-    glGenFramebuffersEXT(1, &impl_->fbo_);    
+    glGenFramebuffersEXT(1, &impl_->fbo_);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->fbo_);
     glReadBuffer(GL_NONE);
-    glGenFramebuffersEXT(1, &impl_->depthOnlyFbo_);    
+    glGenFramebuffersEXT(1, &impl_->depthOnlyFbo_);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->depthOnlyFbo_);
+    glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     impl_->boundFbo_ = 0;
@@ -1936,7 +1937,7 @@ void Graphics::SetDrawBuffers()
         if (renderTargets_[i])
             newDrawBuffers |= 1 << i;
     }
-
+    
     if (newDrawBuffers == impl_->drawBuffers_)
         return;
     
