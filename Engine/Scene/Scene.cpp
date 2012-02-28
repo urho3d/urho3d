@@ -455,7 +455,7 @@ void Scene::Update(float timeStep)
     SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
     
     // Update smoothing if enabled (network client scenes)
-    if (IsSmoothed())
+    if (GetSmoothing())
     {
         PROFILE(UpdateSmoothing);
         

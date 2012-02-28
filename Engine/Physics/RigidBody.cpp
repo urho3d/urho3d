@@ -102,13 +102,19 @@ void RigidBody::SetMassAxis(int massAxis)
 void RigidBody::SetPosition(const Vector3& position)
 {
     if (body_)
+    {
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
+        previousPosition_ = position;
+    }
 }
 
 void RigidBody::SetRotation(const Quaternion& rotation)
 {
     if (body_)
+    {
         dBodySetQuaternion(body_, rotation.Data());
+        previousRotation_ = rotation;
+    }
 }
 
 void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation)
@@ -117,6 +123,8 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     {
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
         dBodySetQuaternion(body_, rotation.Data());
+        previousPosition_ = position;
+        previousRotation_ = rotation;
     }
 }
 
@@ -352,7 +360,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     }
     
     // If the node is smoothed, do not use the dirty callback, but rather update manually during prestep
-    if (node_->IsSmoothed())
+    if (node_->GetSmoothing())
         return;
     
     // Clear the dirty flag by querying world position; this way we are sure to get the dirty notification immediately
@@ -407,7 +415,7 @@ void RigidBody::PreStep()
     const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
     const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
     
-    if (!node_->IsSmoothed())
+    if (!node_->GetSmoothing())
     {
         // If no smoothing, store the current body position for interpolation
         previousPosition_ = currentPosition;
@@ -458,7 +466,7 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     if (!parent)
     {
         // If node already has motion smoothing enabled, do not do substep interpolation
-        if (!node_->IsSmoothed())
+        if (!node_->GetSmoothing())
             node_->SetTransform(previousPosition_.Lerp(currentPosition, t), previousRotation_.Slerp(currentRotation, t));
         else
             node_->SetTransform(currentPosition, currentRotation);
@@ -466,7 +474,7 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     else
     {
         // Transform rigid body's world coordinates back to parent's space
-        if (!node_->IsSmoothed())
+        if (!node_->GetSmoothing())
         {
             Matrix3x4 newTransform(parent->GetWorldTransform().Inverse() * Matrix3x4(previousPosition_.Lerp(currentPosition, t),
                 previousRotation_.Slerp(currentRotation, t), Vector3::ONE));
@@ -501,7 +509,7 @@ void RigidBody::CreateBody()
         // Set the user data pointer
         dBodySetData(body_, this);
         
-        // Set initial transform. Use target position in case the node is smoothed
+        // Set initial transform. Use target position in case the node used smoothing
         const Vector3& position = node_->GetTargetPosition();
         Quaternion rotation(node_->GetTargetRotation());
         dBodySetPosition(body_, position.x_, position.y_, position.z_);

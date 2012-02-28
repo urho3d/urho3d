@@ -108,6 +108,8 @@ public:
     void SetMaxContacts(unsigned num);
     /// %Set gravity.
     void SetGravity(Vector3 gravity);
+    /// %Set whether to interpolate between simulation steps.
+    void SetInterpolation(bool enable);
     /// %Set default linear velocity deactivation threshold for new rigid bodies.
     void SetLinearRestThreshold(float threshold);
     /// %Set default linear velocity damping threshold.
@@ -142,6 +144,8 @@ public:
     dSpaceID GetSpace() const { return space_; }
     /// Return gravity.
     Vector3 GetGravity() const;
+    /// Return whether interpolation between simulation steps is enabled.
+    bool GetInterpolation() const { return interpolation_; }
     /// Return simulation steps per second.
     int GetFps() const { return fps_; }
     /// Return maximum contacts per collision.
@@ -217,38 +221,40 @@ private:
     dGeomID rayGeometry_;
     /// ODE contact joint group ID.
     dJointGroupID contactJoints_;
-    /// Simulation steps per second.
-    unsigned fps_;
-    /// Maximum contacts per collision.
-    unsigned maxContacts_;
-    /// Collision bounce velocity threshold.
-    float bounceThreshold_;
-    /// Maximum angular velocity for network replication.
-    float maxNetworkAngularVelocity_;
-    /// Simulation step time accumulator.
-    float timeAcc_;
-    /// Simulation random seed.
-    unsigned randomSeed_;
     /// Rigid bodies in the world.
     PODVector<RigidBody*> rigidBodies_;
     /// Collision shapes in the world.
     PODVector<CollisionShape*> collisionShapes_;
     /// Joints in the world.
     PODVector<Joint*> joints_;
-    /// Collision contacts (PODVector<dContact>.)
-    void* contacts_;
     /// Collision pairs on this frame.
     HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new."
     HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
     /// Already processed rigid bodies during a poststep.
     HashSet<RigidBody*> processedBodies_;
+    /// Collision contacts (PODVector<dContact>.)
+    void* contacts_;
     /// Collision infos to be sent as events.
     Vector<PhysicsCollisionInfo> collisionInfos_;
     /// Cache for triangle mesh geometries.
     Map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
     /// Cache for heightfield geometries.
     Map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
+    /// Simulation steps per second.
+    unsigned fps_;
+    /// Maximum contacts per collision.
+    unsigned maxContacts_;
+    /// Simulation random seed.
+    unsigned randomSeed_;
+    /// Collision bounce velocity threshold.
+    float bounceThreshold_;
+    /// Maximum angular velocity for network replication.
+    float maxNetworkAngularVelocity_;
+    /// Simulation step time accumulator.
+    float timeAcc_;
+    /// Interpolation flag.
+    bool interpolation_;
 };
 
 /// Register Physics library objects.

@@ -600,7 +600,7 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
     else
     {
         // No rigid body. Must update the geometry transform manually
-        // Use the target transform in case the node has smoothed motion enabled
+        // Use the target transform in case the node has smoothing enabled
         Matrix3x4 transform(node_->GetWorldTargetTransform());
         Vector3 nodePos(transform.Translation());
         Quaternion nodeRot(transform.Rotation());

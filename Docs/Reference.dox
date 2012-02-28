@@ -1104,7 +1104,7 @@ The default flags are AM_FILE and AM_NET.
 
 The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
-%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
+%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 30 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
 Bidirectional communication between the server and the client can happen either using raw network messages, which are binary-serialized data, or remote events, which operate like ordinary events, but are processed on the receiving end only. Code on the server can send messages or remote events either to one client, all clients assigned into a particular scene, or to all connected clients. In contrast the client can only send messages or remote events to the server, not directly to other clients.
 
@@ -1138,6 +1138,8 @@ There are some things to watch out for:
 
 - Position and rotation are Node attributes, while linear and angular velocities are RigidBody attributes. To cut down on the needed network bandwidth the physics components can be created as local on the server: in this case the client will not see them at all, and will only interpolate motion based on the node's transform changes. Replicating the actual physics components allows the client to extrapolate using its own physics simulation, and to also perform collision detection, though always non-authoritatively.
 
+- By default the physics simulation also performs interpolation to enable smooth motion when the rendering framerate is higher than the physics FPS. This should be disabled on the server scene to ensure that the clients do not receive interpolated and therefore possibly non-physical positions and rotations. See \ref PhysicsWorld::SetInterpolation "SetInterpolation()".
+
 - AnimatedModel does not replicate animation by itself. Rather, AnimationController will replicate its command state (such as "fade this animation in, play that animation at 1.5x speed.") To turn off animation replication, create the AnimationController as local. To ensure that also the first animation update will be received correctly, always create the AnimatedModel component first, then the AnimationController.
 
 - Networked attributes can either be in delta update or latest data mode. Delta updates are small incremental changes and must be applied in order, which may cause increased latency if there is a stall in network message delivery eg. due to packet loss. High volume data such as position, rotation and velocities are transmitted as latest data, which does not need ordering, instead this mode simply discards any old data received out of order. Note that node and component creation (when initial attributes need to be sent) and removal can also be considered as delta updates and are therefore applied in order.
@@ -1164,7 +1166,7 @@ For now, creation and removal of nodes is always sent immediately, without consu
 
 \section Network_Controls Client controls update
 
-The Controls structure is used to send controls information from the client to the server, by default also at 25 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap.
+The Controls structure is used to send controls information from the client to the server, by default also at 30 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap.
 
 It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update, and the event E_NETWORKUPDATESENT will be sent after the update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()".
 

@@ -1275,7 +1275,7 @@ Properties:<br>
 - Matrix3x4 transform (readonly)
 - Matrix3x4 targetTransform (readonly)
 - Matrix3x4& worldTransform (readonly)
-- bool smoothed
+- bool smoothing
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -1382,7 +1382,7 @@ Properties:<br>
 - Matrix3x4 transform (readonly)
 - Matrix3x4 targetTransform (readonly)
 - Matrix3x4& worldTransform (readonly)
-- bool smoothed
+- bool smoothing
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4058,6 +4058,7 @@ Properties:<br>
 - Vector3 gravity
 - int fps
 - uint maxContacts
+- bool interpolation
 - float linearRestThreshold
 - float angularRestThreshold
 - float bounceThreshold

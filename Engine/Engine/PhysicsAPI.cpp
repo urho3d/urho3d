@@ -185,6 +185,8 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_maxContacts(uint)", asMETHOD(PhysicsWorld, SetMaxContacts), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "uint get_maxContacts() const", asMETHOD(PhysicsWorld, GetMaxContacts), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_interpolation(bool)", asMETHOD(PhysicsWorld, SetInterpolation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "bool get_interpolation() const", asMETHOD(PhysicsWorld, GetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_linearRestThreshold(float)", asMETHOD(PhysicsWorld, SetLinearRestThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "float get_linearRestThreshold() const", asMETHOD(PhysicsWorld, GetLinearRestThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_angularRestThreshold(float)", asMETHOD(PhysicsWorld, SetAngularRestThreshold), asCALL_THISCALL);

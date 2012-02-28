@@ -40,6 +40,9 @@ void Start()
         network.StartServer(serverPort);
         SubscribeToEvent("ClientConnected", "HandleClientConnected");
 
+        // Disable physics interpolation to ensure clients get sent physically correct transforms
+        testScene.physicsWorld.interpolation = false;
+
         // Test package download by adding all package files in the cache as requirements for the scene
         Array<PackageFile@> packages = cache.packageFiles;
         for (uint i = 0; i < packages.length; ++i)

@@ -15,8 +15,8 @@
     </component>
     <component type="NetworkPriority" id="16777217">
         <attribute name="Base Priority" value="110" />
-        <attribute name="Distance Factor" value="0.03" />
-        <attribute name="Minimum Priority" value="20" />
+        <attribute name="Distance Factor" value="0.02" />
+        <attribute name="Minimum Priority" value="50" />
         <attribute name="Always Update Owner" value="true" />
     </component>
     <component type="CollisionShape" id="11">

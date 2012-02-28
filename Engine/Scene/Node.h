@@ -139,7 +139,7 @@ public:
     /// %Set owner connection for networking.
     void SetOwner(Connection* owner);
     /// Enable or disable motion smoothing.
-    void SetSmoothed(bool enable);
+    void SetSmoothing(bool enable);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node.
@@ -194,9 +194,9 @@ public:
     /// Return scale.
     const Vector3& GetScale() const { return scale_; }
     /// Return unsmoothed (target) position.
-    const Vector3& GetTargetPosition() const { return smoothed_ ? targetPosition_ : position_; }
+    const Vector3& GetTargetPosition() const { return smoothing_ ? targetPosition_ : position_; }
     /// Return unsmoothed (target) rotation.
-    const Quaternion& GetTargetRotation() const { return smoothed_ ? targetRotation_ : rotation_; }
+    const Quaternion& GetTargetRotation() const { return smoothing_ ? targetRotation_ : rotation_; }
     /// Return local transform.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
     /// Return unsmoothed (target) local transform.
@@ -239,9 +239,9 @@ public:
     }
     
     /// Return world-space unsmoothed (target) position. Is recalculated each time.
-    Vector3 GetWorldTargetPosition() const { return smoothed_ ? GetWorldTargetTransform().Translation() : GetWorldPosition(); }
+    Vector3 GetWorldTargetPosition() const { return smoothing_ ? GetWorldTargetTransform().Translation() : GetWorldPosition(); }
     /// Return world-space unsmoothed (target) rotation. Is recalculated each time.
-    Quaternion GetWorldTargetRotation() const { return smoothed_ ? GetWorldTargetTransform().Rotation() : GetWorldRotation(); }
+    Quaternion GetWorldTargetRotation() const { return smoothing_ ? GetWorldTargetTransform().Rotation() : GetWorldRotation(); }
     
     /// Return world-space transform.
     const Matrix3x4& GetWorldTransform() const
@@ -265,7 +265,7 @@ public:
     /// Return whether transform has changed and world transform needs recalculation.
     bool IsDirty() const { return dirty_; }
     /// Return whether motion smoothing is enabled.
-    bool IsSmoothed() const { return smoothed_; }
+    bool GetSmoothing() const { return smoothing_; }
     /// Return number of child scene nodes.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return immediate child scene nodes.
@@ -387,8 +387,8 @@ private:
     unsigned char smoothingMask_;
     /// World transform needs update flag.
     mutable bool dirty_;
-    /// Smoothed motion flag.
-    bool smoothed_;
+    /// Smoothing motion flag.
+    bool smoothing_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

@@ -52,7 +52,7 @@ Node::Node(Context* context) :
     rotateCount_(0),
     smoothingMask_(SMOOTH_NONE),
     dirty_(false),
-    smoothed_(false)
+    smoothing_(false)
 {
 }
 
@@ -229,7 +229,7 @@ void Node::SetName(const String& name)
 
 void Node::SetPosition(const Vector3& position)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ = position;
         if (!dirty_)
@@ -244,7 +244,7 @@ void Node::SetPosition(const Vector3& position)
 
 void Node::SetRotation(const Quaternion& rotation)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         rotation_ = rotation;
         if (!dirty_)
@@ -279,7 +279,7 @@ void Node::SetScale(const Vector3& scale)
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ = position;
         rotation_ = rotation;
@@ -297,7 +297,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ = position;
         rotation_ = rotation;
@@ -316,7 +316,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, flo
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ = position;
         rotation_ = rotation;
@@ -436,7 +436,7 @@ void Node::SnapWorldRotation(const Quaternion& rotation)
 
 void Node::Translate(const Vector3& delta)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ += delta;
         if (!dirty_)
@@ -451,7 +451,7 @@ void Node::Translate(const Vector3& delta)
 
 void Node::TranslateRelative(const Vector3& delta)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         position_ += rotation_ * delta;
         if (!dirty_)
@@ -466,7 +466,7 @@ void Node::TranslateRelative(const Vector3& delta)
 
 void Node::Rotate(const Quaternion& delta, bool fixedAxis)
 {
-    if (!smoothed_)
+    if (!smoothing_)
     {
         if (!fixedAxis)
             rotation_ = rotation_ * delta;
@@ -485,7 +485,7 @@ void Node::Rotate(const Quaternion& delta, bool fixedAxis)
     ++rotateCount_;
     if (rotateCount_ >= NORMALIZE_ROTATION_EVERY)
     {
-        if (!smoothed_)
+        if (!smoothing_)
             rotation_.Normalize();
         else
             targetRotation_.Normalize();
@@ -547,9 +547,9 @@ void Node::SetOwner(Connection* owner)
     owner_ = owner;
 }
 
-void Node::SetSmoothed(bool enable)
+void Node::SetSmoothing(bool enable)
 {
-    smoothed_ = enable;
+    smoothing_ = enable;
 }
 
 void Node::MarkDirty()
@@ -749,7 +749,7 @@ void Node::RemoveListener(Component* component)
 
 Matrix3x4 Node::GetWorldTargetTransform() const
 {
-    if (!smoothed_)
+    if (!smoothing_)
         return GetWorldTransform();
     
     Matrix3x4 ret(targetPosition_, targetRotation_, scale_);
@@ -1001,7 +1001,7 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
 
 void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
 {
-    if (!smoothed_ || !smoothingMask_)
+    if (!smoothing_ || !smoothingMask_)
         return;
     
     if (smoothingMask_ & SMOOTH_POSITION)

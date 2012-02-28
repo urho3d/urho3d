@@ -39,7 +39,7 @@
 
 #include "DebugNew.h"
 
-static const int DEFAULT_UPDATE_FPS = 25;
+static const int DEFAULT_UPDATE_FPS = 30;
 
 OBJECTTYPESTATIC(Network);
 

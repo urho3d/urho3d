@@ -133,6 +133,7 @@ void InitScene()
 
 void InitNetworking()
 {
+    network.updateFps = 25; // 1/4 of physics FPS
     network.RegisterRemoteEvent("PlayerSpawned");
     network.RegisterRemoteEvent("UpdateScore");
     network.RegisterRemoteEvent("UpdateHiscores");
@@ -140,6 +141,9 @@ void InitNetworking()
     if (runServer)
     {
         network.StartServer(serverPort);
+
+        // Disable physics interpolation to ensure clients get sent physically correct transforms
+        gameScene.physicsWorld.interpolation = false;
 
         SubscribeToEvent("ClientIdentity", "HandleClientIdentity");
         SubscribeToEvent("ClientSceneLoaded", "HandleClientSceneLoaded");
