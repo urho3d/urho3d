@@ -137,10 +137,10 @@ void Input::Update()
     #ifndef USE_OPENGL
     // Pump Win32 events
     MSG msg;
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+    while (PeekMessageW(&msg, 0, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        DispatchMessageW(&msg);
     }
     #else
     // Pump GLFW events
