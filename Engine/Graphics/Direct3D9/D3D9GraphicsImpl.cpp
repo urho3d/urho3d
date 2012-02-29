@@ -57,14 +57,14 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
 
 D3DFORMAT GraphicsImpl::GetDesktopFormat()
 {
-    DEVMODE settings;
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &settings);
+    DEVMODEW settings;
+    EnumDisplaySettingsW(0, ENUM_CURRENT_SETTINGS, &settings);
     return settings.dmBitsPerPel <= 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
 }
 
 IntVector2 GraphicsImpl::GetDesktopResolution()
 {
-    DEVMODE settings;
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &settings);
+    DEVMODEW settings;
+    EnumDisplaySettingsW(0, ENUM_CURRENT_SETTINGS, &settings);
     return IntVector2(settings.dmPelsWidth, settings.dmPelsHeight);
 }

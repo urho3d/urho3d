@@ -1853,8 +1853,8 @@ bool Graphics::OpenWindow(int width, int height)
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = impl_->instance_;
-    wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor(0, IDC_ARROW);
+    wc.hIcon         = LoadIconW(0, MAKEINTRESOURCEW(32512));
+    wc.hCursor       = LoadCursorW(0, MAKEINTRESOURCEW(32512));
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName  = 0;
     wc.lpszClassName = L"D3DWindow";
@@ -1872,8 +1872,8 @@ bool Graphics::OpenWindow(int width, int height)
         return false;
     }
     
-    SetWindowLongPtr(impl_->window_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-
+    SetWindowLongPtrW(impl_->window_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    
     LOGINFO("Created application window");
     return true;
 }
@@ -1883,14 +1883,14 @@ void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
     // Adjust window style/size now
     if (newFullscreen)
     {
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
+        SetWindowLongPtrW(impl_->window_, GWL_STYLE, WS_POPUP);
         SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW | SWP_NOCOPYBITS);
     }
     else
     {
         RECT rect = {0, 0, newWidth, newHeight};
         AdjustWindowRect(&rect, windowStyle, FALSE);
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
+        SetWindowLongPtrW(impl_->window_, GWL_STYLE, windowStyle);
         SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
             SWP_SHOWWINDOW | SWP_NOCOPYBITS);
         

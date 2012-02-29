@@ -230,7 +230,8 @@ String GetConsoleInput()
     
     #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
-    if (input == INVALID_HANDLE_VALUE)
+    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE)
         return ret;
     
     // Use char-based input
@@ -245,22 +246,24 @@ String GetConsoleInput()
     
     while (events--)
     {
-        ReadConsoleInput(input, &record, 1, &readEvents);
+        ReadConsoleInputW(input, &record, 1, &readEvents);
         if (record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown)
         {
-            char c = record.Event.KeyEvent.uChar.AsciiChar;
+            unsigned c = record.Event.KeyEvent.uChar.UnicodeChar;
             if (c)
             {
                 if (c == '\b')
                 {
                     printf("\b \b");
-                    int length = currentLine.Length();
+                    
+                    int length = currentLine.LengthUTF8();
                     if (length)
-                        currentLine.Resize(length - 1);
+                        currentLine = currentLine.SubstringUTF8(0, length - 1);
                 }
                 else if (c == '\r')
                 {
                     printf("\n");
+                    
                     ret = currentLine;
                     currentLine.Clear();
                     return ret;
@@ -268,8 +271,11 @@ String GetConsoleInput()
                 else
                 {
                     // We have disabled echo, so echo manually
-                    printf("%c", c);
-                    currentLine += c;
+                    wchar_t out = c;
+                    DWORD charsWritten;
+                    WriteConsoleW(output, &out, 1, &charsWritten, 0);
+                    
+                    currentLine.AppendUTF8(c);
                 }
             }
         }
