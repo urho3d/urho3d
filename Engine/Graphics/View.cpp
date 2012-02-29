@@ -523,6 +523,7 @@ void View::GetDrawables()
 void View::GetBatches()
 {
     WorkQueue* queue = GetSubsystem<WorkQueue>();
+    PODVector<Light*> vertexLights;
     
     // Process lit geometries and shadow casters for each light
     {
@@ -713,7 +714,9 @@ void View::GetBatches()
         {
             Drawable* drawable = *i;
             unsigned numBatches = drawable->GetNumBatches();
-            bool vertexLightsProcessed = false;
+            const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
+            if (!drawableVertexLights.Empty())
+                drawable->LimitVertexLights();
             
             for (unsigned j = 0; j < numBatches; ++j)
             {
@@ -770,20 +773,22 @@ void View::GetBatches()
                 if (pass)
                 {
                     // Check for vertex lights (both forward unlit, light pre-pass material pass, and deferred G-buffer)
-                    const PODVector<Light*>& vertexLights = drawable->GetVertexLights();
-                    if (!vertexLights.Empty())
+                    if (!drawableVertexLights.Empty())
                     {
-                        // In deferred modes, check if this is an opaque object that has converted its lights to per-vertex
-                        // due to overflowing the pixel light count. These need to be skipped as the per-pixel accumulation
-                        // already renders the light
-                        /// \todo Sub-geometries might need different interpretation if opaque & alpha are mixed
-                        if (!vertexLightsProcessed)
+                        // For a deferred opaque batch, check if the vertex lights include converted per-pixel lights, and remove
+                        // them to prevent double-lighting
+                        if (renderMode_ != RENDER_FORWARD && pass->GetBlendMode() == BLEND_REPLACE)
                         {
-                            drawable->LimitVertexLights(renderMode_ != RENDER_FORWARD && pass->GetBlendMode() == BLEND_REPLACE);
-                            vertexLightsProcessed = true;
+                            vertexLights.Clear();
+                            for (unsigned i = 0; i < drawableVertexLights.Size(); ++i)
+                            {
+                                if (drawableVertexLights[i]->GetPerVertex())
+                                    vertexLights.Push(drawableVertexLights[i]);
+                            }
                         }
+                        else
+                            vertexLights = drawableVertexLights;
                         
-                        // The vertex light vector possibly became empty, so re-check
                         if (!vertexLights.Empty())
                         {
                             // Find a vertex light queue. If not found, create new

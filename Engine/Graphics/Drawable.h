@@ -179,10 +179,10 @@ public:
     void AddLight(Light* light);
     /// Add a per-vertex light.
     void AddVertexLight(Light* light);
-    /// Sort and limit per-pixel lights to maximum allowed.
+    /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
-    void LimitVertexLights(bool removeConvertedLights);
+    void LimitVertexLights();
     /// %Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
     /// Return octree octant.

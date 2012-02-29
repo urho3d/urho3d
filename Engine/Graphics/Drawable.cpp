@@ -243,39 +243,30 @@ void Drawable::AddVertexLight(Light* light)
 void Drawable::LimitLights()
 {
     // Maximum lights value 0 means unlimited
-    if (!maxLights_)
+    if (!maxLights_ || lights_.Size() <= maxLights_)
         return;
     
+    // If more lights than allowed, move to vertex lights and cut the list
     const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = 0; i < lights_.Size(); ++i)
         lights_[i]->SetIntensitySortValue(box);
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
-    
-    // If more lights than allowed, move to vertex lights and cut the list
-    if (lights_.Size() > maxLights_)
-    {
-        vertexLights_.Insert(vertexLights_.End(), lights_.Begin() + maxLights_, lights_.End());
-        lights_.Resize(maxLights_);
-    }
+    vertexLights_.Insert(vertexLights_.End(), lights_.Begin() + maxLights_, lights_.End());
+    lights_.Resize(maxLights_);
 }
 
-void Drawable::LimitVertexLights(bool removeConvertedLights)
+void Drawable::LimitVertexLights()
 {
+    if (vertexLights_.Size() <= MAX_VERTEX_LIGHTS)
+        return;
+    
     const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
-    {
-        // If necessary (deferred rendering), remove lights that were converted to per-vertex
-        if (removeConvertedLights && !vertexLights_[i]->GetPerVertex())
-            vertexLights_.Erase(i);
-        else
-            vertexLights_[i]->SetIntensitySortValue(box);
-    }
+        vertexLights_[i]->SetIntensitySortValue(box);
     
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);
-    
-    if (vertexLights_.Size() > MAX_VERTEX_LIGHTS)
-        vertexLights_.Resize(MAX_VERTEX_LIGHTS);
+    vertexLights_.Resize(MAX_VERTEX_LIGHTS);
 }
 
 Zone* Drawable::GetZone() const
