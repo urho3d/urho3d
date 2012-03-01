@@ -373,6 +373,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         UpdateControls();
         CheckEndAndRestart();
     }
+    
+    if (engine.headless)
+    {
+        String command = GetConsoleInput().ToLower();
+        if (command == "shutdown" || command == "exit" || command == "quit")
+            engine.Exit();
+    }
 }
 
 void HandleFixedUpdate(StringHash eventType, VariantMap& eventData)

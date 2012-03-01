@@ -998,7 +998,6 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    ++neededSize;
     
     Resize(neededSize);
     
@@ -1006,17 +1005,13 @@ WString::WString(const String& str) :
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
-    
-    *dest = 0;
     #else
-    Resize(str.LengthUTF8() + 1);
+    Resize(str.LengthUTF8());
     
     unsigned byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())
         *dest++ = str.NextUTF8Char(byteOffset);
-    
-    *dest = 0;
     #endif
 }
 
@@ -1031,12 +1026,14 @@ void WString::Resize(unsigned newSize)
     {
         delete[] buffer_;
         buffer_ = 0;
+        length_ = 0;
     }
     else
     {
-        wchar_t* newBuffer = new wchar_t[newSize];
+        wchar_t* newBuffer = new wchar_t[newSize + 1];
         if (buffer_)
             memcpy(newBuffer, buffer_, length_ * sizeof(wchar_t));
+        newBuffer[newSize] = 0;
         buffer_ = newBuffer;
         length_ = newSize;
     }

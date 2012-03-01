@@ -138,14 +138,21 @@ void OpenConsoleWindow()
 
 void Print(const String& str)
 {
-    /// \todo Handle Unicode
-    printf("%s", str.CString());
+    #ifdef WIN32
+    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (output == INVALID_HANDLE_VALUE)
+        return;
+    WString strW(str);
+    DWORD charsWritten;
+    WriteConsoleW(output, strW.CString(), strW.Length(), &charsWritten, 0);
+    #else
+    printf("%s", str);
+    #endif
 }
 
 void PrintLine(const String& str)
 {
-    /// \todo Handle Unicode
-    printf("%s\n", str.CString());
+    Print(str + '\n');
 }
 
 const Vector<String>& ParseArguments(const String& cmdLine)
@@ -256,16 +263,14 @@ String GetConsoleInput()
             {
                 if (c == '\b')
                 {
-                    printf("\b \b");
-                    
+                    Print("\b \b");
                     int length = currentLine.LengthUTF8();
                     if (length)
                         currentLine = currentLine.SubstringUTF8(0, length - 1);
                 }
                 else if (c == '\r')
                 {
-                    printf("\n");
-                    
+                    Print("\n");
                     ret = currentLine;
                     currentLine.Clear();
                     return ret;
@@ -276,7 +281,6 @@ String GetConsoleInput()
                     wchar_t out = c;
                     DWORD charsWritten;
                     WriteConsoleW(output, &out, 1, &charsWritten, 0);
-                    
                     currentLine.AppendUTF8(c);
                 }
             }
