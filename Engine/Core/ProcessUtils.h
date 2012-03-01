@@ -35,10 +35,10 @@ void ErrorDialog(const String& title, const String& message);
 void ErrorExit(const String& message, int exitCode = 1);
 /// Open a console window.
 void OpenConsoleWindow();
+/// Print to the console without adding a newline.
+void Print(const String& str);
 /// Print to the console. A newline will be added automatically.
 void PrintLine(const String& str);
-/// Print to the console. A newline will be added automatically.
-void PrintLine(const char* str);
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const String& cmdLine);
 /// Parse arguments from the command line.

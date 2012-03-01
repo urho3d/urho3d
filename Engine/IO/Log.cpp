@@ -26,6 +26,7 @@
 #include "File.h"
 #include "IOEvents.h"
 #include "Log.h"
+#include "ProcessUtils.h"
 
 #include <cstdio>
 #include <ctime>
@@ -91,7 +92,7 @@ void Log::Write(int level, const String& message)
     String dateTimeString = String(dateTime).Replaced("\n", "");
     String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
-    printf("%s\n", formattedMessage.CString());
+    PrintLine(formattedMessage);
     
     if (logFile_)
         logFile_->WriteLine(formattedMessage);
@@ -114,7 +115,7 @@ void Log::WriteRaw(const String& message)
     inWrite_ = true;
     lastMessage_ = message;
     
-    printf("%s", message.CString());
+    Print(message);
     
     if (logFile_)
     {

@@ -102,13 +102,13 @@ void ErrorDialog(const String& title, const String& message)
     #ifdef WIN32
     MessageBoxW(0, WString(message).CString(), WString(title).CString(), 0);
     #else
-    printf("%s\n", message.CString());
+    PrintLine(message);
     #endif
 }
 
 void ErrorExit(const String& message, int exitCode)
 {
-    printf("%s", message.CString());
+    Print(message);
     exit(exitCode);
 }
 
@@ -136,14 +136,16 @@ void OpenConsoleWindow()
     #endif
 }
 
-void PrintLine(const String& str)
+void Print(const String& str)
 {
-    printf("%s\n", str.CString());
+    /// \todo Handle Unicode
+    printf("%s", str.CString());
 }
 
-void PrintLine(const char* str)
+void PrintLine(const String& str)
 {
-    printf("%s\n", str);
+    /// \todo Handle Unicode
+    printf("%s\n", str.CString());
 }
 
 const Vector<String>& ParseArguments(const String& cmdLine)
