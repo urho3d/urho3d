@@ -146,7 +146,7 @@ void PrintRaw(const String& str)
     DWORD charsWritten;
     WriteConsoleW(output, strW.CString(), strW.Length(), &charsWritten, 0);
     #else
-    printf("%s", str);
+    printf("%s", str.CString());
     #endif
 }
 
