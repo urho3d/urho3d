@@ -115,7 +115,7 @@ void Log::WriteRaw(const String& message)
     inWrite_ = true;
     lastMessage_ = message;
     
-    Print(message);
+    PrintRaw(message);
     
     if (logFile_)
     {

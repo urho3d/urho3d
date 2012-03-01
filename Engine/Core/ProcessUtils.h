@@ -36,7 +36,7 @@ void ErrorExit(const String& message, int exitCode = 1);
 /// Open a console window.
 void OpenConsoleWindow();
 /// Print to the console without adding a newline.
-void Print(const String& str);
+void PrintRaw(const String& str);
 /// Print to the console. A newline will be added automatically.
 void PrintLine(const String& str);
 /// Parse arguments from the command line.
