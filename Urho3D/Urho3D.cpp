@@ -49,12 +49,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     
     ParseArguments(GetCommandLineW());
     
-    #if defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
+    #if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
     __try
     {
         Run();
     }
-    __except(WriteMiniDump("Urho3D", GetExceptionInformation())) {}
+    __except(WriteMiniDump("Urho3D", GetExceptionInformation()))
+    {
+    }
     #else
     Run();
     #endif

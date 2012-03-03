@@ -92,7 +92,7 @@ void Log::Write(int level, const String& message)
     String dateTimeString = String(dateTime).Replaced("\n", "");
     String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
-    PrintLine(formattedMessage);
+    PrintUnicodeLine(formattedMessage);
     
     if (logFile_)
         logFile_->WriteLine(formattedMessage);
@@ -115,7 +115,7 @@ void Log::WriteRaw(const String& message)
     inWrite_ = true;
     lastMessage_ = message;
     
-    PrintRaw(message);
+    PrintUnicode(message);
     
     if (logFile_)
     {

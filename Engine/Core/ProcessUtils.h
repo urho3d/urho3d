@@ -35,9 +35,11 @@ void ErrorDialog(const String& title, const String& message);
 void ErrorExit(const String& message, int exitCode = 1);
 /// Open a console window.
 void OpenConsoleWindow();
-/// Print to the console without adding a newline.
-void PrintRaw(const String& str);
-/// Print to the console. A newline will be added automatically.
+/// Print Unicode text to the console. Will not be printed to the MSVC output window.
+void PrintUnicode(const String& str);
+/// Print Unicode text to the console with a newline appended. Will not be printed to the MSVC output window.
+void PrintUnicodeLine(const String& str);
+/// Print ASCII text to the console with a newline appended. Uses printf() to allow printing into the MSVC output window.
 void PrintLine(const String& str);
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const String& cmdLine);

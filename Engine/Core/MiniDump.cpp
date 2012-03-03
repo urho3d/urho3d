@@ -23,7 +23,7 @@
 
 #include "Precompiled.h"
 
-#ifdef ENABLE_MINIDUMPS
+#if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
 
 #include "ProcessUtils.h"
 

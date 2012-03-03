@@ -108,7 +108,7 @@ void ErrorDialog(const String& title, const String& message)
 
 void ErrorExit(const String& message, int exitCode)
 {
-    PrintRaw(message);
+    PrintLine(message);
     exit(exitCode);
 }
 
@@ -136,7 +136,7 @@ void OpenConsoleWindow()
     #endif
 }
 
-void PrintRaw(const String& str)
+void PrintUnicode(const String& str)
 {
     #ifdef WIN32
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -150,9 +150,14 @@ void PrintRaw(const String& str)
     #endif
 }
 
+void PrintUnicodeLine(const String& str)
+{
+    PrintUnicode(str + '\n');
+}
+
 void PrintLine(const String& str)
 {
-    PrintRaw(str + '\n');
+    printf("%s\n", str.CString());
 }
 
 const Vector<String>& ParseArguments(const String& cmdLine)
@@ -263,14 +268,14 @@ String GetConsoleInput()
             {
                 if (c == '\b')
                 {
-                    PrintRaw("\b \b");
+                    PrintUnicode("\b \b");
                     int length = currentLine.LengthUTF8();
                     if (length)
                         currentLine = currentLine.SubstringUTF8(0, length - 1);
                 }
                 else if (c == '\r')
                 {
-                    PrintRaw("\n");
+                    PrintUnicode("\n");
                     ret = currentLine;
                     currentLine.Clear();
                     return ret;
