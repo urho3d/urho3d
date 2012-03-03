@@ -564,7 +564,7 @@ bool String::StartsWith(const String& str) const
 
 bool String::EndsWith(const String& str) const
 {
-    return Find(str) == Length() - str.Length();
+    return FindLast(str) == Length() - str.Length();
 }
 
 int String::Compare(const String& str, bool caseSensitive) const

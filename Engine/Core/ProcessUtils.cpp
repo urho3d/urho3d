@@ -201,6 +201,10 @@ const Vector<String>& ParseArguments(const String& cmdLine)
             arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
     }
     
+    // Strip double quotes from the arguments
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+        arguments[i].Replace("\"", "");
+    
     return arguments;
 }
 

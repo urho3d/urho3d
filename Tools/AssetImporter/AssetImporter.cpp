@@ -42,6 +42,7 @@
 #include "StringUtils.h"
 #include "Vector3.h"
 #include "VertexBuffer.h"
+#include "WorkQueue.h"
 #include "XMLFile.h"
 #include "Zone.h"
 
@@ -102,7 +103,6 @@ struct OutScene
 };
 
 SharedPtr<Context> context_(new Context());
-SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 Command command_ = CMD_NONE;
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
@@ -214,6 +214,7 @@ void Run(const Vector<String>& arguments)
     RegisterPhysicsLibrary(context_);
     context_->RegisterSubsystem(new FileSystem(context_));
     context_->RegisterSubsystem(new ResourceCache(context_));
+    context_->RegisterSubsystem(new WorkQueue(context_));
     
     String command = arguments[0].ToLower();
     String rootNodeName;
@@ -1039,7 +1040,7 @@ void ExportScene(const String& outName)
     outScene.rootNode_ = rootNode_;
     
     if (useSubdirs_)
-        fileSystem_->CreateDir(resourcePath_ + "Models");
+        context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Models");
     
     CollectSceneModels(outScene, rootNode_);
     
@@ -1191,7 +1192,7 @@ void BuildAndSaveScene(OutScene& scene)
 void ExportMaterials(Set<String>& usedTextures)
 {
     if (useSubdirs_)
-        fileSystem_->CreateDir(resourcePath_ + "Materials");
+        context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Materials");
     
     for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
         BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
@@ -1297,12 +1298,12 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
 void CopyTextures(const Set<String>& usedTextures, const String& sourcePath)
 {
     if (useSubdirs_)
-        fileSystem_->CreateDir(resourcePath_ + "Textures");
+        context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Textures");
     
     for (Set<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
         PrintLine("Copying texture " + (*i));
-        fileSystem_->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);
+        context_->GetSubsystem<FileSystem>()->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);
     }
 }
 
