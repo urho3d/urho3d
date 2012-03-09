@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse ï¿½ï¿½rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -228,8 +228,10 @@ void Run(const Vector<String>& arguments)
         aiProcess_GenSmoothNormals |
         aiProcess_LimitBoneWeights |
         aiProcess_ImproveCacheLocality |
+        aiProcess_RemoveRedundantMaterials |
         aiProcess_FixInfacingNormals |
         aiProcess_FindInvalidData |
+        aiProcess_GenUVCoords |
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
     
