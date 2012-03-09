@@ -70,9 +70,12 @@ void CreateScene()
     script.defaultScene = editorScene;
 }
 
-void SetResourcePath(String newPath)
+void SetResourcePath(String newPath, bool usePreferredDir = true)
 {
-    newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
+    if (usePreferredDir)
+        newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
+    else
+        newPath = AddTrailingSlash(newPath);
 
     if (newPath == sceneResourcePath)
         return;

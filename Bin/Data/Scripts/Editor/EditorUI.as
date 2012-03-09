@@ -480,7 +480,7 @@ void HandleResourcePath(StringHash eventType, VariantMap& eventData)
     if (!eventData["OK"].GetBool())
         return;
 
-    SetResourcePath(eventData["FileName"].GetString());
+    SetResourcePath(eventData["FileName"].GetString(), false);
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
