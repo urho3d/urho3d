@@ -512,6 +512,9 @@ void Input::SetCursorVisible(bool enable)
 
 void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
+    if (!initialized_)
+        Initialize();
+    
     using namespace WindowMessage;
     
     int msg = eventData[P_MSG].GetInt();

@@ -4166,6 +4166,7 @@ Properties:<br>
 - String& typeName (readonly)
 - XMLFile@ style
 - uint mode
+- uint profilerMaxDepth
 - float profilerInterval
 - bool useRendererStats
 - Text@ statsText (readonly)

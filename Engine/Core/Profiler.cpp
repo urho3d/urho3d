@@ -109,9 +109,9 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     unsigned frames = Max(totalFrames_, 1);
     unsigned accumulatedFrames = Max(accumulatedFrames_, 1);
     
-    if (depth > maxDepth)
+    if (depth >= maxDepth)
         return;
-
+    
     // Do not print the root block as it does not collect any actual data
     if (block != root_)
     {
@@ -168,10 +168,11 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
             }
             output += String(line);
         }
+        
+        ++depth;
     }
     
     const PODVector<ProfilerBlock*>& children = block->GetChildren();
     for (PODVector<ProfilerBlock*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        GetData(*i, output, depth + 1, maxDepth, showUnused, showAccumulated, showTotal);
+        GetData(*i, output, depth, maxDepth, showUnused, showAccumulated, showTotal);
 }
-

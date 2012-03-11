@@ -94,7 +94,7 @@ private:
     SharedPtr<Text> modeText_;
     /// Profiling information text.
     SharedPtr<Text> profilerText_;
-    /// Profiler accumulation timer.
+    /// Profiler timer.
     Timer profilerTimer_;
     /// Profiler max block depth.
     unsigned profilerMaxDepth_;
