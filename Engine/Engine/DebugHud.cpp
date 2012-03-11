@@ -58,8 +58,8 @@ OBJECTTYPESTATIC(DebugHud);
 
 DebugHud::DebugHud(Context* context) :
     Object(context),
+    profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1.0f),
-    profilerTimer_(0.0f),
     useRendererStats_(false)
 {
     UI* ui = GetSubsystem<UI>();
@@ -98,7 +98,7 @@ DebugHud::~DebugHud()
     }
 }
 
-void DebugHud::Update(float timeStep)
+void DebugHud::Update()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
@@ -135,9 +135,7 @@ void DebugHud::Update(float timeStep)
         String mode;
         
         mode += renderModeTexts[renderer->GetRenderMode()];
-        
         mode += " Tex: " + qualityTexts[renderer->GetTextureQuality()];
-        
         mode += " Mat: " + qualityTexts[renderer->GetMaterialQuality()];
         
         mode += " Spec:";
@@ -153,7 +151,6 @@ void DebugHud::Update(float timeStep)
             mode += "Off";
         
         mode += " Size:" + String(renderer->GetShadowMapSize());
-        
         mode += " Quality:" + shadowQualityTexts[renderer->GetShadowQuality()];
         
         mode += " Occlusion:";
@@ -184,16 +181,16 @@ void DebugHud::Update(float timeStep)
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
     {
-        profilerTimer_ += timeStep;
-        if (profilerTimer_ >= profilerInterval_)
+        if (profilerTimer_.GetMSec(false) >= (unsigned)(profilerInterval_ * 1000.0f))
         {
+            profilerTimer_.Reset();
+
             if (profilerText_->IsVisible())
             {
-                String profilerOutput = profiler->GetData(false, true, false);
+                String profilerOutput = profiler->GetData(false, true, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);
             }
-            
-            profilerTimer_ -= profilerInterval_;
+
             profiler->ClearAccumulated();
         }
     }
@@ -215,10 +212,11 @@ void DebugHud::SetMode(unsigned mode)
     statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
     modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
-    
-    // If profiler text is made visible, force update
-    if (profilerText_->IsVisible())
-        profilerTimer_ = profilerInterval_;
+}
+
+void DebugHud::SetProfilerMaxDepth(unsigned depth)
+{
+    profilerMaxDepth_ = depth;
 }
 
 void DebugHud::SetProfilerInterval(float interval)
@@ -259,5 +257,5 @@ void DebugHud::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
     
-    Update(eventData[P_TIMESTEP].GetFloat());
+    Update();
 }

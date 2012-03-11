@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "CoreEvents.h"
+#include "Profiler.h"
 #include "Timer.h"
 
 #ifdef WIN32
@@ -72,19 +73,35 @@ void Time::BeginFrame(float timeStep)
     
     timeStep_ = timeStep;
     
-    // Frame begin event
-    using namespace BeginFrame;
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        profiler->BeginFrame();
+
+    {
+        PROFILE(BeginFrame);
+
+        // Frame begin event
+        using namespace BeginFrame;
     
-    VariantMap eventData;
-    eventData[P_FRAMENUMBER] = frameNumber_;
-    eventData[P_TIMESTEP] = timeStep_;
-    SendEvent(E_BEGINFRAME, eventData);
+        VariantMap eventData;
+        eventData[P_FRAMENUMBER] = frameNumber_;
+        eventData[P_TIMESTEP] = timeStep_;
+        SendEvent(E_BEGINFRAME, eventData);
+    }
 }
 
 void Time::EndFrame()
 {
-    // Frame end event
-    SendEvent(E_ENDFRAME);
+    {
+        PROFILE(EndFrame);
+
+        // Frame end event
+        SendEvent(E_ENDFRAME);
+    }
+
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        profiler->EndFrame();
 }
 
 void Time::SetTimerPeriod(unsigned mSec)

@@ -72,6 +72,8 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "XMLFile@+ get_style() const", asMETHOD(DebugHud, GetStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void set_mode(uint)", asMETHOD(DebugHud, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "uint get_mode() const", asMETHOD(DebugHud, GetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void set_profilerMaxDepth(uint)", asMETHOD(DebugHud, SetProfilerMaxDepth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "uint get_profilerMaxDepth() const", asMETHOD(DebugHud, GetProfilerMaxDepth), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void set_profilerInterval(float)", asMETHOD(DebugHud, SetProfilerInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "float get_profilerInterval() const", asMETHOD(DebugHud, GetProfilerInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void set_useRendererStats(bool)", asMETHOD(DebugHud, SetUseRendererStats), asCALL_THISCALL);

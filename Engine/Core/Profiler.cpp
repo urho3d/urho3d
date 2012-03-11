@@ -45,9 +45,6 @@ Profiler::Profiler(Context* context) :
 {
     root_ = new ProfilerBlock(0, "Root");
     current_ = root_;
-    
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(Profiler, HandleBeginFrame));
-    SubscribeToEvent(E_ENDFRAME, HANDLER(Profiler, HandleEndFrame));
 }
 
 Profiler::~Profiler()
@@ -84,7 +81,7 @@ void Profiler::ClearAccumulated()
     accumulatedFrames_ = 0;
 }
 
-String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal) const
+String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal, unsigned maxDepth) const
 {
     String output;
     
@@ -96,12 +93,15 @@ String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal) 
         output += String("                                    Count     Average       Total      Count     Average       Total\n\n");
     }
     
-    GetData(root_, output, 0, showUnused, showAccumulated, showTotal);
+    if (!maxDepth)
+        maxDepth = 1;
+
+    GetData(root_, output, 0, maxDepth, showUnused, showAccumulated, showTotal);
     
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const
+void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showAccumulated, bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
@@ -109,6 +109,9 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
     unsigned frames = Max(totalFrames_, 1);
     unsigned accumulatedFrames = Max(accumulatedFrames_, 1);
     
+    if (depth > maxDepth)
+        return;
+
     // Do not print the root block as it does not collect any actual data
     if (block != root_)
     {
@@ -134,7 +137,7 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
         if (showUnused || frameCount || (showAccumulated && accumulatedCount))
         {
             memset(indentedName, ' ', NAME_MAX_LENGTH);
-            indentedName[indent] = 0;
+            indentedName[depth] = 0;
             strcat(indentedName, block->GetName());
             indentedName[strlen(indentedName)] = ' ';
             indentedName[NAME_MAX_LENGTH] = 0;
@@ -164,22 +167,11 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
                     totalCount, avgTotalTime, totalTime);
             }
             output += String(line);
-            
-            indent++;
         }
     }
     
     const PODVector<ProfilerBlock*>& children = block->GetChildren();
     for (PODVector<ProfilerBlock*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        GetData(*i, output, indent, showUnused, showAccumulated, showTotal);
+        GetData(*i, output, depth + 1, maxDepth, showUnused, showAccumulated, showTotal);
 }
 
-void Profiler::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
-{
-    BeginFrame();
-}
-
-void Profiler::HandleEndFrame(StringHash eventType, VariantMap& eventData)
-{
-    EndFrame();
-}

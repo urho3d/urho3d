@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Timer.h"
 
 class Engine;
 class Font;
@@ -48,11 +49,13 @@ public:
     ~DebugHud();
     
     /// Update. Called by HandleUpdate().
-    void Update(float timeStep);
+    void Update();
     /// %Set UI elements' style from an XML file.
     void SetStyle(XMLFile* style);
     /// %Set elements to show.
     void SetMode(unsigned mode);
+    /// %Set maximum profiler block depth, default unlimited.
+    void SetProfilerMaxDepth(unsigned depth);
     /// %Set profiler accumulation interval.
     void SetProfilerInterval(float interval);
     /// %Set whether to show 3D geometry primitive/batch count only. Default false.
@@ -72,6 +75,8 @@ public:
     Text* GetProfilerText() const { return profilerText_; }
     /// Return currently shown elements.
     unsigned GetMode() const;
+    /// Return maximum profiler block depth.
+    unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
     /// Return profiler accumulation interval.
     float GetProfilerInterval() const { return profilerInterval_; }
     /// Return whether showing 3D geometry primitive/batch count only.
@@ -89,10 +94,12 @@ private:
     SharedPtr<Text> modeText_;
     /// Profiling information text.
     SharedPtr<Text> profilerText_;
+    /// Profiler accumulation timer.
+    Timer profilerTimer_;
+    /// Profiler max block depth.
+    unsigned profilerMaxDepth_;
     /// Profiler accumulation interval.
     float profilerInterval_;
-    /// Profiler accumulation timer.
-    float profilerTimer_;
     /// Show 3D geometry primitive/batch count flag.
     bool useRendererStats_;
 };

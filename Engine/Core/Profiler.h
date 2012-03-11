@@ -208,18 +208,14 @@ public:
     void ClearAccumulated();
     
     /// Return profiling data as text output.
-    String GetData(bool showUnused = false, bool showAccumulated = false, bool showTotal = false) const;
+    String GetData(bool showUnused = false, bool showAccumulated = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
     /// Return the current profiling block.
     const ProfilerBlock* GetCurrentBlock() { return current_; }
     
 private:
     /// Return profiling data as text output for a specified profiling block.
-    void GetData(ProfilerBlock* block, String& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const;
-    /// Handle begin frame event.
-    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    /// Handle end frame event.
-    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
-    
+    void GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showAccumulated, bool showTotal) const;
+
     /// Current profiling block.
     ProfilerBlock* current_;
     /// Root profiling block.
