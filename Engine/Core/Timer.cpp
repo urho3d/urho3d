@@ -76,13 +76,13 @@ void Time::BeginFrame(float timeStep)
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginFrame();
-
+    
     {
         PROFILE(BeginFrame);
-
+        
         // Frame begin event
         using namespace BeginFrame;
-    
+        
         VariantMap eventData;
         eventData[P_FRAMENUMBER] = frameNumber_;
         eventData[P_TIMESTEP] = timeStep_;
@@ -94,11 +94,11 @@ void Time::EndFrame()
 {
     {
         PROFILE(EndFrame);
-
+        
         // Frame end event
         SendEvent(E_ENDFRAME);
     }
-
+    
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->EndFrame();

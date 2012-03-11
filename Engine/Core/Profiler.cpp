@@ -95,7 +95,7 @@ String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal, 
     
     if (!maxDepth)
         maxDepth = 1;
-
+    
     GetData(root_, output, 0, maxDepth, showUnused, showAccumulated, showTotal);
     
     return output;
