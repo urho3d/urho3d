@@ -62,6 +62,8 @@ struct LightQueryResult
     PODVector<Drawable*> shadowCasters_;
     /// Shadow cameras.
     Camera* shadowCameras_[MAX_LIGHT_SPLITS];
+    /// Shadow camera frustums.
+    Frustum shadowFrustums_[MAX_LIGHT_SPLITS];
     /// Shadow caster start indices.
     unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
     /// Shadow caster end indices.
@@ -212,6 +214,8 @@ private:
     FrameInfo frame_;
     /// Camera frustum.
     Frustum frustum_;
+    /// Scene-bounded camera frustum.
+    Frustum sceneFrustum_;
     /// Combined bounding box of visible geometries.
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space.

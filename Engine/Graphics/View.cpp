@@ -510,6 +510,8 @@ void View::GetDrawables()
         }
     }
     
+    sceneFrustum_ = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_);
+    
     // Sort the lights to brightest/closest first
     for (unsigned i = 0; i < lights_.Size(); ++i)
     {
@@ -1611,13 +1613,13 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     for (unsigned i = 0; i < query.numSplits_; ++i)
     {
         Camera* shadowCamera = query.shadowCameras_[i];
-        Frustum shadowCameraFrustum = shadowCamera->GetFrustum();
+        query.shadowFrustums_[i] = shadowCamera->GetFrustum();
         query.shadowCasterBegin_[i] = query.shadowCasterEnd_[i] = query.shadowCasters_.Size();
         
         // For point light check that the face is visible: if not, can skip the split
         if (type == LIGHT_POINT)
         {
-            BoundingBox shadowCameraBox(shadowCameraFrustum);
+            BoundingBox shadowCameraBox(query.shadowFrustums_[i]);
             if (frustum_.IsInsideFast(shadowCameraBox) == OUTSIDE)
                 continue;
         }
@@ -1631,11 +1633,10 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
                 continue;
         }
         
-        // For spot light (which has only one shadow split) we can optimize by reusing the query for
-        // lit geometries, whose result still exists in tempDrawables
-        if (type != LIGHT_SPOT)
+        // Reuse lit geometry query for all except directional lights
+        if (type == LIGHT_DIRECTIONAL)
         {
-            FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+            FrustumOctreeQuery octreeQuery(tempDrawables, query.shadowFrustums_[i], DRAWABLE_GEOMETRY,
                 camera_->GetViewMask(), true);
             octree_->GetDrawables(octreeQuery);
         }
@@ -1659,7 +1660,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
     lightView = shadowCamera->GetInverseWorldTransform();
     lightProj = shadowCamera->GetProjection();
-    bool dirLight = shadowCamera->IsOrthographic();
+    LightType type = light->GetLightType();
     
     query.shadowCasterBox_[splitIndex].defined_ = false;
     
@@ -1667,8 +1668,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     // we can use the whole scene frustum. For directional lights, use the intersection of the scene frustum and the split
     // frustum, so that shadow casters do not get rendered into unnecessary splits
     Frustum lightViewFrustum;
-    if (!dirLight)
-        lightViewFrustum = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_).Transformed(lightView);
+    if (type != LIGHT_DIRECTIONAL)
+        lightViewFrustum = sceneFrustum_.Transformed(lightView);
     else
         lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, query.shadowNearSplits_[splitIndex]),
             Min(sceneViewBox_.max_.z_, query.shadowFarSplits_[splitIndex])).Transformed(lightView);
@@ -1685,9 +1686,12 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
     {
         Drawable* drawable = *i;
-        // In case this is a spot light query result reused for optimization, we may have non-shadowcasters included.
+        // In case this is a point or spot light query result reused for optimization, we may have non-shadowcasters included.
         // Check for that first
         if (!drawable->GetCastShadows())
+            continue;
+        // For point light, check first that this drawable is inside the split shadow camera frustum
+        if (type == LIGHT_POINT && !query.shadowFrustums_[splitIndex].IsInsideFast(drawable->GetWorldBoundingBox()))
             continue;
         
         // Note: as lights are processed threaded, it is possible a drawable's UpdateDistance() function is called several
@@ -1710,7 +1714,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         if (IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum, lightViewFrustumBox))
         {
             // Merge to shadow caster bounding box and add to the list
-            if (dirLight)
+            if (type == LIGHT_DIRECTIONAL)
                 query.shadowCasterBox_[splitIndex].Merge(lightViewBox);
             else
             {
