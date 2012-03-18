@@ -313,46 +313,41 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (!buffer_)
         return true;
     
-    Vector3 vertices[8];
+    // Transform corners to projection space
+    Vector4 vertices[8];
+    vertices[0] = ModelTransform(viewProj_, worldSpaceBox.min_);
+    vertices[1] = ModelTransform(viewProj_, Vector3(worldSpaceBox.max_.x_, worldSpaceBox.min_.y_, worldSpaceBox.min_.z_));
+    vertices[2] = ModelTransform(viewProj_, Vector3(worldSpaceBox.min_.x_, worldSpaceBox.max_.y_, worldSpaceBox.min_.z_));
+    vertices[3] = ModelTransform(viewProj_, Vector3(worldSpaceBox.max_.x_, worldSpaceBox.max_.y_, worldSpaceBox.min_.z_));
+    vertices[4] = ModelTransform(viewProj_, Vector3(worldSpaceBox.min_.x_, worldSpaceBox.min_.y_, worldSpaceBox.max_.z_));
+    vertices[5] = ModelTransform(viewProj_, Vector3(worldSpaceBox.max_.x_, worldSpaceBox.min_.y_, worldSpaceBox.max_.z_));
+    vertices[6] = ModelTransform(viewProj_, Vector3(worldSpaceBox.min_.x_, worldSpaceBox.max_.y_, worldSpaceBox.max_.z_));
+    vertices[7] = ModelTransform(viewProj_, worldSpaceBox.max_);
     
-    // Transform corners to view space. Note: do not directly transform the bounding box, as this would expand it unnecessarily
-    vertices[0] = view_ * worldSpaceBox.min_;
-    vertices[1] = view_ * Vector3(worldSpaceBox.max_.x_, worldSpaceBox.min_.y_, worldSpaceBox.min_.z_);
-    vertices[2] = view_ * Vector3(worldSpaceBox.min_.x_, worldSpaceBox.max_.y_, worldSpaceBox.min_.z_);
-    vertices[3] = view_ * Vector3(worldSpaceBox.max_.x_, worldSpaceBox.max_.y_, worldSpaceBox.min_.z_);
-    vertices[4] = view_ * Vector3(worldSpaceBox.min_.x_, worldSpaceBox.min_.y_, worldSpaceBox.max_.z_);
-    vertices[5] = view_ * Vector3(worldSpaceBox.max_.x_, worldSpaceBox.min_.y_, worldSpaceBox.max_.z_);
-    vertices[6] = view_ * Vector3(worldSpaceBox.min_.x_, worldSpaceBox.max_.y_, worldSpaceBox.max_.z_);
-    vertices[7] = view_ * worldSpaceBox.max_;
-    
-    // Project to screen. If any of the corners cross the near plane, assume visible
+    // Transform to screen space. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;
     
-    if (vertices[0].z_ <= nearClip_)
+    if (vertices[0].w_ <= nearClip_)
         return true;
     
-    // Project the first corner to initialize the rectangle
-    float invW = 1.0f / (vertices[0].z_ * projection_.m32_ + projection_.m33_);
-    minX = maxX = invW * (projOffsetScaleX_ * vertices[0].x_) + offsetX_;
-    minY = maxY = invW * (projOffsetScaleY_ * vertices[0].y_) + offsetY_;
-    minZ = invW * (projection_.m22_ * vertices[0].z_ + projection_.m23_);
+    Vector3 projected = ViewportTransform(vertices[0]);
+    minX = maxX = projected.x_;
+    minY = maxY = projected.y_;
+    minZ = projected.z_;
     
     // Project the rest
     for (unsigned i = 1; i < 8; ++i)
     {
-        if (vertices[i].z_ <= nearClip_)
+        if (vertices[i].w_ <= nearClip_)
             return true;
         
-        float invW = 1.0f / (vertices[i].z_ * projection_.m32_ + projection_.m33_);
-        float x = invW * (projOffsetScaleX_ * vertices[i].x_) + offsetX_;
-        float y = invW * (projOffsetScaleY_ * vertices[i].y_) + offsetY_;
-        float z = invW * (projection_.m22_ * vertices[i].z_ + projection_.m23_);
+        projected = ViewportTransform(vertices[i]);
         
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-        if (z < minZ) minZ = z;
+        if (projected.x_ < minX) minX = projected.x_;
+        if (projected.x_ > maxX) maxX = projected.x_;
+        if (projected.y_ < minY) minY = projected.y_;
+        if (projected.y_ > maxY) maxY = projected.y_;
+        if (projected.z_ < minZ) minZ = projected.z_;
     }
     
     // Expand the bounding box 1 pixel in each direction to be conservative and correct rasterization offset
@@ -377,7 +372,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (rect.bottom_ >= height_)
         rect.bottom_ = height_ - 1;
     
-    int z = (int)(minZ * OCCLUSION_Z_SCALE + 0.5f) - OCCLUSION_DEPTH_BIAS;
+    int z = (int)(minZ + 0.5f) - OCCLUSION_DEPTH_BIAS;
     
     if (!depthHierarchyDirty_)
     {
@@ -760,10 +755,10 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
     
     int topY = (int)vertices[top].y_;
     int middleY = (int)vertices[middle].y_;
-    int bottoy_ = (int)vertices[bottom].y_;
+    int bottomY = (int)vertices[bottom].y_;
     
     // Check for degenerate triangle
-    if (topY == bottoy_)
+    if (topY == bottomY)
         return;
     
     Gradients gradients(vertices);
@@ -798,7 +793,7 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         
         // Bottom half
         row = buffer_ + middleY * width_;
-        endRow = buffer_ + bottoy_ * width_;
+        endRow = buffer_ + bottomY * width_;
         while (row < endRow)
         {
             int invZ = topToBottom.invZ_;
@@ -844,7 +839,7 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         
         // Bottom half
         row = buffer_ + middleY * width_;
-        endRow = buffer_ + bottoy_ * width_;
+        endRow = buffer_ + bottomY * width_;
         while (row < endRow)
         {
             int invZ = middleToBottom.invZ_;

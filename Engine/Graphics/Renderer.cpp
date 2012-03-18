@@ -276,7 +276,7 @@ Renderer::Renderer(Context* context) :
     maxInstanceTriangles_(500),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
-    occluderSizeThreshold_(0.1f),
+    occluderSizeThreshold_(0.025f),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
     renderMode_(RENDER_FORWARD),
     specularLighting_(true),
