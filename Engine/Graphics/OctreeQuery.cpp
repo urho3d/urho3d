@@ -33,10 +33,10 @@ Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside) c
         return INSIDE;
 }
 
-Intersection PointOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
+Intersection PointOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
     if (!inside)
-        return box.IsInside(point_);
+        return drawable->GetWorldBoundingBox().IsInside(point_);
     else
         return INSIDE;
 }
@@ -49,10 +49,10 @@ Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, bool inside) 
         return INSIDE;
 }
 
-Intersection SphereOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
+Intersection SphereOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
     if (!inside)
-        return sphere_.IsInsideFast(box);
+        return sphere_.IsInsideFast(drawable->GetWorldBoundingBox());
     else
         return INSIDE;
 }
@@ -65,10 +65,10 @@ Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, bool inside) con
         return INSIDE;
 }
 
-Intersection BoxOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
+Intersection BoxOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
     if (!inside)
-        return box_.IsInsideFast(box);
+        return box_.IsInsideFast(drawable->GetWorldBoundingBox());
     else
         return INSIDE;
 }
@@ -81,10 +81,32 @@ Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
         return INSIDE;
 }
 
-Intersection FrustumOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
+Intersection FrustumOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
     if (!inside)
-        return frustum_.IsInsideFast(box);
+        return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
     else
         return INSIDE;
 }
+
+Intersection ShadowCasterFrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
+{
+    if (!inside)
+        return frustum_.IsInside(box);
+    else
+        return INSIDE;
+}
+
+Intersection ShadowCasterFrustumOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
+{
+    if (!drawable->GetCastShadows())
+        return OUTSIDE;
+    else
+    {
+        if (!inside)
+            return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
+        else
+            return INSIDE;
+    }
+}
+

@@ -376,6 +376,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (rect.bottom_ >= height_)
         rect.bottom_ = height_ - 1;
     
+    // Convert depth to integer and apply final bias
     int z = (int)(minZ + 0.5f) - OCCLUSION_FIXED_BIAS;
     
     if (!depthHierarchyDirty_)

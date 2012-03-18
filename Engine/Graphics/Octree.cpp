@@ -215,12 +215,11 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
     {
         Drawable* drawable = *i;
         
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            (query.shadowCastersOnly_ && !drawable->GetCastShadows()) ||
-            !drawable->IsVisible())
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
+            !(drawable->GetViewMask() & query.viewMask_))
             continue;
         
-        if (query.TestDrawable(drawable->GetWorldBoundingBox(), inside) != OUTSIDE)
+        if (query.TestDrawable(drawable, inside) != OUTSIDE)
             query.result_.Push(drawable);
     }
     
@@ -245,8 +244,8 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
         
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            !drawable->IsVisible() || (query.shadowCastersOnly_ && !drawable->GetCastShadows()))
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
+            !(drawable->GetViewMask() & query.viewMask_))
             continue;
         
         drawable->ProcessRayQuery(query, query.result_);
@@ -273,8 +272,8 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
         
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
-            !drawable->IsVisible() || (query.shadowCastersOnly_ && !drawable->GetCastShadows()))
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
+            !(drawable->GetViewMask() & query.viewMask_))
             continue;
         
         drawables.Push(drawable);

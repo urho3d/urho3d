@@ -1630,7 +1630,8 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         // Reuse lit geometry query for all except directional lights
         if (type == LIGHT_DIRECTIONAL)
         {
-            FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY, camera_->GetViewMask(), true);
+            ShadowCasterFrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+                camera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
         }
         

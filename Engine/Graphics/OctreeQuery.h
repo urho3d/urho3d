@@ -37,11 +37,10 @@ class OctreeQuery
 {
 public:
     /// Construct with query parameters.
-    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask, bool shadowCastersOnly) :
+    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
         result_(result),
         drawableFlags_(drawableFlags),
-        viewMask_(viewMask),
-        shadowCastersOnly_(shadowCastersOnly)
+        viewMask_(viewMask)
     {
     }
     
@@ -53,7 +52,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const = 0;
     /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const = 0;
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const = 0;
     
     /// Result vector reference.
     PODVector<Drawable*>& result_;
@@ -61,8 +60,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get shadowcasters only flag.
-    bool shadowCastersOnly_;
 };
 
 /// Point octree query.
@@ -71,8 +68,8 @@ class PointOctreeQuery : public OctreeQuery
 public:
     /// Construct with point and query parameters.
     PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
         point_(point)
     {
     }
@@ -80,7 +77,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
     
     /// Point.
     Vector3 point_;
@@ -92,8 +89,8 @@ class SphereOctreeQuery : public OctreeQuery
 public:
     /// Construct with sphere and query parameters.
     SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
         sphere_(sphere)
     {
     }
@@ -101,7 +98,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
     
     /// Sphere.
     Sphere sphere_;
@@ -113,8 +110,8 @@ class BoxOctreeQuery : public OctreeQuery
 public:
     /// Construct with bounding box and query parameters.
     BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
         box_(box)
     {
     }
@@ -122,7 +119,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
     
     /// Bounding box.
     BoundingBox box_;
@@ -134,20 +131,42 @@ class FrustumOctreeQuery : public OctreeQuery
 public:
     /// Construct with frustum and query parameters.
     FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, viewMask, shadowCastersOnly),
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
         frustum_(frustum)
     {
     }
     
     /// Intersection test for an octant.
-    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
+    /// Intersection test for a drawable.
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
     
     /// Frustum.
     Frustum frustum_;
 };
+
+/// %Frustum octree query for shadowcasters.
+class ShadowCasterFrustumOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct with frustum and query parameters.
+    ShadowCasterFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
+        frustum_(frustum)
+    {
+    }
+    
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
+    /// Intersection test for a drawable.
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
+    
+    /// Frustum.
+    Frustum frustum_;
+};
+
 
 /// Graphics raycast detail level.
 enum RayQueryLevel
@@ -177,15 +196,13 @@ class RayOctreeQuery
 public:
     /// Construct with ray and query parameters.
     RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
-        float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK,
-        bool shadowCastersOnly = false) :
+        float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
         result_(result),
         ray_(ray),
         level_(level),
         maxDistance_(maxDistance),
         drawableFlags_(drawableFlags),
-        viewMask_(viewMask),
-        shadowCastersOnly_(shadowCastersOnly)
+        viewMask_(viewMask)
     {
     }
     
@@ -197,8 +214,6 @@ public:
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get shadowcasters only flag.
-    bool shadowCastersOnly_;
     /// Maximum ray distance.
     float maxDistance_;
     /// Raycast detail level.
