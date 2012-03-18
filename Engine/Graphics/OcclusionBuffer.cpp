@@ -324,10 +324,14 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     vertices[6] = ModelTransform(viewProj_, Vector3(worldSpaceBox.min_.x_, worldSpaceBox.max_.y_, worldSpaceBox.max_.z_));
     vertices[7] = ModelTransform(viewProj_, worldSpaceBox.max_);
     
+    // Apply a far clip relative bias
+    for (unsigned i = 0; i < 8; ++i)
+        vertices[i].z_ -= OCCLUSION_RELATIVE_BIAS;
+    
     // Transform to screen space. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;
     
-    if (vertices[0].w_ <= nearClip_)
+    if (vertices[0].z_ <= 0.0f)
         return true;
     
     Vector3 projected = ViewportTransform(vertices[0]);
@@ -338,7 +342,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     // Project the rest
     for (unsigned i = 1; i < 8; ++i)
     {
-        if (vertices[i].w_ <= nearClip_)
+        if (vertices[i].z_ <= 0.0f)
             return true;
         
         projected = ViewportTransform(vertices[i]);
@@ -372,7 +376,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (rect.bottom_ >= height_)
         rect.bottom_ = height_ - 1;
     
-    int z = (int)(minZ + 0.5f) - OCCLUSION_DEPTH_BIAS;
+    int z = (int)(minZ + 0.5f) - OCCLUSION_FIXED_BIAS;
     
     if (!depthHierarchyDirty_)
     {

@@ -48,7 +48,8 @@ struct DepthValue
 
 static const int OCCLUSION_MIN_SIZE = 8;
 static const int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
-static const int OCCLUSION_DEPTH_BIAS = 256;
+static const float OCCLUSION_RELATIVE_BIAS = 0.00001f;
+static const int OCCLUSION_FIXED_BIAS = 16;
 static const float OCCLUSION_X_SCALE = 65536.0f;
 static const float OCCLUSION_Z_SCALE = 16777216.0f;
 
