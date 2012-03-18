@@ -33,6 +33,13 @@ static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_FOV = 45.0f;
 static const float DEFAULT_ORTHOSIZE = 20.0f;
 
+static const Matrix4 flipMatrix(
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, -1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f
+);
+
 OBJECTTYPESTATIC(Camera);
 
 Camera::Camera(Context* context) :
@@ -49,7 +56,9 @@ Camera::Camera(Context* context) :
     viewOverrideFlags_(VO_NONE),
     orthographic_(false),
     autoAspectRatio_(true),
-    flipVertical_(false)
+    flipVertical_(false),
+    frustumDirty_(true),
+    projectionDirty_(true)
 {
 }
 
@@ -66,50 +75,64 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", orthographic_, false, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", orthoSize_, DEFAULT_ORTHOSIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
-    ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", projectionOffset_, Vector2::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
 }
 
 void Camera::SetNearClip(float nearClip)
 {
     nearClip_ = Max(nearClip, M_MIN_NEARCLIP);
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetFarClip(float farClip)
 {
     farClip_ = Max(farClip, M_MIN_NEARCLIP);
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetFov(float fov)
 {
     fov_ = Clamp(fov, 0.0f, M_MAX_FOV);
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetOrthoSize(float orthoSize)
 {
     orthoSize_ = orthoSize;
     aspectRatio_ = 1.0f;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetOrthoSize(const Vector2& orthoSize)
 {
     orthoSize_ = orthoSize.y_;
     aspectRatio_ = orthoSize.x_ / orthoSize.y_;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetAspectRatio(float aspectRatio)
 {
     aspectRatio_ = aspectRatio;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetZoom(float zoom)
 {
     zoom_ = Max(zoom, M_EPSILON);
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetLodBias(float bias)
@@ -130,6 +153,8 @@ void Camera::SetViewOverrideFlags(unsigned flags)
 void Camera::SetOrthographic(bool enable)
 {
     orthographic_ = enable;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
 }
 
 void Camera::SetAutoAspectRatio(bool enable)
@@ -140,11 +165,13 @@ void Camera::SetAutoAspectRatio(bool enable)
 void Camera::SetProjectionOffset(const Vector2& offset)
 {
     projectionOffset_ = offset;
+    projectionDirty_ = true;
 }
 
 void Camera::SetFlipVertical(bool enable)
 {
     flipVertical_ = enable;
+    projectionDirty_ = true;
 }
 
 float Camera::GetNearClip() const
@@ -234,78 +261,77 @@ Ray Camera::GetScreenRay(float x, float y)
     return ret;
 }
 
-Frustum Camera::GetFrustum() const
+const Frustum& Camera::GetFrustum()
 {
-    Frustum ret;
+    if (frustumDirty_)
+    {
+        if (!orthographic_)
+            frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
+        else
+            frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
+        
+        frustumDirty_ = false;
+    }
     
-    if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
-    else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
-    
-    return ret;
+    return frustum_;
 }
 
-Matrix4 Camera::GetProjection() const
+const Matrix4& Camera::GetProjection()
 {
-    Matrix4 ret(Matrix4::ZERO);
-    
-    if (!orthographic_)
+    if (projectionDirty_)
     {
-        float nearClip = GetNearClip();
-        float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
-        float w = h / aspectRatio_;
-        #ifdef USE_OPENGL
-        float q = (farClip_ + nearClip) / (farClip_ - nearClip);
-        float r = -2.0f * farClip_ * nearClip / (farClip_ - nearClip);
-        #else
-        float q = farClip_ / (farClip_ - nearClip);
-        float r = -q * nearClip;
-        #endif
+        projection_ = Matrix4::ZERO;
         
-        ret.m00_ = w;
-        ret.m02_ = projectionOffset_.x_ * 2.0f;
-        ret.m11_ = h;
-        ret.m12_ = projectionOffset_.y_ * 2.0f;
-        ret.m22_ = q;
-        ret.m23_ = r;
-        ret.m32_ = 1.0f;
-    }
-    else
-    {
-        // Disregard near clip, because it does not affect depth precision as with perspective projection
-        float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
-        float w = h / aspectRatio_;
-        #ifdef USE_OPENGL
-        float q = 2.0f / farClip_;
-        float r = -1.0f;
-        #else
-        float q = 1.0f / farClip_;
-        float r = 0.0f;
-        #endif
+        if (!orthographic_)
+        {
+            float nearClip = GetNearClip();
+            float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
+            float w = h / aspectRatio_;
+            #ifdef USE_OPENGL
+            float q = (farClip_ + nearClip) / (farClip_ - nearClip);
+            float r = -2.0f * farClip_ * nearClip / (farClip_ - nearClip);
+            #else
+            float q = farClip_ / (farClip_ - nearClip);
+            float r = -q * nearClip;
+            #endif
+            
+            projection_.m00_ = w;
+            projection_.m02_ = projectionOffset_.x_ * 2.0f;
+            projection_.m11_ = h;
+            projection_.m12_ = projectionOffset_.y_ * 2.0f;
+            projection_.m22_ = q;
+            projection_.m23_ = r;
+            projection_.m32_ = 1.0f;
+        }
+        else
+        {
+            // Disregard near clip, because it does not affect depth precision as with perspective projection
+            float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
+            float w = h / aspectRatio_;
+            #ifdef USE_OPENGL
+            float q = 2.0f / farClip_;
+            float r = -1.0f;
+            #else
+            float q = 1.0f / farClip_;
+            float r = 0.0f;
+            #endif
+            
+            projection_.m00_ = w;
+            projection_.m03_ = projectionOffset_.x_ * 2.0f;
+            projection_.m11_ = h;
+            projection_.m13_ = projectionOffset_.y_ * 2.0f;
+            projection_.m22_ = q;
+            projection_.m23_ = r;
+            projection_.m33_ = 1.0f;
+        }
         
-        ret.m00_ = w;
-        ret.m03_ = projectionOffset_.x_ * 2.0f;
-        ret.m11_ = h;
-        ret.m13_ = projectionOffset_.y_ * 2.0f;
-        ret.m22_ = q;
-        ret.m23_ = r;
-        ret.m33_ = 1.0f;
-    }
-    
-    if (flipVertical_)
-    {
-        Matrix4 flip(
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, -1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        );
+        if (flipVertical_)
+            projection_ = flipMatrix * projection_;
         
-        ret = flip * ret;
+        projectionDirty_ = false;
     }
     
-    return ret;
+    return projection_;
 }
 
 void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
@@ -389,4 +415,10 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
 bool Camera::IsProjectionValid() const
 {
     return farClip_ > GetNearClip();
+}
+
+void Camera::OnMarkedDirty(Node* node)
+{
+    if (node == node_)
+        frustumDirty_ = true;
 }

@@ -275,9 +275,6 @@ void View::Update(const FrameInfo& frame)
     if (camera_->GetAutoAspectRatio())
         camera_->SetAspectRatio((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
     
-    // Cache the camera frustum to avoid recalculating it constantly
-    frustum_ = camera_->GetFrustum();
-    
     GetDrawables();
     GetBatches();
     UpdateGeometries();
@@ -375,7 +372,7 @@ void View::GetDrawables()
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
     
     // Perform one octree query to get everything, then examine the results
-    FrustumOctreeQuery query(tempDrawables, frustum_, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
+    FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
     octree_->GetDrawables(query);
     
     // Get zones and occluders first
@@ -1551,6 +1548,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 {
     Light* light = query.light_;
     LightType type = light->GetLightType();
+    const Frustum& frustum = camera_->GetFrustum();
     
     // Check if light should be shadowed
     bool isShadowed = drawShadows_ && light->GetCastShadows() && !light->GetPerVertex() && light->GetShadowIntensity() < 1.0f;
@@ -1613,16 +1611,12 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     for (unsigned i = 0; i < query.numSplits_; ++i)
     {
         Camera* shadowCamera = query.shadowCameras_[i];
-        query.shadowFrustums_[i] = shadowCamera->GetFrustum();
+        const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
         query.shadowCasterBegin_[i] = query.shadowCasterEnd_[i] = query.shadowCasters_.Size();
         
         // For point light check that the face is visible: if not, can skip the split
-        if (type == LIGHT_POINT)
-        {
-            BoundingBox shadowCameraBox(query.shadowFrustums_[i]);
-            if (frustum_.IsInsideFast(shadowCameraBox) == OUTSIDE)
-                continue;
-        }
+        if (type == LIGHT_POINT && frustum.IsInsideFast(BoundingBox(shadowCameraFrustum)) == OUTSIDE)
+            continue;
         
         // For directional light check that the split is inside the visible scene: if not, can skip the split
         if (type == LIGHT_DIRECTIONAL)
@@ -1636,8 +1630,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         // Reuse lit geometry query for all except directional lights
         if (type == LIGHT_DIRECTIONAL)
         {
-            FrustumOctreeQuery octreeQuery(tempDrawables, query.shadowFrustums_[i], DRAWABLE_GEOMETRY,
-                camera_->GetViewMask(), true);
+            FrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY, camera_->GetViewMask(), true);
             octree_->GetDrawables(octreeQuery);
         }
         
@@ -1658,6 +1651,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     Matrix4 lightProj;
     
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
+    const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
     lightView = shadowCamera->GetInverseWorldTransform();
     lightProj = shadowCamera->GetProjection();
     LightType type = light->GetLightType();
@@ -1690,8 +1684,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         // Check for that first
         if (!drawable->GetCastShadows())
             continue;
-        // For point light, check first that this drawable is inside the split shadow camera frustum
-        if (type == LIGHT_POINT && !query.shadowFrustums_[splitIndex].IsInsideFast(drawable->GetWorldBoundingBox()))
+        // For point light, check that this drawable is inside the split shadow camera frustum
+        if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
         
         // Note: as lights are processed threaded, it is possible a drawable's UpdateDistance() function is called several
@@ -2050,7 +2044,7 @@ void View::FindZone(Drawable* drawable, unsigned threadIndex)
     Zone* newZone = 0;
     
     // If bounding box center is in view, can use the visible zones. Else must query via the octree
-    if (frustum_.IsInside(center))
+    if (camera_->GetFrustum().IsInside(center))
     {
         // First check if the last zone remains a conclusive result
         Zone* lastZone = drawable->GetLastZone();

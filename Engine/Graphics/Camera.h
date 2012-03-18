@@ -98,9 +98,9 @@ public:
     /// Return auto aspect ratio flag.
     bool GetAutoAspectRatio() const { return autoAspectRatio_; }
     /// Return frustum in world space.
-    Frustum GetFrustum() const;
+    const Frustum& GetFrustum();
     /// Return projection matrix.
-    Matrix4 GetProjection() const;
+    const Matrix4& GetProjection();
     /// Return frustum near and far sizes.
     void GetFrustumSize(Vector3& near, Vector3& far) const;
     /// Return half view size.
@@ -129,13 +129,21 @@ public:
     float GetDistanceSquared(const Vector3& worldPos);
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
-    /// Return if projection parameters are valid for rendering and raycasting
+    /// Return if projection parameters are valid for rendering and raycasting.
     bool IsProjectionValid() const;
     
     /// Return inverse world transform, also known as the view matrix.
     Matrix3x4 GetInverseWorldTransform() const { return GetWorldTransform().Inverse(); }
     
+protected:
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
+    
 private:
+    /// Cached frustum.
+    Frustum frustum_;
+    /// Cached projection matrix.
+    Matrix4 projection_;
     /// Projection offset.
     Vector2 projectionOffset_;
     /// Near clip distance.
@@ -162,4 +170,8 @@ private:
     bool autoAspectRatio_;
     /// Flip vertical flag.
     bool flipVertical_;
+    /// Frustum dirty flag.
+    bool frustumDirty_;
+    /// Projection matrix dirty flag.
+    bool projectionDirty_;
 };
