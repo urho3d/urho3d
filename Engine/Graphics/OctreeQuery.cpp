@@ -88,25 +88,3 @@ Intersection FrustumOctreeQuery::TestDrawable(Drawable* drawable, bool inside) c
     else
         return INSIDE;
 }
-
-Intersection ShadowCasterFrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
-{
-    if (!inside)
-        return frustum_.IsInside(box);
-    else
-        return INSIDE;
-}
-
-Intersection ShadowCasterFrustumOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
-{
-    if (!drawable->GetCastShadows())
-        return OUTSIDE;
-    else
-    {
-        if (!inside)
-            return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
-        else
-            return INSIDE;
-    }
-}
-

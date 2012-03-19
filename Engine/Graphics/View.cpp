@@ -62,6 +62,129 @@ static const Vector3 directions[] =
 static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
 static const float LIGHT_INTENSITY_THRESHOLD = 0.001f;
 
+/// %Frustum octree query for shadowcasters.
+class ShadowCasterOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct with frustum and query parameters.
+    ShadowCasterOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
+        frustum_(frustum)
+    {
+    }
+    
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    {
+        if (!inside)
+            return frustum_.IsInside(box);
+        else
+            return INSIDE;
+    }
+    
+    /// Intersection test for a drawable.
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    {
+        if (drawable->GetCastShadows())
+        {
+            if (!inside)
+                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
+            else
+                return INSIDE;
+        }
+        else
+            return OUTSIDE;
+    }
+    
+    /// Frustum.
+    Frustum frustum_;
+};
+
+/// %Frustum octree query for zones and occluders.
+class ZoneOccluderOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct with frustum and query parameters.
+    ZoneOccluderOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
+        frustum_(frustum)
+    {
+    }
+    
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    {
+        if (!inside)
+            return frustum_.IsInside(box);
+        else
+            return INSIDE;
+    }
+    
+    /// Intersection test for a drawable.
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    {
+        unsigned char flags = drawable->GetDrawableFlags();
+        if (flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder()))
+        {
+            if (!inside)
+                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
+            else
+                return INSIDE;
+        }
+        else
+            return OUTSIDE;
+    }
+    
+    /// Frustum.
+    Frustum frustum_;
+};
+
+/// %Frustum octree query with occlusion.
+class OccludedFrustumOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct with frustum, occlusion buffer and query parameters.
+    OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer, unsigned char
+        drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
+        OctreeQuery(result, drawableFlags, viewMask),
+        frustum_(frustum),
+        buffer_(buffer)
+    {
+    }
+    
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    {
+        if (!inside)
+        {
+            Intersection result = frustum_.IsInside(box);
+            if (result != OUTSIDE && !buffer_->IsVisible(box))
+                result = OUTSIDE;
+            return result;
+        }
+        else
+            return buffer_->IsVisible(box) ? INSIDE : OUTSIDE;
+    }
+    
+    /// Intersection test for a drawable. Note: drawable occlusion is performed later in worker threads.
+    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    {
+        const BoundingBox& box = drawable->GetWorldBoundingBox();
+        
+        if (!inside)
+            return frustum_.IsInsideFast(box);
+        else
+            return INSIDE;
+    }
+    
+    /// Frustum.
+    Frustum frustum_;
+    /// Occlusion buffer.
+    OcclusionBuffer* buffer_;
+};
+
 void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
     View* view = reinterpret_cast<View*>(item->aux_);
@@ -371,11 +494,12 @@ void View::GetDrawables()
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
     
-    // Perform one octree query to get everything, then examine the results
-    FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT | DRAWABLE_ZONE);
-    octree_->GetDrawables(query);
-    
     // Get zones and occluders first
+    {
+        ZoneOccluderOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
+        octree_->GetDrawables(query);
+    }
+    
     highestZonePriority_ = M_MIN_INT;
     int bestPriority = M_MIN_INT;
     Vector3 cameraPos = camera_->GetWorldPosition();
@@ -402,7 +526,7 @@ void View::GetDrawables()
                 bestPriority = priority;
             }
         }
-        else if (flags & DRAWABLE_GEOMETRY && drawable->IsOccluder())
+        else
             occluders_.Push(drawable);
     }
     
@@ -440,7 +564,20 @@ void View::GetDrawables()
         }
     }
     
-    // Check visibility and find zones for moved drawables in worker threads
+    // Get lights and geometries. Coarse occlusion for octants is used at this point
+    if (occlusionBuffer_)
+    {
+        OccludedFrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), occlusionBuffer_, DRAWABLE_GEOMETRY |
+            DRAWABLE_LIGHT);
+        octree_->GetDrawables(query);
+    }
+    else
+    {
+        FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+        octree_->GetDrawables(query);
+    }
+    
+    // Check drawable occlusion and find zones for moved drawables in worker threads
     {
         WorkItem item;
         item.workFunction_ = CheckVisibilityWork;
@@ -1630,9 +1767,9 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         // Reuse lit geometry query for all except directional lights
         if (type == LIGHT_DIRECTIONAL)
         {
-            ShadowCasterFrustumOctreeQuery octreeQuery(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
                 camera_->GetViewMask());
-            octree_->GetDrawables(octreeQuery);
+            octree_->GetDrawables(query);
         }
         
         // Check which shadow casters actually contribute to the shadowing

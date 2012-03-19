@@ -146,28 +146,6 @@ public:
     Frustum frustum_;
 };
 
-/// %Frustum octree query for shadowcasters.
-class ShadowCasterFrustumOctreeQuery : public OctreeQuery
-{
-public:
-    /// Construct with frustum and query parameters.
-    ShadowCasterFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
-        unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
-        frustum_(frustum)
-    {
-    }
-    
-    /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const;
-    
-    /// Frustum.
-    Frustum frustum_;
-};
-
-
 /// Graphics raycast detail level.
 enum RayQueryLevel
 {
