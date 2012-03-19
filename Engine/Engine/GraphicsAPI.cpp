@@ -87,7 +87,7 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "void set_viewOverrideFlags(uint)", asMETHOD(Camera, SetViewOverrideFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint get_viewOverrideFlags() const", asMETHOD(Camera, GetViewOverrideFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Frustum& get_frustum()", asMETHOD(Camera, GetFrustum), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "const Matrix4& get_projection()", asMETHOD(Camera, GetProjection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "const Matrix4& get_projection()", asMETHODPR(Camera, GetProjection, (), const Matrix4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector()", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);

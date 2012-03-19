@@ -110,7 +110,7 @@ public:
     /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues.
-    const List<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+    const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
     
 private:
     /// Query the octree for drawable objects.
@@ -257,7 +257,7 @@ private:
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Per-pixel light queues.
-    List<LightBatchQueue> lightQueues_;
+    Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
     /// Material quality level.

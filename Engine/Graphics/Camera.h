@@ -99,8 +99,10 @@ public:
     bool GetAutoAspectRatio() const { return autoAspectRatio_; }
     /// Return frustum in world space.
     const Frustum& GetFrustum();
-    /// Return projection matrix.
+    /// Return API-specific projection matrix.
     const Matrix4& GetProjection();
+    /// Return either API-specific or API-independent (D3D convention) projection matrix.
+    Matrix4 GetProjection(bool apiSpecific) const;
     /// Return frustum near and far sizes.
     void GetFrustumSize(Vector3& near, Vector3& far) const;
     /// Return half view size.
