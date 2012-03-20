@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
+// Copyright (c) 2008-2012 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,14 +59,17 @@ void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    HashSet<Drawable*>::Iterator start = HashSet<Drawable*>::Iterator(reinterpret_cast<HashSet<Drawable*>::Node*>(item->start_));
-    HashSet<Drawable*>::Iterator end = HashSet<Drawable*>::Iterator(reinterpret_cast<HashSet<Drawable*>::Node*>(item->end_));
+    WeakPtr<Drawable>* start = reinterpret_cast<WeakPtr<Drawable>*>(item->start_);
+    WeakPtr<Drawable>* end = reinterpret_cast<WeakPtr<Drawable>*>(item->end_);
     
     while (start != end)
     {
         Drawable* drawable = *start;
-        drawable->Update(frame);
-        drawable->updateQueued_ = false;
+        if (drawable)
+        {
+            drawable->Update(frame);
+            drawable->updateQueued_ = false;
+        }
         ++start;
     }
 }
@@ -386,11 +389,7 @@ void Octree::RemoveManualDrawable(Drawable* drawable)
     
     Octant* octant = drawable->GetOctant();
     if (octant && octant->GetRoot() == this)
-    {
-        CancelUpdate(drawable);
-        CancelReinsertion(drawable);
         octant->RemoveDrawable(drawable);
-    }
 }
 
 void Octree::GetDrawables(OctreeQuery& query) const
@@ -498,7 +497,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    drawableUpdates_.Insert(drawable);
+    drawableUpdates_.Push(WeakPtr<Drawable>(drawable));
     drawable->updateQueued_ = true;
 }
 
@@ -507,23 +506,12 @@ void Octree::QueueReinsertion(Drawable* drawable)
     if (scene_ && scene_->IsThreadedUpdate())
     {
         MutexLock lock(octreeMutex_);
-        drawableReinsertions_.Insert(drawable);
+        drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
     }
     else
-        drawableReinsertions_.Insert(drawable);
+        drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
+    
     drawable->reinsertionQueued_ = true;
-}
-
-void Octree::CancelUpdate(Drawable* drawable)
-{
-    drawableUpdates_.Erase(drawable);
-    drawable->updateQueued_ = false;
-}
-
-void Octree::CancelReinsertion(Drawable* drawable)
-{
-    drawableReinsertions_.Erase(drawable);
-    drawable->reinsertionQueued_ = false;
 }
 
 void Octree::DrawDebugGeometry(bool depthTest)
@@ -558,20 +546,18 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     item.workFunction_ = UpdateDrawablesWork;
     item.aux_ = const_cast<FrameInfo*>(&frame);
     
-    HashSet<Drawable*>::Iterator start = drawableUpdates_.Begin();
-    HashSet<Drawable*>::Iterator end = drawableUpdates_.End();
-    
+    Vector<WeakPtr<Drawable> >::Iterator start = drawableUpdates_.Begin();
     while (start != drawableUpdates_.End())
     {
-        HashSet<Drawable*>::Iterator itemEnd = start;
-        for (unsigned i = 0; itemEnd != end && i < DRAWABLES_PER_WORK_ITEM; ++i)
-            ++itemEnd;
+        Vector<WeakPtr<Drawable> >::Iterator end = drawableUpdates_.End();
+        if (end - start > DRAWABLES_PER_WORK_ITEM)
+            end = start + DRAWABLES_PER_WORK_ITEM;
         
-        item.start_ = start.ptr_;
-        item.end_ = itemEnd.ptr_;
+        item.start_ = &(*start);
+        item.end_ = &(*end);
         queue->AddWorkItem(item);
         
-        start = itemEnd;
+        start = end;
     }
     
     queue->Complete();
@@ -587,31 +573,36 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     PROFILE(ReinsertDrawables);
     
     // Reinsert drawables into the octree
-    for (HashSet<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
+    for (Vector<WeakPtr<Drawable> >::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;
+        if (!drawable)
+            continue;
+        Octant* octant = drawable->GetOctant();
+        if (!octant)
+            continue;
+        
         const BoundingBox& box = drawable->GetWorldBoundingBox();
         Vector3 boxCenter = box.Center();
         Vector3 boxSize = box.Size();
         
-        Octant* octant = drawable->GetOctant();
-        if (octant)
+        if (octant == this)
         {
-            if (octant == this)
-            {
-                // Handle root octant as special case: if outside the root, do not reinsert
-                if (GetCullingBox().IsInside(box) == INSIDE && !CheckDrawableSize(boxSize))
-                    InsertDrawable(drawable, boxCenter, boxSize);
-            }
-            else
-            {
-                // Otherwise reinsert if outside current octant or if size does not fit octant size
-                if (octant->GetCullingBox().IsInside(box) != INSIDE || !octant->CheckDrawableSize(boxSize))
-                    InsertDrawable(drawable, boxCenter, boxSize);
-            }
+            // Handle root octant as special case: if outside the root, do not reinsert
+            if (GetCullingBox().IsInside(box) == INSIDE && !CheckDrawableSize(boxSize))
+                InsertDrawable(drawable, boxCenter, boxSize);
         }
         else
-            InsertDrawable(drawable, boxCenter, boxSize);
+        {
+            // Break if drawable no longer belongs to this octree (could theoretically happen as we do not explicitly clean up
+            // drawables from the reinsertion list as they leave the octree)
+            if (octant->GetRoot() != this)
+                continue;
+            
+            // Otherwise reinsert if outside current octant or if size does not fit octant size
+            if (octant->GetCullingBox().IsInside(box) != INSIDE || !octant->CheckDrawableSize(boxSize))
+                InsertDrawable(drawable, boxCenter, boxSize);
+        }
         
         drawable->reinsertionQueued_ = false;
     }

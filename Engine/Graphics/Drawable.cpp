@@ -318,8 +318,6 @@ void Drawable::RemoveFromOctree()
     if (octant_)
     {
         Octree* octree = octant_->GetRoot();
-        octree->CancelUpdate(this);
-        octree->CancelReinsertion(this);
         octant_->RemoveDrawable(this);
     }
 }

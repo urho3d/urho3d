@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
+// Copyright (c) 2008-2012 Lasse Öörni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Drawable.h"
-#include "HashSet.h"
 #include "List.h"
 #include "Mutex.h"
 #include "OctreeQuery.h"
@@ -188,10 +187,6 @@ public:
     void QueueUpdate(Drawable* drawable);
     /// Mark drawable object as requiring a reinsertion. Is thread-safe.
     void QueueReinsertion(Drawable* drawable);
-    /// Remove drawable object from update list.
-    void CancelUpdate(Drawable* drawable);
-    /// Remove drawable object from reinsertion list.
-    void CancelReinsertion(Drawable* drawable);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     
@@ -208,9 +203,9 @@ private:
     /// Scene.
     Scene* scene_;
     /// Drawable objects that require update.
-    HashSet<Drawable*> drawableUpdates_;
+    Vector<WeakPtr<Drawable> > drawableUpdates_;
     /// Drawable objects that require reinsertion.
-    HashSet<Drawable*> drawableReinsertions_;
+    Vector<WeakPtr<Drawable> > drawableReinsertions_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Current threaded ray query.
