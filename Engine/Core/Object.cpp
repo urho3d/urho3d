@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "HashSet.h"
 
 #include "DebugNew.h"
 
@@ -182,24 +183,33 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->BeginSendEvent(this);
     
     // Check first the specific event receivers
-    const PODVector<Object*>* group = context->GetEventReceivers(this, eventType);
+    const Set<Object*>* group = context->GetEventReceivers(this, eventType);
     if (group)
     {
-        unsigned numReceivers = group->Size();
-        for (unsigned j = 0; j < numReceivers; ++j)
+        for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
         {
-            Object* receiver = group->At(j);
-            // There may be null pointers due to not removing vector elements during event handling, so check
-            if (receiver)
+            Set<Object*>::ConstIterator current = i++;
+            Object* receiver = *current;
+            Object* next = 0;
+            if (i != group->End())
+                next = *i;
+            
+            unsigned oldSize = group->Size();
+            receiver->OnEvent(this, true, eventType, eventData);
+            
+            // If self has been destroyed as a result of event handling, exit
+            if (self.Expired())
             {
-                processed.Insert(receiver);
-                receiver->OnEvent(this, true, eventType, eventData);
-                if (self.Expired())
-                {
-                    context->EndSendEvent();
-                    return;
-                }
+                context->EndSendEvent();
+                return;
             }
+            
+            // If group has changed size during iteration (removed/added subscribers) try to recover
+            /// \todo This is not entirely foolproof, as a subscriber could have been added to make up for the removed one
+            if (group->Size() != oldSize)
+                i = group->Find(next);
+            
+            processed.Insert(receiver);
         }
     }
     
@@ -207,37 +217,53 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     group = context->GetEventReceivers(eventType);
     if (group)
     {
-        unsigned numReceivers = group->Size();
         if (processed.Empty())
         {
-            for (unsigned k = 0; k < numReceivers; ++k)
+            for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
             {
-                Object* receiver = group->At(k);
-                if (receiver)
+                Set<Object*>::ConstIterator current = i++;
+                Object* receiver = *current;
+                Object* next = 0;
+                if (i != group->End())
+                    next = *i;
+                
+                unsigned oldSize = group->Size();
+                receiver->OnEvent(this, true, eventType, eventData);
+                
+                if (self.Expired())
                 {
-                    receiver->OnEvent(this, true, eventType, eventData);
-                    if (self.Expired())
-                    {
-                        context->EndSendEvent();
-                        return;
-                    }
+                    context->EndSendEvent();
+                    return;
                 }
+                
+                if (group->Size() != oldSize)
+                    i = group->Find(next);
             }
         }
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (unsigned k = 0; k < numReceivers; ++k)
+            for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
             {
-                Object* receiver = group->At(k);
-                if (receiver && processed.Find(receiver) == processed.End())
+                Set<Object*>::ConstIterator current = i++;
+                Object* receiver = *current;
+                Object* next = 0;
+                if (i != group->End())
+                    next = *i;
+                
+                if (!processed.Contains(receiver))
                 {
+                    unsigned oldSize = group->Size();
                     receiver->OnEvent(this, true, eventType, eventData);
+                    
                     if (self.Expired())
                     {
                         context->EndSendEvent();
                         return;
                     }
+                    
+                    if (group->Size() != oldSize)
+                        i = group->Find(next);
                 }
             }
         }

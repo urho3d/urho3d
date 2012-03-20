@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "CoreEvents.h"
 #include "FileSystem.h"
 #include "FileWatcher.h"
+#include "HashSet.h"
 #include "Image.h"
 #include "Log.h"
 #include "PackageFile.h"

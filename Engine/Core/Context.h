@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
 #pragma once
 
 #include "Attribute.h"
-#include "HashSet.h"
 #include "Object.h"
+#include "Set.h"
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context : public RefCounted
@@ -89,17 +89,16 @@ public:
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist.
-    PODVector<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
+    Set<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {
-        Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = 
-            specificEventReceivers_.Find(MakePair(sender, eventType));
+        Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator i =  specificEventReceivers_.Find(MakePair(sender, eventType));
         return i != specificEventReceivers_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist.
-    PODVector<Object*>* GetEventReceivers(StringHash eventType)
+    Set<Object*>* GetEventReceivers(StringHash eventType)
     {
-        Map<StringHash, PODVector<Object*> >::Iterator i = eventReceivers_.Find(eventType);
+        Map<StringHash, Set<Object*> >::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
     
@@ -130,15 +129,11 @@ private:
     /// Network replication attribute descriptions per object type.
     Map<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events.
-    Map<StringHash, PODVector<Object*> > eventReceivers_;
+    Map<StringHash, Set<Object*> > eventReceivers_;
     /// Event receivers for specific senders' events.
-    Map<Pair<Object*, StringHash>, PODVector<Object*> > specificEventReceivers_;
+    Map<Pair<Object*, StringHash>, Set<Object*> > specificEventReceivers_;
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
-    /// Event types that have had receivers removed during event handling.
-    HashSet<StringHash> dirtyReceivers_;
-    /// Event types for specific senders that have had receivers removed during event handling.
-    HashSet<Pair<Object*, StringHash> > dirtySpecificReceivers_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     WeakPtr<EventHandler> eventHandler_;
 };

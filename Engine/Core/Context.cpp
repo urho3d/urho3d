@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -149,37 +149,26 @@ const String& Context::GetTypeName(ShortStringHash type) const
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
-    PODVector<Object*>& receivers = eventReceivers_[eventType];
-    // Check if already registered
-    if (receivers.Contains(receiver))
-        return;
-    
-    receivers.Push(receiver);
+    eventReceivers_[eventType].Insert(receiver);
 }
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    PODVector<Object*>& receivers = specificEventReceivers_[MakePair(sender, eventType)];
-    if (receivers.Contains(receiver))
-        return;
-    
-    receivers.Push(receiver);
+    specificEventReceivers_[MakePair(sender, eventType)].Insert(receiver);
 }
 
 void Context::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = specificEventReceivers_.Begin();
+    for (Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator i = specificEventReceivers_.Begin();
         i != specificEventReceivers_.End();)
     {
-        Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator current = i++;
+        Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator current = i++;
         if (current->first_.first_ == sender)
         {
-            PODVector<Object*>& receivers = current->second_;
-            for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
-            {
-                if (*j)
-                    (*j)->RemoveEventSender(sender);
-            }
+            Set<Object*>& receivers = current->second_;
+            for (Set<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
+                (*j)->RemoveEventSender(sender);
+            
             specificEventReceivers_.Erase(current);
         }
     }
@@ -187,82 +176,19 @@ void Context::RemoveEventSender(Object* sender)
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 {
-    PODVector<Object*>* group = GetEventReceivers(eventType);
-    if (!group)
-        return;
-    
-    PODVector<Object*>::Iterator i = group->Find(receiver);
-    if (i != group->End())
-    {
-        // If no event handling going on, can erase the receiver. Otherwise reset the pointer and clean up later
-        if (eventSenders_.Empty())
-            group->Erase(i);
-        else
-        {
-            *i = 0;
-            dirtyReceivers_.Insert(eventType);
-        }
-    }
+    Set<Object*>* group = GetEventReceivers(eventType);
+    if (group)
+        group->Erase(receiver);
 }
 
 void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    PODVector<Object*>* group = GetEventReceivers(sender, eventType);
-    if (!group)
-        return;
-    
-    PODVector<Object*>::Iterator i = group->Find(receiver);
-    if (i != group->End())
-    {
-        if (eventSenders_.Empty())
-            group->Erase(i);
-        else
-        {
-            *i = 0;
-            dirtySpecificReceivers_.Insert(MakePair(sender, eventType));
-        }
-        return;
-    }
+    Set<Object*>* group = GetEventReceivers(sender, eventType);
+    if (group)
+        group->Erase(receiver);
 }
 
 void Context::EndSendEvent()
 {
     eventSenders_.Pop();
-    
-    // Clean up dirtied event receiver groups when event handling finishes
-    if (eventSenders_.Empty())
-    {
-        if (!dirtySpecificReceivers_.Empty())
-        {
-            for (HashSet<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
-                i != dirtySpecificReceivers_.End(); ++i)
-            {
-                PODVector<Object*>& receivers = specificEventReceivers_[*i];
-                for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
-                {
-                    if (*j == 0)
-                        j = receivers.Erase(j);
-                    else
-                        ++j;
-                }
-            }
-            dirtySpecificReceivers_.Clear();
-        }
-        
-        if (!dirtyReceivers_.Empty())
-        {
-            for (HashSet<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
-            {
-                PODVector<Object*>& receivers = eventReceivers_[*i];
-                for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
-                {
-                    if (*j == 0)
-                        j = receivers.Erase(j);
-                    else
-                        ++j;
-                }
-            }
-            dirtyReceivers_.Clear();
-        }
-    }
 }

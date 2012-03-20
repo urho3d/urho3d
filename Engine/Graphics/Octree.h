@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Drawable.h"
+#include "HashSet.h"
 #include "List.h"
 #include "Mutex.h"
 #include "OctreeQuery.h"
@@ -207,15 +208,15 @@ private:
     /// Scene.
     Scene* scene_;
     /// Drawable objects that require update.
-    PODVector<Drawable*> drawableUpdates_;
+    HashSet<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.
-    PODVector<Drawable*> drawableReinsertions_;
+    HashSet<Drawable*> drawableReinsertions_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Current threaded ray query.
     mutable RayOctreeQuery* rayQuery_;
     /// Drawable list for threaded ray query.
-    mutable PODVector<Drawable*> rayGetDrawables_;
+    mutable PODVector<Drawable*> rayQueryDrawables_;
     /// Threaded ray query intermediate results.
     mutable Vector<PODVector<RayQueryResult> > rayQueryResults_;
     /// Subdivision level.

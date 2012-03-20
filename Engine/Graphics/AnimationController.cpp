@@ -1,6 +1,6 @@
 //
 // Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Öörni
+// Copyright (c) 2008-2012 Lasse Ã–Ã¶rni
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "AnimationController.h"
 #include "AnimationState.h"
 #include "Context.h"
+#include "HashSet.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
