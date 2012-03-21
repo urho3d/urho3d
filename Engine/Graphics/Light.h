@@ -31,6 +31,7 @@ class Camera;
 class Texture;
 class Texture2D;
 class TextureCube;
+struct LightBatchQueue;
 
 /// %Light types.
 enum LightType
@@ -241,10 +242,14 @@ public:
     void SetIntensitySortValue(float distance);
     /// %Set sort value based on overall intensity over a bounding box.
     void SetIntensitySortValue(const BoundingBox& box);
+    /// %Set light queue used for this light. Called by View.
+    void SetLightQueue(LightBatchQueue* queue);
     /// Return directional light quad transform for either near or far split.
     Matrix3x4 GetDirLightTransform(Camera* camera, bool getNearQuad = false);
     /// Return light volume model transform.
     const Matrix3x4& GetVolumeTransform(Camera* camera);
+    /// Return light queue. Called by View.
+    LightBatchQueue* GetLightQueue() const { return lightQueue_; }
     
     /// %Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);
@@ -262,10 +267,22 @@ protected:
 private:
     /// Light type.
     LightType lightType_;
-    /// Per-vertex lighting flag.
-    bool perVertex_;
     /// Color.
     Color color_;
+    /// Shadow depth bias parameters.
+    BiasParameters shadowBias_;
+    /// Directional light cascaded shadow parameters.
+    CascadeParameters shadowCascade_;
+    /// Shadow map focus parameters.
+    FocusParameters shadowFocus_;
+    /// Custom world transform for the light volume.
+    Matrix3x4 volumeTransform_;
+    /// Range attenuation texture.
+    SharedPtr<Texture> rampTexture_;
+    /// Spotlight attenuation texture.
+    SharedPtr<Texture> shapeTexture_;
+    /// Light queue.
+    LightBatchQueue* lightQueue_;
     /// Specular intensity.
     float specularIntensity_;
     /// Range.
@@ -278,22 +295,12 @@ private:
     float fadeDistance_;
     /// Shadow fade start distance.
     float shadowFadeDistance_;
-    /// Shadow depth bias parameters.
-    BiasParameters shadowBias_;
-    /// Directional light cascaded shadow parameters.
-    CascadeParameters shadowCascade_;
-    /// Shadow map focus parameters.
-    FocusParameters shadowFocus_;
-    /// Custom world transform for the light volume.
-    Matrix3x4 volumeTransform_;
     /// Shadow intensity.
     float shadowIntensity_;
     /// Shadow resolution.
     float shadowResolution_;
     /// Shadow camera near/far clip distance ratio.
     float shadowNearFarRatio_;
-    /// Range attenuation texture.
-    SharedPtr<Texture> rampTexture_;
-    /// Spotlight attenuation texture.
-    SharedPtr<Texture> shapeTexture_;
+    /// Per-vertex lighting flag.
+    bool perVertex_;
 };

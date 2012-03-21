@@ -242,8 +242,6 @@ private:
     PODVector<Light*> lights_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
-    /// Lookup map for the processed lights' light queues.
-    Map<Light*, LightBatchQueue*> lightQueueMapping_;
     /// Base pass batches.
     BatchQueue baseQueue_;
     /// Pre-transparent pass batches.

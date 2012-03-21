@@ -651,6 +651,7 @@ void View::GetDrawables()
     {
         Light* light = lights_[i];
         light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
+        light->SetLightQueue(0);
     }
     
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
@@ -687,7 +688,6 @@ void View::GetBatches()
     // Build light queues and lit batches
     {
         maxLightsDrawables_.Clear();
-        lightQueueMapping_.Clear();
         
         // Preallocate light queues: per-pixel lights which have lit geometries
         unsigned numLightQueues = 0;
@@ -719,7 +719,7 @@ void View::GetBatches()
                 
                 // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
-                lightQueueMapping_[light] = &lightQueue;
+                light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
                 lightQueue.litBatches_.Clear();
                 lightQueue.volumeBatches_.Clear();
@@ -844,9 +844,9 @@ void View::GetBatches()
             {
                 Light* light = lights[i];
                 // Find the correct light queue again
-                Map<Light*, LightBatchQueue*>::Iterator j = lightQueueMapping_.Find(light);
-                if (j != lightQueueMapping_.End())
-                    GetLitBatches(drawable, *(j->second_));
+                LightBatchQueue* queue = light->GetLightQueue();
+                if (queue)
+                    GetLitBatches(drawable, *queue);
             }
         }
     }

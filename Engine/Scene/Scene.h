@@ -160,7 +160,7 @@ public:
     void ComponentAdded(Component* component);
     /// Component removed. Remove from ID map.
     void ComponentRemoved(Component* component);
-    /// Set node user variable reverse mappings.
+    /// %Set node user variable reverse mappings.
     void SetVarNamesAttr(String value);
     /// Return node user variable reverse mappings.
     String GetVarNamesAttr() const;

@@ -110,7 +110,7 @@ public:
     
     /// Load parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
-    /// Set number of passes.
+    /// %Set number of passes.
     void SetNumPasses(unsigned passes);
     /// Create a rendertarget. Width and height are either absolute pixels or viewport size divisors. Return true if successful.
     bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered);
@@ -120,7 +120,7 @@ public:
     void SetShaderParameter(const String& name, const Vector4& value);
     /// Remove global shader parameter.
     void RemoveShaderParameter(const String& name);
-    /// Set active flag.
+    /// %Set active flag.
     void SetActive(bool active);
     /// Clone the post-process.
     SharedPtr<PostProcess> Clone();

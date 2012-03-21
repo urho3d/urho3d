@@ -33,7 +33,7 @@ public:
     /// Destruct.
     ~Signal();
     
-    /// Set the signal. Will be automatically reset once a waiting thread wakes up.
+    /// %Set the signal. Will be automatically reset once a waiting thread wakes up.
     void Set();
     
     /// Wait on the signal.

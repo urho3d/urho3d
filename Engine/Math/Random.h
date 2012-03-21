@@ -23,9 +23,9 @@
 
 #pragma once
 
-/// Set the random seed. The default seed is 1.
+/// %Set the random seed. The default seed is 1.
 void SetRandomSeed(unsigned seed);
 /// Return the current random seed.
 unsigned GetRandomSeed();
-/// Internal random generation function, which should operate similarly to MSVC rand().
+/// Return a random number between 0-32767. Should operate similarly to MSVC rand().
 int Rand();

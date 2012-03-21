@@ -82,19 +82,20 @@ OBJECTTYPESTATIC(Light);
 Light::Light(Context* context) :
     Drawable(context),
     lightType_(DEFAULT_LIGHTTYPE),
-    perVertex_(false),
+    shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
+    shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
+    shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
+    lightQueue_(0),
     specularIntensity_(0.0f),
     range_(DEFAULT_RANGE),
     fov_(DEFAULT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
     shadowFadeDistance_(0.0f),
-    shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
-    shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
-    shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     shadowIntensity_(0.0f),
     shadowResolution_(1.0f),
-    shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO)
+    shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
+    perVertex_(false)
 {
     drawableFlags_ =  DRAWABLE_LIGHT;
 }
@@ -520,4 +521,9 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
         }
         break;
     }
+}
+
+void Light::SetLightQueue(LightBatchQueue* queue)
+{
+    lightQueue_ = queue;
 }
