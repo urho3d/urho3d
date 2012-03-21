@@ -83,6 +83,8 @@ public:
     Octant* GetParent() const { return parent_; }
     /// Return octree root.
     Octree* GetRoot() const { return root_; }
+    /// Return number of drawables.
+    unsigned GetNumDrawables() const { return numDrawables_; }
     /// Return true if there are no drawable objects in this octant and child octants.
     bool IsEmpty() { return numDrawables_ == 0; }
     

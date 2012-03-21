@@ -281,7 +281,6 @@ Zone* Drawable::GetLastZone() const
 
 void Drawable::OnNodeSet(Node* node)
 {
-    // Insert initially into the root octant
     if (node)
     {
         AddToOctree();
@@ -309,7 +308,10 @@ void Drawable::AddToOctree()
     {
         Octree* octree = scene->GetComponent<Octree>();
         if (octree)
-            octree->AddDrawable(this);
+        {
+            const BoundingBox& box = GetWorldBoundingBox();
+            octree->InsertDrawable(this, box.Center(), box.Size());
+        }
     }
 }
 
