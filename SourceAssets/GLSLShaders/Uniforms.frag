@@ -1,22 +1,18 @@
 uniform vec3 cAmbientColor;
+uniform vec2 cDepthReconstruct;
 uniform vec2 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;
+uniform vec3 cLightDirPS;
+uniform vec4 cLightPosPS;
 uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
 uniform vec4 cMatSpecColor;
-#ifdef SHADOW
-    uniform vec4 cShadowCubeAdjust;
-    uniform vec4 cShadowDepthFade;
-    uniform vec2 cShadowIntensity;
-    uniform vec2 cShadowMapInvSize;
-    uniform vec4 cShadowSplits;
-#endif
-#if defined(DEFERREDLIGHT) || defined(PREPASSLIGHT)
-    uniform vec2 cDepthReconstruct;
-    uniform vec3 cLightDirPS;
-    uniform vec4 cLightPosPS;
-    uniform mat4 cLightMatricesPS[4];
-#endif
+uniform vec4 cShadowCubeAdjust;
+uniform vec4 cShadowDepthFade;
+uniform vec2 cShadowIntensity;
+uniform vec2 cShadowMapInvSize;
+uniform vec4 cShadowSplits;
+uniform mat4 cLightMatricesPS[4];

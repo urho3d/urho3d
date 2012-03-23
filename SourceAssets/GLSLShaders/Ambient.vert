@@ -17,9 +17,9 @@ void main()
 
     vVertexLighting = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
     #ifdef NUMVERTEXLIGHTS
-        vec3 normal = GetWorldNormal(modelMatrix);
-        for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-            vVertexLighting.rgb += GetVertexLight(i, worldPos, normal) * cVertexLights[i * 3].rgb;
+    vec3 normal = GetWorldNormal(modelMatrix);
+    for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
+        vVertexLighting.rgb += GetVertexLight(i, worldPos, normal) * cVertexLights[i * 3].rgb;
     #endif
 
     #ifdef VERTEXCOLOR

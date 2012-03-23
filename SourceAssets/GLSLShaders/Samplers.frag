@@ -1,45 +1,21 @@
 uniform sampler2D sDiffMap;
 uniform samplerCube sDiffCubeMap;
 uniform sampler2D sNormalMap;
-#ifdef SPECMAP
-    uniform sampler2D sSpecMap;
-#endif
-#ifdef EMISSIVEMAP
-    uniform sampler2D sEmissiveMap;
-#endif
-#ifdef DETAILMAP
-    uniform sampler2D sDetailMap;
-#endif
-#ifdef ENVMAP
-    uniform sampler2D sEnvMap;
-    uniform samplerCube sEnvCubeMap;
-#endif
-#ifdef SHADOW
-    uniform sampler2DShadow sShadowMap;
-#ifdef POINTLIGHT
-    uniform samplerCube sFaceSelectCubeMap;
-    uniform samplerCube sIndirectionCubeMap;
-#endif
-#endif
-#if defined(POINTLIGHT) || defined(SPOTLIGHT)
-    uniform sampler2D sLightRampMap;
-#endif
-#ifdef SPOTLIGHT
-    uniform sampler2D sLightSpotMap;
-#endif
-#ifdef CUBEMASK
-    uniform samplerCube sLightCubeMap;
-#endif
-#ifdef DEFERREDLIGHT
-    uniform sampler2D sAlbedoBuffer;
-#endif
-#if defined(DEFERREDLIGHT) || defined(PREPASSLIGHT)
-    uniform sampler2D sNormalBuffer;
-    uniform sampler2D sDepthBuffer;
-#endif
-#if defined (PREPASSMATERIAL)
-    uniform sampler2D sLightBuffer;
-#endif
+uniform sampler2D sSpecMap;
+uniform sampler2D sEmissiveMap;
+uniform sampler2D sDetailMap;
+uniform sampler2D sEnvMap;
+uniform samplerCube sEnvCubeMap;
+uniform sampler2DShadow sShadowMap;
+uniform sampler2D sLightRampMap;
+uniform sampler2D sLightSpotMap;
+uniform samplerCube sLightCubeMap;
+uniform samplerCube sFaceSelectCubeMap;
+uniform samplerCube sIndirectionCubeMap;
+uniform sampler2D sAlbedoBuffer;
+uniform sampler2D sNormalBuffer;
+uniform sampler2D sDepthBuffer;
+uniform sampler2D sLightBuffer;
 
 vec3 DecodeNormal(vec4 normalInput)
 {
@@ -67,10 +43,8 @@ float DecodeDepth(vec3 depth)
     return dot(depth, dotValues);
 }
 
-#if defined(DEFERREDLIGHT) || defined(PREPASSLIGHT)
 float ReconstructDepth(float hwDepth)
 {
     return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
 }
-#endif
 

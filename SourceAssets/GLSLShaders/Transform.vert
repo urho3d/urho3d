@@ -5,11 +5,7 @@ attribute vec2 iTexCoord;
 attribute vec2 iTexCoord2;
 attribute vec3 iCubeTexCoord;
 attribute vec4 iCubeTexCoord2;
-#ifdef NORMALMAP
-    attribute vec4 iTangent;
-#endif
-
-#ifdef SKINNED
+attribute vec4 iTangent;
 attribute vec4 iBlendWeights;
 attribute vec4 iBlendIndices;
 
@@ -22,11 +18,6 @@ mat4 GetSkinMatrix(vec4 blendWeights, vec4 blendIndices)
         mat4(cSkinMatrices[idx.z], cSkinMatrices[idx.z + 1], cSkinMatrices[idx.z + 2], lastColumn) * blendWeights.z +
         mat4(cSkinMatrices[idx.w], cSkinMatrices[idx.w + 1], cSkinMatrices[idx.w + 2], lastColumn) * blendWeights.w;
 }
-
-#define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
-#else
-#define iModelMatrix cModel
-#endif
 
 mat3 GetNormalMatrix(mat4 modelMatrix)
 {
@@ -63,6 +54,12 @@ vec3 GetBillboardNormal()
     return vec3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
 }
 
+#ifdef SKINNED
+    #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
+#else
+    #define iModelMatrix cModel
+#endif
+
 vec3 GetWorldPos(mat4 modelMatrix)
 {
     #if defined(BILLBOARD)
@@ -85,9 +82,8 @@ vec3 GetWorldNormal(mat4 modelMatrix)
     #endif
 }
 
-#ifdef NORMALMAP
 vec3 GetWorldTangent(mat4 modelMatrix)
-{
+{   
     mat3 normalMatrix = GetNormalMatrix(modelMatrix);
     #ifdef SKINNED
         return normalize(iTangent.xyz * normalMatrix);
@@ -95,5 +91,4 @@ vec3 GetWorldTangent(mat4 modelMatrix)
         return normalize(normalMatrix * iTangent.xyz);
     #endif
 }
-#endif
 
