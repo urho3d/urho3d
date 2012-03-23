@@ -3,23 +3,27 @@ float GetDiffuseDir(vec3 normal, vec3 lightDir)
     return max(dot(normal, lightDir), 0.0);
 }
 
+#if defined(POINTLIGHT) || defined(SPOTLIGHT)
 float GetDiffusePointOrSpot(vec3 normal, vec3 lightVec, out vec3 lightDir)
 {
     float lightDist = length(lightVec);
     lightDir = lightVec / lightDist;
     return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
 }
+#endif
 
 float GetDiffuseDirVolumetric()
 {
     return 1.0;
 }
 
+#if defined(POINTLIGHT) || defined(SPOTLIGHT)
 float GetDiffusePointOrSpotVolumetric(vec3 lightVec)
 {
     float lightDist = length(lightVec);
     return texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
 }
+#endif
 
 float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
@@ -57,6 +61,7 @@ float GetShadow(vec4 shadowPos)
     #endif
 }
 
+#ifdef POINTLIGHT
 float GetCubeShadow(vec3 lightVec)
 {
     vec3 axis = textureCube(sFaceSelectCubeMap, lightVec).rgb;
@@ -76,12 +81,14 @@ float GetCubeShadow(vec3 lightVec)
     vec4 shadowPos = vec4(indirectPos.xy, cShadowDepthFade.x + cShadowDepthFade.y / depth, 1.0);
     return GetShadow(shadowPos);
 }
+#endif
 
 float GetShadowFade(float depth)
 {
     return clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0);
 }
 
+#ifdef DIRLIGHT
 vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
 {
     if (depth < cShadowSplits.x)
@@ -105,5 +112,6 @@ vec4 GetDirShadowPosDeferred(const mat4 shadowMatrix[4], vec4 projWorldPos, floa
     else
         return shadowMatrix[3] * projWorldPos;
 }
+#endif
 #endif
 

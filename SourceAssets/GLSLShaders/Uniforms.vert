@@ -14,6 +14,12 @@ uniform vec4 cVOffset;
 uniform vec3 cViewRightVector;
 uniform vec3 cViewUpVector;
 uniform mat4 cZone;
-uniform mat4 cLightMatrices[4];
-uniform vec4 cSkinMatrices[64*3];
-uniform vec4 cVertexLights[6*3];
+#if defined(SHADOW) || defined(POINTLIGHT) || defined(SPOTLIGHT)
+    uniform mat4 cLightMatrices[4];
+#endif
+#ifdef SKINNED
+    uniform vec4 cSkinMatrices[64*3];
+#endif
+#ifdef NUMVERTEXLIGHTS
+    uniform vec4 cVertexLights[6*3];
+#endif

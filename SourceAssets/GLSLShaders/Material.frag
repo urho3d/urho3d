@@ -1,3 +1,5 @@
+#define PREPASSMATERIAL
+
 #include "Uniforms.frag"
 #include "Samplers.frag"
 #include "Lighting.frag"
