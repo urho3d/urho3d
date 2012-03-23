@@ -1442,8 +1442,8 @@ Properties:<br>
 - Vector2& projectionOffset
 - uint viewMask
 - uint viewOverrideFlags
-- Frustum frustum (readonly)
-- Matrix4 projection (readonly)
+- Frustum& frustum (readonly)
+- Matrix4& projection (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
 - Vector3 forwardVector (readonly)
@@ -2326,9 +2326,6 @@ Properties:<br>
 
 
 Input
-
-Methods:<br>
-- void SuppressNextChar()
 
 Properties:<br>
 - ShortStringHash type (readonly)

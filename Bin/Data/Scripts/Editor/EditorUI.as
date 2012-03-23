@@ -488,10 +488,8 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int key = eventData["Key"].GetInt();
     
     if (key == KEY_F1)
-    {
         console.Toggle();
-        input.SuppressNextChar();
-    }
+
     if (key == KEY_ESC)
     {
         UIElement@ front = ui.frontElement;

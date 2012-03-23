@@ -97,7 +97,6 @@ Input::Input(Context* context) :
     active_(false),
     minimized_(false),
     activated_(false),
-    suppressNextChar_(false),
     suppressNextMouseMove_(false),
     screenModeSet_(false),
     initialized_(false)
@@ -213,11 +212,6 @@ void Input::Update()
 void Input::SetToggleFullscreen(bool enable)
 {
     toggleFullscreen_ = enable;
-}
-
-void Input::SuppressNextChar()
-{
-    suppressNextChar_ = true;
 }
 
 bool Input::GetKeyDown(int key) const
@@ -598,7 +592,6 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_CHAR:
-        if (!suppressNextChar_)
         {
             using namespace Char;
             
@@ -608,7 +601,6 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
             keyEventData[P_QUALIFIERS] = GetQualifiers();
             SendEvent(E_CHAR, keyEventData);
         }
-        suppressNextChar_ = false;
         eventData[P_HANDLED] = true;
         break;
     }

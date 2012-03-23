@@ -51,8 +51,6 @@ public:
     void Update();
     /// %Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
-    /// Suppress the next char message.
-    void SuppressNextChar();
     
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
@@ -141,8 +139,6 @@ private:
     bool minimized_;
     /// Activated on this frame flag.
     bool activated_;
-    /// Next char message suppress flag.
-    bool suppressNextChar_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
     /// Screen mode changed flag. Needed only for GLFW input.

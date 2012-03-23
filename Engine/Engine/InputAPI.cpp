@@ -111,7 +111,6 @@ static Input* GetInput()
 static void RegisterInput(asIScriptEngine* engine)
 {
     RegisterObject<Input>(engine, "Input");
-    engine->RegisterObjectMethod("Input", "void SuppressNextChar()", asMETHOD(Input, SuppressNextChar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);
