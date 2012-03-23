@@ -245,6 +245,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         {
             LOGERROR("OpenGL 2.0 is required");
             glfwCloseWindow(impl_->window_);
+            impl_->window_ = 0;
             return false;
         }
         
@@ -254,6 +255,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and "
                 "EXT_texture_filter_anisotropic OpenGL extensions are required");
             glfwCloseWindow(impl_->window_);
+            impl_->window_ = 0;
             return false;
         }
         
