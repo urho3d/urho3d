@@ -3981,6 +3981,7 @@ Properties:<br>
 - Vector3& angularVelocity
 - float angularRestThreshold
 - float angularMaxVelocity
+- bool useGravity
 - bool active
 - Vector3& position
 - Quaternion& rotation

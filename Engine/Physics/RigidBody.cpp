@@ -84,6 +84,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Damp Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Max Velocity", GetAngularMaxVelocity, SetAngularMaxVelocity, float, M_INFINITY, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Ang Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Active", IsActive, SetActive, bool, true, AM_FILE);
 }
 
@@ -180,6 +181,12 @@ void RigidBody::SetAngularMaxVelocity(float velocity)
 {
     if (body_)
         dBodySetMaxAngularSpeed(body_, velocity);
+}
+
+void RigidBody::SetUseGravity(bool enable)
+{
+    if (body_)
+        dBodySetGravityMode(body_, enable ? 1 : 0);
 }
 
 void RigidBody::SetActive(bool active)
@@ -324,6 +331,14 @@ float RigidBody::GetAngularMaxVelocity() const
         return dBodyGetMaxAngularSpeed(body_);
     else
         return 0.0f;
+}
+
+bool RigidBody::GetUseGravity() const
+{
+    if (body_)
+        return dBodyGetGravityMode(body_) != 0;
+    else
+        return true;
 }
 
 bool RigidBody::IsActive() const

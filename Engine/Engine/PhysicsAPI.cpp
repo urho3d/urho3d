@@ -127,6 +127,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_angularRestThreshold() const", asMETHOD(RigidBody, GetAngularRestThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_angularMaxVelocity(float)", asMETHOD(RigidBody, SetAngularMaxVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_angularMaxVelocity() const", asMETHOD(RigidBody, GetAngularMaxVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_useGravity(bool)", asMETHOD(RigidBody, SetUseGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "bool get_useGravity() const", asMETHOD(RigidBody, GetUseGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_active(bool)", asMETHOD(RigidBody, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_active() const", asMETHOD(RigidBody, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_position(const Vector3&in)", asMETHOD(RigidBody, SetPosition), asCALL_THISCALL);

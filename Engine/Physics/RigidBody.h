@@ -73,6 +73,8 @@ public:
     void SetAngularDampingScale(float scale);
     /// %Set maximum angular velocity. Set to 0 to disable rotation.
     void SetAngularMaxVelocity(float velocity);
+    /// %Set whether gravity is applied to rigid body.
+    void SetUseGravity(bool enable);
     /// %Set rigid body active/inactive state.
     void SetActive(bool active);
     /// Apply force to center of mass.
@@ -114,7 +116,9 @@ public:
     float GetAngularDampingScale() const;
     /// Return maximum angular velocity.
     float GetAngularMaxVelocity() const;
-    /// Return whether body is active.
+    /// Return whether rigid body uses gravity.
+    bool GetUseGravity() const;
+    /// Return whether rigid body is active.
     bool IsActive() const;
     
     /// Recalculate mass.
