@@ -419,7 +419,7 @@ void Engine::ApplyFrameLimit()
     if (input && !input->IsActive())
         maxFps = maxInactiveFps_;
     
-    long long timeAcc = 0;
+    long long elapsed = 0;
     
     if (maxFps)
     {
@@ -429,29 +429,32 @@ void Engine::ApplyFrameLimit()
         
         for (;;)
         {
-            timeAcc += frameTimer_.GetUSec(true);
+            elapsed = frameTimer_.GetUSec(false);
+            if (elapsed >= targetMax)
+                break;
+            
             // Sleep if 1 ms or more off the frame limiting goal
-            if (targetMax - timeAcc >= 1000LL)
+            if (targetMax - elapsed >= 1000LL)
             {
-                unsigned sleepTime = (unsigned)((targetMax - timeAcc) / 1000LL);
+                unsigned sleepTime = (unsigned)((targetMax - elapsed) / 1000LL);
                 Time::Sleep(sleepTime);
             }
-            else
-                break;
         }
+        
+        elapsed = frameTimer_.GetUSec(true);
     }
     else
-        timeAcc = frameTimer_.GetUSec(true);
+        elapsed = frameTimer_.GetUSec(true);
     
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)
     {
         long long targetMin = 1000000LL / minFps_;
-        if (timeAcc > targetMin)
-            timeAcc = targetMin;
+        if (elapsed > targetMin)
+            elapsed = targetMin;
     }
     
-    timeStep_ = timeAcc / 1000000.0f;
+    timeStep_ = elapsed / 1000000.0f;
 }
 
 void Engine::RegisterObjects()
