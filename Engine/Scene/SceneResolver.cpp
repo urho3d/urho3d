@@ -79,27 +79,35 @@ void SceneResolver::Resolve()
             {
                 hasIDAttributes = true;
                 unsigned oldNodeID = component->GetAttribute(j).GetInt();
-                HashMap<unsigned, WeakPtr<Node> >::ConstIterator k = nodes_.Find(oldNodeID);
                 
-                if (k == nodes_.End() || !k->second_)
-                    WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve node ID " + String(oldNodeID));
-                else
+                if (oldNodeID)
                 {
-                    unsigned newNodeID = k->second_->GetID();
-                    component->SetAttribute(j, Variant(newNodeID));
+                    HashMap<unsigned, WeakPtr<Node> >::ConstIterator k = nodes_.Find(oldNodeID);
+                    
+                    if (k == nodes_.End() || !k->second_)
+                        WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve node ID " + String(oldNodeID));
+                    else
+                    {
+                        unsigned newNodeID = k->second_->GetID();
+                        component->SetAttribute(j, Variant(newNodeID));
+                    }
                 }
             }
             if (info.mode_ & AM_COMPONENTID)
             {
                 hasIDAttributes = true;
                 unsigned oldComponentID = component->GetAttribute(j).GetInt();
-                HashMap<unsigned, WeakPtr<Component> >::ConstIterator k = components_.Find(oldComponentID);
                 
-                if (k == components_.End() || !k->second_)
-                    WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve component ID " + String(oldComponentID));
+                if (oldComponentID)
                 {
-                    unsigned newComponentID = k->second_->GetID();
-                    component->SetAttribute(j, Variant(newComponentID));
+                    HashMap<unsigned, WeakPtr<Component> >::ConstIterator k = components_.Find(oldComponentID);
+                    
+                    if (k == components_.End() || !k->second_)
+                        WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve component ID " + String(oldComponentID));
+                    {
+                        unsigned newComponentID = k->second_->GetID();
+                        component->SetAttribute(j, Variant(newComponentID));
+                    }
                 }
             }
         }

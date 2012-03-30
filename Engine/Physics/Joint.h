@@ -61,9 +61,9 @@ public:
     /// Remove the joint.
     void Clear();
     /// %Set a ball joint.
-    bool SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB = 0);
+    bool SetBall(const Vector3& position, RigidBody* otherBody = 0);
     /// %Set a hinge joint.
-    bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bodyA, RigidBody* bodyB = 0);
+    bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* otherBody = 0);
     /// %Set joint world position.
     void SetPosition(Vector3 position);
     /// %Set joint world axis if applicable.
@@ -71,10 +71,10 @@ public:
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-    /// Return the first rigid body.
-    RigidBody* GetBodyA() const { return bodyA_; }
-    /// Return the second rigid body.
-    RigidBody* GetBodyB() const { return bodyB_; }
+    /// Return rigid body in own scene node.
+    RigidBody* GetOwnBody() const { return ownBody_; }
+    /// Return the other rigid body. May be null if connected to the static world.
+    RigidBody* GetOtherBody() const { return otherBody_; }
     /// Return joint type.
     JointType GetJointType() const { return type_; }
     /// Return the ODE joint ID.
@@ -84,14 +84,10 @@ public:
     /// Return joint world axis.
     Vector3 GetAxis() const;
     
-    /// %Set body A attribute.
-    void SetBodyAAttr(int value);
-    /// %Set body B attribute.
-    void SetBodyBAttr(int value);
-    /// Return body A attribute.
-    int GetBodyAAttr() const;
-    /// Return body B attribute.
-    int GetBodyBAttr() const;
+    /// %Set other body attribute.
+    void SetOtherBodyAttr(int value);
+    /// Return other body attribute.
+    int GetOtherBodyAttr() const;
     
 protected:
     /// Handle node being assigned.
@@ -100,10 +96,10 @@ protected:
 private:
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
-    /// First rigid body.
-    WeakPtr<RigidBody> bodyA_;
-    /// Second rigid body.
-    WeakPtr<RigidBody> bodyB_;
+    /// Own rigid body.
+    WeakPtr<RigidBody> ownBody_;
+    /// Other rigid body.
+    WeakPtr<RigidBody> otherBody_;
     /// Joint type.
     JointType type_;
     /// ODE joint ID.
@@ -112,6 +108,8 @@ private:
     Vector3 position_;
     /// Joint axis for creation during post-load.
     Vector3 axis_;
+    /// Other body node ID for pending joint recreation.
+    int otherBodyNodeID_;
     /// Recreate joint flag.
     bool recreateJoint_;
 };

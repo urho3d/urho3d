@@ -4003,8 +4003,8 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void Clear()
-- bool SetBall(const Vector3&, RigidBody@, RigidBody@)
-- bool SetHinge(const Vector3&, const Vector3&, RigidBody@, RigidBody@)
+- bool SetBall(const Vector3&, RigidBody@)
+- bool SetHinge(const Vector3&, const Vector3&, RigidBody@)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4016,8 +4016,8 @@ Properties:<br>
 - Node@ node (readonly)
 - Vector3 position
 - Vector3 axis
-- RigidBody@ bodyA (readonly)
-- RigidBody@ bodyB (readonly)
+- RigidBody@ ownBody (readonly)
+- RigidBody@ otherBody (readonly)
 - JointType jointType (readonly)
 
 

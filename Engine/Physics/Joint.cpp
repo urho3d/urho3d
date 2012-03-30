@@ -49,6 +49,7 @@ Joint::Joint(Context* context) :
     joint_(0),
     position_(Vector3::ZERO),
     axis_(Vector3::ZERO),
+    otherBodyNodeID_(0),
     recreateJoint_(false)
 {
 }
@@ -66,10 +67,9 @@ void Joint::RegisterObject(Context* context)
     context->RegisterFactory<Joint>();
     
     ENUM_ATTRIBUTE(Joint, "Joint Type", type_, typeNames, JOINT_NONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_INT, "Body A", GetBodyAAttr, SetBodyAAttr, int, 0, AM_DEFAULT | AM_COMPONENTID);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_INT, "Body B", GetBodyBAttr, SetBodyBAttr, int, 0, AM_DEFAULT | AM_COMPONENTID);
     ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    ACCESSOR_ATTRIBUTE(Joint, VAR_INT, "Other Body NodeID", GetOtherBodyAttr, SetOtherBodyAttr, int, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -78,13 +78,26 @@ void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     
     // Change of the joint type requires the joint to be recreated
     if (attr.offset_ == offsetof(Joint, type_))
+    {
+        otherBodyNodeID_ = GetOtherBodyAttr();
         recreateJoint_ = true;
+    }
 }
 
 void Joint::ApplyAttributes()
 {
     if (recreateJoint_)
     {
+        otherBody_.Reset();
+        
+        Scene* scene = node_ ? node_->GetScene() : 0;
+        if (scene && otherBodyNodeID_)
+        {
+            Node* otherNode = scene->GetNode(otherBodyNodeID_);
+            if (otherNode)
+                otherBody_ = otherNode->GetComponent<RigidBody>();
+        }
+        
         switch (type_)
         {
         case JOINT_NONE:
@@ -92,11 +105,11 @@ void Joint::ApplyAttributes()
             break;
             
         case JOINT_BALL:
-            SetBall(position_, bodyA_, bodyB_);
+            SetBall(position_, otherBody_);
             break;
             
         case JOINT_HINGE:
-            SetHinge(position_, axis_, bodyA_, bodyB_);
+            SetHinge(position_, axis_, otherBody_);
             break;
         }
         
@@ -106,10 +119,8 @@ void Joint::ApplyAttributes()
 
 void Joint::GetDependencyNodes(PODVector<Node*>& dest)
 {
-    if (bodyA_ && bodyA_->GetNode())
-        dest.Push(bodyA_->GetNode());
-    if (bodyB_ && bodyB_->GetNode())
-        dest.Push(bodyB_->GetNode());
+    if (otherBody_ && otherBody_->GetNode())
+        dest.Push(otherBody_->GetNode());
 }
 
 void Joint::Clear()
@@ -120,12 +131,10 @@ void Joint::Clear()
         joint_ = 0;
     }
     
-    bodyA_.Reset();
-    bodyB_.Reset();
     type_ = JOINT_NONE;
 }
 
-bool Joint::SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB)
+bool Joint::SetBall(const Vector3& position, RigidBody* otherBody)
 {
     Clear();
     
@@ -135,25 +144,25 @@ bool Joint::SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB)
         return false;
     }
     
-    if (!bodyA && !bodyB)
+    ownBody_ = static_cast<RigidBody*>(GetComponent(RigidBody::GetTypeStatic()));
+    if (!ownBody_)
     {
-        LOGERROR("Both bodies null, can not create joint");
+        LOGERROR("No rigid body in node, can not set joint type");
         return false;
     }
+    
+    otherBody_ = otherBody;
+    type_ = JOINT_BALL;
     
     joint_ = dJointCreateBall(physicsWorld_->GetWorld(), 0);
     dJointSetData(joint_, this);
     dJointSetBallAnchor(joint_, position.x_, position.y_, position.z_);
-    dJointAttach(joint_, bodyA ? bodyA->GetBody() : 0, bodyB ? bodyB->GetBody() : 0);
-    
-    type_ = JOINT_BALL;
-    bodyA_ = bodyA;
-    bodyB_ = bodyB;
+    dJointAttach(joint_, ownBody_->GetBody(), otherBody_ ? otherBody_->GetBody() : 0);
     
     return true;
 }
 
-bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bodyA, RigidBody* bodyB)
+bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* otherBody)
 {
     Clear();
     
@@ -163,23 +172,23 @@ bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bo
         return false;
     }
     
-    if (!bodyA && !bodyB)
+    ownBody_ = static_cast<RigidBody*>(GetComponent(RigidBody::GetTypeStatic()));
+    if (!ownBody_)
     {
-        LOGERROR("Both bodies null, can not create joint");
+        LOGERROR("No rigid body in node, can not set joint type");
         return false;
     }
     
-    Vector3 NormalizedAxis = axis.Normalized();
+    otherBody_ = otherBody;
+    type_ = JOINT_HINGE;
+    
+    Vector3 normalizedAxis = axis.Normalized();
     
     joint_ = dJointCreateHinge(physicsWorld_->GetWorld(), 0);
     dJointSetData(joint_, this);
     dJointSetHingeAnchor(joint_, position.x_, position.y_, position.z_);
-    dJointSetHingeAxis(joint_, NormalizedAxis.x_, NormalizedAxis.y_, NormalizedAxis.z_);
-    dJointAttach(joint_, bodyA ? bodyA->GetBody() : 0, bodyB ? bodyB->GetBody() : 0);
-    
-    type_ = JOINT_HINGE;
-    bodyA_ = bodyA;
-    bodyB_ = bodyB;
+    dJointSetHingeAxis(joint_, normalizedAxis.x_, normalizedAxis.y_, normalizedAxis.z_);
+    dJointAttach(joint_, ownBody_->GetBody(), otherBody_ ? otherBody_->GetBody() : 0);
     
     return true;
 }
@@ -260,28 +269,19 @@ Vector3 Joint::GetAxis() const
     return Vector3::ZERO;
 }
 
-void Joint::SetBodyAAttr(int value)
+void Joint::SetOtherBodyAttr(int value)
 {
-    Scene* scene = node_ ? node_->GetScene() : 0;
-    bodyA_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponent(value)) : (RigidBody*)0;
+    otherBodyNodeID_ = value;
     recreateJoint_ = true;
 }
 
-void Joint::SetBodyBAttr(int value)
+int Joint::GetOtherBodyAttr() const
 {
-    Scene* scene = node_ ? node_->GetScene() : 0;
-    bodyB_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponent(value)) : (RigidBody*)0;
-    recreateJoint_ = true;
-}
-
-int Joint::GetBodyAAttr() const
-{
-    return bodyA_ ? bodyA_->GetID() : 0;
-}
-
-int Joint::GetBodyBAttr() const
-{
-    return bodyB_ ? bodyB_->GetID() : 0;
+    if (!otherBody_)
+        return 0;
+    
+    Node* otherNode = otherBody_->GetNode();
+    return otherNode ? otherNode->GetID() : 0;
 }
 
 void Joint::OnNodeSet(Node* node)
