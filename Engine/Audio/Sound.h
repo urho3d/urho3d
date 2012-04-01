@@ -61,14 +61,14 @@ public:
     /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
     void FixInterpolation();
     
-    /// Create and return a Decoder. Return null if fails.
+    /// Create and return a compressed audio decoder instance. Return null if fails.
     void* AllocateDecoder();
     /// Decode compressed audio data. Return number of actually decoded bytes.
-    unsigned Decode(void* Decoder, signed char* dest, unsigned bytes);
+    unsigned Decode(void* decoder, signed char* dest, unsigned bytes);
     /// Rewind the decoder to beginning of audio data.
-    void RewindDecoder(void* Decoder);
-    /// Free the decoder.
-    void FreeDecoder(void* Decoder);
+    void RewindDecoder(void* decoder);
+    /// Free the decoder instance.
+    void FreeDecoder(void* decoder);
     
     /// Return sound data start.
     signed char* GetStart() const { return data_.Get(); }

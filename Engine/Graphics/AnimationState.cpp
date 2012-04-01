@@ -177,7 +177,7 @@ void AnimationState::Apply()
         return;
     
     // Check first if full weight or blending
-    if (weight_ == 1.0f)
+    if (Equals(weight_, 1.0f))
     {
         for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {

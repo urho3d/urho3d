@@ -60,38 +60,39 @@ public:
     
     /// Remove the joint.
     void Clear();
-    /// %Set a ball joint.
-    bool SetBall(const Vector3& position, RigidBody* otherBody = 0);
-    /// %Set a hinge joint.
-    bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* otherBody = 0);
-    /// %Set joint world position.
+    /// %Set joint type and recreate the joint. Return true if successful.
+    bool SetJointType(JointType type);
+    /// %Set other body to connect to.
+    void SetOtherBody(RigidBody* body);
+    /// %Set joint local-space position.
     void SetPosition(Vector3 position);
-    /// %Set joint world axis if applicable.
+    /// %Set joint local-space axis.
     void SetAxis(Vector3 axis);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
+    /// Return joint type.
+    JointType GetJointType() const { return type_; }
     /// Return rigid body in own scene node.
     RigidBody* GetOwnBody() const { return ownBody_; }
     /// Return the other rigid body. May be null if connected to the static world.
     RigidBody* GetOtherBody() const { return otherBody_; }
-    /// Return joint type.
-    JointType GetJointType() const { return type_; }
     /// Return the ODE joint ID.
     dJointID GetJoint() const { return joint_; }
-    /// Return joint world position.
-    Vector3 GetPosition() const;
-    /// Return joint world axis.
-    Vector3 GetAxis() const;
-    
-    /// %Set other body attribute.
-    void SetOtherBodyAttr(int value);
-    /// Return other body attribute.
-    int GetOtherBodyAttr() const;
+    /// Return joint local-space position.
+    Vector3 GetPosition() const { return position_; }
+    /// Return joint local-space axis.
+    Vector3 GetAxis() const { return axis_; }
+    /// Return joint world-space position.
+    Vector3 GetWorldPosition() const;
+    /// Return joint world-space axis.
+    Vector3 GetWorldAxis() const;
     
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// Physics world.
@@ -104,10 +105,12 @@ private:
     JointType type_;
     /// ODE joint ID.
     dJointID joint_;
-    /// Joint position for creation during post-load.
+    /// Joint local-space position.
     Vector3 position_;
-    /// Joint axis for creation during post-load.
+    /// Joint local-space axis.
     Vector3 axis_;
+    /// Cached world scale of node.
+    Vector3 jointScale_;
     /// Other body node ID for pending joint recreation.
     int otherBodyNodeID_;
     /// Recreate joint flag.

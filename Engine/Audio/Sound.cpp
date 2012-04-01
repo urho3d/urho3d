@@ -318,32 +318,32 @@ void* Sound::AllocateDecoder()
     return vorbis;
 }
 
-unsigned Sound::Decode(void* Decoder, signed char* dest, unsigned bytes)
+unsigned Sound::Decode(void* decoder, signed char* dest, unsigned bytes)
 {
-    if (!Decoder)
+    if (!decoder)
         return 0;
     
     unsigned soundSources = stereo_ ? 2 : 1;
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(Decoder);
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
     unsigned outSamples = stb_vorbis_get_samples_short_interleaved(vorbis, soundSources, (short*)dest, bytes >> 1);
     return (outSamples * soundSources) << 1;
 }
 
-void Sound::RewindDecoder(void* Decoder)
+void Sound::RewindDecoder(void* decoder)
 {
-    if (!Decoder)
+    if (!decoder)
         return;
     
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(Decoder);
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
     stb_vorbis_seek_start(vorbis);
 }
 
-void Sound::FreeDecoder(void* Decoder)
+void Sound::FreeDecoder(void* decoder)
 {
-    if (!Decoder)
+    if (!decoder)
         return;
     
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(Decoder);
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder);
     stb_vorbis_close(vorbis);
 }
 
