@@ -421,6 +421,7 @@ void Engine::ApplyFrameLimit()
     
     long long elapsed = 0;
     
+    // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
         PROFILE(ApplyFrameLimit);
@@ -440,11 +441,9 @@ void Engine::ApplyFrameLimit()
                 Time::Sleep(sleepTime);
             }
         }
-        
-        elapsed = frameTimer_.GetUSec(true);
     }
-    else
-        elapsed = frameTimer_.GetUSec(true);
+    
+    elapsed = frameTimer_.GetUSec(true);
     
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)

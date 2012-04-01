@@ -184,7 +184,7 @@ void InitScene()
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
-        object.castShadows = CheckInLight(object);
+        object.castShadows = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
@@ -201,7 +201,7 @@ void InitScene()
         AnimatedModel@ object = objectNode.CreateComponent("AnimatedModel");
         object.model = cache.GetResource("Model", "Models/Jack.mdl");
         object.material = cache.GetResource("Material", "Materials/Jack.xml");
-        object.castShadows = CheckInLight(object);
+        object.castShadows = true;
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
         ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0f);
@@ -230,25 +230,6 @@ void InitScene()
         renderer.viewports[0].AddPostProcess(edgeFilter);
         renderer.viewports[0].AddPostProcess(bloom);
     }
-}
-
-bool CheckInLight(Drawable@ drawable)
-{
-    // Check for occluders blocking the directional light to this drawable, using a simple raycast test
-    Node@ lightNode = testScene.GetChild("GlobalLight", true);
-    Ray reverseLightRay(drawable.node.position, -lightNode.direction);
-    Array<RayQueryResult> result = testScene.octree.Raycast(reverseLightRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
-
-    for (uint i = 0; i < result.length; ++i)
-    {
-        Drawable@ otherDrawable = result[i].drawable;
-        if (otherDrawable is drawable)
-            continue;
-        if (otherDrawable.castShadows && otherDrawable.occluder)
-            return false;
-    }
-
-    return true;
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
