@@ -1558,7 +1558,7 @@ Methods:<br>
 - bool Save(File@)
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- void SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
+- bool SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
 - bool Load(Image@, bool arg1 = false)
 
 Properties:<br>
@@ -1589,7 +1589,7 @@ Methods:<br>
 - bool Save(File@)
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- void SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
+- bool SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
 - bool Load(CubeMapFace, Image@, bool arg2 = false)
 
 Properties:<br>
@@ -4003,8 +4003,6 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void Clear()
-- bool SetBall(const Vector3&, RigidBody@)
-- bool SetHinge(const Vector3&, const Vector3&, RigidBody@)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4015,10 +4013,12 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - Vector3 position
+- Vector3 worldPosition (readonly)
 - Vector3 axis
+- Vector3 worldAxis (readonly)
 - RigidBody@ ownBody (readonly)
-- RigidBody@ otherBody (readonly)
-- JointType jointType (readonly)
+- RigidBody@ otherBody
+- JointType jointType
 
 
 PhysicsRaycastResult
