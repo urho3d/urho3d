@@ -197,7 +197,7 @@ void ImportTundraScene(const String&in fileName)
         {
             for (uint i = 0; i < materialNames.length; ++i)
                 ConvertMaterial(materialNames[i], filePath, convertedMaterials);
-            
+
             ConvertModel(meshName, filePath, convertedMeshes);
             ConvertModel(collisionMeshName, filePath, convertedMeshes);
 
@@ -216,7 +216,7 @@ void ImportTundraScene(const String&in fileName)
             if (!meshName.empty)
             {
                 StaticModel@ model = newNode.CreateComponent("StaticModel");
-                model.model = cache.GetResource("Model", "Models/" + meshName.Replaced(".mesh", ".mdl"));
+                model.model = cache.GetResource("Model", "Models/" + GetFileNameAndExtension(meshName).Replaced(".mesh", ".mdl"));
                 model.drawDistance = drawDistance;
                 model.castShadows = castShadows;
                 // Set default grey material to match Tundra defaults
@@ -224,7 +224,7 @@ void ImportTundraScene(const String&in fileName)
                 // Then try to assign the actual materials
                 for (uint i = 0; i < materialNames.length; ++i)
                 {
-                    Material@ mat = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
+                    Material@ mat = cache.GetResource("Material", "Materials/" + GetFileNameAndExtension(materialNames[i]).Replaced(".material", ".xml"));
                     if (mat !is null)
                         model.materials[i] = mat;
                 }
@@ -258,11 +258,11 @@ void ImportTundraScene(const String&in fileName)
                     break;
                     
                 case 4:
-                    shape.SetTriangleMesh(cache.GetResource("Model", "Models/" + collisionMeshName.Replaced(".mesh", ".mdl")), 0, bodySize);
+                    shape.SetTriangleMesh(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, bodySize);
                     break;
-                    
+
                 case 6:
-                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + collisionMeshName.Replaced(".mesh", ".mdl")), 0.1, 0, bodySize);
+                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0.1, 0, bodySize);
                     break;
                 }
                 
@@ -353,17 +353,20 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
             return;
     }
 
+    String convertedModelName = filePath + modelName + ".xml";
+
     // Convert .mesh to .mesh.xml
-    String cmdLine = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + filePath + modelName + ".xml\"";
-    fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
+    String cmdLine = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + convertedModelName + "\"";
+    if (!fileSystem.FileExists(convertedModelName))
+        fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
 
     // Convert .mesh.xml to .mdl
     Array<String> args;
     args.Push("\"" + filePath + modelName + ".xml\"");
-    args.Push("\"" + sceneResourcePath + "Models/" + modelName.Replaced(".mesh", ".mdl") + "\"");
+    args.Push("\"" + sceneResourcePath + "Models/" + GetFileNameAndExtension(modelName).Replaced(".mesh", ".mdl") + "\"");
     args.Push("-a");
     fileSystem.SystemRun(fileSystem.programDir + "OgreImporter.exe", args);
-    
+
     convertedModels.Push(modelName);
 }
 
