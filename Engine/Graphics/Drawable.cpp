@@ -108,7 +108,8 @@ void Drawable::UpdateDistance(const FrameInfo& frame)
 
 void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
+    if (debug)
+        debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
 }
 
 void Drawable::SetDrawDistance(float distance)

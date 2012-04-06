@@ -190,15 +190,15 @@ void Octant::ResetRoot()
 
 void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (!debug->IsInside(worldBoundingBox_))
-        return;
-    
-    debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
-    
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    if (debug && debug->IsInside(worldBoundingBox_))
     {
-        if (children_[i])
-            children_[i]->DrawDebugGeometry(debug, depthTest);
+        debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
+        
+        for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        {
+            if (children_[i])
+                children_[i]->DrawDebugGeometry(debug, depthTest);
+        }
     }
 }
 
@@ -519,10 +519,8 @@ void Octree::DrawDebugGeometry(bool depthTest)
     PROFILE(OctreeDrawDebug);
     
     DebugRenderer* debug = GetComponent<DebugRenderer>();
-    if (!debug)
-        return;
-    
-    Octant::DrawDebugGeometry(debug, depthTest);
+    if (debug)
+        Octant::DrawDebugGeometry(debug, depthTest);
 }
 
 void Octree::OnNodeSet(Node* node)

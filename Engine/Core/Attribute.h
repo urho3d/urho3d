@@ -26,6 +26,8 @@
 #include "Ptr.h"
 #include "Variant.h"
 
+/// Attribute shown only in the editor, but not serialized.
+static const unsigned AM_EDIT = 0x0;
 /// Attribute used for file serialization.
 static const unsigned AM_FILE = 0x1;
 /// Attribute used for network replication.

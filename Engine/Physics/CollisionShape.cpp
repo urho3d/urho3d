@@ -614,188 +614,185 @@ void CollisionShape::UpdateTransform(bool nodeUpdate)
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (!geometry_)
-        return;
-    
-    const Color* color;
-    RigidBody* rigidBody = GetComponent<RigidBody>();
-    if (rigidBody && rigidBody->IsActive())
-        color = &Color::WHITE;
-    else
-        color = &Color::GREEN;
-    unsigned uintColor = color->ToUInt();
-    
     // Drawing all the debug geometries of a large world may be expensive (especially triangle meshes)
     // so cull the geometry AABB against the debug geometry frustum first
-    if (!debug->IsInside(GetWorldBoundingBox()))
-        return;
-    
-    const Vector3& position = *reinterpret_cast<const Vector3*>(dGeomGetPosition(geometry_));
-    Quaternion rotation;
-    dGeomGetQuaternion(geometry_, const_cast<float*>(rotation.Data()));
-    Matrix3x4 transform(position, rotation, 1.0f);
-    
-    switch (dGeomGetClass(geometry_))
+    if (debug && geometry_ && debug->IsInside(GetWorldBoundingBox()))
     {
-    case dSphereClass:
-        {
-            float radius = dGeomSphereGetRadius(geometry_);
-            
-            for (unsigned i = 0; i < 360; i += 45)
-            {
-                unsigned j = i + 45;
-                float a = radius * sinf(i * M_DEGTORAD);
-                float b = radius * cosf(i * M_DEGTORAD);
-                float c = radius * sinf(j * M_DEGTORAD);
-                float d = radius * cosf(j * M_DEGTORAD);
-                Vector3 start, end;
-                
-                start = transform * Vector3(a, b, 0.0f);
-                end = transform * Vector3(c, d, 0.0f);
-                debug->AddLine(start, end, uintColor, depthTest);
-                start = transform * Vector3(a, 0.0f, b);
-                end = transform * Vector3(c, 0.0f, d);
-                debug->AddLine(start, end, uintColor, depthTest);
-                start = transform * Vector3(0.0f, a, b);
-                end = transform * Vector3(0.0f, c, d);
-                debug->AddLine(start, end, uintColor, depthTest);
-            }
-        }
-        break;
+        const Color* color;
+        RigidBody* rigidBody = GetComponent<RigidBody>();
+        if (rigidBody && rigidBody->IsActive())
+            color = &Color::WHITE;
+        else
+            color = &Color::GREEN;
+        unsigned uintColor = color->ToUInt();
         
-    case dBoxClass:
-        {
-            dVector3 size;
-            dGeomBoxGetLengths(geometry_, size);
-            BoundingBox box(0.5f * Vector3(size[0], size[1], size[2]), 0.5f * Vector3(-size[0], -size[1], -size[2]));
-            debug->AddBoundingBox(box, transform, *color, depthTest);
-        }
-        break;
+        const Vector3& position = *reinterpret_cast<const Vector3*>(dGeomGetPosition(geometry_));
+        Quaternion rotation;
+        dGeomGetQuaternion(geometry_, const_cast<float*>(rotation.Data()));
+        Matrix3x4 transform(position, rotation, 1.0f);
         
-    case dCapsuleClass:
+        switch (dGeomGetClass(geometry_))
         {
-            float radius, length;
-            
-            dGeomCapsuleGetParams(geometry_, &radius, &length);
-            for (unsigned i = 0; i < 360; i += 45)
+        case dSphereClass:
             {
-                unsigned j = i + 45;
+                float radius = dGeomSphereGetRadius(geometry_);
                 
-                float a = radius * sinf(i * M_DEGTORAD);
-                float b = radius * cosf(i * M_DEGTORAD);
-                float c = radius * sinf(j * M_DEGTORAD);
-                float d = radius * cosf(j * M_DEGTORAD);
-                Vector3 start, end;
-                
-                start = transform * Vector3(a, b, 0.5f * length);
-                end = transform * Vector3(c, d, 0.5f * length);
-                debug->AddLine(start, end, uintColor, depthTest);
-                start = transform * Vector3(a, b, -0.5f * length);
-                end = transform * Vector3(c, d, -0.5f * length);
-                debug->AddLine(start, end, uintColor, depthTest);
-                if (!(i & 1))
+                for (unsigned i = 0; i < 360; i += 45)
                 {
+                    unsigned j = i + 45;
+                    float a = radius * sinf(i * M_DEGTORAD);
+                    float b = radius * cosf(i * M_DEGTORAD);
+                    float c = radius * sinf(j * M_DEGTORAD);
+                    float d = radius * cosf(j * M_DEGTORAD);
+                    Vector3 start, end;
+                    
+                    start = transform * Vector3(a, b, 0.0f);
+                    end = transform * Vector3(c, d, 0.0f);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                    start = transform * Vector3(a, 0.0f, b);
+                    end = transform * Vector3(c, 0.0f, d);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                    start = transform * Vector3(0.0f, a, b);
+                    end = transform * Vector3(0.0f, c, d);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                }
+            }
+            break;
+            
+        case dBoxClass:
+            {
+                dVector3 size;
+                dGeomBoxGetLengths(geometry_, size);
+                BoundingBox box(0.5f * Vector3(size[0], size[1], size[2]), 0.5f * Vector3(-size[0], -size[1], -size[2]));
+                debug->AddBoundingBox(box, transform, *color, depthTest);
+            }
+            break;
+            
+        case dCapsuleClass:
+            {
+                float radius, length;
+                
+                dGeomCapsuleGetParams(geometry_, &radius, &length);
+                for (unsigned i = 0; i < 360; i += 45)
+                {
+                    unsigned j = i + 45;
+                    
+                    float a = radius * sinf(i * M_DEGTORAD);
+                    float b = radius * cosf(i * M_DEGTORAD);
+                    float c = radius * sinf(j * M_DEGTORAD);
+                    float d = radius * cosf(j * M_DEGTORAD);
+                    Vector3 start, end;
+                    
+                    start = transform * Vector3(a, b, 0.5f * length);
+                    end = transform * Vector3(c, d, 0.5f * length);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                    start = transform * Vector3(a, b, -0.5f * length);
+                    end = transform * Vector3(c, d, -0.5f * length);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                    if (!(i & 1))
+                    {
+                        start = transform * Vector3(a, b, 0.5f * length);
+                        end = transform * Vector3(a, b, -0.5f * length);
+                        debug->AddLine(start, end, uintColor, depthTest);
+                    }
+                    if (b > -M_EPSILON)
+                    {
+                        start = transform * Vector3(a, 0.0f, b + 0.5f * length);
+                        end = transform * Vector3(c, 0.0f, d + 0.5f * length);
+                        debug->AddLine(start, end, uintColor, depthTest);
+                        start = transform * Vector3(0.0f, a, b + 0.5f * length);
+                        end = transform * Vector3(0.0f, c, d + 0.5f * length);
+                        debug->AddLine(start, end, uintColor, depthTest);
+                        start = transform * Vector3(a, 0.0f, -b - 0.5f * length);
+                        end = transform * Vector3(c, 0.0f, -d - 0.5f * length);
+                        debug->AddLine(start, end, uintColor, depthTest);
+                        start = transform * Vector3(0.0f, a, -b - 0.5f * length);
+                        end = transform * Vector3(0.0f, c, -d - 0.5f * length);
+                        debug->AddLine(start, end, uintColor, depthTest);
+                    }
+                }
+            }
+            break;
+            
+        case dCylinderClass:
+            {
+                float radius, length;
+                
+                dGeomCylinderGetParams(geometry_, &radius, &length);
+                for (unsigned i = 0; i < 360; i += 45)
+                {
+                    unsigned j = i + 45;
+                    float a = radius * sinf(i * M_DEGTORAD);
+                    float b = radius * cosf(i * M_DEGTORAD);
+                    float c = radius * sinf(j * M_DEGTORAD);
+                    float d = radius * cosf(j * M_DEGTORAD);
+                    Vector3 start, end;
+                    
+                    start = transform * Vector3(a, b, 0.5f * length);
+                    end = transform * Vector3(c, d, 0.5f * length);
+                    debug->AddLine(start, end, uintColor, depthTest);
+                    start = transform * Vector3(a, b, -0.5f * length);
+                    end = transform * Vector3(c, d, -0.5f * length);
+                    debug->AddLine(start, end, uintColor, depthTest);
                     start = transform * Vector3(a, b, 0.5f * length);
                     end = transform * Vector3(a, b, -0.5f * length);
                     debug->AddLine(start, end, uintColor, depthTest);
                 }
-                if (b > -M_EPSILON)
+            }
+            break;
+            
+        case dTriMeshClass:
+            {
+                TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.Get());
+                if (data)
                 {
-                    start = transform * Vector3(a, 0.0f, b + 0.5f * length);
-                    end = transform * Vector3(c, 0.0f, d + 0.5f * length);
-                    debug->AddLine(start, end, uintColor, depthTest);
-                    start = transform * Vector3(0.0f, a, b + 0.5f * length);
-                    end = transform * Vector3(0.0f, c, d + 0.5f * length);
-                    debug->AddLine(start, end, uintColor, depthTest);
-                    start = transform * Vector3(a, 0.0f, -b - 0.5f * length);
-                    end = transform * Vector3(c, 0.0f, -d - 0.5f * length);
-                    debug->AddLine(start, end, uintColor, depthTest);
-                    start = transform * Vector3(0.0f, a, -b - 0.5f * length);
-                    end = transform * Vector3(0.0f, c, -d - 0.5f * length);
-                    debug->AddLine(start, end, uintColor, depthTest);
+                    debug->AddTriangleMesh(data->vertexData_.Get(), sizeof(Vector3), data->indexData_.Get(), sizeof(unsigned), 0,
+                        data->indexCount_, transform, *color, depthTest);
                 }
             }
-        }
-        break;
-        
-    case dCylinderClass:
-        {
-            float radius, length;
+            break;
             
-            dGeomCylinderGetParams(geometry_, &radius, &length);
-            for (unsigned i = 0; i < 360; i += 45)
+        case dHeightfieldClass:
             {
-                unsigned j = i + 45;
-                float a = radius * sinf(i * M_DEGTORAD);
-                float b = radius * cosf(i * M_DEGTORAD);
-                float c = radius * sinf(j * M_DEGTORAD);
-                float d = radius * cosf(j * M_DEGTORAD);
-                Vector3 start, end;
+                dHeightfieldDataID heightData = dGeomHeightfieldGetHeightfieldData(geometry_);
+                unsigned xPoints = heightData->m_nWidthSamples;
+                unsigned zPoints = heightData->m_nDepthSamples;
+                float xWidth = heightData->m_fWidth;
+                float zWidth = heightData->m_fDepth;
+                float xBase = -0.5f * xWidth;
+                float zBase = -0.5f * zWidth;
+                float xSpacing = xWidth / (xPoints - 1);
+                float zSpacing = zWidth / (zPoints - 1);
+                float* heights = (float*)heightData->m_pHeightData;
                 
-                start = transform * Vector3(a, b, 0.5f * length);
-                end = transform * Vector3(c, d, 0.5f * length);
-                debug->AddLine(start, end, uintColor, depthTest);
-                start = transform * Vector3(a, b, -0.5f * length);
-                end = transform * Vector3(c, d, -0.5f * length);
-                debug->AddLine(start, end, uintColor, depthTest);
-                start = transform * Vector3(a, b, 0.5f * length);
-                end = transform * Vector3(a, b, -0.5f * length);
-                debug->AddLine(start, end, uintColor, depthTest);
-            }
-        }
-        break;
-        
-    case dTriMeshClass:
-        {
-            TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.Get());
-            if (data)
-            {
-                debug->AddTriangleMesh(data->vertexData_.Get(), sizeof(Vector3), data->indexData_.Get(), sizeof(unsigned), 0,
-                    data->indexCount_, transform, *color, depthTest);
-            }
-        }
-        break;
-        
-    case dHeightfieldClass:
-        {
-            dHeightfieldDataID heightData = dGeomHeightfieldGetHeightfieldData(geometry_);
-            unsigned xPoints = heightData->m_nWidthSamples;
-            unsigned zPoints = heightData->m_nDepthSamples;
-            float xWidth = heightData->m_fWidth;
-            float zWidth = heightData->m_fDepth;
-            float xBase = -0.5f * xWidth;
-            float zBase = -0.5f * zWidth;
-            float xSpacing = xWidth / (xPoints - 1);
-            float zSpacing = zWidth / (zPoints - 1);
-            float* heights = (float*)heightData->m_pHeightData;
-            
-            for (unsigned z = 0; z < zPoints - 1; ++z)
-            {
+                for (unsigned z = 0; z < zPoints - 1; ++z)
+                {
+                    for (unsigned x = 0; x < xPoints - 1; ++x)
+                    {
+                        Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
+                        Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
+                        Vector3 c = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
+                        debug->AddLine(a, b, uintColor, depthTest);
+                        debug->AddLine(a, c, uintColor, depthTest);
+                    }
+                }
+                for (unsigned z = 0; z < zPoints - 1; ++z)
+                {
+                    unsigned x = xPoints - 1;
+                    Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
+                    Vector3 b = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
+                    debug->AddLine(a, b, uintColor, depthTest);
+                }
                 for (unsigned x = 0; x < xPoints - 1; ++x)
                 {
+                    unsigned z = zPoints - 1;
                     Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                     Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
-                    Vector3 c = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
                     debug->AddLine(a, b, uintColor, depthTest);
-                    debug->AddLine(a, c, uintColor, depthTest);
                 }
             }
-            for (unsigned z = 0; z < zPoints - 1; ++z)
-            {
-                unsigned x = xPoints - 1;
-                Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
-                Vector3 b = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
-                debug->AddLine(a, b, uintColor, depthTest);
-            }
-            for (unsigned x = 0; x < xPoints - 1; ++x)
-            {
-                unsigned z = zPoints - 1;
-                Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
-                Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
-                debug->AddLine(a, b, uintColor, depthTest);
-            }
+            break;
         }
-        break;
     }
 }
 

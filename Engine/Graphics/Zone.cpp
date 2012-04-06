@@ -92,7 +92,8 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    debug->AddBoundingBox(boundingBox_, GetWorldTransform(), Color::GREEN, depthTest);
+    if (debug)
+        debug->AddBoundingBox(boundingBox_, GetWorldTransform(), Color::GREEN, depthTest);
 }
 
 void Zone::SetBoundingBox(const BoundingBox& box)

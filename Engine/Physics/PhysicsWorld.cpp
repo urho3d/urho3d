@@ -491,11 +491,14 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
     PROFILE(PhysicsDrawDebug);
     
     DebugRenderer* debug = GetComponent<DebugRenderer>();
-    if (!debug)
-        return;
-    
-    for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
-        (*i)->DrawDebugGeometry(debug, depthTest);
+    if (debug)
+    {
+        for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
+            (*i)->DrawDebugGeometry(debug, depthTest);
+        
+        for (PODVector<Joint*>::Iterator i = joints_.Begin(); i != joints_.End(); ++i)
+            (*i)->DrawDebugGeometry(debug, depthTest);
+    }
 }
 
 void PhysicsWorld::CleanupGeometryCache()

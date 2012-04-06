@@ -343,6 +343,12 @@ void HandlePostRenderUpdate()
             CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
             if (shape !is null)
                 shape.DrawDebugGeometry(debug, false);
+            else
+            {
+                Joint@ joint = cast<Joint>(selectedComponents[i]);
+                if (joint !is null)
+                    joint.DrawDebugGeometry(debug, false);
+            }
         }
     }
 

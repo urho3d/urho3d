@@ -280,8 +280,11 @@ void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batc
 
 void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
-    debug->AddSkeleton(skeleton_, Color(0.75f, 0.75f, 0.75f), depthTest);
+    if (debug)
+    {
+        debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
+        debug->AddSkeleton(skeleton_, Color(0.75f, 0.75f, 0.75f), depthTest);
+    }
 }
 
 void AnimatedModel::SetModel(Model* model, bool createBones)

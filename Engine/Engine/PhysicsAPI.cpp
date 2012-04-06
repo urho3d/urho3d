@@ -157,12 +157,11 @@ static void RegisterJoint(asIScriptEngine* engine)
     
     RegisterComponent<Joint>(engine, "Joint");
     engine->RegisterObjectMethod("Joint", "void Clear()", asMETHOD(Joint, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void set_position(Vector3)", asMETHOD(Joint, SetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "Vector3 get_position() const", asMETHOD(Joint, GetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "Vector3 get_worldPosition() const", asMETHOD(Joint, GetWorldPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void set_axis(Vector3)", asMETHOD(Joint, SetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "Vector3 get_axis() const", asMETHOD(Joint, GetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "Vector3 get_worldAxis() const", asMETHOD(Joint, GetWorldAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Joint", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Joint, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Joint", "void set_position(const Vector3&in)", asMETHOD(Joint, SetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Joint", "const Vector3& get_position() const", asMETHOD(Joint, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Joint", "void set_axis(const Vector3&in)", asMETHOD(Joint, SetAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Joint", "const Vector3& get_axis() const", asMETHOD(Joint, GetAxis), asCALL_THISCALL);
     engine->RegisterObjectMethod("Joint", "RigidBody@+ get_ownBody() const", asMETHOD(Joint, GetOwnBody), asCALL_THISCALL);
     engine->RegisterObjectMethod("Joint", "void set_otherBody(RigidBody@+)", asMETHOD(Joint, SetOtherBody), asCALL_THISCALL);
     engine->RegisterObjectMethod("Joint", "RigidBody@+ get_otherBody() const", asMETHOD(Joint, GetOtherBody), asCALL_THISCALL);

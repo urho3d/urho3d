@@ -49,11 +49,11 @@ public:
     void SetMass(float mass);
     /// %Set mass axis for the cylinder and capsule shapes. By default 1 (Y-axis.)
     void SetMassAxis(int axis);
-    /// %Set physics position.
+    /// %Set rigid body world-space position.
     void SetPosition(const Vector3& position);
-    /// %Set physics rotation.
+    /// %Set rigid body world-space rotation.
     void SetRotation(const Quaternion& rotation);
-    /// %Set physics transform.
+    /// %Set rigid body world-space position and rotation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// %Set linear velocity.
     void SetLinearVelocity(const Vector3& velocity);
@@ -94,9 +94,9 @@ public:
     int GetMassAxis() const { return massAxis_; }
     /// Return ODE body ID.
     dBodyID GetBody() const { return body_; }
-    /// Return physics position.
+    /// Return rigid body world-space position.
     const Vector3& GetPosition() const;
-    /// Return physics rotation.
+    /// Return rigid body world-space rotation.
     const Quaternion& GetRotation() const;
     /// Return linear velocity.
     const Vector3& GetLinearVelocity() const;

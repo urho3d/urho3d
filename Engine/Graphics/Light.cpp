@@ -247,15 +247,18 @@ void Light::UpdateDistance(const FrameInfo& frame)
 
 void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    switch (lightType_)
+    if (debug)
     {
-    case LIGHT_SPOT:
-        debug->AddFrustum(GetFrustum(), color_, depthTest);
-        break;
-        
-    case LIGHT_POINT:
-        debug->AddSphere(Sphere(GetWorldPosition(), range_), GetColor(), depthTest);
-        break;
+        switch (lightType_)
+        {
+        case LIGHT_SPOT:
+            debug->AddFrustum(GetFrustum(), color_, depthTest);
+            break;
+            
+        case LIGHT_POINT:
+            debug->AddSphere(Sphere(GetWorldPosition(), range_), GetColor(), depthTest);
+            break;
+        }
     }
 }
 

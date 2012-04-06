@@ -64,10 +64,10 @@ public:
     bool SetJointType(JointType type);
     /// %Set other body to connect to.
     void SetOtherBody(RigidBody* body);
-    /// %Set joint local-space position.
-    void SetPosition(Vector3 position);
-    /// %Set joint local-space axis.
-    void SetAxis(Vector3 axis);
+    /// %Set joint world-space position.
+    void SetPosition(const Vector3& position);
+    /// %Set joint world-space axis.
+    void SetAxis(const Vector3& axis);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -79,20 +79,17 @@ public:
     RigidBody* GetOtherBody() const { return otherBody_; }
     /// Return the ODE joint ID.
     dJointID GetJoint() const { return joint_; }
-    /// Return joint local-space position.
-    Vector3 GetPosition() const { return position_; }
-    /// Return joint local-space axis.
-    Vector3 GetAxis() const { return axis_; }
     /// Return joint world-space position.
-    Vector3 GetWorldPosition() const;
+    const Vector3& GetPosition() const;
     /// Return joint world-space axis.
-    Vector3 GetWorldAxis() const;
+    const Vector3& GetAxis() const;
+    
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// Physics world.
@@ -105,12 +102,10 @@ private:
     JointType type_;
     /// ODE joint ID.
     dJointID joint_;
-    /// Joint local-space position.
-    Vector3 position_;
-    /// Joint local-space axis.
-    Vector3 axis_;
-    /// Cached world scale of node.
-    Vector3 jointScale_;
+    /// Joint world-space position.
+    mutable Vector3 position_;
+    /// Joint world-space axis.
+    mutable Vector3 axis_;
     /// Other body node ID for pending joint recreation.
     int otherBodyNodeID_;
     /// Recreate joint flag.

@@ -4003,6 +4003,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void Clear()
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4012,10 +4013,8 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
-- Vector3 position
-- Vector3 worldPosition (readonly)
-- Vector3 axis
-- Vector3 worldAxis (readonly)
+- Vector3& position
+- Vector3& axis
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
 - JointType jointType

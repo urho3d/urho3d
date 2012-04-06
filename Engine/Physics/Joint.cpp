@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "Joint.h"
 #include "Log.h"
 #include "PhysicsWorld.h"
@@ -49,7 +50,6 @@ Joint::Joint(Context* context) :
     joint_(0),
     position_(Vector3::ZERO),
     axis_(Vector3::ZERO),
-    jointScale_(Vector3::ONE),
     otherBodyNodeID_(0),
     recreateJoint_(false)
 {
@@ -68,8 +68,8 @@ void Joint::RegisterObject(Context* context)
     context->RegisterFactory<Joint>();
     
     ENUM_ATTRIBUTE(Joint, "Joint Type", type_, typeNames, JOINT_NONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     ATTRIBUTE(Joint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
@@ -178,48 +178,45 @@ void Joint::SetOtherBody(RigidBody* body)
     }
 }
 
-void Joint::SetPosition(Vector3 position)
+void Joint::SetPosition(const Vector3& position)
 {
     position_ = position;
    
-    if (joint_ && node_ && ownBody_)
+    if (joint_)
     {
-        jointScale_ = node_->GetWorldScale();
-        Vector3 worldPosition = ownBody_->GetRotation() * (jointScale_ * position) + ownBody_->GetPosition();
         dJointType type = dJointGetType(joint_);
         
         switch (type)
         {
         case dJointTypeBall:
-            dJointSetBallAnchor(joint_, worldPosition.x_, worldPosition.y_, worldPosition.z_);
+            dJointSetBallAnchor(joint_, position_.x_, position_.y_, position_.z_);
             break;
             
         case dJointTypeHinge:
-            dJointSetHingeAnchor(joint_, worldPosition.x_, worldPosition.y_, worldPosition.z_);
+            dJointSetHingeAnchor(joint_, position_.x_, position_.y_, position_.z_);
             break;
         }
     }
 }
 
-void Joint::SetAxis(Vector3 axis)
+void Joint::SetAxis(const Vector3& axis)
 {
     axis_ = axis.Normalized();
     
-    if (joint_ && node_ && ownBody_)
+    if (joint_)
     {
-        Vector3 worldAxis = ownBody_->GetRotation() * axis_;
         dJointType type = dJointGetType(joint_);
         
         switch (type)
         {
         case dJointTypeHinge:
-            dJointSetHingeAxis(joint_, worldAxis.x_, worldAxis.y_, worldAxis.z_);
+            dJointSetHingeAxis(joint_, axis_.x_, axis_.y_, axis_.z_);
             break;
         }
     }
 }
 
-Vector3 Joint::GetWorldPosition() const
+const Vector3& Joint::GetPosition() const
 {
     dVector3 pos;
     
@@ -231,18 +228,20 @@ Vector3 Joint::GetWorldPosition() const
         {
         case dJointTypeBall:
             dJointGetBallAnchor(joint_, pos);
-            return Vector3(pos[0], pos[1], pos[2]);
+            position_ = Vector3(pos[0], pos[1], pos[2]);
+            break;
             
         case dJointTypeHinge:
             dJointGetHingeAnchor(joint_, pos);
-            return Vector3(pos[0], pos[1], pos[2]);
+            position_ = Vector3(pos[0], pos[1], pos[2]);
+            break;
         }
     }
     
-    return Vector3::ZERO;
+    return position_;
 }
 
-Vector3 Joint::GetWorldAxis() const
+const Vector3& Joint::GetAxis() const
 {
     dVector3 axis;
     
@@ -254,11 +253,41 @@ Vector3 Joint::GetWorldAxis() const
         {
         case dJointTypeHinge:
             dJointGetHingeAxis(joint_, axis);
-            return Vector3(axis[0], axis[1], axis[2]);
+            axis_ = Vector3(axis[0], axis[1], axis[2]);
+            break;
         }
     }
     
-    return Vector3::ZERO;
+    return axis_;
+}
+
+void Joint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug && joint_ && ownBody_)
+    {
+        const Vector3& jointPos = GetPosition();
+        const Vector3& ownBodyPos = ownBody_->GetPosition();
+        const Vector3& otherBodyPos = otherBody_ ? otherBody_->GetPosition() : Vector3::ZERO;
+        
+        BoundingBox jointBox;
+        jointBox.Merge(jointPos);
+        jointBox.Merge(ownBodyPos);
+        if (otherBody_)
+            jointBox.Merge(otherBodyPos);
+        
+        if (debug->IsInside(jointBox))
+        {
+            debug->AddLine(jointPos, ownBodyPos, Color::YELLOW, depthTest);
+            if (otherBody_)
+                debug->AddLine(jointPos, otherBodyPos, Color::YELLOW, depthTest);
+            
+            if (type_ == JOINT_HINGE)
+            {
+                const Vector3& axis = GetAxis();
+                debug->AddLine(jointPos + 0.1f * axis, jointPos - 0.1f * axis, Color::WHITE, depthTest);
+            }
+        }
+    }
 }
 
 void Joint::OnNodeSet(Node* node)
@@ -273,12 +302,8 @@ void Joint::OnNodeSet(Node* node)
                 physicsWorld_->AddJoint(this);
         }
         node->AddListener(this);
+        
+        // Set default position at the node
+        position_ = node->GetWorldPosition();
     }
-}
-
-void Joint::OnMarkedDirty(Node* node)
-{
-    // Reapply position if scale changed
-    if (node_->GetWorldScale() != jointScale_)
-        SetPosition(position_);
 }
