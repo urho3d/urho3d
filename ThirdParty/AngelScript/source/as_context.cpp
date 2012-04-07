@@ -63,11 +63,6 @@ const int CALLSTACK_FRAME_SIZE = 5;
 
 
 #if defined(AS_DEBUG) && defined(AS_DEBUG_STATS)
-// Instruction statistics
-int instrCount[256];
-
-int instrCount2[256][256];
-int lastBC;
 
 class asCDebugStats
 {
@@ -75,6 +70,8 @@ public:
 	asCDebugStats()
 	{
 		memset(instrCount, 0, sizeof(instrCount));
+		memset(instrCount2, 0, sizeof(instrCount2));
+		lastBC = 255;
 	}
 
 	~asCDebugStats()
@@ -85,9 +82,9 @@ public:
 		_mkdir("AS_DEBUG");
 		#if _MSC_VER >= 1500 
 			FILE *f;
-			fopen_s(&f, "AS_DEBUG/total.txt", "at");
+			fopen_s(&f, "AS_DEBUG/stats.txt", "wt");
 		#else
-			FILE *f = fopen("AS_DEBUG/total.txt", "at");
+			FILE *f = fopen("AS_DEBUG/stats.txt", "wt");
 		#endif
 		if( f )
 		{
@@ -107,12 +104,35 @@ public:
 					fprintf(f, "%-10.10s\n", asBCInfo[n].name);
 			}
 
+			fprintf(f, "\nSequences\n");
+			for( n = 0; n < 256; n++ )
+			{
+				if( asBCInfo[n].name )
+				{
+					for( int m = 0; m < 256; m++ )
+					{
+						if( instrCount2[n][m] )
+							fprintf(f, "%-10.10s, %-10.10s : %.0f\n", asBCInfo[n].name, asBCInfo[m].name, instrCount2[n][m]);
+					}
+				}
+			}
 			fclose(f);
 		}
 	}
 
+	void Instr(asBYTE bc)
+	{
+		++instrCount[bc];
+		++instrCount2[lastBC][bc];
+		lastBC = bc;
+	}
+
+	// Instruction statistics
 	double instrCount[256];
+	double instrCount2[256][256];
+	int lastBC;
 } stats;
+
 #endif
 
 AS_API asIScriptContext *asGetActiveContext()
@@ -145,14 +165,6 @@ void asPopActiveContext(asIScriptContext *ctx)
 
 asCContext::asCContext(asCScriptEngine *engine, bool holdRef)
 {
-#if defined(AS_DEBUG) && defined(AS_DEBUG_STATS)
-	memset(instrCount, 0, sizeof(instrCount));
-
-	memset(instrCount2, 0, sizeof(instrCount2));
-
-	lastBC = 255;
-#endif
-
 	holdEngineRef = holdRef;
 	if( holdRef )
 		engine->AddRef();
@@ -1084,46 +1096,6 @@ int asCContext::Execute()
 
 	asPopActiveContext((asIScriptContext *)this);
 
-
-#if defined(AS_DEBUG) && defined(AS_DEBUG_STATS)
-	// Output instruction statistics
-	// This is useful for determining what needs to be optimized.
-
-	_mkdir("AS_DEBUG");
-	#if _MSC_VER >= 1500 
-		FILE *f;
-		fopen_s(&f, "AS_DEBUG/stats.txt", "at");
-	#else
-		FILE *f = fopen("AS_DEBUG/stats.txt", "at");
-	#endif
-	fprintf(f, "\n");
-	asQWORD total = 0;
-	int n;
-	for( n = 0; n < 256; n++ )
-	{
-		if( asBCInfo[n].name && instrCount[n] )
-			fprintf(f, "%-10.10s : %d\n", asBCInfo[n].name, instrCount[n]);
-
-		total += instrCount[n];
-	}
-
-	fprintf(f, "\ntotal      : %I64d\n", total);
-
-	fprintf(f, "\n");
-	for( n = 0; n < 256; n++ )
-	{
-		if( asBCInfo[n].name )
-		{
-			for( int m = 0; m < 256; m++ )
-			{
-				if( instrCount2[n][m] )
-					fprintf(f, "%-10.10s, %-10.10s : %d\n", asBCInfo[n].name, asBCInfo[m].name, instrCount2[n][m]);
-			}
-		}
-	}
-	fclose(f);
-#endif
-
 	if( status == asEXECUTION_FINISHED )
 	{
 		regs.objectType = initialFunction->returnType.GetObjectType();
@@ -1244,6 +1216,11 @@ int asCContext::GetLineNumber(asUINT stackLevel, int *column, const char **secti
 
 void asCContext::CallScriptFunction(asCScriptFunction *func)
 {
+	// TODO: Should perhaps call CallLineCallback() if set. This will allow the 
+	//       application that compiles without line cues to interrupt scripts
+	//       with endless recursive calls. Without this there is no guarantee
+	//       that the SUSPEND instruction is guaranteed to be executed.
+
 	// Push the framepointer, function id and programCounter on the stack
 	PushCallState();
 
@@ -1371,12 +1348,7 @@ void asCContext::ExecuteNext()
 
 #ifdef AS_DEBUG
 #ifdef AS_DEBUG_STATS
-	++stats.instrCount[*(asBYTE*)l_bc];
-
-	++instrCount[*(asBYTE*)l_bc];
-
-	++instrCount2[lastBC][*(asBYTE*)l_bc];
-	lastBC = *(asBYTE*)l_bc;
+	stats.Instr(*(asBYTE*)l_bc);
 #endif
 	// Used to verify that the size of the instructions are correct
 	asDWORD *old = l_bc;
@@ -1395,6 +1367,8 @@ void asCContext::ExecuteNext()
 
 	// Decrease the stack pointer with n dwords (stack grows downward)
 	case asBC_POP:
+		// TODO: optimize: This instruction always pop a single pointer, so there is not really any need for it to take an argument
+		asASSERT( asBC_WORDARG0(l_bc) == AS_PTR_SIZE );
 		l_sp += asBC_WORDARG0(l_bc);
 		l_bc++;
 		break;
@@ -3241,7 +3215,7 @@ void asCContext::ExecuteNext()
 			}
 
 			// Not a JIT resume point, treat as nop
-			l_bc++;
+			l_bc += 1+AS_PTR_SIZE;
 		}
 		break;
 

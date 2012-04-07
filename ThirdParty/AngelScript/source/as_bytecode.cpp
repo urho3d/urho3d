@@ -599,6 +599,9 @@ int asCByteCode::Optimize()
 	// TODO: optimize: A bytecode BC_RefCpyV that copies a handle from a local variable to another local variable
 	//                 can easily substitute the frequently appearing pattern BC_PshV4, BC_PSF, BC_REFCPY, BC_POP
 
+	// TODO: optimize: A single bytecode for incrementing a variable, comparing, and jumping can probably improve 
+	//                 loops a lot. How often do these loops really occur?
+
 	// TODO: optimize: Script class methods are currently implemented to increase the ref count of the object upon
 	//                 entry, and then release it upon exit. When the method isn't doing anything at all, this is
 	//                 not necessary, as the function could simply do a RET immediately. This optimization is only
@@ -606,6 +609,9 @@ int asCByteCode::Optimize()
 	//                 function, then we can't do this optimization. Of course, this optimization may not be all
 	//                 that useful, since in a real world app, it is probably not very common that empty class 
 	//                 methods are called.
+
+	// TODO: optimize: VAR + GET... should be optimized if the only instructions between them are trivial, i.e. no 
+	//                 function calls that can suspend the execution.
 
 	cByteInstruction *instr = first;
 	while( instr )
@@ -799,24 +805,6 @@ int asCByteCode::Optimize()
 			InsertBefore(curr, instr);
 			instr = GoBack(instr);
 		}
-		// PshV4 y, POP x -> POP x-1
-		// PshC4 y, POP x -> POP x-1
-		else if( (IsCombination(curr, asBC_PshV4, asBC_POP) ||
-		          IsCombination(curr, asBC_PshC4, asBC_POP)) && instr->wArg[0] >= 1 )
-		{
-			DeleteInstruction(curr);
-			instr->wArg[0]--;
-			instr = GoBack(instr);
-		}
-		// PshV8 y, POP x -> POP x-2
-		// PshC8 y, POP x -> POP x-2
-		else if( (IsCombination(curr, asBC_PshV8, asBC_POP) ||
-			      IsCombination(curr, asBC_PshC8, asBC_POP)) && instr->wArg[0] >= 2 )
-		{
-			DeleteInstruction(curr);
-			instr->wArg[0] -= 2;
-			instr = GoBack(instr);
-		}
 		// PshVPtr y, POP x -> POP x-AS_PTR_SIZE
 		// PSF y    , POP x -> POP x-AS_PTR_SIZE
 		// VAR y    , POP x -> POP x-AS_PTR_SIZE
@@ -829,6 +817,9 @@ int asCByteCode::Optimize()
 			      IsCombination(curr, asBC_PshNull, asBC_POP)) && 
 				 instr->wArg[0] >= AS_PTR_SIZE )
 		{
+			// The pop instruction will always only pop a single pointer
+			asASSERT( instr->wArg[0] == AS_PTR_SIZE );
+
 			// A pointer is pushed on the stack then immediately removed
 			DeleteInstruction(curr);
 			instr->wArg[0] -= AS_PTR_SIZE;
@@ -2002,6 +1993,10 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 // Decrease stack with "numDwords"
 int asCByteCode::Pop(int numDwords)
 {
+	// Only single pointers are popped
+	// TODO: optimize: Change the instruction to be PopPtr and remove the argument
+	asASSERT(numDwords == AS_PTR_SIZE);
+
 	asASSERT(asBCInfo[asBC_POP].type == asBCTYPE_W_ARG);
 
 	if( AddInstruction() < 0 )

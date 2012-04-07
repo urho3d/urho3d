@@ -172,11 +172,32 @@ int asCCompiler::CompileFactory(asCBuilder *builder, asCScriptCode *script, asCS
 	byteCode.InstrSHORT(asBC_PSF, (short)varOffset);
 
 	// Copy all arguments to the top of the stack
-	// TODO: bytecode: how will this work with platform independent bytecode, as the size of the args may vary?
-	int argDwords = (int)outFunc->GetSpaceNeededForArguments();
-	for( int a = argDwords-1; a >= 0; a-- )
-		byteCode.InstrSHORT(asBC_PshV4, short(-a));
+	// TODO: optimize: Might be interesting to have a specific instruction for copying all arguments
+	int offset = (int)outFunc->GetSpaceNeededForArguments();
+	for( int a = int(outFunc->parameterTypes.GetLength()) - 1; a >= 0; a-- )
+	{
+		if( !outFunc->parameterTypes[a].IsPrimitive() ||
+			outFunc->parameterTypes[a].IsReference() )
+		{
+			offset -= AS_PTR_SIZE;
+			byteCode.InstrSHORT(asBC_PshVPtr, short(-offset));
+		}
+		else
+		{
+			if( outFunc->parameterTypes[a].GetSizeOnStackDWords() == 2 )
+			{
+				offset -= 2;
+				byteCode.InstrSHORT(asBC_PshV8, short(-offset));
+			}
+			else
+			{
+				offset -= 1;
+				byteCode.InstrSHORT(asBC_PshV4, short(-offset));
+			}
+		}
+	}
 
+	int argDwords = (int)outFunc->GetSpaceNeededForArguments();
 	byteCode.Alloc(asBC_ALLOC, dt.GetObjectType(), constructor, argDwords + AS_PTR_SIZE);
 
 	// Return a handle to the newly created object
@@ -222,6 +243,7 @@ void asCCompiler::FinalizeFunction()
 		if( variableAllocations[n].IsObject() && !variableAllocations[n].IsReference() )
 		{
 			outFunc->objVariableTypes.PushLast(variableAllocations[n].GetObjectType());
+			outFunc->funcVariableTypes.PushLast(variableAllocations[n].GetFuncDef());
 			outFunc->objVariablePos.PushLast(GetVariableOffset(n));
 			outFunc->objVariableIsOnHeap.PushLast(variableIsOnHeap[n]);
 		}
@@ -1049,7 +1071,7 @@ int asCCompiler::CompileGlobalVariable(asCBuilder *builder, asCScriptCode *scrip
 				if( assigned )
 				{
 					// Pop the resulting value
-					ctx.bc.Pop(ctx.type.dataType.GetSizeOnStackDWords());
+					ctx.bc.Pop(AS_PTR_SIZE);
 
 					// Release the argument
 					ProcessDeferredParams(&ctx);
@@ -1080,7 +1102,7 @@ int asCCompiler::CompileGlobalVariable(asCBuilder *builder, asCScriptCode *scrip
 				// Release temporary variables used by expression
 				ReleaseTemporaryVariable(expr.type, &ctx.bc);
 
-				ctx.bc.Pop(expr.type.dataType.GetSizeOnStackDWords());
+				ctx.bc.Pop(AS_PTR_SIZE);
 			}
 		}
 	}
@@ -1101,17 +1123,13 @@ int asCCompiler::CompileGlobalVariable(asCBuilder *builder, asCScriptCode *scrip
 		pos = gvar->nextNode->tokenPos;
 	LineInstr(&byteCode, pos);
 
-	// We need to push zeroes on the stack to guarantee
-	// that temporary object handles are clear
-	// TODO: bytecode: How will this work with platform independent bytecode as the pointer size can vary?
-	int n;
-	for( n = 0; n < varSize; n++ )
-		byteCode.InstrINT(asBC_PshC4, 0);
+	// Reserve space for all local variables
+	byteCode.Push(varSize);
 
 	byteCode.AddCode(&ctx.bc);
 
 	// Deallocate variables in this block, in reverse order
-	for( n = (int)variables->variables.GetLength() - 1; n >= 0; --n )
+	for( int n = (int)variables->variables.GetLength() - 1; n >= 0; --n )
 	{
 		sVariable *v = variables->variables[n];
 
@@ -1251,7 +1269,7 @@ void asCCompiler::PrepareArgument(asCDataType *paramType, asSExprContext *ctx, a
 
 					PerformAssignment(&type, &ctx->type, &ctx->bc, node);
 
-					ctx->bc.Pop(ctx->type.dataType.GetSizeOnStackDWords());
+					ctx->bc.Pop(AS_PTR_SIZE);
 
 					ReleaseTemporaryVariable(ctx->type, &ctx->bc);
 
@@ -2059,7 +2077,7 @@ void asCCompiler::CompileDeclaration(asCScriptNode *decl, asCByteCode *bc)
 						if( assigned )
 						{
 							// Pop the resulting value
-							ctx.bc.Pop(ctx.type.dataType.GetSizeOnStackDWords());
+							ctx.bc.Pop(AS_PTR_SIZE);
 
 							// Release the argument
 							ProcessDeferredParams(&ctx);
@@ -2094,7 +2112,7 @@ void asCCompiler::CompileDeclaration(asCScriptNode *decl, asCByteCode *bc)
 						// Release temporary variables used by expression
 						ReleaseTemporaryVariable(expr.type, &ctx.bc);
 
-						ctx.bc.Pop(expr.type.dataType.GetSizeOnStackDWords());
+						ctx.bc.Pop(AS_PTR_SIZE);
 
 						ProcessDeferredParams(&ctx);
 					}
@@ -3062,7 +3080,7 @@ void asCCompiler::CompileExpressionStatement(asCScriptNode *enode, asCByteCode *
 
 		// Pop the value from the stack
 		if( !expr.type.dataType.IsPrimitive() )
-			expr.bc.Pop(expr.type.dataType.GetSizeOnStackDWords());
+			expr.bc.Pop(AS_PTR_SIZE);
 
 		// Release temporary variables used by expression
 		ReleaseTemporaryVariable(expr.type, &expr.bc);
@@ -3902,6 +3920,7 @@ int asCCompiler::PerformAssignment(asCTypeInfo *lvalue, asCTypeInfo *rvalue, asC
 			}
 
 			// Copy larger data types from a reference
+			// TODO: optimize: COPY should pop both arguments and store the reference in the register. 
 			bc->InstrSHORT_DW(asBC_COPY, (short)lvalue->dataType.GetSizeInMemoryDWords(), engine->GetTypeIdFromDataType(lvalue->dataType));
 		}
 	}
@@ -6113,7 +6132,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asSExprContext *ctx)
 				}
 				PerformAssignment(&rtemp, &le.type, &ctx->bc, cexpr->next);
 				if( !rtemp.dataType.IsPrimitive() )
-					ctx->bc.Pop(le.type.dataType.GetSizeOnStackDWords()); // Pop the original value
+					ctx->bc.Pop(AS_PTR_SIZE); // Pop the original value (always a pointer)
 
 				// Release the old temporary variable
 				ReleaseTemporaryVariable(le.type, &ctx->bc);
@@ -6134,7 +6153,7 @@ int asCCompiler::CompileCondition(asCScriptNode *expr, asSExprContext *ctx)
 				}
 				PerformAssignment(&rtemp, &re.type, &ctx->bc, cexpr->next);
 				if( !rtemp.dataType.IsPrimitive() )
-					ctx->bc.Pop(le.type.dataType.GetSizeOnStackDWords()); // Pop the original value
+					ctx->bc.Pop(AS_PTR_SIZE); // Pop the original value (always a pointer)
 
 				// Release the old temporary variable
 				ReleaseTemporaryVariable(re.type, &ctx->bc);
@@ -7417,7 +7436,7 @@ void asCCompiler::ProcessDeferredParams(asSExprContext *ctx)
 				// We must still evaluate the expression
 				MergeExprBytecode(ctx, expr);
 				if( !expr->type.isConstant || expr->type.IsNullConstant() )
-					ctx->bc.Pop(expr->type.dataType.GetSizeOnStackDWords());
+					ctx->bc.Pop(AS_PTR_SIZE);
 
 				// Give a warning, except if the argument is null or 0 which indicate the argument is really to be ignored
 				if( !expr->type.IsNullConstant() && !(expr->type.isConstant && expr->type.qwordValue == 0) )
@@ -9635,6 +9654,7 @@ void asCCompiler::ConvertToVariable(asSExprContext *ctx)
 			// Copy the object handle to a variable
 			ctx->bc.InstrSHORT(asBC_PSF, (short)offset);
 			ctx->bc.InstrPTR(asBC_REFCPY, ctx->type.dataType.GetObjectType());
+			// TODO: optimize: REFCPY should pop both arguments, and store the return in the register, just like a normal function
 			ctx->bc.Pop(AS_PTR_SIZE);
 		}
 

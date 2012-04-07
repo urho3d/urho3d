@@ -68,7 +68,9 @@ protected:
 	asCObjectType *    ReadObjectType();
 	void               ReadObjectTypeDeclaration(asCObjectType *ot, int phase);
 	void               ReadByteCode(asCScriptFunction *func);
+	asWORD             ReadEncodedUInt16();
 	asUINT             ReadEncodedUInt();
+	asQWORD            ReadEncodedUInt64();
 
 	void ReadUsedTypeIds();
 	void ReadUsedFunctions();
@@ -85,6 +87,9 @@ protected:
 	void TranslateFunction(asCScriptFunction *func);
 	void CalculateAdjustmentByPos(asCScriptFunction *func);
 	int  AdjustStackPosition(int pos);
+	int  AdjustGetOffset(int offset, asCScriptFunction *func, asDWORD programPos);
+	void CalculateStackNeeded(asCScriptFunction *func);
+	asCScriptFunction *GetCalledFunction(asCScriptFunction *func, asDWORD programPos);
 
 	// Temporary storage for persisting variable data
 	asCArray<int>                usedTypeIds;
@@ -136,7 +141,7 @@ protected:
 	void WriteObjectType(asCObjectType *ot);
 	void WriteObjectTypeDeclaration(asCObjectType *ot, int phase);
 	void WriteByteCode(asCScriptFunction *func);
-	void WriteEncodedUInt(asUINT i);
+	void WriteEncodedInt64(asINT64 i);
 
 	// Helper functions for storing variable data
 	int FindObjectTypeIdx(asCObjectType*);
@@ -149,6 +154,7 @@ protected:
 	void CalculateAdjustmentByPos(asCScriptFunction *func);
 	int  AdjustStackPosition(int pos);
 	int  AdjustProgramPosition(int pos);
+	int  AdjustGetOffset(int offset, asCScriptFunction *func, asDWORD programPos);
 
 	// Intermediate data used for storing that which isn't constant, function id's, pointers, etc
 	void WriteUsedTypeIds();

@@ -28,15 +28,15 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://gafferongames.com/game-physics/networked-physics/
 - Euler Angle Formulas by David Eberly
   http://www.geometrictools.com/Documentation/EulerAngles.pdf
-- Red Black Trees by Julienne Walker 
+- Red Black Trees by Julienne Walker
   http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
-- Comparison of several sorting algorithms by Juha Nieminen 
+- Comparison of several sorting algorithms by Juha Nieminen
   http://warp.povusers.org/SortComparison/
 - NVIDIA FXAA II for Consoles by Timothy Lottes
   http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.23.0 WIP (http://www.angelcode.com/angelscript/)
+- AngelScript 2.23.0 (http://www.angelcode.com/angelscript/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
 - GLFW 3.0 WIP (http://www.glfw.org/)

@@ -110,7 +110,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asCScriptEngine            *engine    = context->engine;
 	asSSystemFunctionInterface *sysFunc   = descr->sysFuncIntf;
 
-	asQWORD retQW = 0;
+	// This needs to be volatile, as GCC 4.2 is optimizing 
+	// away the assignment of the return code on Mac OS X. 
+	// ref: http://www.gamedev.net/topic/621357-porting-dustforce-to-os-x/
+	volatile asQWORD retQW = 0;
 
 	// Prepare the parameters
 	int paramSize = sysFunc->paramSize;

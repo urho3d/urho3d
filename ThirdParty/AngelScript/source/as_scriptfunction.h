@@ -211,13 +211,22 @@ public:
 
 	// Used by asFUNC_SCRIPT
 	asCArray<asDWORD>               byteCode;
+
+	// These hold information objects and function pointers, including temporary
+	// variables used by exception handler and when saving bytecode
 	asCArray<asCObjectType*>        objVariableTypes;
+	asCArray<asCScriptFunction*>    funcVariableTypes;
 	asCArray<int>	                objVariablePos;
 	asCArray<bool>                  objVariableIsOnHeap;
+
+	// Holds information on scope for object variables on the stack
 	asCArray<asSObjectVariableInfo> objVariableInfo;
+
+	// Holds information on explicitly declared variables
+	asCArray<asSScriptVariable*>    variables;        // debug info
+
 	int                             stackNeeded;
 	asCArray<int>                   lineNumbers;      // debug info
-	asCArray<asSScriptVariable*>    variables;        // debug info
 	int                             scriptSectionIdx; // debug info
 	bool                            dontCleanUpOnException;   // Stub functions don't own the object and parameters
 
