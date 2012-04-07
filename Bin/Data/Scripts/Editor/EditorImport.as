@@ -8,6 +8,12 @@ class ParentAssignment
     String parentName;
 }
 
+class AssetMapping
+{
+    String assetName;
+    String fullAssetName;
+}
+
 void ImportModel(const String&in fileName)
 {
     String modelName = "Models/" + GetFileName(fileName) + ".mdl";
@@ -15,7 +21,7 @@ void ImportModel(const String&in fileName)
     String materialListName = sceneResourcePath + "_tempmatlist_.txt";
 
     fileSystem.CreateDir(sceneResourcePath + "Models");
-    
+
     Array<String> args;
     args.Push("model");
     args.Push("\"" + fileName + "\"");
@@ -62,7 +68,7 @@ void ImportScene(const String&in fileName)
         args.Push("\"" + fileName + "\"");
         args.Push("\"" + tempSceneName + "\"");
         args.Push("-p\"" + sceneResourcePath + "\"");
-        
+
         if (useLocalIDs)
             args.Push("-i");
 
@@ -70,7 +76,7 @@ void ImportScene(const String&in fileName)
         {
             String currentFileName = sceneFileName;
             LoadScene(tempSceneName);
-            fileSystem.Delete(tempSceneName);          
+            fileSystem.Delete(tempSceneName);
             sceneFileName = currentFileName;
             UpdateWindowTitle();
         }
@@ -93,10 +99,21 @@ void ImportTundraScene(const String&in fileName)
     Array<String> convertedMaterials;
     Array<String> convertedMeshes;
     Array<ParentAssignment> parentAssignments;
+    Array<AssetMapping> assetMappings;
+
+    // Read the scene directory structure recursively to get assetname to full assetname mappings
+    Array<String> fileNames = fileSystem.ScanDir(filePath, "*.*", SCAN_FILES, true);
+    for (uint i = 0; i < fileNames.length; ++i)
+    {
+        AssetMapping mapping;
+        mapping.assetName = GetFileNameAndExtension(fileNames[i]);
+        mapping.fullAssetName = fileNames[i];
+        assetMappings.Push(mapping);
+    }
 
     // Clear old scene, then create a zone and a directional light first
     CreateScene();
-    
+
     // Set standard gravity
     editorScene.physicsWorld.gravity = Vector3(0, -9.81, 0);
 
@@ -132,7 +149,7 @@ void ImportTundraScene(const String&in fileName)
         bool castShadows = false;
         float drawDistance = 0;
         Array<String> materialNames;
-        
+
         int shapeType = -1;
         float mass = 0.0f;
         Vector3 bodySize;
@@ -196,7 +213,7 @@ void ImportTundraScene(const String&in fileName)
         if (!meshName.empty || shapeType >= 0)
         {
             for (uint i = 0; i < materialNames.length; ++i)
-                ConvertMaterial(materialNames[i], filePath, convertedMaterials);
+                ConvertMaterial(materialNames[i], filePath, convertedMaterials, assetMappings);
 
             ConvertModel(meshName, filePath, convertedMeshes);
             ConvertModel(collisionMeshName, filePath, convertedMeshes);
@@ -229,7 +246,7 @@ void ImportTundraScene(const String&in fileName)
                         model.materials[i] = mat;
                 }
             }
-            
+
             // Create collision shape
             if (shapeType >= 0)
             {
@@ -256,7 +273,7 @@ void ImportTundraScene(const String&in fileName)
                 case 3:
                     shape.SetCapsule(bodySize.x, bodySize.y);
                     break;
-                    
+
                 case 4:
                     shape.SetTriangleMesh(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, bodySize);
                     break;
@@ -265,7 +282,7 @@ void ImportTundraScene(const String&in fileName)
                     shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0.1, 0, bodySize);
                     break;
                 }
-                
+
                 shape.collisionLayer = collisionLayer;
                 shape.collisionMask = collisionMask;
                 shape.phantom = phantom;
@@ -304,6 +321,17 @@ void ImportTundraScene(const String&in fileName)
 
     UpdateSceneWindow();
     UpdateWindowTitle();
+}
+
+String GetFullAssetName(const String& assetName, Array<AssetMapping>@ mappings)
+{
+    for (uint i = 0; i < mappings.length; ++i)
+    {
+        if (mappings[i].assetName == assetName)
+            return mappings[i].fullAssetName;
+    }
+
+    return assetName;
 }
 
 Quaternion GetTransformQuaternion(Vector3 rotEuler)
@@ -370,7 +398,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
     convertedModels.Push(modelName);
 }
 
-void ConvertMaterial(const String&in materialName, const String&in filePath, Array<String>@ convertedMaterials)
+void ConvertMaterial(const String&in materialName, const String&in filePath, Array<String>@ convertedMaterials, Array<AssetMapping>@ assetMappings)
 {
     if (materialName.Trimmed().empty)
         return;
@@ -427,9 +455,9 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
         File outFile(outFileName, FILE_WRITE);
         outMat.Save(outFile);
         outFile.Close();
-    
-        fileSystem.Copy(filePath + textureName, sceneResourcePath + "Textures/" + textureName);
+
+        fileSystem.Copy(filePath + GetFullAssetName(textureName, assetMappings), sceneResourcePath + "Textures/" + textureName);
     }
-    
+
     convertedMaterials.Push(materialName);
 }
