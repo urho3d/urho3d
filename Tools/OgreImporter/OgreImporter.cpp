@@ -277,7 +277,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             maxSubMeshVertices = vertices;
     }
     
-    if (splitSubMeshes || (totalVertices > 65535 && maxSubMeshVertices <= 65535))
+    if (!sharedGeometry && (splitSubMeshes || (totalVertices > 65535 && maxSubMeshVertices <= 65535)))
     {
         useOneBuffer_ = false;
         vertexBuffers_.Resize(numSubMeshes_);
