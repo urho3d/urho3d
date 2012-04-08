@@ -1,7 +1,5 @@
 // Urho3D editor import functions
 
-bool useLocalIDs = false;
-
 class ParentAssignment
 {
     uint childID;
@@ -13,6 +11,9 @@ class AssetMapping
     String assetName;
     String fullAssetName;
 }
+
+bool useLocalIDs = false;
+Array<AssetMapping> assetMappings;
 
 void ImportModel(const String&in fileName)
 {
@@ -99,7 +100,6 @@ void ImportTundraScene(const String&in fileName)
     Array<String> convertedMaterials;
     Array<String> convertedMeshes;
     Array<ParentAssignment> parentAssignments;
-    Array<AssetMapping> assetMappings;
 
     // Read the scene directory structure recursively to get assetname to full assetname mappings
     Array<String> fileNames = fileSystem.ScanDir(filePath, "*.*", SCAN_FILES, true);
@@ -213,7 +213,7 @@ void ImportTundraScene(const String&in fileName)
         if (!meshName.empty || shapeType >= 0)
         {
             for (uint i = 0; i < materialNames.length; ++i)
-                ConvertMaterial(materialNames[i], filePath, convertedMaterials, assetMappings);
+                ConvertMaterial(materialNames[i], filePath, convertedMaterials);
 
             ConvertModel(meshName, filePath, convertedMeshes);
             ConvertModel(collisionMeshName, filePath, convertedMeshes);
@@ -321,14 +321,15 @@ void ImportTundraScene(const String&in fileName)
 
     UpdateSceneWindow();
     UpdateWindowTitle();
+    assetMappings.Clear();
 }
 
-String GetFullAssetName(const String& assetName, Array<AssetMapping>@ mappings)
+String GetFullAssetName(const String& assetName)
 {
-    for (uint i = 0; i < mappings.length; ++i)
+    for (uint i = 0; i < assetMappings.length; ++i)
     {
-        if (mappings[i].assetName == assetName)
-            return mappings[i].fullAssetName;
+        if (assetMappings[i].assetName == assetName)
+            return assetMappings[i].fullAssetName;
     }
 
     return assetName;
@@ -384,13 +385,13 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
     String convertedModelName = filePath + modelName + ".xml";
 
     // Convert .mesh to .mesh.xml
-    String cmdLine = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + convertedModelName + "\"";
+    String cmdLine = "ogrexmlconverter.exe \"" + filePath + GetFullAssetName(modelName) + "\" \"" + convertedModelName + "\"";
     if (!fileSystem.FileExists(convertedModelName))
         fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
 
     // Convert .mesh.xml to .mdl
     Array<String> args;
-    args.Push("\"" + filePath + modelName + ".xml\"");
+    args.Push("\"" + filePath + GetFullAssetName(modelName) + ".xml\"");
     args.Push("\"" + sceneResourcePath + "Models/" + GetFileNameAndExtension(modelName).Replaced(".mesh", ".mdl") + "\"");
     args.Push("-a");
     fileSystem.SystemRun(fileSystem.programDir + "OgreImporter.exe", args);
@@ -398,7 +399,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
     convertedModels.Push(modelName);
 }
 
-void ConvertMaterial(const String&in materialName, const String&in filePath, Array<String>@ convertedMaterials, Array<AssetMapping>@ assetMappings)
+void ConvertMaterial(const String&in materialName, const String&in filePath, Array<String>@ convertedMaterials)
 {
     if (materialName.Trimmed().empty)
         return;
@@ -409,7 +410,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
             return;
     }
 
-    String fileName = filePath + materialName;
+    String fileName = filePath + GetFullAssetName(materialName);
     String outFileName = sceneResourcePath + "Materials/" + GetFileName(materialName) + ".xml";
 
     if (!fileSystem.FileExists(fileName))
@@ -423,7 +424,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
     while (!file.eof)
     {
         String line = file.ReadLine().Trimmed();
-        if (line.StartsWith("alpha_rejection"))
+        if (line.StartsWith("alpha_rejection") || line.StartsWith("scene_blend alpha_blend"))
             mask = true;
         if (line.StartsWith("cull_hardware none"))
             twoSided = true;
@@ -456,7 +457,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
         outMat.Save(outFile);
         outFile.Close();
 
-        fileSystem.Copy(filePath + GetFullAssetName(textureName, assetMappings), sceneResourcePath + "Textures/" + textureName);
+        fileSystem.Copy(filePath + GetFullAssetName(textureName), sceneResourcePath + "Textures/" + textureName);
     }
 
     convertedMaterials.Push(materialName);
