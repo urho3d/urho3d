@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "CollisionGeometry.h"
 #include "CollisionShape.h"
 #include "Context.h"
 #include "DebugRenderer.h"

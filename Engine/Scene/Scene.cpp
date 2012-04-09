@@ -36,8 +36,6 @@
 
 static const int ASYNC_LOAD_MIN_FPS = 50;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
-static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
-static const float DEFAULT_SNAP_THRESHOLD = 1.0f;
 static const String emptyVarName;
 
 OBJECTTYPESTATIC(Scene);
@@ -48,8 +46,6 @@ Scene::Scene(Context* context) :
     replicatedComponentID_(FIRST_REPLICATED_ID),
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
-    smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
-    snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     checksum_(0),
     active_(true),
     asyncLoading_(false),
@@ -80,8 +76,6 @@ void Scene::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Scene, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     REF_ACCESSOR_ATTRIBUTE(Scene, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Scene, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
@@ -352,16 +346,6 @@ void Scene::SetActive(bool enable)
     active_ = enable;
 }
 
-void Scene::SetSmoothingConstant(float constant)
-{
-    smoothingConstant_ = Max(constant, M_EPSILON);
-}
-
-void Scene::SetSnapThreshold(float threshold)
-{
-    snapThreshold_ = Max(threshold, 0.0f);
-}
-
 void Scene::AddRequiredPackageFile(PackageFile* package)
 {
     // Do not add packages that failed to load
@@ -454,17 +438,7 @@ void Scene::Update(float timeStep)
     // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
     SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
     
-    // Update smoothing if enabled (network client scenes)
-    if (GetSmoothing())
-    {
-        PROFILE(UpdateSmoothing);
-        
-        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
-        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
-        
-        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
-    }
+    /// \todo Update smoothed scene nodes here
     
     // Post-update variable timestep logic
     SendEvent(E_SCENEPOSTUPDATE, eventData);

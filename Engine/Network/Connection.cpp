@@ -147,9 +147,6 @@ void Connection::SetScene(Scene* newScene)
 {
     if (scene_)
     {
-        // Disable smoothing in case scene is no longer used for networking
-        if (!isClient_)
-            scene_->SetSmoothing(false);
         // Reset the owner reference from the previous scene's nodes
         scene_->ResetOwner(this);
     }
@@ -182,8 +179,6 @@ void Connection::SetScene(Scene* newScene)
     }
     else
     {
-        // Enable motion smoothing on the client network scene
-        scene_->SetSmoothing(true);
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
         SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
@@ -506,12 +501,9 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 node = scene_->CreateChild(nodeID, REPLICATED);
             }
             
-            // Enable motion smoothing on the node
-            node->SetSmoothing(true);
-            
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg, deltaUpdateBits_);
-            node->UpdateSmoothing(1.0f, 0.0f);
+            //node->UpdateSmoothing(1.0f, 0.0f);
             
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();

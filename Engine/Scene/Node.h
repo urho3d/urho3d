@@ -39,12 +39,6 @@ enum CreateMode
     LOCAL = 1
 };
 
-/// No ongoing smoothing.
-static const unsigned SMOOTH_NONE = 0;
-/// Ongoing position smoothing.
-static const unsigned SMOOTH_POSITION = 1;
-/// Ongoing rotation smoothing.
-static const unsigned SMOOTH_ROTATION = 2;
 
 /// %Scene node that may contain components and child nodes.
 class Node : public Serializable
@@ -94,10 +88,6 @@ public:
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// %Set transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// Snap position immediately, even if smoothing enabled.
-    void SnapPosition(const Vector3& position);
-    /// Snap rotation immediately, even if smoothing enabled.
-    void SnapRotation(const Quaternion& rotation);
     /// %Set world position.
     void SetWorldPosition(const Vector3& position);
     /// %Set world rotation.
@@ -114,10 +104,6 @@ public:
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// %Set world transform.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// Snap world position immediately, even if smoothing enabled.
-    void SnapWorldPosition(const Vector3& position);
-    /// Snap world rotation immediately, even if smoothing enabled.
-    void SnapWorldRotation(const Quaternion& rotation);
     /// Move the scene node.
     void Translate(const Vector3& delta);
     /// Move the scene node relative to its rotation.
@@ -138,8 +124,6 @@ public:
     void Scale(const Vector3& scale);
     /// %Set owner connection for networking.
     void SetOwner(Connection* owner);
-    /// Enable or disable motion smoothing.
-    void SetSmoothing(bool enable);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node.
@@ -193,14 +177,8 @@ public:
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
     /// Return scale.
     const Vector3& GetScale() const { return scale_; }
-    /// Return unsmoothed (target) position.
-    const Vector3& GetTargetPosition() const { return smoothing_ ? targetPosition_ : position_; }
-    /// Return unsmoothed (target) rotation.
-    const Quaternion& GetTargetRotation() const { return smoothing_ ? targetRotation_ : rotation_; }
     /// Return local transform.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
-    /// Return unsmoothed (target) local transform.
-    Matrix3x4 GetTargetTransform() const { return Matrix3x4(GetTargetPosition(), GetTargetRotation(), scale_); }
     
     /// Return world-space position.
     Vector3 GetWorldPosition() const
@@ -238,11 +216,6 @@ public:
         return worldTransform_.Scale();
     }
     
-    /// Return world-space unsmoothed (target) position. Is recalculated each time.
-    Vector3 GetWorldTargetPosition() const { return smoothing_ ? GetWorldTargetTransform().Translation() : GetWorldPosition(); }
-    /// Return world-space unsmoothed (target) rotation. Is recalculated each time.
-    Quaternion GetWorldTargetRotation() const { return smoothing_ ? GetWorldTargetTransform().Rotation() : GetWorldRotation(); }
-    
     /// Return world-space transform.
     const Matrix3x4& GetWorldTransform() const
     {
@@ -252,8 +225,6 @@ public:
         return worldTransform_;
     }
     
-    /// Return world-space unsmoothed (target) transform. Is recalculated each time.
-    Matrix3x4 GetWorldTargetTransform() const;
     /// Convert a local-space position to world space.
     Vector3 LocalToWorld(const Vector3& position) const;
     /// Convert a local-space position or rotation to world space.
@@ -264,8 +235,6 @@ public:
     Vector3 WorldToLocal(const Vector4& vector) const;
     /// Return whether transform has changed and world transform needs recalculation.
     bool IsDirty() const { return dirty_; }
-    /// Return whether motion smoothing is enabled.
-    bool GetSmoothing() const { return smoothing_; }
     /// Return number of child scene nodes.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return immediate child scene nodes.
@@ -321,8 +290,6 @@ public:
     const PODVector<unsigned char>& GetNetRotationAttr() const;
     /// Return network parent attribute.
     const PODVector<unsigned char>& GetNetParentAttr() const;
-    /// Update motion smoothing. Called by Scene.
-    void UpdateSmoothing(float constant, float squaredSnapThreshold);
     /// Load components and optionally load child nodes.
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     /// Load components from XML data and optionally load child nodes.
@@ -365,10 +332,6 @@ private:
     Vector3 scale_;
     /// World-space transform matrix.
     mutable Matrix3x4 worldTransform_;
-    /// Target position for network motion smoothing.
-    Vector3 targetPosition_;
-    /// Target rotation for network motion smoothing.
-    Quaternion targetRotation_;
     /// Name.
     String name_;
     /// Name hash.
@@ -383,12 +346,8 @@ private:
     mutable VectorBuffer attrBuffer_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned char rotateCount_;
-    /// Active smoothing operations bitmask.
-    unsigned char smoothingMask_;
     /// World transform needs update flag.
     mutable bool dirty_;
-    /// Smoothing motion flag.
-    bool smoothing_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

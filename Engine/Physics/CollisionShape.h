@@ -35,6 +35,41 @@ class PhysicsWorld;
 
 class btCollisionShape;
 
+/// Base class for collision shape geometry data.
+struct CollisionGeometryData : public RefCounted
+{
+    /// Original model name
+    String modelName_;
+};
+
+/// Triangle mesh geometry data.
+struct TriangleMeshData : public CollisionGeometryData
+{
+    /// Construct from a model.
+    TriangleMeshData(Model* model, bool makeConvexHull, float thickness, unsigned lodLevel, const Vector3& scale);
+    /// Destruct. Free geometry data.
+    ~TriangleMeshData();
+    
+    /// Vertex data.
+    SharedArrayPtr<Vector3> vertexData_;
+    /// Index data.
+    SharedArrayPtr<unsigned> indexData_;
+    /// Number of indices.
+    unsigned indexCount_;
+};
+
+/// Heightfield geometry data.
+struct HeightfieldData : public CollisionGeometryData
+{
+    /// Construct from a model.
+    HeightfieldData(Model* model, IntVector2 numPoints, float thickness, unsigned lodLevel, const Vector3& scale);
+    /// Destruct. Free geometry data.
+    ~HeightfieldData();
+    
+    /// Height values.
+    SharedArrayPtr<float> heightData_;
+};
+
 /// Base class for physics collision shape components.
 class CollisionShape : public Component
 {

@@ -97,8 +97,8 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
 {
     if (node_)
     {
-        worldTrans.setOrigin(ToBtVector3(node_->GetWorldTargetPosition()));
-        worldTrans.setRotation(ToBtQuaternion(node_->GetWorldTargetRotation()));
+        worldTrans.setOrigin(ToBtVector3(node_->GetWorldPosition()));
+        worldTrans.setRotation(ToBtQuaternion(node_->GetWorldRotation()));
     }
 }
 
@@ -522,9 +522,7 @@ void RigidBody::OnMarkedDirty(Node* node)
         return;
     }
     
-    // If the node is smoothed, or we changed position ourselves, do not update position here
-    if (!body_ || inSetTransform_ || node_->GetSmoothing())
-        return;
+    /// \todo If the node contains a SmoothedTransform component, do not react to dirtying, but rather update the position elsewhere
     
     SetPosition(node_->GetWorldPosition());
     SetRotation(node_->GetWorldRotation());

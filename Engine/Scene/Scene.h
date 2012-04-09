@@ -94,10 +94,6 @@ public:
     void Clear();
     /// %Set active flag. Only active scenes will be updated automatically.
     void SetActive(bool enable);
-    /// %Set network client motion smoothing constant.
-    void SetSmoothingConstant(float constant);
-    /// %Set network client motion smoothing snap threshold.
-    void SetSnapThreshold(float threshold);
     /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
@@ -125,10 +121,6 @@ public:
     const String& GetFileName() const { return fileName_; }
     /// Return source file checksum.
     unsigned GetChecksum() const { return checksum_; }
-    /// Return motion smoothing constant.
-    float GetSmoothingConstant() const { return smoothingConstant_; }
-    /// Return motion smoothing snap threshold.
-    float GetSnapThreshold() const { return snapThreshold_; }
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return all nodes.
@@ -203,10 +195,6 @@ private:
     unsigned localComponentID_;
     /// Scene source file checksum.
     unsigned checksum_;
-    /// Motion smoothing constant.
-    float smoothingConstant_;
-    /// Motion smoothing snap threshold.
-    float snapThreshold_;
     /// Active flag.
     bool active_;
     /// Asynchronous loading flag.

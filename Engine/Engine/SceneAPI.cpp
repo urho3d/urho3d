@@ -25,6 +25,7 @@
 #include "APITemplates.h"
 #include "PackageFile.h"
 #include "Scene.h"
+#include "SmoothedTransform.h"
 #include "Sort.h"
 
 static void RegisterSerializable(asIScriptEngine* engine)
@@ -132,6 +133,21 @@ static CScriptArray* GetAvailableComponents(Scene* ptr)
     return VectorToArray<String>(components, "Array<String>");
 }
 
+static void RegisterSmoothedTransform(asIScriptEngine* engine)
+{
+    RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform");
+    engine->RegisterObjectMethod("SmoothedTransform", "void Update(float)", asMETHOD(SmoothedTransform, Update), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_targetPosition(const Vector3&in)", asMETHOD(SmoothedTransform, SetTargetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "const Vector3& get_targetPosition() const", asMETHOD(SmoothedTransform, GetTargetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_targetRotation(const Quaternion&in)", asMETHOD(SmoothedTransform, SetTargetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "const Quaternion& get_targetRotation() const", asMETHOD(SmoothedTransform, GetTargetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_smoothingConstant(float)", asMETHOD(SmoothedTransform, SetSmoothingConstant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "float get_smoothingConstant() const", asMETHOD(SmoothedTransform, GetSmoothingConstant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_snapThreshold(float)", asMETHOD(SmoothedTransform, SetSnapThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "float get_snapThreshold() const", asMETHOD(SmoothedTransform, GetSnapThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "bool get_active() const", asMETHOD(SmoothedTransform, IsActive), asCALL_THISCALL);
+}
+
 static void RegisterScene(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
@@ -163,10 +179,6 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHOD(Scene, SetSmoothingConstant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_smoothingConstant() const", asMETHOD(Scene, GetSmoothingConstant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHOD(Scene, SetSnapThreshold), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "float get_snapThreshold() const", asMETHOD(Scene, GetSnapThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHOD(Scene, IsAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_asyncProgress() const", asMETHOD(Scene, GetAsyncProgress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "uint get_checksum() const", asMETHOD(Scene, GetChecksum), asCALL_THISCALL);
@@ -185,5 +197,6 @@ void RegisterSceneAPI(asIScriptEngine* engine)
 {
     RegisterSerializable(engine);
     RegisterNode(engine);
+    RegisterSmoothedTransform(engine);
     RegisterScene(engine);
 }

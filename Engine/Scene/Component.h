@@ -46,10 +46,6 @@ public:
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node) {};
-    /// Handle scene node transform dirtied.
-    virtual void OnMarkedDirty(Node* node) {};
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
     
@@ -80,6 +76,10 @@ public:
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     
 protected:
+    /// Handle scene node being assigned at creation.
+    virtual void OnNodeSet(Node* node) {};
+    /// Handle scene node transform dirtied.
+    virtual void OnMarkedDirty(Node* node) {};
     /// %Set ID. Called by Scene.
     void SetID(unsigned id);
     /// %Set scene node. Called by Node when creating the component.
