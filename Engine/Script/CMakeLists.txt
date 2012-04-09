@@ -8,8 +8,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Core ../IO ../Math ../Physics ../Resource ../Scene 
-    ../../ThirdParty/AngelScript/include
+    ../Container ../Core ../IO ../Math ../Physics ../Resource ../Scene
+    ../../ThirdParty/AngelScript/include ../../ThirdParty/Bullet/src 
 )
 
 # Define target & libraries to link

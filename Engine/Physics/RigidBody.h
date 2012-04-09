@@ -23,15 +23,19 @@
 
 #pragma once
 
-#include "HashSet.h"
 #include "Node.h"
-#include "PhysicsDefs.h"
 
+#include <LinearMath/btMotionState.h>
+
+class CollisionShape;
 class DebugRenderer;
 class PhysicsWorld;
 
+class btCompoundShape;
+class btRigidBody;
+
 /// Physics rigid body component.
-class RigidBody : public Component
+class RigidBody : public Component, public btMotionState
 {
     OBJECT(RigidBody);
     
@@ -45,84 +49,119 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic.
+    /// Return initial world transform to Bullet.
+    virtual void getWorldTransform(btTransform &worldTrans) const;
+    /// Update world transform from Bullet.
+    virtual void setWorldTransform(const btTransform &worldTrans);
+    
+    /// %Set mass. Zero mass makes the body static.
     void SetMass(float mass);
-    /// %Set mass axis for the cylinder and capsule shapes. By default 1 (Y-axis.)
-    void SetMassAxis(int axis);
     /// %Set rigid body world-space position.
-    void SetPosition(const Vector3& position);
+    void SetPosition(Vector3 position);
     /// %Set rigid body world-space rotation.
-    void SetRotation(const Quaternion& rotation);
+    void SetRotation(Quaternion rotation);
     /// %Set rigid body world-space position and rotation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// %Set linear velocity.
-    void SetLinearVelocity(const Vector3& velocity);
+    void SetLinearVelocity(Vector3 velocity);
+    /// %Set linear degrees of freedom.
+    void SetLinearFactor(Vector3 factor);
     /// %Set linear velocity deactivation threshold.
     void SetLinearRestThreshold(float threshold);
-    /// %Set linear velocity damping threshold.
-    void SetLinearDampingThreshold(float threshold);
-    /// %Set linear velocity damping scale.
-    void SetLinearDampingScale(float scale);
+    /// %Set linear velocity damping factor.
+    void SetLinearDamping(float damping);
     /// %Set angular velocity.
-    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularVelocity(Vector3 angularVelocity);
+    /// %Set angular degrees of freedom.
+    void SetAngularFactor(Vector3 factor);
     /// %Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
-    /// %Set angular velocity damping threshold.
-    void SetAngularDampingThreshold(float threshold);
-    /// %Set angular velocity damping scale.
-    void SetAngularDampingScale(float scale);
-    /// %Set maximum angular velocity. Set to 0 to disable rotation.
-    void SetAngularMaxVelocity(float velocity);
+    /// %Set angular velocity damping factor.
+    void SetAngularDamping(float factor);
+    /// %Set friction coefficient.
+    void SetFriction(float friction);
+    /// %Set restitution coefficient.
+    void SetRestitution(float restitution);
     /// %Set whether gravity is applied to rigid body.
     void SetUseGravity(bool enable);
-    /// %Set rigid body active/inactive state.
-    void SetActive(bool active);
+    /// %Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
+    void SetKinematic(bool enable);
+    /// %Set rigid body phantom mode. In phantom mode collisions are registered but do not apply forces.
+    void SetPhantom(bool enable);
+    /// %Set collision group.
+    void SetCollisionGroup(unsigned group);
+    /// %Set collision mask.
+    void SetCollisionMask(unsigned mask);
+    /// %Set collision group and mask.
+    void SetCollisionGroupAndMask(unsigned group, unsigned mask);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
     /// Apply force at position.
-    void ApplyForceAtPosition(const Vector3& force, const Vector3& position);
+    void ApplyForce(const Vector3& force, const Vector3& position);
     /// Apply torque.
     void ApplyTorque(const Vector3& torque);
+    /// Apply impulse to center of mass.
+    void ApplyImpulse(const Vector3& impulse);
+    /// Apply impulse at position.
+    void ApplyImpulse(const Vector3& impulse, const Vector3& position);
+    /// Apply torque impulse.
+    void ApplyTorqueImpulse(const Vector3& torque);
     /// Reset accumulated forces.
     void ResetForces();
+    /// Activate rigid body if it was resting.
+    void Activate();
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return mass.
     float GetMass() const { return mass_; }
-    /// Return mass axis for cylinder and capsule shapes.
-    int GetMassAxis() const { return massAxis_; }
-    /// Return ODE body ID.
-    dBodyID GetBody() const { return body_; }
     /// Return rigid body world-space position.
-    const Vector3& GetPosition() const;
+    Vector3 GetPosition() const;
     /// Return rigid body world-space rotation.
-    const Quaternion& GetRotation() const;
+    Quaternion GetRotation() const;
     /// Return linear velocity.
-    const Vector3& GetLinearVelocity() const;
+    Vector3 GetLinearVelocity() const;
+    /// Return linear degrees of freedom.
+    Vector3 GetLinearFactor() const;
     /// Return linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
     /// Return linear velocity damping threshold.
-    float GetLinearDampingThreshold() const;
+    float GetLinearDamping() const;
     /// Return linear velocity damping scale.
     float GetLinearDampingScale() const;
     /// Return angular velocity.
-    const Vector3& GetAngularVelocity() const;
+    Vector3 GetAngularVelocity() const;
+    /// Return angular degrees of freedom.
+    Vector3 GetAngularFactor() const;
     /// Return angular velocity deactivation threshold.
     float GetAngularRestThreshold() const;
     /// Return angular velocity damping threshold.
-    float GetAngularDampingThreshold() const;
+    float GetAngularDamping() const;
     /// Return angular velocity damping scale.
     float GetAngularDampingScale() const;
-    /// Return maximum angular velocity.
-    float GetAngularMaxVelocity() const;
+    /// Return friction coefficient.
+    float GetFriction() const;
+    /// Return restitution coefficient.
+    float GetRestitution() const;
     /// Return whether rigid body uses gravity.
     bool GetUseGravity() const;
+    /// Return kinematic mode flag.
+    bool IsKinematic() const;
+    /// Return phantom mode flag.
+    bool IsPhantom() const;
     /// Return whether rigid body is active.
     bool IsActive() const;
+    /// Return collision group.
+    unsigned GetCollisionGroup() const { return collisionGroup_; }
+    /// Return collision mask.
+    unsigned GetCollisionMask() const { return collisionMask_; }
     
-    /// Recalculate mass.
-    void UpdateMass();
+    /// Return the Bullet rigid body.
+    btRigidBody* GetBody() const { return body_; }
+    /// Return the Bullet compound collision shape.
+    btCompoundShape* GetCollisionShape() const { return collisionShape_; }
+    /// Update a collision shape.
+    void UpdateCollisionShape(CollisionShape* shape);
     /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
@@ -135,33 +174,29 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     
 private:
-    /// Store previous transform for rendering interpolation.
-    void PreStep();
-    /// Interpolate between previous and current transform and store as rendering transform.
-    void PostStep(float t, HashSet<RigidBody*>& processedBodies);
-    /// Create the body.
+    /// Create the rigid body, or re-add to the physics world with changed flags.
     void CreateBody();
-    /// Remove the body.
+    /// Remove the rigid body.
     void ReleaseBody();
     
+    /// Bullet rigid body.
+    btRigidBody* body_;
+    /// Bullet compound collision shape.
+    btCompoundShape* collisionShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Mass.
     float mass_;
-    /// Mass axis for cylinder and capsule shapes.
-    int massAxis_;
-    /// ODE body ID.
-    dBodyID body_;
-    /// Previous physics position for rendering interpolation.
-    Vector3 previousPosition_;
-    /// Previous physics rotation for rendering interpolation.
-    Quaternion previousRotation_;
     /// Last interpolated position set during PostStep.
     Vector3 lastInterpolatedPosition_;
     /// Last interpolated rotation set during PostStep.
     Quaternion lastInterpolatedRotation_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
-    /// Poststep flag.
-    bool inPostStep_;
+    /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
+    bool inSetTransform_;
+    /// Collision group.
+    unsigned collisionGroup_;
+    /// Collision mask.
+    unsigned collisionMask_;
 };

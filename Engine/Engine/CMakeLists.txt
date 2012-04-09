@@ -9,7 +9,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Include directories
 include_directories (
     ../Audio ../Container ../Core ../Graphics ../Input ../IO ../Math ../Network ../Physics ../Resource
-    ../Scene ../Script ../UI ../../ThirdParty/AngelScript/include ../../ThirdParty/kNet/include
+    ../Scene ../Script ../UI ../../ThirdParty/AngelScript/include ../../ThirdParty/Bullet/src 
+    ../../ThirdParty/kNet/include
 )
 
 # Define target & libraries to link

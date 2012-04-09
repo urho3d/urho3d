@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "PhysicsUtils.h"
 #include "PhysicsWorld.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
@@ -33,29 +34,27 @@
 #include "Scene.h"
 #include "XMLElement.h"
 
-#include <ode/ode.h>
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <BulletCollision/CollisionShapes/btCompoundShape.h>
 
-#include "DebugNew.h"
-
-static const float DEFAULT_MASS = 1.0f;
-static const int DEFAULT_MASS_AXIS = 1;
-
-static const String modeNames[] =
-{
-    "static",
-    "dynamic",
-    "kinematic"
-};
+static const float DEFAULT_MASS = 0.0f;
+static const float DEFAULT_FRICTION = 0.5f;
+static const float DEFAULT_RESTITUTION = 0.0f;
+static const unsigned DEFAULT_COLLISION_GROUP = 0xffff;
 
 OBJECTTYPESTATIC(RigidBody);
 
 RigidBody::RigidBody(Context* context) :
     Component(context),
-    mass_(DEFAULT_MASS),
-    massAxis_(DEFAULT_MASS_AXIS),
     body_(0),
-    inPostStep_(false)
+    collisionShape_(0),
+    mass_(DEFAULT_MASS),
+    collisionGroup_(DEFAULT_COLLISION_GROUP),
+    collisionMask_(DEFAULT_COLLISION_GROUP),
+    inSetTransform_(false)
 {
+    collisionShape_ = new btCompoundShape();
 }
 
 RigidBody::~RigidBody()
@@ -64,6 +63,9 @@ RigidBody::~RigidBody()
     
     if (physicsWorld_)
         physicsWorld_->RemoveRigidBody(this);
+    
+    delete collisionShape_;
+    collisionShape_ = 0;
 }
 
 void RigidBody::RegisterObject(Context* context)
@@ -71,50 +73,82 @@ void RigidBody::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody>();
     
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", GetMass, SetMass, float, DEFAULT_MASS, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Mass Axis", GetMassAxis, SetMassAxis, int, DEFAULT_MASS_AXIS, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Damp Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Lin Damp Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Damp Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Damp Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Ang Max Velocity", GetAngularMaxVelocity, SetAngularMaxVelocity, float, M_INFINITY, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Ang Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT | AM_LATESTDATA);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_FILE);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Active", IsActive, SetActive, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", IsKinematic, SetKinematic, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", IsPhantom, SetPhantom, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
+}
+
+void RigidBody::getWorldTransform(btTransform &worldTrans) const
+{
+    if (node_)
+    {
+        worldTrans.setOrigin(ToBtVector3(node_->GetWorldTargetPosition()));
+        worldTrans.setRotation(ToBtQuaternion(node_->GetWorldTargetRotation()));
+    }
+}
+
+void RigidBody::setWorldTransform(const btTransform &worldTrans)
+{
+    if (node_)
+    {
+        inSetTransform_ = true;
+        node_->SetWorldPosition(ToVector3(worldTrans.getOrigin()));
+        node_->SetWorldRotation(ToQuaternion(worldTrans.getRotation()));
+        inSetTransform_ = false;
+    }
 }
 
 void RigidBody::SetMass(float mass)
 {
-    mass_ = Max(mass, 0.0f);
-    UpdateMass();
-}
-
-void RigidBody::SetMassAxis(int massAxis)
-{
-    massAxis_ = Clamp(massAxis, 0, 2);
-    UpdateMass();
-}
-
-void RigidBody::SetPosition(const Vector3& position)
-{
-    if (body_)
+    mass = Max(mass, 0.0f);
+    
+    if (mass != mass_)
     {
-        dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        previousPosition_ = position;
+        mass_ = mass;
+        CreateBody();
     }
 }
 
-void RigidBody::SetRotation(const Quaternion& rotation)
+void RigidBody::SetPosition(Vector3 position)
 {
     if (body_)
     {
-        dBodySetQuaternion(body_, rotation.Data());
-        previousRotation_ = rotation;
+        btTransform& worldTrans = body_->getWorldTransform();
+        worldTrans.setOrigin(ToBtVector3(position));
+        
+        // When forcing the physics position, set also interpolated position so that there is no jitter
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setOrigin(worldTrans.getOrigin());
+        body_->setInterpolationWorldTransform(interpTrans);
+    }
+}
+
+void RigidBody::SetRotation(Quaternion rotation)
+{
+    if (body_)
+    {
+        btTransform& worldTrans = body_->getWorldTransform();
+        worldTrans.setRotation(ToBtQuaternion(rotation));
+        
+        // When forcing the physics position, set also interpolated position so that there is no jitter
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setRotation(worldTrans.getRotation());
+        body_->setInterpolationWorldTransform(interpTrans);
     }
 }
 
@@ -122,149 +156,247 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
 {
     if (body_)
     {
-        dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        dBodySetQuaternion(body_, rotation.Data());
-        previousPosition_ = position;
-        previousRotation_ = rotation;
+        btTransform& worldTrans = body_->getWorldTransform();
+        worldTrans.setOrigin(ToBtVector3(position));
+        worldTrans.setRotation(ToBtQuaternion(rotation));
+        
+        // When forcing the physics position, set also interpolated position so that there is no jitter
+        btTransform interpTrans = body_->getInterpolationWorldTransform();
+        interpTrans.setOrigin(worldTrans.getOrigin());
+        interpTrans.setRotation(worldTrans.getRotation());
+        body_->setInterpolationWorldTransform(interpTrans);
     }
 }
 
-void RigidBody::SetLinearVelocity(const Vector3& velocity)
+void RigidBody::SetLinearVelocity(Vector3 velocity)
 {
     if (body_)
-        dBodySetLinearVel(body_, velocity.x_, velocity.y_, velocity.z_);
+    {
+        body_->setLinearVelocity(ToBtVector3(velocity));
+        if (velocity != Vector3::ZERO)
+            Activate();
+    }
+}
+
+void RigidBody::SetLinearFactor(Vector3 factor)
+{
+    if (body_)
+        body_->setLinearFactor(ToBtVector3(factor));
 }
 
 void RigidBody::SetLinearRestThreshold(float threshold)
 {
     if (body_)
-        dBodySetAutoDisableLinearThreshold(body_, threshold);
+        body_->setSleepingThresholds(threshold, body_->getAngularSleepingThreshold());
 }
 
-void RigidBody::SetLinearDampingThreshold(float threshold)
+void RigidBody::SetLinearDamping(float damping)
 {
     if (body_)
-        dBodySetLinearDampingThreshold(body_, threshold);
+        body_->setDamping(damping, body_->getAngularDamping());
 }
 
-void RigidBody::SetLinearDampingScale(float scale)
+void RigidBody::SetAngularVelocity(Vector3 velocity)
 {
     if (body_)
-        dBodySetLinearDamping(body_, scale);
+    {
+        body_->setAngularVelocity(ToBtVector3(velocity));
+        if (velocity != Vector3::ZERO)
+            Activate();
+    }
 }
 
-void RigidBody::SetAngularVelocity(const Vector3& velocity)
+void RigidBody::SetAngularFactor(Vector3 factor)
 {
     if (body_)
-        dBodySetAngularVel(body_, velocity.x_, velocity.y_, velocity.z_);
+        body_->setAngularFactor(ToBtVector3(factor));
 }
 
 void RigidBody::SetAngularRestThreshold(float threshold)
 {
     if (body_)
-        dBodySetAutoDisableAngularThreshold(body_, threshold);
+        body_->setSleepingThresholds(body_->getLinearSleepingThreshold(), threshold);
 }
 
-void RigidBody::SetAngularDampingThreshold(float threshold)
+void RigidBody::SetAngularDamping(float damping)
 {
     if (body_)
-        dBodySetAngularDampingThreshold(body_, threshold);
+        body_->setDamping(body_->getLinearDamping(), damping);
 }
 
-void RigidBody::SetAngularDampingScale(float scale)
+void RigidBody::SetFriction(float friction)
 {
     if (body_)
-        dBodySetAngularDamping(body_, scale);
+        body_->setFriction(friction);
 }
 
-void RigidBody::SetAngularMaxVelocity(float velocity)
+void RigidBody::SetRestitution(float restitution)
 {
     if (body_)
-        dBodySetMaxAngularSpeed(body_, velocity);
+        body_->setRestitution(restitution);
 }
 
 void RigidBody::SetUseGravity(bool enable)
 {
-    if (body_)
-        dBodySetGravityMode(body_, enable ? 1 : 0);
+    if (physicsWorld_ && body_)
+    {
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        
+        int flags = body_->getFlags();
+        if (enable)
+            flags &= ~BT_DISABLE_WORLD_GRAVITY;
+        else
+            flags |= BT_DISABLE_WORLD_GRAVITY;
+        body_->setFlags(flags);
+        
+        if (enable)
+            body_->setGravity(world->getGravity());
+        else
+            body_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+    }
 }
 
-void RigidBody::SetActive(bool active)
+void RigidBody::SetKinematic(bool enable)
 {
     if (body_)
     {
-        if (active && !dBodyIsEnabled(body_))
-            dBodyEnable(body_);
-        else if (!active && dBodyIsEnabled(body_))
-            dBodyDisable(body_);
+        int flags = body_->getCollisionFlags();
+        if (enable)
+            flags |= btCollisionObject::CF_KINEMATIC_OBJECT;
+        else
+            flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
+        body_->setCollisionFlags(flags),
+        
+        CreateBody();
+    }
+}
+
+void RigidBody::SetPhantom(bool enable)
+{
+    if (body_)
+    {
+        int flags = body_->getCollisionFlags();
+        if (enable)
+            flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
+        else
+            flags &= ~btCollisionObject::CF_NO_CONTACT_RESPONSE;
+        body_->setCollisionFlags(flags);
+        
+        CreateBody();
+    }
+}
+
+void RigidBody::SetCollisionGroup(unsigned group)
+{
+    group &= 0xffff;
+    
+    if (group != collisionGroup_)
+    {
+        collisionGroup_ = group;
+        CreateBody();
+    }
+}
+
+void RigidBody::SetCollisionMask(unsigned mask)
+{
+    mask &= 0xffff;
+    
+    if (mask != collisionMask_)
+    {
+        collisionMask_ = mask;
+        CreateBody();
+    }
+}
+
+void RigidBody::SetCollisionGroupAndMask(unsigned group, unsigned mask)
+{
+    group &= 0xffff;
+    mask &= 0xffff;
+    
+    if (group != collisionGroup_ || mask != collisionMask_)
+    {
+        collisionGroup_ = group;
+        collisionMask_ = mask;
+        CreateBody();
     }
 }
 
 void RigidBody::ApplyForce(const Vector3& force)
 {
-    if (force == Vector3::ZERO)
-        return;
-    
-    if (body_)
-    {
-        SetActive(true);
-        dBodyAddForce(body_, force.x_, force.y_, force.z_);
-    }
+    if (body_ && force != Vector3::ZERO)
+        body_->applyCentralForce(ToBtVector3(force));
 }
 
-void RigidBody::ApplyForceAtPosition(const Vector3& force, const Vector3& position)
+void RigidBody::ApplyForce(const Vector3& force, const Vector3& position)
 {
-    if (force == Vector3::ZERO)
-        return;
-    
-    if (body_)
-    {
-        SetActive(true);
-        dBodyAddForceAtRelPos(body_, force.x_, force.y_, force.z_, position.x_, position.y_, position.z_);
-    }
+    if (body_ && force != Vector3::ZERO)
+        body_->applyForce(ToBtVector3(force), ToBtVector3(position));
 }
 
 void RigidBody::ApplyTorque(const Vector3& torque)
 {
-    if (torque == Vector3::ZERO)
-        return;
-    
-    if (body_)
-    {
-        SetActive(true);
-        dBodyAddTorque(body_, torque.x_, torque.y_, torque.z_);
-    }
+    if (body_ && torque != Vector3::ZERO)
+        body_->applyTorque(ToBtVector3(torque));
+}
+
+void RigidBody::ApplyImpulse(const Vector3& impulse)
+{
+    if (body_ && impulse != Vector3::ZERO)
+        body_->applyCentralImpulse(ToBtVector3(impulse));
+}
+
+void RigidBody::ApplyImpulse(const Vector3& impulse, const Vector3& position)
+{
+    if (body_ && impulse != Vector3::ZERO)
+        body_->applyImpulse(ToBtVector3(impulse), ToBtVector3(position));
+}
+
+void RigidBody::ApplyTorqueImpulse(const Vector3& torque)
+{
+    if (body_ && torque != Vector3::ZERO)
+        body_->applyTorqueImpulse(ToBtVector3(torque));
 }
 
 void RigidBody::ResetForces()
 {
     if (body_)
-    {
-        dBodySetForce(body_, 0.0f, 0.0f, 0.0f);
-        dBodySetTorque(body_, 0.0f, 0.0f, 0.0f);
-    }
+        body_->clearForces();
 }
 
-const Vector3& RigidBody::GetPosition() const
+void RigidBody::Activate()
 {
     if (body_)
-        return *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
+        body_->activate();
+}
+
+Vector3 RigidBody::GetPosition() const
+{
+    if (body_)
+        return ToVector3(body_->getWorldTransform().getOrigin());
     else
         return Vector3::ZERO;
 }
 
-const Quaternion& RigidBody::GetRotation() const
+Quaternion RigidBody::GetRotation() const
 {
     if (body_)
-        return *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
+        return ToQuaternion(body_->getWorldTransform().getRotation());
     else
         return Quaternion::IDENTITY;
 }
 
-const Vector3& RigidBody::GetLinearVelocity() const
+Vector3 RigidBody::GetLinearVelocity() const
 {
     if (body_)
-        return *reinterpret_cast<const Vector3*>(dBodyGetLinearVel(body_));
+        return ToVector3(body_->getLinearVelocity());
+    else
+        return Vector3::ZERO;
+}
+
+Vector3 RigidBody::GetLinearFactor() const
+{
+    if (body_)
+        return ToVector3(body_->getLinearFactor());
     else
         return Vector3::ZERO;
 }
@@ -272,31 +404,31 @@ const Vector3& RigidBody::GetLinearVelocity() const
 float RigidBody::GetLinearRestThreshold() const
 {
     if (body_)
-        return dBodyGetAutoDisableLinearThreshold(body_);
+        return body_->getLinearSleepingThreshold();
     else
         return 0.0f;
 }
 
-float RigidBody::GetLinearDampingThreshold() const
+float RigidBody::GetLinearDamping() const
 {
     if (body_)
-        return dBodyGetLinearDampingThreshold(body_);
+        return body_->getLinearDamping();
     else
         return 0.0f;
 }
 
-float RigidBody::GetLinearDampingScale() const
+Vector3 RigidBody::GetAngularVelocity() const
 {
     if (body_)
-        return dBodyGetLinearDamping(body_);
+        return ToVector3(body_->getAngularVelocity());
     else
-        return 0.0f;
+        return Vector3::ZERO;
 }
 
-const Vector3& RigidBody::GetAngularVelocity() const
+Vector3 RigidBody::GetAngularFactor() const
 {
     if (body_)
-        return *reinterpret_cast<const Vector3*>(dBodyGetAngularVel(body_));
+        return ToVector3(body_->getAngularFactor());
     else
         return Vector3::ZERO;
 }
@@ -304,31 +436,31 @@ const Vector3& RigidBody::GetAngularVelocity() const
 float RigidBody::GetAngularRestThreshold() const
 {
     if (body_)
-        return dBodyGetAutoDisableAngularThreshold(body_);
+        return body_->getAngularSleepingThreshold();
     else
         return 0.0f;
 }
 
-float RigidBody::GetAngularDampingThreshold() const
+float RigidBody::GetAngularDamping() const
 {
     if (body_)
-        return dBodyGetAngularDampingThreshold(body_);
+        return body_->getAngularDamping();
     else
         return 0.0f;
 }
 
-float RigidBody::GetAngularDampingScale() const
+float RigidBody::GetFriction() const
 {
     if (body_)
-        return dBodyGetAngularDamping(body_);
+        return body_->getFriction();
     else
         return 0.0f;
 }
 
-float RigidBody::GetAngularMaxVelocity() const
+float RigidBody::GetRestitution() const
 {
     if (body_)
-        return dBodyGetMaxAngularSpeed(body_);
+        return body_->getRestitution();
     else
         return 0.0f;
 }
@@ -336,15 +468,31 @@ float RigidBody::GetAngularMaxVelocity() const
 bool RigidBody::GetUseGravity() const
 {
     if (body_)
-        return dBodyGetGravityMode(body_) != 0;
+        return (body_->getFlags() & BT_DISABLE_WORLD_GRAVITY) == 0;
     else
         return true;
+}
+
+bool RigidBody::IsKinematic() const
+{
+    if (body_)
+        return (body_->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) != 0;
+    else
+        return false;
+}
+
+bool RigidBody::IsPhantom() const
+{
+    if (body_)
+        return (body_->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) != 0;
+    else
+        return false;
 }
 
 bool RigidBody::IsActive() const
 {
     if (body_)
-        return dBodyIsEnabled(body_) != 0;
+        return body_->isActive();
     else
         return false;
 }
@@ -374,35 +522,12 @@ void RigidBody::OnMarkedDirty(Node* node)
         return;
     }
     
-    // If the node is smoothed, do not use the dirty callback, but rather update manually during prestep
-    if (node_->GetSmoothing())
+    // If the node is smoothed, or we changed position ourselves, do not update position here
+    if (!body_ || inSetTransform_ || node_->GetSmoothing())
         return;
     
-    // Clear the dirty flag by querying world position; this way we are sure to get the dirty notification immediately
-    // also the next time the node transform changes
-    Vector3 newPosition = node_->GetWorldPosition();
-    
-    // Disregard node dirtying during the physics poststep, when we set node transform ourselves
-    if (inPostStep_ || !body_)
-        return;
-    
-    Quaternion newRotation(node_->GetWorldRotation());
-    
-    // Check that the node actually moved or rotated from the last transform set during poststep.
-    // If only rotated, do not force the physics position, and vice versa.
-    if (newPosition != lastInterpolatedPosition_)
-    {
-        SetActive(true);
-        dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
-        lastInterpolatedPosition_ = previousPosition_ = newPosition;
-    }
-    
-    if (newRotation != lastInterpolatedRotation_)
-    {
-        SetActive(true);
-        dBodySetQuaternion(body_, newRotation.Data());
-        lastInterpolatedRotation_ = previousRotation_ = newRotation;
-    }
+    SetPosition(node_->GetWorldPosition());
+    SetRotation(node_->GetWorldRotation());
 }
 
 void RigidBody::OnNodeSet(Node* node)
@@ -422,93 +547,6 @@ void RigidBody::OnNodeSet(Node* node)
     }
 }
 
-void RigidBody::PreStep()
-{
-    if (!body_)
-        return;
-    
-    const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
-    const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
-    
-    if (!node_->GetSmoothing())
-    {
-        // If no smoothing, store the current body position for interpolation
-        previousPosition_ = currentPosition;
-        previousRotation_ = currentRotation;
-    }
-    else
-    {
-        // If smoothing is active, get the node's target transform and check manually if it has changed
-        // (as a result of eg. server update from the network)
-        Matrix3x4 transform = node_->GetWorldTargetTransform();
-        Vector3 newPosition = transform.Translation();
-        Quaternion newRotation = transform.Rotation();
-        
-        if (newPosition != currentPosition)
-        {
-            SetActive(true);
-            dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
-        }
-        if (newRotation != currentRotation)
-        {
-            SetActive(true);
-            dBodySetQuaternion(body_, newRotation.Data());
-        }
-    }
-}
-
-void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
-{
-    if (!body_ || !IsActive())
-        return;
-    
-    processedBodies.Insert(this);
-    inPostStep_ = true;
-    
-    // If the parent node has a rigid body, process it first
-    // Note: for optimization, we intentionally assume that the scene root node can not have a rigid body
-    Node* parent = node_->GetParent();
-    if (parent && parent != node_->GetScene())
-    {
-        RigidBody* parentBody = parent->GetComponent<RigidBody>();
-        if (parentBody && !processedBodies.Contains(parentBody))
-            parentBody->PostStep(t, processedBodies);
-    }
-    
-    // Apply the physics transform to rendering transform now
-    const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
-    const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
-    if (!parent)
-    {
-        // If node already has motion smoothing enabled, do not do substep interpolation
-        if (!node_->GetSmoothing())
-            node_->SetTransform(previousPosition_.Lerp(currentPosition, t), previousRotation_.Slerp(currentRotation, t));
-        else
-            node_->SetTransform(currentPosition, currentRotation);
-    }
-    else
-    {
-        // Transform rigid body's world coordinates back to parent's space
-        if (!node_->GetSmoothing())
-        {
-            Matrix3x4 newTransform(parent->GetWorldTransform().Inverse() * Matrix3x4(previousPosition_.Lerp(currentPosition, t),
-                previousRotation_.Slerp(currentRotation, t), Vector3::ONE));
-            node_->SetTransform(newTransform.Translation(), newTransform.Rotation());
-        }
-        else
-        {
-            Matrix3x4 newTransform(parent->GetWorldTargetTransform().Inverse() * Matrix3x4(currentPosition, currentRotation,
-                Vector3::ONE));
-            node_->SetTransform(newTransform.Translation(), newTransform.Rotation());
-        }
-    }
-    
-    lastInterpolatedPosition_ = node_->GetWorldPosition();
-    lastInterpolatedRotation_ = node_->GetWorldRotation();
-    
-    inPostStep_ = false;
-}
-
 void RigidBody::CreateBody()
 {
     if (!physicsWorld_)
@@ -517,114 +555,37 @@ void RigidBody::CreateBody()
         return;
     }
     
-    if (!body_)
-    {
-        body_ = dBodyCreate(physicsWorld_->GetWorld());
-        
-        // Set the user data pointer
-        dBodySetData(body_, this);
-        
-        // Set initial transform. Use target position in case the node used smoothing
-        const Vector3& position = node_->GetTargetPosition();
-        Quaternion rotation(node_->GetTargetRotation());
-        dBodySetPosition(body_, position.x_, position.y_, position.z_);
-        dBodySetQuaternion(body_, rotation.Data());
-        lastInterpolatedPosition_ = previousPosition_ = position;
-        lastInterpolatedRotation_ = previousRotation_ = rotation;
-        
-        // Associate geometries with the body
-        PODVector<CollisionShape*> shapes;
-        GetComponents<CollisionShape>(shapes);
-        for (unsigned i = 0; i < shapes.Size(); ++i)
-            shapes[i]->UpdateTransform();
-    }
+    btVector3 localInertia(0.0f, 0.0f, 0.0f);
     
-    UpdateMass();
+    btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+    if (body_)
+    {
+        world->removeRigidBody(body_);
+        body_->setMassProps(mass_, localInertia);
+    }
+    else
+        body_ = new btRigidBody(mass_, this, collisionShape_, localInertia);
+    
+    int flags = body_->getCollisionFlags();
+    if (mass_ > 0.0f)
+        flags &= ~btCollisionObject::CF_STATIC_OBJECT;
+    else
+        flags |= btCollisionObject::CF_STATIC_OBJECT;
+    body_->setCollisionFlags(flags);
+    
+    world->addRigidBody(body_, collisionGroup_, collisionMask_);
 }
 
 void RigidBody::ReleaseBody()
 {
-    if (!body_ || !physicsWorld_)
+    if (!physicsWorld_)
         return;
     
-    PODVector<CollisionShape*> shapes;
-    GetComponents<CollisionShape>(shapes);
-    
-    // First remove rigid body associations
-    for (unsigned i = 0; i < shapes.Size(); ++i)
+    if (body_)
     {
-        dGeomID geom = shapes[i]->GetGeometry();
-        if (geom)
-            dGeomSetBody(geom, 0);
-    }
-    
-    dBodyDestroy(body_);
-    body_ = 0;
-    
-    // Then update geometry transforms
-    for (unsigned i = 0; i < shapes.Size(); ++i)
-        shapes[i]->UpdateTransform();
-}
-
-void RigidBody::UpdateMass()
-{
-    if (!body_)
-        return;
-    
-    dMass mass;
-    dMassSetZero(&mass);
-    
-    // Get all attached collision shapes to calculate the mass
-    PODVector<CollisionShape*> shapes;
-    GetComponents<CollisionShape>(shapes);
-    float density = 1.0f;
-    
-    for (unsigned i = 0; i < shapes.Size(); ++i)
-    {
-        CollisionShape* shape = shapes[i];
-        
-        dMass subMass;
-        Vector3 size = shape->GetSize() * node_->GetScale();
-        Vector3 offset = shape->GetPosition() * node_->GetScale();
-        
-        switch (shape->GetShapeType())
-        {
-        case SHAPE_BOX:
-            dMassSetBox(&subMass, density, size.x_, size.y_, size.z_);
-            break;
-            
-        case SHAPE_SPHERE:
-            dMassSetSphere(&subMass, density, 0.5f * size.x_);
-            break;
-            
-        case SHAPE_CYLINDER:
-            dMassSetCylinder(&subMass, density, massAxis_, 0.5f * size.x_, size.y_);
-            break;
-            
-        case SHAPE_CAPSULE:
-            dMassSetCapsule(&subMass, density, massAxis_, 0.5f * size.x_, Max(size.y_ - size.x_, 0.0f));
-            break;
-            
-        case SHAPE_TRIANGLEMESH:
-            dMassSetBox(&subMass, density, size.x_, size.y_, size.z_);
-            break;
-        }
-        
-        dMatrix3 rotMatrix;
-        dRfromQ(rotMatrix, shape->GetRotation().Data());
-        dMassTranslate(&subMass, offset.x_, offset.y_, offset.z_);
-        dMassRotate(&subMass, rotMatrix);
-        dMassAdd(&mass, &subMass);
-    }
-    
-    // If zero mass or no geometries, set kinematic mode
-    if (mass.mass <= 0.0f)
-        dBodySetKinematic(body_);
-    else
-    {
-        // Translate final mass to center; anything else is unsupported in ODE
-        dMassTranslate(&mass, -mass.c[0], -mass.c[1], -mass.c[2]);
-        dMassAdjust(&mass, mass_);
-        dBodySetMass(body_, &mass);
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->removeRigidBody(body_);
+        delete body_;
+        body_ = 0;
     }
 }

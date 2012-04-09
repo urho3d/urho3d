@@ -30,8 +30,6 @@
 #include "RigidBody.h"
 #include "Scene.h"
 
-#include <ode/ode.h>
-
 #include "DebugNew.h"
 
 static const String typeNames[] =
@@ -47,7 +45,6 @@ OBJECTTYPESTATIC(Joint);
 Joint::Joint(Context* context) :
     Component(context),
     type_(JOINT_NONE),
-    joint_(0),
     position_(Vector3::ZERO),
     axis_(Vector3::ZERO),
     otherBodyNodeID_(0),
@@ -109,57 +106,12 @@ void Joint::GetDependencyNodes(PODVector<Node*>& dest)
 
 void Joint::Clear()
 {
-    if (joint_ && physicsWorld_)
-    {
-        dJointDestroy(joint_);
-        joint_ = 0;
-        type_ = JOINT_NONE;
-    }
+    type_ = JOINT_NONE;
 }
 
 bool Joint::SetJointType(JointType type)
 {
     Clear();
-    
-    if (type == JOINT_NONE)
-        return true;
-    
-    if (!physicsWorld_)
-    {
-        LOGERROR("Null physics world, can not set joint type");
-        return false;
-    }
-    
-    ownBody_ = static_cast<RigidBody*>(GetComponent(RigidBody::GetTypeStatic()));
-    if (!ownBody_)
-    {
-        LOGERROR("No rigid body in node, can not set joint type");
-        return false;
-    }
-    
-    type_ = type;
-    
-    switch (type)
-    {
-    case JOINT_NONE:
-        break;
-        
-    case JOINT_BALL:
-        joint_ = dJointCreateBall(physicsWorld_->GetWorld(), 0);
-        dJointSetData(joint_, this);
-        dJointAttach(joint_, ownBody_->GetBody(), otherBody_ ? otherBody_->GetBody() : 0);
-        SetPosition(position_);
-        break;
-        
-    case JOINT_HINGE:
-        joint_ = dJointCreateHinge(physicsWorld_->GetWorld(), 0);
-        dJointSetData(joint_, this);
-        dJointAttach(joint_, ownBody_->GetBody(), otherBody_ ? otherBody_->GetBody() : 0);
-        SetPosition(position_);
-        SetAxis(axis_);
-        break;
-    }
-    
     return true;
 }
 
@@ -172,122 +124,29 @@ void Joint::SetOtherBody(RigidBody* body)
         // Update the connected body attribute
         Node* otherNode = otherBody_ ? otherBody_->GetNode() : 0;
         otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
-        
-        if (joint_)
-            dJointAttach(joint_, ownBody_->GetBody(), otherBody_ ? otherBody_->GetBody() : 0);
     }
 }
 
 void Joint::SetPosition(const Vector3& position)
 {
-    position_ = position;
-   
-    if (joint_)
-    {
-        dJointType type = dJointGetType(joint_);
-        
-        switch (type)
-        {
-        case dJointTypeBall:
-            dJointSetBallAnchor(joint_, position_.x_, position_.y_, position_.z_);
-            break;
-            
-        case dJointTypeHinge:
-            dJointSetHingeAnchor(joint_, position_.x_, position_.y_, position_.z_);
-            break;
-        }
-    }
 }
 
 void Joint::SetAxis(const Vector3& axis)
 {
-    axis_ = axis.Normalized();
-    
-    if (joint_)
-    {
-        dJointType type = dJointGetType(joint_);
-        
-        switch (type)
-        {
-        case dJointTypeHinge:
-            dJointSetHingeAxis(joint_, axis_.x_, axis_.y_, axis_.z_);
-            break;
-        }
-    }
 }
 
 const Vector3& Joint::GetPosition() const
 {
-    dVector3 pos;
-    
-    if (joint_)
-    {
-        dJointType type = dJointGetType(joint_);
-        
-        switch (type)
-        {
-        case dJointTypeBall:
-            dJointGetBallAnchor(joint_, pos);
-            position_ = Vector3(pos[0], pos[1], pos[2]);
-            break;
-            
-        case dJointTypeHinge:
-            dJointGetHingeAnchor(joint_, pos);
-            position_ = Vector3(pos[0], pos[1], pos[2]);
-            break;
-        }
-    }
-    
     return position_;
 }
 
 const Vector3& Joint::GetAxis() const
 {
-    dVector3 axis;
-    
-    if (joint_)
-    {
-        dJointType type = dJointGetType(joint_);
-        
-        switch (type)
-        {
-        case dJointTypeHinge:
-            dJointGetHingeAxis(joint_, axis);
-            axis_ = Vector3(axis[0], axis[1], axis[2]);
-            break;
-        }
-    }
-    
     return axis_;
 }
 
 void Joint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && joint_ && ownBody_)
-    {
-        const Vector3& jointPos = GetPosition();
-        const Vector3& ownBodyPos = ownBody_->GetPosition();
-        const Vector3& otherBodyPos = otherBody_ ? otherBody_->GetPosition() : Vector3::ZERO;
-        
-        BoundingBox jointBox;
-        jointBox.Merge(jointPos);
-        jointBox.Merge(ownBodyPos);
-        if (otherBody_)
-            jointBox.Merge(otherBodyPos);
-        
-        if (debug->IsInside(jointBox))
-        {
-            debug->AddLine(jointPos, ownBodyPos, Color::YELLOW, depthTest);
-            if (otherBody_)
-                debug->AddLine(jointPos, otherBodyPos, Color::YELLOW, depthTest);
-            
-            if (type_ == JOINT_HINGE)
-            {
-                const Vector3& axis = GetAxis();
-                debug->AddLine(jointPos + 0.1f * axis, jointPos - 0.1f * axis, Color::WHITE, depthTest);
-            }
-        }
-    }
 }
 
 void Joint::OnNodeSet(Node* node)

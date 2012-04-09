@@ -1118,7 +1118,6 @@ void BuildAndSaveScene(OutScene& scene)
     
     /// \todo Make the physics properties configurable
     PhysicsWorld* physicsWorld = outScene->CreateComponent<PhysicsWorld>();
-    physicsWorld->SetGravity(Vector3(0.0f, -9.81f, 0.0f));
     
     /// \todo Make the octree properties configurable, or detect from the scene contents
     Octree* octree = outScene->CreateComponent<Octree>();

@@ -174,13 +174,13 @@ Although Urho3D.exe itself is geared towards running a scripted application, it 
 The third-party libraries are used for the following functionality:
 
 - AngelScript: scripting language implementation
+- Bullet: physics simulation implementation
 - FreeType: font rendering
 - GLee: OpenGL extensions handling
 - GLFW: low-level windowing and input on Linux and Mac OS X, and on Windows when running in OpenGL mode
 - kNet: UDP networking
 - libcpuid: CPU properties detection
 - Open Asset Import Library: reading various 3D file formats
-- Open Dynamics %Engine: physics simulation implementation
 - PortAudio: audio playback on Linux and Mac OS X
 - pugixml: parsing XML files
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes

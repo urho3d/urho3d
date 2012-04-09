@@ -31,7 +31,7 @@
 #include "Profiler.h"
 #include "Texture2D.h"
 
-#include "ft2build.h"
+#include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include "DebugNew.h"

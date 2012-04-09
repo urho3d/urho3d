@@ -8,8 +8,9 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math 
+    ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math
     ../../Engine/Resource ../../Engine/Physics ../../Engine/Scene ../../ThirdParty/Assimp/include
+    ../../ThirdParty/Bullet/src
 )
 
 # Define target & libraries to link

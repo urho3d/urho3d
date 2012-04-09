@@ -810,7 +810,7 @@ The Audio subsystem is always instantiated, but in headless mode it is not activ
 
 \page Physics Physics
 
-The %Physics library in Urho3D implements rigid body physics simulation using Open Dynamics %Engine.
+The %Physics library in Urho3D implements rigid body physics simulation using the Bullet library.
 
 To use, a PhysicsWorld component must first be created to the Scene.
 
@@ -819,14 +819,12 @@ The physics simulation has its own, fixed update rate. By default it is 60Hz. Fo
 The other physics components are:
 
 - CollisionShape: defines physics collision geometry. The supported shapes are sphere, box, cylinder, capsule, triangle mesh, convex hull and heightfield.
-- RigidBody: this component is necessary to create moving physics objects. Its parameters include mass and linear/angular velocities.
+- RigidBody: a physics object instance. Instantiates all the physics geometries in the same Node. Its parameters include mass and linear/angular velocities.
 - Joint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently ball and hinge joints are supported.
 
 Triangle meshes, convex hulls and heightfields are created by specifying a Model resource.
 
 Several collision shapes may exist in the same scene node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. The shape (instead of RigidBody) also contains collision behaviour parameters: which other objects to collide with (see \ref CollisionShape::SetCollisionLayer "SetCollisionLayer()" and \ref CollisionShape::SetCollisionMask "SetCollisionMask()"), the friction coefficient, and the bounce coefficient.
-
-Note that static physics objects such as unmoving level geometry should not have RigidBody components at all.
 
 The physics simulation does all calculations in world space. Therefore nodes containing a RigidBody component should only be parented to the Scene (root node) to operate correctly.
 

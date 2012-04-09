@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Component.h"
-#include "PhysicsDefs.h"
 #include "Vector3.h"
 
 /// Supported joint types.
@@ -77,8 +76,6 @@ public:
     RigidBody* GetOwnBody() const { return ownBody_; }
     /// Return the other rigid body. May be null if connected to the static world.
     RigidBody* GetOtherBody() const { return otherBody_; }
-    /// Return the ODE joint ID.
-    dJointID GetJoint() const { return joint_; }
     /// Return joint world-space position.
     const Vector3& GetPosition() const;
     /// Return joint world-space axis.
@@ -100,8 +97,6 @@ private:
     WeakPtr<RigidBody> otherBody_;
     /// Joint type.
     JointType type_;
-    /// ODE joint ID.
-    dJointID joint_;
     /// Joint world-space position.
     mutable Vector3 position_;
     /// Joint world-space axis.
