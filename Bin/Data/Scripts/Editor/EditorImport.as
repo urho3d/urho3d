@@ -250,6 +250,8 @@ void ImportTundraScene(const String&in fileName)
             // Create collision shape
             if (shapeType >= 0)
             {
+                /// \todo Reimplement
+                /*
                 // If mesh has scaling, undo it for the collision shape
                 bodySize.x /= meshScale.x;
                 bodySize.y /= meshScale.y;
@@ -295,6 +297,7 @@ void ImportTundraScene(const String&in fileName)
                     //    mass = 0.0;
                     body.mass = mass;
                 }
+                */
             }
 
             // Store pending parent assignment if necessary

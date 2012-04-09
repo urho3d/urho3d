@@ -135,6 +135,9 @@ public:
     /// Perform a physics world raycast.
     void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
+    /// Perform a physics world raycast and return the closest result.
+    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask =
+        M_MAX_UNSIGNED);
     
     /// Return gravity.
     Vector3 GetGravity() const;

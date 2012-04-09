@@ -691,16 +691,17 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHOD(T, IsDataLost), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from CollisionShape
+/// Template function for registering a class derived from CollisionShape.
 template <class T> void RegisterCollisionShape(asIScriptEngine* engine, const char* className)
 {
-    RegisterResource<T>(engine, className);
-    RegisterSubclass<Texture, T>(engine, "CollisionShape", className);
+    RegisterComponent<T>(engine, className);
+    RegisterSubclass<CollisionShape, T>(engine, "CollisionShape", className);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(T, SetTransform), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_position(const Vector3&in)", asMETHOD(CollisionShape, SetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Vector3& get_position() const", asMETHOD(CollisionShape, GetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_rotation(const Quaternion&in)", asMETHOD(CollisionShape, SetRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Quaternion& get_rotation() const", asMETHOD(CollisionShape, GetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(T, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_position(const Vector3&in)", asMETHOD(T, SetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector3& get_position() const", asMETHOD(T, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_rotation(const Quaternion&in)", asMETHOD(T, SetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Quaternion& get_rotation() const", asMETHOD(T, GetRotation), asCALL_THISCALL);
 }
 
 static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)

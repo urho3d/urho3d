@@ -32,6 +32,7 @@ class DebugRenderer;
 class Geometry;
 class Model;
 class PhysicsWorld;
+class RigidBody;
 
 class btCollisionShape;
 
@@ -85,8 +86,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
-    /// Create and return a collision shape instance, subject to scene node scaling. Called by RigidBody.
-    virtual btCollisionShape* CreateCollisionShape() = 0;
+    /// Return Bullet collision shape.
+    virtual btCollisionShape* GetCollisionShape() const = 0;
     
     /// %Set offset position.
     void SetPosition(const Vector3& position);
@@ -108,15 +109,23 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Notify the RigidBody of changed collision shape transform.
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
+    /// Update the collision shape after attribute changes.
+    virtual void UpdateCollisionShape() = 0;
+    /// Notify the RigidBody of changed or removed collision shape.
     void NotifyRigidBody();
     
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Rigid body.
+    WeakPtr<RigidBody> rigidBody_;
     /// Offset position.
     Vector3 position_;
     /// Offset rotation.
     Quaternion rotation_;
-    /// Collision shape dirty flag.
+    /// Cached world scale for determining if the collision shape needs update.
+    Vector3 cachedWorldScale_;
+    /// Dirty flag.
     bool dirty_;
 };

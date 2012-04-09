@@ -28,6 +28,7 @@
 #include "MemoryBuffer.h"
 #include "PhysicsUtils.h"
 #include "PhysicsWorld.h"
+#include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "RigidBody.h"
@@ -41,6 +42,8 @@
 static const float DEFAULT_MASS = 0.0f;
 static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
+static const float DEFAULT_LINEAR_REST_THRESHOLD = 0.8f;
+static const float DEFAULT_ANGULAR_REST_THRESHOLD = 1.0f;
 static const unsigned DEFAULT_COLLISION_GROUP = 0xffff;
 
 OBJECTTYPESTATIC(RigidBody);
@@ -48,13 +51,13 @@ OBJECTTYPESTATIC(RigidBody);
 RigidBody::RigidBody(Context* context) :
     Component(context),
     body_(0),
-    collisionShape_(0),
+    compoundShape_(0),
     mass_(DEFAULT_MASS),
     collisionGroup_(DEFAULT_COLLISION_GROUP),
     collisionMask_(DEFAULT_COLLISION_GROUP),
     inSetTransform_(false)
 {
-    collisionShape_ = new btCompoundShape();
+    compoundShape_ = new btCompoundShape();
 }
 
 RigidBody::~RigidBody()
@@ -64,33 +67,33 @@ RigidBody::~RigidBody()
     if (physicsWorld_)
         physicsWorld_->RemoveRigidBody(this);
     
-    delete collisionShape_;
-    collisionShape_ = 0;
+    delete compoundShape_;
+    compoundShape_ = 0;
 }
 
 void RigidBody::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody>();
     
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", GetMass, SetMass, float, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", GetMass, SetMass, float, DEFAULT_MASS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT | AM_LATESTDATA);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", IsKinematic, SetKinematic, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", IsPhantom, SetPhantom, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
 }
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
@@ -121,6 +124,14 @@ void RigidBody::SetMass(float mass)
     {
         mass_ = mass;
         CreateBody();
+        
+        if (mass > 0.0f)
+            Activate();
+        else
+        {
+            SetLinearVelocity(Vector3::ZERO);
+            SetAngularVelocity(Vector3::ZERO);
+        }
     }
 }
 
@@ -497,6 +508,43 @@ bool RigidBody::IsActive() const
         return false;
 }
 
+void RigidBody::RefreshCollisionShapes()
+{
+    if (node_ && compoundShape_)
+    {
+        PROFILE(RefreshCollisionShapes);
+        
+        // Remove all existing shapes first
+        while (compoundShape_->getNumChildShapes())
+            compoundShape_->removeChildShapeByIndex(compoundShape_->getNumChildShapes() - 1);
+        
+        // Then search for CollisionShape components and get their current collision shapes
+        PODVector<CollisionShape*> shapes;
+        node_->GetDerivedComponents<CollisionShape>(shapes);
+        
+        for (PODVector<CollisionShape*>::ConstIterator i = shapes.Begin(); i != shapes.End(); ++i)
+        {
+            btCollisionShape* shape = (*i)->GetCollisionShape();
+            if (shape)
+            {
+                btTransform shapeTransform;
+                shapeTransform.setOrigin(ToBtVector3(node_->GetWorldScale() * (*i)->GetPosition()));
+                shapeTransform.setRotation(ToBtQuaternion((*i)->GetRotation()));
+                compoundShape_->addChildShape(shapeTransform, shape);
+            }
+        }
+        
+        // Refresh inertia whenever collision shapes change
+        if (body_)
+        {
+            btVector3 localInertia(0.0f, 0.0f, 0.0f);
+            if (mass_ > 0.0f)
+                compoundShape_->calculateLocalInertia(mass_, localInertia);
+            body_->setMassProps(mass_, localInertia);
+        }
+    }
+}
+
 void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
@@ -510,6 +558,11 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
     attrBuffer_.Clear();
     attrBuffer_.WritePackedVector3(GetAngularVelocity(), maxVelocity);
     return attrBuffer_.GetBuffer();
+}
+
+void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    /// \todo Implement
 }
 
 void RigidBody::OnMarkedDirty(Node* node)
@@ -554,6 +607,8 @@ void RigidBody::CreateBody()
     }
     
     btVector3 localInertia(0.0f, 0.0f, 0.0f);
+    if (mass_ > 0.0f)
+        compoundShape_->calculateLocalInertia(mass_, localInertia);
     
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
@@ -562,11 +617,18 @@ void RigidBody::CreateBody()
         body_->setMassProps(mass_, localInertia);
     }
     else
-        body_ = new btRigidBody(mass_, this, collisionShape_, localInertia);
+    {
+        // Build the compound shape, then create the Bullet rigid body
+        RefreshCollisionShapes();
+        body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
+    }
     
     int flags = body_->getCollisionFlags();
     if (mass_ > 0.0f)
+    {
         flags &= ~btCollisionObject::CF_STATIC_OBJECT;
+        
+    }
     else
         flags |= btCollisionObject::CF_STATIC_OBJECT;
     body_->setCollisionFlags(flags);

@@ -405,13 +405,13 @@ void ViewRaycast(bool mouseClick)
         Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
         if (!result.empty)
         {
-            CollisionShape@ shape = result[0].collisionShape;
-            if (debug !is null)
+            RigidBody@ body = result[0].body;
+            if (body !is null)
             {
-                debug.AddNode(shape.node, false);
-                shape.DrawDebugGeometry(debug, false);
+                debug.AddNode(body.node, false);
+                body.DrawDebugGeometry(debug, false);
             }
-            selected = shape;
+            selected = body;
         }
     }
 

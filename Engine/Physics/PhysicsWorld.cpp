@@ -22,7 +22,7 @@
 //
 
 #include "Precompiled.h"
-#include "CollisionShape.h"
+#include "BoxShape.h"
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Joint.h"
@@ -129,8 +129,8 @@ void PhysicsWorld::RegisterObject(Context* context)
     
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Interpolation", interpolation_, true, AM_FILE);
-    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Network Max Angular Velocity", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
 }
 
 void PhysicsWorld::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
@@ -146,7 +146,7 @@ void PhysicsWorld::reportErrorWarning(const char* warningString)
 
 void PhysicsWorld::Update(float timeStep)
 {
-    PROFILE(Physics_Update);
+    PROFILE(UpdatePhysics);
     
     float internalTimeStep = 1.0f / fps_;
     
@@ -189,6 +189,12 @@ void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 
 void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
+    /// \todo Implement
+}
+
+void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask)
+{
+    /// \todo Implement
 }
 
 Vector3 PhysicsWorld::GetGravity() const
@@ -303,11 +309,13 @@ void PhysicsWorld::PostStep(float timeStep)
 
 void PhysicsWorld::SendCollisionEvents()
 {
+    /// \todo Implement
 }
 
 void RegisterPhysicsLibrary(Context* context)
 {
     Joint::RegisterObject(context);
     RigidBody::RegisterObject(context);
+    BoxShape::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
 }

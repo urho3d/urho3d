@@ -269,6 +269,8 @@ public:
     void GetDependencyNodes(PODVector<Node*>& dest) const;
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent() const;
+    /// Return components derived from class.
+    template <class T> void GetDerivedComponents(PODVector<T*>& dest) const;
     /// Template version of returning child nodes with a specific component.
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
@@ -367,4 +369,16 @@ template <class T> T* Node::GetDerivedComponent() const
     }
     
     return 0;
+}
+
+template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest) const
+{
+    dest.Clear();
+    
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        T* component = dynamic_cast<T*>(i->Get());
+        if (component)
+            dest.Push(component);
+    }
 }

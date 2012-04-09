@@ -111,8 +111,6 @@ public:
     /// Activate rigid body if it was resting.
     void Activate();
     
-    /// Return physics world.
-    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return mass.
     float GetMass() const { return mass_; }
     /// Return rigid body world-space position.
@@ -156,16 +154,21 @@ public:
     /// Return collision mask.
     unsigned GetCollisionMask() const { return collisionMask_; }
     
-    /// Return the Bullet rigid body.
+    /// Return physics world.
+    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
+    /// Return Bullet rigid body.
     btRigidBody* GetBody() const { return body_; }
-    /// Return the Bullet compound collision shape.
-    btCompoundShape* GetCollisionShape() const { return collisionShape_; }
-    /// Update a collision shape.
-    void UpdateCollisionShape(CollisionShape* shape);
+    /// Return Bullet compound collision shape.
+    btCompoundShape* GetCollisionShape() const { return compoundShape_; }
+    /// Refresh collision shape(s).
+    void RefreshCollisionShapes();
     /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
+    
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
     /// Handle node being assigned.
@@ -182,7 +185,7 @@ private:
     /// Bullet rigid body.
     btRigidBody* body_;
     /// Bullet compound collision shape.
-    btCompoundShape* collisionShape_;
+    btCompoundShape* compoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Mass.

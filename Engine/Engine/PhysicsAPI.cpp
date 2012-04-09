@@ -23,7 +23,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
-#include "CollisionShape.h"
+#include "BoxShape.h"
 #include "Joint.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
@@ -60,12 +60,16 @@ static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsi
     return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
 }
 
-static void RegisterCollisionShape(asIScriptEngine* engine)
+static void RegisterCollisionShapes(asIScriptEngine* engine)
 {
-    // RegisterCollisionShape<BoxShape>(engine, "BoxShape");
+    RegisterCollisionShape<CollisionShape>(engine, "CollisionShape");
+    
+    RegisterCollisionShape<BoxShape>(engine, "BoxShape");
+    engine->RegisterObjectMethod("BoxShape", "void set_size(const Vector3&in)", asMETHOD(BoxShape, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoxShape", "const Vector3& get_size() const", asMETHOD(BoxShape, GetSize), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape
-    //engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterRigidBody(asIScriptEngine* engine)
@@ -81,6 +85,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void ApplyTorqueImpulse(const Vector3&in)", asMETHOD(RigidBody, ApplyTorqueImpulse), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void ResetForces()", asMETHOD(RigidBody, ResetForces), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void Activate()", asMETHOD(RigidBody, Activate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(RigidBody, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_mass(float)", asMETHOD(RigidBody, SetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_mass() const", asMETHOD(RigidBody, GetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_position(Vector3)", asMETHOD(RigidBody, SetPosition), asCALL_THISCALL);
@@ -105,7 +110,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_angularDamping() const", asMETHOD(RigidBody, GetAngularDamping), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_friction(float)", asMETHOD(RigidBody, SetFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_friction() const", asMETHOD(RigidBody, GetFriction), asCALL_THISCALL);
-   engine->RegisterObjectMethod("RigidBody", "void set_restitution(float)", asMETHOD(RigidBody, SetRestitution), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_restitution(float)", asMETHOD(RigidBody, SetRestitution), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_restitution() const", asMETHOD(RigidBody, GetRestitution), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_useGravity(bool)", asMETHOD(RigidBody, SetUseGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_useGravity() const", asMETHOD(RigidBody, GetUseGravity), asCALL_THISCALL);
@@ -172,7 +177,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
 
 void RegisterPhysicsAPI(asIScriptEngine* engine)
 {
-    RegisterCollisionShape(engine);
+    RegisterCollisionShapes(engine);
     RegisterRigidBody(engine);
     RegisterJoint(engine);
     RegisterPhysicsWorld(engine);

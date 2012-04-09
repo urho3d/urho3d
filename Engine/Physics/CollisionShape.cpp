@@ -250,11 +250,14 @@ HeightfieldData::~HeightfieldData()
 {
 }
 
+OBJECTTYPESTATIC(CollisionShape);
+
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
-    dirty_(true)
+    cachedWorldScale_(Vector3::ONE),
+    dirty_(false)
 {
 }
 
@@ -273,7 +276,10 @@ void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 void CollisionShape::ApplyAttributes()
 {
     if (dirty_)
+    {
+        UpdateCollisionShape();
         NotifyRigidBody();
+    }
 }
 
 void CollisionShape::SetPosition(const Vector3& position)
@@ -297,6 +303,7 @@ void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rot
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
+    /// \todo Implement
 }
 
 void CollisionShape::OnNodeSet(Node* node)
@@ -311,13 +318,31 @@ void CollisionShape::OnNodeSet(Node* node)
                 physicsWorld_->AddCollisionShape(this);
         }
         node->AddListener(this);
+        UpdateCollisionShape();
+        NotifyRigidBody();
+    }
+}
+
+void CollisionShape::OnMarkedDirty(Node* node)
+{
+    Vector3 newWorldScale = node_->GetWorldScale();
+    if (newWorldScale != cachedWorldScale_)
+    {
+        UpdateCollisionShape();
+        NotifyRigidBody();
+        
+        cachedWorldScale_ = newWorldScale;
     }
 }
 
 void CollisionShape::NotifyRigidBody()
 {
-    RigidBody* rigidBody = GetComponent<RigidBody>();
-    if (rigidBody)
-        rigidBody->UpdateCollisionShape(this);
+    // We need to notify the rigid body also after having been removed from the node, so maintain a weak pointer to it.
+    if (!rigidBody_)
+        rigidBody_ = GetComponent<RigidBody>();
+    
+    if (rigidBody_)
+        rigidBody_->RefreshCollisionShapes();
+    
     dirty_ = false;
 }

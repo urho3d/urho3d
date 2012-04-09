@@ -99,7 +99,7 @@ void InitScene()
     testScene.CreateComponent("DebugRenderer");
 
     world.gravity = Vector3(0.0, -9.81, 0.0);
-    world.fps = 60;
+    world.fps = 100;
 
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
@@ -131,10 +131,9 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/Test.xml");
         object.occluder = true;
 
-        /*
-        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        */
+        RigidBody@ body = objectNode.CreateComponent("RigidBody");
+        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
+        shape.size = Vector3(2.0, 2.0, 2.0);
     }
 
     for (uint i = 0; i < 50; ++i)
@@ -147,10 +146,9 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/Test.xml");
         object.castShadows = true;
 
-        /*
-        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        */
+        RigidBody@ body = objectNode.CreateComponent("RigidBody");
+        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
+        shape.size = Vector3(2.0, 2.0, 2.0);
     }
 
     for (uint i = 0; i < 10; ++i)
@@ -165,10 +163,9 @@ void InitScene()
         object.castShadows = true;
         object.occluder = true;
 
-        /*
-        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
-        */
+        RigidBody@ body = objectNode.CreateComponent("RigidBody");
+        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
+        shape.size = Vector3(2.0, 2.0, 2.0);
     }
 
     for (uint i = 0; i < 50; ++i)
@@ -412,14 +409,13 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     newNode.rotation = rotation;
     newNode.SetScale(0.1);
 
-    /*
-    CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-    shape.SetBox(Vector3(2, 2, 2));
-    */
-
     RigidBody@ body = newNode.CreateComponent("RigidBody");
     body.mass = 1;
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
+    body.friction = 0.75;
+
+    BoxShape@ shape = newNode.CreateComponent("BoxShape");
+    shape.size = Vector3(2.0, 2.0, 2.0);
 
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/Box.mdl");
