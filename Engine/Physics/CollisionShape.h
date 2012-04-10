@@ -34,7 +34,9 @@ class Model;
 class PhysicsWorld;
 class RigidBody;
 
+class btBvhTriangleMeshShape;
 class btCollisionShape;
+class btTriangleMesh;
 
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
@@ -47,16 +49,28 @@ struct CollisionGeometryData : public RefCounted
 struct TriangleMeshData : public CollisionGeometryData
 {
     /// Construct from a model.
-    TriangleMeshData(Model* model, bool makeConvexHull, float thickness, unsigned lodLevel, const Vector3& scale);
+    TriangleMeshData(Model* model, unsigned lodLevel, const Vector3& scale);
     /// Destruct. Free geometry data.
     ~TriangleMeshData();
     
+    /// Bullet triangle mesh data.
+    btTriangleMesh* meshData_;
+    /// Bullet triangle mesh collision shape.
+    btBvhTriangleMeshShape* shape_;
+};
+
+/// Convex hull geometry data.
+struct ConvexHullData : public CollisionGeometryData
+{
+    /// Construct from a model.
+    ConvexHullData(Model* model, unsigned lodLevel, float thickness, const Vector3& scale);
+    /// Destruct. Free geometry data.
+    ~ConvexHullData();
+    
     /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;
-    /// Index data.
-    SharedArrayPtr<unsigned> indexData_;
-    /// Number of indices.
-    unsigned indexCount_;
+    /// Number of vertices.
+    unsigned vertexCount_;
 };
 
 /// Heightfield geometry data.

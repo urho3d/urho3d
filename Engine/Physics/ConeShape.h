@@ -25,28 +25,34 @@
 
 #include "CollisionShape.h"
 
-/// Box collision shape component.
-class BoxShape : public CollisionShape
+/// Cylinder collision shape component.
+class ConeShape : public CollisionShape
 {
-    OBJECT(BoxShape);
+    OBJECT(ConeShape);
     
 public:
     /// Construct.
-    BoxShape(Context* context);
+    ConeShape(Context* context);
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set box size.
-    void SetSize(const Vector3& size);
+    /// %Set cylinder radius.
+    void SetRadius(float radius);
+    /// %Set cylinder height.
+    void SetHeight(float height);
     
-    /// Return box size.
-    const Vector3& GetSize() { return size_; }
+    /// Return cylinder radius.
+    float GetRadius() const { return radius_; }
+    /// Return cylinder height.
+    float GetHeight() const { return height_; }
     
 protected:
     /// Update the collision shape.
     virtual void UpdateCollisionShape();
     
 private:
-    /// Box size.
-    Vector3 size_;
+    /// Cylinder radius.
+    float radius_;
+    /// Cylinder height.
+    float height_;
 };

@@ -26,27 +26,48 @@
 #include "CollisionShape.h"
 
 /// Box collision shape component.
-class BoxShape : public CollisionShape
+class TriangleMeshShape : public CollisionShape
 {
-    OBJECT(BoxShape);
+    OBJECT(TriangleMeshShape);
     
 public:
     /// Construct.
-    BoxShape(Context* context);
+    TriangleMeshShape(Context* context);
+    /// Destruct.
+    ~TriangleMeshShape();
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set box size.
+    /// %Set model.
+    void SetModel(Model* model);
+    /// %Set LOD level.
+    void SetLodLevel(unsigned lodLevel);
+    /// %Set model scaling.
     void SetSize(const Vector3& size);
     
-    /// Return box size.
+    /// Return model.
+    Model* GetModel() const;
+    /// Return LOD level.
+    unsigned GetLodLevel() const { return lodLevel_; }
+    /// Return model scaling.
     const Vector3& GetSize() { return size_; }
+    
+    /// %Set model attribute.
+    void SetModelAttr(ResourceRef value);
+    /// Return model attribute.
+    ResourceRef GetModelAttr() const;
     
 protected:
     /// Update the collision shape.
     virtual void UpdateCollisionShape();
     
 private:
-    /// Box size.
+    /// Model.
+    SharedPtr<Model> model_;
+    /// Current geometry data.
+    SharedPtr<TriangleMeshData> geometry_;
+    /// Model scaling.
     Vector3 size_;
+    /// LOD level.
+    unsigned lodLevel_;
 };

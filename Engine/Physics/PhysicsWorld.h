@@ -47,6 +47,7 @@ class btDiscreteDynamicsWorld;
 class btDispatcher;
 class btDynamicsWorld;
 
+struct ConvexHullData;
 struct HeightfieldData;
 struct TriangleMeshData;
 
@@ -169,6 +170,8 @@ public:
     void CleanupGeometryCache();
     /// Return the triangle mesh cache.
     Map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
+    /// Return the convex hull cache.
+    Map<String, SharedPtr<ConvexHullData> >& GetConvexHullCache() { return convexHullCache_; }
     /// Return the heightfield cache.
     Map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
     
@@ -214,6 +217,8 @@ private:
     Vector<PhysicsCollisionInfo> collisionInfos_;
     /// Cache for triangle mesh geometries.
     Map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
+    /// Cache for convex hull geometries.
+    Map<String, SharedPtr<ConvexHullData> > convexHullCache_;
     /// Cache for heightfield geometries.
     Map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
     /// Simulation steps per second.

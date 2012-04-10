@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "BoxShape.h"
 #include "CapsuleShape.h"
+#include "ConeShape.h"
 #include "Context.h"
 #include "CylinderShape.h"
 #include "DebugRenderer.h"
@@ -40,6 +41,7 @@
 #include "SceneEvents.h"
 #include "Sort.h"
 #include "SphereShape.h"
+#include "TriangleMeshShape.h"
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -80,7 +82,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     interpolation_(true),
     debugRenderer_(0),
-    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints)
+    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawNormals | btIDebugDraw::DBG_DrawConstraints)
 {
     collisionConfiguration_ = new btDefaultCollisionConfiguration();
     collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
@@ -260,6 +262,13 @@ void PhysicsWorld::CleanupGeometryCache()
             triangleMeshCache_.Erase(current);
     }
     
+    for (Map<String, SharedPtr<ConvexHullData> >::Iterator i = convexHullCache_.Begin();
+        i != convexHullCache_.End();)
+    {
+        Map<String, SharedPtr<ConvexHullData> >::Iterator current = i++;
+        if (current->second_.Refs() == 1)
+            convexHullCache_.Erase(current);
+    }
     for (Map<String, SharedPtr<HeightfieldData> >::Iterator i = heightfieldCache_.Begin();
         i != heightfieldCache_.End();)
     {
@@ -321,7 +330,9 @@ void RegisterPhysicsLibrary(Context* context)
     RigidBody::RegisterObject(context);
     BoxShape::RegisterObject(context);
     CapsuleShape::RegisterObject(context);
+    ConeShape::RegisterObject(context);
     CylinderShape::RegisterObject(context);
     SphereShape::RegisterObject(context);
+    TriangleMeshShape::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
 }

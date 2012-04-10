@@ -591,6 +591,8 @@ void RigidBody::OnNodeSet(Node* node)
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();
             if (physicsWorld_)
                 physicsWorld_->AddRigidBody(this);
+            else
+                LOGERROR("Null physics world, can not create rigid body");
             
             CreateBody();
         }
@@ -601,10 +603,7 @@ void RigidBody::OnNodeSet(Node* node)
 void RigidBody::CreateBody()
 {
     if (!physicsWorld_)
-    {
-        LOGERROR("Null physics world, can not create body");
         return;
-    }
     
     btVector3 localInertia(0.0f, 0.0f, 0.0f);
     if (mass_ > 0.0f)

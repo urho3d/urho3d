@@ -180,10 +180,9 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
         object.castShadows = true;
 
-        /*
-        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
-        */
+        RigidBody@ body = objectNode.CreateComponent("RigidBody");
+        TriangleMeshShape@ shape = objectNode.CreateComponent("TriangleMeshShape");
+        shape.model = cache.GetResource("Model", "Models/Mushroom.mdl");
     }
 
     for (uint i = 0; i < 50; ++i)
