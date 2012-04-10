@@ -22,48 +22,63 @@
 //
 
 #include "Precompiled.h"
-#include "BoxShape.h"
+#include "CapsuleShape.h"
 #include "Context.h"
 #include "Node.h"
 #include "PhysicsUtils.h"
 
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <BulletCollision/CollisionShapes/btCapsuleShape.h>
 
-OBJECTTYPESTATIC(BoxShape);
+OBJECTTYPESTATIC(CapsuleShape);
 
-BoxShape::BoxShape(Context* context) :
+static const float DEFAULT_RADIUS = 0.5f;
+static const float DEFAULT_HEIGHT = 1.0f;
+
+CapsuleShape::CapsuleShape(Context* context) :
     CollisionShape(context),
-    size_(Vector3::ONE)
+    radius_(DEFAULT_RADIUS),
+    height_(DEFAULT_HEIGHT)
 {
 }
 
-void BoxShape::RegisterObject(Context* context)
+void CapsuleShape::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BoxShape>();
+    context->RegisterFactory<CapsuleShape>();
     
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
+    ATTRIBUTE(CapsuleShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(CapsuleShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(CapsuleShape, VAR_FLOAT, "Radius", radius_, DEFAULT_RADIUS, AM_DEFAULT);
+    ATTRIBUTE(CapsuleShape, VAR_FLOAT, "Height", height_, DEFAULT_HEIGHT, AM_DEFAULT);
 }
 
-void BoxShape::SetSize(const Vector3& size)
+void CapsuleShape::SetRadius(float radius)
 {
-    if (size != size_)
+    if (radius != radius_)
     {
-        size_ = size;
+        radius_ = radius;
         UpdateCollisionShape();
         NotifyRigidBody();
     }
 }
 
-void BoxShape::UpdateCollisionShape()
+void CapsuleShape::SetHeight(float height)
+{
+    if (height != height_)
+    {
+        height_ = height;
+        UpdateCollisionShape();
+        NotifyRigidBody();
+    }
+}
+
+void CapsuleShape::UpdateCollisionShape()
 {
     if (node_)
     {
         delete shape_;
         shape_ = 0;
         
-        shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
+        shape_ = new btCapsuleShape(radius_, Max(height_ - 2.0f * radius_, 0.0f));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }
 }

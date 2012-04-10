@@ -23,7 +23,9 @@
 
 #include "Precompiled.h"
 #include "BoxShape.h"
+#include "CapsuleShape.h"
 #include "Context.h"
+#include "CylinderShape.h"
 #include "DebugRenderer.h"
 #include "Joint.h"
 #include "Log.h"
@@ -37,6 +39,7 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
+#include "SphereShape.h"
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -317,5 +320,8 @@ void RegisterPhysicsLibrary(Context* context)
     Joint::RegisterObject(context);
     RigidBody::RegisterObject(context);
     BoxShape::RegisterObject(context);
+    CapsuleShape::RegisterObject(context);
+    CylinderShape::RegisterObject(context);
+    SphereShape::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
 }

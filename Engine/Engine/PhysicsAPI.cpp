@@ -24,10 +24,13 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "BoxShape.h"
+#include "CapsuleShape.h"
+#include "CylinderShape.h"
 #include "Joint.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
 #include "Scene.h"
+#include "SphereShape.h"
 
 static PhysicsWorld* SceneGetPhysicsWorld(Scene* ptr)
 {
@@ -67,6 +70,22 @@ static void RegisterCollisionShapes(asIScriptEngine* engine)
     RegisterCollisionShape<BoxShape>(engine, "BoxShape");
     engine->RegisterObjectMethod("BoxShape", "void set_size(const Vector3&in)", asMETHOD(BoxShape, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoxShape", "const Vector3& get_size() const", asMETHOD(BoxShape, GetSize), asCALL_THISCALL);
+    
+    RegisterCollisionShape<CapsuleShape>(engine, "CapsuleShape");
+    engine->RegisterObjectMethod("CapsuleShape", "void set_radius(float)", asMETHOD(CapsuleShape, SetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CapsuleShape", "float get_radius() const", asMETHOD(CapsuleShape, GetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CapsuleShape", "void set_height(float)", asMETHOD(CapsuleShape, SetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CapsuleShape", "float get_height() const", asMETHOD(CapsuleShape, GetHeight), asCALL_THISCALL);
+    
+    RegisterCollisionShape<CylinderShape>(engine, "CylinderShape");
+    engine->RegisterObjectMethod("CylinderShape", "void set_radius(float)", asMETHOD(CylinderShape, SetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CylinderShape", "float get_radius() const", asMETHOD(CylinderShape, GetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CylinderShape", "void set_height(float)", asMETHOD(CylinderShape, SetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CylinderShape", "float get_height() const", asMETHOD(CylinderShape, GetHeight), asCALL_THISCALL);
+    
+    RegisterCollisionShape<SphereShape>(engine, "SphereShape");
+    engine->RegisterObjectMethod("SphereShape", "void set_radius(float)", asMETHOD(SphereShape, SetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SphereShape", "float get_radius() const", asMETHOD(SphereShape, GetRadius), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);

@@ -21,49 +21,32 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BoxShape.h"
-#include "Context.h"
-#include "Node.h"
-#include "PhysicsUtils.h"
+#pragma once
 
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include "CollisionShape.h"
 
-OBJECTTYPESTATIC(BoxShape);
-
-BoxShape::BoxShape(Context* context) :
-    CollisionShape(context),
-    size_(Vector3::ONE)
+/// Sphere collision shape component.
+class SphereShape : public CollisionShape
 {
-}
-
-void BoxShape::RegisterObject(Context* context)
-{
-    context->RegisterFactory<BoxShape>();
+    OBJECT(SphereShape);
     
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
-}
-
-void BoxShape::SetSize(const Vector3& size)
-{
-    if (size != size_)
-    {
-        size_ = size;
-        UpdateCollisionShape();
-        NotifyRigidBody();
-    }
-}
-
-void BoxShape::UpdateCollisionShape()
-{
-    if (node_)
-    {
-        delete shape_;
-        shape_ = 0;
-        
-        shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
-        shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
-    }
-}
+public:
+    /// Construct.
+    SphereShape(Context* context);
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+    
+    /// %Set sphere radius.
+    void SetRadius(float radius);
+    
+    /// Return sphere radius.
+    float GetRadius() const { return radius_; }
+    
+protected:
+    /// Update the collision shape.
+    virtual void UpdateCollisionShape();
+    
+private:
+    /// Sphere radius.
+    float radius_;
+};

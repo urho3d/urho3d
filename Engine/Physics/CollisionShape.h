@@ -86,21 +86,21 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
-    /// Return Bullet collision shape.
-    virtual btCollisionShape* GetCollisionShape() const = 0;
     
     /// %Set offset position.
     void SetPosition(const Vector3& position);
-    /// %Set rotation.
+    /// %Set offset rotation.
     void SetRotation(const Quaternion& rotation);
     /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     
+    /// Return Bullet collision shape
+    btCollisionShape* GetCollisionShape() const { return shape_; }
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return offset position.
     const Vector3& GetPosition() const { return position_; }
-    /// Return rotation.
+    /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
     
     /// Add debug geometry to the debug renderer.
@@ -120,6 +120,8 @@ protected:
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Rigid body.
     WeakPtr<RigidBody> rigidBody_;
+    /// Bullet collision shape.
+    btCollisionShape* shape_;
     /// Offset position.
     Vector3 position_;
     /// Offset rotation.

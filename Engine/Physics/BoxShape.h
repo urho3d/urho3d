@@ -25,8 +25,6 @@
 
 #include "CollisionShape.h"
 
-class btBoxShape;
-
 /// Box collision shape component.
 class BoxShape : public CollisionShape
 {
@@ -35,13 +33,8 @@ class BoxShape : public CollisionShape
 public:
     /// Construct.
     BoxShape(Context* context);
-    /// Destruct.
-    ~BoxShape();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
-    /// Return Bullet collision shape.
-    virtual btCollisionShape* GetCollisionShape() const;
     
     /// %Set box size.
     void SetSize(const Vector3& size);
@@ -53,8 +46,6 @@ protected:
     virtual void UpdateCollisionShape();
     
 private:
-    /// Box collision shape.
-    btBoxShape* shape_;
     /// Box size.
     Vector3 size_;
 };

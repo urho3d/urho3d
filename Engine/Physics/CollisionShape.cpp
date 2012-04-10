@@ -256,6 +256,7 @@ OBJECTTYPESTATIC(CollisionShape);
 
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
+    shape_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     cachedWorldScale_(Vector3::ONE),
@@ -265,6 +266,11 @@ CollisionShape::CollisionShape(Context* context) :
 
 CollisionShape::~CollisionShape()
 {
+    delete shape_;
+    shape_ = 0;
+    
+    NotifyRigidBody();
+    
     if (physicsWorld_)
         physicsWorld_->RemoveCollisionShape(this);
 }
@@ -286,21 +292,30 @@ void CollisionShape::ApplyAttributes()
 
 void CollisionShape::SetPosition(const Vector3& position)
 {
-    position_ = position;
-    NotifyRigidBody();
+    if (position != position_)
+    {
+        position_ = position;
+        NotifyRigidBody();
+    }
 }
 
 void CollisionShape::SetRotation(const Quaternion& rotation)
 {
-    rotation_ = rotation;
-    NotifyRigidBody();
+    if (rotation != rotation_)
+    {
+        rotation_ = rotation;
+        NotifyRigidBody();
+    }
 }
 
 void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rotation)
 {
-    position_ = position;
-    rotation_ = rotation;
-    NotifyRigidBody();
+    if (position != position_ || rotation != rotation_)
+    {
+        position_ = position;
+        rotation_ = rotation;
+        NotifyRigidBody();
+    }
 }
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -330,9 +345,8 @@ void CollisionShape::OnMarkedDirty(Node* node)
     Vector3 newWorldScale = node_->GetWorldScale();
     if (newWorldScale != cachedWorldScale_)
     {
-        btCollisionShape* shape = GetCollisionShape();
-        if (shape)
-            shape->setLocalScaling(ToBtVector3(newWorldScale));
+        if (shape_)
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
         NotifyRigidBody();
         
         cachedWorldScale_ = newWorldScale;

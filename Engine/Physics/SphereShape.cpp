@@ -22,48 +22,50 @@
 //
 
 #include "Precompiled.h"
-#include "BoxShape.h"
 #include "Context.h"
 #include "Node.h"
 #include "PhysicsUtils.h"
+#include "SphereShape.h"
 
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
 
-OBJECTTYPESTATIC(BoxShape);
+OBJECTTYPESTATIC(SphereShape);
 
-BoxShape::BoxShape(Context* context) :
+static const float DEFAULT_RADIUS = 0.5f;
+
+SphereShape::SphereShape(Context* context) :
     CollisionShape(context),
-    size_(Vector3::ONE)
+    radius_(DEFAULT_RADIUS)
 {
 }
 
-void BoxShape::RegisterObject(Context* context)
+void SphereShape::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BoxShape>();
+    context->RegisterFactory<SphereShape>();
     
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
+    ATTRIBUTE(SphereShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(SphereShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(SphereShape, VAR_FLOAT, "Radius", radius_, DEFAULT_RADIUS, AM_DEFAULT);
 }
 
-void BoxShape::SetSize(const Vector3& size)
+void SphereShape::SetRadius(float radius)
 {
-    if (size != size_)
+    if (radius != radius_)
     {
-        size_ = size;
+        radius_ = radius;
         UpdateCollisionShape();
         NotifyRigidBody();
     }
 }
 
-void BoxShape::UpdateCollisionShape()
+void SphereShape::UpdateCollisionShape()
 {
     if (node_)
     {
         delete shape_;
         shape_ = 0;
         
-        shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
+        shape_ = new btSphereShape(radius_);
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }
 }

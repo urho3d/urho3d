@@ -22,48 +22,63 @@
 //
 
 #include "Precompiled.h"
-#include "BoxShape.h"
+#include "CylinderShape.h"
 #include "Context.h"
 #include "Node.h"
 #include "PhysicsUtils.h"
 
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <BulletCollision/CollisionShapes/btCylinderShape.h>
 
-OBJECTTYPESTATIC(BoxShape);
+OBJECTTYPESTATIC(CylinderShape);
 
-BoxShape::BoxShape(Context* context) :
+static const float DEFAULT_RADIUS = 0.5f;
+static const float DEFAULT_HEIGHT = 1.0f;
+
+CylinderShape::CylinderShape(Context* context) :
     CollisionShape(context),
-    size_(Vector3::ONE)
+    radius_(DEFAULT_RADIUS),
+    height_(DEFAULT_HEIGHT)
 {
 }
 
-void BoxShape::RegisterObject(Context* context)
+void CylinderShape::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BoxShape>();
+    context->RegisterFactory<CylinderShape>();
     
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(BoxShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
+    ATTRIBUTE(CylinderShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(CylinderShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(CylinderShape, VAR_FLOAT, "Radius", radius_, DEFAULT_RADIUS, AM_DEFAULT);
+    ATTRIBUTE(CylinderShape, VAR_FLOAT, "Height", height_, DEFAULT_HEIGHT, AM_DEFAULT);
 }
 
-void BoxShape::SetSize(const Vector3& size)
+void CylinderShape::SetRadius(float radius)
 {
-    if (size != size_)
+    if (radius != radius_)
     {
-        size_ = size;
+        radius_ = radius;
         UpdateCollisionShape();
         NotifyRigidBody();
     }
 }
 
-void BoxShape::UpdateCollisionShape()
+void CylinderShape::SetHeight(float height)
+{
+    if (height != height_)
+    {
+        height_ = height;
+        UpdateCollisionShape();
+        NotifyRigidBody();
+    }
+}
+
+void CylinderShape::UpdateCollisionShape()
 {
     if (node_)
     {
         delete shape_;
         shape_ = 0;
         
-        shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
+        shape_ = new btCylinderShape(btVector3(radius_, height_ * 0.5f, radius_));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }
 }
