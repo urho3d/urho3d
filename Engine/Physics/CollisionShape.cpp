@@ -28,10 +28,12 @@
 #include "Geometry.h"
 #include "Log.h"
 #include "Model.h"
+#include "PhysicsUtils.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
 #include "Scene.h"
 
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <hull.h>
 
 #include "DebugNew.h"
@@ -328,7 +330,9 @@ void CollisionShape::OnMarkedDirty(Node* node)
     Vector3 newWorldScale = node_->GetWorldScale();
     if (newWorldScale != cachedWorldScale_)
     {
-        UpdateCollisionShape();
+        btCollisionShape* shape = GetCollisionShape();
+        if (shape)
+            shape->setLocalScaling(ToBtVector3(newWorldScale));
         NotifyRigidBody();
         
         cachedWorldScale_ = newWorldScale;
@@ -337,7 +341,7 @@ void CollisionShape::OnMarkedDirty(Node* node)
 
 void CollisionShape::NotifyRigidBody()
 {
-    // We need to notify the rigid body also after having been removed from the node, so maintain a weak pointer to it.
+    // We need to notify the rigid body also after having been removed from the node, so maintain a weak pointer to it
     if (!rigidBody_)
         rigidBody_ = GetComponent<RigidBody>();
     

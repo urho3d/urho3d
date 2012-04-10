@@ -33,15 +33,15 @@ OBJECTTYPESTATIC(BoxShape);
 
 BoxShape::BoxShape(Context* context) :
     CollisionShape(context),
-    collisionShape_(0),
+    shape_(0),
     size_(Vector3::ONE)
 {
 }
 
 BoxShape::~BoxShape()
 {
-    delete collisionShape_;
-    collisionShape_ = 0;
+    delete shape_;
+    shape_ = 0;
     
     NotifyRigidBody();
 }
@@ -57,7 +57,7 @@ void BoxShape::RegisterObject(Context* context)
 
 btCollisionShape* BoxShape::GetCollisionShape() const
 {
-    return collisionShape_;
+    return shape_;
 }
 
 void BoxShape::SetSize(const Vector3& size)
@@ -74,10 +74,10 @@ void BoxShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete collisionShape_;
-        collisionShape_ = 0;
+        delete shape_;
+        shape_ = 0;
         
-        Vector3 worldSize = node_->GetWorldScale() * size_;
-        collisionShape_ = new btBoxShape(ToBtVector3(worldSize * 0.5f));
+        shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
+        shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }
 }

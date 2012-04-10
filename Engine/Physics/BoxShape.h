@@ -53,8 +53,8 @@ protected:
     virtual void UpdateCollisionShape();
     
 private:
-    /// Collision shape.
-    btBoxShape* collisionShape_;
+    /// Box collision shape.
+    btBoxShape* shape_;
     /// Box size.
     Vector3 size_;
 };
