@@ -411,7 +411,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     RigidBody@ body = newNode.CreateComponent("RigidBody");
     body.mass = 1;
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
-    body.linearDamping = 0.001;
+    body.linearDamping = 0.1;
     body.friction = 1.0;
 
     BoxShape@ shape = newNode.CreateComponent("BoxShape");
