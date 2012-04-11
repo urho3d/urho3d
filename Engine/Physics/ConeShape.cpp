@@ -73,10 +73,10 @@ void ConeShape::SetHeight(float height)
 
 void ConeShape::UpdateCollisionShape()
 {
+    ReleaseShape();
+    
     if (node_)
     {
-        ReleaseShape();
-        
         shape_ = new btConeShape(radius_, height_);
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }

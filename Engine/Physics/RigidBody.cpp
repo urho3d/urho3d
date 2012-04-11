@@ -509,34 +509,6 @@ bool RigidBody::IsActive() const
         return false;
 }
 
-void RigidBody::RebuildCollision()
-{
-    if (node_ && compoundShape_)
-    {
-        PROFILE(RebuildCollision);
-        
-        // Remove all existing shapes first
-        while (compoundShape_->getNumChildShapes())
-            compoundShape_->removeChildShapeByIndex(compoundShape_->getNumChildShapes() - 1);
-        
-        // Then search for CollisionShape components and get their current collision shapes
-        PODVector<CollisionShape*> shapes;
-        node_->GetDerivedComponents<CollisionShape>(shapes);
-        
-        for (PODVector<CollisionShape*>::ConstIterator i = shapes.Begin(); i != shapes.End(); ++i)
-        {
-            btCollisionShape* shape = (*i)->GetCollisionShape();
-            if (shape)
-            {
-                btTransform offset;
-                offset.setOrigin(ToBtVector3(node_->GetWorldScale() * (*i)->GetPosition()));
-                offset.setRotation(ToBtQuaternion((*i)->GetRotation()));
-                compoundShape_->addChildShape(offset, shape);
-            }
-        }
-    }
-}
-
 void RigidBody::UpdateMass()
 {
     if (body_)
@@ -617,16 +589,22 @@ void RigidBody::AddBodyToWorld()
     
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
+    {
         world->removeRigidBody(body_);
+        UpdateMass();
+    }
     else
     {
-        // Check if CollisionShapes already exist in the node and add them first
-        RebuildCollision();
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
+        
+        // Check if CollisionShapes already exist in the node and add them to the compound shape
+        // Note: NotifyRigidBody() will cause mass to be updated
+        PODVector<CollisionShape*> shapes;
+        node_->GetDerivedComponents<CollisionShape>(shapes);
+        for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+            (*i)->NotifyRigidBody();
     }
-    
-    UpdateMass();
     
     int flags = body_->getCollisionFlags();
     if (mass_ > 0.0f)
@@ -640,13 +618,14 @@ void RigidBody::AddBodyToWorld()
 
 void RigidBody::ReleaseBody()
 {
-    if (!physicsWorld_)
-        return;
-    
     if (body_)
     {
-        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->removeRigidBody(body_);
+        if (physicsWorld_)
+        {
+            btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+            world->removeRigidBody(body_);
+        }
+        
         delete body_;
         body_ = 0;
     }

@@ -73,10 +73,10 @@ void CylinderShape::SetHeight(float height)
 
 void CylinderShape::UpdateCollisionShape()
 {
+    ReleaseShape();
+    
     if (node_)
     {
-        ReleaseShape();
-        
         shape_ = new btCylinderShape(btVector3(radius_, height_ * 0.5f, radius_));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }

@@ -26,8 +26,10 @@
 #include "CapsuleShape.h"
 #include "ConeShape.h"
 #include "Context.h"
+#include "ConvexShape.h"
 #include "CylinderShape.h"
 #include "DebugRenderer.h"
+#include "HeightfieldShape.h"
 #include "Joint.h"
 #include "Log.h"
 #include "Mutex.h"
@@ -52,6 +54,7 @@
 
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
+static const float MAX_PHYSICS_TIMESTEP = 0.1f;
 
 static bool CompareRaycastResults(const PhysicsRaycastResult& lhs, const PhysicsRaycastResult& rhs)
 {
@@ -153,15 +156,15 @@ void PhysicsWorld::Update(float timeStep)
 {
     PROFILE(UpdatePhysics);
     
-    // Allow max. 0.1s update at a time
-    if (timeStep > 0.1f)
-        timeStep = 0.1f;
+    // Clamp elapsed time to a maximum to prevent CPU usage spiralling out of control
+    if (timeStep > MAX_PHYSICS_TIMESTEP)
+        timeStep = MAX_PHYSICS_TIMESTEP;
     
     float internalTimeStep = 1.0f / fps_;
     
     if (interpolation_)
     {
-        int maxSubSteps = (int)(0.1f * fps_);
+        int maxSubSteps = (int)(MAX_PHYSICS_TIMESTEP * fps_);
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
     }
     else
@@ -265,12 +268,12 @@ void PhysicsWorld::CleanupGeometryCache()
             triangleMeshCache_.Erase(current);
     }
     
-    for (Map<String, SharedPtr<ConvexHullData> >::Iterator i = convexHullCache_.Begin();
-        i != convexHullCache_.End();)
+    for (Map<String, SharedPtr<ConvexData> >::Iterator i = convexCache_.Begin();
+        i != convexCache_.End();)
     {
-        Map<String, SharedPtr<ConvexHullData> >::Iterator current = i++;
+        Map<String, SharedPtr<ConvexData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
-            convexHullCache_.Erase(current);
+            convexCache_.Erase(current);
     }
     for (Map<String, SharedPtr<HeightfieldData> >::Iterator i = heightfieldCache_.Begin();
         i != heightfieldCache_.End();)
@@ -334,7 +337,9 @@ void RegisterPhysicsLibrary(Context* context)
     BoxShape::RegisterObject(context);
     CapsuleShape::RegisterObject(context);
     ConeShape::RegisterObject(context);
+    ConvexShape::RegisterObject(context);
     CylinderShape::RegisterObject(context);
+    HeightfieldShape::RegisterObject(context);
     SphereShape::RegisterObject(context);
     TriangleMeshShape::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);

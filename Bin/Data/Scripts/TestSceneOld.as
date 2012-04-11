@@ -58,13 +58,6 @@ void InitScene()
     testScene.CreateComponent("DebugRenderer");
     PhysicsWorld@ world = testScene.CreateComponent("PhysicsWorld");
 
-    // Set the physics world parameters
-    world.gravity = Vector3(0, -9.81, 0);
-    world.fps = 60;
-    world.linearRestThreshold = 0.1;
-    world.angularRestThreshold = 0.1;
-    world.contactSurfaceLayer = 0.001;
-
     // Create the directional light
     Node@ sunNode = testScene.CreateChild();
     sunNode.direction = Vector3(0.5, -1, 0.5);
@@ -88,10 +81,9 @@ void InitScene()
             newNode.position = Vector3(x * 20.5, -0.5, y * 20.5);
             newNode.scale = Vector3(10, 0.5, 10);
 
-            CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-            shape.SetBox(Vector3(2, 2, 2));
-            shape.collisionLayer = 2;
-            shape.collisionMask = 1;
+            RigidBody@ body = newNode.CreateComponent("RigidBody");
+            BoxShape@ shape = newNode.CreateComponent("BoxShape");
+            shape.size = Vector3(2.0, 2.0, 2.0);
 
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -107,10 +99,9 @@ void InitScene()
         newNode.rotation = Quaternion(x * 90, Vector3(0, 1, 0));
         newNode.scale = Vector3(112, 5, 0.5);
 
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2, 2, 2));
-        shape.collisionLayer = 2;
-        shape.collisionMask = 1;
+        RigidBody@ body = newNode.CreateComponent("RigidBody");
+        BoxShape@ shape = newNode.CreateComponent("BoxShape");
+        shape.size = Vector3(2.0, 2.0, 2.0);
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -125,10 +116,9 @@ void InitScene()
         newNode.position = Vector3(50, 0, 50);
         newNode.SetScale(10);
 
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
-        shape.collisionLayer = 2;
-        shape.collisionMask = 1;
+        RigidBody@ body = newNode.CreateComponent("RigidBody");
+        TriangleMeshShape@ shape = newNode.CreateComponent("TriangleMeshShape");
+        shape.model = cache.GetResource("Model", "Models/Mushroom.mdl");
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
@@ -510,17 +500,14 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         newNode.rotation = cameraNode.rotation;
         newNode.SetScale(0.1);
     
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2, 2, 2));
-        shape.friction = 1.0;
-        shape.collisionLayer = 1;
-        shape.collisionMask = 3;
-    
         RigidBody@ body = newNode.CreateComponent("RigidBody");
-        body.angularMaxVelocity = 500.0;
+        body.mass = 1.0;
+        body.friction = 1.0;
         body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
-        body.mass = 1;
-    
+
+        BoxShape@ shape = newNode.CreateComponent("BoxShape");
+        shape.size = Vector3(2.0, 2.0, 2.0);
+
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
         object.material = cache.GetResource("Material", "Materials/Test.xml");

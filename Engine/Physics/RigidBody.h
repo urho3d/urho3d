@@ -160,8 +160,6 @@ public:
     btRigidBody* GetBody() const { return body_; }
     /// Return Bullet compound collision shape.
     btCompoundShape* GetCompoundShape() const { return compoundShape_; }
-    /// Rebuild the compound collision shape.
-    void RebuildCollision();
     /// Update mass and inertia of rigid body.
     void UpdateMass();
     /// %Set network angular velocity attribute.

@@ -60,10 +60,10 @@ void SphereShape::SetRadius(float radius)
 
 void SphereShape::UpdateCollisionShape()
 {
+    ReleaseShape();
+    
     if (node_)
     {
-        ReleaseShape();
-        
         shape_ = new btSphereShape(radius_);
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }

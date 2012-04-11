@@ -25,30 +25,30 @@
 
 #include "CollisionShape.h"
 
-/// Triangle mesh geometry data.
-struct TriangleMeshData : public CollisionGeometryData
+/// Convex hull geometry data.
+struct ConvexData : public CollisionGeometryData
 {
     /// Construct from a model.
-    TriangleMeshData(Model* model, unsigned lodLevel);
+    ConvexData(Model* model, unsigned lodLevel, float thickness);
     /// Destruct. Free geometry data.
-    ~TriangleMeshData();
+    ~ConvexData();
     
-    /// Bullet triangle mesh data.
-    btTriangleMesh* meshData_;
-    /// Bullet triangle mesh collision shape.
-    btBvhTriangleMeshShape* shape_;
+    /// Vertex data.
+    SharedArrayPtr<Vector3> vertexData_;
+    /// Number of vertices.
+    unsigned vertexCount_;
 };
 
-/// Triangle mesh collision shape component.
-class TriangleMeshShape : public CollisionShape
+/// Convex hull collision shape component.
+class ConvexShape : public CollisionShape
 {
-    OBJECT(TriangleMeshShape);
+    OBJECT(ConvexShape);
     
 public:
     /// Construct.
-    TriangleMeshShape(Context* context);
+    ConvexShape(Context* context);
     /// Destruct.
-    ~TriangleMeshShape();
+    ~ConvexShape();
     /// Register object factory.
     static void RegisterObject(Context* context);
     
@@ -56,6 +56,8 @@ public:
     void SetModel(Model* model);
     /// %Set LOD level.
     void SetLodLevel(unsigned lodLevel);
+    /// %Set hull thickness.
+    void SetThickness(float thickness);
     /// %Set model scaling.
     void SetSize(const Vector3& size);
     
@@ -63,6 +65,8 @@ public:
     Model* GetModel() const;
     /// Return LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+    /// Return hull thickness.
+    float GetThickness() const { return thickness_; }
     /// Return model scaling.
     const Vector3& GetSize() { return size_; }
     
@@ -81,9 +85,11 @@ private:
     /// Model.
     SharedPtr<Model> model_;
     /// Current geometry data.
-    SharedPtr<TriangleMeshData> geometry_;
+    SharedPtr<ConvexData> geometry_;
     /// Model scaling.
     Vector3 size_;
     /// LOD level.
     unsigned lodLevel_;
+    /// Hull thickness.
+    float thickness_;
 };

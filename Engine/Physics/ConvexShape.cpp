@@ -29,18 +29,17 @@
 #include "PhysicsUtils.h"
 #include "PhysicsWorld.h"
 #include "ResourceCache.h"
-#include "TriangleMeshShape.h"
+#include "ConvexShape.h"
 
-#include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
-#include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletCollision/CollisionShapes/btConvexHullShape.h>
+#include <hull.h>
 
-TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
-    meshData_(0),
-    shape_(0)
+ConvexData::ConvexData(Model* model, unsigned lodLevel, float thickness)
 {
     modelName_ = model->GetName();
-    meshData_ = new btTriangleMesh();
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    
+    PODVector<Vector3> originalVertices;
     
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
@@ -61,61 +60,59 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         if (!vertexData || !indexData)
             continue;
         
-        unsigned indexStart = geom->GetIndexStart();
-        unsigned indexCount = geom->GetIndexCount();
+        unsigned vertexStart = geom->GetVertexStart();
+        unsigned vertexCount = geom->GetVertexCount();
         
-        // 16-bit indices
-        if (indexSize == sizeof(unsigned short))
+        // Copy vertex data
+        for (unsigned j = 0; j < vertexCount; ++j)
         {
-            const unsigned short* indices = (const unsigned short*)indexData;
-            
-            for (unsigned j = indexStart; j < indexStart + indexCount; j += 3)
-            {
-                const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
-                const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
-                const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2), true);
-            }
-        }
-        // 32-bit indices
-        else
-        {
-            const unsigned* indices = (const unsigned*)indexData;
-            
-            for (unsigned j = indexStart; j < indexStart + indexCount; j += 3)
-            {
-                const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
-                const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
-                const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2), true);
-            }
+            const Vector3& v = *((const Vector3*)(&vertexData[(vertexStart + j) * vertexSize]));
+            originalVertices.Push(v);
         }
     }
     
-    shape_ = new btBvhTriangleMeshShape(meshData_, true, true);
+    if (originalVertices.Size())
+    {
+        // Build the convex hull from the raw geometry
+        StanHull::HullDesc desc;
+        desc.SetHullFlag(StanHull::QF_TRIANGLES);
+        desc.mVcount = originalVertices.Size();
+        desc.mVertices = originalVertices[0].Data();
+        desc.mVertexStride = 3 * sizeof(float);
+        desc.mSkinWidth = thickness;
+        
+        StanHull::HullLibrary lib;
+        StanHull::HullResult result;
+        lib.CreateConvexHull(desc, result);
+        
+        vertexCount_ = result.mNumOutputVertices;
+        vertexData_ = new Vector3[vertexCount_];
+        // Copy vertex data
+        memcpy(vertexData_.Get(), result.mOutputVertices, vertexCount_ * sizeof(Vector3));
+        
+        lib.ReleaseResult(result);
+    }
+    else
+        vertexCount_ = 0;
 }
 
-TriangleMeshData::~TriangleMeshData()
+ConvexData::~ConvexData()
 {
-    delete shape_;
-    shape_ = 0;
-    
-    delete meshData_;
-    meshData_ = 0;
 }
 
-OBJECTTYPESTATIC(TriangleMeshShape);
+OBJECTTYPESTATIC(ConvexShape);
 
-TriangleMeshShape::TriangleMeshShape(Context* context) :
+ConvexShape::ConvexShape(Context* context) :
     CollisionShape(context),
     size_(Vector3::ONE),
-    lodLevel_(0)
+    lodLevel_(0),
+    thickness_(0.0f)
 {
 }
 
-TriangleMeshShape::~TriangleMeshShape()
+ConvexShape::~ConvexShape()
 {
-    // Release shape first before letting go of the mesh geometry
+    // Release shape first before letting go of the geometry
     ReleaseShape();
     
     geometry_.Reset();
@@ -123,18 +120,19 @@ TriangleMeshShape::~TriangleMeshShape()
         physicsWorld_->CleanupGeometryCache();
 }
 
-void TriangleMeshShape::RegisterObject(Context* context)
+void ConvexShape::RegisterObject(Context* context)
 {
-    context->RegisterFactory<TriangleMeshShape>();
+    context->RegisterFactory<ConvexShape>();
     
-    ACCESSOR_ATTRIBUTE(TriangleMeshShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(TriangleMeshShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
-    ATTRIBUTE(TriangleMeshShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(TriangleMeshShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(TriangleMeshShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ConvexShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(ConvexShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
+    ATTRIBUTE(ConvexShape, VAR_FLOAT, "Thickness", thickness_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ConvexShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(ConvexShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(ConvexShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
 }
 
-void TriangleMeshShape::SetModel(Model* model)
+void ConvexShape::SetModel(Model* model)
 {
     if (model != model_)
     {
@@ -144,7 +142,7 @@ void TriangleMeshShape::SetModel(Model* model)
     }
 }
 
-void TriangleMeshShape::SetLodLevel(unsigned lodLevel)
+void ConvexShape::SetLodLevel(unsigned lodLevel)
 {
     if (lodLevel != lodLevel_)
     {
@@ -154,7 +152,19 @@ void TriangleMeshShape::SetLodLevel(unsigned lodLevel)
     }
 }
 
-void TriangleMeshShape::SetSize(const Vector3& size)
+void ConvexShape::SetThickness(float thickness)
+{
+    thickness = Max(thickness, 0.0f);
+    
+    if (thickness != thickness_)
+    {
+        thickness_ = thickness;
+        UpdateCollisionShape();
+        NotifyRigidBody();
+    }
+}
+
+void ConvexShape::SetSize(const Vector3& size)
 {
     if (size != size_)
     {
@@ -164,24 +174,24 @@ void TriangleMeshShape::SetSize(const Vector3& size)
     }
 }
 
-Model* TriangleMeshShape::GetModel() const
+Model* ConvexShape::GetModel() const
 {
     return model_;
 }
 
-void TriangleMeshShape::SetModelAttr(ResourceRef value)
+void ConvexShape::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     model_ = cache->GetResource<Model>(value.id_);
     dirty_ = true;
 }
 
-ResourceRef TriangleMeshShape::GetModelAttr() const
+ResourceRef ConvexShape::GetModelAttr() const
 {
     return GetResourceRef(model_, Model::GetTypeStatic());
 }
 
-void TriangleMeshShape::OnMarkedDirty(Node* node)
+void ConvexShape::OnMarkedDirty(Node* node)
 {
     Vector3 newWorldScale = node_->GetWorldScale();
     if (newWorldScale != cachedWorldScale_)
@@ -194,26 +204,27 @@ void TriangleMeshShape::OnMarkedDirty(Node* node)
     }
 }
 
-void TriangleMeshShape::UpdateCollisionShape()
+void ConvexShape::UpdateCollisionShape()
 {
     ReleaseShape();
     
     if (node_ && model_ && physicsWorld_)
     {
         // Check the geometry cache
-        String id = model_->GetName() + "_" + String(lodLevel_);
+        String id = model_->GetName() + "_" + String(lodLevel_) + "_" + String(thickness_);
         
-        Map<String, SharedPtr<TriangleMeshData> >& cache = physicsWorld_->GetTriangleMeshCache();
-        Map<String, SharedPtr<TriangleMeshData> >::Iterator j = cache.Find(id);
+        Map<String, SharedPtr<ConvexData> >& cache = physicsWorld_->GetConvexCache();
+        Map<String, SharedPtr<ConvexData> >::Iterator j = cache.Find(id);
         if (j != cache.End())
             geometry_ = j->second_;
         else
         {
-            geometry_ = new TriangleMeshData(model_, lodLevel_);
+            geometry_ = new ConvexData(model_, lodLevel_, thickness_);
             cache[id] = geometry_;
         }
         
-        shape_ = new btScaledBvhTriangleMeshShape(geometry_->shape_, ToBtVector3(node_->GetWorldScale() * size_));
+        shape_ = new btConvexHullShape((btScalar*)geometry_->vertexData_.Get(), geometry_->vertexCount_, sizeof(Vector3));
+        shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale() * size_));
     }
     else
         geometry_.Reset();

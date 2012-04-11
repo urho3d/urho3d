@@ -58,10 +58,10 @@ void BoxShape::SetSize(const Vector3& size)
 
 void BoxShape::UpdateCollisionShape()
 {
+    ReleaseShape();
+    
     if (node_)
     {
-        ReleaseShape();
-        
         shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }

@@ -26,7 +26,9 @@
 #include "BoxShape.h"
 #include "CapsuleShape.h"
 #include "ConeShape.h"
+#include "ConvexShape.h"
 #include "CylinderShape.h"
+#include "HeightfieldShape.h"
 #include "Joint.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
@@ -85,11 +87,33 @@ static void RegisterCollisionShapes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ConeShape", "void set_height(float)", asMETHOD(ConeShape, SetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("ConeShape", "float get_height() const", asMETHOD(ConeShape, GetHeight), asCALL_THISCALL);
     
+    RegisterCollisionShape<ConvexShape>(engine, "ConvexShape");
+    engine->RegisterObjectMethod("ConvexShape", "void set_model(Model@+)", asMETHOD(ConvexShape, SetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "Model@+ get_model() const", asMETHOD(ConvexShape, GetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "void set_lodLevel(uint)", asMETHOD(ConvexShape, SetLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "uint get_lodLevel() const", asMETHOD(ConvexShape, GetLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "void set_thickness(float)", asMETHOD(ConvexShape, SetThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "float get_thickness() const", asMETHOD(ConvexShape, GetThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "void set_size(const Vector3&in)", asMETHOD(ConvexShape, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConvexShape", "const Vector3& get_size() const", asMETHOD(ConvexShape, GetSize), asCALL_THISCALL);
+    
     RegisterCollisionShape<CylinderShape>(engine, "CylinderShape");
     engine->RegisterObjectMethod("CylinderShape", "void set_radius(float)", asMETHOD(CylinderShape, SetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CylinderShape", "float get_radius() const", asMETHOD(CylinderShape, GetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CylinderShape", "void set_height(float)", asMETHOD(CylinderShape, SetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("CylinderShape", "float get_height() const", asMETHOD(CylinderShape, GetHeight), asCALL_THISCALL);
+    
+    RegisterCollisionShape<HeightfieldShape>(engine, "HeightfieldShape");
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_model(Model@+)", asMETHOD(HeightfieldShape, SetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "Model@+ get_model() const", asMETHOD(HeightfieldShape, GetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_lodLevel(uint)", asMETHOD(HeightfieldShape, SetLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "uint get_lodLevel() const", asMETHOD(HeightfieldShape, GetLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_dimensions(const IntVector2&in)", asMETHOD(HeightfieldShape, SetDimensions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "const IntVector2& get_dimensions() const", asMETHOD(HeightfieldShape, GetDimensions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_size(const Vector3&in)", asMETHOD(HeightfieldShape, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "const Vector3& get_size() const", asMETHOD(HeightfieldShape, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_flipEdges(bool)", asMETHOD(HeightfieldShape, SetFlipEdges), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "bool get_flipEdges() const", asMETHOD(HeightfieldShape, GetFlipEdges), asCALL_THISCALL);
     
     RegisterCollisionShape<SphereShape>(engine, "SphereShape");
     engine->RegisterObjectMethod("SphereShape", "void set_radius(float)", asMETHOD(SphereShape, SetRadius), asCALL_THISCALL);

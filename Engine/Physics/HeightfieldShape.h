@@ -25,30 +25,36 @@
 
 #include "CollisionShape.h"
 
-/// Triangle mesh geometry data.
-struct TriangleMeshData : public CollisionGeometryData
+/// Heightfield geometry data.
+struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a model.
-    TriangleMeshData(Model* model, unsigned lodLevel);
+    HeightfieldData(Model* model, unsigned lodLevel, IntVector2 dimensions);
     /// Destruct. Free geometry data.
-    ~TriangleMeshData();
+    ~HeightfieldData();
     
-    /// Bullet triangle mesh data.
-    btTriangleMesh* meshData_;
-    /// Bullet triangle mesh collision shape.
-    btBvhTriangleMeshShape* shape_;
+    /// Height values.
+    SharedArrayPtr<float> heightData_;
+    /// Heightfield dimensions.
+    IntVector2 dimensions_;
+    /// Heightfield bounding box.
+    BoundingBox boundingBox_;
+    /// X spacing.
+    float xSpacing_;
+    /// Z spacing.
+    float zSpacing_;
 };
 
-/// Triangle mesh collision shape component.
-class TriangleMeshShape : public CollisionShape
+/// Heightfield collision shape component.
+class HeightfieldShape : public CollisionShape
 {
-    OBJECT(TriangleMeshShape);
+    OBJECT(HeightfieldShape);
     
 public:
     /// Construct.
-    TriangleMeshShape(Context* context);
+    HeightfieldShape(Context* context);
     /// Destruct.
-    ~TriangleMeshShape();
+    ~HeightfieldShape();
     /// Register object factory.
     static void RegisterObject(Context* context);
     
@@ -56,15 +62,23 @@ public:
     void SetModel(Model* model);
     /// %Set LOD level.
     void SetLodLevel(unsigned lodLevel);
+    /// %Set heightfield dimensions. Use 0 to guess from the model.
+    void SetDimensions(const IntVector2& dimensions);
     /// %Set model scaling.
     void SetSize(const Vector3& size);
+    /// %Set flip edges flag.
+    void SetFlipEdges(bool enable);
     
     /// Return model.
     Model* GetModel() const;
     /// Return LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+    /// Return heightfield dimensions.
+    const IntVector2& GetDimensions() const { return dimensions_; }
     /// Return model scaling.
     const Vector3& GetSize() { return size_; }
+    /// Return flip edges flag.
+    bool GetFlipEdges() { return flipEdges_; }
     
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
@@ -81,9 +95,13 @@ private:
     /// Model.
     SharedPtr<Model> model_;
     /// Current geometry data.
-    SharedPtr<TriangleMeshData> geometry_;
+    SharedPtr<HeightfieldData> geometry_;
+    /// Heightfield dimensions.
+    IntVector2 dimensions_;
     /// Model scaling.
     Vector3 size_;
     /// LOD level.
     unsigned lodLevel_;
+    /// Flip edges flag.
+    bool flipEdges_;
 };

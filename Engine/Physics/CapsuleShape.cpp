@@ -73,10 +73,10 @@ void CapsuleShape::SetHeight(float height)
 
 void CapsuleShape::UpdateCollisionShape()
 {
+    ReleaseShape();
+    
     if (node_)
     {
-        ReleaseShape();
-        
         shape_ = new btCapsuleShape(radius_, Max(height_ - 2.0f * radius_, 0.0f));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
     }

@@ -98,9 +98,6 @@ void InitScene()
     testScene.CreateComponent("Octree");
     testScene.CreateComponent("DebugRenderer");
 
-    world.gravity = Vector3(0.0, -9.81, 0.0);
-    world.fps = 100;
-
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.ambientColor = Color(0.1, 0.1, 0.1);
@@ -409,9 +406,9 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     newNode.SetScale(0.1);
 
     RigidBody@ body = newNode.CreateComponent("RigidBody");
-    body.mass = 1;
-    body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
+    body.mass = 1.0;
     body.friction = 1.0;
+    body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
 
     BoxShape@ shape = newNode.CreateComponent("BoxShape");
     shape.size = Vector3(2.0, 2.0, 2.0);

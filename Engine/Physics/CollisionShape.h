@@ -46,45 +46,6 @@ struct CollisionGeometryData : public RefCounted
     String modelName_;
 };
 
-/// Triangle mesh geometry data.
-struct TriangleMeshData : public CollisionGeometryData
-{
-    /// Construct from a model.
-    TriangleMeshData(Model* model, unsigned lodLevel, const Vector3& scale);
-    /// Destruct. Free geometry data.
-    ~TriangleMeshData();
-    
-    /// Bullet triangle mesh data.
-    btTriangleMesh* meshData_;
-    /// Bullet triangle mesh collision shape.
-    btBvhTriangleMeshShape* shape_;
-};
-
-/// Convex hull geometry data.
-struct ConvexHullData : public CollisionGeometryData
-{
-    /// Construct from a model.
-    ConvexHullData(Model* model, unsigned lodLevel, float thickness, const Vector3& scale);
-    /// Destruct. Free geometry data.
-    ~ConvexHullData();
-    
-    /// Vertex data.
-    SharedArrayPtr<Vector3> vertexData_;
-    /// Number of vertices.
-    unsigned vertexCount_;
-};
-
-/// Heightfield geometry data.
-struct HeightfieldData : public CollisionGeometryData
-{
-    /// Construct from a model.
-    HeightfieldData(Model* model, IntVector2 numPoints, float thickness, unsigned lodLevel, const Vector3& scale);
-    /// Destruct. Free geometry data.
-    ~HeightfieldData();
-    
-    /// Height values.
-    SharedArrayPtr<float> heightData_;
-};
 
 /// Base class for physics collision shape components.
 class CollisionShape : public Component
@@ -120,6 +81,8 @@ public:
     /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
     
+    /// Update the new collision shape to the RigidBody, and tell it to update its mass.
+    virtual void NotifyRigidBody();
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
@@ -130,8 +93,6 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Update the collision shape after attribute changes.
     virtual void UpdateCollisionShape() = 0;
-    /// Update the new collision shape to the RigidBody, and tell it to update its mass.
-    void NotifyRigidBody();
     /// Release the collision shape.
     void ReleaseShape();
     
