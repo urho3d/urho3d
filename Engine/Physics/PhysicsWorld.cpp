@@ -153,12 +153,15 @@ void PhysicsWorld::Update(float timeStep)
 {
     PROFILE(UpdatePhysics);
     
+    // Allow max. 0.1s update at a time
+    if (timeStep > 0.1f)
+        timeStep = 0.1f;
+    
     float internalTimeStep = 1.0f / fps_;
     
     if (interpolation_)
     {
-        float minFps = 1.0f;
-        int maxSubSteps = (int)((float)fps_ / minFps);
+        int maxSubSteps = (int)(0.1f * fps_);
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
     }
     else

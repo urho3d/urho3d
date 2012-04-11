@@ -86,7 +86,7 @@ void GetCPUData(struct cpu_id_t* data)
 void InitFPU()
 {
     // Make sure FPU is in round-to-nearest, single precision mode
-    // This is needed for ODE to behave predictably in float mode
+    // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
     _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
     #else

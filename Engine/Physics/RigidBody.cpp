@@ -107,6 +107,7 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
 
 void RigidBody::setWorldTransform(const btTransform &worldTrans)
 {
+    /// \todo If rigid body is parented, should set the transforms in hierarchy order (parent first)
     if (node_)
     {
         inSetTransform_ = true;
@@ -567,18 +568,25 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void RigidBody::OnMarkedDirty(Node* node)
 {
-    // Physics operations are not safe from worker threads
-    Scene* scene = node->GetScene();
-    if (scene && scene->IsThreadedUpdate())
-    {
-        scene->DelayedMarkedDirty(this);
-        return;
-    }
-    
     /// \todo If the node contains a SmoothedTransform component, do not react to dirtying, but rather update the position elsewhere
-    
-    SetPosition(node_->GetWorldPosition());
-    SetRotation(node_->GetWorldRotation());
+    if (!inSetTransform_)
+    {
+        // Physics operations are not safe from worker threads
+        Scene* scene = node->GetScene();
+        if (scene && scene->IsThreadedUpdate())
+        {
+            scene->DelayedMarkedDirty(this);
+            return;
+        }
+        
+        Vector3 newWorldPos = node_->GetWorldPosition();
+        Quaternion newWorldRot = node_->GetWorldRotation();
+        
+        if (newWorldPos != GetPosition())
+            SetPosition(newWorldPos);
+        if (newWorldRot != GetRotation())
+            SetRotation(newWorldRot);
+    }
 }
 
 void RigidBody::OnNodeSet(Node* node)
