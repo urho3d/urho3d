@@ -75,8 +75,7 @@ void ConeShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         shape_ = new btConeShape(radius_, height_);
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));

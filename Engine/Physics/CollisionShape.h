@@ -36,6 +36,7 @@ class RigidBody;
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;
+class btCompoundShape;
 class btTriangleMesh;
 
 /// Base class for collision shape geometry data.
@@ -108,8 +109,10 @@ public:
     /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     
-    /// Return Bullet collision shape
+    /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_; }
+    /// Find the parent rigid body component and return its compound collision shape.
+    btCompoundShape* GetParentCompoundShape();
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return offset position.
@@ -127,8 +130,10 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Update the collision shape after attribute changes.
     virtual void UpdateCollisionShape() = 0;
-    /// Notify the RigidBody of changed or removed collision shape.
+    /// Update the new collision shape to the RigidBody, and tell it to update its mass.
     void NotifyRigidBody();
+    /// Release the collision shape.
+    void ReleaseShape();
     
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;

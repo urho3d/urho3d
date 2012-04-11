@@ -124,7 +124,7 @@ void RigidBody::SetMass(float mass)
     if (mass != mass_)
     {
         mass_ = mass;
-        CreateBody();
+        AddBodyToWorld();
         
         if (mass > 0.0f)
             Activate();
@@ -279,7 +279,7 @@ void RigidBody::SetKinematic(bool enable)
             flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
         body_->setCollisionFlags(flags),
         
-        CreateBody();
+        AddBodyToWorld();
     }
 }
 
@@ -294,7 +294,7 @@ void RigidBody::SetPhantom(bool enable)
             flags &= ~btCollisionObject::CF_NO_CONTACT_RESPONSE;
         body_->setCollisionFlags(flags);
         
-        CreateBody();
+        AddBodyToWorld();
     }
 }
 
@@ -305,7 +305,7 @@ void RigidBody::SetCollisionGroup(unsigned group)
     if (group != collisionGroup_)
     {
         collisionGroup_ = group;
-        CreateBody();
+        AddBodyToWorld();
     }
 }
 
@@ -316,7 +316,7 @@ void RigidBody::SetCollisionMask(unsigned mask)
     if (mask != collisionMask_)
     {
         collisionMask_ = mask;
-        CreateBody();
+        AddBodyToWorld();
     }
 }
 
@@ -329,7 +329,7 @@ void RigidBody::SetCollisionGroupAndMask(unsigned group, unsigned mask)
     {
         collisionGroup_ = group;
         collisionMask_ = mask;
-        CreateBody();
+        AddBodyToWorld();
     }
 }
 
@@ -509,11 +509,11 @@ bool RigidBody::IsActive() const
         return false;
 }
 
-void RigidBody::RefreshCollisionShapes()
+void RigidBody::RebuildCollision()
 {
     if (node_ && compoundShape_)
     {
-        PROFILE(RefreshCollisionShapes);
+        PROFILE(RebuildCollision);
         
         // Remove all existing shapes first
         while (compoundShape_->getNumChildShapes())
@@ -528,21 +528,23 @@ void RigidBody::RefreshCollisionShapes()
             btCollisionShape* shape = (*i)->GetCollisionShape();
             if (shape)
             {
-                btTransform shapeTransform;
-                shapeTransform.setOrigin(ToBtVector3(node_->GetWorldScale() * (*i)->GetPosition()));
-                shapeTransform.setRotation(ToBtQuaternion((*i)->GetRotation()));
-                compoundShape_->addChildShape(shapeTransform, shape);
+                btTransform offset;
+                offset.setOrigin(ToBtVector3(node_->GetWorldScale() * (*i)->GetPosition()));
+                offset.setRotation(ToBtQuaternion((*i)->GetRotation()));
+                compoundShape_->addChildShape(offset, shape);
             }
         }
-        
-        // Refresh inertia whenever collision shapes change
-        if (body_)
-        {
-            btVector3 localInertia(0.0f, 0.0f, 0.0f);
-            if (mass_ > 0.0f)
-                compoundShape_->calculateLocalInertia(mass_, localInertia);
-            body_->setMassProps(mass_, localInertia);
-        }
+    }
+}
+
+void RigidBody::UpdateMass()
+{
+    if (body_)
+    {
+        btVector3 localInertia(0.0f, 0.0f, 0.0f);
+        if (mass_ > 0.0f)
+            compoundShape_->calculateLocalInertia(mass_, localInertia);
+        body_->setMassProps(mass_, localInertia);
     }
 }
 
@@ -602,40 +604,33 @@ void RigidBody::OnNodeSet(Node* node)
             else
                 LOGERROR("Null physics world, can not create rigid body");
             
-            CreateBody();
+            AddBodyToWorld();
         }
         node->AddListener(this);
     }
 }
 
-void RigidBody::CreateBody()
+void RigidBody::AddBodyToWorld()
 {
     if (!physicsWorld_)
         return;
     
-    btVector3 localInertia(0.0f, 0.0f, 0.0f);
-    if (mass_ > 0.0f)
-        compoundShape_->calculateLocalInertia(mass_, localInertia);
-    
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
-    {
         world->removeRigidBody(body_);
-        body_->setMassProps(mass_, localInertia);
-    }
     else
     {
-        // Build the compound shape, then create the Bullet rigid body
-        RefreshCollisionShapes();
+        // Check if CollisionShapes already exist in the node and add them first
+        RebuildCollision();
+        btVector3 localInertia(0.0f, 0.0f, 0.0f);
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
     }
     
+    UpdateMass();
+    
     int flags = body_->getCollisionFlags();
     if (mass_ > 0.0f)
-    {
         flags &= ~btCollisionObject::CF_STATIC_OBJECT;
-        
-    }
     else
         flags |= btCollisionObject::CF_STATIC_OBJECT;
     body_->setCollisionFlags(flags);

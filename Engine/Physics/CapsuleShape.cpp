@@ -75,8 +75,7 @@ void CapsuleShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         shape_ = new btCapsuleShape(radius_, Max(height_ - 2.0f * radius_, 0.0f));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));

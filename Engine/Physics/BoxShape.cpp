@@ -60,8 +60,7 @@ void BoxShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));

@@ -75,8 +75,7 @@ void CylinderShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         shape_ = new btCylinderShape(btVector3(radius_, height_ * 0.5f, radius_));
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));

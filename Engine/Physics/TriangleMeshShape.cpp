@@ -44,8 +44,8 @@ TriangleMeshShape::TriangleMeshShape(Context* context) :
 
 TriangleMeshShape::~TriangleMeshShape()
 {
-    delete shape_;
-    shape_ = 0;
+    // Release shape first before letting go of the mesh geometry
+    ReleaseShape();
     
     geometry_.Reset();
     if (physicsWorld_)
@@ -114,8 +114,7 @@ void TriangleMeshShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         if (model_ && physicsWorld_)
         {

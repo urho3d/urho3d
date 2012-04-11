@@ -62,8 +62,7 @@ void SphereShape::UpdateCollisionShape()
 {
     if (node_)
     {
-        delete shape_;
-        shape_ = 0;
+        ReleaseShape();
         
         shape_ = new btSphereShape(radius_);
         shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));

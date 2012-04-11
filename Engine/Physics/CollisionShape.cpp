@@ -34,6 +34,7 @@
 #include "Scene.h"
 
 #include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
+#include <BulletCollision/CollisionShapes/btCompoundShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <hull.h>
 
@@ -254,10 +255,7 @@ CollisionShape::CollisionShape(Context* context) :
 
 CollisionShape::~CollisionShape()
 {
-    delete shape_;
-    shape_ = 0;
-    
-    NotifyRigidBody();
+    ReleaseShape();
     
     if (physicsWorld_)
         physicsWorld_->RemoveCollisionShape(this);
@@ -306,6 +304,14 @@ void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rot
     }
 }
 
+btCompoundShape* CollisionShape::GetParentCompoundShape()
+{
+    if (!rigidBody_)
+        rigidBody_ = GetComponent<RigidBody>();
+    
+    return rigidBody_ ? rigidBody_->GetCompoundShape() : 0;
+}
+
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     /// \todo Implement
@@ -343,12 +349,34 @@ void CollisionShape::OnMarkedDirty(Node* node)
 
 void CollisionShape::NotifyRigidBody()
 {
-    // We need to notify the rigid body also after having been removed from the node, so maintain a weak pointer to it
-    if (!rigidBody_)
-        rigidBody_ = GetComponent<RigidBody>();
-    
-    if (rigidBody_)
-        rigidBody_->RefreshCollisionShapes();
+    btCompoundShape* compound = GetParentCompoundShape();
+    if (node_ && shape_ && compound)
+    {
+        // Remove the shape first to ensure it is not added twice
+        compound->removeChildShape(shape_);
+        
+        // Then add with updated offset
+        btTransform offset;
+        offset.setOrigin(ToBtVector3(node_->GetWorldScale() * position_));
+        offset.setRotation(ToBtQuaternion(rotation_));
+        compound->addChildShape(offset, shape_);
+        
+        // Finally tell the rigid body to update its mass
+        rigidBody_->UpdateMass();
+    }
     
     dirty_ = false;
+}
+
+void CollisionShape::ReleaseShape()
+{
+    btCompoundShape* compound = GetParentCompoundShape();
+    if (shape_ && compound)
+    {
+        compound->removeChildShape(shape_);
+        rigidBody_->UpdateMass();
+    }
+    
+    delete shape_;
+    shape_ = 0;
 }

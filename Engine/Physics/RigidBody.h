@@ -159,9 +159,11 @@ public:
     /// Return Bullet rigid body.
     btRigidBody* GetBody() const { return body_; }
     /// Return Bullet compound collision shape.
-    btCompoundShape* GetCollisionShape() const { return compoundShape_; }
-    /// Refresh collision shape(s).
-    void RefreshCollisionShapes();
+    btCompoundShape* GetCompoundShape() const { return compoundShape_; }
+    /// Rebuild the compound collision shape.
+    void RebuildCollision();
+    /// Update mass and inertia of rigid body.
+    void UpdateMass();
     /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
@@ -177,8 +179,8 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     
 private:
-    /// Create the rigid body, or re-add to the physics world with changed flags.
-    void CreateBody();
+    /// Create the rigid body, or re-add to the physics world with changed flags. Calls UpdateMass().
+    void AddBodyToWorld();
     /// Remove the rigid body.
     void ReleaseBody();
     
