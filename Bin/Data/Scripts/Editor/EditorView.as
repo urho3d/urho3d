@@ -402,11 +402,15 @@ void ViewRaycast(bool mouseClick)
         if (editorScene.physicsWorld is null)
             return;
 
-        Array<PhysicsRaycastResult> result = editorScene.physicsWorld.Raycast(cameraRay, camera.farClip);
-        if (!result.empty)
+        // If we are not running the actual physics update, refresh collisions before raycasting
+        if (!runUpdate)
+            editorScene.physicsWorld.UpdateCollisions();
+
+        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
+        if (result.body !is null)
         {
-            RigidBody@ body = result[0].body;
-            if (body !is null)
+            RigidBody@ body = result.body;
+            if (debug !is null)
             {
                 debug.AddNode(body.node, false);
                 body.DrawDebugGeometry(debug, false);

@@ -597,6 +597,7 @@ void RigidBody::AddBodyToWorld()
     {
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
+        body_->setUserPointer(this);
         
         // Check if CollisionShapes already exist in the node and add them to the compound shape
         // Note: NotifyRigidBody() will cause mass to be updated

@@ -42,10 +42,12 @@ static PhysicsWorld* GetPhysicsWorld()
 
 static void ConstructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
 {
-    ptr->position_ = Vector3::ZERO;
-    ptr->normal_ = Vector3::ZERO;
-    ptr->distance_ = 0.0f;
-    ptr->body_ = 0;
+    new(ptr) PhysicsRaycastResult();
+}
+
+static void DestructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
+{
+    ptr->~PhysicsRaycastResult();
 }
 
 static RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr)
@@ -55,9 +57,16 @@ static RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr)
 
 static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
 {
-    static PODVector<PhysicsRaycastResult> result;
+    PODVector<PhysicsRaycastResult> result;
     ptr->Raycast(result, ray, maxDistance, collisionMask);
     return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
+}
+
+static PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
+{
+    PhysicsRaycastResult result;
+    ptr->RaycastSingle(result, ray, maxDistance, collisionMask);
+    return result;
 }
 
 static void RegisterCollisionShape(asIScriptEngine* engine)
@@ -173,8 +182,10 @@ static void RegisterJoint(asIScriptEngine* engine)
 
 static void RegisterPhysicsWorld(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_POD);
+    engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPhysicsRaycastResult), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("PhysicsRaycastResult", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPhysicsRaycastResult), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsRaycastResult", "PhysicsRaycastResult& opAssign(const PhysicsRaycastResult&in)", asMETHODPR(PhysicsRaycastResult, operator =, (const PhysicsRaycastResult&), PhysicsRaycastResult&), asCALL_THISCALL);
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, position_));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, normal_));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "float distance", offsetof(PhysicsRaycastResult, distance_));
@@ -182,7 +193,9 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     
     RegisterComponent<PhysicsWorld>(engine, "PhysicsWorld");
     engine->RegisterObjectMethod("PhysicsWorld", "void Update(float)", asMETHOD(PhysicsWorld, Update), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffffffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "void UpdateCollisions()", asMETHOD(PhysicsWorld, UpdateCollisions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingle(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);

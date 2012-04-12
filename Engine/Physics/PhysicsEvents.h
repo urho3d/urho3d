@@ -45,18 +45,18 @@ EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_NODEA, NodeA);                  // Node pointer
     PARAM(P_NODEB, NodeB);                  // Node pointer
-    PARAM(P_SHAPEA, ShapeA);                // CollisionShape pointer
-    PARAM(P_SHAPEB, ShapeB);                // CollisionShape pointer
+    PARAM(P_BODYA, BodyA);                  // RigidBody pointer
+    PARAM(P_BODYB, BodyB);                  // RigidBody pointer
     PARAM(P_NEWCOLLISION, NewCollision);    // bool
-    PARAM(P_CONTACTS, Contacts);            // Buffer containing position, normal, depth, velocity for each contact
+    PARAM(P_CONTACTS, Contacts);            // Buffer containing position, normal, distance for each contact
 }
 
 /// Physics collision occurred (sent to the participating scene nodes.)
 EVENT(E_NODECOLLISION, NodeCollision)
 {
-    PARAM(P_SHAPE, Shape);                  // CollisionShape pointer
+    PARAM(P_BODY, Body);                    // RigidBody pointer
     PARAM(P_OTHERNODE, OtherNode);          // Node pointer
-    PARAM(P_OTHERSHAPE, OtherShape);        // CollisionShape pointer
+    PARAM(P_OTHERBODY, OtherBody);          // RigidBody pointer
     PARAM(P_NEWCOLLISION, NewCollision);    // bool
-    PARAM(P_CONTACTS, Contacts);            // Buffer containing position, normal, depth, velocity for each contact
+    PARAM(P_CONTACTS, Contacts);            // Buffer containing position, normal, distance for each contact
 }

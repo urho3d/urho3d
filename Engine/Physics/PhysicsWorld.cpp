@@ -170,6 +170,11 @@ void PhysicsWorld::Update(float timeStep)
     }
 }
 
+void PhysicsWorld::UpdateCollisions()
+{
+    world_->performDiscreteCollisionDetection();
+}
+
 void PhysicsWorld::SetFps(int fps)
 {
     fps_ = Clamp(fps, 1, 1000);
@@ -192,12 +197,51 @@ void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 
 void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
-    /// \todo Implement
+    PROFILE(PhysicsRaycast);
+    
+    btCollisionWorld::AllHitsRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
+    rayCallback.m_collisionFilterGroup = (short)0xffff;
+    rayCallback.m_collisionFilterMask = collisionMask;
+    
+    world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
+    
+    for (int i = 0; i < rayCallback.m_collisionObjects.size(); ++i)
+    {
+        PhysicsRaycastResult newResult;
+        newResult.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObjects[i]->getUserPointer());
+        newResult.position_ = ToVector3(rayCallback.m_hitPointWorld[i]);
+        newResult.normal_ = ToVector3(rayCallback.m_hitNormalWorld[i]);
+        newResult.distance_ = (newResult.position_ - ray.origin_).Length();
+        result.Push(newResult);
+    }
+    
+    Sort(result.Begin(), result.End(), CompareRaycastResults);
 }
 
 void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
-    /// \todo Implement
+    PROFILE(PhysicsRaycastSingle);
+    
+    btCollisionWorld::ClosestRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
+    rayCallback.m_collisionFilterGroup = (short)0xffff;
+    rayCallback.m_collisionFilterMask = collisionMask;
+    
+    world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
+    
+    if (rayCallback.hasHit())
+    {
+        result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
+        result.position_ = ToVector3(rayCallback.m_hitPointWorld);
+        result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
+        result.distance_ = (result.position_ - ray.origin_).Length();
+    }
+    else
+    {
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+    }
 }
 
 Vector3 PhysicsWorld::GetGravity() const
@@ -304,7 +348,101 @@ void PhysicsWorld::PostStep(float timeStep)
 
 void PhysicsWorld::SendCollisionEvents()
 {
-    /// \todo Implement
+    PROFILE(SendCollisionEvents);
+    
+    currentCollisions_.Clear();
+    int numManifolds = collisionDispatcher_->getNumManifolds();
+    
+    if (numManifolds)
+    {
+        VariantMap physicsCollisionData;
+        VariantMap nodeCollisionData;
+        VectorBuffer contacts;
+        
+        physicsCollisionData[PhysicsCollision::P_WORLD] = (void*)this;
+        
+        for (int i = 0; i < numManifolds; ++i)
+        {
+            btPersistentManifold* contactManifold = collisionDispatcher_->getManifoldByIndexInternal(i);
+            btCollisionObject* objectA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+            btCollisionObject* objectB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+            
+            RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
+            RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
+            
+            // Skip collision if both objects are static or inactive
+            if ((bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f) || (!bodyA->IsActive() && !bodyB->IsActive()))
+                continue;
+            
+            Node* nodeA = bodyA->GetNode();
+            Node* nodeB = bodyB->GetNode();
+            WeakPtr<Node> nodeWeakA(nodeA);
+            WeakPtr<Node> nodeWeakB(nodeB);
+            
+            Pair<RigidBody*, RigidBody*> bodyPair;
+            if (bodyA < bodyB)
+                bodyPair = MakePair(bodyA, bodyB);
+            else
+                bodyPair = MakePair(bodyB, bodyA);
+            currentCollisions_.Insert(bodyPair);
+            bool newCollision = !previousCollisions_.Contains(bodyPair);
+            
+            physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)nodeA;
+            physicsCollisionData[PhysicsCollision::P_NODEB] = (void*)nodeB;
+            physicsCollisionData[PhysicsCollision::P_BODYA] = (void*)bodyA;
+            physicsCollisionData[PhysicsCollision::P_BODYB] = (void*)bodyB;
+            physicsCollisionData[PhysicsCollision::P_NEWCOLLISION] = !previousCollisions_.Contains(bodyPair);
+            
+            contacts.Clear();
+            
+            int numContacts = contactManifold->getNumContacts();
+            for (int j = 0; j < numContacts; ++j)
+            {
+                btManifoldPoint& point = contactManifold->getContactPoint(j);
+                contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                contacts.WriteVector3(ToVector3(point.m_normalWorldOnB));
+                contacts.WriteFloat(point.getDistance());
+            }
+            
+            physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.GetBuffer();
+            
+            SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
+            
+            // Skip if either of the nodes has been removed as a response to the event
+            if (!nodeWeakA || !nodeWeakB)
+                continue;
+            
+            nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
+            nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeB;
+            nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyB;
+            nodeCollisionData[NodeCollision::P_NEWCOLLISION] = newCollision;
+            nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
+            
+            SendEvent(nodeA, E_NODECOLLISION, nodeCollisionData);
+            
+            // Skip if either of the nodes has been removed as a response to the event
+            if (!nodeWeakA || !nodeWeakB)
+                continue;
+            
+            contacts.Clear();
+            for (int j = 0; j < numContacts; ++j)
+            {
+                btManifoldPoint& point = contactManifold->getContactPoint(j);
+                contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                contacts.WriteVector3(-ToVector3(point.m_normalWorldOnB));
+                contacts.WriteFloat(point.getDistance());
+            }
+            
+            nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyB;
+            nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeA;
+            nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyA;
+            nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
+            
+            SendEvent(nodeB, E_NODECOLLISION, nodeCollisionData);
+        }
+    }
+    
+    previousCollisions_ = currentCollisions_;
 }
 
 void RegisterPhysicsLibrary(Context* context)

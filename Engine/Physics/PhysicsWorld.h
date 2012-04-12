@@ -52,6 +52,11 @@ struct CollisionGeometryData;
 /// Physics raycast hit.
 struct PhysicsRaycastResult
 {
+    PhysicsRaycastResult() :
+        body_(0)
+    {
+    }
+    
     /// Hit position.
     Vector3 position_;
     /// Hit normal.
@@ -60,32 +65,6 @@ struct PhysicsRaycastResult
     float distance_;
     /// Rigid body that was hit.
     RigidBody* body_;
-};
-
-/// Internal physics contact info
-struct PhysicsContactInfo
-{
-    /// World position.
-    Vector3 position_;
-    /// World normal from perspective of first rigid body.
-    Vector3 normal_;
-    /// Penetration depth.
-    float depth_;
-    /// Velocity.
-    float velocity_;
-};
-
-/// Internal physics collision info.
-struct PhysicsCollisionInfo
-{
-    /// First rigid body.
-    WeakPtr<RigidBody> bodyA_;
-    /// Second rigid body.
-    WeakPtr<RigidBody> bodyB_;
-    /// New collision flag.
-    bool newCollision_;
-    /// Contacts.
-    PODVector<PhysicsContactInfo> contacts_;
 };
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
@@ -121,6 +100,8 @@ public:
     
     /// Step the simulation forward.
     void Update(float timeStep);
+    /// Refresh collisions only without updating dynamics.
+    void UpdateCollisions();
     /// %Set simulation steps per second.
     void SetFps(int fps);
     /// %Set gravity.
@@ -207,8 +188,6 @@ private:
     HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
     /// Already processed rigid bodies during a poststep.
     HashSet<RigidBody*> processedBodies_;
-    /// Collision infos to be sent as events.
-    Vector<PhysicsCollisionInfo> collisionInfos_;
     /// Cache for collision geometry data.
     Map<String, SharedPtr<CollisionGeometryData> > geometryCache_;
     /// Simulation steps per second.
