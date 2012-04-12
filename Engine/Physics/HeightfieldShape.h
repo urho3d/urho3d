@@ -29,14 +29,14 @@
 struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a model.
-    HeightfieldData(Model* model, unsigned lodLevel, IntVector2 dimensions);
+    HeightfieldData(Model* model, unsigned lodLevel, IntVector2 numPoints);
     /// Destruct. Free geometry data.
     ~HeightfieldData();
     
     /// Height values.
     SharedArrayPtr<float> heightData_;
-    /// Heightfield dimensions.
-    IntVector2 dimensions_;
+    /// Heightfield number of points in X & Z dimensions.
+    IntVector2 numPoints_;
     /// Heightfield bounding box.
     BoundingBox boundingBox_;
     /// X spacing.
@@ -62,8 +62,8 @@ public:
     void SetModel(Model* model);
     /// %Set LOD level.
     void SetLodLevel(unsigned lodLevel);
-    /// %Set heightfield dimensions. Use 0 to guess from the model.
-    void SetDimensions(const IntVector2& dimensions);
+    /// %Set heightfield number of points in X & Z dimensions. Use 0 to guess from the model.
+    void SetNumPoints(const IntVector2& numPoints);
     /// %Set model scaling.
     void SetSize(const Vector3& size);
     /// %Set flip edges flag.
@@ -73,8 +73,8 @@ public:
     Model* GetModel() const;
     /// Return LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
-    /// Return heightfield dimensions.
-    const IntVector2& GetDimensions() const { return dimensions_; }
+    /// Return heightfield number of points in X & Z dimensions.
+    const IntVector2& GetNumPoints() const { return numPoints_; }
     /// Return model scaling.
     const Vector3& GetSize() { return size_; }
     /// Return flip edges flag.
@@ -96,8 +96,8 @@ private:
     SharedPtr<Model> model_;
     /// Current geometry data.
     SharedPtr<HeightfieldData> geometry_;
-    /// Heightfield dimensions.
-    IntVector2 dimensions_;
+    /// Heightfield number of points in X & Z dimensions.
+    IntVector2 numPoints_;
     /// Model scaling.
     Vector3 size_;
     /// LOD level.

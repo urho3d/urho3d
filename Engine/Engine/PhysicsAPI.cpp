@@ -108,8 +108,8 @@ static void RegisterCollisionShapes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("HeightfieldShape", "Model@+ get_model() const", asMETHOD(HeightfieldShape, GetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("HeightfieldShape", "void set_lodLevel(uint)", asMETHOD(HeightfieldShape, SetLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("HeightfieldShape", "uint get_lodLevel() const", asMETHOD(HeightfieldShape, GetLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("HeightfieldShape", "void set_dimensions(const IntVector2&in)", asMETHOD(HeightfieldShape, SetDimensions), asCALL_THISCALL);
-    engine->RegisterObjectMethod("HeightfieldShape", "const IntVector2& get_dimensions() const", asMETHOD(HeightfieldShape, GetDimensions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "void set_numPoints(const IntVector2&in)", asMETHOD(HeightfieldShape, SetNumPoints), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HeightfieldShape", "const IntVector2& get_numPoints() const", asMETHOD(HeightfieldShape, GetNumPoints), asCALL_THISCALL);
     engine->RegisterObjectMethod("HeightfieldShape", "void set_size(const Vector3&in)", asMETHOD(HeightfieldShape, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("HeightfieldShape", "const Vector3& get_size() const", asMETHOD(HeightfieldShape, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("HeightfieldShape", "void set_flipEdges(bool)", asMETHOD(HeightfieldShape, SetFlipEdges), asCALL_THISCALL);
