@@ -669,31 +669,33 @@ void CollisionShape::UpdateShape()
     
     if (node_)
     {
+        Vector3 newWorldScale = node_->GetWorldScale();
+        
         switch (shapeType_)
         {
         case SHAPE_BOX:
             shape_ = new btBoxShape(ToBtVector3(size_ * 0.5f));
-            shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             
         case SHAPE_SPHERE:
             shape_ = new btSphereShape(size_.x_ * 0.5f);
-            shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             
         case SHAPE_CYLINDER:
-            shape_ = new btCylinderShape(ToBtVector3(size_ * 0.5f));
-            shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
+            shape_ = new btCylinderShape(btVector3(size_.x_ * 0.5f, size_.y_ * 0.5f, size_.x_ * 0.5f));
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             
         case SHAPE_CAPSULE:
             shape_ = new btCapsuleShape(size_.x_ * 0.5f, Max(size_.y_  - size_.x_, 0.0f));
-            shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             
         case SHAPE_CONE:
             shape_ = new btConeShape(size_.x_ * 0.5f, size_.y_);
-            shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale()));
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             
         case SHAPE_TRIANGLEMESH:
@@ -713,7 +715,7 @@ void CollisionShape::UpdateShape()
                 }
                 
                 TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
-                shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(node_->GetWorldScale() * size_));
+                shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(newWorldScale * size_));
             }
             break;
             
@@ -735,7 +737,7 @@ void CollisionShape::UpdateShape()
                 
                 ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
                 shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
-                shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale() * size_));
+                shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
             }
             break;
             
@@ -760,11 +762,13 @@ void CollisionShape::UpdateShape()
                 shape_ = new btHeightfieldTerrainShape(heightfield->numPoints_.x_, heightfield->numPoints_.y_,
                     heightfield->heightData_.Get(), 1.0f, heightfield->boundingBox_.min_.y_, heightfield->boundingBox_.max_.y_, 1,
                     PHY_FLOAT, flipEdges_);
-                shape_->setLocalScaling(ToBtVector3(node_->GetWorldScale() * Vector3(heightfield->xSpacing_, 1.0f,
+                shape_->setLocalScaling(ToBtVector3(newWorldScale * Vector3(heightfield->xSpacing_, 1.0f,
                     heightfield->zSpacing_) * size_));
             }
             break;
         }
+        
+        cachedWorldScale_ = newWorldScale;
     }
     
     if (physicsWorld_)
