@@ -44,7 +44,7 @@ static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
 static const float DEFAULT_LINEAR_REST_THRESHOLD = 0.8f;
 static const float DEFAULT_ANGULAR_REST_THRESHOLD = 1.0f;
-static const unsigned DEFAULT_COLLISION_GROUP = 0xffff;
+static const unsigned DEFAULT_COLLISION_LAYER = 0xffff;
 
 OBJECTTYPESTATIC(RigidBody);
 
@@ -53,8 +53,8 @@ RigidBody::RigidBody(Context* context) :
     body_(0),
     compoundShape_(0),
     mass_(DEFAULT_MASS),
-    collisionGroup_(DEFAULT_COLLISION_GROUP),
-    collisionMask_(DEFAULT_COLLISION_GROUP),
+    collisionLayer_(DEFAULT_COLLISION_LAYER),
+    collisionMask_(DEFAULT_COLLISION_LAYER),
     inSetTransform_(false)
 {
     compoundShape_ = new btCompoundShape();
@@ -88,8 +88,8 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_GROUP, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", GetCollisionLayer, SetCollisionLayer, unsigned, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", IsKinematic, SetKinematic, bool, false, AM_DEFAULT);
@@ -298,13 +298,13 @@ void RigidBody::SetPhantom(bool enable)
     }
 }
 
-void RigidBody::SetCollisionGroup(unsigned group)
+void RigidBody::SetCollisionLayer(unsigned layer)
 {
-    group &= 0xffff;
+    layer &= 0xffff;
     
-    if (group != collisionGroup_)
+    if (layer != collisionLayer_)
     {
-        collisionGroup_ = group;
+        collisionLayer_ = layer;
         AddBodyToWorld();
     }
 }
@@ -320,14 +320,14 @@ void RigidBody::SetCollisionMask(unsigned mask)
     }
 }
 
-void RigidBody::SetCollisionGroupAndMask(unsigned group, unsigned mask)
+void RigidBody::SetCollisionLayerAndMask(unsigned layer, unsigned mask)
 {
-    group &= 0xffff;
+    layer &= 0xffff;
     mask &= 0xffff;
     
-    if (group != collisionGroup_ || mask != collisionMask_)
+    if (layer != collisionLayer_ || mask != collisionMask_)
     {
-        collisionGroup_ = group;
+        collisionLayer_ = layer;
         collisionMask_ = mask;
         AddBodyToWorld();
     }
@@ -613,7 +613,7 @@ void RigidBody::AddBodyToWorld()
         flags |= btCollisionObject::CF_STATIC_OBJECT;
     body_->setCollisionFlags(flags);
     
-    world->addRigidBody(body_, collisionGroup_, collisionMask_);
+    world->addRigidBody(body_, collisionLayer_, collisionMask_);
 }
 
 void RigidBody::ReleaseBody()

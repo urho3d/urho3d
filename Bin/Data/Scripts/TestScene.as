@@ -129,8 +129,8 @@ void InitScene()
         object.occluder = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
-        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
-        shape.size = Vector3(2.0, 2.0, 2.0);
+        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
     }
 
     for (uint i = 0; i < 50; ++i)
@@ -144,8 +144,8 @@ void InitScene()
         object.castShadows = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
-        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
-        shape.size = Vector3(2.0, 2.0, 2.0);
+        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
     }
 
     for (uint i = 0; i < 10; ++i)
@@ -161,8 +161,8 @@ void InitScene()
         object.occluder = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
-        BoxShape@ shape = objectNode.CreateComponent("BoxShape");
-        shape.size = Vector3(2.0, 2.0, 2.0);
+        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
     }
 
     for (uint i = 0; i < 50; ++i)
@@ -178,8 +178,8 @@ void InitScene()
         object.castShadows = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
-        TriangleMeshShape@ shape = objectNode.CreateComponent("TriangleMeshShape");
-        shape.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+        CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
     }
 
     for (uint i = 0; i < 50; ++i)
@@ -410,8 +410,8 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     body.friction = 1.0;
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
 
-    BoxShape@ shape = newNode.CreateComponent("BoxShape");
-    shape.size = Vector3(2.0, 2.0, 2.0);
+    CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+    shape.SetBox(Vector3(2.0, 2.0, 2.0));
 
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/Box.mdl");

@@ -82,8 +82,8 @@ void InitScene()
             newNode.scale = Vector3(10, 0.5, 10);
 
             RigidBody@ body = newNode.CreateComponent("RigidBody");
-            BoxShape@ shape = newNode.CreateComponent("BoxShape");
-            shape.size = Vector3(2.0, 2.0, 2.0);
+            CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+            shape.SetBox(Vector3(2.0, 2.0, 2.0));
 
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -100,8 +100,8 @@ void InitScene()
         newNode.scale = Vector3(112, 5, 0.5);
 
         RigidBody@ body = newNode.CreateComponent("RigidBody");
-        BoxShape@ shape = newNode.CreateComponent("BoxShape");
-        shape.size = Vector3(2.0, 2.0, 2.0);
+        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -117,8 +117,8 @@ void InitScene()
         newNode.SetScale(10);
 
         RigidBody@ body = newNode.CreateComponent("RigidBody");
-        TriangleMeshShape@ shape = newNode.CreateComponent("TriangleMeshShape");
-        shape.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
@@ -505,8 +505,8 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         body.friction = 1.0;
         body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
 
-        BoxShape@ shape = newNode.CreateComponent("BoxShape");
-        shape.size = Vector3(2.0, 2.0, 2.0);
+        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(2.0, 2.0, 2.0));
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");

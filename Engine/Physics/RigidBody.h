@@ -88,12 +88,12 @@ public:
     void SetKinematic(bool enable);
     /// %Set rigid body phantom mode. In phantom mode collisions are registered but do not apply forces.
     void SetPhantom(bool enable);
-    /// %Set collision group.
-    void SetCollisionGroup(unsigned group);
+    /// %Set collision layer.
+    void SetCollisionLayer(unsigned layer);
     /// %Set collision mask.
     void SetCollisionMask(unsigned mask);
     /// %Set collision group and mask.
-    void SetCollisionGroupAndMask(unsigned group, unsigned mask);
+    void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
     /// Apply force at position.
@@ -149,8 +149,8 @@ public:
     bool IsPhantom() const;
     /// Return whether rigid body is active.
     bool IsActive() const;
-    /// Return collision group.
-    unsigned GetCollisionGroup() const { return collisionGroup_; }
+    /// Return collision layer.
+    unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask.
     unsigned GetCollisionMask() const { return collisionMask_; }
     
@@ -198,8 +198,8 @@ private:
     mutable VectorBuffer attrBuffer_;
     /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
     bool inSetTransform_;
-    /// Collision group.
-    unsigned collisionGroup_;
+    /// Collision layer.
+    unsigned collisionLayer_;
     /// Collision mask.
     unsigned collisionMask_;
 };

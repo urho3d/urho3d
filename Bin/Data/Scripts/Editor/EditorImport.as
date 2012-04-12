@@ -247,11 +247,11 @@ void ImportTundraScene(const String&in fileName)
                 }
             }
 
-            // Create collision shape
+            // Create rigidbody & collision shape
             if (shapeType >= 0)
             {
-                /// \todo Reimplement
-                /*
+                RigidBody@ body = newNode.CreateComponent("RigidBody");
+
                 // If mesh has scaling, undo it for the collision shape
                 bodySize.x /= meshScale.x;
                 bodySize.y /= meshScale.y;
@@ -281,23 +281,14 @@ void ImportTundraScene(const String&in fileName)
                     break;
 
                 case 6:
-                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0.1, 0, bodySize);
+                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, 0.1, bodySize);
                     break;
                 }
 
-                shape.collisionLayer = collisionLayer;
-                shape.collisionMask = collisionMask;
-                shape.phantom = phantom;
-
-                // Create rigid body if the object should be dynamic or kinematic
-                if (mass > 0.0)
-                {
-                    RigidBody@ body = newNode.CreateComponent("RigidBody");
-                    //if (kinematic)
-                    //    mass = 0.0;
-                    body.mass = mass;
-                }
-                */
+                body.collisionLayer = collisionLayer;
+                body.collisionMask = collisionMask;
+                body.phantom = phantom;
+                body.mass = mass;
             }
 
             // Store pending parent assignment if necessary

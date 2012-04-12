@@ -47,9 +47,7 @@ class btDiscreteDynamicsWorld;
 class btDispatcher;
 class btDynamicsWorld;
 
-struct ConvexData;
-struct HeightfieldData;
-struct TriangleMeshData;
+struct CollisionGeometryData;
 
 /// Physics raycast hit.
 struct PhysicsRaycastResult
@@ -168,12 +166,8 @@ public:
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
-    /// Return the triangle mesh cache.
-    Map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
-    /// Return the convex hull cache.
-    Map<String, SharedPtr<ConvexData> >& GetConvexCache() { return convexCache_; }
-    /// Return the heightfield cache.
-    Map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
+    /// Return the collision geometry cache.
+    Map<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
     
 protected:
     /// Handle node being assigned.
@@ -215,12 +209,8 @@ private:
     HashSet<RigidBody*> processedBodies_;
     /// Collision infos to be sent as events.
     Vector<PhysicsCollisionInfo> collisionInfos_;
-    /// Cache for triangle mesh geometries.
-    Map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
-    /// Cache for convex hull geometries.
-    Map<String, SharedPtr<ConvexData> > convexCache_;
-    /// Cache for heightfield geometries.
-    Map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
+    /// Cache for collision geometry data.
+    Map<String, SharedPtr<CollisionGeometryData> > geometryCache_;
     /// Simulation steps per second.
     unsigned fps_;
     /// Time accumulator for non-interpolated mode.

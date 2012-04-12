@@ -22,14 +22,9 @@
 //
 
 #include "Precompiled.h"
-#include "BoxShape.h"
-#include "CapsuleShape.h"
-#include "ConeShape.h"
+#include "CollisionShape.h"
 #include "Context.h"
-#include "ConvexShape.h"
-#include "CylinderShape.h"
 #include "DebugRenderer.h"
-#include "HeightfieldShape.h"
 #include "Joint.h"
 #include "Log.h"
 #include "Mutex.h"
@@ -42,8 +37,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
-#include "SphereShape.h"
-#include "TriangleMeshShape.h"
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -85,7 +78,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     interpolation_(true),
     debugRenderer_(0),
-    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawNormals | btIDebugDraw::DBG_DrawConstraints)
+    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints)
 {
     collisionConfiguration_ = new btDefaultCollisionConfiguration();
     collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
@@ -112,8 +105,7 @@ PhysicsWorld::~PhysicsWorld()
     }
     
     // Remove any cached geometries that still remain
-    triangleMeshCache_.Clear();
-    heightfieldCache_.Clear();
+    geometryCache_.Clear();
     
     delete world_;
     world_ = 0;
@@ -260,27 +252,12 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (Map<String, SharedPtr<TriangleMeshData> >::Iterator i = triangleMeshCache_.Begin();
-        i != triangleMeshCache_.End();)
+    for (Map<String, SharedPtr<CollisionGeometryData> >::Iterator i = geometryCache_.Begin();
+        i != geometryCache_.End();)
     {
-        Map<String, SharedPtr<TriangleMeshData> >::Iterator current = i++;
+        Map<String, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
-            triangleMeshCache_.Erase(current);
-    }
-    
-    for (Map<String, SharedPtr<ConvexData> >::Iterator i = convexCache_.Begin();
-        i != convexCache_.End();)
-    {
-        Map<String, SharedPtr<ConvexData> >::Iterator current = i++;
-        if (current->second_.Refs() == 1)
-            convexCache_.Erase(current);
-    }
-    for (Map<String, SharedPtr<HeightfieldData> >::Iterator i = heightfieldCache_.Begin();
-        i != heightfieldCache_.End();)
-    {
-        Map<String, SharedPtr<HeightfieldData> >::Iterator current = i++;
-        if (current->second_.Refs() == 1)
-            heightfieldCache_.Erase(current);
+            geometryCache_.Erase(current);
     }
 }
 
@@ -334,13 +311,6 @@ void RegisterPhysicsLibrary(Context* context)
 {
     Joint::RegisterObject(context);
     RigidBody::RegisterObject(context);
-    BoxShape::RegisterObject(context);
-    CapsuleShape::RegisterObject(context);
-    ConeShape::RegisterObject(context);
-    ConvexShape::RegisterObject(context);
-    CylinderShape::RegisterObject(context);
-    HeightfieldShape::RegisterObject(context);
-    SphereShape::RegisterObject(context);
-    TriangleMeshShape::RegisterObject(context);
+    CollisionShape::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
 }
