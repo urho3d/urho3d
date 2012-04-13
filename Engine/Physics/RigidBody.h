@@ -34,6 +34,14 @@ class PhysicsWorld;
 class btCompoundShape;
 class btRigidBody;
 
+/// Rigid body collision event signaling mode.
+enum CollisionEventMode
+{
+    COLLISION_NEVER = 0,
+    COLLISION_ACTIVE,
+    COLLISION_ALWAYS
+};
+
 /// Physics rigid body component.
 class RigidBody : public Component, public btMotionState
 {
@@ -94,6 +102,8 @@ public:
     void SetCollisionMask(unsigned mask);
     /// %Set collision group and mask.
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
+    /// %Set collision event signaling mode. Default is to signal when active.
+    void SetCollisionEventMode(CollisionEventMode mode);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
     /// Apply force at position.
@@ -153,6 +163,8 @@ public:
     unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask.
     unsigned GetCollisionMask() const { return collisionMask_; }
+    /// Return collision event signaling mode.
+    CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -190,16 +202,14 @@ private:
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Mass.
     float mass_;
-    /// Last interpolated position set during PostStep.
-    Vector3 lastInterpolatedPosition_;
-    /// Last interpolated rotation set during PostStep.
-    Quaternion lastInterpolatedRotation_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
-    /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
-    bool inSetTransform_;
     /// Collision layer.
     unsigned collisionLayer_;
     /// Collision mask.
     unsigned collisionMask_;
+    /// Collision event signaling mode.
+    CollisionEventMode collisionEventMode_;
+    /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
+    bool inSetTransform_;
 };

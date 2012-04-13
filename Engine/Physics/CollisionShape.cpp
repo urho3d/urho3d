@@ -299,10 +299,10 @@ void CollisionShape::RegisterObject(Context* context)
     context->RegisterFactory<CollisionShape>();
     
     ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "Heightfield Points X", numPoints_.x_, 0, AM_DEFAULT);
@@ -322,6 +322,7 @@ void CollisionShape::ApplyAttributes()
     {
         UpdateShape();
         NotifyRigidBody();
+        dirty_ = false;
     }
 }
 
@@ -454,6 +455,16 @@ void CollisionShape::SetShapeType(ShapeType type)
     }
 }
 
+void CollisionShape::SetSize(const Vector3& size)
+{
+    if (size != size_)
+    {
+        size_ = size;
+        UpdateShape();
+        NotifyRigidBody();
+    }
+}
+
 void CollisionShape::SetPosition(const Vector3& position)
 {
     if (position != position_)
@@ -478,16 +489,6 @@ void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rot
     {
         position_ = position;
         rotation_ = rotation;
-        NotifyRigidBody();
-    }
-}
-
-void CollisionShape::SetSize(const Vector3& size)
-{
-    if (size != size_)
-    {
-        size_ = size;
-        UpdateShape();
         NotifyRigidBody();
     }
 }
@@ -576,8 +577,6 @@ void CollisionShape::NotifyRigidBody()
         // Finally tell the rigid body to update its mass
         rigidBody_->UpdateMass();
     }
-    
-    dirty_ = false;
 }
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

@@ -370,9 +370,14 @@ void PhysicsWorld::SendCollisionEvents()
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
             
-            // Skip collision if both objects are static or inactive
-            if ((bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f) || (!bodyA->IsActive() && !bodyB->IsActive()))
+            // Skip collision event signaling if both objects are static, or if collision event mode does not match
+            if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
                 continue;
+            if (bodyA->GetCollisionEventMode() == COLLISION_NEVER || bodyB->GetCollisionEventMode() == COLLISION_NEVER)
+                return;
+            if (bodyA->GetCollisionEventMode() == COLLISION_ACTIVE && bodyB->GetCollisionEventMode() == COLLISION_ACTIVE &&
+                !bodyA->IsActive() && !bodyB->IsActive())
+                return;
             
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
@@ -401,7 +406,8 @@ void PhysicsWorld::SendCollisionEvents()
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
                 contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
                 contacts.WriteVector3(ToVector3(point.m_normalWorldOnB));
-                contacts.WriteFloat(point.getDistance());
+                contacts.WriteFloat(point.m_distance1);
+                contacts.WriteFloat(point.m_appliedImpulse);
             }
             
             physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.GetBuffer();
@@ -430,7 +436,8 @@ void PhysicsWorld::SendCollisionEvents()
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
                 contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
                 contacts.WriteVector3(-ToVector3(point.m_normalWorldOnB));
-                contacts.WriteFloat(point.getDistance());
+                contacts.WriteFloat(point.m_distance1);
+                contacts.WriteFloat(point.m_appliedImpulse);
             }
             
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyB;

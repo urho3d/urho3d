@@ -143,14 +143,14 @@ public:
     void SetConvexHull(Model* model, unsigned lodLevel, float thickness, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set shape type.
     void SetShapeType(ShapeType type);
+    /// %Set shape size.
+    void SetSize(const Vector3& size);
     /// %Set offset position.
     void SetPosition(const Vector3& position);
     /// %Set offset rotation.
     void SetRotation(const Quaternion& rotation);
     /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set shape size.
-    void SetSize(const Vector3& size);
     /// %Set triangle mesh / convex hull / heightfield model.
     void SetModel(Model* model);
     /// %Set model LOD level.
@@ -168,12 +168,12 @@ public:
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return shape type.
     ShapeType GetShapeType() const { return shapeType_; }
+    /// Return shape size.
+    const Vector3& GetSize() const { return size_; }
     /// Return offset position.
     const Vector3& GetPosition() const { return position_; }
     /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return shape size
-    const Vector3& GetSize() const { return size_; }
     /// Return triangle mesh / convex hull / heightfield model.
     Model* GetModel() const { return model_; }
     /// Return model LOD level.
