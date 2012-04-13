@@ -293,6 +293,16 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
     debugRenderer_ = 0;
 }
 
+void PhysicsWorld::SetDebugRenderer(DebugRenderer* debug)
+{
+    debugRenderer_ = debug;
+}
+
+void PhysicsWorld::SetDebugDepthTest(bool enable)
+{
+    debugDepthTest_ = enable;
+}
+
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself

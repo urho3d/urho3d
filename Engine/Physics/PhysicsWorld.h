@@ -142,6 +142,10 @@ public:
     void RemoveJoint(Joint* joint);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
+    /// Set debug renderer to use.
+    void SetDebugRenderer(DebugRenderer* debug);
+    /// Set debug geometry depth test mode.
+    void SetDebugDepthTest(bool enable);
     
     /// Return the Bullet physics world.
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
@@ -198,7 +202,7 @@ private:
     float maxNetworkAngularVelocity_;
     /// Interpolation flag.
     bool interpolation_;
-    /// Debug renderer.
+    /// Debug renderer to use.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.
     int debugMode_;

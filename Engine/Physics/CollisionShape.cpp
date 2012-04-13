@@ -45,6 +45,7 @@
 #include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <hull.h>
 
 static const String typeNames[] = 
@@ -274,6 +275,7 @@ OBJECTTYPESTATIC(CollisionShape);
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     shape_(0),
+    shapeType_(SHAPE_BOX),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     size_(Vector3::ONE),
@@ -581,7 +583,27 @@ void CollisionShape::NotifyRigidBody()
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    /// \todo Implement
+    if (debug && physicsWorld_ && shape_ && node_)
+    {
+        physicsWorld_->SetDebugRenderer(debug);
+        physicsWorld_->SetDebugDepthTest(depthTest);
+        
+        // Use the rigid body's world transform if possible, as it may be different from the rendering transform
+        Matrix3x4 worldTransform;
+        RigidBody* body = GetComponent<RigidBody>();
+        if (body)
+            worldTransform = Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale());
+        else
+            worldTransform = node_->GetWorldTransform();
+        Vector3 worldPosition = worldTransform * position_;
+        Quaternion worldRotation = worldTransform.Rotation() * rotation_;
+        
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, btVector3(0.0f,
+            1.0f, 0.0f));
+        
+        physicsWorld_->SetDebugRenderer(0);
+    }
 }
 
 void CollisionShape::SetModelAttr(ResourceRef value)

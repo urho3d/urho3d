@@ -62,7 +62,7 @@ Array<String> pickModeText = {
     "Geometries",
     "Lights",
     "Zones",
-    "Col.shapes"
+    "Rigidbodies"
 };
 
 void CreateCamera()
@@ -212,7 +212,7 @@ void MoveCamera(float timeStep)
 
         if (adjust == Vector3(0, 0, 0))
             return;
-        
+
         bool moved = false;
         adjust *= timeStep * 10;
 
@@ -222,7 +222,7 @@ void MoveCamera(float timeStep)
             if (!moveSnap)
                 moved = MoveNodes(adjust * moveStep);
             break;
-            
+
         case EDIT_ROTATE:
             if (!rotateSnap)
             {
@@ -340,14 +340,20 @@ void HandlePostRenderUpdate()
             drawable.DrawDebugGeometry(debug, false);
         else
         {
-            CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
-            if (shape !is null)
-                shape.DrawDebugGeometry(debug, false);
+            RigidBody@ body = cast<RigidBody>(selectedComponents[i]);
+            if (body !is null)
+                body.DrawDebugGeometry(debug, false);
             else
             {
-                Joint@ joint = cast<Joint>(selectedComponents[i]);
-                if (joint !is null)
-                    joint.DrawDebugGeometry(debug, false);
+                CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
+                if (shape !is null)
+                    shape.DrawDebugGeometry(debug, false);
+                else
+                {
+                    Joint@ joint = cast<Joint>(selectedComponents[i]);
+                    if (joint !is null)
+                        joint.DrawDebugGeometry(debug, false);
+                }
             }
         }
     }
@@ -379,7 +385,7 @@ void ViewRaycast(bool mouseClick)
 
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
 
-    if (pickMode != PICK_COLLISIONSHAPES)
+    if (pickMode != PICK_RIGIDBODIES)
     {
         if (editorScene.octree is null)
             return;

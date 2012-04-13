@@ -546,7 +546,17 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 
 void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    /// \todo Implement
+    if (debug && physicsWorld_ && body_)
+    {
+        physicsWorld_->SetDebugRenderer(debug);
+        physicsWorld_->SetDebugDepthTest(depthTest);
+        
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
+            btVector3(0.0f, 1.0f, 0.0f));
+        
+        physicsWorld_->SetDebugRenderer(0);
+    }
 }
 
 void RigidBody::OnMarkedDirty(Node* node)

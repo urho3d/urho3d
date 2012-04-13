@@ -6,7 +6,7 @@
 const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;
 const int PICK_ZONES = 2;
-const int PICK_COLLISIONSHAPES = 3;
+const int PICK_RIGIDBODIES = 3;
 const int MAX_PICK_MODES = 4;
 
 Scene@ editorScene;
