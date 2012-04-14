@@ -142,9 +142,9 @@ public:
     void RemoveJoint(Joint* joint);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Set debug renderer to use.
+    /// Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
     void SetDebugRenderer(DebugRenderer* debug);
-    /// Set debug geometry depth test mode.
+    /// Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
     void SetDebugDepthTest(bool enable);
     
     /// Return the Bullet physics world.
@@ -202,7 +202,7 @@ private:
     float maxNetworkAngularVelocity_;
     /// Interpolation flag.
     bool interpolation_;
-    /// Debug renderer to use.
+    /// Debug renderer.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.
     int debugMode_;

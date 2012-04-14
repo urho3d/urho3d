@@ -160,6 +160,8 @@ bool Script::Execute(const String& line)
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
     PROFILE(ExecuteImmediate);
     
+    ClearObjectTypeCache();
+    
     String wrappedLine = "void f(){\n" + line + ";\n}";
     
     // If no immediate mode script file set, create a dummy module for compiling the line
@@ -397,6 +399,11 @@ ScriptFile* Script::GetDefaultScriptFile() const
 Scene* Script::GetDefaultScene() const
 {
     return defaultScene_;
+}
+
+void Script::ClearObjectTypeCache()
+{
+    objectTypes_.Clear();
 }
 
 asIObjectType* Script::GetObjectType(const char* declaration)

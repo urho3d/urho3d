@@ -524,6 +524,8 @@ void ScriptFile::ReleaseModule()
 {
     if (scriptModule_)
     {
+        script_->ClearObjectTypeCache();
+        
         // Clear search caches and event handlers
         includeFiles_.Clear();
         validClasses_.Clear();

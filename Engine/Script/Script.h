@@ -83,6 +83,8 @@ public:
     ScriptFile* GetDefaultScriptFile() const;
     /// Return immediate mode scene.
     Scene* GetDefaultScene() const;
+    /// Clear the inbuild object type cache.
+    void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
     asIObjectType* GetObjectType(const char* declaration);
     /// Return logging mode.
