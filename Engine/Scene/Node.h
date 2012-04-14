@@ -284,10 +284,14 @@ public:
     void SetID(unsigned id);
     /// %Set scene. Called by Scene.
     void SetScene(Scene* scene);
+    /// %Set network position attribute.
+    void SetNetPositionAttr(const Vector3& value);
     /// %Set network rotation attribute.
     void SetNetRotationAttr(const PODVector<unsigned char>& value);
     /// %Set network parent attribute.
     void SetNetParentAttr(const PODVector<unsigned char>& value);
+    /// Return network position attribute.
+    const Vector3& GetNetPositionAttr() const;
     /// Return network rotation attribute.
     const PODVector<unsigned char>& GetNetRotationAttr() const;
     /// Return network parent attribute.

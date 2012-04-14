@@ -46,6 +46,16 @@ EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
     PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
 }
 
+/// SmoothedTransform target position changed.
+EVENT(E_TARGETPOSITION, TargetPositionChanged)
+{
+}
+
+/// SmoothedTransform target position changed.
+EVENT(E_TARGETROTATION, TargetRotationChanged)
+{
+}
+
 /// Variable timestep scene post-update.
 EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {

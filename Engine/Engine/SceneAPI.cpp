@@ -141,6 +141,10 @@ static void RegisterSmoothedTransform(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SmoothedTransform", "const Vector3& get_targetPosition() const", asMETHOD(SmoothedTransform, GetTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "void set_targetRotation(const Quaternion&in)", asMETHOD(SmoothedTransform, SetTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "const Quaternion& get_targetRotation() const", asMETHOD(SmoothedTransform, GetTargetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_targetWorldPosition(const Vector3&in)", asMETHOD(SmoothedTransform, SetTargetWorldPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "Vector3 get_targetWorldPosition() const", asMETHOD(SmoothedTransform, GetTargetWorldPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void set_targetWorldRotation(const Quaternion&in)", asMETHOD(SmoothedTransform, SetTargetWorldRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "Quaternion get_targetWorldRotation() const", asMETHOD(SmoothedTransform, GetTargetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "bool get_active() const", asMETHOD(SmoothedTransform, IsActive), asCALL_THISCALL);
 }
 

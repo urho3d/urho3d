@@ -51,11 +51,19 @@ public:
     void SetTargetPosition(const Vector3& position);
     /// %Set target local space rotation.
     void SetTargetRotation(const Quaternion& rotation);
+    /// %Set target world space position.
+    void SetTargetWorldPosition(const Vector3& position);
+    /// %Set target world space rotation.
+    void SetTargetWorldRotation(const Quaternion& rotation);
     
-    /// Return target position.
+    /// Return target local space position.
     const Vector3& GetTargetPosition() const { return targetPosition_; }
-    /// Return target rotation.
+    /// Return target local space rotation.
     const Quaternion& GetTargetRotation() const { return targetRotation_; }
+    /// Return target world space position.
+    Vector3 GetTargetWorldPosition() const;
+    /// Return target world space rotation.
+    Quaternion GetTargetWorldRotation() const;
     /// Return whether smoothing is in progress.
     bool IsActive() const { return smoothingMask_ != 0; }
     

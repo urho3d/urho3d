@@ -30,6 +30,7 @@
 class CollisionShape;
 class DebugRenderer;
 class PhysicsWorld;
+class SmoothedTransform;
 
 class btCompoundShape;
 class btRigidBody;
@@ -197,6 +198,10 @@ private:
     void AddBodyToWorld();
     /// Remove the rigid body.
     void ReleaseBody();
+    /// Handle SmoothedTransform target position update.
+    void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
+    /// Handle SmoothedTransform target rotation update.
+    void HandleTargetRotation(StringHash eventType, VariantMap& eventData);
     
     /// Bullet rigid body.
     btRigidBody* body_;
@@ -204,6 +209,8 @@ private:
     btCompoundShape* compoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Cached SmoothedTransform component, if exists.
+    WeakPtr<SmoothedTransform> smoothedTransform_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.

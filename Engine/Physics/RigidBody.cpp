@@ -33,6 +33,8 @@
 #include "ResourceEvents.h"
 #include "RigidBody.h"
 #include "Scene.h"
+#include "SceneEvents.h"
+#include "SmoothedTransform.h"
 #include "XMLElement.h"
 
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
@@ -127,10 +129,23 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
     if (node_)
     {
         inSetTransform_ = true;
-        node_->SetWorldPosition(ToVector3(worldTrans.getOrigin()));
-        node_->SetWorldRotation(ToQuaternion(worldTrans.getRotation()));
-        lastPosition_ = node_->GetWorldPosition();
-        lastRotation_ = node_->GetWorldRotation();
+        
+        // Apply transform to the SmoothedTransform component instead of rendering transform if available
+        if (!smoothedTransform_)
+        {
+            node_->SetWorldPosition(ToVector3(worldTrans.getOrigin()));
+            node_->SetWorldRotation(ToQuaternion(worldTrans.getRotation()));
+            lastPosition_ = node_->GetWorldPosition();
+            lastRotation_ = node_->GetWorldRotation();
+        }
+        else
+        {
+            lastPosition_ = ToVector3(worldTrans.getOrigin());
+            lastRotation_ = ToQuaternion(worldTrans.getRotation());
+            smoothedTransform_->SetTargetWorldPosition(lastPosition_);
+            smoothedTransform_->SetTargetWorldRotation(lastRotation_);
+        }
+        
         inSetTransform_ = false;
     }
 }
@@ -601,8 +616,10 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void RigidBody::OnMarkedDirty(Node* node)
 {
-    /// \todo If the node contains a SmoothedTransform component, do not react to dirtying, but rather update the position elsewhere
-    if (!inSetTransform_)
+    // If rendering transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
+    // is in use, because in that case it will be constantly updated into possibly non-physical states; rather follow the
+    // SmoothedTransform target transform directly
+    if (!inSetTransform_ && !smoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = node->GetScene();
@@ -612,7 +629,7 @@ void RigidBody::OnMarkedDirty(Node* node)
             return;
         }
         
-        // Check if transform has changed from the last transform set at end of simulation step
+        // Check if transform has changed from the one set at end of simulation step
         Vector3 newPosition = node_->GetWorldPosition();
         Quaternion newRotation = node_->GetWorldRotation();
         
@@ -663,6 +680,15 @@ void RigidBody::AddBodyToWorld()
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
         body_->setUserPointer(this);
         
+        // Check for existence of the SmoothedTransform component, which should be created by now if we are a network client node
+        smoothedTransform_ = GetComponent<SmoothedTransform>();
+        if (smoothedTransform_)
+        {
+            // If SmoothedTransform exists, subscribe to its changes
+            SubscribeToEvent(smoothedTransform_, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
+            SubscribeToEvent(smoothedTransform_, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
+        }
+        
         // Check if CollisionShapes already exist in the node and add them to the compound shape
         // Note: NotifyRigidBody() will cause mass to be updated
         PODVector<CollisionShape*> shapes;
@@ -689,4 +715,18 @@ void RigidBody::ReleaseBody()
         delete body_;
         body_ = 0;
     }
+}
+
+void RigidBody::HandleTargetPosition(StringHash eventType, VariantMap& eventData)
+{
+    // Copy the smoothing target position to the rigid body
+    if (!inSetTransform_ && smoothedTransform_)
+        SetPosition(smoothedTransform_->GetTargetWorldPosition());
+}
+
+void RigidBody::HandleTargetRotation(StringHash eventType, VariantMap& eventData)
+{
+    // Copy the smoothing target rotation to the rigid body
+    if (!inSetTransform_ && smoothedTransform_)
+        SetRotation(smoothedTransform_->GetTargetWorldRotation());
 }

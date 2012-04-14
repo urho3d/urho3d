@@ -96,12 +96,46 @@ void SmoothedTransform::SetTargetPosition(const Vector3& position)
 {
     targetPosition_ = position;
     smoothingMask_ |= SMOOTH_POSITION;
+    SendEvent(E_TARGETPOSITION);
 }
 
 void SmoothedTransform::SetTargetRotation(const Quaternion& rotation)
 {
     targetRotation_ = rotation;
     smoothingMask_ |= SMOOTH_ROTATION;
+    SendEvent(E_TARGETROTATION);
+}
+
+void SmoothedTransform::SetTargetWorldPosition(const Vector3& position)
+{
+    if (node_ && node_->GetParent())
+        SetTargetPosition(node_->GetParent()->GetWorldTransform().Inverse() * position);
+    else
+        SetTargetPosition(position);
+}
+
+void SmoothedTransform::SetTargetWorldRotation(const Quaternion& rotation)
+{
+    if (node_ && node_->GetParent())
+        SetTargetRotation(node_->GetParent()->GetWorldRotation().Inverse() * rotation);
+    else
+        SetTargetRotation(rotation);
+}
+
+Vector3 SmoothedTransform::GetTargetWorldPosition() const
+{
+    if (node_ && node_->GetParent())
+        return node_->GetParent()->GetWorldTransform() * targetPosition_;
+    else
+        return targetPosition_;
+}
+
+Quaternion SmoothedTransform::GetTargetWorldRotation() const
+{
+    if (node_ && node_->GetParent())
+        return node_->GetParent()->GetWorldRotation() * targetRotation_;
+    else
+        return targetRotation_;
 }
 
 void SmoothedTransform::OnNodeSet(Node* node)

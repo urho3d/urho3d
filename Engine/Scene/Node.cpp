@@ -28,6 +28,7 @@
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "Scene.h"
+#include "SmoothedTransform.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -68,10 +69,11 @@ void Node::RegisterObject(Context* context)
     
     /// \todo When position/rotation updates are received from the network, route to SmoothedTransform if exists
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_STRING, "Name", GetName, SetName, String, String(), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
     ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE); // Network replication of vars uses custom data
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
@@ -794,10 +796,23 @@ void Node::SetScene(Scene* scene)
     scene_ = scene;
 }
 
+void Node::SetNetPositionAttr(const Vector3& value)
+{
+    SmoothedTransform* transform = GetComponent<SmoothedTransform>();
+    if (transform)
+        transform->SetTargetPosition(value);
+    else
+        SetPosition(value);
+}
+
 void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
-    SetRotation(buf.ReadPackedQuaternion());
+    SmoothedTransform* transform = GetComponent<SmoothedTransform>();
+    if (transform)
+        transform->SetTargetRotation(buf.ReadPackedQuaternion());
+    else
+        SetRotation(buf.ReadPackedQuaternion());
 }
 
 void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
@@ -835,6 +850,11 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
         else
             parentNode->AddChild(this);
     }
+}
+
+const Vector3& Node::GetNetPositionAttr() const
+{
+    return position_;
 }
 
 const PODVector<unsigned char>& Node::GetNetRotationAttr() const

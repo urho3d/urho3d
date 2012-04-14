@@ -37,6 +37,7 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "SmoothedTransform.h"
 #include "StringUtils.h"
 
 #include <kNet.h>
@@ -499,11 +500,15 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             {
                 // Add initially to the root level. May be moved as we receive the parent attribute
                 node = scene_->CreateChild(nodeID, REPLICATED);
+                // Create smoothed transform component
+                node->CreateComponent<SmoothedTransform>(LOCAL);
             }
             
             // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg, deltaUpdateBits_);
-            //node->UpdateSmoothing(1.0f, 0.0f);
+            SmoothedTransform* transform = node->GetComponent<SmoothedTransform>();
+            if (transform)
+                transform->Update(1.0f, 0.0f);
             
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
