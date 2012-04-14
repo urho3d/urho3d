@@ -65,6 +65,8 @@ RigidBody::RigidBody(Context* context) :
     collisionLayer_(DEFAULT_COLLISION_LAYER),
     collisionMask_(DEFAULT_COLLISION_MASK),
     collisionEventMode_(COLLISION_ACTIVE),
+    lastPosition_(Vector3::ZERO),
+    lastRotation_(Quaternion::IDENTITY),
     inSetTransform_(false)
 {
     compoundShape_ = new btCompoundShape();
@@ -98,6 +100,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", GetCollisionLayer, SetCollisionLayer, unsigned, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_MASK, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
@@ -111,8 +114,10 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
 {
     if (node_)
     {
-        worldTrans.setOrigin(ToBtVector3(node_->GetWorldPosition()));
-        worldTrans.setRotation(ToBtQuaternion(node_->GetWorldRotation()));
+        lastPosition_ = node_->GetWorldPosition();
+        lastRotation_ = node_->GetWorldRotation();
+        worldTrans.setOrigin(ToBtVector3(lastPosition_));
+        worldTrans.setRotation(ToBtQuaternion(lastRotation_));
     }
 }
 
@@ -124,6 +129,8 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
         inSetTransform_ = true;
         node_->SetWorldPosition(ToVector3(worldTrans.getOrigin()));
         node_->SetWorldRotation(ToQuaternion(worldTrans.getRotation()));
+        lastPosition_ = node_->GetWorldPosition();
+        lastRotation_ = node_->GetWorldRotation();
         inSetTransform_ = false;
     }
 }
@@ -309,6 +316,13 @@ void RigidBody::SetPhantom(bool enable)
     }
 }
 
+void RigidBody::SetCcdRadius(float radius)
+{
+    radius = Max(radius, 0.0f);
+    if (body_)
+        body_->setCcdSweptSphereRadius(radius);
+}
+
 void RigidBody::SetCollisionLayer(unsigned layer)
 {
     if (layer != collisionLayer_)
@@ -345,37 +359,55 @@ void RigidBody::SetCollisionEventMode(CollisionEventMode mode)
 void RigidBody::ApplyForce(const Vector3& force)
 {
     if (body_ && force != Vector3::ZERO)
+    {
+        Activate();
         body_->applyCentralForce(ToBtVector3(force));
+    }
 }
 
 void RigidBody::ApplyForce(const Vector3& force, const Vector3& position)
 {
     if (body_ && force != Vector3::ZERO)
+    {
+        Activate();
         body_->applyForce(ToBtVector3(force), ToBtVector3(position));
+    }
 }
 
 void RigidBody::ApplyTorque(const Vector3& torque)
 {
     if (body_ && torque != Vector3::ZERO)
+    {
+        Activate();
         body_->applyTorque(ToBtVector3(torque));
+    }
 }
 
 void RigidBody::ApplyImpulse(const Vector3& impulse)
 {
     if (body_ && impulse != Vector3::ZERO)
+    {
+        Activate();
         body_->applyCentralImpulse(ToBtVector3(impulse));
+    }
 }
 
 void RigidBody::ApplyImpulse(const Vector3& impulse, const Vector3& position)
 {
     if (body_ && impulse != Vector3::ZERO)
+    {
+        Activate();
         body_->applyImpulse(ToBtVector3(impulse), ToBtVector3(position));
+    }
 }
 
 void RigidBody::ApplyTorqueImpulse(const Vector3& torque)
 {
     if (body_ && torque != Vector3::ZERO)
+    {
+        Activate();
         body_->applyTorqueImpulse(ToBtVector3(torque));
+    }
 }
 
 void RigidBody::ResetForces()
@@ -386,7 +418,7 @@ void RigidBody::ResetForces()
 
 void RigidBody::Activate()
 {
-    if (body_)
+    if (body_ && !body_->isActive())
         body_->activate();
 }
 
@@ -518,6 +550,14 @@ bool RigidBody::IsActive() const
         return false;
 }
 
+float RigidBody::GetCcdRadius() const
+{
+    if (body_)
+        return body_->getCcdSweptSphereRadius();
+    else
+        return 0.0f;
+}
+
 void RigidBody::UpdateMass()
 {
     if (body_)
@@ -572,13 +612,20 @@ void RigidBody::OnMarkedDirty(Node* node)
             return;
         }
         
-        Vector3 newWorldPos = node_->GetWorldPosition();
-        Quaternion newWorldRot = node_->GetWorldRotation();
+        // Check if transform has changed from the last transform set at end of simulation step
+        Vector3 newPosition = node_->GetWorldPosition();
+        Quaternion newRotation = node_->GetWorldRotation();
         
-        if (newWorldPos != GetPosition())
-            SetPosition(newWorldPos);
-        if (newWorldRot != GetRotation())
-            SetRotation(newWorldRot);
+        if (newPosition != lastPosition_)
+        {
+            lastPosition_ = newPosition;
+            SetPosition(newPosition);
+        }
+        if (newRotation != GetRotation())
+        {
+            lastRotation_ = newRotation;
+            SetRotation(newRotation);
+        }
     }
 }
 
@@ -608,12 +655,10 @@ void RigidBody::AddBodyToWorld()
     
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
-    {
         world->removeRigidBody(body_);
-        UpdateMass();
-    }
     else
     {
+        // Correct inertia will be calculated below
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
         body_->setUserPointer(this);
@@ -626,12 +671,7 @@ void RigidBody::AddBodyToWorld()
             (*i)->NotifyRigidBody();
     }
     
-    int flags = body_->getCollisionFlags();
-    if (mass_ > 0.0f)
-        flags &= ~btCollisionObject::CF_STATIC_OBJECT;
-    else
-        flags |= btCollisionObject::CF_STATIC_OBJECT;
-    body_->setCollisionFlags(flags);
+    UpdateMass();
     
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
 }

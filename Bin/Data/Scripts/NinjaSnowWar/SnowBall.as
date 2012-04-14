@@ -1,13 +1,10 @@
 #include "Scripts/NinjaSnowWar/GameObject.as"
 
-const float snowballMass = 10;
-const float snowballFriction = 0.5;
-const float snowballDampingForce = 20;
 const float snowballMinHitSpeed = 100;
+const float snowballDampingForce = 20;
 const float snowballDuration = 5;
 const float snowballGroundHitDuration = 1;
 const float snowballObjectHitDuration = 0;
-const float snowballDrawDistance = 7500;
 const int snowballDamage = 1;
 
 class SnowBall : GameObject
@@ -50,7 +47,7 @@ class SnowBall : GameObject
     void WorldCollision(VariantMap& eventData)
     {
         GameObject::WorldCollision(eventData);
-        
+
         // If hit the ground, disappear after a short while
         if (duration > snowballGroundHitDuration)
             duration = snowballGroundHitDuration;

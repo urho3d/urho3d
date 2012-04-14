@@ -79,7 +79,6 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterEnumValue("ShapeType", "SHAPE_CONE", SHAPE_CONE);
     engine->RegisterEnumValue("ShapeType", "SHAPE_TRIANGLEMESH", SHAPE_TRIANGLEMESH);
     engine->RegisterEnumValue("ShapeType", "SHAPE_CONVEXHULL", SHAPE_CONVEXHULL);
-    engine->RegisterEnumValue("ShapeType", "SHAPE_HEIGHTFIELD", SHAPE_HEIGHTFIELD);
     
     RegisterComponent<CollisionShape>(engine, "CollisionShape");
     engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
@@ -88,8 +87,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void SetCapsule(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCapsule), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetCone(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCone), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, uint, uint, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, uint, float, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(CollisionShape, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_shapeType(ShapeType)", asMETHOD(CollisionShape, SetShapeType), asCALL_THISCALL);
@@ -100,16 +98,12 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "const Vector3& get_position() const", asMETHOD(CollisionShape, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_rotation(const Quaternion&in)", asMETHOD(CollisionShape, SetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "const Quaternion& get_rotation() const", asMETHOD(CollisionShape, GetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void set_margin(float)", asMETHOD(CollisionShape, SetMargin), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "float get_margin() const", asMETHOD(CollisionShape, GetMargin), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_model(Model@+)", asMETHOD(CollisionShape, SetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "Model@+ get_model() const", asMETHOD(CollisionShape, GetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_lodLevel(uint)", asMETHOD(CollisionShape, SetLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "uint get_lodLevel() const", asMETHOD(CollisionShape, GetLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void set_thickness(float)", asMETHOD(CollisionShape, SetThickness), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "float get_thickness() const", asMETHOD(CollisionShape, GetThickness), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void set_numPoints(const IntVector2&in)", asMETHOD(CollisionShape, SetNumPoints), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "const IntVector2& get_numPoints() const", asMETHOD(CollisionShape, GetNumPoints), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void set_flipEdges(bool)", asMETHOD(CollisionShape, SetFlipEdges), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "bool get_flipEdges() const", asMETHOD(CollisionShape, GetFlipEdges), asCALL_THISCALL);
     
     // Register Variant GetPtr() for CollisionShape
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
@@ -167,6 +161,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void set_kinematic(bool)", asMETHOD(RigidBody, SetKinematic), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_kinematic() const", asMETHOD(RigidBody, IsKinematic), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_active() const", asMETHOD(RigidBody, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_ccdRadius(float)", asMETHOD(RigidBody, SetCcdRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "float get_ccdRadius() const", asMETHOD(RigidBody, GetCcdRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_collisionLayer(uint)", asMETHOD(RigidBody, SetCollisionLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "uint get_collisionLayer() const", asMETHOD(RigidBody, GetCollisionLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_collisionMask(uint)", asMETHOD(RigidBody, SetCollisionMask), asCALL_THISCALL);

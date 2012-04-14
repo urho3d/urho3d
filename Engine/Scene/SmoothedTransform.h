@@ -45,25 +45,17 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Update smoothing.
+    void Update(float constant, float squaredSnapThreshold);
     /// %Set target local space position.
     void SetTargetPosition(const Vector3& position);
     /// %Set target local space rotation.
     void SetTargetRotation(const Quaternion& rotation);
-    /// %Set smoothing constant.
-    void SetSmoothingConstant(float constant);
-    /// %Set smoothing position snap threshold.
-    void SetSnapThreshold(float threshold);
-    /// Update smoothing.
-    void Update(float timeStep);
     
     /// Return target position.
     const Vector3& GetTargetPosition() const { return targetPosition_; }
     /// Return target rotation.
     const Quaternion& GetTargetRotation() const { return targetRotation_; }
-    /// Return smoothing constant.
-    float GetSmoothingConstant() const { return smoothingConstant_; }
-    /// Return smoothing position snap threshold.
-    float GetSnapThreshold() const { return snapThreshold_; }
     /// Return whether smoothing is in progress.
     bool IsActive() const { return smoothingMask_ != 0; }
     
@@ -72,6 +64,9 @@ protected:
     virtual void OnNodeSet(Node* node);
     
 private:
+    /// Handle smoothing update event.
+    void HandleUpdateSmoothing(StringHash eventType, VariantMap& eventData);
+    
     /// Target position.
     Vector3 targetPosition_;
     /// Target rotation.

@@ -39,6 +39,13 @@ EVENT(E_SCENESUBSYSTEMUPDATE, SceneSubsystemUpdate)
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
+/// Scene transform smoothing update.
+EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
+{
+    PARAM(P_CONSTANT, Constant);            // float
+    PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
+}
+
 /// Variable timestep scene post-update.
 EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {

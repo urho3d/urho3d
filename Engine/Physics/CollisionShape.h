@@ -48,8 +48,7 @@ enum ShapeType
     SHAPE_CAPSULE,
     SHAPE_CONE,
     SHAPE_TRIANGLEMESH,
-    SHAPE_CONVEXHULL,
-    SHAPE_HEIGHTFIELD
+    SHAPE_CONVEXHULL
 };
 
 /// Base class for collision shape geometry data.
@@ -77,7 +76,7 @@ struct TriangleMeshData : public CollisionGeometryData
 struct ConvexData : public CollisionGeometryData
 {
     /// Construct from a model.
-    ConvexData(Model* model, unsigned lodLevel, float thickness);
+    ConvexData(Model* model, unsigned lodLevel);
     /// Destruct. Free geometry data.
     ~ConvexData();
     
@@ -85,26 +84,6 @@ struct ConvexData : public CollisionGeometryData
     SharedArrayPtr<Vector3> vertexData_;
     /// Number of vertices.
     unsigned vertexCount_;
-};
-
-/// Heightfield geometry data.
-struct HeightfieldData : public CollisionGeometryData
-{
-    /// Construct from a model.
-    HeightfieldData(Model* model, unsigned lodLevel, IntVector2 numPoints);
-    /// Destruct. Free geometry data.
-    ~HeightfieldData();
-    
-    /// Height values.
-    SharedArrayPtr<float> heightData_;
-    /// Heightfield number of points in X & Z dimensions.
-    IntVector2 numPoints_;
-    /// Heightfield bounding box.
-    BoundingBox boundingBox_;
-    /// X spacing.
-    float xSpacing_;
-    /// Z spacing.
-    float zSpacing_;
 };
 
 /// Physics collision shape component.
@@ -137,10 +116,8 @@ public:
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a triangle mesh.
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a heightfield.
-    void SetHeightfield(Model* model, unsigned lodLevel, unsigned xPoints, unsigned zPoints, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a convex hull (internally an ODE trimesh as well.)
-    void SetConvexHull(Model* model, unsigned lodLevel, float thickness, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// %Set as a convex hull.
+    void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set shape type.
     void SetShapeType(ShapeType type);
     /// %Set shape size.
@@ -151,16 +128,12 @@ public:
     void SetRotation(const Quaternion& rotation);
     /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set triangle mesh / convex hull / heightfield model.
+    /// %Set collision margin.
+    void SetMargin(float margin);
+    /// %Set triangle mesh / convex hull model.
     void SetModel(Model* model);
     /// %Set model LOD level.
     void SetLodLevel(unsigned lodLevel);
-    /// %Set convex hull thickness.
-    void SetThickness(float thickness);
-    /// %Set heightfield number of points in X & Z dimensions. Use (0,0) to guess from the model.
-    void SetNumPoints(const IntVector2& numPoints);
-    /// %Set heightfield flip edges flag.
-    void SetFlipEdges(bool enable);
     
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_; }
@@ -174,16 +147,12 @@ public:
     const Vector3& GetPosition() const { return position_; }
     /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return triangle mesh / convex hull / heightfield model.
+    /// Return collision margin.
+    float GetMargin() const { return margin_; }
+    /// Return triangle mesh / convex hull model.
     Model* GetModel() const { return model_; }
     /// Return model LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
-    /// Return convex hull thickness.
-    float GetThickness() const { return thickness_; }
-    /// Return heightfield number of points in X & Z dimensions.
-    const IntVector2& GetNumPoints() const { return numPoints_; }
-    /// Return heightfield flip edges flag.
-    bool GetFlipEdges() { return flipEdges_; }
     
     /// Update the new collision shape to the RigidBody, and tell it to update its mass.
     void NotifyRigidBody();
@@ -228,14 +197,10 @@ private:
     Vector3 size_;
     /// Cached world scale for determining if the collision shape needs update.
     Vector3 cachedWorldScale_;
-    /// Heightfield number of points.
-    IntVector2 numPoints_;
     /// Model LOD level.
     unsigned lodLevel_;
-    /// Hull thickness.
-    float thickness_;
-    /// Heightfield flip edges flag.
-    bool flipEdges_;
+    /// Collision margin.
+    float margin_;
     /// Dirty flag.
     bool dirty_;
 };

@@ -281,7 +281,7 @@ void ImportTundraScene(const String&in fileName)
                     break;
 
                 case 6:
-                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, 0.1, bodySize);
+                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, bodySize);
                     break;
                 }
 

@@ -90,6 +90,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     world_->setDebugDrawer(this);
     world_->setInternalTickCallback(InternalPreTickCallback, static_cast<void*>(this), true);
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);
+    world_->getDispatchInfo().m_useContinuous = true;
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -341,10 +342,21 @@ void PhysicsWorld::PreStep(float timeStep)
     eventData[P_WORLD] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
+    
+    // Start profiling block for the actual simulation step
+#ifdef ENABLE_PROFILING
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        profiler->BeginBlock("StepSimulation", 1);
+#endif
 }
 
 void PhysicsWorld::PostStep(float timeStep)
 {
+#ifdef ENABLE_PROFILING
+    GetSubsystem<Profiler>()->EndBlock();
+#endif
+    
     SendCollisionEvents();
     
     // Send post-step event
@@ -374,6 +386,11 @@ void PhysicsWorld::SendCollisionEvents()
         for (int i = 0; i < numManifolds; ++i)
         {
             btPersistentManifold* contactManifold = collisionDispatcher_->getManifoldByIndexInternal(i);
+            int numContacts = contactManifold->getNumContacts();
+            // First check that there are actual contacts
+            if (!numContacts)
+                continue;
+            
             btCollisionObject* objectA = static_cast<btCollisionObject*>(contactManifold->getBody0());
             btCollisionObject* objectB = static_cast<btCollisionObject*>(contactManifold->getBody1());
             
@@ -384,10 +401,10 @@ void PhysicsWorld::SendCollisionEvents()
             if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
                 continue;
             if (bodyA->GetCollisionEventMode() == COLLISION_NEVER || bodyB->GetCollisionEventMode() == COLLISION_NEVER)
-                return;
+                continue;
             if (bodyA->GetCollisionEventMode() == COLLISION_ACTIVE && bodyB->GetCollisionEventMode() == COLLISION_ACTIVE &&
                 !bodyA->IsActive() && !bodyB->IsActive())
-                return;
+                continue;
             
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
@@ -410,7 +427,6 @@ void PhysicsWorld::SendCollisionEvents()
             
             contacts.Clear();
             
-            int numContacts = contactManifold->getNumContacts();
             for (int j = 0; j < numContacts; ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);

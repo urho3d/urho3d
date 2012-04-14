@@ -815,7 +815,7 @@ void UpdateCamera()
     
     // Make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
     if (playerNode.vars["Health"].GetInt() > 0)
-        playerNode.SnapRotation(Quaternion(0, playerControls.yaw, 0));
+        playerNode.rotation = Quaternion(0, playerControls.yaw, 0);
 
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(playerControls.pitch, Vector3(1, 0, 0));

@@ -23,7 +23,8 @@
 
 #include "Precompiled.h"
 #include "Context.h"
-#include "Node.h"
+#include "Scene.h"
+#include "SceneEvents.h"
 #include "SmoothedTransform.h"
 
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
@@ -48,40 +49,12 @@ SmoothedTransform::~SmoothedTransform()
 void SmoothedTransform::RegisterObject(Context* context)
 {
     context->RegisterFactory<SmoothedTransform>();
-    
-    ACCESSOR_ATTRIBUTE(SmoothedTransform, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(SmoothedTransform, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
 }
 
-void SmoothedTransform::SetTargetPosition(const Vector3& position)
-{
-    targetPosition_ = position;
-    smoothingMask_ |= SMOOTH_POSITION;
-}
-
-void SmoothedTransform::SetTargetRotation(const Quaternion& rotation)
-{
-    targetRotation_ = rotation;
-    smoothingMask_ |= SMOOTH_ROTATION;
-}
-
-void SmoothedTransform::SetSmoothingConstant(float constant)
-{
-    smoothingConstant_ = Max(constant, M_EPSILON);
-}
-
-void SmoothedTransform::SetSnapThreshold(float threshold)
-{
-    snapThreshold_ = Max(threshold, 0.0f);
-}
-
-void SmoothedTransform::Update(float timeStep)
+void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
 {
     if (smoothingMask_ && node_)
     {
-        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
-        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
-        
         Vector3 position = node_->GetPosition();
         Quaternion rotation = node_->GetRotation();
         
@@ -119,6 +92,18 @@ void SmoothedTransform::Update(float timeStep)
     }
 }
 
+void SmoothedTransform::SetTargetPosition(const Vector3& position)
+{
+    targetPosition_ = position;
+    smoothingMask_ |= SMOOTH_POSITION;
+}
+
+void SmoothedTransform::SetTargetRotation(const Quaternion& rotation)
+{
+    targetRotation_ = rotation;
+    smoothingMask_ |= SMOOTH_ROTATION;
+}
+
 void SmoothedTransform::OnNodeSet(Node* node)
 {
     if (node)
@@ -126,5 +111,19 @@ void SmoothedTransform::OnNodeSet(Node* node)
         // Copy initial target transform
         targetPosition_ = node->GetPosition();
         targetRotation_ = node->GetRotation();
+        
+        // Subscribe to smoothing update
+        Scene* scene = node_->GetScene();
+        if (scene)
+            SubscribeToEvent(scene, E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
     }
+}
+
+void SmoothedTransform::HandleUpdateSmoothing(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UpdateSmoothing;
+    
+    float constant = eventData[P_CONSTANT].GetFloat();
+    float squaredSnapThreshold = eventData[P_SQUAREDSNAPTHRESHOLD].GetFloat();
+    Update(constant, squaredSnapThreshold);
 }

@@ -41,12 +41,13 @@
 #include <BulletCollision/CollisionShapes/btConeShape.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 #include <BulletCollision/CollisionShapes/btCylinderShape.h>
-#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <hull.h>
+
+static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
 static const String typeNames[] = 
 {
@@ -57,7 +58,6 @@ static const String typeNames[] =
     "Cone",
     "TriangleMesh",
     "ConvexHull",
-    "Heightfield",
     ""
 };
 
@@ -131,7 +131,7 @@ TriangleMeshData::~TriangleMeshData()
     meshData_ = 0;
 }
 
-ConvexData::ConvexData(Model* model, unsigned lodLevel, float thickness)
+ConvexData::ConvexData(Model* model, unsigned lodLevel)
 {
     modelName_ = model->GetName();
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
@@ -176,7 +176,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel, float thickness)
         desc.mVcount = originalVertices.Size();
         desc.mVertices = originalVertices[0].Data();
         desc.mVertexStride = 3 * sizeof(float);
-        desc.mSkinWidth = thickness;
+        desc.mSkinWidth = 0.0f;
         
         StanHull::HullLibrary lib;
         StanHull::HullResult result;
@@ -197,79 +197,6 @@ ConvexData::~ConvexData()
 {
 }
 
-HeightfieldData::HeightfieldData(Model* model, unsigned lodLevel, IntVector2 numPoints)
-{
-    modelName_ = model->GetName();
-    
-    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-    
-    if (!geometries.Size())
-        return;
-    
-    lodLevel = Clamp(lodLevel, 0, geometries[0].Size());
-    
-    Geometry* geom = geometries[0][lodLevel];
-    if (!geom)
-        return;
-    
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
-    
-    geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
-    if (!vertexData || !indexData)
-        return;
-    
-    unsigned indexStart = geom->GetIndexStart();
-    unsigned indexCount = geom->GetIndexCount();
-    
-    // If X & Z size not specified, try to guess them
-    if (numPoints == IntVector2::ZERO)
-        numPoints.x_ = numPoints.y_ = (int)sqrtf((float)geom->GetVertexCount());
-    else
-    {
-        numPoints.x_ = Max(numPoints.x_, 2);
-        numPoints.y_ = Max(numPoints.y_, 2);
-    }
-    
-    unsigned dataSize = numPoints.x_ * numPoints.y_;
-    numPoints_ = numPoints;
-    
-    // Then allocate the heightfield
-    BoundingBox box = model->GetBoundingBox();
-    heightData_ = new float[dataSize];
-    
-    // Calculate spacing from model's bounding box
-    xSpacing_ = (box.max_.x_ - box.min_.x_) / (numPoints.x_ - 1);
-    zSpacing_ = (box.max_.z_ - box.min_.z_) / (numPoints.y_ - 1);
-    
-    // Initialize the heightfield with minimum height
-    for (unsigned i = 0; i < dataSize; ++i)
-        heightData_[i] = box.min_.y_;
-    
-    unsigned vertexStart = geom->GetVertexStart();
-    unsigned vertexCount = geom->GetVertexCount();
-    
-    // Now go through vertex data and fit the vertices into the heightfield
-    for (unsigned i = vertexStart; i < vertexStart + vertexCount; ++i)
-    {
-        const Vector3& vertex = *((const Vector3*)(&vertexData[i * vertexSize]));
-        int x = (int)((vertex.x_ - box.min_.x_) / xSpacing_ + 0.25f);
-        int z = (int)((vertex.z_ - box.min_.z_) / zSpacing_ + 0.25f);
-        if (x >= numPoints.x_)
-            x = numPoints.x_ - 1;
-        if (z >= numPoints.y_)
-            z = numPoints.y_ - 1;
-        if (vertex.y_ > heightData_[z * numPoints.x_ + x])
-            heightData_[z * numPoints.x_ + x] = vertex.y_;
-    }
-}
-
-HeightfieldData::~HeightfieldData()
-{
-}
-
 OBJECTTYPESTATIC(CollisionShape);
 
 CollisionShape::CollisionShape(Context* context) :
@@ -280,11 +207,9 @@ CollisionShape::CollisionShape(Context* context) :
     rotation_(Quaternion::IDENTITY),
     size_(Vector3::ONE),
     lodLevel_(0),
-    thickness_(0.0f),
-    numPoints_(IntVector2::ZERO),
     cachedWorldScale_(Vector3::ONE),
-    dirty_(false),
-    flipEdges_(false)
+    margin_(DEFAULT_COLLISION_MARGIN),
+    dirty_(false)
 {
 }
 
@@ -304,12 +229,9 @@ void CollisionShape::RegisterObject(Context* context)
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Collision Margin", margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "Heightfield Points X", numPoints_.x_, 0, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "Heightfield Points Z", numPoints_.y_, 0, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_BOOL, "Heightfield Flip Edges", flipEdges_, false, AM_DEFAULT);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -407,7 +329,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     NotifyRigidBody();
 }
 
-void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, float thickness, const Vector3& size, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
 {
     if (!model)
     {
@@ -418,27 +340,6 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, float thickn
     shapeType_ = SHAPE_CONVEXHULL;
     model_ = model;
     lodLevel_ = lodLevel;
-    thickness_ = thickness;
-    size_ = size.Abs();
-    position_ = position;
-    rotation_ = rotation;
-    
-    UpdateShape();
-    NotifyRigidBody();
-}
-
-void CollisionShape::SetHeightfield(Model* model, unsigned lodLevel, unsigned xPoints, unsigned zPoints, const Vector3& size, const Vector3& position, const Quaternion& rotation)
-{
-    if (!model)
-    {
-        LOGERROR("Null model, can not set heightfield");
-        return;
-    }
-    
-    shapeType_ = SHAPE_HEIGHTFIELD;
-    model_ = model;
-    lodLevel_ = lodLevel;
-    numPoints_ = IntVector2(xPoints, zPoints);
     size_ = size.Abs();
     position_ = position;
     rotation_ = rotation;
@@ -495,6 +396,18 @@ void CollisionShape::SetTransform(const Vector3& position, const Quaternion& rot
     }
 }
 
+void CollisionShape::SetMargin(float margin)
+{
+    margin = Max(margin, 0.0f);
+    
+    if (margin != margin_)
+    {
+        if (shape_)
+            shape_->setMargin(margin);
+        margin_ = margin;
+    }
+}
+
 void CollisionShape::SetModel(Model* model)
 {
     if (model != model_)
@@ -514,47 +427,6 @@ void CollisionShape::SetLodLevel(unsigned lodLevel)
     {
         lodLevel_ = lodLevel;
         if (shapeType_ >= SHAPE_TRIANGLEMESH)
-        {
-            UpdateShape();
-            NotifyRigidBody();
-        }
-    }
-}
-
-void CollisionShape::SetThickness(float thickness)
-{
-    thickness = Max(thickness, 0.0f);
-    
-    if (thickness != thickness_)
-    {
-        thickness_ = thickness;
-        if (shapeType_ == SHAPE_CONVEXHULL)
-        {
-            UpdateShape();
-            NotifyRigidBody();
-        }
-    }
-}
-
-void CollisionShape::SetNumPoints(const IntVector2& numPoints)
-{
-    if (numPoints != numPoints_)
-    {
-        numPoints_ = numPoints;
-        if (shapeType_ == SHAPE_HEIGHTFIELD)
-        {
-            UpdateShape();
-            NotifyRigidBody();
-        }
-    }
-}
-
-void CollisionShape::SetFlipEdges(bool enable)
-{
-    if (enable != flipEdges_)
-    {
-        flipEdges_ = enable;
-        if (shapeType_ == SHAPE_HEIGHTFIELD)
         {
             UpdateShape();
             NotifyRigidBody();
@@ -654,15 +526,6 @@ void CollisionShape::OnMarkedDirty(Node* node)
         case SHAPE_CONVEXHULL:
             shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
             break;
-            
-        case SHAPE_HEIGHTFIELD:
-            if (geometry_)
-            {
-                HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
-                shape_->setLocalScaling(ToBtVector3(newWorldScale * Vector3(heightfield->xSpacing_, 1.0f, heightfield->zSpacing_)
-                    * size_));
-            }
-            break;
         }
         
         NotifyRigidBody();
@@ -744,7 +607,7 @@ void CollisionShape::UpdateShape()
             if (model_)
             {
                 // Check the geometry cache
-                String id = "Convex_" + model_->GetName() + "_" + String(lodLevel_) + "_" + String(thickness_);
+                String id = "Convex_" + model_->GetName() + "_" + String(lodLevel_);
                 
                 Map<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
                 Map<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
@@ -752,7 +615,7 @@ void CollisionShape::UpdateShape()
                     geometry_ = j->second_;
                 else
                 {
-                    geometry_ = new ConvexData(model_, lodLevel_, thickness_);
+                    geometry_ = new ConvexData(model_, lodLevel_);
                     cache[id] = geometry_;
                 }
                 
@@ -761,33 +624,10 @@ void CollisionShape::UpdateShape()
                 shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
             }
             break;
-            
-        case SHAPE_HEIGHTFIELD:
-            if (model_)
-            {
-                // Check the geometry cache
-                String id = "Heightfield_" + model_->GetName() + "_" + String(lodLevel_) + String(numPoints_) + "_" + 
-                    String(flipEdges_);
-                
-                Map<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
-                Map<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
-                if (j != cache.End())
-                    geometry_ = j->second_;
-                else
-                {
-                    geometry_ = new HeightfieldData(model_, lodLevel_, numPoints_);
-                    cache[id] = geometry_;
-                }
-                
-                HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
-                shape_ = new btHeightfieldTerrainShape(heightfield->numPoints_.x_, heightfield->numPoints_.y_,
-                    heightfield->heightData_.Get(), 1.0f, heightfield->boundingBox_.min_.y_, heightfield->boundingBox_.max_.y_, 1,
-                    PHY_FLOAT, flipEdges_);
-                shape_->setLocalScaling(ToBtVector3(newWorldScale * Vector3(heightfield->xSpacing_, 1.0f,
-                    heightfield->zSpacing_) * size_));
-            }
-            break;
         }
+        
+        if (shape_)
+            shape_->setMargin(margin_);
         
         cachedWorldScale_ = newWorldScale;
     }

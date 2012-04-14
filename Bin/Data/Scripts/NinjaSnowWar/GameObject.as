@@ -122,10 +122,10 @@ class GameObject : ScriptObject
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
     {
         Node@ otherNode = eventData["OtherNode"].GetNode();
-        CollisionShape@ otherShape = eventData["OtherShape"].GetCollisionShape();
+        RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
 
         // If the other collision shape belongs to static geometry, perform world collision
-        if (otherShape.collisionLayer == 2)
+        if (otherBody.collisionLayer == 2)
             WorldCollision(eventData);
 
         // If the other node is scripted, perform object-to-object collision
@@ -141,8 +141,8 @@ class GameObject : ScriptObject
         {
             Vector3 contactPosition = contacts.ReadVector3();
             Vector3 contactNormal = contacts.ReadVector3();
-            float contactDepth = contacts.ReadFloat();
-            float contactVelocity = contacts.ReadFloat();
+            float contactDistance = contacts.ReadFloat();
+            float contactImpulse = contacts.ReadFloat();
 
             // If contact is below node center and mostly vertical, assume it's ground contact
             if (contactPosition.y < node.position.y)

@@ -96,6 +96,8 @@ public:
     void SetKinematic(bool enable);
     /// %Set rigid body phantom mode. In phantom mode collisions are registered but do not apply forces.
     void SetPhantom(bool enable);
+    /// %Set continuous collision detection radius.
+    void SetCcdRadius(float radius);
     /// %Set collision layer.
     void SetCollisionLayer(unsigned layer);
     /// %Set collision mask.
@@ -159,6 +161,8 @@ public:
     bool IsPhantom() const;
     /// Return whether rigid body is active.
     bool IsActive() const;
+    /// Return continuous collision detection radius.
+    float GetCcdRadius() const;
     /// Return collision layer.
     unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask.
@@ -210,6 +214,10 @@ private:
     unsigned collisionMask_;
     /// Collision event signaling mode.
     CollisionEventMode collisionEventMode_;
+    /// Last interpolated position from the simulation.
+    mutable Vector3 lastPosition_;
+    /// Last interpolated rotation from the simulation.
+    mutable Quaternion lastRotation_;
     /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
     bool inSetTransform_;
 };
