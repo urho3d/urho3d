@@ -154,24 +154,12 @@ void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    specificEventReceivers_[MakePair(sender, eventType)].Insert(receiver);
+    specificEventReceivers_[sender][eventType].Insert(receiver);
 }
 
 void Context::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator i = specificEventReceivers_.Begin();
-        i != specificEventReceivers_.End();)
-    {
-        Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator current = i++;
-        if (current->first_.first_ == sender)
-        {
-            Set<Object*>& receivers = current->second_;
-            for (Set<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
-                (*j)->RemoveEventSender(sender);
-            
-            specificEventReceivers_.Erase(current);
-        }
-    }
+    specificEventReceivers_.Erase(sender);
 }
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)

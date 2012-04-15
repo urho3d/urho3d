@@ -287,6 +287,8 @@ void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transfo
 
 void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 {
+    PROFILE(PhysicsDrawDebug);
+    
     debugDepthTest_ = depthTest;
     debugRenderer_ = GetComponent<DebugRenderer>();
     world_->debugDrawWorld();

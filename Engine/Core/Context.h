@@ -91,8 +91,14 @@ public:
     /// Return event receivers for a sender and event type, or null if they do not exist.
     Set<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {
-        Map<Pair<Object*, StringHash>, Set<Object*> >::Iterator i =  specificEventReceivers_.Find(MakePair(sender, eventType));
-        return i != specificEventReceivers_.End() ? &i->second_ : 0;
+        Map<Object*, Map<StringHash, Set<Object*> > >::Iterator i = specificEventReceivers_.Find(sender);
+        if (i != specificEventReceivers_.End())
+        {
+            Map<StringHash, Set<Object*> >::Iterator j = i->second_.Find(eventType);
+            return j != i->second_.End() ? &j->second_ : 0;
+        }
+        else
+            return 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist.
@@ -131,7 +137,7 @@ private:
     /// Event receivers for non-specific events.
     Map<StringHash, Set<Object*> > eventReceivers_;
     /// Event receivers for specific senders' events.
-    Map<Pair<Object*, StringHash>, Set<Object*> > specificEventReceivers_;
+    Map<Object*, Map<StringHash, Set<Object*> > > specificEventReceivers_;
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.

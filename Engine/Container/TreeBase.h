@@ -49,10 +49,10 @@ struct TreeNodeBase
             newChild->parent_ = this;
     }
     
-    /// Parent node.
-    TreeNodeBase* parent_;
     /// Child links.
     TreeNodeBase* link_[2];
+    /// Parent node.
+    TreeNodeBase* parent_;
     /// Color flag.
     bool isRed_;
 };

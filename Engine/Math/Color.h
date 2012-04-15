@@ -117,10 +117,10 @@ public:
     /// Return color packed to a 32-bit integer. Components are clamped to [0, 1] range.
     unsigned ToUInt() const
     {
-        int r = Clamp((int)(r_ * 255.0f), 0, 255);
-        int g = Clamp((int)(g_ * 255.0f), 0, 255);
-        int b = Clamp((int)(b_ * 255.0f), 0, 255);
-        int a = Clamp((int)(b_ * 255.0f), 0, 255);
+        unsigned r = Clamp(((int)(r_ * 255.0f)), 0, 255);
+        unsigned g = Clamp(((int)(g_ * 255.0f)), 0, 255);
+        unsigned b = Clamp(((int)(b_ * 255.0f)), 0, 255);
+        unsigned a = Clamp(((int)(a_ * 255.0f)), 0, 255);
         return (a << 24) | (b << 16) | (g << 8) | r;
     }
     
