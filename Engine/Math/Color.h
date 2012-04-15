@@ -114,14 +114,14 @@ public:
         );
     }
     
-    /// Return color packed to a 32-bit integer. Only the range [0, 1] is supported for components.
+    /// Return color packed to a 32-bit integer. Components are clamped to [0, 1] range.
     unsigned ToUInt() const
     {
-        unsigned r = (unsigned)(Clamp(r_ * 255.0f, 0.0f, 255.0f));
-        unsigned g = (unsigned)(Clamp(g_ * 255.0f, 0.0f, 255.0f));
-        unsigned b = (unsigned)(Clamp(b_ * 255.0f, 0.0f, 255.0f));
-        unsigned a = (unsigned)(Clamp(a_ * 255.0f, 0.0f, 255.0f));
-        return (((a) & 0xff) << 24) | (((b) & 0xff) << 16) | (((g) & 0xff) << 8) | ((r) & 0xff);
+        int r = Clamp((int)(r_ * 255.0f), 0, 255);
+        int g = Clamp((int)(g_ * 255.0f), 0, 255);
+        int b = Clamp((int)(b_ * 255.0f), 0, 255);
+        int a = Clamp((int)(b_ * 255.0f), 0, 255);
+        return (a << 24) | (b << 16) | (g << 8) | r;
     }
     
     /// Return as a four-dimensional vector.
