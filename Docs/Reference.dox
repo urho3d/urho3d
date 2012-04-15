@@ -91,7 +91,9 @@ SubscribeToEvent("Update", "MyEventHandler");
 
 In C++ events must always be handled by a member function. In script procedural event handling is also possible; in this case the ScriptFile where the event handler function is located becomes the event receiver. See \ref Scripting "Scripting" for more details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Time subsystem sends the Update event. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
+
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. As no target object is specified, this is a broadcast event. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
 
 \code
 using namespace Update;
@@ -109,7 +111,7 @@ eventData["TimeStep"] = timeStep;
 SendEvent("Update", eventData);
 \endcode
 
-Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
+A targeted event sent to a Node will be handled specially: it will be forwarded to all its components. This can be used to implement game-specific messaging, such as scoring and damage handling. The \ref Physics "physics simulation" uses this mechanism to inform the participating scene nodes of physics collisions.
 
 
 \page MainLoop Main loop and frame update
@@ -129,9 +131,10 @@ The update of each Scene causes further events to be sent:
 - E_SCENESUBSYSTEMUPDATE: update scene-wide subsystems. Currently only the PhysicsWorld component listens to this, which causes it to step the physics simulation and send the following two events for each simulation step:
 - E_PHYSICSPRESTEP: called before the simulation iteration. Happens at a fixed rate (the physics FPS.) If fixed timestep logic updates are needed, this is a good event to listen to.
 - E_PHYSICSPOSTSTEP: called after the simulation iteration. Happens at the same rate as E_PHYSICSPRESTEP.
+- E_SMOOTHINGUPDATE: update SmoothedTransform components in network client scenes.
 - E_SCENEPOSTUPDATE: variable timestep scene post-update. ParticleEmitter and AnimationController update themselves as a response to this event.
 
-Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics world simulation steps will be performed on each frame to keep up the apparent passage if time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load.
+Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics simulation steps will be performed on each frame to keep up the apparent passage if time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load. Note that the Engine's \ref Engine::SetMinFps "minimum FPS", by default 10, sets a hard cap for the timestep to prevent spiraling down to a complete halt; if exceeded, animation and physics will instead appear to slow down.
 
 
 \page SceneModel %Scene model

@@ -47,22 +47,22 @@ public:
     
     /// Update smoothing.
     void Update(float constant, float squaredSnapThreshold);
-    /// %Set target local space position.
+    /// %Set target position relative to parent node.
     void SetTargetPosition(const Vector3& position);
-    /// %Set target local space rotation.
+    /// %Set target rotation relative to parent node.
     void SetTargetRotation(const Quaternion& rotation);
-    /// %Set target world space position.
+    /// %Set target position in world space.
     void SetTargetWorldPosition(const Vector3& position);
-    /// %Set target world space rotation.
+    /// %Set target rotation in world space.
     void SetTargetWorldRotation(const Quaternion& rotation);
     
-    /// Return target local space position.
+    /// Return target position relative to parent node.
     const Vector3& GetTargetPosition() const { return targetPosition_; }
-    /// Return target local space rotation.
+    /// Return target rotation relative to parent node.
     const Quaternion& GetTargetRotation() const { return targetRotation_; }
-    /// Return target world space position.
+    /// Return target position in world space.
     Vector3 GetTargetWorldPosition() const;
-    /// Return target world space rotation.
+    /// Return target rotation in world space.
     Quaternion GetTargetWorldRotation() const;
     /// Return whether smoothing is in progress.
     bool IsActive() const { return smoothingMask_ != 0; }

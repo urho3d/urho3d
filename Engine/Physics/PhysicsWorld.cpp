@@ -47,7 +47,6 @@
 
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
-static const float MAX_PHYSICS_TIMESTEP = 0.1f;
 
 static bool CompareRaycastResults(const PhysicsRaycastResult& lhs, const PhysicsRaycastResult& rhs)
 {
@@ -149,15 +148,11 @@ void PhysicsWorld::Update(float timeStep)
 {
     PROFILE(UpdatePhysics);
     
-    // Clamp elapsed time to a maximum to prevent CPU usage spiralling out of control
-    if (timeStep > MAX_PHYSICS_TIMESTEP)
-        timeStep = MAX_PHYSICS_TIMESTEP;
-    
     float internalTimeStep = 1.0f / fps_;
     
     if (interpolation_)
     {
-        int maxSubSteps = (int)(MAX_PHYSICS_TIMESTEP * fps_);
+        int maxSubSteps = (int)(timeStep * fps_) + 1;
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
     }
     else

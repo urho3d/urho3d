@@ -72,37 +72,37 @@ public:
     bool SaveXML(Serializer& dest);
     /// %Set name.
     void SetName(const String& name);
-    /// %Set position.
+    /// %Set position relative to parent node.
     void SetPosition(const Vector3& position);
-    /// %Set rotation.
+    /// %Set rotation relative to parent node.
     void SetRotation(const Quaternion& rotation);
-    /// %Set direction. Positive Z equals identity.
+    /// %Set direction relative to parent node. Positive Z equals identity.
     void SetDirection(const Vector3& direction);
-    /// %Set uniform scale.
+    /// %Set uniform scale relative to parent node.
     void SetScale(float scale);
-    /// %Set scale.
+    /// %Set scale relative to parent node.
     void SetScale(const Vector3& scale);
-    /// %Set transform.
+    /// %Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set transform.
+    /// %Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// %Set transform.
+    /// %Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// %Set world position.
+    /// %Set position relative to world space.
     void SetWorldPosition(const Vector3& position);
-    /// %Set world rotation.
+    /// %Set rotation relative to world space.
     void SetWorldRotation(const Quaternion& rotation);
-    /// %Set world direction.
+    /// %Set direction relative to world space.
     void SetWorldDirection(const Vector3& direction);
-    /// %Set uniform world scale.
+    /// %Set uniform scale relative to world space.
     void SetWorldScale(float scale);
-    /// %Set world scale.
+    /// %Set scale relative to world space.
     void SetWorldScale(const Vector3& scale);
-    /// %Set world transform.
+    /// %Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set world transform.
+    /// %Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// %Set world transform.
+    /// %Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     /// Move the scene node.
     void Translate(const Vector3& delta);
@@ -169,18 +169,18 @@ public:
     Scene* GetScene() const { return scene_; }
     /// Return owner connection in networking.
     Connection* GetOwner() const { return owner_; }
-    /// Return position.
+    /// Return position relative to parent node.
     const Vector3& GetPosition() const { return position_; }
-    /// Return rotation.
+    /// Return rotation relative to parent node.
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return direction. Identity rotation equals positive Z.
+    /// Return direction relative to parent node. Identity rotation equals positive Z.
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
-    /// Return scale.
+    /// Return scale relative to parent node.
     const Vector3& GetScale() const { return scale_; }
-    /// Return local transform.
+    /// Return transform matrix relative to parent node.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
     
-    /// Return world-space position.
+    /// Return position in world space.
     Vector3 GetWorldPosition() const
     {
         if (dirty_)
@@ -189,7 +189,7 @@ public:
         return worldTransform_.Translation();
     }
     
-    /// Return world-space rotation.
+    /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
         if (dirty_)
@@ -198,7 +198,7 @@ public:
         return worldTransform_.Rotation();
     }
     
-    /// Return world-space direction.
+    /// Return direction in world space.
     Vector3 GetWorldDirection() const
     {
         if (dirty_)
@@ -207,7 +207,7 @@ public:
         return worldTransform_.RotationMatrix() * Vector3::FORWARD;
     }
     
-    /// Return world-space scale.
+    /// Return scale in world space.
     Vector3 GetWorldScale() const
     {
         if (dirty_)
@@ -216,7 +216,7 @@ public:
         return worldTransform_.Scale();
     }
     
-    /// Return world-space transform.
+    /// Return transform matrix in world space.
     const Matrix3x4& GetWorldTransform() const
     {
         if (dirty_)
@@ -225,13 +225,13 @@ public:
         return worldTransform_;
     }
     
-    /// Convert a local-space position to world space.
+    /// Convert a local space position to world space.
     Vector3 LocalToWorld(const Vector3& position) const;
-    /// Convert a local-space position or rotation to world space.
+    /// Convert a local space position or rotation to world space.
     Vector3 LocalToWorld(const Vector4& vector) const;
-    /// Convert a world-space position to local space.
+    /// Convert a world space position to local space.
     Vector3 WorldToLocal(const Vector3& position) const;
-    /// Convert a world-space position or rotation to local space.
+    /// Convert a world space position or rotation to local space.
     Vector3 WorldToLocal(const Vector4& vector) const;
     /// Return whether transform has changed and world transform needs recalculation.
     bool IsDirty() const { return dirty_; }

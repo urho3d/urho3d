@@ -57,13 +57,13 @@ public:
     /// Get scene node.
     Node* GetNode() const { return node_; }
     
-    /// Return parent node's world transform.
+    /// Return parent node's transform matrix in world space.
     const Matrix3x4& GetWorldTransform() const;
-    /// Return parent node's world position.
+    /// Return parent node's position in world space.
     Vector3 GetWorldPosition() const { return GetWorldTransform().Translation(); }
-    /// Return parent node's world rotation.
+    /// Return parent node's rotation in world space.
     Quaternion GetWorldRotation() const { return GetWorldTransform().Rotation(); }
-    /// Return parent node's world scale.
+    /// Return parent node's scale in world space.
     Vector3 GetWorldScale() const { return GetWorldTransform().Scale(); }
     
     /// Return components in the same scene node by type.
