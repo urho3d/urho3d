@@ -95,7 +95,7 @@ public:
     void SetUseGravity(bool enable);
     /// %Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
     void SetKinematic(bool enable);
-    /// %Set rigid body phantom mode. In phantom mode collisions are registered but do not apply forces.
+    /// %Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
     void SetPhantom(bool enable);
     /// %Set continuous collision detection radius.
     void SetCcdRadius(float radius);
@@ -124,6 +124,12 @@ public:
     /// Activate rigid body if it was resting.
     void Activate();
     
+    /// Return physics world.
+    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
+    /// Return Bullet rigid body.
+    btRigidBody* GetBody() const { return body_; }
+    /// Return Bullet compound collision shape.
+    btCompoundShape* GetCompoundShape() const { return compoundShape_; }
     /// Return mass.
     float GetMass() const { return mass_; }
     /// Return rigid body world-space position.
@@ -171,21 +177,16 @@ public:
     /// Return collision event signaling mode.
     CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
     
-    /// Return physics world.
-    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-    /// Return Bullet rigid body.
-    btRigidBody* GetBody() const { return body_; }
-    /// Return Bullet compound collision shape.
-    btCompoundShape* GetCompoundShape() const { return compoundShape_; }
+    /// Apply new world transform after a simulation step. Called internally.
+    void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
     /// Update mass and inertia of rigid body.
     void UpdateMass();
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
-    
-    /// Add debug geometry to the debug renderer.
-    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
     /// Handle node being assigned.
@@ -209,8 +210,6 @@ private:
     btCompoundShape* compoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
-    /// Cached SmoothedTransform component, if exists.
-    WeakPtr<SmoothedTransform> smoothedTransform_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.
@@ -227,4 +226,6 @@ private:
     mutable Quaternion lastRotation_;
     /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
     bool inSetTransform_;
+    /// Smoothed transform mode.
+    bool hasSmoothedTransform_;
 };

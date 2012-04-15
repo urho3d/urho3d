@@ -286,6 +286,11 @@ void PhysicsWorld::RemoveJoint(Joint* joint)
         joints_.Erase(i);
 }
 
+void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transform)
+{
+    delayedWorldTransforms_[transform.rigidBody_] = transform;
+}
+
 void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 {
     debugDepthTest_ = depthTest;
@@ -343,6 +348,8 @@ void PhysicsWorld::PreStep(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
     
+    delayedWorldTransforms_.Clear();
+    
     // Start profiling block for the actual simulation step
 #ifdef ENABLE_PROFILING
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -356,6 +363,24 @@ void PhysicsWorld::PostStep(float timeStep)
 #ifdef ENABLE_PROFILING
     GetSubsystem<Profiler>()->EndBlock();
 #endif
+    
+    // Apply delayed (parented) world transforms now
+    while (!delayedWorldTransforms_.Empty())
+    {
+        for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
+            i != delayedWorldTransforms_.End(); )
+        {
+            HashMap<RigidBody*, DelayedWorldTransform>::Iterator current = i++;
+            const DelayedWorldTransform& transform = current->second_;
+            
+            // If parent's transform has already been assigned, can proceed
+            if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
+            {
+                transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
+                delayedWorldTransforms_.Erase(current);
+            }
+        }
+    }
     
     SendCollisionEvents();
     
@@ -387,7 +412,7 @@ void PhysicsWorld::SendCollisionEvents()
         {
             btPersistentManifold* contactManifold = collisionDispatcher_->getManifoldByIndexInternal(i);
             int numContacts = contactManifold->getNumContacts();
-            // First check that there are actual contacts
+            // First check that there are actual contacts, as the manifold exists also when objects are close but not touching
             if (!numContacts)
                 continue;
             

@@ -42,11 +42,11 @@ public:
     /// Destruct.
     ~RenderSurface();
     
-    /// Set viewport for auxiliary view rendering.
+    /// %Set viewport for auxiliary view rendering.
     void SetViewport(Viewport* viewport);
-    /// Set linked color rendertarget.
+    /// %Set linked color rendertarget.
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// Set linked depth-stencil surface.
+    /// %Set linked depth-stencil surface.
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
     /// Create a renderbuffer. Return true if successful.
     bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);

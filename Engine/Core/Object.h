@@ -75,6 +75,10 @@ public:
     Context* GetContext() const { return context_; }
     /// Return subsystem by type.
     Object* GetSubsystem(ShortStringHash type) const;
+    /// Return active event sender. Null outside event handling.
+    Object* GetEventSender() const;
+    /// Return active event handler. Null outside event handling.
+    EventHandler* GetEventHandler() const;
     /// Return whether has subscribed to an event without specific sender.
     bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event.

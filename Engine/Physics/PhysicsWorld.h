@@ -67,6 +67,19 @@ struct PhysicsRaycastResult
     RigidBody* body_;
 };
 
+/// Delayed world transform assignment for parented rigidbodies.
+struct DelayedWorldTransform
+{
+    /// Rigid body.
+    RigidBody* rigidBody_;
+    /// Parent rigid body.
+    RigidBody* parentRigidBody_;
+    /// New world position.
+    Vector3 worldPosition_;
+    /// New world rotation.
+    Quaternion worldRotation_;
+};
+
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Physics simulation world component. Should be added only to the root scene node.
@@ -140,11 +153,13 @@ public:
     void AddJoint(Joint* joint);
     /// Remove a joint. Called by Joint.
     void RemoveJoint(Joint* joint);
+    /// Add a delayed world transform assignment. Called by RigidBody.
+    void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
+    /// %Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
     void SetDebugRenderer(DebugRenderer* debug);
-    /// Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
+    /// %Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
     void SetDebugDepthTest(bool enable);
     
     /// Return the Bullet physics world.
@@ -190,8 +205,8 @@ private:
     HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new."
     HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
-    /// Already processed rigid bodies during a poststep.
-    HashSet<RigidBody*> processedBodies_;
+    /// Delayed (parented) world transform assignments.
+    HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for collision geometry data.
     Map<String, SharedPtr<CollisionGeometryData> > geometryCache_;
     /// Simulation steps per second.

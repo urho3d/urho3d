@@ -115,9 +115,9 @@ public:
    /// %Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a triangle mesh.
-    void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a convex hull.
-    void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& size = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set shape type.
     void SetShapeType(ShapeType type);
     /// %Set shape size.

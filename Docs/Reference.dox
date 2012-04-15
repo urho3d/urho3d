@@ -143,12 +143,12 @@ Urho3D's scene model can be described as a component-based scene graph. The Scen
 Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating different \ref Component "Components" into the nodes by calling \ref Node::CreateComponent "CreateComponent()". As with events, in C++ components are identified by type name hashes, and template forms of the component creation and retrieval functions exist for convenience. For example:
 
 \code
-Light* light = lightNode->CreateComponent<Light>();
+Light* light = node->CreateComponent<Light>();
 \endcode
 
 In script, strings are used to identify component types instead, so the same code would look like:
 \code
-Light@ light = lightNode.CreateComponent("Light");
+Light@ light = node.CreateComponent("Light");
 \endcode
 
 Because components are created using \ref ObjectTypes "object factories", a factory must be registered for each component type.
@@ -177,7 +177,7 @@ It is also legal to create a Node that does not belong to a scene. This is parti
 
 \section SceneModel_Update Scene updates and serialization
 
-A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. 
+A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. See \ref Scene::SetActive "SetActive()".
 
 Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
 
@@ -814,19 +814,27 @@ The %Physics library in Urho3D implements rigid body physics simulation using th
 
 To use, a PhysicsWorld component must first be created to the Scene.
 
-The physics simulation has its own, fixed update rate. By default it is 60Hz. For higher rendering frame rates, physics motion is interpolated so that it always appears smooth. The update rate can be changed with \ref PhysicsWorld::SetFps "SetFps()" function. The physics update rate also determines the frequency of fixed timestep scene logic updates.
+The physics simulation has its own fixed update rate, which by default is 60Hz. When the rendering framerate is higher than the physics update rate, physics motion is interpolated so that it always appears smooth. The update rate can be changed with \ref PhysicsWorld::SetFps "SetFps()" function. The physics update rate also determines the frequency of fixed timestep scene logic updates.
 
 The other physics components are:
 
-- CollisionShape: defines physics collision geometry. The supported shapes are sphere, box, cylinder, capsule, triangle mesh, convex hull and heightfield.
-- RigidBody: a physics object instance. Instantiates all the physics geometries in the same Node. Its parameters include mass and linear/angular velocities.
+- RigidBody: a physics object instance. Its parameters include mass, linear/angular velocities, friction and restitution.
+- CollisionShape: defines physics collision geometry. The supported shapes are box, sphere, cylinder, capsule, cone, triangle mesh and convex hull.
 - Joint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently ball and hinge joints are supported.
 
-Triangle meshes, convex hulls and heightfields are created by specifying a Model resource.
+Both a RigidBody and at least one CollisionShape component must exist in a scene node for it to behave physically (a collision shape by itself does nothing.) Several collision shapes may exist in the same node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. Triangle mesh and convex hull geometries require specifying a Model resource and the LOD level to use.
 
-Several collision shapes may exist in the same scene node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. The shape (instead of RigidBody) also contains collision behaviour parameters: which other objects to collide with (see \ref CollisionShape::SetCollisionLayer "SetCollisionLayer()" and \ref CollisionShape::SetCollisionMask "SetCollisionMask()"), the friction coefficient, and the bounce coefficient.
+CollisionShape provides two APIs for defining the collision geometry. Either setting individual properties such as the \ref CollisionShape::SetShapeType "shape type" or \ref CollisionShape::SetSize "size", or specifying both the shape type and all its properties at once: see for example \ref CollisionShape::SetBox "SetBox()", \ref CollisionShape::SetCapsule "SetCapsule()" or \ref CollisionShape::SetTriangleMesh "SetTriangleMesh()".
 
-The physics simulation does all calculations in world space. Therefore nodes containing a RigidBody component should only be parented to the Scene (root node) to operate correctly.
+RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0.
+
+The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetPhantom "phantom mode" to only report collisions without actually applying collision forces. Finally, the \ref RigidBody::SetFriction "friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions.
+
+For continuous collision detection of fast moving bodies, the Bullet library approximates them as swept spheres; use \ref RigidBody::SetCcdRadius "SetCcdRadius()" to control the size. The swept sphere should not be larger than the collision geometries attached to the rigid body. By default the radius is 0.
+
+By default rigid bodies can move and rotate about all 3 coordinate axes when forces are applied. To limit the movement, use \ref RigidBody::SetLinearFactor "SetLinearFactor()" and \ref RigidBody::SetAngularFactor "SetAngularFactor()" and set the axes you wish to use to 1 and those you do not wish to use to 0. For example moving humanoid characters are often represented by a capsule shape: to ensure they stay upright and only rotate when you explicitly set the rotation in code, set the angular factor to 0, 0, 0.
+
+The physics simulation does all calculations in world space. Nodes containing a RigidBody component should be parented to the Scene (root node) to ensure correct operation.
 
 The physics world sends 3 types of events during its update step:
 

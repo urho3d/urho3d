@@ -1210,13 +1210,9 @@ Methods:<br>
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SnapPosition(const Vector3&)
-- void SnapRotation(const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, float)
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SnapWorldPosition(const Vector3&)
-- void SnapWorldRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -1268,14 +1264,8 @@ Properties:<br>
 - Quaternion worldRotation
 - Vector3 worldDirection
 - Vector3 worldScale
-- Vector3& targetPosition (readonly)
-- Quaternion& targetRotation (readonly)
-- Vector3 worldTargetPosition (readonly)
-- Quaternion worldTargetRotation (readonly)
 - Matrix3x4 transform (readonly)
-- Matrix3x4 targetTransform (readonly)
 - Matrix3x4& worldTransform (readonly)
-- bool smoothing
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -1288,6 +1278,34 @@ Properties:<br>
 - Connection@ owner
 - ScriptObject@ scriptObject (readonly)
 - VariantMap vars
+
+
+SmoothedTransform
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Update(float, float)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Vector3& targetPosition
+- Quaternion& targetRotation
+- Vector3 targetWorldPosition
+- Quaternion targetWorldRotation
+- bool active (readonly)
 
 
 Scene
@@ -1304,13 +1322,9 @@ Methods:<br>
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SnapPosition(const Vector3&)
-- void SnapRotation(const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&)
 - void SetWorldTransform(const Vector3&, const Quaternion&, float)
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SnapWorldPosition(const Vector3&)
-- void SnapWorldRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -1375,14 +1389,8 @@ Properties:<br>
 - Quaternion worldRotation
 - Vector3 worldDirection
 - Vector3 worldScale
-- Vector3& targetPosition (readonly)
-- Quaternion& targetRotation (readonly)
-- Vector3 worldTargetPosition (readonly)
-- Quaternion worldTargetRotation (readonly)
 - Matrix3x4 transform (readonly)
-- Matrix3x4 targetTransform (readonly)
 - Matrix3x4& worldTransform (readonly)
-- bool smoothing
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3918,14 +3926,13 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- void Clear()
 - void SetSphere(float, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
+- void SetCone(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetTriangleMesh(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
-- void SetHeightfield(Model@, uint, uint, float, uint, const Vector3& arg5 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg6 = Vector3 ( ), const Quaternion& arg7 = Quaternion ( ))
-- void SetConvexHull(Model@, float, uint, const Vector3& arg3 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg4 = Vector3 ( ), const Quaternion& arg5 = Quaternion ( ))
+- void SetConvexHull(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
 - void SetTransform(const Vector3&, const Quaternion&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
@@ -3937,16 +3944,13 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
-- Model@ model (readonly)
-- ShapeType shapeType (readonly)
+- ShapeType shapeType
+- Vector3& size
 - Vector3& position
 - Quaternion& rotation
-- uint collisionLayer
-- uint collisionMask
-- float friction
-- float bounce
-- bool phantom
-- BoundingBox worldBoundingBox (readonly)
+- float margin
+- Model@ model
+- uint lodLevel
 
 
 RigidBody
@@ -3961,10 +3965,16 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void SetTransform(const Vector3&, const Quaternion&)
+- void SetCollisionLayerAndMask(uint, uint)
 - void ApplyForce(const Vector3&)
-- void ApplyForceAtPosition(const Vector3&, const Vector3&)
+- void ApplyForce(const Vector3&, const Vector3&)
 - void ApplyTorque(const Vector3&)
+- void ApplyImpulse(const Vector3&)
+- void ApplyImpulse(const Vector3&, const Vector3&)
+- void ApplyTorqueImpulse(const Vector3&)
 - void ResetForces()
+- void Activate()
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3975,20 +3985,26 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - float mass
-- int massAxis
-- Vector3& linearVelocity
+- Vector3 position
+- Quaternion rotation
+- Vector3 linearVelocity
+- Vector3 linearFactor
 - float linearRestThreshold
-- Vector3& angularVelocity
+- float linearDamping
+- Vector3 angularVelocity
+- Vector3 angularFactor
 - float angularRestThreshold
-- float angularMaxVelocity
+- float angularDamping
+- float friction
+- float restitution
 - bool useGravity
-- bool active
-- Vector3& position
-- Quaternion& rotation
-- float linearDampingThreshold
-- float linearDampingScale
-- float angularDampingThreshold
-- float angularDampingScale
+- bool phantom
+- bool kinematic
+- bool active (readonly)
+- float ccdRadius
+- uint collisionLayer
+- uint collisionMask
+- CollisionEventMode collisionEventMode
 
 
 Joint
@@ -4023,7 +4039,7 @@ Properties:<br>
 PhysicsRaycastResult
 
 Properties:<br>
-- CollisionShape@ collisionShape (readonly)
+- RigidBody@ body (readonly)
 - Vector3 position
 - Vector3 normal
 - float distance
@@ -4041,7 +4057,9 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void Update(float)
-- PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffffffff)
+- void UpdateCollisions()
+- PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
+- PhysicsRaycastResult RaycastSingle(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
 - void DrawDebugGeometry(bool)
 
 Properties:<br>
@@ -4054,18 +4072,7 @@ Properties:<br>
 - Node@ node (readonly)
 - Vector3 gravity
 - int fps
-- uint maxContacts
 - bool interpolation
-- float linearRestThreshold
-- float angularRestThreshold
-- float bounceThreshold
-- float erp
-- float cfm
-- float contactSurfaceLayer
-- float linearDampingThreshold
-- float linearDampingScale
-- float angularDampingThreshold
-- float angularDampingScale
 
 
 ScriptFile

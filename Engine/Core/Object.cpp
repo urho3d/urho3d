@@ -302,6 +302,16 @@ Object* Object::GetSubsystem(ShortStringHash type) const
     return context_->GetSubsystem(type);
 }
 
+Object* Object::GetEventSender() const
+{
+    return context_->GetEventSender();
+}
+
+EventHandler* Object::GetEventHandler() const
+{
+    return context_->GetEventHandler();
+}
+
 bool Object::HasSubscribedToEvent(StringHash eventType) const
 {
     return eventHandlers_.Find(MakePair((Object*)0, eventType)) != eventHandlers_.End();

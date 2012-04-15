@@ -69,7 +69,8 @@ RigidBody::RigidBody(Context* context) :
     collisionEventMode_(COLLISION_ACTIVE),
     lastPosition_(Vector3::ZERO),
     lastRotation_(Quaternion::IDENTITY),
-    inSetTransform_(false)
+    inSetTransform_(false),
+    hasSmoothedTransform_(false)
 {
     compoundShape_ = new btCompoundShape();
 }
@@ -114,39 +115,34 @@ void RigidBody::RegisterObject(Context* context)
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
 {
-    if (node_)
-    {
-        lastPosition_ = node_->GetWorldPosition();
-        lastRotation_ = node_->GetWorldRotation();
-        worldTrans.setOrigin(ToBtVector3(lastPosition_));
-        worldTrans.setRotation(ToBtQuaternion(lastRotation_));
-    }
+    lastPosition_ = node_->GetWorldPosition();
+    lastRotation_ = node_->GetWorldRotation();
+    worldTrans.setOrigin(ToBtVector3(lastPosition_));
+    worldTrans.setRotation(ToBtQuaternion(lastRotation_));
 }
 
 void RigidBody::setWorldTransform(const btTransform &worldTrans)
 {
-    /// \todo If rigid body is parented, should set the transforms in hierarchy order (parent first)
-    if (node_)
+    Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin());
+    Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
+    RigidBody* parentRigidBody = 0;
+    
+    // If the rigid body is parented to another rigid body, can not set the transform immediately.
+    // In that case store it to PhysicsWorld for delayed assignment
+    Node* parent = node_->GetParent();
+    if (parent && parent != node_->GetScene())
+        parentRigidBody = parent->GetComponent<RigidBody>();
+    
+    if (!parentRigidBody)
+        ApplyWorldTransform(newWorldPosition, newWorldRotation);
+    else
     {
-        inSetTransform_ = true;
-        
-        // Apply transform to the SmoothedTransform component instead of rendering transform if available
-        if (!smoothedTransform_)
-        {
-            node_->SetWorldPosition(ToVector3(worldTrans.getOrigin()));
-            node_->SetWorldRotation(ToQuaternion(worldTrans.getRotation()));
-            lastPosition_ = node_->GetWorldPosition();
-            lastRotation_ = node_->GetWorldRotation();
-        }
-        else
-        {
-            lastPosition_ = ToVector3(worldTrans.getOrigin());
-            lastRotation_ = ToQuaternion(worldTrans.getRotation());
-            smoothedTransform_->SetTargetWorldPosition(lastPosition_);
-            smoothedTransform_->SetTargetWorldRotation(lastRotation_);
-        }
-        
-        inSetTransform_ = false;
+        DelayedWorldTransform delayed;
+        delayed.rigidBody_ = this;
+        delayed.parentRigidBody_ = parentRigidBody;
+        delayed.worldPosition_ = newWorldPosition;
+        delayed.worldRotation_ = newWorldRotation;
+        physicsWorld_->AddDelayedWorldTransform(delayed);
     }
 }
 
@@ -573,6 +569,33 @@ float RigidBody::GetCcdRadius() const
         return 0.0f;
 }
 
+void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
+{
+    inSetTransform_ = true;
+    
+    // Apply transform to the SmoothedTransform component instead of node transform if available
+    SmoothedTransform* transform = 0;
+    if (hasSmoothedTransform_)
+        transform = GetComponent<SmoothedTransform>();
+    
+    if (transform)
+    {
+        transform->SetTargetWorldPosition(newWorldPosition);
+        transform->SetTargetWorldRotation(newWorldRotation);
+        lastPosition_ = newWorldPosition;
+        lastRotation_ = newWorldRotation;
+    }
+    else
+    {
+        node_->SetWorldPosition(newWorldPosition);
+        node_->SetWorldRotation(newWorldRotation);
+        lastPosition_ = node_->GetWorldPosition();
+        lastRotation_ = node_->GetWorldRotation();
+    }
+    
+    inSetTransform_ = false;
+}
+
 void RigidBody::UpdateMass()
 {
     if (body_)
@@ -581,6 +604,21 @@ void RigidBody::UpdateMass()
         if (mass_ > 0.0f)
             compoundShape_->calculateLocalInertia(mass_, localInertia);
         body_->setMassProps(mass_, localInertia);
+    }
+}
+
+void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug && physicsWorld_ && body_)
+    {
+        physicsWorld_->SetDebugRenderer(debug);
+        physicsWorld_->SetDebugDepthTest(depthTest);
+        
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
+            btVector3(0.0f, 1.0f, 0.0f));
+        
+        physicsWorld_->SetDebugRenderer(0);
     }
 }
 
@@ -599,27 +637,12 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
     return attrBuffer_.GetBuffer();
 }
 
-void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
-{
-    if (debug && physicsWorld_ && body_)
-    {
-        physicsWorld_->SetDebugRenderer(debug);
-        physicsWorld_->SetDebugDepthTest(depthTest);
-        
-        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
-            btVector3(0.0f, 1.0f, 0.0f));
-        
-        physicsWorld_->SetDebugRenderer(0);
-    }
-}
-
 void RigidBody::OnMarkedDirty(Node* node)
 {
-    // If rendering transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
-    // is in use, because in that case it will be constantly updated into possibly non-physical states; rather follow the
-    // SmoothedTransform target transform directly
-    if (!inSetTransform_ && !smoothedTransform_)
+    // If node transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
+    // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
+    // states; rather follow the SmoothedTransform target transform directly
+    if (!inSetTransform_ && !hasSmoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = node->GetScene();
@@ -629,7 +652,7 @@ void RigidBody::OnMarkedDirty(Node* node)
             return;
         }
         
-        // Check if transform has changed from the one set at end of simulation step
+        // Check if transform has changed from the last one set in ApplyWorldTransform()
         Vector3 newPosition = node_->GetWorldPosition();
         Quaternion newRotation = node_->GetWorldRotation();
         
@@ -670,6 +693,8 @@ void RigidBody::AddBodyToWorld()
     if (!physicsWorld_)
         return;
     
+    bool massUpdated = false;
+    
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
         world->removeRigidBody(body_);
@@ -680,24 +705,29 @@ void RigidBody::AddBodyToWorld()
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
         body_->setUserPointer(this);
         
-        // Check for existence of the SmoothedTransform component, which should be created by now if we are a network client node
-        smoothedTransform_ = GetComponent<SmoothedTransform>();
-        if (smoothedTransform_)
+        // Check for existence of the SmoothedTransform component, which should be created by now in network client mode.
+        // If it exists, subscribe to its change events
+        SmoothedTransform* transform = GetComponent<SmoothedTransform>();
+        if (transform)
         {
-            // If SmoothedTransform exists, subscribe to its changes
-            SubscribeToEvent(smoothedTransform_, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
-            SubscribeToEvent(smoothedTransform_, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
+            hasSmoothedTransform_ = true;
+            SubscribeToEvent(transform, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
+            SubscribeToEvent(transform, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
         }
         
-        // Check if CollisionShapes already exist in the node and add them to the compound shape
+        // Check if CollisionShapes already exist in the node and add them to the compound shape.
         // Note: NotifyRigidBody() will cause mass to be updated
         PODVector<CollisionShape*> shapes;
         node_->GetDerivedComponents<CollisionShape>(shapes);
         for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+        {
+            massUpdated = true;
             (*i)->NotifyRigidBody();
+        }
     }
     
-    UpdateMass();
+    if (!massUpdated)
+        UpdateMass();
     
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
 }
@@ -720,13 +750,13 @@ void RigidBody::ReleaseBody()
 void RigidBody::HandleTargetPosition(StringHash eventType, VariantMap& eventData)
 {
     // Copy the smoothing target position to the rigid body
-    if (!inSetTransform_ && smoothedTransform_)
-        SetPosition(smoothedTransform_->GetTargetWorldPosition());
+    if (!inSetTransform_)
+        SetPosition(static_cast<SmoothedTransform*>(GetEventSender())->GetTargetWorldPosition());
 }
 
 void RigidBody::HandleTargetRotation(StringHash eventType, VariantMap& eventData)
 {
     // Copy the smoothing target rotation to the rigid body
-    if (!inSetTransform_ && smoothedTransform_)
-        SetRotation(smoothedTransform_->GetTargetWorldRotation());
+    if (!inSetTransform_)
+        SetRotation(static_cast<SmoothedTransform*>(GetEventSender())->GetTargetWorldRotation());
 }

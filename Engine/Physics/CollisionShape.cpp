@@ -310,7 +310,7 @@ void CollisionShape::SetCone(float diameter, float height, const Vector3& positi
     NotifyRigidBody();
 }
 
-void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 {
     if (!model)
     {
@@ -321,7 +321,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     shapeType_ = SHAPE_TRIANGLEMESH;
     model_ = model;
     lodLevel_ = lodLevel;
-    size_ = size.Abs();
+    size_ = scale;
     position_ = position;
     rotation_ = rotation;
     
@@ -329,7 +329,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     NotifyRigidBody();
 }
 
-void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& size, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
 {
     if (!model)
     {
@@ -340,7 +340,7 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
     shapeType_ = SHAPE_CONVEXHULL;
     model_ = model;
     lodLevel_ = lodLevel;
-    size_ = size.Abs();
+    size_ = scale;
     position_ = position;
     rotation_ = rotation;
     
@@ -583,6 +583,7 @@ void CollisionShape::UpdateShape()
             break;
             
         case SHAPE_TRIANGLEMESH:
+            size_ = size_.Abs();
             if (model_)
             {
                 // Check the geometry cache
@@ -604,6 +605,7 @@ void CollisionShape::UpdateShape()
             break;
             
         case SHAPE_CONVEXHULL:
+            size_ = size_.Abs();
             if (model_)
             {
                 // Check the geometry cache
