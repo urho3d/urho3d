@@ -131,7 +131,6 @@
 			<attribute name="Angular Damping" value="0" />
 			<attribute name="Linear Rest Threshold" value="0.8" />
 			<attribute name="Angular Rest Threshold" value="1" />
-			<attribute name="CCD Radius" value="0" />
 			<attribute name="Collision Layer" value="2" />
 			<attribute name="Collision Mask" value="3" />
 			<attribute name="Collision Event Mode" value="When Active" />

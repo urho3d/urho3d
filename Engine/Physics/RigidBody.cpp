@@ -69,8 +69,11 @@ RigidBody::RigidBody(Context* context) :
     collisionEventMode_(COLLISION_ACTIVE),
     lastPosition_(Vector3::ZERO),
     lastRotation_(Quaternion::IDENTITY),
+    kinematic_(false),
+    phantom_(false),
     inSetTransform_(false),
-    hasSmoothedTransform_(false)
+    hasSmoothedTransform_(false),
+    dirty_(false)
 {
     compoundShape_ = new btCompoundShape();
 }
@@ -92,7 +95,7 @@ void RigidBody::RegisterObject(Context* context)
     
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", GetMass, SetMass, float, DEFAULT_MASS, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
@@ -103,14 +106,28 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", GetCollisionLayer, SetCollisionLayer, unsigned, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, DEFAULT_COLLISION_MASK, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", collisionLayer_, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", collisionMask_, DEFAULT_COLLISION_MASK, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ENUM_ATTRIBUTE(RigidBody, "Collision Event Mode", collisionEventMode_, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", IsKinematic, SetKinematic, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", IsPhantom, SetPhantom, bool, false, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", kinematic_, false, AM_DEFAULT);
+    ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", phantom_, false, AM_DEFAULT);
+}
+
+void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    Serializable::OnSetAttribute(attr, src);
+    dirty_ = true;
+}
+
+void RigidBody::ApplyAttributes()
+{
+    if (dirty_)
+    {
+        AddBodyToWorld();
+        dirty_ = false;
+    }
 }
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
@@ -154,14 +171,6 @@ void RigidBody::SetMass(float mass)
     {
         mass_ = mass;
         AddBodyToWorld();
-        
-        if (mass > 0.0f)
-            Activate();
-        else
-        {
-            SetLinearVelocity(Vector3::ZERO);
-            SetAngularVelocity(Vector3::ZERO);
-        }
     }
 }
 
@@ -279,7 +288,7 @@ void RigidBody::SetRestitution(float restitution)
 
 void RigidBody::SetUseGravity(bool enable)
 {
-    if (physicsWorld_ && body_)
+    if (physicsWorld_ && body_ && enable != GetUseGravity())
     {
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
         
@@ -299,39 +308,20 @@ void RigidBody::SetUseGravity(bool enable)
 
 void RigidBody::SetKinematic(bool enable)
 {
-    if (body_)
+    if (enable != kinematic_)
     {
-        int flags = body_->getCollisionFlags();
-        if (enable)
-            flags |= btCollisionObject::CF_KINEMATIC_OBJECT;
-        else
-            flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
-        body_->setCollisionFlags(flags),
-        
+        kinematic_ = enable;
         AddBodyToWorld();
     }
 }
 
 void RigidBody::SetPhantom(bool enable)
 {
-    if (body_)
+    if (enable != phantom_)
     {
-        int flags = body_->getCollisionFlags();
-        if (enable)
-            flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
-        else
-            flags &= ~btCollisionObject::CF_NO_CONTACT_RESPONSE;
-        body_->setCollisionFlags(flags);
-        
+        phantom_ = enable;
         AddBodyToWorld();
     }
-}
-
-void RigidBody::SetCcdRadius(float radius)
-{
-    radius = Max(radius, 0.0f);
-    if (body_)
-        body_->setCcdSweptSphereRadius(radius);
 }
 
 void RigidBody::SetCollisionLayer(unsigned layer)
@@ -537,36 +527,12 @@ bool RigidBody::GetUseGravity() const
         return true;
 }
 
-bool RigidBody::IsKinematic() const
-{
-    if (body_)
-        return (body_->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) != 0;
-    else
-        return false;
-}
-
-bool RigidBody::IsPhantom() const
-{
-    if (body_)
-        return (body_->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) != 0;
-    else
-        return false;
-}
-
 bool RigidBody::IsActive() const
 {
     if (body_)
         return body_->isActive();
     else
         return false;
-}
-
-float RigidBody::GetCcdRadius() const
-{
-    if (body_)
-        return body_->getCcdSweptSphereRadius();
-    else
-        return 0.0f;
 }
 
 void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
@@ -693,6 +659,11 @@ void RigidBody::AddBodyToWorld()
     if (!physicsWorld_)
         return;
     
+    PROFILE(AddBodyToWorld);
+    
+    if (mass_ < 0.0f)
+        mass_ = 0.0f;
+    
     bool massUpdated = false;
     
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
@@ -729,7 +700,26 @@ void RigidBody::AddBodyToWorld()
     if (!massUpdated)
         UpdateMass();
     
+    int flags = body_->getCollisionFlags();
+    if (phantom_)
+        flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
+    else
+        flags &= ~btCollisionObject::CF_NO_CONTACT_RESPONSE;
+    if (kinematic_)
+        flags |= btCollisionObject::CF_KINEMATIC_OBJECT;
+    else
+        flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
+    body_->setCollisionFlags(flags);
+    
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
+    
+    if (mass_ > 0.0f)
+        Activate();
+    else
+    {
+        SetLinearVelocity(Vector3::ZERO);
+        SetAngularVelocity(Vector3::ZERO);
+    }
 }
 
 void RigidBody::ReleaseBody()

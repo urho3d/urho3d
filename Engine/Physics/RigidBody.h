@@ -58,6 +58,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
     /// Return initial world transform to Bullet.
     virtual void getWorldTransform(btTransform &worldTrans) const;
     /// Update world transform from Bullet.
@@ -97,8 +101,6 @@ public:
     void SetKinematic(bool enable);
     /// %Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
     void SetPhantom(bool enable);
-    /// %Set continuous collision detection radius.
-    void SetCcdRadius(float radius);
     /// %Set collision layer.
     void SetCollisionLayer(unsigned layer);
     /// %Set collision mask.
@@ -163,13 +165,11 @@ public:
     /// Return whether rigid body uses gravity.
     bool GetUseGravity() const;
     /// Return kinematic mode flag.
-    bool IsKinematic() const;
+    bool IsKinematic() const { return kinematic_; }
     /// Return phantom mode flag.
-    bool IsPhantom() const;
+    bool IsPhantom() const { return phantom_; }
     /// Return whether rigid body is active.
     bool IsActive() const;
-    /// Return continuous collision detection radius.
-    float GetCcdRadius() const;
     /// Return collision layer.
     unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask.
@@ -224,8 +224,14 @@ private:
     mutable Vector3 lastPosition_;
     /// Last interpolated rotation from the simulation.
     mutable Quaternion lastRotation_;
+    /// Kinematic flag.
+    bool kinematic_;
+    /// Phantom flag.
+    bool phantom_;
     /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
     bool inSetTransform_;
     /// Smoothed transform mode.
     bool hasSmoothedTransform_;
+    /// Dirty flag.
+    bool dirty_;
 };
