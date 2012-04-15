@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_callfunc_x86.cpp
@@ -113,7 +114,13 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	// This needs to be volatile, as GCC 4.2 is optimizing 
 	// away the assignment of the return code on Mac OS X. 
 	// ref: http://www.gamedev.net/topic/621357-porting-dustforce-to-os-x/
+
+    // Urho3D: do not apply this fix on Linux, as it causes problems in release builds
+#ifndef __linux__
 	volatile asQWORD retQW = 0;
+#else    
+    asQWORD retQW = 0;
+#endif
 
 	// Prepare the parameters
 	int paramSize = sysFunc->paramSize;
