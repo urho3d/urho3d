@@ -26,7 +26,6 @@
 #include "Batch.h"
 #include "Color.h"
 #include "Drawable.h"
-#include "HashMap.h"
 #include "HashSet.h"
 #include "Mutex.h"
 #include "Viewport.h"

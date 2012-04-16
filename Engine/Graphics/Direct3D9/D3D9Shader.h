@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "HashMap.h"
 #include "Resource.h"
 
 class ShaderVariation;

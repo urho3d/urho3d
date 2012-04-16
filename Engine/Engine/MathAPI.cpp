@@ -803,7 +803,7 @@ static void DestructPolyhedron(Polyhedron* ptr)
 
 void PolyhedronAddFaceArray(CScriptArray* arr, Polyhedron* ptr)
 {
-    Vector<Vector3> face;
+    PODVector<Vector3> face;
     unsigned numVertices = arr->GetSize();
     
     face.Resize(numVertices);
@@ -819,7 +819,7 @@ static unsigned PolyhedronGetNumFaces(Polyhedron* ptr)
 
 static CScriptArray* PolyhedronGetFace(unsigned index, Polyhedron* ptr)
 {
-    Vector<Vector3> face;
+    PODVector<Vector3> face;
     if (index < ptr->faces_.Size())
         face = ptr->faces_[index];
     return VectorToArray<Vector3>(face, "Array<Vector3>");

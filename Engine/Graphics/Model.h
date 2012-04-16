@@ -25,6 +25,7 @@
 
 #include "ArrayPtr.h"
 #include "BoundingBox.h"
+#include "Map.h"
 #include "Skeleton.h"
 #include "Resource.h"
 #include "Ptr.h"

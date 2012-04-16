@@ -322,6 +322,7 @@ private:
     Node* Root() const { return reinterpret_cast<Node*>(root_); }
     
     /// Find the node with smallest key.
+    /// \todo Should be cached
     Node* FindFirst() const
     {
         Node* node = Root();
@@ -331,6 +332,7 @@ private:
     }
     
     /// Find the node with largest key.
+    /// \todo Should be cached
     Node* FindLast() const
     {
         Node* node = Root();

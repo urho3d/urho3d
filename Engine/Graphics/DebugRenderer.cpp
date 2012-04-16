@@ -206,7 +206,7 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
     
     for (unsigned i = 0; i < poly.faces_.Size(); ++i)
     {
-        const Vector<Vector3>& face = poly.faces_[i];
+        const PODVector<Vector3>& face = poly.faces_[i];
         if (face.Size() >= 3)
         {
             for (unsigned j = 0; j < face.Size(); ++j)

@@ -175,7 +175,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     connection->Disconnect(0);
     
     // Remove the client connection that corresponds to this MessageConnection
-    Map<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
         Connection* connection = i->second_;
@@ -286,14 +286,14 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
         i->second_->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -315,7 +315,7 @@ void Network::BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool in
     }
     
     Scene* scene = receiver->GetScene();
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -352,7 +352,7 @@ void Network::SetPackageCacheDir(const String& path)
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
         return i->second_;
     else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
@@ -424,7 +424,7 @@ void Network::PostUpdate(float timeStep)
         if (IsServerRunning())
         {
             // Send server updates for each client connection
-            for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+            for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
             {
                 i->second_->SendServerUpdate();

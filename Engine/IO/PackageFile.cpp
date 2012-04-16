@@ -90,7 +90,7 @@ bool PackageFile::Exists(const String& fileName) const
 
 const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 {
-    Map<String, PackageEntry>::ConstIterator i = entries_.Find(fileName.ToLower());
+    HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName.ToLower());
     if (i != entries_.End())
         return &i->second_;
     else

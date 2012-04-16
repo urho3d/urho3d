@@ -286,7 +286,7 @@ bool FileSystem::CheckAccess(const String& pathName)
         return false;
     
     // Check if the path is a partial match of any of the allowed directories
-    for (Set<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
+    for (HashSet<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
         if (fixedPath.Find(*i) == 0)
             return true;

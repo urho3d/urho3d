@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "Context.h"
-#include "HashSet.h"
 
 #include "DebugNew.h"
 
@@ -45,7 +44,7 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     Context* context = context_;
     
     // Check first the specific event handlers, which have priority
-    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::ConstIterator i = eventHandlers_.Find(
+    HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::ConstIterator i = eventHandlers_.Find(
         MakePair(sender, eventType));
     if (i != eventHandlers_.End())
     {
@@ -89,10 +88,10 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
+    for (HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
         i != eventHandlers_.End();)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
+        HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
         if (current->first_.second_ == eventType)
         {
             if (current->first_.first_)
@@ -108,7 +107,7 @@ void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType)
 {
     Pair<Object*, StringHash> combination(sender, eventType);
     
-    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Find(combination);
+    HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Find(combination);
     if (i != eventHandlers_.End())
     {
         context_->RemoveEventReceiver(this, i->first_.first_, i->first_.second_);
@@ -121,10 +120,10 @@ void Object::UnsubscribeFromEvents(Object* sender)
     if (!sender)
         return;
     
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
+    for (HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
         i != eventHandlers_.End();)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
+        HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
         if (current->first_.first_ == sender)
         {
             context_->RemoveEventReceiver(this, current->first_.first_, current->first_.second_);
@@ -135,7 +134,7 @@ void Object::UnsubscribeFromEvents(Object* sender)
 
 void Object::UnsubscribeFromAllEvents()
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
+    for (HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
         i != eventHandlers_.End(); ++i)
     {
         if (i->first_.first_)
@@ -149,12 +148,12 @@ void Object::UnsubscribeFromAllEvents()
 
 void Object::UnsubscribeFromAllEventsWithUserData()
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
+    for (HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
         i != eventHandlers_.End(); )
     {
         if (i->second_->GetUserData())
         {
-            Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
+            HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
             if (current->first_.first_)
                 context_->RemoveEventReceiver(this, current->first_.first_, current->first_.second_);
             else
@@ -183,12 +182,12 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->BeginSendEvent(this);
     
     // Check first the specific event receivers
-    const Set<Object*>* group = context->GetEventReceivers(this, eventType);
+    const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
     if (group)
     {
-        for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+        for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
         {
-            Set<Object*>::ConstIterator current = i++;
+            HashSet<Object*>::ConstIterator current = i++;
             Object* receiver = *current;
             Object* next = 0;
             if (i != group->End())
@@ -219,9 +218,9 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     {
         if (processed.Empty())
         {
-            for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
             {
-                Set<Object*>::ConstIterator current = i++;
+                HashSet<Object*>::ConstIterator current = i++;
                 Object* receiver = *current;
                 Object* next = 0;
                 if (i != group->End())
@@ -243,9 +242,9 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (Set<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
             {
-                Set<Object*>::ConstIterator current = i++;
+                HashSet<Object*>::ConstIterator current = i++;
                 Object* receiver = *current;
                 Object* next = 0;
                 if (i != group->End())
@@ -324,10 +323,10 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 
 void Object::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
+    for (HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
         i != eventHandlers_.End();)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
+        HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
         if (current->first_.first_ == sender)
             eventHandlers_.Erase(current);
     }

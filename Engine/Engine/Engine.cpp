@@ -355,10 +355,10 @@ void Engine::DumpProfilingData()
 void Engine::DumpResources()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    const Map<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
+    const HashMap<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
     
-    for (Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
+    for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
         i != resourceGroups.End(); ++i)
     {
         unsigned num = i->second_.resources_.Size();

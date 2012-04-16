@@ -27,7 +27,6 @@
 #include "AnimationController.h"
 #include "AnimationState.h"
 #include "Context.h"
-#include "HashSet.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"

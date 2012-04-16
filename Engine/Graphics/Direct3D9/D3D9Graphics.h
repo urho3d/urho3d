@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Color.h"
-#include "HashMap.h"
 #include "Object.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"

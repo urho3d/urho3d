@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Connection.h"
+#include "HashSet.h"
 #include "Object.h"
 #include "VectorBuffer.h"
 
@@ -32,6 +33,11 @@
 
 class MemoryBuffer;
 class Scene;
+
+namespace kNet
+{
+    class MessageConnection;
+}
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
@@ -89,7 +95,7 @@ public:
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
-    const Map<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
+    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
     /// Return whether the server is running.
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
@@ -117,9 +123,9 @@ private:
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events.
-    Set<StringHash> allowedRemoteEvents_;
+    HashSet<StringHash> allowedRemoteEvents_;
     /// Update FPS.
     int updateFps_;
     /// Update time interval.

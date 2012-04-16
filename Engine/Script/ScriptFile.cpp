@@ -257,7 +257,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
     
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found = false;
-    Map<asIObjectType*, bool>::ConstIterator i = validClasses_.Find(type);
+    HashMap<asIObjectType*, bool>::ConstIterator i = validClasses_.Find(type);
     if (i != validClasses_.End())
         found = i->second_;
     else
@@ -315,7 +315,7 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
-    Map<asIObjectType*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
+    HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
     {
         HashMap<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);

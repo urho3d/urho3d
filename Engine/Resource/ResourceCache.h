@@ -44,7 +44,7 @@ struct ResourceGroup
     /// Current memory use.
     unsigned memoryUse_;
     /// Resources.
-    Map<StringHash, SharedPtr<Resource> > resources_;
+    HashMap<StringHash, SharedPtr<Resource> > resources_;
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
@@ -96,7 +96,7 @@ public:
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources.
-    const Map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
+    const HashMap<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
     /// Return added package files.
@@ -140,7 +140,7 @@ private:
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Resources by type.
-    Map<ShortStringHash, ResourceGroup> resourceGroups_;
+    HashMap<ShortStringHash, ResourceGroup> resourceGroups_;
     /// Resource load directories.
     Vector<String> resourceDirs_;
     /// File watchers for resource directories, if automatic reloading enabled.
@@ -148,7 +148,7 @@ private:
     /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames.
-    Map<StringHash, String> hashToName_;
+    HashMap<StringHash, String> hashToName_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
 };

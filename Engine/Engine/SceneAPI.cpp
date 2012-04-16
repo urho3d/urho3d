@@ -117,12 +117,12 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
 
 static CScriptArray* GetAvailableComponents(Scene* ptr)
 {
-    const Map<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
     Vector<String> components;
     
     // Simply try to create each of the objects, and check which derive from Component.
     // This assumes that creating any of them does not have harmful side-effects
-    for (Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
     {
         SharedPtr<Object> object = i->second_->CreateObject();
         if (dynamic_cast<Component*>(object.Get()))

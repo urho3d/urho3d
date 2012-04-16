@@ -66,7 +66,7 @@ void Polyhedron::Define(const Frustum& frustum)
 void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 {
     faces_.Resize(faces_.Size() + 1);
-    Vector<Vector3>& face = faces_[faces_.Size() - 1];
+    PODVector<Vector3>& face = faces_[faces_.Size() - 1];
     face.Resize(3);
     face[0] = v0;
     face[1] = v1;
@@ -76,7 +76,7 @@ void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2
 void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
     faces_.Resize(faces_.Size() + 1);
-    Vector<Vector3>& face = faces_[faces_.Size() - 1];
+    PODVector<Vector3>& face = faces_[faces_.Size() - 1];
     face.Resize(4);
     face[0] = v0;
     face[1] = v1;
@@ -84,7 +84,7 @@ void Polyhedron::AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2
     face[3] = v3;
 }
 
-void Polyhedron::AddFace(const Vector<Vector3>& face)
+void Polyhedron::AddFace(const PODVector<Vector3>& face)
 {
     faces_.Push(face);
 }
@@ -95,7 +95,7 @@ void Polyhedron::Clip(const Plane& plane)
     
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
-        Vector<Vector3>& face = faces_[i];
+        PODVector<Vector3>& face = faces_[i];
         outFace_.Clear();
         
         Vector3 lastVertex;
@@ -231,7 +231,7 @@ void Polyhedron::Transform(const Matrix3& transform)
 {
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
-        Vector<Vector3>& face = faces_[i];
+        PODVector<Vector3>& face = faces_[i];
         for (unsigned j = 0; j < face.Size(); ++j)
             face[j] = transform * face[j];
     }
@@ -241,7 +241,7 @@ void Polyhedron::Transform(const Matrix3x4& transform)
 {
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
-        Vector<Vector3>& face = faces_[i];
+        PODVector<Vector3>& face = faces_[i];
         for (unsigned j = 0; j < face.Size(); ++j)
             face[j] = transform * face[j];
     }
@@ -254,8 +254,8 @@ Polyhedron Polyhedron::Transformed(const Matrix3& transform) const
     
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
-        const Vector<Vector3>& face = faces_[i];
-        Vector<Vector3>& newFace = ret.faces_[i];
+        const PODVector<Vector3>& face = faces_[i];
+        PODVector<Vector3>& newFace = ret.faces_[i];
         newFace.Resize(face.Size());
         
         for (unsigned j = 0; j < face.Size(); ++j)
@@ -272,8 +272,8 @@ Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const
     
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
-        const Vector<Vector3>& face = faces_[i];
-        Vector<Vector3>& newFace = ret.faces_[i];
+        const PODVector<Vector3>& face = faces_[i];
+        PODVector<Vector3>& newFace = ret.faces_[i];
         newFace.Resize(face.Size());
         
         for (unsigned j = 0; j < face.Size(); ++j)
@@ -285,7 +285,7 @@ Polyhedron Polyhedron::Transformed(const Matrix3x4& transform) const
 
 void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2)
 {
-    Vector<Vector3>& face = faces_[index];
+    PODVector<Vector3>& face = faces_[index];
     face.Resize(3);
     face[0] = v0;
     face[1] = v1;
@@ -294,7 +294,7 @@ void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, c
 
 void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
-    Vector<Vector3>& face = faces_[index];
+    PODVector<Vector3>& face = faces_[index];
     face.Resize(4);
     face[0] = v0;
     face[1] = v1;

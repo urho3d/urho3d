@@ -25,7 +25,7 @@
 
 #include "Attribute.h"
 #include "Object.h"
-#include "Set.h"
+#include "HashSet.h"
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context : public RefCounted
@@ -62,9 +62,9 @@ public:
     /// Return subsystem by type.
     Object* GetSubsystem(ShortStringHash type) const;
     /// Return all subsystems.
-    const Map<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+    const HashMap<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories.
-    const Map<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling.
@@ -77,24 +77,24 @@ public:
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
     {
-        Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
+        HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
         return i != attributes_.End() ? &i->second_ : 0;
     }
     
     /// Return network replication attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes(ShortStringHash type) const
     {
-        Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
+        HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
         return i != networkAttributes_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist.
-    Set<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
+    HashSet<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {
-        Map<Object*, Map<StringHash, Set<Object*> > >::Iterator i = specificEventReceivers_.Find(sender);
+        HashMap<Object*, HashMap<StringHash, HashSet<Object*> > >::Iterator i = specificEventReceivers_.Find(sender);
         if (i != specificEventReceivers_.End())
         {
-            Map<StringHash, Set<Object*> >::Iterator j = i->second_.Find(eventType);
+            HashMap<StringHash, HashSet<Object*> >::Iterator j = i->second_.Find(eventType);
             return j != i->second_.End() ? &j->second_ : 0;
         }
         else
@@ -102,9 +102,9 @@ public:
     }
     
     /// Return event receivers for an event type, or null if they do not exist.
-    Set<Object*>* GetEventReceivers(StringHash eventType)
+    HashSet<Object*>* GetEventReceivers(StringHash eventType)
     {
-        Map<StringHash, Set<Object*> >::Iterator i = eventReceivers_.Find(eventType);
+        HashMap<StringHash, HashSet<Object*> >::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
     
@@ -127,17 +127,17 @@ private:
     void EndSendEvent();
 
     /// Object factories.
-    Map<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
+    HashMap<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
     /// Subsystems.
-    Map<ShortStringHash, SharedPtr<Object> > subsystems_;
+    HashMap<ShortStringHash, SharedPtr<Object> > subsystems_;
     /// Attribute descriptions per object type.
-    Map<ShortStringHash, Vector<AttributeInfo> > attributes_;
+    HashMap<ShortStringHash, Vector<AttributeInfo> > attributes_;
     /// Network replication attribute descriptions per object type.
-    Map<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
+    HashMap<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events.
-    Map<StringHash, Set<Object*> > eventReceivers_;
+    HashMap<StringHash, HashSet<Object*> > eventReceivers_;
     /// Event receivers for specific senders' events.
-    Map<Object*, Map<StringHash, Set<Object*> > > specificEventReceivers_;
+    HashMap<Object*, HashMap<StringHash, HashSet<Object*> > > specificEventReceivers_;
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.

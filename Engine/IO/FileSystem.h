@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Object.h"
-#include "Set.h"
+#include "HashSet.h"
 
 /// Return files.
 static const unsigned SCAN_FILES = 0x1;
@@ -84,7 +84,7 @@ private:
         const String& filter, unsigned flags, bool recursive);
     
     /// Allowed directories.
-    Set<String> allowedPaths_;
+    HashSet<String> allowedPaths_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase.

@@ -26,13 +26,13 @@
 /// Pointer hash function.
 template <class T> unsigned MakeHash(T* value)
 {
-    return ((unsigned)value) / sizeof(T);
+    return (unsigned)value;
 }
 
 /// Const pointer hash function.
 template <class T> unsigned MakeHash(const T* value)
 {
-    return ((unsigned)value) / sizeof(T);
+    return (unsigned)value;
 }
 
 /// Generic hash function.

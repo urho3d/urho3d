@@ -56,7 +56,7 @@ public:
     /// Return the file entry corresponding to the name, or null if not found.
     const PackageEntry* GetEntry(const String& fileName) const;
     /// Return all file entries.
-    const Map<String, PackageEntry>& GetEntries() const { return entries_; }
+    const HashMap<String, PackageEntry>& GetEntries() const { return entries_; }
     /// Return the package file name.
     const String& GetName() const { return fileName_; }
     /// Return hash of the package file name.
@@ -70,7 +70,7 @@ public:
     
 private:
     /// File entries.
-    Map<String, PackageEntry> entries_;
+    HashMap<String, PackageEntry> entries_;
     /// File name.
     String fileName_;
     /// Package file name hash.

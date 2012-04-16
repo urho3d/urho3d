@@ -32,18 +32,18 @@ struct HashNodeBase
 {
     /// Construct.
     HashNodeBase() :
+        down_(0),
         prev_(0),
-        next_(0),
-        down_(0)
+        next_(0)
     {
     }
     
+    /// Next node in the bucket.
+    HashNodeBase* down_;
     /// Previous node.
     HashNodeBase* prev_;
     /// Next node.
     HashNodeBase* next_;
-    /// Next node in the bucket.
-    HashNodeBase* down_;
 };
 
 /// Hash set/map iterator base class.

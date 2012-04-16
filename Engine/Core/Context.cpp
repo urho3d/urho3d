@@ -28,9 +28,9 @@
 
 static String noType;
 
-void RemoveNamedAttribute(Map<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const String& name)
+void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const String& name)
 {
-    Map<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
+    HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
         return;
     
@@ -58,15 +58,15 @@ Context::Context() :
 Context::~Context()
 {
     // Release the subsystems before the event receiver maps are destroyed
-    for (Map<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Begin(); i != subsystems_.End(); ++i)
-        i->second_.Reset();
+    //for (HashMap<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Begin(); i != subsystems_.End(); ++i)
+    //    i->second_.Reset();
     subsystems_.Clear();
     factories_.Clear();
 }
 
 SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
 {
-    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     if (i != factories_.End())
         return i->second_->CreateObject();
     else
@@ -124,7 +124,7 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 
 Object* Context::GetSubsystem(ShortStringHash type) const
 {
-    Map<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    HashMap<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
     if (i != subsystems_.End())
         return i->second_;
     else
@@ -142,7 +142,7 @@ Object* Context::GetEventSender() const
 const String& Context::GetTypeName(ShortStringHash type) const
 {
     // Search factories to find the hash-to-name mapping
-    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
+    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
     return i != factories_.End() ? i->second_->GetTypeName() : noType;
 }
 
@@ -164,14 +164,14 @@ void Context::RemoveEventSender(Object* sender)
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 {
-    Set<Object*>* group = GetEventReceivers(eventType);
+    HashSet<Object*>* group = GetEventReceivers(eventType);
     if (group)
         group->Erase(receiver);
 }
 
 void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    Set<Object*>* group = GetEventReceivers(sender, eventType);
+    HashSet<Object*>* group = GetEventReceivers(sender, eventType);
     if (group)
         group->Erase(receiver);
 }
