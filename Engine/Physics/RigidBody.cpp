@@ -108,6 +108,8 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", collisionLayer_, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", collisionMask_, DEFAULT_COLLISION_MASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Motion Threshold", GetCcdMotionThreshold, SetCcdMotionThreshold, float, 0.0f, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ENUM_ATTRIBUTE(RigidBody, "Collision Event Mode", collisionEventMode_, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
@@ -284,6 +286,20 @@ void RigidBody::SetRestitution(float restitution)
 {
     if (body_)
         body_->setRestitution(restitution);
+}
+
+void RigidBody::SetCcdRadius(float radius)
+{
+    radius = Max(radius, 0.0f);
+    if (body_)
+        body_->setCcdSweptSphereRadius(radius);
+}
+
+void RigidBody::SetCcdMotionThreshold(float threshold)
+{
+    threshold = Max(threshold, 0.0f);
+    if (body_)
+        body_->setCcdMotionThreshold(threshold);
 }
 
 void RigidBody::SetUseGravity(bool enable)
@@ -515,6 +531,22 @@ float RigidBody::GetRestitution() const
 {
     if (body_)
         return body_->getRestitution();
+    else
+        return 0.0f;
+}
+
+float RigidBody::GetCcdRadius() const
+{
+    if (body_)
+        return body_->getCcdSweptSphereRadius();
+    else
+        return 0.0f;
+}
+
+float RigidBody::GetCcdMotionThreshold() const
+{
+    if (body_)
+        return body_->getCcdMotionThreshold();
     else
         return 0.0f;
 }

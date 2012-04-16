@@ -95,6 +95,10 @@ public:
     void SetFriction(float friction);
     /// %Set restitution coefficient.
     void SetRestitution(float restitution);
+    /// %Set continuous collision detection swept sphere radius.
+    void SetCcdRadius(float radius);
+    /// %Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
+    void SetCcdMotionThreshold(float threshold);
     /// %Set whether gravity is applied to rigid body.
     void SetUseGravity(bool enable);
     /// %Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
@@ -162,6 +166,10 @@ public:
     float GetFriction() const;
     /// Return restitution coefficient.
     float GetRestitution() const;
+    /// Return continuous collision detection swept sphere radius.
+    float GetCcdRadius() const;
+    /// Return continuous collision detection motion-per-simulation-step threshold.
+    float GetCcdMotionThreshold() const;
     /// Return whether rigid body uses gravity.
     bool GetUseGravity() const;
     /// Return kinematic mode flag.

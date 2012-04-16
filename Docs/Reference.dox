@@ -835,7 +835,9 @@ The collision behaviour of a rigid body is controlled by several variables. Firs
 
 By default rigid bodies can move and rotate about all 3 coordinate axes when forces are applied. To limit the movement, use \ref RigidBody::SetLinearFactor "SetLinearFactor()" and \ref RigidBody::SetAngularFactor "SetAngularFactor()" and set the axes you wish to use to 1 and those you do not wish to use to 0. For example moving humanoid characters are often represented by a capsule shape: to ensure they stay upright and only rotate when you explicitly set the rotation in code, set the angular factor to 0, 0, 0.
 
-The physics simulation does all calculations in world space. Nodes containing a RigidBody component should be parented to the Scene (root node) to ensure correct operation.
+To prevent tunneling of a fast moving rigid body through obstacles, continuous collision detection can be used. It approximates the object as a swept sphere, but has a performance cost, so it should be used only when necessary. Call \ref RigidBody::SetCcdRadius "SetCcdRadius()" and \ref RigidBody::SetCcdMotionThreshold "SetCcdMotionThreshold()" with non-zero values to enable. To prevent false collisions, the body's actual collision shape should completely contain the radius. The motion threshold is the required motion per simulation step for CCD to kick in: for example a box with size 1 should have motion threshold 1 as well.
+
+All physics calculations are performed in world space. Nodes containing a RigidBody component should be parented to the Scene (root node) to ensure correct operation.
 
 The physics world sends 3 types of events during its update step:
 

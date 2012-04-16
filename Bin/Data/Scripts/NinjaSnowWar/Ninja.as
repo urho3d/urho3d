@@ -216,9 +216,6 @@ class Ninja : GameObject
         if ((controls.IsPressed(CTRL_FIRE, prevControls)) && (throwTime <= 0))
         {
             Vector3 projectileVel = GetAim() * ninjaThrowVelocity;
-            // Hack: clamp projectile downward velocity to limit tunnelling when snowball is thrown almost directly down
-            if (projectileVel.y < -1000.0)
-                projectileVel.y = -1000.0;
 
             animCtrl.Play("Models/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0);
             animCtrl.SetTime("Models/Ninja_Attack1.ani", 0.0); // Always play from beginning

@@ -13,6 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 #include "btDiscreteDynamicsWorld.h"
 
@@ -881,7 +882,9 @@ void	btDiscreteDynamicsWorld::integrateTransforms(btScalar timeStep)
 			if (getDispatchInfo().m_useContinuous && body->getCcdSquareMotionThreshold() && body->getCcdSquareMotionThreshold() < squareMotion)
 			{
 				BT_PROFILE("CCD motion clamping");
-				if (body->getCollisionShape()->isConvex())
+				
+				// Urho3D: Rigid bodies always use a compound shape to allow offset positions, so do not check for being convex here
+				//if (body->getCollisionShape()->isConvex())
 				{
 					gNumClampedCcdMotions++;
 #ifdef USE_STATIC_ONLY

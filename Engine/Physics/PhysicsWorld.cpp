@@ -86,6 +86,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     world_ = new btDiscreteDynamicsWorld(collisionDispatcher_, broadphase_, solver_, collisionConfiguration_);
     
     world_->setGravity(ToBtVector3(DEFAULT_GRAVITY));
+    world_->getDispatchInfo().m_useContinuous = true;
     world_->setDebugDrawer(this);
     world_->setInternalTickCallback(InternalPreTickCallback, static_cast<void*>(this), true);
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);

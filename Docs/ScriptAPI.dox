@@ -3997,11 +3997,12 @@ Properties:<br>
 - float angularDamping
 - float friction
 - float restitution
+- float ccdRadius
+- float ccdMotionThreshold
 - bool useGravity
 - bool phantom
 - bool kinematic
 - bool active (readonly)
-- float ccdRadius
 - uint collisionLayer
 - uint collisionMask
 - CollisionEventMode collisionEventMode

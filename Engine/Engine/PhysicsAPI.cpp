@@ -154,6 +154,10 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_friction() const", asMETHOD(RigidBody, GetFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_restitution(float)", asMETHOD(RigidBody, SetRestitution), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_restitution() const", asMETHOD(RigidBody, GetRestitution), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_ccdRadius(float)", asMETHOD(RigidBody, SetCcdRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "float get_ccdRadius() const", asMETHOD(RigidBody, GetCcdRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_ccdMotionThreshold(float)", asMETHOD(RigidBody, SetCcdMotionThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "float get_ccdMotionThreshold() const", asMETHOD(RigidBody, GetCcdMotionThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_useGravity(bool)", asMETHOD(RigidBody, SetUseGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_useGravity() const", asMETHOD(RigidBody, GetUseGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_phantom(bool)", asMETHOD(RigidBody, SetPhantom), asCALL_THISCALL);
