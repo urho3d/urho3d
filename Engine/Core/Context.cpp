@@ -57,9 +57,6 @@ Context::Context() :
 
 Context::~Context()
 {
-    // Release the subsystems before the event receiver maps are destroyed
-    //for (HashMap<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Begin(); i != subsystems_.End(); ++i)
-    //    i->second_.Reset();
     subsystems_.Clear();
     factories_.Clear();
 }

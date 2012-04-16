@@ -37,6 +37,7 @@ OBJECTTYPESTATIC(FileWatcher);
 
 FileWatcher::FileWatcher(Context* context) :
     Object(context),
+    fileSystem_(GetSubsystem<FileSystem>()),
     watchSubDirs_(false)
 {
 }
@@ -48,6 +49,12 @@ FileWatcher::~FileWatcher()
 
 bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 {
+    if (!fileSystem_)
+    {
+        LOGERROR("No FileSystem, can not start watching");
+        return false;
+    }
+    
     // Stop any previous watching
     StopWatching();
     
@@ -93,7 +100,8 @@ void FileWatcher::StopWatching()
         String dummyFileName = path_ + "dummy.tmp";
         File file(context_, dummyFileName, FILE_WRITE);
         file.Close();
-        GetSubsystem<FileSystem>()->Delete(dummyFileName);
+        if (fileSystem_)
+            fileSystem_->Delete(dummyFileName);
         
         Stop();
         

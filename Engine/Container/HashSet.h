@@ -361,9 +361,9 @@ public:
     bool Empty() const { return size_ == 0; }
     
 private:
-    /// Return the head pointer with correct type.
+    /// Return the head node.
     Node* Head() const { return reinterpret_cast<Node*>(head_); }
-    /// Return the tail pointer with correct type.
+    /// Return the tail node.
     Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
     
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.

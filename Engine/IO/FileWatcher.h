@@ -28,6 +28,8 @@
 #include "Object.h"
 #include "Thread.h"
 
+class FileSystem;
+
 /// Watches a directory and its subdirectories for files being modified
 class FileWatcher : public Object, public Thread
 {
@@ -53,6 +55,8 @@ public:
     const String& GetPath() const { return path_; }
     
 private:
+    /// Filesystem.
+    SharedPtr<FileSystem> fileSystem_;
     /// The path being watched.
     String path_;
     /// Buffered file changes.

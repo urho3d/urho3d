@@ -328,9 +328,9 @@ public:
     bool Empty() const { return size_ == 0; }
     
 private:
-    /// Return the head pointer with correct type.
+    /// Return the head node.
     Node* Head() const { return reinterpret_cast<Node*>(head_); }
-    /// Return the tail pointer with correct type.
+    /// Return the tail node.
     Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
     
     /// Allocate and insert a node into the list.

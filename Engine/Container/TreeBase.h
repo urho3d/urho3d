@@ -140,7 +140,7 @@ class TreeBase
 public:
     /// Construct.
     TreeBase() :
-        root_(0),
+        head_(0),
         allocator_(0),
         size_(0)
     {
@@ -149,7 +149,7 @@ public:
     /// Swap with another tree.
     void Swap(TreeBase& rhs)
     {
-        ::Swap(root_, rhs.root_);
+        ::Swap(head_, rhs.head_);
         ::Swap(allocator_, rhs.allocator_);
         ::Swap(size_, rhs.size_);
     }
@@ -179,8 +179,8 @@ protected:
         return RotateSingle(node, dir);
     }
     
-    /// Root node.
-    TreeNodeBase* root_;
+    /// Head node.
+    TreeNodeBase* head_;
     /// Node allocator.
     AllocatorBlock* allocator_;
     /// Number of nodes.

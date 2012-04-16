@@ -160,7 +160,7 @@ public:
     /// Construct from another map.
     Map(const Map<T, U>& map)
     {
-        allocator_ = AllocatorInitialize(sizeof(Node), map.Size());
+        allocator_ = AllocatorInitialize(sizeof(Node), map.Size() + 1);
         *this = map;
     }
     
@@ -168,6 +168,13 @@ public:
     ~Map()
     {
         Clear();
+        
+        if (head_)
+        {
+            FreeNode(reinterpret_cast<Node*>(head_));
+            head_ = 0;
+        }
+        
         AllocatorUninitialize(allocator_);
     }
     
@@ -253,7 +260,7 @@ public:
             return;
         
         EraseNodes(root);
-        root_ = 0;
+        head_->parent_ = 0;
     }
     
     /// Insert a pair and return iterator to it.
@@ -318,26 +325,42 @@ public:
     bool Empty() const { return size_ == 0; }
     
 private:
-    /// Return the root pointer with correct type.
-    Node* Root() const { return reinterpret_cast<Node*>(root_); }
+    /// Return the root node, or 0 if empty.
+    Node* Root() const { return head_ ? reinterpret_cast<Node*>(head_->parent_) : 0; }
     
     /// Find the node with smallest key.
-    /// \todo Should be cached
     Node* FindFirst() const
     {
-        Node* node = Root();
+        if (!head_)
+            return 0;
+        
+        // Check cached node first
+        if (head_->link_[0])
+            return reinterpret_cast<Node*>(head_->link_[0]);
+        
+        Node* node = reinterpret_cast<Node*>(head_->parent_);
         while (node && node->link_[0])
             node = node->Child(0);
+        
+        head_->link_[0] = node;
         return node;
     }
     
     /// Find the node with largest key.
-    /// \todo Should be cached
     Node* FindLast() const
     {
-        Node* node = Root();
+        if (!head_)
+            return 0;
+        
+        // Check cached node first
+        if (head_->link_[1])
+            return reinterpret_cast<Node*>(head_->link_[1]);
+        
+        Node* node = reinterpret_cast<Node*>(head_->parent_);
         while (node && node->link_[1])
             node = node->Child(1);
+        
+        head_->link_[1] = node;
         return node;
     }
     
@@ -360,23 +383,33 @@ private:
     {
         Node* ret = 0;
         
-        if (!root_)
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(Node));
+        if (!head_)
+            head_ = ReserveNode();
+        
+        if (!head_->parent_)
         {
-            root_ = ret = ReserveNode(key, value);
+            head_->parent_ = ret = ReserveNode(key, value);
+            head_->link_[0] = head_->parent_;
+            head_->link_[1] = head_->parent_;
             ++size_;
         }
         else
         {
-            Node head;
-            Node* g, * t, * p, * q;
+            Node h;
+            Node* g;
+            Node* t;
+            Node* p;
+            Node* q;
             
             unsigned dir = 0;
             unsigned last = 0;
             
-            t = &head;
+            t = &h;
             g = p = 0;
-            q = Root();
-            t->SetChild(1, Root());
+            q = reinterpret_cast<Node*>(head_->parent_);
+            t->SetChild(1, q);
             
             for (;;)
             {
@@ -418,11 +451,15 @@ private:
                 q = q->Child(dir);
             }
             
-            root_ = head.Child(1);
+            head_->parent_ = h.Child(1);
+            
+            // Invalidate cached first and last nodes
+            head_->link_[0] = 0;
+            head_->link_[1] = 0;
         }
         
-        root_->isRed_ = false;
-        root_->parent_ = 0;
+        head_->parent_->isRed_ = false;
+        head_->parent_->parent_ = 0;
         
         return ret;
     }
@@ -430,18 +467,20 @@ private:
     /// Erase a node. Return true if was erased.
     bool EraseNode(const T& key)
     {
-        if (!root_)
+        if (!head_ || !head_->parent_)
             return false;
         
-        Node head;
-        Node* q, * p, *g;
-        Node* f = 0;
+        Node h;
+        Node* q;
+        Node* p;
+        Node* g;
+        Node* f;
         unsigned dir = 1;
         bool removed = false;
         
-        q = &head;
-        g = p = 0;
-        q->SetChild(1, Root());
+        q = &h;
+        f = g = p = 0;
+        q->SetChild(1, head_->parent_);
         
         while (q->link_[dir])
         {
@@ -501,12 +540,16 @@ private:
             removed = true;
         }
         
-        root_ = head.Child(1);
-        if (root_)
+        head_->parent_ = h.Child(1);
+        if (head_->parent_)
         {
-            root_->isRed_ = false;
-            root_->parent_ = 0;
+            head_->parent_->isRed_ = false;
+            head_->parent_->parent_ = 0;
         }
+        
+        // Invalidate cached first and last nodes
+        head_->link_[0] = 0;
+        head_->link_[1] = 0;
         
         return removed;
     }
@@ -528,8 +571,6 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(Node));
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
@@ -538,8 +579,6 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(Node));
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
