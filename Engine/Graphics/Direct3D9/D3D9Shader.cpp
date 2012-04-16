@@ -32,6 +32,8 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 
+#include "DebugNew.h"
+
 OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :

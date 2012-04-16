@@ -31,6 +31,8 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
+#include "DebugNew.h"
+
 static const String passNames[] =
 {
     "base",

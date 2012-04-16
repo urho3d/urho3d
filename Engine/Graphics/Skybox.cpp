@@ -27,6 +27,8 @@
 #include "Context.h"
 #include "Skybox.h"
 
+#include "DebugNew.h"
+
 OBJECTTYPESTATIC(Skybox);
 
 Skybox::Skybox(Context* context) :

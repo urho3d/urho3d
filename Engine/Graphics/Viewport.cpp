@@ -27,6 +27,8 @@
 #include "Scene.h"
 #include "Viewport.h"
 
+#include "DebugNew.h"
+
 Viewport::Viewport() :
     rect_(IntRect::ZERO)
 {

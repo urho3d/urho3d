@@ -27,6 +27,8 @@
 #include "Node.h"
 #include "XMLElement.h"
 
+#include "DebugNew.h"
+
 OBJECTTYPESTATIC(Component);
 
 Component::Component(Context* context) :

@@ -29,6 +29,8 @@
 
 #include <pugixml.hpp>
 
+#include "DebugNew.h"
+
 XMLElement::XMLElement() :
     node_(0)
 {

@@ -29,6 +29,8 @@
 #include "Texture2D.h"
 #include "XMLFile.h"
 
+#include "DebugNew.h"
+
 static const String emptyName;
 
 TextureUnit ParseTextureUnitName(const String& name);

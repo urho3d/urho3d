@@ -28,6 +28,8 @@
 #include "Log.h"
 #include "Node.h"
 
+#include "DebugNew.h"
+
 SceneResolver::SceneResolver()
 {
 }

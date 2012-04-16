@@ -29,6 +29,8 @@
 #include "Mutex.h"
 #include "ProcessUtils.h"
 
+#include "DebugNew.h"
+
 static HashMap<GLFWwindow, Context*> windowContexts;
 
 GraphicsImpl::GraphicsImpl() :

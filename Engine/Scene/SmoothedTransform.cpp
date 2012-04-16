@@ -27,6 +27,8 @@
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
 
+#include "DebugNew.h"
+
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 

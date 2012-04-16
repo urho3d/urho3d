@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "OctreeQuery.h"
+
 #include "DebugNew.h"
 
 Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const

@@ -26,6 +26,8 @@
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 
+#include "DebugNew.h"
+
 GraphicsImpl::GraphicsImpl() :
     interface_(0),
     device_(0),
