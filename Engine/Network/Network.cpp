@@ -47,7 +47,8 @@ Network::Network(Context* context) :
     Object(context),
     updateFps_(DEFAULT_UPDATE_FPS),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
-    updateAcc_(0.0f)
+    updateAcc_(0.0f),
+    frameNumber_(1)
 {
     network_ = new kNet::Network();
     
@@ -427,7 +428,7 @@ void Network::PostUpdate(float timeStep)
             for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
             {
-                i->second_->SendServerUpdate();
+                i->second_->SendServerUpdate(frameNumber_);
                 i->second_->SendRemoteEvents();
                 i->second_->SendPackages();
             }
@@ -442,6 +443,11 @@ void Network::PostUpdate(float timeStep)
         
         // Notify that the update was sent
         SendEvent(E_NETWORKUPDATESENT);
+        
+        // Increment server frame number. Wrap to 1 as 0 means "update never sent" for Serializables
+        ++frameNumber_;
+        if (!frameNumber_)
+            ++frameNumber_;
     }
 }
 

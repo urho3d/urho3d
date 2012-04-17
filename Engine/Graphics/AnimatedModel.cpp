@@ -564,7 +564,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 {
     if (!node_ && createBones)
     {
-        LOGWARNING("AnimatedModel not attached to a scene node, can not create bone nodes");
+        LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
     }
     

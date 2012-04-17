@@ -124,7 +124,7 @@ public:
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Send scene update messages. Called by Network.
-    void SendServerUpdate();
+    void SendServerUpdate(unsigned serverFrameNumber);
     /// Send latest controls from the client. Called by Network.
     void SendClientUpdate();
     /// Send queued remote events. Called by Network.
@@ -194,11 +194,11 @@ private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first.
-    void ProcessNode(Node* node);
+    void ProcessNode(unsigned serverFrameNumber, Node* node);
     /// Process a node that the client had not yet received.
-    void ProcessNewNode(Node* node);
+    void ProcessNewNode(unsigned serverFrameNumber, Node* node);
     /// Process a node that the client has already received.
-    void ProcessExistingNode(Node* node);
+    void ProcessExistingNode(unsigned serverFrameNumber, Node* node);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
@@ -215,13 +215,11 @@ private:
     /// Scene.
     WeakPtr<Scene> scene_;
     /// Last sent state of the scene for network replication.
-    Map<unsigned, NodeReplicationState> sceneState_;
-    /// Preallocated attribute variants per networked object class for sending updates.
-    Map<ShortStringHash, Vector<Variant> > classCurrentState_;
+    HashMap<unsigned, NodeReplicationState> sceneState_;
     /// Waiting or ongoing package file receive transfers.
-    Map<StringHash, PackageDownload> downloads_;
+    HashMap<StringHash, PackageDownload> downloads_;
     /// Ongoing package send transfers.
-    Map<StringHash, PackageUpload> uploads_;
+    HashMap<StringHash, PackageUpload> uploads_;
     /// Pending latest data for not yet received nodes.
     HashMap<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components.

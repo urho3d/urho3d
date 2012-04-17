@@ -132,6 +132,8 @@ private:
     float updateInterval_;
     /// Update time accumulator.
     float updateAcc_;
+    /// Server frame number.
+    unsigned frameNumber_;
     /// Package cache directory.
     String packageCacheDir_;
 };

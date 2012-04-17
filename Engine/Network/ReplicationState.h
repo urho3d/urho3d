@@ -44,7 +44,7 @@ struct NodeReplicationState
     /// User variables.
     VariantMap vars_;
     /// Components by ID.
-    Map<unsigned, ComponentReplicationState> components_;
+    HashMap<unsigned, ComponentReplicationState> components_;
     /// Interest management priority accumulator.
     float priorityAcc_;
     /// Update frame number.

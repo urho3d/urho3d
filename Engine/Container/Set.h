@@ -282,37 +282,39 @@ private:
     /// Find the node with smallest key.
     Node* FindFirst() const
     {
-        if (!head_)
+        Node* node = Root();
+        if (!node)
             return 0;
         
-        // Check cached node first
-        if (head_->link_[0])
-            return reinterpret_cast<Node*>(head_->link_[0]);
+        // Search if not cached
+        Node*& first = reinterpret_cast<Node*&>(head_->link_[0]);
+        if (!first)
+        {
+            while (node && node->link_[0])
+                node = node->Child(0);
+            first = node;
+        }
         
-        Node* node = reinterpret_cast<Node*>(head_->parent_);
-        while (node && node->link_[0])
-            node = node->Child(0);
-        
-        head_->link_[0] = node;
-        return node;
+        return first;
     }
     
     /// Find the node with largest key.
     Node* FindLast() const
     {
-        if (!head_)
+        Node* node = Root();
+        if (!node)
             return 0;
         
-        // Check cached node first
-        if (head_->link_[1])
-            return reinterpret_cast<Node*>(head_->link_[1]);
+        // Search if not cached
+        Node*& last = reinterpret_cast<Node*&>(head_->link_[1]);
+        if (!last)
+        {
+            while (node && node->link_[1])
+                node = node->Child(1);
+            last = node;
+        }
         
-        Node* node = reinterpret_cast<Node*>(head_->parent_);
-        while (node && node->link_[1])
-            node = node->Child(1);
-        
-        head_->link_[1] = node;
-        return node;
+        return last;
     }
     
     /// Find a node with key. Return null if not found.

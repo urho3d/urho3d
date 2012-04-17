@@ -216,7 +216,7 @@ void Connection::Disconnect(int waitMSec)
     connection_->Disconnect(waitMSec);
 }
 
-void Connection::SendServerUpdate()
+void Connection::SendServerUpdate(unsigned serverFrameNumber)
 {
     if (!scene_ || !sceneLoaded_)
         return;
@@ -228,16 +228,16 @@ void Connection::SendServerUpdate()
     // Check for new or changed nodes
     // Start from the root node (scene) so that the scene-wide components get sent first
     processedNodes_.Clear();
-    ProcessNode(scene_);
+    ProcessNode(serverFrameNumber, scene_);
     
     // Then go through the rest of the nodes
     for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-        ProcessNode(i->second_);
+        ProcessNode(serverFrameNumber, i->second_);
     
     // Check for removed nodes
-    for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
+    for (HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
     {
-        Map<unsigned, NodeReplicationState>::Iterator current = i++;
+        HashMap<unsigned, NodeReplicationState>::Iterator current = i++;
         if (current->second_.frameNumber_ != frameNumber_)
         {
             msg_.Clear();
@@ -311,9 +311,9 @@ void Connection::SendPackages()
     {
         unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
         
-        for (Map<StringHash, PackageUpload>::Iterator i = uploads_.Begin(); i != uploads_.End();)
+        for (HashMap<StringHash, PackageUpload>::Iterator i = uploads_.Begin(); i != uploads_.End();)
         {
-            Map<StringHash, PackageUpload>::Iterator current = i++;
+            HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
             unsigned fragmentSize = Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
             upload.file_->Read(buffer, fragmentSize);
@@ -758,7 +758,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
         {
             StringHash nameHash = msg.ReadStringHash();
             
-            Map<StringHash, PackageDownload>::Iterator i = downloads_.Find(nameHash);
+            HashMap<StringHash, PackageDownload>::Iterator i = downloads_.Find(nameHash);
             // In case of being unable to create the package file into the cache, we will still receive all data from the server.
             // Simply disregard it
             if (i == downloads_.End())
@@ -979,7 +979,7 @@ unsigned Connection::GetNumDownloads() const
 
 const String& Connection::GetDownloadName() const
 {
-    for (Map<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
+    for (HashMap<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
     {
         if (i->second_.initiated_)
             return i->second_.name_;
@@ -989,7 +989,7 @@ const String& Connection::GetDownloadName() const
 
 float Connection::GetDownloadProgress() const
 {
-    for (Map<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
+    for (HashMap<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
     {
         if (i->second_.initiated_)
             return (float)i->second_.receivedFragments_.Size() / (float)i->second_.totalFragments_;
@@ -1006,7 +1006,7 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
 }
 
-void Connection::ProcessNode(Node* node)
+void Connection::ProcessNode(unsigned serverFrameNumber, Node* node)
 {
     if (!node || processedNodes_.Contains(node))
         return;
@@ -1017,16 +1017,16 @@ void Connection::ProcessNode(Node* node)
     PODVector<Node*> dependencyNodes;
     node->GetDependencyNodes(dependencyNodes);
     for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
-        ProcessNode(*i);
+        ProcessNode(serverFrameNumber, *i);
     
     // Check if the client's replication state already has this node
     if (sceneState_.Contains(node->GetID()))
-        ProcessExistingNode(node);
+        ProcessExistingNode(serverFrameNumber, node);
     else
-        ProcessNewNode(node);
+        ProcessNewNode(serverFrameNumber, node);
 }
 
-void Connection::ProcessNewNode(Node* node)
+void Connection::ProcessNewNode(unsigned serverFrameNumber, Node* node)
 {
     msg_.Clear();
     msg_.WriteNetID(node->GetID());
@@ -1036,7 +1036,7 @@ void Connection::ProcessNewNode(Node* node)
     nodeState.frameNumber_ = frameNumber_;
     
     // Write node's attributes
-    node->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, nodeState.attributes_);
+    node->WriteInitialDeltaUpdate(serverFrameNumber, msg_, deltaUpdateBits_, nodeState.attributes_);
     
     // Write node's user variables
     const VariantMap& vars = node->GetVars();
@@ -1064,13 +1064,13 @@ void Connection::ProcessNewNode(Node* node)
         
         msg_.WriteShortStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
-        component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
+        component->WriteInitialDeltaUpdate(serverFrameNumber, msg_, deltaUpdateBits_, componentState.attributes_);
     }
     
     SendMessage(MSG_CREATENODE, true, true, msg_, NET_HIGH_PRIORITY);
 }
 
-void Connection::ProcessExistingNode(Node* node)
+void Connection::ProcessExistingNode(unsigned serverFrameNumber, Node* node)
 {
     NodeReplicationState& nodeState = sceneState_[node->GetID()];
     nodeState.frameNumber_ = frameNumber_;
@@ -1086,7 +1086,7 @@ void Connection::ProcessExistingNode(Node* node)
     
     // Check if attributes have changed
     bool deltaUpdate, latestData;
-    node->PrepareUpdates(deltaUpdateBits_, classCurrentState_[node->GetType()], nodeState.attributes_, deltaUpdate, latestData);
+    node->PrepareUpdates(serverFrameNumber, deltaUpdateBits_, nodeState.attributes_, deltaUpdate, latestData);
     
     // Check if user variables have changed. Note: variable removal is not supported
     changedVars_.Clear();
@@ -1141,7 +1141,7 @@ void Connection::ProcessExistingNode(Node* node)
         if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
         
-        Map<unsigned, ComponentReplicationState>::Iterator j = nodeState.components_.Find(component->GetID());
+        HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.components_.Find(component->GetID());
         if (j == nodeState.components_.End())
         {
             // New component
@@ -1153,7 +1153,7 @@ void Connection::ProcessExistingNode(Node* node)
             msg_.WriteNetID(node->GetID());
             msg_.WriteShortStringHash(component->GetType());
             msg_.WriteNetID(component->GetID());
-            component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
+            component->WriteInitialDeltaUpdate(serverFrameNumber, msg_, deltaUpdateBits_, componentState.attributes_);
             
             SendMessage(MSG_CREATECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
         }
@@ -1163,8 +1163,7 @@ void Connection::ProcessExistingNode(Node* node)
             ComponentReplicationState& componentState = j->second_;
             componentState.frameNumber_ = frameNumber_;
             
-            component->PrepareUpdates(deltaUpdateBits_, classCurrentState_[component->GetType()], componentState.attributes_,
-                deltaUpdate, latestData);
+            component->PrepareUpdates(serverFrameNumber, deltaUpdateBits_, componentState.attributes_, deltaUpdate, latestData);
             
             // Send deltaupdate message if necessary
             if (deltaUpdate)
@@ -1190,9 +1189,9 @@ void Connection::ProcessExistingNode(Node* node)
     }
     
     // Check for removed components
-    for (Map<unsigned, ComponentReplicationState>::Iterator i = nodeState.components_.Begin(); i != nodeState.components_.End();)
+    for (HashMap<unsigned, ComponentReplicationState>::Iterator i = nodeState.components_.Begin(); i != nodeState.components_.End();)
     {
-        Map<unsigned, ComponentReplicationState>::Iterator current = i++;
+        HashMap<unsigned, ComponentReplicationState>::Iterator current = i++;
         if (current->second_.frameNumber_ != frameNumber_)
         {
             msg_.Clear();

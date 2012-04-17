@@ -35,6 +35,7 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
+    lastServerFrameNumber_(0),
     loading_(false)
 {
 }
@@ -419,7 +420,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
+void Serializable::WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
     Vector<Variant>& replicationState)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
@@ -427,17 +428,28 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned 
         return;
     unsigned numAttributes = attributes->Size();
     
+    // Get current attribute values from the component if necessary
+    if (serverFrameNumber != lastServerFrameNumber_ || serverAttributes_.Empty())
+    {
+        serverAttributes_.Resize(numAttributes);
+        for (unsigned i = 0; i < numAttributes; ++i)
+        {
+            const AttributeInfo& attr = attributes->At(i);
+            OnGetAttribute(attr, serverAttributes_[i]);
+        }
+        lastServerFrameNumber_ = serverFrameNumber;
+    }
+    
     replicationState.Resize(numAttributes);
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);
     for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
         deltaUpdateBits[i] = 0;
     
-    // Set initial attribute values and compare against defaults
+    // Copy attributes to replication state and compare against defaults
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        
-        OnGetAttribute(attr, replicationState[i]);
+        replicationState[i] = serverAttributes_[i];
         if (replicationState[i] != attr.defaultValue_)
             deltaUpdateBits[i >> 3] |= (1 << (i & 7));
     }
@@ -447,14 +459,12 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned 
     
     for (unsigned i = 0; i < numAttributes; ++i)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        
         if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
             dest.WriteVariantData(replicationState[i]);
     }
 }
 
-void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& classCurrentState,
+void Serializable::PrepareUpdates(unsigned serverFrameNumber, PODVector<unsigned char>& deltaUpdateBits,
     Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData)
 {
     deltaUpdate = false;
@@ -465,23 +475,27 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
         return;
     unsigned numAttributes = attributes->Size();
     
+    // Get current attribute values from the component if necessary
+    if (serverFrameNumber != lastServerFrameNumber_)
+    {
+        for (unsigned i = 0; i < numAttributes; ++i)
+        {
+            const AttributeInfo& attr = attributes->At(i);
+            OnGetAttribute(attr, serverAttributes_[i]);
+        }
+        lastServerFrameNumber_ = serverFrameNumber;
+    }
+    
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);
     for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
         deltaUpdateBits[i] = 0;
     
-    // If class-specific current state has not been previously used, resize it now
-    if (classCurrentState.Empty())
-        classCurrentState.Resize(numAttributes);
-    
     for (unsigned i = 0; i < numAttributes; ++i)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        
-        // Check for attribute change
-        OnGetAttribute(attr, classCurrentState[i]);
-        if (classCurrentState[i] != replicationState[i])
+        if (serverAttributes_[i] != replicationState[i])
         {
-            replicationState[i] = classCurrentState[i];
+            const AttributeInfo& attr = attributes->At(i);
+            replicationState[i] = serverAttributes_[i];
             if (attr.mode_ & AM_LATESTDATA)
                 latestData = true;
             else
