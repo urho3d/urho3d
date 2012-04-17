@@ -63,9 +63,9 @@ public:
     /// %Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
     /// Write initial delta network update (compared to default attribute values) and prepare the last sent state.
-    void WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
+    void WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
     /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate().
-    void PrepareUpdates(unsigned serverFrameNumber, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData);
+    void PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData);
     /// Write a delta network update prepared with PrepareUpdates().
     void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
     /// Write a latestdata network update prepared with PrepareUpdates().
@@ -94,7 +94,7 @@ protected:
     /// Server-side attributes for sending updates. Only updated once per network frame, not per user.
     Vector<Variant> serverAttributes_;
     /// Last network frame number.
-    unsigned lastServerFrameNumber_;
+    unsigned lastFrameNumber_;
     /// Is loading flag.
     bool loading_;
 };

@@ -35,7 +35,7 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    lastServerFrameNumber_(0),
+    lastFrameNumber_(0),
     loading_(false)
 {
 }
@@ -420,7 +420,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
+void Serializable::WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
     Vector<Variant>& replicationState)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
@@ -429,7 +429,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serialize
     unsigned numAttributes = attributes->Size();
     
     // Get current attribute values from the component if necessary
-    if (serverFrameNumber != lastServerFrameNumber_ || serverAttributes_.Empty())
+    if (frameNumber != lastFrameNumber_ || serverAttributes_.Empty())
     {
         serverAttributes_.Resize(numAttributes);
         for (unsigned i = 0; i < numAttributes; ++i)
@@ -437,7 +437,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serialize
             const AttributeInfo& attr = attributes->At(i);
             OnGetAttribute(attr, serverAttributes_[i]);
         }
-        lastServerFrameNumber_ = serverFrameNumber;
+        lastFrameNumber_ = frameNumber;
     }
     
     replicationState.Resize(numAttributes);
@@ -464,7 +464,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned serverFrameNumber, Serialize
     }
 }
 
-void Serializable::PrepareUpdates(unsigned serverFrameNumber, PODVector<unsigned char>& deltaUpdateBits,
+void Serializable::PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>& deltaUpdateBits,
     Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData)
 {
     deltaUpdate = false;
@@ -476,14 +476,14 @@ void Serializable::PrepareUpdates(unsigned serverFrameNumber, PODVector<unsigned
     unsigned numAttributes = attributes->Size();
     
     // Get current attribute values from the component if necessary
-    if (serverFrameNumber != lastServerFrameNumber_)
+    if (frameNumber != lastFrameNumber_)
     {
         for (unsigned i = 0; i < numAttributes; ++i)
         {
             const AttributeInfo& attr = attributes->At(i);
             OnGetAttribute(attr, serverAttributes_[i]);
         }
-        lastServerFrameNumber_ = serverFrameNumber;
+        lastFrameNumber_ = frameNumber;
     }
     
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);

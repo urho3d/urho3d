@@ -124,7 +124,7 @@ public:
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Send scene update messages. Called by Network.
-    void SendServerUpdate(unsigned serverFrameNumber);
+    void SendServerUpdate(unsigned frameNumber);
     /// Send latest controls from the client. Called by Network.
     void SendClientUpdate();
     /// Send queued remote events. Called by Network.
@@ -194,11 +194,11 @@ private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first.
-    void ProcessNode(unsigned serverFrameNumber, Node* node);
+    void ProcessNode(unsigned frameNumber, Node* node);
     /// Process a node that the client had not yet received.
-    void ProcessNewNode(unsigned serverFrameNumber, Node* node);
+    void ProcessNewNode(unsigned frameNumber, Node* node);
     /// Process a node that the client has already received.
-    void ProcessExistingNode(unsigned serverFrameNumber, Node* node);
+    void ProcessExistingNode(unsigned frameNumber, Node* node, NodeReplicationState& nodeState);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
@@ -238,8 +238,6 @@ private:
     String sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
-    /// Update frame number.
-    unsigned frameNumber_;
     /// Client connection flag.
     bool isClient_;
     /// Connection pending flag.
