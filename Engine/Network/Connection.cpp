@@ -222,7 +222,7 @@ void Connection::SendServerUpdate(unsigned frameNumber)
     
     PROFILE(SendServerUpdate);
     
-    const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
+    const HashMap<unsigned, Node*>& nodes = scene_->GetReplicatedNodes();
     
     // Check for new or changed nodes
     // Start from the root node (scene) so that the scene-wide components get sent first
@@ -230,7 +230,7 @@ void Connection::SendServerUpdate(unsigned frameNumber)
     ProcessNode(frameNumber, scene_);
     
     // Then go through the rest of the nodes
-    for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+    for (HashMap<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
         ProcessNode(frameNumber, i->second_);
     
     // Check for removed nodes
@@ -1011,8 +1011,7 @@ void Connection::ProcessNode(unsigned frameNumber, Node* node)
     processedNodes_.Insert(node);
     
     // Process depended upon nodes first
-    PODVector<Node*> dependencyNodes;
-    node->GetDependencyNodes(dependencyNodes);
+    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes(frameNumber);
     for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
         ProcessNode(frameNumber, *i);
     
@@ -1072,7 +1071,7 @@ void Connection::ProcessExistingNode(unsigned frameNumber, Node* node, NodeRepli
 {
     nodeState.frameNumber_ = frameNumber;
     
-    // Check from the interest management priority component, if exists, whether should update
+    // Check from the interest management component, if exists, whether should update
     NetworkPriority* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {

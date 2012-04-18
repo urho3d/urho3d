@@ -91,8 +91,10 @@ public:
     bool IsLoading() const { return loading_; }
     
 private:
-    /// Server-side attributes for sending updates. Only updated once per network frame, not per user.
-    Vector<Variant> serverAttributes_;
+    /// Current attributes for sending network updates. Updated only once per network frame, not per user.
+    Vector<Variant> currentState_;
+    /// Cached network attribute infos.
+    mutable const Vector<AttributeInfo>* networkAttributes_;
     /// Last server frame number.
     unsigned serverFrameNumber_;
     /// Is loading flag.

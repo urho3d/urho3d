@@ -266,7 +266,7 @@ public:
     /// Return user variables.
     VariantMap& GetVars() { return vars_; }
     /// Return the depended on nodes to order network updates.
-    void GetDependencyNodes(PODVector<Node*>& dest) const;
+    const PODVector<Node*>& GetDependencyNodes(unsigned frameNumber) const;
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent() const;
     /// Return components derived from class.
@@ -348,8 +348,12 @@ private:
     Vector<SharedPtr<Component> > components_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
-    /// Attribute buffer for network replication.
+    /// Nodes this node depends on for network updates.
+    mutable PODVector<Node*> dependencyNodes_;
+    /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
+    /// Dependency nodes update framenumber.
+    mutable unsigned dependencyFrameNumber_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned char rotateCount_;
     /// World transform needs update flag.

@@ -66,7 +66,12 @@ Scene::Scene(Context* context) :
 Scene::~Scene()
 {
     // Remove scene reference and owner from all nodes that still exist
-    for (Map<unsigned, Node*>::Iterator i = allNodes_.Begin(); i != allNodes_.End(); ++i)
+    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+    {
+        i->second_->SetScene(0);
+        i->second_->SetOwner(0);
+    }
+    for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
     {
         i->second_->SetScene(0);
         i->second_->SetOwner(0);
@@ -379,7 +384,12 @@ void Scene::ClearRequiredPackageFiles()
 
 void Scene::ResetOwner(Connection* owner)
 {
-    for (Map<unsigned, Node*>::Iterator i = allNodes_.Begin(); i != allNodes_.End(); ++i)
+    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+    {
+        if (i->second_->GetOwner() == owner)
+            i->second_->SetOwner(0);
+    }
+    for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
     {
         if (i->second_->GetOwner() == owner)
             i->second_->SetOwner(0);
@@ -403,20 +413,42 @@ void Scene::UnregisterAllVars()
 
 Node* Scene::GetNode(unsigned id) const
 {
-    Map<unsigned, Node*>::ConstIterator i = allNodes_.Find(id);
-    if (i != allNodes_.End())
-        return i->second_;
+    if (id < FIRST_LOCAL_ID)
+    {
+        HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Find(id);
+        if (i != replicatedNodes_.End())
+            return i->second_;
+        else
+            return 0;
+    }
     else
-        return 0;
+    {
+        HashMap<unsigned, Node*>::ConstIterator i = localNodes_.Find(id);
+        if (i != localNodes_.End())
+            return i->second_;
+        else
+            return 0;
+    }
 }
 
 Component* Scene::GetComponent(unsigned id) const
 {
-    Map<unsigned, Component*>::ConstIterator i = allComponents_.Find(id);
-    if (i != allComponents_.End())
-        return i->second_;
+    if (id < FIRST_LOCAL_ID)
+    {
+        HashMap<unsigned, Component*>::ConstIterator i = replicatedComponents_.Find(id);
+        if (i != replicatedComponents_.End())
+            return i->second_;
+        else
+            return 0;
+    }
     else
-        return 0;
+    {
+        HashMap<unsigned, Component*>::ConstIterator i = localComponents_.Find(id);
+        if (i != localComponents_.End())
+            return i->second_;
+        else
+            return 0;
+    }
 }
 
 float Scene::GetAsyncProgress() const
@@ -429,7 +461,7 @@ float Scene::GetAsyncProgress() const
 
 const String& Scene::GetVarName(ShortStringHash hash) const
 {
-    Map<ShortStringHash, String>::ConstIterator i = varNames_.Find(hash);
+    HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Find(hash);
     return i != varNames_.End() ? i->second_ : emptyVarName;
 }
 
@@ -510,7 +542,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            if (!allNodes_.Contains(replicatedNodeID_))
+            if (!replicatedNodes_.Contains(replicatedNodeID_))
                 return replicatedNodeID_;
             
             if (replicatedNodeID_ != LAST_REPLICATED_ID)
@@ -523,7 +555,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            if (!allNodes_.Contains(localNodeID_))
+            if (!localNodes_.Contains(localNodeID_))
                 return localNodeID_;
             
             if (localNodeID_ != LAST_LOCAL_ID)
@@ -540,7 +572,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            if (!allComponents_.Contains(replicatedComponentID_))
+            if (!replicatedComponents_.Contains(replicatedComponentID_))
                 return replicatedComponentID_;
             
             if (replicatedComponentID_ != LAST_REPLICATED_ID)
@@ -553,7 +585,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            if (!allComponents_.Contains(localComponentID_))
+            if (!localComponents_.Contains(localComponentID_))
                 return localComponentID_;
             
             if (localComponentID_ != LAST_LOCAL_ID)
@@ -573,15 +605,30 @@ void Scene::NodeAdded(Node* node)
     
     // If we already have an existing node with the same ID, must remove the scene reference from it
     unsigned id = node->GetID();
-    Map<unsigned, Node*>::Iterator i = allNodes_.Find(id);
-    if (i != allNodes_.End() && i->second_ != node)
+    if (id < FIRST_LOCAL_ID)
     {
-        LOGWARNING("Overwriting node with ID " + String(id));
-        i->second_->SetScene(0);
-        i->second_->SetOwner(0);
+        HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
+        if (i != replicatedNodes_.End() && i->second_ != node)
+        {
+            LOGWARNING("Overwriting node with ID " + String(id));
+            i->second_->SetScene(0);
+            i->second_->SetOwner(0);
+        }
+        
+        replicatedNodes_[id] = node;
     }
-    
-    allNodes_[id] = node;
+    else
+    {
+        HashMap<unsigned, Node*>::Iterator i = localNodes_.Find(id);
+        if (i != localNodes_.End() && i->second_ != node)
+        {
+            LOGWARNING("Overwriting node with ID " + String(id));
+            i->second_->SetScene(0);
+            i->second_->SetOwner(0);
+        }
+        
+        localNodes_[id] = node;
+    }
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -589,7 +636,12 @@ void Scene::NodeRemoved(Node* node)
     if (!node || node->GetScene() != this)
         return;
     
-    allNodes_.Erase(node->GetID());
+    unsigned id = node->GetID();
+    if (id < FIRST_LOCAL_ID)
+        replicatedNodes_.Erase(id);
+    else
+        localNodes_.Erase(id);
+    
     node->SetID(0);
     node->SetScene(0);
 }
@@ -600,11 +652,22 @@ void Scene::ComponentAdded(Component* component)
         return;
     
     unsigned id = component->GetID();
-    Map<unsigned, Component*>::Iterator i = allComponents_.Find(id);
-    if (i != allComponents_.End() && i->second_ != component)
-        LOGWARNING("Overwriting component with ID " + String(id));
-    
-    allComponents_[id] = component;
+    if (id < FIRST_LOCAL_ID)
+    {
+        HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
+        if (i != replicatedComponents_.End() && i->second_ != component)
+            LOGWARNING("Overwriting component with ID " + String(id));
+        
+        replicatedComponents_[id] = component;
+    }
+    else
+    {
+        HashMap<unsigned, Component*>::Iterator i = localComponents_.Find(id);
+        if (i != localComponents_.End() && i->second_ != component)
+            LOGWARNING("Overwriting component with ID " + String(id));
+        
+        localComponents_[id] = component;
+    }
 }
 
 void Scene::ComponentRemoved(Component* component)
@@ -612,7 +675,12 @@ void Scene::ComponentRemoved(Component* component)
     if (!component)
         return;
     
-    allComponents_.Erase(component->GetID());
+    unsigned id = component->GetID();
+    if (id < FIRST_LOCAL_ID)
+        replicatedComponents_.Erase(id);
+    else
+        localComponents_.Erase(id);
+    
     component->SetID(0);
 }
 
@@ -629,7 +697,7 @@ String Scene::GetVarNamesAttr() const
 {
     String ret;
     
-    for (Map<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
+    for (HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
     {
         if (i != varNames_.Begin())
             ret += ';';

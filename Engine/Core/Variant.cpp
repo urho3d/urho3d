@@ -117,13 +117,10 @@ bool Variant::operator == (const Variant& rhs) const
         return *(reinterpret_cast<const Vector3*>(&value_)) == *(reinterpret_cast<const Vector3*>(&rhs.value_));
         
     case VAR_VECTOR4:
-        return *(reinterpret_cast<const Vector4*>(&value_)) == *(reinterpret_cast<const Vector4*>(&rhs.value_));
-        
     case VAR_QUATERNION:
-        return *(reinterpret_cast<const Quaternion*>(&value_)) == *(reinterpret_cast<const Quaternion*>(&rhs.value_));
-        
     case VAR_COLOR:
-        return *(reinterpret_cast<const Color*>(&value_)) == *(reinterpret_cast<const Color*>(&rhs.value_));
+        // Hack: use the Vector4 compare for all these classes, as they have the same memory structure
+        return *(reinterpret_cast<const Vector4*>(&value_)) == *(reinterpret_cast<const Vector4*>(&rhs.value_));
         
     case VAR_STRING:
         return *(reinterpret_cast<const String*>(&value_)) == *(reinterpret_cast<const String*>(&rhs.value_));

@@ -131,11 +131,9 @@ public:
     float GetSnapThreshold() const { return snapThreshold_; }
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
-    /// Return all nodes.
-    const Map<unsigned, Node*>& GetAllNodes() const { return allNodes_; }
-    /// Return all components.
-    const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
-    /// Return a node var name, or empty if not registered.
+    /// Return all replicated scene nodes.
+    const HashMap<unsigned, Node*>& GetReplicatedNodes() const { return replicatedNodes_; }
+    /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(ShortStringHash hash) const;
     
     /// Update scene. Called by HandleUpdate.
@@ -175,10 +173,14 @@ private:
     /// Finish loading. Sets the scene filename and checksum.
     void FinishLoading(Deserializer* source);
     
-    /// Map of scene nodes by ID.
-    Map<unsigned, Node*> allNodes_;
-    /// Map of components by ID.
-    Map<unsigned, Component*> allComponents_;
+    /// Replicated scene nodes by ID.
+    HashMap<unsigned, Node*> replicatedNodes_;
+    /// Local scene nodes by ID.
+    HashMap<unsigned, Node*> localNodes_;
+    /// Replicated components by ID.
+    HashMap<unsigned, Component*> replicatedComponents_;
+    /// Local components by ID.
+    HashMap<unsigned, Component*> localComponents_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.
@@ -188,7 +190,7 @@ private:
     /// Required package files for networking.
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
-    Map<ShortStringHash, String> varNames_;
+    HashMap<ShortStringHash, String> varNames_;
     /// Delayed dirty notification queue for components.
     PODVector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.

@@ -117,9 +117,6 @@ void InitScene()
 {
     gameScene = Scene("NinjaSnowWar");
 
-    // Set network snap threshold higher, as the world unit is centimeter
-    gameScene.snapThreshold = 100.0;
-
     // Enable access to this script file & scene from the console
     script.defaultScene = gameScene;
     script.defaultScriptFile = scriptFile;
@@ -376,9 +373,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     if (engine.headless)
     {
-        String command = GetConsoleInput().ToLower();
-        if (command == "shutdown" || command == "exit" || command == "quit")
-            engine.Exit();
+        String command = GetConsoleInput();
+        if (command.length > 0)
+            script.Execute(command);
     }
 }
 

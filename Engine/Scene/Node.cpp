@@ -48,6 +48,7 @@ Node::Node(Context* context) :
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
     worldTransform_(Matrix3x4::IDENTITY),
+    dependencyFrameNumber_(0),
     rotateCount_(0),
     dirty_(false)
 {
@@ -770,20 +771,30 @@ Component* Node::GetComponent(ShortStringHash type) const
     return 0;
 }
 
-void Node::GetDependencyNodes(PODVector<Node*>& dest) const
+const PODVector<Node*>& Node::GetDependencyNodes(unsigned frameNumber) const
 {
-    // Add the parent node, but if it is local, traverse to the first non-local node
-    if (parent_ && parent_ != scene_)
+    if (frameNumber != dependencyFrameNumber_)
     {
-        Node* current = parent_;
-        while (current->id_ >= FIRST_LOCAL_ID)
-            current = current->parent_;
-        dest.Push(current);
+        dependencyNodes_.Clear();
+        
+        // Add the parent node, but if it is local, traverse to the first non-local node
+        if (parent_ && parent_ != scene_)
+        {
+            Node* current = parent_;
+            while (current->id_ >= FIRST_LOCAL_ID)
+                current = current->parent_;
+            if (current && current != scene_)
+                dependencyNodes_.Push(current);
+        }
+        
+        // Then let the components add their dependencies
+        for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+            (*i)->GetDependencyNodes(dependencyNodes_);
+        
+        dependencyFrameNumber_ = frameNumber;
     }
     
-    // Then let the components add their dependencies
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
-        (*i)->GetDependencyNodes(dest);
+    return dependencyNodes_;
 }
 
 void Node::SetID(unsigned id)

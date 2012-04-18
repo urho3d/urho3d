@@ -351,7 +351,7 @@ void PhysicsWorld::PreStep(float timeStep)
 #ifdef ENABLE_PROFILING
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
-        profiler->BeginBlock("StepSimulation", 1);
+        profiler->BeginBlock("StepSimulation");
 #endif
 }
 

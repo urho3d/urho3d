@@ -33,6 +33,7 @@ public:
     ProfilerBlock(ProfilerBlock* parent, const char* name) :
         name_(name),
         time_(0),
+        maxTime_(0),
         count_(0),
         parent_(parent),
         lastSearchName_(0),
@@ -56,17 +57,20 @@ public:
         }
     }
     
-    /// Begin timing. Call count can also be specified if known to reduce overhead.
-    void Begin(unsigned count = 1)
+    /// Begin timing.
+    void Begin()
     {
         timer_.Reset();
-        count_ += count;
+        ++count_;
     }
     
     /// End timing.
     void End()
     {
-        time_ += timer_.GetUSec(false);
+        long long time = timer_.GetUSec(false);
+        if (time > maxTime_)
+            maxTime_ = time;
+        time_ += time;
     }
     
     /// End profiling frame and update accumulation period and total values.
@@ -122,6 +126,8 @@ public:
     /// Return name of block.
     const char* GetName() const { return name_; }
     
+    /// Return maximum time of a single call.
+    long long GetMaxTime() const { return maxTime_; }
     /// Return accumulated time during last frame.
     long long GetFrameTime() const { return frameTime_; }
     /// Return number of calls during last frame.
@@ -146,9 +152,10 @@ private:
     HiresTimer timer_;
     /// Time on current frame.
     long long time_;
+    /// Maximum time on a block.
+    long long maxTime_;
     /// Calls on current frame.
     unsigned count_;
-
     /// Parent block.
     ProfilerBlock* parent_;
     /// Last queried child block name (optimization.)
@@ -157,7 +164,6 @@ private:
     ProfilerBlock* lastSearchBlock_;
     /// Child blocks.
     PODVector<ProfilerBlock*> children_;
-    
     /// Time on the previous frame.
     long long frameTime_;
     /// Calls on the previous frame.
@@ -183,11 +189,11 @@ public:
     /// Destruct.
     virtual ~Profiler();
     
-    /// Begin timing a profiling block. Call count can also be specified if known to reduce overhead.
-    void BeginBlock(const char* name, unsigned count = 1)
+    /// Begin timing a profiling block.
+    void BeginBlock(const char* name)
     {
         current_ = current_->GetChild(name);
-        current_->Begin(count);
+        current_->Begin();
     }
     
     /// End timing the current profiling block.
@@ -231,11 +237,11 @@ class AutoProfileBlock
 {
 public:
     /// Construct. Begin a profiling block with the specified name and optional call count.
-    AutoProfileBlock(Profiler* profiler, const char* name, unsigned count = 1) :
+    AutoProfileBlock(Profiler* profiler, const char* name) :
         profiler_(profiler)
     {
         if (profiler_)
-            profiler_->BeginBlock(name, count);
+            profiler_->BeginBlock(name);
     }
     
     /// Destruct. End the profiling block.
@@ -252,8 +258,6 @@ private:
 
 #ifdef ENABLE_PROFILING
 #define PROFILE(name) AutoProfileBlock profile_ ## name (GetSubsystem<Profiler>(), #name)
-#define PROFILE_MULTIPLE(name, count) AutoProfileBlock profile_ ## name (GetSubsystem<Profiler>(), #name, count)
 #else
 #define PROFILE(name)
-#define PROFILE_MULTIPLE(name, count)
 #endif

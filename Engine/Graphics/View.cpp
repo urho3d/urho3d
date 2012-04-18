@@ -664,7 +664,7 @@ void View::GetBatches()
     
     // Process lit geometries and shadow casters for each light
     {
-        PROFILE_MULTIPLE(ProcessLights, lights_.Size());
+        PROFILE(ProcessLights);
         
         lightQueryResults_.Resize(lights_.Size());
         
