@@ -347,8 +347,6 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
 bool Graphics::BeginFrame()
 {
-    PROFILE(BeginRendering);
-
     if (!IsInitialized())
         return false;
 
@@ -377,11 +375,11 @@ bool Graphics::BeginFrame()
 
 void Graphics::EndFrame()
 {
-    PROFILE(EndRendering);
-    
     if (!IsInitialized())
         return;
-    
+ 
+    PROFILE(Present);
+       
     SendEvent(E_ENDRENDERING);
     
     glfwSwapBuffers();

@@ -510,8 +510,6 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
 bool Graphics::BeginFrame()
 {
-    PROFILE(BeginRendering);
-    
     if (!IsInitialized())
         return false;
     
@@ -519,6 +517,8 @@ bool Graphics::BeginFrame()
     HRESULT hr = impl_->device_->TestCooperativeLevel();
     if (hr != D3D_OK)
     {
+        PROFILE(DeviceLost);
+        
         deviceLost_ = true;
         
         // The device can not be reset yet, sleep and try again eventually
@@ -557,10 +557,10 @@ bool Graphics::BeginFrame()
 
 void Graphics::EndFrame()
 {
-    PROFILE(EndRendering);
-    
     if (!IsInitialized())
         return;
+    
+    PROFILE(Present);
     
     SendEvent(E_ENDRENDERING);
     
