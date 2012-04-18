@@ -39,10 +39,13 @@ public:
         lastSearchName_(0),
         lastSearchBlock_(0),
         frameTime_(0),
+        frameMaxTime_(0),
         frameCount_(0),
-        accumulatedTime_(0),
-        accumulatedCount_(0),
+        intervalTime_(0),
+        intervalMaxTime_(0),
+        intervalCount_(0),
         totalTime_(0),
+        totalMaxTime_(0),
         totalCount_(0)
     {
     }
@@ -73,30 +76,37 @@ public:
         time_ += time;
     }
     
-    /// End profiling frame and update accumulation period and total values.
+    /// End profiling frame and update interval and total values.
     void EndFrame()
     {
         frameTime_ = time_;
+        frameMaxTime_ = maxTime_;
         frameCount_ = count_;
-        accumulatedTime_ += time_;
-        accumulatedCount_ += count_;
+        intervalTime_ += time_;
+        if (maxTime_ > intervalMaxTime_)
+            intervalMaxTime_ = maxTime_;
+        intervalCount_ += count_;
         totalTime_ += time_;
+        if (maxTime_ > totalMaxTime_)
+            totalMaxTime_ = maxTime_;
         totalCount_ += count_;
         time_ = 0;
+        maxTime_ = 0;
         count_ = 0;
         
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->EndFrame();
     }
     
-    /// Clear accumulation period data.
-    void ClearAccumulated()
+    /// Begin new profiling interval.
+    void BeginInterval()
     {
-        accumulatedTime_ = 0;
-        accumulatedCount_ = 0;
+        intervalTime_ = 0;
+        intervalMaxTime_ = 0;
+        intervalCount_ = 0;
         
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
-            (*i)->ClearAccumulated();
+            (*i)->BeginInterval();
     }
     
     /// Return child block with the specified name.
@@ -123,36 +133,13 @@ public:
         return newBlock;
     }
     
-    /// Return name of block.
-    const char* GetName() const { return name_; }
-    
-    /// Return maximum time of a single call.
-    long long GetMaxTime() const { return maxTime_; }
-    /// Return accumulated time during last frame.
-    long long GetFrameTime() const { return frameTime_; }
-    /// Return number of calls during last frame.
-    unsigned GetFrameCount() const { return frameCount_; }
-    /// Return accumulated time during the current accumulation period.
-    long long GetAccumulatedTime() const { return accumulatedTime_; }
-    /// Return number of calls during the current accumulation period.
-    unsigned GetAccumulatedCount() const { return accumulatedCount_; }
-    /// Return total accumulated time.
-    long long GetTotalTime() const { return totalTime_; }
-    /// Return total number of calls.
-    unsigned GetTotalCount() const { return totalCount_; }
-    /// Return parent block.
-    ProfilerBlock* GetParent() const { return parent_; }
-    /// Return child blocks.
-    const PODVector<ProfilerBlock*>& GetChildren() const { return children_; }
-    
-private:
     /// Block name.
     const char* name_;
     /// High-resolution timer for measuring the block duration.
     HiresTimer timer_;
     /// Time on current frame.
     long long time_;
-    /// Maximum time on a block.
+    /// Maximum time on current frame.
     long long maxTime_;
     /// Calls on current frame.
     unsigned count_;
@@ -166,15 +153,21 @@ private:
     PODVector<ProfilerBlock*> children_;
     /// Time on the previous frame.
     long long frameTime_;
+    /// Maximum time on the previous frame.
+    long long frameMaxTime_;
     /// Calls on the previous frame.
     unsigned frameCount_;
-    /// Time on the accumulation period.
-    long long accumulatedTime_;
-    /// Calls on the accumulation period.
-    unsigned accumulatedCount_;
-    /// Total time.
+    /// Time during current profiler interval.
+    long long intervalTime_;
+    /// Maximum time during current profiler interval.
+    long long intervalMaxTime_;
+    /// Calls during current profiler interval.
+    unsigned intervalCount_;
+    /// Total accumulated time.
     long long totalTime_;
-    /// Total calls.
+    /// All-time maximum time.
+    long long totalMaxTime_;
+    /// Total accumulated calls.
     unsigned totalCount_;
 };
 
@@ -202,7 +195,7 @@ public:
         if (current_ != root_)
         {
             current_->End();
-            current_ = current_->GetParent();
+            current_ = current_->parent_;
         }
     }
     
@@ -210,24 +203,26 @@ public:
     void BeginFrame();
     /// End the profiling frame. Called by HandleEndFrame().
     void EndFrame();
-    /// Begin a new accumulation period.
-    void ClearAccumulated();
+    /// Begin a new interval.
+    void BeginInterval();
     
     /// Return profiling data as text output.
-    String GetData(bool showUnused = false, bool showAccumulated = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
+    String GetData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
     /// Return the current profiling block.
     const ProfilerBlock* GetCurrentBlock() { return current_; }
+    /// Return the root profiling block.
+    const ProfilerBlock* GetRootBlock() { return root_; }
     
 private:
     /// Return profiling data as text output for a specified profiling block.
-    void GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showAccumulated, bool showTotal) const;
-
+    void GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
+    
     /// Current profiling block.
     ProfilerBlock* current_;
     /// Root profiling block.
     ProfilerBlock* root_;
-    /// Frames in the current accumulation period.
-    unsigned accumulatedFrames_;
+    /// Frames in the current interval.
+    unsigned intervalFrames_;
     /// Total frames.
     unsigned totalFrames_;
 };

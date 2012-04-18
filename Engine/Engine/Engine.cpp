@@ -346,10 +346,7 @@ void Engine::DumpProfilingData()
 {
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
-    {
-        profiler->EndFrame();
-        LOGRAW(profiler->GetData(true, false, true) + "\n");
-    }
+        LOGRAW(profiler->GetData(true, true) + "\n");
 }
 
 void Engine::DumpResources()

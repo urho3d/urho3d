@@ -187,11 +187,11 @@ void DebugHud::Update()
 
             if (profilerText_->IsVisible())
             {
-                String profilerOutput = profiler->GetData(false, true, false, profilerMaxDepth_);
+                String profilerOutput = profiler->GetData(false, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);
             }
 
-            profiler->ClearAccumulated();
+            profiler->BeginInterval();
         }
     }
 }

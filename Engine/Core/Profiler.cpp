@@ -40,7 +40,7 @@ Profiler::Profiler(Context* context) :
     Object(context),
     current_(0),
     root_(0),
-    accumulatedFrames_(0),
+    intervalFrames_(0),
     totalFrames_(0)
 {
     root_ = new ProfilerBlock(0, "Root");
@@ -66,7 +66,7 @@ void Profiler::EndFrame()
     if (current_ != root_)
     {
         EndBlock();
-        ++accumulatedFrames_;
+        ++intervalFrames_;
         ++totalFrames_;
         if (!totalFrames_)
             ++totalFrames_;
@@ -75,39 +75,39 @@ void Profiler::EndFrame()
     }
 }
 
-void Profiler::ClearAccumulated()
+void Profiler::BeginInterval()
 {
-    root_->ClearAccumulated();
-    accumulatedFrames_ = 0;
+    root_->BeginInterval();
+    intervalFrames_ = 0;
 }
 
-String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal, unsigned maxDepth) const
+String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) const
 {
     String output;
     
     if (!showTotal)
-        output += String("Block                          Count   Average   Total\n \n");
+        output += String("Block                            Cnt     Avg      Max     Frame     Total\n\n");
     else
     {
-        output += String("Block                                       Frame average                    Accumulated total\n\n");
-        output += String("                                    Count     Average       Total      Count     Average       Total\n\n");
+        output += String("Block                                       Last frame                       Whole execution time\n\n");
+        output += String("                                 Cnt     Avg      Max      Total      Cnt      Avg       Max        Total\n\n");
     }
     
     if (!maxDepth)
         maxDepth = 1;
     
-    GetData(root_, output, 0, maxDepth, showUnused, showAccumulated, showTotal);
+    GetData(root_, output, 0, maxDepth, showUnused, showTotal);
     
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showAccumulated, bool showTotal) const
+void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
     
     unsigned frames = Max(totalFrames_, 1);
-    unsigned accumulatedFrames = Max(accumulatedFrames_, 1);
+    unsigned intervalFrames = Max(intervalFrames_, 1);
     
     if (depth >= maxDepth)
         return;
@@ -115,64 +115,43 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     // Do not print the root block as it does not collect any actual data
     if (block != root_)
     {
-        // Output data in milliseconds
-        float frameTime = block->GetFrameTime() / 1000.0f;
-        float accumulatedTime = block->GetAccumulatedTime() / 1000.0f;
-        float totalTime = block->GetTotalTime() / 1000.0f;
-        unsigned frameCount = block->GetFrameCount();
-        unsigned accumulatedCount = block->GetAccumulatedCount();
-        unsigned totalCount = block->GetTotalCount();
-        
-        float avgFrameTime = 0.0f;
-        float avgAccumulatedTime = 0.0f;
-        float avgTotalTime = 0.0f;
-        
-        if (frameCount)
-            avgFrameTime = frameTime / frameCount;
-        if (accumulatedCount)
-            avgAccumulatedTime = accumulatedTime / accumulatedCount;
-        if (totalCount)
-            avgTotalTime = totalTime / totalCount;
-        
-        if (showUnused || frameCount || (showAccumulated && accumulatedCount))
+        if (showUnused || block->intervalCount_ || (showTotal && block->totalCount_))
         {
             memset(indentedName, ' ', NAME_MAX_LENGTH);
             indentedName[depth] = 0;
-            strcat(indentedName, block->GetName());
+            strcat(indentedName, block->name_);
             indentedName[strlen(indentedName)] = ' ';
             indentedName[NAME_MAX_LENGTH] = 0;
             
             if (!showTotal)
             {
-                if (!showAccumulated)
-                    sprintf(line, "%s %5u %8.3f %8.3f\n", indentedName, frameCount, avgFrameTime, frameTime);
-                else
-                    sprintf(line, "%s %5u %8.3f %8.3f\n", indentedName, 
-                        (unsigned)((float)accumulatedCount / accumulatedFrames + 0.5f),
-                        avgAccumulatedTime, accumulatedTime / accumulatedFrames);
+                float avg = (block->intervalCount_ ? block->intervalTime_ / block->intervalCount_ : 0.0f) / 1000.0f;
+                float max = block->intervalMaxTime_ / 1000.0f;
+                float frame = block->intervalTime_ / intervalFrames / 1000.0f;
+                float all = block->intervalTime_ / 1000.0f;
+        
+                sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, block->intervalCount_, avg, max, frame, all);
             }
             else
             {
-                unsigned avgFrameCount = (unsigned)((float)totalCount / frames + 0.5f);
-                float avgFrameTime = avgTotalTime;
-                float avgFrameTotalTime = totalTime / frames;
-                if (!avgFrameCount)
-                {
-                    avgFrameTime = 0.0f;
-                    avgFrameTotalTime = 0.0f;
-                }
+                float avg = (block->frameCount_ ? block->frameTime_ / block->frameCount_ : 0.0f) / 1000.0f;
+                float max = block->frameMaxTime_ / 1000.0f;
+                float all = block->frameTime_ / 1000.0f;
                 
-                sprintf(line, "%s %10u %11.3f %11.3f %10u %11.3f %11.3f\n",
-                    indentedName, avgFrameCount, avgFrameTime, avgFrameTotalTime,
-                    totalCount, avgTotalTime, totalTime);
+                float totalAvg = (block->totalCount_ ? block->totalTime_ / block->totalCount_ : 0.0f) / 1000.0f;
+                float totalMax = block->totalMaxTime_ / 1000.0f;
+                float totalAll = block->totalTime_ / 1000.0f;
+                
+                sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, block->frameCount_, avg, max,
+                    all, block->totalCount_, totalAvg, totalMax, totalAll);
             }
+            
             output += String(line);
         }
         
         ++depth;
     }
     
-    const PODVector<ProfilerBlock*>& children = block->GetChildren();
-    for (PODVector<ProfilerBlock*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        GetData(*i, output, depth, maxDepth, showUnused, showAccumulated, showTotal);
+    for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
+        GetData(*i, output, depth, maxDepth, showUnused, showTotal);
 }
