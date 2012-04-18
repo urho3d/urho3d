@@ -93,7 +93,7 @@ public:
 private:
     /// Server-side attributes for sending updates. Only updated once per network frame, not per user.
     Vector<Variant> serverAttributes_;
-    /// Last network frame number.
+    /// Last server frame number.
     unsigned serverFrameNumber_;
     /// Is loading flag.
     bool loading_;

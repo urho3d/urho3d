@@ -428,7 +428,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& des
         return;
     unsigned numAttributes = attributes->Size();
     
-    // Get current attribute values from the component if necessary
+    // Get current attribute values if necessary
     if (frameNumber != serverFrameNumber_ || serverAttributes_.Empty())
     {
         serverAttributes_.Resize(numAttributes);
@@ -475,7 +475,13 @@ void Serializable::PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>
         return;
     unsigned numAttributes = attributes->Size();
     
-    // Get current attribute values from the component if necessary
+    if (numAttributes && serverAttributes_.Empty())
+    {
+        LOGWARNING("PrepareUpdates called without calling WriteInitialDeltaUpdate first");
+        serverAttributes_.Resize(numAttributes);
+    }
+    
+    // Get current attribute values if necessary
     if (frameNumber != serverFrameNumber_)
     {
         for (unsigned i = 0; i < numAttributes; ++i)
