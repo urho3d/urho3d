@@ -35,7 +35,7 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    lastFrameNumber_(0),
+    serverFrameNumber_(0),
     loading_(false)
 {
 }
@@ -429,7 +429,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& des
     unsigned numAttributes = attributes->Size();
     
     // Get current attribute values from the component if necessary
-    if (frameNumber != lastFrameNumber_ || serverAttributes_.Empty())
+    if (frameNumber != serverFrameNumber_ || serverAttributes_.Empty())
     {
         serverAttributes_.Resize(numAttributes);
         for (unsigned i = 0; i < numAttributes; ++i)
@@ -437,7 +437,7 @@ void Serializable::WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& des
             const AttributeInfo& attr = attributes->At(i);
             OnGetAttribute(attr, serverAttributes_[i]);
         }
-        lastFrameNumber_ = frameNumber;
+        serverFrameNumber_ = frameNumber;
     }
     
     replicationState.Resize(numAttributes);
@@ -476,14 +476,14 @@ void Serializable::PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>
     unsigned numAttributes = attributes->Size();
     
     // Get current attribute values from the component if necessary
-    if (frameNumber != lastFrameNumber_)
+    if (frameNumber != serverFrameNumber_)
     {
         for (unsigned i = 0; i < numAttributes; ++i)
         {
             const AttributeInfo& attr = attributes->At(i);
             OnGetAttribute(attr, serverAttributes_[i]);
         }
-        lastFrameNumber_ = frameNumber;
+        serverFrameNumber_ = frameNumber;
     }
     
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);

@@ -90,11 +90,11 @@ public:
     /// Return whether is loading attributes from a file. Is false during network deserialization.
     bool IsLoading() const { return loading_; }
     
-protected:
+private:
     /// Server-side attributes for sending updates. Only updated once per network frame, not per user.
     Vector<Variant> serverAttributes_;
     /// Last network frame number.
-    unsigned lastFrameNumber_;
+    unsigned serverFrameNumber_;
     /// Is loading flag.
     bool loading_;
 };
