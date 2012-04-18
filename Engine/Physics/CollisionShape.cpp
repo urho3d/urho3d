@@ -510,7 +510,7 @@ void CollisionShape::OnNodeSet(Node* node)
 void CollisionShape::OnMarkedDirty(Node* node)
 {
     Vector3 newWorldScale = node_->GetWorldScale();
-    if (newWorldScale != cachedWorldScale_ && shape_)
+    if (!newWorldScale.Equals(cachedWorldScale_) && shape_)
     {
         switch (shapeType_)
         {

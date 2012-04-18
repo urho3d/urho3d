@@ -80,10 +80,10 @@ public:
         return *this;
     }
     
-    /// Test for equality with another vector.
-    bool operator == (const Vector4& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_) && Equals(w_, rhs.w_); }
-    /// Test for inequality with another vector.
-    bool operator != (const Vector4& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_) || !Equals(w_, rhs.w_); }
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector4& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && w_ == rhs.w_; }
+    /// Test for inequality with another vector without epsilon.
+    bool operator != (const Vector4& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_ || w_ != rhs.w_; }
     /// Add a vector.
     Vector4 operator + (const Vector4& rhs) const { return Vector4(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_, w_ + rhs.w_); }
     /// Return negation.
@@ -168,6 +168,8 @@ public:
     Vector4 Abs() const { return Vector4(fabsf(x_), fabsf(y_), fabsf(z_), fabsf(w_)); }
     /// Linear interpolation with another vector.
     Vector4 Lerp(const Vector4& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
+    /// Test for equality with another vector with epsilon.
+    bool Equals(const Vector4& rhs) const { return ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_) && ::Equals(z_, rhs.z_) && ::Equals(w_, rhs.w_); }
     
     /// Return float data.
     const float* Data() const { return &x_; }

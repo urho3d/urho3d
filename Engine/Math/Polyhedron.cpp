@@ -158,7 +158,7 @@ void Polyhedron::Clip(const Plane& plane)
     {
         for (unsigned j = clippedVertices_.Size() - 1; j > i; --j)
         {
-            if (clippedVertices_[j] == clippedVertices_[i])
+            if (clippedVertices_[j].Equals(clippedVertices_[i]))
                 clippedVertices_.Erase(j);
         }
     }

@@ -654,12 +654,12 @@ void RigidBody::OnMarkedDirty(Node* node)
         Vector3 newPosition = node_->GetWorldPosition();
         Quaternion newRotation = node_->GetWorldRotation();
         
-        if (newPosition != lastPosition_)
+        if (!newPosition.Equals(lastPosition_))
         {
             lastPosition_ = newPosition;
             SetPosition(newPosition);
         }
-        if (newRotation != GetRotation())
+        if (!newRotation.Equals(lastRotation_))
         {
             lastRotation_ = newRotation;
             SetRotation(newRotation);

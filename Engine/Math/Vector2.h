@@ -64,10 +64,10 @@ public:
         return *this;
     }
     
-    /// Test for equality with another vector.
-    bool operator == (const Vector2& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_); }
-    /// Test for inequality with another vector.
-    bool operator != (const Vector2& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_); }
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
+    /// Test for inequality with another vector without epsilon.
+    bool operator != (const Vector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
     /// Add a vector.
     Vector2 operator + (const Vector2& rhs) const { return Vector2(x_ + rhs.x_, y_ + rhs.y_); }
     /// Return negation.
@@ -158,6 +158,8 @@ public:
     Vector2 Abs() const { return Vector2(fabsf(x_), fabsf(y_)); }
     /// Linear interpolation with another vector.
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
+    ///// Test for equality with another vectir with epsilon.
+    bool Equals(const Vector2& rhs) const { return ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_); }
     
     /// Return normalized to unit length.
     Vector2 Normalized() const

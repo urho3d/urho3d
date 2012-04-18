@@ -205,6 +205,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHOD(Vector2, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Normalized() const", asMETHOD(Vector2, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHOD(Vector2, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHOD(Vector2, Length), asCALL_THISCALL);
@@ -255,6 +256,7 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "float AbsDotProduct(const Vector3&in) const", asMETHOD(Vector3, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Lerp(const Vector3&in, float) const", asMETHOD(Vector3, Lerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "bool Equals(const Vector3&in) const", asMETHOD(Vector3, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Normalized() const", asMETHOD(Vector3, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "String ToString() const", asMETHOD(Vector3, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float get_length() const", asMETHOD(Vector3, Length), asCALL_THISCALL);
@@ -310,6 +312,7 @@ static void RegisterVector4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHOD(Vector4, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHOD(Vector4, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHOD(Vector4, Lerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector4", "bool Equals(const Vector4&in) const", asMETHOD(Vector4, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHOD(Vector4, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
     engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
@@ -386,6 +389,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float DotProduct(const Quaternion&in) const", asMETHOD(Quaternion, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "bool Equals(const Quaternion&in) const", asMETHOD(Quaternion, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, EulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, YawAngle), asCALL_THISCALL);

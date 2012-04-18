@@ -75,10 +75,10 @@ public:
         return *this;
     }
     
-    /// Test for equality with another vector.
-    bool operator == (const Vector3& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
-    /// Test for inequality with another vector.
-    bool operator != (const Vector3& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_); }
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
+    /// Test for inequality with another vector without epsilon.
+    bool operator != (const Vector3& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_; }
     /// Add a vector.
     Vector3 operator + (const Vector3& rhs) const { return Vector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
     /// Return negation.
@@ -187,6 +187,8 @@ public:
     Vector3 Abs() const { return Vector3(fabsf(x_), fabsf(y_), fabsf(z_)); }
     /// Linear interpolation with another vector.
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
+    /// Test for equality with another vector with epsilon.
+    bool Equals(const Vector3& rhs) const { return ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_) && ::Equals(z_, rhs.z_); }
     
     /// Return normalized to unit length.
     Vector3 Normalized() const

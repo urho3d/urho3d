@@ -101,9 +101,6 @@ bool Variant::operator == (const Variant& rhs) const
     
     switch (type_)
     {
-    case VAR_NONE:
-        return true;
-        
     case VAR_INT:
         return value_.int_ == rhs.value_.int_;
         
@@ -148,7 +145,7 @@ bool Variant::operator == (const Variant& rhs) const
         
     case VAR_VARIANTMAP:
         return *(reinterpret_cast<const VariantMap*>(&value_)) == *(reinterpret_cast<const VariantMap*>(&rhs.value_));
-
+        
     default:
         return true;
     }

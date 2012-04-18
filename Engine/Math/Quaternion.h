@@ -115,10 +115,10 @@ public:
         return *this;
     }
     
-    /// Test for equality with another quaternion.
-    bool operator == (const Quaternion& rhs) const { return Equals(w_, rhs.w_) && Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
-    /// Test for inequality with another quaternion.
-    bool operator != (const Quaternion& rhs) const { return !Equals(w_, rhs.w_) || !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_); }
+    /// Test for equality with another quaternion without epsilon.
+    bool operator == (const Quaternion& rhs) const { return w_ == rhs.w_ && x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
+    /// Test for inequality with another quaternion without epsilon.
+    bool operator != (const Quaternion& rhs) const { return w_ != rhs.w_ || x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_; }
     /// Multiply with a scalar.
     Quaternion operator * (float rhs) const { return Quaternion(w_ * rhs, x_ * rhs, y_ * rhs, z_ * rhs); }
     /// Return negation.
@@ -208,6 +208,8 @@ public:
     float LengthSquared() const { return w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_; }
     /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
+    /// Test for equality with another quaternion with epsilon.
+    bool Equals(const Quaternion& rhs) const { return ::Equals(w_, rhs.w_) && ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_) && ::Equals(z_, rhs.z_); }
     
     /// Return Euler angles in degrees.
     Vector3 EulerAngles() const;
