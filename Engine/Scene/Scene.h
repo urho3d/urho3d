@@ -73,6 +73,8 @@ public:
     virtual bool Save(Serializer& dest);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source);
+    /// Add a replication state that is tracking this scene.
+    virtual void AddReplicationState(NodeReplicationState* state);
     
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -102,8 +104,6 @@ public:
     void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files.
     void ClearRequiredPackageFiles();
-    /// Reset specific owner reference from nodes on disconnect.
-    void ResetOwner(Connection* owner);
     /// Register a node user variable hash reverse mapping (for editing.)
     void RegisterVar(const String& name);
     /// Unregister a node user variable hash reverse mapping.
@@ -131,8 +131,6 @@ public:
     float GetSnapThreshold() const { return snapThreshold_; }
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
-    /// Return all replicated scene nodes.
-    const HashMap<unsigned, Node*>& GetReplicatedNodes() const { return replicatedNodes_; }
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(ShortStringHash hash) const;
     
@@ -162,6 +160,10 @@ public:
     void SetVarNamesAttr(String value);
     /// Return node user variable reverse mappings.
     String GetVarNamesAttr() const;
+    /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
+    void PrepareNetworkUpdate();
+    /// Clean up all references to a network connection that is about to be removed.
+    void CleanupConnection(Connection* connection);
     
 private:
     /// Handle the logic update event to update the scene, if active.

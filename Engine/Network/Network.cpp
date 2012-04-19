@@ -47,8 +47,7 @@ Network::Network(Context* context) :
     Object(context),
     updateFps_(DEFAULT_UPDATE_FPS),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
-    updateAcc_(0.0f),
-    frameNumber_(1)
+    updateAcc_(0.0f)
 {
     network_ = new kNet::Network();
     
@@ -176,7 +175,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     connection->Disconnect(0);
     
     // Remove the client connection that corresponds to this MessageConnection
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    Map<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
         Connection* connection = i->second_;
@@ -287,14 +286,14 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
         i->second_->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -316,7 +315,7 @@ void Network::BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool in
     }
     
     Scene* scene = receiver->GetScene();
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -353,7 +352,7 @@ void Network::SetPackageCacheDir(const String& path)
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
         return i->second_;
     else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
@@ -424,11 +423,26 @@ void Network::PostUpdate(float timeStep)
         
         if (IsServerRunning())
         {
-            // Send server updates for each client connection
-            for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+            // Collect and update all networked scenes
+            networkScenes_.Clear();
+            for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
             {
-                i->second_->SendServerUpdate(frameNumber_);
+                Scene* scene = i->second_->GetScene();
+                if (scene)
+                    networkScenes_.Insert(scene);
+            }
+            for (HashSet<Scene*>::ConstIterator i = networkScenes_.Begin(); i != networkScenes_.End(); ++i)
+            {
+                PROFILE(PrepareServerUpdate);
+                (*i)->PrepareNetworkUpdate();
+            }
+            
+            // Send server updates for each client connection
+            for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+                i != clientConnections_.End(); ++i)
+            {
+                i->second_->SendServerUpdate();
                 i->second_->SendRemoteEvents();
                 i->second_->SendPackages();
             }
@@ -443,11 +457,6 @@ void Network::PostUpdate(float timeStep)
         
         // Notify that the update was sent
         SendEvent(E_NETWORKUPDATESENT);
-        
-        // Increment server frame number. Wrap to 1 as 0 means "update never sent" for Serializables
-        ++frameNumber_;
-        if (!frameNumber_)
-            ++frameNumber_;
     }
 }
 

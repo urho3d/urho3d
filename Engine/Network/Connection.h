@@ -124,7 +124,7 @@ public:
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Send scene update messages. Called by Network.
-    void SendServerUpdate(unsigned frameNumber);
+    void SendServerUpdate();
     /// Send latest controls from the client. Called by Network.
     void SendClientUpdate();
     /// Send queued remote events. Called by Network.
@@ -194,11 +194,11 @@ private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first.
-    void ProcessNode(unsigned frameNumber, Node* node);
-    /// Process a node that the client had not yet received.
-    void ProcessNewNode(unsigned frameNumber, Node* node);
+    void ProcessNode(Node* node);
+    /// Process a node that the client has not yet received.
+    void ProcessNewNode(Node* node);
     /// Process a node that the client has already received.
-    void ProcessExistingNode(unsigned frameNumber, Node* node, NodeReplicationState& nodeState);
+    void ProcessExistingNode(Node* node, NodeReplicationState& nodeState);
     /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
     /// Send an error reply for a package download.
@@ -214,8 +214,8 @@ private:
     kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Scene.
     WeakPtr<Scene> scene_;
-    /// Last sent state of the scene for network replication.
-    HashMap<unsigned, NodeReplicationState> sceneState_;
+    /// Network replication state of the scene.
+    SceneReplicationState sceneState_;
     /// Waiting or ongoing package file receive transfers.
     HashMap<StringHash, PackageDownload> downloads_;
     /// Ongoing package send transfers.
@@ -224,14 +224,10 @@ private:
     HashMap<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components.
     HashMap<unsigned, PODVector<unsigned char> > componentLatestData_;
-    /// Node's changed user variables.
-    HashSet<ShortStringHash> changedVars_;
-    /// Already processed nodes during a replication update.
-    HashSet<Node*> processedNodes_;
+    /// Node ID's to process during a replication update.
+    HashSet<unsigned> nodesToProcess_;
     /// Reusable message buffer.
     VectorBuffer msg_;
-    /// Reusable delta update bits.
-    PODVector<unsigned char> deltaUpdateBits_;
     /// Queued remote events.
     Vector<RemoteEvent> remoteEvents_;
     /// Scene file to load once all packages (if any) have been downloaded.

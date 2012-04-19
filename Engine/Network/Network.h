@@ -25,6 +25,7 @@
 
 #include "Connection.h"
 #include "HashSet.h"
+#include "Map.h"
 #include "Object.h"
 #include "VectorBuffer.h"
 
@@ -95,7 +96,7 @@ public:
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
-    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
+    const Map<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
     /// Return whether the server is running.
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
@@ -123,17 +124,17 @@ private:
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
+    /// Networked scenes.
+    HashSet<Scene*> networkScenes_;
     /// Update FPS.
     int updateFps_;
     /// Update time interval.
     float updateInterval_;
     /// Update time accumulator.
     float updateAcc_;
-    /// Server frame number.
-    unsigned frameNumber_;
     /// Package cache directory.
     String packageCacheDir_;
 };

@@ -32,13 +32,14 @@ class Connection;
 class Scene;
 class SceneResolver;
 
+struct NodeReplicationState;
+
 /// Component and child node creation mode for networking.
 enum CreateMode
 {
     REPLICATED = 0,
     LOCAL = 1
 };
-
 
 /// %Scene node that may contain components and child nodes.
 class Node : public Serializable
@@ -67,6 +68,8 @@ public:
     virtual bool SaveXML(XMLElement& dest);
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
+    /// Add a replication state that is tracking this node.
+    virtual void AddReplicationState(NodeReplicationState* state);
     
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
@@ -265,8 +268,6 @@ public:
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
     /// Return user variables.
     VariantMap& GetVars() { return vars_; }
-    /// Return the depended on nodes to order network updates.
-    const PODVector<Node*>& GetDependencyNodes(unsigned frameNumber) const;
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent() const;
     /// Return components derived from class.
@@ -300,6 +301,14 @@ public:
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     /// Load components from XML data and optionally load child nodes.
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
+    /// Return the depended on nodes to order network updates.
+    const PODVector<Node*>& GetDependencyNodes() const { return dependencyNodes_; }
+    /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
+    void PrepareNetworkUpdate();
+    /// Clean up all references to a network connection that is about to be removed.
+    void CleanupConnection(Connection* connection);
+    /// Mark node dirty in scene replication states.
+    void MarkReplicationDirty();
     
     /// User variables.
     VariantMap vars_;
@@ -309,6 +318,9 @@ protected:
     Component* CreateComponent(ShortStringHash type, unsigned id, CreateMode mode);
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
+    
+    /// Per-user network replication states.
+    PODVector<NodeReplicationState*> replicationStates_;
     
 private:
     /// Recalculate the world transform.
@@ -349,11 +361,11 @@ private:
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
     /// Nodes this node depends on for network updates.
-    mutable PODVector<Node*> dependencyNodes_;
+    PODVector<Node*> dependencyNodes_;
+    /// Previous user variables for network updates.
+    VariantMap previousVars_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
-    /// Dependency nodes update framenumber.
-    mutable unsigned dependencyFrameNumber_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned char rotateCount_;
     /// World transform needs update flag.

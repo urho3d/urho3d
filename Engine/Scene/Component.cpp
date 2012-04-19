@@ -25,6 +25,7 @@
 #include "Component.h"
 #include "Context.h"
 #include "Node.h"
+#include "ReplicationState.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"
@@ -75,6 +76,64 @@ void Component::Remove()
 const Matrix3x4& Component::GetWorldTransform() const
 {
     return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+}
+
+void Component::AddReplicationState(ComponentReplicationState* state)
+{
+    replicationStates_.Push(state);
+}
+
+void Component::PrepareNetworkUpdate()
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return;
+    
+    unsigned numAttributes = attributes->Size();
+    
+    if (currentState_.Size() != numAttributes)
+    {
+        currentState_.Resize(numAttributes);
+        previousState_.Resize(numAttributes);
+        
+        // Copy the default attribute values to the previous state as a starting point
+        for (unsigned i = 0; i < numAttributes; ++i)
+            previousState_[i] = attributes->At(i).defaultValue_;
+    }
+    
+    // Check for attribute changes
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        OnGetAttribute(attr, currentState_[i]);
+        
+        if (currentState_[i] != previousState_[i])
+        {
+            previousState_[i] = currentState_[i];
+            
+            // Mark the attribute dirty in all replication states that are tracking this component
+            for (PODVector<ComponentReplicationState*>::Iterator j = replicationStates_.Begin(); j != replicationStates_.End(); ++j)
+            {
+                (*j)->dirtyAttributes_.Set(i);
+                
+                // Add component's parent node to the dirty set if not added yet
+                if (!(*j)->nodeState_->markedDirty_)
+                {
+                    (*j)->nodeState_->markedDirty_ = true;
+                    (*j)->nodeState_->sceneState_->dirtyNodes_.Insert(node_->GetID());
+                }
+            }
+        }
+    }
+}
+
+void Component::CleanupConnection(Connection* connection)
+{
+    for (unsigned i = replicationStates_.Size() - 1; i < replicationStates_.Size(); --i)
+    {
+        if (replicationStates_[i]->connection_ == connection)
+            replicationStates_.Erase(i);
+    }
 }
 
 void Component::SetID(unsigned id)

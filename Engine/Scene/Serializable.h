@@ -28,9 +28,12 @@
 
 #include <cstddef>
 
+class Connection;
 class Deserializer;
 class Serializer;
 class XMLElement;
+
+struct DirtyBits;
 
 /// Base class for objects with automatic serialization through attributes.
 class Serializable : public Object
@@ -62,16 +65,14 @@ public:
     bool SetAttribute(unsigned index, const Variant& value);
     /// %Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
-    /// Write initial delta network update (compared to default attribute values) and prepare the last sent state.
-    void WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
-    /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate().
-    void PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData);
-    /// Write a delta network update prepared with PrepareUpdates().
-    void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
-    /// Write a latestdata network update prepared with PrepareUpdates().
-    void WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& replicationState);
+    /// Write initial delta network update.
+    void WriteInitialDeltaUpdate(Serializer& dest);
+    /// Write a delta network update according to dirty attribute bits.
+    void WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits);
+    /// Write a latest data network update.
+    void WriteLatestDataUpdate(Serializer& dest);
     /// Read and apply a network delta update.
-    void ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits);
+    void ReadDeltaUpdate(Deserializer& source);
     /// Read and apply a network latest data update.
     void ReadLatestDataUpdate(Deserializer& source);
     
@@ -90,13 +91,11 @@ public:
     /// Return whether is loading attributes from a file. Is false during network deserialization.
     bool IsLoading() const { return loading_; }
     
-private:
-    /// Current attributes for sending network updates. Updated only once per network frame, not per user.
+protected:
+    /// Current attributes for sending network updates.
     Vector<Variant> currentState_;
-    /// Cached network attribute infos.
-    mutable const Vector<AttributeInfo>* networkAttributes_;
-    /// Last server frame number.
-    unsigned serverFrameNumber_;
+    /// Previous attributes for sending network updates.
+    Vector<Variant> previousState_;
     /// Is loading flag.
     bool loading_;
 };

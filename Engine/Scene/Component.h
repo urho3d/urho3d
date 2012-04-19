@@ -28,6 +28,8 @@
 
 class Node;
 
+struct ComponentReplicationState;
+
 /// Base class for components. Components can be created to scene nodes.
 class Component : public Serializable
 {
@@ -75,6 +77,13 @@ public:
     /// Template version of returning components in the same scene node by type.
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     
+    /// Add a replication state that is tracking this component.
+    void AddReplicationState(ComponentReplicationState* state);
+    /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
+    void PrepareNetworkUpdate();
+    /// Clean up all references to a network connection that is about to be removed.
+    void CleanupConnection(Connection* connection);
+    
 protected:
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};
@@ -89,6 +98,8 @@ protected:
     unsigned id_;
     /// Scene node.
     Node* node_;
+    /// Per-user network replication states.
+    PODVector<ComponentReplicationState*> replicationStates_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }

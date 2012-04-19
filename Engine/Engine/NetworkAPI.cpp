@@ -126,7 +126,7 @@ static Network* GetNetwork()
 
 static CScriptArray* NetworkGetClientConnections(Network* ptr)
 {
-    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> >& connections = ptr->GetClientConnections();
+    const Map<kNet::MessageConnection*, SharedPtr<Connection> >& connections = ptr->GetClientConnections();
     
     asIScriptContext *context = asGetActiveContext();
     if (context)
@@ -135,7 +135,7 @@ static CScriptArray* NetworkGetClientConnections(Network* ptr)
         CScriptArray* arr = new CScriptArray(connections.Size(), type);
         
         unsigned index = 0;
-        for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = connections.Begin();
+        for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = connections.Begin();
             i != connections.End(); ++i)
         {
             // Increment reference count for storing in the array

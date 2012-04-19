@@ -69,6 +69,7 @@ Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::Me
     sceneLoaded_(false),
     logStatistics_(false)
 {
+    sceneState_.connection_ = this;
 }
 
 Connection::~Connection()
@@ -147,8 +148,8 @@ void Connection::SetScene(Scene* newScene)
 {
     if (scene_)
     {
-        // Reset the owner reference from the previous scene's nodes
-        scene_->ResetOwner(this);
+        // Remove replication states and owner references from the previous scene
+        scene_->CleanupConnection(this);
     }
     
     scene_ = newScene;
@@ -215,38 +216,45 @@ void Connection::Disconnect(int waitMSec)
     connection_->Disconnect(waitMSec);
 }
 
-void Connection::SendServerUpdate(unsigned frameNumber)
+void Connection::SendServerUpdate()
 {
     if (!scene_ || !sceneLoaded_)
         return;
     
     PROFILE(SendServerUpdate);
     
-    const HashMap<unsigned, Node*>& nodes = scene_->GetReplicatedNodes();
+    // Always check the root node (scene) first so that the scene-wide components get sent first
+    nodesToProcess_.Clear();
+    nodesToProcess_.Insert(scene_->GetID());
+    ProcessNode(scene_);
     
-    // Check for new or changed nodes
-    // Start from the root node (scene) so that the scene-wide components get sent first
-    processedNodes_.Clear();
-    ProcessNode(frameNumber, scene_);
+    // Then go through all dirtied nodes
+    nodesToProcess_.Insert(sceneState_.dirtyNodes_);
+    nodesToProcess_.Erase(scene_->GetID()); // Do not process the root node twice
     
-    // Then go through the rest of the nodes
-    for (HashMap<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-        ProcessNode(frameNumber, i->second_);
-    
-    // Check for removed nodes
-    for (HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
+    while (nodesToProcess_.Size())
     {
-        HashMap<unsigned, NodeReplicationState>::Iterator current = i++;
-        if (current->second_.frameNumber_ != frameNumber)
+        unsigned id = nodesToProcess_.Front();
+        Node* node = scene_->GetNode(id);
+        if (node)
+            ProcessNode(node);
+        else
         {
-            msg_.Clear();
-            msg_.WriteNetID(current->first_);
+            nodesToProcess_.Erase(id);
             
-            // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
-            // would be enough. However, this may be better due to the client not possibly having updated parenting information
-            // at the time of receiving this message
-            SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
-            sceneState_.Erase(current);
+            // If node is dirty, but is no longer found, it has been removed
+            HashMap<unsigned, NodeReplicationState>::Iterator j = sceneState_.nodeStates_.Find(id);
+            if (j != sceneState_.nodeStates_.End())
+            {
+                msg_.Clear();
+                msg_.WriteNetID(id);
+                
+                // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
+                // would be enough. However, this may be better due to the client not possibly having updated parenting information
+                // at the time of receiving this message
+                SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
+                sceneState_.nodeStates_.Erase(id);
+            }
         }
     }
 }
@@ -502,7 +510,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             }
             
             // Read initial attributes, then snap the motion smoothing immediately to the end
-            node->ReadDeltaUpdate(msg, deltaUpdateBits_);
+            node->ReadDeltaUpdate(msg);
             SmoothedTransform* transform = node->GetComponent<SmoothedTransform>();
             if (transform)
                 transform->Update(1.0f, 0.0f);
@@ -544,7 +552,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 }
                 
                 // Read initial attributes and apply
-                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->ReadDeltaUpdate(msg);
                 component->ApplyAttributes();
             }
         }
@@ -556,7 +564,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Node* node = scene_->GetNode(nodeID);
             if (node)
             {
-                node->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                node->ReadDeltaUpdate(msg);
                 // ApplyAttributes() is deliberately skipped, as Node has no attributes that require late applying.
                 // Furthermore it would propagate to components and child nodes, which is not desired in this case
                 unsigned changedVars = msg.ReadVLE();
@@ -630,7 +638,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 }
                 
                 // Read initial attributes and apply
-                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->ReadDeltaUpdate(msg);
                 component->ApplyAttributes();
             }
             else
@@ -644,7 +652,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Component* component = scene_->GetComponent(componentID);
             if (component)
             {
-                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->ReadDeltaUpdate(msg);
                 component->ApplyAttributes();
             }
             else
@@ -1003,37 +1011,42 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
 }
 
-void Connection::ProcessNode(unsigned frameNumber, Node* node)
+void Connection::ProcessNode(Node* node)
 {
-    if (!node || processedNodes_.Contains(node))
+    if (!node || !nodesToProcess_.Contains(node->GetID()))
         return;
     
-    processedNodes_.Insert(node);
+    nodesToProcess_.Erase(node->GetID());
     
-    // Process depended upon nodes first
-    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes(frameNumber);
+    // Process depended upon nodes first, if they are dirty
+    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
     for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
-        ProcessNode(frameNumber, *i);
+    {
+        if (sceneState_.dirtyNodes_.Contains((*i)->GetID()))
+            ProcessNode(*i);
+    }
     
     // Check if the client's replication state already has this node
-    HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.Find(node->GetID());
-    if (i != sceneState_.End())
-        ProcessExistingNode(frameNumber, node, i->second_);
+    HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.nodeStates_.Find(node->GetID());
+    if (i != sceneState_.nodeStates_.End())
+        ProcessExistingNode(node, i->second_);
     else
-        ProcessNewNode(frameNumber, node);
+        ProcessNewNode(node);
 }
 
-void Connection::ProcessNewNode(unsigned frameNumber, Node* node)
+void Connection::ProcessNewNode(Node* node)
 {
     msg_.Clear();
     msg_.WriteNetID(node->GetID());
     
-    NodeReplicationState& nodeState = sceneState_[node->GetID()];
-    nodeState.priorityAcc_ = 0.0f;
-    nodeState.frameNumber_ = frameNumber;
+    NodeReplicationState& nodeState = sceneState_.nodeStates_[node->GetID()];
+    nodeState.connection_ = this;
+    nodeState.sceneState_ = &sceneState_;
+    nodeState.node_ = node;
+    node->AddReplicationState(&nodeState);
     
     // Write node's attributes
-    node->WriteInitialDeltaUpdate(frameNumber, msg_, deltaUpdateBits_, nodeState.attributes_);
+    node->WriteInitialDeltaUpdate(msg_);
     
     // Write node's user variables
     const VariantMap& vars = node->GetVars();
@@ -1042,7 +1055,6 @@ void Connection::ProcessNewNode(unsigned frameNumber, Node* node)
     {
         msg_.WriteShortStringHash(i->first_);
         msg_.WriteVariant(i->second_);
-        nodeState.vars_[i->first_] = i->second_;
     }
     
     // Write node's components
@@ -1055,22 +1067,25 @@ void Connection::ProcessNewNode(unsigned frameNumber, Node* node)
         if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
         
-        ComponentReplicationState& componentState = nodeState.components_[component->GetID()];
-        componentState.frameNumber_ = frameNumber;
-        componentState.type_ = component->GetType();
+        ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
+        componentState.connection_ = this;
+        componentState.nodeState_ = &nodeState;
+        componentState.component_ = component;
+        component->AddReplicationState(&componentState);
         
         msg_.WriteShortStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
-        component->WriteInitialDeltaUpdate(frameNumber, msg_, deltaUpdateBits_, componentState.attributes_);
+        component->WriteInitialDeltaUpdate(msg_);
     }
     
     SendMessage(MSG_CREATENODE, true, true, msg_, NET_HIGH_PRIORITY);
+    
+    nodeState.markedDirty_ = false;
+    sceneState_.dirtyNodes_.Erase(node->GetID());
 }
 
-void Connection::ProcessExistingNode(unsigned frameNumber, Node* node, NodeReplicationState& nodeState)
+void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState)
 {
-    nodeState.frameNumber_ = frameNumber;
-    
     // Check from the interest management component, if exists, whether should update
     NetworkPriority* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
@@ -1081,51 +1096,63 @@ void Connection::ProcessExistingNode(unsigned frameNumber, Node* node, NodeRepli
     }
     
     // Check if attributes have changed
-    bool deltaUpdate, latestData;
-    node->PrepareUpdates(frameNumber, deltaUpdateBits_, nodeState.attributes_, deltaUpdate, latestData);
-    
-    // Check if user variables have changed. Note: variable removal is not supported
-    changedVars_.Clear();
-    const VariantMap& vars = node->GetVars();
-    for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
+    if (nodeState.dirtyAttributes_.Count())
     {
-        VariantMap::Iterator j = nodeState.vars_.Find(i->first_);
-        if (j == nodeState.vars_.End() || i->second_ != j->second_)
-        {
-            nodeState.vars_[i->first_] = i->second_;
-            changedVars_.Insert(i->first_);
-            deltaUpdate = true;
-        }
-    }
-    
-    // Send deltaupdate message if necessary
-    if (deltaUpdate)
-    {
-        msg_.Clear();
-        msg_.WriteNetID(node->GetID());
-        node->WriteDeltaUpdate(msg_, deltaUpdateBits_, nodeState.attributes_);
+        const Vector<AttributeInfo>* attributes = node->GetNetworkAttributes();
+        unsigned numAttributes = attributes->Size();
+        bool hasLatestData = false;
         
-        // Write changed variables
-        msg_.WriteVLE(changedVars_.Size());
-        for (HashSet<ShortStringHash>::ConstIterator i = changedVars_.Begin(); i != changedVars_.End(); ++i)
+        for (unsigned i = 0; i < numAttributes; ++i)
         {
-            VariantMap::ConstIterator j = vars.Find(*i);
-            msg_.WriteShortStringHash(j->first_);
-            msg_.WriteVariant(j->second_);
+            if (nodeState.dirtyAttributes_.IsSet(i) && (attributes->At(i).mode_ & AM_LATESTDATA))
+            {
+                hasLatestData = true;
+                nodeState.dirtyAttributes_.Clear(i);
+            }
         }
         
-        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
-    }
-    
-    // Send latestdata message if necessary
-    if (latestData)
-    {
-        // If at least one latest data attribute changes, send all of them
-        msg_.Clear();
-        msg_.WriteNetID(node->GetID());
-        node->WriteLatestDataUpdate(msg_, nodeState.attributes_);
+        // Send latestdata message if necessary
+        if (hasLatestData)
+        {
+            msg_.Clear();
+            msg_.WriteNetID(node->GetID());
+            node->WriteLatestDataUpdate(msg_);
+            
+            SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, node->GetID());
+        }
         
-        SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, node->GetID());
+        // Send deltaupdate if remaining dirty bits, or vars have changed
+        if (nodeState.dirtyAttributes_.Count() || nodeState.dirtyVars_.Size())
+        {
+            msg_.Clear();
+            msg_.WriteNetID(node->GetID());
+            node->WriteDeltaUpdate(msg_, nodeState.dirtyAttributes_);
+            
+            // Write changed variables
+            msg_.WriteVLE(nodeState.dirtyVars_.Size());
+            const VariantMap& vars = node->GetVars();
+            for (HashSet<ShortStringHash>::ConstIterator i = nodeState.dirtyVars_.Begin(); i != nodeState.dirtyVars_.End(); ++i)
+            {
+                VariantMap::ConstIterator j = vars.Find(*i);
+                if (j != vars.End())
+                {
+                    msg_.WriteShortStringHash(j->first_);
+                    msg_.WriteVariant(j->second_);
+                }
+                else
+                {
+                    // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
+                    LOGWARNING("Sending dummy user variable as original value was removed");
+                    msg_.WriteShortStringHash(ShortStringHash());
+                    msg_.WriteVariant(Variant());
+                }
+            }
+            
+            SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
+            
+            nodeState.dirtyAttributes_.ClearAll();
+            nodeState.dirtyVars_.Clear();
+        }
     }
     
     // Check for new or changed components
@@ -1137,19 +1164,21 @@ void Connection::ProcessExistingNode(unsigned frameNumber, Node* node, NodeRepli
         if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
         
-        HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.components_.Find(component->GetID());
-        if (j == nodeState.components_.End())
+        HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());
+        if (j == nodeState.componentStates_.End())
         {
             // New component
-            ComponentReplicationState& componentState = nodeState.components_[component->GetID()];
-            componentState.frameNumber_ = frameNumber;
-            componentState.type_ = component->GetType();
+            ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
+            componentState.connection_ = this;
+            componentState.nodeState_ = &nodeState;
+            componentState.component_ = component;
+            component->AddReplicationState(&componentState);
             
             msg_.Clear();
             msg_.WriteNetID(node->GetID());
             msg_.WriteShortStringHash(component->GetType());
             msg_.WriteNetID(component->GetID());
-            component->WriteInitialDeltaUpdate(frameNumber, msg_, deltaUpdateBits_, componentState.attributes_);
+            component->WriteInitialDeltaUpdate(msg_);
             
             SendMessage(MSG_CREATECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
         }
@@ -1157,46 +1186,65 @@ void Connection::ProcessExistingNode(unsigned frameNumber, Node* node, NodeRepli
         {
             // Existing component
             ComponentReplicationState& componentState = j->second_;
-            componentState.frameNumber_ = frameNumber;
             
-            component->PrepareUpdates(frameNumber, deltaUpdateBits_, componentState.attributes_, deltaUpdate, latestData);
-            
-            // Send deltaupdate message if necessary
-            if (deltaUpdate)
+            // Check if attributes have changed
+            if (componentState.dirtyAttributes_.Count())
             {
-                msg_.Clear();
-                msg_.WriteNetID(component->GetID());
-                component->WriteDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
+                const Vector<AttributeInfo>* attributes = component->GetNetworkAttributes();
+                unsigned numAttributes = attributes->Size();
+                bool hasLatestData = false;
                 
-                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
-            }
-            
-            // Send latestdata message if necessary
-            if (latestData)
-            {
-                // If at least one latest data attribute changes, send all of them
-                msg_.Clear();
-                msg_.WriteNetID(component->GetID());
-                component->WriteLatestDataUpdate(msg_, componentState.attributes_);
+                for (unsigned i = 0; i < numAttributes; ++i)
+                {
+                    if (componentState.dirtyAttributes_.IsSet(i) && (attributes->At(i).mode_ & AM_LATESTDATA))
+                    {
+                        hasLatestData = true;
+                        componentState.dirtyAttributes_.Clear(i);
+                    }
+                }
                 
-                SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, component->GetID());
+                // Send latestdata message if necessary
+                if (hasLatestData)
+                {
+                    msg_.Clear();
+                    msg_.WriteNetID(component->GetID());
+                    component->WriteLatestDataUpdate(msg_);
+                    
+                    SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, component->GetID());
+                }
+                
+                // Send deltaupdate if remaining dirty bits, or vars have changed
+                if (componentState.dirtyAttributes_.Count())
+                {
+                    msg_.Clear();
+                    msg_.WriteNetID(component->GetID());
+                    component->WriteDeltaUpdate(msg_, componentState.dirtyAttributes_);
+                    
+                    SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
+                    
+                    componentState.dirtyAttributes_.ClearAll();
+                }
             }
         }
     }
     
     // Check for removed components
-    for (HashMap<unsigned, ComponentReplicationState>::Iterator i = nodeState.components_.Begin(); i != nodeState.components_.End();)
+    for (HashMap<unsigned, ComponentReplicationState>::Iterator i = nodeState.componentStates_.Begin();
+        i != nodeState.componentStates_.End();)
     {
         HashMap<unsigned, ComponentReplicationState>::Iterator current = i++;
-        if (current->second_.frameNumber_ != frameNumber)
+        if (!current->second_.component_)
         {
             msg_.Clear();
             msg_.WriteNetID(current->first_);
             
             SendMessage(MSG_REMOVECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
-            nodeState.components_.Erase(current);
+            nodeState.componentStates_.Erase(current);
         }
     }
+    
+    nodeState.markedDirty_ = false;
+    sceneState_.dirtyNodes_.Erase(node->GetID());
 }
 
 void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned checksum)

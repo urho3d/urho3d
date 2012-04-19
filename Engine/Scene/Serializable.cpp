@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Deserializer.h"
 #include "Log.h"
+#include "ReplicationState.h"
 #include "Serializable.h"
 #include "Serializer.h"
 #include "XMLElement.h"
@@ -35,8 +36,6 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    serverFrameNumber_(0),
-    networkAttributes_(0),
     loading_(false)
 {
 }
@@ -421,141 +420,85 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(unsigned frameNumber, Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
-    Vector<Variant>& replicationState)
-{
-    networkAttributes_ = GetNetworkAttributes();
-    if (!networkAttributes_)
-        return;
-    
-    unsigned numAttributes = networkAttributes_->Size();
-    
-    // Get current attribute values if necessary
-    if (frameNumber != serverFrameNumber_ || currentState_.Empty())
-    {
-        currentState_.Resize(numAttributes);
-        for (unsigned i = 0; i < numAttributes; ++i)
-        {
-            const AttributeInfo& attr = networkAttributes_->At(i);
-            OnGetAttribute(attr, currentState_[i]);
-        }
-        serverFrameNumber_ = frameNumber;
-    }
-    
-    replicationState.Resize(numAttributes);
-    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
-    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
-        deltaUpdateBits[i] = 0;
-    
-    // Copy attributes to replication state and compare against defaults
-    for (unsigned i = 0; i < numAttributes; ++i)
-    {
-        const AttributeInfo& attr = networkAttributes_->At(i);
-        replicationState[i] = currentState_[i];
-        if (replicationState[i] != attr.defaultValue_)
-            deltaUpdateBits[i >> 3] |= (1 << (i & 7));
-    }
-    
-    // First write the change bitfield, then attribute data for non-default attributes
-    dest.Write(&deltaUpdateBits[0], deltaUpdateBits.Size());
-    
-    for (unsigned i = 0; i < numAttributes; ++i)
-    {
-        if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
-            dest.WriteVariantData(replicationState[i]);
-    }
-}
-
-void Serializable::PrepareUpdates(unsigned frameNumber, PODVector<unsigned char>& deltaUpdateBits,
-    Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData)
-{
-    deltaUpdate = false;
-    latestData = false;
-    
-    if (!networkAttributes_ || currentState_.Empty())
-        return;
-    
-    unsigned numAttributes = networkAttributes_->Size();
-    
-    // Get current attribute values if necessary
-    if (frameNumber != serverFrameNumber_)
-    {
-        for (unsigned i = 0; i < numAttributes; ++i)
-        {
-            const AttributeInfo& attr = networkAttributes_->At(i);
-            OnGetAttribute(attr, currentState_[i]);
-        }
-        serverFrameNumber_ = frameNumber;
-    }
-    
-    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
-    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
-        deltaUpdateBits[i] = 0;
-    
-    for (unsigned i = 0; i < numAttributes; ++i)
-    {
-        if (currentState_[i] != replicationState[i])
-        {
-            const AttributeInfo& attr = networkAttributes_->At(i);
-            replicationState[i] = currentState_[i];
-            if (attr.mode_ & AM_LATESTDATA)
-                latestData = true;
-            else
-            {
-                deltaUpdate = true;
-                deltaUpdateBits[i >> 3] |= 1 << (i & 7);
-            }
-        }
-    }
-}
-
-void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState)
-{
-    if (!networkAttributes_)
-        return;
-    
-    unsigned numAttributes = networkAttributes_->Size();
-    
-    // First write the change bitfield, then attribute data for changed attributes
-    dest.Write(&deltaUpdateBits[0], deltaUpdateBits.Size());
-    
-    for (unsigned i = 0; i < numAttributes; ++i)
-    {
-        if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
-            dest.WriteVariantData(replicationState[i]);
-    }
-}
-
-void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& replicationState)
-{
-    if (!networkAttributes_)
-        return;
-    
-    unsigned numAttributes = networkAttributes_->Size();
-    
-    for (unsigned i = 0; i < numAttributes; ++i)
-    {
-        if (networkAttributes_->At(i).mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(replicationState[i]);
-    }
-}
-
-void Serializable::ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits)
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
         return;
+    
+    unsigned numAttributes = attributes->Size();
+    DirtyBits attributeBits;
+    
+    // Compare against defaults
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (currentState_[i] != attr.defaultValue_)
+            attributeBits.Set(i);
+    }
+    
+    // First write the change bitfield, then attribute data for non-default attributes
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        if (attributeBits.IsSet(i))
+            dest.WriteVariantData(currentState_[i]);
+    }
+}
+
+void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits)
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return;
+    
     unsigned numAttributes = attributes->Size();
     
-    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
-    source.Read(&deltaUpdateBits[0], deltaUpdateBits.Size());
+    // First write the change bitfield, then attribute data for changed attributes
+    // Note: the attribute bits should not contain LATESTDATA attributes
+    dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
+    
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        if (attributeBits.IsSet(i))
+            dest.WriteVariantData(currentState_[i]);
+    }
+}
+
+void Serializable::WriteLatestDataUpdate(Serializer& dest)
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return;
+    
+    unsigned numAttributes = attributes->Size();
+    
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        if (attributes->At(i).mode_ & AM_LATESTDATA)
+            dest.WriteVariantData(currentState_[i]);
+    }
+}
+
+void Serializable::ReadDeltaUpdate(Deserializer& source)
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return;
+    
+    unsigned numAttributes = attributes->Size();
+    DirtyBits attributeBits;
+    
+    source.Read(attributeBits.data_, (numAttributes + 7) >> 3);
     
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        
-        if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
+        if (attributeBits.IsSet(i))
+        {
+            const AttributeInfo& attr = attributes->At(i);
             OnSetAttribute(attr, source.ReadVariant(attr.type_));
+        }
     }
 }
 
@@ -564,12 +507,12 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
         return;
+    
     unsigned numAttributes = attributes->Size();
     
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        
         if (attr.mode_ & AM_LATESTDATA)
             OnSetAttribute(attr, source.ReadVariant(attr.type_));
     }

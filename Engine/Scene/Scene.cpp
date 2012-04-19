@@ -29,6 +29,7 @@
 #include "Log.h"
 #include "PackageFile.h"
 #include "Profiler.h"
+#include "ReplicationState.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
@@ -155,6 +156,15 @@ bool Scene::LoadXML(const XMLElement& source)
     }
     else
         return false;
+}
+
+void Scene::AddReplicationState(NodeReplicationState* state)
+{
+    replicationStates_.Push(state);
+    
+    // This is the first update for a new connection. Mark all replicated nodes dirty
+    for (HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+        state->sceneState_->dirtyNodes_.Insert(i->first_);
 }
 
 bool Scene::LoadXML(Deserializer& source)
@@ -382,20 +392,6 @@ void Scene::ClearRequiredPackageFiles()
     requiredPackageFiles_.Clear();
 }
 
-void Scene::ResetOwner(Connection* owner)
-{
-    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
-    {
-        if (i->second_->GetOwner() == owner)
-            i->second_->SetOwner(0);
-    }
-    for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
-    {
-        if (i->second_->GetOwner() == owner)
-            i->second_->SetOwner(0);
-    }
-}
-
 void Scene::RegisterVar(const String& name)
 {
     varNames_[ShortStringHash(name)] = name;
@@ -616,6 +612,9 @@ void Scene::NodeAdded(Node* node)
         }
         
         replicatedNodes_[id] = node;
+        
+        for (PODVector<NodeReplicationState*>::Iterator i = replicationStates_.Begin(); i != replicationStates_.End(); ++i)
+            (*i)->sceneState_->dirtyNodes_.Insert(id);
     }
     else
     {
@@ -638,7 +637,12 @@ void Scene::NodeRemoved(Node* node)
     
     unsigned id = node->GetID();
     if (id < FIRST_LOCAL_ID)
+    {
         replicatedNodes_.Erase(id);
+        
+        for (PODVector<NodeReplicationState*>::Iterator i = replicationStates_.Begin(); i != replicationStates_.End(); ++i)
+            (*i)->sceneState_->dirtyNodes_.Insert(id);
+    }
     else
         localNodes_.Erase(id);
     
@@ -705,6 +709,28 @@ String Scene::GetVarNamesAttr() const
     }
     
     return ret;
+}
+
+void Scene::PrepareNetworkUpdate()
+{
+    Node::PrepareNetworkUpdate();
+    
+    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+        i->second_->PrepareNetworkUpdate();
+    
+    for (HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Begin(); i != replicatedComponents_.End(); ++i)
+        i->second_->PrepareNetworkUpdate();
+}
+
+void Scene::CleanupConnection(Connection* connection)
+{
+    Node::CleanupConnection(connection);
+    
+    for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
+        i->second_->CleanupConnection(connection);
+    
+    for (HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Begin(); i != replicatedComponents_.End(); ++i)
+        i->second_->CleanupConnection(connection);
 }
 
 void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
