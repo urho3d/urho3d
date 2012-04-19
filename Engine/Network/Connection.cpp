@@ -480,6 +480,7 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
         return;
     }
     
+    LOGERROR("Scene checksum error");
     OnSceneLoadFailed();
 }
 
@@ -887,6 +888,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
     
     if (checksum != scene_->GetChecksum())
     {
+        LOGINFO("Scene checksum error from client " + ToString());
         msg_.Clear();
         SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_, NET_HIGH_PRIORITY);
         OnSceneLoadFailed();
