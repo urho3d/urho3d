@@ -612,9 +612,7 @@ void Scene::NodeAdded(Node* node)
         }
         
         replicatedNodes_[id] = node;
-        
-        for (PODVector<NodeReplicationState*>::Iterator i = replicationStates_.Begin(); i != replicationStates_.End(); ++i)
-            (*i)->sceneState_->dirtyNodes_.Insert(id);
+        MarkReplicationDirty(node);
     }
     else
     {
@@ -639,9 +637,7 @@ void Scene::NodeRemoved(Node* node)
     if (id < FIRST_LOCAL_ID)
     {
         replicatedNodes_.Erase(id);
-        
-        for (PODVector<NodeReplicationState*>::Iterator i = replicationStates_.Begin(); i != replicationStates_.End(); ++i)
-            (*i)->sceneState_->dirtyNodes_.Insert(id);
+        MarkReplicationDirty(node);
     }
     else
         localNodes_.Erase(id);
@@ -731,6 +727,14 @@ void Scene::CleanupConnection(Connection* connection)
     
     for (HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Begin(); i != replicatedComponents_.End(); ++i)
         i->second_->CleanupConnection(connection);
+}
+
+void Scene::MarkReplicationDirty(Node* node)
+{
+    unsigned id = node->GetID();
+    
+    for (PODVector<NodeReplicationState*>::Iterator i = replicationStates_.Begin(); i != replicationStates_.End(); ++i)
+        (*i)->sceneState_->dirtyNodes_.Insert(id);
 }
 
 void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)

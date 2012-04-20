@@ -164,6 +164,8 @@ public:
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
+    /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
+    void MarkReplicationDirty(Node* node);
     
 private:
     /// Handle the logic update event to update the scene, if active.

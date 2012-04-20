@@ -221,10 +221,8 @@ void Connection::SendServerUpdate()
     if (!scene_ || !sceneLoaded_)
         return;
     
-    PROFILE(SendServerUpdate);
-    
-    // Always check the root node (scene) first so that the scene-wide components get sent first
-    nodesToProcess_.Clear();
+    // Always check the root node (scene) first so that the scene-wide components get sent first,
+    // and all other replicated nodes get added to the dirty set for sending the initial state
     nodesToProcess_.Insert(scene_->GetID());
     ProcessNode(scene_);
     
@@ -243,15 +241,14 @@ void Connection::SendServerUpdate()
             nodesToProcess_.Erase(id);
             
             // If node is dirty, but is no longer found, it has been removed
-            HashMap<unsigned, NodeReplicationState>::Iterator j = sceneState_.nodeStates_.Find(id);
-            if (j != sceneState_.nodeStates_.End())
+            if (sceneState_.nodeStates_.Contains(id))
             {
                 msg_.Clear();
                 msg_.WriteNetID(id);
                 
                 // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
-                // would be enough. However, this may be better due to the client not possibly having updated parenting information
-                // at the time of receiving this message
+                // would be enough. However, this may be better due to the client not possibly having updated parenting
+                // information at the time of receiving this message
                 SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
                 sceneState_.nodeStates_.Erase(id);
             }

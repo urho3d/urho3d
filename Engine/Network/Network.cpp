@@ -423,28 +423,34 @@ void Network::PostUpdate(float timeStep)
         
         if (IsServerRunning())
         {
-            // Collect and update all networked scenes
-            networkScenes_.Clear();
-            for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
-                i != clientConnections_.End(); ++i)
-            {
-                Scene* scene = i->second_->GetScene();
-                if (scene)
-                    networkScenes_.Insert(scene);
-            }
-            for (HashSet<Scene*>::ConstIterator i = networkScenes_.Begin(); i != networkScenes_.End(); ++i)
+            // Collect and prepare all networked scenes
             {
                 PROFILE(PrepareServerUpdate);
-                (*i)->PrepareNetworkUpdate();
+                
+                networkScenes_.Clear();
+                for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+                    i != clientConnections_.End(); ++i)
+                {
+                    Scene* scene = i->second_->GetScene();
+                    if (scene)
+                        networkScenes_.Insert(scene);
+                }
+                
+                for (HashSet<Scene*>::ConstIterator i = networkScenes_.Begin(); i != networkScenes_.End(); ++i)
+                    (*i)->PrepareNetworkUpdate();
             }
             
-            // Send server updates for each client connection
-            for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
-                i != clientConnections_.End(); ++i)
             {
-                i->second_->SendServerUpdate();
-                i->second_->SendRemoteEvents();
-                i->second_->SendPackages();
+                PROFILE(SendServerUpdate);
+                
+                // Then send server updates for each client connection
+                for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+                    i != clientConnections_.End(); ++i)
+                {
+                    i->second_->SendServerUpdate();
+                    i->second_->SendRemoteEvents();
+                    i->second_->SendPackages();
+                }
             }
         }
         
