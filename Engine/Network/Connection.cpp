@@ -78,13 +78,13 @@ Connection::~Connection()
     SetScene(0);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority, unsigned contentID)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
 {
-    SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
+    SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
-    unsigned priority, unsigned contentID)
+    unsigned contentID)
 {
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
@@ -93,7 +93,7 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
         return;
     }
     
-    connection_->SendMessage(msgID, reliable, inOrder, priority, contentID, (const char*)data, numBytes);
+    connection_->SendMessage(msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -176,7 +176,7 @@ void Connection::SetScene(Scene* newScene)
             msg_.WriteUInt(package->GetTotalSize());
             msg_.WriteUInt(package->GetChecksum());
         }
-        SendMessage(MSG_LOADSCENE, true, true, msg_, NET_HIGH_PRIORITY);
+        SendMessage(MSG_LOADSCENE, true, true, msg_);
     }
     else
     {
@@ -249,7 +249,7 @@ void Connection::SendServerUpdate()
                 // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
                 // would be enough. However, this may be better due to the client not possibly having updated parenting
                 // information at the time of receiving this message
-                SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
+                SendMessage(MSG_REMOVENODE, true, true, msg_);
                 sceneState_.nodeStates_.Erase(id);
             }
         }
@@ -267,7 +267,7 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
     msg_.WriteVector3(position_);
-    SendMessage(MSG_CONTROLS, false, false, msg_, NET_HIGH_PRIORITY, CONTROLS_CONTENT_ID);
+    SendMessage(MSG_CONTROLS, false, false, msg_, CONTROLS_CONTENT_ID);
 }
 
 void Connection::SendRemoteEvents()
@@ -293,14 +293,14 @@ void Connection::SendRemoteEvents()
         {
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
-            SendMessage(MSG_REMOTEEVENT, true, i->inOrder_, msg_, NET_HIGH_PRIORITY);
+            SendMessage(MSG_REMOTEEVENT, true, i->inOrder_, msg_);
         }
         else
         {
             msg_.WriteNetID(i->receiverID_);
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
-            SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_, NET_HIGH_PRIORITY);
+            SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_);
         }
     }
     
@@ -324,7 +324,7 @@ void Connection::SendPackages()
             msg_.WriteStringHash(current->first_);
             msg_.WriteUInt(upload.fragment_++);
             msg_.Write(buffer, fragmentSize);
-            SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_LOW_PRIORITY);
+            SendMessage(MSG_PACKAGEDATA, true, false, msg_);
             
             // Check if upload finished
             if (upload.fragment_ == upload.totalFragments_)
@@ -387,8 +387,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
     // Store the scene file name we need to eventually load
     sceneFileName_ = msg.ReadString();
     
-    // Clear previous scene content, pending latest data, and package downloads if any
-    scene_->Clear();
+    // Clear previous pending latest data and package downloads if any
     nodeLatestData_.Clear();
     componentLatestData_.Clear();
     downloads_.Clear();
@@ -818,7 +817,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     LOGINFO("Requesting package " + nextDownload.name_ + " from server");
                     msg_.Clear();
                     msg_.WriteString(nextDownload.name_);
-                    SendMessage(MSG_REQUESTPACKAGE, true, true, msg_, NET_HIGH_PRIORITY);
+                    SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
                     nextDownload.initiated_ = true;
                 }
             }
@@ -887,7 +886,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
     {
         LOGINFO("Scene checksum error from client " + ToString());
         msg_.Clear();
-        SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_, NET_HIGH_PRIORITY);
+        SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_);
         OnSceneLoadFailed();
     }
     else
@@ -1007,7 +1006,7 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     
     msg_.Clear();
     msg_.WriteUInt(scene_->GetChecksum());
-    SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
+    SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
 
 void Connection::ProcessNode(Node* node)
@@ -1077,7 +1076,7 @@ void Connection::ProcessNewNode(Node* node)
         component->WriteInitialDeltaUpdate(msg_);
     }
     
-    SendMessage(MSG_CREATENODE, true, true, msg_, NET_HIGH_PRIORITY);
+    SendMessage(MSG_CREATENODE, true, true, msg_);
     
     nodeState.markedDirty_ = false;
     sceneState_.dirtyNodes_.Erase(node->GetID());
@@ -1117,7 +1116,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
             msg_.WriteNetID(node->GetID());
             node->WriteLatestDataUpdate(msg_);
             
-            SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, node->GetID());
+            SendMessage(MSG_NODELATESTDATA, true, false, msg_, node->GetID());
         }
         
         // Send deltaupdate if remaining dirty bits, or vars have changed
@@ -1147,7 +1146,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 }
             }
             
-            SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
+            SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_);
             
             nodeState.dirtyAttributes_.ClearAll();
             nodeState.dirtyVars_.Clear();
@@ -1179,7 +1178,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
             msg_.WriteNetID(component->GetID());
             component->WriteInitialDeltaUpdate(msg_);
             
-            SendMessage(MSG_CREATECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
+            SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
         }
         else
         {
@@ -1209,7 +1208,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                     msg_.WriteNetID(component->GetID());
                     component->WriteLatestDataUpdate(msg_);
                     
-                    SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, component->GetID());
+                    SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, component->GetID());
                 }
                 
                 // Send deltaupdate if remaining dirty bits, or vars have changed
@@ -1219,7 +1218,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                     msg_.WriteNetID(component->GetID());
                     component->WriteDeltaUpdate(msg_, componentState.dirtyAttributes_);
                     
-                    SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
+                    SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
                     
                     componentState.dirtyAttributes_.ClearAll();
                 }
@@ -1237,7 +1236,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
             msg_.Clear();
             msg_.WriteNetID(current->first_);
             
-            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
+            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
             nodeState.componentStates_.Erase(current);
         }
     }
@@ -1263,7 +1262,7 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
         LOGINFO("Requesting package " + name + " from server");
         msg_.Clear();
         msg_.WriteString(name);
-        SendMessage(MSG_REQUESTPACKAGE, true, true, msg_, NET_HIGH_PRIORITY);
+        SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
         download.initiated_ = true;
     }
 }
@@ -1272,7 +1271,7 @@ void Connection::SendPackageError(const String& name)
 {
     msg_.Clear();
     msg_.WriteStringHash(StringHash(name));
-    SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_HIGH_PRIORITY);
+    SendMessage(MSG_PACKAGEDATA, true, false, msg_);
 }
 
 void Connection::OnSceneLoadFailed()
@@ -1307,7 +1306,7 @@ void Connection::OnPackagesReady()
         // If filename is empty, can send the scene loaded reply immediately
         msg_.Clear();
         msg_.WriteUInt(scene_->GetChecksum());
-        SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
+        SendMessage(MSG_SCENELOADED, true, true, msg_);
     }
     else
     {

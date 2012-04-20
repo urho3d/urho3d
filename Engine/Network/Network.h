@@ -69,9 +69,9 @@ public:
     /// Stop the server.
     void StopServer();
     /// Broadcast a message with content ID to all client connections.
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority = 0, unsigned contentID = 0);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Broadcast a message with content ID to all client connections.
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority = 0, unsigned contentID = 0);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections.
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote event to all client connections in a specific scene.

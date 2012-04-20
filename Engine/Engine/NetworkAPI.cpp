@@ -85,11 +85,8 @@ void SendRemoteNodeEvent(Node* receiver, const String& eventType, bool inOrder, 
 
 static void RegisterConnection(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("uint NET_LOW_PRIORITY", (void*)&NET_LOW_PRIORITY);
-    engine->RegisterGlobalProperty("uint NET_HIGH_PRIORITY", (void*)&NET_HIGH_PRIORITY);
-    
     RegisterObject<Connection>(engine, "Connection");
-    engine->RegisterObjectMethod("Connection", "void SendMessage(int, bool, bool, const VectorBuffer&in, uint priority = 0, uint contentID = 0)", asMETHODPR(Connection, SendMessage, (int, bool, bool, const VectorBuffer&, unsigned, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void SendMessage(int, bool, bool, const VectorBuffer&in, uint contentID = 0)", asMETHODPR(Connection, SendMessage, (int, bool, bool, const VectorBuffer&, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void SendRemoteEvent(const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(SendRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Connection", "void SendRemoteEvent(Node@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(SendRemoteNodeEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Connection", "void Disconnect(int waitMSec = 0)", asMETHOD(Connection, Disconnect), asCALL_THISCALL);
@@ -189,7 +186,7 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, bool, bool, const VectorBuffer&in, uint priority = 0, uint contentID = 0)", asMETHODPR(Network, BroadcastMessage, (int, bool, bool, const VectorBuffer&, unsigned, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, bool, bool, const VectorBuffer&in, uint contentID = 0)", asMETHODPR(Network, BroadcastMessage, (int, bool, bool, const VectorBuffer&, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Scene@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteSceneEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Node@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteNodeEvent), asCALL_CDECL_OBJLAST);

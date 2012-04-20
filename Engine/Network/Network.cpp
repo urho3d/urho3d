@@ -261,14 +261,13 @@ void Network::StopServer()
     LOGINFO("Stopped server");
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority,
-    unsigned contentID)
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
 {
-    BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
+    BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), contentID);
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
-    unsigned priority, unsigned contentID)
+    unsigned contentID)
 {
    // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
@@ -279,7 +278,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     
     kNet::NetworkServer* server = network_->GetServer();
     if (server)
-        server->BroadcastMessage(msgID, reliable, inOrder, priority, contentID, (const char*)data, numBytes);
+        server->BroadcastMessage(msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
     else
         LOGERROR("Server not running, can not broadcast messages");
 }
@@ -489,7 +488,7 @@ void Network::OnServerConnected()
     // Send the identity map now
     VectorBuffer msg;
     msg.WriteVariantMap(serverConnection_->GetIdentity());
-    serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg, NET_HIGH_PRIORITY);
+    serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
     
     SendEvent(E_SERVERCONNECTED);
 }

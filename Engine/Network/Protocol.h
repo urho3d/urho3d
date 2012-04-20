@@ -64,7 +64,3 @@ static const int MSG_REMOTENODEEVENT = 0x15;
 static const unsigned CONTROLS_CONTENT_ID = 1;
 /// Package file fragment size.
 static const unsigned PACKAGE_FRAGMENT_SIZE = 1024;
-/// Message high priority.
-static const unsigned NET_HIGH_PRIORITY = 100;
-/// Message low priority (default.)
-static const unsigned NET_LOW_PRIORITY = 0;

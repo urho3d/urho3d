@@ -59,6 +59,9 @@ AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
 # Enable storing profiling data from different network level events.
 #AddCompilationDefine(KNET_NETWORK_PROFILING)
 
+# Urho3D does not need message priorities. Disable MaxHeap for improved performance.
+AddCompilationDefine(KNET_NO_MAXHEAP)
+
 if (USE_BOOST)
    AddCompilationDefine(KNET_USE_BOOST)
 
