@@ -374,7 +374,7 @@ void Engine::DumpResources()
 void Engine::Update()
 {
     PROFILE(Update);
-
+    
     // Logic update event
     using namespace Update;
     
@@ -395,7 +395,7 @@ void Engine::Update()
 void Engine::Render()
 {
     PROFILE(Render);
-
+    
     // Do not render if device lost
     Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics && graphics->BeginFrame())
@@ -414,7 +414,7 @@ void Engine::ApplyFrameLimit()
     int maxFps = maxFps_;
     Input* input = GetSubsystem<Input>();
     if (input && !input->IsActive())
-        maxFps = maxInactiveFps_;
+        maxFps = Min(maxInactiveFps_, maxFps);
     
     long long elapsed = 0;
     
