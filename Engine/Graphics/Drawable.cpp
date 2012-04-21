@@ -171,11 +171,13 @@ void Drawable::SetOccluder(bool enable)
 
 void Drawable::SetOccludee(bool enable)
 {
-    occludee_ = enable;
-    // If occludee mode is disabled, reinsert to octree root to make sure octant occlusion does not erroneously hide
-    // this drawable
-    if (octant_ && !reinsertionQueued_)
-        octant_->GetRoot()->QueueReinsertion(this);
+    if (enable != occludee_)
+    {
+        occludee_ = enable;
+        // Reinsert to octree to make sure octant occlusion does not erroneously hide this drawable
+        if (octant_ && !reinsertionQueued_)
+            octant_->GetRoot()->QueueReinsertion(this);
+    }
 }
 
 void Drawable::MarkForUpdate()

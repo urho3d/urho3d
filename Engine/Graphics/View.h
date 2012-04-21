@@ -51,6 +51,21 @@ struct GeometryDepthBounds
     float max_;
 };
 
+/// Intermediate shadow map split processing result.
+struct ShadowQueryResult
+{
+    /// Shadow camera.
+    Camera* shadowCamera_;
+    /// Shadow casters.
+    PODVector<Drawable*> shadowCasters_;
+    /// Combined bounding box of the shadow casters in light view or projection space.
+    BoundingBox shadowCasterBox_;
+    /// Directional light shadow near split distance.
+    float shadowNearSplit_;
+    /// Directional light shadow far split distance.
+    float shadowFarSplit_;
+};
+
 /// Intermediate light processing result.
 struct LightQueryResult
 {
@@ -58,22 +73,8 @@ struct LightQueryResult
     Light* light_;
     /// Lit geometries.
     PODVector<Drawable*> litGeometries_;
-    /// Shadow casters.
-    PODVector<Drawable*> shadowCasters_;
-    /// Shadow cameras.
-    Camera* shadowCameras_[MAX_LIGHT_SPLITS];
-    /// Shadow caster start indices.
-    unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
-    /// Shadow caster end indices.
-    unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
-    /// Combined bounding box of shadow casters in light view or projection space.
-    BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
-    /// Shadow camera near splits (directional lights only.)
-    float shadowNearSplits_[MAX_LIGHT_SPLITS];
-    /// Shadow camera far splits (directional lights only.)
-    float shadowFarSplits_[MAX_LIGHT_SPLITS];
-    /// Shadow map split count.
-    unsigned numSplits_;
+    /// Shadow map splits.
+    Vector<ShadowQueryResult> shadowSplits_;
 };
 
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
@@ -81,6 +82,7 @@ class View : public Object
 {
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
+    friend void ProcessShadowSplitWork(const WorkItem* item, unsigned threadIndex);
     
     OBJECT(View);
     
@@ -137,6 +139,8 @@ private:
     void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light.
     void ProcessLight(LightQueryResult& query, unsigned threadIndex);
+    /// Process the shadow splits for a light.
+    void ProcessShadowSplit(LightQueryResult& query, unsigned splitIndex, unsigned threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
     void ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex);
     /// %Set up initial shadow camera view(s).
