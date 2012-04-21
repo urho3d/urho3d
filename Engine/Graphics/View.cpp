@@ -696,6 +696,8 @@ void View::GetBatches()
     
     // Build light queues and lit batches
     {
+        PROFILE(GetLightBatches);
+        
         maxLightsDrawables_.Clear();
         
         // Preallocate light queues: per-pixel lights which have lit geometries
@@ -717,8 +719,6 @@ void View::GetBatches()
             if (query.litGeometries_.Empty())
                 continue;
             
-            PROFILE(GetLightBatches);
-            
             // If no shadow casters, the light can be rendered unshadowed. At this point we have not allocated a shadow map yet,
             // so the only cost has been the shadow camera setup & queries
             unsigned shadowSplits = query.shadowSplits_.Size();
@@ -736,7 +736,7 @@ void View::GetBatches()
             // Per-pixel light
             if (!light->GetPerVertex())
             {
-                // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
+                // Initialize light queue
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
                 light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
@@ -1775,22 +1775,26 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     SetupShadowCameras(query);
     
     // Process each split for shadow casters. Divide multiple splits into the work queue
-    if (query.shadowSplits_.Size() == 1)
-        ProcessShadowSplit(query, 0, threadIndex);
-    else if (query.shadowSplits_.Size() > 1)
+    if (query.shadowSplits_.Size())
     {
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
-        
-        WorkItem item;
-        item.workFunction_ = ProcessShadowSplitWork;
-        item.start_ = &query;
-        item.aux_ = this;
-        
-        for (unsigned i = 0; i < query.shadowSplits_.Size(); ++i)
+        if (query.shadowSplits_.Size() > 1)
         {
-            item.end_ = (void*)i;
-            queue->AddWorkItem(item);
+            WorkQueue* queue = GetSubsystem<WorkQueue>();
+            
+            WorkItem item;
+            item.workFunction_ = ProcessShadowSplitWork;
+            item.start_ = &query;
+            item.aux_ = this;
+            
+            for (unsigned i = 1; i < query.shadowSplits_.Size(); ++i)
+            {
+                item.end_ = (void*)i;
+                queue->AddWorkItem(item);
+            }
         }
+        
+        // Process the first split here
+        ProcessShadowSplit(query, 0, threadIndex);
     }
 }
 
