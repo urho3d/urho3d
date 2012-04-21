@@ -148,8 +148,10 @@ void Octant::DeleteChild(Octant* octant)
 
 void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize)
 {
-    // If size OK or outside, stop recursion & insert here
-    if (CheckDrawableSize(boxSize) || cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
+    // If size OK or outside, stop recursion & insert here. Also, if drawable is not occluded, must stay in the root octant
+    // so that hierarchic octant occlusion does not erroneously hide the drawable
+    if ((!drawable->IsOccludee() && this == root_) || CheckDrawableSize(boxSize) ||
+        cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
     {
         Octant* oldOctant = drawable->octant_;
         if (oldOctant != this)
@@ -319,7 +321,6 @@ OBJECTTYPESTATIC(Octree);
 Octree::Octree(Context* context) :
     Component(context),
     Octant(BoundingBox(-DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), 0, 0, this),
-    scene_(0),
     numLevels_(DEFAULT_OCTREE_LEVELS)
 {
     // Resize threaded ray query intermediate result vector according to number of worker threads
@@ -503,7 +504,8 @@ void Octree::QueueUpdate(Drawable* drawable)
 
 void Octree::QueueReinsertion(Drawable* drawable)
 {
-    if (scene_ && scene_->IsThreadedUpdate())
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
     {
         MutexLock lock(octreeMutex_);
         drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
@@ -523,11 +525,6 @@ void Octree::DrawDebugGeometry(bool depthTest)
         Octant::DrawDebugGeometry(debug, depthTest);
 }
 
-void Octree::OnNodeSet(Node* node)
-{
-    scene_ = node ? node->GetScene() : 0;
-}
-
 void Octree::UpdateDrawables(const FrameInfo& frame)
 {
     // Let drawables update themselves before reinsertion
@@ -536,7 +533,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     
     PROFILE(UpdateDrawables);
     
-    Scene* scene = node_->GetScene();
+    Scene* scene = GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     scene->BeginThreadedUpdate();
     

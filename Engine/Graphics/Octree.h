@@ -192,18 +192,12 @@ public:
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     
-protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
-    
 private:
     /// Update drawable objects marked for update. Updates are executed in worker threads.
     void UpdateDrawables(const FrameInfo& frame);
     /// Reinsert moved drawable objects into the octree.
     void ReinsertDrawables(const FrameInfo& frame);
     
-    /// Scene.
-    Scene* scene_;
     /// Drawable objects that require update.
     Vector<WeakPtr<Drawable> > drawableUpdates_;
     /// Drawable objects that require reinsertion.

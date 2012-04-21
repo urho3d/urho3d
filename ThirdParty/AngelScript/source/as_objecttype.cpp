@@ -521,8 +521,7 @@ const char *asCObjectType::GetPropertyDeclaration(asUINT index) const
 	if( index >= properties.GetLength() )
 		return 0;
 
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	if( properties[index]->isPrivate )
 		*tempString = "private ";
 	else

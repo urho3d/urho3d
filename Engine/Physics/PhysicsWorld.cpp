@@ -323,7 +323,7 @@ void PhysicsWorld::OnNodeSet(Node* node)
     // Subscribe to the scene subsystem update, which will trigger the physics simulation step
     if (node)
     {
-        scene_ = node->GetScene();
+        scene_ = GetScene();
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
     }
 }

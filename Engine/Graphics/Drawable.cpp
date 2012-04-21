@@ -172,6 +172,10 @@ void Drawable::SetOccluder(bool enable)
 void Drawable::SetOccludee(bool enable)
 {
     occludee_ = enable;
+    // If occludee mode is disabled, reinsert to octree root to make sure octant occlusion does not erroneously hide
+    // this drawable
+    if (octant_ && !reinsertionQueued_)
+        octant_->GetRoot()->QueueReinsertion(this);
 }
 
 void Drawable::MarkForUpdate()
@@ -304,7 +308,7 @@ void Drawable::OnMarkedDirty(Node* node)
 
 void Drawable::AddToOctree()
 {
-    Scene* scene = node_->GetScene();
+    Scene* scene = GetScene();
     if (scene)
     {
         Octree* octree = scene->GetComponent<Octree>();

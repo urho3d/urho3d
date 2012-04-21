@@ -223,36 +223,18 @@ void Connection::SendServerUpdate()
     
     // Always check the root node (scene) first so that the scene-wide components get sent first,
     // and all other replicated nodes get added to the dirty set for sending the initial state
-    nodesToProcess_.Insert(scene_->GetID());
-    ProcessNode(scene_);
+    unsigned sceneID = scene_->GetID();
+    nodesToProcess_.Insert(sceneID);
+    ProcessNode(sceneID);
     
     // Then go through all dirtied nodes
     nodesToProcess_.Insert(sceneState_.dirtyNodes_);
-    nodesToProcess_.Erase(scene_->GetID()); // Do not process the root node twice
+    nodesToProcess_.Erase(sceneID); // Do not process the root node twice
     
     while (nodesToProcess_.Size())
     {
-        unsigned id = nodesToProcess_.Front();
-        Node* node = scene_->GetNode(id);
-        if (node)
-            ProcessNode(node);
-        else
-        {
-            nodesToProcess_.Erase(id);
-            
-            // If node is dirty, but is no longer found, it has been removed
-            if (sceneState_.nodeStates_.Contains(id))
-            {
-                msg_.Clear();
-                msg_.WriteNetID(id);
-                
-                // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
-                // would be enough. However, this may be better due to the client not possibly having updated parenting
-                // information at the time of receiving this message
-                SendMessage(MSG_REMOVENODE, true, true, msg_);
-                sceneState_.nodeStates_.Erase(id);
-            }
-        }
+        unsigned nodeID = nodesToProcess_.Front();
+        ProcessNode(nodeID);
     }
 }
 
@@ -1009,31 +991,57 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
 
-void Connection::ProcessNode(Node* node)
+void Connection::ProcessNode(unsigned nodeID)
 {
-    if (!node || !nodesToProcess_.Contains(node->GetID()))
+    // Check that we have not already processed this due to dependency recursion
+    if (!nodesToProcess_.Erase(nodeID))
         return;
     
-    nodesToProcess_.Erase(node->GetID());
-    
-    // Process depended upon nodes first, if they are dirty
-    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
-    for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
-    {
-        if (sceneState_.dirtyNodes_.Contains((*i)->GetID()))
-            ProcessNode(*i);
-    }
-    
-    // Check if the client's replication state already has this node
-    HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.nodeStates_.Find(node->GetID());
+    // Find replication state for the node
+    HashMap<unsigned, NodeReplicationState>::Iterator i = sceneState_.nodeStates_.Find(nodeID);
     if (i != sceneState_.nodeStates_.End())
-        ProcessExistingNode(node, i->second_);
+    {
+        // Replication state found: the node is either be existing or removed
+        Node* node = i->second_.node_;
+        if (!node)
+        {
+            msg_.Clear();
+            msg_.WriteNetID(nodeID);
+            
+            // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
+            // would be enough. However, this may be better due to the client not possibly having updated parenting
+            // information at the time of receiving this message
+            SendMessage(MSG_REMOVENODE, true, true, msg_);
+            sceneState_.nodeStates_.Erase(nodeID);
+        }
+        else
+            ProcessExistingNode(node, i->second_);
+    }
     else
-        ProcessNewNode(node);
+    {
+        // Replication state not found: this is a new node
+        Node* node = scene_->GetNode(nodeID);
+        if (node)
+            ProcessNewNode(node);
+        else
+        {
+            // Did not find the new node (may have been created, then removed immediately): erase from dirty set.
+            sceneState_.dirtyNodes_.Erase(nodeID);
+        }
+    }
 }
 
 void Connection::ProcessNewNode(Node* node)
 {
+    // Process depended upon nodes first, if they are dirty
+    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
+    for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
+    {
+        unsigned nodeID = (*i)->GetID();
+        if (sceneState_.dirtyNodes_.Contains(nodeID))
+            ProcessNode(nodeID);
+    }
+    
     msg_.Clear();
     msg_.WriteNetID(node->GetID());
     
@@ -1084,7 +1092,17 @@ void Connection::ProcessNewNode(Node* node)
 
 void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState)
 {
+    // Process depended upon nodes first, if they are dirty
+    const PODVector<Node*>& dependencyNodes = node->GetDependencyNodes();
+    for (PODVector<Node*>::ConstIterator i = dependencyNodes.Begin(); i != dependencyNodes.End(); ++i)
+    {
+        unsigned nodeID = (*i)->GetID();
+        if (sceneState_.dirtyNodes_.Contains(nodeID))
+            ProcessNode(nodeID);
+    }
+    
     // Check from the interest management component, if exists, whether should update
+    /// \todo Searching for the component is a potential CPU hotspot. It should be cached
     NetworkPriority* priority = node->GetComponent<NetworkPriority>();
     if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
     {
@@ -1153,39 +1171,25 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         }
     }
     
-    // Check for new or changed components
-    const Vector<SharedPtr<Component> >& components = node->GetComponents();
-    for (unsigned i = 0; i < components.Size(); ++i)
+    // Check for removed or changed components
+    for (HashMap<unsigned, ComponentReplicationState>::Iterator i = nodeState.componentStates_.Begin();
+        i != nodeState.componentStates_.End(); )
     {
-        Component* component = components[i];
-        // Check if component is not to be replicated
-        if (component->GetID() >= FIRST_LOCAL_ID)
-            continue;
-        
-        HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());
-        if (j == nodeState.componentStates_.End())
+        HashMap<unsigned, ComponentReplicationState>::Iterator current = i++;
+        ComponentReplicationState& componentState = current->second_;
+        Component* component = componentState.component_;
+        if (!component)
         {
-            // New component
-            ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
-            componentState.connection_ = this;
-            componentState.nodeState_ = &nodeState;
-            componentState.component_ = component;
-            component->AddReplicationState(&componentState);
-            
+            // Removed component
             msg_.Clear();
-            msg_.WriteNetID(node->GetID());
-            msg_.WriteShortStringHash(component->GetType());
-            msg_.WriteNetID(component->GetID());
-            component->WriteInitialDeltaUpdate(msg_);
+            msg_.WriteNetID(current->first_);
             
-            SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
+            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
+            nodeState.componentStates_.Erase(current);
         }
         else
         {
-            // Existing component
-            ComponentReplicationState& componentState = j->second_;
-            
-            // Check if attributes have changed
+            // Existing component. Check if attributes have changed
             if (componentState.dirtyAttributes_.Count())
             {
                 const Vector<AttributeInfo>* attributes = component->GetNetworkAttributes();
@@ -1211,7 +1215,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                     SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, component->GetID());
                 }
                 
-                // Send deltaupdate if remaining dirty bits, or vars have changed
+                // Send deltaupdate if remaining dirty bits
                 if (componentState.dirtyAttributes_.Count())
                 {
                     msg_.Clear();
@@ -1226,18 +1230,35 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         }
     }
     
-    // Check for removed components
-    for (HashMap<unsigned, ComponentReplicationState>::Iterator i = nodeState.componentStates_.Begin();
-        i != nodeState.componentStates_.End();)
+    // Check for new components
+    if (nodeState.componentStates_.Size() != node->GetNumNetworkComponents())
     {
-        HashMap<unsigned, ComponentReplicationState>::Iterator current = i++;
-        if (!current->second_.component_)
+        const Vector<SharedPtr<Component> >& components = node->GetComponents();
+        for (unsigned i = 0; i < components.Size(); ++i)
         {
-            msg_.Clear();
-            msg_.WriteNetID(current->first_);
+            Component* component = components[i];
+            // Check if component is not to be replicated
+            if (component->GetID() >= FIRST_LOCAL_ID)
+                continue;
             
-            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
-            nodeState.componentStates_.Erase(current);
+            HashMap<unsigned, ComponentReplicationState>::Iterator j = nodeState.componentStates_.Find(component->GetID());
+            if (j == nodeState.componentStates_.End())
+            {
+                // New component
+                ComponentReplicationState& componentState = nodeState.componentStates_[component->GetID()];
+                componentState.connection_ = this;
+                componentState.nodeState_ = &nodeState;
+                componentState.component_ = component;
+                component->AddReplicationState(&componentState);
+                
+                msg_.Clear();
+                msg_.WriteNetID(node->GetID());
+                msg_.WriteShortStringHash(component->GetType());
+                msg_.WriteNetID(component->GetID());
+                component->WriteInitialDeltaUpdate(msg_);
+                
+                SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
+            }
         }
     }
     

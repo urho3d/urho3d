@@ -85,7 +85,7 @@ void Joint::ApplyAttributes()
     {
         otherBody_.Reset();
         
-        Scene* scene = node_ ? node_->GetScene() : 0;
+        Scene* scene = GetScene();
         if (scene && otherBodyNodeID_)
         {
             Node* otherNode = scene->GetNode(otherBodyNodeID_);
@@ -153,7 +153,7 @@ void Joint::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = node->GetScene();
+        Scene* scene = GetScene();
         if (scene)
         {
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();

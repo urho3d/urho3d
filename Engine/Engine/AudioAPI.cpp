@@ -44,8 +44,9 @@ void RegisterSoundSources(asIScriptEngine* engine)
 {
     engine->RegisterEnum("SoundType");
     engine->RegisterEnumValue("SoundType", "SOUND_EFFECT", SOUND_EFFECT);
-    engine->RegisterEnumValue("SoundType", "SOUND_MUSIC", SOUND_MUSIC);
+    engine->RegisterEnumValue("SoundType", "SOUND_AMBIENT", SOUND_AMBIENT);
     engine->RegisterEnumValue("SoundType", "SOUND_VOICE", SOUND_VOICE);
+    engine->RegisterEnumValue("SoundType", "SOUND_MUSIC", SOUND_MUSIC);
     engine->RegisterEnumValue("SoundType", "SOUND_MASTER", SOUND_MASTER);
     
     RegisterSoundSource<SoundSource>(engine, "SoundSource");

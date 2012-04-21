@@ -86,10 +86,10 @@ struct asSSystemFunctionInterface;
 //       also functions/methods that are being called. This could be used to build a 
 //       code database with call graphs, etc.
 
-// TODO: optimize: The GC should only be notified of the script function when the last module
-//                 removes it from the scope. Must make sure it is only added to the GC once
-//                 in case the function is added to another module after the GC already knows 
-//                 about the function.
+// TODO: runtime optimize: The GC should only be notified of the script function when the last module
+//                         removes it from the scope. Must make sure it is only added to the GC once
+//                         in case the function is added to another module after the GC already knows 
+//                         about the function.
 
 void RegisterScriptFunction(asCScriptEngine *engine);
 
@@ -211,13 +211,17 @@ public:
 
 	// Used by asFUNC_SCRIPT
 	asCArray<asDWORD>               byteCode;
+	// The stack space needed for the local variables
+	asDWORD                         variableSpace;
 
 	// These hold information objects and function pointers, including temporary
 	// variables used by exception handler and when saving bytecode
 	asCArray<asCObjectType*>        objVariableTypes;
 	asCArray<asCScriptFunction*>    funcVariableTypes;
 	asCArray<int>	                objVariablePos;
-	asCArray<bool>                  objVariableIsOnHeap;
+	// The first variables in above array are allocated on the heap, the rest on the stack.
+	// This variable shows how many are on the heap.
+	asUINT                          objVariablesOnHeap;
 
 	// Holds information on scope for object variables on the stack
 	asCArray<asSObjectVariableInfo> objVariableInfo;

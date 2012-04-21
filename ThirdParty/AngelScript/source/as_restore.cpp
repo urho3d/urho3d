@@ -536,6 +536,8 @@ asCScriptFunction *asCReader::ReadFunction(bool addToModule, bool addToEngine, b
 		
 		ReadByteCode(func);
 
+		func->variableSpace = ReadEncodedUInt();
+
 		count = ReadEncodedUInt();
 		func->objVariablePos.Allocate(count, 0);
 		func->objVariableTypes.Allocate(count, 0);
@@ -547,9 +549,11 @@ asCScriptFunction *asCReader::ReadFunction(bool addToModule, bool addToEngine, b
 			func->funcVariableTypes.PushLast((asCScriptFunction*)(asPWORD)idx);
 			num = ReadEncodedUInt();
 			func->objVariablePos.PushLast(num);
-			bool b; ReadData(&b, 1);
-			func->objVariableIsOnHeap.PushLast(b);
 		}
+		if( count > 0 )
+			func->objVariablesOnHeap = ReadEncodedUInt();
+		else
+			func->objVariablesOnHeap = 0;
 
 		int length = ReadEncodedUInt();
 		func->objVariableInfo.SetLength(length);
@@ -871,10 +875,15 @@ void asCReader::ReadObjectTypeDeclaration(asCObjectType *ot, int phase)
 							// TODO: Write message
 							error = true;
 						}
-						// Destroy the function without releasing any references
-						func->id = 0;
-						func->byteCode.SetLength(0);
-						func->Release();
+						// If the function received wasn't an already existing 
+						// function we must now destroy it
+						if( !savedFunctions.Exists(func) )
+						{
+							// Destroy the function without releasing any references
+							func->id = 0;
+							func->byteCode.SetLength(0);
+							func->Release();
+						}
 					}
 					else
 					{
@@ -920,10 +929,15 @@ void asCReader::ReadObjectTypeDeclaration(asCObjectType *ot, int phase)
 							// TODO: Write message
 							error = true;
 						}
-						// Destroy the function without releasing any references
-						func->id = 0;
-						func->byteCode.SetLength(0);
-						func->Release();
+						// If the function received wasn't an already existing 
+						// function we must now destroy it
+						if( !savedFunctions.Exists(func) )
+						{
+							// Destroy the function without releasing any references
+							func->id = 0;
+							func->byteCode.SetLength(0);
+							func->Release();
+						}
 					}
 					else
 					{
@@ -1693,7 +1707,9 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 	{
 		int c = *(asBYTE*)&bc[n];
 		if( c == asBC_FREE ||
-			c == asBC_REFCPY || c == asBC_OBJTYPE )
+			c == asBC_REFCPY || 
+			c == asBC_RefCpyV ||
+			c == asBC_OBJTYPE )
 		{
 			// Translate the index to the true object type
 			asPWORD *ot = (asPWORD*)&bc[n+1];
@@ -1750,10 +1766,6 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 			if( func->DoesReturnOnStack() ) dw += AS_PTR_SIZE;
 			if( func->objectType ) dw += AS_PTR_SIZE;
 			asBC_WORDARG0(&bc[n]) = dw;
-		}
-		else if( c == asBC_POP )
-		{
-			asBC_WORDARG0(&bc[n]) = AS_PTR_SIZE;
 		}
 		else if( c == asBC_CALL ||
 				 c == asBC_CALLINTF ||
@@ -1836,13 +1848,14 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 				return;
 			}
 		}
-		else if( c == asBC_PGA ||
-			     c == asBC_LDG ||
-				 c == asBC_PshG4 ||
-				 c == asBC_LdGRdR4 ||
+		else if( c == asBC_PGA      ||
+			     c == asBC_PshGPtr  ||
+			     c == asBC_LDG      ||
+				 c == asBC_PshG4    ||
+				 c == asBC_LdGRdR4  ||
 				 c == asBC_CpyGtoV4 ||
 				 c == asBC_CpyVtoG4 ||
-				 c == asBC_SetG4 )
+				 c == asBC_SetG4    )
 		{
 			// Translate the global var index to pointer
 			asPWORD *index = (asPWORD*)&bc[n+1];
@@ -1855,13 +1868,15 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 				return;
 			}
 		}
-		else if( c == asBC_JMP ||
-			     c == asBC_JZ ||
-				 c == asBC_JNZ ||
-				 c == asBC_JS ||
-				 c == asBC_JNS ||
-				 c == asBC_JP ||
-				 c == asBC_JNP ) // The JMPP instruction doesn't need modification
+		else if( c == asBC_JMP    ||
+			     c == asBC_JZ     ||
+				 c == asBC_JNZ    ||
+			     c == asBC_JLowZ  ||
+				 c == asBC_JLowNZ ||
+				 c == asBC_JS     ||
+				 c == asBC_JNS    ||
+				 c == asBC_JP     ||
+				 c == asBC_JNP    ) // The JMPP instruction doesn't need modification
 		{
 			// Get the offset 
 			int offset = int(bc[n+1]);
@@ -1929,18 +1944,11 @@ void asCReader::TranslateFunction(asCScriptFunction *func)
 			break;
 		}
 
-		if( c == asBC_PUSH )
-		{
-			// TODO: Maybe the push instruction should be removed, and be kept in 
-			//       the asCScriptFunction as a property instead. CallScriptFunction 
-			//       can immediately reserve the space
-
-			// PUSH is only used to reserve stack space for variables
-			asBC_SWORDARG0(&bc[n]) = (short)AdjustStackPosition(asBC_SWORDARG0(&bc[n]));
-		}
-
 		n += asBCTypeSize[asBCInfo[c].type];
 	}
+
+	// Adjust the space needed for local variables
+	func->variableSpace = AdjustStackPosition(func->variableSpace);
 
 	// Adjust the variable information. This will be used during the adjustment below
 	for( n = 0; n < func->variables.GetLength(); n++ )
@@ -2006,10 +2014,10 @@ void asCReader::CalculateStackNeeded(asCScriptFunction *func)
 	memset(&stackSize[0], -1, stackSize.GetLength()*4);
 
 	// Add the first instruction to the list of unchecked code 
-	// paths and set the stack size at that instruction to 0
+	// paths and set the stack size at that instruction to variableSpace
 	asCArray<asUINT> paths;
 	paths.PushLast(0);
-	stackSize[0] = 0;
+	stackSize[0] = func->variableSpace;
 
 	// Go through each of the code paths
 	for( asUINT p = 0; p < paths.GetLength(); ++p )
@@ -2026,26 +2034,20 @@ void asCReader::CalculateStackNeeded(asCScriptFunction *func)
 		if( stackInc == 0xFFFF )
 		{
 			// Determine the true delta from the instruction arguments
-			if( bc == asBC_POP )
-			{
-				stackInc = -(int)asBC_WORDARG0(&func->byteCode[pos]);
-			}
-			else if( bc == asBC_PUSH )
-			{
-				stackInc = asBC_WORDARG0(&func->byteCode[pos]);
-			}
-			else if( bc == asBC_CALL ||
-			         bc == asBC_CALLSYS ||
-					 bc == asBC_CALLBND ||
-					 bc == asBC_ALLOC ||
-					 bc == asBC_CALLINTF )
+			if( bc == asBC_CALL ||
+			    bc == asBC_CALLSYS ||
+				bc == asBC_CALLBND ||
+				bc == asBC_ALLOC ||
+				bc == asBC_CALLINTF ||
+				bc == asBC_CallPtr )
 			{
 				asCScriptFunction *called = GetCalledFunction(func, pos);
 				if( called )
 				{
 					stackInc = -called->GetSpaceNeededForArguments();
-
 					if( called->objectType )
+						stackInc -= AS_PTR_SIZE;
+					if( called->DoesReturnOnStack() )
 						stackInc -= AS_PTR_SIZE;
 				}
 				else
@@ -2054,11 +2056,6 @@ void asCReader::CalculateStackNeeded(asCScriptFunction *func)
 					asASSERT( bc == asBC_ALLOC );
 					stackInc = -AS_PTR_SIZE;
 				}
-			}
-			else if ( bc == asBC_CallPtr )
-			{
-				// TODO: bytecode: Determine the function signature from the variable
-				break;
 			}
 		}
 		
@@ -2084,9 +2081,10 @@ void asCReader::CalculateStackNeeded(asCScriptFunction *func)
 				asASSERT(stackSize[pos] == currStackSize);
 			continue;
 		}
-		else if( bc == asBC_JZ || bc == asBC_JNZ ||
-				 bc == asBC_JS || bc == asBC_JNS ||
-				 bc == asBC_JP || bc == asBC_JNP )
+		else if( bc == asBC_JZ    || bc == asBC_JNZ    ||
+				 bc == asBC_JLowZ || bc == asBC_JLowNZ ||
+				 bc == asBC_JS    || bc == asBC_JNS    ||
+				 bc == asBC_JP    || bc == asBC_JNP )
 		{
 			// Find the label that is being jumped to
 			int offset = asBC_INTARG(&func->byteCode[pos]);
@@ -2207,7 +2205,7 @@ void asCReader::CalculateAdjustmentByPos(asCScriptFunction *func)
 			// Determine the size the variable currently occupies on the stack
 			int size = AS_PTR_SIZE;
 			if( (func->objVariableTypes[n]->GetFlags() & asOBJ_VALUE) &&
-				!func->objVariableIsOnHeap[n] )
+				n >= func->objVariablesOnHeap )
 			{
 				size = func->objVariableTypes[n]->GetSize();
 				if( size < 4 ) 
@@ -2663,6 +2661,9 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 
 		WriteByteCode(func);
 
+		asDWORD varSpace = AdjustStackPosition(func->variableSpace);
+		WriteEncodedInt64(varSpace);
+
 		count = (asUINT)func->objVariablePos.GetLength();
 		WriteEncodedInt64(count);
 		for( i = 0; i < count; ++i )
@@ -2671,8 +2672,9 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 			// TODO: Only write this if the object type is the builtin function type
 			WriteEncodedInt64(FindFunctionIndex(func->funcVariableTypes[i]));
 			WriteEncodedInt64(AdjustStackPosition(func->objVariablePos[i]));
-			WriteData(&func->objVariableIsOnHeap[i], 1);
 		}
+		if( count > 0 )
+			WriteEncodedInt64(func->objVariablesOnHeap);
 
 		WriteEncodedInt64((asUINT)func->objVariableInfo.GetLength());
 		for( i = 0; i < func->objVariableInfo.GetLength(); ++i )
@@ -3110,7 +3112,7 @@ void asCWriter::CalculateAdjustmentByPos(asCScriptFunction *func)
 			// Determine the size the variable currently occupies on the stack
 			int size = AS_PTR_SIZE;
 			if( (func->objVariableTypes[n]->GetFlags() & asOBJ_VALUE) &&
-				!func->objVariableIsOnHeap[n] )
+				n >= func->objVariablesOnHeap )
 			{
 				size = func->objVariableTypes[n]->GetSize();
 				if( size < 4 ) 
@@ -3303,9 +3305,10 @@ void asCWriter::WriteByteCode(asCScriptFunction *func)
 			if( ot->flags & asOBJ_SCRIPT_OBJECT )
 				*(int*)&tmp[1+AS_PTR_SIZE] = FindFunctionIndex(engine->scriptFunctions[*(int*)&tmp[1+AS_PTR_SIZE]]);
 		}
-		else if( c == asBC_FREE   || // wW_PTR_ARG
-			     c == asBC_REFCPY || // PTR_ARG
-				 c == asBC_OBJTYPE ) // PTR_ARG
+		else if( c == asBC_FREE    || // wW_PTR_ARG
+			     c == asBC_REFCPY  || // PTR_ARG
+				 c == asBC_RefCpyV || // wW_PTR_ARG
+				 c == asBC_OBJTYPE )  // PTR_ARG
 		{
 			// Translate object type pointers into indices
 			*(int*)(tmp+1) = FindObjectTypeIdx(*(asCObjectType**)(tmp+1));
@@ -3352,14 +3355,6 @@ void asCWriter::WriteByteCode(asCScriptFunction *func)
 			// Save with arg 0, as this will be recalculated on the target platform
 			asBC_WORDARG0(tmp) = 0;
 		}
-		else if( c == asBC_POP ) // W_ARG
-		{
-			// The pop instruction always pop a single pointer
-			asASSERT(asBC_WORDARG0(tmp) == AS_PTR_SIZE);
-			
-			// Save with arg 0, as this will be recalculated on the target platform
-			asBC_WORDARG0(tmp) = 0;
-		}
 		else if( c == asBC_CALL ||     // DW_ARG
 				 c == asBC_CALLINTF || // DW_ARG
 				 c == asBC_CALLSYS )   // DW_ARG
@@ -3391,24 +3386,27 @@ void asCWriter::WriteByteCode(asCScriptFunction *func)
 
 			tmp[1] = funcId;
 		}
-		else if( c == asBC_PGA ||      // PTR_ARG
-			     c == asBC_LDG ||      // PTR_ARG
-				 c == asBC_PshG4 ||    // PTR_ARG
-				 c == asBC_LdGRdR4 ||  // wW_PTR_ARG
+		else if( c == asBC_PGA      || // PTR_ARG
+			     c == asBC_PshGPtr  || // PTR_ARG 
+			     c == asBC_LDG      || // PTR_ARG
+				 c == asBC_PshG4    || // PTR_ARG
+				 c == asBC_LdGRdR4  || // wW_PTR_ARG
 				 c == asBC_CpyGtoV4 || // wW_PTR_ARG
 				 c == asBC_CpyVtoG4 || // rW_PTR_ARG
-				 c == asBC_SetG4 )     // PTR_DW_ARG
+				 c == asBC_SetG4    )  // PTR_DW_ARG
 		{
 			// Translate global variable pointers into indices
 			*(int*)(tmp+1) = FindGlobalPropPtrIndex(*(void**)(tmp+1));
 		}
-		else if( c == asBC_JMP ||	// DW_ARG
-			     c == asBC_JZ ||
-				 c == asBC_JNZ ||
-				 c == asBC_JS ||
-				 c == asBC_JNS ||
-				 c == asBC_JP ||
-				 c == asBC_JNP ) // The JMPP instruction doesn't need modification
+		else if( c == asBC_JMP    ||	// DW_ARG
+			     c == asBC_JZ     ||
+				 c == asBC_JNZ    ||
+				 c == asBC_JLowZ  ||
+				 c == asBC_JLowNZ ||
+				 c == asBC_JS     ||
+				 c == asBC_JNS    ||
+				 c == asBC_JP     ||
+				 c == asBC_JNP    ) // The JMPP instruction doesn't need modification
 		{
 			// Get the DWORD offset from arg
 			int offset = *(int*)(tmp+1);
@@ -3467,16 +3465,6 @@ void asCWriter::WriteByteCode(asCScriptFunction *func)
 			break;
 		}
 
-		if( c == asBC_PUSH )
-		{
-			// TODO: Maybe the push instruction should be removed, and be kept in 
-			//       the asCScriptFunction as a property instead. CallScriptFunction 
-			//       can immediately reserve the space
-
-			// PUSH is only used to reserve stack space for variables
-			asBC_WORDARG0(tmp) = (asWORD)AdjustStackPosition(asBC_WORDARG0(tmp));
-		}
-				 
 		// TODO: bytecode: Must make sure that floats and doubles are always stored the same way regardless of platform. 
 		//                 Some platforms may not use the IEEE 754 standard, in which case it is necessary to encode the values
 		

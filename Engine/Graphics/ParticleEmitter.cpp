@@ -83,7 +83,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", occludee_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
@@ -409,7 +409,7 @@ void ParticleEmitter::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = node->GetScene();
+        Scene* scene = GetScene();
         if (scene)
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
     }

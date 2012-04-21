@@ -77,7 +77,7 @@ void BillboardSet::RegisterObject(Context* context)
     
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
-    ATTRIBUTE(BillboardSet, VAR_BOOL, "Can Be Occluded", occludee_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);

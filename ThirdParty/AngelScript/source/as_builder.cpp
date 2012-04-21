@@ -1409,7 +1409,7 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file, const as
 	decl->objType = st;
 
 	// Add script classes to the GC
-	// TODO: optimize: Only add the class to the GC when the module won't use the type anymore
+	// TODO: runtime optimize: Only add the class to the GC when the module won't use the type anymore
 	engine->gc.AddScriptObjectToGC(st, &engine->objectTypeBehaviours);
 
 	// Use the default script class behaviours
@@ -2298,19 +2298,19 @@ void asCBuilder::CompileClasses()
 			{
 				if( dt.IsObjectHandle() )
 				{
-					// TODO: optimize: If it is known that the handle can't be involved in a circular reference
-					//                 then this object doesn't need to be marked as garbage collected. 
-					//                 - The application could set a flag when registering the object.
-					//                 - The script classes can be marked as final, then the compiler will 
-					//                   be able to determine whether the class is garbage collected or not.
+					// TODO: runtime optimize: If it is known that the handle can't be involved in a circular reference
+					//                         then this object doesn't need to be marked as garbage collected. 
+					//                         - The application could set a flag when registering the object.
+					//                         - The script classes can be marked as final, then the compiler will 
+					//                           be able to determine whether the class is garbage collected or not.
 
 					ot->flags |= asOBJ_GC;
 					break;
 				}
 				else if( dt.GetObjectType()->flags & asOBJ_GC )
 				{
-					// TODO: optimize: Just because the member type is a potential circle doesn't mean that this one is
-					//                 Only if the object is of a type that can reference this type, either directly or indirectly
+					// TODO: runtime optimize: Just because the member type is a potential circle doesn't mean that this one is
+					//                         Only if the object is of a type that can reference this type, either directly or indirectly
 
 					ot->flags |= asOBJ_GC;
 					break;

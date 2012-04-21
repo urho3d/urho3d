@@ -125,6 +125,7 @@ void Run()
             engine->Exit(); // Close the rendering window
             ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
         }
+        scriptFile.Reset();
     }
     catch (std::bad_alloc&)
     {

@@ -463,9 +463,6 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
 
             for (uint i = 0; i < enumNames.length; ++i)
             {
-                // Hack: check for certain internal enums and break
-                if (enumNames[i] == "Master")
-                    break;
                 Text@ choice = Text();
                 choice.SetStyle(uiStyle, "EditorEnumAttributeText");
                 choice.text = enumNames[i];

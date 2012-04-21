@@ -90,10 +90,10 @@
 
 static const String typeNames[] =
 {
-    "Master",
     "Effect",
-    "Music",
+    "Ambient",
     "Voice",
+    "Music",
     ""
 };
 

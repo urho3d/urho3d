@@ -59,8 +59,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22300
-#define ANGELSCRIPT_VERSION_STRING "2.23.0"
+#define ANGELSCRIPT_VERSION        22301
+#define ANGELSCRIPT_VERSION_STRING "2.23.1 WIP"
 
 // Data types
 
@@ -1147,8 +1147,8 @@ public:
 // Byte code instructions
 enum asEBCInstr
 {
-	asBC_POP			= 0,
-	asBC_PUSH			= 1,
+	asBC_PopPtr			= 0,
+	asBC_PshGPtr		= 1,
 	asBC_PshC4			= 2,
 	asBC_PshV4			= 3,
 	asBC_PSF			= 4,
@@ -1323,22 +1323,25 @@ enum asEBCInstr
 	asBC_ChkNullS		= 173,
 	asBC_ClrHi			= 174,
 	asBC_JitEntry		= 175,
-	asBC_CallPtr        = 176,
-	asBC_FuncPtr        = 177,
-	asBC_LoadThisR      = 178,
-	asBC_PshV8          = 179,
+	asBC_CallPtr		= 176,
+	asBC_FuncPtr		= 177,
+	asBC_LoadThisR		= 178,
+	asBC_PshV8			= 179,
 	asBC_DIVu			= 180,
 	asBC_MODu			= 181,
 	asBC_DIVu64			= 182,
 	asBC_MODu64			= 183,
-	asBC_LoadRObjR      = 184,
-	asBC_LoadVObjR      = 185,
+	asBC_LoadRObjR		= 184,
+	asBC_LoadVObjR		= 185,
+	asBC_RefCpyV		= 186,
+	asBC_JLowZ			= 187,
+	asBC_JLowNZ			= 188,
 
-	asBC_MAXBYTECODE	= 186,
+	asBC_MAXBYTECODE	= 189,
 
 	// Temporary tokens. Can't be output to the final program
-	asBC_VarDecl        = 251,
-	asBC_Block          = 252,
+	asBC_VarDecl		= 251,
+	asBC_Block			= 252,
 	asBC_ObjInfo		= 253,
 	asBC_LINE			= 254,
 	asBC_LABEL			= 255
@@ -1426,8 +1429,8 @@ struct asSBCInfo
 
 const asSBCInfo asBCInfo[256] =
 {
-	asBCINFO(POP,		W_ARG,			0xFFFF),
-	asBCINFO(PUSH,		W_ARG,			0xFFFF),
+	asBCINFO(PopPtr,	NO_ARG,			-AS_PTR_SIZE),
+	asBCINFO(PshGPtr,	PTR_ARG,		AS_PTR_SIZE),
 	asBCINFO(PshC4,		DW_ARG,			1),
 	asBCINFO(PshV4,		rW_ARG,			1),
 	asBCINFO(PSF,		rW_ARG,			AS_PTR_SIZE),
@@ -1499,8 +1502,8 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(CHKREF,	NO_ARG,			0),
 	asBCINFO(GETOBJREF,	W_ARG,			0),
 	asBCINFO(GETREF,	W_ARG,			0),
-	asBCINFO(PshNull,   NO_ARG,			AS_PTR_SIZE),
-	asBCINFO(ClrVPtr,   rW_ARG,			0),
+	asBCINFO(PshNull,	NO_ARG,			AS_PTR_SIZE),
+	asBCINFO(ClrVPtr,	rW_ARG,			0),
 	asBCINFO(OBJTYPE,	PTR_ARG,		AS_PTR_SIZE),
 	asBCINFO(TYPEID,	DW_ARG,			1),
 	asBCINFO(SetV4,		wW_DW_ARG,		0),
@@ -1602,20 +1605,20 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(ChkNullS,	W_ARG,			0),
 	asBCINFO(ClrHi,		NO_ARG,			0),
 	asBCINFO(JitEntry,	PTR_ARG,		0),
-	asBCINFO(CallPtr,   rW_ARG,         0xFFFF),
-	asBCINFO(FuncPtr,   PTR_ARG,        AS_PTR_SIZE),
-	asBCINFO(LoadThisR, W_DW_ARG,       0),
+	asBCINFO(CallPtr,	rW_ARG,			0xFFFF),
+	asBCINFO(FuncPtr,	PTR_ARG,		AS_PTR_SIZE),
+	asBCINFO(LoadThisR,	W_DW_ARG,		0),
 	asBCINFO(PshV8,		rW_ARG,			2),
 	asBCINFO(DIVu,		wW_rW_rW_ARG,	0),
 	asBCINFO(MODu,		wW_rW_rW_ARG,	0),
 	asBCINFO(DIVu64,	wW_rW_rW_ARG,	0),
 	asBCINFO(MODu64,	wW_rW_rW_ARG,	0),
-	asBCINFO(LoadRObjR, rW_W_DW_ARG,    0),
-	asBCINFO(LoadVObjR, rW_W_DW_ARG,    0),
+	asBCINFO(LoadRObjR,	rW_W_DW_ARG,	0),
+	asBCINFO(LoadVObjR,	rW_W_DW_ARG,	0),
+	asBCINFO(RefCpyV,	wW_PTR_ARG,		0),
+	asBCINFO(JLowZ,		DW_ARG,			0),
+	asBCINFO(JLowNZ,	DW_ARG,			0),
 
-	asBCINFO_DUMMY(186),
-	asBCINFO_DUMMY(187),
-	asBCINFO_DUMMY(188),
 	asBCINFO_DUMMY(189),
 	asBCINFO_DUMMY(190),
 	asBCINFO_DUMMY(191),

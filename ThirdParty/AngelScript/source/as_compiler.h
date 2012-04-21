@@ -206,7 +206,7 @@ protected:
 	int  DoAssignment(asSExprContext *out, asSExprContext *lctx, asSExprContext *rctx, asCScriptNode *lexpr, asCScriptNode *rexpr, int op, asCScriptNode *opNode);
 	void MergeExprBytecode(asSExprContext *before, asSExprContext *after);
 	void MergeExprBytecodeAndType(asSExprContext *before, asSExprContext *after);
-	void FilterConst(asCArray<int> &funcs);
+	void FilterConst(asCArray<int> &funcs, bool removeConst = true);
 	void ConvertToVariable(asSExprContext *ctx);
 	void ConvertToVariableNotIn(asSExprContext *ctx, asSExprContext *exclude);
 	void ConvertToTempVariable(asSExprContext *ctx);

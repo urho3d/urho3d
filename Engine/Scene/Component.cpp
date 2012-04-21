@@ -73,6 +73,11 @@ void Component::Remove()
         node_->RemoveComponent(this);
 }
 
+Scene* Component::GetScene() const
+{
+    return node_ ? node_->GetScene() : 0;
+}
+
 const Matrix3x4& Component::GetWorldTransform() const
 {
     return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;

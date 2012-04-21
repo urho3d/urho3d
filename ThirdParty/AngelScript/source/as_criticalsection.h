@@ -48,7 +48,9 @@ BEGIN_AS_NAMESPACE
 #define DECLARECRITICALSECTION(x) 
 #define ENTERCRITICALSECTION(x) 
 #define LEAVECRITICALSECTION(x) 
-#define TRYENTERCRITICALSECTION(x) true
+
+inline bool tryEnter() { return true; }
+#define TRYENTERCRITICALSECTION(x) tryEnter()
 
 #else
 

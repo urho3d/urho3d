@@ -149,7 +149,7 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
     // If the rigid body is parented to another rigid body, can not set the transform immediately.
     // In that case store it to PhysicsWorld for delayed assignment
     Node* parent = node_->GetParent();
-    if (parent && parent != node_->GetScene())
+    if (parent && parent != GetScene())
         parentRigidBody = parent->GetComponent<RigidBody>();
     
     if (!parentRigidBody)
@@ -643,7 +643,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     if (!inSetTransform_ && !hasSmoothedTransform_)
     {
         // Physics operations are not safe from worker threads
-        Scene* scene = node->GetScene();
+        Scene* scene = GetScene();
         if (scene && scene->IsThreadedUpdate())
         {
             scene->DelayedMarkedDirty(this);
@@ -671,7 +671,7 @@ void RigidBody::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = node->GetScene();
+        Scene* scene = GetScene();
         if (scene)
         {
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();

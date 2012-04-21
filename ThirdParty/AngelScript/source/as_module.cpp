@@ -671,8 +671,7 @@ const char *asCModule::GetGlobalVarDeclaration(asUINT index, bool includeNamespa
 
 	asCGlobalProperty *prop = scriptGlobals[index];
 
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	*tempString = prop->type.Format();
 	*tempString += " ";
 	if( includeNamespace )
@@ -979,8 +978,7 @@ const char *asCModule::GetImportedFunctionDeclaration(asUINT index) const
 	asCScriptFunction *func = GetImportedFunction(index);
 	if( func == 0 ) return 0;
 
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	*tempString = func->GetDeclarationStr();
 
 	return tempString->AddressOf();

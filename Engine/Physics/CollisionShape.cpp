@@ -494,7 +494,7 @@ void CollisionShape::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = node->GetScene();
+        Scene* scene = GetScene();
         if (scene)
         {
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();

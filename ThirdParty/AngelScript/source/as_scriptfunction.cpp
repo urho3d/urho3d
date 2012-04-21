@@ -148,11 +148,12 @@ asCScriptFunction::asCScriptFunction(asCScriptEngine *engine, asCModule *mod, as
 	id                     = 0;
 	accessMask             = 0xFFFFFFFF;
 	isShared               = false;
+	variableSpace          = 0;
 
-	// TODO: optimize: The engine could notify the GC just before it wants to
-	//                 discard the function. That way the GC won't waste time
-	//                 trying to determine if the functions are garbage before
-	//                 they can actually be considered garbage.
+	// TODO: runtime optimize: The engine could notify the GC just before it wants to
+	//                         discard the function. That way the GC won't waste time
+	//                         trying to determine if the functions are garbage before
+	//                         they can actually be considered garbage.
 	// Notify the GC of script functions
 	if( funcType == asFUNC_SCRIPT )
 		engine->gc.AddScriptObjectToGC(this, &engine->functionBehaviours);
@@ -194,7 +195,7 @@ void asCScriptFunction::DestroyInternal()
 	// Release all references the function holds to other objects
 	ReleaseReferences();
 	parameterTypes.SetLength(0);
-	returnType == asCDataType::CreatePrimitive(ttVoid, false);
+	returnType = asCDataType::CreatePrimitive(ttVoid, false);
 	byteCode.SetLength(0);
 
 	for( asUINT n = 0; n < variables.GetLength(); n++ )
@@ -488,8 +489,7 @@ const char *asCScriptFunction::GetVarDecl(asUINT index) const
 	if( index >= variables.GetLength() )
 		return 0;
 
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	*tempString = variables[index]->type.Format();
 	*tempString += " " + variables[index]->name;
 
@@ -597,6 +597,7 @@ void asCScriptFunction::AddReferences()
 		case asBC_OBJTYPE:
 		case asBC_FREE:
 		case asBC_REFCPY:
+		case asBC_RefCpyV:
 			{
                 asCObjectType *objType = (asCObjectType*)asBC_PTRARG(&byteCode[n]);
 				objType->AddRef();
@@ -617,6 +618,7 @@ void asCScriptFunction::AddReferences()
 
 		// Global variables
 		case asBC_PGA:
+		case asBC_PshGPtr:
 		case asBC_LDG:
 		case asBC_PshG4:
 		case asBC_LdGRdR4:
@@ -704,6 +706,7 @@ void asCScriptFunction::ReleaseReferences()
 		case asBC_OBJTYPE:
 		case asBC_FREE:
 		case asBC_REFCPY:
+		case asBC_RefCpyV:
 			{
 				asCObjectType *objType = (asCObjectType*)asBC_PTRARG(&byteCode[n]);
 				if( objType ) 
@@ -736,6 +739,7 @@ void asCScriptFunction::ReleaseReferences()
 
 		// Global variables
 		case asBC_PGA:
+		case asBC_PshGPtr:
 		case asBC_LDG:
 		case asBC_PshG4:
 		case asBC_LdGRdR4:
@@ -843,8 +847,7 @@ asIScriptEngine *asCScriptFunction::GetEngine() const
 // interface
 const char *asCScriptFunction::GetDeclaration(bool includeObjectName, bool includeNamespace) const
 {
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	*tempString = GetDeclarationStr(includeObjectName, includeNamespace);
 	return tempString->AddressOf();
 }
@@ -979,6 +982,7 @@ void asCScriptFunction::EnumReferences(asIScriptEngine *)
 		case asBC_OBJTYPE:
 		case asBC_FREE:
 		case asBC_REFCPY:
+		case asBC_RefCpyV:
 			{
                 asCObjectType *objType = (asCObjectType*)asBC_PTRARG(&byteCode[n]);
 				engine->GCEnumCallback(objType);
@@ -1016,6 +1020,7 @@ void asCScriptFunction::EnumReferences(asIScriptEngine *)
 
 		// Global variables
 		case asBC_PGA:
+		case asBC_PshGPtr:
 		case asBC_LDG:
 		case asBC_PshG4:
 		case asBC_LdGRdR4:
@@ -1068,6 +1073,7 @@ void asCScriptFunction::ReleaseAllHandles(asIScriptEngine *)
 		case asBC_OBJTYPE:
 		case asBC_FREE:
 		case asBC_REFCPY:
+		case asBC_RefCpyV:
 			{
 				asCObjectType *objType = (asCObjectType*)asBC_PTRARG(&byteCode[n]);
 				if( objType )

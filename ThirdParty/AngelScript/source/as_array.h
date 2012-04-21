@@ -51,12 +51,14 @@ public:
 	~asCArray();
 
 	void   Allocate(size_t numElements, bool keepData);
+	void   AllocateNoConstruct(size_t numElements, bool keepData);
 	size_t GetCapacity() const;
 
 	void PushLast(const T &element);
 	T    PopLast();
 
 	void   SetLength(size_t numElements);
+	void   SetLengthNoConstruct(size_t numElements);
 	size_t GetLength() const;
 
 	void Copy(const T*, size_t count);
@@ -249,6 +251,59 @@ void asCArray<T>::Allocate(size_t numElements, bool keepData)
 }
 
 template <class T>
+void asCArray<T>::AllocateNoConstruct(size_t numElements, bool keepData)
+{
+	// We have 4 situations
+	// 1. The previous array is 8 bytes or smaller and the new array is also 8 bytes or smaller
+	// 2. The previous array is 8 bytes or smaller and the new array is larger than 8 bytes
+	// 3. The previous array is larger than 8 bytes and the new array is 8 bytes or smaller
+	// 4. The previous array is larger than 8 bytes and the new array is also larger than 8 bytes
+
+	T *tmp = 0;
+	if( numElements )
+	{
+		if( sizeof(T)*numElements <= 8 )
+			// Use the internal buffer
+			tmp = (T*)buf;
+		else
+			// Allocate the array and construct each of the elements
+			tmp = asNEWARRAY(T,numElements);
+	}
+
+	if( array )
+	{
+		if( array == tmp )
+		{
+			if( keepData )
+			{
+				if( length > numElements )
+					length = numElements;
+			}
+			else
+				length = 0;
+		}
+		else
+		{
+			if( keepData )
+			{
+				if( length > numElements )
+					length = numElements;
+
+				memcpy(tmp, array, sizeof(T)*length);
+			}
+			else
+				length = 0;
+
+			if( array != (T*)buf )
+				asDELETEARRAY(array);
+		}
+	}
+
+	array = tmp;
+	maxLength = numElements;
+}
+
+template <class T>
 size_t asCArray<T>::GetCapacity() const
 {
 	return maxLength;
@@ -259,6 +314,15 @@ void asCArray<T>::SetLength(size_t numElements)
 {
 	if( numElements > maxLength )
 		Allocate(numElements, true);
+
+	length = numElements;
+}
+
+template <class T>
+void asCArray<T>::SetLengthNoConstruct(size_t numElements)
+{
+	if( numElements > maxLength )
+		AllocateNoConstruct(numElements, true);
 
 	length = numElements;
 }

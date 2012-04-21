@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -42,57 +42,74 @@
 
 BEGIN_AS_NAMESPACE
 
-// Singleton
-asCThreadManager *threadManager = 0;
-
 //======================================================================
 
 extern "C"
 {
 
+// Global API function
 AS_API int asThreadCleanup()
 {
-	// As this function can be called globally, 
-	// we can't assume the threadManager exists
-	if( threadManager )
-		return threadManager->CleanupLocalData();
-
-	return 0;
+	return asCThreadManager::CleanupLocalData();
 }
 
 }
+
+//=======================================================================
+
+// Singleton
+static asCThreadManager *threadManager = 0;
+
+#ifndef AS_NO_THREADS
+static DECLARECRITICALSECTION(criticalSection)
+#endif
 
 //======================================================================
 
 asCThreadManager::asCThreadManager()
 {
+	// We're already in the critical section when this function is called
+
 #ifdef AS_NO_THREADS
 	tld = 0;
 #endif
-	refCount.set(1);
+	refCount = 1;
 }
 
 void asCThreadManager::AddRef()
 {
-	refCount.atomicInc();
+	// It's necessary to protect this section to 
+	// avoid two threads attempting to create thread
+	// managers at the same time.
+	ENTERCRITICALSECTION(criticalSection);
+
+	if( threadManager == 0 )
+		threadManager = asNEW(asCThreadManager);
+	else
+		threadManager->refCount++;
+
+	LEAVECRITICALSECTION(criticalSection);
 }
 
 void asCThreadManager::Release()
 {
-	if( refCount.atomicDec() == 0 )
+	// It's necessary to protect this section so no
+	// other thread attempts to call AddRef or Release
+	// while clean up is in progress.
+	ENTERCRITICALSECTION(criticalSection);
+	if( --threadManager->refCount == 0 )
 	{
 		// The last engine has been destroyed, so we 
 		// need to delete the thread manager as well
-		asDELETE(this,asCThreadManager);
+		asDELETE(threadManager,asCThreadManager);
 		threadManager = 0;
 	}
+	LEAVECRITICALSECTION(criticalSection);
 }
 
 asCThreadManager::~asCThreadManager()
 {
 #ifndef AS_NO_THREADS
-	ENTERCRITICALSECTION(criticalSection);
-
 	// Delete all thread local datas
 	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
 	if( tldMap.MoveFirst(&cursor) )
@@ -105,8 +122,6 @@ asCThreadManager::~asCThreadManager()
 			}
 		} while( tldMap.MoveNext(&cursor, cursor) );
 	}
-
-	LEAVECRITICALSECTION(criticalSection);
 #else
 	if( tld ) 
 	{
@@ -128,16 +143,22 @@ int asCThreadManager::CleanupLocalData()
 
 	ENTERCRITICALSECTION(criticalSection);
 
-	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
-	if( tldMap.MoveTo(&cursor, id) )
+	if( threadManager == 0 )
 	{
-		asCThreadLocalData *tld = tldMap.GetValue(cursor);
+		LEAVECRITICALSECTION(criticalSection);
+		return 0;
+	}
+
+	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
+	if( threadManager->tldMap.MoveTo(&cursor, id) )
+	{
+		asCThreadLocalData *tld = threadManager->tldMap.GetValue(cursor);
 		
 		// Can we really remove it at this time?
 		if( tld->activeContexts.GetLength() == 0 )
 		{
 			asDELETE(tld,asCThreadLocalData);
-			tldMap.Erase(cursor);
+			threadManager->tldMap.Erase(cursor);
 			r = 0;
 		}
 		else
@@ -148,12 +169,12 @@ int asCThreadManager::CleanupLocalData()
 
 	return r;
 #else
-	if( tld )
+	if( threadManager && threadManager->tld )
 	{
-		if( tld->activeContexts.GetLength() == 0 )
+		if( threadManager->tld->activeContexts.GetLength() == 0 )
 		{
-			asDELETE(tld,asCThreadLocalData);
-			tld = 0;
+			asDELETE(threadManager->tld,asCThreadLocalData);
+			threadManager->tld = 0;
 		}
 		else
 			return asCONTEXT_ACTIVE;
@@ -165,26 +186,22 @@ int asCThreadManager::CleanupLocalData()
 #ifndef AS_NO_THREADS
 asCThreadLocalData *asCThreadManager::GetLocalData(asPWORD threadId)
 {
+	// We're already in the critical section when this function is called
+
 	asCThreadLocalData *tld = 0;
 
-	ENTERCRITICALSECTION(criticalSection);
-
 	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
-	if( tldMap.MoveTo(&cursor, threadId) )
-		tld = tldMap.GetValue(cursor);
-
-	LEAVECRITICALSECTION(criticalSection);
+	if( threadManager->tldMap.MoveTo(&cursor, threadId) )
+		tld = threadManager->tldMap.GetValue(cursor);
 
 	return tld;
 }
 
 void asCThreadManager::SetLocalData(asPWORD threadId, asCThreadLocalData *tld)
 {
-	ENTERCRITICALSECTION(criticalSection);
+	// We're already in the critical section when this function is called
 
 	tldMap.Insert(threadId, tld);
-
-	LEAVECRITICALSECTION(criticalSection);
 }
 #endif
 
@@ -196,21 +213,36 @@ asCThreadLocalData *asCThreadManager::GetLocalData()
 #elif defined AS_WINDOWS_THREADS
 	asPWORD id = (asPWORD)GetCurrentThreadId();
 #endif
-		
-	asCThreadLocalData *tld = GetLocalData(id);
+
+	ENTERCRITICALSECTION(criticalSection);
+
+	asASSERT(threadManager);
+
+	if( threadManager == 0 )
+	{
+		LEAVECRITICALSECTION(criticalSection);
+		return 0;
+	}
+
+	asCThreadLocalData *tld = threadManager->GetLocalData(id);
 	if( tld == 0 )
 	{
 		// Create a new tld
 		tld = asNEW(asCThreadLocalData)();
-		SetLocalData(id, tld);
+		threadManager->SetLocalData(id, tld);
 	}
+
+	LEAVECRITICALSECTION(criticalSection);
 
 	return tld;
 #else
-	if( tld == 0 )
-		tld = asNEW(asCThreadLocalData)();
+	if( threadManager == 0 )
+		return 0;
 
-	return tld;
+	if( threadManager->tld == 0 )
+		threadManager->tld = asNEW(asCThreadLocalData)();
+
+	return threadManager->tld;
 #endif
 }
 

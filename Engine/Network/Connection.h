@@ -194,7 +194,7 @@ private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first.
-    void ProcessNode(Node* node);
+    void ProcessNode(unsigned nodeID);
     /// Process a node that the client has not yet received.
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received.

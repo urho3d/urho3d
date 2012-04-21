@@ -384,13 +384,7 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 
 asCScriptEngine::asCScriptEngine() 
 {
-	// Instanciate the thread manager
-	ENTERCRITICALSECTION(engineCritical);
-	if( threadManager == 0 )
-		threadManager = asNEW(asCThreadManager);
-	else
-		threadManager->AddRef();
-	LEAVECRITICALSECTION(engineCritical);
+	asCThreadManager::AddRef();
 
 	// Engine properties
 	{
@@ -672,8 +666,7 @@ asCScriptEngine::~asCScriptEngine()
 	if( userData && cleanEngineFunc )
 		cleanEngineFunc(this);
 
-	// Release the thread manager
-	threadManager->Release();
+	asCThreadManager::Release();
 }
 
 // interface
@@ -2968,6 +2961,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 		}
 		func->inOutFlags[p-1] = factory->inOutFlags[p];
 	}
+	func->objVariablesOnHeap = 0;
 
 	SetScriptFunction(func);
 
@@ -3493,7 +3487,7 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 
 
 // TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
-/// Urho3D: modified for type id caching
+// Urho3D: modified for type id caching
 int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 {
 	if( dtIn.IsNullHandle() ) return 0;
@@ -3617,8 +3611,7 @@ const char *asCScriptEngine::GetTypeDeclaration(int typeId, bool includeNamespac
 {
 	asCDataType dt = GetDataTypeFromTypeId(typeId);
 
-	asASSERT(threadManager);
-	asCString *tempString = &threadManager->GetLocalData()->string;
+	asCString *tempString = &asCThreadManager::GetLocalData()->string;
 	*tempString = dt.Format(includeNamespace);
 
 	return tempString->AddressOf();
@@ -3685,7 +3678,7 @@ void asCScriptEngine::ConstructScriptObjectCopy(void *mem, void *obj, asCObjectT
 	// This function is only meant to be used for value types
 	asASSERT( type->flags & asOBJ_VALUE );
 
-	// TODO: optimize: Should use the copy constructor when available
+	// TODO: runtime optimize: Should use the copy constructor when available
 	int funcIndex = type->beh.construct;
 	if( funcIndex )
 		CallObjectMethod(mem, funcIndex);

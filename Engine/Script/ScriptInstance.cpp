@@ -175,11 +175,7 @@ void ScriptInstance::DelayedExecute(float delay, const String& declaration, cons
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if (!methods_[METHOD_UPDATE] && !HasSubscribedToEvent(E_SCENEUPDATE))
-    {
-        Node* node = GetNode();
-        if (node)
-            SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
-    }
+        SubscribeToEvent(GetScene(), E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
 }
 
 void ScriptInstance::ClearDelayedExecute()
@@ -357,25 +353,21 @@ void ScriptInstance::GetSupportedMethods()
         methods_[i] = scriptFile_->GetMethod(scriptObject_, methodDeclarations[i]);
     
     // Subscribe to the update events as supported
-    Node* node = GetNode();
-    if (node)
+    Scene* scene = GetScene();
+    if (scene)
     {
-        Scene* scene = node->GetScene();
-        if (scene)
+        if (methods_[METHOD_UPDATE])
+            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
+        if (methods_[METHOD_POSTUPDATE])
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
+        
+        PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+        if (world)
         {
-            if (methods_[METHOD_UPDATE])
-                SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
-            if (methods_[METHOD_POSTUPDATE])
-                SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
-            
-            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-            if (world)
-            {
-                if (methods_[METHOD_FIXEDUPDATE])
-                    SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
-                if (methods_[METHOD_FIXEDPOSTUPDATE])
-                    SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
-            }
+            if (methods_[METHOD_FIXEDUPDATE])
+                SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
+            if (methods_[METHOD_FIXEDPOSTUPDATE])
+                SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
         }
     }
 }

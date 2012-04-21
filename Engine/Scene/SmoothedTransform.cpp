@@ -149,7 +149,7 @@ void SmoothedTransform::OnNodeSet(Node* node)
         targetRotation_ = node->GetRotation();
         
         // Subscribe to smoothing update
-        Scene* scene = node_->GetScene();
+        Scene* scene = GetScene();
         if (scene)
             SubscribeToEvent(scene, E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
     }

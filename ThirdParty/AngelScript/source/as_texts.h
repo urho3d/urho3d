@@ -46,6 +46,7 @@
 
 #define TXT_BOTH_MUST_BE_SAME                     "Both expressions must have the same type"
 #define TXT_BOTH_CONDITIONS_MUST_CALL_CONSTRUCTOR "Both conditions must call constructor"
+#define TEXT_BASE_DOESNT_HAVE_DEF_CONSTR          "Base class doesn't have default constructor. Make explicit call to base constructor"
 
 #define TXT_CANDIDATES_ARE                       "Candidates are:"
 #define TXT_CANNOT_CALL_CONSTRUCTOR_IN_LOOPS     "Can't call a constructor in loops"
@@ -168,6 +169,7 @@
 #define TXT_ONLY_ONE_ARGUMENT_IN_CAST      "A cast operator has one argument"
 #define TXT_ONLY_ONE_FUNCTION_ALLOWED      "The code must contain one and only one function"
 #define TXT_ONLY_ONE_VARIABLE_ALLOWED      "The code must contain one and only one global variable"
+#define TXT_OPERANDS_MUST_BE_HANDLES       "Both operands must be handles when comparing identity"
 
 #define TXT_PARAMETER_ALREADY_DECLARED            "Parameter already declared"
 #define TXT_PARAMETER_CANT_BE_s                   "Parameter type can't be '%s', because the type cannot be instanciated."
