@@ -75,7 +75,7 @@ public:
     }
     
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside)
     {
         if (inside)
             return INSIDE;
@@ -83,18 +83,20 @@ public:
             return frustum_.IsInside(box);
     }
     
-    /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    /// Intersection test for drawables.
+    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        if (drawable->GetCastShadows())
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside)
-                return INSIDE;
-            else
-                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
+                (drawable->GetViewMask() & viewMask_))
+            {
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
         }
-        else
-            return OUTSIDE;
     }
     
     /// Frustum.
@@ -114,7 +116,7 @@ public:
     }
     
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside)
     {
         if (inside)
             return INSIDE;
@@ -122,19 +124,21 @@ public:
             return frustum_.IsInside(box);
     }
     
-    /// Intersection test for a drawable.
-    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    /// Intersection test for drawables.
+    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        unsigned char flags = drawable->GetDrawableFlags();
-        if (flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder()))
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside)
-                return INSIDE;
-            else
-                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
+            Drawable* drawable = *i;
+            unsigned char flags = drawable->GetDrawableFlags();
+            
+            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
+                (drawable->GetViewMask() & viewMask_))
+            {
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
         }
-        else
-            return OUTSIDE;
     }
     
     /// Frustum.
@@ -155,7 +159,7 @@ public:
     }
     
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside)
     {
         if (inside)
             return buffer_->IsVisible(box) ? INSIDE : OUTSIDE;
@@ -168,15 +172,19 @@ public:
         }
     }
     
-    /// Intersection test for a drawable. Note: drawable occlusion is performed later in worker threads.
-    virtual Intersection TestDrawable(Drawable* drawable, bool inside) const
+    /// Intersection test for drawables. Note: drawable occlusion is performed later in worker threads.
+    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        const BoundingBox& box = drawable->GetWorldBoundingBox();
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        {
+            Drawable* drawable = *i;
         
-        if (inside)
-            return INSIDE;
-        else
-            return frustum_.IsInsideFast(box);
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            {
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
+        }
     }
     
     /// Frustum.

@@ -219,20 +219,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
     }
     
     if (drawables_.Size())
-    {
-        Drawable** ptr = const_cast<Drawable**>(&drawables_.Front());
-        Drawable** end = ptr + drawables_.Size();
-       
-        while (ptr != end)
-        {
-            Drawable* drawable = *ptr;
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() && 
-                (drawable->GetViewMask() & query.viewMask_) && (query.TestDrawable(drawable, inside) != OUTSIDE))
-                query.result_.Push(drawable);
-            
-            ++ptr;
-        }
-    }
+        query.TestDrawables(drawables_, inside);
     
     if (children_[0])
         children_[0]->GetDrawablesInternal(query, inside);
