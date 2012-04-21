@@ -28,64 +28,64 @@
 
 Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (!inside)
-        return box.IsInside(point_);
-    else
+    if (inside)
         return INSIDE;
+    else
+        return box.IsInside(point_);
 }
 
 Intersection PointOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
-    if (!inside)
-        return drawable->GetWorldBoundingBox().IsInside(point_);
-    else
+    if (inside)
         return INSIDE;
+    else
+        return drawable->GetWorldBoundingBox().IsInside(point_);
 }
 
 Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (!inside)
-        return sphere_.IsInside(box);
-    else
+    if (inside)
         return INSIDE;
+    else
+        return sphere_.IsInside(box);
 }
 
 Intersection SphereOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
-    if (!inside)
-        return sphere_.IsInsideFast(drawable->GetWorldBoundingBox());
-    else
+    if (inside)
         return INSIDE;
+    else
+        return sphere_.IsInsideFast(drawable->GetWorldBoundingBox());
 }
 
 Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (!inside)
-        return box_.IsInside(box);
-    else
+    if (inside)
         return INSIDE;
+    else
+        return box_.IsInside(box);
 }
 
 Intersection BoxOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
-    if (!inside)
-        return box_.IsInsideFast(drawable->GetWorldBoundingBox());
-    else
+    if (inside)
         return INSIDE;
+    else
+        return box_.IsInsideFast(drawable->GetWorldBoundingBox());
 }
 
 Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (!inside)
-        return frustum_.IsInside(box);
-    else
+    if (inside)
         return INSIDE;
+    else
+        return frustum_.IsInside(box);
 }
 
 Intersection FrustumOctreeQuery::TestDrawable(Drawable* drawable, bool inside) const
 {
-    if (!inside)
-        return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
-    else
+    if (inside)
         return INSIDE;
+    else
+        return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
 }

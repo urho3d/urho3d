@@ -209,30 +209,47 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
     if (this != root_)
     {
         Intersection res = query.TestOctant(cullingBox_, inside);
-        if (res == OUTSIDE)
-            // Fully outside, so cull this octant, its children & drawables
-            return;
         if (res == INSIDE)
             inside = true;
+        else if (res == OUTSIDE)
+        {
+            // Fully outside, so cull this octant, its children & drawables
+            return;
+        }
     }
     
-    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    if (drawables_.Size())
     {
-        Drawable* drawable = *i;
-        
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
-            !(drawable->GetViewMask() & query.viewMask_))
-            continue;
-        
-        if (query.TestDrawable(drawable, inside) != OUTSIDE)
-            query.result_.Push(drawable);
+        Drawable** ptr = const_cast<Drawable**>(&drawables_.Front());
+        Drawable** end = ptr + drawables_.Size();
+       
+        while (ptr != end)
+        {
+            Drawable* drawable = *ptr;
+            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() && 
+                (drawable->GetViewMask() & query.viewMask_) && (query.TestDrawable(drawable, inside) != OUTSIDE))
+                query.result_.Push(drawable);
+            
+            ++ptr;
+        }
     }
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query, inside);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesInternal(query, inside);
+    if (children_[1])
+        children_[1]->GetDrawablesInternal(query, inside);
+    if (children_[2])
+        children_[2]->GetDrawablesInternal(query, inside);
+    if (children_[3])
+        children_[3]->GetDrawablesInternal(query, inside);
+    if (children_[4])
+        children_[4]->GetDrawablesInternal(query, inside);
+    if (children_[5])
+        children_[5]->GetDrawablesInternal(query, inside);
+    if (children_[6])
+        children_[6]->GetDrawablesInternal(query, inside);
+    if (children_[7])
+        children_[7]->GetDrawablesInternal(query, inside);
 }
 
 void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
@@ -244,23 +261,38 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     if (octantDist > query.maxDistance_)
         return;
     
-    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    if (drawables_.Size())
     {
-        Drawable* drawable = *i;
-        unsigned drawableFlags = drawable->GetDrawableFlags();
-        
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
-            !(drawable->GetViewMask() & query.viewMask_))
-            continue;
-        
-        drawable->ProcessRayQuery(query, query.result_);
+        Drawable** ptr = const_cast<Drawable**>(&drawables_.Front());
+        Drawable** end = ptr + drawables_.Size();
+       
+        while (ptr != end)
+        {
+            Drawable* drawable = *ptr;
+            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() &&
+                (drawable->GetViewMask() & query.viewMask_))
+                drawable->ProcessRayQuery(query, query.result_);
+            
+            ++ptr;
+        }
     }
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesInternal(query);
+    if (children_[1])
+        children_[1]->GetDrawablesInternal(query);
+    if (children_[2])
+        children_[2]->GetDrawablesInternal(query);
+    if (children_[3])
+        children_[3]->GetDrawablesInternal(query);
+    if (children_[4])
+        children_[4]->GetDrawablesInternal(query);
+    if (children_[5])
+        children_[5]->GetDrawablesInternal(query);
+    if (children_[6])
+        children_[6]->GetDrawablesInternal(query);
+    if (children_[7])
+        children_[7]->GetDrawablesInternal(query);
 }
 
 void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
@@ -272,23 +304,38 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
     if (octantDist > query.maxDistance_)
         return;
     
-    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    if (drawables_.Size())
     {
-        Drawable* drawable = *i;
-        unsigned drawableFlags = drawable->GetDrawableFlags();
-        
-        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !drawable->IsVisible() ||
-            !(drawable->GetViewMask() & query.viewMask_))
-            continue;
-        
-        drawables.Push(drawable);
+        Drawable** ptr = const_cast<Drawable**>(&drawables_.Front());
+        Drawable** end = ptr + drawables_.Size();
+       
+        while (ptr != end)
+        {
+            Drawable* drawable = *ptr;
+            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() &&
+                (drawable->GetViewMask() & query.viewMask_))
+                drawables.Push(drawable);
+            
+            ++ptr;
+        }
     }
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesOnlyInternal(query, drawables);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[1])
+        children_[1]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[2])
+        children_[2]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[3])
+        children_[3]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[4])
+        children_[4]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[5])
+        children_[5]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[6])
+        children_[6]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[7])
+        children_[7]->GetDrawablesOnlyInternal(query, drawables);
 }
 
 void Octant::Release()

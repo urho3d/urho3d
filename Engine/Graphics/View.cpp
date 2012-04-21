@@ -77,10 +77,10 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
     {
-        if (!inside)
-            return frustum_.IsInside(box);
-        else
+        if (inside)
             return INSIDE;
+        else
+            return frustum_.IsInside(box);
     }
     
     /// Intersection test for a drawable.
@@ -88,10 +88,10 @@ public:
     {
         if (drawable->GetCastShadows())
         {
-            if (!inside)
-                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
-            else
+            if (inside)
                 return INSIDE;
+            else
+                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
         }
         else
             return OUTSIDE;
@@ -116,10 +116,10 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
     {
-        if (!inside)
-            return frustum_.IsInside(box);
-        else
+        if (inside)
             return INSIDE;
+        else
+            return frustum_.IsInside(box);
     }
     
     /// Intersection test for a drawable.
@@ -128,10 +128,10 @@ public:
         unsigned char flags = drawable->GetDrawableFlags();
         if (flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder()))
         {
-            if (!inside)
-                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
-            else
+            if (inside)
                 return INSIDE;
+            else
+                return frustum_.IsInsideFast(drawable->GetWorldBoundingBox());
         }
         else
             return OUTSIDE;
@@ -157,15 +157,15 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const
     {
-        if (!inside)
+        if (inside)
+            return buffer_->IsVisible(box) ? INSIDE : OUTSIDE;
+        else
         {
             Intersection result = frustum_.IsInside(box);
             if (result != OUTSIDE && !buffer_->IsVisible(box))
                 result = OUTSIDE;
             return result;
         }
-        else
-            return buffer_->IsVisible(box) ? INSIDE : OUTSIDE;
     }
     
     /// Intersection test for a drawable. Note: drawable occlusion is performed later in worker threads.
@@ -173,10 +173,10 @@ public:
     {
         const BoundingBox& box = drawable->GetWorldBoundingBox();
         
-        if (!inside)
-            return frustum_.IsInsideFast(box);
-        else
+        if (inside)
             return INSIDE;
+        else
+            return frustum_.IsInsideFast(box);
     }
     
     /// Frustum.
