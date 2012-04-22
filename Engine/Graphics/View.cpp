@@ -295,9 +295,14 @@ void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
 void SortLightQueueWork(const WorkItem* item, unsigned threadIndex)
 {
     LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
+    start->litBatches_.SortFrontToBack();
+}
+
+void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
+{
+    LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
     for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
         start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
-    start->litBatches_.SortFrontToBack();
 }
 
 OBJECTTYPESTATIC(View);
@@ -920,7 +925,7 @@ void View::GetBatches()
                 
                 // Check here if the material technique refers to a rendertarget texture with camera(s) attached
                 // Only check this for the main view (null rendertarget)
-                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
+                if (baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
                     CheckMaterialForAuxView(baseBatch.material_);
                 
                 // Fill the rest of the batch
@@ -1075,6 +1080,11 @@ void View::UpdateGeometries()
             item.workFunction_ = SortLightQueueWork;
             item.start_ = &(*i);
             queue->AddWorkItem(item);
+            if ((*i).shadowSplits_.Size())
+            {
+                item.workFunction_ = SortShadowQueueWork;
+                queue->AddWorkItem(item);
+            }
         }
     }
     
