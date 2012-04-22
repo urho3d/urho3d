@@ -34,14 +34,11 @@ Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
         return box.IsInside(point_);
 }
 
-void PointOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+void PointOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
 {
-    Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-    Drawable** end = ptr + drawables.Size();
-    
-    while (ptr != end)
+    while (start != end)
     {
-        Drawable* drawable = *ptr;
+        Drawable* drawable = *start;
         
         if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
         {
@@ -49,7 +46,7 @@ void PointOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool
                 result_.Push(drawable);
         }
         
-        ++ptr;
+        ++start;
     }
 }
 
@@ -61,14 +58,11 @@ Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
         return sphere_.IsInside(box);
 }
 
-void SphereOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+void SphereOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
 {
-    Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-    Drawable** end = ptr + drawables.Size();
-    
-    while (ptr != end)
+    while (start != end)
     {
-        Drawable* drawable = *ptr;
+        Drawable* drawable = *start;
         
         if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
         {
@@ -76,7 +70,7 @@ void SphereOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, boo
                 result_.Push(drawable);
         }
         
-        ++ptr;
+        ++start;
     }
 }
 
@@ -88,14 +82,11 @@ Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
         return box_.IsInside(box);
 }
 
-void BoxOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+void BoxOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
 {
-    Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-    Drawable** end = ptr + drawables.Size();
-    
-    while (ptr != end)
+    while (start != end)
     {
-        Drawable* drawable = *ptr;
+        Drawable* drawable = *start;
         
         if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
         {
@@ -103,7 +94,7 @@ void BoxOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool i
                 result_.Push(drawable);
         }
         
-        ++ptr;
+        ++start;
     }
 }
 
@@ -115,14 +106,11 @@ Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
         return frustum_.IsInside(box);
 }
 
-void FrustumOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+void FrustumOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
 {
-    Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-    Drawable** end = ptr + drawables.Size();
-    
-    while (ptr != end)
+    while (start != end)
     {
-        Drawable* drawable = *ptr;
+        Drawable* drawable = *start;
         
         if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
         {
@@ -130,6 +118,6 @@ void FrustumOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bo
                 result_.Push(drawable);
         }
         
-        ++ptr;
+        ++start;
     }
 }

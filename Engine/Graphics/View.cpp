@@ -84,14 +84,11 @@ public:
     }
     
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside)
     {
-        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-        Drawable** end = ptr + drawables.Size();
-        
-        while (ptr != end)
+        while (start != end)
         {
-            Drawable* drawable = *ptr;
+            Drawable* drawable = *start;
             
             if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
                 (drawable->GetViewMask() & viewMask_))
@@ -100,7 +97,7 @@ public:
                     result_.Push(drawable);
             }
             
-            ++ptr;
+            ++start;
         }
     }
     
@@ -130,14 +127,11 @@ public:
     }
     
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside)
     {
-        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-        Drawable** end = ptr + drawables.Size();
-        
-        while (ptr != end)
+        while (start != end)
         {
-            Drawable* drawable = *ptr;
+            Drawable* drawable = *start;
             unsigned char flags = drawable->GetDrawableFlags();
             
             if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
@@ -147,7 +141,7 @@ public:
                     result_.Push(drawable);
             }
             
-            ++ptr;
+            ++start;
         }
     }
     
@@ -183,14 +177,11 @@ public:
     }
     
     /// Intersection test for drawables. Note: drawable occlusion is performed later in worker threads.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside)
     {
-        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
-        Drawable** end = ptr + drawables.Size();
-        
-        while (ptr != end)
+        while (start != end)
         {
-            Drawable* drawable = *ptr;
+            Drawable* drawable = *start;
             
             if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
                 (drawable->GetViewMask() & viewMask_))
@@ -199,7 +190,7 @@ public:
                     result_.Push(drawable);
             }
             
-            ++ptr;
+            ++start;
         }
     }
     

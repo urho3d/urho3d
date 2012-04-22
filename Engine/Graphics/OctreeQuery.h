@@ -52,7 +52,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) = 0;
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside) = 0;
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) = 0;
     
     /// Result vector reference.
     PODVector<Drawable*>& result_;
@@ -77,7 +77,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside);
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
     
     /// Point.
     Vector3 point_;
@@ -98,7 +98,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside);
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
     
     /// Sphere.
     Sphere sphere_;
@@ -119,7 +119,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside);
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
     
     /// Bounding box.
     BoundingBox box_;
@@ -140,7 +140,7 @@ public:
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
-    virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside);
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
     
     /// Frustum.
     Frustum frustum_;
