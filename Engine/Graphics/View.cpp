@@ -894,14 +894,18 @@ void View::GetBatches()
                 Batch baseBatch;
                 drawable->GetBatch(baseBatch, frame_, j);
                 
-                Technique* tech = GetTechnique(drawable, baseBatch.material_);
-                if (!baseBatch.geometry_ || !tech)
-                    continue;
-                
                 // Check here if the material technique refers to a rendertarget texture with camera(s) attached
                 // Only check this for the main view (null rendertarget)
                 if (baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
                     CheckMaterialForAuxView(baseBatch.material_);
+                
+                // If already has a lit base pass, skip (forward rendering only)
+                if (j < 32 && drawable->HasBasePass(j))
+                    continue;
+                
+                Technique* tech = GetTechnique(drawable, baseBatch.material_);
+                if (!baseBatch.geometry_ || !tech)
+                    continue;
                 
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
@@ -932,14 +936,9 @@ void View::GetBatches()
                 if (renderMode_ == RENDER_DEFERRED)
                     pass = tech->GetPass(PASS_DEFERRED);
                 
-                // Next check for forward base pass
+                // Next check for forward unlit base pass
                 if (!pass)
-                {
-                    // Skip if a lit base pass already exists (only in forward rendering)
-                    if (j < 32 && drawable->HasBasePass(j))
-                        continue;
                     pass = tech->GetPass(PASS_BASE);
-                }
                 
                 if (pass)
                 {
