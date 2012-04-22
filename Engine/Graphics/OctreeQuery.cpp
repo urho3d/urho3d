@@ -36,14 +36,27 @@ Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
 
 void PointOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
 {
-    for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+    if (inside)
     {
-        Drawable* drawable = *i;
-        
-        if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside || drawable->GetWorldBoundingBox().IsInside(point_))
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
                 result_.Push(drawable);
+        }
+    }
+    else
+    {
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            {
+                if (drawable->GetWorldBoundingBox().IsInside(point_))
+                    result_.Push(drawable);
+            }
         }
     }
 }
@@ -58,14 +71,27 @@ Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
 
 void SphereOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
 {
-    for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+    if (inside)
     {
-        Drawable* drawable = *i;
-        
-        if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside || sphere_.IsInsideFast(drawable->GetWorldBoundingBox()))
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
                 result_.Push(drawable);
+        }
+    }
+    else
+    {
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            {
+                if (sphere_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
         }
     }
 }
@@ -80,14 +106,27 @@ Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
 
 void BoxOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
 {
-    for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+    if (inside)
     {
-        Drawable* drawable = *i;
-        
-        if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside || box_.IsInsideFast(drawable->GetWorldBoundingBox()))
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
                 result_.Push(drawable);
+        }
+    }
+    else
+    {
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            {
+                if (box_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
         }
     }
 }
@@ -102,14 +141,27 @@ Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
 
 void FrustumOctreeQuery::TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
 {
-    for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+    if (inside)
     {
-        Drawable* drawable = *i;
-        
-        if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
         {
-            if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
                 result_.Push(drawable);
+        }
+    }
+    else
+    {
+        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            {
+                if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                    result_.Push(drawable);
+            }
         }
     }
 }

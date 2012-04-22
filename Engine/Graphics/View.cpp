@@ -86,15 +86,29 @@ public:
     /// Intersection test for drawables.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        if (inside)
         {
-            Drawable* drawable = *i;
-            
-            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
-                (drawable->GetViewMask() & viewMask_))
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
             {
-                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                Drawable* drawable = *i;
+                
+                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
                     result_.Push(drawable);
+            }
+        }
+        else
+        {
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+            {
+                Drawable* drawable = *i;
+                
+                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
+                {
+                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                        result_.Push(drawable);
+                }
             }
         }
     }
@@ -127,16 +141,31 @@ public:
     /// Intersection test for drawables.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        if (inside)
         {
-            Drawable* drawable = *i;
-            unsigned char flags = drawable->GetDrawableFlags();
-            
-            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
-                (drawable->GetViewMask() & viewMask_))
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
             {
-                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                Drawable* drawable = *i;
+                unsigned char flags = drawable->GetDrawableFlags();
+                
+                if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
                     result_.Push(drawable);
+            }
+        }
+        else
+        {
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+            {
+                Drawable* drawable = *i;
+                unsigned char flags = drawable->GetDrawableFlags();
+                
+                if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
+                {
+                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                        result_.Push(drawable);
+                }
             }
         }
     }
@@ -175,14 +204,29 @@ public:
     /// Intersection test for drawables. Note: drawable occlusion is performed later in worker threads.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+        if (inside)
         {
-            Drawable* drawable = *i;
-        
-            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() && (drawable->GetViewMask() & viewMask_))
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
             {
-                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                Drawable* drawable = *i;
+            
+                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
                     result_.Push(drawable);
+            }
+        }
+        else
+        {
+            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+            {
+                Drawable* drawable = *i;
+            
+                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
+                    (drawable->GetViewMask() & viewMask_))
+                {
+                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
+                        result_.Push(drawable);
+                }
             }
         }
     }
