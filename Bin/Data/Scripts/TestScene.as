@@ -22,6 +22,8 @@ void Start()
     else
         OpenConsoleWindow();
 
+    ParseNetworkArguments();
+
     InitScene();
 
     SubscribeToEvent("Update", "HandleUpdate");
@@ -33,8 +35,7 @@ void Start()
     SubscribeToEvent("SpawnBox", "HandleSpawnBox");
 
     network.RegisterRemoteEvent("SpawnBox");
-    
-    ParseNetworkArguments();
+
     if (runServer)
     {
         network.StartServer(serverPort);
@@ -50,8 +51,6 @@ void Start()
     }
     if (runClient)
     {
-        testScene.Clear();
-
         // Test package download. Remove existing Data.pak from resource cache so that it will be downloaded
         // However, be sure to add the Data directory so that resource requests do not fail in the meanwhile
         String packageName = fileSystem.programDir + "Data.pak";
@@ -93,6 +92,33 @@ void InitUI()
 void InitScene()
 {
     testScene = Scene("TestScene");
+
+    // Enable access to this script file & scene from the console
+    script.defaultScene = testScene;
+    script.defaultScriptFile = scriptFile;
+
+    // Create the camera outside the scene so it is unaffected by scene load/save
+    cameraNode = Node();
+    camera = cameraNode.CreateComponent("Camera");
+    cameraNode.position = Vector3(0, 2, 0);
+
+    if (!engine.headless)
+    {
+        edgeFilter = PostProcess();
+        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
+        edgeFilter.active = false; // Start out disabled
+
+        bloom = PostProcess();
+        bloom.parameters = cache.GetResource("XMLFile", "PostProcess/Bloom.xml");
+        bloom.active = false;
+
+        renderer.viewports[0] = Viewport(testScene, camera);
+        renderer.viewports[0].AddPostProcess(edgeFilter);
+        renderer.viewports[0].AddPostProcess(bloom);
+    }
+    
+    if (runClient)
+        return;
 
     PhysicsWorld@ world = testScene.CreateComponent("PhysicsWorld");
     testScene.CreateComponent("Octree");
@@ -195,30 +221,6 @@ void InitScene()
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
         ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0f);
-    }
-
-    // Enable access to this script file & scene from the console
-    script.defaultScene = testScene;
-    script.defaultScriptFile = scriptFile;
-
-    // Create the camera outside the scene so it is unaffected by scene load/save
-    cameraNode = Node();
-    camera = cameraNode.CreateComponent("Camera");
-    cameraNode.position = Vector3(0, 2, 0);
-
-    if (!engine.headless)
-    {
-        edgeFilter = PostProcess();
-        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
-        edgeFilter.active = false; // Start out disabled
-
-        bloom = PostProcess();
-        bloom.parameters = cache.GetResource("XMLFile", "PostProcess/Bloom.xml");
-        bloom.active = false;
-
-        renderer.viewports[0] = Viewport(testScene, camera);
-        renderer.viewports[0].AddPostProcess(edgeFilter);
-        renderer.viewports[0].AddPostProcess(bloom);
     }
 }
 

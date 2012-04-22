@@ -799,6 +799,7 @@ void View::GetBatches()
                             allGeometries_.Push(drawable);
                         }
                         
+                        Zone* zone = GetZone(drawable);
                         unsigned numBatches = drawable->GetNumBatches();
                         
                         for (unsigned l = 0; l < numBatches; ++l)
@@ -817,7 +818,7 @@ void View::GetBatches()
                             
                             // Fill the rest of the batch
                             shadowBatch.camera_ = shadowCamera;
-                            shadowBatch.zone_ = GetZone(drawable);
+                            shadowBatch.zone_ = zone;
                             shadowBatch.lightQueue_ = &lightQueue;
                             
                             FinalizeBatch(shadowBatch, tech, pass);
@@ -900,7 +901,9 @@ void View::GetBatches()
         for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
         {
             Drawable* drawable = *i;
+            Zone* zone = GetZone(drawable);
             unsigned numBatches = drawable->GetNumBatches();
+            
             const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
             if (!drawableVertexLights.Empty())
                 drawable->LimitVertexLights();
@@ -921,7 +924,7 @@ void View::GetBatches()
                 
                 // Fill the rest of the batch
                 baseBatch.camera_ = camera_;
-                baseBatch.zone_ = GetZone(drawable);
+                baseBatch.zone_ = zone;
                 baseBatch.isBase_ = true;
                 
                 Pass* pass = 0;
@@ -1125,12 +1128,12 @@ void View::UpdateGeometries()
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
-    Light* firstLight = drawable->GetFirstLight();
     Zone* zone = GetZone(drawable);
+    
+    bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool hasVertexLights = drawable->GetVertexLights().Size() > 0;
-    bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
+    bool allowLitBase = light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -1151,7 +1154,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
-        if (i < 32 && light == firstLight && !hasVertexLights && !hasAmbientGradient && !drawable->HasBasePass(i))
+        if (i < 32 && allowLitBase)
         {
             pass = tech->GetPass(PASS_LITBASE);
             if (pass)
@@ -1171,7 +1174,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         // Fill the rest of the batch
         litBatch.camera_ = camera_;
         litBatch.lightQueue_ = &lightQueue;
-        litBatch.zone_ = GetZone(drawable);
+        litBatch.zone_ = zone;
         
         // Check from the ambient pass whether the object is opaque or transparent
         Pass* ambientPass = tech->GetPass(PASS_BASE);

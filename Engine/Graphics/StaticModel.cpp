@@ -165,7 +165,7 @@ unsigned StaticModel::GetNumBatches()
 void StaticModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
     batch.distance_ = geometryDistances_[batchIndex];
-    batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
+    batch.geometry_ = currentGeometries_[batchIndex];
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];
 }
@@ -354,11 +354,13 @@ void StaticModel::ResetLodLevels()
 {
     // Ensure that each subgeometry has at least one LOD level, and reset the current LOD level
     lodLevels_.Resize(geometries_.Size());
+    currentGeometries_.Resize(geometries_.Size());
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         if (!geometries_[i].Size())
             geometries_[i].Resize(1);
         lodLevels_[i] = 0;
+        currentGeometries_[i] = geometries_[i][0];
     }
     
     // Find out the real LOD levels on next geometry update
@@ -376,6 +378,7 @@ void StaticModel::CalculateLodLevels()
                 break;
         }
         lodLevels_[i] = j - 1;
+        currentGeometries_[i] = geometries_[i][lodLevels_[i]];
     }
 }
 

@@ -85,4 +85,6 @@ private:
     float snapThreshold_;
     /// Active smoothing operations bitmask.
     unsigned char smoothingMask_;
+    /// Subscribed to smoothing update event flag.
+    bool subscribed_;
 };

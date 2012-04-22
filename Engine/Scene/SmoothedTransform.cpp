@@ -40,7 +40,8 @@ SmoothedTransform::SmoothedTransform(Context* context) :
     targetRotation_(Quaternion::IDENTITY),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
-    smoothingMask_(SMOOTH_NONE)
+    smoothingMask_(SMOOTH_NONE),
+    subscribed_(false)
 {
 }
 
@@ -92,12 +93,27 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
             node_->SetRotation(rotation);
         }
     }
+    
+    // If smoothing has completed, unsubscribe from the update event
+    if (!smoothingMask_)
+    {
+        UnsubscribeFromEvent(GetScene(), E_UPDATESMOOTHING);
+        subscribed_ = false;
+    }
 }
 
 void SmoothedTransform::SetTargetPosition(const Vector3& position)
 {
     targetPosition_ = position;
     smoothingMask_ |= SMOOTH_POSITION;
+    
+    // Subscribe to smoothing update if not yet subscribed
+    if (!subscribed_)
+    {
+        SubscribeToEvent(GetScene(), E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
+        subscribed_ = true;
+    }
+    
     SendEvent(E_TARGETPOSITION);
 }
 
@@ -105,6 +121,13 @@ void SmoothedTransform::SetTargetRotation(const Quaternion& rotation)
 {
     targetRotation_ = rotation;
     smoothingMask_ |= SMOOTH_ROTATION;
+    
+    if (!subscribed_)
+    {
+        SubscribeToEvent(GetScene(), E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
+        subscribed_ = true;
+    }
+    
     SendEvent(E_TARGETROTATION);
 }
 
@@ -147,11 +170,6 @@ void SmoothedTransform::OnNodeSet(Node* node)
         // Copy initial target transform
         targetPosition_ = node->GetPosition();
         targetRotation_ = node->GetRotation();
-        
-        // Subscribe to smoothing update
-        Scene* scene = GetScene();
-        if (scene)
-            SubscribeToEvent(scene, E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
     }
 }
 

@@ -257,7 +257,7 @@ UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
     batch.distance_ = geometryDistances_[batchIndex];
-    batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
+    batch.geometry_ = currentGeometries_[batchIndex];
     batch.geometryType_ = GEOM_SKINNED;
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];

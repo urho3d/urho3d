@@ -98,7 +98,7 @@ protected:
     SharedPtr<Model> model_;
     /// Bounding box.
     BoundingBox boundingBox_;
-    /// Geometries.
+    /// All geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Geometry centers.
     PODVector<Vector3> geometryCenters_;
@@ -106,6 +106,8 @@ protected:
     PODVector<float> geometryDistances_;
     /// LOD levels.
     PODVector<unsigned> lodLevels_;
+    /// Current geometries chosen with LOD.
+    PODVector<Geometry*> currentGeometries_;
     /// Materials.
     Vector<SharedPtr<Material> > materials_;
     /// Software LOD level, used in raycast and occlusion.
