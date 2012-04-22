@@ -247,6 +247,8 @@ public:
     void Remove();
     /// %Set parent element. Same as parent->AddChild(this).
     void SetParent(UIElement* parent);
+    /// %Set a user variable.
+    void SetVar(ShortStringHash key, const Variant& value);
     
     /// Return name.
     const String& GetName() const { return name_; }
@@ -334,8 +336,10 @@ public:
     UIElement* GetRoot() const;
     /// Return precalculated 32-bit color. Only valid when no gradient.
     unsigned GetUIntColor();
-    /// Return user variables.
-    VariantMap& GetVars() { return vars_; }
+    /// Return a user variable.
+    const Variant& GetVar(ShortStringHash key) const;
+    /// Return all user variables.
+    const VariantMap& GetVars() const { return vars_; }
     
     /// Convert screen coordinates to element coordinates.
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
@@ -362,9 +366,6 @@ public:
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
     
-    /// User variables.
-    VariantMap vars_;
-    
 protected:
     /// Mark screen position as needing an update.
     void MarkDirty();
@@ -379,6 +380,8 @@ protected:
     IntRect clipBorder_;
     /// Colors.
     Color color_[MAX_UIELEMENT_CORNERS];
+    /// User variables.
+    VariantMap vars_;
     /// Priority.
     int priority_;
     /// Bring to front when focused flag.

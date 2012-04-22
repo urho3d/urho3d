@@ -372,6 +372,7 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     RegisterSerializable<T>(engine, className);
     RegisterSubclass<Component, T>(engine, "Component", className);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHODPR(T, Remove, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
@@ -488,6 +489,13 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
     return VectorToHandleArray<Node>(result, "Array<Node@>");
 }
 
+static VariantMap& NodeGetVars(Node* ptr)
+{
+    // Assume that the vars will be modified and queue a network update attribute check
+    ptr->MarkNetworkUpdate();
+    return const_cast<VariantMap&>(ptr->GetVars());
+}
+
 /// Template function for registering a class derived from Node.
 template <class T> void RegisterNode(asIScriptEngine* engine, const char* className)
 {
@@ -558,7 +566,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHOD(T, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_parent(Node@+)", asMETHOD(T, SetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
-    engine->RegisterObjectProperty(className, "VariantMap vars", offsetof(T, vars_));
+    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
 }
 
 static bool ResourceLoad(File* file, XMLFile* ptr)
@@ -708,6 +716,11 @@ static unsigned UIElementGetNumChildrenRecursive(UIElement* ptr)
     return ptr->GetNumChildren(true);
 }
 
+static VariantMap& UIElementGetVars(UIElement* ptr)
+{
+    return const_cast<VariantMap&>(ptr->GetVars());
+}
+
 /// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className)
 {
@@ -816,7 +829,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "IntVector2 get_screenPosition()", asMETHOD(T, GetScreenPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_derivedOpacity()", asMETHOD(T, GetDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect get_combinedScreenRect()", asMETHOD(T, GetCombinedScreenRect), asCALL_THISCALL);
-    engine->RegisterObjectProperty(className, "VariantMap vars", offsetof(T, vars_));
+    engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(UIElementGetVars), asCALL_CDECL_OBJLAST);
 }
 
 /// Template function for registering a class derived from BorderImage.

@@ -1153,6 +1153,8 @@ There are some things to watch out for:
 
 - Networked attributes can either be in delta update or latest data mode. Delta updates are small incremental changes and must be applied in order, which may cause increased latency if there is a stall in network message delivery eg. due to packet loss. High volume data such as position, rotation and velocities are transmitted as latest data, which does not need ordering, instead this mode simply discards any old data received out of order. Note that node and component creation (when initial attributes need to be sent) and removal can also be considered as delta updates and are therefore applied in order.
 
+- To avoid going through the whole scene when sending network updates, nodes and components explicitly mark themselves for update when necessary. When writing your own replicated C++ components, call \ref Component::MarkNetworkUpdate "MarkNetworkUpdate()" in member functions that modify any networked attribute.
+
 - The server update logic orders replication messages so that parent nodes are created and updated before their children. Remote events are queued and only sent after the replication update to ensure that if they target a newly created node, it will already exist on the receiving end. However, it is also possible to specify unordered transmission for a remote event, in which case that guarantee does not hold.
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.

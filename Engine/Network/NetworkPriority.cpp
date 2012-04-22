@@ -60,21 +60,25 @@ void NetworkPriority::RegisterObject(Context* context)
 void NetworkPriority::SetBasePriority(float priority)
 {
     basePriority_ = Max(priority, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void NetworkPriority::SetDistanceFactor(float factor)
 {
     distanceFactor_ = Max(factor, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void NetworkPriority::SetMinPriority(float priority)
 {
     minPriority_ = Max(priority, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void NetworkPriority::SetAlwaysUpdateOwner(bool enable)
 {
     alwaysUpdateOwner_ = enable;
+    MarkNetworkUpdate();
 }
 
 bool NetworkPriority::CheckUpdate(float distance, float& accumulator)

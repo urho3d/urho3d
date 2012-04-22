@@ -142,7 +142,7 @@ void Light::RegisterObject(Context* context)
 
 void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Component::OnSetAttribute(attr, src);
     
     // Validate the bias, cascade & focus parameters
     switch (attr.offset_)
@@ -266,11 +266,13 @@ void Light::SetLightType(LightType type)
 {
     lightType_ = type;
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Light::SetPerVertex(bool enable)
 {
     perVertex_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Light::SetColor(const Color& color)
@@ -278,82 +280,97 @@ void Light::SetColor(const Color& color)
     // Clamp RGB values to positive, as negative values behave erratically depending on whether the pass uses
     // replace or additive blend mode
     color_ = Color(Max(color.r_, 0.0f), Max(color.g_, 0.0f), Max(color.b_, 0.0f), 1.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetRange(float range)
 {
     range_ = Max(range, 0.0f);
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Light::SetFov(float fov)
 {
     fov_ = Clamp(fov, 0.0f, M_MAX_FOV);
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Light::SetAspectRatio(float aspectRatio)
 {
     aspectRatio_ = Max(aspectRatio, M_EPSILON);
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowNearFarRatio(float nearFarRatio)
 {
     shadowNearFarRatio_ = Clamp(nearFarRatio, 0.0f, 0.5f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetSpecularIntensity(float intensity)
 {
     specularIntensity_ = Max(intensity, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetFadeDistance(float distance)
 {
     fadeDistance_ = Max(distance, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowBias(const BiasParameters& parameters)
 {
     shadowBias_ = parameters;
     shadowBias_.Validate();
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowCascade(const CascadeParameters& parameters)
 {
     shadowCascade_ = parameters;
     shadowCascade_.Validate();
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowFocus(const FocusParameters& parameters)
 {
     shadowFocus_ = parameters;
     shadowFocus_.Validate();
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowFadeDistance(float distance)
 {
     shadowFadeDistance_ = Max(distance, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowIntensity(float intensity)
 {
     shadowIntensity_ = Clamp(intensity, 0.0f, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetShadowResolution(float resolution)
 {
     shadowResolution_ = Clamp(resolution, 0.125f, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void Light::SetRampTexture(Texture* texture)
 {
     rampTexture_ = texture;
+    MarkNetworkUpdate();
 }
 
 void Light::SetShapeTexture(Texture* texture)
 {
     shapeTexture_ = texture;
+    MarkNetworkUpdate();
 }
 
 Frustum Light::GetFrustum() const
@@ -364,7 +381,6 @@ Frustum Light::GetFrustum() const
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);
     return ret;
 }
-
 
 Matrix3x4 Light::GetDirLightTransform(Camera* camera, bool getNearQuad)
 {

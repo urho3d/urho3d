@@ -496,13 +496,12 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
-            VariantMap& vars = node->GetVars();
+            const VariantMap& vars = node->GetVars();
             while (numVars)
             {
-                --numVars;
-                
                 ShortStringHash key = msg.ReadShortStringHash();
-                vars[key] = msg.ReadVariant();
+                node->SetVar(key, msg.ReadVariant());
+                --numVars;
             }
             
             // Read components
@@ -547,13 +546,11 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // ApplyAttributes() is deliberately skipped, as Node has no attributes that require late applying.
                 // Furthermore it would propagate to components and child nodes, which is not desired in this case
                 unsigned changedVars = msg.ReadVLE();
-                VariantMap& vars = node->GetVars();
                 while (changedVars)
                 {
-                    --changedVars;
-                    
                     ShortStringHash key = msg.ReadShortStringHash();
-                    vars[key] = msg.ReadVariant();
+                    node->SetVar(key, msg.ReadVariant());
+                    --changedVars;
                 }
             }
             else

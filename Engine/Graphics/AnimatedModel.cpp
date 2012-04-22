@@ -89,6 +89,7 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD Factor", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
     ATTRIBUTE(AnimatedModel, VAR_INT, "Ray/Occl. LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
@@ -338,6 +339,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     // Copy bounding box & skeleton
     SetBoundingBox(model->GetBoundingBox());
     SetSkeleton(model->GetSkeleton(), createBones);
+    
+    MarkNetworkUpdate();
 }
 
 AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
@@ -410,6 +413,7 @@ void AnimatedModel::RemoveAllAnimationStates()
 void AnimatedModel::SetAnimationLodBias(float bias)
 {
     animationLodBias_ = Max(bias, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void AnimatedModel::SetInvisibleLodFactor(float factor)
@@ -418,7 +422,9 @@ void AnimatedModel::SetInvisibleLodFactor(float factor)
         factor = 0.0f;
     else if (factor != 0.0f && factor < 1.0f)
         factor = 1.0f;
+    
     invisibleLodFactor_ = factor;
+    MarkNetworkUpdate();
 }
 
 void AnimatedModel::SetMorphWeight(unsigned index, float weight)
@@ -431,7 +437,6 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
     if (weight != morphs_[index].weight_)
     {
         morphs_[index].weight_ = weight;
-        MarkMorphsDirty();
         
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
@@ -443,6 +448,9 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
             for (unsigned i = 1; i < models.Size(); ++i)
                 models[i]->SetMorphWeight(morphs_[index].nameHash_, weight);
         }
+        
+        MarkMorphsDirty();
+        MarkNetworkUpdate();
     }
 }
 
@@ -475,8 +483,6 @@ void AnimatedModel::ResetMorphWeights()
     for (Vector<ModelMorph>::Iterator i = morphs_.Begin(); i != morphs_.End(); ++i)
         i->weight_ = 0.0f;
     
-    MarkMorphsDirty();
-
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
@@ -487,6 +493,9 @@ void AnimatedModel::ResetMorphWeights()
         for (unsigned i = 1; i < models.Size(); ++i)
             models[i]->ResetMorphWeights();
     }
+    
+    MarkMorphsDirty();
+    MarkNetworkUpdate();
 }
 
 float AnimatedModel::GetMorphWeight(unsigned index) const

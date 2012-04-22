@@ -72,7 +72,7 @@ void Joint::RegisterObject(Context* context)
 
 void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Component::OnSetAttribute(attr, src);
     
     // Change of the joint type or connected body requires the joint to be recreated
     if (attr.offset_ == offsetof(Joint, type_) || attr.offset_ == offsetof(Joint, otherBodyNodeID_))

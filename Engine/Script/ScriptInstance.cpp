@@ -120,6 +120,7 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
     scriptFile_ = scriptFile;
     
     CreateObject();
+    MarkNetworkUpdate();
 }
 
 void ScriptInstance::SetClassName(const String& className)
@@ -130,11 +131,13 @@ void ScriptInstance::SetClassName(const String& className)
     ReleaseObject();
     className_ = className;
     CreateObject();
+    MarkNetworkUpdate();
 }
 
 void ScriptInstance::SetActive(bool active)
 {
     active_ = active;
+    MarkNetworkUpdate();
 }
 
 void ScriptInstance::SetFixedUpdateFps(int fps)
@@ -143,6 +146,7 @@ void ScriptInstance::SetFixedUpdateFps(int fps)
     fixedUpdateInterval_ = fixedUpdateFps_ ? (1.0f / fixedUpdateFps_) : 0.0f;
     fixedUpdateAcc_ = 0.0f;
     fixedPostUpdateAcc_ = 0.0f;
+    MarkNetworkUpdate();
 }
 
 bool ScriptInstance::Execute(const String& declaration, const VariantVector& parameters)

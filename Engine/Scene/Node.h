@@ -58,6 +58,8 @@ public:
     
     /// Handle event. Targeted events will be forwarded to all components.
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Load from XML data. Return true if successful.
@@ -151,6 +153,8 @@ public:
     void Remove();
     /// %Set parent scene node. Retains the world transform.
     void SetParent(Node* parent);
+    /// %Set a user variable.
+    void SetVar(ShortStringHash key, const Variant& value);
     /// Add listener component that is notified of node being dirtied. Can either be in the same node or another.
     void AddListener(Component* component);
     /// Remove listener component.
@@ -266,8 +270,10 @@ public:
     bool HasComponent(ShortStringHash type) const;
     /// Return listener components.
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
-    /// Return user variables.
-    VariantMap& GetVars() { return vars_; }
+    /// Return a user variable.
+    const Variant& GetVar(ShortStringHash key) const;
+    /// Return all user variables.
+    const VariantMap& GetVars() const { return vars_; }
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent() const;
     /// Return components derived from class.
@@ -307,11 +313,10 @@ public:
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
+    /// Mark for attribute check on the next network update.
+    void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
-    
-    /// User variables.
-    VariantMap vars_;
     
 protected:
     /// Create a component with specific ID.
@@ -319,6 +324,8 @@ protected:
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
     
+    /// User variables.
+    VariantMap vars_;
     /// Per-user network replication states.
     PODVector<NodeReplicationState*> replicationStates_;
     
@@ -370,6 +377,8 @@ private:
     unsigned char rotateCount_;
     /// World transform needs update flag.
     mutable bool dirty_;
+    /// Network update queued flag.
+    bool networkUpdate_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

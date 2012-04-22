@@ -127,6 +127,7 @@ void AnimationController::Update(float timeStep)
             if (state)
                 model->RemoveAnimationState(state);
             i = animations_.Erase(i);
+            MarkNetworkUpdate();
         }
         else
             ++i;
@@ -166,6 +167,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     animations_[index].targetWeight_ = 1.0f;
     animations_[index].fadeTime_ = fadeInTime;
     
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -188,6 +190,7 @@ bool AnimationController::Stop(const String& name, float fadeOutTime)
     {
         animations_[index].targetWeight_ = 0.0f;
         animations_[index].fadeTime_ = fadeOutTime;
+        MarkNetworkUpdate();
     }
     
     return index != M_MAX_UNSIGNED || state != 0;
@@ -208,6 +211,8 @@ void AnimationController::StopLayer(unsigned char layer, float fadeOutTime)
             i->fadeTime_ = fadeOutTime;
         }
     }
+    
+    MarkNetworkUpdate();
 }
 
 void AnimationController::StopAll(float fadeOutTime)
@@ -221,6 +226,8 @@ void AnimationController::StopAll(float fadeOutTime)
         i->targetWeight_ = 0.0f;
         i->fadeTime_ = fadeOutTime;
     }
+    
+    MarkNetworkUpdate();
 }
 
 bool AnimationController::Fade(const String& name, float targetWeight, float fadeTime)
@@ -233,6 +240,7 @@ bool AnimationController::Fade(const String& name, float targetWeight, float fad
     
     animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
     animations_[index].fadeTime_ = fadeTime;
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -260,6 +268,8 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
             }
         }
     }
+    
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -270,6 +280,7 @@ bool AnimationController::SetLayer(const String& name, unsigned char layer)
         return false;
     
     state->SetLayer(layer);
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -282,6 +293,7 @@ bool AnimationController::SetStartBone(const String& name, const String& startBo
     AnimatedModel* model = GetComponent<AnimatedModel>();
     Bone* bone = model->GetSkeleton().GetBone(startBoneName);
     state->SetStartBone(bone);
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -299,6 +311,7 @@ bool AnimationController::SetTime(const String& name, float time)
     animations_[index].setTime_ = (unsigned short)(time / state->GetLength() * 65535.0f);
     animations_[index].setTimeTtl_ = COMMAND_STAY_TIME;
     ++animations_[index].setTimeRev_;
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -311,6 +324,7 @@ bool AnimationController::SetSpeed(const String& name, float speed)
         return false;
     
     animations_[index].speed_ = speed;
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -328,6 +342,7 @@ bool AnimationController::SetWeight(const String& name, float weight)
     animations_[index].setWeight_ = (unsigned char)(weight * 255.0f);
     animations_[index].setWeightTtl_ = COMMAND_STAY_TIME;
     ++animations_[index].setWeightRev_;
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -338,6 +353,7 @@ bool AnimationController::SetLooped(const String& name, bool enable)
         return false;
     
     state->SetLooped(enable);
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -350,6 +366,7 @@ bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
         return false;
     
     animations_[index].autoFadeTime_ = Max(fadeOutTime, 0.0f);
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -506,7 +523,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         StringHash animHash = buf.ReadStringHash();
         processedAnimations.Insert(animHash);
         
-       // Check if the animation state exists. If not, add new
+        // Check if the animation state exists. If not, add new
         AnimationState* state = model->GetAnimationState(animHash);
         if (!state)
         {

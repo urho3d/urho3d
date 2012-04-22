@@ -347,6 +347,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
         textureAnimation_ = animations;
     }
     
+    MarkNetworkUpdate();
     return true;
 }
 
@@ -356,6 +357,7 @@ void ParticleEmitter::SetActive(bool enable, bool resetPeriod)
     {
         active_ = enable;
         periodTimer_ = 0.0f;
+        MarkNetworkUpdate();
     }
 }
 

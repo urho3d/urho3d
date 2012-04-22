@@ -50,7 +50,8 @@ Node::Node(Context* context) :
     scale_(Vector3::ONE),
     worldTransform_(Matrix3x4::IDENTITY),
     rotateCount_(0),
-    dirty_(false)
+    dirty_(false),
+    networkUpdate_(false)
 {
 }
 
@@ -96,6 +97,12 @@ void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, Variant
     }
     else
         Object::OnEvent(sender, broadcast, eventType, eventData);
+}
+
+void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    Serializable::OnSetAttribute(attr, src);
+    MarkNetworkUpdate();
 }
 
 bool Node::Load(Deserializer& source)
@@ -230,6 +237,8 @@ void Node::SetName(const String& name)
 {
     name_ = name;
     nameHash_ = StringHash(name);
+    
+    MarkNetworkUpdate();
 }
 
 void Node::SetPosition(const Vector3& position)
@@ -237,15 +246,18 @@ void Node::SetPosition(const Vector3& position)
     position_ = position;
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::SetRotation(const Quaternion& rotation)
 {
     rotation_ = rotation;
+    rotateCount_ = 0;
     if (!dirty_)
         MarkDirty();
     
-    rotateCount_ = 0;
+    MarkNetworkUpdate();
 }
 
 void Node::SetDirection(const Vector3& direction)
@@ -258,6 +270,8 @@ void Node::SetScale(float scale)
     scale_ = Vector3(scale, scale, scale).Abs();
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::SetScale(const Vector3& scale)
@@ -265,38 +279,43 @@ void Node::SetScale(const Vector3& scale)
     scale_ = scale.Abs();
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
 {
     position_ = position;
     rotation_ = rotation;
+    rotateCount_ = 0;
     if (!dirty_)
         MarkDirty();
     
-    rotateCount_ = 0;
+    MarkNetworkUpdate();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 {
     position_ = position;
     rotation_ = rotation;
+    rotateCount_ = 0;
     scale_ = Vector3(scale, scale, scale);
     if (!dirty_)
         MarkDirty();
     
-    rotateCount_ = 0;
+    MarkNetworkUpdate();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 {
     position_ = position;
     rotation_ = rotation;
+    rotateCount_ = 0;
     scale_ = scale;
     if (!dirty_)
         MarkDirty();
     
-    rotateCount_ = 0;
+    MarkNetworkUpdate();
 }
 
 void Node::SetWorldPosition(const Vector3& position)
@@ -370,6 +389,8 @@ void Node::Translate(const Vector3& delta)
     position_ += delta;
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::TranslateRelative(const Vector3& delta)
@@ -377,6 +398,8 @@ void Node::TranslateRelative(const Vector3& delta)
     position_ += rotation_ * delta;
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::Rotate(const Quaternion& delta, bool fixedAxis)
@@ -395,6 +418,8 @@ void Node::Rotate(const Quaternion& delta, bool fixedAxis)
     
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::Yaw(float angle, bool fixedAxis)
@@ -434,6 +459,8 @@ void Node::Scale(float scale)
     scale_ *= scale;
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::Scale(const Vector3& scale)
@@ -441,6 +468,8 @@ void Node::Scale(const Vector3& scale)
     scale_ *= scale;
     if (!dirty_)
         MarkDirty();
+    
+    MarkNetworkUpdate();
 }
 
 void Node::SetOwner(Connection* owner)
@@ -502,6 +531,7 @@ void Node::AddChild(Node* node)
     
     node->parent_ = this;
     node->MarkDirty();
+    node->MarkNetworkUpdate();
 }
 
 void Node::RemoveChild(Node* node)
@@ -620,6 +650,12 @@ void Node::SetParent(Node* parent)
         parent->AddChild(this);
         SetWorldTransform(worldPosition, worldRotation, worldScale);
     }
+}
+
+void Node::SetVar(ShortStringHash key, const Variant& value)
+{
+    vars_[key] = value;
+    MarkNetworkUpdate();
 }
 
 void Node::AddListener(Component* component)
@@ -775,6 +811,15 @@ bool Node::HasComponent(ShortStringHash type) const
     return false;
 }
 
+const Variant& Node::GetVar(ShortStringHash key) const
+{
+    VariantMap::ConstIterator i = vars_.Find(key);
+    if (i != vars_.End())
+        return i->second_;
+    else
+        return Variant::EMPTY;
+}
+
 Component* Node::GetComponent(ShortStringHash type) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
@@ -787,7 +832,7 @@ Component* Node::GetComponent(ShortStringHash type) const
 
 void Node::PrepareNetworkUpdate()
 {
-    // Process dependencies first
+    // Update dependency nodes list first
     dependencyNodes_.Clear();
     
     // Add the parent node, but if it is local, traverse to the first non-local node
@@ -800,10 +845,18 @@ void Node::PrepareNetworkUpdate()
             dependencyNodes_.Push(current);
     }
     
-    // Then let the components add their dependencies
+    // Let the components add their dependencies, and check their attributes at the same time
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
-        (*i)->GetDependencyNodes(dependencyNodes_);
+    {
+        Component* component = *i;
+        if (component->GetID() < FIRST_LOCAL_ID)
+        {
+            component->GetDependencyNodes(dependencyNodes_);
+            component->PrepareNetworkUpdate();
+        }
+    }
     
+    // Then check for node attribute changes
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (attributes)
     {
@@ -846,7 +899,7 @@ void Node::PrepareNetworkUpdate()
         }
     }
     
-    // Check for user var changes
+    // Finally check for user var changes
     for (VariantMap::ConstIterator i = vars_.Begin(); i != vars_.End(); ++i)
     {
         VariantMap::ConstIterator j = previousVars_.Find(i->first_);
@@ -867,6 +920,8 @@ void Node::PrepareNetworkUpdate()
             }
         }
     }
+    
+    networkUpdate_ = false;
 }
 
 void Node::CleanupConnection(Connection* connection)
@@ -881,11 +936,19 @@ void Node::CleanupConnection(Connection* connection)
     }
 }
 
+void Node::MarkNetworkUpdate()
+{
+    if (id_ < FIRST_LOCAL_ID && !networkUpdate_ && scene_)
+    {
+        scene_->MarkNetworkUpdate(this);
+        networkUpdate_ = true;
+    }
+}
+
 void Node::MarkReplicationDirty()
 {
     for (PODVector<NodeReplicationState*>::Iterator j = replicationStates_.Begin(); j != replicationStates_.End(); ++j)
     {
-        // Add component's parent node to the dirty set if not added yet
         if (!(*j)->markedDirty_)
         {
             (*j)->markedDirty_ = true;
@@ -1113,7 +1176,8 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id, CreateMode m
     newComponent->SetNode(this);
     newComponent->OnMarkedDirty(this);
     
-    // Mark node dirty in all replication states
+    // Check attributes of the new component on next network update, and mark node dirty in all replication states
+    MarkNetworkUpdate();
     MarkReplicationDirty();
     
     return newComponent;
@@ -1155,6 +1219,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
     (*i)->parent_ = 0;
     (*i)->MarkDirty();
+    (*i)->MarkNetworkUpdate();
     children_.Erase(i);
 }
 

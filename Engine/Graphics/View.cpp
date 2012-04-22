@@ -790,8 +790,8 @@ void View::GetBatches()
                     ShadowBatchQueue& shadowQueue = lightQueue.shadowSplits_[j];
                     Camera* shadowCamera = split.shadowCamera_;
                     shadowQueue.shadowCamera_ = shadowCamera;
-                    shadowQueue.nearSplit_ = split.shadowNearSplit_;
-                    shadowQueue.farSplit_ = split.shadowFarSplit_;
+                    shadowQueue.nearSplit_ = split.nearSplit_;
+                    shadowQueue.farSplit_ = split.farSplit_;
                     
                     // Setup the shadow split viewport and finalize shadow camera parameters
                     shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
@@ -1853,9 +1853,9 @@ void View::ProcessShadowSplit(LightQueryResult& query, unsigned splitIndex, unsi
     // For directional light check that the split is inside the visible scene: if not, can skip the split
     if (type == LIGHT_DIRECTIONAL)
     {
-        if (sceneViewBox_.min_.z_ > split.shadowFarSplit_)
+        if (sceneViewBox_.min_.z_ > split.farSplit_)
             return;
-        if (sceneViewBox_.max_.z_ < split.shadowNearSplit_)
+        if (sceneViewBox_.max_.z_ < split.nearSplit_)
             return;
     }
     
@@ -1892,8 +1892,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     if (type != LIGHT_DIRECTIONAL)
         lightViewFrustum = sceneFrustum_.Transformed(lightView);
     else
-        lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, split.shadowNearSplit_),
-            Min(sceneViewBox_.max_.z_, split.shadowFarSplit_)).Transformed(lightView);
+        lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, split.nearSplit_),
+            Min(sceneViewBox_.max_.z_, split.farSplit_)).Transformed(lightView);
     
     BoundingBox lightViewFrustumBox(lightViewFrustum);
      
@@ -2055,8 +2055,8 @@ void View::SetupShadowCameras(LightQueryResult& query)
             ShadowQueryResult& split = query.shadowSplits_[i];
             Camera* shadowCamera = renderer_->GetShadowCamera();
             split.shadowCamera_ = shadowCamera;
-            split.shadowNearSplit_ = nearSplit;
-            split.shadowFarSplit_ = farSplit;
+            split.nearSplit_ = nearSplit;
+            split.farSplit_ = farSplit;
             SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit);
             
             nearSplit = farSplit;

@@ -24,8 +24,8 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Context.h"
-#include "Node.h"
 #include "ReplicationState.h"
+#include "Scene.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"
@@ -41,6 +41,12 @@ Component::Component(Context* context) :
 
 Component::~Component()
 {
+}
+
+void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    Serializable::OnSetAttribute(attr, src);
+    MarkNetworkUpdate();
 }
 
 bool Component::Save(Serializer& dest)
@@ -139,6 +145,12 @@ void Component::CleanupConnection(Connection* connection)
         if (replicationStates_[i]->connection_ == connection)
             replicationStates_.Erase(i);
     }
+}
+
+void Component::MarkNetworkUpdate()
+{
+    if (id_ < FIRST_LOCAL_ID && node_)
+        node_->MarkNetworkUpdate();
 }
 
 void Component::SetID(unsigned id)

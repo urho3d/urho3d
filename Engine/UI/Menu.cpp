@@ -121,7 +121,7 @@ void Menu::ShowPopup(bool enable)
             root->AddChild(popup_);
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
-        popup_->vars_[originHash] = (void*)this;
+        popup_->SetVar(originHash, (void*)this);
         popup_->BringToFront();
     }
     else
@@ -136,7 +136,7 @@ void Menu::ShowPopup(bool enable)
                 menu->ShowPopup(false);
         }
         
-        popup_->vars_[originHash].Clear();
+        popup_->SetVar(originHash, Variant());
         popup_->SetVisible(false);
         popup_->Remove();
     }
@@ -212,7 +212,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
         if (element == this || element == popup_)
             return;
         if (element->GetParent() == root)
-            element = static_cast<UIElement*>(element->vars_[originHash].GetPtr());
+            element = static_cast<UIElement*>(element->GetVar(originHash).GetPtr());
         else
             element = element->GetParent();
     }

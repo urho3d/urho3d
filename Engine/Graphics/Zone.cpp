@@ -78,7 +78,7 @@ void Zone::RegisterObject(Context* context)
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Component::OnSetAttribute(attr, src);
     
     // If bounding box, override mode, visibility or priority changes, dirty the drawable as applicable
     switch (attr.offset_)
@@ -102,16 +102,19 @@ void Zone::SetBoundingBox(const BoundingBox& box)
 {
     boundingBox_ = box;
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Zone::SetAmbientColor(const Color& color)
 {
     ambientColor_ = Color(color, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void Zone::SetFogColor(const Color& color)
 {
     fogColor_ = Color(color, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void Zone::SetFogStart(float start)
@@ -120,6 +123,7 @@ void Zone::SetFogStart(float start)
         start = 0.0f;
     
     fogStart_ = start;
+    MarkNetworkUpdate();
 }
 
 void Zone::SetFogEnd(float end)
@@ -128,21 +132,25 @@ void Zone::SetFogEnd(float end)
         end = 0.0f;
     
     fogEnd_ = end;
+    MarkNetworkUpdate();
 }
 
 void Zone::SetPriority(int priority)
 {
     priority_ = priority;
+    MarkNetworkUpdate();
 }
 
 void Zone::SetOverride(bool enable)
 {
     override_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Zone::SetAmbientGradient(bool enable)
 {
     ambientGradient_ = enable;
+    MarkNetworkUpdate();
 }
 
 const Color& Zone::GetAmbientStartColor()

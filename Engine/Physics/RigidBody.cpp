@@ -119,7 +119,7 @@ void RigidBody::RegisterObject(Context* context)
 
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, src);
+    Component::OnSetAttribute(attr, src);
     dirty_ = true;
 }
 
@@ -163,6 +163,8 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
         delayed.worldRotation_ = newWorldRotation;
         physicsWorld_->AddDelayedWorldTransform(delayed);
     }
+    
+    MarkNetworkUpdate();
 }
 
 void RigidBody::SetMass(float mass)
@@ -173,6 +175,7 @@ void RigidBody::SetMass(float mass)
     {
         mass_ = mass;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
@@ -187,6 +190,8 @@ void RigidBody::SetPosition(Vector3 position)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
+        
+        MarkNetworkUpdate();
     }
 }
 
@@ -201,6 +206,8 @@ void RigidBody::SetRotation(Quaternion rotation)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
+        
+        MarkNetworkUpdate();
     }
 }
 
@@ -217,6 +224,8 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         interpTrans.setOrigin(worldTrans.getOrigin());
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
+        
+        MarkNetworkUpdate();
     }
 }
 
@@ -227,25 +236,35 @@ void RigidBody::SetLinearVelocity(Vector3 velocity)
         body_->setLinearVelocity(ToBtVector3(velocity));
         if (velocity != Vector3::ZERO)
             Activate();
+        MarkNetworkUpdate();
     }
 }
 
 void RigidBody::SetLinearFactor(Vector3 factor)
 {
     if (body_)
+    {
         body_->setLinearFactor(ToBtVector3(factor));
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetLinearRestThreshold(float threshold)
 {
     if (body_)
+    {
         body_->setSleepingThresholds(threshold, body_->getAngularSleepingThreshold());
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetLinearDamping(float damping)
 {
     if (body_)
+    {
         body_->setDamping(damping, body_->getAngularDamping());
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetAngularVelocity(Vector3 velocity)
@@ -255,51 +274,73 @@ void RigidBody::SetAngularVelocity(Vector3 velocity)
         body_->setAngularVelocity(ToBtVector3(velocity));
         if (velocity != Vector3::ZERO)
             Activate();
+        MarkNetworkUpdate();
     }
 }
 
 void RigidBody::SetAngularFactor(Vector3 factor)
 {
     if (body_)
+    {
         body_->setAngularFactor(ToBtVector3(factor));
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetAngularRestThreshold(float threshold)
 {
     if (body_)
+    {
         body_->setSleepingThresholds(body_->getLinearSleepingThreshold(), threshold);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetAngularDamping(float damping)
 {
     if (body_)
+    {
         body_->setDamping(body_->getLinearDamping(), damping);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetFriction(float friction)
 {
     if (body_)
+    {
         body_->setFriction(friction);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetRestitution(float restitution)
 {
     if (body_)
+    {
         body_->setRestitution(restitution);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetCcdRadius(float radius)
 {
     radius = Max(radius, 0.0f);
     if (body_)
+    {
         body_->setCcdSweptSphereRadius(radius);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetCcdMotionThreshold(float threshold)
 {
     threshold = Max(threshold, 0.0f);
     if (body_)
+    {
         body_->setCcdMotionThreshold(threshold);
+        MarkNetworkUpdate();
+    }
 }
 
 void RigidBody::SetUseGravity(bool enable)
@@ -319,6 +360,8 @@ void RigidBody::SetUseGravity(bool enable)
             body_->setGravity(world->getGravity());
         else
             body_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+        
+        MarkNetworkUpdate();
     }
 }
 
@@ -328,6 +371,7 @@ void RigidBody::SetKinematic(bool enable)
     {
         kinematic_ = enable;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
@@ -337,6 +381,7 @@ void RigidBody::SetPhantom(bool enable)
     {
         phantom_ = enable;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
@@ -346,6 +391,7 @@ void RigidBody::SetCollisionLayer(unsigned layer)
     {
         collisionLayer_ = layer;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
@@ -355,6 +401,7 @@ void RigidBody::SetCollisionMask(unsigned mask)
     {
         collisionMask_ = mask;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
@@ -365,12 +412,14 @@ void RigidBody::SetCollisionLayerAndMask(unsigned layer, unsigned mask)
         collisionLayer_ = layer;
         collisionMask_ = mask;
         AddBodyToWorld();
+        MarkNetworkUpdate();
     }
 }
 
 void RigidBody::SetCollisionEventMode(CollisionEventMode mode)
 {
     collisionEventMode_ = mode;
+    MarkNetworkUpdate();
 }
 
 void RigidBody::ApplyForce(const Vector3& force)

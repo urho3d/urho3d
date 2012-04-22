@@ -161,6 +161,8 @@ void SoundSource::Play(Sound* sound)
     }
     else
         PlayLockless(sound);
+    
+    MarkNetworkUpdate();
 }
 
 void SoundSource::Play(Sound* sound, float frequency)
@@ -199,6 +201,8 @@ void SoundSource::Stop()
     // Free the compressed sound decoder now if any
     FreeDecoder();
     sound_.Reset();
+    
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetSoundType(SoundType type)
@@ -207,26 +211,31 @@ void SoundSource::SetSoundType(SoundType type)
         return;
     
     soundType_ = type;
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetFrequency(float frequency)
 {
     frequency_ = Clamp(frequency, 0.0f, 535232.0f);
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetGain(float gain)
 {
     gain_ = Max(gain, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetAttenuation(float attenuation)
 {
     attenuation_ = Clamp(attenuation, 0.0f, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetPanning(float panning)
 {
     panning_ = Clamp(panning, -1.0f, 1.0f);
+    MarkNetworkUpdate();
 }
 
 void SoundSource::SetAutoRemove(bool enable)

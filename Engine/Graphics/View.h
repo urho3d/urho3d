@@ -61,9 +61,9 @@ struct ShadowQueryResult
     /// Combined bounding box of the shadow casters in light view or projection space.
     BoundingBox shadowCasterBox_;
     /// Directional light shadow near split distance.
-    float shadowNearSplit_;
+    float nearSplit_;
     /// Directional light shadow far split distance.
-    float shadowFarSplit_;
+    float farSplit_;
 };
 
 /// Intermediate light processing result.

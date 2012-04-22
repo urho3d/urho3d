@@ -1187,6 +1187,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1276,10 +1277,10 @@ Properties:<br>
 - Component@[] components (readonly)
 - String& name
 - Node@ parent
+- VariantMap& vars (readonly)
 - Scene@ scene (readonly)
 - Connection@ owner
 - ScriptObject@ scriptObject (readonly)
-- VariantMap vars
 
 
 SmoothedTransform
@@ -1293,6 +1294,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Update(float, float)
 
 Properties:<br>
@@ -1401,6 +1403,7 @@ Properties:<br>
 - Component@[] components (readonly)
 - String& name
 - Node@ parent
+- VariantMap& vars (readonly)
 - bool active
 - float smoothingConstant
 - float snapThreshold
@@ -1412,7 +1415,6 @@ Properties:<br>
 - DebugRenderer@ debugRenderer (readonly)
 - Octree@ octree (readonly)
 - PhysicsWorld@ physicsWorld (readonly)
-- VariantMap vars
 
 
 Camera
@@ -1426,6 +1428,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void SetOrthoSize(const Vector2&)
 - Frustum GetSplitFrustum(float, float)
 - Ray GetScreenRay(float, float)
@@ -1738,6 +1741,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
 - void AddNode(Node@, bool arg1 = true)
 - void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
@@ -1767,6 +1771,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -1831,6 +1836,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -1886,6 +1892,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -1933,6 +1940,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -1976,6 +1984,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -2036,6 +2045,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - AnimationState@ AddAnimationState(Animation@)
 - void RemoveAnimationState(Animation@)
@@ -2096,6 +2106,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float arg3 = 0.0f)
 - bool PlayExclusive(const String&, uint8, bool, float arg3 = 0.0f)
 - void Stop(const String&, float arg1 = 0.0f)
@@ -2155,6 +2166,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void Updated()
 
@@ -2201,6 +2213,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void SetActive(bool, bool)
 
 Properties:<br>
@@ -2242,6 +2255,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
 - void AddManualDrawable(Drawable@)
@@ -2388,6 +2402,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
 - void Play(Sound@, float, float)
@@ -2424,6 +2439,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Play(Sound@)
 - void Play(Sound@, float)
 - void Play(Sound@, float, float)
@@ -2564,7 +2580,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap vars
+- VariantMap& vars (readonly)
 
 
 BorderImage
@@ -2644,11 +2660,11 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
 - IntVector2& hoverOffset
-- VariantMap vars
 
 
 Button
@@ -2731,6 +2747,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -2739,7 +2756,6 @@ Properties:<br>
 - IntVector2& labelOffset
 - float repeatDelay
 - float repeatRate
-- VariantMap vars
 
 
 CheckBox
@@ -2820,13 +2836,13 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
 - IntVector2& hoverOffset
 - bool checked
 - IntVector2& checkedOffset
-- VariantMap vars
 
 
 Cursor
@@ -2907,12 +2923,12 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
 - IntVector2& hoverOffset
 - CursorShape shape
-- VariantMap vars
 
 
 Slider
@@ -2993,6 +3009,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -3001,7 +3018,6 @@ Properties:<br>
 - float range
 - float value
 - BorderImage@ knob (readonly)
-- VariantMap vars
 
 
 ScrollBar
@@ -3082,6 +3098,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Orientation orientation
 - float range
 - float value
@@ -3091,7 +3108,6 @@ Properties:<br>
 - Button@ backButton (readonly)
 - Button@ forwardButton (readonly)
 - Slider@ slider (readonly)
-- VariantMap vars
 
 
 ScrollView
@@ -3171,6 +3187,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - UIElement@ contentElement
 - IntVector2& viewPosition
 - float scrollStep
@@ -3178,7 +3195,6 @@ Properties:<br>
 - ScrollBar@ horizontalScrollBar (readonly)
 - ScrollBar@ verticalScrollBar (readonly)
 - BorderImage@ scrollPanel (readonly)
-- VariantMap vars
 
 
 ListView
@@ -3273,6 +3289,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - IntVector2& viewPosition
 - UIElement@ contentElement (readonly)
 - ScrollBar@ horizontalScrollBar (readonly)
@@ -3291,7 +3308,6 @@ Properties:<br>
 - bool hierarchyMode
 - bool clearSelectionOnDefocus
 - float floatClickInterval
-- VariantMap vars
 
 
 Text
@@ -3373,6 +3389,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Font@ font (readonly)
 - int fontSize (readonly)
 - String& text
@@ -3385,7 +3402,6 @@ Properties:<br>
 - Color& hoverColor
 - uint numRows (readonly)
 - int rowHeight (readonly)
-- VariantMap vars
 
 
 LineEdit
@@ -3465,6 +3481,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -3479,7 +3496,6 @@ Properties:<br>
 - bool textCopyable
 - Text@ textElement (readonly)
 - BorderImage@ cursor (readonly)
-- VariantMap vars
 
 
 Menu
@@ -3564,6 +3580,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -3577,7 +3594,6 @@ Properties:<br>
 - bool showPopup
 - int acceleratorKey (readonly)
 - int acceleratorQualifiers (readonly)
-- VariantMap vars
 
 
 DropDownList
@@ -3668,6 +3684,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -3686,7 +3703,6 @@ Properties:<br>
 - UIElement@ selectedItem (readonly)
 - ListView@ listView (readonly)
 - UIElement@ placeholder (readonly)
-- VariantMap vars
 
 
 Window
@@ -3766,6 +3782,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- VariantMap& vars (readonly)
 - Texture@ texture
 - IntRect& imageRect
 - IntRect& border
@@ -3773,7 +3790,6 @@ Properties:<br>
 - bool movable
 - bool resizable
 - IntRect& resizeBorder
-- VariantMap vars
 
 
 FileSelector
@@ -3848,6 +3864,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3928,6 +3945,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void SetSphere(float, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
@@ -3966,6 +3984,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetCollisionLayerAndMask(uint, uint)
 - void ApplyForce(const Vector3&)
@@ -4021,6 +4040,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Clear()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
@@ -4059,6 +4079,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - void Update(float)
 - void UpdateCollisions()
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
@@ -4108,6 +4129,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
+- void MarkNetworkUpdate() const
 - bool CreateObject(ScriptFile@, const String&)
 - bool Execute(const String&, const Variant[]@)
 - bool Execute(const String&)

@@ -233,7 +233,7 @@ void InitScene()
         light.shadowNearFarRatio = 0.01;
 
         // Store the original rotation as a node property
-        newNode.vars["rotation"] = Variant(newNode.rotation);
+        newNode.vars["rotation"] = newNode.rotation;
 
         lights.Push(newNode);
     }

@@ -45,6 +45,8 @@ public:
     /// Destruct.
     virtual ~Component();
     
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful.
@@ -84,6 +86,8 @@ public:
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
     void CleanupConnection(Connection* connection);
+    /// Mark for attribute check on the next network update.
+    void MarkNetworkUpdate();
     
 protected:
     /// Handle scene node being assigned at creation.

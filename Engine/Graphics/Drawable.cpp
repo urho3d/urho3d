@@ -115,31 +115,37 @@ void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void Drawable::SetDrawDistance(float distance)
 {
     drawDistance_ = distance;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetShadowDistance(float distance)
 {
     shadowDistance_ = distance;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetLodBias(float bias)
 {
     lodBias_ = Max(bias, M_EPSILON);
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetLightMask(unsigned mask)
 {
     lightMask_ = mask;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetShadowMask(unsigned mask)
 {
     shadowMask_ = mask;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetZoneMask(unsigned mask)
@@ -147,26 +153,31 @@ void Drawable::SetZoneMask(unsigned mask)
     zoneMask_ = mask;
     // Mark dirty to reset cached zone
     OnMarkedDirty(node_);
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetMaxLights(unsigned num)
 {
     maxLights_ = num;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetVisible(bool enable)
 {
     visible_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetCastShadows(bool enable)
 {
     castShadows_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetOccluder(bool enable)
 {
     occluder_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Drawable::SetOccludee(bool enable)
@@ -177,6 +188,7 @@ void Drawable::SetOccludee(bool enable)
         // Reinsert to octree to make sure octant occlusion does not erroneously hide this drawable
         if (octant_ && !reinsertionQueued_)
             octant_->GetRoot()->QueueReinsertion(this);
+        MarkNetworkUpdate();
     }
 }
 

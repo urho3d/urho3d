@@ -847,6 +847,11 @@ void UIElement::SetParent(UIElement* parent)
         parent->AddChild(this);
 }
 
+void UIElement::SetVar(ShortStringHash key, const Variant& value)
+{
+    vars_[key] = value;
+}
+
 IntVector2 UIElement::GetScreenPosition()
 {
     if (positionDirty_)
@@ -999,6 +1004,15 @@ unsigned UIElement::GetUIntColor()
     }
     
     return uintColor_;
+}
+
+const Variant& UIElement::GetVar(ShortStringHash key) const
+{
+    VariantMap::ConstIterator i = vars_.Find(key);
+    if (i != vars_.End())
+        return i->second_;
+    else
+        return Variant::EMPTY;
 }
 
 IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)

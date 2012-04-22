@@ -89,6 +89,7 @@ void Camera::SetNearClip(float nearClip)
     nearClip_ = Max(nearClip, M_MIN_NEARCLIP);
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetFarClip(float farClip)
@@ -96,6 +97,7 @@ void Camera::SetFarClip(float farClip)
     farClip_ = Max(farClip, M_MIN_NEARCLIP);
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetFov(float fov)
@@ -103,6 +105,7 @@ void Camera::SetFov(float fov)
     fov_ = Clamp(fov, 0.0f, M_MAX_FOV);
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetOrthoSize(float orthoSize)
@@ -111,6 +114,7 @@ void Camera::SetOrthoSize(float orthoSize)
     aspectRatio_ = 1.0f;
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetOrthoSize(const Vector2& orthoSize)
@@ -119,6 +123,7 @@ void Camera::SetOrthoSize(const Vector2& orthoSize)
     aspectRatio_ = orthoSize.x_ / orthoSize.y_;
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetAspectRatio(float aspectRatio)
@@ -126,6 +131,7 @@ void Camera::SetAspectRatio(float aspectRatio)
     aspectRatio_ = aspectRatio;
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetZoom(float zoom)
@@ -133,21 +139,25 @@ void Camera::SetZoom(float zoom)
     zoom_ = Max(zoom, M_EPSILON);
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetLodBias(float bias)
 {
     lodBias_ = Max(bias, M_EPSILON);
+    MarkNetworkUpdate();
 }
 
 void Camera::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetViewOverrideFlags(unsigned flags)
 {
     viewOverrideFlags_ = flags;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetOrthographic(bool enable)
@@ -155,23 +165,27 @@ void Camera::SetOrthographic(bool enable)
     orthographic_ = enable;
     frustumDirty_ = true;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetAutoAspectRatio(bool enable)
 {
     autoAspectRatio_ = enable;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetProjectionOffset(const Vector2& offset)
 {
     projectionOffset_ = offset;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 void Camera::SetFlipVertical(bool enable)
 {
     flipVertical_ = enable;
     projectionDirty_ = true;
+    MarkNetworkUpdate();
 }
 
 float Camera::GetNearClip() const

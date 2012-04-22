@@ -164,6 +164,7 @@ void BillboardSet::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batch
 void BillboardSet::SetMaterial(Material* material)
 {
     material_ = material;
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetNumBillboards(unsigned num)
@@ -185,34 +186,40 @@ void BillboardSet::SetNumBillboards(unsigned num)
     
     bufferSizeDirty_ = true;
     MarkPositionsDirty();
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetRelative(bool enable)
 {
     relative_ = enable;
     MarkPositionsDirty();
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetScaled(bool enable)
 {
     scaled_ = enable;
     MarkPositionsDirty();
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetSorted(bool enable)
 {
     sorted_ = enable;
     MarkPositionsDirty();
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetAnimationLodBias(float bias)
 {
     animationLodBias_ = Max(bias, 0.0f);
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::Updated()
 {
     MarkPositionsDirty();
+    MarkNetworkUpdate();
 }
 
 Billboard* BillboardSet::GetBillboard(unsigned index)

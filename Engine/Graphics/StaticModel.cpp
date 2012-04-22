@@ -274,12 +274,15 @@ void StaticModel::SetModel(Model* model)
     
     SetBoundingBox(model->GetBoundingBox());
     ResetLodLevels();
+    MarkNetworkUpdate();
 }
 
 void StaticModel::SetMaterial(Material* material)
 {
     for (unsigned i = 0; i < materials_.Size(); ++i)
         materials_[i] = material;
+    
+    MarkNetworkUpdate();
 }
 
 bool StaticModel::SetMaterial(unsigned index, Material* material)
@@ -291,12 +294,14 @@ bool StaticModel::SetMaterial(unsigned index, Material* material)
     }
     
     materials_[index] = material;
+    MarkNetworkUpdate();
     return true;
 }
 
 void StaticModel::SetSoftwareLodLevel(unsigned level)
 {
     softwareLodLevel_ = level;
+    MarkNetworkUpdate();
 }
 
 Material* StaticModel::GetMaterial(unsigned index) const

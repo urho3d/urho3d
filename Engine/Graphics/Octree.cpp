@@ -382,7 +382,7 @@ void Octree::RegisterObject(Context* context)
 void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     // If any of the (size) attributes change, resize the octree
-    Serializable::OnSetAttribute(attr, src);
+    Component::OnSetAttribute(attr, src);
     Resize(worldBoundingBox_, numLevels_);
 }
 
