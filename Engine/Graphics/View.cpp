@@ -246,15 +246,6 @@ void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
     view->ProcessLight(*query, threadIndex);
 }
 
-void ProcessShadowSplitWork(const WorkItem* item, unsigned threadIndex)
-{
-    View* view = reinterpret_cast<View*>(item->aux_);
-    LightQueryResult* query = reinterpret_cast<LightQueryResult*>(item->start_);
-    unsigned splitIndex = reinterpret_cast<unsigned>(item->end_);
-    
-    view->ProcessShadowSplit(*query, splitIndex, threadIndex);
-}
-
 void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
@@ -739,24 +730,15 @@ void View::GetBatches()
             if (query.litGeometries_.Empty())
                 continue;
             
-            // If no shadow casters, the light can be rendered unshadowed. At this point we have not allocated a shadow map yet,
-            // so the only cost has been the shadow camera setup & queries
-            unsigned shadowSplits = query.shadowSplits_.Size();
-            if (shadowSplits)
-            {
-                unsigned totalShadowCasters = 0;
-                for (unsigned i = 0; i < query.shadowSplits_.Size(); ++i)
-                    totalShadowCasters += query.shadowSplits_[i].shadowCasters_.Size();
-                if (!totalShadowCasters)
-                    shadowSplits = 0;
-            }
             
             Light* light = query.light_;
             
             // Per-pixel light
             if (!light->GetPerVertex())
             {
-                // Initialize light queue
+                unsigned shadowSplits = query.numSplits_;
+                
+                // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
                 light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
@@ -777,20 +759,19 @@ void View::GetBatches()
                 lightQueue.shadowSplits_.Resize(shadowSplits);
                 for (unsigned j = 0; j < shadowSplits; ++j)
                 {
-                    ShadowQueryResult& split = query.shadowSplits_[j];
                     ShadowBatchQueue& shadowQueue = lightQueue.shadowSplits_[j];
-                    Camera* shadowCamera = split.shadowCamera_;
+                    Camera* shadowCamera = query.shadowCameras_[j];
                     shadowQueue.shadowCamera_ = shadowCamera;
-                    shadowQueue.nearSplit_ = split.nearSplit_;
-                    shadowQueue.farSplit_ = split.farSplit_;
+                    shadowQueue.nearSplit_ = query.shadowNearSplits_[j];
+                    shadowQueue.farSplit_ = query.shadowFarSplits_[j];
                     
                     // Setup the shadow split viewport and finalize shadow camera parameters
                     shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
-                    FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, split.shadowCasterBox_);
+                    FinalizeShadowCamera(shadowCamera, light, shadowQueue.shadowViewport_, query.shadowCasterBox_[j]);
                     
                     // Loop through shadow casters
-                    for (PODVector<Drawable*>::ConstIterator k = split.shadowCasters_.Begin(); k != split.shadowCasters_.End();
-                        ++k)
+                    for (PODVector<Drawable*>::ConstIterator k = query.shadowCasters_.Begin() + query.shadowCasterBegin_[j];
+                        k < query.shadowCasters_.Begin() + query.shadowCasterEnd_[j]; ++k)
                     {
                         Drawable* drawable = *k;
                         if (!drawable->IsInView(frame_, false))
@@ -941,7 +922,7 @@ void View::GetBatches()
                         
                         // Allow G-buffer pass instancing only if lightmask matches zone lightmask
                         baseBatch.lightMask_ = GetLightMask(drawable);
-                        FinalizeBatch(baseBatch, tech, pass, baseBatch.lightMask_ == (baseBatch.zone_->GetLightMask() & 0xff));
+                        FinalizeBatch(baseBatch, tech, pass, baseBatch.lightMask_ == (zone->GetLightMask() & 0xff));
                         gbufferQueue_.AddBatch(baseBatch);
                         
                         pass = tech->GetPass(PASS_MATERIAL);
@@ -954,7 +935,7 @@ void View::GetBatches()
                 // Next check for forward base pass
                 if (!pass)
                 {
-                    // Skip if a lit base pass already exists
+                    // Skip if a lit base pass already exists (only in forward rendering)
                     if (j < 32 && drawable->HasBasePass(j))
                         continue;
                     pass = tech->GetPass(PASS_BASE);
@@ -996,6 +977,7 @@ void View::GetBatches()
                         }
                     }
                     
+                    // Check whether batch is opaque or transparent
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                     {
                         if (pass->GetType() != PASS_DEFERRED)
@@ -1020,7 +1002,7 @@ void View::GetBatches()
                     continue;
                 }
                 
-                // If no base pass, finally check for pre-alpha / post-alpha custom passes
+                // If no pass found so far, finally check for pre-alpha / post-alpha custom passes
                 pass = tech->GetPass(PASS_PREALPHA);
                 if (pass)
                 {
@@ -1795,73 +1777,50 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     // If no lit geometries or not shadowed, no need to process shadow cameras
     if (query.litGeometries_.Empty() || !isShadowed)
     {
-        query.shadowSplits_.Clear();
+        query.numSplits_ = 0;
         return;
     }
     
     // Determine number of shadow cameras and setup their initial positions
     SetupShadowCameras(query);
     
-    // Process each split for shadow casters. Divide directional light splits into the work queue
-    if (type == LIGHT_DIRECTIONAL && query.shadowSplits_.Size() > 1)
+    // Process each split for shadow casters
+    query.shadowCasters_.Clear();
+    for (unsigned i = 0; i < query.numSplits_; ++i)
     {
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        Camera* shadowCamera = query.shadowCameras_[i];
+        const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
+        query.shadowCasterBegin_[i] = query.shadowCasterEnd_[i] = query.shadowCasters_.Size();
         
-        WorkItem item;
-        item.workFunction_ = ProcessShadowSplitWork;
-        item.start_ = &query;
-        item.aux_ = this;
+        // For point light check that the face is visible: if not, can skip the split
+        if (type == LIGHT_POINT && frustum.IsInsideFast(BoundingBox(shadowCameraFrustum)) == OUTSIDE)
+            continue;
         
-        for (unsigned i = 1; i < query.shadowSplits_.Size(); ++i)
+        // For directional light check that the split is inside the visible scene: if not, can skip the split
+        if (type == LIGHT_DIRECTIONAL)
         {
-            item.end_ = (void*)i;
-            queue->AddWorkItem(item);
+            if (sceneViewBox_.min_.z_ > query.shadowFarSplits_[i])
+                continue;
+            if (sceneViewBox_.max_.z_ < query.shadowNearSplits_[i])
+                continue;
         }
         
-        // Process the first split here
-        ProcessShadowSplit(query, 0, threadIndex);
-    }
-    else
-    {
-        for (unsigned i = 0; i < query.shadowSplits_.Size(); ++i)
-            ProcessShadowSplit(query, i, threadIndex);
-    }
-}
-
-void View::ProcessShadowSplit(LightQueryResult& query, unsigned splitIndex, unsigned threadIndex)
-{
-    ShadowQueryResult& split = query.shadowSplits_[splitIndex];
-    Camera* shadowCamera = split.shadowCamera_;
-    split.shadowCasters_.Clear();
-    
-    Light* light = query.light_;
-    LightType type = light->GetLightType();
-    const Frustum& frustum = camera_->GetFrustum();
-    const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
-    PODVector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
-    
-    // For point light check that the face is visible: if not, can skip the split
-    if (type == LIGHT_POINT && frustum.IsInsideFast(BoundingBox(shadowCameraFrustum)) == OUTSIDE)
-        return;
-    
-    // For directional light check that the split is inside the visible scene: if not, can skip the split
-    if (type == LIGHT_DIRECTIONAL)
-    {
-        if (sceneViewBox_.min_.z_ > split.farSplit_)
-            return;
-        if (sceneViewBox_.max_.z_ < split.nearSplit_)
-            return;
+        // Reuse lit geometry query for all except directional lights
+        if (type == LIGHT_DIRECTIONAL)
+        {
+            ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
+                camera_->GetViewMask());
+            octree_->GetDrawables(query);
+        }
+        
+        // Check which shadow casters actually contribute to the shadowing
+        ProcessShadowCasters(query, tempDrawables, i);
     }
     
-    // Reuse lit geometry query for all except directional lights
-    if (type == LIGHT_DIRECTIONAL)
-    {
-        ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY, camera_->GetViewMask());
-        octree_->GetDrawables(query);
-    }
-    
-    // Check which shadow casters actually contribute to the shadowing
-    ProcessShadowCasters(query, tempDrawables, splitIndex);
+    // If no shadow casters, the light can be rendered unshadowed. At this point we have not allocated a shadow map yet, so the
+    // only cost has been the shadow camera setup & queries
+    if (query.shadowCasters_.Empty())
+        query.numSplits_ = 0;
 }
 
 void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex)
@@ -1870,14 +1829,13 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     Matrix3x4 lightView;
     Matrix4 lightProj;
     
-    ShadowQueryResult& split = query.shadowSplits_[splitIndex];
-    Camera* shadowCamera = split.shadowCamera_;
+    Camera* shadowCamera = query.shadowCameras_[splitIndex];
     const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
     lightView = shadowCamera->GetInverseWorldTransform();
     lightProj = shadowCamera->GetProjection();
     LightType type = light->GetLightType();
     
-    split.shadowCasterBox_.defined_ = false;
+    query.shadowCasterBox_[splitIndex].defined_ = false;
     
     // Transform scene frustum into shadow camera's view space for shadow caster visibility check. For point & spot lights,
     // we can use the whole scene frustum. For directional lights, use the intersection of the scene frustum and the split
@@ -1886,8 +1844,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     if (type != LIGHT_DIRECTIONAL)
         lightViewFrustum = sceneFrustum_.Transformed(lightView);
     else
-        lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, split.nearSplit_),
-            Min(sceneViewBox_.max_.z_, split.farSplit_)).Transformed(lightView);
+        lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, query.shadowNearSplits_[splitIndex]),
+            Min(sceneViewBox_.max_.z_, query.shadowFarSplits_[splitIndex])).Transformed(lightView);
     
     BoundingBox lightViewFrustumBox(lightViewFrustum);
      
@@ -1930,15 +1888,17 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         {
             // Merge to shadow caster bounding box and add to the list
             if (type == LIGHT_DIRECTIONAL)
-                split.shadowCasterBox_.Merge(lightViewBox);
+                query.shadowCasterBox_[splitIndex].Merge(lightViewBox);
             else
             {
                 lightProjBox = lightViewBox.Projected(lightProj);
-                split.shadowCasterBox_.Merge(lightProjBox);
+                query.shadowCasterBox_[splitIndex].Merge(lightProjBox);
             }
-            split.shadowCasters_.Push(drawable);
+            query.shadowCasters_.Push(drawable);
         }
     }
+    
+    query.shadowCasterEnd_[splitIndex] = query.shadowCasters_.Size();
 }
 
 bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView,
@@ -2015,7 +1975,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
     Light* light = query.light_;
     
     LightType type = light->GetLightType();
-    unsigned splits = 0;
+    int splits = 0;
     
     if (type == LIGHT_DIRECTIONAL)
     {
@@ -2024,7 +1984,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
         float nearSplit = camera_->GetNearClip();
         float farSplit;
         
-        while (splits < (unsigned)renderer_->GetMaxShadowCascades())
+        while (splits < renderer_->GetMaxShadowCascades())
         {
             // If split is completely beyond camera far clip, we are done
             if (nearSplit > camera_->GetFarClip())
@@ -2034,35 +1994,22 @@ void View::SetupShadowCameras(LightQueryResult& query)
             if (farSplit <= nearSplit)
                 break;
             
-            nearSplit = farSplit;
-            ++splits;
-        }
-        
-        query.shadowSplits_.Resize(splits);
-        
-        for (unsigned i = 0; i < splits; ++i)
-        {
-            nearSplit = camera_->GetNearClip();
-            farSplit = Min(camera_->GetFarClip(), cascade.splits_[i]);
-            
             // Setup the shadow camera for the split
-            ShadowQueryResult& split = query.shadowSplits_[i];
             Camera* shadowCamera = renderer_->GetShadowCamera();
-            split.shadowCamera_ = shadowCamera;
-            split.nearSplit_ = nearSplit;
-            split.farSplit_ = farSplit;
+            query.shadowCameras_[splits] = shadowCamera;
+            query.shadowNearSplits_[splits] = nearSplit;
+            query.shadowFarSplits_[splits] = farSplit;
             SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit);
             
             nearSplit = farSplit;
+            ++splits;
         }
     }
     
     if (type == LIGHT_SPOT)
     {
-        query.shadowSplits_.Resize(1);
-        
         Camera* shadowCamera = renderer_->GetShadowCamera();
-        query.shadowSplits_[0].shadowCamera_ = shadowCamera;
+        query.shadowCameras_[0] = shadowCamera;
         Node* cameraNode = shadowCamera->GetNode();
         
         cameraNode->SetTransform(light->GetWorldPosition(), light->GetWorldRotation());
@@ -2070,16 +2017,16 @@ void View::SetupShadowCameras(LightQueryResult& query)
         shadowCamera->SetFarClip(light->GetRange());
         shadowCamera->SetFov(light->GetFov());
         shadowCamera->SetAspectRatio(light->GetAspectRatio());
+        
+        splits = 1;
     }
     
     if (type == LIGHT_POINT)
     {
-        query.shadowSplits_.Resize(MAX_CUBEMAP_FACES);
-        
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
             Camera* shadowCamera = renderer_->GetShadowCamera();
-            query.shadowSplits_[i].shadowCamera_ = shadowCamera;
+            query.shadowCameras_[i] = shadowCamera;
             Node* cameraNode = shadowCamera->GetNode();
             
             // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
@@ -2090,7 +2037,11 @@ void View::SetupShadowCameras(LightQueryResult& query)
             shadowCamera->SetFov(90.0f);
             shadowCamera->SetAspectRatio(1.0f);
         }
+        
+        splits = MAX_CUBEMAP_FACES;
     }
+    
+    query.numSplits_ = splits;
 }
 
 void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit)

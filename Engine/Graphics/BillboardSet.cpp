@@ -157,7 +157,7 @@ void BillboardSet::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batch
     batch.distance_ = distance_;
     batch.geometry_ = geometry_;
     batch.geometryType_ = GEOM_BILLBOARD;
-    batch.worldTransform_ = &GetWorldTransform();
+    batch.worldTransform_ = &node_->GetWorldTransform();
     batch.material_ = material_;
 }
 

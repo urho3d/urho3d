@@ -259,7 +259,7 @@ void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batc
     batch.distance_ = geometryDistances_[batchIndex];
     batch.geometry_ = currentGeometries_[batchIndex];
     batch.geometryType_ = GEOM_SKINNED;
-    batch.worldTransform_ = &GetWorldTransform();
+    batch.worldTransform_ = &node_->GetWorldTransform();
     batch.material_ = materials_[batchIndex];
     
     if (skinMatrices_.Size())

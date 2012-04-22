@@ -166,7 +166,7 @@ void StaticModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchI
 {
     batch.distance_ = geometryDistances_[batchIndex];
     batch.geometry_ = currentGeometries_[batchIndex];
-    batch.worldTransform_ = &GetWorldTransform();
+    batch.worldTransform_ = &node_->GetWorldTransform();
     batch.material_ = materials_[batchIndex];
 }
 
