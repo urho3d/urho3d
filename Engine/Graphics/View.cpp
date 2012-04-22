@@ -86,30 +86,21 @@ public:
     /// Intersection test for drawables.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        if (inside)
+        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
+        Drawable** end = ptr + drawables.Size();
+        
+        while (ptr != end)
         {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+            Drawable* drawable = *ptr;
+            
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
+                (drawable->GetViewMask() & viewMask_))
             {
-                Drawable* drawable = *i;
-                
-                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-        }
-        else
-        {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
-            {
-                Drawable* drawable = *i;
-                
-                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
-                {
-                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
-                        result_.Push(drawable);
-                }
-            }
+            
+            ++ptr;
         }
     }
     
@@ -141,32 +132,22 @@ public:
     /// Intersection test for drawables.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        if (inside)
+        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
+        Drawable** end = ptr + drawables.Size();
+        
+        while (ptr != end)
         {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
+            Drawable* drawable = *ptr;
+            unsigned char flags = drawable->GetDrawableFlags();
+            
+            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
+                (drawable->GetViewMask() & viewMask_))
             {
-                Drawable* drawable = *i;
-                unsigned char flags = drawable->GetDrawableFlags();
-                
-                if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-        }
-        else
-        {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
-            {
-                Drawable* drawable = *i;
-                unsigned char flags = drawable->GetDrawableFlags();
-                
-                if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
-                {
-                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
-                        result_.Push(drawable);
-                }
-            }
+            
+            ++ptr;
         }
     }
     
@@ -204,30 +185,21 @@ public:
     /// Intersection test for drawables. Note: drawable occlusion is performed later in worker threads.
     virtual void TestDrawables(const PODVector<Drawable*>& drawables, bool inside)
     {
-        if (inside)
+        Drawable** ptr = const_cast<Drawable**>(&drawables.Front());
+        Drawable** end = ptr + drawables.Size();
+        
+        while (ptr != end)
         {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
-            {
-                Drawable* drawable = *i;
+            Drawable* drawable = *ptr;
             
-                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
+                (drawable->GetViewMask() & viewMask_))
+            {
+                if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-        }
-        else
-        {
-            for (PODVector<Drawable*>::ConstIterator i = drawables.Begin(); i != drawables.End(); ++i)
-            {
-                Drawable* drawable = *i;
             
-                if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
-                    (drawable->GetViewMask() & viewMask_))
-                {
-                    if (frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
-                        result_.Push(drawable);
-                }
-            }
+            ++ptr;
         }
     }
     
@@ -1826,27 +1798,29 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     // Determine number of shadow cameras and setup their initial positions
     SetupShadowCameras(query);
     
-    // Process each split for shadow casters. Divide multiple splits into the work queue
-    if (query.shadowSplits_.Size())
+    // Process each split for shadow casters. Divide directional light splits into the work queue
+    if (type == LIGHT_DIRECTIONAL && query.shadowSplits_.Size() > 1)
     {
-        if (query.shadowSplits_.Size() > 1)
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        
+        WorkItem item;
+        item.workFunction_ = ProcessShadowSplitWork;
+        item.start_ = &query;
+        item.aux_ = this;
+        
+        for (unsigned i = 1; i < query.shadowSplits_.Size(); ++i)
         {
-            WorkQueue* queue = GetSubsystem<WorkQueue>();
-            
-            WorkItem item;
-            item.workFunction_ = ProcessShadowSplitWork;
-            item.start_ = &query;
-            item.aux_ = this;
-            
-            for (unsigned i = 1; i < query.shadowSplits_.Size(); ++i)
-            {
-                item.end_ = (void*)i;
-                queue->AddWorkItem(item);
-            }
+            item.end_ = (void*)i;
+            queue->AddWorkItem(item);
         }
         
         // Process the first split here
         ProcessShadowSplit(query, 0, threadIndex);
+    }
+    else
+    {
+        for (unsigned i = 0; i < query.shadowSplits_.Size(); ++i)
+            ProcessShadowSplit(query, i, threadIndex);
     }
 }
 

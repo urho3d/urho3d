@@ -221,11 +221,22 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
     if (drawables_.Size())
         query.TestDrawables(drawables_, inside);
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query, inside);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesInternal(query, inside);
+    if (children_[1])
+        children_[1]->GetDrawablesInternal(query, inside);
+    if (children_[2])
+        children_[2]->GetDrawablesInternal(query, inside);
+    if (children_[3])
+        children_[3]->GetDrawablesInternal(query, inside);
+    if (children_[4])
+        children_[4]->GetDrawablesInternal(query, inside);
+    if (children_[5])
+        children_[5]->GetDrawablesInternal(query, inside);
+    if (children_[6])
+        children_[6]->GetDrawablesInternal(query, inside);
+    if (children_[7])
+        children_[7]->GetDrawablesInternal(query, inside);
 }
 
 void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
@@ -253,11 +264,22 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         }
     }
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesInternal(query);
+    if (children_[1])
+        children_[1]->GetDrawablesInternal(query);
+    if (children_[2])
+        children_[2]->GetDrawablesInternal(query);
+    if (children_[3])
+        children_[3]->GetDrawablesInternal(query);
+    if (children_[4])
+        children_[4]->GetDrawablesInternal(query);
+    if (children_[5])
+        children_[5]->GetDrawablesInternal(query);
+    if (children_[6])
+        children_[6]->GetDrawablesInternal(query);
+    if (children_[7])
+        children_[7]->GetDrawablesInternal(query);
 }
 
 void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
@@ -273,7 +295,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
     {
         Drawable** ptr = const_cast<Drawable**>(&drawables_.Front());
         Drawable** end = ptr + drawables_.Size();
-       
+        
         while (ptr != end)
         {
             Drawable* drawable = *ptr;
@@ -285,11 +307,22 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         }
     }
     
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i])
-            children_[i]->GetDrawablesOnlyInternal(query, drawables);
-    }
+    if (children_[0])
+        children_[0]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[1])
+        children_[1]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[2])
+        children_[2]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[3])
+        children_[3]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[4])
+        children_[4]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[5])
+        children_[5]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[6])
+        children_[6]->GetDrawablesOnlyInternal(query, drawables);
+    if (children_[7])
+        children_[7]->GetDrawablesOnlyInternal(query, drawables);
 }
 
 void Octant::Release()
