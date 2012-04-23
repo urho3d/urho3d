@@ -554,7 +554,7 @@ void View::GetDrawables()
     cameraZoneOverride_ = cameraZone_->GetOverride();
     if (!cameraZoneOverride_)
     {
-        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0, 0, camera_->GetFarClip());
+        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0.0f, 0.0f, camera_->GetFarClip());
         bestPriority = M_MIN_INT;
         
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
@@ -631,7 +631,7 @@ void View::GetDrawables()
     {
         Drawable* drawable = tempDrawables[i];
         unsigned char flags = drawable->GetDrawableFlags();
-        if (flags & DRAWABLE_ZONE || !drawable->IsInView(frame_))
+        if (!drawable->IsInView(frame_))
             continue;
         
         if (flags & DRAWABLE_GEOMETRY)
