@@ -518,6 +518,7 @@ void CollisionShape::OnNodeSet(Node* node)
                 physicsWorld_->AddCollisionShape(this);
         }
         node->AddListener(this);
+        
         UpdateShape();
         NotifyRigidBody();
     }

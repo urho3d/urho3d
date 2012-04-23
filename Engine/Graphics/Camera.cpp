@@ -58,7 +58,8 @@ Camera::Camera(Context* context) :
     autoAspectRatio_(true),
     flipVertical_(false),
     frustumDirty_(true),
-    projectionDirty_(true)
+    projectionDirty_(true),
+    inverseWorldDirty_(true)
 {
 }
 
@@ -284,7 +285,7 @@ const Frustum& Camera::GetFrustum()
     return frustum_;
 }
 
-const Matrix4& Camera::GetProjection()
+const Matrix4& Camera::GetProjection() const
 {
     if (projectionDirty_)
     {
@@ -451,8 +452,25 @@ bool Camera::IsProjectionValid() const
     return farClip_ > GetNearClip();
 }
 
+const Matrix3x4& Camera::GetInverseWorldTransform() const
+{
+    if (inverseWorldDirty_)
+    {
+        inverseWorld_ = GetWorldTransform().Inverse();
+        inverseWorldDirty_ = false;
+    }
+    
+    return inverseWorld_;
+}
+
+void Camera::OnNodeSet(Node* node)
+{
+    if (node)
+        node->AddListener(this);
+}
+
 void Camera::OnMarkedDirty(Node* node)
 {
-    if (node == node_)
-        frustumDirty_ = true;
+    frustumDirty_ = true;
+    inverseWorldDirty_ = true;
 }

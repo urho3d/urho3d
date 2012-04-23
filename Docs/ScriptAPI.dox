@@ -1457,6 +1457,7 @@ Properties:<br>
 - uint viewOverrideFlags
 - Frustum& frustum (readonly)
 - Matrix4& projection (readonly)
+- Matrix3x4& inverseWorldTransform (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
 - Vector3 forwardVector (readonly)

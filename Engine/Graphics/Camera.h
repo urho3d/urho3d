@@ -100,7 +100,7 @@ public:
     /// Return frustum in world space.
     const Frustum& GetFrustum();
     /// Return API-specific projection matrix.
-    const Matrix4& GetProjection();
+    const Matrix4& GetProjection() const;
     /// Return either API-specific or API-independent (D3D convention) projection matrix.
     Matrix4 GetProjection(bool apiSpecific) const;
     /// Return frustum near and far sizes.
@@ -135,9 +135,11 @@ public:
     bool IsProjectionValid() const;
     
     /// Return inverse world transform, also known as the view matrix.
-    Matrix3x4 GetInverseWorldTransform() const { return GetWorldTransform().Inverse(); }
+    const Matrix3x4& GetInverseWorldTransform() const;
     
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     
@@ -145,7 +147,9 @@ private:
     /// Cached frustum.
     Frustum frustum_;
     /// Cached projection matrix.
-    Matrix4 projection_;
+    mutable Matrix4 projection_;
+    /// Cached inverse world transform matrix.
+    mutable Matrix3x4 inverseWorld_;
     /// Projection offset.
     Vector2 projectionOffset_;
     /// Near clip distance.
@@ -175,5 +179,7 @@ private:
     /// Frustum dirty flag.
     bool frustumDirty_;
     /// Projection matrix dirty flag.
-    bool projectionDirty_;
+    mutable bool projectionDirty_;
+    /// Inverse world transform dirty flag.
+    mutable bool inverseWorldDirty_;
 };

@@ -409,14 +409,14 @@ VariantVector ParticleEmitter::GetParticlesAttr() const
 
 void ParticleEmitter::OnNodeSet(Node* node)
 {
+    BillboardSet::OnNodeSet(node);
+    
     if (node)
     {
         Scene* scene = GetScene();
         if (scene)
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
     }
-    
-    BillboardSet::OnNodeSet(node);
 }
 
 void ParticleEmitter::SetNumParticles(int num)
