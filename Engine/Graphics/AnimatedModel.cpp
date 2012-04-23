@@ -213,8 +213,13 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
     
     // Note: per-geometry distances do not take skinning into account
-    for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
-        geometryDistances_[i] = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+    if (geometryDistances_.Size() > 1)
+    {
+        for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
+            geometryDistances_[i] = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+    }
+    else
+        geometryDistances_[0] = distance_;
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
