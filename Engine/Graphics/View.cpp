@@ -1024,7 +1024,7 @@ void View::GetBatches()
 
 void View::UpdateGeometries()
 {
-    PROFILE(UpdateGeometries);
+    PROFILE(SortAndUpdateGeometry);
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     

@@ -538,7 +538,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     if (drawableUpdates_.Empty())
         return;
     
-    PROFILE(UpdateDrawables);
+    PROFILE(AnimateDrawables);
     
     Scene* scene = GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();
@@ -572,7 +572,7 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     if (drawableReinsertions_.Empty())
         return;
     
-    PROFILE(ReinsertDrawables);
+    PROFILE(ReinsertToOctree);
     
     // Reinsert drawables into the octree
     for (Vector<WeakPtr<Drawable> >::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
