@@ -730,7 +730,6 @@ void View::GetBatches()
             if (query.litGeometries_.Empty())
                 continue;
             
-            
             Light* light = query.light_;
             
             // Per-pixel light
@@ -894,7 +893,7 @@ void View::GetBatches()
                 Batch baseBatch;
                 drawable->GetBatch(baseBatch, frame_, j);
                 
-                // Check here if the material technique refers to a rendertarget texture with camera(s) attached
+                // Check here if the material refers to a rendertarget texture with camera(s) attached
                 // Only check this for the main view (null rendertarget)
                 if (baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
                     CheckMaterialForAuxView(baseBatch.material_);
@@ -2293,31 +2292,33 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
 {
     if (!material)
         material = renderer_->GetDefaultMaterial();
-    if (!material)
-        return 0;
     
-    float lodDistance = drawable->GetLodDistance();
     const Vector<TechniqueEntry>& techniques = material->GetTechniques();
-    if (techniques.Empty())
-        return 0;
-    
-    // Check for suitable technique. Techniques should be ordered like this:
-    // Most distant & highest quality
-    // Most distant & lowest quality
-    // Second most distant & highest quality
-    // ...
-    for (unsigned i = 0; i < techniques.Size(); ++i)
+    // If only one technique, no choice
+    if (techniques.Size() == 1)
+        return techniques[0].technique_;
+    else
     {
-        const TechniqueEntry& entry = techniques[i];
-        Technique* technique = entry.technique_;
-        if (!technique || (technique->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
-            continue;
-        if (lodDistance >= entry.lodDistance_)
-            return technique;
+        float lodDistance = drawable->GetLodDistance();
+        
+        // Check for suitable technique. Techniques should be ordered like this:
+        // Most distant & highest quality
+        // Most distant & lowest quality
+        // Second most distant & highest quality
+        // ...
+        for (unsigned i = 0; i < techniques.Size(); ++i)
+        {
+            const TechniqueEntry& entry = techniques[i];
+            Technique* technique = entry.technique_;
+            if (!technique || (technique->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
+                continue;
+            if (lodDistance >= entry.lodDistance_)
+                return technique;
+        }
+        
+        // If no suitable technique found, fallback to the last
+        return techniques.Size() ? techniques.Back().technique_ : (Technique*)0;
     }
-    
-    // If no suitable technique found, fallback to the last
-    return techniques.Back().technique_;
 }
 
 void View::CheckMaterialForAuxView(Material* material)
