@@ -36,12 +36,15 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
+    netState_(0),
     loading_(false)
 {
 }
 
 Serializable::~Serializable()
 {
+    delete netState_;
+    netState_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -423,7 +426,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
 void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
+    if (!attributes || !netState_)
         return;
     
     unsigned numAttributes = attributes->Size();
@@ -433,7 +436,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (currentState_[i] != attr.defaultValue_)
+        if (netState_->attributes_[i] != attr.defaultValue_)
             attributeBits.Set(i);
     }
     
@@ -443,14 +446,14 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(currentState_[i]);
+            dest.WriteVariantData(netState_->attributes_[i]);
     }
 }
 
 void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
+    if (!attributes || !netState_)
         return;
     
     unsigned numAttributes = attributes->Size();
@@ -462,14 +465,14 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(currentState_[i]);
+            dest.WriteVariantData(netState_->attributes_[i]);
     }
 }
 
 void Serializable::WriteLatestDataUpdate(Serializer& dest)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
+    if (!attributes || !netState_)
         return;
     
     unsigned numAttributes = attributes->Size();
@@ -477,7 +480,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(currentState_[i]);
+            dest.WriteVariantData(netState_->attributes_[i]);
     }
 }
 

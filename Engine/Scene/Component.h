@@ -103,8 +103,6 @@ protected:
     Node* node_;
     /// Unique ID within the scene.
     unsigned id_;
-    /// Per-user network replication states.
-    PODVector<ComponentReplicationState*> replicationStates_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }

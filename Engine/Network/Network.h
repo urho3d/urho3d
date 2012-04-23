@@ -25,7 +25,6 @@
 
 #include "Connection.h"
 #include "HashSet.h"
-#include "Map.h"
 #include "Object.h"
 #include "VectorBuffer.h"
 

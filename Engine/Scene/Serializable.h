@@ -34,6 +34,8 @@ class Serializer;
 class XMLElement;
 
 struct DirtyBits;
+struct NetworkState;
+struct ReplicationState;
 
 /// Base class for objects with automatic serialization through attributes.
 class Serializable : public Object
@@ -92,10 +94,8 @@ public:
     bool IsLoading() const { return loading_; }
     
 protected:
-    /// Current attributes for sending network updates.
-    Vector<Variant> currentState_;
-    /// Previous attributes for sending network updates.
-    Vector<Variant> previousState_;
+    /// Network attribute state.
+    NetworkState* netState_;
     /// Is loading flag.
     bool loading_;
 };

@@ -131,22 +131,22 @@ protected:
     BoundingBox worldBoundingBox_;
     /// Bounding box used for drawable object fitting.
     BoundingBox cullingBox_;
+    /// Drawable objects.
+    PODVector<Drawable*> drawables_;
+    /// Child octants.
+    Octant* children_[NUM_OCTANTS];
     /// World bounding box center.
     Vector3 center_;
     /// World bounding box half size.
     Vector3 halfSize_;
     /// Subdivision level.
     unsigned level_;
-    /// Parent octant.
-    Octant* parent_;
-    /// Child octants.
-    Octant* children_[NUM_OCTANTS];
-    /// Octree root.
-    Octree* root_;
-    /// Drawable objects.
-    PODVector<Drawable*> drawables_;
     /// Number of drawable objects in this octant and child octants.
     unsigned numDrawables_;
+    /// Parent octant.
+    Octant* parent_;
+    /// Octree root.
+    Octree* root_;
 };
 
 /// %Octree component. Should be added only to the root scene node

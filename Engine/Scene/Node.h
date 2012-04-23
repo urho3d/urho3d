@@ -341,7 +341,7 @@ private:
     /// World transform needs update flag.
     mutable bool dirty_;
     /// Network update queued flag.
-    bool networkUpdate_;
+    bool netUpdate_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned short rotateCount_;
     /// Parent scene node.
@@ -376,10 +376,6 @@ private:
 protected:
     /// User variables.
     VariantMap vars_;
-    /// Previous user variables for network updates.
-    VariantMap previousVars_;
-    /// Per-user network replication states.
-    PODVector<NodeReplicationState*> replicationStates_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

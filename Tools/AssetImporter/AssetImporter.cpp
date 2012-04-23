@@ -47,7 +47,6 @@
 #include "Zone.h"
 
 #include "Sort.h"
-#include "Map.h"
 #include "Set.h"
 
 #ifdef WIN32

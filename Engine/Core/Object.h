@@ -24,6 +24,7 @@
 #pragma once
 
 #include "HashMap.h"
+#include "Map.h"
 #include "Ptr.h"
 #include "Variant.h"
 
@@ -95,7 +96,7 @@ private:
     void RemoveEventSender(Object* sender);
     
     /// Event handlers. Sender is null for non-specific handlers.
-    HashMap<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
+    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
 };
 
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }

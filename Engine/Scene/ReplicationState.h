@@ -37,6 +37,7 @@ class Connection;
 class Node;
 class Scene;
 
+struct ReplicationState;
 struct ComponentReplicationState;
 struct NodeReplicationState;
 struct SceneReplicationState;
@@ -117,11 +118,29 @@ struct DirtyBits
     unsigned char count_;
 };
 
-/// Per-user component network replication state.
-struct ComponentReplicationState
+/// Per-object attribute state for network replication, allocated on demand.
+struct NetworkState
+{
+    /// Current network attributes.
+    Vector<Variant> attributes_;
+    /// Previous network attributes.
+    Vector<Variant> previousAttributes_;
+    /// Replication states that are tracking this object.
+    PODVector<ReplicationState*> replicationStates_;
+    /// Previous user variables.
+    VariantMap previousVars_;
+};
+
+/// Base class for per-user network replication states.
+struct ReplicationState
 {
     /// Parent network connection.
     Connection* connection_;
+};
+
+/// Per-user component network replication state.
+struct ComponentReplicationState : ReplicationState
+{
     /// Parent node replication state.
     NodeReplicationState* nodeState_;
     /// Link to the actual component.
@@ -130,18 +149,17 @@ struct ComponentReplicationState
     DirtyBits dirtyAttributes_;
 };
 
-/// Last sent state of a node for network replication.
-struct NodeReplicationState
+/// Per-user node network replication state.
+struct NodeReplicationState : ReplicationState
 {
     /// Construct.
     NodeReplicationState() :
+        ReplicationState(),
         priorityAcc_(0.0f),
         markedDirty_(false)
     {
     }
     
-    /// Parent network connection.
-    Connection* connection_;
     /// Parent scene replication state.
     SceneReplicationState* sceneState_;
     /// Link to the actual node.
@@ -159,10 +177,8 @@ struct NodeReplicationState
 };
 
 /// Per-user scene network replication state.
-struct SceneReplicationState
+struct SceneReplicationState : ReplicationState
 {
-    /// Parent network connection.
-    Connection* connection_;
     /// Nodes by ID.
     HashMap<unsigned, NodeReplicationState> nodeStates_;
     /// Dirty node IDs.

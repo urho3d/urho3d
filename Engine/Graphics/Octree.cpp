@@ -82,9 +82,9 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
 Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root) :
     worldBoundingBox_(box),
     level_(level),
+    numDrawables_(0),
     parent_(parent),
-    root_(root),
-    numDrawables_(0)
+    root_(root)
 {
     center_ = worldBoundingBox_.Center();
     halfSize_ = worldBoundingBox_.Size() * 0.5f;
@@ -234,9 +234,6 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 
 void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 {
-    if (!numDrawables_)
-        return;
-    
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist > query.maxDistance_)
         return;
@@ -267,9 +264,6 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 
 void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
 {
-    if (!numDrawables_)
-        return;
-    
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist > query.maxDistance_)
         return;

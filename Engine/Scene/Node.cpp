@@ -43,7 +43,7 @@ Node::Node(Context* context) :
     Serializable(context),
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
-    networkUpdate_(false),
+    netUpdate_(false),
     rotateCount_(0),
     parent_(0),
     scene_(0),
@@ -220,7 +220,10 @@ void Node::ApplyAttributes()
 
 void Node::AddReplicationState(NodeReplicationState* state)
 {
-    replicationStates_.Push(state);
+    if (!netState_)
+        netState_ = new NetworkState();
+    
+    netState_->replicationStates_.Push(state);
 }
 
 bool Node::SaveXML(Serializer& dest)
@@ -858,70 +861,74 @@ void Node::PrepareNetworkUpdate()
     
     // Then check for node attribute changes
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (attributes)
+    unsigned numAttributes = attributes->Size();
+    
+    if (!netState_)
+        netState_ = new NetworkState();
+    
+    if (netState_->attributes_.Size() != numAttributes)
     {
-        unsigned numAttributes = attributes->Size();
+        netState_->attributes_.Resize(numAttributes);
+        netState_->previousAttributes_.Resize(numAttributes);
         
-        if (currentState_.Size() != numAttributes)
-        {
-            currentState_.Resize(numAttributes);
-            previousState_.Resize(numAttributes);
-            
-            // Copy the default attribute values to the previous state as a starting point
-            for (unsigned i = 0; i < numAttributes; ++i)
-                previousState_[i] = attributes->At(i).defaultValue_;
-        }
-        
-        // Check for attribute changes
+        // Copy the default attribute values to the previous state as a starting point
         for (unsigned i = 0; i < numAttributes; ++i)
+            netState_->previousAttributes_[i] = attributes->At(i).defaultValue_;
+    }
+    
+    // Check for attribute changes
+    for (unsigned i = 0; i < numAttributes; ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        OnGetAttribute(attr, netState_->attributes_[i]);
+        
+        if (netState_->attributes_[i] != netState_->previousAttributes_[i])
         {
-            const AttributeInfo& attr = attributes->At(i);
-            OnGetAttribute(attr, currentState_[i]);
+            netState_->previousAttributes_[i] = netState_->attributes_[i];
             
-            if (currentState_[i] != previousState_[i])
+            // Mark the attribute dirty in all replication states that are tracking this node
+            for (PODVector<ReplicationState*>::Iterator j = netState_->replicationStates_.Begin(); j !=
+                netState_->replicationStates_.End();
+                ++j)
             {
-                previousState_[i] = currentState_[i];
+                NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
+                nodeState->dirtyAttributes_.Set(i);
                 
-                // Mark the attribute dirty in all replication states that are tracking this node
-                for (PODVector<NodeReplicationState*>::Iterator j = replicationStates_.Begin(); j != replicationStates_.End();
-                    ++j)
+                // Add node to the dirty set if not added yet
+                if (!nodeState->markedDirty_)
                 {
-                    (*j)->dirtyAttributes_.Set(i);
-                    
-                    // Add node to the dirty set if not added yet
-                    if (!(*j)->markedDirty_)
-                    {
-                        (*j)->markedDirty_ = true;
-                        (*j)->sceneState_->dirtyNodes_.Insert(id_);
-                    }
+                    nodeState->markedDirty_ = true;
+                    nodeState->sceneState_->dirtyNodes_.Insert(id_);
                 }
             }
         }
     }
-    
+
     // Finally check for user var changes
     for (VariantMap::ConstIterator i = vars_.Begin(); i != vars_.End(); ++i)
     {
-        VariantMap::ConstIterator j = previousVars_.Find(i->first_);
-        if (j == previousVars_.End() || j->second_ != i->second_)
+        VariantMap::ConstIterator j = netState_->previousVars_.Find(i->first_);
+        if (j == netState_->previousVars_.End() || j->second_ != i->second_)
         {
-            previousVars_[i->first_] = i->second_;
+            netState_->previousVars_[i->first_] = i->second_;
             
             // Mark the var dirty in all replication states that are tracking this node
-            for (PODVector<NodeReplicationState*>::Iterator j = replicationStates_.Begin(); j != replicationStates_.End(); ++j)
+            for (PODVector<ReplicationState*>::Iterator j = netState_->replicationStates_.Begin(); j !=
+                netState_->replicationStates_.End(); ++j)
             {
-                (*j)->dirtyVars_.Insert(i->first_);
+                NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
+                nodeState->dirtyVars_.Insert(i->first_);
                 
-                if (!(*j)->markedDirty_)
+                if (!nodeState->markedDirty_)
                 {
-                    (*j)->markedDirty_ = true;
-                    (*j)->sceneState_->dirtyNodes_.Insert(id_);
+                    nodeState->markedDirty_ = true;
+                    nodeState->sceneState_->dirtyNodes_.Insert(id_);
                 }
             }
         }
     }
     
-    networkUpdate_ = false;
+    netUpdate_ = false;
 }
 
 void Node::CleanupConnection(Connection* connection)
@@ -929,30 +936,38 @@ void Node::CleanupConnection(Connection* connection)
     if (owner_ == connection)
         owner_ = 0;
     
-    for (unsigned i = replicationStates_.Size() - 1; i < replicationStates_.Size(); --i)
+    if (netState_)
     {
-        if (replicationStates_[i]->connection_ == connection)
-            replicationStates_.Erase(i);
+        for (unsigned i = netState_->replicationStates_.Size() - 1; i < netState_->replicationStates_.Size(); --i)
+        {
+            if (netState_->replicationStates_[i]->connection_ == connection)
+                netState_->replicationStates_.Erase(i);
+        }
     }
 }
 
 void Node::MarkNetworkUpdate()
 {
-    if (id_ < FIRST_LOCAL_ID && !networkUpdate_ && scene_)
+    if (id_ < FIRST_LOCAL_ID && !netUpdate_ && scene_)
     {
         scene_->MarkNetworkUpdate(this);
-        networkUpdate_ = true;
+        netUpdate_ = true;
     }
 }
 
 void Node::MarkReplicationDirty()
 {
-    for (PODVector<NodeReplicationState*>::Iterator j = replicationStates_.Begin(); j != replicationStates_.End(); ++j)
+    if (netState_)
     {
-        if (!(*j)->markedDirty_)
+        for (PODVector<ReplicationState*>::Iterator j = netState_->replicationStates_.Begin(); j !=
+            netState_->replicationStates_.End(); ++j)
         {
-            (*j)->markedDirty_ = true;
-            (*j)->sceneState_->dirtyNodes_.Insert(id_);
+            NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
+            if (!nodeState->markedDirty_)
+            {
+                nodeState->markedDirty_ = true;
+                nodeState->sceneState_->dirtyNodes_.Insert(id_);
+            }
         }
     }
 }
