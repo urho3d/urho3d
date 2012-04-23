@@ -215,7 +215,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
         }
         if (lightType_ == LIGHT_POINT)
         {
-            float distance = query.ray_.HitDistance(Sphere(GetWorldPosition(), range_));
+            float distance = query.ray_.HitDistance(Sphere(node_->GetWorldPosition(), range_));
             if (distance <= query.maxDistance_)
             {
                 RayQueryResult result;
@@ -240,7 +240,7 @@ void Light::UpdateDistance(const FrameInfo& frame)
         break;
         
     default:
-        distance_ = frame.camera_->GetDistance(GetWorldPosition());
+        distance_ = frame.camera_->GetDistance(node_->GetWorldPosition());
         break;
     }
 }
@@ -407,7 +407,7 @@ Matrix3x4 Light::GetDirLightTransform(Camera* camera, bool getNearQuad)
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 {
-    const Matrix3x4& transform = GetWorldTransform();
+    const Matrix3x4& transform = node_->GetWorldTransform();
     
     switch (lightType_)
     {
@@ -464,7 +464,7 @@ void Light::OnWorldBoundingBoxUpdate()
         
     case LIGHT_POINT:
         {
-            const Vector3& center = GetWorldPosition();
+            const Vector3& center = node_->GetWorldPosition();
             Vector3 edge(range_, range_, range_);
             worldBoundingBox_.Define(center - edge, center + edge);
         }
@@ -502,7 +502,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
     case LIGHT_POINT:
         {
             Vector3 centerPos = box.Center();
-            Vector3 lightPos = GetWorldPosition();
+            Vector3 lightPos = node_->GetWorldPosition();
             Vector3 lightDir = (centerPos - lightPos).Normalized();
             Ray lightRay(lightPos, lightDir);
             float distance = lightRay.HitDistance(box);
@@ -515,8 +515,8 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
     case LIGHT_SPOT:
         {
             Vector3 centerPos = box.Center();
-            Vector3 lightPos = GetWorldPosition();
-            Vector3 lightDir = GetWorldRotation() * Vector3::FORWARD;
+            Vector3 lightPos = node_->GetWorldPosition();
+            Vector3 lightDir = node_->GetWorldRotation() * Vector3::FORWARD;
             Ray lightRay(lightPos, lightDir);
             
             Vector3 centerProj = lightRay.Project(centerPos);

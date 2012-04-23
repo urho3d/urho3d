@@ -141,7 +141,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
 
 void StaticModel::UpdateDistance(const FrameInfo& frame)
 {
-    const Matrix3x4& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
     
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)

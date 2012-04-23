@@ -93,7 +93,7 @@ void BillboardSet::RegisterObject(Context* context)
 void BillboardSet::UpdateDistance(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case
-    const Vector3& worldPos = GetWorldPosition();
+    const Vector3& worldPos = node_->GetWorldPosition();
     Vector3 offset = (worldPos - frame.camera_->GetWorldPosition());
     if (offset != previousOffset_)
     {
@@ -317,7 +317,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     worldBoundingBox_.defined_ = false;
     
     unsigned enabledBillboards = 0;
-    const Matrix3x4& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
     
@@ -336,7 +336,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     
     // If no billboards enabled, the bounding box is just the node's world position
     if (!enabledBillboards)
-        worldBoundingBox_.Merge(GetWorldPosition());
+        worldBoundingBox_.Merge(node_->GetWorldPosition());
 }
 
 void BillboardSet::UpdateBufferSize()
@@ -393,7 +393,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     
     unsigned numBillboards = billboards_.Size();
     unsigned enabledBillboards = 0;
-    const Matrix3x4& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
     
@@ -432,7 +432,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, LOCK_DISCARD);
     if (!dest)
         return;
-    const Vector3& worldScale = GetWorldTransform().Scale();
+    Vector3 worldScale = worldTransform.Scale();
     
     for (unsigned i = 0; i < enabledBillboards; ++i)
     {

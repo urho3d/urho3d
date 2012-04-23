@@ -422,7 +422,10 @@ Vector3 Camera::GetUpVector()
 float Camera::GetDistance(const Vector3& worldPos)
 {
     if (!orthographic_)
-        return (worldPos - GetWorldPosition()).Length();
+    {
+        const Vector3& cameraPos = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
+        return (worldPos - cameraPos).Length();
+    }
     else
         return fabsf((GetInverseWorldTransform() * worldPos).z_);
 }
@@ -430,7 +433,10 @@ float Camera::GetDistance(const Vector3& worldPos)
 float Camera::GetDistanceSquared(const Vector3& worldPos)
 {
     if (!orthographic_)
-        return (worldPos - GetWorldPosition()).LengthSquared();
+    {
+        const Vector3& cameraPos = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
+        return (worldPos - cameraPos).LengthSquared();
+    }
     else
     {
         float distance = (GetInverseWorldTransform() * worldPos).z_;

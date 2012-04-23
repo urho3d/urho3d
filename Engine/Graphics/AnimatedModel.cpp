@@ -195,7 +195,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
     {
         if (invisibleLodFactor_ == 0.0f)
             return;
-        float distance = frame.camera_->GetDistance(GetWorldPosition());
+        float distance = frame.camera_->GetDistance(node_->GetWorldPosition());
         // If distance is greater than draw distance, no need to update at all
         if (drawDistance_ > 0.0f && distance > drawDistance_)
             return;
@@ -209,7 +209,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
 
 void AnimatedModel::UpdateDistance(const FrameInfo& frame)
 {
-    const Matrix3x4& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
     
     // Note: per-geometry distances do not take skinning into account

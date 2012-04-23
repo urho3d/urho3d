@@ -136,11 +136,11 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     }
     
     // Update existing particles
-    Vector3 relativeConstantForce = GetWorldRotation().Inverse() * constanceForce_;
+    Vector3 relativeConstantForce = node_->GetWorldRotation().Inverse() * constanceForce_;
     // If billboards are not relative, apply scaling to the position update
     Vector3 scaleVector = Vector3::ONE;
     if (scaled_ && !relative_)
-        scaleVector = GetWorldScale();
+        scaleVector = node_->GetWorldScale();
     
     for (unsigned i = 0; i < particles_.Size(); ++i)
     {
@@ -491,8 +491,8 @@ bool ParticleEmitter::EmitNewParticle()
     
     if (!relative_)
     {
-        startPos = GetWorldTransform() * startPos;
-        startDir = GetWorldRotation() * startDir;
+        startPos = node_->GetWorldTransform() * startPos;
+        startDir = node_->GetWorldRotation() * startDir;
     };
     
     particle.velocity_ = Lerp(velocityMin_, velocityMax_, Random(1.0f)) * startDir;
