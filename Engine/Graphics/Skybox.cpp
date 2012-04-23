@@ -59,15 +59,17 @@ void Skybox::UpdateDistance(const FrameInfo& frame)
 
 void Skybox::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
+    StaticModelBatch& srcBatch = batches_[batchIndex];
+    
     // Follow only the camera rotation, not position
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().Inverse(), Vector3::ONE);
     customWorldTransform_ = customView * GetWorldTransform();
     
     batch.distance_ = 0.0f;
-    batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
+    batch.geometry_ = srcBatch.geometry_;
     batch.worldTransform_ = &customWorldTransform_;
     batch.overrideView_ = true;
-    batch.material_ = materials_[batchIndex];
+    batch.material_ = srcBatch.material_;
 }
 
 void Skybox::OnWorldBoundingBoxUpdate()

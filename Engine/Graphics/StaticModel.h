@@ -27,6 +27,21 @@
 
 class Model;
 
+/// Static model per-batch data.
+struct StaticModelBatch
+{
+    /// Current distance.
+    float distance_;
+    /// Current LOD geometry.
+    Geometry* geometry_;
+    /// Material.
+    SharedPtr<Material> material_;
+    /// Current LOD level.
+    unsigned lodLevel_;
+    /// Geometry center.
+    Vector3 center_;
+};
+
 /// Static model component.
 class StaticModel : public Drawable
 {
@@ -76,11 +91,11 @@ public:
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// %Set materials attribute.
-    void SetMaterialsAttr(ResourceRefList value);
+    void SetMaterialsAttr(const ResourceRefList& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return materials attribute.
-    ResourceRefList GetMaterialsAttr() const;
+    const ResourceRefList& GetMaterialsAttr() const;
     
 protected:
     /// Recalculate the world-space bounding box.
@@ -94,24 +109,18 @@ protected:
     /// Choose LOD levels based on distance.
     void CalculateLodLevels();
     
-    /// Model.
-    SharedPtr<Model> model_;
+    /// Per-batch data.
+    Vector<StaticModelBatch> batches_;
     /// Bounding box.
     BoundingBox boundingBox_;
     /// All geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
-    /// Geometry centers.
-    PODVector<Vector3> geometryCenters_;
-    /// Geometry distances.
-    PODVector<float> geometryDistances_;
-    /// LOD levels.
-    PODVector<unsigned> lodLevels_;
-    /// Current geometries chosen with LOD.
-    PODVector<Geometry*> currentGeometries_;
-    /// Materials.
-    Vector<SharedPtr<Material> > materials_;
-    /// Software LOD level, used in raycast and occlusion.
+    /// Model.
+    SharedPtr<Model> model_;
+    /// Software LOD level, used in raycasting and occlusion.
     unsigned softwareLodLevel_;
+    /// Material list attribute.
+    mutable ResourceRefList materialsAttr_;
     
 private:
     /// Handle model reload finished.

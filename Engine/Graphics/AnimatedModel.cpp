@@ -80,7 +80,7 @@ void AnimatedModel::RegisterObject(Context* context)
     context->RegisterFactory<AnimatedModel>();
     
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
@@ -213,13 +213,13 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
     
     // Note: per-geometry distances do not take skinning into account
-    if (geometryDistances_.Size() > 1)
+    if (batches_.Size() > 1)
     {
-        for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
-            geometryDistances_[i] = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * batches_[i].center_);
     }
     else
-        geometryDistances_[0] = distance_;
+        batches_[0].distance_ = distance_;
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -261,11 +261,13 @@ UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 
 void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
 {
-    batch.distance_ = geometryDistances_[batchIndex];
-    batch.geometry_ = currentGeometries_[batchIndex];
+    StaticModelBatch& srcBatch = batches_[batchIndex];
+    
+    batch.distance_ = srcBatch.distance_;
+    batch.geometry_ = srcBatch.geometry_;
     batch.geometryType_ = GEOM_SKINNED;
     batch.worldTransform_ = &node_->GetWorldTransform();
-    batch.material_ = materials_[batchIndex];
+    batch.material_ = srcBatch.material_;
     
     if (skinMatrices_.Size())
     {
@@ -309,10 +311,12 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     // Copy the subgeometry & LOD level structure
     SetNumGeometries(model->GetNumGeometries());
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
     for (unsigned i = 0; i < geometries.Size(); ++i)
+    {
         geometries_[i] = geometries[i];
-    geometryCenters_ = model->GetGeometryCenters();
-    geometryDistances_.Resize(geometryCenters_.Size());
+        batches_[i].center_ = geometryCenters[i];
+    }
     
     // Copy geometry bone mappings
     const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
