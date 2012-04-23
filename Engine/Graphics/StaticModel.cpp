@@ -383,14 +383,21 @@ void StaticModel::CalculateLodLevels()
 {
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
+        const Vector<SharedPtr<Geometry> >& batchGeometries = geometries_[i];
         unsigned j;
-        for (j = 1; j < geometries_[i].Size(); ++j)
+        
+        for (j = 1; j < batchGeometries.Size(); ++j)
         {
-            if (geometries_[i][j] && lodDistance_ <= geometries_[i][j]->GetLodDistance())
+            if (batchGeometries[j] && lodDistance_ <= batchGeometries[j]->GetLodDistance())
                 break;
         }
-        batches_[i].lodLevel_ = j - 1;
-        batches_[i].geometry_ = geometries_[i][j - 1];
+        
+        unsigned newLodLevel = j - 1;
+        if (batches_[i].lodLevel_ != newLodLevel)
+        {
+            batches_[i].lodLevel_ = newLodLevel;
+            batches_[i].geometry_ = batchGeometries[newLodLevel];
+        }
     }
 }
 

@@ -348,7 +348,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     // Copy bounding box & skeleton
     SetBoundingBox(model->GetBoundingBox());
     SetSkeleton(model->GetSkeleton(), createBones);
-    
+    ResetLodLevels();
     MarkNetworkUpdate();
 }
 
