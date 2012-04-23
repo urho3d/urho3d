@@ -41,17 +41,17 @@ OBJECTTYPESTATIC(Node);
 
 Node::Node(Context* context) :
     Serializable(context),
-    id_(0),
+    worldTransform_(Matrix3x4::IDENTITY),
+    dirty_(false),
+    networkUpdate_(false),
+    rotateCount_(0),
     parent_(0),
     scene_(0),
-    owner_(0),
+    id_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
-    worldTransform_(Matrix3x4::IDENTITY),
-    rotateCount_(0),
-    dirty_(false),
-    networkUpdate_(false)
+    owner_(0)
 {
 }
 

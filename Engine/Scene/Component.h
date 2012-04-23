@@ -99,10 +99,10 @@ protected:
     /// %Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
     
-    /// Unique ID within the scene.
-    unsigned id_;
     /// Scene node.
     Node* node_;
+    /// Unique ID within the scene.
+    unsigned id_;
     /// Per-user network replication states.
     PODVector<ComponentReplicationState*> replicationStates_;
 };

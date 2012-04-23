@@ -224,52 +224,12 @@ protected:
     /// Move into another octree octant.
     void SetOctant(Octant* octant) { octant_ = octant; }
     
-    /// Octree octant.
-    Octant* octant_;
     /// World bounding box.
     BoundingBox worldBoundingBox_;
-    /// Last view's frameinfo. Not safe to dereference.
-    const FrameInfo* viewFrame_;
-    /// Last view's camera. Not safe to dereference.
-    Camera* viewCamera_;
-    /// Per-pixel lights affecting this drawable.
-    PODVector<Light*> lights_;
-    /// Per-vertex lights affecting this drawable.
-    PODVector<Light*> vertexLights_;
-    /// First per-pixel light added this frame.
-    Light* firstLight_;
-    /// Current zone.
-    WeakPtr<Zone> zone_;
-    /// Previous zone.
-    WeakPtr<Zone> lastZone_;
-    /// Draw distance.
-    float drawDistance_;
-    /// Shadow distance.
-    float shadowDistance_;
-    /// LOD bias.
-    float lodBias_;
-    /// View mask.
-    unsigned viewMask_;
-    /// Light mask.
-    unsigned lightMask_;
-    /// Shadow mask.
-    unsigned shadowMask_;
-    /// Zone mask.
-    unsigned zoneMask_;
-    /// Maximum lights.
-    unsigned maxLights_;
-    /// Current distance to camera.
-    float distance_;
-    /// LOD scaled distance.
-    float lodDistance_;
-    /// Current sort value.
-    float sortValue_;
-    /// Last visible frame number.
-    unsigned viewFrameNumber_;
-    /// Base pass flags.
-    unsigned basePassFlags_;
     /// Drawable flags.
     unsigned char drawableFlags_;
+    /// Bounding box dirty flag.
+    bool worldBoundingBoxDirty_;
     /// Visible flag.
     bool visible_;
     /// Shadowcaster flag.
@@ -278,12 +238,52 @@ protected:
     bool occluder_;
     /// Occludee flag.
     bool occludee_;
-    /// Bounding box dirty flag.
-    bool worldBoundingBoxDirty_;
     /// Octree update queued flag.
     bool updateQueued_;
     /// Octree reinsertion queued flag.
     bool reinsertionQueued_;
+    /// View mask.
+    unsigned viewMask_;
+    /// Light mask.
+    unsigned lightMask_;
+    /// Shadow mask.
+    unsigned shadowMask_;
+    /// Zone mask.
+    unsigned zoneMask_;
+    /// Last visible frame number.
+    unsigned viewFrameNumber_;
+    /// Current distance to camera.
+    float distance_;
+    /// LOD scaled distance.
+    float lodDistance_;
+    /// Draw distance.
+    float drawDistance_;
+    /// Shadow distance.
+    float shadowDistance_;
+    /// Current sort value.
+    float sortValue_;
+    /// LOD bias.
+    float lodBias_;
+    /// Base pass flags.
+    unsigned basePassFlags_;
+    /// Maximum lights.
+    unsigned maxLights_;
+    /// Octree octant.
+    Octant* octant_;
+    /// First per-pixel light added this frame.
+    Light* firstLight_;
+    /// Per-pixel lights affecting this drawable.
+    PODVector<Light*> lights_;
+    /// Per-vertex lights affecting this drawable.
+    PODVector<Light*> vertexLights_;
+    /// Current zone.
+    WeakPtr<Zone> zone_;
+    /// Previous zone.
+    WeakPtr<Zone> lastZone_;
+    /// Last view's frameinfo. Not safe to dereference.
+    const FrameInfo* viewFrame_;
+    /// Last view's camera. Not safe to dereference.
+    Camera* viewCamera_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

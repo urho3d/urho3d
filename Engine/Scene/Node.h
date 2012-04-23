@@ -324,11 +324,6 @@ protected:
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
     
-    /// User variables.
-    VariantMap vars_;
-    /// Per-user network replication states.
-    PODVector<NodeReplicationState*> replicationStates_;
-    
 private:
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
@@ -341,44 +336,50 @@ private:
     /// Clone node recursively.
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     
-    /// Unique ID within the scene.
-    unsigned id_;
+    /// World-space transform matrix.
+    mutable Matrix3x4 worldTransform_;
+    /// World transform needs update flag.
+    mutable bool dirty_;
+    /// Network update queued flag.
+    bool networkUpdate_;
+    /// Consecutive rotation count for rotation renormalization.
+    unsigned short rotateCount_;
     /// Parent scene node.
     Node* parent_;
     /// Scene (root node.)
     Scene* scene_;
-    /// Owner connection in networking.
-    Connection* owner_;
+    /// Unique ID within the scene.
+    unsigned id_;
     /// Position.
     Vector3 position_;
     /// Rotation.
     Quaternion rotation_;
     /// Scale.
     Vector3 scale_;
-    /// World-space transform matrix.
-    mutable Matrix3x4 worldTransform_;
-    /// Name.
-    String name_;
-    /// Name hash.
-    StringHash nameHash_;
-    /// Child scene nodes.
-    Vector<SharedPtr<Node> > children_;
     /// Components.
     Vector<SharedPtr<Component> > components_;
+    /// Child scene nodes.
+    Vector<SharedPtr<Node> > children_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
     /// Nodes this node depends on for network updates.
     PODVector<Node*> dependencyNodes_;
-    /// Previous user variables for network updates.
-    VariantMap previousVars_;
+    /// Owner connection in networking.
+    Connection* owner_;
+    /// Name.
+    String name_;
+    /// Name hash.
+    StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
-    /// Consecutive rotation count for rotation renormalization.
-    unsigned char rotateCount_;
-    /// World transform needs update flag.
-    mutable bool dirty_;
-    /// Network update queued flag.
-    bool networkUpdate_;
+    
+protected:
+    /// User variables.
+    VariantMap vars_;
+    /// Previous user variables for network updates.
+    VariantMap previousVars_;
+    /// Per-user network replication states.
+    PODVector<NodeReplicationState*> replicationStates_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

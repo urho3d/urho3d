@@ -58,10 +58,10 @@ static void RegisterCamera(asIScriptEngine* engine)
     
     RegisterComponent<Camera>(engine, "Camera");
     engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float)", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Ray GetScreenRay(float, float)", asMETHOD(Camera, GetScreenRay), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3&in)", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3&in)", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3&in) const", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3&in) const", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_nearClip(float)", asMETHOD(Camera, SetNearClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_nearClip() const", asMETHOD(Camera, GetNearClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_farClip(float)", asMETHOD(Camera, SetFarClip), asCALL_THISCALL);
@@ -86,7 +86,7 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "uint get_viewMask() const", asMETHOD(Camera, GetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewOverrideFlags(uint)", asMETHOD(Camera, SetViewOverrideFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint get_viewOverrideFlags() const", asMETHOD(Camera, GetViewOverrideFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "const Frustum& get_frustum()", asMETHOD(Camera, GetFrustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "const Frustum& get_frustum() const", asMETHOD(Camera, GetFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Matrix4& get_projection() const", asMETHODPR(Camera, GetProjection, () const, const Matrix4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Camera, GetInverseWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);

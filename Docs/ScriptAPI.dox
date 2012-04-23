@@ -1430,10 +1430,10 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void SetOrthoSize(const Vector2&)
-- Frustum GetSplitFrustum(float, float)
+- Frustum GetSplitFrustum(float, float) const
 - Ray GetScreenRay(float, float)
-- float GetDistance(const Vector3&)
-- float GetDistanceSquared(const Vector3&)
+- float GetDistance(const Vector3&) const
+- float GetDistanceSquared(const Vector3&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)

@@ -44,7 +44,10 @@ OBJECTTYPESTATIC(Camera);
 
 Camera::Camera(Context* context) :
     Component(context),
-    projectionOffset_(Vector2::ZERO),
+    inverseWorldDirty_(true),
+    projectionDirty_(true),
+    frustumDirty_(true),
+    orthographic_(false),
     nearClip_(DEFAULT_NEARCLIP),
     farClip_(DEFAULT_FARCLIP),
     fov_(DEFAULT_FOV),
@@ -54,12 +57,9 @@ Camera::Camera(Context* context) :
     lodBias_(1.0f),
     viewMask_(DEFAULT_VIEWMASK),
     viewOverrideFlags_(VO_NONE),
-    orthographic_(false),
+    projectionOffset_(Vector2::ZERO),
     autoAspectRatio_(true),
-    flipVertical_(false),
-    frustumDirty_(true),
-    projectionDirty_(true),
-    inverseWorldDirty_(true)
+    flipVertical_(false)
 {
 }
 
@@ -199,7 +199,7 @@ float Camera::GetNearClip() const
         return 0.0f;
 }
 
-Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
+Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
     
@@ -270,7 +270,7 @@ Ray Camera::GetScreenRay(float x, float y)
     return ret;
 }
 
-const Frustum& Camera::GetFrustum()
+const Frustum& Camera::GetFrustum() const
 {
     if (frustumDirty_)
     {
@@ -419,7 +419,7 @@ Vector3 Camera::GetUpVector()
     return GetWorldTransform().RotationMatrix() * Vector3::UP;
 }
 
-float Camera::GetDistance(const Vector3& worldPos)
+float Camera::GetDistance(const Vector3& worldPos) const
 {
     if (!orthographic_)
     {
@@ -430,7 +430,7 @@ float Camera::GetDistance(const Vector3& worldPos)
         return fabsf((GetInverseWorldTransform() * worldPos).z_);
 }
 
-float Camera::GetDistanceSquared(const Vector3& worldPos)
+float Camera::GetDistanceSquared(const Vector3& worldPos) const
 {
     if (!orthographic_)
     {

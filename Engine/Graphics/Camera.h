@@ -98,7 +98,7 @@ public:
     /// Return auto aspect ratio flag.
     bool GetAutoAspectRatio() const { return autoAspectRatio_; }
     /// Return frustum in world space.
-    const Frustum& GetFrustum();
+    const Frustum& GetFrustum() const;
     /// Return API-specific projection matrix.
     const Matrix4& GetProjection() const;
     /// Return either API-specific or API-independent (D3D convention) projection matrix.
@@ -108,7 +108,7 @@ public:
     /// Return half view size.
     float GetHalfViewSize() const;
     /// Return frustum split by custom near and far clip distances.
-    Frustum GetSplitFrustum(float nearClip, float farClip);
+    Frustum GetSplitFrustum(float nearClip, float farClip) const;
     /// Return frustum in view space.
     Frustum GetViewSpaceFrustum() const;
     /// Return split frustum in view space.
@@ -126,9 +126,9 @@ public:
     /// Return vertical flipping mode.
     bool GetFlipVertical() const { return flipVertical_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
-    float GetDistance(const Vector3& worldPos);
+    float GetDistance(const Vector3& worldPos) const;
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.
-    float GetDistanceSquared(const Vector3& worldPos);
+    float GetDistanceSquared(const Vector3& worldPos) const;
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
     /// Return if projection parameters are valid for rendering and raycasting.
@@ -144,14 +144,20 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     
 private:
-    /// Cached frustum.
-    Frustum frustum_;
-    /// Cached projection matrix.
-    mutable Matrix4 projection_;
     /// Cached inverse world transform matrix.
     mutable Matrix3x4 inverseWorld_;
-    /// Projection offset.
-    Vector2 projectionOffset_;
+    /// Cached projection matrix.
+    mutable Matrix4 projection_;
+    /// Cached frustum.
+    mutable Frustum frustum_;
+    /// Inverse world transform dirty flag.
+    mutable bool inverseWorldDirty_;
+    /// Projection matrix dirty flag.
+    mutable bool projectionDirty_;
+    /// Frustum dirty flag.
+    mutable bool frustumDirty_;
+    /// Orthographic mode flag.
+    bool orthographic_;
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.
@@ -170,16 +176,10 @@ private:
     unsigned viewMask_;
     /// View override flags.
     unsigned viewOverrideFlags_;
-    /// Orthographic mode flag.
-    bool orthographic_;
+    /// Projection offset.
+    Vector2 projectionOffset_;
     /// Auto aspect ratio flag.
     bool autoAspectRatio_;
     /// Flip vertical flag.
     bool flipVertical_;
-    /// Frustum dirty flag.
-    bool frustumDirty_;
-    /// Projection matrix dirty flag.
-    mutable bool projectionDirty_;
-    /// Inverse world transform dirty flag.
-    mutable bool inverseWorldDirty_;
 };

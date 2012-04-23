@@ -34,8 +34,8 @@ OBJECTTYPESTATIC(Component);
 
 Component::Component(Context* context) :
     Serializable(context),
-    id_(0),
-    node_(0)
+    node_(0),
+    id_(0)
 {
 }
 
