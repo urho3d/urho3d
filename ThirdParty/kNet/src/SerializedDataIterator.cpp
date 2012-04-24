@@ -15,8 +15,6 @@
 /** @file SerializedDataIterator.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cassert>
 
 #include "kNet/DebugMemoryLeakCheck.h"
@@ -28,41 +26,41 @@ namespace kNet
 
 BasicSerializedDataType SerializedDataIterator::NextElementType() const
 {
-	if (currentElementStack.Size() == 0)
+	if (currentElementStack.size() == 0)
 		return SerialInvalid;
 
-	assert(currentElementStack.Back().elem);
+	assert(currentElementStack.back().elem);
 
 	// If we don't know how many instances there are of the next element, it's the next field 
 	// to be filled - our iterator is pointing to the dynamicCount property of that field.
-	if (currentElementStack.Back().elem->varyingCount && currentElementStack.Back().dynamicCountSpecified == false)
+	if (currentElementStack.back().elem->varyingCount && currentElementStack.back().dynamicCountSpecified == false)
 		return SerialDynamicCount;
 
-	return currentElementStack.Back().elem->type;
+	return currentElementStack.back().elem->type;
 }
 
 const SerializedElementDesc *SerializedDataIterator::NextElementDesc() const
 {
-	return currentElementStack.Size() > 0 ? currentElementStack.Back().elem : 0;
+	return currentElementStack.size() > 0 ? currentElementStack.back().elem : 0;
 }
 
 void SerializedDataIterator::ProceedToNextVariable()
 {
-	if (currentElementStack.Size() == 0)
+	if (currentElementStack.size() == 0)
 		return;
 
-	ElemInfo &nextVar = currentElementStack.Back();
+	ElemInfo &nextVar = currentElementStack.back();
 
 	if (nextVar.elem->type == SerialStruct)
 	{
 		++nextVar.nextElem;
-		if (nextVar.nextElem >= (int)nextVar.elem->elements.Size())
+		if (nextVar.nextElem >= (int)nextVar.elem->elements.size())
 		{
 			nextVar.nextElem = 0;
 			++nextVar.nextIndex;
 			if (nextVar.nextIndex >= nextVar.count)
 			{
-				currentElementStack.Pop();
+				currentElementStack.pop_back();
 				ProceedToNextVariable();
 				return;
 			}
@@ -75,7 +73,7 @@ void SerializedDataIterator::ProceedToNextVariable()
 		++nextVar.nextIndex;
 		if (nextVar.nextIndex >= nextVar.count)
 		{
-			currentElementStack.Pop();
+			currentElementStack.pop_back();
 			ProceedToNextVariable();
 		}
 	}
@@ -90,22 +88,22 @@ void SerializedDataIterator::ProceedNVariables(int count)
 
 void SerializedDataIterator::ProceedToNextElement()
 {
-	ElemInfo &nextVar = currentElementStack.Back();
+	ElemInfo &nextVar = currentElementStack.back();
 
 	++nextVar.nextElem;
-	if (nextVar.nextElem >= (int)nextVar.elem->elements.Size())
+	if (nextVar.nextElem >= (int)nextVar.elem->elements.size())
 	{
 		nextVar.nextElem = 0;
 		++nextVar.nextIndex;
 		if (nextVar.nextIndex >= nextVar.count)
 		{
-			currentElementStack.Pop();
+			currentElementStack.pop_back();
 			ProceedToNextElement();
 		}
 	}
 	else
 	{
-/*		currentElementStack.Push(ElemInfo());
+/*		currentElementStack.push_back(ElemInfo());
 		ElemInfo &newVar = currentElementStack.back();
 		newVar.elem = nextVar.elem->elements[nextVar.nextElem];
 		newVar.nextIndex = 0;
@@ -118,7 +116,7 @@ void SerializedDataIterator::ProceedToNextElement()
 
 void SerializedDataIterator::SetVaryingElemSize(u32 count)
 {
-	ElemInfo &nextVar = currentElementStack.Back();
+	ElemInfo &nextVar = currentElementStack.back();
 	assert(nextVar.dynamicCountSpecified == false);
 	assert(nextVar.elem->varyingCount == true);
 	assert(nextVar.nextIndex == 0);
@@ -131,11 +129,11 @@ void SerializedDataIterator::SetVaryingElemSize(u32 count)
 
 void SerializedDataIterator::DescendIntoStructure()
 {
-	ElemInfo &nextVar = currentElementStack.Back();
+	ElemInfo &nextVar = currentElementStack.back();
 
 	if (nextVar.dynamicCountSpecified == false && nextVar.elem->varyingCount == true)
 		return;
-	if (nextVar.nextElem >= (int)nextVar.elem->elements.Size())
+	if (nextVar.nextElem >= (int)nextVar.elem->elements.size())
 		return;
 
 	ElemInfo newVar;
@@ -144,7 +142,7 @@ void SerializedDataIterator::DescendIntoStructure()
 	newVar.nextElem = 0;
  	newVar.count = (newVar.elem->varyingCount ? 0 : newVar.elem->count); // A varying block? Then the user has to supply multiplicity.
 	newVar.dynamicCountSpecified = false;
-	currentElementStack.Push(newVar);
+	currentElementStack.push_back(newVar);
 
 	// Descend again in case we have a struct-in-struct-in-struct...
 	DescendIntoStructure();
@@ -152,7 +150,7 @@ void SerializedDataIterator::DescendIntoStructure()
 
 void SerializedDataIterator::ResetTraversal()
 {
-	currentElementStack.Clear();
+	currentElementStack.clear();
 
 	ElemInfo newVar;
 	newVar.elem = desc.data;
@@ -160,7 +158,7 @@ void SerializedDataIterator::ResetTraversal()
 	newVar.nextElem = 0;
  	newVar.count = (newVar.elem->varyingCount ? 0 : newVar.elem->count); // A varying block? Then the user has to supply multiplicity.
 	newVar.dynamicCountSpecified = false;
-	currentElementStack.Push(newVar);
+	currentElementStack.push_back(newVar);
 
 	// Descend again in case we have a struct-in-struct-in-struct...
 	DescendIntoStructure();

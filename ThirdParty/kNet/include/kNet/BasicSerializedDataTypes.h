@@ -16,10 +16,8 @@
 /** @file BasicSerializedDataTypes.h
 	@brief Describes the basic POD data types that are used by the DataSerializer and DataDeserializer objects. */
 
-// Modified by Lasse Öörni for Urho3D
-
-#include "List.h"
-#include "Str.h"
+#include <list>
+#include <string>
 
 #include "Types.h"
 
@@ -87,6 +85,6 @@ template<> struct SerializedDataTypeTraits<float> { static const BasicSerialized
 template<> struct SerializedDataTypeTraits<double> { static const BasicSerializedDataType type = SerialDouble; static const int bitSize = 64; };
 template<> struct SerializedDataTypeTraits<char*> { static const BasicSerializedDataType type = SerialString; static const int bitSize = 0; };
 template<> struct SerializedDataTypeTraits<const char*> { static const BasicSerializedDataType type = SerialString; static const int bitSize = 0; };
-template<> struct SerializedDataTypeTraits<String> { static const BasicSerializedDataType type = SerialString; static const int bitSize = 0; };
+template<> struct SerializedDataTypeTraits<std::string> { static const BasicSerializedDataType type = SerialString; static const int bitSize = 0; };
 
 } // ~kNet

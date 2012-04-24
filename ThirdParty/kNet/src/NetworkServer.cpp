@@ -15,8 +15,6 @@
 /** @file NetworkServer.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
@@ -38,7 +36,7 @@
 namespace kNet
 {
 
-NetworkServer::NetworkServer(Network *owner_, Vector<Socket *> listenSockets_)
+NetworkServer::NetworkServer(Network *owner_, std::vector<Socket *> listenSockets_)
 :owner(owner_), listenSockets(listenSockets_), acceptNewConnections(true), networkServerListener(0),
 udpConnectionAttempts(64), workerThread(0)
 #ifdef KNET_THREAD_CHECKING_ENABLED
@@ -46,7 +44,7 @@ udpConnectionAttempts(64), workerThread(0)
 #endif
 {
 	assert(owner);
-	assert(listenSockets.Size() > 0);
+	assert(listenSockets.size() > 0);
 }
 
 NetworkServer::~NetworkServer()
@@ -76,7 +74,7 @@ void NetworkServer::CloseListenSockets()
 {
 	assert(owner);
 
-	for(size_t i = 0; i < listenSockets.Size(); ++i)
+	for(size_t i = 0; i < listenSockets.size(); ++i)
 	{
 		if (listenSockets[i]->TransportLayer() == SocketOverUDP)
 			acceptNewConnections = false; ///\todo At this point, if in UDP mode, we should have destroyed all connections that use this socket!
@@ -85,7 +83,7 @@ void NetworkServer::CloseListenSockets()
 	}
 
 	// Now forget all sockets - not getting them back in any way.
-	listenSockets.Clear();
+	listenSockets.clear();
 }
 
 Socket *NetworkServer::AcceptConnections(Socket *listenSocket)
@@ -103,7 +101,7 @@ Socket *NetworkServer::AcceptConnections(Socket *listenSocket)
 		int error = Network::GetLastError();
 		if (error != KNET_EWOULDBLOCK)
 		{
-			LOG(LogError, "NetworkServer::AcceptConnections: accept failed: %s", Network::GetErrorString(error).CString());
+			LOG(LogError, "NetworkServer::AcceptConnections: accept failed: %s", Network::GetErrorString(error).c_str());
 			closesocket(listenSock);
 			listenSock = INVALID_SOCKET;
 		}
@@ -111,19 +109,19 @@ Socket *NetworkServer::AcceptConnections(Socket *listenSocket)
 	}
 
 	EndPoint remoteEndPoint = EndPoint::FromSockAddrIn(remoteAddress);
-	String remoteHostName = remoteEndPoint.IPToString();
+	std::string remoteHostName = remoteEndPoint.IPToString();
 
-	LOG(LogInfo, "Accepted incoming TCP connection from %s:%d.", remoteHostName.CString(), (int)remoteEndPoint.port);
+	LOG(LogInfo, "Accepted incoming TCP connection from %s:%d.", remoteHostName.c_str(), (int)remoteEndPoint.port);
 
 	EndPoint localEndPoint;
 	sockaddr_in localSockAddr;
 	socklen_t namelen = sizeof(localSockAddr);
 	int sockRet = getsockname(acceptSocket, (sockaddr*)&localSockAddr, &namelen); // Note: This works only if family==INETv4
 	localEndPoint = EndPoint::FromSockAddrIn(localSockAddr);
-	String localHostName = owner->LocalAddress();
+	std::string localHostName = owner->LocalAddress();
 
 	const size_t maxTcpSendSize = 65536;
-	Socket *socket = owner->StoreSocket(Socket(acceptSocket, localEndPoint, localHostName.CString(), remoteEndPoint, remoteHostName.CString(), SocketOverTCP, ServerClientSocket, maxTcpSendSize));
+	Socket *socket = owner->StoreSocket(Socket(acceptSocket, localEndPoint, localHostName.c_str(), remoteEndPoint, remoteHostName.c_str(), SocketOverTCP, ServerClientSocket, maxTcpSendSize));
 	socket->SetBlocking(false);
 
 	return socket;
@@ -135,22 +133,22 @@ void NetworkServer::CleanupDeadConnections()
 	ConnectionMap clientsMap = *clients.Acquire();
 
 	// Clean up all disconnected/timed out connections.
-	ConnectionMap::Iterator iter = clientsMap.Begin();
-	while(iter != clientsMap.End())
+	ConnectionMap::iterator iter = clientsMap.begin();
+	while(iter != clientsMap.end())
 	{
-		ConnectionMap::Iterator next = iter;
+		ConnectionMap::iterator next = iter;
 		++next;
-		if (!iter->second_->Connected())
+		if (!iter->second->Connected())
 		{
-			LOG(LogInfo, "Client %s disconnected.", iter->second_->ToString().CString());
+			LOG(LogInfo, "Client %s disconnected.", iter->second->ToString().c_str());
 			if (networkServerListener)
-				networkServerListener->ClientDisconnected(iter->second_);
-			if (iter->second_->GetSocket() && iter->second_->GetSocket()->TransportLayer() == SocketOverTCP)
-				owner->CloseConnection(iter->second_);
+				networkServerListener->ClientDisconnected(iter->second);
+			if (iter->second->GetSocket() && iter->second->GetSocket()->TransportLayer() == SocketOverTCP)
+				owner->CloseConnection(iter->second);
 
 			{
 				Lockable<ConnectionMap>::LockType clientsLock = clients.Acquire();
-				clientsLock->Erase(iter->first_);
+				clientsLock->erase(iter->first);
 			}
 		}
 		iter = next;
@@ -161,7 +159,7 @@ void NetworkServer::Process()
 {
 	CleanupDeadConnections();
 
-	for(size_t i = 0; i < listenSockets.Size(); ++i)
+	for(size_t i = 0; i < listenSockets.size(); ++i)
 	{
 		Socket *listen = listenSockets[i];
 
@@ -174,7 +172,7 @@ void NetworkServer::Process()
 				if (!client->Connected())
 					LOG(LogError, "Warning: Accepted an already closed connection!");
 
-				LOG(LogInfo, "Client connected from %s.", client->ToString().CString());
+				LOG(LogInfo, "Client connected from %s.", client->ToString().c_str());
 
 				// Build a MessageConnection on top of the raw socket.
 				assert(listen->TransportLayer() == SocketOverTCP);
@@ -211,8 +209,8 @@ void NetworkServer::Process()
 
 	// Process all new inbound data for each connection handled by this server.
 	ConnectionMap clientMap = *clients.Acquire();
-	for(ConnectionMap::Iterator iter = clientMap.Begin(); iter != clientMap.End(); ++iter)
-		iter->second_->Process();
+	for(ConnectionMap::iterator iter = clientMap.begin(); iter != clientMap.end(); ++iter)
+		iter->second->Process();
 }
 
 void NetworkServer::ReadUDPSocketData(Socket *listenSocket) // [worker thread]
@@ -231,8 +229,8 @@ void NetworkServer::ReadUDPSocketData(Socket *listenSocket) // [worker thread]
 		return;
 	}
 	EndPoint endPoint = EndPoint::FromSockAddrIn(recvData->from); // This conversion is quite silly, perhaps it could be removed to gain performance?
-	LOG(LogData, "Received a datagram of size %d to socket %s from endPoint %s.", recvData->bytesContains, listenSocket->ToString().CString(),
-		endPoint.ToString().CString());
+	LOG(LogData, "Received a datagram of size %d to socket %s from endPoint %s.", recvData->bytesContains, listenSocket->ToString().c_str(),
+		endPoint.ToString().c_str());
 
 	PolledTimer timer;
 	MessageConnection *receiverConnection = 0;
@@ -245,9 +243,9 @@ void NetworkServer::ReadUDPSocketData(Socket *listenSocket) // [worker thread]
 			timer.MSecsElapsed());
 		}
 
-		ConnectionMap::Iterator iter = clientsLock->Find(endPoint); ///\todo HashTable for performance.
-		if (iter != clientsLock->End())
-			receiverConnection = iter->second_;
+		ConnectionMap::iterator iter = clientsLock->find(endPoint); ///\todo HashTable for performance.
+		if (iter != clientsLock->end())
+			receiverConnection = iter->second;
 	}
 
 	if (receiverConnection)
@@ -282,12 +280,12 @@ void NetworkServer::EnqueueNewUDPConnectionAttempt(Socket *listenSocket, const E
 	if (!success)
 		LOG(LogError, "Too many connection attempts!");
 	else
-		LOG(LogInfo, "Queued new connection attempt from %s.", endPoint.ToString().CString());
+		LOG(LogInfo, "Queued new connection attempt from %s.", endPoint.ToString().c_str());
 }
 
 bool NetworkServer::ProcessNewUDPConnectionAttempt(Socket *listenSocket, const EndPoint &endPoint, const char *data, size_t numBytes)
 {
-	LOG(LogInfo, "New inbound connection attempt from %s with datagram of size %d.", endPoint.ToString().CString(), (int)numBytes);
+	LOG(LogInfo, "New inbound connection attempt from %s with datagram of size %d.", endPoint.ToString().c_str(), (int)numBytes);
 	if (!acceptNewConnections)
 	{
 		LOG(LogError, "Ignored a new connection attempt since server is set not to accept new connections.");
@@ -308,10 +306,10 @@ bool NetworkServer::ProcessNewUDPConnectionAttempt(Socket *listenSocket, const E
 	///\todo Check IP banlist.
 	///\todo Check that the maximum number of active concurrent connections is not exceeded.
 
-	String remoteHostName = endPoint.IPToString();
+	std::string remoteHostName = endPoint.IPToString();
 
 	// Accept the connection and create a new UDP socket that communicates to that endpoint.
-	Socket *socket = owner->CreateUDPSlaveSocket(listenSocket, endPoint, remoteHostName.CString());
+	Socket *socket = owner->CreateUDPSlaveSocket(listenSocket, endPoint, remoteHostName.c_str());
 	if (!socket)
 	{
 		LOG(LogError, "Network::ConnectUDP failed! Cannot accept new UDP connection.");
@@ -353,9 +351,9 @@ void NetworkServer::BroadcastMessage(const NetworkMessage &msg, MessageConnectio
 			timer.MSecsElapsed());
 	}
 
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
 	{
-		MessageConnection *connection = iter->second_;
+		MessageConnection *connection = iter->second;
 		if (connection == exclude)
 			continue;
 
@@ -375,9 +373,9 @@ void NetworkServer::BroadcastMessage(unsigned long id, bool reliable, bool inOrd
 			timer.MSecsElapsed());
 	}
 
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
 	{
-		MessageConnection *connection = iter->second_;
+		MessageConnection *connection = iter->second;
 		assert(connection);
 		if (connection == exclude || !connection->IsWriteOpen())
 			continue;
@@ -413,8 +411,8 @@ void NetworkServer::DisconnectAllClients()
 	LOG(LogWaits, "NetworkServer::DisconnectAllClients: Accessing the connection list took %f msecs.",
 		timer.MSecsElapsed());
 
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
-		iter->second_->Disconnect(0); // Do not wait for any client.
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
+		iter->second->Disconnect(0); // Do not wait for any client.
 }
 
 void NetworkServer::Close(int disconnectWaitMilliseconds)
@@ -423,7 +421,7 @@ void NetworkServer::Close(int disconnectWaitMilliseconds)
 
 	///\todo Re-implement this function to remove the monolithic Sleep here. Instead of this,
 	/// wait for the individual connections to finish.
-	if (GetConnections().Size() > 0)
+	if (GetConnections().size() > 0)
 	{
 		Clock::Sleep(disconnectWaitMilliseconds);
 		LOG(LogVerbose, "NetworkServer::Close: Waited a fixed period of %d msecs for all connections to disconnect.",
@@ -434,8 +432,8 @@ void NetworkServer::Close(int disconnectWaitMilliseconds)
 	Lockable<ConnectionMap>::LockType clientsLock = clients.Acquire();
 	LOG(LogWaits, "NetworkServer::Close: Accessing the connection list took %f msecs.",
 		timer.MSecsElapsed());
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
-		iter->second_->Close(0); // Do not wait for any client.
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
+		iter->second->Close(0); // Do not wait for any client.
 }
 
 void NetworkServer::RunModalServer()
@@ -458,8 +456,8 @@ void NetworkServer::ConnectionClosed(MessageConnection *connection)
 	Lockable<ConnectionMap>::LockType clientsLock = clients.Acquire();
 	LOG(LogWaits, "NetworkServer::ConnectionClosed: Accessing the connection list took %f msecs.",
 		timer.MSecsElapsed());
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
-		if (iter->second_ == connection)
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
+		if (iter->second == connection)
 		{
 			if (networkServerListener)
 				networkServerListener->ClientDisconnected(connection);
@@ -470,7 +468,7 @@ void NetworkServer::ConnectionClosed(MessageConnection *connection)
 				connection->socket = 0;
 			}
 
-			clientsLock->Erase(iter);
+			clientsLock->erase(iter);
 
 			return;
 		}
@@ -478,7 +476,7 @@ void NetworkServer::ConnectionClosed(MessageConnection *connection)
 	LOG(LogError, "Unknown MessageConnection passed to NetworkServer::Disconnect!");
 }
 
-Vector<Socket *> &NetworkServer::ListenSockets()
+std::vector<Socket *> &NetworkServer::ListenSockets()
 {
 	return listenSockets;
 }
@@ -499,67 +497,67 @@ int NetworkServer::NumConnections() const
 {
 	int numConnections = 0;
 	Lockable<ConnectionMap>::ConstLockType lock = clients.Acquire();
-	for(ConnectionMap::ConstIterator iter = lock->Begin(); iter != lock->End(); ++iter)
+	for(ConnectionMap::const_iterator iter = lock->begin(); iter != lock->end(); ++iter)
 	{
-		const MessageConnection *connection = iter->second_.ptr();
+		const MessageConnection *connection = iter->second.ptr();
 		if (connection && (connection->IsPending() || connection->IsReadOpen() || connection->IsWriteOpen()))
 			++numConnections;
 	}
 	return numConnections;
 }
 
-String NetworkServer::ToString() const
+std::string NetworkServer::ToString() const
 {
 	bool isUdp = false;
 	bool isTcp = false;
-	for(size_t i = 0; i < listenSockets.Size(); ++i)
+	for(size_t i = 0; i < listenSockets.size(); ++i)
 		if (listenSockets[i]->TransportLayer() == SocketOverUDP)
 			isUdp = true;
 		else
 			isTcp = true;
 
-	String str;
+	std::stringstream ss;
 	if (isUdp && isTcp)
-		str += "TCP+UDP server";
+		ss << "TCP+UDP server";
 	else if (isUdp)
-		str += "UDP server";
+		ss << "UDP server";
 	else if (isTcp)
-		str += "TCP server";
-	else str += "Server (no listen sockets open)";
+		ss << "TCP server";
+	else ss << "Server (no listen sockets open)";
 
-	if (listenSockets.Size() == 1)
+	if (listenSockets.size() == 1)
 	{
 		int port = (int)listenSockets[0]->LocalPort();
-		str += " at local port " + String(port);
+		ss << " at local port " << port;
 	}
-	else if (listenSockets.Size() > 1)
+	else if (listenSockets.size() > 1)
 	{
-		str += " (" + String((int)listenSockets.Size()) + " listen sockets at local ports ";
-		for(size_t i = 0; i < listenSockets.Size() && i < 3; ++i)
+		ss << " (" << (int)listenSockets.size() << " listen sockets at local ports ";
+		for(size_t i = 0; i < listenSockets.size() && i < 3; ++i)
 		{
 			if (i > 0)
-				str += ", ";
-			str += String(listenSockets[i]->LocalPort());
+				ss << ", ";
+			ss << listenSockets[i]->LocalPort();
 		}
-		if (listenSockets.Size() > 3)
-			str += ", ...";
-		str += ")";
+		if (listenSockets.size() > 3)
+			ss << ", ...";
+		ss << ")";
 	}
-	str += ": ";
+	ss << ": ";
 
 	int numConnections = 0;
 	{
 		Lockable<ConnectionMap>::ConstLockType lock = clients.Acquire();
-		numConnections = lock->Size();
+		numConnections = lock->size();
 	}
-	str += String(numConnections) + " connections.";
+	ss << numConnections << " connections.";
 
 	if (!acceptNewConnections)
-		str += " (not accepting new connections)";
+		ss << " (not accepting new connections)";
 
 	///\todo Add note about stealth mode.
 
-	return str;
+	return ss.str();
 }
 
 } // ~kNet

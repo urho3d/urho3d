@@ -16,16 +16,14 @@
 /** @file MessageConnection.h
 	@brief The MessageConnection and ConnectionStatistics classes. */
 
-// Modified by Lasse Öörni for Urho3D
-
+#include <vector>
+#include <map>
 #include <utility>
-
-#include "Vector.h"
-#include "Map.h"
-#include "Set.h"
+#include <set>
 
 #include "kNetBuildConfig.h"
 #include "WaitFreeQueue.h"
+#include "NetworkSimulator.h"
 #include "LockFreePoolAllocator.h"
 #include "Lockable.h"
 #include "Socket.h"
@@ -55,7 +53,7 @@ class Network;
 class NetworkWorkerThread;
 class FragmentedSendManager;
 
-#ifdef WIN32
+#ifdef _MSC_VER
 struct FragmentedSendManager::FragmentedTransfer;
 #endif
 
@@ -71,7 +69,7 @@ struct ConnectionStatistics
 		bool replyReceived;        ///< True of PingReply has already been received for this.
 	};
 	/// Contains an entry for each recently performed Ping operation, sorted by age (oldest first).
-	PODVector<PingTrack> ping;
+	std::vector<PingTrack> ping;
 
 	/// Remembers both in- and outbound traffic events on the socket.
 	struct TrafficTrack
@@ -85,7 +83,7 @@ struct ConnectionStatistics
 		unsigned long bytesOut;    ///< The total number of bytes the sent datagrams contained. 
 	};
 	/// Contains an entry for each recent traffic event (data in/out) on the connection, sorted by age (oldest first).
-	PODVector<TrafficTrack> traffic;
+	std::vector<TrafficTrack> traffic;
 
 	/// Remembers the send/receive time of a datagram with a certain ID.
 	struct DatagramIDTrack
@@ -94,7 +92,7 @@ struct ConnectionStatistics
 		packet_id_t packetID;
 	};
 	/// Contains an entry for each recently received packet, sorted by age (oldest first).
-	PODVector<DatagramIDTrack> recvPacketIDs;
+	std::vector<DatagramIDTrack> recvPacketIDs;
 };
 
 /// Comparison object that sorts the two messages by their priority (higher priority/smaller number first).
@@ -125,7 +123,7 @@ enum ConnectionState
 };
 
 /// Returns a textual representation of a ConnectionState.
-String ConnectionStateToString(ConnectionState state);
+std::string ConnectionStateToString(ConnectionState state);
 
 // Prevent confusion with Win32 functions
 #ifdef SendMessage
@@ -307,7 +305,7 @@ public:
 	void FreeMessage(NetworkMessage *msg); // [main and worker thread]
 	
 	/// Returns a single-line message describing the connection state.
-	String ToString() const; // [main and worker thread]
+	std::string ToString() const; // [main and worker thread]
 
 	/// Dumps a long multi-line status message of this connection state to stdout.
 	void DumpStatus() const; // [main thread]
@@ -332,6 +330,9 @@ public:
 
 	/// Returns the total number of bytes (excluding IP and TCP/UDP headers) that have been sent from this connection.
 	u64 BytesOutTotal() const { return bytesOutTotal; } // [main and worker thread]
+
+	/// Returns the simulator object which can be used to apply network condition simulations to this connection.
+	NetworkSimulator &NetworkSendSimulator() { return networkSendSimulator; }
 
 	/// Stores all the statistics about the current connection. This data is periodically recomputed
 	/// by the network worker thread and shared to the client through a lock.
@@ -514,6 +515,10 @@ protected:
 	u64 bytesInTotal;
 	u64 bytesOutTotal;
 
+	/// Stores the current settigns related to network conditions testing.
+	/// By default, the simulator is disabled.
+	NetworkSimulator networkSendSimulator;
+
 	/// A running number attached to each outbound message (not present in network stream) to 
 	/// break ties when deducing which message should come before which.
 	unsigned long outboundMessageNumberCounter; // [worker thread]
@@ -523,15 +528,15 @@ protected:
 	unsigned long outboundReliableMessageNumberCounter; // [worker thread]
 
 	/// A (messageID, contentID) pair.
-	typedef Pair<u32, u32> MsgContentIDPair;
+	typedef std::pair<u32, u32> MsgContentIDPair;
 
-	typedef Map<MsgContentIDPair, Pair<packet_id_t, tick_t> > ContentIDReceiveTrack;
+	typedef std::map<MsgContentIDPair, std::pair<packet_id_t, tick_t> > ContentIDReceiveTrack;
 
 	/// Each (messageID, contentID) pair has a packetID "stamp" associated to them to track 
 	/// and decimate out-of-order received obsoleted messages.
 	ContentIDReceiveTrack inboundContentIDStamps; // [worker thread]
 
-	typedef Map<MsgContentIDPair, NetworkMessage*> ContentIDSendTrack;
+	typedef std::map<MsgContentIDPair, NetworkMessage*> ContentIDSendTrack;
 
 	ContentIDSendTrack outboundContentIDMessages; // [worker thread]
 
@@ -543,7 +548,7 @@ protected:
 	/// by a newer packet and should not be processed.
 	/// @return True if the packet should be processed (there was no superceding record), and
 	///         false if the packet is old and should be discarded.
-	bool CheckAndSaveContentIDStamp(u32 messageID, u32 contentID, packet_id_t packetID); // [worker thread]
+	bool CheckAndSaveContentIDStamp(message_id_t messageID, u32 contentID, packet_id_t packetID); // [worker thread]
 
 	void SplitAndQueueMessage(NetworkMessage *message, bool internalQueue, size_t maxFragmentSize); // [main and worker thread]
 
@@ -557,7 +562,7 @@ protected:
 	/// Private ctor - MessageConnections are instantiated by Network and NetworkServer classes.
 	explicit MessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 
-	virtual bool HandleMessage(packet_id_t /*packetID*/, u32 /*messageID*/, const char * /*data*/, size_t /*numBytes*/) { return false; } // [main thread]
+	virtual bool HandleMessage(packet_id_t /*packetID*/, message_id_t /*messageID*/, const char * /*data*/, size_t /*numBytes*/) { return false; } // [main thread]
 };
 
 template<typename SerializableData>

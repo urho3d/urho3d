@@ -16,27 +16,21 @@
 /** @file NetworkMessage.h
 	@brief The class NetworkMessage. Stores an outbound network message. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "kNetBuildConfig.h"
 #include "LockFreePoolAllocator.h"
 #include "FragmentedTransferManager.h"
+#include "Types.h"
 
 namespace kNet
 {
 
-/// Contains 22 actual bits of data.
-typedef unsigned long packet_id_t;
-
-/// Performs modular arithmetic comparison to see if newID refers to a PacketID newer than oldID.
-/// @return True if newID is newer than oldID, false otherwise.
+/// Performs modular arithmetic comparison to see if newID refers to a PacketID that is *strictly* newer than oldID.
+/// @return True if newID is *strictly* newer than oldID, false otherwise.
 inline bool PacketIDIsNewerThan(packet_id_t newID, packet_id_t oldID)
 {
-	if (newID > oldID)
-		return true;
-	if (oldID - newID >= (1 << 21))
-		return true;
-	return false;
+    packet_id_t diff = (packet_id_t)(newID - oldID);
+    packet_id_t diff2 = (packet_id_t)(newID + 0x3FFFFF - oldID);
+    return diff < 0x1FFFFF || diff2 < 0x1FFFFF;
 }
 
 /// Computes the PacketID for the packet (id + increment).
@@ -92,7 +86,8 @@ public:
 	unsigned long priority;
 
 	/// The ID of this message. IDs 0 - 5 are reserved for the protocol and may not be used.
-	packet_id_t id;
+	/// Valid user range is [6, 1073741821 == 0x3FFFFFFD].
+	message_id_t id;
 
 	/// When sending out a message, the application can attach a content ID to the message,
 	/// which will effectively replace all the older messages with the same messageID and
@@ -114,7 +109,7 @@ public:
 	bool obsolete;
 
 #ifdef KNET_NETWORK_PROFILING
-	String profilerName;
+	std::string profilerName;
 #endif
 
 	/// Checks if this message is newer than the other message.
@@ -137,6 +132,11 @@ private:
 	friend class TCPMessageConnection;
 	friend class FragmentedSendManager;
 	friend struct FragmentedSendManager::FragmentedTransfer;
+
+	/// A temporary storage area to remember the UDP packet ID this messages was received in.
+	/// For TCP messages, this field is always zero.
+	/// When sending out messages, this field is not used.
+	packet_id_t receivedPacketID;
 
 	/// A running number that is assigned to each message to distinguish the order
 	/// the messages were added to the queue. The network layer manages this numbering,

@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "kNet/UDPMessageConnection.h"
 
 #include "kNet/qt/MessageConnectionDialog.h"
+#include "kNet/qt/NetworkSimulationDialog.h"
 #include "kNet/qt/ui/ui_MessageConnectionDialog.h"
 
 namespace kNet
@@ -51,6 +52,7 @@ MessageConnectionDialog::MessageConnectionDialog(QWidget *parent, Ptr(MessageCon
 		dialog->labelDatagramsOut->setText("# send() calls:");
 	}
 
+	connect(dialog->pushButtonSendSimulation, SIGNAL(pressed()), this, SLOT(OpenSendSimulationWindow()));
 	Update();
 }
 
@@ -123,6 +125,17 @@ void MessageConnectionDialog::Update()
 		dialog->packetLossRate->setText(QString::number(udpConnection->PacketLossRate()));
 	}
 	QTimer::singleShot(dialogUpdateInterval, this, SLOT(Update()));
+}
+
+void MessageConnectionDialog::OpenSendSimulationWindow()
+{
+	if (connection)
+	{
+		NetworkSimulationDialog *dialog = new NetworkSimulationDialog(0, connection);
+		dialog->setWindowTitle(QString("Outbound connection to ") + connection->RemoteEndPoint().ToString().c_str());
+		dialog->show();
+		dialog->setAttribute(Qt::WA_DeleteOnClose);
+	}
 }
 
 } // ~kNet

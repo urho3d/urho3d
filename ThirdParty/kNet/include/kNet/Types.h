@@ -20,6 +20,10 @@
 
 #include "kNetBuildConfig.h"
 
+#ifdef __MINGW32__
+#include <stdint.h>
+#endif
+
 // As a reminder: http://predef.sourceforge.net/prestd.html
 
 // If we have C99, take the types from there.
@@ -76,5 +80,16 @@ typedef int s32; ///< 4 bytes signed: max 2,147,483,647 ~ 2000 million or 2e9.
 typedef signed long long s64; ///< 8 bytes signed. 9,223,372,036,854,775,807 ~ 9e18.
 
 #endif
+
+// kNet special types:
+
+namespace kNet
+{
+	/// Identifies a UDP datagram by auto-incrementing number. Contains 22 actual bits of data.
+	typedef unsigned long packet_id_t;
+	/// Identifies the type of a network message. Contains 30 actual bits of data.
+	/// Valid user range is [6, 1073741821 == 0x3FFFFFFD].
+	typedef unsigned long message_id_t;
+}
 
 #endif // ~KNET_NO_FIXEDWIDTH_TYPES

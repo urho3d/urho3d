@@ -16,6 +16,7 @@
 /** @file WaitFreeQueue.h
 	@brief The WaitFreeQueue<T> template class. */
 
+#include <stddef.h>
 #include "Alignment.h"
 
 namespace kNet

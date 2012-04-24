@@ -13,8 +13,8 @@
    limitations under the License. */
 #pragma once
 
-/** @file GraphDialog.h
-	@brief Shows a graph display of a network event counter. */
+/** @file NetworkSimulationDialog.h
+	@brief Shows a UI for specifying parameters for network simulations. */
 
 #include "kNetBuildConfig.h"
 
@@ -26,25 +26,25 @@
 
 #include "kNet/MessageConnection.h"
 #include "kNet/SharedPtr.h"
-#include "kNet/StatsEventHierarchy.h"
 
-class Ui_GraphDialog;
+class Ui_NetworkSimulationDialog;
 
 namespace kNet
 {
 
-class GraphDialog : public QWidget
+class NetworkSimulationDialog : public QWidget
 {
 	Q_OBJECT;
 
-	Ui_GraphDialog *dialog;
-	std::string hierarchyNodeName;
+	Ptr(MessageConnection) connection;
+	Ui_NetworkSimulationDialog *dialog;
 
 public:
-	GraphDialog(QWidget *parent, const char *hierarchyNodeName);
-	~GraphDialog();
+	NetworkSimulationDialog(QWidget *parent, Ptr(MessageConnection) connection);
+	~NetworkSimulationDialog();
 
-	void Update(StatsEventHierarchyNode &node, int timeMSecs);
+public slots:
+	void ParameterChanged();
 };
 
 } // ~kNet

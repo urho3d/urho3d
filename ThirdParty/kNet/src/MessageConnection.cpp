@@ -15,8 +15,6 @@
 /** @file MessageConnection.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <algorithm>
 #include <iostream>
 #include <cassert>
@@ -49,7 +47,7 @@ namespace
 
 	/// The interval at which we send ping messages.
 	///\todo Make this user-defineable.
-	const float pingIntervalMSecs = 1000.f;
+	const float pingIntervalMSecs = 3.5 * 1000.f;
 	/// The interval at which we update the internal statistics fields.
 	const float statsRefreshIntervalMSecs = 1000.f;
 	/// The time interval after which, if we don't get a response to a PingRequest message, the connection is declared lost.
@@ -64,17 +62,17 @@ namespace
 namespace kNet
 {
 
-void AppendU8ToVector(PODVector<char> &data, unsigned long value)
+void AppendU8ToVector(std::vector<char> &data, unsigned long value)
 {
-	data.Insert(data.End(), (const char *)&value, (const char *)&value + 1);
+	data.insert(data.end(), (const char *)&value, (const char *)&value + 1);
 }
 
-void AppendU32ToVector(PODVector<char> &data, unsigned long value)
+void AppendU32ToVector(std::vector<char> &data, unsigned long value)
 {
-	data.Insert(data.End(), (const char *)&value, (const char *)&value + 4);
+	data.insert(data.end(), (const char *)&value, (const char *)&value + 4);
 }
 
-String ConnectionStateToString(ConnectionState state)
+std::string ConnectionStateToString(ConnectionState state)
 {
 	switch(state)
 	{
@@ -104,6 +102,7 @@ bytesInTotal(0), bytesOutTotal(0)
 #endif
 {
 	connectionState = startingState;
+	networkSendSimulator.owner = this;
 
 	eventMsgsOutAvailable = CreateNewEvent(EventWaitSignal);
 	assert(eventMsgsOutAvailable.IsValid());
@@ -195,7 +194,7 @@ bool MessageConnection::WaitToEstablishConnection(int maxMSecsToWait)
 		Clock::Sleep(1); ///\todo Instead of waiting multiple 1msec slices, should wait for proper event.
 
 	LOG(LogWaits, "MessageConnection::WaitToEstablishConnection: Waited %f msecs for connection. Result: %s.",
-		timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).CString());
+		timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str());
 
 	return GetConnectionState() == ConnectionOK;
 }
@@ -211,7 +210,7 @@ void MessageConnection::Disconnect(int maxMSecsToWait)
 		return;
 
 	LOG(LogInfo, "MessageConnection::Disconnect(%d msecs): Write-closing connection. connectionState = %s, socket readOpen:%s, socket writeOpen:%s.", 
-		maxMSecsToWait, ConnectionStateToString(connectionState).CString(), socket->IsReadOpen() ? "true":"false",
+		maxMSecsToWait, ConnectionStateToString(connectionState).c_str(), socket->IsReadOpen() ? "true":"false",
 		socket->IsWriteOpen() ? "true":"false");
 	assert(maxMSecsToWait >= 0);
 
@@ -226,7 +225,7 @@ void MessageConnection::Disconnect(int maxMSecsToWait)
 		}
 
 		LOG(LogWaits, "MessageConnection::Disconnect: Waited %f msecs for disconnection. Result: %s.",
-			timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).CString());
+			timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str());
 	}
 
 	if (GetConnectionState() == ConnectionClosed)
@@ -241,13 +240,13 @@ void MessageConnection::Close(int maxMSecsToWait) // [main thread]
 	{
 		Disconnect(maxMSecsToWait);
 		LOG(LogInfo, "MessageConnection::Close(%d msecs): Disconnecting. connectionState = %s, readOpen:%s, writeOpen:%s.", 
-			maxMSecsToWait, ConnectionStateToString(connectionState).CString(), (socket && socket->IsReadOpen()) ? "true":"false",
+			maxMSecsToWait, ConnectionStateToString(connectionState).c_str(), (socket && socket->IsReadOpen()) ? "true":"false",
 			(socket && socket->IsWriteOpen()) ? "true":"false");
 	}
 
 	if (owner)
 	{
-		LOG(LogInfo, "MessageConnection::Close: Closed connection to %s.", ToString().CString());
+		LOG(LogInfo, "MessageConnection::Close: Closed connection to %s.", ToString().c_str());
 		owner->CloseConnection(this); // This will cause this connection to be disconnected of its worker thread, so that we can safely proceed to tear down the socket.
 		assert(!IsWorkerThreadRunning());
 		owner = 0;
@@ -272,11 +271,11 @@ void MessageConnection::Close(int maxMSecsToWait) // [main thread]
 	if (inboundMessageQueue.Size() > 0)
 		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in inboundMessageQueue!", (int)inboundMessageQueue.Size());
 
-	if (fragmentedSends.UnsafeGetValue().transfers.Size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedSends.transfers list!", (int)fragmentedSends.UnsafeGetValue().transfers.Size());
+	if (fragmentedSends.UnsafeGetValue().transfers.size() > 0)
+		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedSends.transfers list!", (int)fragmentedSends.UnsafeGetValue().transfers.size());
 
-	if (fragmentedReceives.transfers.Size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedReceives.transfers list!", (int)fragmentedReceives.transfers.Size());
+	if (fragmentedReceives.transfers.size() > 0)
+		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedReceives.transfers list!", (int)fragmentedReceives.transfers.size());
 
 	FreeMessageData();
 }
@@ -331,7 +330,7 @@ void MessageConnection::FreeMessageData() // [main thread]
 	Lockable<FragmentedSendManager>::LockType sends = fragmentedSends.Acquire();
 	sends->FreeAllTransfers();
 
-	fragmentedReceives.transfers.Clear();
+	fragmentedReceives.transfers.clear();
 
 	while(outboundAcceptQueue.Size() > 0)
 	{
@@ -355,14 +354,16 @@ void MessageConnection::FreeMessageData() // [main thread]
 
 	outboundQueue.Clear();
 
-	inboundContentIDStamps.Clear();
+	inboundContentIDStamps.clear();
 
-	outboundContentIDMessages.Clear();
+	outboundContentIDMessages.clear();
 
 	Lockable<ConnectionStatistics>::LockType stats_ = statistics.Acquire();
-	stats_->ping.Clear();
-	stats_->recvPacketIDs.Clear();
-	stats_->traffic.Clear();
+	stats_->ping.clear();
+	stats_->recvPacketIDs.clear();
+	stats_->traffic.clear();
+
+	networkSendSimulator.Free();
 }
 
 void MessageConnection::DetectConnectionTimeOut()
@@ -431,6 +432,8 @@ void MessageConnection::UpdateConnection() // [Called from the worker thread]
 		return;
 
 	AcceptOutboundMessages();
+
+	networkSendSimulator.Process();
 
 	// MessageConnection needs to automatically manage the sending of ping messages in an unreliable channel.
 	if (connectionState == ConnectionOK && pingTimer.TriggeredOrNotRunning())
@@ -650,7 +653,7 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 		LOG(LogVerbose, "MessageConnection::EndAndQueueMessage: Discarded message with ID 0x%X and size %d bytes. "
 			"msg->obsolete: %d. socket ptr: %p. ConnectionState: %s. socket->IsWriteOpen(): %s. msgconn->IsWriteOpen: %s. "
 			"internalQueue: %s.",
-			(int)msg->id, (int)numBytes, (int)msg->obsolete, socket, ConnectionStateToString(GetConnectionState()).CString(), (socket && socket->IsWriteOpen()) ? "true" : "false",
+			(int)msg->id, (int)numBytes, (int)msg->obsolete, socket, ConnectionStateToString(GetConnectionState()).c_str(), (socket && socket->IsWriteOpen()) ? "true" : "false",
 			IsWriteOpen() ? "true" : "false", internalQueue ? "true" : "false");
 		FreeMessage(msg);
 		return;
@@ -672,7 +675,7 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 	///\todo We can optimize here by doing the splitting at datagram creation time to create optimally sized datagrams, but
 	/// it is quite more complicated, so left for later. 
 	const size_t sendHeaderUpperBound = 32; // Reserve some bytes for the packet and message headers. (an approximate upper bound)
-	if (msg->dataSize + sendHeaderUpperBound > socket->MaxSendSize())
+	if (msg->dataSize + sendHeaderUpperBound > socket->MaxSendSize() && socket->TransportLayer() == SocketOverUDP)
 	{
 		const size_t maxFragmentSize = socket->MaxSendSize() / 4 - sendHeaderUpperBound; ///\todo Check this is ok.
 		assert(maxFragmentSize > 0 && maxFragmentSize < socket->MaxSendSize());
@@ -697,20 +700,16 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 	}
 	else
 	{
-		if (msg->reliable)
+		if (!outboundAcceptQueue.Insert(msg))
 		{
-			// If message is reliable, block and retry until succeed to queue
-			while (!outboundAcceptQueue.Insert(msg))
-				kNet::Clock::Sleep(5);
-		}
-		else
-		{
-			// If unreliable, just discard if failed to insert
-			if (!outboundAcceptQueue.Insert(msg))
+			if (msg->reliable) // For nonreliable messages it is not critical if we can't enqueue the message. Just discard it.
 			{
-				FreeMessage(msg);
-				return;
+				///\todo Is it possible to check beforehand if this criteria is avoided, or if we are doomed?
+				LOG(LogVerbose, "Critical: Failed to add new reliable message to outboundAcceptQueue! Queue was full. Discarding the message!");
+				assert(false);
 			}
+			FreeMessage(msg);
+			return;
 		}
 		LOG(LogData, "MessageConnection::EndAndQueueMessage: Queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
 	}
@@ -766,7 +765,7 @@ void MessageConnection::Process(int maxMessagesToProcess)
 		if (!inboundMessageHandler)
 		{
 			LOG(LogVerbose, "Warning! Cannot process messages since no message handler registered to connection %s!",
-				ToString().CString());
+				ToString().c_str());
 			return;
 		}
 
@@ -776,7 +775,7 @@ void MessageConnection::Process(int maxMessagesToProcess)
 		inboundMessageQueue.PopFront();
 		assert(msg);
 
-		inboundMessageHandler->HandleMessage(this, msg->id, (msg->dataSize > 0) ? msg->data : 0, msg->dataSize);
+		inboundMessageHandler->HandleMessage(this, msg->receivedPacketID, msg->id, (msg->dataSize > 0) ? msg->data : 0, msg->dataSize);
 
 		FreeMessage(msg);
 	}
@@ -816,7 +815,7 @@ void MessageConnection::WaitForMessage(int maxMSecsToWait) // [main thread]
 		if (timer.MSecsElapsed() >= 1000.f)
 		{
 				LOG(LogWaits, "MessageConnection::WaitForMessage: Waited %f msecs for a new message. ConnectionState: %s. %d messages in queue.",
-				timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).CString(), (int)inboundMessageQueue.Size());
+				timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str(), (int)inboundMessageQueue.Size());
 		}
 	}
 }
@@ -882,8 +881,8 @@ void MessageConnection::AddOutboundStats(unsigned long numBytes, unsigned long n
 		return;
 
 	ConnectionStatistics &cs = statistics.LockGet();
-	cs.traffic.Push(ConnectionStatistics::TrafficTrack());
-	ConnectionStatistics::TrafficTrack &t = cs.traffic.Back();
+	cs.traffic.push_back(ConnectionStatistics::TrafficTrack());
+	ConnectionStatistics::TrafficTrack &t = cs.traffic.back();
 	t.bytesIn = t.messagesIn = t.packetsIn = 0;
 	t.bytesOut = numBytes;
 	t.packetsOut = numPackets;
@@ -901,8 +900,8 @@ void MessageConnection::AddInboundStats(unsigned long numBytes, unsigned long nu
 		return;
 
 	ConnectionStatistics &cs = statistics.LockGet();
-	cs.traffic.Push(ConnectionStatistics::TrafficTrack());
-	ConnectionStatistics::TrafficTrack &t = cs.traffic.Back();
+	cs.traffic.push_back(ConnectionStatistics::TrafficTrack());
+	ConnectionStatistics::TrafficTrack &t = cs.traffic.back();
 	t.bytesOut = t.messagesOut = t.packetsOut = 0;
 	t.bytesIn = numBytes;
 	t.packetsIn = numPackets;
@@ -922,14 +921,14 @@ void MessageConnection::ComputeStats()
 	const tick_t timeNow = Clock::Tick();
 	const tick_t maxTickAge = timeNow - maxEntryAge;
 
-	for(size_t i = 0; i < cs.traffic.Size(); ++i)
+	for(size_t i = 0; i < cs.traffic.size(); ++i)
 		if (Clock::IsNewer(cs.traffic[i].tick, maxTickAge))
 		{
-			cs.traffic.Erase(cs.traffic.Begin(), cs.traffic.Begin() + i);
+			cs.traffic.erase(cs.traffic.begin(), cs.traffic.begin() + i);
 			break;
 		}
 
-	if (cs.traffic.Size() <= 1)
+	if (cs.traffic.size() <= 1)
 	{
 		bytesInPerSec = bytesOutPerSec = msgsInPerSec = msgsOutPerSec = packetsInPerSec = packetsOutPerSec = 0.f;
 		statistics.Unlock();
@@ -943,7 +942,7 @@ void MessageConnection::ComputeStats()
 	unsigned long totalPacketsIn = 0;
 	unsigned long totalPacketsOut = 0;
 
-	for(size_t i = 0; i < cs.traffic.Size(); ++i)
+	for(size_t i = 0; i < cs.traffic.size(); ++i)
 	{
 		totalBytesIn += cs.traffic[i].bytesIn;
 		totalBytesOut += cs.traffic[i].bytesOut;
@@ -952,7 +951,7 @@ void MessageConnection::ComputeStats()
 		totalMsgsIn += cs.traffic[i].messagesIn;
 		totalMsgsOut += cs.traffic[i].messagesOut;
 	}
-	tick_t ticks = cs.traffic.Back().tick - cs.traffic.Front().tick;
+	tick_t ticks = cs.traffic.back().tick - cs.traffic.front().tick;
 	float secs = max(1.f, (float)Clock::TicksToMillisecondsD(ticks) / 1000.f);
 	bytesInPerSec = (float)totalBytesIn / secs;
 	bytesOutPerSec = (float)totalBytesOut / secs;
@@ -972,26 +971,26 @@ void MessageConnection::CheckAndSaveOutboundMessageWithContentID(NetworkMessage 
 	if (msg->contentID == 0)
 		return;
 
-	MsgContentIDPair key(msg->id, msg->contentID);
-	ContentIDSendTrack::Iterator iter = outboundContentIDMessages.Find(key);
-	if (iter != outboundContentIDMessages.End()) // We have a previous message in the queue which is now obsoleted by this message.
+	MsgContentIDPair key = std::make_pair(msg->id, msg->contentID);
+	ContentIDSendTrack::iterator iter = outboundContentIDMessages.find(key);
+	if (iter != outboundContentIDMessages.end()) // We have a previous message in the queue which is now obsoleted by this message.
 	{
 		// Sanity check: The message numbers must be in the proper order. msg must have been admitted later to send queue than the existing message.
-		if (msg->IsNewerThan(*iter->second_))
+		if (msg->IsNewerThan(*iter->second))
 		{
-			iter->second_->obsolete = true;
+			iter->second->obsolete = true;
 
-			assert(iter->second_ != msg);
-			assert(iter->first_.first_ == iter->second_->id);
-			assert(iter->first_.second_ == iter->second_->contentID);
-			assert(iter->first_.first_ == msg->id);
-			assert(iter->first_.second_ == msg->contentID);
-			iter->second_ = msg;
+			assert(iter->second != msg);
+			assert(iter->first.first == iter->second->id);
+			assert(iter->first.second == iter->second->contentID);
+			assert(iter->first.first == msg->id);
+			assert(iter->first.second == msg->contentID);
+			iter->second = msg;
 		}
 		else // This shouldn't happen, but gracefully handle that situation if it does!
 		{
 			LOG(LogError, "Warning! Adding new message ID %d, number %d, content ID %d, priority %d, but it was obsoleted by an already existing message number %d.", 
-				(int)msg->id, (int)msg->messageNumber, (int)msg->contentID, (int)iter->second_->priority, (int)iter->second_->messageNumber);
+				(int)msg->id, (int)msg->messageNumber, (int)msg->contentID, (int)iter->second->priority, (int)iter->second->messageNumber);
 			msg->obsolete = true;
 		}
 	}
@@ -1011,14 +1010,14 @@ void MessageConnection::ClearOutboundMessageWithContentID(NetworkMessage *msg)
 	assert(msg);
 	if (msg->contentID == 0)
 		return;
-	MsgContentIDPair key(msg->id, msg->contentID);
-	ContentIDSendTrack::Iterator iter = outboundContentIDMessages.Find(key);
-	if (iter != outboundContentIDMessages.End())
-		if (msg == iter->second_)
-			outboundContentIDMessages.Erase(iter);
+	MsgContentIDPair key = std::make_pair(msg->id, msg->contentID);
+	ContentIDSendTrack::iterator iter = outboundContentIDMessages.find(key);
+	if (iter != outboundContentIDMessages.end())
+		if (msg == iter->second)
+			outboundContentIDMessages.erase(iter);
 }
 
-bool MessageConnection::CheckAndSaveContentIDStamp(u32 messageID, u32 contentID, packet_id_t packetID)
+bool MessageConnection::CheckAndSaveContentIDStamp(message_id_t messageID, u32 contentID, packet_id_t packetID)
 {
 	AssertInWorkerThreadContext();
 
@@ -1026,18 +1025,18 @@ bool MessageConnection::CheckAndSaveContentIDStamp(u32 messageID, u32 contentID,
 
 	tick_t now = Clock::Tick();
 
-	MsgContentIDPair key(messageID, contentID);
-	ContentIDReceiveTrack::Iterator iter = inboundContentIDStamps.Find(key);
-	if (iter == inboundContentIDStamps.End())
+	MsgContentIDPair key = std::make_pair(messageID, contentID);
+	ContentIDReceiveTrack::iterator iter = inboundContentIDStamps.find(key);
+	if (iter == inboundContentIDStamps.end())
 	{
-		inboundContentIDStamps[key] = Pair<packet_id_t, tick_t>(packetID, now);
+		inboundContentIDStamps[key] = std::make_pair(packetID, now);
 		return true;
 	}
 	else
 	{
-		if (PacketIDIsNewerThan(packetID, iter->second_.first_) || (float)Clock::TimespanToMillisecondsD(iter->second_.second_, now) > 5.f * 1000.f)
+		if (PacketIDIsNewerThan(packetID, iter->second.first) || (float)Clock::TimespanToMillisecondsD(iter->second.second, now) > 5.f * 1000.f)
 		{
-			iter->second_ = Pair<packet_id_t, tick_t>(packetID, now);
+			iter->second = std::make_pair(packetID, now);
 			return true;
 		}
 		else
@@ -1056,16 +1055,16 @@ void MessageConnection::HandleInboundMessage(packet_id_t packetID, const char *d
 
 	// Read the message ID.
 	DataDeserializer reader(data, numBytes);
-	u32 messageID = reader.ReadVLE<VLE8_16_32>(); ///\todo Check that there actually is enough space to read.
+	message_id_t messageID = reader.ReadVLE<VLE8_16_32>(); ///\todo Check that there actually is enough space to read.
 	if (messageID == DataDeserializer::VLEReadError)
 	{
-		LOG(LogError, "Error parsing messageID of a message in socket %s. Data size: %d bytes.", socket->ToString().CString(), (int)numBytes);
+		LOG(LogError, "Error parsing messageID of a message in socket %s. Data size: %d bytes.", socket->ToString().c_str(), (int)numBytes);
 		throw NetException("MessageConnection::HandleInboundMessage: Network error occurred when deserializing message ID VLE field!");
 	}
-	LOG(LogData, "Received message with ID %d and size %d from peer %s.", (int)packetID, (int)numBytes, socket->ToString().CString());
+	LOG(LogData, "Received message with ID %d and size %d from peer %s.", (int)packetID, (int)numBytes, socket->ToString().c_str());
 
 	char str[256];
-	sprintf(str, "messageIn.%u", messageID);
+	sprintf(str, "messageIn.%u", (unsigned int)messageID);
 	ADDEVENT(str, (float)reader.BytesLeft(), "bytes");
 
 	// Pass the message to TCP/UDP -specific message handler.
@@ -1090,6 +1089,7 @@ void MessageConnection::HandleInboundMessage(packet_id_t packetID, const char *d
 			msg->dataSize = reader.BytesLeft();
 			msg->id = messageID;
 			msg->contentID = 0;
+			msg->receivedPacketID = packetID;
 			bool success = inboundMessageQueue.Insert(msg);
 			if (!success)
 			{
@@ -1124,9 +1124,9 @@ void MessageConnection::SendPingRequestMessage(bool internalQueue)
 
 	ConnectionStatistics &cs = statistics.LockGet();
 	
-	u8 pingID = (u8)((cs.ping.Size() == 0) ? 1 : (cs.ping.Back().pingID + 1));
-	cs.ping.Push(ConnectionStatistics::PingTrack());
-	ConnectionStatistics::PingTrack &pingTrack = cs.ping.Back();
+	u8 pingID = (u8)((cs.ping.size() == 0) ? 1 : (cs.ping.back().pingID + 1));
+	cs.ping.push_back(ConnectionStatistics::PingTrack());
+	ConnectionStatistics::PingTrack &pingTrack = cs.ping.back();
 	pingTrack.replyReceived = false;
 	pingTrack.pingSentTick = Clock::Tick();
 	pingTrack.pingID = pingID;
@@ -1180,24 +1180,24 @@ void MessageConnection::HandlePingReplyMessage(const char *data, size_t numBytes
 	const float rttPredictBias = 0.5f;
 
 	u8 pingID = *(u8*)data;
-	for(size_t i = 0; i < cs.ping.Size(); ++i)
+	for(size_t i = 0; i < cs.ping.size(); ++i)
 		if (cs.ping[i].pingID == pingID && cs.ping[i].replyReceived == false)
 		{
 			cs.ping[i].pingReplyTick = Clock::Tick();
 			float newRtt = (float)Clock::TicksToMillisecondsD(Clock::TicksInBetween(cs.ping[i].pingReplyTick, cs.ping[i].pingSentTick));
 			cs.ping[i].replyReceived = true;
 			statistics.Unlock();
-			rtt = rttPredictBias * newRtt + (1.f - rttPredictBias) * rtt;
+			rtt = rttPredictBias * newRtt + (1.f * rttPredictBias) * rtt;
 
 			LOG(LogVerbose, "HandlePingReplyMessage: %d.", (int)pingID);
 			return;
 		}
 
 	statistics.Unlock();
-	LOG(LogError, "Received PingReply with ID %d in socket %s, but no matching PingRequest was ever sent!", (int)pingID, socket->ToString().CString());
+	LOG(LogError, "Received PingReply with ID %d in socket %s, but no matching PingRequest was ever sent!", (int)pingID, socket->ToString().c_str());
 }
 
-String MessageConnection::ToString() const
+std::string MessageConnection::ToString() const
 {
 	if (socket)
 		return socket->ToString();
@@ -1229,7 +1229,7 @@ void MessageConnection::DumpStatus() const
 		"\tOverlapped out: %d (event: %s)\n"
 		"\tTime until next send: %d\n"
 		"\toutboundQueue.Size(): %d\n",
-		ConnectionStateToString(GetConnectionState()).CString(),
+		ConnectionStateToString(GetConnectionState()).c_str(),
 		(int)NumInboundMessagesPending(),
 		(int)NumOutboundMessagesPending(),
 		Connected() ? "connected" : "",
@@ -1241,7 +1241,7 @@ void MessageConnection::DumpStatus() const
 		(socket && socket->IsWriteOpen()) ? "writeOpen" : "",
 		RoundTripTime(), LastHeardTime(), PacketsInPerSec(), PacketsOutPerSec(),
 		MsgsInPerSec(), MsgsOutPerSec(), 
-		FormatBytes(BytesInPerSec()).CString(), FormatBytes(BytesOutPerSec()).CString(),
+		FormatBytes(BytesInPerSec()).c_str(), FormatBytes(BytesOutPerSec()).c_str(),
 		(int)eventMsgsOutAvailable.Test(), 
 #ifdef WIN32
 		socket ? socket->NumOverlappedReceivesInProgress() : -1,
@@ -1288,7 +1288,7 @@ void MessageConnection::AssertInWorkerThreadContext() const
 	if (haveWorkerThread && currentThreadId != workerThreadId)
 	{
 		LOG(LogError, "Assert failure in MessageConnection::AssertInWorkerThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
-			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).CString(), ThreadIdToString(workerThreadId).CString());
+			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).c_str(), ThreadIdToString(workerThreadId).c_str());
 		assert(false && "MessageConnection::AssertInWorkerThreadContext assert failure!");
 	}
 #endif
@@ -1303,7 +1303,7 @@ void MessageConnection::AssertInMainThreadContext() const
 	if (haveWorkerThread && currentThreadId == workerThreadId)
 	{
 		LOG(LogError, "Assert failure in MessageConnection::AssertInMainThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
-			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).CString(), ThreadIdToString(workerThreadId).CString());
+			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).c_str(), ThreadIdToString(workerThreadId).c_str());
 		assert(false && "MessageConnection::AssertInMainThreadContext assert failure!");
 	}
 #endif

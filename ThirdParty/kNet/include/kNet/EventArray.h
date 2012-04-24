@@ -16,9 +16,7 @@
 /** @file EventArray.h
 	@brief The class \ref kNet::EventArray EventArray. Allows listening to multiple events at once.*/
 
-// Modified by Lasse Öörni for Urho3D
-
-#include "Vector.h"
+#include <vector>
 
 #include "Event.h"
 
@@ -68,7 +66,7 @@ private:
 	timeval tv;
 	/// Cache a list of all added events here. This is to remember the order in which the events were added, so that
 	/// we can correctly return the occurred event with the smallest index.
-	Vector<Event> cachedEvents;
+	std::vector<Event> cachedEvents;
 #endif
 };
 

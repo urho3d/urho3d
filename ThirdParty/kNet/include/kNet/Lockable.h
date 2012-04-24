@@ -22,10 +22,10 @@
 #elif defined(WIN32)
 #include <Windows.h>
 #else
-#include <cassert>
 #include <pthread.h>
 #endif
 
+#include <assert.h>
 #include "PolledTimer.h"
 #include "NetworkLogging.h"
 

@@ -15,15 +15,13 @@
 /** @file NetworkLogging.cpp
 	@brief Implements logging functionalities to stdout/file for different log channels. */
 
-// Modified by Lasse Öörni for Urho3D
-
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <cstdarg>
 #include <cstdio>
+#include <string>
 #include <cstring>
-
-#include "Str.h"
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
@@ -53,7 +51,7 @@ ofstream kNetLogFile;
 
 Lockable<int> logWriteMutex;
 
-String Time()
+string Time()
 {
 	static tick_t firstTick;
 	static bool firstCall = true;
@@ -64,12 +62,12 @@ String Time()
 		return "0.000";
 	}
 	double t = Clock::SecondsSinceD(firstTick);
-	String str;
-	str += String(t);
+	std::stringstream ss;
+	ss << t;
 #ifdef KNET_USE_BOOST
-	str += ", " + String(boost::this_thread::get_id());
+	ss << ", " << boost::this_thread::get_id();
 #endif
-	return str;
+	return ss.str();
 }
 
 } // ~unnamed namespace
@@ -87,9 +85,9 @@ void TimeOutputDebugStringVariadic(LogChannel logChannel, const char * /*filenam
 	vsnprintf(errorStr, 1023, msg, args);
 
 	if (kNetLogFile.is_open())
-		kNetLogFile << Time().CString() << ": " << errorStr << std::endl;
+		kNetLogFile << Time() << ": " << errorStr << std::endl;
 	else
-		std::cout << Time().CString() << ": " << errorStr << std::endl;
+		std::cout << Time() << ": " << errorStr << std::endl;
 
 	va_end(args);
 }
@@ -105,9 +103,9 @@ void TimeOutputDebugString(LogChannel logChannel, const char * /*filename*/, int
 	_snprintf(errorStr, 1023, "%s", msg);
 
 	if (kNetLogFile.is_open())
-		kNetLogFile << Time().CString() << ": " << errorStr << std::endl;
+		kNetLogFile << Time() << ": " << errorStr << std::endl;
 	else
-		std::cout << Time().CString() << ": " << errorStr << std::endl;
+		std::cout << Time() << ": " << errorStr << std::endl;
 }
 
 void SetLogChannels(LogChannel logChannels)
@@ -136,7 +134,7 @@ void SetLogFile(const char *filename)
 
 void EnableMemoryLeakLoggingAtExit()
 {
-#ifdef WIN32
+#ifdef _MSC_VER
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);

@@ -16,9 +16,7 @@
 /** @file RingBuffer.h
 	@brief The RingBuffer class stores a fast raw byte buffer queue storage. */
 
-// Modified by Lasse Öörni for Urho3D
-
-#include "Vector.h"
+#include <vector>
 
 namespace kNet
 {
@@ -29,13 +27,13 @@ class RingBuffer
 public:
 	explicit RingBuffer(int capacity)
 	{
-		data.Resize(capacity);
+		data.resize(capacity);
 		start = 0;
 		end = 0;
 	}
 
 	/// Returns the total number of bytes that this RingBuffer can contain.
-	int Capacity() const { return data.Size(); }
+	int Capacity() const { return data.size(); }
 
 	/// Returns the number of bytes filled in the ring buffer.
 	int Size() const { return end - start; }
@@ -61,10 +59,10 @@ public:
 	{
 		assert(newSize > 0);
 
-		if ((size_t)newSize <= data.Size())
+		if ((size_t)newSize <= data.size())
 			return; // No need to resize.
 		Compact();
-		data.Resize(newSize);
+		data.resize(newSize);
 	}
 
 	void Clear()
@@ -84,7 +82,7 @@ public:
 	void Inserted(int numBytes)
 	{ 
 		end += numBytes; 
-		assert(end <= (int)data.Size());
+		assert(end <= (int)data.size());
 	}
 
 	/// Call after having processed the given number of bytes from the buffer.
@@ -97,13 +95,13 @@ public:
 	}
 
 	/// Returns the total number of bytes that can be filled in this structure after compacting.
-	int TotalFreeBytesLeft() const { return data.Size() - Size(); }
+	int TotalFreeBytesLeft() const { return data.size() - Size(); }
 
 	/// Returns the number of bytes that can be added to this structure contiguously, without having to compact.
-	int ContiguousFreeBytesLeft() const { return data.Size() - end; }
+	int ContiguousFreeBytesLeft() const { return data.size() - end; }
 
 private:
-	PODVector<char> data;
+	std::vector<char> data;
 	int start; ///< Points to the first used byte.
 	int end; ///< Points to the first unused byte.
 

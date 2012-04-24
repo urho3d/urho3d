@@ -16,11 +16,9 @@
 /** @file DataSerializer.h
 	@brief The class \ref kNet::DataSerializer DataSerializer. Stores POD data to bit streams. */
 
-// Modified by Lasse Öörni for Urho3D
-
+#include <vector>
 #include <cassert>
-
-#include "Str.h"
+#include <string>
 
 #include "kNetBuildConfig.h"
 #include "kNet/SharedPtr.h"
@@ -36,7 +34,7 @@ namespace kNet
 
 struct SerializedMessage : public RefCountable
 {
-	PODVector<char> data;
+	std::vector<char> data;
 };
 
 /// DataSerializer is a helper class that can be used to serialize data types to a stream of raw bits 
@@ -61,15 +59,15 @@ public:
 
 	/// Instantiates a new DataSerializer that writes to the given vector. 
 	/// @param maxBytes The maximum number of bytes that the message can take up space.
-	explicit DataSerializer(PODVector<char> &data, size_t maxBytes);
+	explicit DataSerializer(std::vector<char> &data, size_t maxBytes);
 
 	/// Instantiates a new DataSerializer that writes to the given vector, using a message template. 
 	/// @param maxBytes The maximum number of bytes that the message can take up space.
-	DataSerializer(PODVector<char> &data, size_t maxBytes, const SerializedMessageDesc *msgTemplate);
+	DataSerializer(std::vector<char> &data, size_t maxBytes, const SerializedMessageDesc *msgTemplate);
 
 	/// Appends a single element of the passed type. If you are using a serialization template to
 	/// aid in serialization, the type T may be any of the types bit, u8, s8, u16, s16, u32, s32, u64, s64, float, double, 
-	/// const char * or String.
+	/// const char * or std::string.
 	/// If you are not using a serialization template, you may pass in any type that is a POD type and can be reinterpret_casted
 	/// to a u8 buffer and memcpy'd to a byte buffer.
 	template<typename T>
@@ -80,15 +78,15 @@ public:
 
 	/// Appends the given number of bits to the stream.
 	/// @param value The variable where the bits are taken from. The bits are read from the LSB first, towards the MSB end of the value.
-	/// @param amount The number of bits to read, in the range [1, 32].
-	void AppendBits(u32 value, int amount);
+	/// @param numBits The number of bits to write, in the range [1, 32].
+	void AppendBits(u32 value, int numBits);
 
 	/// Adds a given string as length-prepended (not zero-padded). In the message template, use a
 	/// parameter of type 's8' with dynamicCount field set to e.g. 8.
 	void AddString(const char *str);
 
 	/// See \ref void kNet::DataSerializer::AddString(const char *str); "".
-	void AddString(const String &str) { AddString(str.CString()); }
+	void AddString(const std::string &str) { AddString(str.c_str()); }
 
 	/// Appends the given amount of elements from the passed array.
 	template<typename T>
@@ -97,6 +95,111 @@ public:
 	/// Adds an array of bytes to the stream. The contents in the stream must be byte-aligned when calling
 	/// this function. A serialization template may not be used when calling this function.
 	void AddAlignedByteArray(const void *data, u32 numBytes);
+
+	/// Writes the given non-negative float quantized to the given fixed-point precision.
+	/// @param value The floating-point value to send. This float must have a value in the range [0, 2^numIntegerBits[.
+	/// @param numIntegerBits The number of bits to use to represent the integer part.
+	/// @param numDecimalBits The number of bits to use to represent the fractional part.
+	/// @note Before writing the value, it is clamped to range specified above to ensure that the written value does not
+	///	 result in complete garbage due to over/underflow.
+	/// @note The total number of bits written is numIntegerBits + numDecimalBits, which must in total be <= 32.
+	/// @return The bit pattern that was written to the buffer.
+	u32 AddUnsignedFixedPoint(int numIntegerBits, int numDecimalBits, float value);
+
+	/// Writes the given float quantized to the given fixed-point precision.
+	/// @param value The floating-point value to send. This float must have a value in the range [-2^(numIntegerBits-1), 2^(numIntegerBits-1)[.
+	/// @param numIntegerBits The number of bits to use to represent the integer part.
+	/// @param numDecimalBits The number of bits to use to represent the fractional part.
+	/// @note Before writing the value, it is clamped to range specified above to ensure that the written value does not
+	///	 result in complete garbage due to over/underflow.
+	/// @note The total number of bits written is numIntegerBits + numDecimalBits, which must in total be <= 32.
+	/// @return The bit pattern that was written to the buffer.
+	u32 AddSignedFixedPoint(int numIntegerBits, int numDecimalBits, float value);
+
+	/// Writes the given float quantized to the number of bits, that are distributed evenly over the range [minRange, maxRange].
+	/// @param value The floating-point value to send. This float must have a value in the range [minRange, maxRange].
+	/// @param numBits The number of bits to use for representing the value. The total number of different values written is then 2^numBits, 
+	///	 which are evenly distributed across the range [minRange, maxRange]. The value numBits must satisfy 1 <= numBits <= 30.
+	/// @param minRange The lower limit for the value that is being written.
+	/// @param maxRange The upper limit for the value that is being written.
+	/// @return The bit pattern that was written to the buffer.
+	/// @note This function performs quantization, which results in lossy serialization/deserialization.
+	u32 AddQuantizedFloat(float minRange, float maxRange, int numBits, float value);
+
+	/// Writes the given float with a reduced amount of bit precision.
+	/// @param signBit If true, a signed float is written (one bit is reserved for sign-magnitude representation).
+	///                If false, an unsigned float is written. Negative numbers clamp to zero (-inf -> zero as well).
+	/// @param exponentBits The number of bits to use to store the exponent value, in the range [1, 8].
+	/// @param mantissaBits The number of bits to use to store the mantissa value, in the range [1, 23].
+	/// @param exponentBias For IEEE-754 floats, the signed exponent is converted to unsigned number by adding an offset bias.
+	///                This field specifies the bias to use. Usually it is ok to reserve the equal number of exponent values
+	///                for negative and positive exponents, meaning that exponentBias == (1 << (exponentBits - 1)) - 1 is an ok default.
+	/// @param value The floating point number to encode.
+	/// @note This function performs quantization, which results in lossy serialization/deserialization.
+	/// @note An example for 8-bit minifloats: signBit==true, exponentBits==3, mantissaBits==4, exponentBias==3.
+	/// @note IEEE-754 16-bit 'half16': signBit==true, exponentBits==5, mantissaBits==10, exponentBias==15.
+	///       See http://en.wikipedia.org/wiki/Half_precision_floating-point_format
+	/// @note IEEE-754 32-bit floats: signBit==true, exponentBits==8, mantissaBits==23, exponentBias==127.
+	void AddMiniFloat(bool signBit, int exponentBits, int mantissaBits, int exponentBias, float value);
+
+	/// Writes the given normalized 2D vector compressed to a single 1D polar angle value. Then the angle is quantized to the specified 
+	/// precision.
+	/// @param x The x coordinate of the 2D vector.
+	/// @param y The y coordinate of the 2D vector.
+	/// @param numBits The number of bits to quantize the representation down to. This value must satisfy 1 <= numBits <= 30.
+	/// @note The vector (x,y) does not need to be normalized for this function to work properly (don't bother enforcing normality in
+	///	advance prior to calling this). When deserializing, (x,y) is reconstructed as a normalized direction vector.
+	/// @note Do not call this function with (x,y) == (0,0).
+	/// @note This function performs quantization, which results in lossy serialization/deserialization.
+	void AddNormalizedVector2D(float x, float y, int numBits);
+
+	/// Writes the given 2D vector in polar form and quantized to the given precision.
+	/// The length of the 2D vector is stored as fixed-point in magnitudeIntegerBits.magnitudeDecimalBits format.
+	/// The direction of the 2D vector is stores with directionBits.
+	/// @param x The x coordinate of the 2D vector.
+	/// @param y The y coordinate of the 2D vector.
+	/// @param magnitudeIntegerBits The number of bits to use for the integral part of the vector's length. This means
+	///	 that the maximum length of the vector to be written by this function is < 2^magnitudeIntegerBits.
+	/// @param magnitudeDecimalBits The number of bits to use for the fractional part of the vector's length.
+	/// @param directionBits The number of bits of precision to use for storing the direction of the 2D vector.
+	/// @return The number of bits written to the stream.
+	/// @important This function does not write a fixed amount of bits to the stream, but omits the direction if the length is zero. 
+	///	 Therefore only use DataDeserializer::ReadVector2D to extract the vector from the buffer.
+	int AddVector2D(float x, float y, int magnitudeIntegerBits, int magnitudeDecimalBits, int directionBits);
+
+	/// Writes the given normalized 3D vector converted to spherical form (azimuth/yaw, inclination/pitch) and quantized to the specified range.
+	/// The given vector (x,y,z) must be normalized in advance.
+	/// @param numBitsYaw The number of bits to use for storing the azimuth/yaw part of the vector.
+	/// @param numBitsPitch The number of bits to use for storing the inclination/pitch part of the vector.
+	/// @note After converting the euclidean (x,y,z) to spherical (yaw, pitch) format, the yaw value is expressed in the range [-pi, pi] and pitch
+	///	 is expressed in the range [-pi/2, pi/2]. Therefore, to maintain consistent precision, the condition numBitsYaw == numBitsPitch + 1 
+	///	 should hold. E.g. If you specify 8 bits for numBitsPitch, then you should specify 9 bits for numBitsYaw to have yaw & pitch use the same
+	///	 amount of precision.
+	/// @note This function uses the convention that the +Y axis points towards up, i.e. +Y is the "Zenith direction", and the X-Z plane is the horizontal
+	///	 "map" plane.
+	void AddNormalizedVector3D(float x, float y, float z, int numBitsYaw, int numBitsPitch);
+
+	/// Writes the given 3D vector converted to spherical form (azimuth/yaw, inclination/pitch, length) and quantized to the specified range.
+	/// @param numBitsYaw The number of bits to use for storing the azimuth/yaw part of the vector.
+	/// @param numBitsPitch The number of bits to use for storing the inclination/pitch part of the vector.
+	/// @param magnitudeIntegerBits The number of bits to use for the integral part of the vector's length. This means
+	///	 that the maximum length of the vector to be written by this function is < 2^magnitudeIntegerBits.
+	/// @param magnitudeDecimalBits The number of bits to use for the fractional part of the vector's length.
+	/// @return The number of bits written to the stream.
+	/// @important This function does not write a fixed amount of bits to the stream, but omits the direction if the length is zero. 
+	///	 Therefore only use DataDeserializer::ReadVector3D to extract the vector from the buffer.
+	/// @note After converting the euclidean (x,y,z) to spherical (yaw, pitch) format, the yaw value is expressed in the range [-pi, pi] and pitch
+	///	 is expressed in the range [-pi/2, pi/2]. Therefore, to maintain consistent precision, the condition numBitsYaw == numBitsPitch + 1 
+	///	 should hold. E.g. If you specify 8 bits for numBitsPitch, then you should specify 9 bits for numBitsYaw to have yaw & pitch use the same
+	///	 amount of precision.
+	/// @note This function uses the convention that the +Y axis points towards up, i.e. +Y is the "Zenith direction", and the X-Z plane is the horizontal
+	///	 "map" plane.
+	int AddVector3D(float x, float y, float z, int numBitsYaw, int numBitsPitch, int magnitudeIntegerBits, int magnitudeDecimalBits);
+
+	void AddArithmeticEncoded(int numBits, int val1, int max1, int val2, int max2);
+	void AddArithmeticEncoded(int numBits, int val1, int max1, int val2, int max2, int val3, int max3);
+	void AddArithmeticEncoded(int numBits, int val1, int max1, int val2, int max2, int val3, int max3, int val4, int max4);
+	void AddArithmeticEncoded(int numBits, int val1, int max1, int val2, int max2, int val3, int max3, int val4, int max4, int val5, int max5);
 
 	/// Sets the number of instances in a varying element.
 	void SetVaryingElemSize(u32 count);
@@ -115,7 +218,7 @@ public:
 	/// @return The number of bits filled so far total.
 	size_t BitsFilled() const { return elemOfs * 8 + bitOfs; }
 
-	/// @return The total capacity of the buffer we are filling into.
+	/// @return The total capacity of the buffer we are filling into, in bytes.
 	size_t Capacity() const { return maxBytes; }
 
 	/// Returns the current byte offset the DataSerializer is writing to.
@@ -124,6 +227,18 @@ public:
 	/// Returns the current bit offset in the current byte this DataSerializer is writing to, [0, 7].
 	size_t BitOffset() const { return bitOfs; }
 
+    /// Returns the total number of bits that can still be serialized into this DataSerializer object before overflowing (which throws an exception).
+    size_t BitsLeft() const { return Capacity()*8 - BitsFilled(); }
+
+    /// Returns the total number of full bytes that can still be serialized into this DataSerializer object before overflowing (which throws an exception).
+    /// @return floor(BitsLeft()/8).
+    size_t BytesLeft() const { return BitsLeft() / 8; }
+
+	/// Returns the bit serialized at the given bit index of this buffer.
+	bool DebugReadBit(int bitIndex) const;
+
+	/// Returns a string of 0's and 1's corresponding to the given bit indices.
+	std::string DebugReadBits(int startIndex, int endIndex) const;
 private:
 	void AppendByte(u8 byte);
 	void AppendUnalignedByte(u8 byte);
@@ -168,7 +283,7 @@ void DataSerializer::Add(const T &value)
 
 template<> void DataSerializer::Add<char*>(char * const & value);
 template<> void DataSerializer::Add<const char*>(const char * const & value);
-template<> void DataSerializer::Add<String>(const String &value);
+template<> void DataSerializer::Add<std::string>(const std::string &value);
 
 template<> void DataSerializer::Add<bit>(const bit &value);
 
@@ -252,15 +367,15 @@ public:
 };
 
 template<>
-class TypeSerializer<String>
+class TypeSerializer<std::string>
 {
 public:
-	static size_t Size(const String &value)
+	static size_t Size(const std::string &value)
 	{
-		return value.Length()+1;
+		return value.length()+1;
 	}
 
-	static void SerializeTo(DataSerializer &dst, const String &src)
+	static void SerializeTo(DataSerializer &dst, const std::string &src)
 	{
 #ifdef _DEBUG
 		size_t bitPos = dst.BitsFilled();
@@ -271,7 +386,7 @@ public:
 #endif
 	}
 
-	static void DeserializeFrom(DataDeserializer &src, String &dst)
+	static void DeserializeFrom(DataDeserializer &src, std::string &dst)
 	{
 		dst = src.ReadString();
 	}

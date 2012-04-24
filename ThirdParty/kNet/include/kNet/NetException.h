@@ -15,12 +15,8 @@
 
 /** @file NetException.h
 	@brief The class NetException. Common exception class thrown by kNet on errors. */
-
-// Modified by Lasse Öörni for Urho3D
-
 #include <exception>
-
-#include "Str.h"
+#include <string>
 
 namespace kNet
 {
@@ -37,10 +33,10 @@ public:
 	{
 	}
 
-	const char *what() const throw() { return exception.CString(); }
+	const char *what() const throw() { return exception.c_str(); }
 
 private:
-	String exception;
+	std::string exception;
 };
 
 } // ~kNet

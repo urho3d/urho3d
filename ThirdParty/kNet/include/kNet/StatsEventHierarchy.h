@@ -16,10 +16,8 @@
 /** @file StatsEventHierarchy.h
 	@brief Stores a hierarchy of network events for profiling purposes. */
 
-// Modified by Lasse Öörni for Urho3D
-
-#include "Map.h"
-#include "Str.h"
+#include <map>
+#include <string>
 
 #include "kNet/WaitFreeQueue.h"
 #include "kNet/Clock.h"
@@ -42,7 +40,7 @@ struct StatsEvent
 	tick_t time;
 };
 
-inline String FirstToken(const char *str, char delimiter, int &nextTokenStart)
+inline std::string FirstToken(const char *str, char delimiter, int &nextTokenStart)
 {
 	int i = 0;
 	while(str[i] != '\0' && str[i] != delimiter)
@@ -51,20 +49,20 @@ inline String FirstToken(const char *str, char delimiter, int &nextTokenStart)
 		nextTokenStart = -1;
 	else
 		nextTokenStart = i+1;
-	return String(str, i);
+	return std::string(str, str + i);
 }
 
 class StatsEventHierarchyNode
 {
 public:
-	///\todo To improve performance, don't use a String as a key to the map, and replace the map with a more efficient data structure.
-	typedef Map<String, StatsEventHierarchyNode> NodeMap;
+	///\todo To improve performance, don't use a std::string as a key to the map, and replace the map with a more efficient data structure.
+	typedef std::map<std::string, StatsEventHierarchyNode> NodeMap;
 	NodeMap children;
 
 	WaitFreeQueue<StatsEvent> events;
 
 	/// Specifies the unit of the numeric data in this node.
-	String valueType;
+	std::string valueType;
 
 	StatsEventHierarchyNode()
 	:events(4) // The default size for the queue must be at least four elements (pow2, >2).
@@ -89,8 +87,8 @@ public:
 	{
 		PruneOldEventsThisLevel(ageMSecs);
 
-		for(NodeMap::Iterator iter = children.Begin(); iter != children.End(); ++iter)
-			iter->second_.PruneOldEventsHierarchy(ageMSecs);
+		for(NodeMap::iterator iter = children.begin(); iter != children.end(); ++iter)
+			iter->second.PruneOldEventsHierarchy(ageMSecs);
 	}
 
 	void AddEventToThisLevel(float value, int oldAgeMSecs)
@@ -108,13 +106,13 @@ public:
 	void AddEventToHierarchy(const char *name, float value, const char *valueType, int oldAgeMSecs)
 	{
 		int nextTokenStart = 0;
-		String childName = FirstToken(name, '.', nextTokenStart);
-		if (childName.Empty())
+		std::string childName = FirstToken(name, '.', nextTokenStart);
+		if (childName.empty())
 			AddEventToThisLevel(value, oldAgeMSecs);
 		else
 		{
-			NodeMap::Iterator iter = children.Find(childName);
-			if (iter == children.End())
+			NodeMap::iterator iter = children.find(childName);
+			if (iter == children.end()) 
 				children[childName].valueType = valueType; // To optimize, only copy this field in the first time the node is created.
 			if (nextTokenStart == -1)
 				children[childName].AddEventToThisLevel(value, oldAgeMSecs);
@@ -126,13 +124,13 @@ public:
 	StatsEventHierarchyNode *FindChild(const char *name)
 	{
 		int nextTokenStart = 0;
-		String childName = FirstToken(name, '.', nextTokenStart);
-		if (childName.Empty())
+		std::string childName = FirstToken(name, '.', nextTokenStart);
+		if (childName.empty())
 			return this;
 		else
 		{
-			NodeMap::Iterator iter = children.Find(childName);
-			if (iter == children.End())
+			NodeMap::iterator iter = children.find(childName);
+			if (iter == children.end()) 
 				return 0;
 			if (nextTokenStart == -1)
 				return &children[childName];
@@ -150,8 +148,8 @@ public:
 	{
 		int count = AccumulateTotalCountThisLevel();
 
-		for(NodeMap::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
-			count += iter->second_.AccumulateTotalCountHierarchy();
+		for(NodeMap::const_iterator iter = children.begin(); iter != children.end(); ++iter)
+			count += iter->second.AccumulateTotalCountHierarchy();
 
 		return count;
 	}
@@ -168,8 +166,8 @@ public:
 	{
 		float value = AccumulateTotalValueThisLevel();
 
-		for(NodeMap::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
-			value += iter->second_.AccumulateTotalValueHierarchy();
+		for(NodeMap::const_iterator iter = children.begin(); iter != children.end(); ++iter)
+			value += iter->second.AccumulateTotalValueHierarchy();
 
 		return value;
 	}

@@ -16,8 +16,6 @@
 /** @file DataDeserializer.h
 	@brief The class \ref kNet::DataDeserializer DataDeserializer. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "kNetBuildConfig.h"
 #include "kNet/Types.h"
 
@@ -82,11 +80,30 @@ public:
 	/// The returned string will only contain ascii values in the range [32, 253], 0x0D, 0x0A, 0x09. Other values will 
 	/// be replaced with a space bar character (0x20). Because of this string validation method, do not use this function
 	/// to extract binary data of any kind (base64-encoded is fine).
-	String ReadString();
+	std::string ReadString();
 
 	/// Reads the given amount of bits and packs them into a u32, which is returned.
 	/// @param numBits the number of bits to read, [1, 32].
 	u32 ReadBits(int numBits);
+
+	float ReadUnsignedFixedPoint(int numIntegerBits, int numDecimalBits);
+
+	float ReadSignedFixedPoint(int numIntegerBits, int numDecimalBits);
+
+	float ReadQuantizedFloat(float minRange, float maxRange, int numBits);
+
+	float ReadMiniFloat(bool signBit, int exponentBits, int mantissaBits, int exponentBias);
+
+	void ReadNormalizedVector2D(int numBits, float &x, float &y);
+
+	void ReadVector2D(int magnitudeIntegerBits, int magnitudeDecimalBits, int directionBits, float &x, float &y);
+	void ReadNormalizedVector3D(int numBitsYaw, int numBitsPitch, float &x, float &y, float &z);
+	void ReadVector3D(int numBitsYaw, int numBitsPitch, int magnitudeIntegerBits, int magnitudeDecimalBits, float &x, float &y, float &z);
+
+	void ReadArithmeticEncoded(int numBits, int &val1, int max1, int &val2, int max2);
+	void ReadArithmeticEncoded(int numBits, int &val1, int max1, int &val2, int max2, int &val3, int max3);
+	void ReadArithmeticEncoded(int numBits, int &val1, int max1, int &val2, int max2, int &val3, int max3, int &val4, int max4);
+	void ReadArithmeticEncoded(int numBits, int &val1, int max1, int &val2, int max2, int &val3, int max3, int &val4, int max4, int &val5, int max5);
 
 	u32 GetDynamicElemCount();
 
@@ -109,10 +126,10 @@ public:
 	const char *CurrentData() const { return data + BytePos(); }
 
 	/// Advances the read pointer with the given amount of bits. Can only be used in nontemplate read mode.
-	void SkipBits(size_t numBits);
+	void SkipBits(int numBits);
 
 	/// Advances the read pointer with the given amount of bytes. Can only be used in nontemplate read mode.
-	void SkipBytes(size_t numBytes) { SkipBits(numBytes * 8); }
+	void SkipBytes(int numBytes) { SkipBits(numBytes * 8); }
 
 private:
 	/// The data pointer to read from.
@@ -148,7 +165,7 @@ T DataDeserializer::Read()
 	return value;
 }
 
-template<> String DataDeserializer::Read<String>();
+template<> std::string DataDeserializer::Read<std::string>();
 
 template<> bool DataDeserializer::Read<bit>();
 

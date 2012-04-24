@@ -37,9 +37,14 @@ endmacro()
 #set(USE_BOOST TRUE)
 #set(BOOST_ROOT "TODO_SpecifyYourBoostRootHereIfCMakeAutoSearchFails")
 
+# TinyXML is embedded to the repository, so you can safely keep this true.
+# However, it is not required for core kNet use, but only for the MessageCompiler tool, in which
+# case you can disable it here by setting USE_TINYXML to FALSE, and excluding MessageCompiler from the build.
 #set(USE_TINYXML TRUE)
-#set(TINYXML_ROOT "TODO_SpecifyYourTinyXMLRootHereIfUsingTinyXML")
+set(TINYXML_ROOT "src/tinyxml")
 
+# If you want to enable the use of visual debugging/profiling windows, uncomment the following line (must
+# have Qt installed and set up)
 #set(USE_QT TRUE)
 
 # To enable specific flags only in debug mode, use the following syntax.
@@ -49,10 +54,13 @@ endmacro()
 # Affects only Boost threads. When native Win32 threads are used, the id is stored on creation.
 AddCompilationDefine(KNET_ENABLE_WINXP_SUPPORT)
 
-# If set, extra code is inserted in debug mode to assert that certain thread race conditions don't occur.
-AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
+if (NOT USE_BOOST) # USE_BOOST and KNET_THREAD_CHECKING_ENABLED are mutually exclusive, because boost::thread_id() does not work across .dll boundaries.
+   # If set, extra code is inserted in debug mode to assert that certain thread race conditions don't occur.
+   # (This can considerably slow down kNet performance)
+   #AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
+endif()
 
-# Enable internal LOG messaging if this flag is enabled. Comment this out to squeeze the last bit of
+# Enable internal LOG messaging if this flag is enabled. Comment this out to squeeze the last bit of 
 # extra performance by avoiding all logging-related string operations.
 #AddCompilationDefine(KNET_LOGGING_SUPPORT_ENABLED)
 
@@ -76,16 +84,16 @@ if (USE_BOOST)
    endif()
 endif()
 
+file(GLOB kNetSourceFiles ./src/*.cpp)
+file(GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
+
 if (USE_TINYXML)
    AddCompilationDefine(KNET_USE_TINYXML)
    
+   file(GLOB TinyXmlSourceFiles ${TINYXML_ROOT}/*.cpp)
+   set(kNetSourceFiles ${kNetSourceFiles} ${TinyXmlSourceFiles})
    include_directories(${TINYXML_ROOT})
-   link_directories(${TINYXML_ROOT})
-   link_directories(${TINYXML_ROOT}/Release)
 endif()
-
-file(GLOB kNetSourceFiles ./src/*.cpp)
-file(GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
 
 if (USE_QT)
    AddCompilationDefine(KNET_USE_QT)
@@ -157,33 +165,28 @@ elseif (UNIX)
 
    set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})
    set(kNetHeaderFiles ${kNetHeaderFiles} ${kNetUnixHeaderFiles})
+
+   add_definitions(-DUNIX)
 endif()
 
 #AddCompilationUnitNameDefines(kNetSourceFiles)
 #TODO: To clean up, move the lines of code below into a macro, like shown above. Disabled for now since passing a list to a CMake macro was problematic.
-# Urho3D: use only on Windows
-if (WIN32)
-   foreach(srcFile ${kNetSourceFiles})
-      get_filename_component(baseName ${srcFile} NAME)
-      set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
-   endforeach()
-endif()
+foreach(srcFile ${kNetSourceFiles})
+   get_filename_component(baseName ${srcFile} NAME)
+   set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
+endforeach()
 
 add_library(kNet STATIC ${kNetSourceFiles} ${kNetHeaderFiles})
-
-if (USE_TINYXML)
-   target_link_libraries(kNet debug tinyxmld.lib optimized tinyxml.lib)
-endif()
 
 # Add the main kNet include directory root folder to all projects.
 include_directories(./include)
 
-# Urho3D: add the Container library
-include_directories(../../Engine/Container)
-set(kNetLinkLibraries ${kNetLinkLibraries} Container)
-
 if (USE_BOOST)
-   find_package(Boost 1.38.0 COMPONENTS thread)
+   if (WIN32)
+      find_package(Boost 1.38.0 COMPONENTS thread)
+   else()
+      find_package(Boost)
+   endif()
    if (Boost_FOUND)
       include_directories(${Boost_INCLUDE_DIRS})
       link_directories(${Boost_LIBRARY_DIRS})
@@ -210,4 +213,3 @@ target_link_libraries(kNet ${kNetLinkLibraries})
 
 #add_subdirectory(tests)
 
-#set_target_properties(kNet Tests ConnectFlood FileTransfer FirewallTest HelloClient HelloServer LatencyTest MessageCompiler SilenceTest SimpleChat SpeedTest TrashTalk PROPERTIES 

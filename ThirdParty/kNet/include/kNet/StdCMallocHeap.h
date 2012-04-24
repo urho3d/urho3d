@@ -37,7 +37,7 @@ public:
 	static inline void *Alloc(StdCAlloc *, size_t size, size_t alignment, const char * /*nameTag*/ = 0, AllocFlags /*flags*/ = AFAllocLow)
 	{
 		assert(IS_POW2(alignment));
-#ifdef WIN32
+#ifdef _MSC_VER
 		void *ptr = _aligned_malloc(size, alignment);
 #else
 		void *ptr = malloc(size); ///\todo aligned_malloc on unix?
@@ -46,7 +46,7 @@ public:
 	}
 	static inline void Free(StdCAlloc *, void *ptr)
 	{
-#ifdef WIN32
+#ifdef _MSC_VER
 		_aligned_free(ptr);
 #else
 		free(ptr);
@@ -56,7 +56,7 @@ public:
 	///\todo Perhaps support Resize(void *ptr, size_t newSize); ?
 	static inline size_t Size(StdCAlloc *, void *ptr)
 	{
-#ifdef WIN32
+#ifdef _MSC_VER
 		return ::_msize(ptr);
 #else
 		assert(false && "N/I");

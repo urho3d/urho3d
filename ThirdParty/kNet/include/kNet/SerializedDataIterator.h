@@ -16,8 +16,6 @@
 /** @file SerializedDataIterator.h
 	@brief The SerializedDataIterator class. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "SharedPtr.h"
 #include "MessageListParser.h"
 
@@ -67,7 +65,7 @@ private:
 	void DescendIntoStructure();
 
 	/// Stores the tree traversal progress.
-	PODVector<ElemInfo> currentElementStack;
+	std::vector<ElemInfo> currentElementStack;
 	/// The type of the message we are building.
 	const SerializedMessageDesc &desc;
 };

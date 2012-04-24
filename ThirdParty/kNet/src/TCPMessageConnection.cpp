@@ -15,8 +15,6 @@
 /** @file TCPMessageConnection.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <sstream>
 
 #ifdef KNET_USE_BOOST
@@ -38,7 +36,7 @@ namespace kNet
 
 /// The maximum size for a TCP message we will allow to be received. If we receive a message larger than this, we consider
 /// it as a protocol violation and kill the connection.
-static const u32 cMaxReceivableTCPMessageSize = 1024 * 1024;
+static const u32 cMaxReceivableTCPMessageSize = 10 * 1024 * 1024; ///\todo Make this configurable for the connection.
 
 TCPMessageConnection::TCPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState)
 :MessageConnection(owner, ownerServer, socket, startingState),
@@ -112,7 +110,7 @@ MessageConnection::SocketReadResult TCPMessageConnection::ReadSocket(size_t &tot
 		}
 
 		LOG(LogData, "TCPMessageConnection::ReadSocket: Received %d bytes from the network from peer %s.", 
-			buffer->bytesContains, socket->ToString().CString());
+			buffer->bytesContains, socket->ToString().c_str());
 
 		assert((size_t)buffer->bytesContains <= (size_t)tcpInboundSocketData.ContiguousFreeBytesLeft());
 		///\todo For performance, this memcpy can be optimized away. We can parse the message directly
@@ -148,7 +146,7 @@ MessageConnection::SocketReadResult TCPMessageConnection::ReadSocket(size_t &tot
 /// Warning: This is a non-threadsafe check for the container, only to be used for debugging.
 /// Warning #2: This function is very slow, as it performs a N^2 search through the container.
 template<typename T>
-bool ContainerUniqueAndNoNullElements(const Vector<T> &cont)
+bool ContainerUniqueAndNoNullElements(const std::vector<T> &cont)
 {
 	for(size_t i = 0; i < cont.size(); ++i)
 		for(size_t j = i+1; j < cont.size(); ++j)
@@ -176,25 +174,22 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 		return PacketSendSocketClosed;
 	}
 
+    // 'serializedMessages' is a temporary data structure used only by this member function.
+    // It caches a list of all the messages we are pushing out during this call.
+	serializedMessages.clear();
+
 	// In the following, we start coalescing multiple messages into a single socket send() calls.
 	// Get the maximum number of bytes we can coalesce for the send() call. This is only a soft limit
 	// in the sense that if we encounter a single message that is larger than this limit, then we try
 	// to send that through in one send() call.
-	const size_t maxSendSize = socket->MaxSendSize();
+//	const size_t maxSendSize = socket->MaxSendSize();
 
 	// Push out all the pending data to the socket.
-//	assert(ContainerUniqueAndNoNullElements(serializedMessages));
-//	assert(ContainerUniqueAndNoNullElements(outboundQueue));
-	serializedMessages.Clear(); // 'serializedMessages' is a temporary data structure used only by this member function.
-	OverlappedTransferBuffer *overlappedTransfer = socket->BeginSend();
-	if (!overlappedTransfer)
-	{
-		LOG(LogError, "TCPMessageConnection::SendOutPacket: Starting an overlapped send failed!");
-		return PacketSendSocketClosed;
-	}
+	OverlappedTransferBuffer *overlappedTransfer = 0;
 
 	int numMessagesPacked = 0;
-	DataSerializer writer(overlappedTransfer->buffer.buf, overlappedTransfer->buffer.len);
+	DataSerializer writer;
+//	assert(ContainerUniqueAndNoNullElements(outboundQueue)); // This precondition should always hold (but very heavy to test, uncomment to debug)
 	while(outboundQueue.Size() > 0)
 	{
 #ifdef KNET_NO_MAXHEAP
@@ -210,12 +205,26 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 			outboundQueue.PopFront();
 			continue;
 		}
+
 		const int encodedMsgIdLength = VLE8_16_32::GetEncodedBitLength(msg->id) / 8;
 		const size_t messageContentSize = msg->dataSize + encodedMsgIdLength; // 1 byte: Message ID. X bytes: Content.
 		const int encodedMsgSizeLength = VLE8_16_32::GetEncodedBitLength(messageContentSize) / 8;
 		const size_t totalMessageSize = messageContentSize + encodedMsgSizeLength; // 2 bytes: Content length. X bytes: Content.
-		// If this message won't fit into the buffer, send out all previously gathered messages (except if there were none, then try to get the big message through).
-		if (writer.BytesFilled() + totalMessageSize >= maxSendSize && numMessagesPacked > 0)
+
+        if (!overlappedTransfer)
+        {
+            overlappedTransfer = socket->BeginSend(std::max<size_t>(socket->MaxSendSize(), totalMessageSize));
+	        if (!overlappedTransfer)
+	        {
+		        LOG(LogError, "TCPMessageConnection::SendOutPacket: Starting an overlapped send failed!");
+                assert(serializedMessages.size() == 0);
+		        return PacketSendSocketClosed;
+	        }
+            writer = DataSerializer(overlappedTransfer->buffer.buf, overlappedTransfer->buffer.len);
+        }
+
+		// If this message won't fit into the buffer, send out all previously gathered messages.
+        if (writer.BytesLeft() < totalMessageSize)
 			break;
 
 		writer.AddVLE<VLE8_16_32>(messageContentSize);
@@ -224,7 +233,7 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 			writer.AddAlignedByteArray(msg->data, msg->dataSize);
 		++numMessagesPacked;
 
-		serializedMessages.Push(msg);
+		serializedMessages.push_back(msg);
 #ifdef KNET_NO_MAXHEAP
 		assert(*outboundQueue.Front() == msg);
 #else
@@ -232,17 +241,17 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 #endif
 		outboundQueue.PopFront();
 	}
-//	assert(ContainerUniqueAndNoNullElements(serializedMessages));
+//	assert(ContainerUniqueAndNoNullElements(serializedMessages)); // This precondition should always hold (but very heavy to test, uncomment to debug)
 
 	if (writer.BytesFilled() == 0 && outboundQueue.Size() > 0)
-		LOG(LogError, "Failed to send any messages to socket %s! (Probably next message was too big to fit in the buffer).", socket->ToString().CString());
+		LOG(LogError, "Failed to send any messages to socket %s! (Probably next message was too big to fit in the buffer).", socket->ToString().c_str());
 
-	overlappedTransfer->buffer.len = writer.BytesFilled();
+	overlappedTransfer->bytesContains = writer.BytesFilled();
 	bool success = socket->EndSend(overlappedTransfer);
 
 	if (!success) // If we failed to send, put all the messages back into the outbound queue to wait for the next send round.
 	{
-		for(size_t i = 0; i < serializedMessages.Size(); ++i)
+		for(size_t i = 0; i < serializedMessages.size(); ++i)
 #ifdef KNET_NO_MAXHEAP
 			outboundQueue.InsertWithResize(serializedMessages[i]);
 #else
@@ -255,21 +264,21 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 		return PacketSendSocketFull;
 	}
 
-	LOG(LogData, "TCPMessageConnection::SendOutPacket: Sent %d bytes (%d messages) to peer %s.", (int)writer.BytesFilled(), (int)serializedMessages.Size(), socket->ToString().CString());
+	LOG(LogData, "TCPMessageConnection::SendOutPacket: Sent %d bytes (%d messages) to peer %s.", (int)writer.BytesFilled(), (int)serializedMessages.size(), socket->ToString().c_str());
 	AddOutboundStats(writer.BytesFilled(), 1, numMessagesPacked);
 	ADDEVENT("tcpDataOut", (float)writer.BytesFilled(), "bytes");
 
 	// The messages in serializedMessages array are now in the TCP driver to handle. It will guarantee
 	// delivery if possible, so we can free the messages already.
-	for(size_t i = 0; i < serializedMessages.Size(); ++i)
+	for(size_t i = 0; i < serializedMessages.size(); ++i)
 	{
 #ifdef KNET_NETWORK_PROFILING
-		String str;
-		if (!serializedMessages[i]->profilerName.Empty())
-			str += "messageOut." + serializedMessages[i]->profilerName;
+		std::stringstream ss;
+		if (!serializedMessages[i]->profilerName.empty())
+			ss << "messageOut." << serializedMessages[i]->profilerName;
 		else
-			str += "messageOut." + String((unsigned)serializedMessages[i]->id);
-		ADDEVENT(str.CString(), (float)serializedMessages[i]->Size(), "bytes");
+			ss << "messageOut." << serializedMessages[i]->id;
+		ADDEVENT(ss.str().c_str(), (float)serializedMessages[i]->Size(), "bytes");
 #endif
 		ClearOutboundMessageWithContentID(serializedMessages[i]);
 		FreeMessage(serializedMessages[i]);

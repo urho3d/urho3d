@@ -16,8 +16,6 @@
 /** @file UDPMessageConnection.h
 	@brief The UDPMessageConnection class. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "MessageConnection.h"
 #include "SequentialIntegerSet.h"
 #include "Array.h"
@@ -68,6 +66,8 @@ public:
 	UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 	~UDPMessageConnection();
 
+	void SetDatagramInFlowRatePerSecond(int newDatagramReceiveRate, bool internalCall);
+
 	float RetransmissionTimeout() const { return retransmissionTimeout; }
 
 	float DatagramSendRate() const { return datagramSendRate; }
@@ -80,7 +80,7 @@ public:
 
 	size_t NumOutboundUnackedDatagrams() const { return outboundPacketAckTrack.Size(); }
 
-	size_t NumReceivedUnackedDatagrams() const { return inboundPacketAckTrack.Size(); }
+	size_t NumReceivedUnackedDatagrams() const { return inboundPacketAckTrack.size(); }
 
 	float PacketLossCount() const { return packetLossCount; }
 
@@ -99,6 +99,10 @@ private:
 	/// @param bytesRead [out] Returns the total number of bytes containes in the datagrams that were read.
 	SocketReadResult UDPReadSocket(size_t &bytesRead); // [worker thread]
 
+	// Congestion control and data rate management:
+	void PerformFlowControl(); // [worker thread]
+	void HandleFlowControlRequestMessage(const char *data, size_t numBytes); // [worker thread]
+
 	void UpdateRTOCounterOnPacketAck(float rtt); // [worker thread]
 	void UpdateRTOCounterOnPacketLoss(); // [worker thread]
 
@@ -113,7 +117,7 @@ private:
 	void SendPacketAckMessage(); // [worker thread]
 	void HandlePacketAckMessage(const char *data, size_t numBytes); // [worker thread]
 	
-	bool HandleMessage(packet_id_t packetID, u32 messageID, const char *data, size_t numBytes); // [worker thread]
+	bool HandleMessage(packet_id_t packetID, message_id_t messageID, const char *data, size_t numBytes); // [worker thread]
 
 	/// Refreshes Packet Loss related statistics.
 	void ComputePacketLoss(); // [worker thread]
@@ -149,8 +153,8 @@ private:
 
 	/// The flow control algorithm:
 	float datagramSendRate; ///< The number of datagrams/second to send.
+
 	float lowestDatagramSendRateOnPacketLoss;
-	int slowModeDelay; ///< Go into slow increase mode for some time on receiving loss
 
 	// These variables correspond to RFC2988, http://tools.ietf.org/html/rfc2988 , section 2.
 	bool rttCleared; ///< If true, smoothedRTT and rttVariation do not contain meaningful values, but "are clear".
@@ -219,11 +223,16 @@ private:
 
 	/// Connection control update timer.
 	PolledTimer udpUpdateTimer;
-	
-	typedef Map<packet_id_t, PacketAckTrack> PacketAckTrackMap;
+
+	PolledTimer statsUpdateTimer;
+
+	typedef std::map<packet_id_t, PacketAckTrack> PacketAckTrackMap;
 	/// Contains the messages we have sent out that we are waiting for the other party to Ack.
+//	PacketAckTrackMap outboundPacketAckTrack;
 	typedef WaitFreeQueue<PacketAckTrack> PacketAckTrackQueue;
 	PacketAckTrackQueue outboundPacketAckTrack;
+//	typedef OrderedHashTable<PacketAckTrack, PacketAckTrack> PacketAckTrackTable;
+//	PacketAckTrackTable outboundPacketAckTrack;
 
 	static int BiasedBinarySearchFindPacketIndex(UDPMessageConnection::PacketAckTrackQueue &queue, int packetID);
 
@@ -234,9 +243,17 @@ private:
 	// Contains a list of all messages we've received that we need to Ack at some point.
 	PacketAckTrackMap inboundPacketAckTrack;
 
+	/// The number of UDP packets to send out per second.
+	int datagramOutRatePerSecond;
+
+	/// The number of UDP packets to receive per second. Of course the local end of the
+	/// connection cannot directly control this, but it uses the FlowControlRequest
+	/// packet to send it to the other party.
+	int datagramInRatePerSecond;
+
 	/// Contains the reliable message numbers of all reliable messages we've received.
 	/// Used to detect and discard duplicate messages we've received.
-	Set<unsigned long> receivedReliableMessages;
+	std::set<unsigned long> receivedReliableMessages;
 
 	SequentialIntegerSet receivedPacketIDs;
 	/// Specifies the packet ID of the most recent datagram we sent. Used currently only
@@ -246,9 +263,9 @@ private:
 	// The following are temporary data structures used by various internal routines for processing.
 	// They are created here as members to avoid having to create objects on the stack at each call to 
 	// time-sensitive functions.
-	Vector<NetworkMessage *> datagramSerializedMessages; // MessageConnection::UDPSendOutPacket()
-	Vector<NetworkMessage *> skippedMessages; // MessageConnection::UDPSendOutPacket()
-	PODVector<char> assembledData; // MessageConnection::DatagramExtractMessages
+	std::vector<NetworkMessage *> datagramSerializedMessages; // MessageConnection::UDPSendOutPacket()
+	std::vector<NetworkMessage *> skippedMessages; // MessageConnection::UDPSendOutPacket()
+	std::vector<char> assembledData; // MessageConnection::DatagramExtractMessages
 
 	/// Returns the average number of inbound packet loss, packets/sec.
 	float GetPacketLossCount() const { return packetLossCount; }

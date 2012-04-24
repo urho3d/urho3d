@@ -16,9 +16,7 @@
 /** @file NetworkServer.h
 	@brief The NetworkServer class. The main class for hosting a kNet server. */
 
-// Modified by Lasse Öörni for Urho3D
-
-#include "List.h"
+#include <list>
 
 #include "kNetBuildConfig.h"
 #include "SharedPtr.h"
@@ -101,9 +99,9 @@ public:
 	void ConnectionClosed(MessageConnection *connection);
 
 	/// Returns all the sockets this server is listening on.
-	Vector<Socket *> &ListenSockets();
+	std::vector<Socket *> &ListenSockets();
 
-	typedef Map<EndPoint, Ptr(MessageConnection)> ConnectionMap;
+	typedef std::map<EndPoint, Ptr(MessageConnection)> ConnectionMap;
 
 	/// Returns all the currently tracked connections.
 	ConnectionMap GetConnections();
@@ -112,16 +110,16 @@ public:
 	int NumConnections() const;
 
 	/// Returns a one-liner textual summary of this server.
-	String ToString() const;
+	std::string ToString() const;
 
 private:
 	/// Private ctor - NetworkServer instances are created by the Network class.
-	NetworkServer(Network *owner, Vector<Socket *> listenSockets);
+	NetworkServer(Network *owner, std::vector<Socket *> listenSockets);
 
 	/// We store possibly multiple listening sockets so that the server
 	/// can listen on several sockets (UDP or TCP) at once, making it
 	/// possible for clients to bypass firewalls and/or mix UDP and TCP use.
-	Vector<Socket *> listenSockets;
+	std::vector<Socket *> listenSockets;
 
 	/// The list of active client connections.
 	Lockable<ConnectionMap> clients;
@@ -195,9 +193,9 @@ void NetworkServer::BroadcastStruct(const SerializableData &data, unsigned long 
 
 	const size_t dataSize = data.Size();
 
-	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
+	for(ConnectionMap::iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
 	{
-		MessageConnection *connection = iter->second_;
+		MessageConnection *connection = iter->second;
 		assert(connection);
 		if (connection == exclude || !connection->IsWriteOpen())
 			continue;

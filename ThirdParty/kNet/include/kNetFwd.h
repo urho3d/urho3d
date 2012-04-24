@@ -33,6 +33,7 @@ namespace kNet
 	class Network;
 	class NetworkMessage;
 	class NetworkServer;
+	struct OverlappedTransferBuffer;
 	class PolledTimer;
 	class SerializationStructCompiler;
 	class SerializedDataIterator;

@@ -47,7 +47,8 @@ public:
 
 	int Capacity() const { return tableSize; }
 
-	int CountSize()
+    /// Recomputes the size of this set, so that Size() returns the exact value.
+	void CountSize()
 	{
 		size = 0;
 		for(int i = 0; i < tableSize; ++i)

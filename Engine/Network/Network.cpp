@@ -67,7 +67,7 @@ Network::~Network()
     network_ = 0;
 }
 
-void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char* data, size_t numBytes)
+void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t packetId, kNet::message_id_t msgId, const char *data, size_t numBytes)
 {
     // Only process messages from known sources
     Connection* connection = GetConnection(source);
@@ -75,31 +75,31 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
     {
         MemoryBuffer msg(data, numBytes);
         
-        switch (id)
+        switch (msgId)
         {
         case MSG_IDENTITY:
-            connection->ProcessIdentity(id, msg);
+            connection->ProcessIdentity(msgId, msg);
             return;
         
         case MSG_CONTROLS:
-            connection->ProcessControls(id, msg);
+            connection->ProcessControls(msgId, msg);
             return;
             
         case MSG_SCENELOADED:
-            connection->ProcessSceneLoaded(id, msg);
+            connection->ProcessSceneLoaded(msgId, msg);
             return;
             
         case MSG_REQUESTPACKAGE:
         case MSG_PACKAGEDATA:
-            connection->ProcessPackageDownload(id, msg);
+            connection->ProcessPackageDownload(msgId, msg);
             return;
             
         case MSG_LOADSCENE:
-            connection->ProcessLoadScene(id, msg);
+            connection->ProcessLoadScene(msgId, msg);
             return;
         
         case MSG_SCENECHECKSUMERROR:
-            connection->ProcessSceneChecksumError(id, msg);
+            connection->ProcessSceneChecksumError(msgId, msg);
             return;
             
         case MSG_CREATENODE:
@@ -110,12 +110,12 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
         case MSG_COMPONENTDELTAUPDATE:
         case MSG_COMPONENTLATESTDATA:
         case MSG_REMOVECOMPONENT:
-            connection->ProcessSceneUpdate(id, msg);
+            connection->ProcessSceneUpdate(msgId, msg);
             return;
             
         case MSG_REMOTEEVENT:
         case MSG_REMOTENODEEVENT:
-            connection->ProcessRemoteEvent(id, msg);
+            connection->ProcessRemoteEvent(msgId, msg);
             return;
         }
         
@@ -124,7 +124,7 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
         
         VariantMap eventData;
         eventData[P_CONNECTION] = (void*)connection;
-        eventData[P_MESSAGEID] = (int)id;
+        eventData[P_MESSAGEID] = (int)msgId;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
@@ -132,9 +132,9 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
         LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
 }
 
-u32 Network::ComputeContentID(kNet::message_id_t id, const char* data, size_t numBytes)
+u32 Network::ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes)
 {
-    switch (id)
+    switch (msgId)
     {
     case MSG_CONTROLS:
         // Return fixed content ID for controls

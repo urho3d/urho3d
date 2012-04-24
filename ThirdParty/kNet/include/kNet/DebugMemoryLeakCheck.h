@@ -16,19 +16,16 @@
 /** @file DebugMemoryLeakCheck.h
 	@brief Provides overloads of operators new and delete for tracking memory leaks. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #if defined (WIN32) && defined(_DEBUG) && defined(KNET_MEMORY_LEAK_CHECK)
 
 #include <new>
 #include <crtdbg.h>
 
-// Include these files beforehand to avoid compilation errors from our operator new redefine.
-#include <ios>
-#include "List.h"
-#include "Map.h"
-#include "Set.h"
-#include "Vector.h"
+// On MSVC2008, include these files beforehand to avoid compilation errors from our operator new redefine.
+#if _MSC_VER == 1500
+#include <ios> 
+#include <map>
+#endif
 
 #ifndef _CRTDBG_MAP_ALLOC
 #define _CRTDBG_MAP_ALLOC

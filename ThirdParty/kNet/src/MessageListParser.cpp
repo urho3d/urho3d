@@ -15,8 +15,6 @@
 /** @file MessageListParser.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef KNET_USE_TINYXML
 #include <tinyxml.h>
 #endif
@@ -45,7 +43,7 @@ namespace kNet
 
 BasicSerializedDataType StringToSerialType(const char *type)
 {
-	if (type == "string" || type == "String")
+	if (type == "string" || type == "std::string")
 		return SerialString;
 	assert(NumSerialTypes-2 == NUMELEMS(data));
 	for(int i = 0; i < NUMELEMS(data); ++i)
@@ -66,7 +64,7 @@ const char *SerialTypeToReadableString(BasicSerializedDataType type)
 const char *SerialTypeToCTypeString(BasicSerializedDataType type)
 {
 	if (type == SerialString)
-		return "String";
+		return "std::string";
 	assert(NumSerialTypes-2 == NUMELEMS(data));
 	assert(type >= SerialInvalid);
 	assert(type < NumSerialTypes); 
@@ -84,7 +82,7 @@ size_t SerialTypeSize(BasicSerializedDataType type)
 SerializedElementDesc *SerializedMessageList::ParseNode(TiXmlElement *node, SerializedElementDesc *parentNode)
 {
 #ifdef KNET_USE_TINYXML
-	elements.Push(SerializedElementDesc());
+	elements.push_back(SerializedElementDesc());
 	SerializedElementDesc *elem = &elements.back();
 	elem->parent = parentNode;
 	elem->name = node->Attribute("name") ? node->Attribute("name") : "";
@@ -119,9 +117,9 @@ SerializedElementDesc *SerializedMessageList::ParseNode(TiXmlElement *node, Seri
 
 		elem->typeString = node->Value();
 		if (elem->typeString == "string")
-			elem->typeString = "String";
+			elem->typeString = "std::string";
 		elem->type = StringToSerialType(node->Value());
-		if (elem->type == SerialInvalid && !elem->typeString.Empty())
+		if (elem->type == SerialInvalid && !elem->typeString.empty())
 			elem->type = SerialOther;
 		if (elem->type == SerialStruct)
 			elem->typeString = "S_" + elem->name; ///\todo Add a ClassName parameter for better control over naming here?
@@ -134,7 +132,7 @@ SerializedElementDesc *SerializedMessageList::ParseNode(TiXmlElement *node, Seri
 		while(child)
 		{
 			SerializedElementDesc *childElem = ParseNode(child, elem);
-			elem->elements.Push(childElem);
+			elem->elements.push_back(childElem);
 
 			child = child->NextSiblingElement();
 		}
@@ -182,7 +180,7 @@ void SerializedMessageList::ParseMessages(TiXmlElement *root)
 
 		// Work a slight convenience - if there is a single struct inside a single struct inside a single struct - jump straight through to the data.
 
-		messages.Push(desc);
+		messages.push_back(desc);
 
 		node = node->NextSiblingElement("message");
 	}
@@ -229,8 +227,8 @@ void SerializedMessageList::LoadMessagesFromFile(const char *filename)
 
 const SerializedMessageDesc *SerializedMessageList::FindMessageByID(u32 id)
 {
-	for(List<SerializedMessageDesc>::Iterator iter = messages.Begin();
-		iter != messages.End(); ++iter)
+	for(std::list<SerializedMessageDesc>::iterator iter = messages.begin();
+		iter != messages.end(); ++iter)
 		if (iter->id == id)
 			return &*iter;
 
@@ -239,8 +237,8 @@ const SerializedMessageDesc *SerializedMessageList::FindMessageByID(u32 id)
 
 const SerializedMessageDesc *SerializedMessageList::FindMessageByName(const char *name)
 {
-	for(List<SerializedMessageDesc>::Iterator iter = messages.Begin();
-		iter != messages.End(); ++iter)
+	for(std::list<SerializedMessageDesc>::iterator iter = messages.begin();
+		iter != messages.end(); ++iter)
 		if (iter->name == name)
 			return &*iter;
 

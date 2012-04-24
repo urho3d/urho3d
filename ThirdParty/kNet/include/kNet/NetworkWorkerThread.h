@@ -17,8 +17,6 @@
 	@brief The NetworkWorkerThread class. Implements a background thread for responsive
 	processing of server and client connections. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "SharedPtr.h"
 
 #include "Lockable.h"
@@ -49,8 +47,8 @@ public:
 	Thread &ThreadObject() { return workThread; }
 
 private:
-	Lockable<Vector<MessageConnection *> > connections;
-	Lockable<Vector<NetworkServer *> > servers;
+	Lockable<std::vector<MessageConnection *> > connections;
+	Lockable<std::vector<NetworkServer *> > servers;
 
 	Thread workThread;
 

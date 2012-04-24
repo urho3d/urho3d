@@ -16,8 +16,6 @@
 /** @file Socket.h
 	@brief The Socket class. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef WIN32
 
 #include "kNetBuildConfig.h"
@@ -55,8 +53,8 @@ typedef unsigned int SOCKET;
 }
 #endif
 
-#include "Vector.h"
-#include "List.h"
+#include <vector>
+#include <list>
 
 #include "SharedPtr.h"
 #include "EndPoint.h"
@@ -74,7 +72,7 @@ enum SocketTransportLayer
 	SocketOverTCP
 };
 
-String SocketTransportLayerToString(SocketTransportLayer transport);
+std::string SocketTransportLayerToString(SocketTransportLayer transport);
 
 /// Converts the given string (case-insensitive parsing) to the corresponding SocketTransportLayer enum.
 /// "tcp" & "socketovertcp" -> SocketOverTCP.
@@ -90,7 +88,7 @@ enum SocketType
 	ClientSocket ///< A client-side socket.
 };
 
-String SocketTypeToString(SocketType type);
+std::string SocketTypeToString(SocketType type);
 
 typedef int OverlappedTransferTag;
 
@@ -99,8 +97,9 @@ typedef WSABUF kNetBuffer;
 #else
 struct kNetBuffer
 {
-	/// Specifies the number of bytes allocated to buf. This is the maximum amount of bytes that can
-	/// be written to buf.
+	/// Stores the number of bytes allocated to buf.
+	/// When sending out a message, this field specifies the number of bytes the client
+	/// can write to buf, at maximum.
 	unsigned long len;
 
 	char *buf;
@@ -114,8 +113,12 @@ struct OverlappedTransferBuffer
 	WSAOVERLAPPED overlapped;
 #endif
 
-	/// Specifies the number of bytes buffer.buf actually contains.
+	/// Stores the number of bytes actually in use in buffer.buf. When sending out a message,
+	/// specify the actual number of bytes filled to buffer.buf here.
 	int bytesContains;
+
+    /// Stores the total number of bytes allocated to the buffer in the overlapped structure.
+    int bytesAllocated;
 
 	sockaddr_in from;
 	socklen_t fromLen;
@@ -188,9 +191,12 @@ public:
 	/// Starts the sending of new data. After having filled the data to send to the OverlappedTransferBuffer that is
 	/// returned here, commit the send by calling EndSend. If you have called BeginSend, but decide not to send any data,
 	/// call AbortSend instead (otherwise memory will leak).
+    /// @param maxBytesToSend Specifies the size of the buffer that must be returned. Specify the size (or at least an 
+    ///         upper limit) of the message you are sending here. Specify the actual number of bytes filled in the resulting
+    ///         structure.
 	/// @return A transfer buffer where the data to send is to be filled in. If no new data can be sent at this time,
 	///         this function returns 0.
-	OverlappedTransferBuffer *BeginSend();
+	OverlappedTransferBuffer *BeginSend(int maxBytesToSend);
 	/// Finishes and queues up the given transfer that was created with a call to BeginSend.
 	/// @return True if send succeeded, false otherwise. In either case, the ownership of the passed buffer send
 	///         is taken by this Socket and may not be accessed anymore. Discard the pointer after calling this function.
@@ -252,7 +258,7 @@ public:
 	/// Returns the local EndPoint this socket is bound to.
 	const EndPoint &LocalEndPoint() const { return localEndPoint; }
 	/// Returns the local address (local hostname) of the local end point this socket is bound to.
-	const char *LocalAddress() const { return localHostName.CString(); }
+	const char *LocalAddress() const { return localHostName.c_str(); }
 	/// Returns the local port that this socket is bound to.
 	unsigned short LocalPort() const { return localEndPoint.port; }
 
@@ -262,14 +268,14 @@ public:
 	const EndPoint &RemoteEndPoint() const { return remoteEndPoint; }
 	/// Returns the destination address (destination hostname) of the remote end point this socket is connected to.
 	/// If SocketType == ServerListenSocket, returns an empty string.
-	const char *DestinationAddress() const { return remoteHostName.CString(); }
+	const char *DestinationAddress() const { return remoteHostName.c_str(); }
 	/// Returns the destination port of the remote end point this socket is connected to.
 	/// If SocketType == ServerListenSocket, returns 0.
 	unsigned short DestinationPort() const { return remoteEndPoint.port; }
 
 	/// Returns a human-readable representation of this socket, specifying the peer address and port this socket is
 	/// connected to.
-	String ToString() const;
+	std::string ToString() const;
 
 	/// Sets the socket to blocking or nonblocking state.
 	void SetBlocking(bool isBlocking);
@@ -293,7 +299,7 @@ private:
 	/// Specifies the network host name of the local end point (the local system).
 	/// If the local end point does not have a hostname, this field is the string representation of the
 	/// system IP address (one of them, there may be multiple IPs).
-	String localHostName;
+	std::string localHostName;
 	
 	/// Specifies the remote system end point (IP and port) this socket is bound to (== the "peer" address).
 	/// If SocketType == ServerListenSocket or transport == SocketOverUDP, this socket is not bound
@@ -308,7 +314,7 @@ private:
 	/// Specifies the network host name of the remote end point (== the remote system == the "peer").
 	/// If the remote end point does not have a known hostname, this field is the string representation of the
 	/// remote IP address. If SocketType == ServerListenSocket, this field is empty.
-	String remoteHostName;
+	std::string remoteHostName;
 
 	/// Specifies the underlying transport protocol that this Socket is using (TCP or UDP).
 	SocketTransportLayer transport;

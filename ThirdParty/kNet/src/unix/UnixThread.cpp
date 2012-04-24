@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ void Thread::Stop()
 
 void* ThreadEntryPoint(void* data)
 {
-	LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%08X.", (unsigned)data);
+	LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%p.", data);
 
 	Thread *thread = reinterpret_cast<Thread*>(data);
 	if (!thread)

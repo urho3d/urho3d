@@ -16,8 +16,6 @@
 /** @file Sort.h
 	@brief A range of comparison sort algorithms. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include "Clock.h"
 
 //#include "LCG.h"
@@ -29,7 +27,7 @@ namespace kNet
 /** @brief A range of comparison sort algorithms.
 
 	When to use one of these sorts and when to use the std sorts? 
-		(std::sort, std::stable_sort, List::sort etc.)
+		(std::sort, std::stable_sort, std::list::sort etc.)
 
 	1)	Always consider using the standard versions first. For example, the visual c++ 
 		std::sort is on average faster than the introsort described here. Additionally, 

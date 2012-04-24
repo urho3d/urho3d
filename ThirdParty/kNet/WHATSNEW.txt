@@ -1,0 +1,31 @@
+Version 2.7, 2012-03-23
+-----------
+- Added new InOrderTest sample.
+- Added support for duplicating datagrams in NetworkSimulator.
+- Fixed a bug in duplicated message receive handling.
+- Added support for corrupting datagrams in NetworkSimulator.
+- Added support for 64-bit memory pointer to 32-bit splicing issue detecting for Windows.
+- Removed KNET_THREAD_CHECKING_ENABLED from being enabled if USE_BOOST is enabled. This is to avoid a bug with boost::thread_id() not working across dynamic library boundaries. (KNET_THREAD_CHECKING_ENABLED and USE_BOOST are now mutually exclusive)
+
+Version 2.6, 2012-01-25
+-----------
+- Implement a NetworkSimulator middle layer for adding delays and packet loss to outbound messaging (UDP only).
+- Enhance DataSerializer with new data types:
+   - lossy quantized floats
+   - minifloats
+   - arithmetic encoding
+   - linear algebra types: quaternion, vector, spherical direction vectors with or without magnitude
+- Incorporate TinyXML inside kNet repository, to avoid requiring extra configuration.
+- Pass UDP datagram packet ID to client code for manual client-side latest-data-guarantee checks.
+- Enable build on MinGW GCC 4.6.1 version 20111118.
+- Bug fixes.
+
+Version 2.5, 2012-01-02
+-----------
+- Fix build on Mac.
+- Performance improvements.
+- Added pthreads support for linux and Mac. Thanks to Lasse Öörni for the implementation.
+- Improved networking statistics window display.
+- Bug fixes.
+
+For history on older kNet versions, see the repository history at github.

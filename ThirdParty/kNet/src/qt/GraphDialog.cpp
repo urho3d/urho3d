@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <QTreeWidget>
 #include <QPainter>
 #include <sstream>
+#include <algorithm>
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
@@ -77,7 +78,7 @@ void GraphDialog::Update(StatsEventHierarchyNode &node, int timeMSecs)
 		{
 			StatsEvent *e = node.events.ItemAt(i);
 			if (Clock::IsNewer(e->time, leftX) && Clock::IsNewer(rightX, e->time))
-				maxY = max(maxY, e->value);
+				maxY = std::max(maxY, e->value);
 		}
 
 		painter.setPen(QPen(QColor(0,0,0)));
