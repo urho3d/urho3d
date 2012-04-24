@@ -67,6 +67,7 @@ AnimatedModel::AnimatedModel(Context* context) :
     morphsDirty_(true),
     skinningDirty_(true),
     isMaster_(true),
+    loading_(false),
     assignBonesPending_(false)
 {
 }
@@ -95,6 +96,24 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
+}
+
+bool AnimatedModel::Load(Deserializer& source)
+{
+    loading_ = true;
+    bool success = Component::Load(source);
+    loading_ = false;
+    
+    return success;
+}
+
+bool AnimatedModel::LoadXML(const XMLElement& source)
+{
+    loading_ = true;
+    bool success = Component::LoadXML(source);
+    loading_ = false;
+    
+    return success;
 }
 
 void AnimatedModel::ApplyAttributes()
@@ -697,7 +716,7 @@ void AnimatedModel::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // When loading a scene, set model without creating the bone nodes (will be assigned later during post-load)
-    SetModel(cache->GetResource<Model>(value.id_), !IsLoading());
+    SetModel(cache->GetResource<Model>(value.id_), !loading_);
 }
 
 void AnimatedModel::SetBonesEnabledAttr(VariantVector value)

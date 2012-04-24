@@ -90,14 +90,10 @@ public:
     const Vector<AttributeInfo>* GetAttributes() const;
     /// Return network replication attribute descriptions, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes() const;
-    /// Return whether is loading attributes from a file. Is false during network deserialization.
-    bool IsLoading() const { return loading_; }
     
 protected:
     /// Network attribute state.
     NetworkState* netState_;
-    /// Is loading flag.
-    bool loading_;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.

@@ -46,6 +46,10 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Load from binary data. Return true if successful.
+    virtual bool Load(Deserializer& source);
+    /// Load from XML data. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
@@ -212,6 +216,8 @@ private:
     bool skinningDirty_;
     /// Master model flag.
     bool isMaster_;
+    /// Loading flag. During loading bone nodes are not created, as they will be serialized as child nodes.
+    bool loading_;
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
 };
