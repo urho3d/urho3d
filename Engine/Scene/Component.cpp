@@ -35,7 +35,8 @@ OBJECTTYPESTATIC(Component);
 Component::Component(Context* context) :
     Serializable(context),
     node_(0),
-    id_(0)
+    id_(0),
+    networkUpdate_(false)
 {
 }
 
@@ -91,10 +92,10 @@ const Matrix3x4& Component::GetWorldTransform() const
 
 void Component::AddReplicationState(ComponentReplicationState* state)
 {
-    if (!netState_)
-        netState_ = new NetworkState();
+    if (!networkState_)
+        networkState_ = new NetworkState();
     
-    netState_->replicationStates_.Push(state);
+    networkState_->replicationStates_.Push(state);
 }
 
 void Component::PrepareNetworkUpdate()
@@ -105,32 +106,32 @@ void Component::PrepareNetworkUpdate()
     
     unsigned numAttributes = attributes->Size();
     
-    if (!netState_)
-        netState_ = new NetworkState();
+    if (!networkState_)
+        networkState_ = new NetworkState();
     
-    if (netState_->attributes_.Size() != numAttributes)
+    if (networkState_->attributes_.Size() != numAttributes)
     {
-        netState_->attributes_.Resize(numAttributes);
-        netState_->previousAttributes_.Resize(numAttributes);
+        networkState_->attributes_.Resize(numAttributes);
+        networkState_->previousAttributes_.Resize(numAttributes);
         
         // Copy the default attribute values to the previous state as a starting point
         for (unsigned i = 0; i < numAttributes; ++i)
-            netState_->previousAttributes_[i] = attributes->At(i).defaultValue_;
+            networkState_->previousAttributes_[i] = attributes->At(i).defaultValue_;
     }
     
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        OnGetAttribute(attr, netState_->attributes_[i]);
+        OnGetAttribute(attr, networkState_->attributes_[i]);
         
-        if (netState_->attributes_[i] != netState_->previousAttributes_[i])
+        if (networkState_->attributes_[i] != networkState_->previousAttributes_[i])
         {
-            netState_->previousAttributes_[i] = netState_->attributes_[i];
+            networkState_->previousAttributes_[i] = networkState_->attributes_[i];
             
             // Mark the attribute dirty in all replication states that are tracking this component
-            for (PODVector<ReplicationState*>::Iterator j = netState_->replicationStates_.Begin(); j !=
-                netState_->replicationStates_.End(); ++j)
+            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
+                networkState_->replicationStates_.End(); ++j)
             {
                 ComponentReplicationState* compState = static_cast<ComponentReplicationState*>(*j);
                 compState->dirtyAttributes_.Set(i);
@@ -145,24 +146,33 @@ void Component::PrepareNetworkUpdate()
             }
         }
     }
+    
+    networkUpdate_ = false;
 }
 
 void Component::CleanupConnection(Connection* connection)
 {
-    if (netState_)
+    if (networkState_)
     {
-        for (unsigned i = netState_->replicationStates_.Size() - 1; i < netState_->replicationStates_.Size(); --i)
+        for (unsigned i = networkState_->replicationStates_.Size() - 1; i < networkState_->replicationStates_.Size(); --i)
         {
-            if (netState_->replicationStates_[i]->connection_ == connection)
-                netState_->replicationStates_.Erase(i);
+            if (networkState_->replicationStates_[i]->connection_ == connection)
+                networkState_->replicationStates_.Erase(i);
         }
     }
 }
 
 void Component::MarkNetworkUpdate()
 {
-    if (id_ < FIRST_LOCAL_ID && node_)
-        node_->MarkNetworkUpdate();
+    if (id_ < FIRST_LOCAL_ID && !networkUpdate_)
+    {
+        Scene* scene = GetScene();
+        if (scene)
+        {
+            scene->MarkNetworkUpdate(this);
+            networkUpdate_ = true;
+        }
+    }
 }
 
 void Component::SetID(unsigned id)

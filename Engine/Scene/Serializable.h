@@ -93,7 +93,7 @@ public:
     
 protected:
     /// Network attribute state.
-    NetworkState* netState_;
+    NetworkState* networkState_;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.

@@ -103,6 +103,8 @@ protected:
     Node* node_;
     /// Unique ID within the scene.
     unsigned id_;
+    /// Network update queued flag.
+    bool networkUpdate_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }

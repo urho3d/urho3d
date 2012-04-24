@@ -166,6 +166,8 @@ public:
     void CleanupConnection(Connection* connection);
     /// Mark a node for attribute check on the next network update.
     void MarkNetworkUpdate(Node* node);
+    /// Mark a comoponent for attribute check on the next network update.
+    void MarkNetworkUpdate(Component* component);
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
     
@@ -197,8 +199,10 @@ private:
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
     HashMap<ShortStringHash, String> varNames_;
-    /// Node IDs to check for attribute changes on the next network update.
+    /// Nodes to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateNodes_;
+    /// Components to check for attribute changes on the next network update.
+    HashSet<unsigned> networkUpdateComponents_;
     /// Delayed dirty notification queue for components.
     PODVector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.

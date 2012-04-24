@@ -341,7 +341,7 @@ private:
     /// World transform needs update flag.
     mutable bool dirty_;
     /// Network update queued flag.
-    bool netUpdate_;
+    bool networkUpdate_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned short rotateCount_;
     /// Parent scene node.

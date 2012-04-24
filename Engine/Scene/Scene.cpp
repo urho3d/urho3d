@@ -718,7 +718,15 @@ void Scene::PrepareNetworkUpdate()
             node->PrepareNetworkUpdate();
     }
     
+    for (HashSet<unsigned>::Iterator i = networkUpdateComponents_.Begin(); i != networkUpdateComponents_.End(); ++i)
+    {
+        Component* component = GetComponent(*i);
+        if (component)
+            component->PrepareNetworkUpdate();
+    }
+    
     networkUpdateNodes_.Clear();
+    networkUpdateComponents_.Clear();
 }
 
 void Scene::CleanupConnection(Connection* connection)
@@ -735,21 +743,23 @@ void Scene::CleanupConnection(Connection* connection)
 void Scene::MarkNetworkUpdate(Node* node)
 {
     if (node)
-    {
-        unsigned id = node->GetID();
-        if (id < FIRST_LOCAL_ID)
-            networkUpdateNodes_.Insert(id);
-    }
+        networkUpdateNodes_.Insert(node->GetID());
+}
+
+void Scene::MarkNetworkUpdate(Component* component)
+{
+    if (component)
+        networkUpdateComponents_.Insert(component->GetID());
 }
 
 void Scene::MarkReplicationDirty(Node* node)
 {
     unsigned id = node->GetID();
     
-    if (id < FIRST_LOCAL_ID && netState_)
+    if (id < FIRST_LOCAL_ID && networkState_)
     {
-        for (PODVector<ReplicationState*>::Iterator i = netState_->replicationStates_.Begin(); i !=
-            netState_->replicationStates_.End(); ++i)
+        for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin(); i !=
+            networkState_->replicationStates_.End(); ++i)
         {
             NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*i);
             nodeState->sceneState_->dirtyNodes_.Insert(id);

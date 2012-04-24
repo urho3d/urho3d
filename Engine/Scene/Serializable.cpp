@@ -36,14 +36,14 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    netState_(0)
+    networkState_(0)
 {
 }
 
 Serializable::~Serializable()
 {
-    delete netState_;
-    netState_ = 0;
+    delete networkState_;
+    networkState_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -421,7 +421,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     if (!attributes)
         return;
     
-    if (!netState_)
+    if (!networkState_)
     {
         LOGERROR("WriteInitialDeltaUpdate called without allocated NetworkState");
         return;
@@ -434,7 +434,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (netState_->attributes_[i] != attr.defaultValue_)
+        if (networkState_->attributes_[i] != attr.defaultValue_)
             attributeBits.Set(i);
     }
     
@@ -444,7 +444,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(netState_->attributes_[i]);
+            dest.WriteVariantData(networkState_->attributes_[i]);
     }
 }
 
@@ -454,7 +454,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     if (!attributes)
         return;
     
-    if (!netState_)
+    if (!networkState_)
     {
         LOGERROR("WriteDeltaUpdate called without allocated NetworkState");
         return;
@@ -469,7 +469,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(netState_->attributes_[i]);
+            dest.WriteVariantData(networkState_->attributes_[i]);
     }
 }
 
@@ -479,7 +479,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
     if (!attributes)
         return;
     
-    if (!netState_)
+    if (!networkState_)
     {
         LOGERROR("WriteLatestDataUpdate called without allocated NetworkState");
         return;
@@ -490,7 +490,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(netState_->attributes_[i]);
+            dest.WriteVariantData(networkState_->attributes_[i]);
     }
 }
 
