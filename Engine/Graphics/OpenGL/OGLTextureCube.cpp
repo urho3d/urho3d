@@ -389,11 +389,18 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         int height = image->GetHeight();
         unsigned levels = image->GetNumCompressedLevels();
         unsigned format = GetDXTFormat(image->GetCompressedFormat());
+        bool needDecompress = false;
         
         if (width != height)
         {
             LOGERROR("Cube texture width not equal to height");
             return false;
+        }
+        
+        if (!graphics_->GetCompressedTextureSupport())
+        {
+            format = Graphics::GetRGBAFormat();
+            needDecompress = true;
         }
         
         unsigned mipsToSkip = mipsToSkip_[quality];
@@ -427,8 +434,19 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
-            SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
-            memoryUse += level.rows_ * level.rowSize_;
+            if (!needDecompress)
+            {
+                SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
+                memoryUse += level.rows_ * level.rowSize_;
+            }
+            else
+            {
+                unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
+                level.Decompress(rgbaData);
+                SetData(face, i, 0, 0, level.width_, level.height_, rgbaData);
+                memoryUse += level.width_ * level.height_ * 4;
+                delete[] rgbaData;
+            }
         }
     }
     

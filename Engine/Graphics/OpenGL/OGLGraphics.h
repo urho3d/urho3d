@@ -247,6 +247,8 @@ public:
     bool GetHiresShadowSupport() const { return true; }
     /// Return whether stream offset is supported. Always false on OpenGL.
     bool GetStreamOffsetSupport() const { return false; }
+    /// Return whether DXT texture compression is supported.
+    bool GetCompressedTextureSupport() const { return compressedTextureSupport_; }
     /// Return supported fullscreen resolutions.
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
@@ -394,6 +396,8 @@ private:
     bool deferredSupport_;
     /// Hardware depth support flag.
     bool hardwareDepthSupport_;
+    /// Compressed texture support flag.
+    bool compressedTextureSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

@@ -133,6 +133,7 @@ Graphics::Graphics(Context* context_) :
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareDepthSupport_(false),
+    compressedTextureSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -249,15 +250,16 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil || !_GLEE_EXT_texture_compression_s3tc ||
-            !_GLEE_EXT_texture_filter_anisotropic)
+        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil || !_GLEE_EXT_texture_filter_anisotropic)
         {
-            LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and "
+            LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil and "
                 "EXT_texture_filter_anisotropic OpenGL extensions are required");
             glfwCloseWindow(impl_->window_);
             impl_->window_ = 0;
             return false;
         }
+        
+        compressedTextureSupport_ = _GLEE_EXT_texture_compression_s3tc != 0;
         
         // Set window close callback
         glfwSetWindowCloseCallback(CloseCallback);
