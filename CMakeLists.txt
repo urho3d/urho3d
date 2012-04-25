@@ -11,6 +11,9 @@ endif ()
 # Set project name
 project (Urho3D)
 
+# Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
+set (ENABLE_SSE 1)
+
 # Enable structured exception handling and minidumps on MSVC only. Note: minidump generation requires
 # a Windows XP or newer version of dbghelp.dll, so disable it if you want Windows 2000 compatibility.
 if (MSVC)
@@ -44,11 +47,19 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /MT /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /GL")
+    if (ENABLE_SSE)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE")
+    endif ()
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /LTCG")
 else ()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
+    if (ENABLE_SSE)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+    endif ()
 endif ()
 
 # Macro for precompiled headers
