@@ -27,9 +27,9 @@
 #include "FileSystem.h"
 #include "Image.h"
 #include "Log.h"
+#include "Squish.h"
 
 #include <cstring>
-#include <squish.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
