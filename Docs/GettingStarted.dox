@@ -31,7 +31,7 @@ To actually make Urho3D.exe do something useful, it must be supplied with the na
 
 \page Running Running Urho3D
 
-For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and EXT_texture_filter_anisotropic extensions is required.
+For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is required.
 
 The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
 
