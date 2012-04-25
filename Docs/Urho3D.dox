@@ -71,6 +71,7 @@ Urho3D uses the following third-party libraries:
 - Open Asset Import Library, svn rev 1102 (http://assimp.sourceforge.net/)
 - PortAudio V19 (http://www.portaudio.com/)
 - pugixml 1.0 (http://pugixml.org/)
+- Squish 1.11 (http://libsquish.googlecode.com/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)

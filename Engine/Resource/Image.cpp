@@ -29,6 +29,7 @@
 #include "Log.h"
 
 #include <cstring>
+#include <squish.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -160,6 +161,29 @@ struct DDSurfaceDesc2
     DDSCaps2 ddsCaps_;
     unsigned dwTextureStage_;
 };
+
+void CompressedLevel::Decompress(unsigned char* dest)
+{
+    int flags = 0;
+    
+    switch (compressedFormat_)
+    {
+    case CF_DXT1:
+        flags = squish::kDxt1;
+        break;
+        
+    case CF_DXT3:
+        flags = squish::kDxt3;
+        break;
+        
+    case CF_DXT5:
+        flags = squish::kDxt5;
+        break;
+    }
+    
+    if (data_)
+        squish::DecompressImage(dest, width_, height_, data_, flags);
+}
 
 OBJECTTYPESTATIC(Image);
 
@@ -479,6 +503,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
         return level;
     }
     
+    level.compressedFormat_ = compressedFormat_;
     level.width_ = width_;
     level.height_ = height_;
     level.blockSize_ = compressedFormat_ == CF_DXT1 ? 8 : 16;

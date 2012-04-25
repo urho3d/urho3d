@@ -1,5 +1,5 @@
 # Define target name
-set (TARGET_NAME Resource)
+set (TARGET_NAME Squish)
 
 # Define source files
 file (GLOB CPP_FILES *.cpp)
@@ -8,11 +8,9 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Core ../IO ../Math ../../ThirdParty/STB ../../ThirdParty/PugiXml/src ../../ThirdParty/Squish
+    .
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core IO Math Squish STB PugiXml)
-enable_pch ()
 finalize_lib ()

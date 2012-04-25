@@ -50,8 +50,13 @@ struct CompressedLevel
     {
     }
     
-    /// Image data.
+    /// Decompress. The destination buffer required is width * height * 4 bytes.
+    void Decompress(unsigned char* dest);
+    
+    /// Compressed image data.
     unsigned char* data_;
+    /// Compression format.
+    CompressedFormat compressedFormat_;
     /// Width.
     int width_;
     /// Height.
