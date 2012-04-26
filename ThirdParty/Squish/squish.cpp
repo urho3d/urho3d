@@ -25,8 +25,7 @@
 
 // Modified by Lasse Öörni for Urho3D to include only DXT decompression
 
-#include "Precompiled.h"
-#include "Squish.h"
+#include <squish.h>
 
 namespace squish {
 

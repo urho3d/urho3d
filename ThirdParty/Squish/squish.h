@@ -25,7 +25,8 @@
 
 // Modified by Lasse Öörni for Urho3D to include only DXT decompression
 
-#pragma once
+#ifndef SQUISH_H
+#define SQUISH_H
 
 //! All squish API functions live in this namespace.
 namespace squish {
@@ -112,4 +113,6 @@ void DecompressImage( u8* rgba, int width, int height, void const* blocks, int f
 // -----------------------------------------------------------------------------
 
 } // namespace squish
+
+#endif // ndef SQUISH_H
 
