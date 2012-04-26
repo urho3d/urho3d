@@ -55,20 +55,6 @@ static RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr)
     return ptr->body_;
 }
 
-static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PODVector<PhysicsRaycastResult> result;
-    ptr->Raycast(result, ray, maxDistance, collisionMask);
-    return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
-}
-
-static PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
-{
-    PhysicsRaycastResult result;
-    ptr->RaycastSingle(result, ray, maxDistance, collisionMask);
-    return result;
-}
-
 static void RegisterCollisionShape(asIScriptEngine* engine)
 {
     engine->RegisterEnum("ShapeType");
@@ -197,6 +183,27 @@ static void RegisterJoint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Joint", "JointType get_jointType() const", asMETHOD(Joint, GetJointType), asCALL_THISCALL);
 }
 
+static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
+{
+    PODVector<PhysicsRaycastResult> result;
+    ptr->Raycast(result, ray, maxDistance, collisionMask);
+    return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
+}
+
+static PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
+{
+    PhysicsRaycastResult result;
+    ptr->RaycastSingle(result, ray, maxDistance, collisionMask);
+    return result;
+}
+
+static PhysicsRaycastResult PhysicsWorldSphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
+{
+    PhysicsRaycastResult result;
+    ptr->SphereCast(result, ray, radius, maxDistance, collisionMask);
+    return result;
+}
+
 static void RegisterPhysicsWorld(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -213,6 +220,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void UpdateCollisions()", asMETHOD(PhysicsWorld, UpdateCollisions), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingle(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult SphereCast(const Ray&in, float, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);

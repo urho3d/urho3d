@@ -321,7 +321,12 @@ bool NetworkServer::ProcessNewUDPConnectionAttempt(Socket *listenSocket, const E
 	{
 		PolledTimer timer;
 		Lockable<ConnectionMap>::LockType clientsLock = clients.Acquire();
-		(*clientsLock)[endPoint] = connection;
+		if (clientsLock->find(endPoint) == clientsLock->end())
+			(*clientsLock)[endPoint] = connection;
+		else
+			LOG(LogError, "NetworkServer::ProcessNewUDPConnectionAttempt: Trying to overwrite an old connection with a new one! Discarding connection attempt datagram!",
+				timer.MSecsElapsed());
+
 
 		LOG(LogWaits, "NetworkServer::ProcessNewUDPConnectionAttempt: Accessing the connection list took %f msecs.",
 			timer.MSecsElapsed());

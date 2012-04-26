@@ -2309,7 +2309,6 @@ Properties:<br>
 - bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
-- bool compressedTextureSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)
@@ -4086,6 +4085,7 @@ Methods:<br>
 - void UpdateCollisions()
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
+- PhysicsRaycastResult SphereCast(const Ray&, float, float arg2 = M_INFINITY, uint arg3 = 0xffff)
 - void DrawDebugGeometry(bool)
 
 Properties:<br>

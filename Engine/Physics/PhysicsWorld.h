@@ -125,13 +125,15 @@ public:
     void SetMaxNetworkAngularVelocity(float velocity);
     /// %Set simulation step time accumulator.
     void SetTimeAccumulator(float time);
-    /// Perform a physics world raycast.
+    /// Perform a physics world raycast and return all hits.
     void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
-    /// Perform a physics world raycast and return the closest result.
+    /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
-    
+    /// Perform a physics world swept sphere test and return the closest hit.
+    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask =
+        M_MAX_UNSIGNED);
     /// Return gravity.
     Vector3 GetGravity() const;
     /// Return whether interpolation between simulation steps is enabled.

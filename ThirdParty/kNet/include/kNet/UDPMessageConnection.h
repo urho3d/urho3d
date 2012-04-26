@@ -16,6 +16,8 @@
 /** @file UDPMessageConnection.h
 	@brief The UDPMessageConnection class. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "MessageConnection.h"
 #include "SequentialIntegerSet.h"
 #include "Array.h"
@@ -66,8 +68,6 @@ public:
 	UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 	~UDPMessageConnection();
 
-	void SetDatagramInFlowRatePerSecond(int newDatagramReceiveRate, bool internalCall);
-
 	float RetransmissionTimeout() const { return retransmissionTimeout; }
 
 	float DatagramSendRate() const { return datagramSendRate; }
@@ -98,10 +98,6 @@ private:
 	/// as long as there are available ones to process.
 	/// @param bytesRead [out] Returns the total number of bytes containes in the datagrams that were read.
 	SocketReadResult UDPReadSocket(size_t &bytesRead); // [worker thread]
-
-	// Congestion control and data rate management:
-	void PerformFlowControl(); // [worker thread]
-	void HandleFlowControlRequestMessage(const char *data, size_t numBytes); // [worker thread]
 
 	void UpdateRTOCounterOnPacketAck(float rtt); // [worker thread]
 	void UpdateRTOCounterOnPacketLoss(); // [worker thread]
@@ -153,8 +149,8 @@ private:
 
 	/// The flow control algorithm:
 	float datagramSendRate; ///< The number of datagrams/second to send.
-
 	float lowestDatagramSendRateOnPacketLoss;
+	int slowModeDelay; ///< Go into slow increase mode for some time on receiving loss
 
 	// These variables correspond to RFC2988, http://tools.ietf.org/html/rfc2988 , section 2.
 	bool rttCleared; ///< If true, smoothedRTT and rttVariation do not contain meaningful values, but "are clear".
@@ -242,14 +238,6 @@ private:
 
 	// Contains a list of all messages we've received that we need to Ack at some point.
 	PacketAckTrackMap inboundPacketAckTrack;
-
-	/// The number of UDP packets to send out per second.
-	int datagramOutRatePerSecond;
-
-	/// The number of UDP packets to receive per second. Of course the local end of the
-	/// connection cannot directly control this, but it uses the FlowControlRequest
-	/// packet to send it to the other party.
-	int datagramInRatePerSecond;
 
 	/// Contains the reliable message numbers of all reliable messages we've received.
 	/// Used to detect and discard duplicate messages we've received.

@@ -40,6 +40,7 @@
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
@@ -195,7 +196,8 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 {
     PROFILE(PhysicsRaycast);
     
-    btCollisionWorld::AllHitsRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
+    btCollisionWorld::AllHitsRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
+        maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
     rayCallback.m_collisionFilterMask = collisionMask;
     
@@ -218,7 +220,8 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 {
     PROFILE(PhysicsRaycastSingle);
     
-    btCollisionWorld::ClosestRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
+    btCollisionWorld::ClosestRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
+        maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
     rayCallback.m_collisionFilterMask = collisionMask;
     
@@ -229,6 +232,34 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
         result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
         result.position_ = ToVector3(rayCallback.m_hitPointWorld);
         result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
+        result.distance_ = (result.position_ - ray.origin_).Length();
+    }
+    else
+    {
+        result.body_ = 0;
+        result.position_ = Vector3::ZERO;
+        result.normal_ = Vector3::ZERO;
+        result.distance_ = M_INFINITY;
+    }
+}
+
+void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
+{
+    btSphereShape shape(radius);
+    
+    btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
+        maxDistance * ray.direction_));
+    convexCallback.m_collisionFilterGroup = (short)0xffff;
+    convexCallback.m_collisionFilterMask = collisionMask;
+    
+    world_->convexSweepTest(&shape, btTransform(btQuaternion::getIdentity(), convexCallback.m_convexFromWorld),
+        btTransform(btQuaternion::getIdentity(), convexCallback.m_convexToWorld), convexCallback);
+    
+    if (convexCallback.hasHit())
+    {
+        result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
+        result.position_ = ToVector3(convexCallback.m_hitPointWorld);
+        result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
         result.distance_ = (result.position_ - ray.origin_).Length();
     }
     else

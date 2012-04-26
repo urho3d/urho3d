@@ -824,9 +824,9 @@ void UpdateCamera()
     // Collide camera ray with static objects (collision mask 2)
     Vector3 rayDir = (maxDist - minDist).Normalized();
     float rayDistance = cameraMaxDist - cameraMinDist + cameraSafetyDist;
-    Array<PhysicsRaycastResult>@ result = gameScene.physicsWorld.Raycast(Ray(minDist, rayDir), rayDistance, 2);
-    if (result.length > 0)
-        rayDistance = Min(rayDistance, result[0].distance - cameraSafetyDist);
+    PhysicsRaycastResult result = gameScene.physicsWorld.RaycastSingle(Ray(minDist, rayDir), rayDistance, 2);
+    if (result.body !is null)
+        rayDistance = Min(rayDistance, result.distance - cameraSafetyDist);
 
     gameCameraNode.position = minDist + rayDir * rayDistance;
     gameCameraNode.rotation = dir;
