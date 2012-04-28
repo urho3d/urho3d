@@ -748,10 +748,10 @@ void BatchQueue::AddBatch(const Batch& batch)
         batches_.Push(batch);
     else
     {
-        Map<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &baseBatchGroups_ : &batchGroups_;
+        HashMap<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &baseBatchGroups_ : &batchGroups_;
         BatchGroupKey key(batch);
         
-        Map<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
+        HashMap<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
         if (i == groups->End())
         {
             // Create a new group based on the batch
@@ -779,10 +779,10 @@ void BatchQueue::SortBackToFront()
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         sortedBaseBatchGroups_[index++] = &i->second_;
     index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
 }
 
@@ -805,9 +805,9 @@ void BatchQueue::SortFrontToBack()
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesFrontToBack);
     
     // Sort each group front to back
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
     
     // Now sort batch groups by the distance of the first batch
@@ -815,10 +815,10 @@ void BatchQueue::SortFrontToBack()
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
     unsigned index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         sortedBaseBatchGroups_[index++] = &i->second_;
     index = 0;
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
     
     Sort(sortedBaseBatchGroups_.Begin(), sortedBaseBatchGroups_.End(), CompareBatchGroupsFrontToBack);
@@ -827,9 +827,9 @@ void BatchQueue::SortFrontToBack()
 
 void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
 {
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
         i->second_.SetTransforms(renderer, lockedData, freeIndex);
-    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         i->second_.SetTransforms(renderer, lockedData, freeIndex);
 }
 
@@ -941,14 +941,14 @@ unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
     unsigned total = 0;
     unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
     
-    // This is for the purpose of calculating how much space is needed in the instancing buffer. Do not add groups
-    // that have too many triangles
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
+    // As this function is for the purpose of calculating how much space is needed in the instancing buffer, do not add groups
+    // that have too many triangles to be instanced
+    for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
     {
         if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
             total += i->second_.instances_.Size();
     }
-    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+    for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
         if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
             total += i->second_.instances_.Size();

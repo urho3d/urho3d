@@ -25,7 +25,6 @@
 
 #include "GraphicsDefs.h"
 #include "HashMap.h"
-#include "Map.h"
 #include "MathDefs.h"
 #include "Ptr.h"
 #include "Rect.h"
@@ -190,53 +189,8 @@ struct BatchGroupKey
     /// Test for inequality with another batch group key.
     bool operator != (const BatchGroupKey& rhs) const { return zone_ != rhs.zone_ || lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
-    /// Test if less than another batch group key.
-    bool operator < (const BatchGroupKey& rhs) const
-    {
-        if (zone_ == rhs.zone_)
-        {
-            if (lightQueue_ == rhs.lightQueue_)
-            {
-                if (pass_ == rhs.pass_)
-                {
-                    if (material_ == rhs.material_)
-                        return geometry_ < rhs.geometry_;
-                    else
-                        return material_ < rhs.material_;
-                }
-                else
-                    return pass_ < rhs.pass_;
-            }
-            else
-                return lightQueue_ < rhs.lightQueue_;
-        }
-        else
-            return zone_ < rhs.zone_;
-    }
-    
-    /// Test if greater than another batch group key.
-    bool operator > (const BatchGroupKey& rhs) const
-    {
-        if (zone_ == rhs.zone_)
-        {
-            if (lightQueue_ == rhs.lightQueue_)
-            {
-                if (pass_ == rhs.pass_)
-                {
-                    if (material_ == rhs.material_)
-                        return geometry_ > rhs.geometry_;
-                    else
-                        return material_ > rhs.material_;
-                }
-                else
-                    return pass_ > rhs.pass_;
-            }
-            else
-                return lightQueue_ > rhs.lightQueue_;
-        }
-        else
-            return zone_ > rhs.zone_;
-    }
+    /// Return hash value.
+    unsigned ToHash() const { return (unsigned)zone_ + (unsigned)lightQueue_ + (unsigned)pass_ + (unsigned)material_ + (unsigned)geometry_; }
 };
 
 /// Queue that contains both instanced and non-instanced draw calls.
@@ -262,12 +216,12 @@ public:
     /// Return whether the batch group is empty.
     bool IsEmpty() const { return batches_.Empty() && baseBatchGroups_.Empty() && batchGroups_.Empty(); }
     
+    /// Instanced draw calls with base flag.
+    HashMap<BatchGroupKey, BatchGroup> baseBatchGroups_;
+    /// Instanced draw calls.
+    HashMap<BatchGroupKey, BatchGroup> batchGroups_;
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
-    /// Instanced draw calls with base flag.
-    Map<BatchGroupKey, BatchGroup> baseBatchGroups_;
-    /// Instanced draw calls.
-    Map<BatchGroupKey, BatchGroup> batchGroups_;
     /// Sorted non-instanced draw calls with base flag.
     PODVector<Batch*> sortedBaseBatches_;
     /// Sorted non-instanced draw calls.
