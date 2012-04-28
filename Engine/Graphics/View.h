@@ -42,15 +42,6 @@ class Viewport;
 class Zone;
 struct WorkItem;
 
-/// %Geometry view space depth minimum and maximum values.
-struct GeometryDepthBounds
-{
-    /// Minimum value.
-    float min_;
-    /// Maximum value.
-    float max_;
-};
-
 /// Intermediate light processing result.
 struct LightQueryResult
 {
@@ -210,12 +201,26 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Scene-bounded camera frustum.
-    Frustum sceneFrustum_;
     /// Combined bounding box of visible geometries.
     BoundingBox sceneBox_;
-    /// Combined bounding box of visible geometries in view space.
-    BoundingBox sceneViewBox_;
+    /// Minimum Z value of the visible scene.
+    float minZ_;
+    /// Maximum Z value of the visible scene.
+    float maxZ_;
+    /// Rendering mode.
+    RenderMode renderMode_;
+    /// Material quality level.
+    int materialQuality_;
+    /// Maximum number of occluder triangles.
+    int maxOccluderTriangles_;
+    /// Highest zone priority currently visible.
+    int highestZonePriority_;
+    /// Camera zone's override flag.
+    bool cameraZoneOverride_;
+    /// Draw shadows flag.
+    bool drawShadows_;
+    /// Whether objects with zero lightmask exist. In light pre-pass mode this means skipping some optimizations.
+    bool hasZeroLightMask_;
     /// Post-processing effects.
     Vector<SharedPtr<PostProcess> > postProcesses_;
     /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
@@ -234,40 +239,24 @@ private:
     PODVector<Drawable*> threadedGeometries_;
     /// Occluder objects.
     PODVector<Drawable*> occluders_;
-    /// Depth minimum and maximum values for visible geometries.
-    PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights.
     PODVector<Light*> lights_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
-    /// Base pass batches.
-    BatchQueue baseQueue_;
-    /// Pre-transparent pass batches.
-    BatchQueue preAlphaQueue_;
-    /// Deferred rendering G-buffer batches.
-    BatchQueue gbufferQueue_;
-    /// Transparent geometry batches.
-    BatchQueue alphaQueue_;
-    /// Post-transparent pass batches.
-    BatchQueue postAlphaQueue_;
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Per-pixel light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Material quality level.
-    int materialQuality_;
-    /// Maximum number of occluder triangles.
-    int maxOccluderTriangles_;
-    /// Highest zone priority currently visible.
-    int highestZonePriority_;
-    /// Rendering mode.
-    RenderMode renderMode_;
-    /// Camera zone's override flag.
-    bool cameraZoneOverride_;
-    /// Draw shadows flag.
-    bool drawShadows_;
-    /// Whether objects with zero lightmask exist. In light pre-pass mode this means skipping some optimizations.
-    bool hasZeroLightMask_;
+    /// Base pass batches.
+    BatchQueue baseQueue_;
+    /// Deferred rendering G-buffer batches.
+    BatchQueue gbufferQueue_;
+    /// Pre-transparent pass batches.
+    BatchQueue preAlphaQueue_;
+    /// Transparent geometry batches.
+    BatchQueue alphaQueue_;
+    /// Post-transparent pass batches.
+    BatchQueue postAlphaQueue_;
 };

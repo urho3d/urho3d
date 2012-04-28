@@ -171,6 +171,8 @@ public:
     void SetZone(Zone* zone, bool temporary = false);
     /// %Set sorting value.
     void SetSortValue(float value);
+    /// %Set view-space depth bounds.
+    void SetMinMaxZ(float minZ, float maxZ);
     /// Mark in view (either the main camera, or a shadow camera view) this frame.
     void MarkInView(const FrameInfo& frame, bool mainView = true);
     /// Clear lights and base pass flags for a new frame.
@@ -209,6 +211,10 @@ public:
     const PODVector<Light*>& GetVertexLights() const { return vertexLights_; }
     /// Return the first added per-pixel light.
     Light* GetFirstLight() const { return firstLight_; }
+    /// Return the minimum view-space depth.
+    float GetMinZ() const { return minZ_; }
+    /// Return the maximum view-space depth.
+    float GetMaxZ() const { return maxZ_; }
     
 protected:
     /// Handle node being assigned.
@@ -262,6 +268,10 @@ protected:
     float shadowDistance_;
     /// Current sort value.
     float sortValue_;
+    /// Current minimum view space depth.
+    float minZ_;
+    /// Current maximum view space depth.
+    float maxZ_;
     /// LOD bias.
     float lodBias_;
     /// Base pass flags.

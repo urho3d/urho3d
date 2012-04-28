@@ -57,6 +57,8 @@ Drawable::Drawable(Context* context) :
     drawDistance_(0.0f),
     shadowDistance_(0.0f),
     sortValue_(0.0f),
+    minZ_(0.0f),
+    maxZ_(0.0f),
     lodBias_(1.0f),
     basePassFlags_(0),
     maxLights_(0),
@@ -220,6 +222,12 @@ void Drawable::SetZone(Zone* zone, bool temporary)
 void Drawable::SetSortValue(float value)
 {
     sortValue_ = value;
+}
+
+void Drawable::SetMinMaxZ(float minZ, float maxZ)
+{
+    minZ_ = minZ;
+    maxZ_ = maxZ;
 }
 
 void Drawable::MarkInView(const FrameInfo& frame, bool mainView)

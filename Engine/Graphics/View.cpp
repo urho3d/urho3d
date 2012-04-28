@@ -396,7 +396,6 @@ void View::Update(const FrameInfo& frame)
     screenBuffers_.Clear();
     geometries_.Clear();
     allGeometries_.Clear();
-    geometryDepthBounds_.Clear();
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
@@ -622,9 +621,9 @@ void View::GetDrawables()
     // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
     sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
     sceneBox_.defined_ = false;
-    sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
-    sceneViewBox_.defined_ = false;
-    Matrix3x4 view(camera_->GetInverseWorldTransform());
+    minZ_ = M_INFINITY;
+    maxZ_ = 0.0f;
+    const Matrix3x4& view = camera_->GetInverseWorldTransform();
     
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
@@ -642,15 +641,13 @@ void View::GetDrawables()
             if (drawable->GetType() != Skybox::GetTypeStatic())
             {
                 sceneBox_.Merge(geomBox);
-                sceneViewBox_.Merge(geomViewBox);
+                minZ_ = Min(minZ_, geomViewBox.min_.z_);
+                maxZ_ = Max(maxZ_, geomViewBox.max_.z_);
             }
             
             // Store depth info for split directional light queries
-            GeometryDepthBounds bounds;
-            bounds.min_ = geomViewBox.min_.z_;
-            bounds.max_ = geomViewBox.max_.z_;
+            drawable->SetMinMaxZ(geomViewBox.min_.z_, geomViewBox.max_.z_);
             
-            geometryDepthBounds_.Push(bounds);
             geometries_.Push(drawable);
             allGeometries_.Push(drawable);
         }
@@ -662,8 +659,6 @@ void View::GetDrawables()
                 lights_.Push(light);
         }
     }
-    
-    sceneFrustum_ = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_);
     
     // Sort the lights to brightest/closest first
     for (unsigned i = 0; i < lights_.Size(); ++i)
@@ -1796,9 +1791,9 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         // For directional light check that the split is inside the visible scene: if not, can skip the split
         if (type == LIGHT_DIRECTIONAL)
         {
-            if (sceneViewBox_.min_.z_ > query.shadowFarSplits_[i])
+            if (minZ_ > query.shadowFarSplits_[i])
                 continue;
-            if (sceneViewBox_.max_.z_ < query.shadowNearSplits_[i])
+            if (maxZ_ < query.shadowNearSplits_[i])
                 continue;
         }
         
@@ -1823,13 +1818,11 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex)
 {
     Light* light = query.light_;
-    Matrix3x4 lightView;
-    Matrix4 lightProj;
     
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
     const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
-    lightView = shadowCamera->GetInverseWorldTransform();
-    lightProj = shadowCamera->GetProjection();
+    const Matrix3x4& lightView = shadowCamera->GetInverseWorldTransform();
+    const Matrix4& lightProj = shadowCamera->GetProjection();
     LightType type = light->GetLightType();
     
     query.shadowCasterBox_[splitIndex].defined_ = false;
@@ -1839,10 +1832,10 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     // frustum, so that shadow casters do not get rendered into unnecessary splits
     Frustum lightViewFrustum;
     if (type != LIGHT_DIRECTIONAL)
-        lightViewFrustum = sceneFrustum_.Transformed(lightView);
+        lightViewFrustum = camera_->GetSplitFrustum(minZ_, maxZ_).Transformed(lightView);
     else
-        lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, query.shadowNearSplits_[splitIndex]),
-            Min(sceneViewBox_.max_.z_, query.shadowFarSplits_[splitIndex])).Transformed(lightView);
+        lightViewFrustum = camera_->GetSplitFrustum(Max(minZ_, query.shadowNearSplits_[splitIndex]),
+            Min(maxZ_, query.shadowFarSplits_[splitIndex])).Transformed(lightView);
     
     BoundingBox lightViewFrustumBox(lightViewFrustum);
      
@@ -2057,8 +2050,8 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     // Use the scene Z bounds to limit frustum size if applicable
     if (parameters.focus_)
     {
-        nearSplit = Max(sceneViewBox_.min_.z_, nearSplit);
-        farSplit = Min(sceneViewBox_.max_.z_, farSplit);
+        nearSplit = Max(minZ_, nearSplit);
+        farSplit = Min(maxZ_, farSplit);
     }
     
     Frustum splitFrustum = camera_->GetSplitFrustum(nearSplit, farSplit);
@@ -2070,13 +2063,15 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         BoundingBox litGeometriesBox;
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
+            Drawable* drawable = geometries_[i];
+            
             // Skip skyboxes as they have undefinedly large bounding box size
-            if (geometries_[i]->GetType() == Skybox::GetTypeStatic())
+            if (drawable->GetType() == Skybox::GetTypeStatic())
                 continue;
             
-            if (geometryDepthBounds_[i].min_ <= farSplit && geometryDepthBounds_[i].max_ >= nearSplit &&
-                (GetLightMask(geometries_[i]) & light->GetLightMask()))
-                litGeometriesBox.Merge(geometries_[i]->GetWorldBoundingBox());
+            if (drawable->GetMinZ() <= farSplit && drawable->GetMaxZ() >= nearSplit &&
+                (GetLightMask(drawable) & light->GetLightMask()))
+                litGeometriesBox.Merge(drawable->GetWorldBoundingBox());
         }
         if (litGeometriesBox.defined_)
         {
@@ -2088,7 +2083,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     }
     
     // Transform frustum volume to light space
-    Matrix3x4 lightView(shadowCamera->GetInverseWorldTransform());
+    const Matrix3x4& lightView = shadowCamera->GetInverseWorldTransform();
     frustumVolume.Transform(lightView);
     
     // Fit the frustum volume inside a bounding box. If uniform size, use a sphere instead
