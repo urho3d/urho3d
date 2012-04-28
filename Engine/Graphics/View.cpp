@@ -660,6 +660,9 @@ void View::GetDrawables()
         }
     }
     
+    if (minZ_ == M_INFINITY)
+        minZ_ = 0.0f;
+    
     // Sort the lights to brightest/closest first
     for (unsigned i = 0; i < lights_.Size(); ++i)
     {
