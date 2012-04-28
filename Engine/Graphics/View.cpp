@@ -206,6 +206,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     Drawable** start = reinterpret_cast<Drawable**>(item->start_);
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
     OcclusionBuffer* buffer = view->occlusionBuffer_;
+    const Matrix3x4& viewMatrix = view->camera_->GetInverseWorldTransform();
     
     while (start != end)
     {
@@ -219,9 +220,18 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
         {
             drawable->MarkInView(view->frame_);
             
-            // For geometries, clear lights and find new zone if necessary
+            // For geometries, clear lights, find new zone if necessary and calculate view space Z range
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
+                const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
+                Vector3 center = geomBox.Center();
+                float viewCenterZ = viewMatrix.m20_ * center.x_ + viewMatrix.m21_ * center.y_ + viewMatrix.m22_ * center.z_ +
+                    viewMatrix.m23_;
+                Vector3 edge = geomBox.Size() * 0.5f;
+                float viewEdgeZ = fabsf(viewMatrix.m20_) * edge.x_ + fabsf(viewMatrix.m21_) * edge.y_ + fabsf(viewMatrix.m22_) *
+                    edge.z_;
+                
+                drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
                 drawable->ClearLights();
                 if (!drawable->GetZone() && !view->cameraZoneOverride_)
                     view->FindZone(drawable, threadIndex);
@@ -387,7 +397,7 @@ void View::Update(const FrameInfo& frame)
     // Clear screen buffers, geometry, light, occluder & batch lists
     screenBuffers_.Clear();
     geometries_.Clear();
-    allGeometries_.Clear();
+    shadowGeometries_.Clear();
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
@@ -626,22 +636,14 @@ void View::GetDrawables()
         
         if (flags & DRAWABLE_GEOMETRY)
         {
-            // Expand the scene bounding boxes. However, do not take skyboxes into account, as they have undefinedly large size
-            // and the bounding boxes are also used for shadow focusing
-            const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
-            BoundingBox geomViewBox = geomBox.Transformed(view);
+            // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
             if (drawable->GetType() != Skybox::GetTypeStatic())
             {
-                sceneBox_.Merge(geomBox);
-                minZ_ = Min(minZ_, geomViewBox.min_.z_);
-                maxZ_ = Max(maxZ_, geomViewBox.max_.z_);
+                sceneBox_.Merge(drawable->GetWorldBoundingBox());
+                minZ_ = Min(minZ_, drawable->GetMinZ());
+                maxZ_ = Max(maxZ_, drawable->GetMaxZ());
             }
-            
-            // Store depth info for split directional light queries
-            drawable->SetMinMaxZ(geomViewBox.min_.z_, geomViewBox.max_.z_);
-            
             geometries_.Push(drawable);
-            allGeometries_.Push(drawable);
         }
         else if (flags & DRAWABLE_LIGHT)
         {
@@ -765,7 +767,7 @@ void View::GetBatches()
                         if (!drawable->IsInView(frame_, false))
                         {
                             drawable->MarkInView(frame_, false);
-                            allGeometries_.Push(drawable);
+                            shadowGeometries_.Push(drawable);
                         }
                         
                         Zone* zone = GetZone(drawable);
@@ -1043,7 +1045,7 @@ void View::UpdateGeometries()
             item.workFunction_ = SortLightQueueWork;
             item.start_ = &(*i);
             queue->AddWorkItem(item);
-            if ((*i).shadowSplits_.Size())
+            if (i->shadowSplits_.Size())
             {
                 item.workFunction_ = SortShadowQueueWork;
                 queue->AddWorkItem(item);
@@ -1055,7 +1057,16 @@ void View::UpdateGeometries()
     {
         nonThreadedGeometries_.Clear();
         threadedGeometries_.Clear();
-        for (PODVector<Drawable*>::Iterator i = allGeometries_.Begin(); i != allGeometries_.End(); ++i)
+        
+        for (PODVector<Drawable*>::Iterator i = geometries_.Begin(); i != geometries_.End(); ++i)
+        {
+            UpdateGeometryType type = (*i)->GetUpdateGeometryType();
+            if (type == UPDATE_MAIN_THREAD)
+                nonThreadedGeometries_.Push(*i);
+            else if (type == UPDATE_WORKER_THREAD)
+                threadedGeometries_.Push(*i);
+        }
+        for (PODVector<Drawable*>::Iterator i = shadowGeometries_.Begin(); i != shadowGeometries_.End(); ++i)
         {
             UpdateGeometryType type = (*i)->GetUpdateGeometryType();
             if (type == UPDATE_MAIN_THREAD)

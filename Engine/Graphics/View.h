@@ -231,8 +231,8 @@ private:
     PODVector<Zone*> zones_;
     /// Visible geometry objects.
     PODVector<Drawable*> geometries_;
-    /// All geometry objects, including shadow casters not visible in the main view.
-    PODVector<Drawable*> allGeometries_;
+    /// Geometry objects visible in shadow maps.
+    PODVector<Drawable*> shadowGeometries_;
     /// Geometry objects that will be updated in the main thread.
     PODVector<Drawable*> nonThreadedGeometries_;
     /// Geometry objects that will be updated in worker threads.
