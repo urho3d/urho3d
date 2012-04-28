@@ -630,11 +630,10 @@ void View::GetDrawables()
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
         Drawable* drawable = tempDrawables[i];
-        unsigned char flags = drawable->GetDrawableFlags();
         if (!drawable->IsInView(frame_))
             continue;
         
-        if (flags & DRAWABLE_GEOMETRY)
+        if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
         {
             // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
             if (drawable->GetType() != Skybox::GetTypeStatic())
@@ -645,7 +644,7 @@ void View::GetDrawables()
             }
             geometries_.Push(drawable);
         }
-        else if (flags & DRAWABLE_LIGHT)
+        else
         {
             Light* light = static_cast<Light*>(drawable);
             // Skip lights which are so dim that they can not contribute to a rendertarget
