@@ -168,7 +168,7 @@ public:
     bool IsOccludee() const { return occludee_; }
     
     /// %Set new zone.
-    void SetZone(Zone* zone);
+    void SetZone(Zone* zone, bool temporary = false);
     /// %Set sorting value.
     void SetSortValue(float value);
     /// Mark in view (either the main camera, or a shadow camera view) this frame.
@@ -284,6 +284,8 @@ protected:
     const FrameInfo* viewFrame_;
     /// Last view's camera. Not safe to dereference.
     Camera* viewCamera_;
+    /// Zone assignment temporary flag.
+    bool temporaryZone_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

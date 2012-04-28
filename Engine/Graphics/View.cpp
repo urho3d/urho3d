@@ -301,9 +301,8 @@ View::View(Context* context) :
 {
     frame_.camera_ = 0;
     
-    // Create octree query vectors for each thread
+    // Create octree query vector for each thread
     tempDrawables_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
-    tempZones_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
 }
 
 View::~View()
@@ -2220,46 +2219,30 @@ void View::FindZone(Drawable* drawable, unsigned threadIndex)
     int bestPriority = M_MIN_INT;
     Zone* newZone = 0;
     
-    // If bounding box center is in view, can use the visible zones. Else must query via the octree
-    if (camera_->GetFrustum().IsInside(center))
-    {
-        // First check if the last zone remains a conclusive result
-        Zone* lastZone = drawable->GetLastZone();
-        if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) &&
-            lastZone->GetPriority() >= highestZonePriority_)
-            newZone = lastZone;
-        else
-        {
-            for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
-            {
-                int priority = (*i)->GetPriority();
-                if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
-                {
-                    newZone = *i;
-                    bestPriority = priority;
-                }
-            }
-        }
-    }
+    // If bounding box center is in view, the zone assignment is conclusive also for next frames. Otherwise it is temporary
+    // (possibly incorrect) and must be re-evaluated on the next frame
+    bool temporary = !camera_->GetFrustum().IsInside(center);
+    
+    // First check if the last zone remains a conclusive result
+    Zone* lastZone = drawable->GetLastZone();
+    if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) &&
+        lastZone->GetPriority() >= highestZonePriority_)
+        newZone = lastZone;
     else
     {
-        PODVector<Zone*>& tempZones = tempZones_[threadIndex];
-        PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(tempZones), center, DRAWABLE_ZONE);
-        octree_->GetDrawables(query);
-        
-        bestPriority = M_MIN_INT;
-        for (PODVector<Zone*>::Iterator i = tempZones.Begin(); i != tempZones.End(); ++i)
+        for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
-            int priority = (*i)->GetPriority();
-            if ((*i)->IsInside(center) && (drawable->GetZoneMask() & (*i)->GetZoneMask()) && priority > bestPriority)
+            Zone* zone = *i;
+            int priority = zone->GetPriority();
+            if (zone->IsInside(center) && (drawable->GetZoneMask() & zone->GetZoneMask()) && priority > bestPriority)
             {
-                newZone = *i;
+                newZone = zone;
                 bestPriority = priority;
             }
         }
     }
     
-    drawable->SetZone(newZone);
+    drawable->SetZone(newZone, temporary);
 }
 
 Zone* View::GetZone(Drawable* drawable)

@@ -222,8 +222,6 @@ private:
     PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
-    /// Per-thread octree zone query results.
-    Vector<PODVector<Zone*> > tempZones_;
     /// Visible zones.
     PODVector<Zone*> zones_;
     /// Visible geometry objects.

@@ -63,7 +63,8 @@ Drawable::Drawable(Context* context) :
     octant_(0),
     firstLight_(0),
     viewFrame_(0),
-    viewCamera_(0)
+    viewCamera_(0),
+    temporaryZone_(false)
 {
 }
 
@@ -209,10 +210,11 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
     return worldBoundingBox_;
 }
 
-void Drawable::SetZone(Zone* zone)
+void Drawable::SetZone(Zone* zone, bool temporary)
 {
     zone_ = zone;
     lastZone_ = zone;
+    temporaryZone_ = temporary;
 }
 
 void Drawable::SetSortValue(float value)
@@ -224,6 +226,13 @@ void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
 {
     if (mainView)
     {
+        // Reset zone assignment now if was temporary
+        if (temporaryZone_)
+        {
+            zone_.Reset();
+            temporaryZone_ = false;
+        }
+        
         viewFrameNumber_ = frame.frameNumber_;
         viewFrame_ = &frame;
         viewCamera_ = frame.camera_;
