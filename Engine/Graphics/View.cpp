@@ -209,31 +209,23 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     
     while (start != end)
     {
-        Drawable* drawable = *start;
-        unsigned char flags = drawable->GetDrawableFlags();
-        ++start;
-        
-        if (flags & DRAWABLE_ZONE)
-            continue;
-        
+        Drawable* drawable = *start++;
         drawable->UpdateDistance(view->frame_);
         
         // If draw distance non-zero, check it
         float maxDistance = drawable->GetDrawDistance();
-        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
-            continue;
-        
-        if (buffer && drawable->IsOccludee() && !buffer->IsVisible(drawable->GetWorldBoundingBox()))
-            continue;
-        
-        drawable->MarkInView(view->frame_);
-        
-        // For geometries, clear lights and find new zone if necessary
-        if (flags & DRAWABLE_GEOMETRY)
+        if ((maxDistance <= 0.0f || drawable->GetDistance() <= maxDistance) && (!buffer || !drawable->IsOccludee() ||
+            buffer->IsVisible(drawable->GetWorldBoundingBox())))
         {
-            drawable->ClearLights();
-            if (!drawable->GetZone() && !view->cameraZoneOverride_)
-                view->FindZone(drawable, threadIndex);
+            drawable->MarkInView(view->frame_);
+            
+            // For geometries, clear lights and find new zone if necessary
+            if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
+            {
+                drawable->ClearLights();
+                if (!drawable->GetZone() && !view->cameraZoneOverride_)
+                    view->FindZone(drawable, threadIndex);
+            }
         }
     }
 }
@@ -1660,9 +1652,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         
         // Check occluder's draw distance (in main camera view)
         float maxDistance = occluder->GetDrawDistance();
-        if (maxDistance > 0.0f && occluder->GetDistance() > maxDistance)
-            erase = true;
-        else
+        if (maxDistance <= 0.0f || occluder->GetDistance() <= maxDistance)
         {
             // Check that occluder is big enough on the screen
             const BoundingBox& box = occluder->GetWorldBoundingBox();
@@ -1682,6 +1672,8 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
                 occluder->SetSortValue((float)occluder->GetNumOccluderTriangles() / compare);
             }
         }
+        else
+            erase = true;
         
         if (erase)
             i = occluders.Erase(i);
