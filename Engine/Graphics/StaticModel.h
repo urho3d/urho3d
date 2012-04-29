@@ -27,6 +27,15 @@
 
 class Model;
 
+/// Static model per-geometry extra data.
+struct StaticModelGeometryData
+{
+    /// Geometry center.
+    Vector3 center_;
+    /// Current LOD level.
+    unsigned lodLevel_;
+};
+
 /// Static model component.
 class StaticModel : public Drawable
 {
@@ -92,10 +101,8 @@ protected:
     
     /// Bounding box.
     BoundingBox boundingBox_;
-    /// Current LOD levels.
-    PODVector<unsigned> lodLevels_;
-    /// Geometry centers.
-    PODVector<Vector3> geometryCenters_;
+    /// Extra per-geometry data.
+    PODVector<StaticModelGeometryData> geometryData_;
     /// All geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Model.

@@ -54,6 +54,8 @@ void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResu
 
 void Skybox::UpdateBatches(const FrameInfo& frame)
 {
+    distance_ = 0.0f;
+    
     // Follow only the camera rotation, not position
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
     customWorldTransform_ = customView * node_->GetWorldTransform();

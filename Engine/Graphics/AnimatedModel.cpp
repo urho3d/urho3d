@@ -235,7 +235,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {
-            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
             batches_[i].worldTransform_ = &worldTransform;
         }
     }
@@ -312,7 +312,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
         geometries_[i] = geometries[i];
-        geometryCenters_[i] = geometryCenters[i];
+        geometryData_[i].center_ = geometryCenters[i];
     }
     
     // Copy geometry bone mappings

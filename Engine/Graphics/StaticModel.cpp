@@ -112,7 +112,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                     unsigned lodLevel;
                     // Check whether to use same LOD as visible, or a specific LOD
                     if (softwareLodLevel_ == M_MAX_UNSIGNED)
-                        lodLevel = lodLevels_[i];
+                        lodLevel = geometryData_[i].lodLevel_;
                     else
                         lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
                     
@@ -147,7 +147,7 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {
-            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
             batches_[i].worldTransform_ = &worldTransform;
         }
     }
@@ -176,7 +176,7 @@ unsigned StaticModel::GetNumOccluderTriangles()
         unsigned lodLevel;
         // Check whether to use same LOD as visible, or a specific LOD
         if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = lodLevels_[i];
+            lodLevel = geometryData_[i].lodLevel_;
         else
             lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
         
@@ -204,7 +204,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned lodLevel;
         // Check whether to use same LOD as visible, or a specific LOD
         if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = lodLevels_[i];
+            lodLevel = geometryData_[i].lodLevel_;
         else
             lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
         
@@ -267,7 +267,7 @@ void StaticModel::SetModel(Model* model)
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
         geometries_[i] = geometries[i];
-        geometryCenters_[i] = geometryCenters[i];
+        geometryData_[i].center_ = geometryCenters[i];
     }
     
     SetBoundingBox(model->GetBoundingBox());
@@ -317,8 +317,7 @@ void StaticModel::SetNumGeometries(unsigned num)
 {
     batches_.Resize(num);
     geometries_.Resize(num);
-    geometryCenters_.Resize(num);
-    lodLevels_.Resize(num);
+    geometryData_.Resize(num);
     ResetLodLevels();
 }
 
@@ -362,7 +361,7 @@ void StaticModel::ResetLodLevels()
         if (!geometries_[i].Size())
             geometries_[i].Resize(1);
         batches_[i].geometry_ = geometries_[i][0];
-        lodLevels_[i] = 0;
+        geometryData_[i].lodLevel_ = 0;
     }
     
     // Find out the real LOD levels on next geometry update
@@ -383,9 +382,9 @@ void StaticModel::CalculateLodLevels()
         }
         
         unsigned newLodLevel = j - 1;
-        if (lodLevels_[i] != newLodLevel)
+        if (geometryData_[i].lodLevel_ != newLodLevel)
         {
-            lodLevels_[i] = newLodLevel;
+            geometryData_[i].lodLevel_ = newLodLevel;
             batches_[i].geometry_ = batchGeometries[newLodLevel];
         }
     }
