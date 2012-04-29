@@ -68,11 +68,11 @@ public:
     /// %Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
     /// Write initial delta network update.
-    void WriteInitialDeltaUpdate(Serializer& dest);
+    void WriteInitialDeltaUpdate(Serializer& dest, NetworkState* state);
     /// Write a delta network update according to dirty attribute bits.
-    void WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits);
+    void WriteDeltaUpdate(Serializer& dest, NetworkState* state, const DirtyBits& attributeBits);
     /// Write a latest data network update.
-    void WriteLatestDataUpdate(Serializer& dest);
+    void WriteLatestDataUpdate(Serializer& dest, NetworkState* state);
     /// Read and apply a network delta update.
     void ReadDeltaUpdate(Deserializer& source);
     /// Read and apply a network latest data update.
@@ -90,10 +90,6 @@ public:
     const Vector<AttributeInfo>* GetAttributes() const;
     /// Return network replication attribute descriptions, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes() const;
-    
-protected:
-    /// Network attribute state.
-    NetworkState* networkState_;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.

@@ -1049,7 +1049,7 @@ void Connection::ProcessNewNode(Node* node)
     node->AddReplicationState(&nodeState);
     
     // Write node's attributes
-    node->WriteInitialDeltaUpdate(msg_);
+    node->WriteInitialDeltaUpdate(msg_, node->GetNetworkState());
     
     // Write node's user variables
     const VariantMap& vars = node->GetVars();
@@ -1078,7 +1078,7 @@ void Connection::ProcessNewNode(Node* node)
         
         msg_.WriteShortStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
-        component->WriteInitialDeltaUpdate(msg_);
+        component->WriteInitialDeltaUpdate(msg_, component->GetNetworkState());
     }
     
     SendMessage(MSG_CREATENODE, true, true, msg_);
@@ -1129,7 +1129,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             msg_.Clear();
             msg_.WriteNetID(node->GetID());
-            node->WriteLatestDataUpdate(msg_);
+            node->WriteLatestDataUpdate(msg_, node->GetNetworkState());
             
             SendMessage(MSG_NODELATESTDATA, true, false, msg_, node->GetID());
         }
@@ -1139,7 +1139,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             msg_.Clear();
             msg_.WriteNetID(node->GetID());
-            node->WriteDeltaUpdate(msg_, nodeState.dirtyAttributes_);
+            node->WriteDeltaUpdate(msg_, node->GetNetworkState(), nodeState.dirtyAttributes_);
             
             // Write changed variables
             msg_.WriteVLE(nodeState.dirtyVars_.Size());
@@ -1207,7 +1207,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 {
                     msg_.Clear();
                     msg_.WriteNetID(component->GetID());
-                    component->WriteLatestDataUpdate(msg_);
+                    component->WriteLatestDataUpdate(msg_, component->GetNetworkState());
                     
                     SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, component->GetID());
                 }
@@ -1217,7 +1217,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 {
                     msg_.Clear();
                     msg_.WriteNetID(component->GetID());
-                    component->WriteDeltaUpdate(msg_, componentState.dirtyAttributes_);
+                    component->WriteDeltaUpdate(msg_, component->GetNetworkState(), componentState.dirtyAttributes_);
                     
                     SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
                     
@@ -1252,7 +1252,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 msg_.WriteNetID(node->GetID());
                 msg_.WriteShortStringHash(component->GetType());
                 msg_.WriteNetID(component->GetID());
-                component->WriteInitialDeltaUpdate(msg_);
+                component->WriteInitialDeltaUpdate(msg_, component->GetNetworkState());
                 
                 SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
             }

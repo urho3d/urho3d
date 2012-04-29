@@ -51,7 +51,8 @@ Node::Node(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
-    owner_(0)
+    owner_(0),
+    networkState_(0)
 {
 }
 
@@ -63,6 +64,9 @@ Node::~Node()
     // Remove from the scene
     if (scene_)
         scene_->NodeRemoved(this);
+    
+    delete networkState_;
+    networkState_ = 0;
 }
 
 void Node::RegisterObject(Context* context)
@@ -221,7 +225,10 @@ void Node::ApplyAttributes()
 void Node::AddReplicationState(NodeReplicationState* state)
 {
     if (!networkState_)
+    {
         networkState_ = new NetworkState();
+        networkState_->attributes_ = GetNetworkAttributes();
+    }
     
     networkState_->replicationStates_.Push(state);
 }
@@ -857,31 +864,34 @@ void Node::PrepareNetworkUpdate()
     }
     
     // Then check for node attribute changes
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!networkState_)
+    {
+        networkState_ = new NetworkState();
+        networkState_->attributes_ = GetNetworkAttributes();
+    }
+    
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     unsigned numAttributes = attributes->Size();
     
-    if (!networkState_)
-        networkState_ = new NetworkState();
-    
-    if (networkState_->attributes_.Size() != numAttributes)
+    if (networkState_->currentValues_.Size() != numAttributes)
     {
-        networkState_->attributes_.Resize(numAttributes);
-        networkState_->previousAttributes_.Resize(numAttributes);
+        networkState_->currentValues_.Resize(numAttributes);
+        networkState_->previousValues_.Resize(numAttributes);
         
         // Copy the default attribute values to the previous state as a starting point
         for (unsigned i = 0; i < numAttributes; ++i)
-            networkState_->previousAttributes_[i] = attributes->At(i).defaultValue_;
+            networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
     }
     
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        OnGetAttribute(attr, networkState_->attributes_[i]);
+        OnGetAttribute(attr, networkState_->currentValues_[i]);
         
-        if (networkState_->attributes_[i] != networkState_->previousAttributes_[i])
+        if (networkState_->currentValues_[i] != networkState_->previousValues_[i])
         {
-            networkState_->previousAttributes_[i] = networkState_->attributes_[i];
+            networkState_->previousValues_[i] = networkState_->currentValues_[i];
             
             // Mark the attribute dirty in all replication states that are tracking this node
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
@@ -900,7 +910,7 @@ void Node::PrepareNetworkUpdate()
             }
         }
     }
-
+    
     // Finally check for user var changes
     for (VariantMap::ConstIterator i = vars_.Begin(); i != vars_.End(); ++i)
     {

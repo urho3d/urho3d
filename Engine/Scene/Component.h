@@ -80,6 +80,8 @@ public:
     void CleanupConnection(Connection* connection);
     /// Mark for attribute check on the next network update.
     void MarkNetworkUpdate();
+    /// Return the network attribute state.
+    NetworkState* GetNetworkState() const { return networkState_; }
     
 protected:
     /// Handle scene node being assigned at creation.
@@ -95,6 +97,8 @@ protected:
     Node* node_;
     /// Unique ID within the scene.
     unsigned id_;
+    /// Network attribute state.
+    NetworkState* networkState_;
     /// Network update queued flag.
     bool networkUpdate_;
 };

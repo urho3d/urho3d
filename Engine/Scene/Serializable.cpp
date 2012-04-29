@@ -35,15 +35,12 @@
 OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
-    Object(context),
-    networkState_(0)
+    Object(context)
 {
 }
 
 Serializable::~Serializable()
 {
-    delete networkState_;
-    networkState_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -415,17 +412,17 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest, NetworkState* state)
 {
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
-        return;
-    
-    if (!networkState_)
+    if (!state)
     {
         LOGERROR("WriteInitialDeltaUpdate called without allocated NetworkState");
         return;
     }
+    
+    const Vector<AttributeInfo>* attributes = state->attributes_;
+    if (!attributes)
+        return;
     
     unsigned numAttributes = attributes->Size();
     DirtyBits attributeBits;
@@ -434,7 +431,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (networkState_->attributes_[i] != attr.defaultValue_)
+        if (state->currentValues_[i] != attr.defaultValue_)
             attributeBits.Set(i);
     }
     
@@ -444,21 +441,21 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(networkState_->attributes_[i]);
+            dest.WriteVariantData(state->currentValues_[i]);
     }
 }
 
-void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits)
+void Serializable::WriteDeltaUpdate(Serializer& dest, NetworkState* state, const DirtyBits& attributeBits)
 {
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
-        return;
-    
-    if (!networkState_)
+    if (!state)
     {
         LOGERROR("WriteDeltaUpdate called without allocated NetworkState");
         return;
     }
+    
+    const Vector<AttributeInfo>* attributes = state->attributes_;
+    if (!attributes)
+        return;
     
     unsigned numAttributes = attributes->Size();
     
@@ -469,28 +466,28 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(networkState_->attributes_[i]);
+            dest.WriteVariantData(state->currentValues_[i]);
     }
 }
 
-void Serializable::WriteLatestDataUpdate(Serializer& dest)
+void Serializable::WriteLatestDataUpdate(Serializer& dest, NetworkState* state)
 {
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
-    if (!attributes)
-        return;
-    
-    if (!networkState_)
+    if (!state)
     {
         LOGERROR("WriteLatestDataUpdate called without allocated NetworkState");
         return;
     }
+    
+    const Vector<AttributeInfo>* attributes = state->attributes_;
+    if (!attributes)
+        return;
     
     unsigned numAttributes = attributes->Size();
     
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(networkState_->attributes_[i]);
+            dest.WriteVariantData(state->currentValues_[i]);
     }
 }
 

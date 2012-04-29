@@ -36,12 +36,15 @@ Component::Component(Context* context) :
     Serializable(context),
     node_(0),
     id_(0),
+    networkState_(0),
     networkUpdate_(false)
 {
 }
 
 Component::~Component()
 {
+    delete networkState_;
+    networkState_ = 0;
 }
 
 void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -88,41 +91,47 @@ Scene* Component::GetScene() const
 void Component::AddReplicationState(ComponentReplicationState* state)
 {
     if (!networkState_)
+    {
         networkState_ = new NetworkState();
+        networkState_->attributes_ = GetNetworkAttributes();
+    }
     
     networkState_->replicationStates_.Push(state);
 }
 
 void Component::PrepareNetworkUpdate()
 {
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!networkState_)
+    {
+        networkState_ = new NetworkState();
+        networkState_->attributes_ = GetNetworkAttributes();
+    }
+    
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
     
     unsigned numAttributes = attributes->Size();
     
-    if (!networkState_)
-        networkState_ = new NetworkState();
-    
-    if (networkState_->attributes_.Size() != numAttributes)
+    if (networkState_->currentValues_.Size() != numAttributes)
     {
-        networkState_->attributes_.Resize(numAttributes);
-        networkState_->previousAttributes_.Resize(numAttributes);
+        networkState_->currentValues_.Resize(numAttributes);
+        networkState_->previousValues_.Resize(numAttributes);
         
         // Copy the default attribute values to the previous state as a starting point
         for (unsigned i = 0; i < numAttributes; ++i)
-            networkState_->previousAttributes_[i] = attributes->At(i).defaultValue_;
+            networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
     }
     
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        OnGetAttribute(attr, networkState_->attributes_[i]);
+        OnGetAttribute(attr, networkState_->currentValues_[i]);
         
-        if (networkState_->attributes_[i] != networkState_->previousAttributes_[i])
+        if (networkState_->currentValues_[i] != networkState_->previousValues_[i])
         {
-            networkState_->previousAttributes_[i] = networkState_->attributes_[i];
+            networkState_->previousValues_[i] = networkState_->currentValues_[i];
             
             // Mark the attribute dirty in all replication states that are tracking this component
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=

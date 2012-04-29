@@ -317,6 +317,8 @@ public:
     void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
+    /// Return the network attribute state.
+    NetworkState* GetNetworkState() const { return networkState_; }
     
 protected:
     /// Create a component with specific ID.
@@ -364,7 +366,7 @@ private:
     Vector<WeakPtr<Component> > listeners_;
     /// Nodes this node depends on for network updates.
     PODVector<Node*> dependencyNodes_;
-    /// Owner connection in networking.
+    /// Network owner connection.
     Connection* owner_;
     /// Name.
     String name_;
@@ -374,6 +376,8 @@ private:
     mutable VectorBuffer attrBuffer_;
     
 protected:
+    /// Network attribute state.
+    NetworkState* networkState_;
     /// User variables.
     VariantMap vars_;
 };
