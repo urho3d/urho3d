@@ -1008,17 +1008,17 @@ ShaderVariation* Renderer::GetShader(const String& name, const String& extension
         return 0;
 }
 
-void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows)
+void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
 {
     // Check if shaders are unloaded or need reloading
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
-    if (!vertexShaders.Size() || !pixelShaders.Size() || technique->GetShadersLoadedFrameNumber() !=
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = batch.pass_->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = batch.pass_->GetPixelShaders();
+    if (!vertexShaders.Size() || !pixelShaders.Size() || tech->GetShadersLoadedFrameNumber() !=
         shadersChangedFrameNumber_)
     {
         // First release all previous shaders, then load
-        technique->ReleaseShaders();
-        LoadMaterialShaders(technique);
+        tech->ReleaseShaders();
+        LoadMaterialShaders(tech);
     }
     
     // Make sure shaders are loaded now
@@ -1032,7 +1032,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             geomType = GEOM_STATIC;
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
-        PassType type = pass->GetType();
+        PassType type = batch.pass_->GetType();
         if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
@@ -1131,10 +1131,10 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     // Log error if shaders could not be assigned, but only once per technique
     if (!batch.vertexShader_ || !batch.pixelShader_)
     {
-        if (!shaderErrorDisplayed_.Contains(technique))
+        if (!shaderErrorDisplayed_.Contains(tech))
         {
-            shaderErrorDisplayed_.Insert(technique);
-            LOGERROR("Technique " + technique->GetName() + " has missing shaders");
+            shaderErrorDisplayed_.Insert(tech);
+            LOGERROR("Technique " + tech->GetName() + " has missing shaders");
         }
     }
 }
@@ -1503,30 +1503,30 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadMaterialShaders(Technique* technique)
+void Renderer::LoadMaterialShaders(Technique* tech)
 {
-    if (renderMode_ == RENDER_PREPASS && technique->HasPass(PASS_PREPASS))
+    if (renderMode_ == RENDER_PREPASS && tech->HasPass(PASS_PREPASS))
     {
-        LoadPassShaders(technique, PASS_PREPASS);
-        LoadPassShaders(technique, PASS_MATERIAL);
+        LoadPassShaders(tech, PASS_PREPASS);
+        LoadPassShaders(tech, PASS_MATERIAL);
     }
-    else if (renderMode_ == RENDER_DEFERRED && technique->HasPass(PASS_DEFERRED))
-        LoadPassShaders(technique, PASS_DEFERRED);
+    else if (renderMode_ == RENDER_DEFERRED && tech->HasPass(PASS_DEFERRED))
+        LoadPassShaders(tech, PASS_DEFERRED);
     else
     {
-        LoadPassShaders(technique, PASS_BASE);
-        LoadPassShaders(technique, PASS_LITBASE);
-        LoadPassShaders(technique, PASS_LIGHT);
+        LoadPassShaders(tech, PASS_BASE);
+        LoadPassShaders(tech, PASS_LITBASE);
+        LoadPassShaders(tech, PASS_LIGHT);
     }
     
-    LoadPassShaders(technique, PASS_PREALPHA);
-    LoadPassShaders(technique, PASS_POSTALPHA);
-    LoadPassShaders(technique, PASS_SHADOW);
+    LoadPassShaders(tech, PASS_PREALPHA);
+    LoadPassShaders(tech, PASS_POSTALPHA);
+    LoadPassShaders(tech, PASS_SHADOW);
 }
 
-void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowShadows)
+void Renderer::LoadPassShaders(Technique* tech, PassType type, bool allowShadows)
 {
-    Pass* pass = technique->GetPass(type);
+    Pass* pass = tech->GetPass(type);
     if (!pass)
         return;
     
@@ -1562,7 +1562,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         // do not load shadowed variations
         if (reuseShadowMaps_)
         {
-            if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
+            if (!tech->HasPass(PASS_BASE) || tech->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
                 allowShadows = false;
         }
         
@@ -1616,7 +1616,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType type, bool allowSh
         pixelShaders[0] = GetPixelShader(pixelShaderName);
     }
     
-    technique->MarkShadersLoaded(shadersChangedFrameNumber_);
+    tech->MarkShadersLoaded(shadersChangedFrameNumber_);
 }
 
 void Renderer::ReleaseMaterialShaders()

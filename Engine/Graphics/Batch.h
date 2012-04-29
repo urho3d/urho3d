@@ -199,8 +199,6 @@ struct BatchQueue
 public:
     /// Clear everything.
     void Clear();
-    /// Add a batch.
-    void AddBatch(const Batch& batch);
     /// Sort non-instanced draw calls back to front.
     void SortBackToFront();
     /// Sort instanced and non-instanced draw calls front to back.

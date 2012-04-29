@@ -740,30 +740,6 @@ void BatchQueue::Clear()
     batchGroups_.Clear();
 }
 
-void BatchQueue::AddBatch(const Batch& batch)
-{
-    // Important: this function does not check whether the batch can actually be instanced. It must have been checked before,
-    // including setting the correct vertex shader (non-instanced or instanced)
-    if (batch.geometryType_ != GEOM_INSTANCED)
-        batches_.Push(batch);
-    else
-    {
-        HashMap<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &baseBatchGroups_ : &batchGroups_;
-        BatchGroupKey key(batch);
-        
-        HashMap<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
-        if (i == groups->End())
-        {
-            // Create a new group based on the batch
-            BatchGroup newGroup(batch);
-            newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
-            groups->Insert(MakePair(key, newGroup));
-        }
-        else
-            i->second_.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
-    }
-}
-
 void BatchQueue::SortBackToFront()
 {
     sortedBaseBatches_.Clear();

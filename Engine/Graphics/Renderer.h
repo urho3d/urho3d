@@ -303,7 +303,7 @@ public:
     /// Get a shader program.
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a forward rendering batch.
-    void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
+    void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
     void SetLightVolumeBatchShaders(Batch& batch);
     /// %Set cull mode while taking possible projection flipping into account.
@@ -329,9 +329,9 @@ private:
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material technique.
-    void LoadMaterialShaders(Technique* technique);
+    void LoadMaterialShaders(Technique* tech);
     /// Reload shaders for a material pass.
-    void LoadPassShaders(Technique* technique, PassType type, bool allowShadows = true);
+    void LoadPassShaders(Technique* tech, PassType type, bool allowShadows = true);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.

@@ -78,8 +78,8 @@ TechniqueEntry::TechniqueEntry() :
 {
 }
 
-TechniqueEntry::TechniqueEntry(Technique* technique, unsigned qualityLevel, float lodDistance) :
-    technique_(technique),
+TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) :
+    technique_(tech),
     qualityLevel_(qualityLevel),
     lodDistance_(lodDistance)
 {
@@ -140,11 +140,11 @@ bool Material::Load(Deserializer& source)
     techniques_.Clear();
     while (techniqueElem)
     {
-        Technique* technique = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
-        if (technique)
+        Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
+        if (tech)
         {
             TechniqueEntry newTechnique;
-            newTechnique.technique_ = technique;
+            newTechnique.technique_ = tech;
             if (techniqueElem.HasAttribute("quality"))
                 newTechnique.qualityLevel_ = techniqueElem.GetInt("quality");
             if (techniqueElem.HasAttribute("loddistance"))
@@ -269,12 +269,12 @@ void Material::SetNumTechniques(unsigned num)
     techniques_.Resize(num);
 }
 
-void Material::SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel, float lodDistance)
+void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel, float lodDistance)
 {
     if (index >= techniques_.Size())
         return;
     
-    techniques_[index] = TechniqueEntry(technique, qualityLevel, lodDistance);
+    techniques_[index] = TechniqueEntry(tech, qualityLevel, lodDistance);
     CheckOcclusion();
 }
 
@@ -348,9 +348,9 @@ void Material::ReleaseShaders()
 {
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
-        Technique* technique = techniques_[i].technique_;
-        if (technique)
-            technique->ReleaseShaders();
+        Technique* tech = techniques_[i].technique_;
+        if (tech)
+            tech->ReleaseShaders();
     }
 }
 
@@ -388,8 +388,8 @@ Technique* Material::GetTechnique(unsigned index) const
 
 Pass* Material::GetPass(unsigned index, PassType pass) const
 {
-    Technique* technique = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
-    return technique ? technique->GetPass(pass) : 0;
+    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
+    return tech ? tech->GetPass(pass) : 0;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
@@ -414,10 +414,10 @@ void Material::CheckOcclusion()
     occlusion_ = false;
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
-        Technique* technique = techniques_[i].technique_;
-        if (technique)
+        Technique* tech = techniques_[i].technique_;
+        if (tech)
         {
-            Pass* pass = technique->GetPass(PASS_BASE);
+            Pass* pass = tech->GetPass(PASS_BASE);
             if (pass && pass->GetDepthWrite())
                 occlusion_ = true;
         }

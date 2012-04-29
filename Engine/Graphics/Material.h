@@ -48,7 +48,7 @@ struct TechniqueEntry
     /// Construct with defaults.
     TechniqueEntry();
     /// Construct with parameters.
-    TechniqueEntry(Technique* technique, unsigned qualityLevel, float lodDistance);
+    TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance);
     /// Destruct.
     ~TechniqueEntry();
     
@@ -81,7 +81,7 @@ public:
     /// %Set number of techniques.
     void SetNumTechniques(unsigned num);
     /// %Set technique.
-    void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// %Set shader parameter.
     void SetShaderParameter(const String& name, const Vector4& value);
     /// %Set texture.
