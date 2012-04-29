@@ -51,8 +51,7 @@ Node::Node(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
-    owner_(0),
-    networkState_(0)
+    owner_(0)
 {
 }
 
@@ -64,9 +63,6 @@ Node::~Node()
     // Remove from the scene
     if (scene_)
         scene_->NodeRemoved(this);
-    
-    delete networkState_;
-    networkState_ = 0;
 }
 
 void Node::RegisterObject(Context* context)
@@ -225,10 +221,7 @@ void Node::ApplyAttributes()
 void Node::AddReplicationState(NodeReplicationState* state)
 {
     if (!networkState_)
-    {
-        networkState_ = new NetworkState();
-        networkState_->attributes_ = GetNetworkAttributes();
-    }
+        AllocateNetworkState();
     
     networkState_->replicationStates_.Push(state);
 }
@@ -865,10 +858,7 @@ void Node::PrepareNetworkUpdate()
     
     // Then check for node attribute changes
     if (!networkState_)
-    {
-        networkState_ = new NetworkState();
-        networkState_->attributes_ = GetNetworkAttributes();
-    }
+        AllocateNetworkState();
     
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     unsigned numAttributes = attributes->Size();

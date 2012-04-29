@@ -36,15 +36,12 @@ Component::Component(Context* context) :
     Serializable(context),
     node_(0),
     id_(0),
-    networkState_(0),
     networkUpdate_(false)
 {
 }
 
 Component::~Component()
 {
-    delete networkState_;
-    networkState_ = 0;
 }
 
 void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -91,10 +88,7 @@ Scene* Component::GetScene() const
 void Component::AddReplicationState(ComponentReplicationState* state)
 {
     if (!networkState_)
-    {
-        networkState_ = new NetworkState();
-        networkState_->attributes_ = GetNetworkAttributes();
-    }
+        AllocateNetworkState();
     
     networkState_->replicationStates_.Push(state);
 }
@@ -102,10 +96,7 @@ void Component::AddReplicationState(ComponentReplicationState* state)
 void Component::PrepareNetworkUpdate()
 {
     if (!networkState_)
-    {
-        networkState_ = new NetworkState();
-        networkState_->attributes_ = GetNetworkAttributes();
-    }
+        AllocateNetworkState();
     
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)

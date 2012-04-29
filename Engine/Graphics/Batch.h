@@ -197,8 +197,8 @@ struct BatchGroupKey
 struct BatchQueue
 {
 public:
-    /// Clear everything.
-    void Clear();
+    /// Clear for new frame by clearing all groups and batches.
+    void Clear(int maxSortedInstances);
     /// Sort non-instanced draw calls back to front.
     void SortBackToFront();
     /// Sort instanced and non-instanced draw calls front to back.
@@ -228,6 +228,8 @@ public:
     PODVector<BatchGroup*> sortedBaseBatchGroups_;
     /// Sorted instanced draw calls.
     PODVector<BatchGroup*> sortedBatchGroups_;
+    /// Maximum sorted instances.
+    unsigned maxSortedInstances_;
 };
 
 /// Queue for shadow map draw calls
@@ -250,10 +252,10 @@ struct LightBatchQueue
 {
     /// Per-pixel light.
     Light* light_;
-    /// Lit geometry draw calls.
-    BatchQueue litBatches_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
+    /// Lit geometry draw calls.
+    BatchQueue litBatches_;
     /// Shadow map split queues.
     Vector<ShadowBatchQueue> shadowSplits_;
     /// Per-vertex lights.

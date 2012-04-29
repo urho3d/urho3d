@@ -274,6 +274,7 @@ Renderer::Renderer(Context* context) :
     maxShadowMaps_(1),
     maxShadowCascades_(MAX_CASCADE_SPLITS),
     maxInstanceTriangles_(500),
+    maxSortedInstances_(1000),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.025f),
@@ -476,6 +477,11 @@ void Renderer::SetDynamicInstancing(bool enable)
 void Renderer::SetMaxInstanceTriangles(int triangles)
 {
     maxInstanceTriangles_ = Max(triangles, 0);
+}
+
+void Renderer::SetMaxSortedInstances(int instances)
+{
+    maxSortedInstances_ = Max(instances, 0);
 }
 
 void Renderer::SetMaxOccluderTriangles(int triangles)

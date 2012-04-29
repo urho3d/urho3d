@@ -197,6 +197,8 @@ public:
     void SetDynamicInstancing(bool enable);
     /// %Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
+    /// %Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
+    void SetMaxSortedInstances(int instances);
     /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
     /// %Set occluder buffer width.
@@ -234,7 +236,9 @@ public:
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.
-    int GetMaxInstanceTriangles() { return maxInstanceTriangles_; }
+    int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
+    /// Return maximum number of sorted instances per batch group.
+    int GetMaxSortedInstances() const { return maxSortedInstances_; }
     /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
@@ -447,6 +451,8 @@ private:
     int maxShadowCascades_;
     /// Maximum triangles per object for instancing.
     int maxInstanceTriangles_;
+    /// Maximum sorted instances per batch group.
+    int maxSortedInstances_;
     /// Maximum occluder triangles.
     int maxOccluderTriangles_;
     /// Occlusion buffer width.

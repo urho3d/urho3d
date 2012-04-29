@@ -62,7 +62,7 @@ inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceD
 
 inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
 {
-    return lhs->instances_[0].distance_ < rhs->instances_[0].distance_;
+    return lhs->distance_ < rhs->distance_;
 }
 
 void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
@@ -741,13 +741,14 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
     }
 }
 
-void BatchQueue::Clear()
+void BatchQueue::Clear(int maxSortedInstances)
 {
     batches_.Clear();
     sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
     baseBatchGroups_.Clear();
     batchGroups_.Clear();
+    maxSortedInstances_ = maxSortedInstances;
 }
 
 void BatchQueue::SortBackToFront()
@@ -792,9 +793,38 @@ void BatchQueue::SortFrontToBack()
     
     // Sort each group front to back
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+    {
+        if (i->second_.instances_.Size() <= maxSortedInstances_)
+        {
+            Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+            if (i->second_.instances_.Size())
+                i->second_.distance_ = i->second_.instances_[0].distance_;
+        }
+        else
+        {
+            float minDistance = M_INFINITY;
+            for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
+                minDistance = Min(minDistance, j->distance_);
+            i->second_.distance_ = minDistance;
+        }
+    }
+    
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
-        Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+    {
+        if (i->second_.instances_.Size() <= maxSortedInstances_)
+        {
+            Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+            if (i->second_.instances_.Size())
+                i->second_.distance_ = i->second_.instances_[0].distance_;
+        }
+        else
+        {
+            float minDistance = M_INFINITY;
+            for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
+                minDistance = Min(minDistance, j->distance_);
+            i->second_.distance_ = minDistance;
+        }
+    }
     
     // Now sort batch groups by the distance of the first batch
     sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());

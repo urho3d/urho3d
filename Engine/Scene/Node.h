@@ -317,8 +317,6 @@ public:
     void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
-    /// Return the network attribute state.
-    NetworkState* GetNetworkState() const { return networkState_; }
     
 protected:
     /// Create a component with specific ID.
@@ -376,8 +374,6 @@ private:
     mutable VectorBuffer attrBuffer_;
     
 protected:
-    /// Network attribute state.
-    NetworkState* networkState_;
     /// User variables.
     VariantMap vars_;
 };

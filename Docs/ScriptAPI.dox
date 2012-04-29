@@ -2340,6 +2340,7 @@ Properties:<br>
 - bool reuseShadowMaps
 - bool dynamicInstancing
 - int maxInstanceTriangles
+- int maxSortedInstances
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold

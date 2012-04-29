@@ -35,12 +35,15 @@
 OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
-    Object(context)
+    Object(context),
+    networkState_(0)
 {
 }
 
 Serializable::~Serializable()
 {
+    delete networkState_;
+    networkState_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -412,15 +415,24 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(Serializer& dest, NetworkState* state)
+void Serializable::AllocateNetworkState()
 {
-    if (!state)
+    if (!networkState_)
+    {
+        networkState_ = new NetworkState();
+        networkState_->attributes_ = context_->GetNetworkAttributes(GetType());
+    }
+}
+
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
+{
+    if (!networkState_)
     {
         LOGERROR("WriteInitialDeltaUpdate called without allocated NetworkState");
         return;
     }
     
-    const Vector<AttributeInfo>* attributes = state->attributes_;
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
     
@@ -431,7 +443,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, NetworkState* state
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (state->currentValues_[i] != attr.defaultValue_)
+        if (networkState_->currentValues_[i] != attr.defaultValue_)
             attributeBits.Set(i);
     }
     
@@ -441,19 +453,19 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, NetworkState* state
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(state->currentValues_[i]);
+            dest.WriteVariantData(networkState_->currentValues_[i]);
     }
 }
 
-void Serializable::WriteDeltaUpdate(Serializer& dest, NetworkState* state, const DirtyBits& attributeBits)
+void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits)
 {
-    if (!state)
+    if (!networkState_)
     {
         LOGERROR("WriteDeltaUpdate called without allocated NetworkState");
         return;
     }
     
-    const Vector<AttributeInfo>* attributes = state->attributes_;
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
     
@@ -466,19 +478,19 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, NetworkState* state, const
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
-            dest.WriteVariantData(state->currentValues_[i]);
+            dest.WriteVariantData(networkState_->currentValues_[i]);
     }
 }
 
-void Serializable::WriteLatestDataUpdate(Serializer& dest, NetworkState* state)
+void Serializable::WriteLatestDataUpdate(Serializer& dest)
 {
-    if (!state)
+    if (!networkState_)
     {
         LOGERROR("WriteLatestDataUpdate called without allocated NetworkState");
         return;
     }
     
-    const Vector<AttributeInfo>* attributes = state->attributes_;
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
     
@@ -487,7 +499,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest, NetworkState* state)
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(state->currentValues_[i]);
+            dest.WriteVariantData(networkState_->currentValues_[i]);
     }
 }
 
@@ -572,7 +584,8 @@ unsigned Serializable::GetNumAttributes() const
 
 unsigned Serializable::GetNumNetworkAttributes() const
 {
-    const Vector<AttributeInfo>* attributes = context_->GetNetworkAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = networkState_ ? networkState_->attributes_ :
+        context_->GetNetworkAttributes(GetType());
     return attributes ? attributes->Size() : 0;
 }
 
@@ -583,5 +596,5 @@ const Vector<AttributeInfo>* Serializable::GetAttributes() const
 
 const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
 {
-    return context_->GetNetworkAttributes(GetType());
+    return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
 }

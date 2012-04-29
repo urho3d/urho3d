@@ -395,6 +395,8 @@ void View::Update(const FrameInfo& frame)
     frame_.frameNumber_ = frame.frameNumber_;
     frame_.viewSize_ = viewSize_;
     
+    int maxSortedInstances = renderer_->GetMaxSortedInstances();
+    
     // Clear screen buffers, geometry, light, occluder & batch lists
     screenBuffers_.Clear();
     geometries_.Clear();
@@ -402,12 +404,11 @@ void View::Update(const FrameInfo& frame)
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
-    baseQueue_.Clear();
-    preAlphaQueue_.Clear();
-    gbufferQueue_.Clear();
-    alphaQueue_.Clear();
-    postAlphaQueue_.Clear();
-    lightQueues_.Clear();
+    baseQueue_.Clear(maxSortedInstances);
+    preAlphaQueue_.Clear(maxSortedInstances);
+    gbufferQueue_.Clear(maxSortedInstances);
+    alphaQueue_.Clear(maxSortedInstances);
+    postAlphaQueue_.Clear(maxSortedInstances);
     vertexLightQueues_.Clear();
     
     // Do not update if camera projection is illegal
@@ -700,8 +701,6 @@ void View::GetBatches()
     {
         PROFILE(GetLightBatches);
         
-        maxLightsDrawables_.Clear();
-        
         // Preallocate light queues: per-pixel lights which have lit geometries
         unsigned numLightQueues = 0;
         unsigned usedLightQueues = 0;
@@ -712,6 +711,8 @@ void View::GetBatches()
         }
         
         lightQueues_.Resize(numLightQueues);
+        maxLightsDrawables_.Clear();
+        unsigned maxSortedInstances = renderer_->GetMaxSortedInstances();
         
         for (Vector<LightQueryResult>::Iterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
@@ -728,15 +729,15 @@ void View::GetBatches()
             {
                 unsigned shadowSplits = query.numSplits_;
                 
-                // Initialize light queue. Store light-to-queue mapping so that the queue can be found later
+                // Initialize light queue and store it to the light so that it can be found later
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
                 light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
-                lightQueue.litBatches_.Clear();
+                lightQueue.shadowMap_ = 0;
+                lightQueue.litBatches_.Clear(maxSortedInstances);
                 lightQueue.volumeBatches_.Clear();
                 
                 // Allocate shadow map now
-                lightQueue.shadowMap_ = 0;
                 if (shadowSplits > 0)
                 {
                     lightQueue.shadowMap_ = renderer_->GetShadowMap(light, camera_, viewSize_.x_, viewSize_.y_);
@@ -754,6 +755,7 @@ void View::GetBatches()
                     shadowQueue.shadowCamera_ = shadowCamera;
                     shadowQueue.nearSplit_ = query.shadowNearSplits_[j];
                     shadowQueue.farSplit_ = query.shadowFarSplits_[j];
+                    shadowQueue.shadowBatches_.Clear(maxSortedInstances);
                     
                     // Setup the shadow split viewport and finalize shadow camera parameters
                     shadowQueue.shadowViewport_ = GetShadowMapViewport(light, j, lightQueue.shadowMap_);
