@@ -3317,6 +3317,19 @@ void asCContext::ExecuteNext()
 			// PshVPtr 0
 			asPWORD tmp = *(asPWORD*)l_fp;
 
+			// Make sure the pointer is not null
+			if( tmp == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_NULL_POINTER_ACCESS);
+				return;
+			}
+
 			// ADDSi
 			tmp = tmp + asBC_SWORDARG0(l_bc);
 
@@ -3413,6 +3426,19 @@ void asCContext::ExecuteNext()
 		{
 			// PshVPtr x
 			asPWORD tmp = *(asPWORD*)(l_fp - asBC_SWORDARG0(l_bc)); 
+
+			// Make sure the pointer is not null
+			if( tmp == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_NULL_POINTER_ACCESS);
+				return;
+			}
 
 			// ADDSi y
 			tmp = tmp + asBC_SWORDARG1(l_bc);

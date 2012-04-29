@@ -10960,6 +10960,14 @@ void asCCompiler::CompileOperatorOnHandles(asCScriptNode *node, asSExprContext *
 	to.MakeHandle(true);
 	to.MakeReference(false);
 
+	if( !to.IsObjectHandle() )
+	{
+		// Compiler error, don't continue
+		Error(TXT_OPERANDS_MUST_BE_HANDLES, node);
+		ctx->type.SetConstantDW(asCDataType::CreatePrimitive(ttBool, true), true);
+		return;
+	}
+
 	// Do the conversion
 	ImplicitConversion(lctx, to, node, asIC_IMPLICIT_CONV);
 	ImplicitConversion(rctx, to, node, asIC_IMPLICIT_CONV);

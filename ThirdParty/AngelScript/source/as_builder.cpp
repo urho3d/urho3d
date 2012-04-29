@@ -3276,14 +3276,14 @@ int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file
 	asCString emulatedName;
 	asCDataType emulatedType;
 	
+	asCScriptNode *mainNode = node;
+	node = node->firstChild;
+
 	if( !isGlobalFunction && node->tokenType == ttPrivate )
 	{
 		isPrivate = true;
 		node = node->next;
 	}
-
-	asCScriptNode *mainNode = node;
-	node = node->firstChild;
 
 	// TODO: namespace: Use correct implicit namespace
 	emulatedType = CreateDataTypeFromNode(node, file, "");

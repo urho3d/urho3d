@@ -663,7 +663,7 @@
 		#define AS_WINDOWS_THREADS
 
 	// Linux
-	#elif defined(__linux__)
+	#elif defined(__linux__) && !defined(ANDROID)
 		#if defined(i386) && !defined(__LP64__)
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
