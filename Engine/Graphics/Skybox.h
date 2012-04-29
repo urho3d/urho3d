@@ -40,10 +40,8 @@ public:
     
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
-    /// Fill rendering batch with distance, geometry, material and world transform.
-    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     
 protected:
     /// Recalculate the world-space bounding box.

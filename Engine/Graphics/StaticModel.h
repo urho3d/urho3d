@@ -27,21 +27,6 @@
 
 class Model;
 
-/// Static model per-batch data.
-struct StaticModelBatch
-{
-    /// Current distance.
-    float distance_;
-    /// Current LOD geometry.
-    Geometry* geometry_;
-    /// Material.
-    SharedPtr<Material> material_;
-    /// Current LOD level.
-    unsigned lodLevel_;
-    /// Geometry center.
-    Vector3 center_;
-};
-
 /// Static model component.
 class StaticModel : public Drawable
 {
@@ -57,12 +42,8 @@ public:
     
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return number of batches.
-    virtual unsigned GetNumBatches();
-    /// Fill rendering batch with distance, geometry, material and world transform.
-    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
@@ -109,10 +90,12 @@ protected:
     /// Choose LOD levels based on distance.
     void CalculateLodLevels();
     
-    /// Per-batch data.
-    Vector<StaticModelBatch> batches_;
     /// Bounding box.
     BoundingBox boundingBox_;
+    /// Current LOD levels.
+    PODVector<unsigned> lodLevels_;
+    /// Geometry centers.
+    PODVector<Vector3> geometryCenters_;
     /// All geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Model.

@@ -52,24 +52,18 @@ void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResu
     // Return no ray hits, as camera rays practically always originate within the bounding box, blocking any other results
 }
 
-void Skybox::UpdateDistance(const FrameInfo& frame)
+void Skybox::UpdateBatches(const FrameInfo& frame)
 {
-    distance_ = 0.0f;
-}
-
-void Skybox::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
-{
-    StaticModelBatch& srcBatch = batches_[batchIndex];
-    
     // Follow only the camera rotation, not position
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
     customWorldTransform_ = customView * node_->GetWorldTransform();
     
-    batch.distance_ = 0.0f;
-    batch.geometry_ = srcBatch.geometry_;
-    batch.worldTransform_ = &customWorldTransform_;
-    batch.overrideView_ = true;
-    batch.material_ = srcBatch.material_;
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+    {
+        batches_[i].worldTransform_ = &customWorldTransform_;
+        batches_[i].distance_ = 0.0f;
+        batches_[i].overrideView_ = true;
+    }
 }
 
 void Skybox::OnWorldBoundingBoxUpdate()

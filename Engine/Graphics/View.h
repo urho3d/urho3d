@@ -161,7 +161,7 @@ private:
     /// Return hash code for a vertex light queue.
     unsigned long long GetVertexLightQueueHash(const PODVector<Light*>& vertexLights);
     /// Return material technique, considering the drawable's LOD distance.
-    Technique* GetTechnique(Drawable* drawable, Material*& material);
+    Technique* GetTechnique(Drawable* drawable, Material* material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
     void CheckMaterialForAuxView(Material* material);
     /// Choose shaders for a batch and add it to queue.

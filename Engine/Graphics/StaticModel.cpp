@@ -25,9 +25,7 @@
 #include "Batch.h"
 #include "Camera.h"
 #include "Context.h"
-#include "Geometry.h"
 #include "Log.h"
-#include "Material.h"
 #include "Model.h"
 #include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
@@ -109,12 +107,12 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             if (distance <= query.maxDistance_)
             {
                 // Then the actual test using triangle geometry
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                for (unsigned i = 0; i < geometries_.Size(); ++i)
                 {
                     unsigned lodLevel;
                     // Check whether to use same LOD as visible, or a specific LOD
                     if (softwareLodLevel_ == M_MAX_UNSIGNED)
-                        lodLevel = batches_[i].lodLevel_;
+                        lodLevel = lodLevels_[i];
                     else
                         lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
                     
@@ -140,7 +138,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
     }
 }
 
-void StaticModel::UpdateDistance(const FrameInfo& frame)
+void StaticModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
@@ -148,10 +146,16 @@ void StaticModel::UpdateDistance(const FrameInfo& frame)
     if (batches_.Size() > 1)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
-            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * batches_[i].center_);
+        {
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+            batches_[i].worldTransform_ = &worldTransform;
+        }
     }
     else
+    {
         batches_[0].distance_ = distance_;
+        batches_[0].worldTransform_ = &worldTransform;
+    }
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -163,21 +167,6 @@ void StaticModel::UpdateDistance(const FrameInfo& frame)
     }
 }
 
-unsigned StaticModel::GetNumBatches()
-{
-    return batches_.Size();
-}
-
-void StaticModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
-{
-    StaticModelBatch& srcBatch = batches_[batchIndex];
-    
-    batch.distance_ = srcBatch.distance_;
-    batch.geometry_ = srcBatch.geometry_;
-    batch.worldTransform_ = &node_->GetWorldTransform();
-    batch.material_ = srcBatch.material_;
-}
-
 unsigned StaticModel::GetNumOccluderTriangles()
 {
     unsigned triangles = 0;
@@ -187,7 +176,7 @@ unsigned StaticModel::GetNumOccluderTriangles()
         unsigned lodLevel;
         // Check whether to use same LOD as visible, or a specific LOD
         if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = batches_[i].lodLevel_;
+            lodLevel = lodLevels_[i];
         else
             lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
         
@@ -215,7 +204,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned lodLevel;
         // Check whether to use same LOD as visible, or a specific LOD
         if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = batches_[i].lodLevel_;
+            lodLevel = lodLevels_[i];
         else
             lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
         
@@ -223,8 +212,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         if (!geom)
             continue;
         
-        // Check that the material is suitable for occlusion (default material always is)
-        // and set culling mode
+        // Check that the material is suitable for occlusion (default material always is) and set culling mode
         Material* mat = batches_[i].material_;
         if (mat)
         {
@@ -279,7 +267,7 @@ void StaticModel::SetModel(Model* model)
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
         geometries_[i] = geometries[i];
-        batches_[i].center_ = geometryCenters[i];
+        geometryCenters_[i] = geometryCenters[i];
     }
     
     SetBoundingBox(model->GetBoundingBox());
@@ -329,6 +317,8 @@ void StaticModel::SetNumGeometries(unsigned num)
 {
     batches_.Resize(num);
     geometries_.Resize(num);
+    geometryCenters_.Resize(num);
+    lodLevels_.Resize(num);
     ResetLodLevels();
 }
 
@@ -372,7 +362,7 @@ void StaticModel::ResetLodLevels()
         if (!geometries_[i].Size())
             geometries_[i].Resize(1);
         batches_[i].geometry_ = geometries_[i][0];
-        batches_[i].lodLevel_ = 0;
+        lodLevels_[i] = 0;
     }
     
     // Find out the real LOD levels on next geometry update
@@ -393,9 +383,9 @@ void StaticModel::CalculateLodLevels()
         }
         
         unsigned newLodLevel = j - 1;
-        if (batches_[i].lodLevel_ != newLodLevel)
+        if (lodLevels_[i] != newLodLevel)
         {
-            batches_[i].lodLevel_ = newLodLevel;
+            lodLevels_[i] = newLodLevel;
             batches_[i].geometry_ = batchGeometries[newLodLevel];
         }
     }

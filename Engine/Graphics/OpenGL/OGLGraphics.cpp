@@ -35,7 +35,6 @@
 #include "IndexBuffer.h"
 #include "Light.h"
 #include "Log.h"
-#include "Material.h"
 #include "Mutex.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"

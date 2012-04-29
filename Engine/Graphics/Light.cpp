@@ -230,7 +230,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     }
 }
 
-void Light::UpdateDistance(const FrameInfo& frame)
+void Light::UpdateBatches(const FrameInfo& frame)
 {
     switch (lightType_)
     {

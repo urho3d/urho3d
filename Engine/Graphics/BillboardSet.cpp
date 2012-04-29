@@ -26,11 +26,9 @@
 #include "BillboardSet.h"
 #include "Camera.h"
 #include "Context.h"
-#include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "IndexBuffer.h"
-#include "Material.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -52,7 +50,6 @@ OBJECTTYPESTATIC(BillboardSet);
 
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context),
-    geometry_(new Geometry(context_)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
@@ -65,6 +62,10 @@ BillboardSet::BillboardSet(Context* context) :
     sortFrameNumber_(0)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
+    
+    batches_.Resize(1);
+    batches_[0].geometry_ = new Geometry(context_);
+    batches_[0].geometryType_ = GEOM_BILLBOARD;
 }
 
 BillboardSet::~BillboardSet()
@@ -90,10 +91,11 @@ void BillboardSet::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 
-void BillboardSet::UpdateDistance(const FrameInfo& frame)
+void BillboardSet::UpdateBatches(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case
-    const Vector3& worldPos = node_->GetWorldPosition();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    Vector3 worldPos = worldTransform.Translation();
     Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     if (offset != previousOffset_)
     {
@@ -119,6 +121,9 @@ void BillboardSet::UpdateDistance(const FrameInfo& frame)
         lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     else
         lodDistance_ = 0.0f;
+    
+    batches_[0].distance_ = distance_;
+    batches_[0].worldTransform_ = &worldTransform;
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -128,6 +133,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
         UpdateBufferSize();
         forceUpdate_ = true;
     }
+    
     if (vertexBuffer_->IsDataLost())
     {
         vertexBuffer_->ClearDataLost();
@@ -147,23 +153,9 @@ UpdateGeometryType BillboardSet::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
-unsigned BillboardSet::GetNumBatches()
-{
-    return 1;
-}
-
-void BillboardSet::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
-{
-    batch.distance_ = distance_;
-    batch.geometry_ = geometry_;
-    batch.geometryType_ = GEOM_BILLBOARD;
-    batch.worldTransform_ = &node_->GetWorldTransform();
-    batch.material_ = material_;
-}
-
 void BillboardSet::SetMaterial(Material* material)
 {
-    material_ = material;
+    batches_[0].material_ = material;
     MarkNetworkUpdate();
 }
 
@@ -222,6 +214,11 @@ void BillboardSet::Updated()
     MarkNetworkUpdate();
 }
 
+Material* BillboardSet::GetMaterial() const
+{
+    return batches_[0].material_;
+}
+
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
     return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
@@ -269,7 +266,7 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
 
 ResourceRef BillboardSet::GetMaterialAttr() const
 {
-    return GetResourceRef(material_, Material::GetTypeStatic());
+    return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
 }
 
 VariantVector BillboardSet::GetBillboardsAttr() const
@@ -346,8 +343,8 @@ void BillboardSet::UpdateBufferSize()
         vertexBuffer_ = new VertexBuffer(context_);
         indexBuffer_ = new IndexBuffer(context_);
         
-        geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
-        geometry_->SetIndexBuffer(indexBuffer_);
+        batches_[0].geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
+        batches_[0].geometry_->SetIndexBuffer(indexBuffer_);
     }
     
     unsigned numBillboards = billboards_.Size();
@@ -419,8 +416,8 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         }
     }
     
-    geometry_->SetDrawRange(TRIANGLE_LIST, 0, enabledBillboards * 6, false);
-
+    batches_[0].geometry_->SetDrawRange(TRIANGLE_LIST, 0, enabledBillboards * 6, false);
+    
     bufferDirty_ = false;
     forceUpdate_ = false;
     if (!enabledBillboards)

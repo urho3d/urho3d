@@ -30,7 +30,6 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "DrawableEvents.h"
-#include "Geometry.h"
 #include "Graphics.h"
 #include "IndexBuffer.h"
 #include "Log.h"
@@ -226,7 +225,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
     UpdateAnimation(frame);
 }
 
-void AnimatedModel::UpdateDistance(const FrameInfo& frame)
+void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(worldTransform.Translation());
@@ -235,10 +234,16 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
     if (batches_.Size() > 1)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
-            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * batches_[i].center_);
+        {
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryCenters_[i]);
+            batches_[i].worldTransform_ = &worldTransform;
+        }
     }
     else
+    {
         batches_[0].distance_ = distance_;
+        batches_[0].worldTransform_ = &worldTransform;
+    }
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -278,33 +283,6 @@ UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
-void AnimatedModel::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
-{
-    StaticModelBatch& srcBatch = batches_[batchIndex];
-    
-    batch.distance_ = srcBatch.distance_;
-    batch.geometry_ = srcBatch.geometry_;
-    batch.geometryType_ = GEOM_SKINNED;
-    batch.worldTransform_ = &node_->GetWorldTransform();
-    batch.material_ = srcBatch.material_;
-    
-    if (skinMatrices_.Size())
-    {
-        // Check if model has per-geometry bone mappings
-        if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[batchIndex].Size())
-        {
-            batch.shaderData_ = geometrySkinMatrices_[batchIndex][0].Data();
-            batch.shaderDataSize_ = geometrySkinMatrices_[batchIndex].Size() * 12;
-        }
-        // If not, use the global skin matrices
-        else
-        {
-            batch.shaderData_ = skinMatrices_[0].Data();
-            batch.shaderDataSize_ = skinMatrices_.Size() * 12;
-        }
-    }
-}
-
 void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug)
@@ -334,7 +312,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
         geometries_[i] = geometries[i];
-        batches_[i].center_ = geometryCenters[i];
+        geometryCenters_[i] = geometryCenters[i];
     }
     
     // Copy geometry bone mappings
@@ -368,6 +346,30 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     SetBoundingBox(model->GetBoundingBox());
     SetSkeleton(model->GetSkeleton(), createBones);
     ResetLodLevels();
+    
+    // Enable skinning in batches
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+    {
+        if (skinMatrices_.Size())
+        {
+            batches_[i].geometryType_ = GEOM_SKINNED;
+            // Check if model has per-geometry bone mappings
+            if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[i].Size())
+            {
+                batches_[i].shaderData_ = geometrySkinMatrices_[i][0].Data();
+                batches_[i].shaderDataSize_ = geometrySkinMatrices_[i].Size() * 12;
+            }
+            // If not, use the global skin matrices
+            else
+            {
+                batches_[i].shaderData_ = skinMatrices_[0].Data();
+                batches_[i].shaderDataSize_ = skinMatrices_.Size() * 12;
+            }
+        }
+        else
+            batches_[i].geometryType_ = GEOM_STATIC;
+    }
+    
     MarkNetworkUpdate();
 }
 
@@ -707,7 +709,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     
     // Reserve space for skinning matrices
     skinMatrices_.Resize(skeleton_.GetNumBones());
-    RefreshGeometryBoneMappings();
+    SetGeometryBoneMappings();
     
     assignBonesPending_ = !createBones;
 }
@@ -955,7 +957,7 @@ void AnimatedModel::CloneGeometries()
     }
 }
 
-void AnimatedModel::RefreshGeometryBoneMappings()
+void AnimatedModel::SetGeometryBoneMappings()
 {
     geometrySkinMatrices_.Clear();
     geometrySkinMatrixPtrs_.Clear();

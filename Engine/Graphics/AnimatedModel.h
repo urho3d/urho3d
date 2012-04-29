@@ -56,14 +56,12 @@ public:
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Animation is updated here.
     virtual void Update(const FrameInfo& frame);
-    /// Calculate distance and LOD level for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    /// Fill rendering batch with distance, geometry, material and world transform.
-    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     /// Add debug geometry to the debug renderer.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
@@ -163,8 +161,8 @@ private:
     void MarkMorphsDirty();
     /// %Set skeleton.
     void SetSkeleton(const Skeleton& skeleton, bool createBones);
-    /// Refresh mapping of subgeometry bone indices.
-    void RefreshGeometryBoneMappings();
+    /// %Set mapping of subgeometry bone indices.
+    void SetGeometryBoneMappings();
     /// Clone geometries as required.
     void CloneGeometries();
     /// Recalculate animations. Called from UpdateNode().

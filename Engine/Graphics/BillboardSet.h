@@ -63,16 +63,12 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance and LOD level for rendering.  May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    /// Return number of batches.
-    virtual unsigned GetNumBatches();
-    /// Fill rendering batch with distance, geometry, material and world transform.
-    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex);
     
     /// %Set material.
     void SetMaterial(Material* material);
@@ -90,7 +86,7 @@ public:
     void Updated();
     
     /// Return material.
-    Material* GetMaterial() const { return material_; }
+    Material* GetMaterial() const;
     /// Return number of billboards.
     unsigned GetNumBillboards() const { return billboards_.Size(); }
     /// Return all billboards.
@@ -146,10 +142,6 @@ private:
     /// Rewrite billboard vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
     
-    /// Geometry.
-    SharedPtr<Geometry> geometry_;
-    /// Material.
-    SharedPtr<Material> material_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Index buffer.

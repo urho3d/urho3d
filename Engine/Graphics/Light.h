@@ -161,8 +161,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Calculate distance for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     /// Add debug geometry to the debug renderer.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     

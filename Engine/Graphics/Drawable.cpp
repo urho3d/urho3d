@@ -98,7 +98,7 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
     }
 }
 
-void Drawable::UpdateDistance(const FrameInfo& frame)
+void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(node_->GetWorldPosition());
     

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
+#include "Drawable.h"
 #include "HashMap.h"
 #include "MathDefs.h"
 #include "Ptr.h"
@@ -45,18 +45,27 @@ class VertexBuffer;
 class Zone;
 struct LightBatchQueue;
 
-/// Description of a 3D geometry draw call.
+/// Queued 3D geometry draw call.
 struct Batch
 {
     /// Construct with defaults.
     Batch() :
         lightQueue_(0),
-        shaderData_(0),
-        shaderDataSize_(0),
-        geometryType_(GEOM_STATIC),
-        overrideView_(false),
         isBase_(false)
     {
+    }
+    
+    /// Assign from a drawable's source data.
+    void CopyFrom(const SourceBatch& rhs)
+    {
+        distance_ = rhs.distance_;
+        geometry_ = rhs.geometry_;
+        material_ = rhs.material_;
+        worldTransform_  = rhs.worldTransform_;
+        shaderData_ = rhs.shaderData_;
+        shaderDataSize_ = rhs.shaderDataSize_;
+        geometryType_ = rhs.geometryType_;
+        overrideView_ = rhs.overrideView_;
     }
     
     /// Calculate state sorting key, which consists of base pass flag, light, pass and geometry.
@@ -72,6 +81,8 @@ struct Batch
     float distance_;
     /// Geometry.
     Geometry* geometry_;
+    /// Material.
+    Material* material_;
     /// Model world transform.
     const Matrix3x4* worldTransform_;
     /// Camera.
@@ -80,8 +91,6 @@ struct Batch
     Zone* zone_;
     /// Light properties.
     LightBatchQueue* lightQueue_;
-    /// Material.
-    Material* material_;
     /// Material pass.
     Pass* pass_;
     /// Vertex shader.
@@ -247,7 +256,7 @@ struct ShadowBatchQueue
     float farSplit_;
 };
 
-/// Queue for light related draw calls
+/// Queue for light related draw calls.
 struct LightBatchQueue
 {
     /// Per-pixel light.

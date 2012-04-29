@@ -24,11 +24,9 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "DebugRenderer.h"
-#include "Geometry.h"
 #include "Graphics.h"
 #include "Light.h"
 #include "Log.h"
-#include "Material.h"
 #include "OcclusionBuffer.h"
 #include "Octree.h"
 #include "Renderer.h"
@@ -211,7 +209,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable* drawable = *start++;
-        drawable->UpdateDistance(view->frame_);
+        drawable->UpdateBatches(view->frame_);
         
         // If draw distance non-zero, check it
         float maxDistance = drawable->GetDrawDistance();
@@ -773,28 +771,29 @@ void View::GetBatches()
                         }
                         
                         Zone* zone = GetZone(drawable);
-                        unsigned numBatches = drawable->GetNumBatches();
+                        const Vector<SourceBatch>& batches = drawable->GetBatches();
                         
-                        for (unsigned l = 0; l < numBatches; ++l)
+                        for (unsigned l = 0; l < batches.Size(); ++l)
                         {
-                            Batch shadowBatch;
-                            drawable->GetBatch(shadowBatch, frame_, l);
+                            const SourceBatch& srcBatch = batches[l];
                             
-                            Technique* tech = GetTechnique(drawable, shadowBatch.material_);
-                            if (!shadowBatch.geometry_ || !tech)
+                            Technique* tech = GetTechnique(drawable, srcBatch.material_);
+                            if (!srcBatch.geometry_ || !tech)
                                 continue;
                             
-                            shadowBatch.pass_ = tech->GetPass(PASS_SHADOW);
+                            Batch destBatch;
+                            destBatch.pass_ = tech->GetPass(PASS_SHADOW);
                             // Skip if material has no shadow pass
-                            if (!shadowBatch.pass_)
+                            if (!destBatch.pass_)
                                 continue;
                             
-                            // Fill the rest of the batch
-                            shadowBatch.camera_ = shadowCamera;
-                            shadowBatch.zone_ = zone;
-                            shadowBatch.lightQueue_ = &lightQueue;
+                            // Copy the rest of the batch
+                            destBatch.CopyFrom(srcBatch);
+                            destBatch.camera_ = shadowCamera;
+                            destBatch.zone_ = zone;
+                            destBatch.lightQueue_ = &lightQueue;
                             
-                            AddBatchToQueue(shadowQueue.shadowBatches_, shadowBatch, tech);
+                            AddBatchToQueue(shadowQueue.shadowBatches_, destBatch, tech);
                         }
                     }
                 }
@@ -874,68 +873,70 @@ void View::GetBatches()
         {
             Drawable* drawable = *i;
             Zone* zone = GetZone(drawable);
-            unsigned numBatches = drawable->GetNumBatches();
+            const Vector<SourceBatch>& batches = drawable->GetBatches();
             
             const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
             if (!drawableVertexLights.Empty())
                 drawable->LimitVertexLights();
             
-            for (unsigned j = 0; j < numBatches; ++j)
+            for (unsigned j = 0; j < batches.Size(); ++j)
             {
-                Batch baseBatch;
-                drawable->GetBatch(baseBatch, frame_, j);
+                const SourceBatch& srcBatch = batches[j];
                 
                 // Check here if the material refers to a rendertarget texture with camera(s) attached
                 // Only check this for the main view (null rendertarget)
-                if (baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
-                    CheckMaterialForAuxView(baseBatch.material_);
+                if (srcBatch.material_ && srcBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
+                    CheckMaterialForAuxView(srcBatch.material_);
                 
                 // If already has a lit base pass, skip (forward rendering only)
                 if (j < 32 && drawable->HasBasePass(j))
                     continue;
                 
-                Technique* tech = GetTechnique(drawable, baseBatch.material_);
-                if (!baseBatch.geometry_ || !tech)
+                Technique* tech = GetTechnique(drawable, srcBatch.material_);
+                if (!srcBatch.geometry_ || !tech)
                     continue;
                 
-                // Fill the rest of the batch
-                baseBatch.camera_ = camera_;
-                baseBatch.zone_ = zone;
-                baseBatch.isBase_ = true;
-                baseBatch.pass_ = 0;
-                baseBatch.lightMask_ = GetLightMask(drawable);
+                Batch destBatch;
+                
+                // Copy the rest of the batch
+                destBatch.CopyFrom(srcBatch);
+                destBatch.camera_ = camera_;
+                destBatch.zone_ = zone;
+                destBatch.isBase_ = true;
+                destBatch.pass_ = 0;
+                destBatch.lightMask_ = GetLightMask(drawable);
                 
                 // In deferred modes check for G-buffer and material passes first
                 if (renderMode_ == RENDER_PREPASS)
                 {
-                    baseBatch.pass_ = tech->GetPass(PASS_PREPASS);
-                    if (baseBatch.pass_)
+                    destBatch.pass_ = tech->GetPass(PASS_PREPASS);
+                    if (destBatch.pass_)
                     {
                         // If the opaque object has a zero lightmask, have to skip light buffer optimization
                         if (!hasZeroLightMask_ && (!(GetLightMask(drawable) & 0xff)))
                             hasZeroLightMask_ = true;
                         
                         // Allow G-buffer pass instancing only if lightmask matches zone lightmask
-                        AddBatchToQueue(gbufferQueue_, baseBatch, tech, baseBatch.lightMask_ == (zone->GetLightMask() & 0xff));
-                        baseBatch.pass_ = tech->GetPass(PASS_MATERIAL);
+                        AddBatchToQueue(gbufferQueue_, destBatch, tech, destBatch.lightMask_ == (zone->GetLightMask() & 0xff));
+                        destBatch.pass_ = tech->GetPass(PASS_MATERIAL);
                     }
                 }
                 
                 if (renderMode_ == RENDER_DEFERRED)
-                    baseBatch.pass_ = tech->GetPass(PASS_DEFERRED);
+                    destBatch.pass_ = tech->GetPass(PASS_DEFERRED);
                 
                 // Next check for forward unlit base pass
-                if (!baseBatch.pass_)
-                    baseBatch.pass_ = tech->GetPass(PASS_BASE);
+                if (!destBatch.pass_)
+                    destBatch.pass_ = tech->GetPass(PASS_BASE);
                 
-                if (baseBatch.pass_)
+                if (destBatch.pass_)
                 {
                     // Check for vertex lights (both forward unlit, light pre-pass material pass, and deferred G-buffer)
                     if (!drawableVertexLights.Empty())
                     {
                         // For a deferred opaque batch, check if the vertex lights include converted per-pixel lights, and remove
                         // them to prevent double-lighting
-                        if (renderMode_ != RENDER_FORWARD && baseBatch.pass_->GetBlendMode() == BLEND_REPLACE)
+                        if (renderMode_ != RENDER_FORWARD && destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
                         {
                             vertexLights.Clear();
                             for (unsigned i = 0; i < drawableVertexLights.Size(); ++i)
@@ -960,42 +961,42 @@ void View::GetBatches()
                                 i->second_.vertexLights_ = vertexLights;
                             }
                             
-                            baseBatch.lightQueue_ = &(i->second_);
+                            destBatch.lightQueue_ = &(i->second_);
                         }
                     }
                     
                     // Check whether batch is opaque or transparent
-                    if (baseBatch.pass_->GetBlendMode() == BLEND_REPLACE)
+                    if (destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
                     {
-                        if (baseBatch.pass_->GetType() != PASS_DEFERRED)
-                            AddBatchToQueue(baseQueue_, baseBatch, tech);
+                        if (destBatch.pass_->GetType() != PASS_DEFERRED)
+                            AddBatchToQueue(baseQueue_, destBatch, tech);
                         else
                         {
                             // Allow G-buffer pass instancing only if lightmask matches zone lightmask
-                            AddBatchToQueue(gbufferQueue_, baseBatch, tech, baseBatch.lightMask_ == (baseBatch.zone_->GetLightMask() & 0xff));
+                            AddBatchToQueue(gbufferQueue_, destBatch, tech, destBatch.lightMask_ == (destBatch.zone_->GetLightMask() & 0xff));
                         }
                     }
                     else
                     {
                         // Transparent batches can not be instanced
-                        AddBatchToQueue(alphaQueue_, baseBatch, tech, false);
+                        AddBatchToQueue(alphaQueue_, destBatch, tech, false);
                     }
                     continue;
                 }
                 
                 // If no pass found so far, finally check for pre-alpha / post-alpha custom passes
-                baseBatch.pass_ = tech->GetPass(PASS_PREALPHA);
-                if (baseBatch.pass_)
+                destBatch.pass_ = tech->GetPass(PASS_PREALPHA);
+                if (destBatch.pass_)
                 {
-                    AddBatchToQueue(preAlphaQueue_, baseBatch, tech);
+                    AddBatchToQueue(preAlphaQueue_, destBatch, tech);
                     continue;
                 }
                 
-                baseBatch.pass_ = tech->GetPass(PASS_POSTALPHA);
-                if (baseBatch.pass_)
+                destBatch.pass_ = tech->GetPass(PASS_POSTALPHA);
+                if (destBatch.pass_)
                 {
                     // Post-alpha pass is treated similarly as alpha, and is not instanced
-                    AddBatchToQueue(postAlphaQueue_, baseBatch, tech, false);
+                    AddBatchToQueue(postAlphaQueue_, destBatch, tech, false);
                     continue;
                 }
             }
@@ -1099,20 +1100,19 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
 {
     Light* light = lightQueue.light_;
     Zone* zone = GetZone(drawable);
+    const Vector<SourceBatch>& batches = drawable->GetBatches();
     
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
     bool allowLitBase = light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
-    unsigned numBatches = drawable->GetNumBatches();
     
-    for (unsigned i = 0; i < numBatches; ++i)
+    for (unsigned i = 0; i < batches.Size(); ++i)
     {
-        Batch litBatch;
-        drawable->GetBatch(litBatch, frame_, i);
+        const SourceBatch& srcBatch = batches[i];
         
-        Technique* tech = GetTechnique(drawable, litBatch.material_);
-        if (!litBatch.geometry_ || !tech)
+        Technique* tech = GetTechnique(drawable, srcBatch.material_);
+        if (!srcBatch.geometry_ || !tech)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
@@ -1120,39 +1120,42 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             tech->HasPass(PASS_DEFERRED)))
             continue;
         
+        Batch destBatch;
+        
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
         if (i < 32 && allowLitBase)
         {
-            litBatch.pass_ = tech->GetPass(PASS_LITBASE);
-            if (litBatch.pass_)
+            destBatch.pass_ = tech->GetPass(PASS_LITBASE);
+            if (destBatch.pass_)
             {
-                litBatch.isBase_ = true;
+                destBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
             else
-                litBatch.pass_ = tech->GetPass(PASS_LIGHT);
+                destBatch.pass_ = tech->GetPass(PASS_LIGHT);
         }
         else
-            litBatch.pass_ = tech->GetPass(PASS_LIGHT);
+            destBatch.pass_ = tech->GetPass(PASS_LIGHT);
         
         // Skip if material does not receive light at all
-        if (!litBatch.pass_)
+        if (!destBatch.pass_)
             continue;
         
         // Fill the rest of the batch
-        litBatch.camera_ = camera_;
-        litBatch.lightQueue_ = &lightQueue;
-        litBatch.zone_ = zone;
+        destBatch.CopyFrom(srcBatch);
+        destBatch.camera_ = camera_;
+        destBatch.lightQueue_ = &lightQueue;
+        destBatch.zone_ = zone;
         
         // Check from the ambient pass whether the object is opaque or transparent
         Pass* ambientPass = tech->GetPass(PASS_BASE);
         if (!ambientPass || ambientPass->GetBlendMode() == BLEND_REPLACE)
-            AddBatchToQueue(lightQueue.litBatches_, litBatch, tech);
+            AddBatchToQueue(lightQueue.litBatches_, destBatch, tech);
         else
         {
             // Transparent batches can not be instanced
-            AddBatchToQueue(alphaQueue_, litBatch, tech, false, allowTransparentShadows);
+            AddBatchToQueue(alphaQueue_, destBatch, tech, false, allowTransparentShadows);
         }
     }
 }
@@ -1644,7 +1647,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         bool erase = false;
         
         if (!occluder->IsInView(frame_, false))
-            occluder->UpdateDistance(frame_);
+            occluder->UpdateBatches(frame_);
         
         // Check occluder's draw distance (in main camera view)
         float maxDistance = occluder->GetDrawDistance();
@@ -1848,10 +1851,10 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
         
-        // Note: as lights are processed threaded, it is possible a drawable's UpdateDistance() function is called several
+        // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
         // times. However, this should not cause problems as no scene modification happens at this point.
         if (!drawable->IsInView(frame_, false))
-            drawable->UpdateDistance(frame_);
+            drawable->UpdateBatches(frame_);
         
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
@@ -2259,10 +2262,13 @@ unsigned long long View::GetVertexLightQueueHash(const PODVector<Light*>& vertex
     return hash;
 }
 
-Technique* View::GetTechnique(Drawable* drawable, Material*& material)
+Technique* View::GetTechnique(Drawable* drawable, Material* material)
 {
     if (!material)
-        material = renderer_->GetDefaultMaterial();
+    {
+        const Vector<TechniqueEntry>& techniques = renderer_->GetDefaultMaterial()->GetTechniques();
+        return techniques.Size() ? techniques[0].technique_ : (Technique*)0;
+    }
     
     const Vector<TechniqueEntry>& techniques = material->GetTechniques();
     // If only one technique, no choice
@@ -2336,6 +2342,9 @@ void View::CheckMaterialForAuxView(Material* material)
 
 void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
 {
+    if (!batch.material_)
+        batch.material_ = renderer_->GetDefaultMaterial();
+    
     // Convert to instanced if possible
     if (allowInstancing && batch.geometryType_ == GEOM_STATIC && !batch.shaderData_ && !batch.overrideView_)
         batch.geometryType_ = GEOM_INSTANCED;

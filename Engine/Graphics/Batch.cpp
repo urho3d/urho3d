@@ -23,11 +23,9 @@
 
 #include "Precompiled.h"
 #include "Camera.h"
-#include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Light.h"
-#include "Material.h"
 #include "Renderer.h"
 #include "Profiler.h"
 #include "ShaderVariation.h"

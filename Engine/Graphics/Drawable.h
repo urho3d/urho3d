@@ -25,7 +25,9 @@
 
 #include "BoundingBox.h"
 #include "Component.h"
+#include "Geometry.h"
 #include "GraphicsDefs.h"
+#include "Material.h"
 #include "Node.h"
 
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
@@ -39,7 +41,6 @@ static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 static const int DRAWABLES_PER_WORK_ITEM = 16;
 static const int MAX_VERTEX_LIGHTS = 6;
 
-struct Batch;
 class Camera;
 class DebugRenderer;
 class Geometry;
@@ -73,6 +74,38 @@ struct FrameInfo
     Camera* camera_;
 };
 
+/// Source data for a 3D geometry draw call.
+struct SourceBatch
+{
+    /// Construct with defaults.
+    SourceBatch() :
+        distance_(0.0f),
+        worldTransform_(&Matrix3x4::IDENTITY),
+        shaderData_(0),
+        shaderDataSize_(0),
+        geometryType_(GEOM_STATIC),
+        overrideView_(false)
+    {
+    }
+    
+    /// Distance from camera.
+    float distance_;
+    /// Geometry.
+    SharedPtr<Geometry> geometry_;
+    /// Material.
+    SharedPtr<Material> material_;
+    /// Model world transform.
+    const Matrix3x4* worldTransform_;
+    /// Vertex shader data.
+    const float* shaderData_;
+    /// Vertex shader data size in floats.
+    unsigned shaderDataSize_;
+    /// Geometry type.
+    GeometryType geometryType_;
+    /// Override view transform flag.
+    bool overrideView_;
+};
+
 /// Base class for visible components.
 class Drawable : public Component
 {
@@ -94,16 +127,12 @@ public:
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
-    /// Calculate distance and LOD level for rendering.May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateDistance(const FrameInfo& frame);
+    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
-    /// Return number of rendering batches.
-    virtual unsigned GetNumBatches() { return 0; }
-    /// Fill rendering batch with distance, geometry, material and world transform.
-    virtual void GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex) {}
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
@@ -166,6 +195,8 @@ public:
     bool IsOccluder() const { return occluder_; }
     /// Return occludee flag.
     bool IsOccludee() const { return occludee_; }
+    /// Return draw call source data.
+    const Vector<SourceBatch>& GetBatches() const { return batches_; }
     
     /// %Set new zone.
     void SetZone(Zone* zone, bool temporary = false);
@@ -232,6 +263,8 @@ protected:
     
     /// World bounding box.
     BoundingBox worldBoundingBox_;
+    /// Draw call source data.
+    Vector<SourceBatch> batches_;
     /// Drawable flags.
     unsigned char drawableFlags_;
     /// Bounding box dirty flag.
