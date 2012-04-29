@@ -315,7 +315,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {
     Scene* scene = viewport->GetScene();
     Camera* camera = viewport->GetCamera();
-    if (!scene || !camera)
+    if (!scene || !camera || !camera->GetNode())
         return false;
     
     // If scene is loading asynchronously, it is incomplete and should not be rendered
@@ -329,6 +329,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     renderMode_ = renderer_->GetRenderMode();
     octree_ = octree;
     camera_ = camera;
+    cameraNode_ = camera->GetNode();
     renderTarget_ = renderTarget;
     
     // Get active post-processing effects on the viewport
@@ -522,7 +523,7 @@ void View::GetDrawables()
     
     highestZonePriority_ = M_MIN_INT;
     int bestPriority = M_MIN_INT;
-    Vector3 cameraPos = camera_->GetWorldPosition();
+    Vector3 cameraPos = cameraNode_->GetWorldPosition();
     
     // Get default zone first in case we do not have zones defined
     Zone* defaultZone = renderer_->GetDefaultZone();
@@ -554,7 +555,7 @@ void View::GetDrawables()
     cameraZoneOverride_ = cameraZone_->GetOverride();
     if (!cameraZoneOverride_)
     {
-        Vector3 farClipPos = cameraPos + camera_->GetNode()->GetWorldDirection() * Vector3(0.0f, 0.0f, camera_->GetFarClip());
+        Vector3 farClipPos = cameraPos + cameraNode_->GetWorldDirection() * Vector3(0.0f, 0.0f, camera_->GetFarClip());
         bestPriority = M_MIN_INT;
         
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
@@ -660,7 +661,7 @@ void View::GetDrawables()
     for (unsigned i = 0; i < lights_.Size(); ++i)
     {
         Light* light = lights_[i];
-        light->SetIntensitySortValue(camera_->GetDistance(light->GetWorldPosition()));
+        light->SetIntensitySortValue(camera_->GetDistance(light->GetNode()->GetWorldPosition()));
         light->SetLightQueue(0);
     }
     
@@ -1633,7 +1634,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
     float occluderSizeThreshold_ = renderer_->GetOccluderSizeThreshold();
     float halfViewSize = camera->GetHalfViewSize();
     float invOrthoSize = 1.0f / camera->GetOrthoSize();
-    Vector3 cameraPos = camera->GetWorldPosition();
+    Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
     
     for (PODVector<Drawable*>::Iterator i = occluders.Begin(); i != occluders.End();)
     {
@@ -1742,7 +1743,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
         
     case LIGHT_POINT:
         {
-            SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetWorldPosition(), light->GetRange()),
+            SphereOctreeQuery octreeQuery(tempDrawables, Sphere(light->GetNode()->GetWorldPosition(), light->GetRange()),
                 DRAWABLE_GEOMETRY, camera_->GetViewMask());
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
@@ -1989,8 +1990,9 @@ void View::SetupShadowCameras(LightQueryResult& query)
         Camera* shadowCamera = renderer_->GetShadowCamera();
         query.shadowCameras_[0] = shadowCamera;
         Node* cameraNode = shadowCamera->GetNode();
+        Node* lightNode = light->GetNode();
         
-        cameraNode->SetTransform(light->GetWorldPosition(), light->GetWorldRotation());
+        cameraNode->SetTransform(lightNode->GetWorldPosition(), lightNode->GetWorldRotation());
         shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
         shadowCamera->SetFarClip(light->GetRange());
         shadowCamera->SetFov(light->GetFov());
@@ -2008,7 +2010,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
             Node* cameraNode = shadowCamera->GetNode();
             
             // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
-            cameraNode->SetPosition(light->GetWorldPosition());
+            cameraNode->SetPosition(light->GetNode()->GetWorldPosition());
             cameraNode->SetDirection(directions[i]);
             shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
             shadowCamera->SetFarClip(light->GetRange());
@@ -2024,14 +2026,15 @@ void View::SetupShadowCameras(LightQueryResult& query)
 
 void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit)
 {
-    Node* cameraNode = shadowCamera->GetNode();
+    Node* shadowCameraNode = shadowCamera->GetNode();
+    Node* lightNode = light->GetNode();
     float extrusionDistance = camera_->GetFarClip();
     const FocusParameters& parameters = light->GetShadowFocus();
     
     // Calculate initial position & rotation
-    Vector3 lightWorldDirection = light->GetWorldRotation() * Vector3::FORWARD;
-    Vector3 pos = camera_->GetWorldPosition() - extrusionDistance * lightWorldDirection;
-    cameraNode->SetTransform(pos, light->GetWorldRotation());
+    Vector3 lightWorldDirection = lightNode->GetWorldRotation() * Vector3::FORWARD;
+    Vector3 pos = cameraNode_->GetWorldPosition() - extrusionDistance * lightWorldDirection;
+    shadowCameraNode->SetTransform(pos, lightNode->GetWorldRotation());
     
     // Calculate main camera shadowed frustum in light's view space
     farSplit = Min(farSplit, camera_->GetFarClip());
@@ -2147,7 +2150,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
 void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, const IntRect& shadowViewport,
     const BoundingBox& viewBox)
 {
-    Node* cameraNode = shadowCamera->GetNode();
+    Node* shadowCameraNode = shadowCamera->GetNode();
     const FocusParameters& parameters = light->GetShadowFocus();
     float shadowMapWidth = (float)(shadowViewport.right_ - shadowViewport.left_);
     
@@ -2179,20 +2182,20 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     shadowCamera->SetOrthoSize(viewSize);
     
     // Center shadow camera to the view space bounding box
-    Vector3 pos(shadowCamera->GetWorldPosition());
-    Quaternion rot(shadowCamera->GetWorldRotation());
+    Vector3 pos(shadowCameraNode->GetWorldPosition());
+    Quaternion rot(shadowCameraNode->GetWorldRotation());
     Vector3 adjust(center.x_, center.y_, 0.0f);
-    cameraNode->Translate(rot * adjust);
+    shadowCameraNode->Translate(rot * adjust);
     
     // If the shadow map viewport is known, snap to whole texels
     if (shadowMapWidth > 0.0f)
     {
-        Vector3 viewPos(rot.Inverse() * cameraNode->GetWorldPosition());
+        Vector3 viewPos(rot.Inverse() * shadowCameraNode->GetWorldPosition());
         // Take into account that shadow map border will not be used
         float invActualSize = 1.0f / (shadowMapWidth - 2.0f);
         Vector2 texelSize(viewSize.x_ * invActualSize, viewSize.y_ * invActualSize);
         Vector3 snap(-fmodf(viewPos.x_, texelSize.x_), -fmodf(viewPos.y_, texelSize.y_), 0.0f);
-        cameraNode->Translate(rot * snap);
+        shadowCameraNode->Translate(rot * snap);
     }
 }
 
@@ -2407,6 +2410,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
 {
     Light* light = batch.lightQueue_->light_;
     LightType type = light->GetLightType();
+    Vector3 cameraPos = cameraNode_->GetWorldPosition();
     float lightDist;
     
     // Use replace blend mode for the first pre-pass light volume, and additive for the rest
@@ -2417,9 +2421,9 @@ void View::SetupLightVolumeBatch(Batch& batch)
     if (type != LIGHT_DIRECTIONAL)
     {
         if (type == LIGHT_POINT)
-            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).Distance(camera_->GetWorldPosition());
+            lightDist = Sphere(light->GetNode()->GetWorldPosition(), light->GetRange() * 1.25f).Distance(cameraPos);
         else
-            lightDist = light->GetFrustum().Distance(camera_->GetWorldPosition());
+            lightDist = light->GetFrustum().Distance(cameraPos);
         
         // Draw front faces if not inside light volume
         if (lightDist < camera_->GetNearClip() * 2.0f)

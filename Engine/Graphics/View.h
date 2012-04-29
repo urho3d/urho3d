@@ -185,6 +185,8 @@ private:
     Octree* octree_;
     /// Camera to use.
     Camera* camera_;
+    /// Camera's scene node.
+    Node* cameraNode_;
     /// Zone the camera is inside, or default zone if not assigned.
     Zone* cameraZone_;
     /// Zone at far clip plane.

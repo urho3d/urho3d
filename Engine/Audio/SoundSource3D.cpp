@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Audio.h"
 #include "Context.h"
+#include "Node.h"
 #include "Sound.h"
 #include "SoundSource3D.h"
 #include "XMLElement.h"
@@ -95,9 +96,9 @@ void SoundSource3D::CalculateAttenuation()
         return;
     
     float interval = farDistance_ - nearDistance_;
-    if (interval > 0.0f)
+    if (interval > 0.0f && node_)
     {
-        Vector3 relativePos(audio_->GetListenerRotation().Inverse() * (GetWorldPosition() - audio_->GetListenerPosition()));
+        Vector3 relativePos(audio_->GetListenerRotation().Inverse() * (node_->GetWorldPosition() - audio_->GetListenerPosition()));
         float distance = Clamp(relativePos.Length() - nearDistance_, 0.0f, interval);
         float attenuation = powf(1.0f - distance / interval, rolloffFactor_);
         float panning = relativePos.Normalized().x_;

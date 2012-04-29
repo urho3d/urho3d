@@ -85,7 +85,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         
     case RAY_OBB:
         {
-            Matrix3x4 inverse(GetWorldTransform().Inverse());
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(boundingBox_);
             if (distance <= query.maxDistance_)
@@ -103,7 +103,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
     case RAY_TRIANGLE:
         {
             // Do a pretest using the OBB
-            Matrix3x4 inverse(GetWorldTransform().Inverse());
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(boundingBox_);
             if (distance <= query.maxDistance_)
@@ -249,7 +249,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned indexCount = geom->GetIndexCount();
         
         // Draw and check for running out of triangles
-        if (!buffer->Draw(GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
+        if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
             success = false;
         
         if (!success)
@@ -361,7 +361,7 @@ const ResourceRefList& StaticModel::GetMaterialsAttr() const
 
 void StaticModel::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
+    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
 void StaticModel::ResetLodLevels()

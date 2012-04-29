@@ -553,6 +553,7 @@ static void RegisterZone(asIScriptEngine* engine)
     RegisterDrawable<Zone>(engine, "Zone");
     engine->RegisterObjectMethod("Zone", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Zone, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const BoundingBox& get_boundingBox() const", asMETHOD(Zone, GetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Zone, GetInverseWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_ambientColor(const Color&in)", asMETHOD(Zone, SetAmbientColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_ambientColor() const", asMETHOD(Zone, GetAmbientColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_ambientStartColor()", asMETHOD(Zone, GetAmbientStartColor), asCALL_THISCALL);

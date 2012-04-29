@@ -94,7 +94,7 @@ void BillboardSet::UpdateDistance(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case
     const Vector3& worldPos = node_->GetWorldPosition();
-    Vector3 offset = (worldPos - frame.camera_->GetWorldPosition());
+    Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     if (offset != previousOffset_)
     {
         previousOffset_ = offset;

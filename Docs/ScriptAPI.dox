@@ -1919,6 +1919,7 @@ Properties:<br>
 - uint maxLights
 - BoundingBox& worldBoundingBox (readonly)
 - BoundingBox& boundingBox
+- Matrix3x4& inverseWorldTransform (readonly)
 - Color& ambientColor
 - Color& ambientStartColor (readonly)
 - Color& ambientEndColor (readonly)
@@ -2309,6 +2310,7 @@ Properties:<br>
 - bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
+- bool compressedTextureSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)

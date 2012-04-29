@@ -814,7 +814,7 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
     if (!skeleton_.GetNumBones())
-        worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
+        worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
     else
     {
         // If has bones, update world bounding box based on them

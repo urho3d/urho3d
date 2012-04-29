@@ -203,15 +203,16 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
     
+    const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
         farClip = nearClip;
     
     if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, GetWorldTransform());
+        ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
     else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, GetWorldTransform());
+        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
     
     return ret;
 }
@@ -252,7 +253,7 @@ Ray Camera::GetScreenRay(float x, float y)
     // If projection is invalid, just return a ray pointing forward
     if (!IsProjectionValid())
     {
-        ret.origin_ = GetWorldPosition();
+        ret.origin_ = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
         ret.direction_ = GetForwardVector();
         return ret;
     }
@@ -274,10 +275,11 @@ const Frustum& Camera::GetFrustum() const
 {
     if (frustumDirty_)
     {
+        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
         if (!orthographic_)
-            frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
+            frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         else
-            frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, GetWorldTransform());
+            frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         
         frustumDirty_ = false;
     }
@@ -406,17 +408,20 @@ float Camera::GetHalfViewSize() const
 
 Vector3 Camera::GetForwardVector()
 {
-    return GetWorldTransform().RotationMatrix() * Vector3::FORWARD;
+    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    return worldRotation * Vector3::FORWARD;
 }
 
 Vector3 Camera::GetRightVector()
 {
-    return GetWorldTransform().RotationMatrix() * Vector3::RIGHT;
+    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    return worldRotation * Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector()
 {
-    return GetWorldTransform().RotationMatrix() * Vector3::UP;
+    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    return worldRotation * Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos) const
@@ -462,7 +467,8 @@ const Matrix3x4& Camera::GetInverseWorldTransform() const
 {
     if (inverseWorldDirty_)
     {
-        inverseWorld_ = GetWorldTransform().Inverse();
+        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+        inverseWorld_ = worldTransform.Inverse();
         inverseWorldDirty_ = false;
     }
     

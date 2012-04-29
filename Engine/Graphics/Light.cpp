@@ -184,7 +184,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     case RAY_OBB:
         if (lightType_ != LIGHT_DIRECTIONAL)
         {
-            Matrix3x4 inverse(GetWorldTransform().Inverse());
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
             float distance = localRay.HitDistance(GetWorldBoundingBox());
             if (distance <= query.maxDistance_)
@@ -256,7 +256,7 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             break;
             
         case LIGHT_POINT:
-            debug->AddSphere(Sphere(GetWorldPosition(), range_), GetColor(), depthTest);
+            debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), GetColor(), depthTest);
             break;
         }
     }
@@ -375,7 +375,7 @@ void Light::SetShapeTexture(Texture* texture)
 
 Frustum Light::GetFrustum() const
 {
-    const Matrix3x4& transform = GetWorldTransform();
+    const Matrix3x4& transform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     Matrix3x4 frustumTransform(transform.Translation(), transform.Rotation(), 1.0f);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);

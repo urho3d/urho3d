@@ -41,14 +41,15 @@ OBJECTTYPESTATIC(Zone);
 
 Zone::Zone(Context* context) :
     Drawable(context),
+    inverseWorldDirty_(true),
+    override_(false),
+    ambientGradient_(false),
     boundingBox_(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX),
     ambientColor_(DEFAULT_AMBIENT_COLOR),
     fogColor_(DEFAULT_FOG_COLOR),
     fogStart_(DEFAULT_FOG_START),
     fogEnd_(DEFAULT_FOG_END),
-    priority_(0),
-    override_(false),
-    ambientGradient_(false)
+    priority_(0)
 {
     drawableFlags_ =  DRAWABLE_ZONE;
 }
@@ -95,7 +96,7 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug)
-        debug->AddBoundingBox(boundingBox_, GetWorldTransform(), Color::GREEN, depthTest);
+        debug->AddBoundingBox(boundingBox_, node_->GetWorldTransform(), Color::GREEN, depthTest);
 }
 
 void Zone::SetBoundingBox(const BoundingBox& box)
@@ -153,6 +154,18 @@ void Zone::SetAmbientGradient(bool enable)
     MarkNetworkUpdate();
 }
 
+const Matrix3x4& Zone::GetInverseWorldTransform() const
+{
+    if (inverseWorldDirty_ && node_)
+    {
+        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+        inverseWorld_ = worldTransform.Inverse();
+        inverseWorldDirty_ = false;
+    }
+    
+    return inverseWorld_;
+}
+
 const Color& Zone::GetAmbientStartColor()
 {
     if (!ambientGradient_)
@@ -175,11 +188,10 @@ const Color& Zone::GetAmbientEndColor()
     return ambientEndColor_;
 }
 
-bool Zone::IsInside(const Vector3& point)
+bool Zone::IsInside(const Vector3& point) const
 {
     // Use an oriented bounding box test
-    Matrix3x4 inverse(GetWorldTransform().Inverse());
-    Vector3 localPoint(inverse * point);
+    Vector3 localPoint(GetInverseWorldTransform() * point);
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
 }
 
@@ -213,11 +225,12 @@ void Zone::OnMarkedDirty(Node* node)
     lastWorldBoundingBox_ = GetWorldBoundingBox();
     lastAmbientStartZone_.Reset();
     lastAmbientEndZone_.Reset();
+    inverseWorldDirty_ = true;
 }
 
 void Zone::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
+    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
 void Zone::UpdateAmbientGradient()
@@ -230,7 +243,7 @@ void Zone::UpdateAmbientGradient()
     
     if (octant_)
     {
-        const Matrix3x4& worldTransform = GetWorldTransform();
+        const Matrix3x4& worldTransform = node_->GetWorldTransform();
         Vector3 center = boundingBox_.Center();
         Vector3 minZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.min_.z_);
         Vector3 maxZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.max_.z_);

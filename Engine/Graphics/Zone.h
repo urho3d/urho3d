@@ -63,6 +63,8 @@ public:
     
     /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return inverse world transform.
+    const Matrix3x4& GetInverseWorldTransform() const;
     /// Return zone's own ambient color, disregarding gradient mode.
     const Color& GetAmbientColor() const { return ambientColor_; }
     /// Return ambient start color.
@@ -83,7 +85,7 @@ public:
     bool GetAmbientGradient() const { return ambientGradient_; }
     
     /// Check whether a point is inside.
-    virtual bool IsInside(const Vector3& point);
+    bool IsInside(const Vector3& point) const;
     
 protected:
     /// Transform has changed. Clear cached zone of any contained drawables.
@@ -93,10 +95,14 @@ protected:
     /// Recalculate the ambient gradient colors from neighbor zones.
     void UpdateAmbientGradient();
     
-    /// Last zone used for ambient gradient start color.
-    WeakPtr<Zone> lastAmbientStartZone_;
-    /// Last zone used for ambient gradient end color.
-    WeakPtr<Zone> lastAmbientEndZone_;
+    /// Cached inverse world transform matrix.
+    mutable Matrix3x4 inverseWorld_;
+    /// Inverse transform dirty flag.
+    mutable bool inverseWorldDirty_;
+    /// Override mode flag.
+    bool override_;
+    /// Ambient gradient mode flag.
+    bool ambientGradient_;
     /// Bounding box.
     BoundingBox boundingBox_;
     /// Last world-space bounding box.
@@ -115,8 +121,8 @@ protected:
     float fogEnd_;
     /// Zone priority.
     int priority_;
-    /// Override mode flag.
-    bool override_;
-    /// Ambient gradient mode flag.
-    bool ambientGradient_;
+    /// Last zone used for ambient gradient start color.
+    WeakPtr<Zone> lastAmbientStartZone_;
+    /// Last zone used for ambient gradient end color.
+    WeakPtr<Zone> lastAmbientEndZone_;
 };

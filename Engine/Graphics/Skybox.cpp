@@ -62,8 +62,8 @@ void Skybox::GetBatch(Batch& batch, const FrameInfo& frame, unsigned batchIndex)
     StaticModelBatch& srcBatch = batches_[batchIndex];
     
     // Follow only the camera rotation, not position
-    Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().Inverse(), Vector3::ONE);
-    customWorldTransform_ = customView * GetWorldTransform();
+    Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
+    customWorldTransform_ = customView * node_->GetWorldTransform();
     
     batch.distance_ = 0.0f;
     batch.geometry_ = srcBatch.geometry_;

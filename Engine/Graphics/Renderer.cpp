@@ -769,7 +769,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         if (type == LIGHT_POINT)
         {
             // Calculate point light pixel size from the projection of its diagonal
-            Vector3 center = view * light->GetWorldPosition();
+            Vector3 center = view * light->GetNode()->GetWorldPosition();
             float extent = 0.58f * light->GetRange();
             lightBox.Define(center + Vector3(extent, extent, extent), center - Vector3(extent, extent, extent));
         }
@@ -1251,12 +1251,13 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         Geometry* geometry = GetLightGeometry(light);
         const Matrix3x4& view = camera->GetInverseWorldTransform();
         const Matrix4& projection = camera->GetProjection();
+        Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
         float lightDist;
         
         if (type == LIGHT_POINT)
-            lightDist = Sphere(light->GetWorldPosition(), light->GetRange() * 1.25f).Distance(camera->GetWorldPosition());
+            lightDist = Sphere(light->GetNode()->GetWorldPosition(), light->GetRange() * 1.25f).Distance(cameraPos);
         else
-            lightDist = light->GetFrustum().Distance(camera->GetWorldPosition());
+            lightDist = light->GetFrustum().Distance(cameraPos);
         
         // If the camera is actually inside the light volume, do not draw to stencil as it would waste fillrate
         if (lightDist < M_EPSILON)
