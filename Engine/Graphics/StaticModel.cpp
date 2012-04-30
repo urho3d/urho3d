@@ -25,6 +25,7 @@
 #include "Batch.h"
 #include "Camera.h"
 #include "Context.h"
+#include "Geometry.h"
 #include "Log.h"
 #include "Model.h"
 #include "OcclusionBuffer.h"

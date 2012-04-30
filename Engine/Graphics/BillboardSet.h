@@ -26,6 +26,7 @@
 #include "Color.h"
 #include "Drawable.h"
 #include "Rect.h"
+#include "VectorBuffer.h"
 
 class IndexBuffer;
 class Graphics;
@@ -142,6 +143,8 @@ private:
     /// Rewrite billboard vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
     
+    /// Geometry.
+    SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Index buffer.

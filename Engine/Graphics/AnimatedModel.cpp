@@ -30,6 +30,7 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "DrawableEvents.h"
+#include "Geometry.h"
 #include "Graphics.h"
 #include "IndexBuffer.h"
 #include "Log.h"

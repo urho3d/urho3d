@@ -26,6 +26,7 @@
 #include "BillboardSet.h"
 #include "Camera.h"
 #include "Context.h"
+#include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "IndexBuffer.h"
@@ -50,6 +51,7 @@ OBJECTTYPESTATIC(BillboardSet);
 
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context),
+    geometry_(new Geometry(context)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
@@ -64,7 +66,7 @@ BillboardSet::BillboardSet(Context* context) :
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
     batches_.Resize(1);
-    batches_[0].geometry_ = new Geometry(context_);
+    batches_[0].geometry_ = geometry_;
     batches_[0].geometryType_ = GEOM_BILLBOARD;
 }
 

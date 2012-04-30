@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Camera.h"
+#include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Light.h"

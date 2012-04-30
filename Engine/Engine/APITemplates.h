@@ -28,6 +28,7 @@
 #include "Context.h"
 #include "Drawable.h"
 #include "File.h"
+#include "Node.h"
 #include "Renderer.h"
 #include "Resource.h"
 #include "Script.h"

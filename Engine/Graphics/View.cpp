@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "DebugRenderer.h"
+#include "Geometry.h"
 #include "Graphics.h"
 #include "Light.h"
 #include "Log.h"

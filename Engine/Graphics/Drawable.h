@@ -25,10 +25,8 @@
 
 #include "BoundingBox.h"
 #include "Component.h"
-#include "Geometry.h"
 #include "GraphicsDefs.h"
 #include "Material.h"
-#include "Node.h"
 
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
@@ -45,7 +43,6 @@ class Camera;
 class DebugRenderer;
 class Geometry;
 class Light;
-class Material;
 class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
@@ -80,6 +77,7 @@ struct SourceBatch
     /// Construct with defaults.
     SourceBatch() :
         distance_(0.0f),
+        geometry_(0),
         worldTransform_(&Matrix3x4::IDENTITY),
         shaderData_(0),
         shaderDataSize_(0),
@@ -91,7 +89,7 @@ struct SourceBatch
     /// Distance from camera.
     float distance_;
     /// Geometry.
-    SharedPtr<Geometry> geometry_;
+    Geometry* geometry_;
     /// Material.
     SharedPtr<Material> material_;
     /// %Object's world transform.
