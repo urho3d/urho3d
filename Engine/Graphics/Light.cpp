@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Light.h"
+#include "Node.h"
 #include "OctreeQuery.h"
 #include "Profiler.h"
 #include "ResourceCache.h"

@@ -27,6 +27,7 @@
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Light.h"
+#include "Node.h"
 #include "Renderer.h"
 #include "Profiler.h"
 #include "ShaderVariation.h"

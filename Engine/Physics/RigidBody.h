@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include "Node.h"
+#include "Component.h"
+#include "VectorBuffer.h"
 
 #include <LinearMath/btMotionState.h>
 

@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Node.h"
 #include "Octree.h"
 #include "XMLElement.h"
 #include "Zone.h"

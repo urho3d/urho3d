@@ -25,7 +25,6 @@
 
 #include "Frustum.h"
 #include "Component.h"
-#include "Node.h"
 #include "Ray.h"
 
 static const unsigned VO_NONE = 0x0;

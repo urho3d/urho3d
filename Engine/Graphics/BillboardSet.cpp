@@ -31,6 +31,7 @@
 #include "GraphicsImpl.h"
 #include "IndexBuffer.h"
 #include "MemoryBuffer.h"
+#include "Node.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Sort.h"

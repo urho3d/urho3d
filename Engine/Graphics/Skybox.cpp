@@ -25,6 +25,7 @@
 #include "Batch.h"
 #include "Camera.h"
 #include "Context.h"
+#include "Node.h"
 #include "Skybox.h"
 
 #include "DebugNew.h"

@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Drawable.h"
+#include "Node.h"
 
 #include "DebugNew.h"
 
