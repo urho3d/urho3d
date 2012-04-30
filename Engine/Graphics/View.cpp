@@ -781,14 +781,13 @@ void View::GetBatches()
                             if (!srcBatch.geometry_ || !tech)
                                 continue;
                             
-                            Batch destBatch;
-                            destBatch.pass_ = tech->GetPass(PASS_SHADOW);
+                            Pass* pass = tech->GetPass(PASS_SHADOW);
                             // Skip if material has no shadow pass
-                            if (!destBatch.pass_)
+                            if (!pass)
                                 continue;
                             
-                            // Copy the rest of the batch
-                            destBatch.CopyFrom(srcBatch);
+                            Batch destBatch(srcBatch);
+                            destBatch.pass_ = pass;
                             destBatch.camera_ = shadowCamera;
                             destBatch.zone_ = zone;
                             destBatch.lightQueue_ = &lightQueue;
@@ -896,10 +895,7 @@ void View::GetBatches()
                 if (!srcBatch.geometry_ || !tech)
                     continue;
                 
-                Batch destBatch;
-                
-                // Copy the rest of the batch
-                destBatch.CopyFrom(srcBatch);
+                Batch destBatch(srcBatch);
                 destBatch.camera_ = camera_;
                 destBatch.zone_ = zone;
                 destBatch.isBase_ = true;
@@ -1120,7 +1116,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             tech->HasPass(PASS_DEFERRED)))
             continue;
         
-        Batch destBatch;
+        Batch destBatch(srcBatch);
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
@@ -1142,8 +1138,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         if (!destBatch.pass_)
             continue;
         
-        // Fill the rest of the batch
-        destBatch.CopyFrom(srcBatch);
         destBatch.camera_ = camera_;
         destBatch.lightQueue_ = &lightQueue;
         destBatch.zone_ = zone;

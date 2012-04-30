@@ -94,13 +94,13 @@ struct SourceBatch
     SharedPtr<Geometry> geometry_;
     /// Material.
     SharedPtr<Material> material_;
-    /// Model world transform.
+    /// %Object's world transform.
     const Matrix3x4* worldTransform_;
     /// Vertex shader data.
     const float* shaderData_;
     /// Vertex shader data size in floats.
     unsigned shaderDataSize_;
-    /// Geometry type.
+    /// %Geometry type.
     GeometryType geometryType_;
     /// Override view transform flag.
     bool overrideView_;
@@ -127,11 +127,11 @@ public:
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
-    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
-    /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
+    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }

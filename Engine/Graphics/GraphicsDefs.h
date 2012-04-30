@@ -41,7 +41,7 @@ enum PrimitiveType
     LINE_LIST
 };
 
-/// Geometry type.
+/// %Geometry type.
 enum GeometryType
 {
     GEOM_STATIC = 0,

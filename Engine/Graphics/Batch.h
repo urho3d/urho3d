@@ -55,17 +55,19 @@ struct Batch
     {
     }
     
-    /// Assign from a drawable's source data.
-    void CopyFrom(const SourceBatch& rhs)
+    /// Construct from a drawable's source batch.
+    Batch(const SourceBatch& rhs) :
+        distance_(rhs.distance_),
+        geometry_(rhs.geometry_),
+        material_(rhs.material_),
+        worldTransform_(rhs.worldTransform_),
+        lightQueue_(0),
+        shaderData_(rhs.shaderData_),
+        shaderDataSize_(rhs.shaderDataSize_),
+        geometryType_(rhs.geometryType_),
+        overrideView_(rhs.overrideView_),
+        isBase_(false)
     {
-        distance_ = rhs.distance_;
-        geometry_ = rhs.geometry_;
-        material_ = rhs.material_;
-        worldTransform_  = rhs.worldTransform_;
-        shaderData_ = rhs.shaderData_;
-        shaderDataSize_ = rhs.shaderDataSize_;
-        geometryType_ = rhs.geometryType_;
-        overrideView_ = rhs.overrideView_;
     }
     
     /// Calculate state sorting key, which consists of base pass flag, light, pass and geometry.
@@ -83,7 +85,7 @@ struct Batch
     Geometry* geometry_;
     /// Material.
     Material* material_;
-    /// Model world transform.
+    /// %Object's world transform.
     const Matrix3x4* worldTransform_;
     /// Camera.
     Camera* camera_;
@@ -101,7 +103,7 @@ struct Batch
     const float* shaderData_;
     /// Vertex shader data size in floats.
     unsigned shaderDataSize_;
-    /// Geometry type.
+    /// %Geometry type.
     GeometryType geometryType_;
     /// Override view transform flag.
     bool overrideView_;
@@ -164,7 +166,7 @@ struct BatchGroup : public Batch
     unsigned startIndex_;
 };
 
-/// Instanced draw call key.
+/// Instanced draw call grouping key.
 struct BatchGroupKey
 {
     /// Construct undefined.

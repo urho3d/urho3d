@@ -63,11 +63,11 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance and update batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
     virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return whether a geometry update is necessary, and if it should happen in a worker thread.
+    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
     /// %Set material.
