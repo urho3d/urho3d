@@ -227,8 +227,8 @@ void CollisionShape::RegisterObject(Context* context)
     
     ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Collision Margin", margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
@@ -238,8 +238,9 @@ void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 {
     Component::OnSetAttribute(attr, src);
     
-    // Change of any attribute needs the collision shape to be recreated
-    recreateShape_ = true;
+    // Change of any non-accessor attribute requires recreation of the collision shape
+    if (!attr.accessor_)
+        recreateShape_ = true;
 }
 
 void CollisionShape::ApplyAttributes()

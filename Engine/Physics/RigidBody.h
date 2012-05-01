@@ -238,6 +238,6 @@ private:
     bool inSetTransform_;
     /// Smoothed transform mode.
     bool hasSmoothedTransform_;
-    /// Dirty flag.
-    bool dirty_;
+    /// Readd body to world flag.
+    bool readdBody_;
 };

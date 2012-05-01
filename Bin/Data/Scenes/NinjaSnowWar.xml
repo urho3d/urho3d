@@ -5,7 +5,7 @@
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Smoothing Constant" value="50" />
-	<attribute name="Snap Threshold" value="100" />
+	<attribute name="Snap Threshold" value="500" />
 	<attribute name="Next Replicated Node ID" value="2" />
 	<attribute name="Next Replicated Component ID" value="1" />
 	<attribute name="Next Local Node ID" value="16777220" />

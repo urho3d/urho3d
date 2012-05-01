@@ -73,7 +73,7 @@ RigidBody::RigidBody(Context* context) :
     phantom_(false),
     inSetTransform_(false),
     hasSmoothedTransform_(false),
-    dirty_(false)
+    readdBody_(false)
 {
     compoundShape_ = new btCompoundShape();
 }
@@ -120,15 +120,18 @@ void RigidBody::RegisterObject(Context* context)
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
-    dirty_ = true;
+    
+    // Change of any non-accessor attribute requires the rigid body to be re-added to the physics world
+    if (!attr.accessor_)
+        readdBody_ = true;
 }
 
 void RigidBody::ApplyAttributes()
 {
-    if (dirty_)
+    if (readdBody_)
     {
         AddBodyToWorld();
-        dirty_ = false;
+        readdBody_ = false;
     }
 }
 

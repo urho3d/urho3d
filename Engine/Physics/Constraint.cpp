@@ -93,7 +93,7 @@ void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
     
-    // Change of any attribute needs recreation of the constraint
+    // Change of any attribute requires recreation of the constraint
     recreateConstraint_ = true;
 }
 
