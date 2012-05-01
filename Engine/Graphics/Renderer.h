@@ -30,7 +30,6 @@
 #include "Mutex.h"
 #include "Viewport.h"
 
-class DebugRenderer;
 class Geometry;
 class Drawable;
 class Light;

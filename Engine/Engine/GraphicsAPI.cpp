@@ -36,6 +36,7 @@
 #include "ParticleEmitter.h"
 #include "PostProcess.h"
 #include "Scene.h"
+#include "SmoothedTransform.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -879,7 +880,7 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
-    RegisterComponent<DebugRenderer>(engine, "DebugRenderer");
+    RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
     engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddLine, (const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddNode(Node@+, bool depthTest = true)", asMETHOD(DebugRenderer, AddNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
@@ -889,6 +890,12 @@ static void RegisterDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
+    
+    // Component::DrawDebugGeometry() can be registered now
+    engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(SmoothedTransform, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
+
 }
 
 static void ConstructRayQueryResult(RayQueryResult* ptr)
@@ -997,7 +1004,7 @@ static void RegisterOctree(asIScriptEngine* engine)
     
     RegisterComponent<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void Resize(const BoundingBox&in, uint)", asMETHOD(Octree, Resize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHOD(Octree, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHODPR(Octree, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void AddManualDrawable(Drawable@+)", asMETHOD(Octree, AddManualDrawable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void RemoveManualDrawable(Drawable@+)", asMETHOD(Octree, RemoveManualDrawable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK) const", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
@@ -1014,14 +1021,14 @@ static void RegisterOctree(asIScriptEngine* engine)
 
 void RegisterGraphicsAPI(asIScriptEngine* engine)
 {
-    RegisterCamera(engine);
     RegisterSkeleton(engine);
+    RegisterDebugRenderer(engine);
+    RegisterCamera(engine);
     RegisterTextures(engine);
     RegisterMaterial(engine);
     RegisterPostProcess(engine);
     RegisterModel(engine);
     RegisterAnimation(engine);
-    RegisterDebugRenderer(engine);
     RegisterDrawable(engine);
     RegisterLight(engine);
     RegisterZone(engine);

@@ -166,6 +166,8 @@ public:
     
     /// Handle attribute change.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root.
     void Resize(const BoundingBox& box, unsigned numLevels);
@@ -189,7 +191,7 @@ public:
     void QueueUpdate(Drawable* drawable);
     /// Mark drawable object as requiring a reinsertion. Is thread-safe.
     void QueueReinsertion(Drawable* drawable);
-    /// Add debug geometry to the debug renderer.
+    /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
     
 private:

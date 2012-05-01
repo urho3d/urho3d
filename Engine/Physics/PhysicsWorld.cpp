@@ -23,9 +23,9 @@
 
 #include "Precompiled.h"
 #include "CollisionShape.h"
+#include "Constraint.h"
 #include "Context.h"
 #include "DebugRenderer.h"
-#include "Joint.h"
 #include "Log.h"
 #include "Mutex.h"
 #include "PhysicsEvents.h"
@@ -97,12 +97,15 @@ PhysicsWorld::~PhysicsWorld()
 {
     if (scene_)
     {
-        // Force all remaining joints, rigid bodies and collision shapes to release themselves
-        for (PODVector<Joint*>::Iterator i = joints_.Begin(); i != joints_.End(); ++i)
-            (*i)->Clear();
+        // Force all remaining constraints, rigid bodies and collision shapes to release themselves
+        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+            (*i)->ReleaseConstraint();
         
         for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
             (*i)->ReleaseBody();
+        
+        for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
+            (*i)->ReleaseShape();
     }
     
     // Remove any cached geometries that still remain
@@ -138,6 +141,19 @@ void PhysicsWorld::drawLine(const btVector3& from, const btVector3& to, const bt
 {
     if (debugRenderer_)
         debugRenderer_->AddLine(ToVector3(from), ToVector3(to), Color(color.x(), color.y(), color.z()), debugDepthTest_);
+}
+
+void PhysicsWorld::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug)
+    {
+        PROFILE(PhysicsDrawDebug);
+        
+        debugRenderer_ = debug;
+        debugDepthTest_ = depthTest;
+        world_->debugDrawWorld();
+        debugRenderer_ = 0;
+    }
 }
 
 void PhysicsWorld::reportErrorWarning(const char* warningString)
@@ -300,16 +316,16 @@ void PhysicsWorld::RemoveCollisionShape(CollisionShape* shape)
         collisionShapes_.Erase(i);
 }
 
-void PhysicsWorld::AddJoint(Joint* joint)
+void PhysicsWorld::AddConstraint(Constraint* constraint)
 {
-    joints_.Push(joint);
+    constraints_.Push(constraint);
 }
 
-void PhysicsWorld::RemoveJoint(Joint* joint)
+void PhysicsWorld::RemoveConstraint(Constraint* constraint)
 {
-    PODVector<Joint*>::Iterator i = joints_.Find(joint);
-    if (i != joints_.End())
-        joints_.Erase(i);
+    PODVector<Constraint*>::Iterator i = constraints_.Find(constraint);
+    if (i != constraints_.End())
+        constraints_.Erase(i);
 }
 
 void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transform)
@@ -319,12 +335,8 @@ void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transfo
 
 void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 {
-    PROFILE(PhysicsDrawDebug);
-    
-    debugDepthTest_ = depthTest;
-    debugRenderer_ = GetComponent<DebugRenderer>();
-    world_->debugDrawWorld();
-    debugRenderer_ = 0;
+    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    DrawDebugGeometry(debug, depthTest);
 }
 
 void PhysicsWorld::SetDebugRenderer(DebugRenderer* debug)
@@ -389,7 +401,9 @@ void PhysicsWorld::PreStep(float timeStep)
 void PhysicsWorld::PostStep(float timeStep)
 {
 #ifdef ENABLE_PROFILING
-    GetSubsystem<Profiler>()->EndBlock();
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        profiler->EndBlock();
 #endif
     
     // Apply delayed (parented) world transforms now
@@ -533,8 +547,8 @@ void PhysicsWorld::SendCollisionEvents()
 
 void RegisterPhysicsLibrary(Context* context)
 {
-    Joint::RegisterObject(context);
-    RigidBody::RegisterObject(context);
     CollisionShape::RegisterObject(context);
+    RigidBody::RegisterObject(context);
+    Constraint::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
 }

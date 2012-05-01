@@ -29,7 +29,6 @@
 
 class Animation;
 class AnimationState;
-class DebugRenderer;
 
 /// Animated model component.
 class AnimatedModel : public StaticModel
@@ -62,7 +61,7 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
-    /// Add debug geometry to the debug renderer.
+    /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set model.

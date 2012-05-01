@@ -823,7 +823,7 @@ The other physics components are:
 
 - RigidBody: a physics object instance. Its parameters include mass, linear/angular velocities, friction and restitution.
 - CollisionShape: defines physics collision geometry. The supported shapes are box, sphere, cylinder, capsule, cone, triangle mesh and convex hull.
-- Joint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently ball and hinge joints are supported.
+- Constraint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently point and hinge constraints are supported.
 
 Both a RigidBody and at least one CollisionShape component must exist in a scene node for it to behave physically (a collision shape by itself does nothing.) Several collision shapes may exist in the same node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. Triangle mesh and convex hull geometries require specifying a Model resource and the LOD level to use.
 

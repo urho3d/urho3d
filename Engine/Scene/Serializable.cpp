@@ -61,7 +61,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     switch (attr.type_)
     {
     case VAR_INT:
-        // If enum type, use the low 8 bits only (assume full value to be initialized)
+        // If enum type, use the low 8 bits only
         if (attr.enumNames_)
             *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
         else

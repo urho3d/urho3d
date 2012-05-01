@@ -29,7 +29,6 @@
 #include <LinearMath/btMotionState.h>
 
 class CollisionShape;
-class DebugRenderer;
 class PhysicsWorld;
 class SmoothedTransform;
 
@@ -49,8 +48,6 @@ class RigidBody : public Component, public btMotionState
 {
     OBJECT(RigidBody);
     
-    friend class PhysicsWorld;
-    
 public:
     /// Construct.
     RigidBody(Context* context);
@@ -67,6 +64,8 @@ public:
     virtual void getWorldTransform(btTransform &worldTrans) const;
     /// Update world transform from Bullet.
     virtual void setWorldTransform(const btTransform &worldTrans);
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set mass. Zero mass makes the body static.
     void SetMass(float mass);
@@ -190,12 +189,12 @@ public:
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
     /// Update mass and inertia of rigid body.
     void UpdateMass();
-    /// Add debug geometry to the debug renderer.
-    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
+    /// Remove the rigid body.
+    void ReleaseBody();
     
 protected:
     /// Handle node being assigned.
@@ -206,8 +205,6 @@ protected:
 private:
     /// Create the rigid body, or re-add to the physics world with changed flags. Calls UpdateMass().
     void AddBodyToWorld();
-    /// Remove the rigid body.
-    void ReleaseBody();
     /// Handle SmoothedTransform target position update.
     void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
     /// Handle SmoothedTransform target rotation update.

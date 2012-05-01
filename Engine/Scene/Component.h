@@ -26,6 +26,7 @@
 #include "Matrix3x4.h"
 #include "Serializable.h"
 
+class DebugRenderer;
 class Node;
 class Scene;
 
@@ -53,6 +54,8 @@ public:
     virtual bool SaveXML(XMLElement& dest);
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) {};
     
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();

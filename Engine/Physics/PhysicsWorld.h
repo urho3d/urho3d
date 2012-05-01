@@ -30,9 +30,8 @@
 #include <LinearMath/btIDebugDraw.h>
 
 class CollisionShape;
-class DebugRenderer;
 class Deserializer;
-class Joint;
+class Constraint;
 class Node;
 class Ray;
 class RigidBody;
@@ -110,6 +109,8 @@ public:
     virtual void setDebugMode(int debugMode) { debugMode_ = debugMode; }
     /// Return debug draw flags.
     virtual int getDebugMode() const { return debugMode_; }
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -151,10 +152,10 @@ public:
     void AddCollisionShape(CollisionShape* shape);
     /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
-    /// Add a joint to keep track of. Called by Joint.
-    void AddJoint(Joint* joint);
-    /// Remove a joint. Called by Joint.
-    void RemoveJoint(Joint* joint);
+    /// Add a constraint to keep track of. Called by Constraint.
+    void AddConstraint(Constraint* joint);
+    /// Remove a constraint. Called by Constraint.
+    void RemoveConstraint(Constraint* joint);
     /// Add a delayed world transform assignment. Called by RigidBody.
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.
@@ -201,8 +202,8 @@ private:
     PODVector<RigidBody*> rigidBodies_;
     /// Collision shapes in the world.
     PODVector<CollisionShape*> collisionShapes_;
-    /// Joints in the world.
-    PODVector<Joint*> joints_;
+    /// Constraints in the world.
+    PODVector<Constraint*> constraints_;
     /// Collision pairs on this frame.
     HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new."

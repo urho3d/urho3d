@@ -1188,6 +1188,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1296,6 +1297,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void Update(float, float)
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1417,6 +1419,62 @@ Properties:<br>
 - PhysicsWorld@ physicsWorld (readonly)
 
 
+Bone
+
+Properties:<br>
+- Node@ node (readonly)
+- String name
+- Vector3 initialPosition
+- Quaternion initialRotation
+- Vector3 initialScale
+- bool animated
+- float radius
+- BoundingBox boundingBox
+
+
+Skeleton
+
+Methods:<br>
+- void Reset()
+- Bone@ GetBone(const String&) const
+
+Properties:<br>
+- Bone@ rootBone (readonly)
+- uint numBones (readonly)
+- Bone@[] bones (readonly)
+
+
+DebugRenderer
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
+- void AddNode(Node@, bool arg1 = true)
+- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
+- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
+- void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
+- void AddSphere(const Sphere&, const Color&, bool arg2 = true)
+- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
+- void DrawDebugGeometry(DebugRenderer@, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
 Camera
 
 Methods:<br>
@@ -1429,6 +1487,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetOrthoSize(const Vector2&)
 - Frustum GetSplitFrustum(float, float) const
 - Ray GetScreenRay(float, float)
@@ -1463,31 +1522,6 @@ Properties:<br>
 - Vector3 forwardVector (readonly)
 - Vector3 rightVector (readonly)
 - Vector3 upVector (readonly)
-
-
-Bone
-
-Properties:<br>
-- Node@ node (readonly)
-- String name
-- Vector3 initialPosition
-- Quaternion initialRotation
-- Vector3 initialScale
-- bool animated
-- float radius
-- BoundingBox boundingBox
-
-
-Skeleton
-
-Methods:<br>
-- void Reset()
-- Bone@ GetBone(const String&) const
-
-Properties:<br>
-- Bone@ rootBone (readonly)
-- uint numBones (readonly)
-- Bone@[] bones (readonly)
 
 
 Texture
@@ -1729,36 +1763,6 @@ Properties:<br>
 - String& animationName (readonly)
 - float length (readonly)
 - uint numTracks (readonly)
-
-
-DebugRenderer
-
-Methods:<br>
-- bool Load(File@)
-- bool Save(File@)
-- bool LoadXML(const XMLElement&)
-- bool SaveXML(XMLElement&)
-- void ApplyAttributes()
-- bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- void Remove()
-- void MarkNetworkUpdate() const
-- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
-- void AddNode(Node@, bool arg1 = true)
-- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
-- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
-- void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
-- void AddSphere(const Sphere&, const Color&, bool arg2 = true)
-- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
-
-Properties:<br>
-- ShortStringHash type (readonly)
-- String& typeName (readonly)
-- uint numAttributes (readonly)
-- Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
-- uint id (readonly)
-- Node@ node (readonly)
 
 
 Drawable
@@ -2109,6 +2113,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - bool Play(const String&, uint8, bool, float arg3 = 0.0f)
 - bool PlayExclusive(const String&, uint8, bool, float arg3 = 0.0f)
 - void Stop(const String&, float arg1 = 0.0f)
@@ -2216,6 +2221,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetActive(bool, bool)
 
 Properties:<br>
@@ -2258,6 +2264,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void Resize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
 - void AddManualDrawable(Drawable@)
@@ -2407,6 +2414,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void Play(Sound@)
 - void Play(Sound@, float)
 - void Play(Sound@, float, float)
@@ -2444,6 +2452,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void Play(Sound@)
 - void Play(Sound@, float)
 - void Play(Sound@, float, float)
@@ -3869,6 +3878,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3950,6 +3960,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetSphere(float, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
@@ -3958,7 +3969,6 @@ Methods:<br>
 - void SetTriangleMesh(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
 - void SetConvexHull(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
 - void SetTransform(const Vector3&, const Quaternion&)
-- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3989,6 +3999,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetCollisionLayerAndMask(uint, uint)
 - void ApplyForce(const Vector3&)
@@ -3999,7 +4010,6 @@ Methods:<br>
 - void ApplyTorqueImpulse(const Vector3&)
 - void ResetForces()
 - void Activate()
-- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4033,7 +4043,7 @@ Properties:<br>
 - CollisionEventMode collisionEventMode
 
 
-Joint
+Constraint
 
 Methods:<br>
 - bool Load(File@)
@@ -4045,7 +4055,6 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
-- void Clear()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
@@ -4056,11 +4065,15 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- ConstraintType constraintType
 - Vector3& position
+- Vector3& otherPosition
 - Vector3& axis
+- Vector3& otherAxis
+- float lowLimit
+- float highLimit
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
-- JointType jointType
 
 
 PhysicsRaycastResult
@@ -4084,6 +4097,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void Update(float)
 - void UpdateCollisions()
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
@@ -4135,6 +4149,7 @@ Methods:<br>
 - Variant GetAttribute(const String&)
 - void Remove()
 - void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - bool CreateObject(ScriptFile@, const String&)
 - bool Execute(const String&, const Variant[]@)
 - bool Execute(const String&)

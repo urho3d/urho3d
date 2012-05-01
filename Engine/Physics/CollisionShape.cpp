@@ -209,7 +209,7 @@ CollisionShape::CollisionShape(Context* context) :
     lodLevel_(0),
     cachedWorldScale_(Vector3::ONE),
     margin_(DEFAULT_COLLISION_MARGIN),
-    dirty_(false)
+    recreateShape_(false)
 {
 }
 
@@ -237,16 +237,43 @@ void CollisionShape::RegisterObject(Context* context)
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
-    dirty_ = true;
+    
+    // Change of any attribute needs the collision shape to be recreated
+    recreateShape_ = true;
 }
 
 void CollisionShape::ApplyAttributes()
 {
-    if (dirty_)
+    if (recreateShape_)
     {
         UpdateShape();
         NotifyRigidBody();
-        dirty_ = false;
+        recreateShape_ = false;
+    }
+}
+
+void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug && physicsWorld_ && shape_ && node_)
+    {
+        physicsWorld_->SetDebugRenderer(debug);
+        physicsWorld_->SetDebugDepthTest(depthTest);
+        
+        // Use the rigid body's world transform if possible, as it may be different from the rendering transform
+        Matrix3x4 worldTransform;
+        RigidBody* body = GetComponent<RigidBody>();
+        if (body)
+            worldTransform = Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale());
+        else
+            worldTransform = node_->GetWorldTransform();
+        Vector3 worldPosition = worldTransform * position_;
+        Quaternion worldRotation = worldTransform.Rotation() * rotation_;
+        
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, btVector3(0.0f,
+            1.0f, 0.0f));
+        
+        physicsWorld_->SetDebugRenderer(0);
     }
 }
 
@@ -468,42 +495,35 @@ void CollisionShape::NotifyRigidBody()
     }
 }
 
-void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
-{
-    if (debug && physicsWorld_ && shape_ && node_)
-    {
-        physicsWorld_->SetDebugRenderer(debug);
-        physicsWorld_->SetDebugDepthTest(depthTest);
-        
-        // Use the rigid body's world transform if possible, as it may be different from the rendering transform
-        Matrix3x4 worldTransform;
-        RigidBody* body = GetComponent<RigidBody>();
-        if (body)
-            worldTransform = Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale());
-        else
-            worldTransform = node_->GetWorldTransform();
-        Vector3 worldPosition = worldTransform * position_;
-        Quaternion worldRotation = worldTransform.Rotation() * rotation_;
-        
-        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, btVector3(0.0f,
-            1.0f, 0.0f));
-        
-        physicsWorld_->SetDebugRenderer(0);
-    }
-}
-
 void CollisionShape::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     model_ = cache->GetResource<Model>(value.id_);
-    dirty_ = true;
+    recreateShape_ = true;
     MarkNetworkUpdate();
 }
 
 ResourceRef CollisionShape::GetModelAttr() const
 {
     return GetResourceRef(model_, Model::GetTypeStatic());
+}
+
+void CollisionShape::ReleaseShape()
+{
+    btCompoundShape* compound = GetParentCompoundShape();
+    if (shape_ && compound)
+    {
+        compound->removeChildShape(shape_);
+        rigidBody_->UpdateMass();
+    }
+    
+    delete shape_;
+    shape_ = 0;
+    
+    geometry_.Reset();
+    
+    if (physicsWorld_)
+        physicsWorld_->CleanupGeometryCache();
 }
 
 void CollisionShape::OnNodeSet(Node* node)
@@ -516,6 +536,8 @@ void CollisionShape::OnNodeSet(Node* node)
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();
             if (physicsWorld_)
                 physicsWorld_->AddCollisionShape(this);
+            else
+                LOGERROR("No physics world component in scene, can not create collision shape");
         }
         node->AddListener(this);
         
@@ -650,24 +672,6 @@ void CollisionShape::UpdateShape()
         
         cachedWorldScale_ = newWorldScale;
     }
-    
-    if (physicsWorld_)
-        physicsWorld_->CleanupGeometryCache();
-}
-
-void CollisionShape::ReleaseShape()
-{
-    btCompoundShape* compound = GetParentCompoundShape();
-    if (shape_ && compound)
-    {
-        compound->removeChildShape(shape_);
-        rigidBody_->UpdateMass();
-    }
-    
-    delete shape_;
-    shape_ = 0;
-    
-    geometry_.Reset();
     
     if (physicsWorld_)
         physicsWorld_->CleanupGeometryCache();

@@ -28,7 +28,6 @@
 #include "Component.h"
 #include "Quaternion.h"
 
-class DebugRenderer;
 class Geometry;
 class Model;
 class PhysicsWorld;
@@ -103,6 +102,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set as a sphere.
     void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
@@ -156,12 +157,12 @@ public:
     
     /// Update the new collision shape to the RigidBody, and tell it to update its mass.
     void NotifyRigidBody();
-    /// Add debug geometry to the debug renderer.
-    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
+    /// Release the collision shape.
+    void ReleaseShape();
     
 protected:
     /// Handle node being assigned.
@@ -174,8 +175,6 @@ private:
     btCompoundShape* GetParentCompoundShape();
     /// Update the collision shape after attribute changes.
     void UpdateShape();
-    /// Release the collision shape.
-    void ReleaseShape();
     
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
@@ -201,6 +200,6 @@ private:
     unsigned lodLevel_;
     /// Collision margin.
     float margin_;
-    /// Dirty flag.
-    bool dirty_;
+    /// Recrease collision shape flag.
+    bool recreateShape_;
 };

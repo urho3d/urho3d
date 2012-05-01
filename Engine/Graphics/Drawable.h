@@ -40,7 +40,6 @@ static const int DRAWABLES_PER_WORK_ITEM = 16;
 static const int MAX_VERTEX_LIGHTS = 6;
 
 class Camera;
-class DebugRenderer;
 class Geometry;
 class Light;
 class OcclusionBuffer;
@@ -135,7 +134,7 @@ public:
     virtual unsigned GetNumOccluderTriangles() { return 0; }
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
-    /// Add debug geometry to the debug renderer.
+    /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set draw distance.

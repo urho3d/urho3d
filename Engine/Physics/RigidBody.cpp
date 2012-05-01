@@ -167,6 +167,21 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
     MarkNetworkUpdate();
 }
 
+void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug && physicsWorld_ && body_)
+    {
+        physicsWorld_->SetDebugRenderer(debug);
+        physicsWorld_->SetDebugDepthTest(depthTest);
+        
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
+            btVector3(0.0f, 1.0f, 0.0f));
+        
+        physicsWorld_->SetDebugRenderer(0);
+    }
+}
+
 void RigidBody::SetMass(float mass)
 {
     mass = Max(mass, 0.0f);
@@ -191,6 +206,7 @@ void RigidBody::SetPosition(Vector3 position)
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
         
+        Activate();
         MarkNetworkUpdate();
     }
 }
@@ -207,6 +223,7 @@ void RigidBody::SetRotation(Quaternion rotation)
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
         
+        Activate();
         MarkNetworkUpdate();
     }
 }
@@ -225,6 +242,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
         
+        Activate();
         MarkNetworkUpdate();
     }
 }
@@ -484,7 +502,7 @@ void RigidBody::ResetForces()
 
 void RigidBody::Activate()
 {
-    if (body_ && !body_->isActive())
+    if (mass_ > 0.0f && body_ && !body_->isActive())
         body_->activate();
 }
 
@@ -654,21 +672,6 @@ void RigidBody::UpdateMass()
     }
 }
 
-void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
-{
-    if (debug && physicsWorld_ && body_)
-    {
-        physicsWorld_->SetDebugRenderer(debug);
-        physicsWorld_->SetDebugDepthTest(depthTest);
-        
-        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
-            btVector3(0.0f, 1.0f, 0.0f));
-        
-        physicsWorld_->SetDebugRenderer(0);
-    }
-}
-
 void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
@@ -682,6 +685,21 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
     attrBuffer_.Clear();
     attrBuffer_.WritePackedVector3(GetAngularVelocity(), maxVelocity);
     return attrBuffer_.GetBuffer();
+}
+
+void RigidBody::ReleaseBody()
+{
+    if (body_)
+    {
+        if (physicsWorld_)
+        {
+            btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+            world->removeRigidBody(body_);
+        }
+        
+        delete body_;
+        body_ = 0;
+    }
 }
 
 void RigidBody::OnMarkedDirty(Node* node)
@@ -727,7 +745,7 @@ void RigidBody::OnNodeSet(Node* node)
             if (physicsWorld_)
                 physicsWorld_->AddRigidBody(this);
             else
-                LOGERROR("Null physics world, can not create rigid body");
+                LOGERROR("No physics world component in scene, can not create rigid body");
             
             AddBodyToWorld();
         }
@@ -800,21 +818,6 @@ void RigidBody::AddBodyToWorld()
     {
         SetLinearVelocity(Vector3::ZERO);
         SetAngularVelocity(Vector3::ZERO);
-    }
-}
-
-void RigidBody::ReleaseBody()
-{
-    if (body_)
-    {
-        if (physicsWorld_)
-        {
-            btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-            world->removeRigidBody(body_);
-        }
-        
-        delete body_;
-        body_ = 0;
     }
 }
 

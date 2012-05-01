@@ -353,6 +353,16 @@ void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     Resize(worldBoundingBox_, numLevels_);
 }
 
+void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (debug)
+    {
+        PROFILE(OctreeDrawDebug);
+        
+        Octant::DrawDebugGeometry(debug, depthTest);
+    }
+}
+
 void Octree::Resize(const BoundingBox& box, unsigned numLevels)
 {
     PROFILE(ResizeOctree);
@@ -519,11 +529,8 @@ void Octree::QueueReinsertion(Drawable* drawable)
 
 void Octree::DrawDebugGeometry(bool depthTest)
 {
-    PROFILE(OctreeDrawDebug);
-    
     DebugRenderer* debug = GetComponent<DebugRenderer>();
-    if (debug)
-        Octant::DrawDebugGeometry(debug, depthTest);
+    DrawDebugGeometry(debug, depthTest);
 }
 
 void Octree::UpdateDrawables(const FrameInfo& frame)

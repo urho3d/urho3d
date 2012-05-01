@@ -41,7 +41,7 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Add debug geometry to the debug renderer.
+    /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// %Set bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.

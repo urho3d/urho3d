@@ -334,29 +334,7 @@ void HandlePostRenderUpdate()
 
     // Visualize the currently selected components
     for (uint i = 0; i < selectedComponents.length; ++i)
-    {
-        Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
-        if (drawable !is null)
-            drawable.DrawDebugGeometry(debug, false);
-        else
-        {
-            RigidBody@ body = cast<RigidBody>(selectedComponents[i]);
-            if (body !is null)
-                body.DrawDebugGeometry(debug, false);
-            else
-            {
-                CollisionShape@ shape = cast<CollisionShape>(selectedComponents[i]);
-                if (shape !is null)
-                    shape.DrawDebugGeometry(debug, false);
-                else
-                {
-                    Joint@ joint = cast<Joint>(selectedComponents[i]);
-                    if (joint !is null)
-                        joint.DrawDebugGeometry(debug, false);
-                }
-            }
-        }
-    }
+        selectedComponents[i].DrawDebugGeometry(debug, false);
 
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);

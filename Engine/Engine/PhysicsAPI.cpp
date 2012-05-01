@@ -24,7 +24,7 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "CollisionShape.h"
-#include "Joint.h"
+#include "Constraint.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
 #include "Scene.h"
@@ -75,7 +75,6 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(CollisionShape, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_shapeType(ShapeType)", asMETHOD(CollisionShape, SetShapeType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "ShapeType get_shapeType() const", asMETHOD(CollisionShape, GetShapeType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_size(const Vector3&in)", asMETHOD(CollisionShape, SetSize), asCALL_THISCALL);
@@ -113,7 +112,6 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void ApplyTorqueImpulse(const Vector3&in)", asMETHOD(RigidBody, ApplyTorqueImpulse), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void ResetForces()", asMETHOD(RigidBody, ResetForces), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void Activate()", asMETHOD(RigidBody, Activate), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(RigidBody, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_mass(float)", asMETHOD(RigidBody, SetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_mass() const", asMETHOD(RigidBody, GetMass), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_position(Vector3)", asMETHOD(RigidBody, SetPosition), asCALL_THISCALL);
@@ -162,25 +160,30 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }
 
-static void RegisterJoint(asIScriptEngine* engine)
+static void RegisterConstraint(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("JointType");
-    engine->RegisterEnumValue("JointType", "JOINT_NONE", JOINT_NONE);
-    engine->RegisterEnumValue("JointType", "JOINT_BALL", JOINT_BALL);
-    engine->RegisterEnumValue("JointType", "JOINT_HINGE", JOINT_HINGE);
+    engine->RegisterEnum("ConstraintType");
+    engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_POINT", CONSTRAINT_POINT);
+    engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_HINGE", CONSTRAINT_HINGE);
     
-    RegisterComponent<Joint>(engine, "Joint");
-    engine->RegisterObjectMethod("Joint", "void Clear()", asMETHOD(Joint, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Joint, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void set_position(const Vector3&in)", asMETHOD(Joint, SetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "const Vector3& get_position() const", asMETHOD(Joint, GetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void set_axis(const Vector3&in)", asMETHOD(Joint, SetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "const Vector3& get_axis() const", asMETHOD(Joint, GetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "RigidBody@+ get_ownBody() const", asMETHOD(Joint, GetOwnBody), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "void set_otherBody(RigidBody@+)", asMETHOD(Joint, SetOtherBody), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "RigidBody@+ get_otherBody() const", asMETHOD(Joint, GetOtherBody), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "bool set_jointType(JointType)", asMETHOD(Joint, SetJointType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Joint", "JointType get_jointType() const", asMETHOD(Joint, GetJointType), asCALL_THISCALL);
+    RegisterComponent<Constraint>(engine, "Constraint");
+    engine->RegisterObjectMethod("Constraint", "void set_constraintType(ConstraintType)", asMETHOD(Constraint, SetConstraintType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_position() const", asMETHOD(Constraint, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherPosition(const Vector3&in)", asMETHOD(Constraint, SetOtherPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherPosition() const", asMETHOD(Constraint, GetOtherPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_axis(const Vector3&in)", asMETHOD(Constraint, SetAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_axis() const", asMETHOD(Constraint, GetAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherAxis(const Vector3&in)", asMETHOD(Constraint, SetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherAxis() const", asMETHOD(Constraint, GetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "float get_lowLimit() const", asMETHOD(Constraint, GetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_lowLimit(float)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "float get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_highLimit(float)", asMETHOD(Constraint, SetHighLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "RigidBody@+ get_ownBody() const", asMETHOD(Constraint, GetOwnBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherBody(RigidBody@+)", asMETHOD(Constraint, SetOtherBody), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "RigidBody@+ get_otherBody() const", asMETHOD(Constraint, GetOtherBody), asCALL_THISCALL);
 }
 
 static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
@@ -221,7 +224,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingle(const Ray&in, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult SphereCast(const Ray&in, float, float maxDistance = M_INFINITY, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
@@ -239,6 +242,6 @@ void RegisterPhysicsAPI(asIScriptEngine* engine)
 {
     RegisterCollisionShape(engine);
     RegisterRigidBody(engine);
-    RegisterJoint(engine);
+    RegisterConstraint(engine);
     RegisterPhysicsWorld(engine);
 }

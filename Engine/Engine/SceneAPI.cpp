@@ -54,7 +54,7 @@ static void RegisterNode(asIScriptEngine* engine)
     engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
     
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
-    RegisterComponent<Component>(engine, "Component", false);
+    RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
     engine->RegisterObjectMethod("Node", "bool SaveXML(File@+)", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);
@@ -135,7 +135,7 @@ static CScriptArray* GetAvailableComponents(Scene* ptr)
 
 static void RegisterSmoothedTransform(asIScriptEngine* engine)
 {
-    RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform");
+    RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform", true, false);
     engine->RegisterObjectMethod("SmoothedTransform", "void Update(float, float)", asMETHOD(SmoothedTransform, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "void set_targetPosition(const Vector3&in)", asMETHOD(SmoothedTransform, SetTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "const Vector3& get_targetPosition() const", asMETHOD(SmoothedTransform, GetTargetPosition), asCALL_THISCALL);

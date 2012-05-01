@@ -368,7 +368,7 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
 }
 
 /// Template function for registering a class derived from Component.
-template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true)
+template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true, bool debugRendererRegistered = true)
 {
     RegisterSerializable<T>(engine, className);
     RegisterSubclass<Component, T>(engine, "Component", className);
@@ -377,6 +377,8 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
+    if (debugRendererRegistered)
+        engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
 }
 
 static Component* NodeCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
@@ -620,7 +622,6 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<Drawable, T>(engine, "Drawable", className);
-    engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(T, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_inView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
