@@ -171,12 +171,8 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_position() const", asMETHOD(Constraint, GetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "void set_otherPosition(const Vector3&in)", asMETHOD(Constraint, SetOtherPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherPosition() const", asMETHOD(Constraint, GetOtherPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_axis(const Vector3&in)", asMETHOD(Constraint, SetAxis), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_axis() const", asMETHOD(Constraint, GetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "void set_otherAxis(const Vector3&in)", asMETHOD(Constraint, SetOtherAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherAxis() const", asMETHOD(Constraint, GetOtherAxis), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "float get_lowLimit() const", asMETHOD(Constraint, GetLowLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_lowLimit(float)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "float get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);

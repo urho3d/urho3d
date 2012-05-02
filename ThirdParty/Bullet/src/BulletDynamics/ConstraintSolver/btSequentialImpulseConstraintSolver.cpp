@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
+
 //#define COMPUTE_IMPULSE_DENOM 1
 //It is not necessary (redundant) to refresh contact manifolds, this refresh has been moved to the collision algorithms.
 
@@ -1202,7 +1204,10 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlyFinish(btCo
 		const btSolverConstraint& solverConstr = m_tmpSolverNonContactConstraintPool[j];
 		btTypedConstraint* constr = (btTypedConstraint*)solverConstr.m_originalContactPoint;
 		constr->internalSetAppliedImpulse(solverConstr.m_appliedImpulse);
-		if (btFabs(solverConstr.m_appliedImpulse)>=constr->getBreakingImpulseThreshold())
+		
+		// Urho3D: if constraint has infinity breaking threshold, do not break no matter what
+		btScalar breakingThreshold = constr->getBreakingImpulseThreshold();
+		if (breakingThreshold < SIMD_INFINITY && btFabs(solverConstr.m_appliedImpulse)>=breakingThreshold)
 		{
 			constr->setEnabled(false);
 		}

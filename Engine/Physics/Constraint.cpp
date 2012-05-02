@@ -55,9 +55,7 @@ Constraint::Constraint(Context* context) :
     constraint_(0),
     type_(CONSTRAINT_POINT),
     position_(Vector3::ZERO),
-    otherPosition_(Vector3::ZERO),
-    axis_(Vector3::ZERO),
-    otherAxis_(Vector3::ZERO),
+    axis_(Vector3::FORWARD),
     lowLimit_(DEFAULT_LOW_LIMIT),
     highLimit_(DEFAULT_HIGH_LIMIT),
     otherBodyNodeID_(0),
@@ -79,13 +77,11 @@ void Constraint::RegisterObject(Context* context)
     context->RegisterFactory<Constraint>();
     
     ENUM_ATTRIBUTE(Constraint, "Constraint Type", type_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Axis", axis_, Vector3::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::FORWARD, AM_DEFAULT | AM_LATESTDATA);
+    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "Low Limit", GetLowLimit, SetLowLimit, float, DEFAULT_LOW_LIMIT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "High Limit", GetHighLimit, SetHighLimit, float, DEFAULT_HIGH_LIMIT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Axis", otherAxis_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_FLOAT, "Low Limit", lowLimit_, DEFAULT_LOW_LIMIT, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_FLOAT, "High Limit", highLimit_, DEFAULT_HIGH_LIMIT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
 }
 
@@ -93,8 +89,9 @@ void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
     
-    // Change of any attribute requires recreation of the constraint
-    recreateConstraint_ = true;
+    // Change of any non-accessor attribute requires recreation of the constraint
+    if (!attr.accessor_)
+        recreateConstraint_ = true;
 }
 
 void Constraint::ApplyAttributes()
@@ -158,16 +155,9 @@ void Constraint::SetPosition(const Vector3& position)
     if (position != position_)
     {
         position_ = position;
-        CreateConstraint();
-    }
-}
-
-void Constraint::SetOtherPosition(const Vector3& position)
-{
-    if (position != otherPosition_)
-    {
-        otherPosition_ = position;
-        CreateConstraint();
+        /// \todo Optimize and do not recreate the constraint
+        if (constraint_)
+            CreateConstraint();
     }
 }
 
@@ -176,41 +166,79 @@ void Constraint::SetAxis(const Vector3& axis)
     if (axis != axis_)
     {
         axis_ = axis;
-        if (type_ == CONSTRAINT_HINGE)
-            CreateConstraint();
-    }
-}
-
-void Constraint::SetOtherAxis(const Vector3& axis)
-{
-    if (axis != otherAxis_)
-    {
-        otherAxis_ = axis;
-        if (type_ == CONSTRAINT_HINGE)
+        /// \todo Optimize and do not recreate the constraint
+        if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
             CreateConstraint();
     }
 }
 
 void Constraint::SetLowLimit(float limit)
 {
-    lowLimit_ = limit;
-    
-    if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
+    if (limit != lowLimit_)
     {
-        btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
-        hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        lowLimit_ = limit;
+        
+        if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
+        {
+            btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
+            hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        }
     }
 }
 
 void Constraint::SetHighLimit(float limit)
 {
-    highLimit_ = limit;
+    if (limit != highLimit_)
+    {
+        highLimit_ = limit;
+        
+        if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
+        {
+            btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
+            hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        }
+    }
+}
+
+const Vector3& Constraint::GetPosition() const
+{
+    // If the constraint exists and connects two rigid bodies, update position from it
+    /// \todo If there is constraint error, the two bodies may disagree, resulting in drift with successive load/save
+    if (constraint_ && ownBody_ && otherBody_)
+    {
+        switch (constraint_->getConstraintType())
+        {
+        case POINT2POINT_CONSTRAINT_TYPE:
+            {
+                btPoint2PointConstraint* pointConstraint = static_cast<btPoint2PointConstraint*>(constraint_);
+                position_ = ToVector3(ownBody_->GetBody()->getCenterOfMassTransform() * pointConstraint->getPivotInA());
+            }
+            break;
+            
+        case HINGE_CONSTRAINT_TYPE:
+            {
+                btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
+                position_ = ToVector3(ownBody_->GetBody()->getCenterOfMassTransform() * hingeConstraint->getAFrame().getOrigin());
+            }
+            break;
+        }
+    }
     
-    if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
+    return position_;
+}
+
+const Vector3& Constraint::GetAxis() const
+{
+    // If the constraint exists and connects two rigid bodies, update axis from it
+    /// \todo If there is constraint error, the two bodies may disagree, resulting in drift with successive load/save
+    if (constraint_ && ownBody_ && otherBody_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
     {
         btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
-        hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        btTransform worldFrame = ownBody_->GetBody()->getCenterOfMassTransform() * hingeConstraint->getAFrame();
+        axis_ = ToVector3(worldFrame.getBasis().getColumn(0));
     }
+    
+    return axis_;
 }
 
 void Constraint::ReleaseConstraint()
@@ -239,6 +267,10 @@ void Constraint::OnNodeSet(Node* node)
                 LOGERROR("No physics world component in scene, can not create constraint");
         }
         node->AddListener(this);
+        
+        // Set node world position as initial position, then try to create the constraint initially
+        position_ = node->GetWorldPosition();
+        CreateConstraint();
     }
 }
 
@@ -259,9 +291,13 @@ void Constraint::CreateConstraint()
     {
     case CONSTRAINT_POINT:
         if (otherBody)
-            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(position_), ToBtVector3(otherPosition_));
+        {
+            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ownBody->getCenterOfMassTransform().inverse() *
+                ToBtVector3(position_), otherBody->getCenterOfMassTransform().inverse() * ToBtVector3(position_));
+        }
         else
-            constraint_ = new btPoint2PointConstraint(*ownBody, ToBtVector3(position_));
+            constraint_ = new btPoint2PointConstraint(*ownBody, ownBody->getCenterOfMassTransform().inverse() *
+                ToBtVector3(position_));
         break;
         
     case CONSTRAINT_HINGE:
@@ -269,13 +305,21 @@ void Constraint::CreateConstraint()
             btHingeConstraint* hingeConstraint;
             if (otherBody)
             {
-                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ToBtVector3(position_),
-                    ToBtVector3(otherPosition_), ToBtVector3(axis_.Normalized()), ToBtVector3(otherAxis_.Normalized()));
+                btTransform ownBodyInverse = ownBody->getCenterOfMassTransform().inverse();
+                btTransform otherBodyInverse = otherBody->getCenterOfMassTransform().inverse();
+                Vector3 axis = axis_.Normalized();
+                
+                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ownBodyInverse *
+                    ToBtVector3(position_), otherBodyInverse * ToBtVector3(position_), ownBodyInverse.getBasis() *
+                    ToBtVector3(axis), otherBodyInverse.getBasis() * ToBtVector3(axis));
             }
             else
             {
-                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, ToBtVector3(position_),
-                    ToBtVector3(axis_.Normalized()));
+                btTransform ownBodyInverse = ownBody->getCenterOfMassTransform().inverse();
+                Vector3 axis = axis_.Normalized();
+                
+                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, ownBodyInverse * ToBtVector3(position_),
+                    ownBodyInverse.getBasis() * ToBtVector3(axis));
             }
             
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);

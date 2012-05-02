@@ -4067,9 +4067,7 @@ Properties:<br>
 - Node@ node (readonly)
 - ConstraintType constraintType
 - Vector3& position
-- Vector3& otherPosition
 - Vector3& axis
-- Vector3& otherAxis
 - float lowLimit
 - float highLimit
 - RigidBody@ ownBody (readonly)

@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "CollisionShape.h"
+#include "Constraint.h"
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
@@ -791,12 +792,19 @@ void RigidBody::AddBodyToWorld()
         // Check if CollisionShapes already exist in the node and add them to the compound shape.
         // Note: NotifyRigidBody() will cause mass to be updated
         PODVector<CollisionShape*> shapes;
-        node_->GetDerivedComponents<CollisionShape>(shapes);
+        node_->GetComponents<CollisionShape>(shapes);
         for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
         {
             massUpdated = true;
             (*i)->NotifyRigidBody();
         }
+        
+        // Check if this node contains Constraint components that were waiting for the rigid body to be created, and signal them
+        // to create themselves now
+        PODVector<Constraint*> constraints;
+        node_->GetComponents<Constraint>(constraints);
+        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+            (*i)->CreateConstraint();
     }
     
     if (!massUpdated)

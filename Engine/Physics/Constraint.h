@@ -42,6 +42,8 @@ class Constraint : public Component
 {
     OBJECT(Constraint);
     
+    friend class RigidBody;
+    
 public:
     /// Construct.
     Constraint(Context* context);
@@ -63,14 +65,10 @@ public:
     void SetConstraintType(ConstraintType type);
     /// %Set other body to connect to. Set to null to connect to the static world.
     void SetOtherBody(RigidBody* body);
-    /// %Set position relative to own body.
+    /// %Set constraint world-space position.
     void SetPosition(const Vector3& position);
-    /// %Set position relative to other body.
-    void SetOtherPosition(const Vector3& position);
-    /// %Set axis relative to own body.
+    /// %Set constraint world-space axis.
     void SetAxis(const Vector3& axis);
-    /// %Set axis relative to other body.
-    void SetOtherAxis(const Vector3& axis);
     /// %Set low limit.
     void SetLowLimit(float limit);
     /// %Set high limit.
@@ -86,14 +84,10 @@ public:
     RigidBody* GetOwnBody() const { return ownBody_; }
     /// Return the other rigid body. May be null if connected to the static world.
     RigidBody* GetOtherBody() const { return otherBody_; }
-    /// Return position relative to own body.
-    const Vector3& GetPosition() const { return position_; }
-    /// Return position relative to other body.
-    const Vector3& GetOtherPosition() const { return otherPosition_; }
-    /// Return axis relative to own body.
-    const Vector3& GetAxis() const { return axis_; }
-    /// Return axis relative to other body.
-    const Vector3& GetOtherAxis() const { return otherAxis_; }
+    /// Return constraint world-space position.
+    const Vector3& GetPosition() const;
+    /// Return constraint world-space axis.
+    const Vector3& GetAxis() const;
     /// Return low limit.
     float GetLowLimit() const { return lowLimit_; }
     /// Return high limit.
@@ -120,14 +114,10 @@ private:
     btTypedConstraint* constraint_;
     /// Constraint type.
     ConstraintType type_;
-    /// Constraint position relative to own body.
-    Vector3 position_;
-    /// Constraint position relative to other body.
-    Vector3 otherPosition_;
-    /// Constraint axis relative to own body.
-    Vector3 axis_;
-    /// Constraint axis relative to other body.
-    Vector3 otherAxis_;
+    /// Constraint world-space position.
+    mutable Vector3 position_;
+    /// Constraint world-space axis.
+    mutable Vector3 axis_;
     /// Low limit.
     float lowLimit_;
     /// High limit.
