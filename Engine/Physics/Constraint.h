@@ -120,10 +120,10 @@ private:
     Vector3 position_;
     /// Constraint axis.
     Vector3 axis_;
-    /// Constraint world position. Used only in file serialization of static constraints.
-    Vector3 worldPosition_;
-    /// Constraint world axis. Used only in file serialization of static constraints.
-    Vector3 worldAxis_;
+    /// Constraint other body position.
+    Vector3 otherBodyPosition_;
+    /// Constraint other body axis.
+    Vector3 otherBodyAxis_;
     /// Cached world scale for determining if the constraint position needs update.
     Vector3 cachedWorldScale_;
     /// Low limit.
@@ -136,6 +136,6 @@ private:
     bool disableCollision_;
     /// Recreate constraint flag.
     bool recreateConstraint_;
-    /// World position valid flag. Used to indicate that it should be used when recreating the joint.
-    bool worldPositionValid_;
+    /// Other body position valid flag. Used to indicate that it should be used when recreating the joint.
+    bool otherBodyPositionValid_;
 };

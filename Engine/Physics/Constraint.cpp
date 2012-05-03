@@ -56,14 +56,14 @@ Constraint::Constraint(Context* context) :
     type_(CONSTRAINT_POINT),
     position_(Vector3::ZERO),
     axis_(Vector3::RIGHT),
-    worldPosition_(Vector3::ZERO),
-    worldAxis_(Vector3::RIGHT),
+    otherBodyPosition_(Vector3::ZERO),
+    otherBodyAxis_(Vector3::RIGHT),
     lowLimit_(DEFAULT_LOW_LIMIT),
     highLimit_(DEFAULT_HIGH_LIMIT),
     otherBodyNodeID_(0),
     disableCollision_(false),
     recreateConstraint_(false),
-    worldPositionValid_(false)
+    otherBodyPositionValid_(false)
 {
 }
 
@@ -82,12 +82,12 @@ void Constraint::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Constraint, "Constraint Type", type_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Axis", axis_, Vector3::RIGHT, AM_DEFAULT);
+    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherBodyPosition_, Vector3::ZERO, AM_DEFAULT | AM_NOEDIT);
+    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Axis", otherBodyAxis_, Vector3::RIGHT, AM_DEFAULT | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "Low Limit", GetLowLimit, SetLowLimit, float, DEFAULT_LOW_LIMIT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "High Limit", GetHighLimit, SetHighLimit, float, DEFAULT_HIGH_LIMIT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
     ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "World Position", worldPosition_, Vector3::ZERO, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "World Axis", worldAxis_, Vector3::RIGHT, AM_FILE | AM_NOEDIT);
 }
 
 void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -98,8 +98,8 @@ void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     if (!attr.accessor_)
     {
         recreateConstraint_ = true;
-        if (attr.offset_ == offsetof(Constraint, worldPosition_))
-            worldPositionValid_ = true;
+        if (attr.offset_ == offsetof(Constraint, otherBodyPosition_) || attr.offset_ == offsetof(Constraint, otherBodyAxis_))
+            otherBodyPositionValid_ = true;
     }
 }
 
@@ -247,11 +247,7 @@ void Constraint::OnNodeSet(Node* node)
 void Constraint::OnMarkedDirty(Node* node)
 {
     if (!node->GetWorldScale().Equals(cachedWorldScale_))
-    {
-        // The serialized world position can not be re-used if node scale changes
-        worldPositionValid_ = false;
         CreateConstraint();
-    }
 }
 
 void Constraint::CreateConstraint()
@@ -269,51 +265,40 @@ void Constraint::CreateConstraint()
     if (!physicsWorld_ || !ownBody)
         return;
     
-    btTransform ownInverse = ownBody->getCenterOfMassTransform().inverse();
+    if (!otherBody)
+        otherBody = &btTypedConstraint::getFixedBody();
     
-    // For a static constraint with a valid deserialized world position, calculate the local position from it
-    if (!otherBody && worldPositionValid_)
-    {
-        position_ = ToVector3(ownInverse * ToBtVector3(worldPosition_)) / cachedWorldScale_;
-        axis_ = ToVector3(ownInverse * ToBtVector3(worldAxis_));
-        // Note: if any other constraint attributes are changed, requiring another constraint recreation, the old
-        // world position will not be re-used again
-        worldPositionValid_ = false;
-    }
+    btTransform ownInverse = ownBody->getWorldTransform().inverse();
+    btTransform otherInverse = otherBody->getWorldTransform().inverse();
+    
+    // If the deserialized constraint other body position is valid, use it, but only this time
+    if (otherBodyPositionValid_)
+        otherBodyPositionValid_ = false;
     else
     {
-        worldPosition_ = ToVector3(ownBody->getCenterOfMassTransform() * ToBtVector3(position_ * cachedWorldScale_));
-        worldAxis_ = ToVector3(ownBody->getCenterOfMassTransform() * ToBtVector3(axis_));
+        // Otherwise calculate it from own body's position
+        otherBodyPosition_ = ToVector3(otherInverse * (ownBody->getWorldTransform() * ToBtVector3(position_ *
+            cachedWorldScale_)));
+        otherBodyAxis_ = ToVector3(otherInverse.getBasis() * (ownBody->getWorldTransform().getBasis() *
+            ToBtVector3(axis_)));
     }
     
     switch (type_)
     {
     case CONSTRAINT_POINT:
-        if (otherBody)
         {
-            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(position_ * cachedWorldScale_),
-                otherBody->getCenterOfMassTransform().inverse() * ToBtVector3(worldPosition_));
+            btPoint2PointConstraint* pointConstraint;
+            constraint_ = pointConstraint = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(position_ *
+                cachedWorldScale_), ToBtVector3(otherBodyPosition_));
         }
-        else
-            constraint_ = new btPoint2PointConstraint(*ownBody, ToBtVector3(position_ * cachedWorldScale_));
         break;
         
     case CONSTRAINT_HINGE:
         {
             btHingeConstraint* hingeConstraint;
-            if (otherBody)
-            {
-                btTransform otherBodyInverse = otherBody->getCenterOfMassTransform().inverse();
-                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ToBtVector3(position_ *
-                    cachedWorldScale_), otherBodyInverse * ToBtVector3(worldPosition_), ToBtVector3(axis_.Normalized()),
-                    otherBodyInverse.getBasis() * ToBtVector3(worldAxis_.Normalized()));
-            }
-            else
-            {
-                constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, ToBtVector3(position_ * cachedWorldScale_),
-                    ToBtVector3(axis_.Normalized()));
-            }
-            
+            constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ToBtVector3(position_ *
+                cachedWorldScale_), ToBtVector3(otherBodyPosition_), ToBtVector3(axis_.Normalized()),
+                ToBtVector3(otherBodyAxis_.Normalized()));
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
         }
         break;
