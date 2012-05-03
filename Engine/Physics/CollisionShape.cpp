@@ -206,8 +206,8 @@ CollisionShape::CollisionShape(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     size_(Vector3::ONE),
-    lodLevel_(0),
     cachedWorldScale_(Vector3::ONE),
+    lodLevel_(0),
     margin_(DEFAULT_COLLISION_MARGIN),
     recreateShape_(false)
 {

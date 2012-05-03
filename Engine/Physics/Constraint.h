@@ -65,13 +65,13 @@ public:
     void SetConstraintType(ConstraintType type);
     /// %Set other body to connect to. Set to null to connect to the static world.
     void SetOtherBody(RigidBody* body);
-    /// %Set constraint world-space position.
+    /// %Set constraint position relative to own body.
     void SetPosition(const Vector3& position);
-    /// %Set constraint world-space axis.
+    /// %Set constraint axis relative to own body.
     void SetAxis(const Vector3& axis);
-    /// %Set low limit.
+    /// %Set low limit. For hinge joints, this means the minimum (negative) angle.
     void SetLowLimit(float limit);
-    /// %Set high limit.
+    /// %Set high limit. For hinge joints, this means the maximum (positive) angle.
     void SetHighLimit(float limit);
     
     /// Return physics world.
@@ -84,10 +84,10 @@ public:
     RigidBody* GetOwnBody() const { return ownBody_; }
     /// Return the other rigid body. May be null if connected to the static world.
     RigidBody* GetOtherBody() const { return otherBody_; }
-    /// Return constraint world-space position.
-    const Vector3& GetPosition() const;
-    /// Return constraint world-space axis.
-    const Vector3& GetAxis() const;
+    /// Return constraint position relative to own body.
+    const Vector3& GetPosition() const { return position_; }
+    /// Return constraint axis relative to own body.
+    const Vector3& GetAxis() const { return axis_; }
     /// Return low limit.
     float GetLowLimit() const { return lowLimit_; }
     /// Return high limit.
@@ -99,6 +99,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// Create the constraint.
@@ -114,10 +116,16 @@ private:
     btTypedConstraint* constraint_;
     /// Constraint type.
     ConstraintType type_;
-    /// Constraint world-space position.
-    mutable Vector3 position_;
-    /// Constraint world-space axis.
-    mutable Vector3 axis_;
+    /// Constraint position.
+    Vector3 position_;
+    /// Constraint axis.
+    Vector3 axis_;
+    /// Constraint world position. Used only in file serialization of static constraints.
+    Vector3 worldPosition_;
+    /// Constraint world axis. Used only in file serialization of static constraints.
+    Vector3 worldAxis_;
+    /// Cached world scale for determining if the constraint position needs update.
+    Vector3 cachedWorldScale_;
     /// Low limit.
     float lowLimit_;
     /// High limit.
@@ -128,4 +136,6 @@ private:
     bool disableCollision_;
     /// Recreate constraint flag.
     bool recreateConstraint_;
+    /// World position valid flag. Used to indicate that it should be used when recreating the joint.
+    bool worldPositionValid_;
 };
