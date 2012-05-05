@@ -24,6 +24,7 @@
 #pragma once
 
 #include "File.h"
+#include "HashMap.h"
 #include "Resource.h"
 
 class FileWatcher;
