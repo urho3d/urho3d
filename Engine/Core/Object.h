@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "HashMap.h"
-#include "Map.h"
+#include "LinkedList.h"
 #include "Ptr.h"
 #include "Variant.h"
 
@@ -92,11 +91,17 @@ protected:
     Context* context_;
     
 private:
+    /// Find the first event handler with no specific sender.
+    EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = 0) const;
+    /// Find the first event handler with specific sender.
+    EventHandler* FindSpecificEventHandler(Object* sender, EventHandler** previous = 0) const;
+    /// Find the first event handler with specific sender and event type.
+    EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = 0) const;
     /// Remove event handlers related to a specific sender.
     void RemoveEventSender(Object* sender);
     
     /// Event handlers. Sender is null for non-specific handlers.
-    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
+    LinkedList<EventHandler> eventHandlers_;
 };
 
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
@@ -148,12 +153,13 @@ public:
 };
 
 /// Internal helper class for invoking event handler functions.
-class EventHandler : public RefCounted
+class EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver.
     EventHandler(Object* receiver) :
         receiver_(receiver),
+        sender_(0),
         userData_(0)
     {
         assert(receiver_);
@@ -162,6 +168,7 @@ public:
     /// Construct with specified receiver and userdata.
     EventHandler(Object* receiver, void* userData) :
         receiver_(receiver),
+        sender_(0),
         userData_(userData)
     {
         assert(receiver_);
@@ -170,17 +177,32 @@ public:
     /// Destruct.
     virtual ~EventHandler() {}
     
+    /// Set sender and event type.
+    void SetSenderAndEventType(Object* sender, StringHash eventType)
+    {
+        sender_ = sender;
+        eventType_ = eventType;
+    }
+    
     /// Invoke event handler function.
-    virtual void Invoke(StringHash eventType, VariantMap& eventData) = 0;
+    virtual void Invoke(VariantMap& eventData) = 0;
     
     /// Return event receiver.
     Object* GetReceiver() const { return receiver_; }
+    /// Return event sender. Null if the handler is non-specific.
+    Object* GetSender() const { return sender_; }
+    /// Return event type.
+    const StringHash& GetEventType() const { return eventType_; }
     /// Return userdata.
     void* GetUserData() const { return userData_; }
     
 protected:
     /// Event receiver.
     Object* receiver_;
+    /// Event sender.
+    Object* sender_;
+    /// Event type.
+    StringHash eventType_;
     /// Userdata.
     void* userData_;
 };
@@ -208,10 +230,10 @@ public:
     }
     
     /// Invoke event handler function.
-    virtual void Invoke(StringHash eventType, VariantMap& eventData)
+    virtual void Invoke(VariantMap& eventData)
     {
         T* receiver = static_cast<T*>(receiver_);
-        (receiver->*function_)(eventType, eventData);
+        (receiver->*function_)(eventType_, eventData);
     }
     
 private:

@@ -24,6 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "HashMap.h"
 #include "Object.h"
 
 class Texture2D;

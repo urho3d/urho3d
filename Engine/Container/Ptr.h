@@ -136,9 +136,9 @@ public:
     /// Return the raw pointer.
     T* Get() const { return ptr_; }
     /// Return the object's reference count, or 0 if the pointer is null.
-    unsigned Refs() const { return ptr_ ? ptr_->Refs() : 0; }
+    int Refs() const { return ptr_ ? ptr_->Refs() : 0; }
     /// Return the object's weak reference count, or 0 if the pointer is null.
-    unsigned WeakRefs() const { return ptr_ ? ptr_->WeakRefs() : 0; }
+    int WeakRefs() const { return ptr_ ? ptr_->WeakRefs() : 0; }
     /// Return pointer to the RefCount structure.
     RefCount* RefCountPtr() const { return ptr_ ? ptr_->RefCountPtr() : 0; }
     /// Return hash value for HashSet & HashMap.
@@ -195,7 +195,10 @@ public:
         refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Copy-construct from another weak pointer.
@@ -204,7 +207,10 @@ public:
         refCount_(rhs.refCount_)
     {
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Construct from a raw pointer.
@@ -213,7 +219,10 @@ public:
         refCount_(ptr ? ptr->RefCountPtr() : 0)
     {
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Destruct. Release the weak reference to the object.
@@ -233,7 +242,10 @@ public:
         ptr_ = rhs.Get();
         refCount_ = rhs.RefCountPtr();
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
         
         return *this;
     }
@@ -249,7 +261,10 @@ public:
         ptr_ = rhs.ptr_;
         refCount_ = rhs.refCount_;
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
         
         return *this;
     }
@@ -267,7 +282,10 @@ public:
         ptr_ = ptr;
         refCount_ = refCount;
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
         
         return *this;
     }
@@ -336,7 +354,10 @@ public:
         ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.refCount_;
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Perform a dynamic cast from a weak pointer of another type.
@@ -349,7 +370,10 @@ public:
         {
             refCount_ = rhs.refCount_;
             if (refCount_)
+            {
+                assert(refCount_->weakRefs_ >= 0);
                 ++(refCount_->weakRefs_);
+            }
         }
         else
             refCount_ = 0;
@@ -360,10 +384,10 @@ public:
     /// Check if the pointer is not null. It does not matter whether the object has expired or not.
     bool NotNull() const { return refCount_ != 0; }
     /// Return the object's reference count, or 0 if null pointer or if object is expired.
-    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
+    int Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     
     /// Return the object's weak reference count.
-    unsigned WeakRefs() const
+    int WeakRefs() const
     {
         if (!Expired())
             return ptr_->WeakRefs();
@@ -372,7 +396,7 @@ public:
     }
     
     /// Return whether the object has expired. If null pointer, always return true.
-    bool Expired() const { return refCount_ ? refCount_->expired_ : true; }
+    bool Expired() const { return refCount_ ? refCount_->refs_ < 0 : true; }
     /// Return pointer to the RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap.
@@ -387,10 +411,10 @@ private:
     {
         if (refCount_)
         {
-            if (refCount_->weakRefs_)
-                --(refCount_->weakRefs_);
+            assert(refCount_->weakRefs_ > 0);
+            --(refCount_->weakRefs_);
             
-            if (!refCount_->refs_ && !refCount_->weakRefs_)
+            if (Expired() && !refCount_->weakRefs_)
                 delete refCount_;
         }
         

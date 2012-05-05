@@ -25,6 +25,7 @@
 
 #include "Attribute.h"
 #include "Object.h"
+#include "HashMap.h"
 #include "HashSet.h"
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
@@ -141,7 +142,7 @@ private:
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
-    WeakPtr<EventHandler> eventHandler_;
+    EventHandler* eventHandler_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

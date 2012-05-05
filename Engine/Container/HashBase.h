@@ -27,7 +27,7 @@
 #include "Hash.h"
 #include "Swap.h"
 
-/// Hash set/map node base.
+/// Hash set/map node base class.
 struct HashNodeBase
 {
     /// Construct.
@@ -47,9 +47,8 @@ struct HashNodeBase
 };
 
 /// Hash set/map iterator base class.
-class HashIteratorBase
+struct HashIteratorBase
 {
-public:
     /// Construct.
     HashIteratorBase() :
         ptr_(0)
@@ -61,26 +60,26 @@ public:
         ptr_(ptr)
     {
     }
-
+    
     /// Test for equality with another iterator.
     bool operator == (const HashIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another iterator.
     bool operator != (const HashIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
-
+    
     /// Go to the next node.
     void GotoNext()
     {
         if (ptr_)
             ptr_ = ptr_->next_;
     }
-
+    
     /// Go to the previous node.
     void GotoPrev()
     {
         if (ptr_)
             ptr_ = ptr_->prev_;
     }
-
+    
     /// Node pointer.
     HashNodeBase* ptr_;
 };

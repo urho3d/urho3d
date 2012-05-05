@@ -36,9 +36,10 @@ RefCounted::~RefCounted()
 {
     assert(refCount_);
     assert(refCount_->refs_ == 0);
+    assert(refCount_->weakRefs_ > 0);
     
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
-    refCount_->expired_ = true;
+    refCount_->refs_ = -1;
     --(refCount_->weakRefs_);
     if (!refCount_->weakRefs_)
         delete refCount_;
@@ -48,24 +49,24 @@ RefCounted::~RefCounted()
 
 void RefCounted::AddRef()
 {
+    assert(refCount_->refs_ >= 0);
     ++(refCount_->refs_);
 }
 
 void RefCounted::ReleaseRef()
 {
     assert(refCount_->refs_ > 0);
-    
     --(refCount_->refs_);
     if (!refCount_->refs_)
         delete this;
 }
 
-unsigned RefCounted::Refs() const
+int RefCounted::Refs() const
 {
     return refCount_->refs_;
 }
 
-unsigned RefCounted::WeakRefs() const
+int RefCounted::WeakRefs() const
 {
     // Subtract one to not return the internally held reference
     return refCount_->weakRefs_ - 1;

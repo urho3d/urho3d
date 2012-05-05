@@ -29,7 +29,7 @@
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
-/// Red-black tree node base.
+/// Red-black tree node base class.
 struct TreeNodeBase
 {
     /// Construct.
@@ -58,9 +58,8 @@ struct TreeNodeBase
 };
 
 /// Red-black tree iterator base class.
-class TreeIteratorBase
+struct TreeIteratorBase
 {
-public:
     /// Construct.
     TreeIteratorBase() :
         ptr_(0),

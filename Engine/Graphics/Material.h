@@ -24,6 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "HashMap.h"
 #include "Resource.h"
 #include "Vector4.h"
 

@@ -24,6 +24,7 @@
 #pragma once
 
 #include "ArrayPtr.h"
+#include "HashMap.h"
 #include "Resource.h"
 
 class Graphics;

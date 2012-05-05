@@ -85,9 +85,8 @@ public:
     };
     
     /// %Map iterator.
-    class Iterator : public TreeIteratorBase
+    struct Iterator : public TreeIteratorBase
     {
-    public:
         /// Construct.
         Iterator()
         {
@@ -115,9 +114,8 @@ public:
     };
     
     /// %Map const iterator.
-    class ConstIterator : public TreeIteratorBase
+    struct ConstIterator : public TreeIteratorBase
     {
-    public:
         /// Construct.
         ConstIterator()
         {

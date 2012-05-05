@@ -29,17 +29,22 @@ struct RefCount
     /// Construct.
     RefCount() :
         refs_(0),
-        weakRefs_(0),
-        expired_(false)
+        weakRefs_(0)
     {
     }
     
-    /// Reference count.
-    unsigned refs_;
+    /// Destruct.
+    ~RefCount()
+    {
+        // Set reference counts below zero to fire asserts if this object is still accessed
+        refs_ = -1;
+        weakRefs_ = -1;
+    }
+    
+    /// Reference count. If below zero, the object has been destroyed.
+    int refs_;
     /// Weak reference count.
-    unsigned weakRefs_;
-    /// Expired status for the object.
-    bool expired_;
+    int weakRefs_;
 };
 
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
@@ -56,9 +61,9 @@ public:
     /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
     void ReleaseRef();
     /// Return reference count.
-    unsigned Refs() const;
+    int Refs() const;
     /// Return weak reference count.
-    unsigned WeakRefs() const;
+    int WeakRefs() const;
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
     

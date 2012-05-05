@@ -26,9 +26,8 @@
 #include "Swap.h"
 
 /// Random access iterator.
-template <class T> class RandomAccessIterator
+template <class T> struct RandomAccessIterator
 {
-public:
     /// Construct.
     RandomAccessIterator() :
         ptr_(0)
@@ -81,9 +80,8 @@ public:
 };
 
 /// Random access const iterator.
-template <class T> class RandomAccessConstIterator
+template <class T> struct RandomAccessConstIterator
 {
-public:
     /// Construct.
     RandomAccessConstIterator() :
         ptr_(0)

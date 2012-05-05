@@ -42,24 +42,38 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
 {
     // Make a copy of the context pointer in case the object is destroyed during event handler invocation
     Context* context = context_;
+    EventHandler* specific = 0;
+    EventHandler* nonSpecific = 0;
     
-    // Check first the specific event handlers, which have priority
-    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::ConstIterator i = eventHandlers_.Find(
-        MakePair(sender, eventType));
-    if (i != eventHandlers_.End())
+    EventHandler* handler = eventHandlers_.First();
+    while (handler)
     {
-        context->SetEventHandler(i->second_);
-        i->second_->Invoke(eventType, eventData);
+        if (handler->GetEventType() == eventType)
+        {
+            if (!handler->GetSender())
+                nonSpecific = handler;
+            else if (handler->GetSender() == sender)
+            {
+                specific = handler;
+                break;
+            }
+        }
+        handler = eventHandlers_.Next(handler);
+    }
+    
+    // Specific event handlers have priority, so if found, invoke first
+    if (specific)
+    {
+        context->SetEventHandler(specific);
+        specific->Invoke(eventData);
         context->SetEventHandler(0);
         return;
     }
     
-    // Then check non-specific (null sender pointer)
-    i = eventHandlers_.Find(MakePair((Object*)0, eventType));
-    if (i != eventHandlers_.End())
+    if (nonSpecific)
     {
-        context->SetEventHandler(i->second_);
-        i->second_->Invoke(eventType, eventData);
+        context->SetEventHandler(nonSpecific);
+        nonSpecific->Invoke(eventData);
         context->SetEventHandler(0);
     }
 }
@@ -69,9 +83,15 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
     if (!handler)
         return;
     
-    Pair<Object*, StringHash> combination((Object*)0, eventType);
+    handler->SetSenderAndEventType(0, eventType);
+    // Remove old event handler first
+    EventHandler* previous;
+    EventHandler* oldHandler = FindSpecificEventHandler(0, eventType, &previous);
+    if (oldHandler)
+        eventHandlers_.Erase(oldHandler, previous);
     
-    eventHandlers_[combination] = handler;
+    eventHandlers_.InsertFront(handler);
+    
     context_->AddEventReceiver(this, eventType);
 }
 
@@ -80,38 +100,48 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     if (!sender || !handler)
         return;
     
-    Pair<Object*, StringHash> combination(sender, eventType);
+    handler->SetSenderAndEventType(sender, eventType);
+    // Remove old event handler first
+    EventHandler* previous;
+    EventHandler* oldHandler = FindSpecificEventHandler(sender, eventType, &previous);
+    if (oldHandler)
+        eventHandlers_.Erase(oldHandler, previous);
     
-    eventHandlers_[combination] = handler;
+    eventHandlers_.InsertFront(handler);
+    
     context_->AddEventReceiver(this, sender, eventType);
 }
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
-        i != eventHandlers_.End();)
+    for (;;)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
-        if (current->first_.second_ == eventType)
+        EventHandler* previous;
+        EventHandler* handler = FindEventHandler(eventType, &previous);
+        if (handler)
         {
-            if (current->first_.first_)
-                context_->RemoveEventReceiver(this, current->first_.first_, current->first_.second_);
+            if (handler->GetSender())
+                context_->RemoveEventReceiver(this, handler->GetSender(), eventType);
             else
-                context_->RemoveEventReceiver(this, current->first_.second_);
-            eventHandlers_.Erase(current);
+                context_->RemoveEventReceiver(this, eventType);
+            eventHandlers_.Erase(handler, previous);
         }
+        else
+            break;
     }
 }
 
 void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType)
 {
-    Pair<Object*, StringHash> combination(sender, eventType);
+    if (!sender)
+        return;
     
-    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Find(combination);
-    if (i != eventHandlers_.End())
+    EventHandler* previous;
+    EventHandler* handler = FindSpecificEventHandler(sender, eventType, &previous);
+    if (handler)
     {
-        context_->RemoveEventReceiver(this, i->first_.first_, i->first_.second_);
-        eventHandlers_.Erase(i);
+        context_->RemoveEventReceiver(this, handler->GetSender(), eventType);
+        eventHandlers_.Erase(handler, previous);
     }
 }
 
@@ -120,48 +150,61 @@ void Object::UnsubscribeFromEvents(Object* sender)
     if (!sender)
         return;
     
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
-        i != eventHandlers_.End();)
+    for (;;)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
-        if (current->first_.first_ == sender)
+        EventHandler* previous;
+        EventHandler* handler = FindSpecificEventHandler(sender, &previous);
+        if (handler)
         {
-            context_->RemoveEventReceiver(this, current->first_.first_, current->first_.second_);
-            eventHandlers_.Erase(current);
+            context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
+            eventHandlers_.Erase(handler, previous);
         }
+        else
+            break;
     }
 }
 
 void Object::UnsubscribeFromAllEvents()
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
-        i != eventHandlers_.End(); ++i)
+    for (;;)
     {
-        if (i->first_.first_)
-            context_->RemoveEventReceiver(this, i->first_.first_, i->first_.second_);
+        EventHandler* handler = eventHandlers_.First();
+        if (handler)
+        {
+            if (handler->GetSender())
+                context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
+            else
+                context_->RemoveEventReceiver(this, handler->GetEventType());
+            eventHandlers_.Erase(handler);
+        }
         else
-            context_->RemoveEventReceiver(this, i->first_.second_);
+            break;
     }
-    
-    eventHandlers_.Clear();
 }
 
 void Object::UnsubscribeFromAllEventsWithUserData()
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
-        i != eventHandlers_.End(); )
+    EventHandler* handler = eventHandlers_.First();
+    EventHandler* previous = 0;
+    
+    while (handler)
     {
-        if (i->second_->GetUserData())
+        if (handler->GetUserData())
         {
-            Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
-            if (current->first_.first_)
-                context_->RemoveEventReceiver(this, current->first_.first_, current->first_.second_);
+            if (handler->GetSender())
+                context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
             else
-                context_->RemoveEventReceiver(this, current->first_.second_);
-            eventHandlers_.Erase(current);
+                context_->RemoveEventReceiver(this, handler->GetEventType());
+            
+            EventHandler* next = eventHandlers_.Next(handler);
+            eventHandlers_.Erase(handler, previous);
+            handler = next;
         }
         else
-            ++i;
+        {
+            previous = handler;
+            handler = eventHandlers_.Next(handler);
+        }
     }
 }
 
@@ -313,21 +356,89 @@ EventHandler* Object::GetEventHandler() const
 
 bool Object::HasSubscribedToEvent(StringHash eventType) const
 {
-    return eventHandlers_.Find(MakePair((Object*)0, eventType)) != eventHandlers_.End();
+    return FindEventHandler(eventType) != 0;
 }
 
 bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 {
-    return eventHandlers_.Find(MakePair(sender, eventType)) != eventHandlers_.End();
+    if (!sender)
+        return false;
+    else
+        return FindSpecificEventHandler(sender, eventType) != 0;
+}
+
+EventHandler* Object::FindEventHandler(StringHash eventType, EventHandler** previous) const
+{
+    EventHandler* handler = eventHandlers_.First();
+    if (previous)
+        *previous = 0;
+    
+    while (handler)
+    {
+        if (handler->GetEventType() == eventType)
+            return handler;
+        if (previous)
+            *previous = handler;
+        handler = eventHandlers_.Next(handler);
+    }
+    
+    return 0;
+}
+
+EventHandler* Object::FindSpecificEventHandler(Object* sender, EventHandler** previous) const
+{
+    EventHandler* handler = eventHandlers_.First();
+    if (previous)
+        *previous = 0;
+    
+    while (handler)
+    {
+        if (handler->GetSender() == sender)
+            return handler;
+        if (previous)
+            *previous = handler;
+        handler = eventHandlers_.Next(handler);
+    }
+    
+    return 0;
+}
+
+EventHandler* Object::FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous) const
+{
+    EventHandler* handler = eventHandlers_.First();
+    if (previous)
+        *previous = 0;
+    
+    while (handler)
+    {
+        if (handler->GetSender() == sender && handler->GetEventType() == eventType)
+            return handler;
+        if (previous)
+            *previous = handler;
+        handler = eventHandlers_.Next(handler);
+    }
+    
+    return 0;
 }
 
 void Object::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator i = eventHandlers_.Begin();
-        i != eventHandlers_.End();)
+    EventHandler* handler = eventHandlers_.First();
+    EventHandler* previous = 0;
+    
+    while (handler)
     {
-        Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::Iterator current = i++;
-        if (current->first_.first_ == sender)
-            eventHandlers_.Erase(current);
+        if (handler->GetSender() == sender)
+        {
+            context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
+            EventHandler* next = eventHandlers_.Next(handler);
+            eventHandlers_.Erase(handler, previous);
+            handler = next;
+        }
+        else
+        {
+            previous = handler;
+            handler = eventHandlers_.Next(handler);
+        }
     }
 }

@@ -45,7 +45,10 @@ public:
         refCount_(rhs.refCount_)
     {
         if (refCount_)
+        {
+            assert(refCount_->refs_ >= 0);
             ++(refCount_->refs_);
+        }
     }
     
     /// Construct from a raw pointer.
@@ -73,7 +76,10 @@ public:
         ptr_ = rhs.ptr_;
         refCount_ = rhs.refCount_;
         if (refCount_)
+        {
+            assert(refCount_->refs_ >= 0);
             ++(refCount_->refs_);
+        }
         
         return *this;
     }
@@ -137,7 +143,10 @@ public:
         {
             refCount_ = rhs.RefCountPtr();
             if (refCount_)
+            {
+                assert(refCount_->refs_ >= 0);
                 ++(refCount_->refs_);
+            }
         }
         else
             refCount_ = 0;
@@ -150,9 +159,9 @@ public:
     /// Return the raw pointer.
     T* Get() const { return ptr_; }
     /// Return the array's reference count, or 0 if the pointer is null.
-    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
+    int Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count, or 0 if the pointer is null.
-    unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
+    int WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return pointer to the RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap.
@@ -169,15 +178,16 @@ private:
         {
             if (refCount_->refs_)
             {
+                assert(refCount_->refs_ > 0);
                 --(refCount_->refs_);
                 if (!refCount_->refs_)
                 {
-                    refCount_->expired_ = true;
+                    refCount_->refs_ = -1;
                     delete[] ptr_;
                 }
             }
             
-            if (!refCount_->refs_ && !refCount_->weakRefs_)
+            if (refCount_->refs_ < 0 && !refCount_->weakRefs_)
                 delete refCount_;
         }
         
@@ -224,7 +234,10 @@ public:
         refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Copy-construct from another weak array pointer.
@@ -233,7 +246,10 @@ public:
         refCount_(rhs.refCount_)
     {
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Destruct. Release the weak reference to the array.
@@ -253,8 +269,10 @@ public:
         ptr_ = rhs.Get();
         refCount_ = rhs.RefCountPtr();
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
-        
+        }
         return *this;
     }
     
@@ -269,7 +287,10 @@ public:
         ptr_ = rhs.ptr_;
         refCount_ = rhs.refCount_;
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
         
         return *this;
     }
@@ -338,7 +359,10 @@ public:
         ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.refCount_;
         if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+        }
     }
     
     /// Perform a dynamic cast from a weak array pointer of another type.
@@ -351,7 +375,10 @@ public:
         {
             refCount_ = rhs.refCount_;
             if (refCount_)
+            {
+                assert(refCount_->weakRefs_ >= 0);
                 ++(refCount_->weakRefs_);
+            }
         }
         else
             refCount_ = 0;
@@ -362,11 +389,11 @@ public:
     /// Check if the pointer is not null.
     bool NotNull() const { return refCount_ != 0; }
     /// Return the array's reference count, or 0 if null pointer or if array is expired.
-    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
+    int Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count.
-    unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
+    int WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return whether the array has expired. If null pointer, always return true.
-    bool Expired() const { return refCount_ ? refCount_->expired_ : true; }
+    bool Expired() const { return refCount_ ? refCount_->refs_ < 0 : true; }
     /// Return pointer to RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap.
@@ -381,10 +408,12 @@ private:
     {
         if (refCount_)
         {
-            if (refCount_->weakRefs_)
+            assert(refCount_->weakRefs_ >= 0);
+            
+            if (refCount_->weakRefs_ > 0)
                 --(refCount_->weakRefs_);
             
-            if (!refCount_->refs_ && !refCount_->weakRefs_)
+            if (Expired() && !refCount_->weakRefs_)
                 delete refCount_;
         }
         

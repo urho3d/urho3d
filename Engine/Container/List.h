@@ -25,7 +25,7 @@
 
 #include "ListBase.h"
 
-/// Linked list template class.
+/// Doubly-linked list template class.
 template <class T> class List : public ListBase
 {
 public:
@@ -53,9 +53,8 @@ public:
     };
     
     /// %List iterator.
-    class Iterator : public ListIteratorBase
+    struct Iterator : public ListIteratorBase
     {
-    public:
         /// Construct.
         Iterator()
         {
@@ -83,9 +82,8 @@ public:
     };
     
     /// %List const iterator.
-    class ConstIterator : public ListIteratorBase
+    struct ConstIterator : public ListIteratorBase
     {
-    public:
         /// Construct.
         ConstIterator()
         {

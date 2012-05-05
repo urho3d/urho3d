@@ -84,9 +84,8 @@ public:
     };
     
     /// Hash map node iterator.
-    class Iterator : public HashIteratorBase
+    struct Iterator : public HashIteratorBase
     {
-    public:
         /// Construct.
         Iterator()
         {
@@ -114,9 +113,8 @@ public:
     };
     
     /// Hash map node const iterator.
-    class ConstIterator : public HashIteratorBase
+    struct ConstIterator : public HashIteratorBase
     {
-    public:
         /// Construct.
         ConstIterator()
         {
