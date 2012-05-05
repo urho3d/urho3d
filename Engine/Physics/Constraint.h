@@ -30,7 +30,8 @@
 enum ConstraintType
 {
     CONSTRAINT_POINT = 0,
-    CONSTRAINT_HINGE
+    CONSTRAINT_HINGE,
+    CONSTRAINT_SLIDER
 };
 
 class PhysicsWorld;

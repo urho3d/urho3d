@@ -34,6 +34,7 @@
 
 #include "BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btHingeConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btSliderConstraint.h"
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
 #include "DebugNew.h"
@@ -42,6 +43,7 @@ static const String typeNames[] =
 {
     "Point",
     "Hinge",
+    "Slider",
     ""
 };
 
@@ -195,6 +197,11 @@ void Constraint::SetLowLimit(float limit)
             btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
         }
+        if (constraint_ && constraint_->getConstraintType() == SLIDER_CONSTRAINT_TYPE)
+        {
+            btSliderConstraint* sliderConstraint = static_cast<btSliderConstraint*>(constraint_);
+            sliderConstraint->setLowerLinLimit(lowLimit_);
+        }
     }
 }
 
@@ -208,6 +215,11 @@ void Constraint::SetHighLimit(float limit)
         {
             btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        }
+        if (constraint_ && constraint_->getConstraintType() == SLIDER_CONSTRAINT_TYPE)
+        {
+            btSliderConstraint* sliderConstraint = static_cast<btSliderConstraint*>(constraint_);
+            sliderConstraint->setUpperLinLimit(highLimit_);
         }
     }
 }
@@ -295,14 +307,28 @@ void Constraint::CreateConstraint()
         
     case CONSTRAINT_HINGE:
         {
-            btHingeConstraint* hingeConstraint;
             Quaternion ownRotation(Vector3::FORWARD, axis_);
             Quaternion otherRotation(Vector3::FORWARD, otherBodyAxis_);
             btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
             btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
             
+            btHingeConstraint* hingeConstraint;
             constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
+        }
+        break;
+        
+    case CONSTRAINT_SLIDER:
+        {
+            Quaternion ownRotation(Vector3::RIGHT, axis_);
+            Quaternion otherRotation(Vector3::RIGHT, otherBodyAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
+            
+            btSliderConstraint* sliderConstraint;
+            constraint_ = sliderConstraint = new btSliderConstraint(*ownBody, *otherBody, ownFrame, otherFrame, false);
+            sliderConstraint->setLowerLinLimit(lowLimit_);
+            sliderConstraint->setUpperLinLimit(highLimit_);
         }
         break;
     }
