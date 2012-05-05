@@ -36,6 +36,8 @@
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
+#include "DebugNew.h"
+
 static const int ASYNC_LOAD_MIN_FPS = 30;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
