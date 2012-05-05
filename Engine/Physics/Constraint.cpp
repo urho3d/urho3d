@@ -296,9 +296,12 @@ void Constraint::CreateConstraint()
     case CONSTRAINT_HINGE:
         {
             btHingeConstraint* hingeConstraint;
-            constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ToBtVector3(position_ *
-                cachedWorldScale_), ToBtVector3(otherBodyPosition_), ToBtVector3(axis_.Normalized()),
-                ToBtVector3(otherBodyAxis_.Normalized()));
+            Quaternion ownRotation(Vector3::FORWARD, axis_);
+            Quaternion otherRotation(Vector3::FORWARD, otherBodyAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
+            
+            constraint_ = hingeConstraint = new btHingeConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
             hingeConstraint->setLimit(lowLimit_ * M_DEGTORAD, highLimit_ * M_DEGTORAD);
         }
         break;
