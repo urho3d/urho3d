@@ -84,7 +84,7 @@ successfully:
   Projects and Solutions -> VC++ Directories in VS2008.)
 
 - For Linux, the following development packages need to be installed:
-  libx11-dev, libxrandr-dev, libasound2-dev. Also install the package 
+  libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
   libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
 
 
@@ -103,7 +103,7 @@ cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and
 Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For gcc, execute make (by default, cmake_gcc.sh specifies to make a 
+For gcc, execute make (by default, cmake_gcc.sh specifies to make a
 RelWithDebInfo build.)
 
 The build process will also compile models and shaders from the Source_Asset
@@ -118,9 +118,9 @@ After the build is complete, the programs can be run from the Bin directory.
 
 To run Urho3D from the Visual Studio debugger, set it as a startup project and
 enter its relative path and filename into Properties -> Debugging -> Command:
-..\Bin\Urho3D.exe. Additionally, entering -w into Debugging -> Command 
-Arguments is highly recommended. This enables startup in windowed mode: 
-without it running into an exception or breakpoint will be obnoxious as the 
+..\Bin\Urho3D.exe. Additionally, entering -w into Debugging -> Command
+Arguments is highly recommended. This enables startup in windowed mode:
+without it running into an exception or breakpoint will be obnoxious as the
 mouse cursor will likely be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the
@@ -164,3 +164,9 @@ V1.15   - New deferred rendering pipeline.
         - Live resource reloading in the editor (Windows only so far.)
         - More accurate frame timing.
         - Bugfixes to physics jittering and FBO performance issue on Linux.
+
+V1.16   - Switched to Bullet physics library.
+        - More physics constraint types.
+        - Rendering and networking performance optimizations.
+        - Use Squish library to implement software DXT decompression when not
+          supported in hardware.

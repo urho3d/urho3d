@@ -125,20 +125,20 @@ V1.12
 - %Zone system refactoring. Objects check the zone they belong to for per-zone light masking, ambient light and fog settings.
 - Scripting API fixes and improvements.
 
-V1.13   
+V1.13
 
 - Task-based multithreading.
 - Vertex lighting option.
 - Forward and light pre-pass rendering pipelines.
 
-V1.14   
+V1.14
 
 - %Object (partial scene) load/save.
 - Post-processing.
 - Switched to pugixml library, scene load/save optimizations.
 - Bugfixes to rendertexture views and component attributes.
 
-V1.15   
+V1.15
 
 - New deferred rendering pipeline.
 - Unicode support.
@@ -146,4 +146,10 @@ V1.15
 - More accurate frame timing.
 - Bugfixes to physics jittering and FBO performance issue on Linux.
 
+V1.16
+
+- Switched to Bullet physics library.
+- More physics constraint types.
+- Rendering and networking performance optimizations.
+- Use Squish library to implement software DXT decompression when not supported in hardware.
 */
