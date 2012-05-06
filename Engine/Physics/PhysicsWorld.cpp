@@ -40,11 +40,10 @@
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
-
-#include "DebugNew.h"
 
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
@@ -63,6 +62,30 @@ void InternalTickCallback(btDynamicsWorld *world, btScalar timeStep)
 {
     static_cast<PhysicsWorld*>(world->getWorldUserInfo())->PostStep(timeStep);
 }
+
+/// Callback for physics world queries.
+struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
+{
+    /// Construct.
+    PhysicsQueryCallback(PODVector<RigidBody*>& result) : result_(result)
+    {
+    }
+    
+    /// Add a contact result.
+    virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObject *colObj0, int, int, const btCollisionObject *colObj1, int, int)
+    {
+        RigidBody* body = reinterpret_cast<RigidBody*>(colObj0->getUserPointer());
+        if (body && !result_.Contains(body))
+            result_.Push(body);
+        body = reinterpret_cast<RigidBody*>(colObj1->getUserPointer());
+        if (body && !result_.Contains(body))
+            result_.Push(body);
+        return 0.0f;
+    }
+    
+    /// Found rigid bodies.
+    PODVector<RigidBody*>& result_;
+};
 
 OBJECTTYPESTATIC(PhysicsWorld);
 
@@ -261,6 +284,8 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
 {
+    PROFILE(PhysicsSphereCast);
+    
     btSphereShape shape(radius);
     
     btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
@@ -285,6 +310,45 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
     }
+}
+
+void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
+{
+    PROFILE(PhysicsWorld_GetRigidBodies);
+    
+    result.Clear();
+    
+    btSphereShape sphereShape(sphere.radius_);
+    btRigidBody* tempRigidBody = new btRigidBody(1.0f, 0, &sphereShape);
+    tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(sphere.center_)));
+    // Need to activate the temporary rigid body to get reliable results from static, sleeping objects
+    tempRigidBody->activate();
+    world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
+    
+    PhysicsQueryCallback callback(result);
+    world_->contactTest(tempRigidBody, callback);
+    
+    world_->removeRigidBody(tempRigidBody);
+    delete tempRigidBody;
+}
+
+void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
+{
+    PROFILE(PhysicsWorld_GetRigidBodies);
+    
+    result.Clear();
+    
+    btBoxShape boxShape(ToBtVector3(box.HalfSize()));
+    btRigidBody* tempRigidBody = new btRigidBody(1.0f, 0, &boxShape);
+    tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(box.Center())));
+    tempRigidBody->activate();
+    world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
+    
+    PhysicsQueryCallback callback(result);
+    world_->contactTest(tempRigidBody, callback);
+    
+    world_->removeRigidBody(tempRigidBody);
+    delete tempRigidBody;
 }
 
 Vector3 PhysicsWorld::GetGravity() const

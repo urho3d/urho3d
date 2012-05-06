@@ -135,6 +135,10 @@ public:
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
+    /// Perform a sphere test into the physics world.
+    void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a bounding box test into the physics world.
+    void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return gravity.
     Vector3 GetGravity() const;
     /// Return whether interpolation between simulation steps is enabled.

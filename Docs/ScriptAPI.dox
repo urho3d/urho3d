@@ -4101,6 +4101,8 @@ Methods:<br>
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
 - PhysicsRaycastResult SphereCast(const Ray&, float, float arg2 = M_INFINITY, uint arg3 = 0xffff)
+- RigidBody@[]@ GetRigidBodies(const Sphere&, uint arg1 = 0xffff)
+- RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint arg1 = 0xffff)
 - void DrawDebugGeometry(bool)
 
 Properties:<br>
