@@ -2458,16 +2458,15 @@ void View::SetupLightVolumeBatch(Batch& batch)
 
 void View::DrawFullscreenQuad(Camera* camera, bool nearQuad)
 {
-    Light quadDirLight(context_);
-    quadDirLight.SetLightType(LIGHT_DIRECTIONAL);
-    Matrix3x4 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
+    Light* quadDirLight = renderer_->GetQuadDirLight();
+    Matrix3x4 model(quadDirLight->GetDirLightTransform(camera, nearQuad));
     
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetShaderParameter(VSP_MODEL, model);
     graphics_->SetShaderParameter(VSP_VIEWPROJ, camera->GetProjection());
     graphics_->ClearTransformSources();
     
-    renderer_->GetLightGeometry(&quadDirLight)->Draw(graphics_);
+    renderer_->GetLightGeometry(quadDirLight)->Draw(graphics_);
 }
 
 void View::RenderShadowMap(const LightBatchQueue& queue)

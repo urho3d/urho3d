@@ -262,6 +262,7 @@ OBJECTTYPESTATIC(Renderer);
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
+    quadDirLight_(new Light(context)),
     numViews_(0),
     numShadowCameras_(0),
     numOcclusionBuffers_(0),
@@ -290,6 +291,8 @@ Renderer::Renderer(Context* context) :
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
+    
+    quadDirLight_->SetLightType(LIGHT_DIRECTIONAL);
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();

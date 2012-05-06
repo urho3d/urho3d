@@ -260,6 +260,8 @@ public:
     unsigned GetNumOccluders(bool allViews = false) const;
     /// Return the default zone.
     Zone* GetDefaultZone() const { return defaultZone_; }
+    /// Return the directional light for fullscreen quad rendering.
+    Light* GetQuadDirLight() const { return quadDirLight_; }
     /// Return the default material.
     Material* GetDefaultMaterial() const { return defaultMaterial_; }
     /// Return the default range attenuation texture.
@@ -368,6 +370,8 @@ private:
     WeakPtr<ResourceCache> cache_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
+    /// Directional light for drawing fullscreen quads.
+    SharedPtr<Light> quadDirLight_;
     /// Directional light quad geometry.
     SharedPtr<Geometry> dirLightGeometry_;
     /// Spot light volume geometry.
