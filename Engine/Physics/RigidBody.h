@@ -193,6 +193,10 @@ public:
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
+    /// Add a constraint that refers to this rigid body.
+    void AddConstraint(Constraint* constraint);
+    /// Remove a constraint that refers to this rigid body.
+    void RemoveConstraint(Constraint* constraint);
     /// Remove the rigid body.
     void ReleaseBody();
     
@@ -216,6 +220,8 @@ private:
     btCompoundShape* compoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Constraints that refer to this rigid body.
+    PODVector<Constraint*> constraints_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.

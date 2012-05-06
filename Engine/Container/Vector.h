@@ -216,8 +216,8 @@ public:
         MoveRange(pos + length, pos, size_ - pos - length);
         
         T* destPtr = Buffer() + pos;
-        for (Iterator i = start; i != end; ++i)
-            *destPtr++ = *i;
+        for (Iterator it = start; it != end; ++it)
+            *destPtr++ = *it;
         
         return Begin() + pos;
     }
@@ -309,19 +309,19 @@ public:
     /// Return iterator to value, or to the end if not found.
     Iterator Find(const T& value)
     {
-        Iterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        Iterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return const iterator to value, or to the end if not found.
     ConstIterator Find(const T& value) const
     {
-        ConstIterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        ConstIterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return whether contains a specific value.
@@ -749,19 +749,19 @@ public:
     /// Return iterator to value, or to the end if not found.
     Iterator Find(const T& value)
     {
-        Iterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        Iterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return const iterator to value, or to the end if not found.
     ConstIterator Find(const T& value) const
     {
-        ConstIterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        ConstIterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return whether contains a specific value.

@@ -108,6 +108,9 @@ void Constraint::ApplyAttributes()
 {
     if (recreateConstraint_)
     {
+        if (otherBody_)
+            otherBody_->RemoveConstraint(this);
+        
         otherBody_.Reset();
         
         Scene* scene = GetScene();
@@ -154,6 +157,9 @@ void Constraint::SetOtherBody(RigidBody* body)
 {
     if (otherBody_ != body)
     {
+        if (otherBody_)
+            otherBody_->RemoveConstraint(this);
+        
         otherBody_ = body;
         
         // Update the connected body attribute
@@ -213,6 +219,11 @@ void Constraint::ReleaseConstraint()
 {
     if (constraint_)
     {
+        if (ownBody_)
+            ownBody_->RemoveConstraint(this);
+        if (otherBody_)
+            otherBody_->RemoveConstraint(this);
+        
         if (physicsWorld_)
             physicsWorld_->GetWorld()->removeConstraint(constraint_);
         
@@ -321,8 +332,12 @@ void Constraint::CreateConstraint()
     }
     
     constraint_->setUserConstraintPtr(this);
-    physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
+    ownBody_->AddConstraint(this);
+    if (otherBody_)
+        otherBody_->AddConstraint(this);
+    
     ApplyLimits();
+    physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
 }
 
 void Constraint::ApplyLimits()

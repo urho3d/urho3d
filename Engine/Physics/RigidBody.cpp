@@ -691,10 +691,25 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
     return attrBuffer_.GetBuffer();
 }
 
+void RigidBody::AddConstraint(Constraint* constraint)
+{
+    constraints_.Push(constraint);
+}
+
+void RigidBody::RemoveConstraint(Constraint* constraint)
+{
+    constraints_.Erase(constraints_.Find(constraint));
+}
+
 void RigidBody::ReleaseBody()
 {
     if (body_)
     {
+        // Release all constraints which refer to this body
+        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+            (*i)->ReleaseConstraint();
+        constraints_.Clear();
+        
         if (physicsWorld_)
         {
             btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();

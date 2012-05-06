@@ -483,23 +483,23 @@ private:
     }
     
     /// Erase a node from the list. Return pointer to the next element, or to the end if could not erase.
-    Node* EraseNode(Node* toRemove)
+    Node* EraseNode(Node* node)
     {
         // The tail node can not be removed
-        if (!toRemove || toRemove == tail_)
+        if (!node || node == tail_)
             return Tail();
         
-        Node* prev = toRemove->Prev();
-        Node* next = toRemove->Next();
+        Node* prev = node->Prev();
+        Node* next = node->Next();
         if (prev)
             prev->next_ = next;
         next->prev_ = prev;
         
         // Reassign the head node if necessary
-        if (toRemove == Head())
+        if (node == Head())
             head_ = next;
         
-        FreeNode(toRemove);
+        FreeNode(node);
         --size_;
         
         return next;

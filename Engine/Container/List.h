@@ -287,19 +287,19 @@ public:
     /// Return iterator to value, or to the end if not found.
     Iterator Find(const T& value)
     {
-        Iterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        Iterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return const iterator to value, or to the end if not found.
     ConstIterator Find(const T& value) const
     {
-        ConstIterator i = Begin();
-        while (i != End() && *i != value)
-            ++i;
-        return i;
+        ConstIterator it = Begin();
+        while (it != End() && *it != value)
+            ++it;
+        return it;
     }
     
     /// Return whether contains a specific value.
@@ -353,23 +353,23 @@ private:
     }
     
     /// Erase and free a node. Return pointer to the next node, or to the end if could not erase.
-    Node* EraseNode(Node* toRemove)
+    Node* EraseNode(Node* node)
     {
         // The tail node can not be removed
-        if (!toRemove || toRemove == tail_)
+        if (!node || node == tail_)
             return Tail();
         
-        Node* prev = toRemove->Prev();
-        Node* next = toRemove->Next();
+        Node* prev = node->Prev();
+        Node* next = node->Next();
         if (prev)
             prev->next_ = next;
         next->prev_ = prev;
         
         // Reassign the head node if necessary
-        if (toRemove == Head())
+        if (node == Head())
             head_ = next;
         
-        FreeNode(toRemove);
+        FreeNode(node);
         --size_;
         
         return next;

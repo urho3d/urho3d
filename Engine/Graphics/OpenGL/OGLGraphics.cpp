@@ -1670,9 +1670,7 @@ void Graphics::AddGPUObject(GPUObject* object)
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
-    Vector<GPUObject*>::Iterator i = gpuObjects_.Find(object);
-    if (i != gpuObjects_.End())
-        gpuObjects_.Erase(i);
+    gpuObjects_.Erase(gpuObjects_.Find(object));
 }
 
 void* Graphics::ReserveDiscardLockBuffer(unsigned size)

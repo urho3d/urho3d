@@ -299,9 +299,7 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
-    PODVector<RigidBody*>::Iterator i = rigidBodies_.Find(body);
-    if (i != rigidBodies_.End())
-        rigidBodies_.Erase(i);
+    rigidBodies_.Erase(rigidBodies_.Find(body));
 }
 
 void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
@@ -311,9 +309,7 @@ void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
 
 void PhysicsWorld::RemoveCollisionShape(CollisionShape* shape)
 {
-    PODVector<CollisionShape*>::Iterator i = collisionShapes_.Find(shape);
-    if (i != collisionShapes_.End())
-        collisionShapes_.Erase(i);
+    collisionShapes_.Erase(collisionShapes_.Find(shape));
 }
 
 void PhysicsWorld::AddConstraint(Constraint* constraint)
@@ -323,9 +319,7 @@ void PhysicsWorld::AddConstraint(Constraint* constraint)
 
 void PhysicsWorld::RemoveConstraint(Constraint* constraint)
 {
-    PODVector<Constraint*>::Iterator i = constraints_.Find(constraint);
-    if (i != constraints_.End())
-        constraints_.Erase(i);
+    constraints_.Erase(constraints_.Find(constraint));
 }
 
 void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transform)
