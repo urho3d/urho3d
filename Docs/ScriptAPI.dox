@@ -4068,8 +4068,8 @@ Properties:<br>
 - ConstraintType constraintType
 - Vector3& position
 - Vector3& axis
-- float lowLimit
-- float highLimit
+- Vector3& highLimit
+- Vector3& lowLimit
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
 

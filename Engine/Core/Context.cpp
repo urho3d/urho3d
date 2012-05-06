@@ -156,7 +156,16 @@ void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash even
 
 void Context::RemoveEventSender(Object* sender)
 {
-    specificEventReceivers_.Erase(sender);
+    HashMap<Object*, HashMap<StringHash, HashSet<Object*> > >::Iterator i = specificEventReceivers_.Find(sender);
+    if (i != specificEventReceivers_.End())
+    {
+        for (HashMap<StringHash, HashSet<Object*> >::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
+        {
+            for (HashSet<Object*>::Iterator k = j->second_.Begin(); k != j->second_.End(); ++k)
+                (*k)->RemoveEventSender(sender);
+        }
+        specificEventReceivers_.Erase(i);
+    }
 }
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)

@@ -430,7 +430,6 @@ void Object::RemoveEventSender(Object* sender)
     {
         if (handler->GetSender() == sender)
         {
-            context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());
             EventHandler* next = eventHandlers_.Next(handler);
             eventHandlers_.Erase(handler, previous);
             handler = next;

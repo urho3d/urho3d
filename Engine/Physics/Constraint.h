@@ -31,7 +31,8 @@ enum ConstraintType
 {
     CONSTRAINT_POINT = 0,
     CONSTRAINT_HINGE,
-    CONSTRAINT_SLIDER
+    CONSTRAINT_SLIDER,
+    CONSTRAINT_CONETWIST
 };
 
 class PhysicsWorld;
@@ -70,10 +71,10 @@ public:
     void SetPosition(const Vector3& position);
     /// %Set constraint axis relative to own body.
     void SetAxis(const Vector3& axis);
-    /// %Set low limit. For hinge joints, this means the minimum (negative) angle.
-    void SetLowLimit(float limit);
-    /// %Set high limit. For hinge joints, this means the maximum (positive) angle.
-    void SetHighLimit(float limit);
+    /// %Set high limit. Interpretation is constraint type specific.
+    void SetHighLimit(const Vector3& limit);
+    /// %Set low limit. Interpretation is constraint type specific.
+    void SetLowLimit(const Vector3& limit);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -89,10 +90,10 @@ public:
     const Vector3& GetPosition() const { return position_; }
     /// Return constraint axis relative to own body.
     const Vector3& GetAxis() const { return axis_; }
-    /// Return low limit.
-    float GetLowLimit() const { return lowLimit_; }
     /// Return high limit.
-    float GetHighLimit() const { return highLimit_; }
+    const Vector3& GetHighLimit() const { return highLimit_; }
+    /// Return low limit.
+    const Vector3& GetLowLimit() const { return lowLimit_; }
     
     /// Release the constraint.
     void ReleaseConstraint();
@@ -127,10 +128,10 @@ private:
     Vector3 otherBodyAxis_;
     /// Cached world scale for determining if the constraint position needs update.
     Vector3 cachedWorldScale_;
-    /// Low limit.
-    float lowLimit_;
     /// High limit.
-    float highLimit_;
+    Vector3 highLimit_;
+    /// Low limit.
+    Vector3 lowLimit_;
     /// Other body node ID for pending constraint recreation.
     int otherBodyNodeID_;
     /// Disable collision between connected bodies flag.

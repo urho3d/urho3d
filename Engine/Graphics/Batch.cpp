@@ -35,6 +35,7 @@
 #include "Technique.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
+#include "View.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
@@ -739,6 +740,12 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
         vertexBuffers.Pop();
         elementMasks.Pop();
     }
+}
+
+unsigned BatchGroupKey::ToHash() const
+{
+    return ((unsigned)zone_) / sizeof(Zone) + ((unsigned)lightQueue_) / sizeof(LightBatchQueue) + ((unsigned)pass_) / sizeof(Pass)
+        + ((unsigned)material_) / sizeof(Material) + ((unsigned)geometry_) / sizeof(Geometry);
 }
 
 void BatchQueue::Clear(int maxSortedInstances)

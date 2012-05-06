@@ -823,7 +823,9 @@ The other physics components are:
 
 - RigidBody: a physics object instance. Its parameters include mass, linear/angular velocities, friction and restitution.
 - CollisionShape: defines physics collision geometry. The supported shapes are box, sphere, cylinder, capsule, cone, triangle mesh and convex hull.
-- Constraint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently point, hinge and slider constraints are supported.
+- Constraint: connects two RigidBodies together, or one RigidBody to a static point in the world. Point, hinge, slider and cone twist constraints are supported.
+
+\section Physics_Movement Movement and collision
 
 Both a RigidBody and at least one CollisionShape component must exist in a scene node for it to behave physically (a collision shape by itself does nothing.) Several collision shapes may exist in the same node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. Triangle mesh and convex hull geometries require specifying a Model resource and the LOD level to use.
 
@@ -839,6 +841,14 @@ To prevent tunneling of a fast moving rigid body through obstacles, continuous c
 
 All physics calculations are performed in world space. Nodes containing a RigidBody component should be parented to the Scene (root node) to ensure correct operation.
 
+\section Physics_ConstraintParameters Constraint parameters
+
+Hinge and slider constraints support defining limits for the motion. To be generic, these are encoded slightly unintuitively into Vector3's.
+For a hinge constraint, the low and high limit X coordinates define the minimum and maximum angle in degrees. For example -45 to 45. For a slider constraint,
+the X coordinates define the maximum linear motion in world space units, and the Y coordinates define maximum angular motion in degrees. The cone twist constraint uses only the high limit to define the maximum angles (minimum angle is always -maximum) in the following manner: The X coordinate is the limit of the twist (main) axis, while Y and Z are the limits of the swinging motion about the other axes.
+
+\section Physics_Events Physics events
+
 The physics world sends 3 types of events during its update step:
 
 - E_PHYSICSPRESTEP before the simulation is stepped.
@@ -846,6 +856,38 @@ The physics world sends 3 types of events during its update step:
 - E_PHYSICSPOSTSTEP after the simulation has been stepped.
 
 Note that if the rendering framerate is high, the physics might not be stepped at all on each frame: in that case those events will not be sent.
+
+\section Physics_Collision Reading collision events
+
+A physics collision event will report the collided scene nodes and rigid bodies, whether the collision is new (meaning the same pair of rigid bodies did not collide on the previous simulation step) and the list of contact points.
+
+The contact points are encoded in a byte buffer, which can be read using the VectorBuffer or MemoryBuffer helper class. The following structure repeats for each contact:
+
+- World-space position (Vector3)
+- Normal vector (Vector3)
+- Distance, negative when interpenetrating (float)
+- Impulse applied in collision (float)
+
+An example of reading collision event and contact point data in script, from NinjaSnowWar game object collision handling code:
+
+\code
+void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
+{
+    Node@ otherNode = eventData["OtherNode"].GetNode();
+    RigidBody@ otherBody = eventData["OtherBody"].GetRigidBody();
+    VectorBuffer contacts = eventData["Contacts"].GetBuffer();
+
+    while (!contacts.eof)
+    {
+        Vector3 contactPosition = contacts.ReadVector3();
+        Vector3 contactNormal = contacts.ReadVector3();
+        float contactDistance = contacts.ReadFloat();
+        float contactImpulse = contacts.ReadFloat();
+
+        // Do something with the contact data...
+    }
+}
+\endcode
 
 
 \page UI User interface

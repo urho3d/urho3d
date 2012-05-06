@@ -173,7 +173,7 @@ struct BatchGroupKey
     BatchGroupKey()
     {
     }
-
+    
     /// Construct from a batch.
     BatchGroupKey(const Batch& batch) :
         zone_(batch.zone_),
@@ -183,7 +183,7 @@ struct BatchGroupKey
         geometry_(batch.geometry_)
     {
     }
-
+    
     /// Zone.
     Zone* zone_;
     /// Light properties.
@@ -201,7 +201,7 @@ struct BatchGroupKey
     bool operator != (const BatchGroupKey& rhs) const { return zone_ != rhs.zone_ || lightQueue_ != rhs.lightQueue_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
     /// Return hash value.
-    unsigned ToHash() const { return (unsigned)zone_ + (unsigned)lightQueue_ + (unsigned)pass_ + (unsigned)material_ + (unsigned)geometry_; }
+    unsigned ToHash() const;
 };
 
 /// Queue that contains both instanced and non-instanced draw calls.
