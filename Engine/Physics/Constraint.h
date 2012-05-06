@@ -107,6 +107,8 @@ protected:
 private:
     /// Create the constraint.
     void CreateConstraint();
+    /// Apply high and low constraint limits.
+    void ApplyLimits();
     
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
