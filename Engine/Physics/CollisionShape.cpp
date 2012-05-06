@@ -669,7 +669,10 @@ void CollisionShape::UpdateShape()
         }
         
         if (shape_)
+        {
+            shape_->setUserPointer(this);
             shape_->setMargin(margin_);
+        }
         
         cachedWorldScale_ = newWorldScale;
     }

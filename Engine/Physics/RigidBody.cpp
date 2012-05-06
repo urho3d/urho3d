@@ -706,9 +706,10 @@ void RigidBody::ReleaseBody()
     if (body_)
     {
         // Release all constraints which refer to this body
-        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+        // Make a copy for iteration
+        PODVector<Constraint*> constraints = constraints_;
+        for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
-        constraints_.Clear();
         
         if (physicsWorld_)
         {

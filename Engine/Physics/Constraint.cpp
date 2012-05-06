@@ -337,6 +337,7 @@ void Constraint::CreateConstraint()
         otherBody_->AddConstraint(this);
     
     ApplyLimits();
+    
     physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
 }
 
