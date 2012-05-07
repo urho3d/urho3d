@@ -1422,7 +1422,7 @@ Properties:<br>
 Bone
 
 Properties:<br>
-- Node@ node (readonly)
+- Node@ node
 - String name
 - Vector3 initialPosition
 - Quaternion initialRotation
@@ -4056,7 +4056,6 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void SetParameters(ConstraintType, RigidBody@, const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vector2&, const Vector2&, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4071,6 +4070,7 @@ Properties:<br>
 - Vector3& axis
 - Vector3& otherPosition
 - Vector3& otherAxis
+- Vector3 worldPosition
 - Vector2& highLimit
 - Vector2& lowLimit
 - bool disableCollision

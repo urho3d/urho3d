@@ -206,6 +206,22 @@ void Constraint::SetOtherAxis(const Vector3& axis)
     }
 }
 
+void Constraint::SetWorldPosition(const Vector3& position)
+{
+    if (constraint_)
+    {
+        btTransform ownBodyInverse = constraint_->getRigidBodyA().getWorldTransform().inverse();
+        btTransform otherBodyInverse = constraint_->getRigidBodyB().getWorldTransform().inverse();
+        btVector3 worldPos = ToBtVector3(position);
+        position_ = ToVector3(ownBodyInverse * worldPos) / cachedWorldScale_;
+        otherPosition_ = ToVector3(otherBodyInverse * worldPos);
+        if (otherBody_)
+            otherPosition_ /= otherBody_->GetNode()->GetWorldScale();
+        ApplyFrames();
+        MarkNetworkUpdate();
+    }
+}
+
 void Constraint::SetHighLimit(const Vector2& limit)
 {
     if (limit != highLimit_)
@@ -236,27 +252,15 @@ void Constraint::SetDisableCollision(bool disable)
     }
 }
 
-void Constraint::SetParameters(ConstraintType type, RigidBody* otherBody, const Vector3& position, const Vector3& axis, const Vector3& otherPosition, const Vector3& otherAxis, const Vector2& highLimit, const Vector2& lowLimit, bool disableCollision)
+Vector3 Constraint::GetWorldPosition() const
 {
-    if (otherBody_)
-        otherBody_->RemoveConstraint(this);
-    
-    type_ = type;
-    otherBody_ = otherBody;
-    position_ = position;
-    axis_ = axis;
-    otherPosition_ = otherPosition;
-    otherAxis_ = otherAxis;
-    highLimit_ = highLimit;
-    lowLimit_ = lowLimit;
-    disableCollision_ = disableCollision;
-    
-    // Update the connected body attribute
-    Node* otherNode = otherBody_ ? otherBody_->GetNode() : 0;
-    otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
-    
-    CreateConstraint();
-    MarkNetworkUpdate();
+    if (constraint_)
+    {
+        btTransform ownBody = constraint_->getRigidBodyA().getWorldTransform();
+        return ToVector3(ownBody * ToBtVector3(position_ * cachedWorldScale_));
+    }
+    else
+        return Vector3::ZERO;
 }
 
 void Constraint::ReleaseConstraint()

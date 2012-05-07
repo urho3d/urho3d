@@ -75,14 +75,14 @@ public:
     void SetOtherPosition(const Vector3& position);
     /// %Set constraint axis relative to other body. If constraint connects to static world, this is the static axis in world space.
     void SetOtherAxis(const Vector3& axis);
+    ///% Set constraint world position. Sets both own and other body positions to the same point.
+    void SetWorldPosition(const Vector3& position);
     /// %Set high limit. Interpretation is constraint type specific.
     void SetHighLimit(const Vector2& limit);
     /// %Set low limit. Interpretation is constraint type specific.
     void SetLowLimit(const Vector2& limit);
     /// %Set whether to disable collisions between connected bodies.
     void SetDisableCollision(bool disable);
-    /// Set all constraint parameters at once.
-    void SetParameters(ConstraintType type, RigidBody* otherBody, const Vector3& position, const Vector3& axis, const Vector3& otherPosition, const Vector3& otherAxis, const Vector2& highLimit, const Vector2& lowLimit, bool disableCollision);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -102,6 +102,8 @@ public:
     const Vector3& GetOtherPosition() const { return otherPosition_; }
     /// Return constraint axis relative to other body.
     const Vector3& GetOtherAxis() const { return otherAxis_; }
+    /// Return constraint world position.
+    Vector3 GetWorldPosition() const;
     /// Return high limit.
     const Vector2& GetHighLimit() const { return highLimit_; }
     /// Return low limit.

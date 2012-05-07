@@ -438,7 +438,7 @@ void HandlePostRenderUpdate()
     if (drawDebug == 1)
         renderer.DrawDebugGeometry(false);
     if (drawDebug == 2)
-        testScene.physicsWorld.DrawDebugGeometry(true);
+        testScene.physicsWorld.DrawDebugGeometry(false);
 
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
@@ -450,6 +450,10 @@ void HandlePostRenderUpdate()
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
+                
+            // Test creating a ragdoll
+            if (input.keyPress['R'] && result.drawable.typeName == "AnimatedModel")
+                CreateRagdoll(result.drawable);
         }
     }
 }
@@ -459,4 +463,68 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
     Connection@ connection = eventData["Connection"].GetConnection();
     connection.scene = testScene; // Begin scene replication to the client
     connection.logStatistics = true;
+}
+
+void CreateRagdoll(AnimatedModel@ model)
+{
+    Node@ root = model.node;
+    
+    CreateRagdollBone(root, "Bip01_Pelvis", 1.0, SHAPE_BOX, Vector3(0.15, 0.2, 0.3), Vector3(0.1, 0, 0), Quaternion(0, 0, 0));
+    CreateRagdollBone(root, "Bip01_Spine1", 1.0, SHAPE_BOX, Vector3(0.35, 0.3, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 0));
+    CreateRagdollBone(root, "Bip01_L_Thigh", 1.0, SHAPE_CAPSULE, Vector3(0.2, 0.45, 0.2), Vector3(0.2, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Thigh", 1.0, SHAPE_CAPSULE, Vector3(0.2, 0.45, 0.2), Vector3(0.2, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_L_Calf", 1.0, SHAPE_CAPSULE, Vector3(0.2, 0.45, 0.2), Vector3(0.2, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Calf", 1.0, SHAPE_CAPSULE, Vector3(0.2, 0.45, 0.2), Vector3(0.2, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_Head", 1.0, SHAPE_SPHERE, Vector3(0.3, 0.3, 0.3), Vector3(0.1, 0, 0), Quaternion(0, 0, 0));
+    CreateRagdollBone(root, "Bip01_L_UpperArm", 1.0, SHAPE_CAPSULE, Vector3(0.15, 0.3, 0.15), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_UpperArm", 1.0, SHAPE_CAPSULE, Vector3(0.15, 0.3, 0.15), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_L_Forearm", 1.0, SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Forearm", 1.0, SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
+
+    CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_Head", "Bip01_Spine1", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_POINT);
+    CreateRagdollConstraint(root, "Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_POINT);
+
+    // Disable animation from all bones (both physical and non-physical) to not interfere
+    Skeleton@ skel = model.skeleton;
+    for (uint i = 0; i < skel.numBones; ++i)
+        skel.bones[i].animated = false;
+}
+
+void CreateRagdollBone(Node@ root, String boneName, float mass, ShapeType type, Vector3 size, Vector3 position, Quaternion rotation)
+{
+    Node@ boneNode = root.GetChild(boneName, true);
+    if (boneNode is null || boneNode.HasComponent("RigidBody"))
+        return;
+    
+    RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL);
+    body.mass = mass;
+    body.linearDamping = 0.8;
+    body.angularDamping = 0.5;
+
+    CollisionShape@ shape = boneNode.CreateComponent("CollisionShape", LOCAL);
+    shape.shapeType = type;
+    shape.size = size;
+    shape.position = position;
+    shape.rotation = rotation;
+}
+
+void CreateRagdollConstraint(Node@ root, String boneName, String parentName, ConstraintType type)
+{
+    Node@ boneNode = root.GetChild(boneName, true);
+    Node@ parentNode = root.GetChild(parentName, true);
+    if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
+        return;
+        
+    Constraint@ constraint = boneNode.CreateComponent("Constraint");
+    constraint.constraintType = type;
+    constraint.otherBody = parentNode.GetComponent("RigidBody");
+    constraint.worldPosition = boneNode.worldPosition;
 }

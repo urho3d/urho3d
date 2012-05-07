@@ -102,6 +102,11 @@ static Node* BoneGetNode(Bone* ptr)
     return ptr->node_;
 }
 
+static void BoneSetNode(Node* node, Bone* ptr)
+{
+    ptr->node_ = node;
+}
+
 static void RegisterSkeleton(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Bone", 0, asOBJ_REF);
@@ -114,7 +119,8 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Bone", "bool animated", offsetof(Bone, animated_));
     engine->RegisterObjectProperty("Bone", "float radius", offsetof(Bone, radius_));
     engine->RegisterObjectProperty("Bone", "const BoundingBox boundingBox", offsetof(Bone, boundingBox_));
-    engine->RegisterObjectMethod("Bone", "Node@+ get_node()", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "void set_node(Node@+)", asFUNCTION(BoneSetNode), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "Node@+ get_node() const", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);

@@ -169,7 +169,6 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_CONETWIST", CONSTRAINT_CONETWIST);
     
     RegisterComponent<Constraint>(engine, "Constraint");
-    engine->RegisterObjectMethod("Constraint", "void SetParameters(ConstraintType, RigidBody@+, const Vector3&in, const Vector3&in, const Vector3&in, const Vector3&in, const Vector2&in, const Vector2&in, bool)", asMETHOD(Constraint, SetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_constraintType(ConstraintType)", asMETHOD(Constraint, SetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);
@@ -180,6 +179,8 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherPosition() const", asMETHOD(Constraint, GetOtherPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_otherAxis(const Vector3&in)", asMETHOD(Constraint, SetOtherAxis), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherAxis() const", asMETHOD(Constraint, GetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_worldPosition(const Vector3&in)", asMETHOD(Constraint, SetWorldPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "Vector3 get_worldPosition() const", asMETHOD(Constraint, GetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_highLimit(const Vector2&in)", asMETHOD(Constraint, SetHighLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector2& get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_lowLimit(const Vector2&in)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
