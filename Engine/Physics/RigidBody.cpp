@@ -208,6 +208,7 @@ void RigidBody::SetPosition(Vector3 position)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
+        body_->updateInertiaTensor();
         
         Activate();
         MarkNetworkUpdate();
@@ -225,6 +226,7 @@ void RigidBody::SetRotation(Quaternion rotation)
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
+        body_->updateInertiaTensor();
         
         Activate();
         MarkNetworkUpdate();
@@ -244,6 +246,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         interpTrans.setOrigin(worldTrans.getOrigin());
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
+        body_->updateInertiaTensor();
         
         Activate();
         MarkNetworkUpdate();
@@ -672,6 +675,7 @@ void RigidBody::UpdateMass()
         if (mass_ > 0.0f)
             compoundShape_->calculateLocalInertia(mass_, localInertia);
         body_->setMassProps(mass_, localInertia);
+        body_->updateInertiaTensor();
     }
 }
 
