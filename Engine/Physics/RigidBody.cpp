@@ -72,7 +72,6 @@ RigidBody::RigidBody(Context* context) :
     lastRotation_(Quaternion::IDENTITY),
     kinematic_(false),
     phantom_(false),
-    inSetTransform_(false),
     hasSmoothedTransform_(false),
     readdBody_(false)
 {
@@ -640,7 +639,7 @@ bool RigidBody::IsActive() const
 
 void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
 {
-    inSetTransform_ = true;
+    physicsWorld_->SetApplyingTransforms(true);
     
     // Apply transform to the SmoothedTransform component instead of node transform if available
     SmoothedTransform* transform = 0;
@@ -662,7 +661,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
         lastRotation_ = node_->GetWorldRotation();
     }
     
-    inSetTransform_ = false;
+    physicsWorld_->SetApplyingTransforms(false);
 }
 
 void RigidBody::UpdateMass()
@@ -727,7 +726,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     // If node transform changes, apply it back to the physics transform. However, do not do this when a SmoothedTransform
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
-    if (!inSetTransform_ && !hasSmoothedTransform_)
+    if ((!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
@@ -851,13 +850,13 @@ void RigidBody::AddBodyToWorld()
 void RigidBody::HandleTargetPosition(StringHash eventType, VariantMap& eventData)
 {
     // Copy the smoothing target position to the rigid body
-    if (!inSetTransform_)
+    if (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms())
         SetPosition(static_cast<SmoothedTransform*>(GetEventSender())->GetTargetWorldPosition());
 }
 
 void RigidBody::HandleTargetRotation(StringHash eventType, VariantMap& eventData)
 {
     // Copy the smoothing target rotation to the rigid body
-    if (!inSetTransform_)
+    if (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms())
         SetRotation(static_cast<SmoothedTransform*>(GetEventSender())->GetTargetWorldRotation());
 }

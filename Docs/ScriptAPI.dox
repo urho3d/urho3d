@@ -1457,7 +1457,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
-- void AddNode(Node@, bool arg1 = true)
+- void AddNode(Node@, float arg1 = 1.0, bool arg2 = true)
 - void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
 - void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
 - void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
@@ -4056,6 +4056,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void SetParameters(ConstraintType, RigidBody@, const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vector2&, const Vector2&, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4068,8 +4069,11 @@ Properties:<br>
 - ConstraintType constraintType
 - Vector3& position
 - Vector3& axis
-- Vector3& highLimit
-- Vector3& lowLimit
+- Vector3& otherPosition
+- Vector3& otherAxis
+- Vector2& highLimit
+- Vector2& lowLimit
+- bool disableCollision
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
 

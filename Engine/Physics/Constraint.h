@@ -71,10 +71,18 @@ public:
     void SetPosition(const Vector3& position);
     /// %Set constraint axis relative to own body.
     void SetAxis(const Vector3& axis);
+    /// %Set constraint position relative to other body. If constraint connects to static world, this is the static position in world space.
+    void SetOtherPosition(const Vector3& position);
+    /// %Set constraint axis relative to other body. If constraint connects to static world, this is the static axis in world space.
+    void SetOtherAxis(const Vector3& axis);
     /// %Set high limit. Interpretation is constraint type specific.
-    void SetHighLimit(const Vector3& limit);
+    void SetHighLimit(const Vector2& limit);
     /// %Set low limit. Interpretation is constraint type specific.
-    void SetLowLimit(const Vector3& limit);
+    void SetLowLimit(const Vector2& limit);
+    /// %Set whether to disable collisions between connected bodies.
+    void SetDisableCollision(bool disable);
+    /// Set all constraint parameters at once.
+    void SetParameters(ConstraintType type, RigidBody* otherBody, const Vector3& position, const Vector3& axis, const Vector3& otherPosition, const Vector3& otherAxis, const Vector2& highLimit, const Vector2& lowLimit, bool disableCollision);
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -90,10 +98,16 @@ public:
     const Vector3& GetPosition() const { return position_; }
     /// Return constraint axis relative to own body.
     const Vector3& GetAxis() const { return axis_; }
+    /// Return constraint position relative to other body.
+    const Vector3& GetOtherPosition() const { return otherPosition_; }
+    /// Return constraint axis relative to other body.
+    const Vector3& GetOtherAxis() const { return otherAxis_; }
     /// Return high limit.
-    const Vector3& GetHighLimit() const { return highLimit_; }
+    const Vector2& GetHighLimit() const { return highLimit_; }
     /// Return low limit.
-    const Vector3& GetLowLimit() const { return lowLimit_; }
+    const Vector2& GetLowLimit() const { return lowLimit_; }
+    /// Return whether collisions between connected bodies are disabled.
+    bool GetDisableCollision() const { return disableCollision_; }
     
     /// Release the constraint.
     void ReleaseConstraint();
@@ -107,6 +121,8 @@ protected:
 private:
     /// Create the constraint.
     void CreateConstraint();
+    /// Apply constraint frames.
+    void ApplyFrames();
     /// Apply high and low constraint limits.
     void ApplyLimits();
     
@@ -125,21 +141,19 @@ private:
     /// Constraint axis.
     Vector3 axis_;
     /// Constraint other body position.
-    Vector3 otherBodyPosition_;
+    Vector3 otherPosition_;
     /// Constraint other body axis.
-    Vector3 otherBodyAxis_;
+    Vector3 otherAxis_;
     /// Cached world scale for determining if the constraint position needs update.
     Vector3 cachedWorldScale_;
     /// High limit.
-    Vector3 highLimit_;
+    Vector2 highLimit_;
     /// Low limit.
-    Vector3 lowLimit_;
+    Vector2 lowLimit_;
     /// Other body node ID for pending constraint recreation.
     int otherBodyNodeID_;
     /// Disable collision between connected bodies flag.
     bool disableCollision_;
     /// Recreate constraint flag.
     bool recreateConstraint_;
-    /// Other body position valid flag. Used to indicate that it should be used when recreating the joint.
-    bool otherBodyPositionValid_;
 };

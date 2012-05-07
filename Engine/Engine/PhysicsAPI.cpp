@@ -169,16 +169,23 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_CONETWIST", CONSTRAINT_CONETWIST);
     
     RegisterComponent<Constraint>(engine, "Constraint");
+    engine->RegisterObjectMethod("Constraint", "void SetParameters(ConstraintType, RigidBody@+, const Vector3&in, const Vector3&in, const Vector3&in, const Vector3&in, const Vector2&in, const Vector2&in, bool)", asMETHOD(Constraint, SetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_constraintType(ConstraintType)", asMETHOD(Constraint, SetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_position() const", asMETHOD(Constraint, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_axis(const Vector3&in)", asMETHOD(Constraint, SetAxis), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_axis() const", asMETHOD(Constraint, GetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "void set_highLimit(const Vector3&in)", asMETHOD(Constraint, SetHighLimit), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "void set_lowLimit(const Vector3&in)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_lowLimit() const", asMETHOD(Constraint, GetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherPosition(const Vector3&in)", asMETHOD(Constraint, SetOtherPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherPosition() const", asMETHOD(Constraint, GetOtherPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherAxis(const Vector3&in)", asMETHOD(Constraint, SetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherAxis() const", asMETHOD(Constraint, GetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_highLimit(const Vector2&in)", asMETHOD(Constraint, SetHighLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector2& get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_lowLimit(const Vector2&in)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Vector2& get_lowLimit() const", asMETHOD(Constraint, GetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_disableCollision(bool)", asMETHOD(Constraint, SetDisableCollision), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "bool get_disableCollision() const" ,asMETHOD(Constraint, GetDisableCollision), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "RigidBody@+ get_ownBody() const", asMETHOD(Constraint, GetOwnBody), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_otherBody(RigidBody@+)", asMETHOD(Constraint, SetOtherBody), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "RigidBody@+ get_otherBody() const", asMETHOD(Constraint, GetOtherBody), asCALL_THISCALL);

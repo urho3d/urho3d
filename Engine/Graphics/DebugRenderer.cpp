@@ -84,7 +84,7 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned c
         noDepthLines_.Push(DebugLine(start, end, color));
 }
 
-void DebugRenderer::AddNode(Node* node, bool depthTest)
+void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
 {
     if (!node)
         return;
@@ -94,15 +94,15 @@ void DebugRenderer::AddNode(Node* node, bool depthTest)
     
     if (depthTest)
     {
-        lines_.Push(DebugLine(start, start + rotation * Vector3::RIGHT, Color::RED.ToUInt()));
-        lines_.Push(DebugLine(start, start + rotation * Vector3::UP, Color::GREEN.ToUInt()));
-        lines_.Push(DebugLine(start, start + rotation * Vector3::FORWARD, Color::BLUE.ToUInt()));
+        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt()));
+        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt()));
+        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt()));
     }
     else
     {
-        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::RIGHT, Color::RED.ToUInt()));
-        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::UP, Color::GREEN.ToUInt()));
-        noDepthLines_.Push(DebugLine(start, start + rotation * Vector3::FORWARD, Color::BLUE.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt()));
     }
 }
 

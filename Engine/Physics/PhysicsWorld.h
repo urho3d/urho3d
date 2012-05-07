@@ -124,20 +124,15 @@ public:
     void SetInterpolation(bool enable);
     /// %Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
-    /// %Set simulation step time accumulator.
-    void SetTimeAccumulator(float time);
     /// Perform a physics world raycast and return all hits.
-    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
-        M_MAX_UNSIGNED);
+    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
-    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask =
-        M_MAX_UNSIGNED);
+    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
-    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask =
-        M_MAX_UNSIGNED);
-    /// Perform a sphere test into the physics world.
+    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Return rigid bodies by a sphere query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Perform a bounding box test into the physics world.
+    /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return gravity.
     Vector3 GetGravity() const;
@@ -175,6 +170,10 @@ public:
     void CleanupGeometryCache();
     /// Return the collision geometry cache.
     Map<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
+    /// Set node dirtying to be disregarded.
+    void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
+    /// Return whether node dirtying should be disregarded.
+    bool IsApplyingTransforms() const { return applyingTransforms_; }
     
 protected:
     /// Handle node being assigned.
@@ -224,6 +223,8 @@ private:
     float maxNetworkAngularVelocity_;
     /// Interpolation flag.
     bool interpolation_;
+    /// Applying transforms flag.
+    bool applyingTransforms_;
     /// Debug renderer.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.

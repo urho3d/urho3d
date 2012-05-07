@@ -57,14 +57,13 @@ Constraint::Constraint(Context* context) :
     type_(CONSTRAINT_POINT),
     position_(Vector3::ZERO),
     axis_(Vector3::RIGHT),
-    otherBodyPosition_(Vector3::ZERO),
-    otherBodyAxis_(Vector3::RIGHT),
-    lowLimit_(Vector3::ZERO),
-    highLimit_(Vector3::ZERO),
+    otherPosition_(Vector3::ZERO),
+    otherAxis_(Vector3::RIGHT),
+    highLimit_(Vector2::ZERO),
+    lowLimit_(Vector2::ZERO),
     otherBodyNodeID_(0),
     disableCollision_(false),
-    recreateConstraint_(false),
-    otherBodyPositionValid_(false)
+    recreateConstraint_(false)
 {
 }
 
@@ -83,11 +82,11 @@ void Constraint::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Constraint, "Constraint Type", type_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Axis", axis_, Vector3::RIGHT, AM_DEFAULT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherBodyPosition_, Vector3::ZERO, AM_DEFAULT | AM_NOEDIT);
-    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Axis", otherBodyAxis_, Vector3::RIGHT, AM_DEFAULT | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR3, "High Limit", GetHighLimit, SetHighLimit, Vector3, Vector3::ZERO, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR3, "Low Limit", GetLowLimit, SetLowLimit, Vector3, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Axis", otherAxis_, Vector3::RIGHT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
 }
 
@@ -97,11 +96,7 @@ void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     
     // Change of any non-accessor attribute requires recreation of the constraint
     if (!attr.accessor_)
-    {
         recreateConstraint_ = true;
-        if (attr.offset_ == offsetof(Constraint, otherBodyPosition_) || attr.offset_ == offsetof(Constraint, otherBodyAxis_))
-            otherBodyPositionValid_ = true;
-    }
 }
 
 void Constraint::ApplyAttributes()
@@ -176,9 +171,7 @@ void Constraint::SetPosition(const Vector3& position)
     if (position != position_)
     {
         position_ = position;
-        /// \todo Optimize and do not recreate the constraint
-        if (constraint_)
-            CreateConstraint();
+        ApplyFrames();
         MarkNetworkUpdate();
     }
 }
@@ -188,14 +181,32 @@ void Constraint::SetAxis(const Vector3& axis)
     if (axis != axis_)
     {
         axis_ = axis;
-        /// \todo Optimize and do not recreate the constraint
-        if (constraint_ && constraint_->getConstraintType() == HINGE_CONSTRAINT_TYPE)
-            CreateConstraint();
+        ApplyFrames();
         MarkNetworkUpdate();
     }
 }
 
-void Constraint::SetHighLimit(const Vector3& limit)
+void Constraint::SetOtherPosition(const Vector3& position)
+{
+    if (position != otherPosition_)
+    {
+        otherPosition_ = position;
+        ApplyFrames();
+        MarkNetworkUpdate();
+    }
+}
+
+void Constraint::SetOtherAxis(const Vector3& axis)
+{
+    if (axis != otherAxis_)
+    {
+        otherAxis_ = axis;
+        ApplyFrames();
+        MarkNetworkUpdate();
+    }
+}
+
+void Constraint::SetHighLimit(const Vector2& limit)
 {
     if (limit != highLimit_)
     {
@@ -205,7 +216,7 @@ void Constraint::SetHighLimit(const Vector3& limit)
     }
 }
 
-void Constraint::SetLowLimit(const Vector3& limit)
+void Constraint::SetLowLimit(const Vector2& limit)
 {
     if (limit != lowLimit_)
     {
@@ -213,6 +224,39 @@ void Constraint::SetLowLimit(const Vector3& limit)
         ApplyLimits();
         MarkNetworkUpdate();
     }
+}
+
+void Constraint::SetDisableCollision(bool disable)
+{
+    if (disable != disableCollision_)
+    {
+        disableCollision_ = disable;
+        CreateConstraint();
+        MarkNetworkUpdate();
+    }
+}
+
+void Constraint::SetParameters(ConstraintType type, RigidBody* otherBody, const Vector3& position, const Vector3& axis, const Vector3& otherPosition, const Vector3& otherAxis, const Vector2& highLimit, const Vector2& lowLimit, bool disableCollision)
+{
+    if (otherBody_)
+        otherBody_->RemoveConstraint(this);
+    
+    type_ = type;
+    otherBody_ = otherBody;
+    position_ = position;
+    axis_ = axis;
+    otherPosition_ = otherPosition;
+    otherAxis_ = otherAxis;
+    highLimit_ = highLimit;
+    lowLimit_ = lowLimit;
+    disableCollision_ = disableCollision;
+    
+    // Update the connected body attribute
+    Node* otherNode = otherBody_ ? otherBody_->GetNode() : 0;
+    otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
+    
+    CreateConstraint();
+    MarkNetworkUpdate();
 }
 
 void Constraint::ReleaseConstraint()
@@ -254,8 +298,9 @@ void Constraint::OnNodeSet(Node* node)
 
 void Constraint::OnMarkedDirty(Node* node)
 {
+    /// \todo This does not catch the connected body node's scale changing
     if (!node->GetWorldScale().Equals(cachedWorldScale_))
-        CreateConstraint();
+        ApplyFrames();
 }
 
 void Constraint::CreateConstraint()
@@ -276,36 +321,25 @@ void Constraint::CreateConstraint()
     if (!otherBody)
         otherBody = &btTypedConstraint::getFixedBody();
     
-    btTransform ownInverse = ownBody->getWorldTransform().inverse();
-    btTransform otherInverse = otherBody->getWorldTransform().inverse();
-    
-    // If the deserialized constraint other body position is valid, use it, but only this time
-    if (otherBodyPositionValid_)
-        otherBodyPositionValid_ = false;
-    else
-    {
-        // Otherwise calculate it from own body's position
-        otherBodyPosition_ = ToVector3(otherInverse * (ownBody->getWorldTransform() * ToBtVector3(position_ *
-            cachedWorldScale_)));
-        otherBodyAxis_ = ToVector3(otherInverse.getBasis() * (ownBody->getWorldTransform().getBasis() *
-            ToBtVector3(axis_)));
-    }
+    Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_;
+    Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() :
+        otherPosition_;
     
     switch (type_)
     {
     case CONSTRAINT_POINT:
         {
-            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(position_ * cachedWorldScale_),
-                ToBtVector3(otherBodyPosition_));
+            constraint_ = new btPoint2PointConstraint(*ownBody, *otherBody, ToBtVector3(ownBodyScaledPosition),
+                ToBtVector3(otherBodyScaledPosition));
         }
         break;
         
     case CONSTRAINT_HINGE:
         {
             Quaternion ownRotation(Vector3::FORWARD, axis_);
-            Quaternion otherRotation(Vector3::FORWARD, otherBodyAxis_);
-            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
-            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
+            Quaternion otherRotation(Vector3::FORWARD, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
             constraint_ = new btHingeConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
@@ -313,9 +347,9 @@ void Constraint::CreateConstraint()
     case CONSTRAINT_SLIDER:
         {
             Quaternion ownRotation(Vector3::RIGHT, axis_);
-            Quaternion otherRotation(Vector3::RIGHT, otherBodyAxis_);
-            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
-            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
+            Quaternion otherRotation(Vector3::RIGHT, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
             constraint_ = new btSliderConstraint(*ownBody, *otherBody, ownFrame, otherFrame, false);
         }
         break;
@@ -323,9 +357,9 @@ void Constraint::CreateConstraint()
     case CONSTRAINT_CONETWIST:
         {
             Quaternion ownRotation(Vector3::RIGHT, axis_);
-            Quaternion otherRotation(Vector3::RIGHT, otherBodyAxis_);
-            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(position_ * cachedWorldScale_));
-            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyPosition_));
+            Quaternion otherRotation(Vector3::RIGHT, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
             constraint_ = new btConeTwistConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
@@ -339,6 +373,63 @@ void Constraint::CreateConstraint()
     ApplyLimits();
     
     physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
+}
+
+void Constraint::ApplyFrames()
+{
+    if (!constraint_)
+        return;
+    
+    if (node_)
+        cachedWorldScale_ = node_->GetWorldScale();
+    
+    Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_;
+    Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() :
+        otherPosition_;
+    
+    switch (constraint_->getConstraintType())
+    {
+    case POINT2POINT_CONSTRAINT_TYPE:
+        {
+            btPoint2PointConstraint* pointConstraint = static_cast<btPoint2PointConstraint*>(constraint_);
+            pointConstraint->setPivotA(ToBtVector3(ownBodyScaledPosition));
+            pointConstraint->setPivotB(ToBtVector3(otherBodyScaledPosition));
+        }
+        break;
+        
+    case HINGE_CONSTRAINT_TYPE:
+        {
+            btHingeConstraint* hingeConstraint = static_cast<btHingeConstraint*>(constraint_);
+            Quaternion ownRotation(Vector3::FORWARD, axis_);
+            Quaternion otherRotation(Vector3::FORWARD, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
+            hingeConstraint->setFrames(ownFrame, otherFrame);
+        }
+        break;
+        
+    case SLIDER_CONSTRAINT_TYPE:
+        {
+            btSliderConstraint* sliderConstraint = static_cast<btSliderConstraint*>(constraint_);
+            Quaternion ownRotation(Vector3::RIGHT, axis_);
+            Quaternion otherRotation(Vector3::RIGHT, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
+            sliderConstraint->setFrames(ownFrame, otherFrame);
+        }
+        break;
+        
+    case CONETWIST_CONSTRAINT_TYPE:
+        {
+            btConeTwistConstraint* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_);
+            Quaternion ownRotation(Vector3::RIGHT, axis_);
+            Quaternion otherRotation(Vector3::RIGHT, otherAxis_);
+            btTransform ownFrame(ToBtQuaternion(ownRotation), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation), ToBtVector3(otherBodyScaledPosition));
+            coneTwistConstraint->setFrames(ownFrame, otherFrame);
+        }
+        break;
+    }
 }
 
 void Constraint::ApplyLimits()
@@ -368,7 +459,7 @@ void Constraint::ApplyLimits()
     case CONETWIST_CONSTRAINT_TYPE:
         {
             btConeTwistConstraint* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_);
-            coneTwistConstraint->setLimit(highLimit_.y_ * M_DEGTORAD, highLimit_.z_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
+            coneTwistConstraint->setLimit(highLimit_.y_ * M_DEGTORAD, highLimit_.y_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
         break;
     }

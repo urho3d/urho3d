@@ -839,13 +839,16 @@ By default rigid bodies can move and rotate about all 3 coordinate axes when for
 
 To prevent tunneling of a fast moving rigid body through obstacles, continuous collision detection can be used. It approximates the object as a swept sphere, but has a performance cost, so it should be used only when necessary. Call \ref RigidBody::SetCcdRadius "SetCcdRadius()" and \ref RigidBody::SetCcdMotionThreshold "SetCcdMotionThreshold()" with non-zero values to enable. To prevent false collisions, the body's actual collision shape should completely contain the radius. The motion threshold is the required motion per simulation step for CCD to kick in: for example a box with size 1 should have motion threshold 1 as well.
 
-All physics calculations are performed in world space. Nodes containing a RigidBody component should be parented to the Scene (root node) to ensure correct operation.
+All physics calculations are performed in world space. Nodes containing a RigidBody component should preferably be parented to the Scene (root node) to ensure independent
+motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is more important, but be aware that the ragdoll bones may drift far from the animated model's root scene node.
 
 \section Physics_ConstraintParameters Constraint parameters
 
-Hinge and slider constraints support defining limits for the motion. To be generic, these are encoded slightly unintuitively into Vector3's.
+Constraint position (and axis if relevant) needs to be defined relative to both connected bodies. If a constraint connects a body to the static world, then the "other body position" and "other body axis" mean the static end's position in world space.
+
+Hinge and slider constraints support defining limits for the motion. To be generic, these are encoded slightly unintuitively into Vector2's.
 For a hinge constraint, the low and high limit X coordinates define the minimum and maximum angle in degrees. For example -45 to 45. For a slider constraint,
-the X coordinates define the maximum linear motion in world space units, and the Y coordinates define maximum angular motion in degrees. The cone twist constraint uses only the high limit to define the maximum angles (minimum angle is always -maximum) in the following manner: The X coordinate is the limit of the twist (main) axis, while Y and Z are the limits of the swinging motion about the other axes.
+the X coordinates define the maximum linear motion in world space units, and the Y coordinates define maximum angular motion in degrees. The cone twist constraint uses only the high limit to define the maximum angles (minimum angle is always -maximum) in the following manner: The X coordinate is the limit of the twist (main) axis, while Y is the limit of the swinging motion about the other axes.
 
 \section Physics_Events Physics events
 

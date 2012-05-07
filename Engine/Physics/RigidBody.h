@@ -240,8 +240,6 @@ private:
     bool kinematic_;
     /// Phantom flag.
     bool phantom_;
-    /// Whether is in Bullet's transform update. Node dirtying is ignored at this point to prevent endless recursion.
-    bool inSetTransform_;
     /// Smoothed transform mode.
     bool hasSmoothedTransform_;
     /// Readd body to world flag.

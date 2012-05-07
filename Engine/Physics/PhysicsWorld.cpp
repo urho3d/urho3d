@@ -100,6 +100,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     timeAcc_(0.0f),
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     interpolation_(true),
+    applyingTransforms_(false),
     debugRenderer_(0),
     debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints)
 {
@@ -189,6 +190,7 @@ void PhysicsWorld::Update(float timeStep)
     PROFILE(UpdatePhysics);
     
     float internalTimeStep = 1.0f / fps_;
+    delayedWorldTransforms_.Clear();
     
     if (interpolation_)
     {
@@ -202,6 +204,24 @@ void PhysicsWorld::Update(float timeStep)
         {
             world_->stepSimulation(internalTimeStep, 0, internalTimeStep);
             timeAcc_ -= internalTimeStep;
+        }
+    }
+    
+    // Apply delayed (parented) world transforms now
+    while (!delayedWorldTransforms_.Empty())
+    {
+        for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
+            i != delayedWorldTransforms_.End(); )
+        {
+            HashMap<RigidBody*, DelayedWorldTransform>::Iterator current = i++;
+            const DelayedWorldTransform& transform = current->second_;
+            
+            // If parent's transform has already been assigned, can proceed
+            if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
+            {
+                transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
+                delayedWorldTransforms_.Erase(current);
+            }
         }
     }
 }
@@ -446,8 +466,6 @@ void PhysicsWorld::PreStep(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
     
-    delayedWorldTransforms_.Clear();
-    
     // Start profiling block for the actual simulation step
 #ifdef ENABLE_PROFILING
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -463,24 +481,6 @@ void PhysicsWorld::PostStep(float timeStep)
     if (profiler)
         profiler->EndBlock();
 #endif
-    
-    // Apply delayed (parented) world transforms now
-    while (!delayedWorldTransforms_.Empty())
-    {
-        for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
-            i != delayedWorldTransforms_.End(); )
-        {
-            HashMap<RigidBody*, DelayedWorldTransform>::Iterator current = i++;
-            const DelayedWorldTransform& transform = current->second_;
-            
-            // If parent's transform has already been assigned, can proceed
-            if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
-            {
-                transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
-                delayedWorldTransforms_.Erase(current);
-            }
-        }
-    }
     
     SendCollisionEvents();
     

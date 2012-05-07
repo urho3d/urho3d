@@ -320,7 +320,7 @@ void HandlePostRenderUpdate()
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Node@ node = selectedNodes[i];
-        debug.AddNode(node, false);
+        debug.AddNode(node, 1.0, false);
         for (uint j = 0; j < node.numComponents; ++j)
         {
             Drawable@ drawable = cast<Drawable>(node.components[j]);
@@ -375,7 +375,7 @@ void ViewRaycast(bool mouseClick)
             Drawable@ drawable = result.drawable;
             if (debug !is null)
             {
-                debug.AddNode(drawable.node, false);
+                debug.AddNode(drawable.node, 1.0, false);
                 drawable.DrawDebugGeometry(debug, false);
             }
             selected = drawable;
@@ -396,7 +396,7 @@ void ViewRaycast(bool mouseClick)
             RigidBody@ body = result.body;
             if (debug !is null)
             {
-                debug.AddNode(body.node, false);
+                debug.AddNode(body.node, 1.0, false);
                 body.DrawDebugGeometry(debug, false);
             }
             selected = body;
