@@ -844,11 +844,11 @@ motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is
 
 \section Physics_ConstraintParameters Constraint parameters
 
-Constraint position (and axis if relevant) needs to be defined relative to both connected bodies. If a constraint connects a body to the static world, then the "other body position" and "other body axis" mean the static end's position in world space.
+%Constraint position (and rotation if relevant) need to be defined in relation to both connected bodies, see \ref Constraint::SetPosition "SetPosition()" and \ref Constraint::SetOtherPosition "SetOtherPosition()". If the constraint connects a body to the static world, then the "other body position" and "other body rotation" mean the static end's transform in world space. There is also a helper function \ref Constraint::SetWorldPosition "SetWorldPosition()" to assign the constraint to a world-space position; this sets both relative positions.
 
-Hinge and slider constraints support defining limits for the motion. To be generic, these are encoded slightly unintuitively into Vector2's.
-For a hinge constraint, the low and high limit X coordinates define the minimum and maximum angle in degrees. For example -45 to 45. For a slider constraint,
-the X coordinates define the maximum linear motion in world space units, and the Y coordinates define maximum angular motion in degrees. The cone twist constraint uses only the high limit to define the maximum angles (minimum angle is always -maximum) in the following manner: The X coordinate is the limit of the twist (main) axis, while Y is the limit of the swinging motion about the other axes.
+Specifying the constraint's motion axis instead of rotation is provided as an alternative as it can be more intuitive, see \ref Constraint::SetAxis "SetAxis()". However, by explicitly specifying a rotation you can be sure the constraint is oriented precisely as you want.
+
+Hinge and slider constraints support defining limits for the motion. To be generic, these are encoded slightly unintuitively into Vector2's. For a hinge constraint, the low and high limit X coordinates define the minimum and maximum angle in degrees. For example -45 to 45. For a slider constraint, the X coordinates define the maximum linear motion in world space units, and the Y coordinates define maximum angular motion in degrees. The cone twist constraint uses only the high limit to define the maximum angles (minimum angle is always -maximum) in the following manner: The X coordinate is the limit of the twist (main) axis, while Y is the limit of the swinging motion about the other axes.
 
 \section Physics_Events Physics events
 

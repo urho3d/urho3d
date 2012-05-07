@@ -173,12 +173,14 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_position() const", asMETHOD(Constraint, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_rotation(const Quaternion&in)", asMETHOD(Constraint, SetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_axis(const Vector3&in)", asMETHOD(Constraint, SetAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_axis() const", asMETHOD(Constraint, GetAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Quaternion& get_rotation() const", asMETHOD(Constraint, GetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_otherPosition(const Vector3&in)", asMETHOD(Constraint, SetOtherPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherPosition() const", asMETHOD(Constraint, GetOtherPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_otherRotation(const Quaternion&in)", asMETHOD(Constraint, SetOtherRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_otherAxis(const Vector3&in)", asMETHOD(Constraint, SetOtherAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Constraint", "const Vector3& get_otherAxis() const", asMETHOD(Constraint, GetOtherAxis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "const Quaternion& get_otherRotation() const", asMETHOD(Constraint, GetOtherRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_worldPosition(const Vector3&in)", asMETHOD(Constraint, SetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "Vector3 get_worldPosition() const", asMETHOD(Constraint, GetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_highLimit(const Vector2&in)", asMETHOD(Constraint, SetHighLimit), asCALL_THISCALL);

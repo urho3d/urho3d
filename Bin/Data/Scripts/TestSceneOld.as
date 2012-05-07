@@ -45,6 +45,7 @@ void Start()
     SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown");
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+    SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision");    
 }
 
 void InitScene()
@@ -165,6 +166,12 @@ void InitScene()
         object.drawDistance = 300;
         object.castShadows = true;
         object.maxLights = 2;
+
+        // Create a capsule shape for detecting collisions
+        RigidBody@ body = newNode.CreateComponent("RigidBody");
+        body.phantom = true;
+        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+        shape.SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0));
 
         AnimationState@ anim = object.AddAnimationState(cache.GetResource("Animation", "Models/Jack_Walk.ani"));
         anim.looped = true;
@@ -544,6 +551,103 @@ void HandlePostRenderUpdate()
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
+                
+            // Test creating a ragdoll
+            if (input.keyPress['R'] && result.drawable.typeName == "AnimatedModel")
+                CreateRagdoll(result.drawable);
         }
     }
+}
+
+void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
+{
+    // Check if either of the nodes has an AnimatedModel component
+    Node@ nodeA = eventData["NodeA"].GetNode();
+    Node@ nodeB = eventData["NodeB"].GetNode();
+    if (nodeA.HasComponent("AnimatedModel"))
+    {
+        // Remove the trigger physics shape, and create the ragdoll
+        nodeA.RemoveComponent("RigidBody");
+        nodeA.RemoveComponent("CollisionShape");
+        CreateRagdoll(nodeA.GetComponent("AnimatedModel"));
+    }
+    else if (nodeB.HasComponent("AnimatedModel"))
+    {
+        // Remove the trigger physics shape, and create the ragdoll
+        nodeB.RemoveComponent("RigidBody");
+        nodeB.RemoveComponent("CollisionShape");
+        CreateRagdoll(nodeB.GetComponent("AnimatedModel"));
+    }
+}
+
+void CreateRagdoll(AnimatedModel@ model)
+{
+    Node@ root = model.node;
+    
+    CreateRagdollBone(root, "Bip01_Pelvis", SHAPE_CAPSULE, Vector3(0.3, 0.3, 0.3), Vector3(0.0, 0, 0), Quaternion(0, 0, 0));
+    CreateRagdollBone(root, "Bip01_Spine1", SHAPE_CAPSULE, Vector3(0.3, 0.4, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_L_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_L_Calf", SHAPE_CAPSULE, Vector3(0.15, 0.55, 0.15), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Calf", SHAPE_CAPSULE, Vector3(0.15, 0.55, 0.15), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_Head", SHAPE_SPHERE, Vector3(0.25, 0.25, 0.25), Vector3(0.1, 0, 0), Quaternion(0, 0, 0));
+    CreateRagdollBone(root, "Bip01_L_UpperArm", SHAPE_CAPSULE, Vector3(0.125, 0.35, 0.125), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_UpperArm", SHAPE_CAPSULE, Vector3(0.125, 0.35, 0.125), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_L_Forearm", SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
+    CreateRagdollBone(root, "Bip01_R_Forearm", SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
+
+    CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(90, 0), Vector2(-25, 0));
+    CreateRagdollConstraint(root, "Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
+    CreateRagdollConstraint(root, "Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
+
+    // Disable animation from all bones (both physical and non-physical) to not interfere
+    Skeleton@ skel = model.skeleton;
+    for (uint i = 0; i < skel.numBones; ++i)
+        skel.bones[i].animated = false;
+}
+
+void CreateRagdollBone(Node@ root, String boneName, ShapeType type, Vector3 size, Vector3 position, Quaternion rotation)
+{
+    Node@ boneNode = root.GetChild(boneName, true);
+    if (boneNode is null || boneNode.HasComponent("RigidBody"))
+        return;
+    
+    RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL);
+    body.mass = 1.0;
+    body.linearDamping = 0.05;
+    body.angularDamping = 0.85;
+    body.linearRestThreshold = 1.5;
+    body.angularRestThreshold = 2.5;
+
+    CollisionShape@ shape = boneNode.CreateComponent("CollisionShape", LOCAL);
+    shape.shapeType = type;
+    shape.size = size;
+    shape.position = position;
+    shape.rotation = rotation;
+}
+
+void CreateRagdollConstraint(Node@ root, String boneName, String parentName, ConstraintType type, Vector3 axis, Vector3 parentAxis, Vector2 highLimit, Vector2 lowLimit)
+{
+    Node@ boneNode = root.GetChild(boneName, true);
+    Node@ parentNode = root.GetChild(parentName, true);
+    if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
+        return;
+        
+    Constraint@ constraint = boneNode.CreateComponent("Constraint", LOCAL);
+    constraint.constraintType = type;
+    constraint.disableCollision = true;
+    // The connected body must be specified before setting the world position
+    constraint.otherBody = parentNode.GetComponent("RigidBody");
+    constraint.worldPosition = boneNode.worldPosition;
+    constraint.axis = axis;
+    constraint.otherAxis = parentAxis;
+    constraint.highLimit = highLimit;
+    constraint.lowLimit = lowLimit;
 }

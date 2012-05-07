@@ -69,13 +69,17 @@ public:
     void SetOtherBody(RigidBody* body);
     /// %Set constraint position relative to own body.
     void SetPosition(const Vector3& position);
-    /// %Set constraint axis relative to own body.
+    /// %Set constraint rotation relative to own body.
+    void SetRotation(const Quaternion& rotation);
+    /// %Set constraint rotation relative to own body by specifying the axis.
     void SetAxis(const Vector3& axis);
-    /// %Set constraint position relative to other body. If constraint connects to static world, this is the static position in world space.
+    /// %Set constraint position relative to the other body. If connected to the static world, is a world-space position.
     void SetOtherPosition(const Vector3& position);
-    /// %Set constraint axis relative to other body. If constraint connects to static world, this is the static axis in world space.
+    /// %Set constraint rotation relative to the other body. If connected to the static world, is a world-space rotation.
+    void SetOtherRotation(const Quaternion& rotation);
+    /// %Set constraint rotation relative to the other body by specifying the axis.
     void SetOtherAxis(const Vector3& axis);
-    ///% Set constraint world position. Sets both own and other body positions to the same point.
+    ///% Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
     void SetWorldPosition(const Vector3& position);
     /// %Set high limit. Interpretation is constraint type specific.
     void SetHighLimit(const Vector2& limit);
@@ -89,20 +93,20 @@ public:
     /// Return Bullet constraint.
     btTypedConstraint* GetConstraint() const { return constraint_; }
     /// Return constraint type.
-    ConstraintType GetConstraintType() const { return type_; }
+    ConstraintType GetConstraintType() const { return constraintType_; }
     /// Return rigid body in own scene node.
     RigidBody* GetOwnBody() const { return ownBody_; }
     /// Return the other rigid body. May be null if connected to the static world.
     RigidBody* GetOtherBody() const { return otherBody_; }
     /// Return constraint position relative to own body.
     const Vector3& GetPosition() const { return position_; }
-    /// Return constraint axis relative to own body.
-    const Vector3& GetAxis() const { return axis_; }
+    /// Return constraint rotation relative to own body.
+    const Quaternion& GetRotation() const { return rotation_; }
     /// Return constraint position relative to other body.
     const Vector3& GetOtherPosition() const { return otherPosition_; }
-    /// Return constraint axis relative to other body.
-    const Vector3& GetOtherAxis() const { return otherAxis_; }
-    /// Return constraint world position.
+    /// Return constraint rotation relative to other body.
+    const Quaternion& GetOtherRotation() const { return otherRotation_; }
+    /// Return constraint world position, calculated from own body.
     Vector3 GetWorldPosition() const;
     /// Return high limit.
     const Vector2& GetHighLimit() const { return highLimit_; }
@@ -137,15 +141,15 @@ private:
     /// Bullet constraint.
     btTypedConstraint* constraint_;
     /// Constraint type.
-    ConstraintType type_;
+    ConstraintType constraintType_;
     /// Constraint position.
     Vector3 position_;
-    /// Constraint axis.
-    Vector3 axis_;
+    /// Constraint rotation.
+    Quaternion rotation_;
     /// Constraint other body position.
     Vector3 otherPosition_;
     /// Constraint other body axis.
-    Vector3 otherAxis_;
+    Quaternion otherRotation_;
     /// Cached world scale for determining if the constraint position needs update.
     Vector3 cachedWorldScale_;
     /// High limit.
@@ -158,4 +162,6 @@ private:
     bool disableCollision_;
     /// Recreate constraint flag.
     bool recreateConstraint_;
+    /// Frames need update flag.
+    bool framesDirty_;
 };

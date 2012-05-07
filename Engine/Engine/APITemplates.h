@@ -391,6 +391,11 @@ static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mo
     return ptr->GetOrCreateComponent(ShortStringHash(typeName), mode);
 }
 
+static void NodeRemoveComponent(const String& typeName, Node* ptr)
+{
+    ptr->RemoveComponent(ShortStringHash(typeName));
+}
+
 static Component* NodeGetComponent(unsigned index, Node* ptr)
 {
     const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
@@ -527,7 +532,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHOD(T, RemoveComponent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHODPR(T, RemoveComponent, (Component*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveComponent(const String&in)", asFUNCTION(NodeRemoveComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);

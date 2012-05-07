@@ -91,9 +91,37 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
             info->indexed_ = true;
             info->type_ += "[]";
         }
+        
+        // Sanitate the reference operator away
+        info->type_.Replace("&", "");
     }
     if (functionName.Find("set_") != String::NPOS)
+    {
         info->write_ = true;
+        if (info->type_.Empty())
+        {
+            // Extract type from parameters
+            unsigned begin = declaration.Find(',');
+            if (begin == String::NPOS)
+                begin = declaration.Find('(');
+            else
+                info->indexed_ = true;
+            
+            if (begin != String::NPOS)
+            {
+                ++begin;
+                unsigned end = declaration.Find(')');
+                if (end != String::NPOS)
+                {
+                    info->type_ = declaration.Substring(begin, end - begin);
+                    // Sanitate const & reference operator away
+                    info->type_.Replace("const ", "");
+                    info->type_.Replace("&in", "");
+                    info->type_.Replace("&", "");
+                }
+            }
+        }
+    }
 }
 
 OBJECTTYPESTATIC(Script);
@@ -241,13 +269,7 @@ void Script::DumpAPI()
     LOGRAW("\\section ScriptAPI_GlobalProperties Global properties\n");
     
     for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
-    {
-        // For now, skip write-only properties
-        if (!globalPropertyInfos[i].read_)
-            continue;
-        
         OutputAPIRow(globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
-    }
     
     LOGRAW("\\section ScriptAPI_GlobalConstants Global constants\n");
     
@@ -328,15 +350,13 @@ void Script::DumpAPI()
                 LOGRAW("\nProperties:<br>\n");
                 for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
-                    // For now, skip write-only properties
-                    if (!propertyInfos[j].read_)
-                        continue;
-                    
-                    String readOnly;
+                    String remark;
                     if (!propertyInfos[j].write_)
-                        readOnly = " (readonly)";
+                        remark = " (readonly)";
+                    else if (!propertyInfos[j].read_)
+                        remark = " (writeonly)";
                     
-                    OutputAPIRow(propertyInfos[j].type_ + " " + propertyInfos[j].name_ + readOnly);
+                    OutputAPIRow(propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
                 }
             }
             

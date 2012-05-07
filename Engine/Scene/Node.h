@@ -145,6 +145,8 @@ public:
     Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
+    /// Remove the first component of specific type from this node.
+    void RemoveComponent(ShortStringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
     /// Clone scene node, components and child nodes. Return the clone.

@@ -700,7 +700,7 @@ Methods:<br>
 
 Properties:<br>
 - VariantType type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 
 
 VariantMap
@@ -731,7 +731,7 @@ Object
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 
 
 Timer
@@ -745,7 +745,7 @@ Time
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint frameNumber (readonly)
 - float timeStep (readonly)
 - float elapsedTime (readonly)
@@ -762,9 +762,9 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - int level
-- String& lastMessage (readonly)
+- String lastMessage (readonly)
 
 
 Serializer
@@ -832,7 +832,7 @@ Methods:<br>
 - uint Seek(uint)
 
 Properties:<br>
-- String& name (readonly)
+- String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
 - uint size (readonly)
@@ -902,10 +902,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - FileMode mode (readonly)
 - bool open (readonly)
-- String& name (readonly)
+- String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
 - uint size (readonly)
@@ -975,7 +975,7 @@ Methods:<br>
 - uint Seek(uint)
 
 Properties:<br>
-- String& name (readonly)
+- String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
 - uint size (readonly)
@@ -998,7 +998,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - String currentDir
 - String programDir (readonly)
 - String userDocumentsDir (readonly)
@@ -1012,8 +1012,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name (readonly)
+- String typeName (readonly)
+- String name (readonly)
 - uint numFiles (readonly)
 - uint totalSize (readonly)
 - uint checksum (readonly)
@@ -1027,8 +1027,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 
@@ -1057,7 +1057,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint[] memoryBudget
 - uint[] memoryUse (readonly)
 - uint totalMemoryUse (readonly)
@@ -1076,8 +1076,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - int width (readonly)
@@ -1096,8 +1096,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - XMLElement root (readonly)
@@ -1170,10 +1170,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 
 
 Component
@@ -1192,10 +1192,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -1234,6 +1234,7 @@ Methods:<br>
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - void RemoveComponent(Component@)
+- void RemoveComponent(const String&)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1256,29 +1257,29 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
-- Vector3& position
-- Quaternion& rotation
+- AttributeInfo[] attributeInfos (readonly)
+- Vector3 position
+- Quaternion rotation
 - Vector3 direction
-- Vector3& scale
+- Vector3 scale
 - Vector3 worldPosition
 - Quaternion worldRotation
 - Vector3 worldDirection
 - Vector3 worldScale
 - Matrix3x4 transform (readonly)
-- Matrix3x4& worldTransform (readonly)
+- Matrix3x4 worldTransform (readonly)
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
 - Node@[] children (readonly)
 - uint numComponents (readonly)
 - Component@[] components (readonly)
-- String& name
+- String name
 - Node@ parent
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Scene@ scene (readonly)
 - Connection@ owner
 - ScriptObject@ scriptObject (readonly)
@@ -1301,14 +1302,14 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
-- Vector3& targetPosition
-- Quaternion& targetRotation
+- Vector3 targetPosition
+- Quaternion targetRotation
 - Vector3 targetWorldPosition
 - Quaternion targetWorldRotation
 - bool active (readonly)
@@ -1348,6 +1349,7 @@ Methods:<br>
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - void RemoveComponent(Component@)
+- void RemoveComponent(const String&)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1383,36 +1385,36 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
-- Vector3& position
-- Quaternion& rotation
+- AttributeInfo[] attributeInfos (readonly)
+- Vector3 position
+- Quaternion rotation
 - Vector3 direction
-- Vector3& scale
+- Vector3 scale
 - Vector3 worldPosition
 - Quaternion worldRotation
 - Vector3 worldDirection
 - Vector3 worldScale
 - Matrix3x4 transform (readonly)
-- Matrix3x4& worldTransform (readonly)
+- Matrix3x4 worldTransform (readonly)
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
 - Node@[] children (readonly)
 - uint numComponents (readonly)
 - Component@[] components (readonly)
-- String& name
+- String name
 - Node@ parent
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - bool active
 - float smoothingConstant
 - float snapThreshold
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
 - uint checksum (readonly)
-- String& fileName (readonly)
+- String fileName (readonly)
 - PackageFile@[]@ requiredPackageFiles (readonly)
 - DebugRenderer@ debugRenderer (readonly)
 - Octree@ octree (readonly)
@@ -1467,10 +1469,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -1496,10 +1498,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float nearClip
@@ -1511,12 +1513,12 @@ Properties:<br>
 - float lodBias
 - bool orthographic
 - bool autoAspectRatio
-- Vector2& projectionOffset
+- Vector2 projectionOffset
 - uint viewMask
 - uint viewOverrideFlags
-- Frustum& frustum (readonly)
-- Matrix4& projection (readonly)
-- Matrix3x4& inverseWorldTransform (readonly)
+- Frustum frustum (readonly)
+- Matrix4 projection (readonly)
+- Matrix3x4 inverseWorldTransform (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
 - Vector3 forwardVector (readonly)
@@ -1534,8 +1536,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - TextureUsage usage (readonly)
@@ -1547,7 +1549,7 @@ Properties:<br>
 - int[] levelHeight (readonly)
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
-- Color& borderColor
+- Color borderColor
 - Texture@ backupTexture
 - bool dataLost (readonly)
 
@@ -1563,7 +1565,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - XMLFile@ parameters
 - uint numPasses
 - Vector4[] shaderParameters
@@ -1583,7 +1585,7 @@ Methods:<br>
 Properties:<br>
 - Scene@ scene
 - Camera@ camera
-- IntRect& rect
+- IntRect rect
 - uint numPostProcesses (readonly)
 
 
@@ -1611,8 +1613,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - TextureUsage usage (readonly)
@@ -1624,7 +1626,7 @@ Properties:<br>
 - int[] levelHeight (readonly)
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
-- Color& borderColor
+- Color borderColor
 - Texture@ backupTexture
 - bool dataLost (readonly)
 - RenderSurface@ renderSurface (readonly)
@@ -1642,8 +1644,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - TextureUsage usage (readonly)
@@ -1655,7 +1657,7 @@ Properties:<br>
 - int[] levelHeight (readonly)
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
-- Color& borderColor
+- Color borderColor
 - Texture@ backupTexture
 - bool dataLost (readonly)
 - RenderSurface@[] renderSurface (readonly)
@@ -1668,8 +1670,8 @@ Properties:<br>
 - BlendMode blendMode
 - CompareMode depthTestMode
 - bool depthWrite
-- String& vertexShader
-- String& pixelShader
+- String vertexShader
+- String pixelShader
 
 
 Technique
@@ -1683,8 +1685,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - bool sm3
@@ -1703,13 +1705,13 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - uint numTechniques
 - Technique@[] technique (readonly)
-- Vector4&[] shaderParameters
+- Vector4[] shaderParameters
 - Texture@[] textures
 - bool occlusion (readonly)
 - CullMode cullMode
@@ -1722,10 +1724,10 @@ Methods:<br>
 - void RemoveShaderParameter(const String&)
 
 Properties:<br>
-- String& vertexShader
-- String& pixelShader
-- String& output
-- String&[] textures
+- String vertexShader
+- String pixelShader
+- String output
+- String[] textures
 - Vector4[] shaderParameters
 
 
@@ -1737,11 +1739,11 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
-- BoundingBox& boundingBox (readonly)
+- BoundingBox boundingBox (readonly)
 - Skeleton@ skeleton (readonly)
 - uint numGeometries (readonly)
 - uint[] numGeometryLodLevels (readonly)
@@ -1756,11 +1758,11 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
-- String& animationName (readonly)
+- String animationName (readonly)
 - float length (readonly)
 - uint numTracks (readonly)
 
@@ -1781,10 +1783,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -1800,7 +1802,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 
 
 BiasParameters
@@ -1846,10 +1848,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -1865,18 +1867,18 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - LightType lightType
 - bool perVertex
-- Color& color
+- Color color
 - float specularIntensity
 - float range
 - float fov
 - float aspectRatio
 - float fadeDistance
-- BiasParameters& shadowBias
-- CascadeParameters& shadowCascade
-- FocusParameters& shadowFocus
+- BiasParameters shadowBias
+- CascadeParameters shadowCascade
+- FocusParameters shadowFocus
 - float shadowFadeDistance
 - float shadowIntensity
 - float shadowResolution
@@ -1902,10 +1904,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -1921,13 +1923,13 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
-- BoundingBox& boundingBox
-- Matrix3x4& inverseWorldTransform (readonly)
-- Color& ambientColor
-- Color& ambientStartColor (readonly)
-- Color& ambientEndColor (readonly)
-- Color& fogColor
+- BoundingBox worldBoundingBox (readonly)
+- BoundingBox boundingBox
+- Matrix3x4 inverseWorldTransform (readonly)
+- Color ambientColor
+- Color ambientStartColor (readonly)
+- Color ambientEndColor (readonly)
+- Color fogColor
 - float fogStart
 - float fogEnd
 - int priority
@@ -1951,10 +1953,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -1970,10 +1972,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - Model@ model
+- Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox& boundingBox (readonly)
+- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint softwareLodLevel
 - Zone@ zone (readonly)
@@ -1995,10 +1998,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -2014,10 +2017,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - Model@ model
+- Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox& boundingBox (readonly)
+- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint softwareLodLevel
 - Zone@ zone (readonly)
@@ -2066,10 +2070,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -2085,10 +2089,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - Model@ model
+- Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox& boundingBox (readonly)
+- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint softwareLodLevel
 - float animationLodBias
@@ -2143,10 +2148,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -2179,10 +2184,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
@@ -2198,7 +2203,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - Material@ material
 - uint numBillboards
 - bool relative
@@ -2226,10 +2231,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - Material@ material
@@ -2278,13 +2283,13 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
-- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
 - uint numLevels (readonly)
 
 
@@ -2299,8 +2304,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& windowTitle
+- String typeName (readonly)
+- String windowTitle
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)
@@ -2330,7 +2335,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numViewports
 - Viewport@[] viewports
 - RenderMode renderMode
@@ -2364,7 +2369,7 @@ Input
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - bool toggleFullscreen
 - bool[] keyDown (readonly)
 - bool[] keyPress (readonly)
@@ -2373,7 +2378,7 @@ Properties:<br>
 - bool[] qualifierDown (readonly)
 - bool[] qualifierPress (readonly)
 - int qualifiers (readonly)
-- IntVector2& mouseMove (readonly)
+- IntVector2 mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
@@ -2389,8 +2394,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - float length (readonly)
@@ -2423,10 +2428,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - SoundType soundType
@@ -2462,10 +2467,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - SoundType soundType
@@ -2492,10 +2497,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - float[] masterGain
-- Vector3& listenerPosition
-- Quaternion& listenerRotation
+- Vector3 listenerPosition
+- Quaternion listenerRotation
 - uint sampleSize (readonly)
 - int mixRate (readonly)
 - bool stereo (readonly)
@@ -2512,8 +2517,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 
@@ -2551,22 +2556,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -2583,8 +2590,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -2593,7 +2600,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 
 
 BorderImage
@@ -2631,22 +2638,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -2663,8 +2672,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -2673,11 +2682,11 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
 
 
 Button
@@ -2718,22 +2727,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -2750,8 +2761,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -2760,13 +2771,13 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
-- IntVector2& pressedOffset
-- IntVector2& labelOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
+- IntVector2 pressedOffset
+- IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
 
@@ -2807,22 +2818,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -2839,8 +2852,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -2849,13 +2862,13 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
 - bool checked
-- IntVector2& checkedOffset
+- IntVector2 checkedOffset
 
 
 Cursor
@@ -2894,22 +2907,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -2926,8 +2941,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -2936,11 +2951,11 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
 - CursorShape shape
 
 
@@ -2980,22 +2995,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3012,8 +3029,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3022,11 +3039,11 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
 - Orientation orientation
 - float range
 - float value
@@ -3069,22 +3086,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3101,8 +3120,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3111,7 +3130,7 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Orientation orientation
 - float range
 - float value
@@ -3158,22 +3177,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3190,8 +3211,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3200,9 +3221,9 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - UIElement@ contentElement
-- IntVector2& viewPosition
+- IntVector2 viewPosition
 - float scrollStep
 - float pageStep
 - ScrollBar@ horizontalScrollBar (readonly)
@@ -3260,22 +3281,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3292,8 +3315,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3302,8 +3325,8 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
-- IntVector2& viewPosition
+- VariantMap vars (readonly)
+- IntVector2 viewPosition
 - UIElement@ contentElement (readonly)
 - ScrollBar@ horizontalScrollBar (readonly)
 - ScrollBar@ verticalScrollBar (readonly)
@@ -3360,22 +3383,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3392,8 +3417,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3402,17 +3427,17 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Font@ font (readonly)
 - int fontSize (readonly)
-- String& text
+- String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
 - bool wordwrap
 - uint selectionStart (readonly)
 - uint selectionLength (readonly)
-- Color& selectionColor
-- Color& hoverColor
+- Color selectionColor
+- Color hoverColor
 - uint numRows (readonly)
 - int rowHeight (readonly)
 
@@ -3452,22 +3477,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3484,8 +3511,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3494,12 +3521,12 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
-- String& text
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
+- String text
 - uint cursorPosition
 - float cursorBlinkRate
 - uint maxLength
@@ -3551,22 +3578,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3583,8 +3612,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3593,17 +3622,17 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
-- IntVector2& pressedOffset
-- IntVector2& labelOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
+- IntVector2 pressedOffset
+- IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
 - UIElement@ popup
-- IntVector2& popupOffset
+- IntVector2 popupOffset
 - bool showPopup
 - int acceleratorKey (readonly)
 - int acceleratorQualifiers (readonly)
@@ -3655,22 +3684,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3687,8 +3718,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3697,13 +3728,13 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
-- IntVector2& pressedOffset
-- IntVector2& labelOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
+- IntVector2 pressedOffset
+- IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
 - bool showPopup
@@ -3753,22 +3784,24 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
-- IntVector2& position
-- IntVector2& size
+- String typeName (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 position
+- IntVector2 size
 - int width
 - int height
-- IntVector2& minSize
+- IntVector2 minSize
 - int minWidth
 - int minHeight
-- IntVector2& maxSize
+- IntVector2 maxSize
 - int maxWidth
 - int maxHeight
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
-- IntRect& clipBorder
-- Color&[] colors
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
 - int priority
 - float opacity
 - bool bringToFront
@@ -3785,8 +3818,8 @@ Properties:<br>
 - uint dragDropMode
 - LayoutMode layoutMode
 - int layoutSpacing
-- IntRect& layoutBorder
-- IntVector2& childOffset (readonly)
+- IntRect layoutBorder
+- IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3795,14 +3828,14 @@ Properties:<br>
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
-- VariantMap& vars (readonly)
+- VariantMap vars (readonly)
 - Texture@ texture
-- IntRect& imageRect
-- IntRect& border
-- IntVector2& hoverOffset
+- IntRect imageRect
+- IntRect border
+- IntVector2 hoverOffset
 - bool movable
 - bool resizable
-- IntRect& resizeBorder
+- IntRect resizeBorder
 
 
 FileSelector
@@ -3814,12 +3847,12 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& title
-- String& path
-- String& fileName
+- String typeName (readonly)
+- String title
+- String path
+- String fileName
 - bool directoryMode
-- String& filter (readonly)
+- String filter (readonly)
 - uint filterIndex (readonly)
 - XMLFile@ style
 - Window@ window (readonly)
@@ -3843,7 +3876,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
 - UIElement@ focusElement
@@ -3882,10 +3915,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float basePriority
@@ -3905,7 +3938,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - Scene@ scene
 - bool logStatistics
 - bool client (readonly)
@@ -3915,7 +3948,7 @@ Properties:<br>
 - String address (readonly)
 - uint16 port (readonly)
 - uint numDownloads (readonly)
-- String& downloadName (readonly)
+- String downloadName (readonly)
 - float downloadProgress (readonly)
 - Vector3 position
 - Controls controls
@@ -3940,9 +3973,9 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - int updateFps
-- String& packageCacheDir
+- String packageCacheDir
 - bool serverRunning (readonly)
 - Connection@ serverConnection (readonly)
 - Connection@[]@ clientConnections (readonly)
@@ -3972,16 +4005,16 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - ShapeType shapeType
-- Vector3& size
-- Vector3& position
-- Quaternion& rotation
+- Vector3 size
+- Vector3 position
+- Quaternion rotation
 - float margin
 - Model@ model
 - uint lodLevel
@@ -4013,10 +4046,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float mass
@@ -4059,20 +4092,22 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - ConstraintType constraintType
-- Vector3& position
-- Vector3& axis
-- Vector3& otherPosition
-- Vector3& otherAxis
+- Vector3 position
+- Quaternion rotation
+- Vector3 axis (writeonly)
+- Vector3 otherPosition
+- Quaternion otherRotation
+- Vector3 otherAxis (writeonly)
 - Vector3 worldPosition
-- Vector2& highLimit
-- Vector2& lowLimit
+- Vector2 highLimit
+- Vector2 lowLimit
 - bool disableCollision
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
@@ -4111,10 +4146,10 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - Vector3 gravity
@@ -4131,8 +4166,8 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& name
+- String typeName (readonly)
+- String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - bool compiled (readonly)
@@ -4163,17 +4198,17 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
+- AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool active
 - int fixedUpdateFps
 - ScriptFile@ scriptFile
 - ScriptObject@ object (readonly)
-- String& className
+- String className
 
 
 Script
@@ -4184,7 +4219,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - ScriptFile@ defaultScriptFile
 - Scene@ defaultScene
 
@@ -4197,13 +4232,13 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - XMLFile@ style
 - bool visible
 - uint numRows
 - uint numHistoryRows
 - uint historyPosition (readonly)
-- String&[] historyRow (readonly)
+- String[] historyRow (readonly)
 - BorderImage@ background (readonly)
 - LineEdit@ lineEdit (readonly)
 
@@ -4216,7 +4251,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - XMLFile@ style
 - uint mode
 - uint profilerMaxDepth
@@ -4239,7 +4274,7 @@ Methods:<br>
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
+- String typeName (readonly)
 - int minFps
 - int maxFps
 - int maxInactiveFps

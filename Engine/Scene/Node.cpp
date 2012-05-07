@@ -596,6 +596,30 @@ void Node::RemoveComponent(Component* component)
     }
 }
 
+void Node::RemoveComponent(ShortStringHash type)
+{
+    for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+        {
+            WeakPtr<Component> componentWeak(*i);
+            
+            RemoveListener(*i);
+            if (scene_)
+                scene_->ComponentRemoved(*i);
+            components_.Erase(i);
+            
+            // If the component is still referenced elsewhere, reset its node pointer now
+            if (componentWeak)
+                componentWeak->SetNode(0);
+            
+            // Mark node dirty in all replication states
+            MarkReplicationDirty();
+            return;
+        }
+    }
+}
+
 void Node::RemoveAllComponents()
 {
     if (components_.Empty())
