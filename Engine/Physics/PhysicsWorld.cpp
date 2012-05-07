@@ -521,6 +521,8 @@ void PhysicsWorld::SendCollisionEvents()
             
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
+            WeakPtr<RigidBody> bodyWeakA(bodyA);
+            WeakPtr<RigidBody> bodyWeakB(bodyB);
             
             // Skip collision event signaling if both objects are static, or if collision event mode does not match
             if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
@@ -565,8 +567,8 @@ void PhysicsWorld::SendCollisionEvents()
             
             SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
             
-            // Skip if either of the nodes has been removed as a response to the event
-            if (!nodeWeakA || !nodeWeakB)
+            // Skip if either of the nodes or bodies has been removed as a response to the event
+            if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
                 continue;
             
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
