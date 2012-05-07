@@ -522,7 +522,7 @@ void CreateRagdoll(AnimatedModel@ model)
         skel.bones[i].animated = false;
 }
 
-void CreateRagdollBone(Node@ root, String boneName, ShapeType type, Vector3 size, Vector3 position, Quaternion rotation)
+void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position, const Quaternion&in rotation)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     if (boneNode is null || boneNode.HasComponent("RigidBody"))
@@ -545,7 +545,7 @@ void CreateRagdollBone(Node@ root, String boneName, ShapeType type, Vector3 size
     shape.rotation = rotation;
 }
 
-void CreateRagdollConstraint(Node@ root, String boneName, String parentName, ConstraintType type, Vector3 axis, Vector3 parentAxis, Vector2 highLimit, Vector2 lowLimit)
+void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type, const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     Node@ parentNode = root.GetChild(parentName, true);
