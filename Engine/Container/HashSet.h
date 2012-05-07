@@ -179,7 +179,7 @@ public:
         {
             if (!rhs.Contains(*it))
                 return false;
-            ++i;
+            ++it;
         }
         
         return true;
