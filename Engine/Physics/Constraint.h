@@ -79,7 +79,7 @@ public:
     void SetOtherRotation(const Quaternion& rotation);
     /// %Set constraint rotation relative to the other body by specifying the axis.
     void SetOtherAxis(const Vector3& axis);
-    ///% Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    /// %Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
     void SetWorldPosition(const Vector3& position);
     /// %Set high limit. Interpretation is constraint type specific.
     void SetHighLimit(const Vector2& limit);
@@ -162,6 +162,6 @@ private:
     bool disableCollision_;
     /// Recreate constraint flag.
     bool recreateConstraint_;
-    /// Frames need update flag.
+    /// Coordinate frames dirty flag.
     bool framesDirty_;
 };
