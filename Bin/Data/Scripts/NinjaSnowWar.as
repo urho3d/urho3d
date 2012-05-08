@@ -56,9 +56,6 @@ void Start()
     if (runServer || runClient)
         singlePlayer = false;
 
-    // Subscribe to Update event before creating the scene to ensure we call HandleUpdate() before the scene is updated
-    SubscribeToEvent("Update", "HandleUpdate");
-
     InitAudio();
     InitConsole();
     InitScene();
@@ -66,10 +63,12 @@ void Start()
     CreateCamera();
     CreateOverlays();
 
+    SubscribeToEvent(gameScene, "SceneUpdate", "HandleUpdate");
     if (gameScene.physicsWorld !is null)
         SubscribeToEvent(gameScene.physicsWorld, "PhysicsPreStep", "HandleFixedUpdate");
-    SubscribeToEvent("PostUpdate", "HandlePostUpdate");
+    SubscribeToEvent(gameScene, "ScenePostUpdate", "HandlePostUpdate");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+    SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
@@ -338,39 +337,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
-    if (input.keyPress[KEY_F1])
-        console.Toggle();
-    if (input.keyPress[KEY_F2])
-        debugHud.ToggleAll();
-    if (input.keyPress[KEY_F3])
-        drawDebug = !drawDebug;
-    if (input.keyPress[KEY_F4])
-        drawOctreeDebug = !drawOctreeDebug;
-    
-    // Allow pause only in singleplayer
-    if (singlePlayer && input.keyPress['P'] && !console.visible && gameOn)
-    {
-        gameScene.active = !gameScene.active;
-        if (!gameScene.active)
-            SetMessage("PAUSED");
-        else
-            SetMessage("");
-    }
+    UpdateControls();
+    CheckEndAndRestart();
 
-    if (input.keyPress[KEY_ESC])
-    {
-        if (!console.visible)
-            engine.Exit();
-        else
-            console.visible = false;
-    }
-
-    if (gameScene.active)
-    {
-        UpdateControls();
-        CheckEndAndRestart();
-    }
-    
     if (engine.headless)
     {
         String command = GetConsoleInput();
@@ -403,6 +372,41 @@ void HandlePostRenderUpdate()
         gameScene.physicsWorld.DrawDebugGeometry(true);
     if (drawOctreeDebug)
         gameScene.octree.DrawDebugGeometry(true);
+}
+
+void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    int key = eventData["Key"].GetInt();
+
+    if (key == KEY_ESC)
+    {
+        if (!console.visible)
+            engine.Exit();
+        else
+            console.visible = false;
+    }
+
+    if (key == KEY_F1)
+        console.Toggle();
+    
+    if (key == KEY_F2)
+        debugHud.ToggleAll();
+    
+    if (key == KEY_F3)
+        drawDebug = !drawDebug;
+    
+    if (key == KEY_F4)
+        drawOctreeDebug = !drawOctreeDebug;
+
+    // Allow pause only in singleplayer
+    if (key == 'P' && singlePlayer && !console.visible && gameOn)
+    {
+        gameScene.active = !gameScene.active;
+        if (!gameScene.active)
+            SetMessage("PAUSED");
+        else
+            SetMessage("");
+    }
 }
 
 void HandlePoints(StringHash eventType, VariantMap& eventData)

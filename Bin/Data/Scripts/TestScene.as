@@ -251,95 +251,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             cameraNode.TranslateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
         if (input.keyDown['D'])
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
-
-        if (input.keyPress['1'])
-            renderer.renderMode = RenderMode((renderer.renderMode + 1) % 3);
-        
-        if (input.keyPress['2'])
-        {
-            int quality = renderer.textureQuality;
-            ++quality;
-            if (quality > 2)
-                quality = 0;
-            renderer.textureQuality = quality;
-        }
-
-        if (input.keyPress['3'])
-        {
-            int quality = renderer.materialQuality;
-            ++quality;
-            if (quality > 2)
-                quality = 0;
-            renderer.materialQuality = quality;
-        }
-
-        if (input.keyPress['4'])
-            renderer.specularLighting = !renderer.specularLighting;
-
-        if (input.keyPress['5'])
-            renderer.drawShadows = !renderer.drawShadows;
-
-        if (input.keyPress['6'])
-        {
-            int size = renderer.shadowMapSize;
-            size *= 2;
-            if (size > 2048)
-                size = 512;
-            renderer.shadowMapSize = size;
-        }
-
-        if (input.keyPress['7'])
-            renderer.shadowQuality = renderer.shadowQuality + 1;
-
-        if (input.keyPress['8'])
-        {
-            bool occlusion = renderer.maxOccluderTriangles > 0;
-            occlusion = !occlusion;
-            renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
-        }
-
-        if (input.keyPress['9'])
-            renderer.dynamicInstancing = !renderer.dynamicInstancing;
-
-        if (input.keyPress[' '])
-        {
-            drawDebug++;
-            if (drawDebug > 2)
-                drawDebug = 0;
-        }
-
-        if (input.keyPress['C'])
-            camera.orthographic = !camera.orthographic;
-
-        if (input.keyPress['B'])
-            bloom.active = !bloom.active;
-
-        if (input.keyPress['F'])
-            edgeFilter.active = !edgeFilter.active;
-
-        if (input.keyPress['T'])
-            debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
-
-        if (input.keyPress[KEY_F5])
-        {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_WRITE);
-            testScene.SaveXML(xmlFile);
-        }
-
-        if (input.keyPress[KEY_F7])
-        {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_READ);
-            if (xmlFile.open)
-                testScene.LoadXML(xmlFile);
-        }
-    }
-
-    if (input.keyPress[KEY_ESC])
-    {
-        if (ui.focusElement is null)
-            engine.Exit();
-        else
-            console.visible = false;
     }
 
     // Update package download status
@@ -358,9 +269,102 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    // Check for toggling the console
-    if (eventData["Key"].GetInt() == KEY_F1)
+    int key = eventData["Key"].GetInt();
+
+    if (key == KEY_ESC)
+    {
+        if (ui.focusElement is null)
+            engine.Exit();
+        else
+            console.visible = false;
+    }
+    
+    if (key == KEY_F1)
         console.Toggle();
+
+    if (ui.focusElement is null)
+    {
+        if (key == '1')
+            renderer.renderMode = RenderMode((renderer.renderMode + 1) % 3);
+        
+        if (key == '2')
+        {
+            int quality = renderer.textureQuality;
+            ++quality;
+            if (quality > 2)
+                quality = 0;
+            renderer.textureQuality = quality;
+        }
+
+        if (key == '3')
+        {
+            int quality = renderer.materialQuality;
+            ++quality;
+            if (quality > 2)
+                quality = 0;
+            renderer.materialQuality = quality;
+        }
+
+        if (key == '4')
+            renderer.specularLighting = !renderer.specularLighting;
+
+        if (key == '5')
+            renderer.drawShadows = !renderer.drawShadows;
+
+        if (key == '6')
+        {
+            int size = renderer.shadowMapSize;
+            size *= 2;
+            if (size > 2048)
+                size = 512;
+            renderer.shadowMapSize = size;
+        }
+
+        if (key == '7')
+            renderer.shadowQuality = renderer.shadowQuality + 1;
+
+        if (key == '8')
+        {
+            bool occlusion = renderer.maxOccluderTriangles > 0;
+            occlusion = !occlusion;
+            renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
+        }
+
+        if (key == '9')
+            renderer.dynamicInstancing = !renderer.dynamicInstancing;
+
+        if (key == ' ')
+        {
+            drawDebug++;
+            if (drawDebug > 2)
+                drawDebug = 0;
+        }
+
+        if (key == 'C')
+            camera.orthographic = !camera.orthographic;
+
+        if (key == 'B')
+            bloom.active = !bloom.active;
+
+        if (key == 'F')
+            edgeFilter.active = !edgeFilter.active;
+
+        if (key == 'T')
+            debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
+
+        if (key == KEY_F5)
+        {
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_WRITE);
+            testScene.SaveXML(xmlFile);
+        }
+
+        if (key == KEY_F7)
+        {
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_READ);
+            if (xmlFile.open)
+                testScene.LoadXML(xmlFile);
+        }
+    }
 }
 
 void HandleMouseMove(StringHash eventType, VariantMap& eventData)

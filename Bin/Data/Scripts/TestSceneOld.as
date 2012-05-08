@@ -349,11 +349,30 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             cameraNode.TranslateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
         if (input.keyDown['D'])
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
+    }
+}
 
-        if (input.keyPress['1'])
+void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    int key = eventData["Key"].GetInt();
+
+    if (key == KEY_ESC)
+    {
+        if (ui.focusElement is null)
+            engine.Exit();
+        else
+            console.visible = false;
+    }
+
+    if (key == KEY_F1)
+        console.Toggle();
+
+    if (ui.focusElement is null)
+    {
+        if (key == '1')
             renderer.renderMode = RenderMode((renderer.renderMode + 1) % 3);
 
-        if (input.keyPress['2'])
+        if (key == '2')
         {
             int quality = renderer.textureQuality;
             ++quality;
@@ -362,7 +381,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.textureQuality = quality;
         }
 
-        if (input.keyPress['3'])
+        if (key == '3')
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -371,13 +390,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.materialQuality = quality;
         }
 
-        if (input.keyPress['4'])
+        if (key == '4')
             renderer.specularLighting = !renderer.specularLighting;
 
-        if (input.keyPress['5'])
+        if (key == '5')
             renderer.drawShadows = !renderer.drawShadows;
 
-        if (input.keyPress['6'])
+        if (key == '6')
         {
             int size = renderer.shadowMapSize;
             size *= 2;
@@ -386,30 +405,30 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.shadowMapSize = size;
         }
 
-        if (input.keyPress['7'])
+        if (key == '7')
             renderer.shadowQuality = renderer.shadowQuality + 1;
 
-        if (input.keyPress['8'])
+        if (key == '8')
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
 
-        if (input.keyPress['9'])
+        if (key == '9')
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
-        if (input.keyPress[' '])
+        if (key == ' ')
         {
             drawDebug++;
             if (drawDebug > 2)
                 drawDebug = 0;
         }
 
-        if (input.keyPress['P'])
+        if (key == 'P')
             paused = !paused;
 
-        if (input.keyPress['L'])
+        if (key == 'L')
         {
             if (cameraLightNode.parent is testScene)
             {
@@ -421,28 +440,28 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 cameraLightNode.parent = testScene;
         }
         
-        if (input.keyPress['V'])
+        if (key == 'V')
             cameraLight.perVertex = !cameraLight.perVertex;
 
-        if (input.keyPress['C'])
+        if (key == 'C')
             camera.orthographic = !camera.orthographic;
 
-        if (input.keyPress['B'])
+        if (key == 'B')
             bloom.active = !bloom.active;
             
-        if (input.keyPress['F'])
+        if (key == 'F')
             edgeFilter.active = !edgeFilter.active;
         
-        if (input.keyPress['T'])
+        if (key == 'T')
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 
-        if (input.keyPress[KEY_F5])
+        if (key == KEY_F5)
         {
             File@ xmlFile = File("Data/Scenes/SceneOld.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
-        if (input.keyPress[KEY_F7])
+        if (key == KEY_F7)
         {
             File@ xmlFile = File("Data/Scenes/SceneOld.xml", FILE_READ);
             if (xmlFile.open)
@@ -456,21 +475,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             }
         }
     }
-
-    if (input.keyPress[KEY_ESC])
-    {
-        if (ui.focusElement is null)
-            engine.Exit();
-        else
-            console.visible = false;
-    }
-}
-
-void HandleKeyDown(StringHash eventType, VariantMap& eventData)
-{
-    // Check for toggling the console
-    if (eventData["Key"].GetInt() == KEY_F1)
-        console.Toggle();
 }
 
 void HandleMouseMove(StringHash eventType, VariantMap& eventData)
