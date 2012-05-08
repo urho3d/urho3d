@@ -315,7 +315,9 @@ void ScriptInstance::CreateObject()
     scriptObject_ = scriptFile_->CreateObject(className_);
     if (scriptObject_)
     {
-        script_->GetObjectMap()[(void*)scriptObject_] = this;
+        // Map script object to script instance with userdata
+        scriptObject_->SetUserData(this);
+        
         ClearDelayedExecute();
         GetSupportedMethods();
         if (methods_[METHOD_START])
@@ -336,10 +338,9 @@ void ScriptInstance::ReleaseObject()
         ClearMethods();
         ClearDelayedExecute();
         
+        scriptObject_->SetUserData(0);
         scriptObject_->Release();
         scriptObject_ = 0;
-        
-        script_->GetObjectMap().Erase((void*)scriptObject_);
     }
 }
 
@@ -497,11 +498,9 @@ Context* GetScriptContext()
 ScriptInstance* GetScriptContextInstance()
 {
     asIScriptContext* context = asGetActiveContext();
-    void* object = context->GetThisPointer();
-    Map<void*, ScriptInstance*>& objectMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetObjectMap();
-    Map<void*, ScriptInstance*>::ConstIterator i = objectMap.Find(object);
-    if (i != objectMap.End())
-        return i->second_;
+    asIScriptObject* object = context ? static_cast<asIScriptObject*>(context->GetThisPointer()) : 0;
+    if (object)
+        return static_cast<ScriptInstance*>(object->GetUserData());
     else
         return 0;
 }

@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_scriptobject.h
@@ -75,6 +75,10 @@ public:
 
 	int         CopyFrom(asIScriptObject *other);
 
+	// Urho3D: added userdata
+	void *SetUserData(void *data);
+	void *GetUserData() const;
+
 //====================================
 // Internal
 //====================================
@@ -105,6 +109,9 @@ protected:
 	mutable asCAtomic refCount;
 	mutable bool gcFlag;
 	bool isDestructCalled;
+	
+	// Urho3D: added userdata
+	void* userData;
 };
 
 void ScriptObject_Construct(asCObjectType *objType, asCScriptObject *self);

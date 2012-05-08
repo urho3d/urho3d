@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 #include <new>
 #include "as_config.h"
@@ -199,6 +200,9 @@ asCScriptObject::asCScriptObject(asCObjectType *ot)
 			}
 		}
 	}
+	
+	// Urho3D: initialize userdata
+	userData = 0;
 }
 
 void asCScriptObject::Destruct()
@@ -338,6 +342,20 @@ int asCScriptObject::GetTypeId() const
 {
 	asCDataType dt = asCDataType::CreateObject(objType, false);
 	return objType->engine->GetTypeIdFromDataType(dt);
+}
+
+// interface
+void *asCScriptObject::SetUserData(void *data)
+{
+	void *oldData = userData;
+	userData = data;
+	return oldData;
+}
+
+// interface
+void *asCScriptObject::GetUserData() const
+{
+	return userData;
 }
 
 asUINT asCScriptObject::GetPropertyCount() const

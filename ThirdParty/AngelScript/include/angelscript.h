@@ -824,6 +824,10 @@ public:
 	virtual asIScriptEngine *GetEngine() const = 0;
 	virtual int              CopyFrom(asIScriptObject *other) = 0;
 
+	// Urho3D: added userdata
+	virtual void *SetUserData(void *data) = 0;
+	virtual void *GetUserData() const = 0;
+
 protected:
 	virtual ~asIScriptObject() {}
 };

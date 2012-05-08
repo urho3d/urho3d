@@ -64,8 +64,6 @@ bool ScriptFile::Load(Deserializer& source)
     ReleaseModule();
     
     // Create the module. Discard previous module if there was one
-    if (scriptModule_)
-        script_->GetModuleMap().Erase(scriptModule_);
     asIScriptEngine* engine = script_->GetScriptEngine();
     scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
     if (!scriptModule_)
@@ -94,7 +92,8 @@ bool ScriptFile::Load(Deserializer& source)
     
     LOGINFO("Compiled script module " + GetName());
     compiled_ = true;
-    script_->GetModuleMap()[scriptModule_] = this;
+    // Map script module to script resource with userdata
+    scriptModule_->SetUserData(this);
     
     return true;
 }
@@ -534,7 +533,7 @@ void ScriptFile::ReleaseModule()
         UnsubscribeFromAllEventsWithUserData();
         
         // Remove the module
-        script_->GetModuleMap().Erase(scriptModule_);
+        scriptModule_->SetUserData(0);
         asIScriptEngine* engine = script_->GetScriptEngine();
         engine->DiscardModule(GetName().CString());
         scriptModule_ = 0;
@@ -563,12 +562,10 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 ScriptFile* GetScriptContextFile()
 {
     asIScriptContext* context = asGetActiveContext();
-    asIScriptFunction* function = context->GetFunction();
-    asIScriptModule* module = function->GetEngine()->GetModule(function->GetModuleName());
-    Map<asIScriptModule*, ScriptFile*>& moduleMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetModuleMap();
-    Map<asIScriptModule*, ScriptFile*>::ConstIterator i = moduleMap.Find(module);
-    if (i != moduleMap.End())
-        return i->second_;
+    asIScriptFunction* function = context ? context->GetFunction() : 0;
+    asIScriptModule* module = function ? function->GetEngine()->GetModule(function->GetModuleName()) : 0;
+    if (module)
+        return static_cast<ScriptFile*>(module->GetUserData());
     else
         return 0;
 }

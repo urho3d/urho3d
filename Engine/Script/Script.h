@@ -92,11 +92,6 @@ public:
     /// Return retained mode log messages.
     const String& GetLogMessages() const { return logMessages_; }
     
-    /// Return script module to script file map.
-    Map<asIScriptModule*, ScriptFile*>& GetModuleMap() { return moduleMap_; }
-    /// Return script object to script instance map.
-    Map<void*, ScriptInstance*>& GetObjectMap() { return objectMap_; }
-    
 private:
     /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
@@ -119,10 +114,6 @@ private:
     WeakPtr<Scene> defaultScene_;
     /// Script function/method execution contexts.
     Vector<asIScriptContext*> scriptFileContexts_;
-    /// Map of script modules to script files.
-    Map<asIScriptModule*, ScriptFile*> moduleMap_;
-    /// Map of script objects to script instance components.
-    Map<void*, ScriptInstance*> objectMap_;
     /// Search cache for inbuilt object types.
     Map<const char*, asIObjectType*> objectTypes_;
     /// Script engine logging mode.
