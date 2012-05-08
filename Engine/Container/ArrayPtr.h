@@ -388,8 +388,8 @@ public:
     bool Null() const { return refCount_ == 0; }
     /// Check if the pointer is not null.
     bool NotNull() const { return refCount_ != 0; }
-    /// Return the array's reference count, or 0 if null pointer or if array is expired.
-    int Refs() const { return refCount_ ? refCount_->refs_ : 0; }
+    /// Return the array's reference count, or 0 if null pointer or if array has expired.
+    int Refs() const { return (refCount_ && refCount_->refs_ >= 0) ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count.
     int WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return whether the array has expired. If null pointer, always return true.
