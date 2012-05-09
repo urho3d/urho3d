@@ -577,7 +577,6 @@ void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
     }
     else if (nodeB.HasComponent("AnimatedModel"))
     {
-        // Remove the trigger physics shape, and create the ragdoll
         nodeB.RemoveComponent("RigidBody");
         nodeB.RemoveComponent("CollisionShape");
         CreateRagdoll(nodeB.GetComponent("AnimatedModel"));

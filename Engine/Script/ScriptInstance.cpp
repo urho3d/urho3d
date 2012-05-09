@@ -537,8 +537,8 @@ Scene* GetScriptContextScene()
 
 ScriptEventListener* GetScriptContextEventListener()
 {
-    // If context this pointer is non-null, try to get the script instance. Else get the script file for procedural
-    // event handling.
+    // If context's this pointer is non-null, try to get the script instance. Else get the script file for procedural
+    // event handling
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
@@ -553,8 +553,6 @@ ScriptEventListener* GetScriptContextEventListener()
 
 Object* GetScriptContextEventListenerObject()
 {
-    // If context this pointer is non-null, try to get the script instance. Else get the script file for procedural
-    // event handling.
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
