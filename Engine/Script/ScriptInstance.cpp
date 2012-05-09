@@ -490,6 +490,17 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
     scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
+void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
+{
+    ReleaseObject();
+}
+
+void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    if (!className_.Empty())
+        CreateObject();
+}
+
 Context* GetScriptContext()
 {
     return static_cast<Script*>(asGetActiveContext()->GetEngine()->GetUserData())->GetContext();
@@ -526,30 +537,33 @@ Scene* GetScriptContextScene()
 
 ScriptEventListener* GetScriptContextEventListener()
 {
-    // First try to get the script instance. If not found, get the script file for procedural event handling
-    ScriptInstance* instance = GetScriptContextInstance();
-    if (instance)
-        return instance;
-    ScriptFile* file = GetScriptContextFile();
-    return file;
+    // If context this pointer is non-null, try to get the script instance. Else get the script file for procedural
+    // event handling.
+    asIScriptContext* context = asGetActiveContext();
+    if (context)
+    {
+        if (context->GetThisPointer())
+            return GetScriptContextInstance();
+        else
+            return GetScriptContextFile();
+    }
+    else
+        return 0;
 }
 
 Object* GetScriptContextEventListenerObject()
 {
-    ScriptInstance* instance = GetScriptContextInstance();
-    if (instance)
-        return instance;
-    ScriptFile* file = GetScriptContextFile();
-    return file;
+    // If context this pointer is non-null, try to get the script instance. Else get the script file for procedural
+    // event handling.
+    asIScriptContext* context = asGetActiveContext();
+    if (context)
+    {
+        if (context->GetThisPointer())
+            return GetScriptContextInstance();
+        else
+            return GetScriptContextFile();
+    }
+    else
+        return 0;
 }
 
-void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
-{
-    ReleaseObject();
-}
-
-void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
-{
-    if (!className_.Empty())
-        CreateObject();
-}
