@@ -254,18 +254,18 @@ parameters.Push(Variant(100)); // Add an int parameter
 file->Execute("void MyFunction(int)", parameters); // Execute
 \endcode
 
-\ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but note that the query results are also stored to an internal cache, so repeated queries for the same declaration do not need to go to the AngelScript module level each time. Storing function pointers is risky in case the ScriptFile resource is reloaded, because then the pointers will be invalidated.
+\ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but also more risky: in case the ScriptFile resource is unloaded or reloaded, any function pointers will be invalidated.
 
 \section Scripting_Object Instantiating a script object
 
-The component ScriptInstance can be used to instantiate a specific class from within a script file. After this the script object can respond to scene updates, \ref Events "events" and \ref Serialization "serialization" much like a component written in C++ would do, if it has the appropriate methods implemented. For example:
+The component ScriptInstance can be used to instantiate a specific class from within a script file. After instantiation, the the script object can respond to scene updates, \ref Events "events" and \ref Serialization "serialization" much like a component written in C++ would do, if it has the appropriate methods implemented. For example:
 
 \code
 ScriptInstance* instance = node->CreateComponent<ScriptInstance>();
 instance->CreateObject(GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyClass.as"), "MyClass");
 \endcode
 
-The class must implement the empty interface ScriptObject, so that the object can also be accessed from script using ScriptInstance's \ref ScriptInstance::GetScriptObject "GetScriptObject()" function.
+The class must implement the empty interface ScriptObject to make its base class statically known. This enables accessing any script object in the scene using ScriptInstance's \ref ScriptInstance::GetScriptObject "GetScriptObject()" function.
 
 The following methods that implement the component behaviour will be checked for. None of them are required.
 
@@ -283,15 +283,17 @@ The update methods above correspond to the variable timestep scene update and po
 
 The Start() and Stop() methods do not have direct counterparts in C++ components. Start() is called just after the script object has been created. Stop() is called just before the script object is destroyed. This happens when the ScriptInstance is destroyed, or if the script class is changed.
 
-Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver. Note that object-based event handling only works when the script object in question is attached to a ScriptInstance component, as it needs a C++ side proxy. If you simply create a new free-standing object in script, it will not be able to subscribe to events.
+Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver. Note that object-based event handling only works when the script object in question is attached to a ScriptInstance component, as a C++ side proxy is always needed. If you simply create a new free-standing object in script, it will not be able to subscribe to events.
 
 The script object's active/inactive state can be controlled through the \ref ScriptInstance::SetActive "SetActive()" function. When inactive, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
 
-There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject() (alternatively, if the node has only one ScriptInstance, and a specific class is not needed, the node's scriptObject property can also be used.) These are not actual Node member functions on the C++ side. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
+There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject(). Alternatively, if the node has only one ScriptInstance, and a specific class is not needed, the node's scriptObject property can also be used. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
 
 \code
 ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 \endcode
+
+Note that these are not actual Node member functions on the C++ side, as the %Scene library is not allowed to depend on scripting.
 
 \section Script_ScriptAPI The script API
 
@@ -765,7 +767,7 @@ The input events include:
 - E_MOUSEWHEEL: the mouse wheel has been moved.
 - E_KEYUP: a key has been released.
 - E_KEYDOWN: a key has been pressed.
-- E_CHAR: translation of a keypress to Latin-1 charset for text entry. This is currently the only way to get translated key input.
+- E_CHAR: translation of a keypress to Unicode charset for text entry. This is currently the only way to get translated key input.
 
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
 
@@ -785,9 +787,10 @@ For pseudo-3D positional sounds, the listener position and rotation have to be u
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 
-For purposes of volume control, each SoundSource is classified into one of three categories:
+For purposes of volume control, each SoundSource is classified into one of four categories:
 
 - %Sound effects
+- Ambient
 - Music
 - Voice
 
