@@ -44,7 +44,7 @@
 #include <string.h>
 #include "GLee.h"
 
-#include <GL/glfw3.h>
+#include <SDL.h>
 
 typedef GLuint(*GLEE_LINK_FUNCTION)(void);
 
@@ -56,7 +56,7 @@ GLboolean __GLeeInited=GL_FALSE;
 
 void * __GLeeGetProcAddress(const char *extname)
 {
-    return glfwGetProcAddress(extname);
+    return SDL_GL_GetProcAddress(extname);
 }
 
 

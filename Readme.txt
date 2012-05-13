@@ -40,12 +40,11 @@ Urho3D uses the following third-party libraries:
 - Bullet 2.80 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
-- GLFW 3.0 WIP (http://www.glfw.org/)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Open Asset Import Library, svn rev 1102 (http://assimp.sourceforge.net/)
-- PortAudio V19 (http://www.portaudio.com/)
 - pugixml 1.0 (http://pugixml.org/)
+- SDL 2.0 (http://www.libsdl.org/)
 - Squish 1.11 (http://libsquish.googlecode.com/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
@@ -86,7 +85,6 @@ successfully:
 - For Linux, the following development packages need to be installed:
   libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
   libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
-
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.

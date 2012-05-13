@@ -1,0 +1,16 @@
+2.0 release checklist:
+ * http://wiki.libsdl.org/moin.cgi/Roadmap
+
+ * See why windows are being rearranged.  Is the shield window not up?
+ * Make sure you can create and show a fullscreen window in one step
+ * Write automated test case for multi-draw APIs
+ * Implement assertion code on iPhone
+ * Add __WINDOWS__ in addition to __WIN32__
+
+ * Check 1.2 revisions:
+	3554 - Need to resolve semantics for locking keys on different platforms
+	4874 - Do we want screen rotation?  At what level?
+	4974 - Windows file code needs to convert UTF-8 to Unicode, but we don't need to tap dance for Windows 95/98
+	4484, 4485 - Verify that SDL's Windows keyboard handling works correctly
+	4865 - See if this is still needed (mouse coordinate clamping)
+	4866 - See if this is still needed (blocking window repositioning)

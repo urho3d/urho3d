@@ -32,13 +32,6 @@ class Graphics;
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
 {
-    #ifdef USE_OPENGL
-    friend void KeyCallback(GLFWwindow, int, int);
-    friend void CharCallback(GLFWwindow, int);
-    friend void MouseButtonCallback(GLFWwindow, int, int);
-    friend void MouseScrollCallback(GLFWwindow, int, int);
-    #endif
-    
     OBJECT(Input);
     
 public:
@@ -96,18 +89,21 @@ private:
     void SetKey(int key, bool newState);
     /// Handle mousewheel change.
     void SetMouseWheel(int delta);
+    /// Internal function to set the mouse cursor position.
+    void SetCursorPosition(const IntVector2& position);
+    /// Internal function to get the mouse cursor position.
+    IntVector2 GetCursorPosition() const;
     #ifndef USE_OPENGL
     /// Internal function to clip the mouse cursor to the window.
     void SetClipCursor(bool enable);
-    /// Internal function to set the mouse cursor position.
-    void SetCursorPosition(const IntVector2& position);
     /// Internal function to show/hide the mouse cursor.
     void SetCursorVisible(bool enable);
     /// Handle window message event.
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
+    #else
+    /// Handle SDL event.
+    void HandleSDLEvent(void* sdlEvent);
     #endif
-    /// Internal function to get the mouse cursor position.
-    IntVector2 GetCursorPosition() const;
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
@@ -141,8 +137,6 @@ private:
     bool activated_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
-    /// Screen mode changed flag. Needed only for GLFW input.
-    bool screenModeSet_;
     /// Initialized flag.
     bool initialized_;
 };

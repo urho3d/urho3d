@@ -31,10 +31,9 @@
 
 #include "DebugNew.h"
 
-static HashMap<GLFWwindow, Context*> windowContexts;
-
 GraphicsImpl::GraphicsImpl() :
     window_(0),
+    context_(0),
     activeTexture_(0),
     enabledAttributes_(0),
     boundFbo_(0),
@@ -43,25 +42,4 @@ GraphicsImpl::GraphicsImpl() :
     windowDepthBits_(0),
     fboDirty_(false)
 {
-}
-
-void SetWindowContext(GLFWwindow window, Context* context)
-{
-    MutexLock lock(GetStaticMutex());
-    
-    if (context)
-        windowContexts[window] = context;
-    else
-        windowContexts.Erase(context);
-}
-
-Context* GetWindowContext(GLFWwindow window)
-{
-    MutexLock lock(GetStaticMutex());
-    
-    HashMap<GLFWwindow, Context*>::ConstIterator i = windowContexts.Find(window);
-    if (i != windowContexts.End())
-        return i->second_;
-    else
-        return 0;
 }

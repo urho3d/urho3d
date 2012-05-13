@@ -34,9 +34,7 @@
 #include "Sound.h"
 #include "SoundSource3D.h"
 
-#ifdef USE_OPENGL
-#include <portaudio.h>
-#else
+#ifndef USE_OPENGL
 #define DIRECTSOUND_VERSION 0x0800
 
 #include "Thread.h"
@@ -45,6 +43,8 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include <dsound.h>
+#else
+#include <SDL.h>
 #endif
 
 #include "DebugNew.h"
@@ -57,8 +57,7 @@ static const int AUDIO_FPS = 100;
 #ifdef USE_OPENGL
 static unsigned numInstances = 0;
 
-static int AudioCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
-    const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
 #else
 /// DirectSound audio output stream.
 class AudioStream : public Thread
@@ -270,15 +269,13 @@ Audio::Audio(Context* context) :
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
         masterGain_[i] = 1.0f;
     
-    // Initialize PortAudio under static mutex in case this is the first instance
+    // Initialize SDL audio under static mutex in case this is the first instance
     #ifdef USE_OPENGL
     {
         MutexLock lock(GetStaticMutex());
+        
         if (!numInstances)
-        {
-            if (Pa_Initialize() != paNoError)
-                LOGERROR("Could not initialize PortAudio");
-        }
+            SDL_InitSubSystem(SDL_INIT_AUDIO);
         ++numInstances;
     }
     #endif
@@ -288,14 +285,14 @@ Audio::~Audio()
 {
     Release();
     
-    // Uninitialize PortAudio under static mutex in case this is the last instance
+    // Uninitialize SDL audio under static mutex in case this is the last instance
     #ifdef USE_OPENGL
     {
         MutexLock lock(GetStaticMutex());
         
         --numInstances;
         if (!numInstances)
-            Pa_Terminate();
+            SDL_QuitSubSystem(SDL_INIT_AUDIO);
     }
     #else
     delete (AudioStream*)stream_;
@@ -314,18 +311,46 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     fragmentSize_ = NextPowerOfTwo(mixRate >> 6);
     
     #ifdef USE_OPENGL
-    PaStreamParameters outputParams;
-    outputParams.device = Pa_GetDefaultOutputDevice();
-    outputParams.channelCount = stereo ? 2 : 1;
-    outputParams.sampleFormat = paInt16;
-    outputParams.suggestedLatency = bufferLengthMSec / 1000.0;
-    outputParams.hostApiSpecificStreamInfo = 0;
+    SDL_AudioSpec desired;
+    SDL_AudioSpec obtained;
     
-    if (Pa_OpenStream(&stream_, 0, &outputParams, mixRate, fragmentSize_, 0, AudioCallback, this) != paNoError)
+    desired.freq = mixRate;
+    desired.format = AUDIO_S16SYS;
+    desired.channels = 1;
+    if (stereo)
+        desired.channels = 2;
+    
+    // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
+    if (desired.freq <= 11025)
+        desired.samples = 512;
+    else if (desired.freq <= 22050)
+        desired.samples = 1024;
+    else if (desired.freq <= 44100)
+        desired.samples = 2048;
+    else
+        desired.samples = 4096;
+    
+    desired.callback = SDLAudioCallback;
+    desired.userdata = this;
+    
+    stream_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
+    if (!stream_)
     {
-        LOGERROR("Failed to open audio stream");
+        LOGERROR("Could not initialize audio output");
         return false;
     }
+    if (obtained.format != AUDIO_S16SYS && obtained.format != AUDIO_S16LSB && obtained.format != AUDIO_S16MSB)
+    {
+        LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
+        SDL_CloseAudioDevice(stream_);
+        stream_ = 0;
+        return false;
+    }
+    
+    if (obtained.channels == 2)
+        stereo_ = true;
+    
+    fragmentSize_ = obtained.samples;
     #else
     if (!stream_)
         stream_ = new AudioStream(this);
@@ -340,6 +365,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
         LOGERROR("Failed to open audio stream");
         return false;
     }
+    
     #endif
     
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
@@ -378,11 +404,12 @@ bool Audio::Play()
     }
     
     #ifdef USE_OPENGL
-    if (Pa_StartStream(stream_) != paNoError)
+    if (!clipBuffer_)
     {
-        LOGERROR("Failed to start playback");
+        LOGERROR("No audio buffer, can not start playback");
         return false;
     }
+    SDL_PauseAudioDevice(stream_, 0);
     #else
     if (!((AudioStream*)stream_)->StartPlayback())
     {
@@ -397,13 +424,14 @@ bool Audio::Play()
 
 void Audio::Stop()
 {
-    if (!stream_ || !playing_)
+    if (!playing_)
         return;
     
     #ifdef USE_OPENGL
-    Pa_StopStream(stream_);
+    SDL_PauseAudioDevice(stream_, 1);
     #else
-    ((AudioStream*)stream_)->StopPlayback();
+    if (stream_)
+        ((AudioStream*)stream_)->StopPlayback();
     #endif
     
     playing_ = false;
@@ -467,22 +495,26 @@ void Audio::RemoveSoundSource(SoundSource* channel)
 }
 
 #ifdef USE_OPENGL
-int AudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
-    timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
+
+void SDLAudioCallback(void *userdata, Uint8* stream, int len)
 {
-    Audio* audio = static_cast<Audio*>(userData);
+    Audio* audio = static_cast<Audio*>(userdata);
     
     {
-        MutexLock lock(audio->GetMutex());
-        audio->MixOutput(outputBuffer, framesPerBuffer);
+        MutexLock Lock(audio->GetMutex());
+        audio->MixOutput(stream, len / audio->GetSampleSize());
     }
-    
-    return 0;
 }
 #endif
 
 void Audio::MixOutput(void *dest, unsigned samples)
 {
+    if (!playing_ || !clipBuffer_)
+    {
+        memset(dest, 0, samples * sampleSize_);
+        return;
+    }
+    
     while (samples)
     {
         // If sample count exceeds the fragment (clip buffer) size, split the work
@@ -524,8 +556,12 @@ void Audio::Release()
     if (stream_)
     {
         #ifdef USE_OPENGL
-        Pa_CloseStream(stream_);
-        stream_ = 0;
+        if (clipBuffer_)
+        {
+            SDL_CloseAudioDevice(stream_);
+            stream_ = 0;
+            clipBuffer_.Reset();
+        }
         #else
         ((AudioStream*)stream_)->Close();
         #endif

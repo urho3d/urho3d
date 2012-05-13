@@ -104,20 +104,6 @@ static const String noParameter;
 
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
-int CloseCallback(GLFWwindow window)
-{
-    Context* context = GetWindowContext(window);
-    if (context)
-    {
-        Graphics* graphics = context->GetSubsystem<Graphics>();
-        // Do not close the window: GLFW will do it for us
-        if (graphics)
-            graphics->Release(true, false);
-    }
-
-    return GL_TRUE;
-}
-
 OBJECTTYPESTATIC(Graphics);
 
 Graphics::Graphics(Context* context_) :
@@ -146,7 +132,7 @@ Graphics::Graphics(Context* context_) :
     {
         MutexLock lock(GetStaticMutex());
         if (!numInstances)
-            glfwInit();
+            SDL_InitSubSystem(SDL_INIT_VIDEO);
         
         ++numInstances;
     }
@@ -164,7 +150,7 @@ Graphics::~Graphics()
         
         --numInstances;
         if (!numInstances)
-            glfwTerminate();
+            SDL_QuitSubSystem(SDL_INIT_VIDEO);
     }
 }
 
@@ -172,7 +158,7 @@ void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
     if (impl_->window_)
-        glfwSetWindowTitle(impl_->window_, windowTitle_.CString());
+        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
@@ -189,7 +175,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
-        glfwSwapInterval(vsync ? 1 : 0);
+        SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
         return true;
     }
@@ -204,36 +190,56 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         }
         else
         {
-            GLFWvidmode mode;
-            glfwGetDesktopMode(&mode);
-            width = mode.width;
-            height = mode.height;
+            SDL_DisplayMode mode;
+            SDL_GetDesktopDisplayMode(0, &mode);
+            width = mode.w;
+            height = mode.h;
         }
     }
     
-    // Close the existing window, mark GPU objects as lost
+    // Close the existing window and OpenGL context, mark GPU objects as lost
     Release(false, true);
     
     {
-        // GLFW window parameters and the window list are static, so need to operate under static lock
+        // SDL window parameters are static, so need to operate under static lock
         MutexLock lock(GetStaticMutex());
         
-        glfwOpenWindowHint(GLFW_RED_BITS, 8);
-        glfwOpenWindowHint(GLFW_GREEN_BITS, 8);
-        glfwOpenWindowHint(GLFW_BLUE_BITS, 8);
-        glfwOpenWindowHint(GLFW_ALPHA_BITS, 0);
-        glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
-        glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
-        glfwOpenWindowHint(GLFW_WINDOW_RESIZABLE, GL_FALSE);
-        if (multiSample > 1)
-            glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
-        else
-            glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         
-        impl_->window_ = glfwOpenWindow(width, height, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOWED, windowTitle_.CString(), 0);
+        if (multiSample > 1)
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+        }
+        else
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+        }
+        
+        unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+        int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+        int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+        if (fullscreen)
+            flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+        
+        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
         if (!impl_->window_)
         {
             LOGERROR("Could not open window");
+            return false;
+        }
+        
+        impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        if (!impl_->context_)
+        {
+            LOGERROR("Could not create OpenGL context");
             return false;
         }
         
@@ -244,8 +250,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         if (!_GLEE_VERSION_2_0)
         {
             LOGERROR("OpenGL 2.0 is required");
-            glfwCloseWindow(impl_->window_);
-            impl_->window_ = 0;
+            Release(true, true);
             return false;
         }
         
@@ -253,22 +258,15 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         {
             LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil and "
                 "EXT_texture_filter_anisotropic OpenGL extensions are required");
-            glfwCloseWindow(impl_->window_);
-            impl_->window_ = 0;
+            Release(true, true);
             return false;
         }
         
         compressedTextureSupport_ = _GLEE_EXT_texture_compression_s3tc != 0;
-        
-        // Set window close callback
-        glfwSetWindowCloseCallback(CloseCallback);
-        
-        // Associate GLFW window with the execution context
-        SetWindowContext(impl_->window_, context_);
     }
     
     // Set vsync
-    glfwSwapInterval(vsync ? 1 : 0);
+    SDL_GL_SetSwapInterval(vsync ? 1 : 0);
     
     // Query for system backbuffer depth
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
@@ -279,7 +277,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     SetCullMode(CULL_CCW);
     SetDepthTest(CMP_LESSEQUAL);
     
-    glfwGetWindowSize(impl_->window_, &width_, &height_);
+    SDL_GetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
@@ -290,7 +288,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     
     // Clear the window to black now, because GPU object restore may take time
     Clear(CLEAR_COLOR);
-    glfwSwapBuffers();
+    SDL_GL_SwapWindow(impl_->window_);
     
     // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
@@ -352,7 +350,7 @@ bool Graphics::BeginFrame()
         return false;
 
     // If we should be fullscreen, but are not currently active, do not render
-    if (fullscreen_ && (!glfwGetWindowParam(impl_->window_, GLFW_ACTIVE) || glfwGetWindowParam(impl_->window_, GLFW_ICONIFIED)))
+    if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
         return false;
     
     // Set default rendertarget and depth buffer
@@ -383,7 +381,7 @@ void Graphics::EndFrame()
        
     SendEvent(E_ENDRENDERING);
     
-    glfwSwapBuffers();
+    SDL_GL_SwapWindow(impl_->window_);
     
     // Clean up FBO's that have not been used for a long time
     CleanupFramebuffers(false);
@@ -1567,16 +1565,15 @@ void* Graphics::GetWindowHandle() const
 
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
-    static const unsigned MAX_MODES = 256;
-    GLFWvidmode modes[MAX_MODES];
-    
-    unsigned count = glfwGetVideoModes(modes, MAX_MODES);
     PODVector<IntVector2> ret;
+    unsigned numModes = SDL_GetNumDisplayModes(0);
     
-    for (unsigned i = 0; i < count; ++i)
+    for (unsigned i = 0; i < numModes; ++i)
     {
-        int width = modes[i].width;
-        int height  = modes[i].height;
+        SDL_DisplayMode mode;
+        SDL_GetDisplayMode(0, i, &mode);
+        int width = mode.w;
+        int height  = mode.h;
         
         // Store mode if unique
         bool unique = true;
@@ -1750,11 +1747,17 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     {
         MutexLock lock(GetStaticMutex());
         
-        SetWindowContext(impl_->window_, 0);
-        // If in close callback, GLFW will close the window for us, so skip it
+        if (impl_->context_)
+        {
+            SDL_GL_DeleteContext(impl_->context_);
+            impl_->context_ = 0;
+        }
         if (closeWindow)
-            glfwCloseWindow(impl_->window_);
-        impl_->window_ = 0;
+        {
+            SDL_ShowCursor(SDL_TRUE);
+            SDL_DestroyWindow(impl_->window_);
+            impl_->window_ = 0;
+        }
     }
 }
 

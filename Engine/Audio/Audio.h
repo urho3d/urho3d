@@ -34,7 +34,7 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// %Audio subsystem. Uses either DirectSound or PortAudio for the actual sound output.
+/// %Audio subsystem. Uses either DirectSound or SDL for sound output
 class Audio : public Object
 {
     OBJECT(Audio);
@@ -103,8 +103,13 @@ private:
     /// Stop sound output and release the sound buffer.
     void Release();
     
+#ifdef USE_OPENGL
+    /// SDL audio device ID
+    unsigned stream_;
+#else
     /// Sound output stream.
     void* stream_;
+#endif
     /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex.

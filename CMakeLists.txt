@@ -135,9 +135,9 @@ else()
     endmacro ()
 endif ()
 
-# If GLFW used, add it as a global include directory
+# If SDL used, add it as a global include directory
 if (USE_OPENGL)
-    include_directories (ThirdParty/GLFW/include)
+    include_directories (ThirdParty/SDL/include)
 endif ()
 
 # Add projects
@@ -175,8 +175,7 @@ add_subdirectory (Urho3D)
 if (USE_OPENGL)
     add_subdirectory (SourceAssets/GLSLShaders)
     add_subdirectory (ThirdParty/GLee)
-    add_subdirectory (ThirdParty/GLFW)
-    add_subdirectory (ThirdParty/PortAudio)
+    add_subdirectory (ThirdParty/SDL)
     add_subdirectory (Tools/GLShaderProcessor)
 else ()
     add_subdirectory (SourceAssets/HLSLShaders)

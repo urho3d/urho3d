@@ -46,7 +46,7 @@ public:
     {
         if (refCount_)
         {
-            assert(refCount_->refs_ >= 0);
+            assert(refCount_->refs_ > 0);
             ++(refCount_->refs_);
         }
     }
@@ -77,7 +77,7 @@ public:
         refCount_ = rhs.refCount_;
         if (refCount_)
         {
-            assert(refCount_->refs_ >= 0);
+            assert(refCount_->refs_ > 0);
             ++(refCount_->refs_);
         }
         
@@ -133,7 +133,7 @@ public:
             ++(refCount_->refs_);
     }
     
-    /// Perform a dynatic cast from a shared array pointer of another type.
+    /// Perform a dynamic cast from a shared array pointer of another type.
     template <class U> void DynamicCast(const SharedArrayPtr<U>& rhs)
     {
         Release();
@@ -142,11 +142,8 @@ public:
         if (ptr_)
         {
             refCount_ = rhs.RefCountPtr();
-            if (refCount_)
-            {
-                assert(refCount_->refs_ >= 0);
-                ++(refCount_->refs_);
-            }
+            assert(refCount_->refs_ > 0);
+            ++(refCount_->refs_);
         }
         else
             refCount_ = 0;
@@ -176,15 +173,12 @@ private:
     {
         if (refCount_)
         {
-            if (refCount_->refs_)
+            assert(refCount_->refs_ > 0);
+            --(refCount_->refs_);
+            if (!refCount_->refs_)
             {
-                assert(refCount_->refs_ > 0);
-                --(refCount_->refs_);
-                if (!refCount_->refs_)
-                {
-                    refCount_->refs_ = -1;
-                    delete[] ptr_;
-                }
+                refCount_->refs_ = -1;
+                delete[] ptr_;
             }
             
             if (refCount_->refs_ < 0 && !refCount_->weakRefs_)

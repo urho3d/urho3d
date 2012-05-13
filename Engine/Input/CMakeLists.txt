@@ -20,7 +20,7 @@ add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene)
 
 if (USE_OPENGL)
-    target_link_libraries (${TARGET_NAME} GLFW)
+    target_link_libraries (${TARGET_NAME} SDL)
 endif ()
 
 finalize_lib ()

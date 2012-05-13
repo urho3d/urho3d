@@ -98,7 +98,6 @@ Input::Input(Context* context) :
     minimized_(false),
     activated_(false),
     suppressNextMouseMove_(false),
-    screenModeSet_(false),
     initialized_(false)
 {
     // Zero the initial state
@@ -142,21 +141,21 @@ void Input::Update()
         DispatchMessageW(&msg);
     }
     #else
-    // Pump GLFW events
-    glfwPollEvents();
+    // Pump SDL events
+    SDL_Event evt;
+    SDL_PumpEvents();
+    while (SDL_PollEvent(&evt))
+        HandleSDLEvent(&evt);
     
-    // Check for automatic input activation in fullscreen mode or after a screen mode change
-    if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
+    // Poll SDL window activation state
+    SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    unsigned flags = SDL_GetWindowFlags(window);
+    if ((flags & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)) == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
     {
-        if (screenModeSet_ || (!active_ && graphics_->GetFullscreen()))
-        {
+        if (!active_)
             activated_ = true;
-            screenModeSet_ = false;
-        }
     }
-    
-    // Check for input inactivation
-    if (!glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
+    else
     {
         if (active_)
             MakeInactive();
@@ -170,24 +169,18 @@ void Input::Update()
     // Finally send the mouse move event if motion has been accumulated
     if (active_)
     {
-        #ifndef USE_OPENGL
         IntVector2 mousePos = GetCursorPosition();
         mouseMove_ = mousePos - lastCursorPosition_;
-        
+
         // Recenter the mouse cursor manually if it moved
         if (mouseMove_ != IntVector2::ZERO)
         {
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             SetCursorPosition(center);
-            lastCursorPosition_ = GetCursorPosition();
+            lastCursorPosition_ = center;
         }
         else
             lastCursorPosition_ = mousePos;
-        #else
-        IntVector2 mousePos = GetCursorPosition();
-        mouseMove_ = mousePos - lastCursorPosition_;
-        lastCursorPosition_ = mousePos;
-        #endif
         
         if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
         {
@@ -296,13 +289,12 @@ void Input::MakeActive()
     activated_ = false;
     
     // Re-establish mouse cursor clipping as necessary
-    #ifndef USE_OPENGL
+    #ifdef USE_OPENGL
+    SDL_ShowCursor(SDL_FALSE);
+    suppressNextMouseMove_ = true;
+    #else
     SetClipCursor(true);
     SetCursorVisible(false);
-    #else
-    glfwSetInputMode(graphics_->GetWindowHandle(), GLFW_CURSOR_MODE, GLFW_CURSOR_CAPTURED);
-    lastCursorPosition_ = GetCursorPosition();
-    suppressNextMouseMove_ = true;
     #endif
     
     using namespace Activation;
@@ -330,7 +322,7 @@ void Input::MakeInactive()
     ClipCursor(0);
     SetCursorVisible(true);
     #else
-    glfwSetInputMode(graphics_->GetWindowHandle(), GLFW_CURSOR_MODE, GLFW_CURSOR_NORMAL);
+    SDL_ShowCursor(SDL_TRUE);
     #endif
     
     using namespace Activation;
@@ -358,13 +350,6 @@ void Input::ResetState()
 
 void Input::SetMouseButton(int button, bool newState)
 {
-    // After deactivation in windowed mode, activate by a left-click inside the window
-    if (initialized_ && !graphics_->GetFullscreen())
-    {
-        if (!active_ && newState && button == MOUSEB_LEFT)
-            activated_ = true;
-    }
-    
     // If we are not active yet, do not react to the mouse button down
     if (newState && !active_)
         return;
@@ -451,6 +436,43 @@ void Input::SetMouseWheel(int delta)
     }
 }
 
+void Input::SetCursorPosition(const IntVector2& position)
+{
+    if (!graphics_)
+        return;
+    
+    #ifdef USE_OPENGL
+    SDL_WarpMouseInWindow(graphics_->GetImpl()->GetWindow(), position.x_, position.y_);
+    #else
+    POINT point;
+    point.x = position.x_;
+    point.y = position.y_;
+    ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
+    SetCursorPos(point.x, point.y);
+    #endif
+}
+
+
+IntVector2 Input::GetCursorPosition() const
+{
+    IntVector2 ret = lastCursorPosition_;
+    
+    if (!graphics_ || !graphics_->IsInitialized())
+        return ret;
+    
+    #ifdef USE_OPENGL
+    SDL_GetMouseState(&ret.x_, &ret.y_);
+    #else
+    POINT mouse;
+    GetCursorPos(&mouse);
+    ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
+    ret.x_ = mouse.x;
+    ret.y_ = mouse.y;
+    #endif
+    
+    return ret;
+}
+
 #ifndef USE_OPENGL
 void Input::SetClipCursor(bool enable)
 {
@@ -474,18 +496,6 @@ void Input::SetClipCursor(bool enable)
         }
         ClipCursor(0);
     }
-}
-
-void Input::SetCursorPosition(const IntVector2& position)
-{
-    if (!graphics_)
-        return;
-    
-    POINT point;
-    point.x = position.x_;
-    point.y = position.y_;
-    ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
-    SetCursorPos(point.x, point.y);
 }
 
 void Input::SetCursorVisible(bool enable)
@@ -562,7 +572,7 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
             MakeInactive();
         else
         {
-            if (!minimized_ && graphics_->GetFullscreen())
+            if (!minimized_)
                activated_ = true;
         }
         eventData[P_HANDLED] = true;
@@ -606,77 +616,60 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 #else
-Input* GetInputInstance(GLFWwindow window)
+void Input::HandleSDLEvent(void* sdlEvent)
 {
-    Context* context = GetWindowContext(window);
-    if (context)
-        return context->GetSubsystem<Input>();
-    else
-        return 0;
-}
-
-void KeyCallback(GLFWwindow window, int key, int action)
-{
-    Input* instance = GetInputInstance(window);
-    if (!instance)
-        return;
+    /// \todo Multiple windows are not differentiated
+    SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
     
-    instance->SetKey(key, action & GLFW_PRESS);
-}
-
-void CharCallback(GLFWwindow window, int key)
-{
-    Input* instance = GetInputInstance(window);
-    if (!instance)
-        return;
-
-    using namespace Char;
-
-    VariantMap keyEventData;
-    keyEventData[P_CHAR] = key;
-    keyEventData[P_BUTTONS] = instance->mouseButtonDown_;
-    keyEventData[P_QUALIFIERS] = instance->GetQualifiers();
-    instance->SendEvent(E_CHAR, keyEventData);
-}
-
-void MouseButtonCallback(GLFWwindow window, int button, int action)
-{
-    Input* instance = GetInputInstance(window);
-    if (!instance)
-        return;
-    
-    instance->SetMouseButton(1 << button, action == GLFW_PRESS);
-}
-
-void MouseScrollCallback(GLFWwindow window, int x, int y)
-{
-    Input* instance = GetInputInstance(window);
-    if (!instance)
-        return;
-    
-    instance->SetMouseWheel(y);
+    switch (evt.type)
+    {
+    case SDL_KEYDOWN:
+        // Convert to uppercase to match Win32 virtual key codes
+        SetKey(SDL_toupper(evt.key.keysym.sym), true);
+        break;
+        
+    case SDL_KEYUP:
+        SetKey(SDL_toupper(evt.key.keysym.sym), false);
+        break;
+        
+    case SDL_TEXTINPUT:
+        if (evt.text.text[0])
+        {
+            String text(&evt.text.text[0]);
+            unsigned unicode = text.AtUTF8(0);
+            if (unicode)
+            {
+                using namespace Char;
+                
+                VariantMap keyEventData;
+                
+                keyEventData[P_CHAR] = unicode;
+                keyEventData[P_BUTTONS] = mouseButtonDown_;
+                keyEventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_CHAR, keyEventData);
+            }
+        }
+        break;
+        
+    case SDL_MOUSEBUTTONDOWN:
+        SetMouseButton(1 << (evt.button.button - 1), true);
+        break;
+        
+    case SDL_MOUSEBUTTONUP:
+        SetMouseButton(1 << (evt.button.button - 1), false);
+        break;
+        
+    case SDL_MOUSEWHEEL:
+        SetMouseWheel(evt.wheel.y);
+        break;
+        
+    case SDL_QUIT:
+        if (graphics_)
+            graphics_->Close();
+        break;
+    }
 }
 #endif
-
-IntVector2 Input::GetCursorPosition() const
-{
-    IntVector2 ret = lastCursorPosition_;
-    
-    if (!graphics_ || !graphics_->IsInitialized())
-        return ret;
-    
-    #ifndef USE_OPENGL
-    POINT mouse;
-    GetCursorPos(&mouse);
-    ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
-    ret.x_ = mouse.x;
-    ret.y_ = mouse.y;
-    #else
-    glfwGetMousePos(graphics_->GetWindowHandle(), &ret.x_, &ret.y_);
-    #endif
-    
-    return ret;
-}
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
@@ -686,19 +679,15 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     else
         ResetState();
     
-    // Screen mode change may affect the cursor clipping behaviour. Also re-center the cursor (if needed) to the new screen size,
-    // so that there is no erroneous mouse move event
-    #ifndef USE_OPENGL
-    SetClipCursor(true);
+    // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
+    // mouse move event
+    #ifdef USE_OPENGL
+    IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+    SetCursorPosition(center);
+    lastCursorPosition_ = center;
+    activated_ = true;
     #else
-    // Re-enable GLFW callbacks each time the window has been recreated
-    GLFWwindow window = graphics_->GetWindowHandle();
-    glfwSetInputMode(window, GLFW_KEY_REPEAT, GL_TRUE);
-    glfwSetKeyCallback(&KeyCallback);
-    glfwSetCharCallback(&CharCallback);
-    glfwSetMouseButtonCallback(&MouseButtonCallback);
-    glfwSetScrollCallback(&MouseScrollCallback);
-    screenModeSet_ = true;
+    SetClipCursor(true);
     #endif
 }
 

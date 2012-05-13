@@ -28,7 +28,7 @@
 #include "Timer.h"
 
 #include <GLee.h>
-#include <GL/glfw3.h>
+#include <SDL.h>
 
 class Context;
 
@@ -67,10 +67,14 @@ class GraphicsImpl
 public:
     /// Construct.
     GraphicsImpl();
+    /// Return the SDL window.
+    SDL_Window* GetWindow() const { return window_; }
     
 private:
-    /// GLFW window.
-    GLFWwindow window_;
+    /// SDL window.
+    SDL_Window* window_;
+    /// SDL OpenGL context
+    SDL_GLContext context_;
     /// Active texture unit.
     unsigned activeTexture_;
     /// Vertex attributes in use.
@@ -88,8 +92,3 @@ private:
     /// Need FBO commit flag.
     bool fboDirty_;
 };
-
-/// Store execution context specific to the GLFW window
-void SetWindowContext(GLFWwindow window, Context* context);
-/// Return execution context specific to the GLFW window
-Context* GetWindowContext(GLFWwindow window);
