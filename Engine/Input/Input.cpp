@@ -732,8 +732,17 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         ResetState();
     
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
-    // mouse move event
+    // mouse move event. Also, in SDL mode reset the window ID
     #ifdef USE_OPENGL
+    unsigned newWindowID = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
+    if (newWindowID != windowID_)
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        inputInstances.Erase(windowID_);
+        inputInstances[newWindowID] = this;
+        windowID_ = newWindowID;
+    }
     IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
     SetCursorPosition(center);
     lastCursorPosition_ = center;
