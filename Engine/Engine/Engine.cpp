@@ -65,6 +65,12 @@ Engine::Engine(Context* context) :
 
 Engine::~Engine()
 {
+    // Remove subsystems that use SDL (OpenGL mode only) in reverse order of construction
+    context_->RemoveSubsystem<Audio>();
+    context_->RemoveSubsystem<UI>();
+    context_->RemoveSubsystem<Input>();
+    context_->RemoveSubsystem<Renderer>();
+    context_->RemoveSubsystem<Graphics>();
 }
 
 bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments)

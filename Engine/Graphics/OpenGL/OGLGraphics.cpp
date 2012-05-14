@@ -129,11 +129,13 @@ Graphics::Graphics(Context* context_) :
     ResetCachedState();
     SetTextureUnitMappings();
     
+    // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
+    // of shutting down SDL as a whole, so it should be the last SDL-using subsystem (Audio and Input also use SDL) alive
     {
         MutexLock lock(GetStaticMutex());
-        if (!numInstances)
-            SDL_InitSubSystem(SDL_INIT_VIDEO);
         
+        if (!numInstances)
+            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
         ++numInstances;
     }
 }
@@ -145,12 +147,13 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
     
+    // If last instance in this process, shut down SDL under static mutex
     {
         MutexLock lock(GetStaticMutex());
         
         --numInstances;
         if (!numInstances)
-            SDL_QuitSubSystem(SDL_INIT_VIDEO);
+            SDL_Quit();
     }
 }
 

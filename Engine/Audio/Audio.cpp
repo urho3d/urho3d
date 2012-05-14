@@ -55,8 +55,6 @@ static const int MAX_MIXRATE = 48000;
 static const int AUDIO_FPS = 100;
 
 #ifdef USE_OPENGL
-static unsigned numInstances = 0;
-
 static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
 #else
 /// DirectSound audio output stream.
@@ -268,33 +266,13 @@ Audio::Audio(Context* context) :
     
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
         masterGain_[i] = 1.0f;
-    
-    // Initialize SDL audio under static mutex in case this is the first instance
-    #ifdef USE_OPENGL
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        if (!numInstances)
-            SDL_InitSubSystem(SDL_INIT_AUDIO);
-        ++numInstances;
-    }
-    #endif
 }
 
 Audio::~Audio()
 {
     Release();
     
-    // Uninitialize SDL audio under static mutex in case this is the last instance
-    #ifdef USE_OPENGL
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        --numInstances;
-        if (!numInstances)
-            SDL_QuitSubSystem(SDL_INIT_AUDIO);
-    }
-    #else
+    #ifndef USE_OPENGL
     delete (AudioStream*)stream_;
     stream_ = 0;
     #endif

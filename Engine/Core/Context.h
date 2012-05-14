@@ -41,10 +41,12 @@ public:
     
     /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(ShortStringHash objectType);
-    /// Register a factory for an object type. If exists already, will not be replaced.
+    /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
-    /// Register a subsystem. If exists already, will not be replaced.
+    /// Register a subsystem.
     void RegisterSubsystem(Object* subsystem);
+    /// Remove a subsystem.
+    void RemoveSubsystem(ShortStringHash objectType);
     /// Register object attribute.
     void RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
@@ -53,10 +55,12 @@ public:
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
+    /// Template version of removing a subsystem.
+    template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
     template <class T> void RegisterAttribute(const AttributeInfo& attr);
     /// Template version of removing an object attribute.
-    template <class T> void RemoveAttribute(const char* name);
+    template <class T> void RemoveAttribute(const String& name);
     /// Template version of copying base class attributes to derived class.
     template <class T, class U> void CopyBaseAttributes();
     
@@ -146,7 +150,8 @@ private:
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
+template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
-template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
+template <class T> void Context::RemoveAttribute(const String& name) { RemoveAttribute(T::GetTypeStatic(), name); }
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }

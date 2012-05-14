@@ -86,6 +86,13 @@ void Context::RegisterSubsystem(Object* object)
     subsystems_[object->GetType()] = object;
 }
 
+void Context::RemoveSubsystem(ShortStringHash objectType)
+{
+    HashMap<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Find(objectType);
+    if (i != subsystems_.End())
+        subsystems_.Erase(i);
+}
+
 void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
 {
     // None or Pointer types can not be supported

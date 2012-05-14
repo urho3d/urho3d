@@ -27,20 +27,30 @@
 #include "GraphicsEvents.h"
 #include "Input.h"
 #include "Log.h"
+#include "Mutex.h"
+#include "ProcessUtils.h"
 #include "Profiler.h"
 #include "StringUtils.h"
 
 #include <cstring>
 
-#ifndef USE_OPENGL
-#include <windows.h>
-#else
+#ifdef USE_OPENGL
 #include <GraphicsImpl.h>
+#else
+#include <windows.h>
 #endif
 
 #include "DebugNew.h"
 
-#ifndef USE_OPENGL
+#ifdef USE_OPENGL
+static HashMap<unsigned, Input*> inputInstances;
+
+/// Return the Input subsystem instance corresponding to an SDL window ID.
+Input* GetInputInstance(unsigned windowID)
+{
+    return windowID ? inputInstances[windowID] : 0;
+}
+#else
 /// Convert the virtual key code & scan code if necessary. Return non-zero if key should be posted
 int ConvertKeyCode(unsigned wParam, unsigned lParam)
 {
@@ -92,7 +102,11 @@ OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
     Object(context),
+    #ifdef USE_OPENGL
+    windowID_(0),
+    #else
     showCursor_(true),
+    #endif
     toggleFullscreen_(true),
     active_(false),
     minimized_(false),
@@ -117,6 +131,15 @@ Input::Input(Context* context) :
 
 Input::~Input()
 {
+    #ifdef USE_OPENGL
+    // Remove input instance mapping
+    if (initialized_)
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        inputInstances.Erase(windowID_);
+    }
+    #endif
 }
 
 void Input::Update()
@@ -141,11 +164,15 @@ void Input::Update()
         DispatchMessageW(&msg);
     }
     #else
-    // Pump SDL events
-    SDL_Event evt;
-    SDL_PumpEvents();
-    while (SDL_PollEvent(&evt))
-        HandleSDLEvent(&evt);
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        // Pump SDL events
+        SDL_Event evt;
+        SDL_PumpEvents();
+        while (SDL_PollEvent(&evt))
+            HandleSDLEvent(&evt);
+    }
     
     // Poll SDL window activation state
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
@@ -274,6 +301,16 @@ void Input::Initialize()
     // Set the initial activation
     activated_ = true;
     initialized_ = true;
+    
+    #ifdef USE_OPENGL
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        // Store window ID to direct SDL events to the correct instance
+        windowID_ = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
+        inputInstances[windowID_] = this;
+    }
+    #endif
     
     LOGINFO("Initialized input");
 }
@@ -618,22 +655,27 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
 #else
 void Input::HandleSDLEvent(void* sdlEvent)
 {
-    /// \todo Multiple windows are not differentiated
     SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
+    Input* input = 0;
     
     switch (evt.type)
     {
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
-        SetKey(SDL_toupper(evt.key.keysym.sym), true);
+        input = GetInputInstance(evt.key.windowID);
+        if (input)
+            input->SetKey(SDL_toupper(evt.key.keysym.sym), true);
         break;
         
     case SDL_KEYUP:
-        SetKey(SDL_toupper(evt.key.keysym.sym), false);
+        input = GetInputInstance(evt.key.windowID);
+        if (input)
+            input->SetKey(SDL_toupper(evt.key.keysym.sym), false);
         break;
         
     case SDL_TEXTINPUT:
-        if (evt.text.text[0])
+        input = GetInputInstance(evt.text.windowID);
+        if (input && evt.text.text[0])
         {
             String text(&evt.text.text[0]);
             unsigned unicode = text.AtUTF8(0);
@@ -644,28 +686,38 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 VariantMap keyEventData;
                 
                 keyEventData[P_CHAR] = unicode;
-                keyEventData[P_BUTTONS] = mouseButtonDown_;
-                keyEventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_CHAR, keyEventData);
+                keyEventData[P_BUTTONS] = input->mouseButtonDown_;
+                keyEventData[P_QUALIFIERS] = input->GetQualifiers();
+                input->SendEvent(E_CHAR, keyEventData);
             }
         }
         break;
         
     case SDL_MOUSEBUTTONDOWN:
-        SetMouseButton(1 << (evt.button.button - 1), true);
+        input = GetInputInstance(evt.button.windowID);
+        if (input)
+            input->SetMouseButton(1 << (evt.button.button - 1), true);
         break;
         
     case SDL_MOUSEBUTTONUP:
-        SetMouseButton(1 << (evt.button.button - 1), false);
+        input = GetInputInstance(evt.button.windowID);
+        if (input)
+            input->SetMouseButton(1 << (evt.button.button - 1), false);
         break;
         
     case SDL_MOUSEWHEEL:
-        SetMouseWheel(evt.wheel.y);
+        input = GetInputInstance(evt.wheel.windowID);
+        if (input)
+            input->SetMouseWheel(evt.wheel.y);
         break;
         
-    case SDL_QUIT:
-        if (graphics_)
-            graphics_->Close();
+    case SDL_WINDOWEVENT:
+        if (evt.window.event == SDL_WINDOWEVENT_CLOSE)
+        {
+            input = GetInputInstance(evt.window.windowID);
+            if (input)
+                input->GetSubsystem<Graphics>()->Close();
+        }
         break;
     }
 }
