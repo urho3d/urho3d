@@ -106,6 +106,16 @@ typedef enum
     /* Clipboard events */
     SDL_CLIPBOARDUPDATE = 0x900, /**< The clipboard changed */
 
+    /* System events */
+
+    SDL_SYSEVENT_TERMINATE = 0xa00,
+    SDL_SYSEVENT_WILL_SUSPEND,
+    SDL_SYSEVENT_SUSPEND,
+    SDL_SYSEVENT_WILL_RESUME,
+    SDL_SYSEVENT_RESUME,
+    SDL_SYSEVENT_LOWMEMORY,
+    SDL_SYSEVENT_ORIENTATION_CHANGED,
+
     /* Drag and drop events */
     SDL_DROPFILE        = 0x1000, /**< The system requests a file open */
 
@@ -382,6 +392,22 @@ typedef struct SDL_QuitEvent
     Uint32 timestamp;
 } SDL_QuitEvent;
 
+/**
+ *  \brief System event
+ */
+
+typedef struct SDL_SystemEvent
+{
+    Uint32 type;
+    Uint32 timestamp;
+    void *data;
+} SDL_SystemEvent;
+
+typedef enum
+{
+    SDL_ORIENTATION_PORTRAIT,
+    SDL_ORIENTATION_LANDSCAPE
+} SDL_DeviceOrientation;
 
 /**
  *  \brief A user-defined event type (event.user.*)
@@ -438,6 +464,7 @@ typedef union SDL_Event
     SDL_MultiGestureEvent mgesture; /**< Multi Finger Gesture data */
     SDL_DollarGestureEvent dgesture; /**< Multi Finger Gesture data */
     SDL_DropEvent drop;             /**< Drag and drop event data */
+    SDL_SystemEvent sysevent;       /**< System event data */
 } SDL_Event;
 
 
@@ -618,6 +645,16 @@ extern DECLSPEC Uint8 SDLCALL SDL_EventState(Uint32 type, int state);
  *  returns (Uint32)-1
  */
 extern DECLSPEC Uint32 SDLCALL SDL_RegisterEvents(int numevents);
+
+/**
+ * Set system event hook
+ * 
+ */
+typedef int (SDLCALL * SDL_SystemEventHandler) (SDL_Event* event);
+
+extern DECLSPEC void SDLCALL SDL_SetSystemEventHook(SDL_SystemEventHandler handler);
+
+
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

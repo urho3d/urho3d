@@ -121,18 +121,23 @@
     CGRect frame = noborder ? [uiscreen bounds] : [uiscreen applicationFrame];
     const CGSize size = frame.size;
     int w, h;
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_ORIENTATION_CHANGED;
+    event.sysevent.data=NULL;
 
     switch (toInterfaceOrientation) {
         case UIInterfaceOrientationPortrait:
         case UIInterfaceOrientationPortraitUpsideDown:
             w = (size.width < size.height) ? size.width : size.height;
             h = (size.width > size.height) ? size.width : size.height;
+            event.sysevent.data=(void*)SDL_ORIENTATION_PORTRAIT;
             break;
 
         case UIInterfaceOrientationLandscapeLeft:
         case UIInterfaceOrientationLandscapeRight:
             w = (size.width > size.height) ? size.width : size.height;
             h = (size.width < size.height) ? size.width : size.height;
+            event.sysevent.data=(void*)SDL_ORIENTATION_LANDSCAPE;
             break;
 
         default:
@@ -140,15 +145,19 @@
             return;
     }
 
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+
     w = (int)(w * displaymodedata->scale);
     h = (int)(h * displaymodedata->scale);
 
     [uiwindow setFrame:frame];
     [data->view setFrame:frame];
     [data->view updateFrame];
-    SDL_SendWindowEvent(self->window, SDL_WINDOWEVENT_RESIZED, w, h);
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else SDL_SendWindowEvent(self->window, SDL_WINDOWEVENT_RESIZED, w, h);
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
-
 @end

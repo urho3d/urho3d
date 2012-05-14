@@ -168,14 +168,28 @@ extern "C" void Java_org_libsdl_app_SDLActivity_nativeQuit(
                                     JNIEnv* env, jclass cls)
 {    
     // Inject a SDL_QUIT event
-    SDL_SendQuit();
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_TERMINATE;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else SDL_SendQuit();
 }
 
 // Pause
 extern "C" void Java_org_libsdl_app_SDLActivity_nativePause(
                                     JNIEnv* env, jclass cls)
 {
-    if (Android_Window) {
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_WILL_SUSPEND;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    event.type=SDL_SYSEVENT_SUSPEND;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else if (Android_Window) {
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
     }
@@ -185,7 +199,16 @@ extern "C" void Java_org_libsdl_app_SDLActivity_nativePause(
 extern "C" void Java_org_libsdl_app_SDLActivity_nativeResume(
                                     JNIEnv* env, jclass cls)
 {
-    if (Android_Window) {
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_WILL_RESUME;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    event.type=SDL_SYSEVENT_RESUME;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else if (Android_Window) {
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_RESTORED, 0, 0);
     }

@@ -36,6 +36,7 @@
 /* Public data -- the event filter */
 SDL_EventFilter SDL_EventOK = NULL;
 void *SDL_EventOKParam;
+SDL_SystemEventHandler SDL_SysEventHandler = NULL;
 
 typedef struct SDL_EventWatcher {
     SDL_EventFilter callback;
@@ -527,6 +528,15 @@ SDL_SendSysWMEvent(SDL_SysWMmsg * message)
     }
     /* Update internal event state */
     return (posted);
+}
+
+void
+SDL_SetSystemEventHook(SDL_SystemEventHandler handler)
+{
+    if (handler)
+    {
+        SDL_SysEventHandler=handler;
+    }
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

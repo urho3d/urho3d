@@ -46,4 +46,7 @@ extern void SDL_QuitQuit(void);
 extern SDL_EventFilter SDL_EventOK;
 extern void *SDL_EventOKParam;
 
+/* The system event hook function */
+extern SDL_SystemEventHandler SDL_SysEventHandler;
+
 /* vi: set ts=4 sw=4 expandtab: */

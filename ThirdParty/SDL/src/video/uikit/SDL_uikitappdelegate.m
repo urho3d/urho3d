@@ -123,7 +123,12 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    SDL_SendQuit();
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_TERMINATE;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else SDL_SendQuit();
      /* hack to prevent automatic termination.  See SDL_uikitevents.m for details */
     longjmp(*(jump_env()), 1);
 }
@@ -131,37 +136,82 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
 - (void) applicationWillResignActive:(UIApplication*)application
 {
     //NSLog(@"%@", NSStringFromSelector(_cmd));
-
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_WILL_SUSPEND;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else {
     // Send every window on every screen a MINIMIZED event.
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
-    if (!_this) {
-        return;
-    }
+        SDL_VideoDevice *_this = SDL_GetVideoDevice();
+        if (!_this) {
+            return;
+        }
 
-    SDL_Window *window;
-    for (window = _this->windows; window != nil; window = window->next) {
-        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
-        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
+        SDL_Window *window;
+        for (window = _this->windows; window != nil; window = window->next) {
+            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
+            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
+        }
     }
+}
+
+- (void)applicationDidEnterBackground:(UIApplication*)application
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+	
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_SUSPEND;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+}
+
+- (void)applicationWillEnterForeground:(UIApplication*)application
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+	
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_WILL_RESUME;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
 }
 
 - (void) applicationDidBecomeActive:(UIApplication*)application
 {
     //NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    // Send every window on every screen a RESTORED event.
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
-    if (!_this) {
-        return;
-    }
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_RESUME;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+    else {
+        // Send every window on every screen a RESTORED event.
+        SDL_VideoDevice *_this = SDL_GetVideoDevice();
+        if (!_this) {
+            return;
+        }
 
-    SDL_Window *window;
-    for (window = _this->windows; window != nil; window = window->next) {
-        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
-        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESTORED, 0, 0);
+        SDL_Window *window;
+        for (window = _this->windows; window != nil; window = window->next) {
+            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
+            SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESTORED, 0, 0);
+        }
     }
 }
 
+- (void)applicationDidReceiveMemoryWarning:(UIApplication*)application
+{
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+	
+    SDL_Event event;
+    event.type=SDL_SYSEVENT_LOWMEMORY;
+    event.sysevent.data=NULL;
+    if (SDL_SysEventHandler)
+        SDL_SysEventHandler(&event);
+}
 @end
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
