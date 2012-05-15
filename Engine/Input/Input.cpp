@@ -171,7 +171,15 @@ void Input::Update()
         SDL_Event evt;
         SDL_PumpEvents();
         while (SDL_PollEvent(&evt))
-            HandleSDLEvent(&evt);
+        {
+            // Dispatch event to the appropriate Input instance. However SDL_QUIT can not at the moment be handled for multiple
+            // instances properly (OpenGL contexts running in other threads can not be closed from this thread), so we handle
+            // it only for the own instance
+            if (evt.type != SDL_QUIT)
+                HandleSDLEvent(&evt);
+            else
+                graphics_->Close();
+        }
     }
     
     // Poll SDL window activation state
