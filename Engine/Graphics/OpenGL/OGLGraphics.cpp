@@ -753,6 +753,8 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vs == vertexShader_ && ps == pixelShader_)
         return;
     
+    ClearParameterSources();
+    
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
     if (vs && !vs->IsCompiled())
     {
@@ -1009,40 +1011,44 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     }
 }
 
-bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
+bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if (shaderProgram_)
-        return shaderProgram_->NeedParameterUpdate(param, source, shaderParameterFrame_);
-    
-    return false;
-}
-
-bool Graphics::NeedTextureUnit(TextureUnit unit)
-{
-    if (shaderProgram_ && shaderProgram_->HasTextureUnit(unit))
+    if ((unsigned)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
+    {
+        shaderParameterSources_[group] = source;
         return true;
-    
-    return false;
+    }
+    else
+        return false;
 }
 
-void Graphics::ClearParameterSource(StringHash param)
+bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
 {
-    if (shaderProgram_)
-        shaderProgram_->ClearParameterSource(param);
+    return shaderProgram_ && shaderProgram_->HasParameter(param);
+    
+}
+
+bool Graphics::HasTextureUnit(TextureUnit unit)
+{
+    return shaderProgram_ && shaderProgram_->HasTextureUnit(unit);
+}
+
+
+void Graphics::ClearParameterSource(ShaderParameterGroup group)
+{
+    shaderParameterSources_[group] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::ClearParameterSources()
 {
-    ++shaderParameterFrame_;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::ClearTransformSources()
 {
-    if (shaderProgram_)
-    {
-        shaderProgram_->ClearParameterSource(VSP_MODEL);
-        shaderProgram_->ClearParameterSource(VSP_VIEWPROJ);
-    }
+    shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::CleanupShaderPrograms()

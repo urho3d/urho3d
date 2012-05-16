@@ -299,11 +299,11 @@ void UI::Render()
         }
         
         graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SPG_OBJECTTRANSFORM, this))
+        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
             graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-        if (graphics_->NeedParameterUpdate(SPG_CAMERA, this))
+        if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-        if (graphics_->NeedParameterUpdate(SPG_MATERIAL, this))
+        if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
         
         // Use alpha test if not alpha blending

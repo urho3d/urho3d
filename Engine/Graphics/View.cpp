@@ -1219,7 +1219,7 @@ void View::RenderBatchesForward()
     graphics_->SetStencilTest(false);
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-    graphics_->ClearParameterSource(SPG_MATERIAL);
+    graphics_->ClearParameterSource(SP_MATERIAL);
     DrawFullscreenQuad(camera_, false);
     
     // Render pre-alpha custom pass
@@ -1370,7 +1370,7 @@ void View::RenderBatchesDeferred()
     graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-    graphics_->ClearParameterSource(SPG_MATERIAL);
+    graphics_->ClearParameterSource(SP_MATERIAL);
     DrawFullscreenQuad(camera_, false);
     
     // Render opaque objects with deferred lighting result (light pre-pass only)

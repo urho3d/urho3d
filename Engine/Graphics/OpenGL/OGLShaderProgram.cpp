@@ -33,7 +33,6 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
     GPUObject(graphics),
     vertexShader_(vertexShader),
     pixelShader_(pixelShader),
-    lastParameterFrame_(0),
     linked_(false)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -182,32 +181,6 @@ bool ShaderProgram::Link()
     shaderParameters_.Rehash(NextPowerOfTwo(shaderParameters_.Size()));
     
     return true;
-}
-
-bool ShaderProgram::NeedParameterUpdate(StringHash param, const void* source, unsigned frame)
-{
-    // If global parameter frame has changed, clear all remembered sources
-    if (frame != lastParameterFrame_)
-    {
-        lastParameterFrame_ = frame;
-        for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
-            i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
-    }
-    
-    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
-    if (i == shaderParameters_.End() || i->second_.lastSource_ == source)
-        return false;
-    
-    i->second_.lastSource_ = source;
-    return true;
-}
-
-void ShaderProgram::ClearParameterSource(StringHash param)
-{
-    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
-    if (i == shaderParameters_.End())
-        return;
-    i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
 }
 
 ShaderVariation* ShaderProgram::GetVertexShader() const

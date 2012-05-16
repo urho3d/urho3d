@@ -187,7 +187,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     
     // Set camera shader parameters
     void* cameraSource = (void*)(overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_);
-    if (graphics->NeedParameterUpdate(SPG_CAMERA, cameraSource))
+    if (graphics->NeedParameterUpdate(SP_CAMERA, cameraSource))
     {
         graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
         graphics->SetShaderParameter(VSP_CAMERAROT, cameraNode->GetWorldTransform().RotationMatrix());
@@ -231,7 +231,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     IntRect viewport = graphics->GetViewport();
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
     
-    if (graphics->NeedParameterUpdate(SPG_VIEWPORT, (void*)viewportHash))
+    if (graphics->NeedParameterUpdate(SP_VIEWPORT, (void*)viewportHash))
     {
         float rtWidth = (float)rtSize.x_;
         float rtHeight = (float)rtSize.y_;
@@ -253,18 +253,18 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     }
     
     // Set model transform
-    if (setModelTransform && graphics->NeedParameterUpdate(SPG_OBJECTTRANSFORM, worldTransform_))
+    if (setModelTransform && graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, worldTransform_))
         graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
     
     // Set skinning transforms
-    if (shaderData_ && shaderDataSize_ && graphics->NeedParameterUpdate(SPG_OBJECTDATA, shaderData_))
+    if (shaderData_ && shaderDataSize_ && graphics->NeedParameterUpdate(SP_OBJECTDATA, shaderData_))
         graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
     
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
     Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
     unsigned zoneHash = (unsigned)zone_ + (unsigned)fogColorZone;
-    if (zone_ && graphics->NeedParameterUpdate(SPG_ZONE, (void*)zoneHash))
+    if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, (void*)zoneHash))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
         graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
@@ -301,7 +301,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         light = lightQueue_->light_;
         shadowMap = lightQueue_->shadowMap_;
         
-        if (graphics->NeedParameterUpdate(SPG_VERTEXLIGHTS, lightQueue_) && vertexShader_->HasParameter(VSP_VERTEXLIGHTS))
+        if (graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VS, VSP_VERTEXLIGHTS))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
             const PODVector<Light*>& lights = lightQueue_->vertexLights_;
@@ -353,7 +353,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         }
     }
     
-    if (light && graphics->NeedParameterUpdate(SPG_LIGHT, light))
+    if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
         Node* lightNode = light->GetNode();
         
@@ -362,7 +362,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
         graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
         
-        if (vertexShader_->HasParameter(VSP_LIGHTMATRICES))
+        if (graphics->HasShaderParameter(VS, VSP_LIGHTMATRICES))
         {
             switch (light->GetLightType())
             {
@@ -382,7 +382,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                     Matrix4 shadowMatrices[2];
                     
                     CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
-                    bool isShadowed = shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP);
+                    bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
                     if (isShadowed)
                         CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
                     
@@ -417,7 +417,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightNode->GetWorldRotation() * Vector3::BACK);
         graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraNode->GetWorldPosition(), atten));
         
-        if (pixelShader_->HasParameter(PSP_LIGHTMATRICES))
+        if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
         {
             switch (light->GetLightType())
             {
@@ -535,7 +535,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     // Set material-specific shader parameters and textures
     if (material_)
     {
-        if (graphics->NeedParameterUpdate(SPG_MATERIAL, material_))
+        if (graphics->NeedParameterUpdate(SP_MATERIAL, material_))
         {
             const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
             for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
@@ -543,31 +543,31 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         }
         
         const SharedPtr<Texture>* textures = material_->GetTextures();
-        if (graphics->NeedTextureUnit(TU_DIFFUSE))
+        if (graphics->HasTextureUnit(TU_DIFFUSE))
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
-        if (graphics->NeedTextureUnit(TU_NORMAL))
+        if (graphics->HasTextureUnit(TU_NORMAL))
             graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
-        if (graphics->NeedTextureUnit(TU_SPECULAR))
+        if (graphics->HasTextureUnit(TU_SPECULAR))
             graphics->SetTexture(TU_NORMAL, textures[TU_SPECULAR]);
-        if (graphics->NeedTextureUnit(TU_DETAIL))
+        if (graphics->HasTextureUnit(TU_DETAIL))
             graphics->SetTexture(TU_DETAIL, textures[TU_DETAIL]);
-        if (graphics->NeedTextureUnit(TU_ENVIRONMENT))
+        if (graphics->HasTextureUnit(TU_ENVIRONMENT))
             graphics->SetTexture(TU_ENVIRONMENT, textures[TU_ENVIRONMENT]);
     }
     
     // Set light-related textures
     if (light)
     {
-        if (shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP))
+        if (shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP))
             graphics->SetTexture(TU_SHADOWMAP, shadowMap);
-        if (graphics->NeedTextureUnit(TU_LIGHTRAMP))
+        if (graphics->HasTextureUnit(TU_LIGHTRAMP))
         {
             Texture* rampTexture = light->GetRampTexture();
             if (!rampTexture)
                 rampTexture = renderer->GetDefaultLightRamp();
             graphics->SetTexture(TU_LIGHTRAMP, rampTexture);
         }
-        if (graphics->NeedTextureUnit(TU_LIGHTSHAPE))
+        if (graphics->HasTextureUnit(TU_LIGHTSHAPE))
         {
             Texture* shapeTexture = light->GetShapeTexture();
             if (!shapeTexture && light->GetLightType() == LIGHT_SPOT)

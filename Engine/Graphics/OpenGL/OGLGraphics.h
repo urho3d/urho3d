@@ -132,12 +132,14 @@ public:
     void SetShaderParameter(StringHash param, const Vector4& vector);
     /// Set shader 4x3 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
-    /// Check whether a shader parameter in the currently set shaders needs update.
-    bool NeedParameterUpdate(StringHash param, const void* source);
+    /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
+    bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
+    /// Check whether a shader parameter exists on the currently set shaders.
+    bool HasShaderParameter(ShaderType type, StringHash param);
     /// Check whether the current pixel shader uses a texture unit.
-    bool NeedTextureUnit(TextureUnit unit);
-    /// Clear remembered shader parameter source.
-    void ClearParameterSource(StringHash param);
+    bool HasTextureUnit(TextureUnit unit);
+    /// Clear remembered shader parameter source group.
+    void ClearParameterSource(ShaderParameterGroup group);
     /// Clear remembered shader parameter sources.
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources.
@@ -488,6 +490,8 @@ private:
     TextureFilterMode defaultTextureFilterMode_;
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
     HashMap<int, SharedPtr<Texture2D> > depthTextures_;
+    /// Remembered shader parameter sources.
+    const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
 };
 
 /// Register Graphics library objects.

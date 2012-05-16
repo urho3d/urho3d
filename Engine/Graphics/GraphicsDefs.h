@@ -265,18 +265,18 @@ enum TextureUnit
     MAX_TEXTURE_UNITS = 16
 };
 
-/// Shader parameter groups for determining need to update
+/// Shader parameter groups for determining need to update.
 enum ShaderParameterGroup
 {
-    SPG_FRAME = 0,
-    SPG_CAMERA,
-    SPG_VIEWPORT,
-    SPG_ZONE,
-    SPG_LIGHT,
-    SPG_VERTEXLIGHTS,
-    SPG_MATERIAL,
-    SPG_OBJECTTRANSFORM,
-    SPG_OBJECTDATA,
+    SP_FRAME = 0,
+    SP_CAMERA,
+    SP_VIEWPORT,
+    SP_ZONE,
+    SP_LIGHT,
+    SP_VERTEXLIGHTS,
+    SP_MATERIAL,
+    SP_OBJECTTRANSFORM,
+    SP_OBJECTDATA,
     MAX_SHADER_PARAMETER_GROUPS
 };
 

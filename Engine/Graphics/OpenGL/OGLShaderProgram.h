@@ -38,8 +38,6 @@ struct ShaderParameter
     int location_;
     /// Element type.
     unsigned type_;
-    /// Last parameter source.
-    const void* lastSource_;
 };
 
 /// Linked shader program on the GPU.
@@ -56,10 +54,6 @@ public:
     
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful.
     bool Link();
-    /// Check whether needs a parameter update.
-    bool NeedParameterUpdate(StringHash param, const void* source, unsigned frame);
-    /// Clear a specific remembered parameter source.
-    void ClearParameterSource(StringHash param);
     
     /// Return the vertex shader.
     ShaderVariation* GetVertexShader() const;
@@ -85,8 +79,6 @@ private:
     WeakPtr<ShaderVariation> pixelShader_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
-    /// Shader parameters global frame number.
-    unsigned lastParameterFrame_;
     /// Texture unit use.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
     /// Vertex attribute bindings.
