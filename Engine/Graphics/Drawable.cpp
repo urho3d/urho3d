@@ -328,13 +328,12 @@ void Drawable::OnNodeSet(Node* node)
 
 void Drawable::OnMarkedDirty(Node* node)
 {
+    worldBoundingBoxDirty_ = true;
+    if (octant_ && !reinsertionQueued_)
+        octant_->GetRoot()->QueueReinsertion(this);
+    
     if (node == node_)
-    {
-        worldBoundingBoxDirty_ = true;
         zone_.Reset();
-        if (octant_ && !reinsertionQueued_)
-            octant_->GetRoot()->QueueReinsertion(this);
-    }
 }
 
 void Drawable::AddToOctree()
