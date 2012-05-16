@@ -185,15 +185,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     // Set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
     
-    // Set viewport and camera shader parameters
-    if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
-        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
-    
-    if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
-        graphics->SetShaderParameter(VSP_CAMERAROT, cameraNode->GetWorldTransform().RotationMatrix());
-    
-    if (graphics->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
+    // Set camera shader parameters
+    void* cameraSource = (void*)(overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_);
+    if (graphics->NeedParameterUpdate(SPG_CAMERA, cameraSource))
     {
+        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
+        graphics->SetShaderParameter(VSP_CAMERAROT, cameraNode->GetWorldTransform().RotationMatrix());
         Vector4 depthMode = Vector4::ZERO;
         if (camera_->IsOrthographic())
         {
@@ -209,24 +206,35 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             depthMode.w_ = 1.0f / camera_->GetFarClip();
         
         graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
-    }
-    
-    if (graphics->NeedParameterUpdate(VSP_FRUSTUMSIZE, camera_))
-    {
+        
         Vector3 nearVector, farVector;
         camera_->GetFrustumSize(nearVector, farVector);
         Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
-        
         graphics->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
+        
+        if (overrideView_)
+            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection());
+        else
+            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() * camera_->GetInverseWorldTransform());
+        
+        graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
+        graphics->SetShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
+        
+        float farClip = camera_->GetFarClip();
+        float nearClip = camera_->GetNearClip();
+        Vector4 depthReconstruct(farClip / (farClip - nearClip), -nearClip / (farClip - nearClip), 0.0f, 0.0f);
+        graphics->SetShaderParameter(PSP_DEPTHRECONSTRUCT, depthReconstruct);
     }
     
+    // Set viewport shader parameters
     IntVector2 rtSize = graphics->GetRenderTargetDimensions();
     IntRect viewport = graphics->GetViewport();
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
-    float rtWidth = (float)rtSize.x_;
-    float rtHeight = (float)rtSize.y_;
-    if (graphics->NeedParameterUpdate(VSP_GBUFFEROFFSETS, (const void*)viewportHash))
+    
+    if (graphics->NeedParameterUpdate(SPG_VIEWPORT, (void*)viewportHash))
     {
+        float rtWidth = (float)rtSize.x_;
+        float rtHeight = (float)rtSize.y_;
         float widthRange = 0.5f * (viewport.right_ - viewport.left_) / rtWidth;
         float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / rtHeight;
         
@@ -237,96 +245,52 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         Vector4 bufferUVOffset((0.5f + (float)viewport.left_) / rtWidth + widthRange,
             (0.5f + (float)viewport.top_) / rtHeight + heightRange, widthRange, heightRange);
         #endif
-        
         graphics->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    }
-    if (graphics->NeedParameterUpdate(PSP_GBUFFERINVSIZE, (const void*)viewportHash))
-    {
+        
         float sizeX = 1.0f / rtWidth;
         float sizeY = 1.0f / rtHeight;
         graphics->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
     }
     
-    if (overrideView_)
-    {
-        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
-            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection());
-    }
-    else
-    {
-        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
-            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
-                camera_->GetInverseWorldTransform());
-    }
-    
-    if (graphics->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
-        graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
-    
-    if (graphics->NeedParameterUpdate(VSP_VIEWUPVECTOR, camera_))
-        graphics->SetShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
-    
     // Set model transform
-    if (setModelTransform && graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_))
+    if (setModelTransform && graphics->NeedParameterUpdate(SPG_OBJECTTRANSFORM, worldTransform_))
         graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
     
     // Set skinning transforms
-    if (shaderData_ && shaderDataSize_)
-    {
-        if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
-            graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
-    }
+    if (shaderData_ && shaderDataSize_ && graphics->NeedParameterUpdate(SPG_OBJECTDATA, shaderData_))
+        graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
     
     // Set zone-related shader parameters
-    if (zone_)
+    BlendMode blend = graphics->GetBlendMode();
+    Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
+    unsigned zoneHash = (unsigned)zone_ + (unsigned)fogColorZone;
+    if (zone_ && graphics->NeedParameterUpdate(SPG_ZONE, (void*)zoneHash))
     {
-        if (graphics->NeedParameterUpdate(VSP_AMBIENTSTARTCOLOR, zone_))
-            graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
-        if (graphics->NeedParameterUpdate(VSP_AMBIENTENDCOLOR, zone_))
-            graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
+        graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
+        graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
         
-        if (graphics->NeedParameterUpdate(VSP_ZONE, zone_))
-        {
-            const BoundingBox& box = zone_->GetBoundingBox();
-            Vector3 boxSize = box.Size();
-            Matrix3x4 adjust(Matrix3x4::IDENTITY);
-            adjust.SetScale(Vector3(1.0f / boxSize.x_, 1.0f / boxSize.y_, 1.0f / boxSize.z_));
-            adjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
-            Matrix3x4 zoneTransform = adjust * zone_->GetInverseWorldTransform();
-            
-            graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
-        }
+        const BoundingBox& box = zone_->GetBoundingBox();
+        Vector3 boxSize = box.Size();
+        Matrix3x4 adjust(Matrix3x4::IDENTITY);
+        adjust.SetScale(Vector3(1.0f / boxSize.x_, 1.0f / boxSize.y_, 1.0f / boxSize.z_));
+        adjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+        Matrix3x4 zoneTransform = adjust * zone_->GetInverseWorldTransform();
+        graphics->SetShaderParameter(VSP_ZONE, zoneTransform);
         
-        if (graphics->NeedParameterUpdate(PSP_AMBIENTCOLOR, zone_))
-            graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
+        graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
         
         // If the pass is additive, override fog color to black so that shaders do not need a separate additive path
-        BlendMode blend = pass_->GetBlendMode();
-        Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
-        if (graphics->NeedParameterUpdate(PSP_FOGCOLOR, fogColorZone))
-            graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
+        graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
         
-        if (graphics->NeedParameterUpdate(PSP_FOGPARAMS, zone_))
-        {
-            float farClip = camera_->GetFarClip();
-            float nearClip = camera_->GetNearClip();
-            float fogStart = Min(zone_->GetFogStart(), farClip);
-            float fogEnd = Min(zone_->GetFogEnd(), farClip);
-            if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
-                fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
-            float fogRange = Max(fogEnd - fogStart, M_EPSILON);
-            Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
-            
-            graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
-        }
-    }
-    
-    if (graphics->NeedParameterUpdate(PSP_DEPTHRECONSTRUCT, camera_))
-    {
         float farClip = camera_->GetFarClip();
         float nearClip = camera_->GetNearClip();
-        Vector4 depthReconstruct(farClip / (farClip - nearClip), -nearClip / (farClip - nearClip), 0.0f, 0.0f);
-        
-        graphics->SetShaderParameter(PSP_DEPTHRECONSTRUCT, depthReconstruct);
+        float fogStart = Min(zone_->GetFogStart(), farClip);
+        float fogEnd = Min(zone_->GetFogEnd(), farClip);
+        if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
+            fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
+        float fogRange = Max(fogEnd - fogStart, M_EPSILON);
+        Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
+        graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
     }
     
     // Set light-related shader parameters
@@ -337,7 +301,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         light = lightQueue_->light_;
         shadowMap = lightQueue_->shadowMap_;
         
-        if (graphics->NeedParameterUpdate(VSP_VERTEXLIGHTS, lightQueue_))
+        if (graphics->NeedParameterUpdate(SPG_VERTEXLIGHTS, lightQueue_) && vertexShader_->HasParameter(VSP_VERTEXLIGHTS))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
             const PODVector<Light*>& lights = lightQueue_->vertexLights_;
@@ -387,135 +351,118 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             if (lights.Size())
                 graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].Data(), lights.Size() * 3 * 4);
         }
+    }
+    
+    if (light && graphics->NeedParameterUpdate(SPG_LIGHT, light))
+    {
+        Node* lightNode = light->GetNode();
         
-        if (light)
+        graphics->SetShaderParameter(VSP_LIGHTDIR, lightNode->GetWorldRotation() * Vector3::BACK);
+        
+        float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
+        graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
+        
+        if (vertexShader_->HasParameter(VSP_LIGHTMATRICES))
         {
-            Node* lightNode = light->GetNode();
-            
-            if (graphics->NeedParameterUpdate(VSP_LIGHTDIR, light))
-                graphics->SetShaderParameter(VSP_LIGHTDIR, lightNode->GetWorldRotation() * Vector3::BACK);
-            
-            if (graphics->NeedParameterUpdate(VSP_LIGHTPOS, light))
+            switch (light->GetLightType())
             {
-                float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
-                graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
-            }
-            
-            if (graphics->NeedParameterUpdate(VSP_LIGHTMATRICES, light))
-            {
-                switch (light->GetLightType())
+            case LIGHT_DIRECTIONAL:
                 {
-                case LIGHT_DIRECTIONAL:
-                    {
-                        Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = lightQueue_->shadowSplits_.Size();
-                        for (unsigned i = 0; i < numSplits; ++i)
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
-                        
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
-                    }
-                    break;
+                    Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
+                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    for (unsigned i = 0; i < numSplits; ++i)
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
                     
-                case LIGHT_SPOT:
-                    {
-                        Matrix4 shadowMatrices[2];
-                        
-                        CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
-                        bool isShadowed = shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP);
-                        if (isShadowed)
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
-                        
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
-                    }
-                    break;
-                    
-                case LIGHT_POINT:
-                    {
-                        Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
-                        // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
-                        // the next parameter
-                        #ifdef USE_OPENGL
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-                        #else
-                        graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-                        #endif
-                    }
-                    break;
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
-            }
-            
-            if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light))
-            {
-                float fade = 1.0f;
-                float fadeEnd = light->GetDrawDistance();
-                float fadeStart = light->GetFadeDistance();
+                break;
                 
-                // Do fade calculation for light if both fade & draw distance defined
-                if (light->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
-                    fade = Min(1.0f - (light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
-                
-                graphics->SetShaderParameter(PSP_LIGHTCOLOR, Vector4(light->GetColor().RGBValues(),
-                    light->GetSpecularIntensity()) * fade);
-            }
-            
-            if (graphics->NeedParameterUpdate(PSP_LIGHTDIR, light))
-                graphics->SetShaderParameter(PSP_LIGHTDIR, lightNode->GetWorldRotation() * Vector3::BACK);
-            
-            if (graphics->NeedParameterUpdate(PSP_LIGHTPOS, light))
-            {
-                float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
-                graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() -
-                    cameraNode->GetWorldPosition(), atten));
-            }
-            
-            if (graphics->NeedParameterUpdate(PSP_LIGHTMATRICES, light))
-            {
-                switch (light->GetLightType())
+            case LIGHT_SPOT:
                 {
-                case LIGHT_DIRECTIONAL:
-                    {
-                        Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = lightQueue_->shadowSplits_.Size();
-                        for (unsigned i = 0; i < numSplits; ++i)
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraNode->GetWorldPosition());
-                        
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
-                    }
-                    break;
+                    Matrix4 shadowMatrices[2];
                     
-                case LIGHT_SPOT:
-                    {
-                        Matrix4 shadowMatrices[2];
-                        
-                        CalculateSpotMatrix(shadowMatrices[0], light, cameraNode->GetWorldPosition());
-                        bool isShadowed = lightQueue_->shadowMap_ != 0;
-                        if (isShadowed)
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraNode->GetWorldPosition());
-                        
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
-                    }
-                    break;
+                    CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
+                    bool isShadowed = shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP);
+                    if (isShadowed)
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
                     
-                case LIGHT_POINT:
-                    {
-                        Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
-                        // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
-                        // the next parameter
-                        #ifdef USE_OPENGL
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-                        #else
-                        graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-                        #endif
-                    }
-                    break;
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }
+                break;
+                
+            case LIGHT_POINT:
+                {
+                    Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
+                    // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
+                    // the next parameter
+                    #ifdef USE_OPENGL
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
+                    #else
+                    graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
+                    #endif
+                }
+                break;
+            }
+        }
+        
+        float fade = 1.0f;
+        float fadeEnd = light->GetDrawDistance();
+        float fadeStart = light->GetFadeDistance();
+        
+        // Do fade calculation for light if both fade & draw distance defined
+        if (light->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
+            fade = Min(1.0f - (light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
+        
+        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Vector4(light->GetColor().RGBValues(), light->GetSpecularIntensity()) * fade);
+        graphics->SetShaderParameter(PSP_LIGHTDIR, lightNode->GetWorldRotation() * Vector3::BACK);
+        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraNode->GetWorldPosition(), atten));
+        
+        if (pixelShader_->HasParameter(PSP_LIGHTMATRICES))
+        {
+            switch (light->GetLightType())
+            {
+            case LIGHT_DIRECTIONAL:
+                {
+                    Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
+                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    for (unsigned i = 0; i < numSplits; ++i)
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraNode->GetWorldPosition());
+                    
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
+                }
+                break;
+                
+            case LIGHT_SPOT:
+                {
+                    Matrix4 shadowMatrices[2];
+                    
+                    CalculateSpotMatrix(shadowMatrices[0], light, cameraNode->GetWorldPosition());
+                    bool isShadowed = lightQueue_->shadowMap_ != 0;
+                    if (isShadowed)
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraNode->GetWorldPosition());
+                    
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
+                }
+                break;
+                
+            case LIGHT_POINT:
+                {
+                    Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
+                    // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
+                    // the next parameter
+                    #ifdef USE_OPENGL
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
+                    #else
+                    graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
+                    #endif
+                }
+                break;
             }
         }
         
         // Set shadow mapping shader parameters
         if (shadowMap)
         {
-            if (graphics->NeedParameterUpdate(PSP_SHADOWCUBEADJUST, light))
             {
                 unsigned faceWidth = shadowMap->GetWidth() / 2;
                 unsigned faceHeight = shadowMap->GetHeight() / 3;
@@ -541,7 +488,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 graphics->SetShaderParameter(PSP_SHADOWCUBEADJUST, Vector4(mulX, mulY, addX, addY));
             }
             
-            if (graphics->NeedParameterUpdate(PSP_SHADOWDEPTHFADE, light))
             {
                 Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
                 float nearClip = shadowCamera->GetNearClip();
@@ -559,7 +505,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeStart, 1.0f / fadeRange));
             }
             
-            if (graphics->NeedParameterUpdate(PSP_SHADOWINTENSITY, light))
             {
                 float intensity = light->GetShadowIntensity();
                 float fadeStart = light->GetShadowFadeDistance();
@@ -571,35 +516,29 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
             }
             
-            if (graphics->NeedParameterUpdate(PSP_SHADOWMAPINVSIZE, shadowMap))
-            {
-                float sizeX = 1.0f / (float)shadowMap->GetWidth();
-                float sizeY = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SHADOWMAPINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
-            }
+            float sizeX = 1.0f / (float)shadowMap->GetWidth();
+            float sizeY = 1.0f / (float)shadowMap->GetHeight();
+            graphics->SetShaderParameter(PSP_SHADOWMAPINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
             
-            if (graphics->NeedParameterUpdate(PSP_SHADOWSPLITS, light))
-            {
-                Vector4 lightSplits(M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE);
-                if (lightQueue_->shadowSplits_.Size() > 1)
-                    lightSplits.x_ = lightQueue_->shadowSplits_[0].farSplit_ / camera_->GetFarClip();
-                if (lightQueue_->shadowSplits_.Size() > 2)
-                    lightSplits.y_ = lightQueue_->shadowSplits_[1].farSplit_ / camera_->GetFarClip();
-                if (lightQueue_->shadowSplits_.Size() > 3)
-                    lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera_->GetFarClip();
-                
-                graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
-            }
+            Vector4 lightSplits(M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE);
+            if (lightQueue_->shadowSplits_.Size() > 1)
+                lightSplits.x_ = lightQueue_->shadowSplits_[0].farSplit_ / camera_->GetFarClip();
+            if (lightQueue_->shadowSplits_.Size() > 2)
+                lightSplits.y_ = lightQueue_->shadowSplits_[1].farSplit_ / camera_->GetFarClip();
+            if (lightQueue_->shadowSplits_.Size() > 3)
+                lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera_->GetFarClip();
+            
+            graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
         }
     }
     
     // Set material-specific shader parameters and textures
     if (material_)
     {
-        const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
-        for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        if (graphics->NeedParameterUpdate(SPG_MATERIAL, material_))
         {
-            if (graphics->NeedParameterUpdate(i->first_, material_))
+            const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
+            for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
         

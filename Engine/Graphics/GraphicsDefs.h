@@ -265,6 +265,21 @@ enum TextureUnit
     MAX_TEXTURE_UNITS = 16
 };
 
+/// Shader parameter groups for determining need to update
+enum ShaderParameterGroup
+{
+    SPG_FRAME = 0,
+    SPG_CAMERA,
+    SPG_VIEWPORT,
+    SPG_ZONE,
+    SPG_LIGHT,
+    SPG_VERTEXLIGHTS,
+    SPG_MATERIAL,
+    SPG_OBJECTTRANSFORM,
+    SPG_OBJECTDATA,
+    MAX_SHADER_PARAMETER_GROUPS
+};
+
 static const int QUALITY_LOW = 0;
 static const int QUALITY_MEDIUM = 1;
 static const int QUALITY_HIGH = 2;

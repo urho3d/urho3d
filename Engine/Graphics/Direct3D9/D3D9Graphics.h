@@ -114,11 +114,11 @@ public:
     /// Register a shader parameter globally. Called by Shader.
     void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
     /// Check whether a shader parameter in the currently set shaders needs update.
-    bool NeedParameterUpdate(StringHash param, const void* source);
+    bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
     /// Check whether the current pixel shader uses a texture unit.
     bool NeedTextureUnit(TextureUnit unit);
-    /// Clear remembered shader parameter source.
-    void ClearParameterSource(StringHash param);
+    /// Clear remembered shader parameter source group.
+    void ClearParameterSource(ShaderParameterGroup group);
     /// Clear remembered shader parameter sources.
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources.
@@ -479,6 +479,8 @@ private:
     unsigned stencilWriteMask_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
+    /// Remembered shader parameter sources.
+    const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
 };
 
 /// Register Graphics library objects.

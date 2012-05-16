@@ -38,8 +38,7 @@ struct ShaderParameter
     ShaderParameter() :
         type_(VS),
         register_(M_MAX_UNSIGNED),
-        regCount_(0),
-        lastSource_((void*)M_MAX_UNSIGNED)
+        regCount_(0)
     {
     }
     
@@ -47,8 +46,7 @@ struct ShaderParameter
     ShaderParameter(ShaderType type, unsigned reg, unsigned regCount) :
         type_(type),
         register_(reg),
-        regCount_(regCount),
-        lastSource_((void*)M_MAX_UNSIGNED)
+        regCount_(regCount)
     {
     }
     
@@ -58,8 +56,6 @@ struct ShaderParameter
     unsigned register_;
     /// Number of registers.
     unsigned regCount_;
-    /// Last data source.
-    const void* lastSource_;
 };
 
 /// Vertex or pixel shader on the GPU.

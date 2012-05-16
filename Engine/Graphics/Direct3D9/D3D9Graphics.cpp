@@ -862,16 +862,18 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
 
 void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
+    if (vs == vertexShader_ && ps == pixelShader_)
+        return;
+    
+    ClearParameterSources();
+    
     if (vs != vertexShader_)
     {
         // Clear all previous vertex shader register mappings
         for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
         {
             if (i->second_.type_ == VS)
-            {
                 i->second_.register_ = M_MAX_UNSIGNED;
-                i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
-            }
         }
         
         // Create the shader now if not yet created. If already attempted, do not retry
@@ -917,10 +919,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
         {
             if (i->second_.type_ == PS)
-            {
                 i->second_.register_ = M_MAX_UNSIGNED;
-                i->second_.lastSource_ = (void*)M_MAX_UNSIGNED;
-            }
         }
         
         if (ps && !ps->IsCreated())
@@ -1110,15 +1109,11 @@ void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& 
     }
 }
 
-bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
+bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
-    if (i == shaderParameters_.End() || i->second_.register_ >= MAX_CONSTANT_REGISTERS)
-        return false;
-    
-    if (i->second_.lastSource_ != source)
+    if ((unsigned)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
     {
-        i->second_.lastSource_ = source;
+        shaderParameterSources_[group] = source;
         return true;
     }
     else
@@ -1130,21 +1125,21 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
     return pixelShader_ && pixelShader_->HasTextureUnit(unit);
 }
 
-void Graphics::ClearParameterSource(StringHash param)
+void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
-    shaderParameters_[param].lastSource_ = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[group] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::ClearParameterSources()
 {
-    for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
-        i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::ClearTransformSources()
 {
-    shaderParameters_[VSP_MODEL].lastSource_ = (const void*)M_MAX_UNSIGNED;
-    shaderParameters_[VSP_VIEWPROJ].lastSource_ = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SPG_CAMERA] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SPG_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
