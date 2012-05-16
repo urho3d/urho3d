@@ -409,19 +409,19 @@ float Camera::GetHalfViewSize() const
 
 Vector3 Camera::GetForwardVector()
 {
-    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
     return worldRotation * Vector3::FORWARD;
 }
 
 Vector3 Camera::GetRightVector()
 {
-    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
     return worldRotation * Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector()
 {
-    Quaternion worldRotation = node_ ? node_->GetWorldRotation() : Quaternion::IDENTITY;
+    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
     return worldRotation * Vector3::UP;
 }
 
