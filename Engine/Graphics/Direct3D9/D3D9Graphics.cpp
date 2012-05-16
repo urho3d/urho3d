@@ -1120,7 +1120,15 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
         return false;
 }
 
-bool Graphics::NeedTextureUnit(TextureUnit unit)
+bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
+{
+    if (type == VS)
+        return vertexShader_ && vertexShader_->HasParameter(param);
+    else
+        return pixelShader_ && pixelShader_->HasParameter(param);
+}
+
+bool Graphics::HasTextureUnit(TextureUnit unit)
 {
     return pixelShader_ && pixelShader_->HasTextureUnit(unit);
 }
@@ -1138,8 +1146,8 @@ void Graphics::ClearParameterSources()
 
 void Graphics::ClearTransformSources()
 {
-    shaderParameterSources_[SPG_CAMERA] = (const void*)M_MAX_UNSIGNED;
-    shaderParameterSources_[SPG_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)

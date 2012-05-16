@@ -186,8 +186,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     graphics->SetShaders(vertexShader_, pixelShader_);
     
     // Set camera shader parameters
-    void* cameraSource = (void*)(overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_);
-    if (graphics->NeedParameterUpdate(SP_CAMERA, cameraSource))
+    unsigned cameraHash = overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_;
+    if (graphics->NeedParameterUpdate(SP_CAMERA, (void*)cameraHash))
     {
         graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
         graphics->SetShaderParameter(VSP_CAMERAROT, cameraNode->GetWorldTransform().RotationMatrix());

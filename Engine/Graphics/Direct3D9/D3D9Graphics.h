@@ -113,10 +113,12 @@ public:
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Register a shader parameter globally. Called by Shader.
     void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
-    /// Check whether a shader parameter in the currently set shaders needs update.
+    /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
+    /// Check whether a shader parameter exists on the currently set shaders.
+    bool HasShaderParameter(ShaderType type, StringHash param);
     /// Check whether the current pixel shader uses a texture unit.
-    bool NeedTextureUnit(TextureUnit unit);
+    bool HasTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter source group.
     void ClearParameterSource(ShaderParameterGroup group);
     /// Clear remembered shader parameter sources.
