@@ -26,7 +26,6 @@
 #include "List.h"
 #include "Mutex.h"
 #include "Object.h"
-#include "Signal.h"
 
 class WorkerThread;
 

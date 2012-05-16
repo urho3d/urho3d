@@ -122,7 +122,7 @@ The main loop iteration (also called a frame) is driven by the Engine. In contra
 - E_UPDATE: application-wide logic update event. By default each active Scene reacts to this and triggers the scene update (more on this below.)
 - E_POSTUPDATE: application-wide logic post-update event. The UI subsystem updates its logic here.
 - E_RENDERUPDATE: Renderer updates its viewports here to prepare for rendering, and the UI generates render commands necessary to render the user interface.
-- E_POSTRENDERUPDATE: by default nothing hooks to this. This can be used to implement logic that requires the rendering views to be up-to-date (for example to do accurate raycasts.) Scenes may not be modified at this point (especially scene objects may not be deleted or crashes may occur.)
+- E_POSTRENDERUPDATE: by default nothing hooks to this. This can be used to implement logic that requires the rendering views to be up-to-date, for example to do accurate raycasts. Scenes may not be modified at this point; especially scene objects may not be deleted or crashes may occur.
 - E_ENDFRAME: signals the end of the frame. Before this, rendering the frame and measuring the next frame's timestep will have occurred.
 
 The update of each Scene causes further events to be sent:
