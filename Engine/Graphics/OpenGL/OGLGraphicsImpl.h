@@ -27,7 +27,13 @@
 #include "Map.h"
 #include "Timer.h"
 
+#ifndef ANDROID
 #include <GLee.h>
+#else
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#endif
+
 #include <SDL.h>
 
 class Context;

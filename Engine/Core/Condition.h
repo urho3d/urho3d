@@ -23,20 +23,20 @@
 
 #pragma once
 
-/// %Signal on which a thread can wait.
-class Signal
+/// %Condition on which a thread can wait.
+class Condition
 {
 public:
     /// Construct.
-    Signal();
+    Condition();
     
     /// Destruct.
-    ~Signal();
+    ~Condition();
     
-    /// %Set the signal. Will be automatically reset once a waiting thread wakes up.
+    /// %Set the condition. Will be automatically reset once a waiting thread wakes up.
     void Set();
     
-    /// Wait on the signal.
+    /// Wait on the condition.
     void Wait();
     
 private:

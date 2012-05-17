@@ -28,7 +28,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+
+#ifndef ANDROID
 #include <libcpuid.h>
+#endif
 
 #ifdef WIN32
 #include <windows.h>
@@ -37,9 +40,9 @@
 #include <unistd.h>
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #include <float.h>
-#else
+#elif !defined(ANDROID)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -74,6 +77,7 @@ static String currentLine;
 static Vector<String> arguments;
 static Mutex staticMutex;
 
+#ifndef ANDROID
 void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -82,9 +86,11 @@ void GetCPUData(struct cpu_id_t* data)
         data->num_cores = 1;
     }
 }
+#endif
 
 void InitFPU()
 {
+    #ifndef ANDROID
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
@@ -94,6 +100,7 @@ void InitFPU()
     control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
     control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
     SetFPUState(control);
+    #endif
     #endif
 }
 
@@ -313,16 +320,26 @@ String GetConsoleInput()
 
 unsigned GetNumPhysicalCPUs()
 {
+    #ifndef ANDROID
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
+    #else
+    /// \todo Implement properly
+    return 1;
+    #endif
 }
 
 unsigned GetNumLogicalCPUs()
 {
+    #ifndef ANDROID
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;
+    #else
+    /// \todo Implement properly
+    return 1;
+    #endif
 }
 
 Mutex& GetStaticMutex()

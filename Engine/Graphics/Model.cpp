@@ -112,68 +112,54 @@ bool Model::Load(Deserializer& source)
         buffer->SetMorphRange(morphStart, morphCount);
         
         unsigned vertexSize = buffer->GetVertexSize();
-        unsigned char* data = (unsigned char*)buffer->Lock(0, vertexCount, LOCK_NORMAL);
+        SharedArrayPtr<unsigned char> data(new unsigned char[vertexCount * vertexSize]);
         memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
-        
-        if (data)
+
+        source.Read(data.Get(), vertexCount * vertexSize);
+        buffer->SetData(data.Get());
+
+        // If there is a morph range, make a copy of the data so that the morph range can be reset
+        if (morphCount)
         {
-            source.Read(data, vertexCount * vertexSize);
-            // If there is a morph range, make a copy of the data so that the morph range can be reset
-            if (morphCount)
-            {
-                SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
-                memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
-                buffer->SetMorphRangeResetData(morphResetData);
-                memoryUse += morphCount * vertexSize;
-            }
-            
-            // Copy the raw position data for CPU-side operations
-            SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
-            float* rawDest = (float*)rawVertexData.Get();
-            for (unsigned i = 0; i < vertexCount; ++i)
-            {
-                float* rawSrc = (float*)&data[i * vertexSize];
-                *rawDest++ = *rawSrc++;
-                *rawDest++ = *rawSrc++;
-                *rawDest++ = *rawSrc++;
-            }
-            rawVertexDatas.Push(rawVertexData);
-            
-            buffer->Unlock();
+            SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
+            memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
+            buffer->SetMorphRangeResetData(morphResetData);
+            memoryUse += morphCount * vertexSize;
         }
-        else
-            return false;
         
+        // Copy the raw position data for CPU-side operations
+        SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
+        float* rawDest = (float*)rawVertexData.Get();
+        for (unsigned i = 0; i < vertexCount; ++i)
+        {
+            float* rawSrc = (float*)&data[i * vertexSize];
+            *rawDest++ = *rawSrc++;
+            *rawDest++ = *rawSrc++;
+            *rawDest++ = *rawSrc++;
+        }
+        
+        rawVertexDatas.Push(rawVertexData);
         vertexBuffers_.Push(buffer);
     }
-    
+
     // Read index buffers
     unsigned numIndexBuffers = source.ReadUInt();
     for (unsigned i = 0; i < numIndexBuffers; ++i)
     {
         unsigned indexCount = source.ReadUInt();
         unsigned indexSize = source.ReadUInt();
-        
+
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
         buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
-        
-        unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
+
+        // Copy the raw index data for CPU-side operations
+        SharedArrayPtr<unsigned char> data(new unsigned char[indexSize * indexCount]);
         memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
-        
-        if (data)
-        {
-            source.Read(data, indexCount * indexSize);
-            
-            // Copy the raw index data for CPU-side operations
-            SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
-            memcpy(rawIndexData.Get(), data, indexSize * indexCount);
-            rawIndexDatas.Push(rawIndexData);
-            
-            buffer->Unlock();
-        }
-        else
-            return false;
-        
+
+        source.Read(data.Get(), indexCount * indexSize);
+        buffer->SetData(data.Get());
+
+        rawIndexDatas.Push(data);
         indexBuffers_.Push(buffer);
     }
     

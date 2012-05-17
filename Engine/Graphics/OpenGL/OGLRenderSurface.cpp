@@ -32,6 +32,14 @@
 
 #include "DebugNew.h"
 
+#ifdef GL_ES_VERSION_2_0
+#define GL_RENDERBUFFER_EXT GL_RENDERBUFFER
+#define glGenRenderbuffersEXT glGenRenderbuffers
+#define glBindRenderbufferEXT glBindRenderbuffer
+#define glRenderbufferStorageEXT glRenderbufferStorage
+#define glDeleteRenderbuffersEXT glDeleteRenderbuffers
+#endif
+
 RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
     parentTexture_(parentTexture),
     target_(target),

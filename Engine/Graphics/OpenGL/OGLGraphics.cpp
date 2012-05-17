@@ -56,6 +56,22 @@
 
 #include "DebugNew.h"
 
+#ifdef GL_ES_VERSION_2_0
+#define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT16
+#define GL_FRAMEBUFFER_EXT GL_FRAMEBUFFER
+#define GL_RENDERBUFFER_EXT GL_RENDERBUFFER
+#define GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT0
+#define GL_DEPTH_ATTACHMENT_EXT GL_DEPTH_ATTACHMENT
+#define GL_STENCIL_ATTACHMENT_EXT GL_STENCIL_ATTACHMENT
+#define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+#define glBindFramebufferEXT glBindFramebuffer
+#define glFramebufferTexture2DEXT glFramebufferTexture2D
+#define glFramebufferRenderbufferEXT glFramebufferRenderbuffer
+#define glGenFramebuffersEXT glGenFramebuffers
+#define glDeleteFramebuffersEXT glDeleteFramebuffers
+#define glCheckFramebufferStatusEXT glCheckFramebufferStatus
+#endif
+
 static const unsigned glCmpFunc[] =
 {
     GL_ALWAYS,
@@ -105,6 +121,12 @@ static const String noParameter;
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
 OBJECTTYPESTATIC(Graphics);
+
+bool CheckExtension(const String& name)
+{
+    String extensions((const char*)glGetString(GL_EXTENSIONS));
+    return extensions.Find(name) != String::NPOS;
+}
 
 Graphics::Graphics(Context* context_) :
     Object(context_),
@@ -247,25 +269,28 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         }
         
         // If OpenGL extensions not yet initialized, initialize now
+        #ifndef GL_ES_VERSION_2_0
         if (!GLeeInitialized())
             GLeeInit();
-        
+
         if (!_GLEE_VERSION_2_0)
         {
             LOGERROR("OpenGL 2.0 is required");
             Release(true, true);
             return false;
         }
-        
-        if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil || !_GLEE_EXT_texture_filter_anisotropic)
+
+        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil" ||
+            !CheckExtension("EXT_texture_filter_anisotropic"))
         {
             LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil and "
                 "EXT_texture_filter_anisotropic OpenGL extensions are required");
             Release(true, true);
             return false;
         }
-        
-        compressedTextureSupport_ = _GLEE_EXT_texture_compression_s3tc != 0;
+        #endif
+
+        compressedTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
     }
     
     // Set vsync
@@ -304,7 +329,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         " multisample " + String(multiSample));
     else
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
-    
+
     using namespace ScreenMode;
     
     VariantMap eventData;
@@ -414,7 +439,11 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     if (flags & CLEAR_DEPTH)
     {
         glFlags |= GL_DEPTH_BUFFER_BIT;
+        #ifndef GL_ES_VERSION_2_0
         glClearDepth(depth);
+        #else
+        glClearDepthf(depth);
+        #endif
     }
     if (flags & CLEAR_STENCIL)
     {
@@ -1304,13 +1333,16 @@ void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
 {
     if (enable != alphaTest_)
     {
+        #ifndef GL_ES_VERSION_2_0
         if (enable)
             glEnable(GL_ALPHA_TEST);
         else
             glDisable(GL_ALPHA_TEST);
+        #endif
         alphaTest_ = enable;
     }
-    
+
+    #ifndef GL_ES_VERSION_2_0
     if (enable)
     {
         alphaRef = Clamp(alphaRef, 0.0f, 1.0f);
@@ -1321,6 +1353,7 @@ void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
             alphaRef_ = alphaRef;
         }
     }
+    #endif
 }
 
 void Graphics::SetBlendMode(BlendMode mode)
@@ -1384,13 +1417,17 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
             float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             
             glEnable(GL_POLYGON_OFFSET_FILL);
+            #ifndef GL_ES_VERSION_2_0
             glEnable(GL_POLYGON_OFFSET_LINE);
+            #endif
             glPolygonOffset(adjustedSlopeScaledBias, adjustedConstantBias);
         }
         else
         {
             glDisable(GL_POLYGON_OFFSET_FILL);
+            #ifndef GL_ES_VERSION_2_0
             glDisable(GL_POLYGON_OFFSET_LINE);
+            #endif
         }
         
         constantDepthBias_ = constantBias;
@@ -1420,7 +1457,9 @@ void Graphics::SetFillMode(FillMode mode)
 {
     if (mode != fillMode_)
     {
+        #ifndef GL_ES_VERSION_2_0
         glPolygonMode(GL_FRONT_AND_BACK, mode == FILL_SOLID ? GL_FILL : GL_LINE);
+        #endif
         fillMode_ = mode;
     }
 }
@@ -1844,7 +1883,11 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetFloatFormat()
 {
+    #ifndef GL_ES_VERSION_2_0
     return GL_LUMINANCE32F_ARB;
+    #else
+    return GL_LUMINANCE;
+    #endif
 }
 
 unsigned Graphics::GetLinearDepthFormat()
@@ -1856,7 +1899,11 @@ unsigned Graphics::GetLinearDepthFormat()
 
 unsigned Graphics::GetDepthStencilFormat()
 {
+    #ifndef GL_ES_VERSION_2_0
     return GL_DEPTH24_STENCIL8_EXT;
+    #else
+    return 0;
+    #endif
 }
 
 void Graphics::CheckFeatureSupport()
@@ -1867,7 +1914,9 @@ void Graphics::CheckFeatureSupport()
     hardwareDepthSupport_ = false;
 
     int numSupportedRTs = 1;
+    #ifndef GL_ES_VERSION_2_0
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+    #endif
 
     // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
     String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
@@ -1961,6 +2010,7 @@ void Graphics::CommitFramebuffer()
         impl_->boundFbo_ = i->second_.fbo_;
     }
     
+    #ifndef GL_ES_VERSION_2_0
     // Setup readbuffers & drawbuffers if needed
     if (i->second_.readBuffers_ != GL_NONE)
     {
@@ -1996,6 +2046,7 @@ void Graphics::CommitFramebuffer()
         
         i->second_.drawBuffers_ = newDrawBuffers;
     }
+    #endif
     
     for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
     {

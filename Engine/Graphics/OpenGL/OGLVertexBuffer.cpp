@@ -300,11 +300,13 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     
     if (object_)
     {
+        #ifndef GL_ES_VERSION_2_0
         GLenum glLockMode = GL_WRITE_ONLY;
         if (mode == LOCK_READONLY)
             glLockMode = GL_READ_ONLY;
         else if (mode == LOCK_NORMAL)
             glLockMode = GL_READ_WRITE;
+        #endif
         
         // In discard mode, use a CPU side buffer to avoid stalling
         if (mode == LOCK_DISCARD)
@@ -315,11 +317,15 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         }
         else
         {
+            #ifndef GL_ES_VERSION_2_0
             glBindBuffer(GL_ARRAY_BUFFER, object_);
             hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
             if (!hwData)
                 return 0;
             hwData = (unsigned char*)hwData + start * vertexSize_;
+            #else
+            LOGERROR("Locking the vertex buffer without discard not supported on OpenGL ES");
+            #endif
         }
     }
     else
@@ -339,8 +345,10 @@ void VertexBuffer::Unlock()
         {
             if (!discardLockData_)
             {
+                #ifndef GL_ES_VERSION_2_0
                 glBindBuffer(GL_ARRAY_BUFFER, object_);
                 glUnmapBuffer(GL_ARRAY_BUFFER);
+                #endif
             }
             else
             {

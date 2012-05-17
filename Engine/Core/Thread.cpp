@@ -104,7 +104,7 @@ void Thread::SetPriority(int priority)
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
     #endif
-    #ifdef __linux__
+    #if defined(__linux__) && !defined(ANDROID)
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);

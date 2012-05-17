@@ -22,7 +22,7 @@
 //
 
 #include "Precompiled.h"
-#include "Signal.h"
+#include "Condition.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -31,29 +31,29 @@
 #endif
 
 #ifdef WIN32
-Signal::Signal() :
+Condition::Condition() :
     event_(0)
 {
     event_ = CreateEvent(0, FALSE, FALSE, 0);
 }
 
-Signal::~Signal()
+Condition::~Condition()
 {
     CloseHandle((HANDLE)event_);
     event_ = 0;
 }
 
-void Signal::Set()
+void Condition::Set()
 {
     SetEvent((HANDLE)event_);
 }
 
-void Signal::Wait()
+void Condition::Wait()
 {
     WaitForSingleObject((HANDLE)event_, INFINITE);
 }
 #else
-Signal::Signal() :
+Condition::Condition() :
     mutex_(new pthread_mutex_t),
     event_(new pthread_cond_t)
 {
@@ -61,7 +61,7 @@ Signal::Signal() :
     pthread_cond_init((pthread_cond_t*)event_, 0);
 }
 
-Signal::~Signal()
+Condition::~Condition()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
@@ -74,12 +74,12 @@ Signal::~Signal()
     mutex_ = 0;
 }
 
-void Signal::Set()
+void Condition::Set()
 {
     pthread_cond_signal((pthread_cond_t*)event_);
 }
 
-void Signal::Wait()
+void Condition::Wait()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
