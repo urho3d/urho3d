@@ -52,6 +52,9 @@ void CreateScene()
     octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
     editorScene.CreateComponent("DebugRenderer");
 
+    // Allow access to the scene from the console
+    script.defaultScene = editorScene;
+    
     // Always pause the scene, and do updates manually
     editorScene.active = false;
 
@@ -66,8 +69,6 @@ void CreateScene()
     UpdateWindowTitle();
     CreateCamera();
     CreateGizmo();
-
-    script.defaultScene = editorScene;
 }
 
 void SetResourcePath(String newPath, bool usePreferredDir = true)
@@ -221,7 +222,7 @@ void SaveScene(const String&in fileName)
     if (fileName.empty || GetFileName(fileName).empty)
         return;
 
-    // Unpause when saving so that there are no surprises when trying to use the scene
+    // Unpause when saving so that the scene will work properly when loaded outside the editor
     editorScene.active = true;
 
     File file(fileName, FILE_WRITE);

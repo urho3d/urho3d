@@ -179,14 +179,14 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     RegisterObjects();
     RegisterSubsystems();
     
-    // Set maximally accurate low res timer for frame limiting
-    GetSubsystem<Time>()->SetTimerPeriod(1);
-    
     // Start logging
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     if (logDebug)
         log->SetLevel(LOG_DEBUG);
+    
+    // Set maximally accurate low res timer
+    GetSubsystem<Time>()->SetTimerPeriod(1);
     
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
