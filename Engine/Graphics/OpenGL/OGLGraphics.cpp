@@ -280,7 +280,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
 
-        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil" ||
+        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil") ||
             !CheckExtension("EXT_texture_filter_anisotropic"))
         {
             LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil and "
