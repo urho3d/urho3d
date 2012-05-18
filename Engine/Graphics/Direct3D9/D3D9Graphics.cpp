@@ -1377,31 +1377,6 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
-{
-    if (enable != alphaTest_)
-    {
-        impl_->device_->SetRenderState(D3DRS_ALPHATESTENABLE, enable ? TRUE : FALSE);
-        alphaTest_ = enable;
-    }
-    
-    if (enable)
-    {
-        if (mode != alphaTestMode_)
-        {
-            impl_->device_->SetRenderState(D3DRS_ALPHAFUNC, d3dCmpFunc[mode]);
-            alphaTestMode_ = mode;
-        }
-        
-        alphaRef = Clamp(alphaRef, 0.0f, 1.0f);
-        if (alphaRef != alphaRef_)
-        {
-            impl_->device_->SetRenderState(D3DRS_ALPHAREF, (DWORD)(alphaRef * 255.0f));
-            alphaRef_ = alphaRef;
-        }
-    }
-}
-
 void Graphics::SetTextureAnisotropy(unsigned level)
 {
     if (level < 1)

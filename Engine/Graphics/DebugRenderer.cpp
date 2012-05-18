@@ -398,7 +398,6 @@ void DebugRenderer::Render()
     
     vertexBuffer_->Unlock();
     
-    graphics->SetAlphaTest(false);
     graphics->SetBlendMode(BLEND_REPLACE);
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);

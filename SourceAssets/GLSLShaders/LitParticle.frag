@@ -18,7 +18,12 @@ varying vec4 vLightVec;
 void main()
 {
     #ifdef DIFFMAP
-        vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord);
+        vec4 diffInput = texture2D(sDiffMap, vTexCoord);
+        #ifdef ALPHAMASK
+            if (diffInput.a < 0.5)
+                discard;
+        #endif
+        vec4 diffColor = cMatDiffColor * diffInput;
     #else
         vec4 diffColor = cMatDiffColor;
     #endif

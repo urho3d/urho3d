@@ -7,7 +7,7 @@
     </shader>
     <shader name="Prepass" type="ps">
         <option name="Normal" define="NORMALMAP" />
-        <option name="Mask" define="ALPHAMASK" />
+        <option name="AlphaMask" define="ALPHAMASK" />
         <option name="HW" define="HWDEPTH" />
     </shader>
 </shaders>

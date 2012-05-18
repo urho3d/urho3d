@@ -12,6 +12,7 @@
     </shader>
     <shader name="LitParticle" type="ps">
         <option name="Diff" define="DIFFMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="Ambient" define="AMBIENT" />
         <variation name="Dir" define="DIRLIGHT" />

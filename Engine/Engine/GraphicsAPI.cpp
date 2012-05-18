@@ -327,8 +327,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("CullMode", "CULL_CW", CULL_CW);
     
     RegisterRefCounted<Pass>(engine, "Pass");
-    engine->RegisterObjectMethod("Pass", "void set_alphaTest(bool)", asMETHOD(Pass, SetAlphaTest), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "bool get_alphaTest() const", asMETHOD(Pass, GetAlphaTest), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_blendMode(BlendMode)", asMETHOD(Pass, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "BlendMode get_blendMode() const", asMETHOD(Pass, GetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_depthTestMode(CompareMode)", asMETHOD(Pass, SetDepthTestMode), asCALL_THISCALL);

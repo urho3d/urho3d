@@ -648,7 +648,6 @@ void Renderer::Render()
     // If no views, just clear the screen
     if (!numViews_)
     {
-        graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
         graphics_->SetDepthWrite(true);

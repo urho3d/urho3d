@@ -17,7 +17,7 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
-        <option name="Mask" define="ALPHAMASK" require="DIFFMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="HW" define="HWDEPTH" />
     </shader>
 </shaders>

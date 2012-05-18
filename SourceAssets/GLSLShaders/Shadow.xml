@@ -5,6 +5,6 @@
         <variation name="Skinned" define="SKINNED" />
     </shader>
     <shader name="Shadow" type="ps">
-        <option name="Mask" define="ALPHAMASK" />
+        <option name="AlphaMask" define="ALPHAMASK" />
     </shader>
 </shaders>

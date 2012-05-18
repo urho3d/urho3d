@@ -6,6 +6,7 @@
     <shader name="Basic" type="ps">
         <option name="Diff" define="DIFFMAP" exclude="Alpha" />
         <option name="Alpha" define="ALPHAMAP" exclude="Diff" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
         <option name="VCol" define="VERTEXCOLOR" />
     </shader>
     <shader name="Skybox" />

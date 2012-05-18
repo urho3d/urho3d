@@ -64,6 +64,7 @@
 #define GL_DEPTH_ATTACHMENT_EXT GL_DEPTH_ATTACHMENT
 #define GL_STENCIL_ATTACHMENT_EXT GL_STENCIL_ATTACHMENT
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+#define glClearDepth glClearDepthf
 #define glBindFramebufferEXT glBindFramebuffer
 #define glFramebufferTexture2DEXT glFramebufferTexture2D
 #define glFramebufferRenderbufferEXT glFramebufferRenderbuffer
@@ -439,11 +440,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     if (flags & CLEAR_DEPTH)
     {
         glFlags |= GL_DEPTH_BUFFER_BIT;
-        #ifndef GL_ES_VERSION_2_0
         glClearDepth(depth);
-        #else
-        glClearDepthf(depth);
-        #endif
     }
     if (flags & CLEAR_STENCIL)
     {
@@ -1327,33 +1324,6 @@ void Graphics::SetViewport(const IntRect& rect)
     
     // Disable scissor test, needs to be re-enabled by the user
     SetScissorTest(false);
-}
-
-void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
-{
-    if (enable != alphaTest_)
-    {
-        #ifndef GL_ES_VERSION_2_0
-        if (enable)
-            glEnable(GL_ALPHA_TEST);
-        else
-            glDisable(GL_ALPHA_TEST);
-        #endif
-        alphaTest_ = enable;
-    }
-
-    #ifndef GL_ES_VERSION_2_0
-    if (enable)
-    {
-        alphaRef = Clamp(alphaRef, 0.0f, 1.0f);
-        if (mode != alphaTestMode_ || alphaRef != alphaRef_)
-        {
-            glAlphaFunc(glCmpFunc[mode], alphaRef);
-            alphaTestMode_ = mode;
-            alphaRef_ = alphaRef;
-        }
-    }
-    #endif
 }
 
 void Graphics::SetBlendMode(BlendMode mode)

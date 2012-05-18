@@ -73,7 +73,6 @@ static const String CompareModeNames[] =
 
 Pass::Pass(PassType type) :
     type_(type),
-    alphaTest_(false),
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
     depthWrite_(true)
@@ -82,11 +81,6 @@ Pass::Pass(PassType type) :
 
 Pass::~Pass()
 {
-}
-
-void Pass::SetAlphaTest(bool enable)
-{
-    alphaTest_ = enable;
 }
 
 void Pass::SetBlendMode(BlendMode mode)
@@ -175,9 +169,6 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("ps"))
                 newPass->SetPixelShader(passElem.GetAttribute("ps"));
-            
-            if (passElem.HasAttribute("alphatest"))
-                newPass->SetAlphaTest(passElem.GetBool("alphatest"));
             
             if (passElem.HasAttribute("blend"))
             {

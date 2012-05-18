@@ -6,6 +6,6 @@
         <variation name="Instanced" define="INSTANCED" require="SM3" />
     </shader>
     <shader name="Shadow" type="ps">
-        <option name="Mask" define="ALPHAMASK" />
+        <option name="AlphaMask" define="ALPHAMASK" />
     </shader>
 </shaders>

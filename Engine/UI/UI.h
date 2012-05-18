@@ -126,6 +126,8 @@ private:
     SharedPtr<ShaderVariation> noTexturePS_;
     /// Pixel shader for diffuse texture.
     SharedPtr<ShaderVariation> diffTexturePS_;
+    /// Pixel shader for diffuse texture masking.
+    SharedPtr<ShaderVariation> diffMaskTexturePS_;
     /// Pixel shader for alpha texture.
     SharedPtr<ShaderVariation> alphaTexturePS_;
     /// UI root element.

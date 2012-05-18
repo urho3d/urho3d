@@ -263,7 +263,6 @@ void UI::Render()
     projection.m33_ = 1.0f;
     
     graphics_->ClearParameterSources();
-    graphics_->SetAlphaTest(false);
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
@@ -294,6 +293,8 @@ void UI::Render()
             
             if (batch.texture_->GetFormat() == alphaFormat)
                 ps = alphaTexturePS_;
+            else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
+                ps = diffMaskTexturePS_;
             else
                 ps = diffTexturePS_;
         }
@@ -305,12 +306,6 @@ void UI::Render()
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
-        
-        // Use alpha test if not alpha blending
-        if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
-            graphics_->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
-        else
-            graphics_->SetAlphaTest(false);
         
         graphics_->SetBlendMode(batch.blendMode_);
         graphics_->SetScissorTest(true, batch.scissor_);
@@ -454,6 +449,7 @@ void UI::Initialize()
         diffTextureVS_ = basicVS->GetVariation("DiffVCol");
         noTexturePS_ = basicPS->GetVariation("VCol");
         diffTexturePS_ = basicPS->GetVariation("DiffVCol");
+        diffMaskTexturePS_ = basicPS->GetVariation("DiffAlphaMaskVCol");
         alphaTexturePS_ = basicPS->GetVariation("AlphaVCol");
     }
     

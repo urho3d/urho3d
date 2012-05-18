@@ -37,8 +37,6 @@ public:
     /// Destruct.
     ~Pass();
     
-    /// %Set alpha test on/off.
-    void SetAlphaTest(bool enable);
     /// %Set blend mode.
     void SetBlendMode(BlendMode mode);
     /// %Set depth compare mode.
@@ -54,8 +52,6 @@ public:
     
     /// Return pass type.
     PassType GetType() const { return type_; }
-    /// Return alpha test mode.
-    bool GetAlphaTest() const { return alphaTest_; }
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return depth compare mode.
@@ -74,8 +70,6 @@ public:
 private:
     /// Pass type.
     PassType type_;
-    /// Alpha test mode.
-    bool alphaTest_;
     /// Blend mode.
     BlendMode blendMode_;
     /// Depth compare mode.

@@ -172,11 +172,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     // Set pass / material-specific renderstates
     if (pass_ && material_)
     {
-        if (pass_->GetAlphaTest())
-            graphics->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
-        else
-            graphics->SetAlphaTest(false);
-        
         graphics->SetBlendMode(pass_->GetBlendMode());
         renderer->SetCullMode(pass_->GetType() != PASS_SHADOW ? material_->GetCullMode() : material_->GetShadowCullMode(),
             camera_);

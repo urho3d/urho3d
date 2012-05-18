@@ -1210,7 +1210,6 @@ void View::RenderBatchesForward()
     graphics_->SetStencilTest(false);
     
     // At this point clear the parts of viewport not occupied by opaque geometry with fog color
-    graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthTest(CMP_LESSEQUAL);
@@ -1361,7 +1360,6 @@ void View::RenderBatchesDeferred()
     }
     
     // At this point clear the parts of viewport not occupied by opaque geometry with fog color
-    graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -1439,7 +1437,6 @@ void View::BlitFramebuffer()
 {
     // Blit the final image to destination rendertarget
     /// \todo Depth is reset to far plane, so geometry drawn after the view can not be depth tested
-    graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(true);
@@ -1478,7 +1475,6 @@ void View::RunPostProcesses()
     unsigned readRtIndex = 0;
     unsigned writeRtIndex = screenBuffers_.Size() - 1;
     
-    graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetScissorTest(false);
@@ -2420,7 +2416,6 @@ void View::SetupLightVolumeBatch(Batch& batch)
     float lightDist;
     
     // Use replace blend mode for the first pre-pass light volume, and additive for the rest
-    graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(renderMode_ == RENDER_PREPASS && light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
     graphics_->SetDepthWrite(false);
     

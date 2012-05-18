@@ -16,7 +16,7 @@
     <shader name="Material" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" />
-        <option name="Mask" define="ALPHAMASK" include="Diff" />
+        <option name="AlphaMask" define="ALPHAMASK" include="Diff" />
         <option name="VCol" define="VERTEXCOLOR" />
     </shader>
 </shaders>

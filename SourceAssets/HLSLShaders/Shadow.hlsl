@@ -33,9 +33,9 @@ void PS(
 {
     #ifdef ALPHAMASK
         float alpha = tex2D(sDiffMap, iTexCoord).a;
-    #else
-        const float alpha = 1.0;
+        if (alpha < 0.5)
+            discard;
     #endif
 
-    oColor = alpha;
+    oColor = 1.0;
 }

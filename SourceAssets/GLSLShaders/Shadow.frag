@@ -9,9 +9,9 @@ void main()
 {
     #ifdef ALPHAMASK
         float alpha = texture2D(sDiffMap, vTexCoord).a;
-    #else
-        const float alpha = 1.0;
+        if (alpha < 0.5)
+            discard;
     #endif
 
-    gl_FragColor = vec4(alpha);
+    gl_FragColor = vec4(1.0);
 }

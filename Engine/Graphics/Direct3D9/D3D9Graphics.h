@@ -149,8 +149,6 @@ public:
     void SetViewTexture(Texture* texture);
     /// %Set viewport.
     void SetViewport(const IntRect& rect);
-    /// %Set alpha test.
-    void SetAlphaTest(bool enable, CompareMode mode = CMP_ALWAYS, float alphaRef = 0.5f);
     /// %Set blending mode.
     void SetBlendMode(BlendMode mode);
     /// %Set color write on/off.
@@ -254,14 +252,8 @@ public:
     Texture2D* GetDepthTexture() const;
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
-    /// Return whether alpha testing is enabled.
-    bool GetAlphaTest() const { return alphaTest_; }
-    /// Return alpha test compare mode.
-    CompareMode GetAlphaTestMode() const { return alphaTestMode_; }
     /// Return texture anisotropy.
     unsigned GetTextureAnisotropy() const { return textureAnisotropy_; }
-    /// Return alpha test reference value.
-    float GetAlphaRef() const { return alphaRef_; }
     /// Return blending mode.
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return whether color write is enabled.
@@ -435,12 +427,6 @@ private:
     Texture* viewTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
-    /// Alpha test enable flag.
-    bool alphaTest_;
-    /// Alpha test compare mode.
-    CompareMode alphaTestMode_;
-    /// Alpha test reference value.
-    float alphaRef_;
     /// Texture anisotropy level.
     unsigned textureAnisotropy_;
     /// Blending mode.
