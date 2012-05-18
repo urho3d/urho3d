@@ -56,7 +56,12 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffInput = tex2D(sDiffMap, iTexCoord);
+        #ifdef ALPHAMASK
+            if (diffInput.a < 0.5)
+                discard;
+        #endif
+        float4 diffColor = cMatDiffColor * diffInput;
     #else
         float4 diffColor = cMatDiffColor;
     #endif

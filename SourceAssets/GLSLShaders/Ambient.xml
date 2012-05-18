@@ -15,6 +15,7 @@
     </shader>
     <shader name="Ambient" type="ps">
         <option name="Diff" define="DIFFMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
     </shader>
 </shaders>
