@@ -135,8 +135,12 @@ float GetCubeShadow(float3 lightVec)
     // Expand the maximum component of the light vector to get full 0.0 - 1.0 UV range from the cube map,
     // and to avoid sampling across faces. Some GPU's filter across faces, while others do not, and in this
     // case filtering across faces is wrong
+    // Note: when doing also alpha masking on SM2, the texture sampling becomes too complex, so there is no
+    // choice but to skip it
+    #if defined(SM3) || !defined(ALPHAMASK)
     const float factor = 1.0 / 256.0;
     lightVec += factor * axis * lightVec;
+    #endif
 
     // Read the 2D UV coordinates, adjust according to shadow map size and add face offset
     float4 indirectPos = texCUBE(sIndirectionCubeMap, lightVec);
