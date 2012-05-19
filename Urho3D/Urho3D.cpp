@@ -30,9 +30,7 @@
 #include "ResourceCache.h"
 #include "ScriptFile.h"
 
-#ifndef ANDROID
-#include <stdexcept>
-#endif
+#include <exception>
 
 #ifdef WIN32
 #include <windows.h>
@@ -76,9 +74,7 @@ int main(int argc, char** argv)
 
 void Run()
 {
-    #ifndef ANDROID
     try
-    #endif
     {
         // Check for script file name
         const Vector<String>& arguments = GetArguments();
@@ -131,11 +127,9 @@ void Run()
         }
         scriptFile.Reset();
     }
-    #ifndef ANDROID
     catch (std::bad_alloc&)
     {
         ErrorDialog("Urho3D", "An out-of-memory error occurred. The application will now exit.");
     }
-    #endif
 }
 

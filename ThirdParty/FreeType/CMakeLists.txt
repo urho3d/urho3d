@@ -3,17 +3,8 @@ set (TARGET_NAME FreeType)
 
 add_definitions (-DFT2_BUILD_LIBRARY)
 
-# Compiler-specific options
-#if (MSVC)
-#    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D FT2_BUILD_LIBRARY")
-#endif ()
-#if (MINGW)
-#    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D FT2_BUILD_LIBRARY")
-#endif ()
-
 # Define source files
 set (SOURCE_FILES
-    include/ft2build.h
     src/autofit/autofit.c
     src/base/ftbase.c
     src/base/ftbbox.c

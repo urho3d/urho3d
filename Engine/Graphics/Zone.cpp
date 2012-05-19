@@ -83,15 +83,9 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     Component::OnSetAttribute(attr, src);
     
     // If bounding box, override mode, visibility or priority changes, dirty the drawable as applicable
-    switch (attr.offset_)
-    {
-    case offsetof(Zone, boundingBox_.min_):
-    case offsetof(Zone, boundingBox_.max_):
-    case offsetof(Zone, visible_):
-    case offsetof(Zone, priority_):
+    if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
+        attr.offset_ == offsetof(Zone, visible_) || attr.offset_ == offsetof(Zone, priority_))
         OnMarkedDirty(node_);
-        break;
-    }
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

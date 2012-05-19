@@ -146,27 +146,12 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     Component::OnSetAttribute(attr, src);
     
     // Validate the bias, cascade & focus parameters
-    switch (attr.offset_)
-    {
-    case offsetof(Light, shadowBias_.constantBias_):
-    case offsetof(Light, shadowBias_.slopeScaledBias_):
+    if (attr.offset_ >= offsetof(Light, shadowBias_) && attr.offset_ < (offsetof(Light, shadowBias_) + sizeof(BiasParameters)))
         shadowBias_.Validate();
-        break;
-    
-    case offsetof(Light, shadowCascade_.start_):
-    case offsetof(Light, shadowCascade_.splits_):
-    case offsetof(Light, shadowCascade_.splits_) + sizeof(float):
-    case offsetof(Light, shadowCascade_.splits_) + sizeof(float) * 2:
-    case offsetof(Light, shadowCascade_.splits_) + sizeof(float) * 3:
-    case offsetof(Light, shadowCascade_.fadeStart_):
+    else if (attr.offset_ >= offsetof(Light, shadowCascade_) && attr.offset_ < (offsetof(Light, shadowCascade_) + sizeof(CascadeParameters)))
         shadowCascade_.Validate();
-        break;
-        
-    case offsetof(Light, shadowFocus_.quantize_):
-    case offsetof(Light, shadowFocus_.minView_):
+    else if (attr.offset_ >= offsetof(Light, shadowFocus_) && attr.offset_ < (offsetof(Light, shadowFocus_) + sizeof(FocusParameters)))
         shadowFocus_.Validate();
-        break;
-    }
 }
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
