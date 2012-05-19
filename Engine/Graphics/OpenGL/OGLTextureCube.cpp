@@ -194,9 +194,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    if (compressed)
+    if (IsCompressed())
     {
         x &= ~3;
         y &= ~3;
@@ -216,7 +214,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     
     graphics_->SetTextureForUpdate(this);
     
-    if (!compressed)
+    if (!IsCompressed())
     {
         if (wholeLevel)
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format_, width, height, 0, GetExternalFormat(format_),
@@ -397,7 +395,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
             return false;
         }
         
-        if (!graphics_->GetCompressedTextureSupport())
+        if (!graphics_->GetCompressedTextureSupport() || !format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
@@ -460,6 +458,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
 
 bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 {
+    #ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
         LOGERROR("No texture created, can not get data");
@@ -478,18 +477,19 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         return false;
     }
     
-    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    
     graphics_->SetTextureForUpdate(const_cast<TextureCube*>(this));
     
-    if (!compressed)
+    if (!IsCompressed())
         glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, GetExternalFormat(format_), GetDataType(format_), dest);
     else
         glGetCompressedTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, dest);
     
     graphics_->SetTexture(0, 0);
     return true;
+    #else
+    LOGERROR("Get texture data not supported");
+    return false;
+    #endif
 }
 
 bool TextureCube::Create()
@@ -511,8 +511,7 @@ bool TextureCube::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
-    if (format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT && format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT &&
-        format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+    if (!IsCompressed())
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
@@ -530,8 +529,10 @@ bool TextureCube::Create()
         }
     }
     
+    #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
+    #endif
     
     // Set initial parameters, then unbind the texture
     UpdateParameters();

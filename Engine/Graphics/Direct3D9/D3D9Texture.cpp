@@ -109,6 +109,11 @@ void Texture::ClearDataLost()
     dataLost_ = false;
 }
 
+bool Texture::IsCompressed() const
+{
+    return format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
+}
+
 int Texture::GetLevelWidth(unsigned level) const
 {
     if (level > levels_)
@@ -139,7 +144,7 @@ TextureUsage Texture::GetUsage() const
 
 unsigned Texture::GetDataSize(int width, int height) const
 {
-    if (format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5)
+    if (IsCompressed())
         return GetRowDataSize(width) * ((height + 3) >> 2);
     else
         return GetRowDataSize(width) * height;

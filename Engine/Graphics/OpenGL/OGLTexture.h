@@ -67,6 +67,8 @@ public:
     unsigned GetTarget() const { return target_; }
     /// Return texture format.
     unsigned GetFormat() const { return format_; }
+    /// Return whether the texture format is compressed.
+    bool IsCompressed() const;
     /// Return number of mipmap levels.
     unsigned GetLevels() const { return levels_; }
     /// Return OpenGL depth bits.

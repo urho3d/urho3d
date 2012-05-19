@@ -175,8 +175,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
-    if (compressed)
+    if (IsCompressed())
     {
         x &= ~3;
         y &= ~3;
@@ -208,7 +207,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    if (compressed)
+    if (IsCompressed())
     {
         height = (height + 3) >> 2;
         y >>= 2;
@@ -487,10 +486,9 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         return false;
     }
     
-    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
-
+    
     D3DLOCKED_RECT d3dLockedRect;
     RECT d3dRect;
     d3dRect.left = 0;
@@ -505,7 +503,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     }
     
     int height = levelHeight;
-    if (compressed)
+    if (IsCompressed())
         height = (height + 3) >> 2;
     
     unsigned char* destPtr = (unsigned char*)dest;

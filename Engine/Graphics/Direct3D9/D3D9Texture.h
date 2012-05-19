@@ -58,6 +58,8 @@ public:
     
     /// Return texture format.
     unsigned GetFormat() const { return format_; }
+    /// Return whether the texture format is compressed.
+    bool IsCompressed() const;
     /// Return number of mip levels.
     unsigned GetLevels() const { return levels_; }
     /// Return width.

@@ -39,7 +39,11 @@ GLenum glWrapModes[] =
     GL_REPEAT,
     GL_MIRRORED_REPEAT,
     GL_CLAMP_TO_EDGE,
+    #ifndef GL_ES_VERSION_2_0
     GL_CLAMP
+    #else
+    GL_CLAMP_TO_EDGE
+    #endif
 };
 
 static const String addressModeNames[] =
@@ -135,7 +139,9 @@ void Texture::UpdateParameters()
     // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
+    #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[2]]);
+    #endif
     
     TextureFilterMode filterMode = filterMode_;
     if (filterMode == FILTER_DEFAULT)
@@ -171,6 +177,7 @@ void Texture::UpdateParameters()
     glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode_ == FILTER_ANISOTROPIC ?
         (float)graphics_->GetTextureAnisotropy() : 1.0f);
     
+    #ifndef GL_ES_VERSION_2_0
     // Shadow compare
     if (shadowCompare_)
     {
@@ -181,8 +188,19 @@ void Texture::UpdateParameters()
         glTexParameteri(target_, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     
     glTexParameterfv(target_, GL_TEXTURE_BORDER_COLOR, borderColor_.Data());
+    #endif
     
     parametersDirty_ = false;
+}
+
+bool Texture::IsCompressed() const
+{
+    #ifndef GL_ES_VERSION_2_0
+    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
+        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    #else
+    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+    #endif
 }
 
 int Texture::GetLevelWidth(unsigned level) const
@@ -210,8 +228,7 @@ TextureUsage Texture::GetUsage() const
 
 unsigned Texture::GetDataSize(int width, int height) const
 {
-    if (format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+    if (IsCompressed())
         return GetRowDataSize(width) * ((height + 3) >> 2);
     else
         return GetRowDataSize(width) * height;
@@ -224,24 +241,28 @@ unsigned Texture::GetRowDataSize(int width) const
     case GL_ALPHA:
     case GL_LUMINANCE:
         return width;
-
+        
     case GL_LUMINANCE_ALPHA:
         return width * 2;
-
+        
     case GL_RGB:
         return width * 3;
-
+        
     case GL_RGBA:
+    #ifndef GL_ES_VERSION_2_0
     case GL_LUMINANCE32F_ARB:
     case GL_DEPTH24_STENCIL8_EXT:
+    #endif
         return width * 4;
-
+        
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
-
+        
+    #ifndef GL_ES_VERSION_2_0
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
         return ((width + 3) >> 2) * 16;
+    #endif
         
     default:
         return 0;
@@ -255,11 +276,13 @@ unsigned Texture::GetDXTFormat(CompressedFormat format)
     case CF_DXT1:
         return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
         
+    #ifndef GL_ES_VERSION_2_0
     case CF_DXT3:
         return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
         
     case CF_DXT5:
         return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    #endif
     }
     
     return 0;
@@ -267,6 +290,7 @@ unsigned Texture::GetDXTFormat(CompressedFormat format)
 
 unsigned Texture::GetExternalFormat(unsigned format)
 {
+    #ifndef GL_ES_VERSION_2_0
     // For DEPTH_COMPONENTxx textures DEPTH_COMPONENT needs to be returned
     if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH_COMPONENT32)
         return GL_DEPTH_COMPONENT;
@@ -276,13 +300,21 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_LUMINANCE;
     else
         return format;
+    #else
+    if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
+        return GL_DEPTH_COMPONENT;
+    else
+        return format;
+    #endif
 }
 
 unsigned Texture::GetDataType(unsigned format)
 {
+    #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_UNSIGNED_INT_24_8_EXT;
     else
+    #endif
         return GL_UNSIGNED_BYTE;
 }
 

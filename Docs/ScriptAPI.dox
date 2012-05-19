@@ -1543,6 +1543,7 @@ Properties:<br>
 - TextureUsage usage (readonly)
 - uint format (readonly)
 - uint levels (readonly)
+- bool compressed (readonly)
 - int width (readonly)
 - int height (readonly)
 - int[] levelWidth (readonly)
@@ -1620,6 +1621,7 @@ Properties:<br>
 - TextureUsage usage (readonly)
 - uint format (readonly)
 - uint levels (readonly)
+- bool compressed (readonly)
 - int width (readonly)
 - int height (readonly)
 - int[] levelWidth (readonly)
@@ -1651,6 +1653,7 @@ Properties:<br>
 - TextureUsage usage (readonly)
 - uint format (readonly)
 - uint levels (readonly)
+- bool compressed (readonly)
 - int width (readonly)
 - int height (readonly)
 - int[] levelWidth (readonly)
@@ -1666,7 +1669,6 @@ Properties:<br>
 Pass
 
 Properties:<br>
-- bool alphaTest
 - BlendMode blendMode
 - CompareMode depthTestMode
 - bool depthWrite

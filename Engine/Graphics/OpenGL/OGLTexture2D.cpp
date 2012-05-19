@@ -187,9 +187,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    if (compressed)
+    if (IsCompressed())
     {
         x &= ~3;
         y &= ~3;
@@ -209,7 +207,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     
     graphics_->SetTextureForUpdate(this);
     
-    if (!compressed)
+    if (!IsCompressed())
     {
         if (wholeLevel)
             glTexImage2D(target_, level, format_, width, height, 0, GetExternalFormat(format_), GetDataType(format_), data);
@@ -305,7 +303,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         unsigned format = GetDXTFormat(image->GetCompressedFormat());
         bool needDecompress = false;
         
-        if (!graphics_->GetCompressedTextureSupport())
+        if (!graphics_->GetCompressedTextureSupport() || !format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
@@ -347,6 +345,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
+    #ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
         LOGERROR("No texture created, can not get data");
@@ -365,18 +364,19 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
     
-    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    
     graphics_->SetTextureForUpdate(const_cast<Texture2D*>(this));
     
-    if (!compressed)
+    if (!IsCompressed())
         glGetTexImage(target_, level, GetExternalFormat(format_), GetDataType(format_), dest);
     else
         glGetCompressedTexImage(target_, level, dest);
     
     graphics_->SetTexture(0, 0);
     return true;
+    #else
+    LOGERROR("Get texture data not supported");
+    return false;
+    #endif
 }
 
 bool Texture2D::Create()
@@ -411,13 +411,16 @@ bool Texture2D::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
-    if (format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT && format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT &&
-        format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+    if (!IsCompressed())
         glTexImage2D(target_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
     
     // If depth format, get the depth size
+    #ifndef GL_ES_VERSION_2_0
     if (externalFormat == GL_DEPTH_COMPONENT)
         glGetTexLevelParameteriv(target_, 0, GL_TEXTURE_DEPTH_SIZE, &depthBits_);
+    #else
+    depthBits_ = 16;
+    #endif
     
     // Set mipmapping
     levels_ = requestedLevels_;
@@ -431,8 +434,10 @@ bool Texture2D::Create()
         }
     }
     
+    #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
+    #endif
     
     // Set initial parameters, then unbind the texture
     UpdateParameters();

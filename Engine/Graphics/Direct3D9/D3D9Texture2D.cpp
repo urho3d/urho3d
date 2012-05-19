@@ -174,8 +174,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
-    if (compressed)
+    if (IsCompressed())
     {
         x &= ~3;
         y &= ~3;
@@ -206,7 +205,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    if (compressed)
+    if (IsCompressed())
     {
         height = (height + 3) >> 2;
         y >>= 2;
@@ -380,10 +379,9 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
     
-    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
-
+    
     D3DLOCKED_RECT d3dLockedRect;
     RECT d3dRect;
     d3dRect.left = 0;
@@ -398,15 +396,15 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     }
     
     int height = levelHeight;
-    if (compressed)
+    if (IsCompressed())
         height = (height + 3) >> 2;
-
+    
     unsigned char* destPtr = (unsigned char*)dest;
     unsigned rowSize = GetRowDataSize(levelWidth);
     // GetRowDataSize() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
-
+    
     // Perform conversion to RGB / RGBA as necessary
     switch (format_)
     {

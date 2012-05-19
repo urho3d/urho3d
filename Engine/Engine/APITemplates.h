@@ -691,6 +691,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "void ClearDataLost()", asMETHOD(T, ClearDataLost), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "TextureUsage get_usage() const", asMETHOD(T, GetUsage), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_format() const", asMETHOD(T, GetFormat), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_compressed() const", asMETHOD(T, IsCompressed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_levels() const", asMETHOD(T, GetLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_width() const", asMETHOD(T, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_height() const", asMETHOD(T, GetHeight), asCALL_THISCALL);

@@ -273,7 +273,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         #ifndef GL_ES_VERSION_2_0
         if (!GLeeInitialized())
             GLeeInit();
-
+        
         if (!_GLEE_VERSION_2_0)
         {
             LOGERROR("OpenGL 2.0 is required");
@@ -290,7 +290,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         #endif
-
+        
         compressedTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
     }
     
