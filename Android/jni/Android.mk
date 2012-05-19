@@ -25,6 +25,7 @@ LOCAL_MODULE := Bullet
 
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
+    $(wildcard $(LOCAL_PATH)/src/BulletCollision/BroadPhaseCollision/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/CollisionDispatch/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/CollisionShapes/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/Gimpact/*.cpp) \
@@ -150,8 +151,6 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
     $(wildcard $(LOCAL_PATH)/src/events/*.c) \
     $(wildcard $(LOCAL_PATH)/src/file/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/haptic/dummy/*.c) \
     $(wildcard $(LOCAL_PATH)/src/joystick/*.c) \
     $(wildcard $(LOCAL_PATH)/src/joystick/android/*.c) \
     $(wildcard $(LOCAL_PATH)/src/loadso/dlopen/*.c) \
@@ -240,7 +239,7 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/ThirdParty/SDL/include \
     $(LOCAL_PATH)/ThirdParty/Squish \
     $(LOCAL_PATH)/ThirdParty/StanHull \
-    $(LOCAL_PATH)/ThirdParty/STB \
+    $(LOCAL_PATH)/ThirdParty/STB
 
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
@@ -259,7 +258,8 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/Engine/Scene/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/Script/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/UI/*.cpp) \
-    $(wildcard $(LOCAL_PATH)/Urho3D/*.cpp))
+    $(wildcard $(LOCAL_PATH)/Urho3D/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/ThirdParty/SDL/src/main/android/*.cpp))
 
 LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL Squish StanHull STB
 

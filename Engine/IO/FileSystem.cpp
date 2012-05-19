@@ -349,26 +349,29 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir()
 {
-    #ifdef WIN32
+    #if defined(WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
     return GetPath(String(exeName));
-    #endif
-    #ifdef __APPLE__
+    #elif defined(__APPLE__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
     return GetPath(String(exeName));
-    #endif
-    #ifdef __linux__
+    #elif defined(ANDROID)
+    /// \todo Hack, remove
+    return "/sdcard/";
+    #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
     return GetPath(String(exeName));
+    #else
+    return String();
     #endif
 }
 

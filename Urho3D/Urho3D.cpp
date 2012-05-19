@@ -64,7 +64,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return 0;
 }
 #else
+#ifndef ANDROID
 int main(int argc, char** argv)
+#else
+extern "C" int SDL_main(int argc, char** argv);
+
+int SDL_main(int argc, char** argv)
+#endif
 {
     ParseArguments(argc, argv);
     Run();
@@ -87,6 +93,11 @@ void Run()
                 break;
             }
         }
+        
+        #ifdef ANDROID
+        // Can not pass script name on Android, so choose a hardcoded default
+        scriptFileName = "Scripts/TestScene.as";
+        #endif
         
         // Show usage if not found
         if (scriptFileName.Empty())

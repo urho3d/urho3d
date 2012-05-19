@@ -1,3 +1,5 @@
+// Modified by Lasse Öörni for Urho3D
+
 package org.libsdl.app;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -38,26 +40,24 @@ public class SDLActivity extends Activity {
     private static AudioTrack mAudioTrack;
 
     // EGL private objects
-    private static EGLContext  mEGLContext;
-    private static EGLSurface  mEGLSurface;
-    private static EGLDisplay  mEGLDisplay;
-    private static EGLConfig   mEGLConfig;
-    private static int mGLMajor, mGLMinor;
+    private EGLContext  mEGLContext;
+    private EGLSurface  mEGLSurface;
+    private EGLDisplay  mEGLDisplay;
+    private EGLConfig   mEGLConfig;
+    private int mGLMajor, mGLMinor;
+
+    private boolean mFinished = false;
 
     // Load the .so
     static {
-        System.loadLibrary("SDL2");
-        //System.loadLibrary("SDL2_image");
-        //System.loadLibrary("SDL2_mixer");
-        //System.loadLibrary("SDL2_ttf");
-        System.loadLibrary("main");
+        System.loadLibrary("Urho3D");
     }
 
     // Setup
     protected void onCreate(Bundle savedInstanceState) {
         //Log.v("SDL", "onCreate()");
         super.onCreate(savedInstanceState);
-        
+
         // So we can call stuff from static callbacks
         mSingleton = this;
 
@@ -83,6 +83,9 @@ public class SDLActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.v("SDL", "onDestroy()");
+        
+        mFinished = true;
+
         // Send a quit message to the application
         SDLActivity.nativeQuit();
 
@@ -97,16 +100,25 @@ public class SDLActivity extends Activity {
 
             //Log.v("SDL", "Finished waiting for SDL thread");
         }
+
+        mSingleton = null;
     }
 
     // Messages from the SDLMain thread
     static int COMMAND_CHANGE_TITLE = 1;
+    static int COMMAND_FINISH = 2;
 
     // Handler for the messages
     Handler commandHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.arg1 == COMMAND_CHANGE_TITLE) {
                 setTitle((String)msg.obj);
+            }
+            if (msg.arg1 == COMMAND_FINISH) {
+                if (mFinished == false) {
+                    mFinished = true;
+                    finish();
+                }
             }
         }
     };
@@ -148,6 +160,10 @@ public class SDLActivity extends Activity {
         // Called from SDLMain() thread and can't directly affect the view
         mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
+    
+    public static void finishActivity() {
+        mSingleton.sendCommand(COMMAND_FINISH, null);
+    }
 
     public static Context getContext() {
         return mSingleton;
@@ -166,7 +182,7 @@ public class SDLActivity extends Activity {
 
     // EGL functions
     public static boolean initEGL(int majorVersion, int minorVersion) {
-        if (SDLActivity.mEGLDisplay == null) {
+        if (SDLActivity.mSingleton.mEGLDisplay == null) {
             //Log.v("SDL", "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
 
             try {
@@ -207,10 +223,10 @@ public class SDLActivity extends Activity {
                     return false;
                 }
                 SDLActivity.mEGLContext = ctx;*/
-                SDLActivity.mEGLDisplay = dpy;
-                SDLActivity.mEGLConfig = config;
-                SDLActivity.mGLMajor = majorVersion;
-                SDLActivity.mGLMinor = minorVersion;
+                SDLActivity.mSingleton.mEGLDisplay = dpy;
+                SDLActivity.mSingleton.mEGLConfig = config;
+                SDLActivity.mSingleton.mGLMajor = majorVersion;
+                SDLActivity.mSingleton.mGLMinor = minorVersion;
 
                 SDLActivity.createEGLSurface();
             } catch(Exception e) {
@@ -228,9 +244,9 @@ public class SDLActivity extends Activity {
     public static boolean createEGLContext() {
         EGL10 egl = (EGL10)EGLContext.getEGL();
         int EGL_CONTEXT_CLIENT_VERSION=0x3098;
-        int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, SDLActivity.mGLMajor, EGL10.EGL_NONE };
-        SDLActivity.mEGLContext = egl.eglCreateContext(SDLActivity.mEGLDisplay, SDLActivity.mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttrs);
-        if (SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) {
+        int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, SDLActivity.mSingleton.mGLMajor, EGL10.EGL_NONE };
+        SDLActivity.mSingleton.mEGLContext = egl.eglCreateContext(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttrs);
+        if (SDLActivity.mSingleton.mEGLContext == EGL10.EGL_NO_CONTEXT) {
             Log.e("SDL", "Couldn't create context");
             return false;
         }
@@ -238,26 +254,26 @@ public class SDLActivity extends Activity {
     }
 
     public static boolean createEGLSurface() {
-        if (SDLActivity.mEGLDisplay != null && SDLActivity.mEGLConfig != null) {
+        if (SDLActivity.mSingleton.mEGLDisplay != null && SDLActivity.mSingleton.mEGLConfig != null) {
             EGL10 egl = (EGL10)EGLContext.getEGL();
-            if (SDLActivity.mEGLContext == null) createEGLContext();
+            if (SDLActivity.mSingleton.mEGLContext == null) createEGLContext();
 
             Log.v("SDL", "Creating new EGL Surface");
-            EGLSurface surface = egl.eglCreateWindowSurface(SDLActivity.mEGLDisplay, SDLActivity.mEGLConfig, SDLActivity.mSurface, null);
+            EGLSurface surface = egl.eglCreateWindowSurface(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLConfig, SDLActivity.mSingleton.mSurface, null);
             if (surface == EGL10.EGL_NO_SURFACE) {
                 Log.e("SDL", "Couldn't create surface");
                 return false;
             }
 
-            if (!egl.eglMakeCurrent(SDLActivity.mEGLDisplay, surface, surface, SDLActivity.mEGLContext)) {
+            if (!egl.eglMakeCurrent(SDLActivity.mSingleton.mEGLDisplay, surface, surface, SDLActivity.mSingleton.mEGLContext)) {
                 Log.e("SDL", "Old EGL Context doesnt work, trying with a new one");
                 createEGLContext();
-                if (!egl.eglMakeCurrent(SDLActivity.mEGLDisplay, surface, surface, SDLActivity.mEGLContext)) {
+                if (!egl.eglMakeCurrent(SDLActivity.mSingleton.mEGLDisplay, surface, surface, SDLActivity.mSingleton.mEGLContext)) {
                     Log.e("SDL", "Failed making EGL Context current");
                     return false;
                 }
             }
-            SDLActivity.mEGLSurface = surface;
+            SDLActivity.mSingleton.mEGLSurface = surface;
             return true;
         }
         return false;
@@ -274,7 +290,7 @@ public class SDLActivity extends Activity {
 
             egl.eglWaitGL();
 
-            egl.eglSwapBuffers(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface);
+            egl.eglSwapBuffers(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLSurface);
 
 
         } catch(Exception e) {
@@ -392,26 +408,27 @@ class SDLMain implements Runnable {
         SDLActivity.nativeInit();
 
         //Log.v("SDL", "SDL thread terminated");
+        SDLActivity.finishActivity();
     }
 }
 
 
 /**
     SDLSurface. This is what we draw on, so we need to know when it's created
-    in order to do anything useful. 
+    in order to do anything useful.
 
     Because of this, that's where we set up the SDL thread
 */
-class SDLSurface extends SurfaceView implements SurfaceHolder.Callback, 
+class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
 
     // Sensors
     private static SensorManager mSensorManager;
 
-    // Startup    
+    // Startup
     public SDLSurface(Context context) {
         super(context);
-        getHolder().addCallback(this); 
+        getHolder().addCallback(this);
     
         setFocusable(true);
         setFocusableInTouchMode(true);

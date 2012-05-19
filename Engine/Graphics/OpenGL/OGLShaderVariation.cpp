@@ -111,6 +111,10 @@ bool ShaderVariation::Create()
     if (!defines_.Empty())
         defines += "\n";
     
+    #ifdef GL_ES_VERSION_2_0
+    defines += "precision medp float;\n";
+    #endif
+    
     shaderCode = version + defines + shaderCode;
     
     const char* shaderCStr = shaderCode.CString();

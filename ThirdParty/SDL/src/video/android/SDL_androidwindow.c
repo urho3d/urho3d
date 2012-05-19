@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -30,10 +33,13 @@
 int
 Android_CreateWindow(_THIS, SDL_Window * window)
 {
+    // Urho3D: this is a static variable that may not be cleared between runs of the program. Skip the check
+    /*
     if (Android_Window) {
         SDL_SetError("Android only supports one window");
         return -1;
     }
+    */
     Android_Window = window;
 
     /* Adjust the window data to match the screen */

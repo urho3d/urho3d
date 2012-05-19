@@ -28,11 +28,11 @@
 
 /**
  *  \file SDL_main.h
- *  
+ *
  *  Redefine main() on some platforms so that it is called by SDL.
  */
 
-#if defined(__WIN32__) || defined(__IPHONEOS__) || defined(__ANDROID__)
+#if defined(__IPHONEOS__) || defined(__ANDROID__)
 #ifndef SDL_MAIN_HANDLED
 #define SDL_MAIN_NEEDED
 #endif
@@ -60,11 +60,9 @@
  */
 
 // Urho3D: commented out
-/*
 #ifdef SDL_MAIN_NEEDED
 #define main	SDL_main
 #endif
-*/
 
 /**
  *  The prototype for the application's main() function

@@ -31,6 +31,10 @@
 #include <cstdio>
 #include <ctime>
 
+#ifdef ANDROID
+#include <android/log.h>
+#endif
+
 #include "DebugNew.h"
 
 static const String levelPrefixes[] =
@@ -60,6 +64,7 @@ Log::~Log()
 
 void Log::Open(const String& fileName)
 {
+    #ifndef ANDROID
     if (fileName.Empty())
         return;
     
@@ -71,6 +76,7 @@ void Log::Open(const String& fileName)
         logFile_.Reset();
         Write(LOG_ERROR, "Failed to create log file " + fileName);
     }
+    #endif
 }
 
 void Log::Write(int level, const String& message)
@@ -92,7 +98,12 @@ void Log::Write(int level, const String& message)
     String dateTimeString = String(dateTime).Replaced("\n", "");
     String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
+    #ifndef ANDROID
     PrintUnicodeLine(formattedMessage);
+    #else
+    /// \todo Use proper log levels
+    __android_log_print(ANDROID_LOG_INFO, "Urho3D", formattedMessage.CString());
+    #endif
     
     if (logFile_)
         logFile_->WriteLine(formattedMessage);
@@ -115,7 +126,11 @@ void Log::WriteRaw(const String& message)
     inWrite_ = true;
     lastMessage_ = message;
     
+    #ifndef ANDROID
     PrintUnicode(message);
+    #else
+    __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
+    #endif
     
     if (logFile_)
     {
