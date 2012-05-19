@@ -2159,9 +2159,6 @@ void Graphics::ResetCachedState()
     pixelShader_ = 0;
     shaderProgram_ = 0;
     blendMode_ = BLEND_REPLACE;
-    alphaTest_ = false;
-    alphaTestMode_ = CMP_ALWAYS;
-    alphaRef_ = 0.0f;
     textureAnisotropy_ = 1;
     colorWrite_ = true;
     cullMode_ = CULL_NONE;
