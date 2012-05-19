@@ -97,7 +97,7 @@ void Geometry::SetIndexBuffer(IndexBuffer* buffer)
     indexBuffer_ = buffer;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool GetUsedVertexRange)
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange)
 {
     if (!indexBuffer_)
     {
@@ -118,7 +118,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     vertexStart_ = 0;
     vertexCount_ = vertexBuffers_[0]->GetVertexCount();
     
-    if (GetUsedVertexRange)
+    if (getUsedVertexRange)
         indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
     
     return true;

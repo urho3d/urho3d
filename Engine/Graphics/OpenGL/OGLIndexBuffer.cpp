@@ -258,6 +258,10 @@ void IndexBuffer::ClearDataLost()
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
+    #ifdef GL_ES_VERSION_2_0
+    return false;
+    #endif
+    
     void* data = Lock(start, count, LOCK_READONLY);
     if (!data)
         return false;

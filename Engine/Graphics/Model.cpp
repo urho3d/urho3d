@@ -299,6 +299,7 @@ bool Model::Save(Serializer& dest)
         dest.WriteUInt(buffer->GetElementMask());
         dest.WriteUInt(buffer->GetMorphRangeStart());
         dest.WriteUInt(buffer->GetMorphRangeCount());
+        /// \todo Will not work on OpenGL ES
         void* data = buffer->Lock(0, buffer->GetVertexCount(), LOCK_READONLY);
         if (!data)
             return false;
@@ -312,6 +313,7 @@ bool Model::Save(Serializer& dest)
         IndexBuffer* buffer = indexBuffers[i];
         dest.WriteUInt(buffer->GetIndexCount());
         dest.WriteUInt(buffer->GetIndexSize());
+        /// \todo Will not work on OpenGL ES
         void* data = buffer->Lock(0, buffer->GetIndexCount(), LOCK_READONLY);
         if (!data)
             return false;

@@ -913,6 +913,7 @@ void AnimatedModel::CloneGeometries()
         {
             SharedPtr<VertexBuffer> clone(new VertexBuffer(context_));
             clone->SetSize(original->GetVertexCount(), original->GetElementMask(), true);
+            /// \todo Will not work on OpenGL ES
             void* originalData = original->Lock(0, original->GetVertexCount(), LOCK_READONLY);
             if (originalData)
             {

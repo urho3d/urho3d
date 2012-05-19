@@ -50,7 +50,7 @@ public:
     /// %Set the index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
     /// %Set the draw range.
-    bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool GetUsedVertexRange = true);
+    bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true);
     /// %Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// %Set the LOD distance.
