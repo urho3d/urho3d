@@ -407,9 +407,9 @@ void Graphics::EndFrame()
 {
     if (!IsInitialized())
         return;
- 
+    
     PROFILE(Present);
-       
+    
     SendEvent(E_ENDRENDERING);
     
     SDL_GL_SwapWindow(impl_->window_);
@@ -425,7 +425,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     
     bool oldColorWrite = colorWrite_;
     bool oldDepthWrite = depthWrite_;
-
+    
     if (flags & CLEAR_COLOR && !oldColorWrite)
         SetColorWrite(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
@@ -922,7 +922,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 
             case GL_FLOAT_MAT4:
                 #ifndef GL_ES_VERSION_2_0
-                glUniformMatrix4fv(info->location_, count / 4, GL_TRUE, data);
+                glUniformMatrix4fv(info->location_, count / 16, GL_TRUE, data);
                 #else
                 {
                     for (unsigned i = 0; i < count; i += 16)
