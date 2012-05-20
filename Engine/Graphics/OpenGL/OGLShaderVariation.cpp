@@ -115,7 +115,6 @@ bool ShaderVariation::Create()
     if (shaderType_ == PS)
     {
         defines += "precision mediump float;\n";
-        shaderCode.Replace("sampler2DShadow", "sampler2D");
     }
     #endif
     

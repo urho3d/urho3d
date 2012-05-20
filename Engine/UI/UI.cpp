@@ -266,7 +266,6 @@ void UI::Render()
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
-    graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
     

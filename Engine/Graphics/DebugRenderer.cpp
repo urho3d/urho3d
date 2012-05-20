@@ -402,7 +402,6 @@ void DebugRenderer::Render()
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
     graphics->SetDepthWrite(true);
-    graphics->SetFillMode(FILL_SOLID);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(renderer->GetVertexShader("Basic_VCol"), renderer->GetPixelShader("Basic_VCol"));

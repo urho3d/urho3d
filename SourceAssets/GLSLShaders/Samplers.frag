@@ -6,16 +6,18 @@ uniform sampler2D sEmissiveMap;
 uniform sampler2D sDetailMap;
 uniform sampler2D sEnvMap;
 uniform samplerCube sEnvCubeMap;
-uniform sampler2DShadow sShadowMap;
 uniform sampler2D sLightRampMap;
 uniform sampler2D sLightSpotMap;
 uniform samplerCube sLightCubeMap;
-uniform samplerCube sFaceSelectCubeMap;
-uniform samplerCube sIndirectionCubeMap;
 uniform sampler2D sAlbedoBuffer;
 uniform sampler2D sNormalBuffer;
 uniform sampler2D sDepthBuffer;
 uniform sampler2D sLightBuffer;
+#ifndef GL_ES
+uniform sampler2DShadow sShadowMap;
+uniform samplerCube sFaceSelectCubeMap;
+uniform samplerCube sIndirectionCubeMap;
+#endif
 
 vec3 DecodeNormal(vec4 normalInput)
 {

@@ -651,7 +651,6 @@ void Renderer::Render()
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
         graphics_->SetDepthWrite(true);
-        graphics_->SetFillMode(FILL_SOLID);
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();

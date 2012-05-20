@@ -446,11 +446,13 @@ void View::Render()
         camera_->SetAspectRatio((float)(viewSize_.x_) / (float)(viewSize_.y_));
     
     graphics_->SetColorWrite(true);
-    graphics_->SetFillMode(FILL_SOLID);
     
     // Bind the face selection and indirection cube maps for point light shadows
-    graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
-    graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
+    if (renderer_->GetDrawShadows())
+    {
+        graphics_->SetTexture(TU_FACESELECT, renderer_->GetFaceSelectCubeMap());
+        graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
+    }
     
     // Set "view texture" to prevent destination texture sampling in case we do not render to the destination directly
     // ie. when using deferred rendering and/or doing post-processing

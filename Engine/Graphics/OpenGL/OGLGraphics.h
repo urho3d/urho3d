@@ -186,8 +186,6 @@ public:
     void SetDepthTest(CompareMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// Set polygon fill mode.
-    void SetFillMode(FillMode mode);
     /// Set scissor test.
     void SetScissorTest(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     /// Set scissor test.
@@ -295,8 +293,6 @@ public:
     CompareMode GetDepthTest() const { return depthTestMode_; }
     /// Return whether depth write is enabled.
     bool GetDepthWrite() const { return depthWrite_; }
-    /// Return polygon fill mode.
-    FillMode GetFillMode() const { return fillMode_; }
     /// Return whether stencil test is enabled.
     bool GetStencilTest() const { return stencilTest_; }
     /// Return whether scissor test is enabled.
@@ -450,8 +446,6 @@ private:
     CompareMode depthTestMode_;
     /// Depth write enable flag.
     bool depthWrite_;
-    /// Polygon fill mode.
-    FillMode fillMode_;
     /// Scissor test rectangle.
     IntRect scissorRect_;
     /// Scissor test enable flag.

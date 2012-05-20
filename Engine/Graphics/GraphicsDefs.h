@@ -86,13 +86,6 @@ enum CullMode
     MAX_CULLMODES
 };
 
-/// Fill mode.
-enum FillMode
-{
-    FILL_SOLID = 0,
-    FILL_WIREFRAME
-};
-
 /// Stencil operation.
 enum StencilOp
 {
@@ -256,10 +249,10 @@ enum TextureUnit
     TU_DETAIL = 4,
     TU_ENVIRONMENT = 5,
     MAX_MATERIAL_TEXTURE_UNITS = 6,
-    TU_SHADOWMAP = 6,
-    TU_LIGHTRAMP = 7,
-    TU_LIGHTBUFFER = 7,
-    TU_LIGHTSHAPE = 8,
+    TU_LIGHTRAMP = 6,
+    TU_LIGHTBUFFER = 6,
+    TU_LIGHTSHAPE = 7,
+    TU_SHADOWMAP = 8,
     TU_FACESELECT = 9,
     TU_INDIRECTION = 10,
     MAX_TEXTURE_UNITS = 16

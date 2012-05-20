@@ -1140,7 +1140,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (impl_->activeTexture_ != index)
         {
+            glGetError();
             glActiveTexture(GL_TEXTURE0 + index);
+            int error = glGetError();
+            if (error)
+                LOGERROR("Activetexture unit " + String(index) + " error " + String(error));
+            
             impl_->activeTexture_ = index;
         }
         
@@ -1175,7 +1180,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         {
             if (impl_->activeTexture_ != index)
             {
+                glGetError();
                 glActiveTexture(GL_TEXTURE0 + index);
+                int error = glGetError();
+                if (error)
+                    LOGERROR("Activetexture unit " + String(index) + " error " + String(error));
+                
                 impl_->activeTexture_ = index;
             }
             
@@ -1421,18 +1431,10 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
             float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             
             glEnable(GL_POLYGON_OFFSET_FILL);
-            #ifndef GL_ES_VERSION_2_0
-            glEnable(GL_POLYGON_OFFSET_LINE);
-            #endif
             glPolygonOffset(adjustedSlopeScaledBias, adjustedConstantBias);
         }
         else
-        {
             glDisable(GL_POLYGON_OFFSET_FILL);
-            #ifndef GL_ES_VERSION_2_0
-            glDisable(GL_POLYGON_OFFSET_LINE);
-            #endif
-        }
         
         constantDepthBias_ = constantBias;
         slopeScaledDepthBias_ = slopeScaledBias;
@@ -1454,17 +1456,6 @@ void Graphics::SetDepthWrite(bool enable)
     {
         glDepthMask(enable ? GL_TRUE : GL_FALSE);
         depthWrite_ = enable;
-    }
-}
-
-void Graphics::SetFillMode(FillMode mode)
-{
-    if (mode != fillMode_)
-    {
-        #ifndef GL_ES_VERSION_2_0
-        glPolygonMode(GL_FRONT_AND_BACK, mode == FILL_SOLID ? GL_FILL : GL_LINE);
-        #endif
-        fillMode_ = mode;
     }
 }
 
@@ -2204,7 +2195,6 @@ void Graphics::ResetCachedState()
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_ALWAYS;
     depthWrite_ = true;
-    fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
