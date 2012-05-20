@@ -812,6 +812,12 @@
 			#define AS_ARM
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define AS_ALIGN
+			
+			// Urho3D: correct complex mask
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 		#endif
 
 	// Haiku OS
