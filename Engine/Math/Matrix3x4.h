@@ -88,7 +88,7 @@ public:
     }
     
     /// Construct from a float array.
-    Matrix3x4(float* data) :
+    Matrix3x4(const float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),

@@ -102,7 +102,7 @@ public:
     }
     
     /// Construct from a float array.
-    Matrix4(float* data) :
+    Matrix4(const float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
