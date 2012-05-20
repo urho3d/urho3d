@@ -318,6 +318,21 @@ String GetConsoleInput()
     return ret;
 }
 
+String GetPlatform()
+{
+    #if defined(WIN32)
+    return "Windows";
+    #elif defined(__APPLE__)
+    return "Mac OS X";
+    #elif defined(ANDROID)
+    return "Android";
+    #elif defined(__linux__)
+    return "Linux";
+    #else
+    return String();
+    #endif
+}
+
 unsigned GetNumPhysicalCPUs()
 {
     #ifndef ANDROID

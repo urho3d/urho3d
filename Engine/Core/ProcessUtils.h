@@ -55,6 +55,8 @@ const Vector<String>& ParseArguments(int argc, char** argv);
 const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 String GetConsoleInput();
+/// Return the runtime platform identifier. Currently either "Windows", "Linux", "Mac OS X" or "Android".
+String GetPlatform();
 /// Return the number of physical CPU cores.
 unsigned GetNumPhysicalCPUs();
 /// Return the number of logical CPUs (different from physical if hyperthreading is used.)
