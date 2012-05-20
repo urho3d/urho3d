@@ -83,7 +83,7 @@ public class SDLActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.v("SDL", "onDestroy()");
-        
+
         mFinished = true;
 
         // Send a quit message to the application
@@ -182,6 +182,7 @@ public class SDLActivity extends Activity {
 
     // EGL functions
     public static boolean initEGL(int majorVersion, int minorVersion) {
+
         if (SDLActivity.mSingleton.mEGLDisplay == null) {
             //Log.v("SDL", "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
 

@@ -112,7 +112,11 @@ bool ShaderVariation::Create()
         defines += "\n";
     
     #ifdef GL_ES_VERSION_2_0
-    defines += "precision medp float;\n";
+    if (shaderType_ == PS)
+    {
+        defines += "precision mediump float;\n";
+        shaderCode.Replace("sampler2DShadow", "sampler2D");
+    }
     #endif
     
     shaderCode = version + defines + shaderCode;
@@ -128,7 +132,8 @@ bool ShaderVariation::Create()
     {
         glGetShaderiv(object_, GL_INFO_LOG_LENGTH, &length);
         compilerOutput_.Resize(length);
-        glGetShaderInfoLog(object_, length, &length, &compilerOutput_[0]);
+        int outLength;
+        glGetShaderInfoLog(object_, length, &outLength, &compilerOutput_[0]);
     }
     else
         compilerOutput_.Clear();

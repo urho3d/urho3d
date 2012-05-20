@@ -57,7 +57,7 @@
 #include "DebugNew.h"
 
 #ifdef GL_ES_VERSION_2_0
-#define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT16
+#define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
 #define GL_FRAMEBUFFER_EXT GL_FRAMEBUFFER
 #define GL_RENDERBUFFER_EXT GL_RENDERBUFFER
 #define GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT0
@@ -237,6 +237,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         
         if (multiSample > 1)
         {
@@ -1886,8 +1888,12 @@ void Graphics::CheckFeatureSupport()
     int numSupportedRTs = 1;
     #ifndef GL_ES_VERSION_2_0
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+    #else
+    // For now disable shadow mapping on OpenGL ES
+    shadowMapFormat_ = 0;
+    hiresShadowMapFormat_ = 0;
     #endif
-
+    
     // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
     String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
     if (vendorString.Find("NVIDIA") != String::NPOS)
