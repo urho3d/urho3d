@@ -19,6 +19,7 @@ import android.text.*;
 import android.media.*;
 import android.hardware.*;
 import android.content.*;
+import android.content.res.*;
 
 import java.lang.*;
 
@@ -55,7 +56,7 @@ public class SDLActivity extends Activity {
 
     // Setup
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.v("SDL", "onCreate()");
+        Log.v("SDL", "onCreate()");
         super.onCreate(savedInstanceState);
 
         // So we can call stuff from static callbacks
@@ -102,6 +103,10 @@ public class SDLActivity extends Activity {
         }
 
         mSingleton = null;
+    }
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     // Messages from the SDLMain thread
