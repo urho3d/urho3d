@@ -25,6 +25,7 @@
 #include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
+#include "Log.h"
 #include "Material.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -173,11 +174,11 @@ void Texture::UpdateParameters()
         break;
     }
     
+    #ifndef GL_ES_VERSION_2_0
     // Anisotropy
     glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode_ == FILTER_ANISOTROPIC ?
         (float)graphics_->GetTextureAnisotropy() : 1.0f);
     
-    #ifndef GL_ES_VERSION_2_0
     // Shadow compare
     if (shadowCompare_)
     {

@@ -1140,12 +1140,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (impl_->activeTexture_ != index)
         {
-            glGetError();
             glActiveTexture(GL_TEXTURE0 + index);
-            int error = glGetError();
-            if (error)
-                LOGERROR("Activetexture unit " + String(index) + " error " + String(error));
-            
             impl_->activeTexture_ = index;
         }
         
@@ -1180,12 +1175,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         {
             if (impl_->activeTexture_ != index)
             {
-                glGetError();
                 glActiveTexture(GL_TEXTURE0 + index);
-                int error = glGetError();
-                if (error)
-                    LOGERROR("Activetexture unit " + String(index) + " error " + String(error));
-                
                 impl_->activeTexture_ = index;
             }
             

@@ -209,6 +209,7 @@ public class SDLActivity extends Activity {
                 }
                 int[] configSpec = {
                     EGL10.EGL_DEPTH_SIZE, 16,
+                    EGL10.EGL_STENCIL_SIZE, 8,
                     EGL10.EGL_RENDERABLE_TYPE, renderableType,
                     EGL10.EGL_NONE
                 };

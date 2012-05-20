@@ -1690,56 +1690,61 @@ void Renderer::CreateGeometries()
     pointLightGeometry_->SetIndexBuffer(plib);
     pointLightGeometry_->SetDrawRange(TRIANGLE_LIST, 0, plib->GetIndexCount());
     
-    faceSelectCubeMap_ = new TextureCube(context_);
-    faceSelectCubeMap_->SetNumLevels(1);
-    faceSelectCubeMap_->SetSize(1, graphics_->GetRGBAFormat());
-    faceSelectCubeMap_->SetFilterMode(FILTER_NEAREST);
-    
-    unsigned char data[256 * 256 * 4];
-    
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    #if !defined(USE_OPENGL) || !defined(GL_ES_VERSION_2_0)
+    if (graphics_->GetShadowMapFormat())
     {
-        unsigned axis = i / 2;
-        data[0] = (axis == 0) ? 255 : 0;
-        data[1] = (axis == 1) ? 255 : 0;
-        data[2] = (axis == 2) ? 255 : 0;
-        data[3] = 0;
-        faceSelectCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 1, 1, data);
-    }
-    
-    indirectionCubeMap_ = new TextureCube(context_);
-    indirectionCubeMap_->SetNumLevels(1);
-    indirectionCubeMap_->SetSize(256, graphics_->GetRGBAFormat());
-    indirectionCubeMap_->SetFilterMode(FILTER_BILINEAR);
-    indirectionCubeMap_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
-    indirectionCubeMap_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
-    indirectionCubeMap_->SetAddressMode(COORD_W, ADDRESS_CLAMP);
-    
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-    {
-        unsigned char faceX = (i & 1) * 255;
-        unsigned char faceY = (i / 2) * 255 / 3;
-        unsigned char* dest = data;
-        for (unsigned y = 0; y < 256; ++y)
+        faceSelectCubeMap_ = new TextureCube(context_);
+        faceSelectCubeMap_->SetNumLevels(1);
+        faceSelectCubeMap_->SetSize(1, graphics_->GetRGBAFormat());
+        faceSelectCubeMap_->SetFilterMode(FILTER_NEAREST);
+        
+        unsigned char data[256 * 256 * 4];
+        
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            for (unsigned x = 0; x < 256; ++x)
-            {
-                #ifdef USE_OPENGL
-                *dest++ = x;
-                *dest++ = 255 - y;
-                *dest++ = faceX;
-                *dest++ = 255 * 2 / 3 - faceY;
-                #else
-                *dest++ = x;
-                *dest++ = y;
-                *dest++ = faceX;
-                *dest++ = faceY;
-                #endif
-            }
+            unsigned axis = i / 2;
+            data[0] = (axis == 0) ? 255 : 0;
+            data[1] = (axis == 1) ? 255 : 0;
+            data[2] = (axis == 2) ? 255 : 0;
+            data[3] = 0;
+            faceSelectCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 1, 1, data);
         }
         
-        indirectionCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 256, 256, data);
+        indirectionCubeMap_ = new TextureCube(context_);
+        indirectionCubeMap_->SetNumLevels(1);
+        indirectionCubeMap_->SetSize(256, graphics_->GetRGBAFormat());
+        indirectionCubeMap_->SetFilterMode(FILTER_BILINEAR);
+        indirectionCubeMap_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+        indirectionCubeMap_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+        indirectionCubeMap_->SetAddressMode(COORD_W, ADDRESS_CLAMP);
+        
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            unsigned char faceX = (i & 1) * 255;
+            unsigned char faceY = (i / 2) * 255 / 3;
+            unsigned char* dest = data;
+            for (unsigned y = 0; y < 256; ++y)
+            {
+                for (unsigned x = 0; x < 256; ++x)
+                {
+                    #ifdef USE_OPENGL
+                    *dest++ = x;
+                    *dest++ = 255 - y;
+                    *dest++ = faceX;
+                    *dest++ = 255 * 2 / 3 - faceY;
+                    #else
+                    *dest++ = x;
+                    *dest++ = y;
+                    *dest++ = faceX;
+                    *dest++ = faceY;
+                    #endif
+                }
+            }
+            
+            indirectionCubeMap_->SetData((CubeMapFace)i, 0, 0, 0, 256, 256, data);
+        }
     }
+    #endif
 }
 
 void Renderer::CreateInstancingBuffer()
