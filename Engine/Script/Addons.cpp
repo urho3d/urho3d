@@ -1022,7 +1022,8 @@ static void ConstructStringUInt(unsigned value, String* ptr)
     new(ptr) String(value);
 }
 
-static void ConstructStringFloat(float value, String* ptr)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static void ConstructStringFloat(String* ptr, float value)
 {
     new(ptr) String(value);
 }
@@ -1076,24 +1077,28 @@ static String StringAddUIntReverse(unsigned value, const String& str)
     return String(value) + str;
 }
 
-static String& StringAssignFloat(float value, String& str)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static String& StringAssignFloat(String& str, float value)
 {
     str = String(value);
     return str;
 }
 
-static String& StringAddAssignFloat(float value, String& str)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static String& StringAddAssignFloat(String& str, float value)
 {
     str += String(value);
     return str;
 }
 
-static String StringAddFloat(float value, const String& str)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static String StringAddFloat(const String& str, float value)
 {
     return str + String(value);
 }
 
-static String StringAddFloatReverse(float value, const String& str)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static String StringAddFloatReverse(const String& str, float value)
 {
     return String(value) + str;
 }
@@ -1171,7 +1176,7 @@ void RegisterString(asIScriptEngine *engine)
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructStringUInt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructStringFloat), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructStringFloat), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructStringBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String& opAssign(int)", asFUNCTION(StringAssignInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String& opAddAssign(int)", asFUNCTION(StringAddAssignInt), asCALL_CDECL_OBJLAST);
@@ -1181,10 +1186,10 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String& opAddAssign(uint)", asFUNCTION(StringAddAssignUInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(uint) const", asFUNCTION(StringAddUInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(uint) const", asFUNCTION(StringAddUIntReverse), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String& opAssign(float)", asFUNCTION(StringAssignFloat), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String& opAddAssign(float)", asFUNCTION(StringAddAssignFloat), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String opAdd(float) const", asFUNCTION(StringAddFloat), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String opAdd_r(float) const", asFUNCTION(StringAddFloatReverse), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "String& opAssign(float)", asFUNCTION(StringAssignFloat), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String& opAddAssign(float)", asFUNCTION(StringAddAssignFloat), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String opAdd(float) const", asFUNCTION(StringAddFloat), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String opAdd_r(float) const", asFUNCTION(StringAddFloatReverse), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "String& opAssign(bool)", asFUNCTION(StringAssignBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String& opAddAssign(bool)", asFUNCTION(StringAddAssignBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(bool) const", asFUNCTION(StringAddBool), asCALL_CDECL_OBJLAST);

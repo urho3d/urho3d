@@ -432,7 +432,7 @@ bool Texture2D::Create()
     if (externalFormat == GL_DEPTH_COMPONENT)
         glGetTexLevelParameteriv(target_, 0, GL_TEXTURE_DEPTH_SIZE, &depthBits_);
     #else
-    depthBits_ = 16;
+    depthBits_ = 24;
     #endif
     
     // Set mipmapping

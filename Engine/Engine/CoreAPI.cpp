@@ -222,7 +222,8 @@ static void ConstructVariantBool(bool value, Variant* ptr)
     new(ptr) Variant(value);
 }
 
-static void ConstructVariantFloat(float value, Variant* ptr)
+// Workaround for asCALL_CDECL_OBJLAST trashing the first float parameter on Android
+static void ConstructVariantFloat(Variant* ptr, float value)
 {
     new(ptr) Variant(value);
 }
@@ -426,7 +427,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructVariantStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash&in)", asFUNCTION(ConstructVariantShortStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructVariantBool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructVariantFloat), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructVariantFloat), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(ConstructVariantVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructVariantVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(ConstructVariantVector4), asCALL_CDECL_OBJLAST);
