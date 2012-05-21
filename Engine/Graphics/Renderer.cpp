@@ -844,8 +844,8 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     SharedPtr<Texture2D> newShadowMap(new Texture2D(context_));
     int retries = 3;
     
+    // OpenGL: create shadow map only. Color rendertarget is not needed
     #ifdef USE_OPENGL
-    // Create shadow map only. Color rendertarget is not needed
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
@@ -856,13 +856,15 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
+            #ifndef GL_ES_VERSION_2_0
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
+            #endif
             newShadowMap->SetShadowCompare(true);
             break;
         }
     }
     #else
-    // Create shadow map and dummy color rendertarget
+    // Direct3D9: create shadow map and dummy color rendertarget
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))

@@ -289,7 +289,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
     engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
     engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
-    engine->RegisterEnumValue("TextureUnit", "TU_DETAIL", TU_DETAIL);
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     

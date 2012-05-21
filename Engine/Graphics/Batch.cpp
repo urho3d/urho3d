@@ -550,8 +550,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
             graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
         if (graphics->HasTextureUnit(TU_SPECULAR))
             graphics->SetTexture(TU_NORMAL, textures[TU_SPECULAR]);
-        if (graphics->HasTextureUnit(TU_DETAIL))
-            graphics->SetTexture(TU_DETAIL, textures[TU_DETAIL]);
         if (graphics->HasTextureUnit(TU_ENVIRONMENT))
             graphics->SetTexture(TU_ENVIRONMENT, textures[TU_ENVIRONMENT]);
     }

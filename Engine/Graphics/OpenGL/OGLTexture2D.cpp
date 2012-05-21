@@ -389,8 +389,15 @@ bool Texture2D::Create()
     if (!width_ || !height_)
         return false;
     
-    // For packed depth-stencil, create a renderbuffer instead of a texture if depth texture is not properly supported
+    unsigned externalFormat = GetExternalFormat(format_);
+    unsigned dataType = GetDataType(format_);
+    
+    // Create a renderbuffer instead of a texture if depth texture is not properly supported
+    #ifndef GL_ES_VERSION_2_0
     if (!graphics_->GetHardwareDepthSupport() && format_ == Graphics::GetDepthStencilFormat())
+    #else
+    if (!graphics_->GetHardwareDepthSupport() && externalFormat == GL_DEPTH_COMPONENT)
+    #endif
     {
         if (renderSurface_)
         {
@@ -408,11 +415,17 @@ bool Texture2D::Create()
     graphics_->SetTextureForUpdate(this);
     
     // If not compressed, create the initial level 0 texture with null data
-    unsigned externalFormat = GetExternalFormat(format_);
-    unsigned dataType = GetDataType(format_);
-    
+    bool success = true;
     if (!IsCompressed())
+    {
+        glGetError();
         glTexImage2D(target_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
+        if (glGetError())
+        {
+            LOGERROR("Failed to create texture");
+            success = false;
+        }
+    }
     
     // If depth format, get the depth size
     #ifndef GL_ES_VERSION_2_0
@@ -443,5 +456,5 @@ bool Texture2D::Create()
     UpdateParameters();
     graphics_->SetTexture(0, 0);
     
-    return true;
+    return success;
 }

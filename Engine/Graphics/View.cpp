@@ -1712,7 +1712,11 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     // If shadow distance non-zero, check it
     if (isShadowed && light->GetShadowDistance() > 0.0f && light->GetDistance() > light->GetShadowDistance())
         isShadowed = false;
-    
+    // OpenGL ES can not support point light shadows
+    #ifdef GL_ES_VERSION_2_0
+    if (isShadowed && type == LIGHT_POINT)
+        isShadowed = false;
+    #endif
     // Get lit geometries. They must match the light mask and be inside the main camera frustum to be considered
     PODVector<Drawable*>& tempDrawables = tempDrawables_[threadIndex];
     query.litGeometries_.Clear();

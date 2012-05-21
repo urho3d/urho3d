@@ -1887,7 +1887,7 @@ unsigned Graphics::GetDepthStencilFormat()
     #ifndef GL_ES_VERSION_2_0
     return GL_DEPTH24_STENCIL8_EXT;
     #else
-    return 0;
+    return GL_DEPTH_COMPONENT;
     #endif
 }
 
@@ -1897,15 +1897,11 @@ void Graphics::CheckFeatureSupport()
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     hardwareDepthSupport_ = false;
-
+    
     int numSupportedRTs = 1;
+    
     #ifndef GL_ES_VERSION_2_0
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
-    #else
-    // For now disable shadow mapping on OpenGL ES
-    shadowMapFormat_ = 0;
-    hiresShadowMapFormat_ = 0;
-    #endif
     
     // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
     String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
@@ -1939,6 +1935,19 @@ void Graphics::CheckFeatureSupport()
         if (numSupportedRTs >= 4)
             deferredSupport_ = true;
     }
+    #else
+    if (!CheckExtension("GL_OES_depth_texture"))
+    {
+        shadowMapFormat_ = 0;
+        hiresShadowMapFormat_ = 0;
+    }
+    else
+    {
+        shadowMapFormat_ = GL_DEPTH_COMPONENT;
+        hiresShadowMapFormat_ = GL_DEPTH_COMPONENT;
+        hardwareDepthSupport_ = true;
+    }
+    #endif
 }
 
 void Graphics::CommitFramebuffer()
@@ -2072,7 +2081,11 @@ void Graphics::CommitFramebuffer()
     {
         // Bind either a renderbuffer or a depth texture, depending on what is available
         Texture* texture = depthStencil_->GetParentTexture();
+        #ifndef GL_ES_VERSION_2_0
         bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
+        #else
+        bool hasStencil = false;
+        #endif
         unsigned renderBufferID = depthStencil_->GetRenderBuffer();
         if (!renderBufferID)
         {
@@ -2206,7 +2219,6 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
     textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
-    textureUnits_["DetailMap"] = TU_DETAIL;
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;
     textureUnits_["EnvironmentCubeMap"] = TU_ENVIRONMENT;
     textureUnits_["LightRampMap"] = TU_LIGHTRAMP;

@@ -3,7 +3,6 @@ uniform samplerCube sDiffCubeMap;
 uniform sampler2D sNormalMap;
 uniform sampler2D sSpecMap;
 uniform sampler2D sEmissiveMap;
-uniform sampler2D sDetailMap;
 uniform sampler2D sEnvMap;
 uniform samplerCube sEnvCubeMap;
 uniform sampler2D sLightRampMap;
@@ -17,6 +16,8 @@ uniform sampler2D sLightBuffer;
 uniform sampler2DShadow sShadowMap;
 uniform samplerCube sFaceSelectCubeMap;
 uniform samplerCube sIndirectionCubeMap;
+#else
+uniform sampler2D sShadowMap;
 #endif
 
 vec3 DecodeNormal(vec4 normalInput)

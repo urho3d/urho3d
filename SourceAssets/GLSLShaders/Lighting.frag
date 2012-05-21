@@ -47,16 +47,29 @@ float GetShadow(vec4 shadowPos)
         #else
             vec2 offsets = cShadowMapInvSize;
         #endif
-        vec4 inLight = vec4(
-            shadow2DProj(sShadowMap, shadowPos).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
-            shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
-        );
+        #ifndef GL_ES
+            vec4 inLight = vec4(
+                shadow2DProj(sShadowMap, shadowPos).r,
+                shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
+                shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
+                shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
+            );
+        #else
+            vec4 inLight = vec4(
+                texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
+            );
+        #endif
         return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
     #else
         // Take one sample
-        float inLight = shadow2DProj(sShadowMap, shadowPos).r;
+        #ifndef GL_ES
+            float inLight = shadow2DProj(sShadowMap, shadowPos).r;
+        #else
+            float inLight = texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z;
+        #endif
         return cShadowIntensity.y + cShadowIntensity.x * inLight;
     #endif
 }

@@ -246,16 +246,15 @@ enum TextureUnit
     TU_EMISSIVE = 2,
     TU_DEPTHBUFFER = 2,
     TU_SPECULAR = 3,
-    TU_DETAIL = 4,
-    TU_ENVIRONMENT = 5,
-    MAX_MATERIAL_TEXTURE_UNITS = 6,
-    TU_LIGHTRAMP = 6,
-    TU_LIGHTBUFFER = 6,
-    TU_LIGHTSHAPE = 7,
-    TU_SHADOWMAP = 8,
-    TU_FACESELECT = 9,
-    TU_INDIRECTION = 10,
-    MAX_TEXTURE_UNITS = 16
+    TU_ENVIRONMENT = 4,
+    MAX_MATERIAL_TEXTURE_UNITS = 5,
+    TU_LIGHTRAMP = 5,
+    TU_LIGHTBUFFER = 5,
+    TU_LIGHTSHAPE = 6,
+    TU_SHADOWMAP = 7,
+    TU_FACESELECT = 8,
+    TU_INDIRECTION = 9,
+    MAX_TEXTURE_UNITS = 10
 };
 
 /// Shader parameter groups for determining need to update.

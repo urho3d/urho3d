@@ -225,7 +225,7 @@ public:
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame.
     unsigned GetNumBatches() const { return numBatches_; }
-    /// Return dummy color texture format for shadow maps. Is always 0 on OpenGL.
+    /// Return dummy color texture format for shadow maps.
     unsigned GetDummyColorFormat() const { return 0; }
     /// Return shadow map depth texture format, or 0 if not supported.
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
@@ -237,7 +237,7 @@ public:
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
     bool GetDeferredSupport() const { return deferredSupport_; }
-    /// Return whether hardware depth texture is supported.
+    /// Return whether hardware depth texture is supported. On OpenGL ES this means the depth texture extension.
     bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }

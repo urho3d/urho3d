@@ -511,11 +511,19 @@ bool TextureCube::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
+    bool success = true;
     if (!IsCompressed())
     {
+        glGetError();
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
+            if (glGetError())
+                success = false;
+        }
     }
+    if (!success)
+        LOGERROR("Failed to create texture");
     
     // Set mipmapping
     levels_ = requestedLevels_;
@@ -538,5 +546,5 @@ bool TextureCube::Create()
     UpdateParameters();
     graphics_->SetTexture(0, 0);
     
-    return true;
+    return success;
 }

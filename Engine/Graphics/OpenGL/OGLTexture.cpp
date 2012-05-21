@@ -302,7 +302,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
     else
         return format;
     #else
-    if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
+    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
         return GL_DEPTH_COMPONENT;
     else
         return format;
@@ -315,8 +315,15 @@ unsigned Texture::GetDataType(unsigned format)
     if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_UNSIGNED_INT_24_8_EXT;
     else
-    #endif
         return GL_UNSIGNED_BYTE;
+    #else
+    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
+        return GL_UNSIGNED_INT;
+    else if (format == GL_DEPTH_COMPONENT16)
+        return GL_UNSIGNED_SHORT;
+    else
+        return GL_UNSIGNED_BYTE;
+    #endif
 }
 
 void Texture::LoadParameters()

@@ -139,7 +139,7 @@ bool ShaderProgram::Link()
             ShaderParameter newParam;
             newParam.location_ = location;
             newParam.type_ = type;
-            shaderParameters_[StringHash(paramName)] = newParam;    
+            shaderParameters_[StringHash(paramName)] = newParam;
         }
         else if (name[0] == 's')
         {
