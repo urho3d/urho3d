@@ -914,7 +914,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                     for (unsigned i = 0; i < count; i += 9)
                     {
                         Matrix3 matrix(&data[i]);
-                        glUniformMatrix3fv(info->location_ + i / 3, 1, GL_FALSE, matrix.Transpose().Data());
+                        glUniformMatrix3fv(info->location_ + i / 9, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
                 #endif
@@ -928,7 +928,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                     for (unsigned i = 0; i < count; i += 16)
                     {
                         Matrix4 matrix(&data[i]);
-                        glUniformMatrix3fv(info->location_ + i / 4, 1, GL_FALSE, matrix.Transpose().Data());
+                        glUniformMatrix4fv(info->location_ + i / 16, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
                 #endif
