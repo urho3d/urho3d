@@ -64,16 +64,18 @@ armFunc:
     ble     nomoreargs
 
     // Load the rest of the arguments onto the stack
-    sub     r7, r7, #4*4    // skip the 4 registers already loaded into r0-r3
-    sub     sp, sp, r7
-    mov     r8, r7
+    sub     r7, r7, #4*4      // skip the 4 registers already loaded into r0-r3
+    add     r8, r7, #4        // ensure 8-byte stack alignment
+    bic     r8, r8, #4
+    sub     sp, sp, r8
+    mov     r12, sp           // copy size != frame size, so store frame start sp
 stackargsloop:
     ldr     r5, [r6], #4
     str     r5, [sp], #4
     subs    r7, r7, #4
     bne     stackargsloop
+    mov     sp, r12
 nomoreargs:
-    sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
@@ -86,8 +88,7 @@ armFuncObjLast:
     mov     r8, #0
 
     mov     r0, r3          // objlast. might get overwritten
-    str     r3, [sp, #-4]!  // objlast again.
-    str     r3, [sp, #-4]!  // push object ptr twice to ensure 8-byte stack alignment needed by EABI
+    mov     r5, r3          // objlast to temp reg
 
     beq     nomoreargsarmFuncObjLast
 
@@ -96,36 +97,39 @@ armFuncObjLast:
     ldrge   r0, [r6],#4
     cmp     r7, #2*4
     ldrge   r1, [r6],#4
-    ldrlt   r1, [sp]    
+    movlt   r1, r5
     cmp     r7, #3*4
     ldrge   r2, [r6],#4
-    ldrlt   r2, [sp]
+    movlt   r2, r5
     cmp     r7, #4*4
     ldrge   r3, [r6],#4
-    ldrlt   r3, [sp]
-    ble     nomoreargsarmFuncObjLast
+    movlt   r3, r5
+    blt     nomoreargsarmFuncObjLast
 
     // Load the rest of the arguments onto the stack
     sub     r7, r7, #4*4    // skip the 4 registers already loaded into r0-r3
-    sub     sp, sp, r7
-    mov     r8, r7
+    add     r8, r7, #8      // account for the objlast pointer, ensure 8-byte stack alignment
+    bic     r8, r8, #4
+    str     r5, [sp,#-4]    // store the objlast on stack, twice in case we adjusted alignment
+    str     r5, [sp,#-8]
+    sub     sp, sp, r8      // adjust frame
+    cmp     r7, #0          // we may also have come here with no extra params
+    beq     nomoreargsarmFuncObjLast
+    mov     r12, sp         // copy size != frame size, so store frame start sp
 stackargslooparmFuncObjLast:
     ldr     r5, [r6], #4
     str     r5, [sp], #4
     subs    r7, r7, #4
     bne     stackargslooparmFuncObjLast
+    mov     sp, r12
 nomoreargsarmFuncObjLast:
-    sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
-    add     sp, sp, #8 // cleanup 2 copies of the object ptr
     ldmia   sp!, {r4-r8, pc}
 
 armFuncR0ObjLast:
     stmdb   sp!, {r4-r8, lr}
-    ldr     r7, [sp,#6*4]
-    str     r7, [sp,#-4]!
-    str     r7, [sp,#-4]! // push object ptr twice to ensure 8-byte stack alignment needed by EABI
+    ldr     r5, [sp,#6*4]   // objlast to temp reg
 
     mov     r6, r0  // arg table
     movs    r7, r1  // arg size (also set the condition code flags so that we detect if there are no arguments)
@@ -133,7 +137,7 @@ armFuncR0ObjLast:
     mov     r8, #0
 
     mov     r0, r3      // r0 explicitly set
-    ldr     r1, [sp]    // objlast.  might get overwritten
+    mov     r1, r5      // objlast.  might get overwritten
 
     beq     nomoreargsarmFuncR0ObjLast
 
@@ -142,26 +146,31 @@ armFuncR0ObjLast:
     ldrge   r1, [r6],#4
     cmp     r7, #2*4
     ldrge   r2, [r6],#4
-    ldrlt   r2, [sp]
+    movlt   r2, r5
     cmp     r7, #3*4
     ldrge   r3, [r6],#4
-    ldrlt   r3, [sp]
-    ble     nomoreargsarmFuncR0ObjLast
+    movlt   r3, r5
+    blt     nomoreargsarmFuncR0ObjLast
 
     // Load the rest of the arguments onto the stack
     sub     r7, r7, #3*4    // skip the 3 registers already loaded into r1-r3
-    sub     sp, sp, r7
-    mov     r8, r7
+    add     r8, r7, #8      // account for the objlast pointer, ensure 8-byte stack alignment
+    bic     r8, r8, #4
+    str     r5, [sp,#-4]    // store the objlast on stack, twice in case we adjusted alignment
+    str     r5, [sp,#-8]
+    sub     sp, sp, r8      // adjust frame
+    cmp     r7, #0          // we may also have come here with no extra params
+    beq     nomoreargsarmFuncR0ObjLast
+    mov     r12, sp         // copy size != frame size, so store frame start sp
 stackargslooparmFuncR0ObjLast:
     ldr     r5, [r6], #4
     str     r5, [sp], #4
     subs    r7, r7, #4
     bne     stackargslooparmFuncR0ObjLast
+    mov     sp, r12
 nomoreargsarmFuncR0ObjLast:
-    sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
-    add     sp, sp, #8 // cleanup 2 copies of the object ptr
     ldmia   sp!, {r4-r8, pc}
 
 
@@ -187,15 +196,17 @@ armFuncR0:
 
     // Load the rest of the arguments onto the stack
     sub     r7, r7, #3*4    // skip the 3 registers already loaded into r1-r3
-    sub     sp, sp, r7
-    mov     r8, r7
+    add     r8, r7, #4      // ensure 8-byte stack alignment
+    bic     r8, r8, #4
+    sub     sp, sp, r8
+    mov     r12, sp         // copy size != frame size, so store frame start sp
 stackargslooparmFuncR0:
     ldr     r5, [r6], #4
     str     r5, [sp], #4
     subs    r7, r7, #4
     bne     stackargslooparmFuncR0
+    mov     sp, r12
 nomoreargsarmFuncR0:
-    sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
@@ -222,15 +233,17 @@ armFuncR0R1:
 
     // Load the rest of the arguments onto the stack
     sub     r7, r7, #2*4    // skip the 2 registers already loaded into r2-r3
-    sub     sp, sp, r7
-    mov     r8, r7
+    add     r8, r7, #4      // ensure 8-byte stack alignment
+    bic     r8, r8, #4
+    sub     sp, sp, r8
+    mov     r12, sp         // copy size != frame size, so store frame start sp
 stackargslooparmFuncR0R1:
     ldr     r5, [r6], #4
     str     r5, [sp], #4
     subs    r7, r7, #4
     bne     stackargslooparmFuncR0R1
+    mov     sp, r12
 nomoreargsarmFuncR0R1:
-    sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
