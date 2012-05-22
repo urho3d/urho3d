@@ -28,6 +28,7 @@
   andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 // Assembly routines for the ARM call convention
 // Written by Fredrik Ehnbom in June 2009
@@ -86,6 +87,7 @@ armFuncObjLast:
 
     mov     r0, r3          // objlast. might get overwritten
     str     r3, [sp, #-4]!  // objlast again.
+    str     r3, [sp, #-4]!  // push object ptr twice to ensure 8-byte stack alignment needed by EABI
 
     beq     nomoreargsarmFuncObjLast
 
@@ -116,13 +118,14 @@ nomoreargsarmFuncObjLast:
     sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
-    add     sp, sp, #4
+    add     sp, sp, #8 // cleanup 2 copies of the object ptr
     ldmia   sp!, {r4-r8, pc}
 
 armFuncR0ObjLast:
     stmdb   sp!, {r4-r8, lr}
     ldr     r7, [sp,#6*4]
     str     r7, [sp,#-4]!
+    str     r7, [sp,#-4]! // push object ptr twice to ensure 8-byte stack alignment needed by EABI
 
     mov     r6, r0  // arg table
     movs    r7, r1  // arg size (also set the condition code flags so that we detect if there are no arguments)
@@ -158,7 +161,7 @@ nomoreargsarmFuncR0ObjLast:
     sub     sp, sp, r8
     blx     r4
     add     sp, sp, r8
-    add     sp, sp, #4
+    add     sp, sp, #8 // cleanup 2 copies of the object ptr
     ldmia   sp!, {r4-r8, pc}
 
 
