@@ -2155,7 +2155,6 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["SpecMap"] = TU_SPECULAR;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
-    textureUnits_["DetailMap"] = TU_DETAIL;
     textureUnits_["EnvironmentMap"] = TU_ENVIRONMENT;
     textureUnits_["EnvironmentCubeMap"] = TU_ENVIRONMENT;
     textureUnits_["LightRampMap"] = TU_LIGHTRAMP;
