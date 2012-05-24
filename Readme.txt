@@ -89,11 +89,14 @@ successfully:
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
 
+- For Android, the Android SDK and Android NDK need to be installed.
 
-Build process
--------------
 
-Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
+Desktop build process
+---------------------
+
+On desktop systems Urho3D uses CMake (http://www.cmake.org) to build. The
+process has two steps:
 
 1) Run CMake in the root directory with your preferred toolchain specified to
 generate the build files. You can use the batch files or shell scripts provided:
@@ -115,15 +118,33 @@ before building. Compiling Urho3D as 64-bit is not supported.
 After the build is complete, the programs can be run from the Bin directory.
 
 To run from the Visual Studio debugger, set the Urho3D project as the startup
-project, set it as a startup project and enter its relative path and filename 
-into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe. Additionally, 
-entering -w into Debugging -> Command Arguments is highly recommended. This 
-enables startup in windowed mode: without it running into an exception or 
+project, set it as a startup project and enter its relative path and filename
+into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe. Additionally,
+entering -w into Debugging -> Command Arguments is highly recommended. This
+enables startup in windowed mode: without it running into an exception or
 breakpoint will be obnoxious as the mouse cursor will likely be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
 following arguments: Scripts/TestScene.as -w
+
+
+Android build process
+---------------------
+
+First build Urho3D for desktop OpenGL to make sure the GLSL shaders are
+generated. Then copy the Data and CoreData directories to the Android/assets
+directory. Finally execute the following commands in the Android directory:
+
+android update project -p . (only needed on the first time)
+ndk-build
+ant debug (or ant release, but then you will have to sign the APK)
+
+The APK should now have been generated to the bin directory, from where you can
+install it to a device or emulator.
+
+Note that ndk-build builds Urho3D twice, once without hardware floating point
+instructions, and once with them.
 
 
 History

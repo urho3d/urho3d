@@ -12,7 +12,9 @@ Although all required third-party libraries are included as source code, there a
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary.
 
-\section Building_BuildProcess Build process
+- For Android, the Android SDK and Android NDK need to be installed.
+
+\section Building_Desktop Desktop build process
 
 Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
@@ -29,15 +31,30 @@ To run from the Visual Studio debugger, set the Urho3D project as the startup pr
 To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
 
 
+\section Building_Android Android build process
+
+First build Urho3D for desktop OpenGL to make sure the GLSL shaders are generated. Then copy the Data and CoreData directories to the Android/assets directory. Finally execute the following commands in the Android directory:
+
+- android update project -p . (only needed on the first time)
+- ndk-build
+- ant debug (or ant release, but then you will have to sign the APK)
+
+The APK should now have been generated to the bin directory, from where you can install it to a device or emulator.
+
+Note that ndk-build builds Urho3D twice, once without hardware floating point instructions, and once with them.
+
+
 \page Running Running Urho3D
 
-For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is required.
+For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is required. On Android OS version 2.2 or newer and OpenGL ES 2 support is required.
 
 The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
 
 Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
+
+On Android there are no command line options, so the Urho3D activity chooses to load the TestScene example. This can be changed from Urho3D.cpp.
 
 Currently, five example application scripts exist:
 

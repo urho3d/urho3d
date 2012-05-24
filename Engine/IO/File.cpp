@@ -48,12 +48,21 @@ static const char* openMode[] =
 };
 #endif
 
+#ifdef ANDROID
+static const unsigned READ_BUFFER_SIZE = 1024;
+#endif
+
 OBJECTTYPESTATIC(File);
 
 File::File(Context* context) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
+    #ifdef ANDROID
+    assetHandle_(0),
+    readBufferOffset_(0),
+    readBufferSize_(0),
+    #endif
     offset_(0),
     checksum_(0)
 {
@@ -63,6 +72,11 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
+    #ifdef ANDROID
+    assetHandle_(0),
+    readBufferOffset_(0),
+    readBufferSize_(0),
+    #endif
     offset_(0),
     checksum_(0)
 {
@@ -73,6 +87,11 @@ File::File(Context* context, PackageFile* package, const String& fileName) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
+    #ifdef ANDROID
+    assetHandle_(0),
+    readBufferOffset_(0),
+    readBufferSize_(0),
+    #endif
     offset_(0),
     checksum_(0)
 {
@@ -94,6 +113,37 @@ bool File::Open(const String& fileName, FileMode mode)
         LOGERROR("Access denied to " + fileName);
         return false;
     }
+    
+    #ifdef ANDROID
+    if (fileName.StartsWith("/apk/"))
+    {
+        if (mode != FILE_READ)
+        {
+            LOGERROR("Only read mode is supported for asset files");
+            return false;
+        }
+        
+        assetHandle_ = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
+        if (!assetHandle_)
+        {
+            LOGERROR("Could not open asset file " + fileName);
+            return false;
+        }
+        else
+        {
+            fileName_ = fileName;
+            mode_ = mode;
+            position_ = 0;
+            offset_ = 0;
+            checksum_ = 0;
+            size_ = assetHandle_->hidden.androidio.size;
+            readBuffer_ = new unsigned char[READ_BUFFER_SIZE];
+            readBufferOffset_ = 0;
+            readBufferSize_ = 0;
+            return true;
+        }
+    }
+    #endif
     
     #ifdef WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
@@ -160,16 +210,43 @@ unsigned File::Read(void* dest, unsigned size)
         return 0;
     }
     
+    if (size + position_ > size_)
+        size = size_ - position_;
+    if (!size)
+        return 0;
+    
+    #ifdef ANDROID
+    if (assetHandle_)
+    {
+        unsigned sizeLeft = size;
+        unsigned char* destPtr = (unsigned char*)dest;
+        
+        while (sizeLeft)
+        {
+            if (readBufferOffset_ >= readBufferSize_)
+            {
+                readBufferSize_ = Min((int)size_ - position_, (int)READ_BUFFER_SIZE);
+                readBufferOffset_ = 0;
+                SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
+            }
+            
+            unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
+            destPtr += copySize;
+            sizeLeft -= copySize;
+            readBufferOffset_ += copySize;
+            position_ += copySize;
+        }
+        
+        return size;
+    }
+    #endif
+    
     if (!handle_)
     {
         LOGERROR("File not open");
         return 0;
     }
-    
-    if (size + position_ > size_)
-        size = size_ - position_;
-    if (!size)
-        return 0;
     
     size_t ret = fread(dest, size, 1, (FILE*)handle_);
     if (ret != 1)
@@ -189,6 +266,17 @@ unsigned File::Seek(unsigned position)
     // Allow sparse seeks if writing
     if (mode_ == FILE_READ && position > size_)
         position = size_;
+    
+    #ifdef ANDROID
+    if (assetHandle_)
+    {
+        SDL_RWseek(assetHandle_, position, SEEK_SET);
+        position_ = position;
+        readBufferOffset_ = 0;
+        readBufferSize_ = 0;
+        return position_;
+    }
+    #endif
     
     if (!handle_)
     {
@@ -260,6 +348,15 @@ unsigned File::GetChecksum()
 
 void File::Close()
 {
+    #ifdef ANDROID
+    if (assetHandle_)
+    {
+        SDL_RWclose(assetHandle_);
+        assetHandle_ = 0;
+        readBuffer_.Reset();
+    }
+    #endif
+    
     if (handle_)
     {
         fclose((FILE*)handle_);

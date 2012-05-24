@@ -303,6 +303,20 @@ bool FileSystem::FileExists(const String& fileName)
     
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
     
+    #ifdef ANDROID
+    if (fixedName.StartsWith("/apk/"))
+    {
+        SDL_RWops* rwOps = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
+        if (rwOps)
+        {
+            SDL_RWclose(rwOps);
+            return true;
+        }
+        else
+            return false;
+    }
+    #endif
+    
     #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -322,6 +336,12 @@ bool FileSystem::DirExists(const String& pathName)
         return false;
     
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
+    
+    #ifdef ANDROID
+    /// \todo Actually check for existence, now true is always returned for directories within the APK
+    if (fixedName.StartsWith("/apk/"))
+        return true;
+    #endif
     
     #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -361,8 +381,9 @@ String FileSystem::GetProgramDir()
     _NSGetExecutablePath(exeName, &size);
     return GetPath(String(exeName));
     #elif defined(ANDROID)
-    /// \todo Hack, remove
-    return "/sdcard/";
+    // This is an internal directory specifier pointing to the assets in the .apk
+    // Files from this directory will be opened using special handling
+    return "/apk/";
     #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
