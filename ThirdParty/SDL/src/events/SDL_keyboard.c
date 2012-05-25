@@ -27,7 +27,6 @@
 #include "SDL_events_c.h"
 #include "../video/SDL_sysvideo.h"
 
-
 /* Global keyboard information */
 
 typedef struct SDL_Keyboard SDL_Keyboard;

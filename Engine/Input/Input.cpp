@@ -48,8 +48,22 @@ static HashMap<unsigned, Input*> inputInstances;
 /// Return the Input subsystem instance corresponding to an SDL window ID.
 Input* GetInputInstance(unsigned windowID)
 {
+    #ifndef ANDROID
     return windowID ? inputInstances[windowID] : 0;
+    #else
+    // On Android we support only a single instance of Urho3D in the process, and the window ID can not be relied on.
+    return inputInstances.Size() ? inputInstances.Begin()->second_ : 0;
+    #endif
 }
+
+/// Convert SDL keycode if necessary
+int ConvertSDLKeyCode(int keySym, int scanCode)
+{
+    if (scanCode == SDL_SCANCODE_AC_BACK)
+        return KEY_ESC;
+    else return SDL_toupper(keySym);
+}
+
 #else
 /// Convert the virtual key code & scan code if necessary. Return non-zero if key should be posted
 int ConvertKeyCode(unsigned wParam, unsigned lParam)
@@ -672,13 +686,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
         // Convert to uppercase to match Win32 virtual key codes
         input = GetInputInstance(evt.key.windowID);
         if (input)
-            input->SetKey(SDL_toupper(evt.key.keysym.sym), true);
+            input->SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), true);
         break;
         
     case SDL_KEYUP:
         input = GetInputInstance(evt.key.windowID);
         if (input)
-            input->SetKey(SDL_toupper(evt.key.keysym.sym), false);
+            input->SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), false);
         break;
         
     case SDL_TEXTINPUT:
