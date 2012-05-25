@@ -240,7 +240,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
             batches_[i].worldTransform_ = &worldTransform;
         }
     }
-    else
+    else if (batches_.Size() == 1)
     {
         batches_[0].distance_ = distance_;
         batches_[0].worldTransform_ = &worldTransform;
