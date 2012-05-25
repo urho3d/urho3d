@@ -133,15 +133,16 @@ Android build process
 ---------------------
 
 First build Urho3D for desktop OpenGL to make sure the GLSL shaders are
-generated. Then copy the Data and CoreData directories to the Android/assets
-directory. Finally execute the following commands in the Android directory:
+generated. Then copy Bin/Data and Bin/CoreData directories to the
+Android/assets directory. Finally execute the following commands in the 
+Android directory:
 
 android update project -p . (only needed on the first time)
 ndk-build
 ant debug (or ant release, but then you will have to sign the APK)
 
-The APK should now have been generated to the bin directory, from where you can
-install it to a device or emulator.
+The APK should now have been generated to the Android/bin directory, from where 
+you can install it on a device or an emulator.
 
 Note that ndk-build builds Urho3D twice, once without hardware floating point
 instructions, and once with them.
