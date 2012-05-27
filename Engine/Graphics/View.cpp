@@ -220,7 +220,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
         {
             drawable->MarkInView(view->frame_);
             
-            // For geometries, clear lights, find new zone if necessary and calculate view space Z range
+            // For geometries, clear lights and calculate view space Z range
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
