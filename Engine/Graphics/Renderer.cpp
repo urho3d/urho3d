@@ -1248,6 +1248,7 @@ void Renderer::OptimizeLightByScissor(Light* light, Camera* camera)
 
 void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
 {
+    #ifndef GL_ES_VERSION_2_0
     if (light)
     {
         LightType type = light->GetLightType();
@@ -1313,6 +1314,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
     }
     else
         graphics_->SetStencilTest(false);
+    #endif
 }
 
 const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)

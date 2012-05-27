@@ -778,7 +778,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         input = GetInputInstance(evt.tfinger.windowID);
         if (input)
         {
-            int touchID = (int)evt.tfinger.fingerId;
+            int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = input->touches_[touchID];
             state.touchID_ = touchID;
             state.delta_ = state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
@@ -801,7 +801,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         input = GetInputInstance(evt.tfinger.windowID);
         if (input)
         {
-            int touchID = (int)evt.tfinger.fingerId;
+            int touchID = evt.tfinger.fingerId & 0x7ffffff;
             input->touches_.Erase(touchID);
             
             using namespace TouchEnd;
@@ -819,7 +819,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         input = GetInputInstance(evt.tfinger.windowID);
         if (input)
         {
-            int touchID = (int)evt.tfinger.fingerId;
+            int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = input->touches_[touchID];
             state.touchID_ = touchID;
             state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,

@@ -44,9 +44,9 @@ float GetDepth(vec4 clipPos)
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
-vec3 GetBillboardPos(vec4 iPos, vec2 iSize)
+vec3 GetBillboardPos(vec4 iPos, vec2 iSize, mat4 modelMatrix)
 {
-    return vec3(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector);
+    return (modelMatrix * vec4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0)).xyz;
 }
 
 vec3 GetBillboardNormal()
@@ -63,7 +63,7 @@ vec3 GetBillboardNormal()
 vec3 GetWorldPos(mat4 modelMatrix)
 {
     #if defined(BILLBOARD)
-        return GetBillboardPos(iPos, iTexCoord2);
+        return GetBillboardPos(iPos, iTexCoord2, modelMatrix);
     #elif defined(SKINNED)
         return (iPos * modelMatrix).xyz;
     #else

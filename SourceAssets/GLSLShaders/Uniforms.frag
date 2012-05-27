@@ -1,3 +1,7 @@
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 uniform vec3 cAmbientColor;
 uniform vec2 cDepthReconstruct;
 uniform vec2 cFogParams;

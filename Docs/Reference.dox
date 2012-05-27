@@ -496,8 +496,6 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
 
-- On OpenGL vertex attribute bindings depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
-
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
 - On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.

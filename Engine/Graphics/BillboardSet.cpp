@@ -126,7 +126,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = 0.0f;
     
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &worldTransform;
+    batches_[0].worldTransform_ = &Matrix3x4::IDENTITY;
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)

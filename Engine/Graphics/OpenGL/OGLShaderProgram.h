@@ -65,8 +65,6 @@ public:
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
-    /// Return the vertex attribute bindings.
-    const int* GetAttributeLocations() const { return attributeLocations_; }
     /// Return whether successfully linked.
     bool IsLinked() const { return linked_; }
     /// Return linker output.
@@ -81,8 +79,6 @@ private:
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
-    /// Vertex attribute bindings.
-    int attributeLocations_[MAX_VERTEX_ELEMENTS];
     /// Shader link error string.
     String linkerOutput_;
     /// Linked flag.

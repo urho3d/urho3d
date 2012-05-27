@@ -84,7 +84,11 @@ void Start()
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
 
     if (touchEnabled)
+    {
+        SubscribeToEvent("TouchBegin", "HandleTouchBegin");
         SubscribeToEvent("TouchEnd", "HandleTouchEnd");
+    }
+
     if (singlePlayer)
         StartGame(null);
 }
@@ -406,9 +410,24 @@ void HandlePostRenderUpdate()
         gameScene.octree.DrawDebugGeometry(true);
 }
 
+void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+{
+    int touchID = eventData["TouchID"].GetInt();
+    IntVector2 pos(eventData["X"].GetInt(), eventData["Y"].GetInt());
+    UIElement@ element = ui.GetElementAt(pos, false);
+
+    if (element is moveButton)
+        moveTouchID = touchID;
+    else if (element is fireButton)
+        fireTouchID = touchID;
+    else
+        rotateTouchID = touchID;
+}
+
 void HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 {
     int touchID = eventData["TouchID"].GetInt();
+
     if (touchID == moveTouchID)
         moveTouchID = -1;
     if (touchID == rotateTouchID)
@@ -772,17 +791,15 @@ void UpdateControls()
             for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState touch = input.touches[i];
-                UIElement@ element = ui.GetElementAt(touch.position, false);
 
-                if (touch.touchID == rotateTouchID || (element !is moveButton && element !is fireButton))
+                if (touch.touchID == rotateTouchID)
                 {
-                    rotateTouchID = touch.touchID;
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
                     playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
                 }
-                else if (element is moveButton || touch.touchID == moveTouchID)
+                
+                if (touch.touchID == moveTouchID)
                 {
-                    moveTouchID = touch.touchID;
                     int relX = touch.position.x - touchButtonSize / 2;
                     int relY = touch.position.y - (graphics.height - touchButtonSize / 2);
                     if (relY < 0 && Abs(relX * 3 / 2) < Abs(relY))
@@ -794,12 +811,10 @@ void UpdateControls()
                     if (relX > 0 && Abs(relY * 3 / 2) < Abs(relX))
                         playerControls.Set(CTRL_RIGHT, true);
                 }
-                else if (element is fireButton)
-                {
-                    fireTouchID = touch.touchID;
-                    playerControls.Set(CTRL_FIRE, true);
-                }
             }
+            
+            if (fireTouchID >= 0)
+                playerControls.Set(CTRL_FIRE, true);
         }
 
         // For the triggered actions (fire & jump) check also for press, in case the FPS is low

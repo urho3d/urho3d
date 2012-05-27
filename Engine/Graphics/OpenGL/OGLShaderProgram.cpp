@@ -79,6 +79,17 @@ bool ShaderProgram::Link()
         return false;
     }
     
+    // Bind vertex attribute locations to ensure they are the same in all shaders
+    glBindAttribLocation(object_, 0, "iPos");
+    glBindAttribLocation(object_, 1, "iNormal");
+    glBindAttribLocation(object_, 2, "iColor");
+    glBindAttribLocation(object_, 3, "iTexCoord");
+    glBindAttribLocation(object_, 4, "iTexCoord2");
+    glBindAttribLocation(object_, 5, "iCubeTexCoord");
+    glBindAttribLocation(object_, 6, "iCubeTexCoord2");
+    glBindAttribLocation(object_, 7, "iTangent");
+    glBindAttribLocation(object_, 8, "iBlendWeights");
+    glBindAttribLocation(object_, 9, "iBlendIndices");
     glAttachShader(object_, vertexShader_->GetGPUObject());
     glAttachShader(object_, pixelShader_->GetGPUObject());
     glLinkProgram(object_);
@@ -109,12 +120,11 @@ bool ShaderProgram::Link()
     // Check for shader parameters and texture units
     for (int i = 0; i < uniformCount; ++i)
     {
-        int location;
         unsigned type;
         int count;
         
         glGetActiveUniform(object_, i, MAX_PARAMETER_NAME_LENGTH, 0, &count, &type, uniformName);
-        location = glGetUniformLocation(object_, uniformName);
+        int location = glGetUniformLocation(object_, uniformName);
         
         // Skip inbuilt or disabled uniforms
         if (location < 0)
@@ -165,18 +175,6 @@ bool ShaderProgram::Link()
             }
         }
     }
-    
-    // Query the vertex attribute bindings
-    attributeLocations_[0] = glGetAttribLocation(object_, "iPos");
-    attributeLocations_[1] = glGetAttribLocation(object_, "iNormal");
-    attributeLocations_[2] = glGetAttribLocation(object_, "iColor");
-    attributeLocations_[3] = glGetAttribLocation(object_, "iTexCoord");
-    attributeLocations_[4] = glGetAttribLocation(object_, "iTexCoord2");
-    attributeLocations_[5] = glGetAttribLocation(object_, "iCubeTexCoord");
-    attributeLocations_[6] = glGetAttribLocation(object_, "iCubeTexCoord2");
-    attributeLocations_[7] = glGetAttribLocation(object_, "iTangent");
-    attributeLocations_[8] = glGetAttribLocation(object_, "iBlendWeights");
-    attributeLocations_[9] = glGetAttribLocation(object_, "iBlendIndices");
     
     // Rehash the parameter map to ensure minimal load factor
     shaderParameters_.Rehash(NextPowerOfTwo(shaderParameters_.Size()));

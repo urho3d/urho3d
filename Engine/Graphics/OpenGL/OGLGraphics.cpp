@@ -583,11 +583,6 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         return false;
     }
     
-    // If no valid shader to determine the attribute bindings, can not set vertex buffers
-    if (!shaderProgram_)
-        return false;
-    const int* attributeLocations = shaderProgram_->GetAttributeLocations();
-    
     bool changed = false;
     unsigned newAttributes = 0;
     
@@ -596,16 +591,17 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         VertexBuffer* buffer = 0;
         unsigned elementMask = 0;
         
-        if (i < buffers.Size())
+        if (i < buffers.Size() && buffers[i])
         {
             buffer = buffers[i];
-            elementMask = elementMasks[i];
-            if (elementMask == MASK_DEFAULT && buffer)
-                elementMask = buffers[i]->GetElementMask();
+            if (elementMasks[i] == MASK_DEFAULT)
+                elementMask = buffer->GetElementMask();
+            else
+                elementMask = buffer->GetElementMask() & elementMasks[i];
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
             continue;
         
         vertexBuffers_[i] = buffer;
@@ -620,27 +616,21 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
         {
-            // If shader does not use the attribute, do not bind it (bandwidth optimization)
-            int attributeIndex = attributeLocations[j];
-            if (attributeIndex < 0)
-                continue;
-            
             unsigned elementBit = 1 << j;
-            unsigned attributeBit = 1 << attributeIndex;
             
             if (elementMask & elementBit)
             {
-                newAttributes |= attributeBit;
+                newAttributes |= elementBit;
                 
                 // Enable attribute if not enabled yet
-                if ((impl_->enabledAttributes_ & attributeBit) == 0)
+                if ((impl_->enabledAttributes_ & elementBit) == 0)
                 {
-                    glEnableVertexAttribArray(attributeIndex);
-                    impl_->enabledAttributes_ |= attributeBit;
+                    glEnableVertexAttribArray(j);
+                    impl_->enabledAttributes_ |= elementBit;
                 }
                 
                 // Set the attribute pointer
-                glVertexAttribPointer(attributeIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
+                glVertexAttribPointer(j, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
             }
         }
@@ -680,11 +670,6 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         return false;
     }
     
-    // If no valid shader to determine the attribute bindings, can not set vertex buffers
-    if (!shaderProgram_)
-        return false;
-    const int* attributeLocations = shaderProgram_->GetAttributeLocations();
-    
     bool changed = false;
     unsigned newAttributes = 0;
     
@@ -693,16 +678,17 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         VertexBuffer* buffer = 0;
         unsigned elementMask = 0;
         
-        if (i < buffers.Size())
+        if (i < buffers.Size() && buffers[i])
         {
             buffer = buffers[i];
-            elementMask = elementMasks[i];
-            if (elementMask == MASK_DEFAULT && buffer)
-                elementMask = buffers[i]->GetElementMask();
+            if (elementMasks[i] == MASK_DEFAULT)
+                elementMask = buffer->GetElementMask();
+            else
+                elementMask = buffer->GetElementMask() & elementMasks[i];
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
             continue;
         
         vertexBuffers_[i] = buffer;
@@ -717,27 +703,21 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
         {
-            // If shader does not use the attribute, do not bind it (bandwidth optimization)
-            int attributeIndex = attributeLocations[j];
-            if (attributeIndex < 0)
-                continue;
-            
             unsigned elementBit = 1 << j;
-            unsigned attributeBit = 1 << attributeIndex;
             
             if (elementMask & elementBit)
             {
-                newAttributes |= attributeBit;
+                newAttributes |= elementBit;
                 
                 // Enable attribute if not enabled yet
-                if ((impl_->enabledAttributes_ & attributeBit) == 0)
+                if ((impl_->enabledAttributes_ & elementBit) == 0)
                 {
-                    glEnableVertexAttribArray(attributeIndex);
-                    impl_->enabledAttributes_ |= attributeBit;
+                    glEnableVertexAttribArray(j);
+                    impl_->enabledAttributes_ |= elementBit;
                 }
                 
                 // Set the attribute pointer
-                glVertexAttribPointer(attributeIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
+                glVertexAttribPointer(j, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
             }
         }
@@ -789,7 +769,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         if (vs->GetCompilerOutput().Empty())
         {
             PROFILE(CompileVertexShader);
-
+            
             bool success = vs->Create();
             if (success)
                 LOGDEBUG("Compiled vertex shader " + vs->GetName());
@@ -808,7 +788,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         if (ps->GetCompilerOutput().Empty())
         {
             PROFILE(CompilePixelShader);
-
+            
             bool success = ps->Create();
             if (success)
                 LOGDEBUG("Compiled pixel shader " + ps->GetName());
@@ -820,12 +800,6 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
         else
             ps = 0;
-    }
-    
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        vertexBuffers_[i] = 0;
-        elementMasks_[i] = 0;
     }
     
     if (!vs || !ps)
@@ -907,9 +881,6 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 break;
                 
             case GL_FLOAT_MAT3:
-                #ifndef GL_ES_VERSION_2_0
-                glUniformMatrix3fv(info->location_, count / 9, GL_TRUE, data);
-                #else
                 {
                     for (unsigned i = 0; i < count; i += 9)
                     {
@@ -917,13 +888,9 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                         glUniformMatrix3fv(info->location_ + i / 9, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
-                #endif
                 break;
                 
             case GL_FLOAT_MAT4:
-                #ifndef GL_ES_VERSION_2_0
-                glUniformMatrix4fv(info->location_, count / 16, GL_TRUE, data);
-                #else
                 {
                     for (unsigned i = 0; i < count; i += 16)
                     {
@@ -931,7 +898,6 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                         glUniformMatrix4fv(info->location_ + i / 16, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
-                #endif
                 break;
             }
         }
@@ -959,13 +925,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-        {
-            #ifndef GL_ES_VERSION_2_0
-            glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.Data());
-            #else
             glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
-            #endif
-        }
     }
 }
 
@@ -1001,13 +961,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-        {
-            #ifndef GL_ES_VERSION_2_0
-            glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.Data());
-            #else
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
-            #endif
-        }
     }
 }
 
@@ -1554,6 +1508,7 @@ void Graphics::ResetStreamFrequencies()
 
 void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask)
 {
+    #ifndef GL_ES_VERSION_2_0
     if (enable != stencilTest_)
     {
         if (enable)
@@ -1585,6 +1540,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
             stencilZFail_ = zFail;
         }
     }
+    #endif
 }
 
 void Graphics::SetForceSM2(bool enable)

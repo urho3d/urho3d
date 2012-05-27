@@ -122,8 +122,6 @@ private:
     
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Resource cache subsystem.
-    WeakPtr<ResourceCache> cache_;
     /// Vertex shader for no texture.
     SharedPtr<ShaderVariation> noTextureVS_;
     /// Vertex shader for diffuse texture.

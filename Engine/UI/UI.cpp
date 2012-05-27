@@ -38,7 +38,7 @@
 #include "Log.h"
 #include "Matrix3x4.h"
 #include "Profiler.h"
-#include "ResourceCache.h"
+#include "Renderer.h"
 #include "ScrollBar.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
@@ -439,36 +439,24 @@ IntVector2 UI::GetCursorPosition()
 void UI::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Renderer* renderer = GetSubsystem<Renderer>();
     
-    if (!graphics || !graphics->IsInitialized() || !cache)
+    if (!graphics || !graphics->IsInitialized() || !renderer)
         return;
     
     PROFILE(InitUI);
     
     graphics_ = graphics;
-    cache_ = cache;
     
     rootElement_ = new UIElement(context_);
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     
-    #ifdef USE_OPENGL
-    Shader* basicVS = cache->GetResource<Shader>("Shaders/GLSL/Basic.vert");
-    Shader* basicPS = cache->GetResource<Shader>("Shaders/GLSL/Basic.frag");
-    #else
-    Shader* basicVS = cache->GetResource<Shader>("Shaders/SM2/Basic.vs2");
-    Shader* basicPS = cache->GetResource<Shader>("Shaders/SM2/Basic.ps2");
-    #endif
-    
-    if (basicVS && basicPS)
-    {
-        noTextureVS_ = basicVS->GetVariation("VCol");
-        diffTextureVS_ = basicVS->GetVariation("DiffVCol");
-        noTexturePS_ = basicPS->GetVariation("VCol");
-        diffTexturePS_ = basicPS->GetVariation("DiffVCol");
-        diffMaskTexturePS_ = basicPS->GetVariation("DiffAlphaMaskVCol");
-        alphaTexturePS_ = basicPS->GetVariation("AlphaVCol");
-    }
+    noTextureVS_ = renderer->GetVertexShader("Basic_VCol");
+    diffTextureVS_ = renderer->GetVertexShader("Basic_DiffVCol");
+    noTexturePS_ = renderer->GetPixelShader("Basic_VCol");
+    diffTexturePS_ = renderer->GetPixelShader("Basic_DiffVCol");
+    diffMaskTexturePS_ = renderer->GetPixelShader("Basic_DiffAlphaMaskVCol");
+    alphaTexturePS_ = renderer->GetPixelShader("Basic_AlphaVCol");
     
     vertexBuffer_ = new VertexBuffer(context_);
     
