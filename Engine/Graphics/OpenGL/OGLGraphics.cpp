@@ -881,6 +881,9 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 break;
                 
             case GL_FLOAT_MAT3:
+                #ifndef GL_ES_VERSION_2_0
+                glUniformMatrix3fv(info->location_, count / 9, GL_TRUE, data);
+                #else
                 {
                     for (unsigned i = 0; i < count; i += 9)
                     {
@@ -888,9 +891,13 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                         glUniformMatrix3fv(info->location_ + i / 9, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
+                #endif
                 break;
                 
             case GL_FLOAT_MAT4:
+                #ifndef GL_ES_VERSION_2_0
+                glUniformMatrix4fv(info->location_, count / 16, GL_TRUE, data);
+                #else
                 {
                     for (unsigned i = 0; i < count; i += 16)
                     {
@@ -898,6 +905,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                         glUniformMatrix4fv(info->location_ + i / 16, 1, GL_FALSE, matrix.Transpose().Data());
                     }
                 }
+                #endif
                 break;
             }
         }
@@ -925,7 +933,13 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
+        {
+            #ifndef GL_ES_VERSION_2_0
+            glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.Data());
+            #else
             glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
+            #endif
+        }
     }
 }
 
@@ -961,7 +975,13 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
+        {
+            #ifndef GL_ES_VERSION_2_0
+            glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.Data());
+            #else
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
+            #endif
+        }
     }
 }
 

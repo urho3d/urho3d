@@ -233,8 +233,6 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
                 
                 drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
                 drawable->ClearLights();
-                if (!drawable->GetZone() && !view->cameraZoneOverride_)
-                    view->FindZone(drawable, threadIndex);
             }
         }
     }
@@ -639,6 +637,10 @@ void View::GetDrawables()
         
         if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
         {
+            // Find zone for the drawable if necessary
+            if (!drawable->GetZone() && !cameraZoneOverride_)
+                FindZone(drawable);
+            
             // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
             if (drawable->GetType() != Skybox::GetTypeStatic())
             {
@@ -2202,7 +2204,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     }
 }
 
-void View::FindZone(Drawable* drawable, unsigned threadIndex)
+void View::FindZone(Drawable* drawable)
 {
     Vector3 center = drawable->GetWorldBoundingBox().Center();
     int bestPriority = M_MIN_INT;

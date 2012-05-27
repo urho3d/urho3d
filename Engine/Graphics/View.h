@@ -151,7 +151,7 @@ private:
     /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
     /// Find and set a new zone for a drawable when it has moved.
-    void FindZone(Drawable* drawable, unsigned threadIndex);
+    void FindZone(Drawable* drawable);
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable);
     /// Return the drawable's light mask, considering also its zone.
