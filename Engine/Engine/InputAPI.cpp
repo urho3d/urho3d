@@ -108,8 +108,20 @@ static Input* GetInput()
     return GetScriptContext()->GetSubsystem<Input>();
 }
 
+static void ConstructTouchState(TouchState* ptr)
+{
+    new(ptr) TouchState();
+}
+
 static void RegisterInput(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("TouchState", sizeof(TouchState), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS);
+    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTouchState), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TouchState", "int touchID", offsetof(TouchState, touchID_));
+    engine->RegisterObjectProperty("TouchState", "IntVector2 position", offsetof(TouchState, position_));
+    engine->RegisterObjectProperty("TouchState", "IntVector2 delta", offsetof(TouchState, delta_));
+    engine->RegisterObjectProperty("TouchState", "int pressure", offsetof(TouchState, pressure_));
+    
     RegisterObject<Input>(engine, "Input");
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
@@ -124,6 +136,8 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "int get_mouseMoveX() const", asMETHOD(Input, GetMouseMoveX), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int get_mouseMoveY() const", asMETHOD(Input, GetMouseMoveY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int get_mouseMoveWheel() const", asMETHOD(Input, GetMouseMoveWheel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint get_numTouches() const", asMETHOD(Input, GetNumTouches), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "TouchState get_touches(uint) const", asMETHOD(Input, GetTouch), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_active() const", asMETHOD(Input, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_minimized() const", asMETHOD(Input, IsMinimized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);

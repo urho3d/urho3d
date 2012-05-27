@@ -26,6 +26,7 @@
 #include "DebugRenderer.h"
 #include "Geometry.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Light.h"
 #include "Log.h"
 #include "OcclusionBuffer.h"

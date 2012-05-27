@@ -41,6 +41,8 @@ void CreateCursor()
     cursor.style = uiStyle;
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
+    if (GetPlatform() == "Android")
+        ui.cursor.visible = false;
 }
 
 void CreateMenuBar()

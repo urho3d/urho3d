@@ -17,7 +17,7 @@ uniform sampler2DShadow sShadowMap;
 uniform samplerCube sFaceSelectCubeMap;
 uniform samplerCube sIndirectionCubeMap;
 #else
-uniform sampler2D sShadowMap;
+uniform mediump sampler2D sShadowMap;
 #endif
 
 vec3 DecodeNormal(vec4 normalInput)

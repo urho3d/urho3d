@@ -77,7 +77,7 @@ void Window::OnHover(const IntVector2& position, const IntVector2& screenPositio
         SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if (buttons != MOUSEB_LEFT || !CheckAlignment())
     {
@@ -85,9 +85,9 @@ void Window::OnDragStart(const IntVector2& position, const IntVector2& screenPos
         return;
     }
     
-    dragStartCursor_ = screenPosition;
-    dragStartPosition_ = GetPosition();
-    dragStartSize_ = GetSize();
+    dragBeginCursor_ = screenPosition;
+    dragBeginPosition_ = GetPosition();
+    dragBeginSize_ = GetSize();
     dragMode_ = GetDragMode(position);
     SetCursorShape(dragMode_, cursor);
 }
@@ -97,49 +97,49 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     if (dragMode_ == DRAG_NONE)
         return;
     
-    IntVector2 delta = screenPosition - dragStartCursor_;
+    IntVector2 delta = screenPosition - dragBeginCursor_;
     
     switch (dragMode_)
     {
     case DRAG_MOVE:
-        SetPosition(dragStartPosition_ + delta);
+        SetPosition(dragBeginPosition_ + delta);
         break;
         
     case DRAG_RESIZE_TOPLEFT:
-        SetPosition(dragStartPosition_ + delta);
-        SetSize(dragStartSize_ - delta);
+        SetPosition(dragBeginPosition_ + delta);
+        SetSize(dragBeginSize_ - delta);
         break;
         
     case DRAG_RESIZE_TOP:
-        SetPosition(dragStartPosition_.x_, dragStartPosition_.y_ + delta.y_);
-        SetSize(dragStartSize_.x_, dragStartSize_.y_ - delta.y_);
+        SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
+        SetSize(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
         break;
         
     case DRAG_RESIZE_TOPRIGHT:
-        SetPosition(dragStartPosition_.x_, dragStartPosition_.y_ + delta.y_);
-        SetSize(dragStartSize_.x_ + delta.x_, dragStartSize_.y_ - delta.y_);
+        SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
+        SetSize(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
         break;
         
     case DRAG_RESIZE_RIGHT:
-        SetSize(dragStartSize_.x_ + delta.x_, dragStartSize_.y_);
+        SetSize(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_);
         break;
         
     case DRAG_RESIZE_BOTTOMRIGHT:
-        SetSize(dragStartSize_ + delta);
+        SetSize(dragBeginSize_ + delta);
         break;
         
     case DRAG_RESIZE_BOTTOM:
-        SetSize(dragStartSize_.x_, dragStartSize_.y_ + delta.y_);
+        SetSize(dragBeginSize_.x_, dragBeginSize_.y_ + delta.y_);
         break;
         
     case DRAG_RESIZE_BOTTOMLEFT:
-        SetPosition(dragStartPosition_.x_ + delta.x_, dragStartPosition_.y_);
-        SetSize(dragStartSize_.x_ - delta.x_, dragStartSize_.y_ + delta.y_);
+        SetPosition(dragBeginPosition_.x_ + delta.x_, dragBeginPosition_.y_);
+        SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
         break;
         
     case DRAG_RESIZE_LEFT:
-        SetPosition(dragStartPosition_.x_ + delta.x_, dragStartPosition_.y_);
-        SetSize(dragStartSize_.x_ - delta.x_, dragStartSize_.y_);
+        SetPosition(dragBeginPosition_.x_ + delta.x_, dragBeginPosition_.y_);
+        SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
         break;
 
     default:
@@ -224,6 +224,9 @@ WindowDragMode Window::GetDragMode(const IntVector2& position) const
 
 void Window::SetCursorShape(WindowDragMode mode, Cursor* cursor) const
 {
+    if (!cursor)
+        return;
+    
     switch (mode)
     {
     case DRAG_RESIZE_TOP:

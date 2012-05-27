@@ -34,12 +34,10 @@
 #include <stdio.h>
 #include <math.h>
 
-//TODO: Replace with malloc
+// Urho3D: disabled
+#if 0
 
-// Urho3D: added definition
-#ifndef M_PI
-static const float M_PI = 3.141592653589793238462643f;
-#endif
+//TODO: Replace with malloc
 
 #define MAXPATHSIZE 1024
 
@@ -666,5 +664,16 @@ void SDL_GestureProcessEvent(SDL_Event* event)
         }
     }
 }
+
+#else
+void SDL_GestureProcessEvent(SDL_Event* event)
+{
+}
+
+int SDL_GestureAddTouch(SDL_Touch* touch)
+{
+    return 0;
+}
+#endif
 
 /* vi: set ts=4 sw=4 expandtab: */

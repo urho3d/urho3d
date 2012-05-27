@@ -50,6 +50,10 @@
 #include <mach-o/dyld.h>
 #endif
 
+#ifdef ANDROID
+extern "C" const char* SDL_Android_GetFilesDir();
+#endif
+
 #include "DebugNew.h"
 
 OBJECTTYPESTATIC(FileSystem);
@@ -398,11 +402,13 @@ String FileSystem::GetProgramDir()
 
 String FileSystem::GetUserDocumentsDir()
 {
-    #ifdef WIN32
+    #if defined(WIN32)
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
     return AddTrailingSlash(String(pathName));
+    #elif defined(ANDROID)
+    return AddTrailingSlash(String(SDL_Android_GetFilesDir()));
     #else
     char pathName[MAX_PATH];
     pathName[0] = 0;

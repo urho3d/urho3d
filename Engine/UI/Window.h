@@ -59,8 +59,8 @@ public:
     virtual void SetStyle(const XMLElement& element);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start.
-    virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse drag begin.
+    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag end.
@@ -98,10 +98,10 @@ protected:
     IntRect resizeBorder_;
     /// Current drag mode.
     WindowDragMode dragMode_;
-    /// Mouse position at drag start.
-    IntVector2 dragStartCursor_;
-    /// Original position at drag start.
-    IntVector2 dragStartPosition_;
-    /// Original size at drag start.
-    IntVector2 dragStartSize_;
+    /// Mouse position at drag begin.
+    IntVector2 dragBeginCursor_;
+    /// Original position at drag begin.
+    IntVector2 dragBeginPosition_;
+    /// Original size at drag begin.
+    IntVector2 dragBeginSize_;
 };

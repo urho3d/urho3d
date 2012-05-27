@@ -54,7 +54,7 @@ Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-On Android there are no command line options, so the Urho3D activity chooses to load the TestScene example. This can be changed from Urho3D.cpp.
+On Android there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from Urho3D.cpp.
 
 Currently, five example application scripts exist:
 

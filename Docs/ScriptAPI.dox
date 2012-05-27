@@ -2368,6 +2368,15 @@ Properties:<br>
 - uint[] numOccluders (readonly)
 
 
+TouchState
+
+Properties:<br>
+- int touchID
+- IntVector2 position
+- IntVector2 delta
+- int pressure
+
+
 Input
 
 Properties:<br>
@@ -2385,6 +2394,8 @@ Properties:<br>
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
+- uint numTouches (readonly)
+- TouchState[] touches (readonly)
 - bool active (readonly)
 - bool minimized (readonly)
 

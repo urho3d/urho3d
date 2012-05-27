@@ -169,6 +169,13 @@ void Input::Update()
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     
+    // Reset touch delta movement. Note: last coordinates are stored internally, but the frame delta is returned to user
+    for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    {
+        TouchState& state = i->second_;
+        state.delta_ = state.position_;
+    }
+    
     #ifndef USE_OPENGL
     // Pump Win32 events
     MSG msg;
@@ -312,6 +319,25 @@ int Input::GetQualifiers() const
     return ret;
 }
 
+TouchState Input::GetTouch(unsigned index) const
+{
+    unsigned cmpIndex = 0;
+    for (Map<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
+    {
+        if (cmpIndex == index)
+        {
+            TouchState ret = i->second_;
+            // Convert last position to delta
+            ret.delta_ = ret.position_ - ret.delta_;
+            return ret;
+        }
+        else
+            ++cmpIndex;
+    }
+    
+    return TouchState();
+}
+
 void Input::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -396,6 +422,21 @@ void Input::ResetState()
 {
     keyDown_.Clear();
     keyPress_.Clear();
+    
+    // When clearing touch states, send the corresponding touch end events
+    for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    {
+        TouchState& state = i->second_;
+        
+        using namespace TouchEnd;
+        
+        VariantMap eventData;
+        
+        eventData[P_TOUCHID] = state.touchID_;
+        eventData[P_X] = state.position_.x_;
+        eventData[P_Y] = state.position_.y_;
+        SendEvent(E_TOUCHEND, eventData);
+    }
     
     // Use SetMouseButton() to reset the state so that mouse events will be sent properly
     SetMouseButton(MOUSEB_LEFT, false);
@@ -731,6 +772,72 @@ void Input::HandleSDLEvent(void* sdlEvent)
         input = GetInputInstance(evt.wheel.windowID);
         if (input)
             input->SetMouseWheel(evt.wheel.y);
+        break;
+        
+    case SDL_FINGERDOWN:
+        input = GetInputInstance(evt.tfinger.windowID);
+        if (input)
+        {
+            int touchID = (int)evt.tfinger.fingerId;
+            TouchState& state = input->touches_[touchID];
+            state.touchID_ = touchID;
+            state.delta_ = state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
+                evt.tfinger.y * input->graphics_->GetHeight() / 32768);
+            state.pressure_ = evt.tfinger.pressure;
+            
+            using namespace TouchBegin;
+            
+            VariantMap eventData;
+            
+            eventData[P_TOUCHID] = touchID;
+            eventData[P_X] = state.position_.x_;
+            eventData[P_Y] = state.position_.y_;
+            eventData[P_PRESSURE] = state.pressure_;
+            input->SendEvent(E_TOUCHBEGIN, eventData);
+        }
+        break;
+        
+    case SDL_FINGERUP:
+        input = GetInputInstance(evt.tfinger.windowID);
+        if (input)
+        {
+            int touchID = (int)evt.tfinger.fingerId;
+            input->touches_.Erase(touchID);
+            
+            using namespace TouchEnd;
+            
+            VariantMap eventData;
+            
+            eventData[P_TOUCHID] = touchID;
+            eventData[P_X] = evt.tfinger.x * input->graphics_->GetWidth() / 32768;
+            eventData[P_Y] = evt.tfinger.y * input->graphics_->GetHeight() / 32768;
+            input->SendEvent(E_TOUCHEND, eventData);
+        }
+        break;
+        
+    case SDL_FINGERMOTION:
+        input = GetInputInstance(evt.tfinger.windowID);
+        if (input)
+        {
+            int touchID = (int)evt.tfinger.fingerId;
+            TouchState& state = input->touches_[touchID];
+            state.touchID_ = touchID;
+            state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
+                evt.tfinger.y * input->graphics_->GetHeight() / 32768);
+            state.pressure_ = evt.tfinger.pressure;
+            
+            using namespace TouchMove;
+            
+            VariantMap eventData;
+            
+            eventData[P_TOUCHID] = touchID;
+            eventData[P_X] = state.position_.x_;
+            eventData[P_Y] = state.position_.y_;
+            eventData[P_DX] = evt.tfinger.dx * input->graphics_->GetWidth() / 32768;
+            eventData[P_DY] = evt.tfinger.dy * input->graphics_->GetHeight() / 32768;
+            eventData[P_PRESSURE] = state.pressure_;
+            input->SendEvent(E_TOUCHMOVE, eventData);
+        }
         break;
         
     case SDL_WINDOWEVENT:

@@ -50,8 +50,8 @@ public:
     
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start.
-    virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse drag begin.
+    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
@@ -121,8 +121,8 @@ protected:
     int lastFontSize_;
     /// Text edit cursor position.
     unsigned cursorPosition_;
-    /// Drag start edit cursor position.
-    unsigned dragStartCursor_;
+    /// Drag begin cursor position.
+    unsigned dragBeginCursor_;
     /// Cursor blink rate.
     float cursorBlinkRate_;
     /// Cursor blink timer.

@@ -97,14 +97,20 @@ private:
     void LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse move event.
-    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
     void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button up event.
     void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData);
+    /// Handle mouse move event.
+    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
     /// Handle mouse wheel event.
     void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
+    /// Handle touch begin event.
+    void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
+    /// Handle touch end event.
+    void HandleTouchEnd(StringHash eventType, VariantMap& eventData);
+    /// Handle touch move event.
+    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
     /// Handle keypress event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event.

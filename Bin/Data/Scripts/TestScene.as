@@ -83,7 +83,9 @@ void InitUI()
     newCursor.style = uiStyle;
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
-    
+    if (GetPlatform() == "Android")
+        ui.cursor.visible = false;
+
     downloadsText = Text();
     downloadsText.SetAlignment(HA_CENTER, VA_CENTER);
     downloadsText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 20);

@@ -9,6 +9,7 @@
 #include "Scripts/Utilities/Network.as"
 
 const float mouseSensitivity = 0.125;
+const float touchSensitivity = 2.0;
 const float cameraMinDist = 25;
 const float cameraMaxDist = 500;
 const float cameraSafetyDist = 30;
@@ -29,6 +30,8 @@ Text@ hiscoreText;
 Text@ messageText;
 BorderImage@ healthBar;
 BorderImage@ sight;
+BorderImage@ moveButton;
+BorderImage@ shootButton;
 SoundSource@ musicSource;
 
 Controls playerControls;
@@ -43,6 +46,12 @@ float enemySpawnTimer = 0;
 float powerupSpawnTimer = 0;
 uint clientNodeID = 0;
 int clientScore = 0;
+
+bool touchEnabled = false;
+int touchButtonSize = 96;
+int moveTouchID = -1;
+int rotateTouchID = -1;
+int fireTouchID = -1;
 
 Array<Player> players;
 Array<HiscoreEntry> hiscores;
@@ -73,6 +82,8 @@ void Start()
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
 
+    if (touchEnabled)
+        SubscribeToEvent("TouchEnd", "HandleTouchEnd");
     if (singlePlayer)
         StartGame(null);
 }
@@ -225,6 +236,25 @@ void CreateOverlays()
     healthBar.SetPosition(2, 2);
     healthBar.SetSize(116, 16);
     healthBorder.AddChild(healthBar);
+
+    if (GetPlatform() == "Android")
+    {
+        touchEnabled = true;
+
+        moveButton = BorderImage();
+        moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
+        moveButton.imageRect = IntRect(0, 0, 96, 96);
+        moveButton.SetPosition(0, graphics.height - touchButtonSize);
+        moveButton.SetSize(touchButtonSize, touchButtonSize);
+        ui.root.AddChild(moveButton);
+
+        shootButton = BorderImage();
+        shootButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
+        shootButton.imageRect = IntRect(96, 0, 192, 96);
+        shootButton.SetPosition(graphics.width - touchButtonSize, graphics.height - touchButtonSize);
+        shootButton.SetSize(touchButtonSize, touchButtonSize);
+        ui.root.AddChild(shootButton);
+    }
 }
 
 void SetMessage(const String&in message)
@@ -372,6 +402,17 @@ void HandlePostRenderUpdate()
         gameScene.physicsWorld.DrawDebugGeometry(true);
     if (drawOctreeDebug)
         gameScene.octree.DrawDebugGeometry(true);
+}
+
+void HandleTouchEnd(StringHash eventType, VariantMap& eventData)
+{
+    int touchID = eventData["TouchID"].GetInt();
+    if (touchID == moveTouchID)
+        moveTouchID = -1;
+    if (touchID == rotateTouchID)
+        rotateTouchID = -1;
+    if (touchID == fireTouchID)
+        fireTouchID = -1;
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -723,6 +764,41 @@ void UpdateControls()
     {
         prevPlayerControls = playerControls;
         playerControls.Set(CTRL_ALL, false);
+
+        if (touchEnabled)
+        {
+            for (int i = 0; i < input.numTouches; ++i)
+            {
+                TouchState touch = input.touches[i];
+                if (touch.touchID == rotateTouchID || (touch.position.y < graphics.height - touchButtonSize || 
+                    (touch.position.x >= touchButtonSize && touch.position.x < graphics.width - touchButtonSize)))
+                {
+                    rotateTouchID = touch.touchID;
+                    playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
+                    playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
+                }
+                else if (touch.position.y >= graphics.height - touchButtonSize && touch.position.x < touchButtonSize)
+                {
+                    moveTouchID = touch.touchID;
+                    int relX = touch.position.x - touchButtonSize / 2;
+                    int relY = touch.position.y - (graphics.height - touchButtonSize / 2);
+                    if (relY < 0 && Abs(relX * 3 / 2) < Abs(relY))
+                        playerControls.Set(CTRL_UP, true);
+                    if (relY > 0 && Abs(relX * 3 / 2) < Abs(relY))
+                        playerControls.Set(CTRL_DOWN, true);
+                    if (relX < 0 && Abs(relY * 3 / 2) < Abs(relX))
+                        playerControls.Set(CTRL_LEFT, true);
+                    if (relX > 0 && Abs(relY * 3 / 2) < Abs(relX))
+                        playerControls.Set(CTRL_RIGHT, true);
+                }
+                else if (touch.position.y >= graphics.height - touchButtonSize && touch.position.x >= graphics.width - 
+                    touchButtonSize)
+                {
+                    fireTouchID = touch.touchID;
+                    playerControls.Set(CTRL_FIRE, true);
+                }
+            }
+        }
 
         // For the triggered actions (fire & jump) check also for press, in case the FPS is low
         // and the key was already released

@@ -46,8 +46,8 @@ public:
     virtual void Update(float timeStep);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start.
-    virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse drag begin.
+    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag end.
@@ -87,8 +87,8 @@ protected:
     float value_;
     /// Internal flag of whether the slider is being dragged.
     bool dragSlider_;
-    /// Original mouse cursor position at drag start.
-    IntVector2 dragStartCursor_;
-    /// Original slider position at drag start.
-    IntVector2 dragStartPosition_;
+    /// Original mouse cursor position at drag begin.
+    IntVector2 dragBeginCursor_;
+    /// Original slider position at drag begin.
+    IntVector2 dragBeginPosition_;
 };

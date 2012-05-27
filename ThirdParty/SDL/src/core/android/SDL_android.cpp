@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 #include "SDL_stdinc.h"
 #include "SDL_assert.h"
@@ -73,6 +76,9 @@ static jmethodID midAudioQuit;
 static float fLastAccelerometer[3];
 static bool bHasNewData;
 
+// Application files dir
+static char* mFilesDir = 0;
+
 /*******************************************************************************
                  Functions called by JNI
 *******************************************************************************/
@@ -91,10 +97,29 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
     return JNI_VERSION_1_4;
 }
 
+extern "C" const char* SDL_Android_GetFilesDir()
+{
+    return mFilesDir;
+}
+
 // Called before SDL_main() to initialize JNI bindings
-extern "C" void SDL_Android_Init(JNIEnv* env, jclass cls)
+extern "C" void SDL_Android_Init(JNIEnv* env, jclass cls, jstring filesDir)
 {
     __android_log_print(ANDROID_LOG_INFO, "SDL", "SDL_Android_Init()");
+
+    // Copy the files dir
+    const char *str;
+    str = env->GetStringUTFChars(filesDir, 0);
+    if (str)
+    {
+        if (mFilesDir)
+            free(mFilesDir);
+
+        size_t length = strlen(str) + 1;
+        mFilesDir = (char*)malloc(length);
+        memcpy(mFilesDir, str, length);
+        env->ReleaseStringUTFChars(filesDir, str);
+    }
 
     mEnv = env;
     mActivityClass = (jclass)env->NewGlobalRef(cls);
@@ -103,7 +128,7 @@ extern "C" void SDL_Android_Init(JNIEnv* env, jclass cls)
                                 "createGLContext","(II)Z");
     midFlipBuffers = mEnv->GetStaticMethodID(mActivityClass,
                                 "flipBuffers","()V");
-    midAudioInit = mEnv->GetStaticMethodID(mActivityClass, 
+    midAudioInit = mEnv->GetStaticMethodID(mActivityClass,
                                 "audioInit", "(IZZI)Ljava/lang/Object;");
     midAudioWriteShortBuffer = mEnv->GetStaticMethodID(mActivityClass,
                                 "audioWriteShortBuffer", "([S)V");

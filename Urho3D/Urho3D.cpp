@@ -96,7 +96,7 @@ void Run()
         
         #ifdef ANDROID
         // Can not pass script name on Android, so choose a hardcoded default
-        scriptFileName = "Scripts/TestScene.as";
+        scriptFileName = "Scripts/NinjaSnowWar.as";
         #endif
         
         // Show usage if not found

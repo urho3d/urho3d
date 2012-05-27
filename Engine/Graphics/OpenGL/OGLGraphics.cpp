@@ -1414,9 +1414,14 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         {
             // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
             // Zero depth bits may be returned if using the packed depth-stencil format. Assume 24bit in that case
+            #ifndef GL_ES_VERSION_2_0
             int depthBits = Min(impl_->depthBits_, 23);
             if (!depthBits)
                 depthBits = 23;
+            #else
+            int depthBits = 25;
+            #endif
+            
             float adjustedConstantBias = constantBias * (float)(1 << (depthBits - 1));
             float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             

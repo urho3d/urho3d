@@ -95,10 +95,10 @@ void Slider::OnHover(const IntVector2& position, const IntVector2& screenPositio
     hovering_ = knob_->IsInside(screenPosition, true);
 }
 
-void Slider::OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    dragStartCursor_ = position;
-    dragStartPosition_ = knob_->GetPosition();
+    dragBeginCursor_ = position;
+    dragBeginPosition_ = knob_->GetPosition();
     dragSlider_ = knob_->IsInside(screenPosition, true);
 }
 
@@ -108,17 +108,17 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
     
     float newValue = value_;
-    IntVector2 delta = position - dragStartCursor_;
+    IntVector2 delta = position - dragBeginCursor_;
     
     if (orientation_ == O_HORIZONTAL)
     {
-        int newX = Clamp(dragStartPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth());
+        int newX = Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth());
         knob_->SetPosition(newX, 0);
         newValue = (float)newX * range_ / (float)(GetWidth() - knob_->GetWidth());
     }
     else
     {
-        int newY = Clamp(dragStartPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight());
+        int newY = Clamp(dragBeginPosition_.y_ + delta.y_, 0, GetHeight() - knob_->GetHeight());
         knob_->SetPosition(0, newY);
         newValue = (float)newY * range_ / (float)(GetHeight() - knob_->GetHeight());
     }

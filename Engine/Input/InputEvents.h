@@ -87,6 +87,34 @@ EVENT(E_CHAR, Char)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
+/// Finger pressed on the screen.
+EVENT(E_TOUCHBEGIN, TouchBegin)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_PRESSURE, Pressure);            // int
+}
+
+/// Finger released from the screen.
+EVENT(E_TOUCHEND, TouchEnd)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+}
+
+/// Finger moved on the screen.
+EVENT(E_TOUCHMOVE, TouchMove)
+{
+    PARAM(P_TOUCHID, TouchID);              // int
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_DX, DX);                        // int
+    PARAM(P_DY, DY);                        // int
+    PARAM(P_PRESSURE, Pressure);            // int
+}
+
 /// Application activation state changed.
 EVENT(E_ACTIVATION, Activation)
 {

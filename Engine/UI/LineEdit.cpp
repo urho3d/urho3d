@@ -38,7 +38,7 @@ LineEdit::LineEdit(Context* context) :
     lastFont_(0),
     lastFontSize_(0),
     cursorPosition_(0),
-    dragStartCursor_(M_MAX_UNSIGNED),
+    dragBeginCursor_(M_MAX_UNSIGNED),
     cursorBlinkRate_(1.0f),
     cursorBlinkTimer_(0.0f),
     maxLength_(0),
@@ -144,16 +144,16 @@ void LineEdit::OnClick(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void LineEdit::OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    dragStartCursor_ = GetCharIndex(position);
+    dragBeginCursor_ = GetCharIndex(position);
 }
 
 void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if (cursorMovable_ && textSelectable_)
     {
-        unsigned start = dragStartCursor_;
+        unsigned start = dragBeginCursor_;
         unsigned current = GetCharIndex(position);
         if (start != M_MAX_UNSIGNED && current != M_MAX_UNSIGNED)
         {
@@ -235,7 +235,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         if (cursorMovable_ && cursorPosition_ > 0)
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
-                dragStartCursor_ = cursorPosition_;
+                dragBeginCursor_ = cursorPosition_;
             
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = 0;
@@ -245,7 +245,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragStartCursor_;
+                unsigned start = dragBeginCursor_;
                 unsigned current = cursorPosition_;
                 if (start < current)
                     text_->SetSelection(start, current - start);
@@ -261,7 +261,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         if (cursorMovable_ && cursorPosition_ < line_.LengthUTF8())
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
-                dragStartCursor_ = cursorPosition_;
+                dragBeginCursor_ = cursorPosition_;
             
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = line_.LengthUTF8();
@@ -271,7 +271,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
-                unsigned start = dragStartCursor_;
+                unsigned start = dragBeginCursor_;
                 unsigned current = cursorPosition_;
                 if (start < current)
                     text_->SetSelection(start, current - start);

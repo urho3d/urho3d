@@ -23,11 +23,25 @@
 
 #pragma once
 
+#include "Map.h"
 #include "HashSet.h"
 #include "InputEvents.h"
 #include "Object.h"
 
 class Graphics;
+
+/// Structure for an ongoing finger touch.
+struct TouchState
+{
+    /// Touch (finger) ID.
+    int touchID_;
+    /// Position in screen coordinates.
+    IntVector2 position_;
+    /// Movement since last frame.
+    IntVector2 delta_;
+    /// Finger pressure.
+    int pressure_;
+};
 
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
@@ -67,6 +81,10 @@ public:
     int GetMouseMoveY() const { return mouseMove_.y_; }
     /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
+    /// Return number of active finger touches.
+    unsigned GetNumTouches() const { return touches_.Size(); }
+    /// Return active finger touch by index.
+    TouchState GetTouch(unsigned index) const;
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether application window is active.
@@ -117,6 +135,8 @@ private:
     HashSet<int> keyDown_;
     /// Key pressed state.
     HashSet<int> keyPress_;
+    /// Active finger touches.
+    Map<int, TouchState> touches_;
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.
