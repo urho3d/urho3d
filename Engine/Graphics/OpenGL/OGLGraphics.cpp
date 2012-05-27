@@ -2163,7 +2163,8 @@ void Graphics::CleanupFramebuffers(bool deleteAll)
     for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();)
     {
         Map<unsigned long long, FrameBufferObject>::Iterator current = i++;
-        if (deleteAll || (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) > MAX_FRAMEBUFFER_AGE))
+        if (deleteAll || (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) >
+            MAX_FRAMEBUFFER_AGE))
         {
             glDeleteFramebuffersEXT(1, &current->second_.fbo_);
             impl_->frameBuffers_.Erase(current);

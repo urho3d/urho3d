@@ -68,7 +68,7 @@ float GetShadow(vec4 shadowPos)
         #ifndef GL_ES
             float inLight = shadow2DProj(sShadowMap, shadowPos).r;
         #else
-            float inLight = texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z;
+            float inLight = texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? 1.0 : 0.0;
         #endif
         return cShadowIntensity.y + cShadowIntensity.x * inLight;
     #endif

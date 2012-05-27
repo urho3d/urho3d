@@ -31,7 +31,7 @@ Text@ messageText;
 BorderImage@ healthBar;
 BorderImage@ sight;
 BorderImage@ moveButton;
-BorderImage@ shootButton;
+BorderImage@ fireButton;
 SoundSource@ musicSource;
 
 Controls playerControls;
@@ -49,6 +49,7 @@ int clientScore = 0;
 
 bool touchEnabled = false;
 int touchButtonSize = 96;
+int touchButtonBorder = 12;
 int moveTouchID = -1;
 int rotateTouchID = -1;
 int fireTouchID = -1;
@@ -244,16 +245,17 @@ void CreateOverlays()
         moveButton = BorderImage();
         moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
         moveButton.imageRect = IntRect(0, 0, 96, 96);
-        moveButton.SetPosition(0, graphics.height - touchButtonSize);
+        moveButton.SetPosition(touchButtonBorder, graphics.height - touchButtonSize - touchButtonBorder);
         moveButton.SetSize(touchButtonSize, touchButtonSize);
         ui.root.AddChild(moveButton);
 
-        shootButton = BorderImage();
-        shootButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-        shootButton.imageRect = IntRect(96, 0, 192, 96);
-        shootButton.SetPosition(graphics.width - touchButtonSize, graphics.height - touchButtonSize);
-        shootButton.SetSize(touchButtonSize, touchButtonSize);
-        ui.root.AddChild(shootButton);
+        fireButton = BorderImage();
+        fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
+        fireButton.imageRect = IntRect(96, 0, 192, 96);
+        fireButton.SetPosition(graphics.width - touchButtonSize - touchButtonBorder, graphics.height - touchButtonSize -
+            touchButtonBorder);
+        fireButton.SetSize(touchButtonSize, touchButtonSize);
+        ui.root.AddChild(fireButton);
     }
 }
 
@@ -767,17 +769,18 @@ void UpdateControls()
 
         if (touchEnabled)
         {
-            for (int i = 0; i < input.numTouches; ++i)
+            for (uint i = 0; i < input.numTouches; ++i)
             {
                 TouchState touch = input.touches[i];
-                if (touch.touchID == rotateTouchID || (touch.position.y < graphics.height - touchButtonSize || 
-                    (touch.position.x >= touchButtonSize && touch.position.x < graphics.width - touchButtonSize)))
+                UIElement@ element = ui.GetElementAt(touch.position, false);
+
+                if (touch.touchID == rotateTouchID || (element !is moveButton && element !is fireButton))
                 {
                     rotateTouchID = touch.touchID;
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
                     playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
                 }
-                else if (touch.position.y >= graphics.height - touchButtonSize && touch.position.x < touchButtonSize)
+                else if (element is moveButton || touch.touchID == moveTouchID)
                 {
                     moveTouchID = touch.touchID;
                     int relX = touch.position.x - touchButtonSize / 2;
@@ -791,8 +794,7 @@ void UpdateControls()
                     if (relX > 0 && Abs(relY * 3 / 2) < Abs(relX))
                         playerControls.Set(CTRL_RIGHT, true);
                 }
-                else if (touch.position.y >= graphics.height - touchButtonSize && touch.position.x >= graphics.width - 
-                    touchButtonSize)
+                else if (element is fireButton)
                 {
                     fireTouchID = touch.touchID;
                     playerControls.Set(CTRL_FIRE, true);
