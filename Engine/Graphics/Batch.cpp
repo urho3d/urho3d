@@ -633,7 +633,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
         vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
         elementMasks.Push(instanceBuffer->GetElementMask());
         
-        // No stream offset support, instancing buffer not pre-filled with transforms: have fill now
+        // No stream offset support, instancing buffer not pre-filled with transforms: have to fill now
         if (startIndex_ == M_MAX_UNSIGNED)
         {
             unsigned startIndex = 0;
