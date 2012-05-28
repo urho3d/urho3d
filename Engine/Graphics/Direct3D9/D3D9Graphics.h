@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Color.h"
 #include "HashMap.h"
 #include "Object.h"
@@ -47,6 +48,23 @@ class VertexBuffer;
 class VertexDeclaration;
 
 struct ShaderParameter;
+
+/// CPU-side scratch buffer for vertex data updates.
+struct ScratchBuffer
+{
+    ScratchBuffer() :
+        size_(0),
+        reserved_(false)
+    {
+    }
+    
+    /// Buffer data.
+    SharedArrayPtr<unsigned char> data_;
+    /// Data size.
+    unsigned size_;
+    /// Reserved flag.
+    bool reserved_;
+};
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
@@ -297,6 +315,10 @@ public:
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
     void RemoveGPUObject(GPUObject* object);
+    /// Reserve a CPU-side scratch buffer.
+    void* ReserveScratchBuffer(unsigned size);
+    /// Free a CPU-side scratch buffer.
+    void FreeScratchBuffer(void* buffer);
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -385,6 +407,8 @@ private:
     unsigned numBatches_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
+    /// Scratch buffers.
+    Vector<ScratchBuffer> scratchBuffers_;
     /// Vertex declarations.
     HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Shadow map dummy color texture format.

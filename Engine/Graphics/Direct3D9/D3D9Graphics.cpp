@@ -40,6 +40,7 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
+#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -1762,6 +1763,60 @@ void Graphics::AddGPUObject(GPUObject* object)
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
     gpuObjects_.Erase(gpuObjects_.Find(object));
+}
+
+
+void* Graphics::ReserveScratchBuffer(unsigned size)
+{
+    if (!size)
+        return 0;
+    
+    // First check for a free buffer that is large enough
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    {
+        if (!i->reserved_ && i->size_ >= size)
+        {
+            i->reserved_ = true;
+            return i->data_.Get();
+        }
+    }
+    
+    // Then check if a free buffer can be resized
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    {
+        if (!i->reserved_)
+        {
+            i->data_ = new unsigned char[size];
+            i->size_ = size;
+            i->reserved_ = true;
+            return i->data_.Get();
+        }
+    }
+    
+    // Finally allocate a new buffer
+    ScratchBuffer newBuffer;
+    newBuffer.data_ = new unsigned char[size];
+    newBuffer.size_ = size;
+    newBuffer.reserved_ = true;
+    scratchBuffers_.Push(newBuffer);
+    return newBuffer.data_.Get();
+}
+
+void Graphics::FreeScratchBuffer(void* buffer)
+{
+    if (!buffer)
+        return;
+    
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    {
+        if (i->reserved_ && i->data_.Get() == buffer)
+        {
+            i->reserved_ = false;
+            return;
+        }
+    }
+    
+    LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)buffer) + " not found");
 }
 
 unsigned Graphics::GetAlphaFormat()

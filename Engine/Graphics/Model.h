@@ -78,6 +78,10 @@ public:
     
     /// %Set bounding box.
     void SetBoundingBox(const BoundingBox& box);
+    /// %Set vertex buffers.
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts);
+    /// %Set index buffers.
+    bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);
     /// %Set number of geometries.
     void SetNumGeometries(unsigned num);
     /// %Set number of LOD levels in a geometry.
@@ -123,6 +127,10 @@ public:
     const ModelMorph* GetMorph(const String& name) const;
     /// Return vertex morph by name hash.
     const ModelMorph* GetMorph(StringHash nameHash) const;
+    /// Return vertex buffer morph range start.
+    unsigned GetMorphRangeStart(unsigned bufferIndex) const;
+    /// Return vertex buffer morph range vertex count.
+    unsigned GetMorphRangeCount(unsigned bufferIndex) const;
     
 private:
     /// Bounding box.
@@ -141,4 +149,8 @@ private:
     PODVector<Vector3> geometryCenters_;
     /// Vertex morphs.
     Vector<ModelMorph> morphs_;
+    /// Vertex buffer morph range start.
+    PODVector<unsigned> morphRangeStarts_;
+    /// Vertex buffer morph range vertex count.
+    PODVector<unsigned> morphRangeCounts_;
 };

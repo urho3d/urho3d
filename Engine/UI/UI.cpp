@@ -259,14 +259,13 @@ void UI::Render()
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
     
     unsigned vertexSize = vertexBuffer_->GetVertexSize();
-    void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
-    if (!lockedData)
-        return;
+    void* scratch = graphics_->ReserveScratchBuffer(numVertices * vertexSize);
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
-        batches_[i].UpdateGeometry(graphics_, ((unsigned char*)lockedData) + batches_[i].quadStart_ * vertexSize * 6);
+        batches_[i].UpdateGeometry(graphics_, ((unsigned char*)scratch) + batches_[i].quadStart_ * vertexSize * 6);
     
-    vertexBuffer_->Unlock();
+    vertexBuffer_->SetDataRange(scratch, 0, numVertices, true);
+    graphics_->FreeScratchBuffer(scratch);
     
     Vector2 scale(2.0f, -2.0f);
     Vector2 offset(-1.0f, 1.0f);

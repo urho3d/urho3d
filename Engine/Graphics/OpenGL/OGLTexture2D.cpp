@@ -75,42 +75,24 @@ bool Texture2D::Load(Deserializer& source)
 
 void Texture2D::OnDeviceLost()
 {
-    savedLevels_.Clear();
+    GPUObject::OnDeviceLost();
     
-    // Check if save data is supported, in that case save data of each mip level
-    if (GetDataSize(width_, height_))
-    {
-        for (unsigned i = 0; i < levels_; ++i)
-        {
-            int levelWidth = GetLevelWidth(i);
-            int levelHeight = GetLevelHeight(i);
-            SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
-            GetData(i, savedLevel.Get());
-            savedLevels_.Push(savedLevel);
-        }
-    }
+    if (renderSurface_)
+        renderSurface_->OnDeviceLost();
     
-    Release();
+    dataLost_ = true;
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if (!object_)
+    // If has a file name, reload through the resource cache. Otherwise just recreate.
+    if (!GetName().Trimmed().Empty())
     {
-        Create();
-        
-        // Restore texture from save data if it exists
-        if (savedLevels_.Size())
-        {
-            for (unsigned i = 0; i < savedLevels_.Size(); ++i)
-            {
-                int levelWidth = GetLevelWidth(i);
-                int levelHeight = GetLevelHeight(i);
-                SetData(i, 0, 0, levelWidth, levelHeight, savedLevels_[i].Get());
-            }
-            savedLevels_.Clear();
-        }
+        if (GetSubsystem<ResourceCache>()->ReloadResource(this))
+            dataLost_ = false;
     }
+    else
+        Create();
 }
 
 void Texture2D::Release()

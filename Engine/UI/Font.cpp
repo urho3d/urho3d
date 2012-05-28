@@ -154,7 +154,15 @@ const FontFace* Font::GetFace(int pointSize)
 {
     HashMap<int, SharedPtr<FontFace> >::ConstIterator i = faces_.Find(pointSize);
     if (i != faces_.End())
-        return i->second_;
+    {
+        if (!i->second_->texture_->IsDataLost())
+            return i->second_;
+        else
+        {
+            // Erase and reload face if texture data lost (OpenGL mode only)
+            faces_.Erase(pointSize);
+        }
+    }
     
     PROFILE(GetFontFace);
     

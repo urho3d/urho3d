@@ -62,47 +62,27 @@ void TextureCube::RegisterObject(Context* context)
 
 void TextureCube::OnDeviceLost()
 {
-    savedLevels_.Clear();
+    GPUObject::OnDeviceLost();
     
-    // Check if save data is supported, in that case save data of each face and mip level
-    if (GetDataSize(width_, height_))
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {
-        for (unsigned i = 0; i < levels_; ++i)
-        {
-            for (unsigned face = FACE_POSITIVE_X; face < MAX_CUBEMAP_FACES; ++face)
-            {
-                int levelWidth = GetLevelWidth(i);
-                int levelHeight = GetLevelHeight(i);
-                SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
-                GetData((CubeMapFace)face, i, savedLevel.Get());
-                savedLevels_.Push(savedLevel);
-            }
-        }
+        if (renderSurfaces_[i])
+            renderSurfaces_[i]->OnDeviceLost();
     }
     
-    Release();
+    dataLost_ = true;
 }
 
 void TextureCube::OnDeviceReset()
 {
-    if (!object_)
+    // If has a file name, reload through the resource cache. Otherwise just recreate.
+    if (!GetName().Trimmed().Empty())
     {
-        Create();
-        
-        // Restore texture from save data if it exists
-        if (savedLevels_.Size())
-        {
-            for (unsigned i = 0; i < savedLevels_.Size(); ++i)
-            {
-                CubeMapFace face = (CubeMapFace)(i % 6);
-                unsigned level = i / 6;
-                int levelWidth = GetLevelWidth(level);
-                int levelHeight = GetLevelHeight(level);
-                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].Get());
-            }
-            savedLevels_.Clear();
-        }
+        if (GetSubsystem<ResourceCache>()->ReloadResource(this))
+            dataLost_ = false;
     }
+    else
+        Create();
 }
 
 void TextureCube::Release()

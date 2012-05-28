@@ -43,9 +43,9 @@ public:
     
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save data and release the texture.
+    /// Mark the GPU resource destroyed on context destruction.
     virtual void OnDeviceLost();
-    /// Recreate the texture from saved data if necessary and possible.
+    /// Recreate the GPU resource and restore data if applicable.
     virtual void OnDeviceReset();
     /// Release the texture.
     virtual void Release();

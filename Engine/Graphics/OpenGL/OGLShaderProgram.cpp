@@ -44,6 +44,17 @@ ShaderProgram::~ShaderProgram()
     Release();
 }
 
+void ShaderProgram::OnDeviceLost()
+{
+    GPUObject::OnDeviceLost();
+    
+    if (graphics_ && graphics_->GetShaderProgram() == this)
+        graphics_->SetShaders(0, 0);
+    
+    linked_ = false;
+    linkerOutput_.Clear();
+}
+
 void ShaderProgram::Release()
 {
     if (object_)

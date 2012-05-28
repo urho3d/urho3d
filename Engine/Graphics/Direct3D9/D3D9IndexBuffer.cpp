@@ -39,7 +39,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     usage_(0),
     indexCount_(0),
     indexSize_(0),
-    locked_(false),
+    shadowed_(false),
     dataLost_(false)
 {
 }
@@ -52,7 +52,10 @@ IndexBuffer::~IndexBuffer()
 void IndexBuffer::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
+    {
         Release();
+        dataLost_ = true;
+    }
 }
 
 void IndexBuffer::OnDeviceReset()
@@ -60,7 +63,8 @@ void IndexBuffer::OnDeviceReset()
     if (pool_ == D3DPOOL_DEFAULT)
     {
         Create();
-        dataLost_ = true;
+        if (UpdateToGPU())
+            dataLost_ = false;
     }
 }
 
@@ -71,16 +75,29 @@ void IndexBuffer::Release()
         if (!graphics_)
             return;
         
-        Unlock();
-        
         if (graphics_->GetIndexBuffer() == this)
             graphics_->SetIndexBuffer(0);
         
         ((IDirect3DIndexBuffer9*)object_)->Release();
         object_ = 0;
     }
+}
+
+void IndexBuffer::SetShadowed(bool enable)
+{
+    // If no graphics subsystem, can not disable shadowing
+    if (!graphics_)
+        enable = true;
     
-    fallbackData_.Reset();
+    if (enable != shadowed_)
+    {
+        if (enable && indexSize_ && indexCount_)
+            shadowData_ = new unsigned char[indexCount_ * indexSize_];
+        else
+            shadowData_.Reset();
+        
+        shadowed_ = enable;
+    }
 }
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
@@ -99,85 +116,79 @@ bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
     indexCount_ = indexCount;
     indexSize_ = largeIndices ? sizeof(unsigned) : sizeof(unsigned short);
     
+    if (shadowed_ && indexCount_ && indexSize_)
+        shadowData_ = new unsigned char[indexCount_ * indexSize_];
+    else
+        shadowData_.Reset();
+    
     return Create();
 }
 
 bool IndexBuffer::SetData(const void* data)
 {
-    void* hwData = Lock(0, indexCount_, LOCK_DISCARD);
-    if (!hwData)
-        return false;
-    
-    memcpy(hwData, data, indexCount_ * indexSize_);
-    Unlock();
-    return true;
-}
-
-bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
-{
-    if (!count)
-        return true;
-    
-    void* hwData = Lock(start, count, LOCK_NORMAL);
-    if (!hwData)
-        return false;
-    
-    memcpy(hwData, data, count * indexSize_);
-    Unlock();
-    return true;
-}
-
-void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
-{
-    if (!object_ && !fallbackData_)
-        return 0;
-
-    if (locked_)
+    if (!data)
     {
-        LOGERROR("Index buffer already locked");
-        return 0;
+        LOGERROR("Null pointer for index buffer data");
+        return false;
     }
-
-    if (!count || start + count > indexCount_)
-    {
-        LOGERROR("Illegal range for locking index buffer");
-        return 0;
-    }
-    
-    void* hwData = 0;
     
     if (object_)
     {
-        DWORD flags = 0;
-        
-        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
-            flags = D3DLOCK_DISCARD;
-        if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
-            flags = D3DLOCK_NOOVERWRITE;
-        if (mode == LOCK_READONLY)
-            flags = D3DLOCK_READONLY;
-        
-        if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
+        void* hwData = Lock(0, indexCount_, true);
+        if (hwData)
         {
-            LOGERROR("Could not lock index buffer");
-            return 0;
+            memcpy(hwData, data, indexCount_ * indexSize_);
+            Unlock();
         }
     }
-    else
-        hwData = fallbackData_.Get() + start * indexSize_;
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
     
-    locked_ = true;
-    return hwData;
+    return true;
 }
 
-void IndexBuffer::Unlock()
+bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
 {
-    if (locked_)
+    if (start == 0 && count == indexCount_)
+        return SetData(data);
+    
+    if (!data)
     {
-        if (object_)
-            ((IDirect3DIndexBuffer9*)object_)->Unlock();
-        locked_ = false;
+        LOGERROR("Null pointer for index buffer data");
+        return false;
     }
+    
+    if (start + count > indexCount_)
+    {
+        LOGERROR("Illegal range for setting new index buffer data");
+        return false;
+    }
+    
+    if (!count)
+        return true;
+    
+    if (object_)
+    {
+        void* hwData = Lock(start, count, discard);
+        if (hwData)
+        {
+            memcpy(hwData, data, count * indexSize_);
+            Unlock();
+        }
+    }
+    
+    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
+        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    
+    return true;
+}
+
+bool IndexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
+    else
+        return false;
 }
 
 void IndexBuffer::ClearDataLost()
@@ -192,8 +203,7 @@ bool IndexBuffer::IsDynamic() const
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
-    void* data = Lock(start, count, LOCK_READONLY);
-    if (!data)
+    if (!shadowData_)
         return false;
     
     minVertex = M_MAX_UNSIGNED;
@@ -201,7 +211,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     
     if (indexSize_ == sizeof(unsigned))
     {
-        unsigned* indices = (unsigned*)data;
+        unsigned* indices = (unsigned*)shadowData_.Get();
         
         for (unsigned i = 0; i < count; ++i)
         {
@@ -213,7 +223,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     }
     else
     {
-        unsigned short* indices = (unsigned short*)data;
+        unsigned short* indices = (unsigned short*)shadowData_.Get();
         
         for (unsigned i = 0; i < count; ++i)
         {
@@ -225,8 +235,6 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     }
     
     vertexCount = maxVertex - minVertex + 1;
-    
-    Unlock();
     return true;
 }
 
@@ -252,8 +260,34 @@ bool IndexBuffer::Create()
             return false;
         }
     }
-    else
-        fallbackData_ = new unsigned char[indexCount_ * indexSize_];
     
     return true;
+}
+
+
+void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
+{
+    void* hwData = 0;
+    
+    if (object_)
+    {
+        DWORD flags = 0;
+        
+        if (discard && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_DISCARD;
+        
+        if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
+        {
+            LOGERROR("Could not lock index buffer");
+            return 0;
+        }
+    }
+    
+    return hwData;
+}
+
+void IndexBuffer::Unlock()
+{
+    if (object_)
+        ((IDirect3DIndexBuffer9*)object_)->Unlock();
 }

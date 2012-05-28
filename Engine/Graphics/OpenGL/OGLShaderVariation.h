@@ -40,6 +40,8 @@ public:
     /// Destruct.
     virtual ~ShaderVariation();
     
+    /// Mark the GPU resource destroyed on context destruction.
+    virtual void OnDeviceLost();
     /// Release the shader.
     virtual void Release();
     

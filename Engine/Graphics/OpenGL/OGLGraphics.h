@@ -52,10 +52,10 @@ typedef Map<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >
 
 static const unsigned NUM_SCREEN_BUFFERS = 2;
 
-/// CPU-side buffer for VBO discard locking.
-struct DiscardLockBuffer
+/// CPU-side scratch buffer for vertex data updates.
+struct ScratchBuffer
 {
-    DiscardLockBuffer() :
+    ScratchBuffer() :
         size_(0),
         reserved_(false)
     {
@@ -324,10 +324,10 @@ public:
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
     void RemoveGPUObject(GPUObject* object);
-    /// Reserve a CPU side discard locking buffer.
-    void* ReserveDiscardLockBuffer(unsigned size);
-    /// Free a CPU side discard locking buffer.
-    void FreeDiscardLockBuffer(void* buffer);
+    /// Reserve a CPU-side scratch buffer.
+    void* ReserveScratchBuffer(unsigned size);
+    /// Free a CPU-side scratch buffer.
+    void FreeScratchBuffer(void* buffer);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Clean up a render surface from all FBOs.
@@ -358,7 +358,7 @@ private:
     /// Check FBO completeness.
     bool CheckFramebuffer();
     /// Cleanup unused and unbound FBO's.
-    void CleanupFramebuffers(bool deleteAll);
+    void CleanupFramebuffers(bool contextLost);
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.
@@ -394,8 +394,8 @@ private:
     unsigned numBatches_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
-    /// Discard lock buffers.
-    Vector<DiscardLockBuffer> discardLockBuffers_;
+    /// Scratch buffers.
+    Vector<ScratchBuffer> scratchBuffers_;
     /// Shadow map depth texture format.
     unsigned shadowMapFormat_;
     /// Shadow map 24-bit depth texture format.

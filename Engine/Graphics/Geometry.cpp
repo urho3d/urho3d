@@ -154,12 +154,6 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData)
-{
-    rawVertexData_ = vertexData;
-    rawIndexData_ = indexData;
-}
-
 void Geometry::Draw(Graphics* graphics)
 {
     graphics->SetIndexBuffer(indexBuffer_);
@@ -196,10 +190,13 @@ unsigned short Geometry::GetBufferHash() const
 
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize)
 {
-    if (rawVertexData_)
+    if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
     {
-        vertexData = rawVertexData_.Get();
-        vertexSize = 3 * sizeof(float);
+        vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
+        if (vertexData)
+            vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
+        else
+            vertexSize = 0;
     }
     else
     {
@@ -207,10 +204,13 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
         vertexSize = 0;
     }
     
-    if (rawIndexData_ && indexBuffer_)
+    if (indexBuffer_)
     {
-        indexData = rawIndexData_.Get();
-        indexSize = indexBuffer_->GetIndexSize();
+        indexData = indexBuffer_->GetShadowData();
+        if (indexData)
+            indexSize = indexBuffer_->GetIndexSize();
+        else
+            indexSize = 0;
     }
     else
     {
@@ -221,10 +221,16 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 
 float Geometry::GetDistance(const Ray& ray)
 {
-    if (!rawIndexData_ || !rawVertexData_ || !indexBuffer_)
+    const unsigned char* rawVertexData = 0;
+    const unsigned char* rawIndexData = 0;
+    unsigned vertexSize = 0;
+    unsigned indexSize = 0;
+    
+    GetRawData(rawVertexData, vertexSize, rawIndexData, indexSize);
+    if (!rawVertexData || !rawIndexData)
         return M_INFINITY;
     
-    return ray.HitDistance(rawVertexData_.Get(), 3 * sizeof(float), rawIndexData_.Get(), indexBuffer_->GetIndexSize(), indexStart_, indexCount_);
+    return ray.HitDistance(rawVertexData, vertexSize, rawIndexData, indexSize, indexStart_, indexCount_);
 }
 
 void Geometry::GetPositionBufferIndex()

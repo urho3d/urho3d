@@ -46,19 +46,21 @@ public:
     /// Release buffer.
     virtual void Release();
     
-    /// %Set buffer size and dynamic mode. Previous data will be lost.
+    /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
+    void SetShadowed(bool enable);
+    /// %Set size and vertex elements and dynamic mode. Previous data will be lost.
     bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
     /// %Set all data in the buffer.
     bool SetData(const void* data);
-    /// %Set a data range in the buffer.
-    bool SetDataRange(const void* data, unsigned start, unsigned count);
-    /// Lock a data range in the buffer. Return pointer to locked data if successful.
-    void* Lock(unsigned start, unsigned count, LockMode mode);
-    /// Unlock buffer.
-    void Unlock();
+    /// %Set a data range in the buffer. Optionally discard data outside the range.
+    bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
+    /// Update the shadow data to the GPU buffer. Call after manipulating shadow data directly, not necessary with SetData().
+    bool UpdateToGPU();
     /// Clear data lost flag.
     void ClearDataLost();
     
+    /// Return whether CPU memory shadowing is enabled.
+    bool IsShadowed() const { return shadowed_; }
     /// Return whether is dynamic.
     bool IsDynamic() const;
     /// Return whether default pool data lost.
@@ -69,13 +71,19 @@ public:
     unsigned GetIndexSize() const { return indexSize_; }
     /// Return used vertex range from index range.
     bool GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount);
+    /// Return CPU memory shadow data.
+    unsigned char* GetShadowData() const { return shadowData_.Get(); }
     
 private:
     /// Create buffer.
     bool Create();
+    /// Lock buffer.
+    void* Lock(unsigned start, unsigned count, bool discard);
+    /// Unlock buffer.
+    void Unlock();
     
-    /// Fallback data when operating with a null graphics subsystem.
-    SharedArrayPtr<unsigned char> fallbackData_;
+    /// Shadow data.
+    SharedArrayPtr<unsigned char> shadowData_;
     /// Memory pool.
     unsigned pool_;
     /// Usage type.
@@ -84,8 +92,8 @@ private:
     unsigned indexCount_;
     /// Index size.
     unsigned indexSize_;
-    /// Buffer locked flag.
-    bool locked_;
+    /// Shadowed flag.
+    bool shadowed_;
     /// Default pool data lost flag.
     bool dataLost_;
 };

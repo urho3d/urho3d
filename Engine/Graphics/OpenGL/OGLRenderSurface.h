@@ -50,6 +50,8 @@ public:
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
     /// Create a renderbuffer. Return true if successful.
     bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);
+    /// Handle device loss.
+    void OnDeviceLost();
     /// Release renderbuffer if any.
     void Release();
     

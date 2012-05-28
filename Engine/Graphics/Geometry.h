@@ -55,8 +55,6 @@ public:
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// %Set the LOD distance.
     void SetLodDistance(float distance);
-    /// %Set vertex and index raw data for CPU access. Vertex raw data should contain positions only.
-    void SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData);
     /// Draw.
     void Draw(Graphics* graphics);
     
@@ -88,10 +86,6 @@ public:
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
-    /// Return the raw vertex data array.
-    const SharedArrayPtr<unsigned char>& GetRawVertexData() const { return rawVertexData_; }
-    /// Return the raw index data array.
-    const SharedArrayPtr<unsigned char>& GetRawIndexData() const { return rawIndexData_; }
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
     float GetDistance(const Ray& ray);
     
@@ -119,8 +113,4 @@ private:
     unsigned positionBufferIndex_;
     /// LOD distance.
     float lodDistance_;
-    /// Raw vertex data (positions only) for CPU operations.
-    SharedArrayPtr<unsigned char> rawVertexData_;
-    /// Raw index data for CPU operations.
-    SharedArrayPtr<unsigned char> rawIndexData_;
 };

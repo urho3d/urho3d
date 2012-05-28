@@ -368,11 +368,9 @@ void DebugRenderer::Render()
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
-    void* lockedData = vertexBuffer_->Lock(0, numVertices, LOCK_DISCARD);
-    if (!lockedData)
-        return;
     
-    float* dest = (float*)lockedData;
+    void* scratch = graphics->ReserveScratchBuffer(numVertices * vertexBuffer_->GetVertexSize());
+    float* dest = (float*)scratch;
     
     for (unsigned i = 0; i < lines_.Size(); ++i)
     {
@@ -396,7 +394,8 @@ void DebugRenderer::Render()
         *((unsigned*)dest) = line.color_; dest++;
     }
     
-    vertexBuffer_->Unlock();
+    vertexBuffer_->SetDataRange(scratch, 0, numVertices, true);
+    graphics->FreeScratchBuffer(scratch);
     
     graphics->SetBlendMode(BLEND_REPLACE);
     graphics->SetColorWrite(true);

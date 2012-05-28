@@ -96,15 +96,6 @@ enum StencilOp
     OP_DECR
 };
 
-/// Buffer lock mode.
-enum LockMode
-{
-    LOCK_NORMAL,
-    LOCK_DISCARD,
-    LOCK_NOOVERWRITE,
-    LOCK_READONLY
-};
-
 /// Vertex elements.
 enum VertexElement
 {

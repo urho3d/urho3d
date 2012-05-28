@@ -77,6 +77,7 @@ Texture::Texture(Context* context) :
     dynamic_(false),
     shadowCompare_(false),
     parametersDirty_(true),
+    dataLost_(false),
     filterMode_(FILTER_DEFAULT)
 {
     for (int i = 0; i < MAX_COORDS; ++i)

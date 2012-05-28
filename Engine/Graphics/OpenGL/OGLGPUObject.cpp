@@ -43,5 +43,5 @@ GPUObject::~GPUObject()
 
 void GPUObject::OnDeviceLost()
 {
-    Release();
+    object_ = 0;
 }

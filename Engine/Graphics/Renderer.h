@@ -345,6 +345,8 @@ private:
     void CreateGeometries();
     /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
+    /// Create point light shadow indirection texture data.
+    void SetIndirectionTextureData();
     /// Prepare for rendering of a new view.
     void PrepareViewRender();
     /// Remove unused occlusion and screen buffers.

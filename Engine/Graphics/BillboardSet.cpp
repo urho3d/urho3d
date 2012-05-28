@@ -126,7 +126,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = 0.0f;
     
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &Matrix3x4::IDENTITY;
+    batches_[0].worldTransform_ = relative_ ? &node_->GetWorldTransform() : &Matrix3x4::IDENTITY;
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -361,9 +361,9 @@ void BillboardSet::UpdateBufferSize()
         return;
     
     // Indices do not change for a given billboard capacity
-    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, numBillboards * 6, LOCK_DISCARD);
-    if (!dest)
-        return;
+    Graphics* graphics = indexBuffer_->GetGraphics();
+    void* scratch = graphics->ReserveScratchBuffer(numBillboards * 6 * sizeof(unsigned short));
+    unsigned short* dest = (unsigned short*)scratch;
     unsigned vertexIndex = 0;
     while (numBillboards--)
     {
@@ -372,7 +372,8 @@ void BillboardSet::UpdateBufferSize()
         
         vertexIndex += 4;
     }
-    indexBuffer_->Unlock();
+    indexBuffer_->SetData(scratch);
+    graphics->FreeScratchBuffer(scratch);
 }
 
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
@@ -396,6 +397,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
+    Vector3 worldScale = worldTransform.Scale();
     
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)
@@ -429,16 +431,14 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     if (sorted_)
         Sort(sortedBillboards_.Begin(), sortedBillboards_.End(), CompareBillboards);
     
-    float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, LOCK_DISCARD);
-    if (!dest)
-        return;
-    Vector3 worldScale = worldTransform.Scale();
+    Graphics* graphics = vertexBuffer_->GetGraphics();
+    void* scratch = graphics->ReserveScratchBuffer(enabledBillboards * 4 * vertexBuffer_->GetVertexSize());
+    float* dest = (float*)scratch;
     
     for (unsigned i = 0; i < enabledBillboards; ++i)
     {
         Billboard& billboard = *sortedBillboards_[i];
         
-        Vector3 position(billboardTransform * billboard.position_);
         Vector2 size(billboard.size_.x_ * billboardScale.x_, billboard.size_.y_ * billboardScale.y_);
         unsigned color = billboard.color_.ToUInt();
         float angleRad = billboard.rotation_ * M_DEGTORAD;
@@ -449,32 +449,33 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         rotationMatrix[1][0] = -rotationMatrix[0][1];
         rotationMatrix[1][1] = rotationMatrix[0][0];
         
-        *dest++ = position.x_; *dest++ = position.y_; *dest++ = position.z_;
+        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
         *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.max_.y_;
         *dest++ = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         *dest++ = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = position.x_; *dest++ = position.y_; *dest++ = position.z_;
+        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
         *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.max_.y_;
         *dest++ = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         *dest++ = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = position.x_; *dest++ = position.y_; *dest++ = position.z_;
+        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
         *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.min_.y_;
         *dest++ = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         *dest++ = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
         
-        *dest++ = position.x_; *dest++ = position.y_; *dest++ = position.z_;
+        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
         *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.min_.y_;
         *dest++ = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         *dest++ = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
     }
     
-    vertexBuffer_->Unlock();
+    vertexBuffer_->SetDataRange(scratch, 0, enabledBillboards * 4, true);
+    graphics->FreeScratchBuffer(scratch);
 }
 
 void BillboardSet::MarkPositionsDirty()

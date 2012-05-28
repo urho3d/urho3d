@@ -49,6 +49,8 @@ public:
     /// Destruct.
     ~ShaderProgram();
     
+    /// Mark the GPU resource destroyed on context destruction.
+    virtual void OnDeviceLost();
     /// Release shader program.
     virtual void Release();
     
@@ -83,5 +85,4 @@ private:
     String linkerOutput_;
     /// Linked flag.
     bool linked_;
-    
 };

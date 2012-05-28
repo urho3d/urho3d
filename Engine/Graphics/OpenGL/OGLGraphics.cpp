@@ -1684,10 +1684,13 @@ void Graphics::RemoveGPUObject(GPUObject* object)
     gpuObjects_.Erase(gpuObjects_.Find(object));
 }
 
-void* Graphics::ReserveDiscardLockBuffer(unsigned size)
+void* Graphics::ReserveScratchBuffer(unsigned size)
 {
+    if (!size)
+        return 0;
+    
     // First check for a free buffer that is large enough
-    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
     {
         if (!i->reserved_ && i->size_ >= size)
         {
@@ -1697,7 +1700,7 @@ void* Graphics::ReserveDiscardLockBuffer(unsigned size)
     }
     
     // Then check if a free buffer can be resized
-    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
     {
         if (!i->reserved_)
         {
@@ -1709,17 +1712,20 @@ void* Graphics::ReserveDiscardLockBuffer(unsigned size)
     }
     
     // Finally allocate a new buffer
-    DiscardLockBuffer newBuffer;
+    ScratchBuffer newBuffer;
     newBuffer.data_ = new unsigned char[size];
     newBuffer.size_ = size;
     newBuffer.reserved_ = true;
-    discardLockBuffers_.Push(newBuffer);
+    scratchBuffers_.Push(newBuffer);
     return newBuffer.data_.Get();
 }
 
-void Graphics::FreeDiscardLockBuffer(void* buffer)
+void Graphics::FreeScratchBuffer(void* buffer)
 {
-    for (Vector<DiscardLockBuffer>::Iterator i = discardLockBuffers_.Begin(); i != discardLockBuffers_.End(); ++i)
+    if (!buffer)
+        return;
+    
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
     {
         if (i->reserved_ && i->data_.Get() == buffer)
         {
@@ -1728,7 +1734,7 @@ void Graphics::FreeDiscardLockBuffer(void* buffer)
         }
     }
     
-    LOGWARNING("Reserved discard lock buffer " + ToStringHex((unsigned)buffer) + " not found");
+    LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)buffer) + " not found");
 }
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
@@ -1736,42 +1742,51 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
-    CleanupFramebuffers(true);
-    
-    depthTextures_.Clear();
-    
     if (clearGPUObjects)
     {
-        // Shutting down: release all GPU objects that still exist
+        // Shutting down: release all GPU objects that still exist, then delete the context
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
+        
+        if (impl_->context_)
+        {
+            MutexLock lock(GetStaticMutex());
+            SDL_GL_DeleteContext(impl_->context_);
+            impl_->context_ = 0;
+        }
+        
+        CleanupFramebuffers(true);
     }
     else
     {
+        if (impl_->context_)
+        {
+            MutexLock lock(GetStaticMutex());
+            SDL_GL_DeleteContext(impl_->context_);
+            impl_->context_ = 0;
+        }
+        
         // We are not shutting down, but recreating the context: mark GPU objects lost
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
     }
     
+    CleanupFramebuffers(true);
+    depthTextures_.Clear();
+    shaderPrograms_.Clear();
+    
     // When the new context is initialized, it will have default state again
     ResetCachedState();
     ClearParameterSources();
     
+    if (closeWindow)
     {
         MutexLock lock(GetStaticMutex());
         
-        if (impl_->context_)
-        {
-            SDL_GL_DeleteContext(impl_->context_);
-            impl_->context_ = 0;
-        }
-        if (closeWindow)
-        {
-            SDL_ShowCursor(SDL_TRUE);
-            SDL_DestroyWindow(impl_->window_);
-            impl_->window_ = 0;
-        }
+        SDL_ShowCursor(SDL_TRUE);
+        SDL_DestroyWindow(impl_->window_);
+        impl_->window_ = 0;
     }
 }
 
@@ -2128,23 +2143,25 @@ bool Graphics::CheckFramebuffer()
     return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
 }
 
-void Graphics::CleanupFramebuffers(bool deleteAll)
+void Graphics::CleanupFramebuffers(bool contextLost)
 {
-    if (deleteAll && impl_->boundFbo_)
+    if (!contextLost)
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        impl_->boundFbo_ = 0;
-    }
-    
-    for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();)
-    {
-        Map<unsigned long long, FrameBufferObject>::Iterator current = i++;
-        if (deleteAll || (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) >
-            MAX_FRAMEBUFFER_AGE))
+        for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();)
         {
-            glDeleteFramebuffersEXT(1, &current->second_.fbo_);
-            impl_->frameBuffers_.Erase(current);
+            Map<unsigned long long, FrameBufferObject>::Iterator current = i++;
+            if (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) >
+                MAX_FRAMEBUFFER_AGE)
+            {
+                glDeleteFramebuffersEXT(1, &current->second_.fbo_);
+                impl_->frameBuffers_.Erase(current);
+            }
         }
+    }
+    else
+    {
+        impl_->boundFbo_ = 0;
+        impl_->frameBuffers_.Clear();
     }
 }
 

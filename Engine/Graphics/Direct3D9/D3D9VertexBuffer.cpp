@@ -72,12 +72,14 @@ VertexBuffer::VertexBuffer(Context* context) :
     usage_(0),
     vertexCount_(0),
     elementMask_(0),
-    morphRangeStart_(0),
-    morphRangeCount_(0),
-    locked_(false),
+    shadowed_(false),
     dataLost_(false)
 {
     UpdateOffsets();
+    
+    // Force shadowing mode if graphics subsystem does not exist
+    if (!graphics_)
+        shadowed_ = true;
 }
 
 VertexBuffer::~VertexBuffer()
@@ -88,7 +90,10 @@ VertexBuffer::~VertexBuffer()
 void VertexBuffer::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
+    {
         Release();
+        dataLost_ = true;
+    }
 }
 
 void VertexBuffer::OnDeviceReset()
@@ -96,7 +101,8 @@ void VertexBuffer::OnDeviceReset()
     if (pool_ == D3DPOOL_DEFAULT)
     {
         Create();
-        dataLost_ = true;
+        if (UpdateToGPU())
+            dataLost_ = false;
     }
 }
 
@@ -107,8 +113,6 @@ void VertexBuffer::Release()
         if (!graphics_)
             return;
         
-        Unlock();
-        
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
@@ -118,8 +122,23 @@ void VertexBuffer::Release()
         ((IDirect3DVertexBuffer9*)object_)->Release();
         object_ = 0;
     }
+}
+
+void VertexBuffer::SetShadowed(bool enable)
+{
+    // If no graphics subsystem, can not disable shadowing
+    if (!graphics_)
+        enable = true;
     
-    fallbackData_.Reset();
+    if (enable != shadowed_)
+    {
+        if (enable && vertexSize_ && vertexCount_)
+            shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
+        else
+            shadowData_.Reset();
+        
+        shadowed_ = enable;
+    }
 }
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
@@ -138,129 +157,81 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
     vertexCount_ = vertexCount;
     elementMask_ = elementMask;
     
-    if (morphRangeStart_ + morphRangeCount_ > vertexCount_)
-    {
-        morphRangeStart_ = 0;
-        morphRangeCount_ = 0;
-    }
-    
     UpdateOffsets();
+    
+    if (shadowed_ && vertexCount_ && vertexSize_)
+        shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
+    else
+        shadowData_.Reset();
+    
     return Create();
 }
 
 bool VertexBuffer::SetData(const void* data)
 {
-    void* hwData = Lock(0, vertexCount_, LOCK_DISCARD);
-    if (!hwData)
-        return false;
-    
-    memcpy(hwData, data, vertexCount_ * vertexSize_);
-    Unlock();
-    return true;
-}
-
-bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
-{
-    if (!count)
-        return true;
-    
-    void* hwData = Lock(start, count, LOCK_NORMAL);
-    if (!hwData)
-        return false;
-    
-    memcpy(hwData, data, count * vertexSize_);
-    Unlock();
-    return true;
-}
-
-bool VertexBuffer::SetMorphRange(unsigned start, unsigned count)
-{
-    if (start + count > vertexCount_)
+    if (!data)
     {
-        LOGERROR("Illegal morph range");
+        LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
-    
-    morphRangeStart_ = start;
-    morphRangeCount_ = count;
-    return true;
-}
-
-void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& data)
-{
-    morphRangeResetData_ = data;
-}
-
-void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
-{
-    if (!object_ && !fallbackData_)
-        return 0;
-
-    if (locked_)
-    {
-        LOGERROR("Vertex buffer already locked");
-        return 0;
-    }
-    
-    if (!count || start + count > vertexCount_)
-    {
-        LOGERROR("Illegal range for locking vertex buffer");
-        return 0;
-    }
-    
-    void* hwData = 0;
     
     if (object_)
     {
-        DWORD flags = 0;
-        
-        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
-            flags = D3DLOCK_DISCARD;
-        if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
-            flags = D3DLOCK_NOOVERWRITE;
-        if (mode == LOCK_READONLY)
-            flags = D3DLOCK_READONLY;
-        
-        if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
+        void* hwData = Lock(0, vertexCount_, true);
+        if (hwData)
         {
-            LOGERROR("Could not lock vertex buffer");
-            return 0;
+            memcpy(hwData, data, vertexCount_ * vertexSize_);
+            Unlock();
         }
     }
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+    
+    return true;
+}
+
+bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
+{
+    if (start == 0 && count == vertexCount_)
+        return SetData(data);
+    
+    if (!data)
+    {
+        LOGERROR("Null pointer for vertex buffer data");
+        return false;
+    }
+    
+    if (start + count > vertexCount_)
+    {
+        LOGERROR("Illegal range for setting new index buffer data");
+        return false;
+    }
+    
+    if (!count)
+        return true;
+    
+    if (object_)
+    {
+        void* hwData = Lock(start, count, discard);
+        if (hwData)
+        {
+            memcpy(hwData, data, count * vertexSize_);
+            Unlock();
+        }
+    }
+    
+    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
+        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+    
+    return true;
+}
+
+bool VertexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
     else
-        hwData = fallbackData_.Get() + start * vertexSize_;
-    
-    locked_ = true;
-    return hwData;
-}
-
-void VertexBuffer::Unlock()
-{
-    if (locked_)
-    {
-        if (object_)
-            ((IDirect3DVertexBuffer9*)object_)->Unlock();
-        locked_ = false;
-    }
-}
-
-void* VertexBuffer::LockMorphRange()
-{
-    if (!HasMorphRange())
-    {
-        LOGERROR("No vertex morph range defined");
-        return 0;
-    }
-    
-    return Lock(morphRangeStart_, morphRangeCount_, LOCK_DISCARD);
-}
-
-void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
-{
-    if (!lockedMorphRange || !morphRangeResetData_)
-        return;
-    
-    memcpy(lockedMorphRange, morphRangeResetData_.Get(), morphRangeCount_ * vertexSize_);
+        return false;
 }
 
 void VertexBuffer::ClearDataLost()
@@ -339,8 +310,33 @@ bool VertexBuffer::Create()
             return false;
         }
     }
-    else
-        fallbackData_ = new unsigned char[vertexCount_ * vertexSize_];
     
     return true;
+}
+
+void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+{
+    void* hwData = 0;
+    
+    if (object_)
+    {
+        DWORD flags = 0;
+        
+        if (discard && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_DISCARD;
+        
+        if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
+        {
+            LOGERROR("Could not lock vertex buffer");
+            return 0;
+        }
+    }
+    
+    return hwData;
+}
+
+void VertexBuffer::Unlock()
+{
+    if (object_)
+        ((IDirect3DVertexBuffer9*)object_)->Unlock();
 }

@@ -43,6 +43,17 @@ ShaderVariation::~ShaderVariation()
     Release();
 }
 
+void ShaderVariation::OnDeviceLost()
+{
+    GPUObject::OnDeviceLost();
+    
+    compiled_ = false;
+    compilerOutput_.Clear();
+    
+    if (graphics_)
+        graphics_->CleanupShaderPrograms();
+}
+
 void ShaderVariation::Release()
 {
     if (object_)

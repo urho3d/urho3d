@@ -633,7 +633,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
         vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
         elementMasks.Push(instanceBuffer->GetElementMask());
         
-        // No stream offset support, instancing buffer not pre-filled with transforms: have to lock and fill now
+        // No stream offset support, instancing buffer not pre-filled with transforms: have fill now
         if (startIndex_ == M_MAX_UNSIGNED)
         {
             unsigned startIndex = 0;
@@ -643,19 +643,13 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
                 if (instances > instanceBuffer->GetVertexCount())
                     instances = instanceBuffer->GetVertexCount();
                 
-                // Lock the instance stream buffer and copy the transforms
-                void* data = instanceBuffer->Lock(0, instances, LOCK_DISCARD);
-                if (!data)
-                {
-                    // Remember to remove the instancing buffer and element mask
-                    vertexBuffers.Pop();
-                    elementMasks.Pop();
-                    return;
-                }
-                Matrix3x4* dest = (Matrix3x4*)data;
+                // Copy the transforms
+                void* scratch = graphics->ReserveScratchBuffer(instances * instanceBuffer->GetVertexSize());
+                Matrix3x4* dest = (Matrix3x4*)scratch;
                 for (unsigned i = 0; i < instances; ++i)
                     dest[i] = *instances_[i + startIndex].worldTransform_;
-                instanceBuffer->Unlock();
+                instanceBuffer->SetDataRange(scratch, 0, instances, true);
+                graphics->FreeScratchBuffer(scratch);
                 
                 graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
                 graphics->SetVertexBuffers(vertexBuffers, elementMasks);

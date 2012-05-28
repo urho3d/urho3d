@@ -75,21 +75,24 @@ bool Texture2D::Load(Deserializer& source)
 void Texture2D::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
+    {
         Release();
+        dataLost_ = true;
+    }
 }
 
 void Texture2D::OnDeviceReset()
 {
     if (pool_ == D3DPOOL_DEFAULT)
     {
-        // If has a file name, reload through the resource cache. Otherwise recreate and mark the data lost
+        // If has a file name, reload through the resource cache. Otherwise just recreate.
         if (!GetName().Trimmed().Empty())
-            GetSubsystem<ResourceCache>()->ReloadResource(this);
-        else
         {
-            Create();
-            dataLost_ = true;
+            if (GetSubsystem<ResourceCache>()->ReloadResource(this))
+                dataLost_ = false;
         }
+        else
+            Create();
     }
 }
 

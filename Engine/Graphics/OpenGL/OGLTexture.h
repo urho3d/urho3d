@@ -77,8 +77,8 @@ public:
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
-    /// Return whether data is lost. Always false on OpenGL.
-    bool IsDataLost() const { return false; }
+    /// Return whether data is lost due to context loss.
+    bool IsDataLost() const { return dataLost_; }
     /// Return whether parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_; }
     /// Return filtering mode.
@@ -139,6 +139,8 @@ protected:
     bool shadowCompare_;
     /// Parameters dirty flag.
     bool parametersDirty_;
+    /// Data lost flag.
+    bool dataLost_;
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.
@@ -149,6 +151,4 @@ protected:
     Color borderColor_;
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
-    /// Save data per mip level.
-    Vector<SharedArrayPtr<unsigned char> > savedLevels_;
 };

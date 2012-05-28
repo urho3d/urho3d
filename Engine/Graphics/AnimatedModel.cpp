@@ -909,24 +909,17 @@ void AnimatedModel::CloneGeometries()
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
     {
         VertexBuffer* original = originalVertexBuffers[i];
-        if (original->HasMorphRange())
+        if (model_->GetMorphRangeCount(i))
         {
             SharedPtr<VertexBuffer> clone(new VertexBuffer(context_));
             clone->SetSize(original->GetVertexCount(), original->GetElementMask(), true);
-            /// \todo Will not work on OpenGL ES
-            void* originalData = original->Lock(0, original->GetVertexCount(), LOCK_READONLY);
-            if (originalData)
-            {
-                clone->SetData(originalData);
-                original->Unlock();
-            }
-            
-            clone->SetMorphRange(original->GetMorphRangeStart(), original->GetMorphRangeCount());
-            clone->SetMorphRangeResetData(original->GetMorphRangeResetData());
+            clone->SetData(original->GetShadowData());
             
             clonedVertexBuffers[original] = clone;
             morphVertexBuffers_[i] = clone;
         }
+        else
+            morphVertexBuffers_[i].Reset();
     }
     
     // Geometries will always be cloned fully. They contain only references to buffer, so they are relatively light
@@ -952,7 +945,6 @@ void AnimatedModel::CloneGeometries()
             clone->SetIndexBuffer(original->GetIndexBuffer());
             clone->SetDrawRange(original->GetPrimitiveType(), original->GetIndexStart(), original->GetIndexCount());
             clone->SetLodDistance(original->GetLodDistance());
-            clone->SetRawData(original->GetRawVertexData(), original->GetRawIndexData());
             
             geometries_[i][j] = clone;
         }
@@ -1069,6 +1061,10 @@ void AnimatedModel::UpdateSkinning()
 
 void AnimatedModel::UpdateMorphs()
 {
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return;
+    
     if (morphs_.Size())
     {
         // Reset the morph data range from all morphable vertex buffers, then apply morphs
@@ -1077,10 +1073,13 @@ void AnimatedModel::UpdateMorphs()
             VertexBuffer* buffer = morphVertexBuffers_[i];
             if (buffer)
             {
-                void* lockedMorphRange = buffer->LockMorphRange();
-                if (!lockedMorphRange)
-                    continue;
-                buffer->ResetMorphRange(lockedMorphRange);
+                VertexBuffer* originalBuffer = model_->GetVertexBuffers()[i];
+                unsigned morphStart = model_->GetMorphRangeStart(i);
+                unsigned morphCount = model_->GetMorphRangeCount(i);
+                unsigned vertexSize = buffer->GetVertexSize();
+                void* scratch = graphics->ReserveScratchBuffer(morphCount * vertexSize);
+                // Reset morph range by copying data from the original vertex buffer
+                memcpy(scratch, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
                 
                 for (unsigned j = 0; j < morphs_.Size(); ++j)
                 {
@@ -1088,11 +1087,12 @@ void AnimatedModel::UpdateMorphs()
                     {
                         Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                         if (k != morphs_[j].buffers_.End())
-                            ApplyMorph(buffer, lockedMorphRange, k->second_, morphs_[j].weight_);
+                            ApplyMorph(buffer, scratch, morphStart, k->second_, morphs_[j].weight_);
                     }
                 }
                 
-                buffer->Unlock();
+                buffer->SetDataRange(scratch, morphStart, morphCount);
+                graphics->FreeScratchBuffer(scratch);
             }
         }
     }
@@ -1100,17 +1100,16 @@ void AnimatedModel::UpdateMorphs()
     morphsDirty_ = false;
 }
 
-void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* lockedMorphRange, const VertexBufferMorph& morph, float weight)
+void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight)
 {
     unsigned elementMask = morph.elementMask_;
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(ELEMENT_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(ELEMENT_TANGENT);
-    unsigned morphRangeStart = buffer->GetMorphRangeStart();
     unsigned vertexSize = buffer->GetVertexSize();
     
     unsigned char* srcData = morph.morphData_;
-    unsigned char* destData = (unsigned char*)lockedMorphRange;
+    unsigned char* destData = (unsigned char*)destVertexData;
     
     while (vertexCount--)
     {

@@ -37,12 +37,14 @@ OBJECTTYPESTATIC(IndexBuffer);
 IndexBuffer::IndexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),
-    discardLockData_(0),
     indexCount_(0),
     indexSize_(0),
     dynamic_(false),
-    locked_(false)
+    dataLost_(false)
 {
+    // Force shadowing mode if graphics subsystem does not exist
+    if (!graphics_)
+        shadowed_ = true;
 }
 
 IndexBuffer::~IndexBuffer()
@@ -52,17 +54,9 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::OnDeviceLost()
 {
-    if (object_)
-    {
-        void* hwData = Lock(0, indexCount_, LOCK_READONLY);
-        if (hwData)
-        {
-            saveData_ = new unsigned char[indexCount_ * indexSize_];
-            memcpy(saveData_.Get(), hwData, indexCount_ * indexSize_);
-        }
-        Unlock();
-        Release();
-    }
+    GPUObject::OnDeviceLost();
+    
+    dataLost_ = true;
 }
 
 void IndexBuffer::OnDeviceReset()
@@ -70,31 +64,38 @@ void IndexBuffer::OnDeviceReset()
     if (!object_)
     {
         Create();
-        if (saveData_)
-        {
-            SetData(saveData_.Get());
-            saveData_.Reset();
-        }
+        if (UpdateToGPU())
+            dataLost_ = false;
     }
 }
 
 void IndexBuffer::Release()
 {
-    if (object_)
+    if (object_ && graphics_)
     {
-        if (!graphics_)
-            return;
-        
-        Unlock();
-        
         if (graphics_->GetIndexBuffer() == this)
             graphics_->SetIndexBuffer(0);
         
         glDeleteBuffers(1, &object_);
         object_ = 0;
     }
+}
+
+void IndexBuffer::SetShadowed(bool enable)
+{
+    // If no graphics subsystem, can not disable shadowing
+    if (!graphics_)
+        enable = true;
     
-    fallbackData_.Reset();
+    if (enable != shadowed_)
+    {
+        if (enable && indexCount_ && indexSize_)
+            shadowData_ = new unsigned char[indexCount_ * indexSize_];
+        else
+            shadowData_.Reset();
+        
+        shadowed_ = enable;
+    }
 }
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
@@ -102,6 +103,11 @@ bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
     dynamic_ = dynamic;
     indexCount_ = indexCount;
     indexSize_ = largeIndices ? sizeof(unsigned) : sizeof(unsigned short);
+    
+    if (shadowed_ && indexCount_ && indexSize_)
+        shadowData_ = new unsigned char[indexCount_ * indexSize_];
+    else
+        shadowData_.Reset();
     
     return Create();
 }
@@ -114,27 +120,24 @@ bool IndexBuffer::SetData(const void* data)
         return false;
     }
     
-    if (locked_)
-        Unlock();
-    
     if (object_)
     {
         graphics_->SetIndexBuffer(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        return true;
-    }
-    else if (fallbackData_)
-    {
-        memcpy(fallbackData_.Get(), data, indexCount_ * indexSize_);
-        return true;
     }
     
-    return false;
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+    
+    return true;
 }
 
-bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
+bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count, bool discard)
 {
+    if (start == 0 && count == indexCount_)
+        return SetData(data);
+    
     if (!data)
     {
         LOGERROR("Null pointer for index buffer data");
@@ -147,123 +150,47 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
         return false;
     }
     
-    if (locked_)
-        Unlock();
+    if (!count)
+        return true;
     
     if (object_)
     {
         graphics_->SetIndexBuffer(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
-        return true;
-    }
-    else if (fallbackData_)
-    {
-        memcpy(fallbackData_.Get() + start * indexSize_, data, count * indexSize_);
-        return true;
+        if (!discard || start != 0)
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
+        else
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     
-    return false;
+    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
+        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    
+    return true;
 }
 
-void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
+bool IndexBuffer::UpdateToGPU()
 {
-    if (!object_ && !fallbackData_)
-        return 0;
-    
-    if (locked_)
+    if (object_ && shadowData_)
     {
-        LOGERROR("Index buffer already locked");
-        return 0;
-    }
-
-    if (!count || start + count > indexCount_)
-    {
-        LOGERROR("Illegal range for locking index buffer");
-        return 0;
-    }
-    
-    void* hwData = 0;
-    
-    if (object_)
-    {
-        #ifndef GL_ES_VERSION_2_0
-        GLenum glLockMode = GL_WRITE_ONLY;
-        if (mode == LOCK_READONLY)
-            glLockMode = GL_READ_ONLY;
-        else if (mode == LOCK_NORMAL)
-            glLockMode = GL_READ_WRITE;
-        #endif
-        
-        // In discard mode, use a CPU side buffer to avoid stalling
-        if (mode == LOCK_DISCARD)
-        {
-            hwData = discardLockData_ = graphics_->ReserveDiscardLockBuffer(count * indexSize_);
-            discardLockStart_ = start;
-            discardLockCount_ = count;
-        }
-        else
-        {
-            #ifndef GL_ES_VERSION_2_0
-            graphics_->SetIndexBuffer(0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-            hwData = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, glLockMode);
-            if (!hwData)
-                return 0;
-            hwData = (unsigned char*)hwData + start * indexSize_;
-            #else
-            LOGERROR("Locking the index buffer without discard not supported on OpenGL ES");
-            #endif
-        }
+        graphics_->SetIndexBuffer(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, shadowData_.Get(), dynamic_ ? GL_DYNAMIC_DRAW :
+            GL_STATIC_DRAW);
+        return true;
     }
     else
-        hwData = fallbackData_.Get() + start * indexSize_;
-    
-    locked_ = true;
-    return hwData;
-}
-
-void IndexBuffer::Unlock()
-{
-    if (locked_)
-    {
-        locked_ = false;
-        
-        if (object_)
-        {
-            if (!discardLockData_)
-            {
-                #ifndef GL_ES_VERSION_2_0
-                graphics_->SetIndexBuffer(0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-                glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-                #endif
-            }
-            else
-            {
-                if (discardLockCount_ < indexCount_)
-                    SetDataRange(discardLockData_, discardLockStart_, discardLockCount_);
-                else
-                    SetData(discardLockData_);
-                graphics_->FreeDiscardLockBuffer(discardLockData_);
-                discardLockData_ = 0;
-            }
-        }
-    }
+        return false;
 }
 
 void IndexBuffer::ClearDataLost()
 {
+    dataLost_ = false;
 }
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
-    #ifdef GL_ES_VERSION_2_0
-    return false;
-    #endif
-    
-    void* data = Lock(start, count, LOCK_READONLY);
-    if (!data)
+    if (!shadowData_)
         return false;
     
     minVertex = M_MAX_UNSIGNED;
@@ -271,7 +198,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     
     if (indexSize_ == sizeof(unsigned))
     {
-        unsigned* indices = (unsigned*)data;
+        unsigned* indices = (unsigned*)shadowData_.Get();
         
         for (unsigned i = 0; i < count; ++i)
         {
@@ -283,7 +210,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     }
     else
     {
-        unsigned short* indices = (unsigned short*)data;
+        unsigned short* indices = (unsigned short*)shadowData_.Get();
         
         for (unsigned i = 0; i < count; ++i)
         {
@@ -295,8 +222,6 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     }
     
     vertexCount = maxVertex - minVertex + 1;
-    
-    Unlock();
     return true;
 }
 
@@ -318,8 +243,6 @@ bool IndexBuffer::Create()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
-    else
-        fallbackData_ = new unsigned char[indexCount_ * indexSize_];
     
     return true;
 }

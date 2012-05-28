@@ -37,26 +37,24 @@
 
 #include "DebugNew.h"
 
-unsigned StoreOrLookupVertexBuffer(VertexBuffer* buffer, Vector<VertexBuffer*>& dest)
+unsigned LookupVertexBuffer(VertexBuffer* buffer, const Vector<SharedPtr<VertexBuffer> >& buffers)
 {
-    for (unsigned i = 0; i < dest.Size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (dest[i] == buffer)
+        if (buffers[i] == buffer)
             return i;
     }
-    dest.Push(buffer);
-    return dest.Size() - 1;
+    return 0;
 }
 
-unsigned StoreOrLookupIndexBuffer(IndexBuffer* buffer, Vector<IndexBuffer*>& dest)
+unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuffer> >& buffers)
 {
-    for (unsigned i = 0; i < dest.Size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (dest[i] == buffer)
+        if (buffers[i] == buffer)
             return i;
     }
-    dest.Push(buffer);
-    return dest.Size() - 1;
+    return 0;
 }
 
 OBJECTTYPESTATIC(Model);
@@ -95,50 +93,26 @@ bool Model::Load(Deserializer& source)
     
     unsigned memoryUse = sizeof(Model);
     
-    Vector<SharedArrayPtr<unsigned char> > rawVertexDatas;
-    Vector<SharedArrayPtr<unsigned char> > rawIndexDatas;
-    
     // Read vertex buffers
     unsigned numVertexBuffers = source.ReadUInt();
+    morphRangeStarts_.Resize(numVertexBuffers);
+    morphRangeCounts_.Resize(numVertexBuffers);
     for (unsigned i = 0; i < numVertexBuffers; ++i)
     {
         unsigned vertexCount = source.ReadUInt();
         unsigned elementMask = source.ReadUInt();
-        unsigned morphStart = source.ReadUInt();
-        unsigned morphCount = source.ReadUInt();
+        morphRangeStarts_[i] = source.ReadUInt();
+        morphRangeCounts_[i] = source.ReadUInt();
         
         SharedPtr<VertexBuffer> buffer(new VertexBuffer(context_));
+        buffer->SetShadowed(true);
         buffer->SetSize(vertexCount, elementMask);
-        buffer->SetMorphRange(morphStart, morphCount);
         
         unsigned vertexSize = buffer->GetVertexSize();
-        SharedArrayPtr<unsigned char> data(new unsigned char[vertexCount * vertexSize]);
+        source.Read(buffer->GetShadowData(), vertexCount * vertexSize);
+        buffer->UpdateToGPU();
+        
         memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
-
-        source.Read(data.Get(), vertexCount * vertexSize);
-        buffer->SetData(data.Get());
-
-        // If there is a morph range, make a copy of the data so that the morph range can be reset
-        if (morphCount)
-        {
-            SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
-            memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
-            buffer->SetMorphRangeResetData(morphResetData);
-            memoryUse += morphCount * vertexSize;
-        }
-        
-        // Copy the raw position data for CPU-side operations
-        SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
-        float* rawDest = (float*)rawVertexData.Get();
-        for (unsigned i = 0; i < vertexCount; ++i)
-        {
-            float* rawSrc = (float*)&data[i * vertexSize];
-            *rawDest++ = *rawSrc++;
-            *rawDest++ = *rawSrc++;
-            *rawDest++ = *rawSrc++;
-        }
-        
-        rawVertexDatas.Push(rawVertexData);
         vertexBuffers_.Push(buffer);
     }
 
@@ -148,18 +122,15 @@ bool Model::Load(Deserializer& source)
     {
         unsigned indexCount = source.ReadUInt();
         unsigned indexSize = source.ReadUInt();
-
+        
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
+        buffer->SetShadowed(true);
         buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
-
-        // Copy the raw index data for CPU-side operations
-        SharedArrayPtr<unsigned char> data(new unsigned char[indexSize * indexCount]);
+        
+        source.Read(buffer->GetShadowData(), indexCount * indexSize);
+        buffer->UpdateToGPU();
+        
         memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
-
-        source.Read(data.Get(), indexCount * indexSize);
-        buffer->SetData(data.Get());
-
-        rawIndexDatas.Push(data);
         indexBuffers_.Push(buffer);
     }
     
@@ -204,7 +175,6 @@ bool Model::Load(Deserializer& source)
             geometry->SetIndexBuffer(indexBuffers_[indexBufferRef]);
             geometry->SetDrawRange(type, indexStart, indexCount);
             geometry->SetLodDistance(distance);
-            geometry->SetRawData(rawVertexDatas[vertexBufferRef], rawIndexDatas[indexBufferRef]);
             
             geometryLodLevels.Push(geometry);
             memoryUse += sizeof(Geometry);
@@ -273,52 +243,29 @@ bool Model::Load(Deserializer& source)
 
 bool Model::Save(Serializer& dest)
 {
-    // Build lists of vertex and index buffers used by the geometries
-    Vector<VertexBuffer*> vertexBuffers;
-    Vector<IndexBuffer*> indexBuffers;
-    
-    for (unsigned i = 0; i < geometries_.Size(); ++i)
-    {
-        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
-        {
-            StoreOrLookupVertexBuffer(geometries_[i][j]->GetVertexBuffer(0), vertexBuffers);
-            StoreOrLookupIndexBuffer(geometries_[i][j]->GetIndexBuffer(), indexBuffers);
-        }
-    }
-    
     // Write ID
     if (!dest.WriteFileID("UMDL"))
         return false;
     
     // Write vertex buffers
-    dest.WriteUInt(vertexBuffers.Size());
-    for (unsigned i = 0; i < vertexBuffers.Size(); ++i)
+    dest.WriteUInt(vertexBuffers_.Size());
+    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        VertexBuffer* buffer = vertexBuffers[i];
+        VertexBuffer* buffer = vertexBuffers_[i];
         dest.WriteUInt(buffer->GetVertexCount());
         dest.WriteUInt(buffer->GetElementMask());
-        dest.WriteUInt(buffer->GetMorphRangeStart());
-        dest.WriteUInt(buffer->GetMorphRangeCount());
-        /// \todo Will not work on OpenGL ES
-        void* data = buffer->Lock(0, buffer->GetVertexCount(), LOCK_READONLY);
-        if (!data)
-            return false;
-        dest.Write(data, buffer->GetVertexCount() * buffer->GetVertexSize());
-        buffer->Unlock();
+        dest.WriteUInt(morphRangeStarts_[i]);
+        dest.WriteUInt(morphRangeCounts_[i]);
+        dest.Write(buffer->GetShadowData(), buffer->GetVertexCount() * buffer->GetVertexSize());
     }
     // Write index buffers
-    dest.WriteUInt(indexBuffers.Size());
-    for (unsigned i = 0; i < indexBuffers.Size(); ++i)
+    dest.WriteUInt(indexBuffers_.Size());
+    for (unsigned i = 0; i < indexBuffers_.Size(); ++i)
     {
-        IndexBuffer* buffer = indexBuffers[i];
+        IndexBuffer* buffer = indexBuffers_[i];
         dest.WriteUInt(buffer->GetIndexCount());
         dest.WriteUInt(buffer->GetIndexSize());
-        /// \todo Will not work on OpenGL ES
-        void* data = buffer->Lock(0, buffer->GetIndexCount(), LOCK_READONLY);
-        if (!data)
-            return false;
-        dest.Write(data, buffer->GetIndexCount() * buffer->GetIndexSize());
-        buffer->Unlock();
+        dest.Write(buffer->GetShadowData(), buffer->GetIndexCount() * buffer->GetIndexSize());
     }
     // Write geometries
     dest.WriteUInt(geometries_.Size());
@@ -336,8 +283,8 @@ bool Model::Save(Serializer& dest)
             Geometry* geometry = geometries_[i][j];
             dest.WriteFloat(geometry->GetLodDistance());
             dest.WriteUInt(geometry->GetPrimitiveType());
-            dest.WriteUInt(StoreOrLookupVertexBuffer(geometry->GetVertexBuffer(0), vertexBuffers));
-            dest.WriteUInt(StoreOrLookupIndexBuffer(geometry->GetIndexBuffer(), indexBuffers));
+            dest.WriteUInt(LookupVertexBuffer(geometry->GetVertexBuffer(0), vertexBuffers_));
+            dest.WriteUInt(LookupIndexBuffer(geometry->GetIndexBuffer(), indexBuffers_));
             dest.WriteUInt(geometry->GetIndexStart());
             dest.WriteUInt(geometry->GetIndexCount());
         }
@@ -388,6 +335,56 @@ bool Model::Save(Serializer& dest)
 void Model::SetBoundingBox(const BoundingBox& box)
 {
     boundingBox_ = box;
+}
+
+bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts)
+{
+    for (unsigned i = 0; i < buffers.Size(); ++i)
+    {
+        if (!buffers[i])
+        {
+            LOGERROR("Null model vertex buffers specified");
+            return false;
+        }
+        if (!buffers[i]->IsShadowed())
+        {
+            LOGERROR("Model vertex buffers must be shadowed");
+            return false;
+        }
+    }
+    
+    vertexBuffers_ = buffers;
+    morphRangeStarts_.Resize(buffers.Size());
+    morphRangeCounts_.Resize(buffers.Size());
+    
+    // If morph ranges are not specified for buffers, assume to be zero
+    for (unsigned i = 0; i < buffers.Size(); ++i)
+    {
+        morphRangeStarts_[i] = i < morphRangeStarts.Size() ? morphRangeStarts[i] : 0;
+        morphRangeCounts_[i] = i < morphRangeCounts.Size() ? morphRangeCounts[i] : 0;
+    }
+    
+    return true;
+}
+
+bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers)
+{
+    for (unsigned i = 0; i < buffers.Size(); ++i)
+    {
+        if (!buffers[i])
+        {
+            LOGERROR("Null model index buffers specified");
+            return false;
+        }
+        if (!buffers[i]->IsShadowed())
+        {
+            LOGERROR("Model index buffers must be shadowed");
+            return false;
+        }
+    }
+    
+    indexBuffers_ = buffers;
+    return true;
 }
 
 void Model::SetNumGeometries(unsigned num)
@@ -490,4 +487,14 @@ const ModelMorph* Model::GetMorph(StringHash nameHash) const
     }
     
     return 0;
+}
+
+unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
+{
+    return bufferIndex < vertexBuffers_.Size() ? morphRangeStarts_[bufferIndex] : 0;
+}
+
+unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
+{
+    return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
