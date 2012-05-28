@@ -304,14 +304,6 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
     return attrBuffer_.GetBuffer();
 }
 
-void BillboardSet::OnMarkedDirty(Node* node)
-{
-    Drawable::OnMarkedDirty(node);
-    
-    if (node == node_ && relative_)
-        bufferDirty_ = true;
-}
-
 void BillboardSet::OnWorldBoundingBoxUpdate()
 {
     worldBoundingBox_.defined_ = false;

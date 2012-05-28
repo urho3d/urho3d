@@ -117,8 +117,6 @@ public:
     const PODVector<unsigned char>& GetNetBillboardsAttr() const;
     
 protected:
-    /// Handle node transform being dirtied. Mark billboards dirty if necessary.
-    virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Mark billboard vertex buffer to need an update.

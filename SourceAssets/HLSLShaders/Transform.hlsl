@@ -26,9 +26,9 @@ float GetDepth(float4 clipPos)
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
-float3 GetBillboardPos(float4 iPos, float2 iSize)
+float3 GetBillboardPos(float4 iPos, float2 iSize, float4x3 modelMatrix)
 {
-    return float3(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector);
+    return mul(float4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0), modelMatrix);
 }
 
 float3 GetBillboardNormal()
@@ -45,7 +45,7 @@ float3 GetBillboardNormal()
 #endif
 
 #ifdef BILLBOARD
-    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize)
+    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, modelMatrix)
 #else
     #define GetWorldPos(modelMatrix) mul(iPos, modelMatrix)
 #endif
