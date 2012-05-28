@@ -690,7 +690,7 @@ void BuildAndSaveModel(OutModel& model)
             vb->SetSize(mesh->mNumVertices, elementMask);
             
             // Build the index data
-            void* indexData = ib->Lock(0, ib->GetIndexCount(), LOCK_NORMAL);
+            void* indexData = ib->GetShadowData();
             if (!largeIndices)
             {
                 unsigned short* dest = (unsigned short*)indexData;
@@ -712,13 +712,10 @@ void BuildAndSaveModel(OutModel& model)
             if (model.bones_.Size())
                 GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
             
-            void* vertexData = vb->Lock(0, vb->GetVertexCount(), LOCK_NORMAL);
+            void* vertexData = vb->GetShadowData();
             float* dest = (float*)vertexData;
             for (unsigned j = 0; j < mesh->mNumVertices; ++j)
                 WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
-            
-            ib->Unlock();
-            vb->Unlock();
             
             // Calculate the geometry center
             Vector3 center = Vector3::ZERO;
@@ -730,6 +727,15 @@ void BuildAndSaveModel(OutModel& model)
             }
             if (mesh->mNumFaces)
                 center /= (float)mesh->mNumFaces * 3;
+            
+            // Define the model buffers
+            Vector<SharedPtr<VertexBuffer> > vbVector;
+            Vector<SharedPtr<IndexBuffer> > ibVector;
+            PODVector<unsigned> emptyMorphRange;
+            vbVector.Push(vb);
+            ibVector.Push(ib);
+            outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+            outModel->SetIndexBuffers(ibVector);
             
             // Define the geometry
             geom->SetIndexBuffer(ib);
@@ -753,11 +759,8 @@ void BuildAndSaveModel(OutModel& model)
         
         unsigned startVertexOffset = 0;
         unsigned startIndexOffset = 0;
-        void* indexData = ib->Lock(0, ib->GetIndexCount(), LOCK_NORMAL);
-        void* vertexData = vb->Lock(0, vb->GetVertexCount(), LOCK_NORMAL);
-        // The buffer is in CPU memory, and therefore locking is irrelevant. Unlock so that draw range checking can lock again
-        ib->Unlock();
-        vb->Unlock();
+        void* indexData = ib->GetShadowData();
+        void* vertexData = vb->GetShadowData();
         
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
@@ -812,6 +815,15 @@ void BuildAndSaveModel(OutModel& model)
             }
             if (mesh->mNumFaces)
                 center /= (float)mesh->mNumFaces * 3;
+            
+            // Define the model buffers
+            Vector<SharedPtr<VertexBuffer> > vbVector;
+            Vector<SharedPtr<IndexBuffer> > ibVector;
+            PODVector<unsigned> emptyMorphRange;
+            vbVector.Push(vb);
+            ibVector.Push(ib);
+            outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+            outModel->SetIndexBuffers(ibVector);
             
             // Define the geometry
             geom->SetIndexBuffer(ib);
