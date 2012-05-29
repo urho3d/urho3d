@@ -1093,43 +1093,49 @@ void AnimatedModel::UpdateMorphs()
                 
                 if (!buffer->IsDataLost())
                 {
-                    void* scratch = graphics->ReserveScratchBuffer(morphCount * vertexSize);
-                    // Reset morph range by copying data from the original vertex buffer
-                    memcpy(scratch, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
-                    
-                    for (unsigned j = 0; j < morphs_.Size(); ++j)
+                    void* dest = buffer->Lock(morphStart, morphCount);
+                    if (dest)
                     {
-                        if (morphs_[j].weight_ > 0.0f)
+                        // Reset morph range by copying data from the original vertex buffer
+                        memcpy(dest, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
+                        
+                        for (unsigned j = 0; j < morphs_.Size(); ++j)
                         {
-                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
-                            if (k != morphs_[j].buffers_.End())
-                                ApplyMorph(buffer, scratch, morphStart, k->second_, morphs_[j].weight_);
+                            if (morphs_[j].weight_ > 0.0f)
+                            {
+                                Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                                if (k != morphs_[j].buffers_.End())
+                                    ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
+                            }
                         }
+                        
+                        buffer->Unlock();
                     }
-                    
-                    buffer->SetDataRange(scratch, morphStart, morphCount);
-                    graphics->FreeScratchBuffer(scratch);
                 }
                 else
                 {
                     // Data is lost, need to copy whole original buffer
-                    void* scratch = graphics->ReserveScratchBuffer(buffer->GetVertexCount() * vertexSize);
-                    memcpy(scratch, originalBuffer->GetShadowData(), buffer->GetVertexCount() * vertexSize);
-                    
-                    void* morphScratch = (void*)(((unsigned char*)scratch) + morphStart * vertexSize);
-                    for (unsigned j = 0; j < morphs_.Size(); ++j)
+                    unsigned vertexCount = buffer->GetVertexCount();
+                    void* dest = buffer->Lock(0, vertexCount, true);
+                    if (dest)
                     {
-                        if (morphs_[j].weight_ > 0.0f)
+                        memcpy(dest, originalBuffer->GetShadowData(), vertexCount * vertexSize);
+                        
+                        dest = ((unsigned char*)dest) + morphStart * vertexSize;
+                        for (unsigned j = 0; j < morphs_.Size(); ++j)
                         {
-                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
-                            if (k != morphs_[j].buffers_.End())
-                                ApplyMorph(buffer, morphScratch, morphStart, k->second_, morphs_[j].weight_);
+                            if (morphs_[j].weight_ > 0.0f)
+                            {
+                                Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                                if (k != morphs_[j].buffers_.End())
+                                    ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
+                            }
                         }
+                        
+                        buffer->Unlock();
                     }
                     
-                    buffer->SetData(scratch);
                     buffer->ClearDataLost();
-                    graphics->FreeScratchBuffer(scratch);
                 }
             }
         }

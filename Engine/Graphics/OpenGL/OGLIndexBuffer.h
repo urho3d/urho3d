@@ -48,14 +48,16 @@ public:
     
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
-    /// Set buffer size and dynamic mode. Previous data will be lost.
+    /// %Set buffer size and dynamic mode. Previous data will be lost.
     bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
-    /// Set all data in the buffer.
+    /// %Set all data in the buffer.
     bool SetData(const void* data);
-    /// Set a data range in the buffer. Optionally discard data outside the range.
+    /// %Set a data range in the buffer. Optionally discard data outside the range.
     bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
-    /// Update the shadow data to the GPU buffer. Call after manipulating shadow data directly, not necessary with SetData().
-    bool UpdateToGPU();
+    /// Lock the buffer for write-only editing. Return data pointer if successful. Optionally discard data outside the range.
+    void* Lock(unsigned start, unsigned count, bool discard = false);
+    /// Unlock the buffer and apply changes to the GPU buffer.
+    void Unlock();
     /// Clear data lost flag.
     void ClearDataLost();
     
@@ -65,6 +67,8 @@ public:
     bool IsDynamic() const { return dynamic_; }
     /// Return whether data is lost due to context loss.
     bool IsDataLost() const { return false; }
+    /// Return whether is currently locked.
+    bool IsLocked() const { return lockState_ != LOCK_NONE; }
     /// Return number of indices.
     unsigned GetIndexCount() const {return indexCount_; }
     /// Return index size.
@@ -77,6 +81,8 @@ public:
 private:
     /// Create buffer.
     bool Create();
+    /// Update the shadow data to the GPU buffer.
+    bool UpdateToGPU();
     
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
@@ -84,6 +90,14 @@ private:
     unsigned indexCount_;
     /// Index size.
     unsigned indexSize_;
+    /// Buffer locking state.
+    LockState lockState_;
+    /// Lock start vertex.
+    unsigned lockStart_;
+    /// Lock number of vertices.
+    unsigned lockCount_;
+    /// Scratch buffer for fallback locking.
+    void* lockScratchData_;
     /// Shadowed flag.
     bool shadowed_;
     /// Dynamic flag.

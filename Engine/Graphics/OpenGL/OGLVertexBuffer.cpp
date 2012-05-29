@@ -123,6 +123,10 @@ VertexBuffer::VertexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementMask_(0),
+    lockState_(LOCK_NONE),
+    lockStart_(0),
+    lockCount_(0),
+    lockScratchData_(0),
     shadowed_(false),
     dynamic_(false),
     dataLost_(false)
@@ -158,8 +162,13 @@ void VertexBuffer::OnDeviceReset()
 
 void VertexBuffer::Release()
 {
-    if (object_ && graphics_)
+    Unlock();
+    
+    if (object_)
     {
+        if (!graphics_)
+            return;
+        
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
@@ -190,6 +199,8 @@ void VertexBuffer::SetShadowed(bool enable)
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
+    Unlock();
+    
     dynamic_ = dynamic;
     vertexCount_ = vertexCount;
     elementMask_ = elementMask;
@@ -209,6 +220,12 @@ bool VertexBuffer::SetData(const void* data)
     if (!data)
     {
         LOGERROR("Null pointer for vertex buffer data");
+        return false;
+    }
+    
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
     
@@ -235,9 +252,15 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         return false;
     }
     
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        return false;
+    }
+    
     if (start + count > vertexCount_)
     {
-        LOGERROR("Illegal range for setting new index buffer data");
+        LOGERROR("Illegal range for setting new vertex buffer data");
         return false;
     }
     
@@ -259,12 +282,64 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     return true;
 }
 
-bool VertexBuffer::UpdateToGPU()
+void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
-    if (object_ && shadowData_)
-        return SetData(shadowData_.Get());
+    if (lockState_ != LOCK_NONE)
+    {
+        LOGERROR("Vertex buffer already locked");
+        return 0;
+    }
+    
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not lock vertex buffer");
+        return 0;
+    }
+    
+    if (start + count > vertexCount_)
+    {
+        LOGERROR("Illegal range for locking vertex buffer");
+        return 0;
+    }
+    
+    if (!count)
+        return 0;
+    
+    lockStart_ = start;
+    lockCount_ = count;
+    
+    if (shadowData_)
+    {
+        lockState_ = LOCK_SHADOW;
+        return shadowData_.Get() + start * vertexSize_;
+    }
+    else if (graphics_)
+    {
+        lockState_ = LOCK_SCRATCH;
+        lockScratchData_ = graphics_->ReserveScratchBuffer(count * vertexSize_);
+        return lockScratchData_;
+    }
     else
-        return false;
+        return 0;
+}
+
+void VertexBuffer::Unlock()
+{
+    switch (lockState_)
+    {
+    case LOCK_SHADOW:
+        SetDataRange(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
+        lockState_ = LOCK_NONE;
+        break;
+        
+    case LOCK_SCRATCH:
+        SetDataRange(lockScratchData_, lockStart_, lockCount_);
+        if (graphics_)
+            graphics_->FreeScratchBuffer(lockScratchData_);
+        lockScratchData_ = 0;
+        lockState_ = LOCK_NONE;
+        break;
+    }
 }
 
 void VertexBuffer::ClearDataLost()
@@ -319,4 +394,12 @@ bool VertexBuffer::Create()
     }
     
     return true;
+}
+
+bool VertexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
+    else
+        return false;
 }

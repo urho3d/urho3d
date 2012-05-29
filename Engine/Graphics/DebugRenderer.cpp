@@ -369,8 +369,9 @@ void DebugRenderer::Render()
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR, true);
     
-    void* scratch = graphics->ReserveScratchBuffer(numVertices * vertexBuffer_->GetVertexSize());
-    float* dest = (float*)scratch;
+    float* dest = (float*)vertexBuffer_->Lock(0, numVertices, true);
+    if (!dest)
+        return;
     
     for (unsigned i = 0; i < lines_.Size(); ++i)
     {
@@ -394,8 +395,7 @@ void DebugRenderer::Render()
         *((unsigned*)dest) = line.color_; dest++;
     }
     
-    vertexBuffer_->SetDataRange(scratch, 0, numVertices, true);
-    graphics->FreeScratchBuffer(scratch);
+    vertexBuffer_->Unlock();
     
     graphics->SetBlendMode(BLEND_REPLACE);
     graphics->SetColorWrite(true);

@@ -108,9 +108,10 @@ bool Model::Load(Deserializer& source)
         buffer->SetShadowed(true);
         buffer->SetSize(vertexCount, elementMask);
         
+        void* dest = buffer->Lock(0, vertexCount);
         unsigned vertexSize = buffer->GetVertexSize();
-        source.Read(buffer->GetShadowData(), vertexCount * vertexSize);
-        buffer->UpdateToGPU();
+        source.Read(dest, vertexCount * vertexSize);
+        buffer->Unlock();
         
         memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
         vertexBuffers_.Push(buffer);
@@ -127,8 +128,9 @@ bool Model::Load(Deserializer& source)
         buffer->SetShadowed(true);
         buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
         
-        source.Read(buffer->GetShadowData(), indexCount * indexSize);
-        buffer->UpdateToGPU();
+        void* dest = buffer->Lock(0, indexCount);
+        source.Read(dest, indexCount * indexSize);
+        buffer->Unlock();
         
         memoryUse += sizeof(IndexBuffer) + indexCount * indexSize;
         indexBuffers_.Push(buffer);

@@ -39,6 +39,11 @@ IndexBuffer::IndexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
+    lockState_(LOCK_NONE),
+    lockStart_(0),
+    lockCount_(0),
+    lockScratchData_(0),
+    shadowed_(false),
     dynamic_(false),
     dataLost_(false)
 {
@@ -71,8 +76,13 @@ void IndexBuffer::OnDeviceReset()
 
 void IndexBuffer::Release()
 {
-    if (object_ && graphics_)
+    Unlock();
+    
+    if (object_)
     {
+        if (!graphics_)
+            return;
+        
         if (graphics_->GetIndexBuffer() == this)
             graphics_->SetIndexBuffer(0);
         
@@ -100,6 +110,8 @@ void IndexBuffer::SetShadowed(bool enable)
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
 {
+    Unlock();
+    
     dynamic_ = dynamic;
     indexCount_ = indexCount;
     indexSize_ = largeIndices ? sizeof(unsigned) : sizeof(unsigned short);
@@ -117,6 +129,12 @@ bool IndexBuffer::SetData(const void* data)
     if (!data)
     {
         LOGERROR("Null pointer for index buffer data");
+        return false;
+    }
+    
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not set index buffer data");
         return false;
     }
     
@@ -141,6 +159,12 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (!data)
     {
         LOGERROR("Null pointer for index buffer data");
+        return false;
+    }
+    
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not set index buffer data");
         return false;
     }
     
@@ -169,12 +193,64 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     return true;
 }
 
-bool IndexBuffer::UpdateToGPU()
+void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
-    if (object_ && shadowData_)
-        return SetData(shadowData_.Get());
+    if (lockState_ != LOCK_NONE)
+    {
+        LOGERROR("Index buffer already locked");
+        return 0;
+    }
+    
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not lock index buffer");
+        return 0;
+    }
+    
+    if (start + count > indexCount_)
+    {
+        LOGERROR("Illegal range for locking index buffer");
+        return 0;
+    }
+    
+    if (!count)
+        return 0;
+    
+    lockStart_ = start;
+    lockCount_ = count;
+    
+    if (shadowData_)
+    {
+        lockState_ = LOCK_SHADOW;
+        return shadowData_.Get() + start * indexSize_;
+    }
+    else if (graphics_)
+    {
+        lockState_ = LOCK_SCRATCH;
+        lockScratchData_ = graphics_->ReserveScratchBuffer(count * indexSize_);
+        return lockScratchData_;
+    }
     else
-        return false;
+        return 0;
+}
+
+void IndexBuffer::Unlock()
+{
+    switch (lockState_)
+    {
+    case LOCK_SHADOW:
+        SetDataRange(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_);
+        lockState_ = LOCK_NONE;
+        break;
+        
+    case LOCK_SCRATCH:
+        SetDataRange(lockScratchData_, lockStart_, lockCount_);
+        if (graphics_)
+            graphics_->FreeScratchBuffer(lockScratchData_);
+        lockScratchData_ = 0;
+        lockState_ = LOCK_NONE;
+        break;
+    }
 }
 
 void IndexBuffer::ClearDataLost()
@@ -239,4 +315,12 @@ bool IndexBuffer::Create()
     }
     
     return true;
+}
+
+bool IndexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
+    else
+        return false;
 }

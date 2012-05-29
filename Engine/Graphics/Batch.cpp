@@ -644,17 +644,18 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
                     instances = instanceBuffer->GetVertexCount();
                 
                 // Copy the transforms
-                void* scratch = graphics->ReserveScratchBuffer(instances * instanceBuffer->GetVertexSize());
-                Matrix3x4* dest = (Matrix3x4*)scratch;
-                for (unsigned i = 0; i < instances; ++i)
-                    dest[i] = *instances_[i + startIndex].worldTransform_;
-                instanceBuffer->SetDataRange(scratch, 0, instances, true);
-                graphics->FreeScratchBuffer(scratch);
-                
-                graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-                graphics->SetVertexBuffers(vertexBuffers, elementMasks);
-                graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
-                    geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances);
+                Matrix3x4* dest = (Matrix3x4*)instanceBuffer->Lock(0, instances, true);
+                if (dest)
+                {
+                    for (unsigned i = 0; i < instances; ++i)
+                        dest[i] = *instances_[i + startIndex].worldTransform_;
+                    instanceBuffer->Unlock();
+                    
+                    graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
+                    graphics->SetVertexBuffers(vertexBuffers, elementMasks);
+                    graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
+                        geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances);
+                }
                 
                 startIndex += instances;
             }

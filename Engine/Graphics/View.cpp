@@ -2397,22 +2397,23 @@ void View::PrepareInstancingBuffer()
     {
         VertexBuffer* instancingBuffer = renderer_->GetInstancingBuffer();
         unsigned freeIndex = 0;
-        void* scratch = graphics_->ReserveScratchBuffer(totalInstances * instancingBuffer->GetVertexSize());
+        void* dest = instancingBuffer->Lock(0, totalInstances, true);
+        if (!dest)
+            return;
         
-        baseQueue_.SetTransforms(renderer_, scratch, freeIndex);
-        preAlphaQueue_.SetTransforms(renderer_, scratch, freeIndex);
+        baseQueue_.SetTransforms(renderer_, dest, freeIndex);
+        preAlphaQueue_.SetTransforms(renderer_, dest, freeIndex);
         if (renderMode_ != RENDER_FORWARD)
-            gbufferQueue_.SetTransforms(renderer_, scratch, freeIndex);
+            gbufferQueue_.SetTransforms(renderer_, dest, freeIndex);
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-                i->shadowSplits_[j].shadowBatches_.SetTransforms(renderer_, scratch, freeIndex);
-            i->litBatches_.SetTransforms(renderer_, scratch, freeIndex);
+                i->shadowSplits_[j].shadowBatches_.SetTransforms(renderer_, dest, freeIndex);
+            i->litBatches_.SetTransforms(renderer_, dest, freeIndex);
         }
         
-        instancingBuffer->SetDataRange(scratch, 0, totalInstances, true);
-        graphics_->FreeScratchBuffer(scratch);
+        instancingBuffer->Unlock();
     }
 }
 

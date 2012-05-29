@@ -353,9 +353,10 @@ void BillboardSet::UpdateBufferSize()
         return;
     
     // Indices do not change for a given billboard capacity
-    Graphics* graphics = indexBuffer_->GetGraphics();
-    void* scratch = graphics->ReserveScratchBuffer(numBillboards * 6 * sizeof(unsigned short));
-    unsigned short* dest = (unsigned short*)scratch;
+    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, numBillboards * 6, true);
+    if (!dest)
+        return;
+    
     unsigned vertexIndex = 0;
     while (numBillboards--)
     {
@@ -364,8 +365,8 @@ void BillboardSet::UpdateBufferSize()
         
         vertexIndex += 4;
     }
-    indexBuffer_->SetData(scratch);
-    graphics->FreeScratchBuffer(scratch);
+    
+    indexBuffer_->Unlock();
 }
 
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
@@ -424,8 +425,9 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         Sort(sortedBillboards_.Begin(), sortedBillboards_.End(), CompareBillboards);
     
     Graphics* graphics = vertexBuffer_->GetGraphics();
-    void* scratch = graphics->ReserveScratchBuffer(enabledBillboards * 4 * vertexBuffer_->GetVertexSize());
-    float* dest = (float*)scratch;
+    float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
+    if (!dest)
+        return;
     
     for (unsigned i = 0; i < enabledBillboards; ++i)
     {
@@ -466,8 +468,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         *dest++ = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
     }
     
-    vertexBuffer_->SetDataRange(scratch, 0, enabledBillboards * 4, true);
-    graphics->FreeScratchBuffer(scratch);
+    vertexBuffer_->Unlock();
 }
 
 void BillboardSet::MarkPositionsDirty()

@@ -68,10 +68,14 @@ OBJECTTYPESTATIC(VertexBuffer);
 VertexBuffer::VertexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),
-    pool_(D3DPOOL_MANAGED),
-    usage_(0),
     vertexCount_(0),
     elementMask_(0),
+    pool_(D3DPOOL_MANAGED),
+    usage_(0),
+    lockState_(LOCK_NONE),
+    lockStart_(0),
+    lockCount_(0),
+    lockScratchData_(0),
     shadowed_(false),
     dataLost_(false)
 {
@@ -108,6 +112,8 @@ void VertexBuffer::OnDeviceReset()
 
 void VertexBuffer::Release()
 {
+    Unlock();
+    
     if (object_)
     {
         if (!graphics_)
@@ -143,6 +149,8 @@ void VertexBuffer::SetShadowed(bool enable)
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
+    Unlock();
+    
     if (dynamic)
     {
         pool_ = D3DPOOL_DEFAULT;
@@ -175,15 +183,22 @@ bool VertexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        return false;
+    }
+    
     if (object_)
     {
-        void* hwData = Lock(0, vertexCount_, true);
+        void* hwData = MapBuffer(0, vertexCount_, true);
         if (hwData)
         {
             memcpy(hwData, data, vertexCount_ * vertexSize_);
-            Unlock();
+            UnmapBuffer();
         }
     }
+    
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
     
@@ -201,9 +216,15 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         return false;
     }
     
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        return false;
+    }
+    
     if (start + count > vertexCount_)
     {
-        LOGERROR("Illegal range for setting new index buffer data");
+        LOGERROR("Illegal range for setting new vertex buffer data");
         return false;
     }
     
@@ -212,11 +233,11 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     
     if (object_)
     {
-        void* hwData = Lock(start, count, discard);
+        void* hwData = MapBuffer(start, count, discard);
         if (hwData)
         {
             memcpy(hwData, data, count * vertexSize_);
-            Unlock();
+            UnmapBuffer();
         }
     }
     
@@ -226,12 +247,71 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     return true;
 }
 
-bool VertexBuffer::UpdateToGPU()
+void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
-    if (object_ && shadowData_)
-        return SetData(shadowData_.Get());
+    if (lockState_ != LOCK_NONE)
+    {
+        LOGERROR("Vertex buffer already locked");
+        return 0;
+    }
+    
+    if (!vertexSize_)
+    {
+        LOGERROR("Vertex elements not defined, can not lock vertex buffer");
+        return 0;
+    }
+    
+    if (start + count > vertexCount_)
+    {
+        LOGERROR("Illegal range for locking vertex buffer");
+        return 0;
+    }
+    
+    if (!count)
+        return 0;
+    
+    lockStart_ = start;
+    lockCount_ = count;
+    
+    // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
+    if (object_ && !shadowData_)
+        return MapBuffer(start, count, discard);
+    else if (shadowData_)
+    {
+        lockState_ = LOCK_SHADOW;
+        return shadowData_.Get() + start * vertexSize_;
+    }
+    else if (graphics_)
+    {
+        lockState_ = LOCK_SCRATCH;
+        lockScratchData_ = graphics_->ReserveScratchBuffer(count * vertexSize_);
+        return lockScratchData_;
+    }
     else
-        return false;
+        return 0;
+}
+
+void VertexBuffer::Unlock()
+{
+    switch (lockState_)
+    {
+    case LOCK_HARDWARE:
+        UnmapBuffer();
+        break;
+        
+    case LOCK_SHADOW:
+        SetDataRange(shadowData_.Get() + lockStart_ * vertexSize_, lockStart_, lockCount_);
+        lockState_ = LOCK_NONE;
+        break;
+        
+    case LOCK_SCRATCH:
+        SetDataRange(lockScratchData_, lockStart_, lockCount_);
+        if (graphics_)
+            graphics_->FreeScratchBuffer(lockScratchData_);
+        lockScratchData_ = 0;
+        lockState_ = LOCK_NONE;
+        break;
+    }
 }
 
 void VertexBuffer::ClearDataLost()
@@ -314,7 +394,15 @@ bool VertexBuffer::Create()
     return true;
 }
 
-void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
+bool VertexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
+    else
+        return false;
+}
+
+void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     void* hwData = 0;
     
@@ -326,17 +414,19 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
             flags = D3DLOCK_DISCARD;
         
         if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
-        {
             LOGERROR("Could not lock vertex buffer");
-            return 0;
-        }
+        else
+            lockState_ = LOCK_HARDWARE;
     }
     
     return hwData;
 }
 
-void VertexBuffer::Unlock()
+void VertexBuffer::UnmapBuffer()
 {
-    if (object_)
+    if (object_ && lockState_ == LOCK_HARDWARE)
+    {
         ((IDirect3DVertexBuffer9*)object_)->Unlock();
+        lockState_ = LOCK_NONE;
+    }
 }

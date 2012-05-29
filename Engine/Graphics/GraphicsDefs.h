@@ -96,6 +96,15 @@ enum StencilOp
     OP_DECR
 };
 
+/// Vertex/index buffer lock state.
+enum LockState
+{
+    LOCK_NONE = 0,
+    LOCK_HARDWARE,
+    LOCK_SHADOW,
+    LOCK_SCRATCH
+};
+
 /// Vertex elements.
 enum VertexElement
 {

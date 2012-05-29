@@ -35,13 +35,18 @@ OBJECTTYPESTATIC(IndexBuffer);
 IndexBuffer::IndexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),
-    pool_(D3DPOOL_MANAGED),
-    usage_(0),
     indexCount_(0),
     indexSize_(0),
+    lockState_(LOCK_NONE),
+    lockStart_(0),
+    lockCount_(0),
+    lockScratchData_(0),
     shadowed_(false),
     dataLost_(false)
 {
+    // Force shadowing mode if graphics subsystem does not exist
+    if (!graphics_)
+        shadowed_ = true;
 }
 
 IndexBuffer::~IndexBuffer()
@@ -70,6 +75,8 @@ void IndexBuffer::OnDeviceReset()
 
 void IndexBuffer::Release()
 {
+    Unlock();
+    
     if (object_)
     {
         if (!graphics_)
@@ -91,7 +98,7 @@ void IndexBuffer::SetShadowed(bool enable)
     
     if (enable != shadowed_)
     {
-        if (enable && indexSize_ && indexCount_)
+        if (enable && indexCount_ && indexSize_)
             shadowData_ = new unsigned char[indexCount_ * indexSize_];
         else
             shadowData_.Reset();
@@ -102,6 +109,8 @@ void IndexBuffer::SetShadowed(bool enable)
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
 {
+    Unlock();
+    
     if (dynamic)
     {
         pool_ = D3DPOOL_DEFAULT;
@@ -132,15 +141,22 @@ bool IndexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not set index buffer data");
+        return false;
+    }
+    
     if (object_)
     {
-        void* hwData = Lock(0, indexCount_, true);
+        void* hwData = MapBuffer(0, indexCount_, true);
         if (hwData)
         {
             memcpy(hwData, data, indexCount_ * indexSize_);
-            Unlock();
+            UnmapBuffer();
         }
     }
+    
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
     
@@ -158,6 +174,12 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         return false;
     }
     
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not set index buffer data");
+        return false;
+    }
+    
     if (start + count > indexCount_)
     {
         LOGERROR("Illegal range for setting new index buffer data");
@@ -169,11 +191,11 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     
     if (object_)
     {
-        void* hwData = Lock(start, count, discard);
+        void* hwData = MapBuffer(start, count, discard);
         if (hwData)
         {
             memcpy(hwData, data, count * indexSize_);
-            Unlock();
+            UnmapBuffer();
         }
     }
     
@@ -183,12 +205,71 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     return true;
 }
 
-bool IndexBuffer::UpdateToGPU()
+void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
-    if (object_ && shadowData_)
-        return SetData(shadowData_.Get());
+    if (lockState_ != LOCK_NONE)
+    {
+        LOGERROR("Index buffer already locked");
+        return 0;
+    }
+    
+    if (!indexSize_)
+    {
+        LOGERROR("Index size not defined, can not lock index buffer");
+        return 0;
+    }
+    
+    if (start + count > indexCount_)
+    {
+        LOGERROR("Illegal range for locking index buffer");
+        return 0;
+    }
+    
+    if (!count)
+        return 0;
+    
+    lockStart_ = start;
+    lockCount_ = count;
+    
+    // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
+    if (object_ && !shadowData_)
+        return MapBuffer(start, count, discard);
+    else if (shadowData_)
+    {
+        lockState_ = LOCK_SHADOW;
+        return shadowData_.Get() + start * indexSize_;
+    }
+    else if (graphics_)
+    {
+        lockState_ = LOCK_SCRATCH;
+        lockScratchData_ = graphics_->ReserveScratchBuffer(count * indexSize_);
+        return lockScratchData_;
+    }
     else
-        return false;
+        return 0;
+}
+
+void IndexBuffer::Unlock()
+{
+    switch (lockState_)
+    {
+    case LOCK_HARDWARE:
+        UnmapBuffer();
+        break;
+        
+    case LOCK_SHADOW:
+        SetDataRange(shadowData_.Get() + lockStart_ * indexSize_, lockStart_, lockCount_);
+        lockState_ = LOCK_NONE;
+        break;
+        
+    case LOCK_SCRATCH:
+        SetDataRange(lockScratchData_, lockStart_, lockCount_);
+        if (graphics_)
+            graphics_->FreeScratchBuffer(lockScratchData_);
+        lockScratchData_ = 0;
+        lockState_ = LOCK_NONE;
+        break;
+    }
 }
 
 void IndexBuffer::ClearDataLost()
@@ -204,7 +285,10 @@ bool IndexBuffer::IsDynamic() const
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
     if (!shadowData_)
+    {
+        LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
         return false;
+    }
     
     minVertex = M_MAX_UNSIGNED;
     unsigned maxVertex = 0;
@@ -264,8 +348,15 @@ bool IndexBuffer::Create()
     return true;
 }
 
+bool IndexBuffer::UpdateToGPU()
+{
+    if (object_ && shadowData_)
+        return SetData(shadowData_.Get());
+    else
+        return false;
+}
 
-void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
+void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     void* hwData = 0;
     
@@ -277,17 +368,19 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
             flags = D3DLOCK_DISCARD;
         
         if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
-        {
             LOGERROR("Could not lock index buffer");
-            return 0;
-        }
+        else
+            lockState_ = LOCK_HARDWARE;
     }
     
     return hwData;
 }
 
-void IndexBuffer::Unlock()
+void IndexBuffer::UnmapBuffer()
 {
-    if (object_)
+    if (object_ && lockState_ == LOCK_HARDWARE)
+    {
         ((IDirect3DIndexBuffer9*)object_)->Unlock();
+        lockState_ = LOCK_NONE;
+    }
 }

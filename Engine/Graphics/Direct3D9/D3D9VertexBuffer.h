@@ -53,8 +53,10 @@ public:
     bool SetData(const void* data);
     /// %Set a data range in the buffer. Optionally discard data outside the range.
     bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
-    /// Update the shadow data to the GPU buffer. Call after manipulating shadow data directly, not necessary with SetData().
-    bool UpdateToGPU();
+    /// Lock the buffer for write-only editing. Return data pointer if successful. Optionally discard data outside the range.
+    void* Lock(unsigned start, unsigned count, bool discard = false);
+    /// Unlock the buffer and apply changes to the GPU buffer.
+    void Unlock();
     /// Clear data lost flag.
     void ClearDataLost();
     
@@ -62,8 +64,10 @@ public:
     bool IsShadowed() const { return shadowed_; }
     /// Return whether is dynamic.
     bool IsDynamic() const;
-    /// Return whether default pool data lost.
+    /// Return whether default pool data is lost.
     bool IsDataLost() const { return dataLost_; }
+    /// Return whether is currently locked.
+    bool IsLocked() const { return lockState_ != LOCK_NONE; }
     /// Return number of vertices.
     unsigned GetVertexCount() const {return vertexCount_; }
     /// Return vertex size.
@@ -90,25 +94,35 @@ private:
     void UpdateOffsets();
     /// Create buffer.
     bool Create();
-    /// Lock buffer.
-    void* Lock(unsigned start, unsigned count, bool discard);
-    /// Unlock buffer.
-    void Unlock();
+    /// Update the shadow data to the GPU buffer.
+    bool UpdateToGPU();
+    /// Map the GPU buffer into CPU memory.
+    void* MapBuffer(unsigned start, unsigned count, bool discard);
+    /// Unmap the GPU buffer.
+    void UnmapBuffer();
     
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
-    /// Memory pool.
-    unsigned pool_;
-    /// Usage type.
-    unsigned usage_;
     /// Number of vertices.
     unsigned vertexCount_;
     /// Vertex size.
     unsigned vertexSize_;
     /// Vertex element bitmask.
     unsigned elementMask_;
-    /// Vertex element offsets.
+   /// Vertex element offsets.
     unsigned elementOffset_[MAX_VERTEX_ELEMENTS];
+    /// Memory pool.
+    unsigned pool_;
+    /// Usage type.
+    unsigned usage_;
+    /// Buffer locking state.
+    LockState lockState_;
+    /// Lock start vertex.
+    unsigned lockStart_;
+    /// Lock number of vertices.
+    unsigned lockCount_;
+    /// Scratch buffer for fallback locking.
+    void* lockScratchData_;
     /// Shadowed flag.
     bool shadowed_;
     /// Default pool data lost flag.
