@@ -37,6 +37,8 @@ IndexBuffer::IndexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
+    pool_(D3DPOOL_MANAGED),
+    usage_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
     lockCount_(0),
