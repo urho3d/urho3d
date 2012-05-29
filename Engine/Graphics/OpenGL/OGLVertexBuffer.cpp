@@ -262,11 +262,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
 bool VertexBuffer::UpdateToGPU()
 {
     if (object_ && shadowData_)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, shadowData_.Get(), dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        return true;
-    }
+        return SetData(shadowData_.Get());
     else
         return false;
 }

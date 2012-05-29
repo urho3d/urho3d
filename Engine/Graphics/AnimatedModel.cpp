@@ -263,6 +263,19 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+    
+    // If model has morphs, check if the morph vertex buffer(s) have lost data (only possible in OpenGL mode)
+    if (morphs_.Size())
+    {
+        for (unsigned i = 0; i < morphVertexBuffers_.Size(); ++i)
+        {
+            if (morphVertexBuffers_[i] && morphVertexBuffers_[i]->IsDataLost())
+            {
+                morphsDirty_ = true;
+                break;
+            }
+        }
+    }
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -1077,22 +1090,47 @@ void AnimatedModel::UpdateMorphs()
                 unsigned morphStart = model_->GetMorphRangeStart(i);
                 unsigned morphCount = model_->GetMorphRangeCount(i);
                 unsigned vertexSize = buffer->GetVertexSize();
-                void* scratch = graphics->ReserveScratchBuffer(morphCount * vertexSize);
-                // Reset morph range by copying data from the original vertex buffer
-                memcpy(scratch, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
                 
-                for (unsigned j = 0; j < morphs_.Size(); ++j)
+                if (!buffer->IsDataLost())
                 {
-                    if (morphs_[j].weight_ > 0.0f)
+                    void* scratch = graphics->ReserveScratchBuffer(morphCount * vertexSize);
+                    // Reset morph range by copying data from the original vertex buffer
+                    memcpy(scratch, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
+                    
+                    for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
-                        Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
-                        if (k != morphs_[j].buffers_.End())
-                            ApplyMorph(buffer, scratch, morphStart, k->second_, morphs_[j].weight_);
+                        if (morphs_[j].weight_ > 0.0f)
+                        {
+                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            if (k != morphs_[j].buffers_.End())
+                                ApplyMorph(buffer, scratch, morphStart, k->second_, morphs_[j].weight_);
+                        }
                     }
+                    
+                    buffer->SetDataRange(scratch, morphStart, morphCount);
+                    graphics->FreeScratchBuffer(scratch);
                 }
-                
-                buffer->SetDataRange(scratch, morphStart, morphCount);
-                graphics->FreeScratchBuffer(scratch);
+                else
+                {
+                    // Data is lost, need to copy whole original buffer
+                    void* scratch = graphics->ReserveScratchBuffer(buffer->GetVertexCount() * vertexSize);
+                    memcpy(scratch, originalBuffer->GetShadowData(), buffer->GetVertexCount() * vertexSize);
+                    
+                    void* morphScratch = (void*)(((unsigned char*)scratch) + morphStart * vertexSize);
+                    for (unsigned j = 0; j < morphs_.Size(); ++j)
+                    {
+                        if (morphs_[j].weight_ > 0.0f)
+                        {
+                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            if (k != morphs_[j].buffers_.End())
+                                ApplyMorph(buffer, morphScratch, morphStart, k->second_, morphs_[j].weight_);
+                        }
+                    }
+                    
+                    buffer->SetData(scratch);
+                    buffer->ClearDataLost();
+                    graphics->FreeScratchBuffer(scratch);
+                }
             }
         }
     }

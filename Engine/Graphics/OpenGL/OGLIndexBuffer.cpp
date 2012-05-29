@@ -172,13 +172,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
 bool IndexBuffer::UpdateToGPU()
 {
     if (object_ && shadowData_)
-    {
-        graphics_->SetIndexBuffer(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, shadowData_.Get(), dynamic_ ? GL_DYNAMIC_DRAW :
-            GL_STATIC_DRAW);
-        return true;
-    }
+        return SetData(shadowData_.Get());
     else
         return false;
 }
