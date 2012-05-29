@@ -261,7 +261,10 @@ void IndexBuffer::ClearDataLost()
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
     if (!shadowData_)
+    {
+        LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
         return false;
+    }
     
     minVertex = M_MAX_UNSIGNED;
     unsigned maxVertex = 0;
