@@ -4292,6 +4292,7 @@ Properties:<br>
 - int minFps
 - int maxFps
 - int maxInactiveFps
+- bool pauseMinimized
 - bool initialized (readonly)
 - bool exiting (readonly)
 - bool headless (readonly)

@@ -104,6 +104,8 @@ static void RegisterEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "int get_maxFps() const", asMETHOD(Engine, GetMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void set_maxInactiveFps(int)", asMETHOD(Engine, SetMaxInactiveFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int get_maxInactiveFps() const", asMETHOD(Engine, GetMaxInactiveFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void set_pauseMinimized(bool)", asMETHOD(Engine, SetPauseMinimized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "bool get_pauseMinimized() const", asMETHOD(Engine, GetPauseMinimized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool get_initialized() const", asMETHOD(Engine, IsInitialized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool get_exiting() const", asMETHOD(Engine, IsExiting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool get_headless() const", asMETHOD(Engine, IsHeadless), asCALL_THISCALL);

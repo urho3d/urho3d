@@ -90,7 +90,10 @@ void Start()
     }
 
     if (singlePlayer)
+    {
         StartGame(null);
+        engine.pauseMinimized = true;
+    }
 }
 
 void InitAudio()

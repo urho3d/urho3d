@@ -57,6 +57,7 @@ Engine::Engine(Context* context) :
     maxFps_(200),
     maxInactiveFps_(60),
     timeStep_(0.0f),
+    pauseMinimized_(false),
     initialized_(false),
     exiting_(false),
     headless_(false)
@@ -299,9 +300,25 @@ void Engine::RunFrame()
     }
     
     Time* time = GetSubsystem<Time>();
+    Input* input = GetSubsystem<Input>();
+    Audio* audio = GetSubsystem<Audio>();
+    
     time->BeginFrame(timeStep_);
     
-    Update();
+    // If pause when minimized -mode is in use, stop updates and audio as necessary
+    if (!input || !input->IsMinimized() || !pauseMinimized_)
+    {
+        if (pauseMinimized_ && audio && audio->IsInitialized() && !audio->IsPlaying())
+            audio->Play();
+        
+        Update();
+    }
+    else
+    {
+        if (audio && audio->IsInitialized() && audio->IsPlaying())
+            audio->Stop();
+    }
+    
     Render();
     ApplyFrameLimit();
     
@@ -337,6 +354,11 @@ void Engine::SetMaxFps(int fps)
 void Engine::SetMaxInactiveFps(int fps)
 {
     maxInactiveFps_ = Max(fps, 0);
+}
+
+void Engine::SetPauseMinimized(bool enable)
+{
+    pauseMinimized_ = enable;
 }
 
 void Engine::Exit()
@@ -402,14 +424,15 @@ void Engine::Render()
 {
     PROFILE(Render);
     
-    // Do not render if device lost
+    // Do not render if device lost or if minimized
     Graphics* graphics = GetSubsystem<Graphics>();
-    if (graphics && graphics->BeginFrame())
-    {
-        GetSubsystem<Renderer>()->Render();
-        GetSubsystem<UI>()->Render();
-        graphics->EndFrame();
-    }
+    Input* input = GetSubsystem<Input>();
+    if (!graphics || (input && input->IsMinimized()) || !graphics->BeginFrame())
+        return;
+    
+    GetSubsystem<Renderer>()->Render();
+    GetSubsystem<UI>()->Render();
+    graphics->EndFrame();
 }
 
 void Engine::ApplyFrameLimit()

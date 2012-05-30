@@ -378,10 +378,6 @@ bool Graphics::BeginFrame()
     if (!IsInitialized() || !impl_->context_)
         return false;
     
-    // If we should be fullscreen, but are not currently active, do not render
-    if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
-        return false;
-    
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
     

@@ -57,6 +57,8 @@ public:
     void SetMaxFps(int fps);
     /// %Set maximum frames per second when the application is inactive.
     void SetMaxInactiveFps(int fps);
+    /// %Set whether to pause logic and audio when minimized.
+    void SetPauseMinimized(bool enable);
     /// Close the application window and set the exit flag.
     void Exit();
     /// Dump profiling information to the log.
@@ -70,6 +72,8 @@ public:
     int GetMaxFps() const { return maxFps_; }
     /// Return the maximum frames per second when the application is inactive.
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
+    /// Return whether to pause logic and audio when minimized.
+    bool GetPauseMinimized() const { return pauseMinimized_; }
     /// Return whether engine has been initialized.
     bool IsInitialized() const { return initialized_; }
     /// Return whether exit has been requested.
@@ -100,6 +104,8 @@ private:
     unsigned maxFps_;
     /// Maximum frames per second when the application is inactive.
     unsigned maxInactiveFps_;
+    /// Pause when minimized flag.
+    bool pauseMinimized_;
     /// Initialized flag.
     bool initialized_;
     /// Exiting flag.
