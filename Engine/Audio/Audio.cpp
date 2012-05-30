@@ -405,9 +405,7 @@ void Audio::Stop()
     if (!playing_)
         return;
     
-    #ifdef USE_OPENGL
-    SDL_PauseAudioDevice(stream_, 1);
-    #else
+    #ifndef USE_OPENGL
     if (stream_)
         ((AudioStream*)stream_)->StopPlayback();
     #endif

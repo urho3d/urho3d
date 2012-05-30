@@ -841,28 +841,36 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
         
     case SDL_WINDOWEVENT:
-        if (evt.window.event == SDL_WINDOWEVENT_CLOSE)
+        input = GetInputInstance(evt.window.windowID);
+        if (input)
         {
-            input = GetInputInstance(evt.window.windowID);
-            if (input)
+            switch (evt.window.event)
+            {
+            case SDL_WINDOWEVENT_CLOSE:
                 input->GetSubsystem<Graphics>()->Close();
-        }
-        #ifdef ANDROID
-        if (evt.window.event == SDL_WINDOWEVENT_SURFACE_LOST)
-        {
-            input = GetInputInstance(evt.window.windowID);
-            // Mark GPU objects lost
-            if (input)
+                break;
+                
+            case SDL_WINDOWEVENT_MINIMIZED:
+                input->minimized_ = true;
+                break;
+                
+            case SDL_WINDOWEVENT_RESTORED:
+                input->minimized_ = false;
+                break;
+                
+            #ifdef ANDROID
+            case SDL_WINDOWEVENT_SURFACE_LOST:
+                // Mark GPU objects lost
                 input->graphics_->Release(false, false);
-        }
-        if (evt.window.event == SDL_WINDOWEVENT_SURFACE_CREATED)
-        {
-            input = GetInputInstance(evt.window.windowID);
-            // Restore GPU objects
-            if (input)
+                break;
+                
+            case SDL_WINDOWEVENT_SURFACE_CREATED:
+                // Restore GPU objects
                 input->graphics_->Restore();
+                break;
+            #endif
+            }
         }
-        #endif
         break;
     }
 }
@@ -895,6 +903,9 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     #else
     SetClipCursor(true);
     #endif
+    
+    // After setting new screen mode we never should be minimized
+    minimized_ = false;
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
