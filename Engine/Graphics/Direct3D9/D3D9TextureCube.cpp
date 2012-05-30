@@ -62,10 +62,7 @@ void TextureCube::RegisterObject(Context* context)
 void TextureCube::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
-    {
         Release();
-        dataLost_ = true;
-    }
 }
 
 void TextureCube::OnDeviceReset()
@@ -74,12 +71,12 @@ void TextureCube::OnDeviceReset()
     {
         // If has a file name, reload through the resource cache. Otherwise just recreate.
         if (!GetName().Trimmed().Empty())
-        {
-            if (GetSubsystem<ResourceCache>()->ReloadResource(this))
-                dataLost_ = false;
-        }
+            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
         else
+        {
             Create();
+            dataLost_ = true;
+        }
     }
 }
 

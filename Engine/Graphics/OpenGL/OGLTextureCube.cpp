@@ -69,20 +69,18 @@ void TextureCube::OnDeviceLost()
         if (renderSurfaces_[i])
             renderSurfaces_[i]->OnDeviceLost();
     }
-    
-    dataLost_ = true;
 }
 
 void TextureCube::OnDeviceReset()
 {
     // If has a file name, reload through the resource cache. Otherwise just recreate.
     if (!GetName().Trimmed().Empty())
-    {
-        if (GetSubsystem<ResourceCache>()->ReloadResource(this))
-            dataLost_ = false;
-    }
+        dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
     else
+    {
         Create();
+        dataLost_ = true;
+    }
 }
 
 void TextureCube::Release()

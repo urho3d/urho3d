@@ -59,10 +59,7 @@ IndexBuffer::~IndexBuffer()
 void IndexBuffer::OnDeviceLost()
 {
     if (pool_ == D3DPOOL_DEFAULT)
-    {
         Release();
-        dataLost_ = true;
-    }
 }
 
 void IndexBuffer::OnDeviceReset()
@@ -70,8 +67,7 @@ void IndexBuffer::OnDeviceReset()
     if (pool_ == D3DPOOL_DEFAULT)
     {
         Create();
-        if (UpdateToGPU())
-            dataLost_ = false;
+        dataLost_ = !UpdateToGPU();
     }
 }
 

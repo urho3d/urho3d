@@ -146,8 +146,6 @@ VertexBuffer::~VertexBuffer()
 void VertexBuffer::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
-    
-    dataLost_ = true;
 }
 
 void VertexBuffer::OnDeviceReset()
@@ -155,8 +153,7 @@ void VertexBuffer::OnDeviceReset()
     if (!object_)
     {
         Create();
-        if (UpdateToGPU())
-            dataLost_ = false;
+        dataLost_ = !UpdateToGPU();
     }
 }
 
