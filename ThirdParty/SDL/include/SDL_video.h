@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
+
 /**
  *  \file SDL_video.h
  *  
@@ -150,8 +152,10 @@ typedef enum
     SDL_WINDOWEVENT_LEAVE,          /**< Window has lost mouse focus */
     SDL_WINDOWEVENT_FOCUS_GAINED,   /**< Window has gained keyboard focus */
     SDL_WINDOWEVENT_FOCUS_LOST,     /**< Window has lost keyboard focus */
-    SDL_WINDOWEVENT_CLOSE           /**< The window manager requests that the 
+    SDL_WINDOWEVENT_CLOSE,          /**< The window manager requests that the 
                                          window be closed */
+    SDL_WINDOWEVENT_SURFACE_LOST,   /**< Android only: surface has been lost */
+    SDL_WINDOWEVENT_SURFACE_CREATED /**< Android only: surface has been restored after loss */
 } SDL_WindowEventID;
 
 /**

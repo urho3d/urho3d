@@ -385,6 +385,11 @@ bool VertexBuffer::Create()
     {
         if (!object_)
             glGenBuffers(1, &object_);
+        if (!object_)
+        {
+            LOGERROR("Failed to create vertex buffer");
+            return false;
+        }
         
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);

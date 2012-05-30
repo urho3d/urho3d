@@ -248,6 +248,23 @@ extern "C" void Java_org_libsdl_app_SDLActivity_nativeRunAudioThread(
     Android_RunAudioThread();
 }
 
+// Surface destroyed
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(
+                                    JNIEnv* env, jclass cls)
+{
+    if (Android_Window) {
+        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_SURFACE_LOST, 0, 0);
+    }
+}
+
+// Surface created
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeSurfaceCreated(
+                                    JNIEnv* env, jclass cls)
+{
+    if (Android_Window) {
+        SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_SURFACE_CREATED, 0, 0);
+    }
+}
 
 /*******************************************************************************
              Functions called by SDL into Java

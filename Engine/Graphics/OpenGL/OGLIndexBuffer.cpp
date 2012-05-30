@@ -309,6 +309,11 @@ bool IndexBuffer::Create()
         
         if (!object_)
             glGenBuffers(1, &object_);
+        if (!object_)
+        {
+            LOGERROR("Failed to create index buffer");
+            return false;
+        }
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);

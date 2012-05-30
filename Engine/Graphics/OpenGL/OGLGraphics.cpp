@@ -322,9 +322,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     SDL_GL_SwapWindow(impl_->window_);
     
     // Let GPU objects restore themselves
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->OnDeviceReset();
-    
+    Restore();
     CheckFeatureSupport();
     
     if (multiSample > 1)
@@ -377,9 +375,9 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
 bool Graphics::BeginFrame()
 {
-    if (!IsInitialized())
+    if (!IsInitialized() || !impl_->context_)
         return false;
-
+    
     // If we should be fullscreen, but are not currently active, do not render
     if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
         return false;
@@ -524,7 +522,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!indexCount || !indexBuffer_)
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
         return;
     
     if (impl_->fboDirty_)
@@ -608,7 +606,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         elementMasks_[i] = elementMask;
         changed = true;
         
-        if (!buffer)
+        if (!buffer || !buffer->GetGPUObject())
             continue;
         
         glBindBuffer(GL_ARRAY_BUFFER, buffer->GetGPUObject());
@@ -695,7 +693,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         elementMasks_[i] = elementMask;
         changed = true;
         
-        if (!buffer)
+        if (!buffer || !buffer->GetGPUObject())
             continue;
         
         glBindBuffer(GL_ARRAY_BUFFER, buffer->GetGPUObject());
@@ -1744,29 +1742,13 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     
     if (clearGPUObjects)
     {
-        // Shutting down: release all GPU objects that still exist, then delete the context
+        // Shutting down: release all GPU objects that still exist
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
-        
-        if (impl_->context_)
-        {
-            MutexLock lock(GetStaticMutex());
-            SDL_GL_DeleteContext(impl_->context_);
-            impl_->context_ = 0;
-        }
-        
-        CleanupFramebuffers(true);
     }
     else
     {
-        if (impl_->context_)
-        {
-            MutexLock lock(GetStaticMutex());
-            SDL_GL_DeleteContext(impl_->context_);
-            impl_->context_ = 0;
-        }
-        
         // We are not shutting down, but recreating the context: mark GPU objects lost
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
@@ -1776,9 +1758,13 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     depthTextures_.Clear();
     shaderPrograms_.Clear();
     
-    // When the new context is initialized, it will have default state again
-    ResetCachedState();
-    ClearParameterSources();
+    if (impl_->context_)
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        SDL_GL_DeleteContext(impl_->context_);
+        impl_->context_ = 0;
+    }
     
     if (closeWindow)
     {
@@ -1788,6 +1774,24 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         SDL_DestroyWindow(impl_->window_);
         impl_->window_ = 0;
     }
+}
+
+void Graphics::Restore()
+{
+    if (!impl_->window_)
+        return;
+    
+    // Ensure first that the context exists
+    if (!impl_->context_)
+        impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+    if (!impl_->context_)
+        return;
+    
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        (*i)->OnDeviceReset();
+    
+    ResetCachedState();
+    ClearParameterSources();
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)

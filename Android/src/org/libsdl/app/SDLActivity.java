@@ -152,6 +152,8 @@ public class SDLActivity extends Activity {
                                             int action, float x,
                                             float y, float p);
     public static native void onNativeAccel(float x, float y, float z);
+    public static native void onNativeSurfaceDestroyed();
+    public static native void onNativeSurfaceCreated();
     public static native void nativeRunAudioThread();
 
 
@@ -453,8 +455,11 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     public void surfaceCreated(SurfaceHolder holder) {
         Log.v("SDL", "surfaceCreated()");
         holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
-        SDLActivity.createEGLSurface();
         enableSensor(Sensor.TYPE_ACCELEROMETER, true);
+        SDLActivity.onNativeSurfaceCreated();
+        
+        // Note: we must not recreate the OpenGL context here, but wait for the application call initEGL() again
+        // from its own thread, to ensure the context is made current to the correct thread
     }
 
     // Called when we lose the surface
@@ -462,6 +467,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         Log.v("SDL", "surfaceDestroyed()");
         SDLActivity.nativePause();
         enableSensor(Sensor.TYPE_ACCELEROMETER, false);
+        SDLActivity.onNativeSurfaceDestroyed();
     }
 
     // Called when the surface is resized

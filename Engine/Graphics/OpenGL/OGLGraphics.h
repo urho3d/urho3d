@@ -330,6 +330,8 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
+    /// Restore GPU objects and reinitialize state. Requires an open window.
+    void Restore();
     /// Clean up a render surface from all FBOs.
     void CleanupRenderSurface(RenderSurface* surface);
     

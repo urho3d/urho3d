@@ -227,7 +227,7 @@ void Input::Update()
     {
         IntVector2 mousePos = GetCursorPosition();
         mouseMove_ = mousePos - lastCursorPosition_;
-
+        
         // Recenter the mouse cursor manually if it moved
         if (mouseMove_ != IntVector2::ZERO)
         {
@@ -847,6 +847,22 @@ void Input::HandleSDLEvent(void* sdlEvent)
             if (input)
                 input->GetSubsystem<Graphics>()->Close();
         }
+        #ifdef ANDROID
+        if (evt.window.event == SDL_WINDOWEVENT_SURFACE_LOST)
+        {
+            input = GetInputInstance(evt.window.windowID);
+            // Mark GPU objects lost
+            if (input)
+                input->graphics_->Release(false, false);
+        }
+        if (evt.window.event == SDL_WINDOWEVENT_SURFACE_CREATED)
+        {
+            input = GetInputInstance(evt.window.windowID);
+            // Restore GPU objects
+            if (input)
+                input->graphics_->Restore();
+        }
+        #endif
         break;
     }
 }
