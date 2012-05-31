@@ -303,11 +303,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
     impl_->depthBits_ = impl_->windowDepthBits_;
     
-    // Set initial state to match Direct3D
-    glEnable(GL_DEPTH_TEST);
-    SetCullMode(CULL_CCW);
-    SetDepthTest(CMP_LESSEQUAL);
-    
     SDL_GetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
@@ -321,7 +316,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
-    // Let GPU objects restore themselves
+    // Let GPU objects restore themselves and set initial renderstate
     Restore();
     CheckFeatureSupport();
     
@@ -2196,7 +2191,7 @@ void Graphics::ResetCachedState()
     constantDepthBias_ = 0.0f;
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_ALWAYS;
-    depthWrite_ = true;
+    depthWrite_ = false;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
@@ -2210,6 +2205,12 @@ void Graphics::ResetCachedState()
     
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
+    
+    // Set initial state to match Direct3D
+    glEnable(GL_DEPTH_TEST);
+    SetCullMode(CULL_CCW);
+    SetDepthTest(CMP_LESSEQUAL);
+    SetDepthWrite(true);
 }
 
 void Graphics::SetTextureUnitMappings()

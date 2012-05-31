@@ -23,12 +23,11 @@ import android.content.res.*;
 
 import java.lang.*;
 
-
 /**
     SDL Activity
 */
-public class SDLActivity extends Activity {
-
+public class SDLActivity extends Activity 
+{
     // Main components
     private static SDLActivity mSingleton;
     private static SDLSurface mSurface;
@@ -50,12 +49,14 @@ public class SDLActivity extends Activity {
     private boolean mFinished = false;
 
     // Load the .so
-    static {
+    static 
+    {
         System.loadLibrary("Urho3D");
     }
 
     // Setup
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         Log.v("SDL", "onCreate()");
         super.onCreate(savedInstanceState);
 
@@ -69,19 +70,22 @@ public class SDLActivity extends Activity {
     }
 
     // Events
-    protected void onPause() {
+    protected void onPause() 
+    {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.nativePause();
     }
 
-    protected void onResume() {
+    protected void onResume() 
+    {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.nativeResume();
     }
 
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         Log.v("SDL", "onDestroy()");
         super.onDestroy();
 
@@ -91,10 +95,14 @@ public class SDLActivity extends Activity {
         SDLActivity.nativeQuit();
 
         // Now wait for the SDL thread to quit
-        if (mSDLThread != null) {
-            try {
+        if (mSDLThread != null) 
+        {
+            try 
+            {
                 mSDLThread.join();
-            } catch(Exception e) {
+            } 
+            catch(Exception e)
+            {
                 Log.v("SDL", "Problem stopping thread: " + e);
             }
             mSDLThread = null;
@@ -105,11 +113,13 @@ public class SDLActivity extends Activity {
         mSingleton = null;
     }
 
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) 
+    {
         super.onConfigurationChanged(newConfig);
     }
 
-    public static SDLActivity getSingleton() {
+    public static SDLActivity getSingleton() 
+    {
         return mSingleton;
     }
 
@@ -118,13 +128,18 @@ public class SDLActivity extends Activity {
     static int COMMAND_FINISH = 2;
 
     // Handler for the messages
-    Handler commandHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            if (msg.arg1 == COMMAND_CHANGE_TITLE) {
+    Handler commandHandler = new Handler() 
+    {
+        public void handleMessage(Message msg) 
+        {
+            if (msg.arg1 == COMMAND_CHANGE_TITLE) 
+            {
                 setTitle((String)msg.obj);
             }
-            if (msg.arg1 == COMMAND_FINISH) {
-                if (mFinished == false) {
+            if (msg.arg1 == COMMAND_FINISH) 
+            {
+                if (mFinished == false) 
+                {
                     mFinished = true;
                     finish();
                 }
@@ -133,7 +148,8 @@ public class SDLActivity extends Activity {
     };
 
     // Send a message from the SDLMain thread
-    void sendCommand(int command, Object data) {
+    void sendCommand(int command, Object data) 
+    {
         Message msg = commandHandler.obtainMessage();
         msg.arg1 = command;
         msg.obj = data;
@@ -156,31 +172,36 @@ public class SDLActivity extends Activity {
     public static native void onNativeSurfaceCreated();
     public static native void nativeRunAudioThread();
 
-
     // Java functions called from C
 
-    public static boolean createGLContext(int majorVersion, int minorVersion) {
-        return initEGL(majorVersion, minorVersion);
+    public static boolean createGLContext(int majorVersion, int minorVersion) 
+    {
+        return SDLActivity.mSingleton.initEGL(majorVersion, minorVersion);
     }
 
-    public static void flipBuffers() {
+    public static void flipBuffers()
+    {
         flipEGL();
     }
 
-    public static void setActivityTitle(String title) {
+    public static void setActivityTitle(String title)
+    {
         // Called from SDLMain() thread and can't directly affect the view
         mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
 
-    public static void finishActivity() {
+    public static void finishActivity() 
+    {
         mSingleton.sendCommand(COMMAND_FINISH, null);
     }
 
-    public static Context getContext() {
+    public static Context getContext()
+    {
         return mSingleton;
     }
 
-    public static void startApp() {
+    public static void startApp() 
+    {
         // Start up the C app thread
         if (mSDLThread == null) {
             mSDLThread = new Thread(new SDLMain(), "SDLThread");
@@ -188,126 +209,126 @@ public class SDLActivity extends Activity {
         }
         else {
             SDLActivity.nativeResume();
+
+            // startApp() is called whenever the window is ready to be rendered to. If the SDL main thread is already running,
+            // notify it that any OpenGL resources can be recreated
+            SDLActivity.onNativeSurfaceCreated();
         }
     }
 
     // EGL functions
-    public static boolean initEGL(int majorVersion, int minorVersion) {
+    public boolean initEGL(int majorVersion, int minorVersion) 
+    {
+        EGL10 egl = (EGL10)EGLContext.getEGL();
 
-        if (SDLActivity.mSingleton.mEGLDisplay == null) {
-            //Log.v("SDL", "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
-
-            try {
-                EGL10 egl = (EGL10)EGLContext.getEGL();
-
+        try
+        {
+            if (mEGLDisplay == null)
+            {
                 EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-
+    
                 int[] version = new int[2];
                 egl.eglInitialize(dpy, version);
-
+    
                 int EGL_OPENGL_ES_BIT = 1;
                 int EGL_OPENGL_ES2_BIT = 4;
                 int renderableType = 0;
-                if (majorVersion == 2) {
+                if (majorVersion == 2) 
+                {
                     renderableType = EGL_OPENGL_ES2_BIT;
-                } else if (majorVersion == 1) {
+                } 
+                else if (majorVersion == 1)
+                {
                     renderableType = EGL_OPENGL_ES_BIT;
                 }
-                int[] configSpec = {
+                int[] configSpec = 
+                {
                     EGL10.EGL_DEPTH_SIZE, 16,
                     EGL10.EGL_RENDERABLE_TYPE, renderableType,
                     EGL10.EGL_NONE
                 };
                 EGLConfig[] configs = new EGLConfig[1];
                 int[] num_config = new int[1];
-                if (!egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config) || num_config[0] == 0) {
+                if (!egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config) || num_config[0] == 0) 
+                {
                     Log.e("SDL", "No EGL config available");
                     return false;
                 }
                 EGLConfig config = configs[0];
-
-                /*int EGL_CONTEXT_CLIENT_VERSION=0x3098;
-                int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, majorVersion, EGL10.EGL_NONE };
-                EGLContext ctx = egl.eglCreateContext(dpy, config, EGL10.EGL_NO_CONTEXT, contextAttrs);
-
-                if (ctx == EGL10.EGL_NO_CONTEXT) {
-                    Log.e("SDL", "Couldn't create context");
-                    return false;
+    
+                mEGLDisplay = dpy;
+                mEGLConfig = config;
+                mGLMajor = majorVersion;
+                mGLMinor = minorVersion;
+            }
+            else
+            {
+                egl.eglMakeCurrent(mEGLDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+                if (mEGLSurface != null)
+                {
+                    egl.eglDestroySurface(mEGLDisplay, mEGLSurface);
+                    mEGLSurface = null;
                 }
-                SDLActivity.mEGLContext = ctx;*/
-                SDLActivity.mSingleton.mEGLDisplay = dpy;
-                SDLActivity.mSingleton.mEGLConfig = config;
-                SDLActivity.mSingleton.mGLMajor = majorVersion;
-                SDLActivity.mSingleton.mGLMinor = minorVersion;
-
-                SDLActivity.createEGLSurface();
-            } catch(Exception e) {
-                Log.v("SDL", e + "");
-                for (StackTraceElement s : e.getStackTrace()) {
-                    Log.v("SDL", s.toString());
+                if (mEGLContext != null)
+                {
+                    egl.eglDestroyContext(mEGLDisplay, mEGLContext);
+                    mEGLContext = null;
                 }
             }
-        }
-        else SDLActivity.createEGLSurface();
 
-        return true;
-    }
-
-    public static boolean createEGLContext() {
-        EGL10 egl = (EGL10)EGLContext.getEGL();
-        int EGL_CONTEXT_CLIENT_VERSION=0x3098;
-        int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, SDLActivity.mSingleton.mGLMajor, EGL10.EGL_NONE };
-        SDLActivity.mSingleton.mEGLContext = egl.eglCreateContext(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttrs);
-        if (SDLActivity.mSingleton.mEGLContext == EGL10.EGL_NO_CONTEXT) {
-            Log.e("SDL", "Couldn't create context");
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean createEGLSurface() {
-        if (SDLActivity.mSingleton.mEGLDisplay != null && SDLActivity.mSingleton.mEGLConfig != null) {
-            EGL10 egl = (EGL10)EGLContext.getEGL();
-            if (SDLActivity.mSingleton.mEGLContext == null) createEGLContext();
+            int EGL_CONTEXT_CLIENT_VERSION=0x3098;
+            int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, mGLMajor, EGL10.EGL_NONE };
+            EGLContext context = egl.eglCreateContext(mEGLDisplay, mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttrs);
+            if (context == EGL10.EGL_NO_CONTEXT)
+            {
+                Log.e("SDL", "Couldn't create context");
+                return false;
+            }
+            mEGLContext = context;
 
             Log.v("SDL", "Creating new EGL Surface");
-            EGLSurface surface = egl.eglCreateWindowSurface(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLConfig, SDLActivity.mSingleton.mSurface, null);
-            if (surface == EGL10.EGL_NO_SURFACE) {
+            EGLSurface surface = egl.eglCreateWindowSurface(mEGLDisplay, mEGLConfig, mSurface, null);
+            if (surface == EGL10.EGL_NO_SURFACE)
+            {
                 Log.e("SDL", "Couldn't create surface");
                 return false;
             }
-
-            if (!egl.eglMakeCurrent(SDLActivity.mSingleton.mEGLDisplay, surface, surface, SDLActivity.mSingleton.mEGLContext)) {
-                Log.e("SDL", "Old EGL Context doesnt work, trying with a new one");
-                createEGLContext();
-                if (!egl.eglMakeCurrent(SDLActivity.mSingleton.mEGLDisplay, surface, surface, SDLActivity.mSingleton.mEGLContext)) {
-                    Log.e("SDL", "Failed making EGL Context current");
-                    return false;
-                }
+            mEGLSurface = surface;
+            
+            if (!egl.eglMakeCurrent(mEGLDisplay, surface, surface, mEGLContext))
+            {
+                Log.e("SDL", "Failed making EGL Context current");
+                return false;
             }
-            SDLActivity.mSingleton.mEGLSurface = surface;
+            
             return true;
         }
-        return false;
+        catch(Exception e) 
+        {
+            Log.v("SDL", e + "");
+            for (StackTraceElement s : e.getStackTrace()) 
+            {
+                Log.v("SDL", s.toString());
+            }
+            
+            return false;
+        }
     }
 
     // EGL buffer flip
-    public static void flipEGL() {
-        try {
+    public static void flipEGL()
+    {
+        try
+        {
             EGL10 egl = (EGL10)EGLContext.getEGL();
 
-            egl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, null);
-
-            // drawing here
-
-            egl.eglWaitGL();
-
             egl.eglSwapBuffers(SDLActivity.mSingleton.mEGLDisplay, SDLActivity.mSingleton.mEGLSurface);
-
-
-        } catch(Exception e) {
+        }
+        catch(Exception e) 
+        {
             Log.v("SDL", "flipEGL(): " + e);
-            for (StackTraceElement s : e.getStackTrace()) {
+            for (StackTraceElement s : e.getStackTrace()) 
+            {
                 Log.v("SDL", s.toString());
             }
         }
@@ -316,7 +337,8 @@ public class SDLActivity extends Activity {
     // Audio
     private static Object buf;
 
-    public static Object audioInit(int sampleRate, boolean is16Bit, boolean isStereo, int desiredFrames) {
+    public static Object audioInit(int sampleRate, boolean is16Bit, boolean isStereo, int desiredFrames) 
+    {
         int channelConfig = isStereo ? AudioFormat.CHANNEL_CONFIGURATION_STEREO : AudioFormat.CHANNEL_CONFIGURATION_MONO;
         int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
         int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
@@ -335,17 +357,23 @@ public class SDLActivity extends Activity {
 
         Log.v("SDL", "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + ((float)mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
 
-        if (is16Bit) {
+        if (is16Bit) 
+        {
             buf = new short[desiredFrames * (isStereo ? 2 : 1)];
-        } else {
+        } 
+        else
+        {
             buf = new byte[desiredFrames * (isStereo ? 2 : 1)];
         }
         return buf;
     }
 
-    public static void audioStartThread() {
-        mAudioThread = new Thread(new Runnable() {
-            public void run() {
+    public static void audioStartThread() 
+    {
+        mAudioThread = new Thread(new Runnable() 
+        {
+            public void run() 
+            {
                 mAudioTrack.play();
                 nativeRunAudioThread();
             }
@@ -356,47 +384,69 @@ public class SDLActivity extends Activity {
         mAudioThread.start();
     }
 
-    public static void audioWriteShortBuffer(short[] buffer) {
-        for (int i = 0; i < buffer.length; ) {
+    public static void audioWriteShortBuffer(short[] buffer)
+     {
+        for (int i = 0; i < buffer.length; ) 
+        {
             int result = mAudioTrack.write(buffer, i, buffer.length - i);
             if (result > 0) {
                 i += result;
-            } else if (result == 0) {
-                try {
+            } else if (result == 0) 
+            {
+                try 
+                {
                     Thread.sleep(1);
-                } catch(InterruptedException e) {
+                } 
+                catch(InterruptedException e)
+                {
                     // Nom nom
                 }
-            } else {
+            } 
+            else
+            {
                 Log.w("SDL", "SDL audio: error return from write(short)");
                 return;
             }
         }
     }
 
-    public static void audioWriteByteBuffer(byte[] buffer) {
-        for (int i = 0; i < buffer.length; ) {
+    public static void audioWriteByteBuffer(byte[] buffer)
+    {
+        for (int i = 0; i < buffer.length; )
+        {
             int result = mAudioTrack.write(buffer, i, buffer.length - i);
-            if (result > 0) {
+            if (result > 0) 
+            {
                 i += result;
-            } else if (result == 0) {
-                try {
+            } 
+            else if (result == 0) 
+            {
+                try 
+                {
                     Thread.sleep(1);
-                } catch(InterruptedException e) {
+                } catch(InterruptedException e) 
+                {
                     // Nom nom
                 }
-            } else {
+            }
+            else 
+            {
                 Log.w("SDL", "SDL audio: error return from write(short)");
                 return;
             }
         }
     }
 
-    public static void audioQuit() {
-        if (mAudioThread != null) {
-            try {
+    public static void audioQuit()
+    {
+        if (mAudioThread != null)
+        {
+            try
+            {
                 mAudioThread.join();
-            } catch(Exception e) {
+            }
+            catch(Exception e)
+            {
                 Log.v("SDL", "Problem stopping audio thread: " + e);
             }
             mAudioThread = null;
@@ -404,7 +454,8 @@ public class SDLActivity extends Activity {
             //Log.v("SDL", "Finished waiting for audio thread");
         }
 
-        if (mAudioTrack != null) {
+        if (mAudioTrack != null) 
+        {
             mAudioTrack.stop();
             mAudioTrack = null;
         }
@@ -414,8 +465,10 @@ public class SDLActivity extends Activity {
 /**
     Simple nativeInit() runnable
 */
-class SDLMain implements Runnable {
-    public void run() {
+class SDLMain implements Runnable 
+{
+    public void run() 
+    {
         // Runs SDL_main()
         SDLActivity.nativeInit(SDLActivity.getSingleton().getFilesDir().getAbsolutePath());
 
@@ -431,14 +484,15 @@ class SDLMain implements Runnable {
 
     Because of this, that's where we set up the SDL thread
 */
-class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
-    View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
+class SDLSurface extends SurfaceView implements SurfaceHolder.Callback, View.OnKeyListener, View.OnTouchListener, SensorEventListener
+{
 
     // Sensors
     private static SensorManager mSensorManager;
 
     // Startup
-    public SDLSurface(Context context) {
+    public SDLSurface(Context context) 
+    {
         super(context);
         getHolder().addCallback(this);
 
@@ -452,18 +506,16 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     // Called when we have a valid drawing surface
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(SurfaceHolder holder)
+    {
         Log.v("SDL", "surfaceCreated()");
         holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
         enableSensor(Sensor.TYPE_ACCELEROMETER, true);
-        SDLActivity.onNativeSurfaceCreated();
-        
-        // Note: we must not recreate the OpenGL context here, but wait for the application call initEGL() again
-        // from its own thread, to ensure the context is made current to the correct thread
     }
 
     // Called when we lose the surface
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
         Log.v("SDL", "surfaceDestroyed()");
         SDLActivity.nativePause();
         enableSensor(Sensor.TYPE_ACCELEROMETER, false);
@@ -471,8 +523,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     // Called when the surface is resized
-    public void surfaceChanged(SurfaceHolder holder,
-                               int format, int width, int height) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+    {
         Log.v("SDL", "surfaceChanged()");
 
         int sdlFormat = 0x85151002; // SDL_PIXELFORMAT_RGB565 by default
@@ -528,22 +580,21 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // unused
     public void onDraw(Canvas canvas) {}
 
-
-
-
     // Key events
-    public boolean onKey(View  v, int keyCode, KeyEvent event) {
-
-        // Urho3D: let the home & volume keys be handled by the system
+    public boolean onKey(View  v, int keyCode, KeyEvent event)
+    {
+        // Let the home & volume keys be handled by the system
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_HOME)
             return false;
 
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) 
+        {
             //Log.v("SDL", "key down: " + keyCode);
             SDLActivity.onNativeKeyDown(keyCode);
             return true;
         }
-        else if (event.getAction() == KeyEvent.ACTION_UP) {
+        else if (event.getAction() == KeyEvent.ACTION_UP) 
+        {
             //Log.v("SDL", "key up: " + keyCode);
             SDLActivity.onNativeKeyUp(keyCode);
             return true;
@@ -553,20 +604,22 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     // Touch events
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(View v, MotionEvent event) 
+    {
         {
-             final int touchDevId = event.getDeviceId();
-             final int pointerCount = event.getPointerCount();
-             // touchId, pointerId, action, x, y, pressure
-             int actionPointerIndex = event.getActionIndex();
-             int pointerFingerId = event.getPointerId(actionPointerIndex);
-             int action = event.getActionMasked();
+            final int touchDevId = event.getDeviceId();
+            final int pointerCount = event.getPointerCount();
+            // touchId, pointerId, action, x, y, pressure
+            int actionPointerIndex = event.getActionIndex();
+            int pointerFingerId = event.getPointerId(actionPointerIndex);
+            int action = event.getActionMasked();
 
-             float x = event.getX(actionPointerIndex);
-             float y = event.getY(actionPointerIndex);
-             float p = event.getPressure(actionPointerIndex);
+            float x = event.getX(actionPointerIndex);
+            float y = event.getY(actionPointerIndex);
+            float p = event.getPressure(actionPointerIndex);
 
-             if (action == MotionEvent.ACTION_MOVE && pointerCount > 1) {
+            if (action == MotionEvent.ACTION_MOVE && pointerCount > 1)
+            {
                 // TODO send motion to every pointer if its position has
                 // changed since prev event.
                 for (int i = 0; i < pointerCount; i++) {
@@ -576,37 +629,44 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                     p = event.getPressure(i);
                     SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
                 }
-             } else {
+            }
+            else
+            {
                 SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
-             }
+            }
         }
       return true;
    }
 
     // Sensor events
-    public void enableSensor(int sensortype, boolean enabled) {
+    public void enableSensor(int sensortype, boolean enabled)
+    {
         // TODO: This uses getDefaultSensor - what if we have >1 accels?
-        if (enabled) {
+        if (enabled) 
+        {
             mSensorManager.registerListener(this,
                             mSensorManager.getDefaultSensor(sensortype),
                             SensorManager.SENSOR_DELAY_GAME, null);
-        } else {
+        } 
+        else 
+        {
             mSensorManager.unregisterListener(this,
                             mSensorManager.getDefaultSensor(sensortype));
         }
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy) 
+    {
         // TODO
     }
 
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+    public void onSensorChanged(SensorEvent event) 
+    {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        {
             SDLActivity.onNativeAccel(event.values[0] / SensorManager.GRAVITY_EARTH,
                                       event.values[1] / SensorManager.GRAVITY_EARTH,
                                       event.values[2] / SensorManager.GRAVITY_EARTH);
         }
     }
-
 }
-

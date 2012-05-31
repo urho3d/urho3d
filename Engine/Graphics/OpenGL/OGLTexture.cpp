@@ -131,6 +131,7 @@ void Texture::SetParametersDirty()
 
 void Texture::ClearDataLost()
 {
+    dataLost_ = false;
 }
 
 void Texture::UpdateParameters()
