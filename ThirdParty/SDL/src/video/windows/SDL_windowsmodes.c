@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -261,6 +264,8 @@ WIN_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
         }
         if (SDL_ISPIXELFORMAT_INDEXED(mode.format)) {
             /* We don't support palettized modes now */
+            // Urho3D: fixed memory leak
+            SDL_free(mode.driverdata);
             continue;
         }
         if (mode.format != SDL_PIXELFORMAT_UNKNOWN) {
