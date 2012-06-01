@@ -90,7 +90,7 @@ public:
     /// Return whether application window is active.
     bool IsActive() { return active_; }
     /// Return whether application window is minimized.
-    bool IsMinimized() { return minimized_; }
+    bool IsMinimized() const;
     
 private:
     /// Initialize when screen mode initially set.

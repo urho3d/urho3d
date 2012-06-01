@@ -338,6 +338,15 @@ TouchState Input::GetTouch(unsigned index) const
     return TouchState();
 }
 
+bool Input::IsMinimized() const
+{
+    // Return minimized state also when inactive in fullscreen
+    if (!active_ && graphics_ && graphics_->GetFullscreen())
+        return true;
+    else
+        return minimized_;
+}
+
 void Input::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
