@@ -1561,6 +1561,11 @@ bool Graphics::IsInitialized() const
     return impl_->window_ != 0;
 }
 
+bool Graphics::IsDeviceLost() const
+{
+    return impl_->context_ == 0;
+}
+
 void* Graphics::GetWindowHandle() const
 {
     return impl_->window_;

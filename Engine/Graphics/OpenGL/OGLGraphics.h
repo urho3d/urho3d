@@ -217,8 +217,8 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
-    /// Return whether device is lost, and can not yet render. Always false on OpenGL.
-    bool IsDeviceLost() const { return false; }
+    /// Return whether device is lost, and can not yet render.
+    bool IsDeviceLost() const;
     /// Return window handle.
     void* GetWindowHandle() const;
     /// Return number of primitives drawn this frame.
