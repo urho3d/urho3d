@@ -53,6 +53,8 @@ OBJECTTYPESTATIC(BillboardSet);
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context),
     geometry_(new Geometry(context)),
+    vertexBuffer_(new VertexBuffer(context_)),
+    indexBuffer_(new IndexBuffer(context_)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
@@ -66,8 +68,6 @@ BillboardSet::BillboardSet(Context* context) :
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
-    vertexBuffer_ = new VertexBuffer(context_);
-    indexBuffer_ = new IndexBuffer(context_);
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
     geometry_->SetIndexBuffer(indexBuffer_);
     
@@ -136,18 +136,8 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 {
-    if (vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
-    {
-        vertexBuffer_->ClearDataLost();
-        indexBuffer_->ClearDataLost();
-        bufferSizeDirty_ = true;
-    }
-    
-    if (bufferSizeDirty_)
-    {
+    if (bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         UpdateBufferSize();
-        forceUpdate_ = true;
-    }
     
     if (bufferDirty_)
         UpdateVertexBuffer(frame);
@@ -347,6 +337,8 @@ void BillboardSet::UpdateBufferSize()
     
     bufferSizeDirty_ = false;
     bufferDirty_ = true;
+    forceUpdate_ = true;
+    
     if (!numBillboards)
         return;
     
@@ -365,6 +357,7 @@ void BillboardSet::UpdateBufferSize()
     }
     
     indexBuffer_->Unlock();
+    indexBuffer_->ClearDataLost();
 }
 
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
@@ -467,6 +460,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     }
     
     vertexBuffer_->Unlock();
+    vertexBuffer_->ClearDataLost();
 }
 
 void BillboardSet::MarkPositionsDirty()

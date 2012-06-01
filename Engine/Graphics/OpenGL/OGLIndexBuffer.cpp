@@ -135,6 +135,9 @@ bool IndexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+    
     if (object_)
     {
         graphics_->SetIndexBuffer(0);
@@ -142,9 +145,7 @@ bool IndexBuffer::SetData(const void* data)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     
-    if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
-    
+    dataLost_ = false;
     return true;
 }
 
@@ -174,6 +175,9 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (!count)
         return true;
     
+    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
+        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    
     if (object_)
     {
         graphics_->SetIndexBuffer(0);
@@ -183,9 +187,6 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         else
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
-    
-    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
     
     return true;
 }

@@ -29,7 +29,7 @@
 
 #include "DebugNew.h"
 
-const unsigned VertexBuffer::elementSize[] = 
+const unsigned VertexBuffer::elementSize[] =
 {
     3 * sizeof(float), // Position
     3 * sizeof(float), // Normal
@@ -46,7 +46,7 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(float) // Instancematrix3
 };
 
-const String VertexBuffer::elementName[] = 
+const String VertexBuffer::elementName[] =
 {
     "Position",
     "Normal",
@@ -185,6 +185,9 @@ bool VertexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+    
     if (object_)
     {
         void* hwData = MapBuffer(0, vertexCount_, true);
@@ -193,11 +196,11 @@ bool VertexBuffer::SetData(const void* data)
             memcpy(hwData, data, vertexCount_ * vertexSize_);
             UnmapBuffer();
         }
+        else
+            return false;
     }
     
-    if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
-    
+    dataLost_ = false;
     return true;
 }
 
@@ -227,6 +230,9 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (!count)
         return true;
     
+    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
+        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+    
     if (object_)
     {
         void* hwData = MapBuffer(start, count, discard);
@@ -235,11 +241,10 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
             memcpy(hwData, data, count * vertexSize_);
             UnmapBuffer();
         }
+        else
+            return false;
     }
-    
-    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
-    
+
     return true;
 }
 

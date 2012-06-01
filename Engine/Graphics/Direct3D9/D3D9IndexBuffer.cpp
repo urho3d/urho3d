@@ -145,6 +145,9 @@ bool IndexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
+    
     if (object_)
     {
         void* hwData = MapBuffer(0, indexCount_, true);
@@ -153,11 +156,11 @@ bool IndexBuffer::SetData(const void* data)
             memcpy(hwData, data, indexCount_ * indexSize_);
             UnmapBuffer();
         }
+        else
+            return false;
     }
     
-    if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
-    
+    dataLost_ = false;
     return true;
 }
 
@@ -187,6 +190,9 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (!count)
         return true;
     
+    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
+        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
+    
     if (object_)
     {
         void* hwData = MapBuffer(start, count, discard);
@@ -195,11 +201,10 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
             memcpy(hwData, data, count * indexSize_);
             UnmapBuffer();
         }
+        else
+            return false;
     }
-    
-    if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
-        memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
-    
+
     return true;
 }
 

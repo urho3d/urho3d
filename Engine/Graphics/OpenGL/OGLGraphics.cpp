@@ -597,6 +597,8 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         elementMasks_[i] = elementMask;
         changed = true;
         
+        // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
+        // in which case the pointer will be invalid and cause a crash
         if (!buffer || !buffer->GetGPUObject())
             continue;
         
@@ -676,7 +678,6 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
                 elementMask = buffer->GetElementMask() & elementMasks[i];
         }
         
-        // If buffer and element mask have stayed the same, skip to the next buffer
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
             continue;
         
@@ -698,14 +699,12 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
             {
                 newAttributes |= elementBit;
                 
-                // Enable attribute if not enabled yet
                 if ((impl_->enabledAttributes_ & elementBit) == 0)
                 {
                     glEnableVertexAttribArray(j);
                     impl_->enabledAttributes_ |= elementBit;
                 }
                 
-                // Set the attribute pointer
                 glVertexAttribPointer(j, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
             }
@@ -715,7 +714,6 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
     if (!changed)
         return true;
     
-    // Now check which vertex attributes should be disabled
     unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
     int disableIndex = 0;
     while (disableAttributes)
@@ -2210,6 +2208,7 @@ void Graphics::ResetCachedState()
     
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
+    impl_->boundFbo_ = 0;
     
     // Set initial state to match Direct3D
     glEnable(GL_DEPTH_TEST);

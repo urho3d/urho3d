@@ -65,7 +65,7 @@ public:
     /// Return whether is dynamic.
     bool IsDynamic() const { return dynamic_; }
     /// Return whether data is lost due to context loss.
-    bool IsDataLost() const { return false; }
+    bool IsDataLost() const { return dataLost_; }
     /// Return whether is currently locked.
     bool IsLocked() const { return lockState_ != LOCK_NONE; }
     /// Return number of vertices.

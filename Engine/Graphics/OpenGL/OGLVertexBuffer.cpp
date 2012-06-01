@@ -226,15 +226,16 @@ bool VertexBuffer::SetData(const void* data)
         return false;
     }
     
+    if (shadowData_ && data != shadowData_.Get())
+        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
+    
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     
-    if (shadowData_ && data != shadowData_.Get())
-        memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
-    
+    dataLost_ = false;
     return true;
 }
 
@@ -264,6 +265,9 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (!count)
         return true;
     
+    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
+        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
+    
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
@@ -272,9 +276,6 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         else
             glBufferData(GL_ARRAY_BUFFER, count * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
-    
-    if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
-        memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
     
     return true;
 }

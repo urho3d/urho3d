@@ -782,7 +782,6 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         return false;
     }
     
-    // Build vertex declaration hash code out of the buffers & masks
     unsigned long long hash = 0;
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -794,7 +793,6 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
     
     if (hash)
     {
-        // If no previous vertex declaration for that hash, create new
         if (!vertexDeclarations_.Contains(hash))
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
