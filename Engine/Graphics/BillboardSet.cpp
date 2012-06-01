@@ -66,6 +66,11 @@ BillboardSet::BillboardSet(Context* context) :
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
+    vertexBuffer_ = new VertexBuffer(context_);
+    indexBuffer_ = new IndexBuffer(context_);
+    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
+    geometry_->SetIndexBuffer(indexBuffer_);
+    
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     batches_[0].geometryType_ = GEOM_BILLBOARD;
@@ -131,16 +136,16 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 {
+    if (vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
+    {
+        vertexBuffer_->ClearDataLost();
+        indexBuffer_->ClearDataLost();
+        bufferSizeDirty_ = true;
+    }
+    
     if (bufferSizeDirty_)
     {
         UpdateBufferSize();
-        forceUpdate_ = true;
-    }
-    
-    if (vertexBuffer_->IsDataLost())
-    {
-        vertexBuffer_->ClearDataLost();
-        bufferDirty_ = true;
         forceUpdate_ = true;
     }
     
@@ -150,7 +155,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType BillboardSet::GetUpdateGeometryType()
 {
-    if (bufferDirty_ || bufferSizeDirty_ || (vertexBuffer_ && vertexBuffer_->IsDataLost()))
+    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else
         return UPDATE_NONE;
@@ -333,19 +338,12 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
 
 void BillboardSet::UpdateBufferSize()
 {
-    if (!vertexBuffer_ || !indexBuffer_)
-    {
-        vertexBuffer_ = new VertexBuffer(context_);
-        indexBuffer_ = new IndexBuffer(context_);
-        
-        batches_[0].geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
-        batches_[0].geometry_->SetIndexBuffer(indexBuffer_);
-    }
-    
     unsigned numBillboards = billboards_.Size();
     
-    vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
-    indexBuffer_->SetSize(numBillboards * 6, false);
+    if (vertexBuffer_->GetVertexCount() != numBillboards * 4)
+        vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
+    if (indexBuffer_->GetIndexCount() != numBillboards * 6)
+        indexBuffer_->SetSize(numBillboards * 6, false);
     
     bufferSizeDirty_ = false;
     bufferDirty_ = true;
