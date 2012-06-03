@@ -219,8 +219,6 @@ public:
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
-    /// Return window handle.
-    void* GetWindowHandle() const;
     /// Return number of primitives drawn this frame.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame.
