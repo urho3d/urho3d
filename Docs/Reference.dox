@@ -532,6 +532,8 @@ OpenGL ES 2 has further limitations:
 
 - Due to texture unit limit (usually 8), point light shadow maps are not supported.
 
+- To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
+
 \page Materials Materials
 
 Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the CoreData/Materials & Data/Materials subdirectories, and techniques exist in the CoreData/Techniques subdirectory.
