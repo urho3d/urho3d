@@ -14,6 +14,16 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android SDK and Android NDK need to be installed.
 
+To run Urho3D, the minimum system requirements are:
+
+- Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 2 support (%Shader %Model 3 recommended.)
+
+- Linux & Mac OS X: GPU with OpenGL 2.0 support and EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions.
+
+- Android: OS version 2.2 or newer, OpenGL ES 2 capable GPU.
+
+For Windows, SSE and Windows XP requirements can be eliminated by disabling SSE, crash dump support and file watcher from the root CMakeLists.txt. Windows 2000 will then be the absolute minimum.
+
 \section Building_Desktop Desktop build process
 
 Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
@@ -30,23 +40,27 @@ To run from the Visual Studio debugger, set the Urho3D project as the startup pr
 
 To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
 
-
 \section Building_Android Android build process
 
-First build Urho3D for desktop OpenGL to make sure the GLSL shaders are generated. Then copy Bin/Data and Bin/CoreData directories to the Android/assets directory. Finally execute the following commands in the Android directory:
+First build Urho3D for desktop OpenGL to make sure the GLSL shaders are generated. For Windows this requires forcing OpenGL mode from the root CMakeLists.txt. Then copy Bin/Data and Bin/CoreData directories to the Android/assets directory. Finally execute the following commands in the Android directory:
 
 - android update project -p . (only needed on the first time)
 - ndk-build
-- ant debug (or ant release, but then you will have to sign the APK)
+- ant debug
 
-The APK should now have been generated to the Android/bin directory, from where you can install it on a device or an emulator.
+Note that ndk-build builds Urho3D twice, once without hardware floating point instructions, and once with them. After the commands finish successfully, the APK should have been generated to the Android/bin directory, from where it can be installed on a device or an emulator.
 
-Note that ndk-build builds Urho3D twice, once without hardware floating point instructions, and once with them.
+For a release build, use the "ant release" command instead of "ant debug" and follow the Android SDK instructions on how to sign your APK properly.
+
+By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. Unfortunately the name has to be replaced in several files:
+
+- Android/AndroidManifest.xml
+- Android/src/com/googlecode/urho3d/SDLActivity.java (rename directories also)
+- ThirdParty/SDL/include/SDL_config_android.h, look for the NATIVE_FUNCTION macro
+
 
 
 \page Running Running Urho3D
-
-For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is required. On Android OS version 2.2 or newer and OpenGL ES 2 support is required.
 
 The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
 
@@ -54,7 +68,7 @@ Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-On Android there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from Urho3D.cpp.
+On Android there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
 
 Currently, five example application scripts exist:
 
@@ -101,6 +115,10 @@ F4          Toggle octree debug geometry
 
 NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
 
+\section Running_Editor Editor
+
+%Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
+
 \section Running_Chat Chat
 
 Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
@@ -109,10 +127,6 @@ On the client, first type the server address to the text edit box and click "Con
 either press return or click "Send" to send them. Press ESC to exit.
 
 To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
-
-\section Running_Editor Editor
-
-%Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
 
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
 

@@ -291,9 +291,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             Release(true, true);
             return false;
         }
-        #endif
         
         compressedTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
+        #else
+        compressedTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
+        #endif
     }
     
     // Set vsync

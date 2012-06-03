@@ -377,8 +377,8 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, the supported shader model is checked. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
-- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil, EXT_texture_compression_s3tc and EXT_texture_filter_anisotropic extensions is checked for.
+- For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()".
+- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and either R32F texture format or readable hardware depth.
 
@@ -432,11 +432,19 @@ The following techniques will be used to reduce the amount of CPU and GPU work w
 
 - Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing (Direct3D9 SM3.0 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing (Direct3D9 SM3 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
 Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
+
+\section Rendering_GPUResourceLoss Handling GPU resource loss
+
+On Direct3D9 and Android OpenGL ES 2 it is possible to lose the rendering context (and therefore GPU resources) due to the application window being minimized to the background. Also, to work around possible GPU driver bugs the desktop OpenGL context will be voluntarily destroyed and recreated when changing screen mode or toggling between fullscreen and windowed. Therefore, on all graphics APIs one must be prepared for losing GPU resources.
+
+Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
+
+See \ref VertexBuffer::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
 \section Rendering_Further Further details
 
@@ -449,7 +457,7 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 \page RenderingModes Rendering modes
 
-Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering.
+Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering. Note that on OpenGL ES 2 only forward rendering is available.
 
 \section RenderingModes_Forward Forward rendering
 
@@ -496,6 +504,12 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 \page APIDifferences Differences between Direct3D9 and OpenGL
 
+These differences need to be observed when using the low-level rendering functionality directly. The high-level rendering architecture, including the Renderer and UI subsystems and the Drawable subclasses already handle most of them transparently to the user.
+
+- The post-projection depth range is (0,1) for Direct3D9 and (-1,1) for OpenGL. The Camera can be queried either for an API-specific or API-independent (Direct3D9 convention) projection matrix.
+
+- To render with 1:1 texel-to-pixel mapping, on Direct3D9 UV coordinates have to be shifted a half-pixel to the right and down, or alternatively vertex positions can be shifted a half-pixel left and up.
+
 - On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
 - On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
@@ -506,14 +520,17 @@ Finally note that due to OpenGL framebuffer object limitations an extra framebuf
 
 - %Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 for Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
 
-- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change.
-
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
-Note that these differences only need to be observed when writing custom rendering functionality and accessing Graphics directly. When using Renderer and the Drawable components, they are taken care of automatically.
+OpenGL ES 2 has further limitations:
 
+- Only DXT1 compressed textures will be uploaded as compressed if the EXT_texture_compression_dxt1 extension is present. Other compressed texture formats will be uploaded as uncompressed RGBA. Mobile hardware specific compression formats such as ETC or PVRTC are not yet supported.
+
+- %Light pre-pass and deferred rendering are not supported due to missing multiple rendertarget support, and limited rendertarget formats.
+
+- Due to texture unit limit (usually 8), point light shadow maps are not supported.
 
 \page Materials Materials
 
@@ -759,13 +776,16 @@ The Input subsystem provides keyboard and mouse input via both a polled interfac
 
 The input events include:
 
-- E_MOUSEBUTTONUP: a mouse button has been released.
-- E_MOUSEBUTTONDOWN: a mouse button has been pressed.
-- E_MOUSEMOVE: the mouse has been moved.
-- E_MOUSEWHEEL: the mouse wheel has been moved.
-- E_KEYUP: a key has been released.
-- E_KEYDOWN: a key has been pressed.
+- E_MOUSEBUTTONUP: a mouse button was released.
+- E_MOUSEBUTTONDOWN: a mouse button was pressed.
+- E_MOUSEMOVE: the mouse moved.
+- E_MOUSEWHEEL: the mouse wheel moved.
+- E_KEYUP: a key was released.
+- E_KEYDOWN: a key was pressed.
 - E_CHAR: translation of a keypress to Unicode charset for text entry. This is currently the only way to get translated key input.
+- E_TOUCHBEGIN: a finger touched the screen.
+- E_TOUCHEND: a finger was lifted from the screen.
+- E_TOUCHMOVE: a finger moved on the screen.
 
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
 

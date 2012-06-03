@@ -91,6 +91,20 @@ successfully:
 
 - For Android, the Android SDK and Android NDK need to be installed.
 
+To run Urho3D, the minimum system requirements are:
+
+- Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c,
+  GPU with Shader Model 2 support (Shader Model 3 recommended.)
+
+- Linux & Mac OS X: GPU with OpenGL 2.0 support and EXT_framebuffer_object,
+  EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions.
+
+- Android: OS version 2.2 or newer, OpenGL ES 2 capable GPU.
+
+For Windows, SSE and Windows XP requirements can be eliminated by disabling SSE,
+crash dump support and file watcher from the root CMakeLists.txt. Windows 2000
+will then be the absolute minimum.
+
 
 Desktop build process
 ---------------------
@@ -132,20 +146,32 @@ following arguments: Scripts/TestScene.as -w
 Android build process
 ---------------------
 
-First build Urho3D for desktop OpenGL to make sure the GLSL shaders are
-generated. Then copy Bin/Data and Bin/CoreData directories to the
-Android/assets directory. Finally execute the following commands in the 
+First build Urho3D for desktop OpenGL to make sure the GLSL shaders are 
+generated. For Windows this requires forcing OpenGL mode from the root 
+CMakeLists.txt. Then copy Bin/Data and Bin/CoreData directories to the
+Android/assets directory. Finally execute the following commands in the
 Android directory:
 
-android update project -p . (only needed on the first time)
-ndk-build
-ant debug (or ant release, but then you will have to sign the APK)
-
-The APK should now have been generated to the Android/bin directory, from where 
-you can install it on a device or an emulator.
+- android update project -p . (only needed on the first time)
+- ndk-build
+- ant debug
 
 Note that ndk-build builds Urho3D twice, once without hardware floating point
-instructions, and once with them.
+instructions, and once with them. After the commands finish successfully, the
+APK should have been generated to the Android/bin directory, from where it can
+be installed on a device or an emulator.
+
+For a release build, use the "ant release" command instead of "ant debug" and
+follow the Android SDK instructions on how to sign your APK properly.
+
+By default the Android package for Urho3D is com.googlecode.urho3d. For a real
+application you must replace this with your own package name. Unfortunately the
+name has to be replaced in several files:
+
+- Android/AndroidManifest.xml
+- Android/src/com/googlecode/urho3d/SDLActivity.java (rename directories also)
+- ThirdParty/SDL/include/SDL_config_android.h, look for the NATIVE_FUNCTION
+  macro
 
 
 History
