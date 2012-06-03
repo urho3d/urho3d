@@ -25,9 +25,7 @@
 
 #include "Object.h"
 
-#ifdef USE_OPENGL
 #include <SDL_keycode.h>
-#endif
 
 /// Mouse button pressed.
 EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
@@ -131,75 +129,6 @@ static const int QUAL_CTRL = 2;
 static const int QUAL_ALT = 4;
 static const int QUAL_ANY = 8;
 
-#ifndef USE_OPENGL
-static const int KEY_BACKSPACE = 0x08;
-static const int KEY_TAB = 0x09;
-static const int KEY_RETURN = 0x0d;
-static const int KEY_PAUSE = 0x13;
-static const int KEY_CAPSLOCK = 0x14;
-static const int KEY_ESC = 0x1b;
-static const int KEY_SPACE = 0x20;
-static const int KEY_PAGEUP = 0x21;
-static const int KEY_PAGEDOWN = 0x22;
-static const int KEY_END = 0x23;
-static const int KEY_HOME = 0x24;
-static const int KEY_LEFT = 0x25;
-static const int KEY_UP = 0x26;
-static const int KEY_RIGHT = 0x27;
-static const int KEY_DOWN = 0x28;
-static const int KEY_INSERT = 0x2d;
-static const int KEY_DELETE = 0x2e;
-static const int KEY_LWIN = 0x5b;
-static const int KEY_RWIN = 0x5c;
-static const int KEY_APPS = 0x5d;
-static const int KEY_NUMPAD0 = 0x60;
-static const int KEY_NUMPAD1 = 0x61;
-static const int KEY_NUMPAD2 = 0x62;
-static const int KEY_NUMPAD3 = 0x63;
-static const int KEY_NUMPAD4 = 0x64;
-static const int KEY_NUMPAD5 = 0x65;
-static const int KEY_NUMPAD6 = 0x66;
-static const int KEY_NUMPAD7 = 0x67;
-static const int KEY_NUMPAD8 = 0x68;
-static const int KEY_NUMPAD9 = 0x69;
-static const int KEY_MULTIPLY = 0x6a;
-static const int KEY_ADD = 0x6b;
-static const int KEY_SUBTRACT = 0x6d;
-static const int KEY_DECIMAL = 0x6e;
-static const int KEY_DIVIDE = 0x6f;
-static const int KEY_F1 = 0x70;
-static const int KEY_F2 = 0x71;
-static const int KEY_F3 = 0x72;
-static const int KEY_F4 = 0x73;
-static const int KEY_F5 = 0x74;
-static const int KEY_F6 = 0x75;
-static const int KEY_F7 = 0x76;
-static const int KEY_F8 = 0x77;
-static const int KEY_F9 = 0x78;
-static const int KEY_F10 = 0x79;
-static const int KEY_F11 = 0x7a;
-static const int KEY_F12 = 0x7b;
-static const int KEY_F13 = 0x7c;
-static const int KEY_F14 = 0x7d;
-static const int KEY_F15 = 0x7e;
-static const int KEY_F16 = 0x7f;
-static const int KEY_F17 = 0x80;
-static const int KEY_F18 = 0x81;
-static const int KEY_F19 = 0x82;
-static const int KEY_F20 = 0x83;
-static const int KEY_F21 = 0x84;
-static const int KEY_F22 = 0x85;
-static const int KEY_F23 = 0x86;
-static const int KEY_F24 = 0x87;
-static const int KEY_NUMLOCK = 0x90;
-static const int KEY_SCROLLLOCK = 0x91;
-static const int KEY_LSHIFT = 0xa0;
-static const int KEY_RSHIFT = 0xa1;
-static const int KEY_LCTRL = 0xa2;
-static const int KEY_RCTRL = 0xa3;
-static const int KEY_LALT = 0xa4;
-static const int KEY_RALT = 0xa5;
-#else
 static const int KEY_BACKSPACE = SDLK_BACKSPACE;
 static const int KEY_TAB = SDLK_TAB;
 static const int KEY_RETURN = SDLK_RETURN;
@@ -272,4 +201,3 @@ static const int KEY_LCTRL = SDLK_LCTRL;
 static const int KEY_RCTRL = SDLK_RCTRL;
 static const int KEY_LALT = SDLK_LALT;
 static const int KEY_RALT = SDLK_RALT;
-#endif

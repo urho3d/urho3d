@@ -75,7 +75,7 @@ public:
     /// Return whether audio is being output.
     bool IsPlaying() const { return playing_; }
     /// Return whether an audio stream has been reserved.
-    bool IsInitialized() const { return stream_ != 0; }
+    bool IsInitialized() const { return deviceID_ != 0; }
     /// Return master gain for a specific sound source type.
     float GetMasterGain(SoundType type) const;
     /// Return listener position.
@@ -103,17 +103,12 @@ private:
     /// Stop sound output and release the sound buffer.
     void Release();
     
-#ifdef USE_OPENGL
-    /// SDL audio device ID
-    unsigned stream_;
-#else
-    /// Sound output stream.
-    void* stream_;
-#endif
     /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex.
     Mutex audioMutex_;
+    /// SDL audio device ID.
+    unsigned deviceID_;
     /// Sample size.
     unsigned sampleSize_;
     /// Clip buffer size in samples.

@@ -25,8 +25,8 @@
 
 #include "Color.h"
 
-#include <windows.h>
 #include <d3d9.h>
+#include <SDL.h>
 
 /// %Graphics implementation. Holds API-specific objects.
 class GraphicsImpl
@@ -41,18 +41,16 @@ public:
     IDirect3DDevice9* GetDevice() const { return device_; }
     /// Return device capabilities.
     const D3DCAPS9& GetDeviceCaps() const { return deviceCaps_; }
-    /// Return window handle.
-    HWND GetWindowHandle() const { return window_; }
+    /// Return window.
+    SDL_Window* GetWindow() const { return window_; }
     /// Return adapter identifier.
     const D3DADAPTER_IDENTIFIER9& GetAdapterIdentifier() const { return adapterIdentifier_; }
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
-    /// Return desktop texture format.
-    D3DFORMAT GetDesktopFormat();
-    /// Return desktop width/height.
-    IntVector2 GetDesktopResolution();
     
 private:
+    /// SDL window.
+    SDL_Window* window_;
     /// Direct3D interface.
     IDirect3D9* interface_;
     /// Direct3D device.
@@ -69,10 +67,6 @@ private:
     D3DCAPS9 deviceCaps_;
     /// Adapter identifier.
     D3DADAPTER_IDENTIFIER9 adapterIdentifier_;
-    /// Application instance.
-    HINSTANCE instance_;
-    /// Application window.
-    HWND window_;
     /// Direct3D presentation parameters.
     D3DPRESENT_PARAMETERS presentParams_;
     /// Texture min/mag filter modes in use.

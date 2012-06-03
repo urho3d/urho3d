@@ -29,13 +29,12 @@
 #include "DebugNew.h"
 
 GraphicsImpl::GraphicsImpl() :
+    window_(0),
     interface_(0),
     device_(0),
     defaultColorSurface_(0),
     adapter_(D3DADAPTER_DEFAULT),
-    deviceType_(D3DDEVTYPE_HAL),
-    instance_(GetModuleHandle(0)),
-    window_(0)
+    deviceType_(D3DDEVTYPE_HAL)
 {
     memset(&presentParams_, 0, sizeof presentParams_);
 }
@@ -55,18 +54,4 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
         return true;
     else
         return false;
-}
-
-D3DFORMAT GraphicsImpl::GetDesktopFormat()
-{
-    DEVMODEW settings;
-    EnumDisplaySettingsW(0, ENUM_CURRENT_SETTINGS, &settings);
-    return settings.dmBitsPerPel <= 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
-}
-
-IntVector2 GraphicsImpl::GetDesktopResolution()
-{
-    DEVMODEW settings;
-    EnumDisplaySettingsW(0, ENUM_CURRENT_SETTINGS, &settings);
-    return IntVector2(settings.dmPelsWidth, settings.dmPelsHeight);
 }

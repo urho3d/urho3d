@@ -5,7 +5,7 @@ set (TARGET_NAME SDL)
 file (GLOB C_FILES
     src/*.c src/atomic/*.c src/audio/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c src/joystick/*.c src/libm/*.c src/stdlib/*.c src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
-    
+
 if (WIN32)
     file (GLOB SYS_C_FILES
         src/audio/directsound/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c src/thread/windows/*.c src/timer/windows/*.c src/video/windows/*.c
@@ -23,14 +23,18 @@ endif ()
 file (GLOB H_FILES include/*.h)
 
 set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
-set_source_files_properties (${SYS_FILES} PROPERTIES LANGUAGE C)
+set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 
 if (WIN32)
-    target_link_libraries (${TARGET_NAME} winmm.lib opengl32.lib)
+    if (USE_OPENGL)
+        target_link_libraries (${TARGET_NAME} winmm.lib opengl32.lib)
+    else ()
+        target_link_libraries (${TARGET_NAME} winmm.lib)
+    endif ()
 elseif (APPLE)
     FIND_LIBRARY (AUDIOUNIT_FW AudioUnit)
     FIND_LIBRARY (CARBON_FW Carbon)

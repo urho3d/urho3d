@@ -17,10 +17,6 @@ endif ()
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene)
-
-if (USE_OPENGL)
-    target_link_libraries (${TARGET_NAME} SDL)
-endif ()
+target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene SDL)
 
 finalize_lib ()

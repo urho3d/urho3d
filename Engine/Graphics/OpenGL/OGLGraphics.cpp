@@ -314,7 +314,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
     
-    // Clear the window to black now, because GPU object restore may take time
+    // Clear the initial window contents to black
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
@@ -1566,11 +1566,6 @@ bool Graphics::IsDeviceLost() const
     return impl_->context_ == 0;
 }
 
-void* Graphics::GetWindowHandle() const
-{
-    return impl_->window_;
-}
-
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
@@ -1585,7 +1580,7 @@ PODVector<IntVector2> Graphics::GetResolutions() const
         
         // Store mode if unique
         bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++i)
+        for (unsigned j = 0; j < ret.Size(); ++j)
         {
             if (ret[j].x_ == width && ret[j].y_ == height)
             {

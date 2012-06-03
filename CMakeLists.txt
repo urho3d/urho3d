@@ -135,10 +135,8 @@ else()
     endmacro ()
 endif ()
 
-# If SDL used, add it as a global include directory
-if (USE_OPENGL)
-    include_directories (ThirdParty/SDL/include)
-endif ()
+# Add SDL as a global include directory
+include_directories (ThirdParty/SDL/include)
 
 # Add projects
 add_subdirectory (Engine/Audio)
@@ -163,6 +161,7 @@ add_subdirectory (ThirdParty/FreeType)
 add_subdirectory (ThirdParty/kNet)
 add_subdirectory (ThirdParty/LibCpuId)
 add_subdirectory (ThirdParty/PugiXml)
+add_subdirectory (ThirdParty/SDL)
 add_subdirectory (ThirdParty/Squish)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
@@ -175,7 +174,6 @@ add_subdirectory (Urho3D)
 if (USE_OPENGL)
     add_subdirectory (SourceAssets/GLSLShaders)
     add_subdirectory (ThirdParty/GLee)
-    add_subdirectory (ThirdParty/SDL)
     add_subdirectory (Tools/GLShaderProcessor)
 else ()
     add_subdirectory (SourceAssets/HLSLShaders)

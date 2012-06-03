@@ -26,10 +26,10 @@ endif ()
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene)
+target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene SDL)
 
 if (USE_OPENGL)
-    target_link_libraries (${TARGET_NAME} GLee SDL)
+    target_link_libraries (${TARGET_NAME} GLee)
 else ()
     target_link_libraries (${TARGET_NAME} d3d9.lib)
 endif ()

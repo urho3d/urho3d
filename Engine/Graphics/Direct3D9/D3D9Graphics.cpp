@@ -36,6 +36,7 @@
 #include "Log.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
+#include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
@@ -53,6 +54,8 @@
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
+
+extern "C" HWND WIN_GetWindowHandle(SDL_Window* window);
 
 static const D3DCMPFUNC d3dCmpFunc[] =
 {
@@ -138,10 +141,6 @@ static const D3DSTENCILOP d3dStencilOp[] =
     D3DSTENCILOP_DECR
 };
 
-static const DWORD windowStyle = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
-
-static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 static unsigned GetD3DColor(const Color& color)
 {
     unsigned r = (unsigned)(Clamp(color.r_ * 255.0f, 0.0f, 255.0f));
@@ -150,6 +149,8 @@ static unsigned GetD3DColor(const Color& color)
     unsigned a = (unsigned)(Clamp(color.a_ * 255.0f, 0.0f, 255.0f));
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }
+
+static unsigned numInstances = 0;
 
 static unsigned depthStencilFormat = D3DFMT_D24S8;
 
@@ -183,7 +184,15 @@ Graphics::Graphics(Context* context) :
     ResetCachedState();
     SetTextureUnitMappings();
     
-    SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Graphics, HandleWindowMessage));
+    // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
+    // of shutting down SDL as a whole, so it should be the last SDL-using subsystem (Audio and Input also use SDL) alive
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        if (!numInstances)
+            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+        ++numInstances;
+    }
 }
 
 Graphics::~Graphics()
@@ -218,19 +227,31 @@ Graphics::~Graphics()
     }
     if (impl_->window_)
     {
-        DestroyWindow(impl_->window_);
+        MutexLock lock(GetStaticMutex());
+        
+        SDL_ShowCursor(SDL_TRUE);
+        SDL_DestroyWindow(impl_->window_);
         impl_->window_ = 0;
     }
     
     delete impl_;
     impl_ = 0;
+    
+    // If last instance in this process, shut down SDL under static mutex
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        --numInstances;
+        if (!numInstances)
+            SDL_Quit();
+    }
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
     if (impl_->window_)
-        SetWindowTextW(impl_->window_, WString(windowTitle_).CString());
+        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
@@ -238,21 +259,23 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     PROFILE(SetScreenMode);
     
     // Find out the full screen mode display format (match desktop color depth)
-    D3DFORMAT fullscreenFormat = impl_->GetDesktopFormat();
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(0, &mode);
+    D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
     
-    // If zero dimensions, use the desktop default
-    if (width <= 0 || height <= 0)
+    // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
+    if (!width || !height)
     {
-        if (fullscreen)
-        {
-            IntVector2 desktopResolution = impl_->GetDesktopResolution();
-            width = desktopResolution.x_;
-            height = desktopResolution.y_;
-        }
-        else
+        if (!fullscreen)
         {
             width = 800;
             height = 600;
+        }
+        else
+        {
+
+            width = mode.w;
+            height = mode.h;
         }
     }
     
@@ -303,18 +326,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             multiSample = 1;
     }
     
-    // Save window placement if currently windowed
-    if (!fullscreen_)
-    {
-        WINDOWPLACEMENT wndpl;
-        wndpl.length = sizeof wndpl;
-        if (SUCCEEDED(GetWindowPlacement(impl_->window_, &wndpl)))
-        {
-            windowPosX_ = wndpl.rcNormalPosition.left;
-            windowPosY_ = wndpl.rcNormalPosition.top;
-        }
-    }
-    
     if (fullscreen)
     {
         impl_->presentParams_.BackBufferFormat = fullscreenFormat;
@@ -335,7 +346,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     impl_->presentParams_.MultiSampleType            = multiSample > 1 ? (D3DMULTISAMPLE_TYPE)multiSample : D3DMULTISAMPLE_NONE;
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
-    impl_->presentParams_.hDeviceWindow              = impl_->window_;
+    impl_->presentParams_.hDeviceWindow              = WIN_GetWindowHandle(impl_->window_);
     impl_->presentParams_.EnableAutoDepthStencil     = autoDepthStencil ? TRUE : FALSE;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
     impl_->presentParams_.Flags                      = 0;
@@ -351,6 +362,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
+    
+    AdjustWindow(width, height, fullscreen);
     
     if (!impl_->device_)
     {
@@ -377,7 +390,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     else
         ResetDevice();
     
-    AdjustWindow(width, height, fullscreen);
+    // Clear the initial window contents to black
+    impl_->device_->BeginScene();
+    Clear(CLEAR_COLOR);
+    impl_->device_->EndScene();
+    impl_->device_->Present(0, 0, 0, 0);
     
     if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
@@ -410,9 +427,12 @@ void Graphics::Close()
 {
     if (impl_->window_)
     {
+        MutexLock lock(GetStaticMutex());
+        
         depthTexture_.Reset();
         
-        DestroyWindow(impl_->window_);
+        SDL_ShowCursor(SDL_TRUE);
+        SDL_DestroyWindow(impl_->window_);
         impl_->window_ = 0;
     }
 }
@@ -570,7 +590,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         d3dFlags |= D3DCLEAR_ZBUFFER;
     if (flags & CLEAR_STENCIL)
         d3dFlags |= D3DCLEAR_STENCIL;
-
+    
     impl_->device_->Clear(0, 0, d3dFlags, GetD3DColor(color), depth, stencil);
 }
 
@@ -1640,41 +1660,31 @@ bool Graphics::IsInitialized() const
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
 }
 
-unsigned Graphics::GetWindowHandle() const
-{
-    return (unsigned)impl_->window_;
-}
-
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
-    if (!impl_->interface_)
-        return ret;
-    
-    D3DFORMAT fullscreenFormat = impl_->GetDesktopFormat();
-    unsigned numModes = impl_->interface_->GetAdapterModeCount(impl_->adapter_, fullscreenFormat);
-    D3DDISPLAYMODE displayMode;
+    unsigned numModes = SDL_GetNumDisplayModes(0);
     
     for (unsigned i = 0; i < numModes; ++i)
     {
-        if (FAILED(impl_->interface_->EnumAdapterModes(impl_->adapter_, fullscreenFormat, i, &displayMode)))
-            continue;
-        if (displayMode.Format != fullscreenFormat)
-            continue;
-        IntVector2 newMode(displayMode.Width, displayMode.Height);
+        SDL_DisplayMode mode;
+        SDL_GetDisplayMode(0, i, &mode);
+        int width = mode.w;
+        int height  = mode.h;
         
-        // Check for duplicate before storing
+        // Store mode if unique
         bool unique = true;
         for (unsigned j = 0; j < ret.Size(); ++j)
         {
-            if (ret[j] == newMode)
+            if (ret[j].x_ == width && ret[j].y_ == height)
             {
                 unique = false;
                 break;
             }
         }
+        
         if (unique)
-            ret.Push(newMode);
+            ret.Push(IntVector2(width, height));
     }
     
     return ret;
@@ -1689,7 +1699,9 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     if (!impl_->interface_)
         return ret;
     
-    D3DFORMAT fullscreenFormat = impl_->GetDesktopFormat();
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(0, &mode);
+    D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
     
     for (unsigned i = (int)D3DMULTISAMPLE_2_SAMPLES; i < (int)D3DMULTISAMPLE_16_SAMPLES; ++i)
     {
@@ -1859,24 +1871,7 @@ unsigned Graphics::GetDepthStencilFormat()
 
 bool Graphics::OpenWindow(int width, int height)
 {
-    WNDCLASSW wc;
-    wc.style         = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc   = wndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = impl_->instance_;
-    wc.hIcon         = LoadIconW(0, MAKEINTRESOURCEW(32512));
-    wc.hCursor       = LoadCursorW(0, MAKEINTRESOURCEW(32512));
-    wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wc.lpszMenuName  = 0;
-    wc.lpszClassName = L"D3DWindow";
-    
-    RegisterClassW(&wc);
-    
-    RECT rect = {0, 0, width, height};
-    AdjustWindowRect(&rect, windowStyle, false);
-    impl_->window_ = CreateWindowW(L"D3DWindow", WString(windowTitle_).CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
-        rect.right, rect.bottom, 0, 0, impl_->instance_, 0); 
+    impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
     
     if (!impl_->window_)
     {
@@ -1884,31 +1879,13 @@ bool Graphics::OpenWindow(int width, int height)
         return false;
     }
     
-    SetWindowLongPtrW(impl_->window_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-    
-    LOGINFO("Created application window");
     return true;
 }
 
 void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
 {
-    // Adjust window style/size now
-    if (newFullscreen)
-    {
-        SetWindowLongPtrW(impl_->window_, GWL_STYLE, WS_POPUP);
-        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW | SWP_NOCOPYBITS);
-    }
-    else
-    {
-        RECT rect = {0, 0, newWidth, newHeight};
-        AdjustWindowRect(&rect, windowStyle, FALSE);
-        SetWindowLongPtrW(impl_->window_, GWL_STYLE, windowStyle);
-        SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
-            SWP_SHOWWINDOW | SWP_NOCOPYBITS);
-        
-        // Clean up the desktop of old window contents
-        InvalidateRect(0, 0, TRUE);
-    }
+    SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+    SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
 }
 
 bool Graphics::CreateInterface()
@@ -1954,12 +1931,12 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
         behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
     
     if (FAILED(impl_->interface_->CreateDevice(
-        adapter,                    // adapter
-        (D3DDEVTYPE)deviceType,     // device type
-        impl_->window_,             // window associated with device
-        behaviorFlags,              // vertex processing
-        &impl_->presentParams_,     // present parameters
-        &impl_->device_)))          // return created device
+        adapter,
+        (D3DDEVTYPE)deviceType,
+        WIN_GetWindowHandle(impl_->window_),
+        behaviorFlags,
+        &impl_->presentParams_,
+        &impl_->device_)))
     {
         LOGERROR("Could not create Direct3D9 device");
         return false;
@@ -2216,49 +2193,6 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
-}
-
-void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
-{
-    using namespace WindowMessage;
-    
-    if (eventData[P_WINDOW].GetInt() != (int)impl_->window_)
-        return;
-    
-    switch (eventData[P_MSG].GetInt())
-    {
-    case WM_CLOSE:
-        Close();
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_DESTROY:
-        eventData[P_HANDLED] = true;
-        break;
-    }
-}
-
-LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    using namespace WindowMessage;
-    
-    Graphics* graphics = reinterpret_cast<Graphics*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-    
-    if (graphics && graphics->IsInitialized())
-    {
-        VariantMap eventData;
-        eventData[P_WINDOW] = (int)hwnd;
-        eventData[P_MSG] = (int)msg;
-        eventData[P_WPARAM] = (int)wParam;
-        eventData[P_LPARAM] = (int)lParam;
-        eventData[P_HANDLED] = false;
-        
-        graphics->SendEvent(E_WINDOWMESSAGE, eventData);
-        if (eventData[P_HANDLED].GetBool())
-            return 0;
-    }
-    
-    return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
 void RegisterGraphicsLibrary(Context* context)

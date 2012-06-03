@@ -212,8 +212,6 @@ public:
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
-    /// Return window handle.
-    unsigned GetWindowHandle() const;
     /// Return number of primitives drawn this frame.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame.
@@ -358,9 +356,7 @@ private:
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
-    /// Handle operating system window message.
-    void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
-
+    
     /// Implementation.
     GraphicsImpl* impl_;
     /// Window title.

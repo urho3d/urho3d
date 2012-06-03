@@ -25,6 +25,7 @@
 #include "CoreEvents.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
+#include "GraphicsImpl.h"
 #include "Input.h"
 #include "Log.h"
 #include "Mutex.h"
@@ -34,15 +35,10 @@
 
 #include <cstring>
 
-#ifdef USE_OPENGL
-#include <GraphicsImpl.h>
-#else
-#include <windows.h>
-#endif
+#include <SDL.h>
 
 #include "DebugNew.h"
 
-#ifdef USE_OPENGL
 static HashMap<unsigned, Input*> inputInstances;
 
 /// Return the Input subsystem instance corresponding to an SDL window ID.
@@ -64,63 +60,11 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
     else return SDL_toupper(keySym);
 }
 
-#else
-/// Convert the virtual key code & scan code if necessary. Return non-zero if key should be posted
-int ConvertKeyCode(unsigned wParam, unsigned lParam)
-{
-    unsigned scanCode = (lParam >> 16) & 0x1ff;
-    
-    // Recognize left/right qualifier key from the scan code
-    switch (wParam)
-    {
-    case VK_SHIFT:
-        if (scanCode == 54)
-            return KEY_RSHIFT;
-        else
-            return KEY_LSHIFT;
-        break;
-        
-    case VK_CONTROL:
-        // Control might not be a real key, as Windows posts it whenever Alt-Gr is pressed (inspired by GLFW)
-        {
-            MSG nextMsg;
-            DWORD msgTime = GetMessageTime();
-            
-            if (PeekMessage(&nextMsg, NULL, 0, 0, PM_NOREMOVE))
-            {
-                if ((nextMsg.message == WM_KEYDOWN || nextMsg.message == WM_SYSKEYDOWN) && nextMsg.wParam == VK_MENU &&
-                    (nextMsg.lParam & 0x01000000) != 0 && nextMsg.time == msgTime)
-                    return 0;
-            }
-            
-            if (scanCode & 0x100)
-                return KEY_RCTRL;
-            else
-                return KEY_LCTRL;
-        }
-        break;
-        
-    case VK_MENU:
-        if (scanCode & 0x100)
-            return KEY_RALT;
-        else
-            return KEY_LALT;
-        
-    default:
-        return wParam;
-    }
-}
-#endif
-
 OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
     Object(context),
-    #ifdef USE_OPENGL
     windowID_(0),
-    #else
-    showCursor_(true),
-    #endif
     toggleFullscreen_(true),
     active_(false),
     minimized_(false),
@@ -132,10 +76,6 @@ Input::Input(Context* context) :
     mouseButtonDown_ = 0;
     ResetState();
     
-    #ifndef USE_OPENGL
-    SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
-    #endif
-    
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame));
     
@@ -145,7 +85,6 @@ Input::Input(Context* context) :
 
 Input::~Input()
 {
-    #ifdef USE_OPENGL
     // Remove input instance mapping
     if (initialized_)
     {
@@ -153,7 +92,6 @@ Input::~Input()
         
         inputInstances.Erase(windowID_);
     }
-    #endif
 }
 
 void Input::Update()
@@ -176,15 +114,6 @@ void Input::Update()
         state.delta_ = state.position_;
     }
     
-    #ifndef USE_OPENGL
-    // Pump Win32 events
-    MSG msg;
-    while (PeekMessageW(&msg, 0, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
-    #else
     {
         MutexLock lock(GetStaticMutex());
         
@@ -194,8 +123,8 @@ void Input::Update()
         while (SDL_PollEvent(&evt))
         {
             // Dispatch event to the appropriate Input instance. However SDL_QUIT can not at the moment be handled for multiple
-            // instances properly (OpenGL contexts running in other threads can not be closed from this thread), so we handle
-            // it only for the own instance
+            // instances properly (other threads' graphics devices can not be closed from this thread), so we handle it only 
+            // for own instance
             if (evt.type != SDL_QUIT)
                 HandleSDLEvent(&evt);
             else
@@ -216,7 +145,6 @@ void Input::Update()
         if (active_)
             MakeInactive();
     }
-    #endif
     
     // Activate input now if necessary
     if (activated_)
@@ -359,7 +287,6 @@ void Input::Initialize()
     activated_ = true;
     initialized_ = true;
     
-    #ifdef USE_OPENGL
     {
         MutexLock lock(GetStaticMutex());
         
@@ -367,7 +294,6 @@ void Input::Initialize()
         windowID_ = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
         inputInstances[windowID_] = this;
     }
-    #endif
     
     LOGINFO("Initialized input");
 }
@@ -382,14 +308,9 @@ void Input::MakeActive()
     active_ = true;
     activated_ = false;
     
-    // Re-establish mouse cursor clipping as necessary
-    #ifdef USE_OPENGL
+    // Re-establish mouse cursor hiding as necessary
     SDL_ShowCursor(SDL_FALSE);
     suppressNextMouseMove_ = true;
-    #else
-    SetClipCursor(true);
-    SetCursorVisible(false);
-    #endif
     
     using namespace Activation;
     
@@ -410,14 +331,8 @@ void Input::MakeInactive()
     active_ = false;
     activated_ = false;
     
-    // Free and show the mouse cursor
-    #ifndef USE_OPENGL
-    ReleaseCapture();
-    ClipCursor(0);
-    SetCursorVisible(true);
-    #else
+    // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
-    #endif
     
     using namespace Activation;
     
@@ -550,15 +465,7 @@ void Input::SetCursorPosition(const IntVector2& position)
     if (!graphics_)
         return;
     
-    #ifdef USE_OPENGL
     SDL_WarpMouseInWindow(graphics_->GetImpl()->GetWindow(), position.x_, position.y_);
-    #else
-    POINT point;
-    point.x = position.x_;
-    point.y = position.y_;
-    ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
-    SetCursorPos(point.x, point.y);
-    #endif
 }
 
 
@@ -569,162 +476,11 @@ IntVector2 Input::GetCursorPosition() const
     if (!graphics_ || !graphics_->IsInitialized())
         return ret;
     
-    #ifdef USE_OPENGL
     SDL_GetMouseState(&ret.x_, &ret.y_);
-    #else
-    POINT mouse;
-    GetCursorPos(&mouse);
-    ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
-    ret.x_ = mouse.x;
-    ret.y_ = mouse.y;
-    #endif
     
     return ret;
 }
 
-#ifndef USE_OPENGL
-void Input::SetClipCursor(bool enable)
-{
-    if (!graphics_)
-        return;
-    
-    if (!graphics_->GetFullscreen() && active_ && enable)
-    {
-        SetCursorPosition(IntVector2(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2));
-        lastCursorPosition_ = GetCursorPosition();
-        RECT clipRect;
-        GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
-        ClipCursor(&clipRect);
-    }
-    else
-    {
-        if (graphics_->GetFullscreen() && active_ && enable)
-        {
-            SetCursorPosition(IntVector2(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2));
-            lastCursorPosition_ = GetCursorPosition();
-        }
-        ClipCursor(0);
-    }
-}
-
-void Input::SetCursorVisible(bool enable)
-{
-    if (!graphics_)
-        return;
-    
-    // When inactive, always show the cursor
-    if (!active_)
-        enable = true;
-    
-    if (showCursor_ == enable)
-        return;
-    
-    ShowCursor(enable ? TRUE : FALSE);
-    showCursor_ = enable;
-}
-
-void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
-{
-    if (!initialized_)
-        Initialize();
-    
-    using namespace WindowMessage;
-    
-    int msg = eventData[P_MSG].GetInt();
-    int wParam = eventData[P_WPARAM].GetInt();
-    int lParam = eventData[P_LPARAM].GetInt();
-    int keyCode;
-    
-    switch (msg)
-    {
-    case WM_LBUTTONDOWN:
-        SetMouseButton(MOUSEB_LEFT, true);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_NCLBUTTONUP:
-    case WM_LBUTTONUP:
-        SetMouseButton(MOUSEB_LEFT, false);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_RBUTTONDOWN:
-        SetMouseButton(MOUSEB_RIGHT, true);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_NCRBUTTONUP:
-    case WM_RBUTTONUP:
-        SetMouseButton(MOUSEB_RIGHT, false);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_MBUTTONDOWN:
-        SetMouseButton(MOUSEB_MIDDLE, true);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_NCMBUTTONUP:
-    case WM_MBUTTONUP:
-        SetMouseButton(MOUSEB_MIDDLE, false);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_MOUSEWHEEL:
-        SetMouseWheel(wParam >> 16);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_ACTIVATE:
-        minimized_ = HIWORD(wParam) != 0;
-        if (LOWORD(wParam) == WA_INACTIVE)
-            MakeInactive();
-        else
-        {
-            if (!minimized_)
-               activated_ = true;
-        }
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_KEYDOWN:
-        keyCode = ConvertKeyCode(wParam, lParam);
-        if (keyCode)
-            SetKey(keyCode, true);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_SYSKEYDOWN:
-        keyCode = ConvertKeyCode(wParam, lParam);
-        if (keyCode)
-            SetKey(keyCode, true);
-        if (keyCode != KEY_F4)
-            eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_KEYUP:
-    case WM_SYSKEYUP:
-        keyCode = ConvertKeyCode(wParam, lParam);
-        if (keyCode)
-            SetKey(keyCode, false);
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_CHAR:
-        {
-            using namespace Char;
-            
-            VariantMap keyEventData;
-            keyEventData[P_CHAR] = wParam;
-            keyEventData[P_BUTTONS] = mouseButtonDown_;
-            keyEventData[P_QUALIFIERS] = GetQualifiers();
-            SendEvent(E_CHAR, keyEventData);
-        }
-        eventData[P_HANDLED] = true;
-        break;
-    }
-}
-#else
 void Input::HandleSDLEvent(void* sdlEvent)
 {
     SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
@@ -883,7 +639,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
     }
 }
-#endif
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
@@ -894,8 +649,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         ResetState();
     
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
-    // mouse move event. Also, in SDL mode reset the window ID
-    #ifdef USE_OPENGL
+    // mouse move event. Also get the new window ID in case it changed
     unsigned newWindowID = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
     if (newWindowID != windowID_)
     {
@@ -909,9 +663,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SetCursorPosition(center);
     lastCursorPosition_ = center;
     activated_ = true;
-    #else
-    SetClipCursor(true);
-    #endif
     
     // After setting new screen mode we never should be minimized
     minimized_ = false;

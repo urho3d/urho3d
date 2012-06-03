@@ -111,23 +111,12 @@ private:
     void SetCursorPosition(const IntVector2& position);
     /// Internal function to get the mouse cursor position.
     IntVector2 GetCursorPosition() const;
-    #ifndef USE_OPENGL
-    /// Internal function to clip the mouse cursor to the window.
-    void SetClipCursor(bool enable);
-    /// Internal function to show/hide the mouse cursor.
-    void SetCursorVisible(bool enable);
-    /// Handle window message event.
-    void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
-    #endif
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    
-    #ifdef USE_OPENGL
     /// Handle SDL event.
     static void HandleSDLEvent(void* sdlEvent);
-    #endif
     
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -147,13 +136,8 @@ private:
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
-    #ifdef USE_OPENGL
     /// SDL window ID.
     unsigned windowID_;
-    #else
-    /// Mouse cursor show/hide flag.
-    bool showCursor_;
-    #endif
     /// Fullscreen toggle flag.
     bool toggleFullscreen_;
     /// Active flag.

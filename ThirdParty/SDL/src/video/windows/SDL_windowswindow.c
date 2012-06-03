@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -49,6 +52,12 @@ static ATOM SDL_HelperWindowClass = 0;
 #define STYLE_NORMAL        (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX)
 #define STYLE_RESIZABLE     (WS_THICKFRAME | WS_MAXIMIZEBOX)
 #define STYLE_MASK          (STYLE_FULLSCREEN | STYLE_BORDERLESS | STYLE_NORMAL | STYLE_RESIZABLE)
+
+// Urho3D: added function for Direct3D9 initialization
+HWND WIN_GetWindowHandle(SDL_Window* window)
+{
+    return ((SDL_WindowData *)window->driverdata)->hwnd;
+}
 
 static DWORD
 GetWindowStyle(SDL_Window * window)
