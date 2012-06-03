@@ -75,7 +75,8 @@ Pass::Pass(PassType type) :
     type_(type),
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
-    depthWrite_(true)
+    depthWrite_(true),
+    alphaMask_(false)
 {
 }
 
@@ -96,6 +97,11 @@ void Pass::SetDepthTestMode(CompareMode mode)
 void Pass::SetDepthWrite(bool enable)
 {
     depthWrite_ = enable;
+}
+
+void Pass::SetAlphaMask(bool enable)
+{
+    alphaMask_ = enable;
 }
 
 void Pass::SetVertexShader(const String& name)
@@ -187,6 +193,9 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("depthwrite"))
                 newPass->SetDepthWrite(passElem.GetBool("depthwrite"));
+            
+            if (passElem.HasAttribute("alphamask"))
+                newPass->SetAlphaMask(passElem.GetBool("alphamask"));
         }
         
         passElem = passElem.GetNext("pass");

@@ -584,7 +584,7 @@ A technique definition looks like this:
 <technique>
     <pass name="base|litbase|light|prealpha|postalpha|prepass|material|deferred|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
-        depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
+        depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" alphamask="true|false" />
     <pass ... />
     <pass ... />
 </technique>
@@ -607,6 +607,8 @@ By default draw calls within passes are sorted by render state, but transparent 
 Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the files Ambient.xml and ForwardLit.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders to see which variations are required.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
+
+"Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
 
 
 \page Lights Lights and shadows

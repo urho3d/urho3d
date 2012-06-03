@@ -43,6 +43,8 @@ public:
     void SetDepthTestMode(CompareMode mode);
     /// %Set depth write on/off.
     void SetDepthWrite(bool enable);
+    /// %Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
+    void SetAlphaMask(bool enable);
     /// %Set vertex shader name.
     void SetVertexShader(const String& name);
     /// %Set pixel shader name.
@@ -58,6 +60,8 @@ public:
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
+    /// Return alpha masking hint.
+    bool GetAlphaMask() const { return alphaMask_; }
     /// Return vertex shader name.
     const String& GetVertexShader() const { return vertexShaderName_; }
     /// Return pixel shader name.
@@ -76,6 +80,8 @@ private:
     CompareMode depthTestMode_;
     /// Depth write mode.
     bool depthWrite_;
+    /// Alpha masking hint.
+    bool alphaMask_;
     /// Vertex shader name.
     String vertexShaderName_;
     /// Pixel shader name.
@@ -104,7 +110,7 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// %Set whether requires Shader Model 3.
+    /// %Set whether requires %Shader %Model 3.
     void SetIsSM3(bool enable);
     /// Create a new pass.
     Pass* CreatePass(PassType pass);
@@ -112,17 +118,14 @@ public:
     void RemovePass(PassType pass);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
-    
     /// Mark shaders loaded this frame
     void MarkShadersLoaded(unsigned frameNumber);
     
     /// Return whether has a pass.
     bool HasPass(PassType pass) const { return passes_[pass] != 0; }
-    
     /// Return a pass.
     Pass* GetPass(PassType pass) const { return passes_[pass]; }
-    
-    /// Return whether requires Shader Model 3.
+    /// Return whether requires %Shader %Model 3.
     bool IsSM3() const { return isSM3_; }
     /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
@@ -131,7 +134,7 @@ public:
     static const String& GetPassName(PassType pass);
     
 private:
-    /// Require Shader Model 3 flag.
+    /// Require %Shader %Model 3 flag.
     bool isSM3_;
     /// Last shaders loaded frame number.
     unsigned shadersLoadedFrameNumber_;

@@ -418,7 +418,7 @@ void Material::CheckOcclusion()
         if (tech)
         {
             Pass* pass = tech->GetPass(PASS_BASE);
-            if (pass && pass->GetDepthWrite())
+            if (pass && pass->GetDepthWrite() && !pass->GetAlphaMask())
                 occlusion_ = true;
         }
     }

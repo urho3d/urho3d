@@ -2360,6 +2360,9 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             // Create a new group based on the batch
             renderer_->SetBatchShaders(batch, tech, allowShadows);
             BatchGroup newGroup(batch);
+            // Retain only the base & alpha mask bits of the sort key
+            newGroup.CalculateSortKey();
+            newGroup.sortKey_ &= 0xc000000000000000ULL;
             newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
             groups->Insert(MakePair(key, newGroup));
         }

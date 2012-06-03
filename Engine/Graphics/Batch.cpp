@@ -63,7 +63,10 @@ inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceD
 
 inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
 {
-    return lhs->distance_ < rhs->distance_;
+    if (lhs->sortKey_ == rhs->sortKey_)
+        return lhs->distance_ < rhs->distance_;
+    else
+        return lhs->sortKey_ > rhs->sortKey_;
 }
 
 void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
@@ -152,12 +155,14 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
 
 void Batch::CalculateSortKey()
 {
-    unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0x7fff;
+    unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0x3fff;
     unsigned pass = (*((unsigned*)&pass_) / sizeof(Pass)) & 0xffff;
     unsigned material = (*((unsigned*)&material_) / sizeof(Material)) & 0xffff;
     unsigned geometry = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
     if (isBase_)
         lightQueue |= 0x8000;
+    if (pass_ && !pass_->GetAlphaMask())
+        lightQueue |= 0x4000;
     sortKey_ = (((unsigned long long)lightQueue) << 48) | (((unsigned long long)pass) << 32) |
         (((unsigned long long)material) << 16) | geometry;
 }
@@ -718,8 +723,7 @@ void BatchQueue::SortFrontToBack()
     sortedBaseBatches_.Clear();
     sortedBatches_.Clear();
     
-    // Must explicitly divide into base and non-base batches, so that priorities do not get mixed up between
-    // instanced and non-instanced batches
+    // Need to divide into base and non-base batches here to ensure proper order in relation to grouped batches
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         if (batches_[i].isBase_)
