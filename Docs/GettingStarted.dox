@@ -212,7 +212,7 @@ The third-party libraries are used for the following functionality:
 - libcpuid: CPU properties detection
 - Open Asset Import Library: reading various 3D file formats
 - pugixml: parsing XML files
-- SDL: low-level windowing, input and sound on Linux and Mac OS X, and on Windows when running in OpenGL mode
+- SDL: window and OpenGL context creation, input and sound output
 - Squish: decompressing DXT images when not supported by hardware
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
