@@ -181,7 +181,6 @@ Graphics::Graphics(Context* context) :
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR)
 {
-    ResetCachedState();
     SetTextureUnitMappings();
     
     // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
@@ -2090,8 +2089,6 @@ void Graphics::OnDeviceLost()
 
 void Graphics::OnDeviceReset()
 {
-    ResetCachedState();
-    
     for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceReset();
     
@@ -2116,6 +2113,8 @@ void Graphics::OnDeviceReset()
         // When AutoDepthStencil is not used, depth buffering must be enabled manually
         impl_->device_->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     }
+    
+    ResetCachedState();
 }
 
 void Graphics::ResetCachedState()

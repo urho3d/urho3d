@@ -149,7 +149,6 @@ Graphics::Graphics(Context* context_) :
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     shaderParameterFrame_(0)
 {
-    ResetCachedState();
     SetTextureUnitMappings();
     
     // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
@@ -1782,7 +1781,6 @@ void Graphics::Restore()
         (*i)->OnDeviceReset();
     
     ResetCachedState();
-    ClearParameterSources();
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)
@@ -2202,16 +2200,18 @@ void Graphics::ResetCachedState()
     stencilRef_ = 0;
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
-    
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
     impl_->boundFbo_ = 0;
     
     // Set initial state to match Direct3D
-    glEnable(GL_DEPTH_TEST);
-    SetCullMode(CULL_CCW);
-    SetDepthTest(CMP_LESSEQUAL);
-    SetDepthWrite(true);
+    if (impl_->context_)
+    {
+        glEnable(GL_DEPTH_TEST);
+        SetCullMode(CULL_CCW);
+        SetDepthTest(CMP_LESSEQUAL);
+        SetDepthWrite(true);
+    }
 }
 
 void Graphics::SetTextureUnitMappings()
