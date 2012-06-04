@@ -107,11 +107,12 @@ void Input::Update()
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     
-    // Reset touch delta movement. Note: last coordinates are stored internally, but the frame delta is returned to user
+    // Reset touch delta movement
     for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         TouchState& state = i->second_;
-        state.delta_ = state.position_;
+        state.lastPosition_ = state.position_;
+        state.delta_ = IntVector2::ZERO;
     }
     
     {
@@ -123,7 +124,7 @@ void Input::Update()
         while (SDL_PollEvent(&evt))
         {
             // Dispatch event to the appropriate Input instance. However SDL_QUIT can not at the moment be handled for multiple
-            // instances properly (other threads' graphics devices can not be closed from this thread), so we handle it only 
+            // instances properly (other threads' graphics devices can not be closed from this thread), so we handle it only
             // for own instance
             if (evt.type != SDL_QUIT)
                 HandleSDLEvent(&evt);
@@ -134,6 +135,9 @@ void Input::Update()
     
     // Poll SDL window activation state
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    if (!window)
+        return;
+    
     unsigned flags = SDL_GetWindowFlags(window);
     if ((flags & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)) == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
     {
@@ -150,21 +154,16 @@ void Input::Update()
     if (activated_)
         MakeActive();
     
-    // Finally send the mouse move event if motion has been accumulated
+    // Check for mouse move
     if (active_)
     {
         IntVector2 mousePos = GetCursorPosition();
         mouseMove_ = mousePos - lastCursorPosition_;
         
-        // Recenter the mouse cursor manually if it moved
-        if (mouseMove_ != IntVector2::ZERO)
-        {
-            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            SetCursorPosition(center);
-            lastCursorPosition_ = center;
-        }
-        else
-            lastCursorPosition_ = mousePos;
+        // Recenter the mouse cursor manually
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        SetCursorPosition(center);
+        lastCursorPosition_ = center;
         
         if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
         {
@@ -252,13 +251,9 @@ TouchState Input::GetTouch(unsigned index) const
     unsigned cmpIndex = 0;
     for (Map<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
+        /// \todo Do not make a value copy
         if (cmpIndex == index)
-        {
-            TouchState ret = i->second_;
-            // Convert last position to delta
-            ret.delta_ = ret.position_ - ret.delta_;
-            return ret;
-        }
+            return i->second_;
         else
             ++cmpIndex;
     }
@@ -546,8 +541,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = input->touches_[touchID];
             state.touchID_ = touchID;
-            state.delta_ = state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
+            state.lastPosition_ = state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
                 evt.tfinger.y * input->graphics_->GetHeight() / 32768);
+            state.delta_ = IntVector2::ZERO;
             state.pressure_ = evt.tfinger.pressure;
             
             using namespace TouchBegin;
@@ -589,6 +585,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             state.touchID_ = touchID;
             state.position_ = IntVector2(evt.tfinger.x * input->graphics_->GetWidth() / 32768,
                 evt.tfinger.y * input->graphics_->GetHeight() / 32768);
+            state.delta_ = state.position_ - state.lastPosition_;
             state.pressure_ = evt.tfinger.pressure;
             
             using namespace TouchMove;

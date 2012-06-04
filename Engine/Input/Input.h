@@ -37,6 +37,8 @@ struct TouchState
     int touchID_;
     /// Position in screen coordinates.
     IntVector2 position_;
+    /// Last position in screen coordinates.
+    IntVector2 lastPosition_;
     /// Movement since last frame.
     IntVector2 delta_;
     /// Finger pressure.
