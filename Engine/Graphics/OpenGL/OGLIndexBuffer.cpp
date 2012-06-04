@@ -264,12 +264,18 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
         return false;
     }
     
+    if (start + count > indexCount_)
+    {
+        LOGERROR("Illegal index range for querying used vertices");
+        return false;
+    }
+    
     minVertex = M_MAX_UNSIGNED;
     unsigned maxVertex = 0;
     
     if (indexSize_ == sizeof(unsigned))
     {
-        unsigned* indices = (unsigned*)shadowData_.Get();
+        unsigned* indices = ((unsigned*)shadowData_.Get()) + start;
         
         for (unsigned i = 0; i < count; ++i)
         {
@@ -281,7 +287,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
     }
     else
     {
-        unsigned short* indices = (unsigned short*)shadowData_.Get();
+        unsigned short* indices = ((unsigned short*)shadowData_.Get()) + start;
         
         for (unsigned i = 0; i < count; ++i)
         {
