@@ -505,7 +505,7 @@ static int Android_JNI_FileOpen(SDL_RWops* ctx)
         goto failure;
     }
 
-    fileNameJString = (jstring)ctx->hidden.androidio.fileName;
+    fileNameJString = (jstring)ctx->hidden.androidio.fileNameRef;
 
     // context = SDLActivity.getContext();
     mid = mEnv->GetStaticMethodID(mActivityClass,
@@ -525,7 +525,6 @@ static int Android_JNI_FileOpen(SDL_RWops* ctx)
         goto failure;
     }
 
-    ctx->hidden.androidio.inputStream = inputStream;
     ctx->hidden.androidio.inputStreamRef = mEnv->NewGlobalRef(inputStream);
 
     // Despite all the visible documentation on [Asset]InputStream claiming
@@ -553,7 +552,6 @@ static int Android_JNI_FileOpen(SDL_RWops* ctx)
         goto failure;
     }
 
-    ctx->hidden.androidio.readableByteChannel = readableByteChannel;
     ctx->hidden.androidio.readableByteChannelRef =
         mEnv->NewGlobalRef(readableByteChannel);
 
@@ -573,6 +571,11 @@ failure:
         if(ctx->hidden.androidio.inputStreamRef != NULL) {
             mEnv->DeleteGlobalRef((jobject)ctx->hidden.androidio.inputStreamRef);
         }
+
+        if(ctx->hidden.androidio.readableByteChannelRef != NULL) {
+            mEnv->DeleteGlobalRef((jobject)ctx->hidden.androidio.readableByteChannelRef);
+        }
+
     }
 
     return result;
@@ -592,7 +595,6 @@ extern "C" int Android_JNI_FileOpen(SDL_RWops* ctx,
     }
 
     jstring fileNameJString = mEnv->NewStringUTF(fileName);
-    ctx->hidden.androidio.fileName = fileNameJString;
     ctx->hidden.androidio.fileNameRef = mEnv->NewGlobalRef(fileNameJString);
     ctx->hidden.androidio.inputStreamRef = NULL;
 
@@ -610,7 +612,7 @@ extern "C" size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
         return -1;
     }
 
-    jobject readableByteChannel = (jobject)ctx->hidden.androidio.readableByteChannel;
+    jobject readableByteChannel = (jobject)ctx->hidden.androidio.readableByteChannelRef;
     jmethodID readMethod = (jmethodID)ctx->hidden.androidio.readMethod;
     jobject byteBuffer = mEnv->NewDirectByteBuffer(buffer, bytesRemaining);
 
@@ -656,7 +658,7 @@ static int Android_JNI_FileClose(SDL_RWops* ctx, bool release)
             mEnv->DeleteGlobalRef((jobject)ctx->hidden.androidio.fileNameRef);
         }
 
-        jobject inputStream = (jobject)ctx->hidden.androidio.inputStream;
+        jobject inputStream = (jobject)ctx->hidden.androidio.inputStreamRef;
 
         // inputStream.close();
         jmethodID mid = mEnv->GetMethodID(mEnv->GetObjectClass(inputStream),
@@ -703,7 +705,7 @@ extern "C" long Android_JNI_FileSeek(SDL_RWops* ctx, long offset, int whence)
     }
 
     long movement = newPosition - ctx->hidden.androidio.position;
-    jobject inputStream = (jobject)ctx->hidden.androidio.inputStream;
+    jobject inputStream = (jobject)ctx->hidden.androidio.inputStreamRef;
 
     if (movement > 0) {
         unsigned char buffer[1024];

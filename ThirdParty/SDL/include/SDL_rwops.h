@@ -85,11 +85,8 @@ typedef struct SDL_RWops
 #if defined(ANDROID)
         struct
         {
-            void *fileName;
             void *fileNameRef;
-            void *inputStream;
             void *inputStreamRef;
-            void *readableByteChannel;
             void *readableByteChannelRef;
             void *readMethod;
             long position;
