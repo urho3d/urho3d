@@ -90,9 +90,6 @@ endmacro ()
 
 # Macro for lib finalization
 macro (finalize_lib)
-    if (MSVC)
-        set_target_properties (${TARGET_NAME} PROPERTIES STATIC_LIBRARY_FLAGS_RELEASE "/LTCG")
-    endif ()
 endmacro ()
 
 # Macro for model asset compilation
