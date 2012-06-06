@@ -140,7 +140,7 @@ void Input::Update()
     if (window)
     {
         unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-        if (!active_ && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+        if (!active_ && graphics_->GetFullscreen() && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
             activated_ = true;
         else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             MakeInactive();
@@ -158,20 +158,18 @@ void Input::Update()
         IntVector2 mousePos = GetCursorPosition();
         mouseMove_ = mousePos - lastCursorPosition_;
         
+        // Recenter the mouse cursor manually
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        SetCursorPosition(center);
+        lastCursorPosition_ = center;
+        
         if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
         {
             mouseMove_ = IntVector2::ZERO;
             suppressNextMouseMove_ = false;
         }
         
-        if (!suppressNextMouseMove_)
-        {
-            // Recenter the mouse cursor manually
-            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            SetCursorPosition(center);
-            lastCursorPosition_ = center;
-        }
-        
+        // Send mouse move event if necessary
         if (mouseMove_ != IntVector2::ZERO)
         {
             using namespace MouseMove;
@@ -370,6 +368,13 @@ void Input::ResetState()
 
 void Input::SetMouseButton(int button, bool newState)
 {
+    // After deactivation in windowed mode, activate by a left-click inside the window
+    if (initialized_ && !graphics_->GetFullscreen())
+    {
+        if (!active_ && newState && button == MOUSEB_LEFT)
+            activated_ = true;
+    }
+    
     // If we are not active yet, do not react to the mouse button down
     if (newState && !active_)
         return;
@@ -662,7 +667,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     lastCursorPosition_ = center;
     activated_ = true;
     
-    // After setting new screen mode we never should be minimized
+    // After setting new screen mode we should not be minimized
     minimized_ = false;
 }
 
