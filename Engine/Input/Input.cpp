@@ -57,7 +57,8 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
 {
     if (scanCode == SDL_SCANCODE_AC_BACK)
         return KEY_ESC;
-    else return SDL_toupper(keySym);
+    else
+        return SDL_toupper(keySym);
 }
 
 OBJECTTYPESTATIC(Input);
@@ -157,15 +158,18 @@ void Input::Update()
         IntVector2 mousePos = GetCursorPosition();
         mouseMove_ = mousePos - lastCursorPosition_;
         
-        // Recenter the mouse cursor manually
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        SetCursorPosition(center);
-        lastCursorPosition_ = center;
-        
         if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
         {
             mouseMove_ = IntVector2::ZERO;
             suppressNextMouseMove_ = false;
+        }
+        
+        if (!suppressNextMouseMove_)
+        {
+            // Recenter the mouse cursor manually
+            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+            SetCursorPosition(center);
+            lastCursorPosition_ = center;
         }
         
         if (mouseMove_ != IntVector2::ZERO)
