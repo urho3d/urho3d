@@ -19,16 +19,6 @@ SET(BUILD_CONFIG_FILE include/kNetBuildConfig.h)
 file(WRITE ${BUILD_CONFIG_FILE} "// This file is programmatically generated using CMake.\n// This file shows the compilation settings that were used to build kNet.\n// These need to match for the client code using kNet.\n")
 file(APPEND ${BUILD_CONFIG_FILE} "#pragma once\n\n")
 
-# This macro adds to each .cpp file listed in the parameter 'cppFiles' a #define DEBUG_CPP_NAME "thisCppFileName"
-#macro(AddCompilationUnitNameDefines cppFiles)
-#  message("cppFiles ${cppFiles} ${${cppFiles}}")
-#      foreach(srcFile ${cppFiles})
-#         get_filename_component(baseName ${srcFile} NAME)
-#         set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
-#        message("${srcFile} with ${baseName}")
-#      endforeach()
-#endmacro()
-
 macro(AddCompilationDefine define)
    add_definitions(-D${define})
    file(APPEND ${BUILD_CONFIG_FILE} "#ifndef ${define}\n#define ${define}\n#endif\n\n")
@@ -169,12 +159,13 @@ elseif (UNIX)
    add_definitions(-DUNIX)
 endif()
 
-#AddCompilationUnitNameDefines(kNetSourceFiles)
-#TODO: To clean up, move the lines of code below into a macro, like shown above. Disabled for now since passing a list to a CMake macro was problematic.
-foreach(srcFile ${kNetSourceFiles})
-   get_filename_component(baseName ${srcFile} NAME)
-   set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
-endforeach()
+# Urho3D: set DEBUG_CPP_NAME only on Windows, at least Xcode project file can not be opened if this is included
+if (WIN32)
+    foreach(srcFile ${kNetSourceFiles})
+        get_filename_component(baseName ${srcFile} NAME)
+        set_source_files_properties(${srcFile} PROPERTIES COMPILE_FLAGS "-DDEBUG_CPP_NAME=\"\\\"${baseName}\"\\\"")
+    endforeach()
+endif ()
 
 add_library(kNet STATIC ${kNetSourceFiles} ${kNetHeaderFiles})
 
