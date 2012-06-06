@@ -133,22 +133,19 @@ void Input::Update()
         }
     }
     
-    // Poll SDL window activation state
+    // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
+    // been closed due to input events
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
-    if (!window)
-        return;
-    
-    unsigned flags = SDL_GetWindowFlags(window);
-    if ((flags & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)) == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+    if (window)
     {
-        if (!active_)
+        unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+        if (!active_ && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
             activated_ = true;
-    }
-    else
-    {
-        if (active_)
+        else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             MakeInactive();
     }
+    else
+        return;
     
     // Activate input now if necessary
     if (activated_)
