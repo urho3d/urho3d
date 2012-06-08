@@ -412,6 +412,7 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
 
     bool mask = false;
     bool twoSided = false;
+    bool hasTexture = false;
     String textureName;
 
     File file(fileName, FILE_READ);
@@ -422,10 +423,11 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
             mask = true;
         if (line.StartsWith("cull_hardware none"))
             twoSided = true;
-        if (line.StartsWith("texture "))
+        if (line.StartsWith("texture ") && !hasTexture)
         {
             textureName = line.Substring(8);
             ProcessRef(textureName);
+            hasTexture = true; // For now handle only the first texture
         }
     }
 
