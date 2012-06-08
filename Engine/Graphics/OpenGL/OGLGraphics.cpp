@@ -150,6 +150,7 @@ Graphics::Graphics(Context* context_) :
     shaderParameterFrame_(0)
 {
     SetTextureUnitMappings();
+    ResetCachedState();
     
     // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
     // of shutting down SDL as a whole, so it should be the last SDL-using subsystem (Audio and Input also use SDL) alive
