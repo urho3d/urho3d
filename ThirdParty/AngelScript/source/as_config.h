@@ -549,6 +549,7 @@
 
 	// MacOSX and IPhone
 	#ifdef __APPLE__
+		#include <TargetConditionals.h>
 
 		// Is this a Mac or an IPhone?
 		#ifdef TARGET_OS_IPHONE
@@ -622,9 +623,9 @@
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 			#define COMPLEX_OBJS_PASSED_BY_REF
 			#undef COMPLEX_MASK
-			#define COMPLEX_MASK asOBJ_APP_CLASS_DESTRUCTOR
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK asOBJ_APP_CLASS_DESTRUCTOR
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			
 			// STDCALL is not available on ARM
 			#undef STDCALL

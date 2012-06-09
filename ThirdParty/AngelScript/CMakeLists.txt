@@ -10,7 +10,12 @@ file (GLOB H_FILES
     include/*.h source/*.h
 )
 
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+if (NOT IOS)
+    set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+else ()
+    set (ASM_FILES source/as_callfunc_arm_xcode.S)
+    set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})
+endif ()
 
 # Include directories
 include_directories (

@@ -64,12 +64,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return 0;
 }
 #else
-#ifndef ANDROID
-int main(int argc, char** argv)
-#else
+#if defined(ANDROID) || defined(IOS)
 extern "C" int SDL_main(int argc, char** argv);
 
 int SDL_main(int argc, char** argv)
+#else
+int main(int argc, char** argv)
 #endif
 {
     ParseArguments(argc, argv);
@@ -94,8 +94,8 @@ void Run()
             }
         }
         
-        #ifdef ANDROID
-        // Can not pass script name on Android, so choose a hardcoded default
+        #if defined(ANDROID) || defined(IOS)
+        // Can not pass script name on mobile devices, so choose a hardcoded default
         scriptFileName = "Scripts/NinjaSnowWar.as";
         #endif
         

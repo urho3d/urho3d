@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -93,15 +96,16 @@
     NSEnumerator *enumerator = [touches objectEnumerator];
     UITouch *touch = (UITouch*)[enumerator nextObject];
 
+    // Urho3D: do not send mouse events for touch to be consistent with Android
+    /*
     if (touch) {
         CGPoint locationInView = [touch locationInView: self];
 
-        /* send moved event */
         SDL_SendMouseMotion(NULL, 0, locationInView.x, locationInView.y);
 
-        /* send mouse down event */
         SDL_SendMouseButton(NULL, SDL_PRESSED, SDL_BUTTON_LEFT);
     }
+    */
 
 #ifdef FIXED_MULTITOUCH
     while(touch) {
@@ -137,10 +141,12 @@
     NSEnumerator *enumerator = [touches objectEnumerator];
     UITouch *touch = (UITouch*)[enumerator nextObject];
 
+    // Urho3D: do not send mouse events for touch to be consistent with Android
+    /*
     if (touch) {
-        /* send mouse up */
         SDL_SendMouseButton(NULL, SDL_RELEASED, SDL_BUTTON_LEFT);
     }
+    */
 
 #ifdef FIXED_MULTITOUCH
     while(touch) {
@@ -183,12 +189,14 @@
     NSEnumerator *enumerator = [touches objectEnumerator];
     UITouch *touch = (UITouch*)[enumerator nextObject];
 
+    // Urho3D: do not send mouse events for touch to be consistent with Android
+    /*
     if (touch) {
         CGPoint locationInView = [touch locationInView: self];
 
-        /* send moved event */
         SDL_SendMouseMotion(NULL, 0, locationInView.x, locationInView.y);
     }
+    */
 
 #ifdef FIXED_MULTITOUCH
     while(touch) {

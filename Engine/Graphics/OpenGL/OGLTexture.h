@@ -71,8 +71,6 @@ public:
     bool IsCompressed() const;
     /// Return number of mipmap levels.
     unsigned GetLevels() const { return levels_; }
-    /// Return OpenGL depth bits.
-    int GetDepthBits() const { return depthBits_; }
     /// Return width.
     int GetWidth() const { return width_; }
     /// Return height.
@@ -127,8 +125,6 @@ protected:
     unsigned levels_;
     /// Requested mipmap levels.
     unsigned requestedLevels_;
-    /// Texture's OpenGL depth bits (depth textures only.)
-    int depthBits_;
     /// Texture width.
     int width_;
     /// Texture height.

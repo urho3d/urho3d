@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifndef _SDL_config_iphoneos_h
 #define _SDL_config_iphoneos_h
 
@@ -135,7 +137,7 @@
 #define SDL_VIDEO_RENDER_OGL_ES2	1
 
 /* Enable system power support */
-#define SDL_POWER_UIKIT 1
+// #define SDL_POWER_UIKIT 1
 
 /* enable iPhone keyboard support */
 #define SDL_IPHONE_KEYBOARD 1

@@ -418,6 +418,33 @@ public:
     float m32_;
     float m33_;
     
+    /// Bulk transpose matrices.
+    static void BulkTranspose(float* dest, const float* src, unsigned count)
+    {
+        for (unsigned i = 0; i < count; ++i)
+        {
+            dest[0] = src[0];
+            dest[1] = src[4];
+            dest[2] = src[8];
+            dest[3] = src[12];
+            dest[4] = src[1];
+            dest[5] = src[5];
+            dest[6] = src[9];
+            dest[7] = src[13];
+            dest[8] = src[2];
+            dest[9] = src[6];
+            dest[10] = src[10];
+            dest[11] = src[14];
+            dest[12] = src[3];
+            dest[13] = src[7];
+            dest[14] = src[11];
+            dest[15] = src[15];
+            
+            dest += 16;
+            src += 16;
+        }
+    }
+    
     /// Zero matrix.
     static const Matrix4 ZERO;
     /// Identity matrix.

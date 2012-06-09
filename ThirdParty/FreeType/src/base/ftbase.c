@@ -15,6 +15,7 @@
 /*                                                                         */
 /***************************************************************************/
 
+// Modified by Lasse Öörni for Urho3D
 
 #include <ft2build.h>
 
@@ -34,7 +35,7 @@
 #include "fttrigon.c"
 #include "ftutil.c"
 
-#if defined( FT_MACINTOSH ) && !defined ( DARWIN_NO_CARBON )
+#if defined( FT_MACINTOSH ) && !defined ( DARWIN_NO_CARBON ) && !defined(IOS)
 #include "ftmac.c"
 #endif
 

@@ -71,7 +71,6 @@ Texture::Texture(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     levels_(0),
     requestedLevels_(0),
-    depthBits_(0),
     width_(0),
     height_(0),
     dynamic_(false),
@@ -202,7 +201,11 @@ bool Texture::IsCompressed() const
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
         format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     #else
+    #ifdef ANDROID
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+    #else
+    return false;
+    #endif
     #endif
 }
 
@@ -258,9 +261,11 @@ unsigned Texture::GetRowDataSize(int width) const
     #endif
         return width * 4;
         
+    #if !defined(GL_ES_VERSION_2_0) || defined(ANDROID)
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
-        
+    #endif
+            
     #ifndef GL_ES_VERSION_2_0
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
@@ -276,9 +281,11 @@ unsigned Texture::GetDXTFormat(CompressedFormat format)
 {
     switch (format)
     {
+    #if !defined(GL_ES_VERSION_2_0) || defined(ANDROID)
     case CF_DXT1:
         return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-        
+    #endif
+            
     #ifndef GL_ES_VERSION_2_0
     case CF_DXT3:
         return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
@@ -304,7 +311,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
     else
         return format;
     #else
-    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
+    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES)
         return GL_DEPTH_COMPONENT;
     else
         return format;
@@ -319,7 +326,7 @@ unsigned Texture::GetDataType(unsigned format)
     else
         return GL_UNSIGNED_BYTE;
     #else
-    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH_COMPONENT32_OES)
+    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES)
         return GL_UNSIGNED_INT;
     else if (format == GL_DEPTH_COMPONENT16)
         return GL_UNSIGNED_SHORT;

@@ -230,6 +230,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         // SDL window parameters are static, so need to operate under static lock
         MutexLock lock(GetStaticMutex());
         
+        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -301,9 +302,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     // Set vsync
     SDL_GL_SetSwapInterval(vsync ? 1 : 0);
     
-    // Query for system backbuffer depth
-    glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
-    impl_->depthBits_ = impl_->windowDepthBits_;
+    // Store the system FBO on IOS now
+    #ifdef IOS
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
+    #endif
     
     SDL_GetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
@@ -870,31 +872,15 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 break;
                 
             case GL_FLOAT_MAT3:
-                #ifndef GL_ES_VERSION_2_0
-                glUniformMatrix3fv(info->location_, count / 9, GL_TRUE, data);
-                #else
-                {
-                    for (unsigned i = 0; i < count; i += 9)
-                    {
-                        Matrix3 matrix(&data[i]);
-                        glUniformMatrix3fv(info->location_ + i / 9, 1, GL_FALSE, matrix.Transpose().Data());
-                    }
-                }
-                #endif
+                count = Min((int)count, (int)NUM_TEMP_MATRICES * 9);
+                Matrix3::BulkTranspose(&tempMatrices3_[0].m00_, data, count / 9);
+                glUniformMatrix3fv(info->location_, count / 9, GL_FALSE, tempMatrices3_[0].Data());
                 break;
                 
             case GL_FLOAT_MAT4:
-                #ifndef GL_ES_VERSION_2_0
-                glUniformMatrix4fv(info->location_, count / 16, GL_TRUE, data);
-                #else
-                {
-                    for (unsigned i = 0; i < count; i += 16)
-                    {
-                        Matrix4 matrix(&data[i]);
-                        glUniformMatrix4fv(info->location_ + i / 16, 1, GL_FALSE, matrix.Transpose().Data());
-                    }
-                }
-                #endif
+                count = Min((int)count, (int)NUM_TEMP_MATRICES * 16);
+                Matrix4::BulkTranspose(&tempMatrices4_[0].m00_, data, count / 16);
+                glUniformMatrix4fv(info->location_, count / 16, GL_FALSE, tempMatrices4_[0].Data());
                 break;
             }
         }
@@ -922,13 +908,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-        {
-            #ifndef GL_ES_VERSION_2_0
-            glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.Data());
-            #else
             glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
-            #endif
-        }
     }
 }
 
@@ -964,13 +944,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-        {
-            #ifndef GL_ES_VERSION_2_0
-            glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.Data());
-            #else
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
-            #endif
-        }
     }
 }
 
@@ -1373,29 +1347,21 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
 {
     if (constantBias != constantDepthBias_ || slopeScaledBias != slopeScaledDepthBias_)
     {
-        if (constantBias != 0.0f || slopeScaledBias != 0.0f)
+        #ifndef GL_ES_VERSION_2_0
+        if (slopeScaledBias != 0.0f)
         {
-            // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
-            // Zero depth bits may be returned if using the packed depth-stencil format. Assume 24bit in that case
-            #ifndef GL_ES_VERSION_2_0
-            int depthBits = Min(impl_->depthBits_, 23);
-            if (!depthBits)
-                depthBits = 23;
-            #else
-            int depthBits = 25;
-            #endif
-            
-            float adjustedConstantBias = constantBias * (float)(1 << (depthBits - 1));
+            // OpenGL constant bias is unreliable and dependant on depth buffer bitdepth, apply in the projection matrix instead
             float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
-            
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(adjustedSlopeScaledBias, adjustedConstantBias);
+            glPolygonOffset(adjustedSlopeScaledBias, 0.0f);
         }
         else
             glDisable(GL_POLYGON_OFFSET_FILL);
+        #endif
         
         constantDepthBias_ = constantBias;
         slopeScaledDepthBias_ = slopeScaledBias;
+        shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
     }
 }
 
@@ -1771,10 +1737,15 @@ void Graphics::Restore()
 {
     if (!impl_->window_)
         return;
-    
+
     // Ensure first that the context exists
     if (!impl_->context_)
+    {
         impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        #ifdef IOS
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
+        #endif
+    }
     if (!impl_->context_)
         return;
     
@@ -1963,10 +1934,10 @@ void Graphics::CommitFramebuffer()
     
     if (noFbo)
     {
-        if (impl_->boundFbo_)
+        if (impl_->boundFbo_ != impl_->systemFbo_)
         {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-            impl_->boundFbo_ = 0;
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->systemFbo_);
+            impl_->boundFbo_ = impl_->systemFbo_;
         }
         
         return;
@@ -2117,8 +2088,6 @@ void Graphics::CommitFramebuffer()
                 i->second_.depthAttachment_ = depthStencil_;
             }
         }
-        
-        impl_->depthBits_ = texture->GetDepthBits();
     }
     else
     {
@@ -2127,7 +2096,6 @@ void Graphics::CommitFramebuffer()
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
             i->second_.depthAttachment_ = 0;
-            impl_->depthBits_ = impl_->windowDepthBits_;
         }
     }
 }
@@ -2203,7 +2171,7 @@ void Graphics::ResetCachedState()
     stencilWriteMask_ = M_MAX_UNSIGNED;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
-    impl_->boundFbo_ = 0;
+    impl_->boundFbo_ = impl_->systemFbo_;
     
     // Set initial state to match Direct3D
     if (impl_->context_)

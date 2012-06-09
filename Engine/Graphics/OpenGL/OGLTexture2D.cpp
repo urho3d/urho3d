@@ -382,7 +382,6 @@ bool Texture2D::Create()
         if (renderSurface_)
         {
             renderSurface_->CreateRenderBuffer(width_, height_, format_);
-            depthBits_ = 24;
             return true;
         }
         else
@@ -406,14 +405,6 @@ bool Texture2D::Create()
             success = false;
         }
     }
-    
-    // If depth format, get the depth size
-    #ifndef GL_ES_VERSION_2_0
-    if (externalFormat == GL_DEPTH_COMPONENT)
-        glGetTexLevelParameteriv(target_, 0, GL_TEXTURE_DEPTH_SIZE, &depthBits_);
-    #else
-    depthBits_ = 24;
-    #endif
     
     // Set mipmapping
     levels_ = requestedLevels_;

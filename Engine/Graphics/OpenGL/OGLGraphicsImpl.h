@@ -27,11 +27,14 @@
 #include "Map.h"
 #include "Timer.h"
 
-#ifndef ANDROID
-#include <GLee.h>
-#else
+#if defined(ANDROID)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#elif defined(IOS)
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
+#else
+#include <GLee.h>
 #endif
 
 #include <SDL.h>
@@ -79,8 +82,10 @@ public:
 private:
     /// SDL window.
     SDL_Window* window_;
-    /// SDL OpenGL context
+    /// SDL OpenGL context.
     SDL_GLContext context_;
+    /// IOS system framebuffer handle.
+    unsigned systemFbo_;
     /// Active texture unit.
     unsigned activeTexture_;
     /// Vertex attributes in use.
@@ -89,10 +94,6 @@ private:
     unsigned boundFbo_;
     /// Current pixel format.
     int pixelFormat_;
-    /// Current depth bits.
-    int depthBits_;
-    /// Backbuffer depth bits.
-    int windowDepthBits_;
     /// Map for FBO's per resolution and format.
     Map<unsigned long long, FrameBufferObject> frameBuffers_;
     /// Need FBO commit flag.

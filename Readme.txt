@@ -99,7 +99,9 @@ To run Urho3D, the minimum system requirements are:
 - Linux & Mac OS X: GPU with OpenGL 2.0 support and EXT_framebuffer_object,
   EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions.
 
-- Android: OS version 2.2 or newer, OpenGL ES 2 capable GPU.
+- Android: OS version 2.2 or newer, OpenGL ES 2.0 capable GPU.
+
+- iOS: OpenGL ES 2.0 capable GPU.
 
 For Windows, SSE and Windows XP requirements can be eliminated by disabling SSE,
 crash dump support and file watcher from the root CMakeLists.txt. Windows 2000
@@ -146,8 +148,8 @@ following arguments: Scripts/TestScene.as -w
 Android build process
 ---------------------
 
-First build Urho3D for desktop OpenGL to make sure the GLSL shaders are 
-generated. For Windows this requires forcing OpenGL mode from the root 
+First build Urho3D for desktop OpenGL to make sure the GLSL shaders are
+generated. For Windows this requires forcing OpenGL mode from the root
 CMakeLists.txt. Then copy Bin/Data and Bin/CoreData directories to the
 Android/assets directory. Finally execute the following commands in the
 Android directory:
@@ -172,6 +174,27 @@ name has to be replaced in several files:
 - Android/src/com/googlecode/urho3d/SDLActivity.java (rename directories also)
 - ThirdParty/SDL/include/SDL_config_android.h, look for the NATIVE_FUNCTION
   macro
+
+
+iOS build process
+-----------------
+
+First build desktop Urho3D to generate the OgreImporter and GLShaderProcessor
+utilities into the Bin directory. Then run cmake_ios.sh. This generates an Xcode
+project named Urho3D.xcodeproj.
+
+Open the Xcode project and check the properties for the Urho3D project (topmost
+in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK.
+In Code Signing, enter your developer identity as necessary.
+
+The Urho3D target will actually build the application bundle and copy resources
+from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose
+debug or release mode.
+
+Note that due to a CMake / Xcode bug, you may need to modify and save Urho3D.cpp
+after modifying any of the libraries to get Xcode to re-link the executable.
+Do this also if you modify the data files and get an error about resources
+having been added or modified after signing.
 
 
 History

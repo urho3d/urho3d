@@ -34,12 +34,11 @@
 GraphicsImpl::GraphicsImpl() :
     window_(0),
     context_(0),
+    systemFbo_(0),
     activeTexture_(0),
     enabledAttributes_(0),
     boundFbo_(0),
     pixelFormat_(0),
-    depthBits_(0),
-    windowDepthBits_(0),
     fboDirty_(false)
 {
 }

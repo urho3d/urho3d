@@ -10,6 +10,10 @@ if (WIN32)
     file (GLOB SYS_C_FILES
         src/audio/directsound/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c src/thread/windows/*.c src/timer/windows/*.c src/video/windows/*.c
     )
+elseif (IOS)
+    file (GLOB SYS_C_FILES
+        src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c
+    )
 elseif (APPLE)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
@@ -36,14 +40,7 @@ if (WIN32)
         target_link_libraries (${TARGET_NAME} winmm.lib)
     endif ()
 elseif (APPLE)
-    FIND_LIBRARY (AUDIOUNIT_FW AudioUnit)
-    FIND_LIBRARY (CARBON_FW Carbon)
-    FIND_LIBRARY (COCOA_FW Cocoa)
-    FIND_LIBRARY (COREAUDIO_FW CoreAudio)
-    FIND_LIBRARY (FORCEFEEDBACK_FW ForceFeedback)
-    FIND_LIBRARY (IOKIT_FW IOKit)
-    FIND_LIBRARY (OPENGL_FW OpenGL)
-    target_link_libraries (${TARGET_NAME} dl pthread ${AUDIOUNIT_FW} ${CARBON_FW} ${COCOA_FW} ${COREAUDIO_FW} ${FORCEFEEDBACK_FW} ${IOKIT_FW} ${OPENGL_FW})
+    target_link_libraries (${TARGET_NAME} dl pthread)
 else ()
     target_link_libraries (${TARGET_NAME} dl pthread GL)
 endif ()

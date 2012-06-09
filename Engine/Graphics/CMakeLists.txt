@@ -20,7 +20,7 @@ include_directories (
     . ../Container ../Core ../IO ../Math ../Resource ../Scene
 )
 
-if (USE_OPENGL)
+if (USE_OPENGL AND NOT IOS)
     include_directories (../../ThirdParty/GLee)
 endif ()
 
@@ -29,7 +29,9 @@ add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene SDL)
 
 if (USE_OPENGL)
-    target_link_libraries (${TARGET_NAME} GLee)
+    if (NOT IOS)
+        target_link_libraries (${TARGET_NAME} GLee)
+    endif ()
 else ()
     target_link_libraries (${TARGET_NAME} d3d9.lib)
 endif ()

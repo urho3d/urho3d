@@ -46,12 +46,15 @@
 #define MAX_PATH 256
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
 
 #ifdef ANDROID
 extern "C" const char* SDL_Android_GetFilesDir();
+#endif
+#ifdef IOS
+extern "C" const char* SDL_IOS_GetResourceDir();
 #endif
 
 #include "DebugNew.h"
@@ -373,7 +376,13 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir()
 {
-    #if defined(WIN32)
+    #if defined(ANDROID)
+    // This is an internal directory specifier pointing to the assets in the .apk
+    // Files from this directory will be opened using special handling
+    return "/apk/";
+    #elif defined(IOS)
+    return AddTrailingSlash(SDL_IOS_GetResourceDir());
+    #elif defined(WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
@@ -384,10 +393,6 @@ String FileSystem::GetProgramDir()
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
     return GetPath(String(exeName));
-    #elif defined(ANDROID)
-    // This is an internal directory specifier pointing to the assets in the .apk
-    // Files from this directory will be opened using special handling
-    return "/apk/";
     #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
@@ -401,14 +406,16 @@ String FileSystem::GetProgramDir()
 }
 
 String FileSystem::GetUserDocumentsDir()
-{
-    #if defined(WIN32)
+{          
+    #if defined(ANDROID)
+    return AddTrailingSlash(SDL_Android_GetFilesDir());
+    #elif defined(IOS)
+    return AddTrailingSlash(SDL_IOS_GetResourceDir());
+    #elif defined(WIN32)
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
     return AddTrailingSlash(String(pathName));
-    #elif defined(ANDROID)
-    return AddTrailingSlash(String(SDL_Android_GetFilesDir()));
     #else
     char pathName[MAX_PATH];
     pathName[0] = 0;

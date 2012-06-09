@@ -27,6 +27,8 @@
    Andreas Jonsson
    andreas@angelcode.com
 */
+
+// Modified by Lasse Öörni for Urho3D
  
 //
 // as_gc.cpp
@@ -145,7 +147,7 @@ asDWORD asCAtomic::atomicDec()
 	return __sync_sub_and_fetch(&value, 1);
 }
 
-#elif defined(AS_MAC)
+#elif defined(AS_MAC) || defined(AS_IPHONE)
 
 END_AS_NAMESPACE
 #include <libkern/OSAtomic.h>

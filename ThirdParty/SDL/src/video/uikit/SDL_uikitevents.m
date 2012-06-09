@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -33,24 +36,10 @@
 void
 UIKit_PumpEvents(_THIS)
 {
-    /*
-        When the user presses the 'home' button on the iPod
-        the application exits -- immediatly.
-
-        Unlike in Mac OS X, it appears there is no way to cancel the termination.
-
-        This doesn't give the SDL user's application time to respond to an SDL_Quit event.
-        So what we do is that in the UIApplicationDelegate class (SDLUIApplicationDelegate),
-        when the delegate receives the ApplicationWillTerminate message, we execute
-        a longjmp statement to get back here, preventing an immediate exit.
-     */
-    if (setjmp(*jump_env()) == 0) {
-        /* if we're setting the jump, rather than jumping back */
-        SInt32 result;
-        do {
-            result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE);
-        } while (result == kCFRunLoopRunHandledSource);
-    }
+    SInt32 result;
+    do {
+        result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE);
+    } while (result == kCFRunLoopRunHandledSource);
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

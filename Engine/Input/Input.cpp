@@ -44,10 +44,10 @@ static HashMap<unsigned, Input*> inputInstances;
 /// Return the Input subsystem instance corresponding to an SDL window ID.
 Input* GetInputInstance(unsigned windowID)
 {
-    #ifndef ANDROID
+    #if !defined(ANDROID) && !defined(IOS)
     return windowID ? inputInstances[windowID] : 0;
     #else
-    // On Android we support only a single instance of Urho3D in the process, and the window ID can not be relied on.
+    // On mobile devices only a single Urho3D instance within a process is supported, and the window ID can not be relied on.
     return inputInstances.Size() ? inputInstances.Begin()->second_ : 0;
     #endif
 }

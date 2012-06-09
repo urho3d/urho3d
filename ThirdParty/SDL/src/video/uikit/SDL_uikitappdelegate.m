@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -29,7 +32,7 @@
 
 #import "SDL_uikitappdelegate.h"
 #import "SDL_uikitopenglview.h"
-#import "SDL_events_c.h"
+#import "../../events/SDL_events_c.h"
 #import "jumphack.h"
 
 #ifdef main
@@ -40,6 +43,7 @@ extern int SDL_main(int argc, char *argv[]);
 static int forward_argc;
 static char **forward_argv;
 static int exit_status;
+static char *resource_dir = 0;
 
 int main(int argc, char **argv)
 {
@@ -66,6 +70,27 @@ int main(int argc, char **argv)
 
     [pool release];
     return exit_status;
+}
+
+// Urho3D: added function
+void SDL_IOS_LogMessage(const char *message)
+{   
+    #ifdef XCODE_DEBUG_CONFIGURATION
+    NSLog(@"%@", [NSString stringWithUTF8String: message]);
+    #endif
+}
+
+// Urho3D: added function
+const char* SDL_IOS_GetResourceDir()
+{
+    if (!resource_dir)
+    {
+        const char *temp = [[[NSBundle mainBundle] resourcePath] UTF8String];
+        resource_dir = malloc(strlen(temp + 1));
+        strcpy(resource_dir, temp);
+    }
+    
+    return resource_dir;
 }
 
 static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue, const char *newValue)
@@ -128,9 +153,8 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
     event.sysevent.data=NULL;
     if (SDL_SysEventHandler)
         SDL_SysEventHandler(&event);
-    else SDL_SendQuit();
-     /* hack to prevent automatic termination.  See SDL_uikitevents.m for details */
-    longjmp(*(jump_env()), 1);
+    else 
+        SDL_SendQuit();
 }
 
 - (void) applicationWillResignActive:(UIApplication*)application

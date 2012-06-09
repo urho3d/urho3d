@@ -440,7 +440,7 @@ Note that many more optimization opportunities are possible at the content level
 
 \section Rendering_GPUResourceLoss Handling GPU resource loss
 
-On Direct3D9 and Android OpenGL ES 2 it is possible to lose the rendering context (and therefore GPU resources) due to the application window being minimized to the background. Also, to work around possible GPU driver bugs the desktop OpenGL context will be voluntarily destroyed and recreated when changing screen mode or toggling between fullscreen and windowed. Therefore, on all graphics APIs one must be prepared for losing GPU resources.
+On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering context (and therefore GPU resources) due to the application window being minimized to the background. Also, to work around possible GPU driver bugs the desktop OpenGL context will be voluntarily destroyed and recreated when changing screen mode or toggling between fullscreen and windowed. Therefore, on all graphics APIs one must be prepared for losing GPU resources.
 
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
@@ -457,7 +457,7 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 \page RenderingModes Rendering modes
 
-Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering. Note that on OpenGL ES 2 only forward rendering is available.
+Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering. Note that on OpenGL ES 2.0 only forward rendering is available.
 
 \section RenderingModes_Forward Forward rendering
 
@@ -524,7 +524,7 @@ These differences need to be observed when using the low-level rendering functio
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
-OpenGL ES 2 has further limitations:
+OpenGL ES 2.0 has further limitations:
 
 - Only DXT1 compressed textures will be uploaded as compressed if the EXT_texture_compression_dxt1 extension is present. Other compressed texture formats will be uploaded as uncompressed RGBA. Mobile hardware specific compression formats such as ETC or PVRTC are not yet supported.
 

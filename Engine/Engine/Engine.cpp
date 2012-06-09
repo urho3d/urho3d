@@ -206,6 +206,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
+    
     if (fileSystem->FileExists(exePath + "CoreData.pak"))
     {
         SharedPtr<PackageFile> package(new PackageFile(context_));

@@ -245,7 +245,7 @@ void CreateOverlays()
     healthBar.SetSize(116, 16);
     healthBorder.AddChild(healthBar);
 
-    if (GetPlatform() == "Android")
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
     {
         touchEnabled = true;
 

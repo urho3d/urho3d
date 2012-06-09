@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -27,7 +30,7 @@
 #include "SDL_uikitappdelegate.h"
 #include "SDL_uikitwindow.h"
 #include "jumphack.h"
-#include "SDL_sysvideo.h"
+#include "../../video/SDL_sysvideo.h"
 #include "../../events/SDL_keyboard_c.h"
 #include "../../events/SDL_mouse_c.h"
 #include "../../power/uikit/SDL_syspower.h"

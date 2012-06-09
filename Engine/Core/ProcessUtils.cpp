@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(IOS)
 #include <libcpuid.h>
 #endif
 
@@ -42,7 +42,7 @@
 
 #if defined(_MSC_VER)
 #include <float.h>
-#elif !defined(ANDROID)
+#elif !defined(ANDROID) && !defined(IOS)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -77,7 +77,7 @@ static String currentLine;
 static Vector<String> arguments;
 static Mutex staticMutex;
 
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(IOS)
 void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -90,7 +90,7 @@ void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-    #ifndef ANDROID
+    #if !defined(ANDROID) && !defined(IOS)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
@@ -145,6 +145,7 @@ void OpenConsoleWindow()
 
 void PrintUnicode(const String& str)
 {
+    #if !defined(ANDROID) && !defined(IOS)
     #ifdef WIN32
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
     if (output == INVALID_HANDLE_VALUE)
@@ -155,6 +156,7 @@ void PrintUnicode(const String& str)
     #else
     printf("%s", str.CString());
     #endif
+    #endif
 }
 
 void PrintUnicodeLine(const String& str)
@@ -164,7 +166,9 @@ void PrintUnicodeLine(const String& str)
 
 void PrintLine(const String& str)
 {
+    #if !defined(ANDROID) && !defined(IOS)
     printf("%s\n", str.CString());
+    #endif
 }
 
 const Vector<String>& ParseArguments(const String& cmdLine)
@@ -302,7 +306,7 @@ String GetConsoleInput()
             }
         }
     }
-    #else
+    #elif !defined(ANDROID) && !defined(IOS)
     int flags = fcntl(STDIN_FILENO, F_GETFL);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
@@ -320,12 +324,14 @@ String GetConsoleInput()
 
 String GetPlatform()
 {
-    #if defined(WIN32)
+    #if defined(ANDROID)
+    return "Android";    
+    #elif defined(IOS)
+    return "iOS";
+    #elif defined(WIN32)
     return "Windows";
     #elif defined(__APPLE__)
     return "Mac OS X";
-    #elif defined(ANDROID)
-    return "Android";
     #elif defined(__linux__)
     return "Linux";
     #else
@@ -335,7 +341,7 @@ String GetPlatform()
 
 unsigned GetNumPhysicalCPUs()
 {
-    #ifndef ANDROID
+    #if !defined(ANDROID) && !defined(IOS)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -347,7 +353,7 @@ unsigned GetNumPhysicalCPUs()
 
 unsigned GetNumLogicalCPUs()
 {
-    #ifndef ANDROID
+    #if !defined(ANDROID) && !defined(IOS)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

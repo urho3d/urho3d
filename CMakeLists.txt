@@ -4,6 +4,15 @@ cmake_minimum_required (VERSION 2.6)
 # Disable "unnecessary" build types
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configurations" FORCE)
 
+# IOS-specific setup
+if (IOS)
+    add_definitions (-DIOS)
+    enable_language (ASM)
+    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
+    set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
+endif ()
+
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
@@ -53,7 +62,7 @@ if (MSVC)
     endif ()
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
-else ()
+elseif (NOT IOS)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
     if (ENABLE_SSE)
@@ -82,7 +91,7 @@ macro (finalize_exe)
     if (MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $(TARGETPATH) ${PROJECT_BINARY_DIR}/Bin)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $(TARGETDIR)$(TARGETNAME).pdb ${PROJECT_BINARY_DIR}/Bin)
-    else ()
+    elseif (NOT IOS)
         get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_BINARY_DIR}/Bin)
     endif ()
@@ -94,11 +103,19 @@ endmacro ()
 
 # Macro for model asset compilation
 macro (add_model NAME PARAMETERS)
-    add_custom_command (
-        OUTPUT ../../Bin/Data/Models/${NAME}.mdl
-        COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
-        DEPENDS OgreImporter ${NAME}.mesh.xml
-    )
+    if (IOS)
+        add_custom_command (
+            OUTPUT ../../Bin/Data/Models/${NAME}.mdl
+            COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
+            DEPENDS ${NAME}.mesh.xml
+        )
+    else ()
+        add_custom_command (
+            OUTPUT ../../Bin/Data/Models/${NAME}.mdl
+            COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
+            DEPENDS OgreImporter ${NAME}.mesh.xml
+        )
+    endif ()
 
     set (ALL_MODELS ${ALL_MODELS} ../../Bin/Data/Models/${NAME}.mdl)
 endmacro ()
@@ -106,15 +123,23 @@ endmacro ()
 # Macro for shader asset compilation
 if (USE_OPENGL)
     macro (add_shader NAME)
-        add_custom_command (
-            OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
-            COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-            DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
-        )
+        if (IOS)
+            add_custom_command (
+                OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
+                COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
+                DEPENDS ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
+            )
+        else ()
+            add_custom_command (
+                OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
+                COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
+                DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
+            )
+        endif ()
         
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)
     endmacro ()
-else()
+else ()
     macro (add_shader NAME)
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2
@@ -152,28 +177,32 @@ add_subdirectory (Engine/Script)
 add_subdirectory (Engine/UI)
 add_subdirectory (SourceAssets/Models)
 add_subdirectory (ThirdParty/AngelScript)
-add_subdirectory (ThirdParty/Assimp)
 add_subdirectory (ThirdParty/Bullet)
 add_subdirectory (ThirdParty/FreeType)
 add_subdirectory (ThirdParty/kNet)
-add_subdirectory (ThirdParty/LibCpuId)
 add_subdirectory (ThirdParty/PugiXml)
 add_subdirectory (ThirdParty/SDL)
 add_subdirectory (ThirdParty/Squish)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
-add_subdirectory (Tools/AssetImporter)
-add_subdirectory (Tools/OgreImporter)
-add_subdirectory (Tools/PackageTool)
-add_subdirectory (Tools/RampGenerator)
 add_subdirectory (Urho3D)
 
 if (USE_OPENGL)
     add_subdirectory (SourceAssets/GLSLShaders)
-    add_subdirectory (ThirdParty/GLee)
-    add_subdirectory (Tools/GLShaderProcessor)
+    if (NOT IOS)
+        add_subdirectory (ThirdParty/GLee)
+        add_subdirectory (Tools/GLShaderProcessor)
+    endif ()
 else ()
     add_subdirectory (SourceAssets/HLSLShaders)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()
 
+if (NOT IOS)
+    add_subdirectory (ThirdParty/Assimp)
+    add_subdirectory (ThirdParty/LibCpuId)
+    add_subdirectory (Tools/AssetImporter)
+    add_subdirectory (Tools/OgreImporter)
+    add_subdirectory (Tools/PackageTool)
+    add_subdirectory (Tools/RampGenerator)
+endif ()

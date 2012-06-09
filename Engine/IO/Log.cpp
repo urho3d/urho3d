@@ -34,6 +34,9 @@
 #ifdef ANDROID
 #include <android/log.h>
 #endif
+#ifdef IOS
+extern "C" void SDL_IOS_LogMessage(const char* message);
+#endif
 
 #include "DebugNew.h"
 
@@ -49,7 +52,7 @@ OBJECTTYPESTATIC(Log);
 
 Log::Log(Context* context) :
     Object(context),
-    #ifdef _DEBUG
+    #if defined(_DEBUG) || defined(XCODE_DEBUG_CONFIGURATION)
     level_(LOG_DEBUG),
     #else
     level_(LOG_INFO),
@@ -64,7 +67,7 @@ Log::~Log()
 
 void Log::Open(const String& fileName)
 {
-    #ifndef ANDROID
+    #if !defined(ANDROID) && !defined(IOS)
     if (fileName.Empty())
         return;
     
@@ -98,11 +101,13 @@ void Log::Write(int level, const String& message)
     String dateTimeString = String(dateTime).Replaced("\n", "");
     String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
-    #ifndef ANDROID
-    PrintUnicodeLine(formattedMessage);
+    #if defined(ANDROID)
+    int androidLevel = ANDROID_LOG_DEBUG + level;
+    __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
+    #elif defined(IOS)
+    SDL_IOS_LogMessage(message.CString());
     #else
-    /// \todo Use proper log levels
-    __android_log_print(ANDROID_LOG_INFO, "Urho3D", formattedMessage.CString());
+    PrintUnicodeLine(formattedMessage);
     #endif
     
     if (logFile_)
@@ -126,10 +131,12 @@ void Log::WriteRaw(const String& message)
     inWrite_ = true;
     lastMessage_ = message;
     
-    #ifndef ANDROID
-    PrintUnicode(message);
-    #else
+    #if defined(ANDROID)
     __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
+    #elif defined(IOS)
+    SDL_IOS_LogMessage(message.CString());
+    #else
+    PrintUnicode(message);
     #endif
     
     if (logFile_)

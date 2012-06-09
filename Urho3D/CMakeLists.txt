@@ -15,9 +15,22 @@ include_directories (
 # Define target & libraries to link
 if (WIN32)
     add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
+elseif (IOS)
+    set (RESOURCE_DIR \${TARGET_BUILD_DIR}/\${FULL_PRODUCT_NAME})
+    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
+    add_executable (${TARGET_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
+    add_dependencies (${TARGET_NAME} Models Shaders)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .svn -exclude .rule -resolve-src-symlinks ${CMAKE_SOURCE_DIR}/Bin/CoreData ${RESOURCE_DIR}
+        COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .svn -exclude .rule -resolve-src-symlinks ${CMAKE_SOURCE_DIR}/Bin/Data ${RESOURCE_DIR}
+    )
+    set_target_properties(${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
+elseif (APPLE)
+    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL")
+    add_executable (${TARGET_NAME} ${SOURCE_FILES})
 else ()
     add_executable (${TARGET_NAME} ${SOURCE_FILES})
 endif ()
 
-target_link_libraries (${TARGET_NAME} Container Core Engine IO Math Resource Script ${DBGHELP_LIB})
+target_link_libraries (${TARGET_NAME} Container Core Engine IO Math Resource Script)
 finalize_exe ()

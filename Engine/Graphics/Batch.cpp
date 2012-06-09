@@ -217,10 +217,23 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
         graphics->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
         
+        Matrix4 projection = camera_->GetProjection();
+        #ifdef USE_OPENGL
+        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
+        float constantBias = 2.0f * graphics->GetDepthConstantBias();
+        // On OpenGL ES slope-scaled bias can not be guaranteed to be available, and the shadow filtering is more coarse,
+        // so use a higher constant bias
+        #ifdef GL_ES_VERSION_2_0
+        constantBias *= 1.5f;
+        #endif
+        projection.m22_ += projection.m32_ * constantBias;
+        projection.m23_ += projection.m33_ * constantBias;
+        #endif
+        
         if (overrideView_)
-            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection());
+            graphics->SetShaderParameter(VSP_VIEWPROJ, projection);
         else
-            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() * camera_->GetInverseWorldTransform());
+            graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetInverseWorldTransform());
         
         graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, cameraWorldRotation * Vector3::RIGHT);
         graphics->SetShaderParameter(VSP_VIEWUPVECTOR, cameraWorldRotation * Vector3::UP);
