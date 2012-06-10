@@ -423,6 +423,10 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     if (impl_->fboDirty_)
         CommitFramebuffer();
     
+    #ifdef GL_ES_VERSION_2_0
+    flags &= ~CLEAR_STENCIL;
+    #endif
+    
     bool oldColorWrite = colorWrite_;
     bool oldDepthWrite = depthWrite_;
     

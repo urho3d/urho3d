@@ -1182,7 +1182,11 @@ void View::RenderBatchesForward()
     graphics_->SetRenderTarget(0, renderTarget);
     graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(viewRect_);
+    #ifndef GL_ES_VERSION_2_0
     graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+    #else
+    graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, farClipZone_->GetFogColor());
+    #endif
     
     // Render opaque object unlit base pass
     if (!baseQueue_.IsEmpty())
@@ -1214,7 +1218,9 @@ void View::RenderBatchesForward()
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
+    #ifndef GL_ES_VERSION_2_0
     // At this point clear the parts of viewport not occupied by opaque geometry with fog color
+    // On OpenGL ES an ordinary color clear has been performed beforehand instead
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthTest(CMP_LESSEQUAL);
@@ -1225,6 +1231,7 @@ void View::RenderBatchesForward()
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
     graphics_->ClearParameterSource(SP_MATERIAL);
     DrawFullscreenQuad(camera_, false);
+    #endif
     
     // Render pre-alpha custom pass
     if (!preAlphaQueue_.IsEmpty())
