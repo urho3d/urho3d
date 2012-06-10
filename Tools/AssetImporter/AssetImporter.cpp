@@ -60,15 +60,6 @@
 
 #include "DebugNew.h"
 
-enum Command
-{
-    CMD_NONE = 0,
-    CMD_MODEL,
-    CMD_SCENE,
-    CMD_DUMP,
-    CMD_LOD
-};
-
 struct OutModel
 {
     OutModel() :
@@ -102,7 +93,6 @@ struct OutScene
 };
 
 SharedPtr<Context> context_(new Context());
-Command command_ = CMD_NONE;
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
 String materialListName_;
@@ -299,18 +289,7 @@ void Run(const Vector<String>& arguments)
         }
     }
     
-    if (command == "model")
-        command_ = CMD_MODEL;
-    else if (command == "scene")
-        command_ = CMD_SCENE;
-    else if (command == "dump")
-        command_ = CMD_DUMP;
-    else if (command == "lod")
-        command_ = CMD_LOD;
-    else
-        ErrorExit("Unrecognized command " + command);
-        
-    if (command_ != CMD_LOD)
+    if (command == "model" || command == "scene" || command == "dump")
     {
         String inFile = arguments[1];
         String outFile;
@@ -321,7 +300,7 @@ void Run(const Vector<String>& arguments)
         {
             resourcePath_ = GetPath(outFile);
             // If output file already has the Models/ path (model mode), do not take it into the resource path
-            if (command_ == CMD_MODEL)
+            if (command == "model")
             {
                 String resPathLower = resourcePath_.ToLower();
                 if (resPathLower.FindLast("models/") == resPathLower.Length() - 7)
@@ -347,20 +326,17 @@ void Run(const Vector<String>& arguments)
                 ErrorExit("Could not find scene node " + rootNodeName);
         }
         
-        switch (command_)
+        if (command == "dump")
         {
-        case CMD_DUMP:
             DumpNodes(rootNode_, 0);
             return;
-        
-        case CMD_MODEL:
-            ExportModel(outFile);
-            break;
-            
-        case CMD_SCENE:
-            ExportScene(outFile);
-            break;
         }
+        
+        if (command == "model")
+            ExportModel(outFile);
+        
+        if (command == "scene")
+            ExportScene(outFile);
         
         if (!noMaterials)
         {
@@ -369,7 +345,7 @@ void Run(const Vector<String>& arguments)
             CopyTextures(usedTextures, GetPath(inFile));
         }
     }
-    else
+    else if (command == "lod")
     {
         PODVector<float> lodDistances;
         Vector<String> modelNames;
@@ -408,6 +384,8 @@ void Run(const Vector<String>& arguments)
         
         CombineLods(lodDistances, modelNames, outFile);
     }
+    else
+        ErrorExit("Unrecognized command " + command);
 }
 
 void DumpNodes(aiNode* rootNode, unsigned level)

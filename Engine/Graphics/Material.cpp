@@ -72,6 +72,8 @@ TextureUnit ParseTextureUnitName(const String& name)
     return unit;
 }
 
+static TechniqueEntry noEntry;
+
 TechniqueEntry::TechniqueEntry() :
     qualityLevel_(0),
     lodDistance_(0.0f)
@@ -377,7 +379,6 @@ void Material::MarkForAuxView(unsigned frameNumber)
 
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 {
-    TechniqueEntry noEntry;
     return index < techniques_.Size() ? techniques_[index] : noEntry;
 }
 
