@@ -21,8 +21,10 @@ elseif (IOS)
     add_executable (${TARGET_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
     add_dependencies (${TARGET_NAME} Models Shaders)
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .svn -exclude .rule -resolve-src-symlinks ${CMAKE_SOURCE_DIR}/Bin/CoreData ${RESOURCE_DIR}
-        COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .svn -exclude .rule -resolve-src-symlinks ${CMAKE_SOURCE_DIR}/Bin/Data ${RESOURCE_DIR}
+        COMMAND mkdir -p ${RESOURCE_DIR}/CoreData
+        COMMAND mkdir -p ${RESOURCE_DIR}/Data
+        COMMAND ditto ${CMAKE_SOURCE_DIR}/Bin/CoreData ${RESOURCE_DIR}/CoreData
+        COMMAND ditto ${CMAKE_SOURCE_DIR}/Bin/Data ${RESOURCE_DIR}/Data
     )
     set_target_properties(${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
 elseif (APPLE)
