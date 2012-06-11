@@ -53,11 +53,17 @@ OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
     Object(context),
+    timeStep_(0.0f),
     minFps_(10),
+    #if defined(ANDROID) || defined(IOS)
+    maxFps_(60),
+    maxInactiveFps_(10),
+    pauseMinimized_(true),
+    #else
     maxFps_(200),
     maxInactiveFps_(60),
-    timeStep_(0.0f),
     pauseMinimized_(false),
+    #endif
     initialized_(false),
     exiting_(false),
     headless_(false)
