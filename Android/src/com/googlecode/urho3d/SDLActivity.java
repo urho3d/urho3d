@@ -241,20 +241,34 @@ public class SDLActivity extends Activity
                 {
                     renderableType = EGL_OPENGL_ES_BIT;
                 }
-                int[] configSpec = 
-                {
-                    EGL10.EGL_DEPTH_SIZE, 16,
-                    EGL10.EGL_RENDERABLE_TYPE, renderableType,
-                    EGL10.EGL_NONE
-                };
+
+                EGLConfig config = null;
                 EGLConfig[] configs = new EGLConfig[1];
                 int[] num_config = new int[1];
-                if (!egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config) || num_config[0] == 0) 
+                int depth = 24;
+
+                while (depth >= 16)
+                {
+                    int[] configSpec =
+                    {
+                        EGL10.EGL_DEPTH_SIZE, depth,
+                        EGL10.EGL_RENDERABLE_TYPE, renderableType,
+                        EGL10.EGL_NONE
+                    };
+
+                    if (egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config) && num_config[0] > 0)
+                    {
+                        config = configs[0];
+                        break;
+                    }
+                    depth -= 8;
+                }
+                
+                if (config == null)
                 {
                     Log.e("SDL", "No EGL config available");
                     return false;
                 }
-                EGLConfig config = configs[0];
     
                 mEGLDisplay = dpy;
                 mEGLConfig = config;
