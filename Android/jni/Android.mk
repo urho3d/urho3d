@@ -25,7 +25,7 @@ LOCAL_MODULE := Bullet
 
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
-    $(wildcard $(LOCAL_PATH)/src/BulletCollision/BroadPhaseCollision/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/src/BulletCollision/BroadphaseCollision/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/CollisionDispatch/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/CollisionShapes/*.cpp) \
     $(wildcard $(LOCAL_PATH)/src/BulletCollision/Gimpact/*.cpp) \
