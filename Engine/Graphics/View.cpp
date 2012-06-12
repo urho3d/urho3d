@@ -1219,7 +1219,7 @@ void View::RenderBatchesForward()
     graphics_->SetStencilTest(false);
     
     #ifndef GL_ES_VERSION_2_0
-    // At this point clear the parts of viewport not occupied by opaque geometry with fog color
+    // At this point clear the parts of viewport not occupied by opaque geometry with fog color.
     // On OpenGL ES an ordinary color clear has been performed beforehand instead
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetColorWrite(true);
@@ -2367,9 +2367,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             // Create a new group based on the batch
             renderer_->SetBatchShaders(batch, tech, allowShadows);
             BatchGroup newGroup(batch);
-            // Retain only the base and alpha mask bits in the sort key for better distance sorting
             newGroup.CalculateSortKey();
-            newGroup.sortKey_ &= 0xc000000000000000ULL;
             newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
             groups->Insert(MakePair(key, newGroup));
         }

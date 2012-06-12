@@ -61,12 +61,34 @@ inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceD
     return lhs.distance_ < rhs.distance_;
 }
 
-inline bool CompareBatchGroupsFrontToBack(BatchGroup* lhs, BatchGroup* rhs)
+static void SortFrontToBack2Pass(PODVector<Batch*>& batches)
 {
-    if (lhs->sortKey_ == rhs->sortKey_)
-        return lhs->distance_ < rhs->distance_;
-    else
-        return lhs->sortKey_ > rhs->sortKey_;
+    // First sort with state having priority
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    
+    // Then rewrite distances so that different states will be ordered front to back, and sort again
+    float lastDistance;
+    unsigned long long lastSortKey;
+    for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
+    {
+        Batch* batch = *i;
+        
+        if (i == batches.Begin() || batch->sortKey_ != lastSortKey)
+        {
+            lastSortKey = batch->sortKey_;
+            lastDistance = batch->distance_;
+        }
+        else
+        {
+            lastDistance *= 1.000001f;
+            batch->distance_ = lastDistance;
+        }
+        
+        // Leave only the base & alphamask bits to the sort key
+        batch->sortKey_ &= 0xc000000000000000ULL;
+    }
+    
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
 }
 
 void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
@@ -155,15 +177,17 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
 
 void Batch::CalculateSortKey()
 {
-    unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0x3fff;
-    unsigned pass = (*((unsigned*)&pass_) / sizeof(Pass)) & 0xffff;
+    unsigned shaders = ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) & 0x3fff;
+    if (isBase_)
+        shaders |= 0x8000;
+    if (pass_ && !pass_->GetAlphaMask())
+        shaders |= 0x4000;
+    
+    unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffff;
     unsigned material = (*((unsigned*)&material_) / sizeof(Material)) & 0xffff;
     unsigned geometry = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
-    if (isBase_)
-        lightQueue |= 0x8000;
-    if (pass_ && !pass_->GetAlphaMask())
-        lightQueue |= 0x4000;
-    sortKey_ = (((unsigned long long)lightQueue) << 48) | (((unsigned long long)pass) << 32) |
+    
+    sortKey_ = (((unsigned long long)shaders) << 48) | (((unsigned long long)lightQueue) << 32) |
         (((unsigned long long)material) << 16) | geometry;
 }
 
@@ -745,8 +769,8 @@ void BatchQueue::SortFrontToBack()
             sortedBatches_.Push(&batches_[i]);
     }
     
-    Sort(sortedBaseBatches_.Begin(), sortedBaseBatches_.End(), CompareBatchesFrontToBack);
-    Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesFrontToBack);
+    SortFrontToBack2Pass(sortedBaseBatches_);
+    SortFrontToBack2Pass(sortedBatches_);
     
     // Sort each group front to back
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
@@ -783,7 +807,6 @@ void BatchQueue::SortFrontToBack()
         }
     }
     
-    // Now sort batch groups by the distance of the first batch
     sortedBaseBatchGroups_.Resize(baseBatchGroups_.Size());
     sortedBatchGroups_.Resize(batchGroups_.Size());
     
@@ -794,8 +817,8 @@ void BatchQueue::SortFrontToBack()
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
     
-    Sort(sortedBaseBatchGroups_.Begin(), sortedBaseBatchGroups_.End(), CompareBatchGroupsFrontToBack);
-    Sort(sortedBatchGroups_.Begin(), sortedBatchGroups_.End(), CompareBatchGroupsFrontToBack);
+    SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBaseBatchGroups_));
+    SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBatchGroups_));
 }
 
 void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
