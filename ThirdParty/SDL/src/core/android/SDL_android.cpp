@@ -324,7 +324,9 @@ extern "C" void Android_JNI_SetActivityTitle(const char *title)
 
     mid = mEnv->GetStaticMethodID(mActivityClass,"setActivityTitle","(Ljava/lang/String;)V");
     if (mid) {
-        mEnv->CallStaticVoidMethod(mActivityClass, mid, mEnv->NewStringUTF(title));
+        jstring jtitle = reinterpret_cast<jstring>(mEnv->NewStringUTF(title));
+        mEnv->CallStaticVoidMethod(mActivityClass, mid, jtitle);
+        mEnv->DeleteLocalRef(jtitle);
     }
 }
 
