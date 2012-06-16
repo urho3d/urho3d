@@ -136,6 +136,22 @@ The update of each Scene causes further events to be sent:
 
 Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics simulation steps will be performed on each frame to keep up the apparent passage if time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load. Note that the Engine's \ref Engine::SetMinFps "minimum FPS", by default 10, sets a hard cap for the timestep to prevent spiraling down to a complete halt; if exceeded, animation and physics will instead appear to slow down.
 
+\section MainLoop_ApplicationState Main loop and the application activation state
+
+The window's activation state (active or inactive, minimized or not) can be queried from the Input subsystem. It can also effect the main loop in the following ways:
+
+- Rendering is always skipped when the window is minimized.
+
+- To avoid spinning the CPU and GPU unnecessarily, it is possible to define a smaller maximum FPS when in inactive. See \ref Engine::SetMaxInactiveFps "SetMaxInactiveFps()"
+
+- It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS.) For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
+
+- On mobile devices the window becoming minimized can mean that it will never become maximized again, in case the OS decides it needs to free memory and kills your program. Therefore you should listen for the E_ACTIVATION event from the Input subsystem and immediately save your program state as applicable if the program becomes inactive/minimized.
+
+- On mobile devices it is also unsafe to access or create any graphics resources while the window is minimized (as the graphics context may be destroyed during this time); doing so can crash the program. It is recommended to leave the pause-minimized feature on to ensure you do not have to check for this in your update code.
+
+Note that on iOS you should never call \ref Engine::Exit "Exit()" as there is no officially sanctioned way to manually exit your program; the application would simply hang while no longer updating or rendering. On Android it is permitted (though perhaps not recommended) and will cause the activity to manually exit.
+
 
 \page SceneModel %Scene model
 

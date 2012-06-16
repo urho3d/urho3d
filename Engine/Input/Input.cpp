@@ -309,7 +309,7 @@ void Input::MakeActive()
     using namespace Activation;
     
     VariantMap eventData;
-
+    
     eventData[P_ACTIVE] = active_;
     eventData[P_MINIMIZED] = minimized_;
     SendEvent(E_ACTIVATION, eventData);

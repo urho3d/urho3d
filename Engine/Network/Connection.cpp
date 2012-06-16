@@ -464,6 +464,8 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
 
 void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 {
+    /// \todo On mobile devices processing this message may potentially cause a crash if it attempts to load new GPU resources
+    /// while the application is minimized
     if (IsClient())
     {
         LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
