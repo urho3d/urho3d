@@ -27,7 +27,6 @@
 #include "Color.h"
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
-#include "Image.h"
 #include "Resource.h"
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
@@ -99,8 +98,6 @@ public:
     unsigned GetDataSize(int width, int height) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
-    /// Return API-specific compressed texture format.
-    static unsigned GetDXTFormat(CompressedFormat format);
     /// Return the non-internal texture format corresponding to an OpenGL internal format.
     static unsigned GetExternalFormat(unsigned format);
     /// Return the data type corresponding to an OpenGL internal format.

@@ -162,7 +162,7 @@ struct DDSurfaceDesc2
     unsigned dwTextureStage_;
 };
 
-void CompressedLevel::Decompress(unsigned char* dest)
+bool CompressedLevel::Decompress(unsigned char* dest)
 {
     int flags = 0;
     
@@ -181,8 +181,11 @@ void CompressedLevel::Decompress(unsigned char* dest)
         break;
     }
     
-    if (data_)
-        squish::DecompressImage(dest, width_, height_, data_, flags);
+    if (!flags || !data_)
+        return false;
+    
+    squish::DecompressImage(dest, width_, height_, data_, flags);
+    return true;
 }
 
 OBJECTTYPESTATIC(Image);
@@ -206,24 +209,10 @@ void Image::RegisterObject(Context* context)
 
 bool Image::Load(Deserializer& source)
 {
-    // Check for DDS compressed format
-    if (source.ReadFileID() != "DDS ")
-    {
-        // Not DDS, use STBImage to load other image formats as uncompressed
-        source.Seek(0);
-        int width, height;
-        unsigned components;
-        unsigned char* pixelData = GetImageData(source, width, height, components);
-        if (!pixelData)
-        {
-            LOGERROR("Could not load image: " + String(stbi_failure_reason()));
-            return false;
-        }
-        SetSize(width, height, components);
-        SetData(pixelData);
-        FreeImageData(pixelData);
-    }
-    else
+    // Check for DDS or KTX compressed format
+    String fileID = source.ReadFileID();
+    
+    if (fileID == "DDS ")
     {
         // DDS compressed format
         DDSurfaceDesc2 ddsd;
@@ -250,7 +239,7 @@ bool Image::Load(Deserializer& source)
             LOGERROR("Unsupported DDS format");
             return false;
         }
-
+        
         unsigned dataSize = source.GetSize() - source.GetPosition();
         data_ = new unsigned char[dataSize];
         width_ = ddsd.dwWidth_;
@@ -260,6 +249,112 @@ bool Image::Load(Deserializer& source)
             numCompressedLevels_ = 1;
         SetMemoryUse(dataSize);
         source.Read(data_.Get(), dataSize);
+    }
+    else if (fileID == "\253KTX")
+    {
+        source.Seek(12);
+        
+        unsigned endianness = source.ReadUInt();
+        unsigned type = source.ReadUInt();
+        unsigned typeSize = source.ReadUInt();
+        unsigned format = source.ReadUInt();
+        unsigned internalFormat = source.ReadUInt();
+        unsigned baseInternalFormat = source.ReadUInt();
+        unsigned width = source.ReadUInt();
+        unsigned height = source.ReadUInt();
+        unsigned depth = source.ReadUInt();
+        unsigned arrayElements = source.ReadUInt();
+        unsigned faces = source.ReadUInt();
+        unsigned mipmaps = source.ReadUInt();
+        unsigned keyValueBytes = source.ReadUInt();
+        
+        if (endianness != 0x04030201)
+        {
+            LOGERROR("Big-endian KTX files not supported");
+            return false;
+        }
+        
+        if (type != 0 || format != 0)
+        {
+            LOGERROR("Uncompressed KTX files not supported");
+            return false;
+        }
+        
+        if (faces > 1 || depth > 1)
+        {
+            LOGERROR("3D or cube KTX files not supported");
+            return false;
+        }
+        
+        if (mipmaps == 0)
+        {
+            LOGERROR("KTX files without explicitly specified mipmap count not supported");
+            return false;
+        }
+        
+        compressedFormat_ = CF_NONE;
+        switch (internalFormat)
+        {
+        case 0x83f1:
+            compressedFormat_ = CF_DXT1;
+            components_ = 4;
+            break;
+            
+        case 0x83f2:
+            compressedFormat_ = CF_DXT3;
+            components_ = 4;
+            break;
+            
+        case 0x83f3:
+            compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+            
+        case 0x8d64:
+            compressedFormat_ = CF_ETC1;
+            components_ = 3;
+            break;
+        }
+        
+        if (compressedFormat_ == CF_NONE)
+        {
+            LOGERROR("Unrecognized texture format in KTX file");
+            return false;
+        }
+        
+        source.Seek(source.GetPosition() + keyValueBytes);
+        unsigned dataSize = source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned);
+        
+        data_ = new unsigned char[dataSize];
+        width_ = width;
+        height_ = height;
+        numCompressedLevels_ = mipmaps;
+        
+        unsigned dataOffset = 0;
+        for (unsigned i = 0; i < mipmaps; ++i)
+        {
+            unsigned levelSize = source.ReadUInt();
+            source.Read(&data_[dataOffset], levelSize);
+            dataOffset += levelSize;
+        }
+        
+        SetMemoryUse(dataSize);
+    }
+    else
+    {
+        // Not DDS or KTX, use STBImage to load other image formats as uncompressed
+        source.Seek(0);
+        int width, height;
+        unsigned components;
+        unsigned char* pixelData = GetImageData(source, width, height, components);
+        if (!pixelData)
+        {
+            LOGERROR("Could not load image: " + String(stbi_failure_reason()));
+            return false;
+        }
+        SetSize(width, height, components);
+        SetData(pixelData);
+       
     }
     
     return true;
@@ -506,7 +601,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     level.compressedFormat_ = compressedFormat_;
     level.width_ = width_;
     level.height_ = height_;
-    level.blockSize_ = compressedFormat_ == CF_DXT1 ? 8 : 16;
+    level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
     unsigned i = 0;
     unsigned offset = 0;
     

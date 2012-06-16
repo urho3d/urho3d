@@ -202,9 +202,9 @@ bool Texture::IsCompressed() const
         format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     #else
     #ifdef ANDROID
-    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_ETC1_RGB8_OES;
     #else
-    return false;
+    return format_ == GL_ETC1_RGB8_OES;
     #endif
     #endif
 }
@@ -265,37 +265,19 @@ unsigned Texture::GetRowDataSize(int width) const
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
     #endif
-            
+    
     #ifndef GL_ES_VERSION_2_0
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
         return ((width + 3) >> 2) * 16;
+    #else
+    case GL_ETC1_RGB8_OES:
+        return ((width + 3) >> 2) * 8;
     #endif
         
     default:
         return 0;
     }
-}
-
-unsigned Texture::GetDXTFormat(CompressedFormat format)
-{
-    switch (format)
-    {
-    #if !defined(GL_ES_VERSION_2_0) || defined(ANDROID)
-    case CF_DXT1:
-        return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-    #endif
-            
-    #ifndef GL_ES_VERSION_2_0
-    case CF_DXT3:
-        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-        
-    case CF_DXT5:
-        return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    #endif
-    }
-    
-    return 0;
 }
 
 unsigned Texture::GetExternalFormat(unsigned format)
@@ -311,10 +293,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
     else
         return format;
     #else
-    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES)
-        return GL_DEPTH_COMPONENT;
-    else
-        return format;
+    return format;
     #endif
 }
 

@@ -2326,7 +2326,6 @@ Properties:<br>
 - bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool hiresShadowSupport (readonly)
-- bool compressedTextureSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)

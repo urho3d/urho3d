@@ -32,7 +32,8 @@ enum CompressedFormat
     CF_NONE = 0,
     CF_DXT1,
     CF_DXT3,
-    CF_DXT5
+    CF_DXT5,
+    CF_ETC1
 };
 
 /// Compressed image mip level.
@@ -50,8 +51,8 @@ struct CompressedLevel
     {
     }
     
-    /// Decompress. The destination buffer required is width * height * 4 bytes.
-    void Decompress(unsigned char* dest);
+    /// Decompress. The destination buffer required is width * height * 4 bytes. Return true if successful.
+    bool Decompress(unsigned char* dest);
     
     /// Compressed image data.
     unsigned char* data_;

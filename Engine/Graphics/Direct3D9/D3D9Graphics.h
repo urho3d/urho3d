@@ -26,6 +26,7 @@
 #include "ArrayPtr.h"
 #include "Color.h"
 #include "HashMap.h"
+#include "Image.h"
 #include "Object.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"
@@ -236,12 +237,12 @@ public:
     bool GetHiresShadowSupport() const { return hiresShadowSupport_; }
     /// Return whether stream offset is supported.
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
-    /// Return whether DXT texture compression is supported. Always true on Direct3D9.
-    bool GetCompressedTextureSupport() const { return true; }
     /// Return supported fullscreen resolutions.
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
+    /// Return hardware format for a compressed image format, or 0 if unsupported.
+    unsigned GetFormat(CompressedFormat format) const;
     /// Return vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return current index buffer.

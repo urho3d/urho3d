@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "Image.h"
 #include "PackageFile.h"
 #include "ResourceCache.h"
 

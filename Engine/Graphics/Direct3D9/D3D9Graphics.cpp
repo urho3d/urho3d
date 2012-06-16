@@ -1712,6 +1712,23 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     return ret;
 }
 
+unsigned Graphics::GetFormat(CompressedFormat format) const
+{
+    switch (format)
+    {
+    case CF_DXT1:
+        return D3DFMT_DXT1;
+        
+    case CF_DXT3:
+        return D3DFMT_DXT3;
+        
+    case CF_DXT5:
+        return D3DFMT_DXT5;
+    }
+    
+    return 0;
+}
+
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;

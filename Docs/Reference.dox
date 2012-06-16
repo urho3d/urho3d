@@ -542,7 +542,7 @@ These differences need to be observed when using the low-level rendering functio
 
 OpenGL ES 2.0 has further limitations:
 
-- Only DXT1 compressed textures will be uploaded as compressed if the EXT_texture_compression_dxt1 extension is present. Other compressed texture formats will be uploaded as uncompressed RGBA. Mobile hardware specific compression formats such as ETC or PVRTC are not yet supported.
+- Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 compressed textures are supported through the .ktx file extension.
 
 - %Light pre-pass and deferred rendering are not supported due to missing multiple rendertarget support, and limited rendertarget formats.
 

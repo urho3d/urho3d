@@ -141,7 +141,7 @@ Graphics::Graphics(Context* context_) :
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareDepthSupport_(false),
-    compressedTextureSupport_(false),
+    dxtTextureSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -300,9 +300,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        compressedTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
+        dxtTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
         #else
-        compressedTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
+        dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
         #endif
     }
     
@@ -1582,6 +1582,31 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     
     return ret;
 }
+
+unsigned Graphics::GetFormat(CompressedFormat format) const
+{
+    switch (format)
+    {
+    #if !defined(GL_ES_VERSION_2_0) || defined(ANDROID)
+    case CF_DXT1:
+        return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : 0;
+    #endif
+        
+    #ifndef GL_ES_VERSION_2_0
+    case CF_DXT3:
+        return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : 0;
+        
+    case CF_DXT5:
+        return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : 0;
+    #else
+    case CF_ETC1:
+        return GL_ETC1_RGB8_OES;
+    #endif
+    }
+    
+    return 0;
+}
+
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {

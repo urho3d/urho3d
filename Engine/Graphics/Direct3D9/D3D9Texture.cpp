@@ -185,23 +185,6 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-unsigned Texture::GetDXTFormat(CompressedFormat format)
-{
-    switch (format)
-    {
-    case CF_DXT1:
-        return D3DFMT_DXT1;
-        
-    case CF_DXT3:
-        return D3DFMT_DXT3;
-        
-    case CF_DXT5:
-        return D3DFMT_DXT5;
-    }
-    
-    return 0;
-}
-
 void Texture::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

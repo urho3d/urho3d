@@ -86,8 +86,6 @@ public:
     unsigned GetDataSize(int width, int height) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
-    /// Return API-specific DXT compressed texture format.
-    static unsigned GetDXTFormat(CompressedFormat format);
     
     /// Load parameters.
     void LoadParameters();

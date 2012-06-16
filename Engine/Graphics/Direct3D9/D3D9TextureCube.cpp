@@ -413,7 +413,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         int width = image->GetWidth();
         int height = image->GetHeight();
         unsigned levels = image->GetNumCompressedLevels();
-        unsigned format = GetDXTFormat(image->GetCompressedFormat());
+        unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
         
         if (width != height)
         {

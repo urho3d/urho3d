@@ -280,10 +280,10 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         int width = image->GetWidth();
         int height = image->GetHeight();
         unsigned levels = image->GetNumCompressedLevels();
-        unsigned format = GetDXTFormat(image->GetCompressedFormat());
+        unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
         bool needDecompress = false;
         
-        if (!graphics_->GetCompressedTextureSupport() || !format)
+        if (!format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
