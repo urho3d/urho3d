@@ -37,6 +37,15 @@
 #include <GLee.h>
 #endif
 
+#ifdef GL_ES_VERSION_2_0
+#ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83f1
+#endif
+#ifndef GL_ETC1_RGB8_OES
+#define GL_ETC1_RGB8_OES 0x8d64
+#endif
+#endif
+
 #include <SDL.h>
 
 class Context;

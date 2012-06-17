@@ -390,6 +390,8 @@ private:
     bool hardwareDepthSupport_;
     /// DXT format support flag.
     bool dxtTextureSupport_;
+    /// ETC1 format support flag.
+    bool etcTextureSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.
