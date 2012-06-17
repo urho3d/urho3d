@@ -33,7 +33,11 @@ enum CompressedFormat
     CF_DXT1,
     CF_DXT3,
     CF_DXT5,
-    CF_ETC1
+    CF_ETC1,
+    CF_PVRTC_RGB_2BPP,
+    CF_PVRTC_RGBA_2BPP,
+    CF_PVRTC_RGB_4BPP,
+    CF_PVRTC_RGBA_4BPP,
 };
 
 /// Compressed image mip level.

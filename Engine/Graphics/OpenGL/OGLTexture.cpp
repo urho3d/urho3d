@@ -235,7 +235,14 @@ TextureUsage Texture::GetUsage() const
 unsigned Texture::GetDataSize(int width, int height) const
 {
     if (IsCompressed())
-        return GetRowDataSize(width) * ((height + 3) >> 2);
+    {
+        if (format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG)
+            return (Max(width_, 8) * Max(height_, 8) * 4 + 7) >> 3;
+        else if (format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG)
+            return (Max(width_, 8) * Max(height_, 8) * 2 + 7) >> 3;
+        else
+            return GetRowDataSize(width) * ((height + 3) >> 2);
+    }
     else
         return GetRowDataSize(width) * height;
 }
@@ -261,11 +268,9 @@ unsigned Texture::GetRowDataSize(int width) const
     #endif
         return width * 4;
         
-    #if !defined(GL_ES_VERSION_2_0) || defined(ANDROID)
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
-    #endif
-    
+        
     #ifndef GL_ES_VERSION_2_0
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
@@ -273,6 +278,14 @@ unsigned Texture::GetRowDataSize(int width) const
     #else
     case GL_ETC1_RGB8_OES:
         return ((width + 3) >> 2) * 8;
+        
+    case COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+    case COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+        return (width * 4 + 7) >> 3;
+        
+    case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+    case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+        return (width * 2 + 7) >> 3;
     #endif
         
     default:

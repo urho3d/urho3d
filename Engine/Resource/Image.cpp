@@ -209,7 +209,7 @@ void Image::RegisterObject(Context* context)
 
 bool Image::Load(Deserializer& source)
 {
-    // Check for DDS or KTX compressed format
+    // Check for DDS, KTX or PVR compressed format
     String fileID = source.ReadFileID();
     
     if (fileID == "DDS ")
@@ -314,11 +314,31 @@ bool Image::Load(Deserializer& source)
             compressedFormat_ = CF_ETC1;
             components_ = 3;
             break;
+            
+        case 0x8c00:
+            compressedFormat_ = CF_PVRTC_RGB_4BPP;
+            components_ = 3;
+            break;
+            
+        case 0x8c01:
+            compressedFormat_ = CF_PVRTC_RGB_2BPP;
+            components_ = 3;
+            break;
+            
+        case 0x8c02:
+            compressedFormat_ = CF_PVRTC_RGBA_4BPP;
+            components_ = 4;
+            break;
+            
+        case 0x8c03:
+            compressedFormat_ = CF_PVRTC_RGBA_2BPP;
+            components_ = 4;
+            break;
         }
         
         if (compressedFormat_ == CF_NONE)
         {
-            LOGERROR("Unrecognized texture format in KTX file");
+            LOGERROR("Unsupported texture format in KTX file");
             return false;
         }
         
@@ -340,9 +360,97 @@ bool Image::Load(Deserializer& source)
         
         SetMemoryUse(dataSize);
     }
+    else if (fileID == "PVR\3")
+    {
+        unsigned flags = source.ReadUInt();
+        unsigned pixelFormatLo = source.ReadUInt();
+        unsigned pixelFormatHi = source.ReadUInt();
+        unsigned colourSpace = source.ReadUInt();
+        unsigned channelType = source.ReadUInt();
+        unsigned height = source.ReadUInt();
+        unsigned width = source.ReadUInt();
+        unsigned depth = source.ReadUInt();
+        unsigned numSurfaces = source.ReadUInt();
+        unsigned numFaces = source.ReadUInt();
+        unsigned mipmapCount = source.ReadUInt();
+        unsigned metaDataSize = source.ReadUInt();
+        
+        if (depth > 1 || numFaces > 1)
+        {
+            LOGERROR("3D or cube PVR files not supported");
+            return false;
+        }
+        
+        if (mipmapCount == 0)
+        {
+            LOGERROR("PVR files without explicitly specified mipmap count not supported");
+            return false;
+        }
+        
+        compressedFormat_ = CF_NONE;
+        switch (pixelFormatLo)
+        {
+        case 0:
+            compressedFormat_ = CF_PVRTC_RGB_2BPP;
+            components_ = 3;
+            break;
+            
+        case 1:
+            compressedFormat_ = CF_PVRTC_RGBA_2BPP;
+            components_ = 4;
+            break;
+            
+        case 2:
+            compressedFormat_ = CF_PVRTC_RGB_4BPP;
+            components_ = 3;
+            break;
+            
+        case 3:
+            compressedFormat_ = CF_PVRTC_RGBA_4BPP;
+            components_ = 4;
+            break;
+            
+        case 6:
+            compressedFormat_ = CF_ETC1;
+            components_ = 3;
+            break;
+            
+        case 7:
+            compressedFormat_ = CF_DXT1;
+            components_ = 4;
+            break;
+            
+        case 9:
+            compressedFormat_ = CF_DXT3;
+            components_ = 4;
+            break;
+            
+        case 11:
+            compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+        }
+        
+        if (compressedFormat_ == CF_NONE)
+        {
+            LOGERROR("Unsupported texture format in PVR file");
+            return false;
+        }
+        
+        source.Seek(source.GetPosition() + metaDataSize);
+        unsigned dataSize = source.GetSize() - source.GetPosition();
+        
+        data_ = new unsigned char[dataSize];
+        width_ = width;
+        height_ = height;
+        numCompressedLevels_ = mipmapCount;
+        
+        source.Read(data_.Get(), dataSize);
+        SetMemoryUse(dataSize);
+    }
     else
     {
-        // Not DDS or KTX, use STBImage to load other image formats as uncompressed
+        // Not DDS, KTX or PVR, use STBImage to load other image formats as uncompressed
         source.Seek(0);
         int width, height;
         unsigned components;
@@ -601,36 +709,76 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     level.compressedFormat_ = compressedFormat_;
     level.width_ = width_;
     level.height_ = height_;
-    level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
-    unsigned i = 0;
-    unsigned offset = 0;
     
-    for (;;)
+    if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
     {
-        if (!level.width_)
-            level.width_ = 1;
-        if (!level.height_)
-            level.height_ = 1;
+        level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
+        unsigned i = 0;
+        unsigned offset = 0;
         
-        level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
-        level.rows_ = ((level.height_ + 3) / 4);
-        level.data_ = data_.Get() + offset;
-        level.dataSize_ = level.rows_ * level.rowSize_;
-        
-        if (offset + level.dataSize_ > GetMemoryUse())
+        for (;;)
         {
-            LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
-                " Datasize: " + String(GetMemoryUse()));
-            level.data_ = 0;
-            return level;
+            if (!level.width_)
+                level.width_ = 1;
+            if (!level.height_)
+                level.height_ = 1;
+            
+            level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
+            level.rows_ = ((level.height_ + 3) / 4);
+            level.data_ = data_.Get() + offset;
+            level.dataSize_ = level.rows_ * level.rowSize_;
+            
+            if (offset + level.dataSize_ > GetMemoryUse())
+            {
+                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                    " Datasize: " + String(GetMemoryUse()));
+                level.data_ = 0;
+                return level;
+            }
+            
+            if (i == index)
+                return level;
+            
+            offset += level.dataSize_;
+            level.width_ /= 2;
+            level.height_ /= 2;
+            ++i;
         }
+    }
+    else
+    {
+        level.blockSize_ = compressedFormat_ < CF_PVRTC_RGB_4BPP ? 2 : 4;
+        unsigned i = 0;
+        unsigned offset = 0;
         
-        if (i == index)
-            return level;
-        
-        offset += level.dataSize_;
-        level.width_ /= 2;
-        level.height_ /= 2;
-        ++i;
+        for (;;)
+        {
+            if (!level.width_)
+                level.width_ = 1;
+            if (!level.height_)
+                level.height_ = 1;
+            
+            int dataWidth = Max(level.width_, 8);
+            int dataHeight = Max(level.height_, 8);
+            level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
+            level.rows_ = dataHeight;
+            level.rowSize_ = level.dataSize_ / level.rows_;
+            
+            if (offset + level.dataSize_ > GetMemoryUse())
+            {
+                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                    " Datasize: " + String(GetMemoryUse()));
+                level.data_ = 0;
+                return level;
+            }
+            
+            if (i == index)
+                return level;
+            
+            offset += level.dataSize_;
+            level.width_ /= 2;
+            level.height_ /= 2;
+            ++i;
+        }
     }
 }

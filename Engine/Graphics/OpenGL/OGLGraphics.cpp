@@ -143,6 +143,7 @@ Graphics::Graphics(Context* context_) :
     hardwareDepthSupport_(false),
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
+    pvrtcTextureSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -305,6 +306,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         #else
         dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
         etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
+        pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
         #endif
     }
     
@@ -1601,6 +1603,18 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     #else
     case CF_ETC1:
         return etcTextureSupport_ ? GL_ETC1_RGB8_OES : 0;
+        
+    case CF_PVRTC_RGB_2BPP:
+        return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0;
+        
+    case CF_PVRTC_RGB_4BPP:
+        return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0;
+        
+    case CF_PVRTC_RGBA_2BPP:
+        return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0;
+        
+    case CF_PVRTC_RGBA_4BPP:
+        return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0;
     #endif
     }
     
