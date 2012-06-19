@@ -201,11 +201,9 @@ bool Texture::IsCompressed() const
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
         format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     #else
-    #ifdef ANDROID
-    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_ETC1_RGB8_OES;
-    #else
-    return format_ == GL_ETC1_RGB8_OES;
-    #endif
+    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_ETC1_RGB8_OES ||
+        format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG ||
+        format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
     #endif
 }
 
@@ -237,9 +235,9 @@ unsigned Texture::GetDataSize(int width, int height) const
     if (IsCompressed())
     {
         if (format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG)
-            return (Max(width_, 8) * Max(height_, 8) * 4 + 7) >> 3;
+            return (Max(width, 8) * Max(height, 8) * 4 + 7) >> 3;
         else if (format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG)
-            return (Max(width_, 8) * Max(height_, 8) * 2 + 7) >> 3;
+            return (Max(width, 16) * Max(height, 8) * 2 + 7) >> 3;
         else
             return GetRowDataSize(width) * ((height + 3) >> 2);
     }

@@ -758,8 +758,9 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             if (!level.height_)
                 level.height_ = 1;
             
-            int dataWidth = Max(level.width_, 8);
+            int dataWidth = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
             int dataHeight = Max(level.height_, 8);
+            level.data_ = data_.Get() + offset;
             level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
             level.rows_ = dataHeight;
             level.rowSize_ = level.dataSize_ / level.rows_;
