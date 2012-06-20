@@ -103,6 +103,8 @@ private:
     void MakeInactive();
     /// Clear input state.
     void ResetState();
+    /// Send an activation event. Called when minimized or active status changes.
+    void SendActivationEvent();
     /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.

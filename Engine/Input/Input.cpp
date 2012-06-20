@@ -139,18 +139,24 @@ void Input::Update()
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
     if (window)
     {
-        unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+        unsigned flags = SDL_GetWindowFlags(window);
+        bool oldMinimized = minimized_;
+        minimized_ = (flags & SDL_WINDOW_MINIMIZED) != 0;
+        
+        flags &= (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
         if (!active_ && graphics_->GetFullscreen() && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
             activated_ = true;
         else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             MakeInactive();
+        else if (minimized_ != oldMinimized)
+            SendActivationEvent();
+        
+        // Activate input now if necessary
+        if (activated_)
+            MakeActive();
     }
     else
         return;
-    
-    // Activate input now if necessary
-    if (activated_)
-        MakeActive();
     
     // Check for mouse move
     if (active_)
@@ -306,13 +312,7 @@ void Input::MakeActive()
     SDL_ShowCursor(SDL_FALSE);
     suppressNextMouseMove_ = true;
     
-    using namespace Activation;
-    
-    VariantMap eventData;
-    
-    eventData[P_ACTIVE] = active_;
-    eventData[P_MINIMIZED] = minimized_;
-    SendEvent(E_ACTIVATION, eventData);
+    SendActivationEvent();
 }
 
 void Input::MakeInactive()
@@ -328,12 +328,7 @@ void Input::MakeInactive()
     // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
     
-    using namespace Activation;
-    
-    VariantMap eventData;
-    eventData[P_ACTIVE] = active_;
-    eventData[P_MINIMIZED] = minimized_;
-    SendEvent(E_ACTIVATION, eventData);
+    SendActivationEvent();
 }
 
 void Input::ResetState()
@@ -364,6 +359,16 @@ void Input::ResetState()
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     mouseButtonPress_ = 0;
+}
+
+void Input::SendActivationEvent()
+{
+    using namespace Activation;
+    
+    VariantMap eventData;
+    eventData[P_ACTIVE] = IsActive();
+    eventData[P_MINIMIZED] = IsMinimized();
+    SendEvent(E_ACTIVATION, eventData);
 }
 
 void Input::SetMouseButton(int button, bool newState)
@@ -618,14 +623,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 input->GetSubsystem<Graphics>()->Close();
                 break;
                 
-            case SDL_WINDOWEVENT_MINIMIZED:
-                input->minimized_ = true;
-                break;
-                
-            case SDL_WINDOWEVENT_RESTORED:
-                input->minimized_ = false;
-                break;
-                
             #ifdef ANDROID
             case SDL_WINDOWEVENT_SURFACE_LOST:
                 // Mark GPU objects lost
@@ -666,9 +663,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SetCursorPosition(center);
     lastCursorPosition_ = center;
     activated_ = true;
-    
-    // After setting new screen mode we should not be minimized
-    minimized_ = false;
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
