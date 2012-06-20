@@ -30,7 +30,8 @@
 
 GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
-    object_(0)
+    object_(0),
+    dataLost_(false)
 {
     if (graphics_)
         graphics->AddGPUObject(this);
@@ -40,4 +41,9 @@ GPUObject::~GPUObject()
 {
     if (graphics_)
         graphics_->RemoveGPUObject(this);
+}
+
+void GPUObject::ClearDataLost()
+{
+    dataLost_ = false;
 }

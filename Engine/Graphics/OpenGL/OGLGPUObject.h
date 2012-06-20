@@ -43,14 +43,21 @@ public:
     /// Unconditionally release the GPU resource.
     virtual void Release() {}
     
+    /// Clear the data lost flag.
+    void ClearDataLost();
+    
     /// Return the graphics subsystem.
     Graphics* GetGraphics() const { return graphics_; }
     /// Return the object's OpenGL handle.
     unsigned GetGPUObject() const { return object_; }
+    /// Return whether data is lost due to context loss.
+    bool IsDataLost() const { return dataLost_; }
     
 protected:
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Object handle.
     unsigned object_;
+    /// Data lost flag.
+    bool dataLost_;
 };

@@ -43,8 +43,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     lockStart_(0),
     lockCount_(0),
     lockScratchData_(0),
-    shadowed_(false),
-    dataLost_(false)
+    shadowed_(false)
 {
     // Force shadowing mode if graphics subsystem does not exist
     if (!graphics_)
@@ -273,11 +272,6 @@ void IndexBuffer::Unlock()
         lockState_ = LOCK_NONE;
         break;
     }
-}
-
-void IndexBuffer::ClearDataLost()
-{
-    dataLost_ = false;
 }
 
 bool IndexBuffer::IsDynamic() const

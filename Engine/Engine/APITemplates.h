@@ -688,7 +688,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     RegisterResource<T>(engine, className);
     RegisterSubclass<Texture, T>(engine, "Texture", className);
     engine->RegisterObjectMethod(className, "void SetNumLevels(uint)", asMETHOD(T, SetNumLevels), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void ClearDataLost()", asMETHOD(T, ClearDataLost), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ClearDataLost()", asMETHODPR(T, ClearDataLost, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "TextureUsage get_usage() const", asMETHOD(T, GetUsage), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_format() const", asMETHOD(T, GetFormat), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_compressed() const", asMETHOD(T, IsCompressed), asCALL_THISCALL);
@@ -705,7 +705,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "const Color& get_borderColor() const", asMETHOD(T, GetBorderColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_backupTexture(Texture@+)", asMETHOD(T, SetBackupTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture@+ get_backupTexture() const", asMETHOD(T, GetBackupTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHOD(T, IsDataLost), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHODPR(T, IsDataLost, () const, bool), asCALL_THISCALL);
 }
 
 static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)

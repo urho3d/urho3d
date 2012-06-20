@@ -76,7 +76,6 @@ Texture::Texture(Context* context) :
     dynamic_(false),
     shadowCompare_(false),
     parametersDirty_(true),
-    dataLost_(false),
     filterMode_(FILTER_DEFAULT)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
@@ -126,11 +125,6 @@ void Texture::SetBackupTexture(Texture* texture)
 void Texture::SetParametersDirty()
 {
     parametersDirty_ = true;
-}
-
-void Texture::ClearDataLost()
-{
-    dataLost_ = false;
 }
 
 void Texture::UpdateParameters()

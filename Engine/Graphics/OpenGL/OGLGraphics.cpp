@@ -1544,6 +1544,12 @@ bool Graphics::IsInitialized() const
 
 bool Graphics::IsDeviceLost() const
 {
+    // On iOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
+    #ifdef IOS
+    if (impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED) != 0)
+        return true;
+    #endif
+    
     return impl_->context_ == 0;
 }
 

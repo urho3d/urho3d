@@ -58,15 +58,11 @@ public:
     void* Lock(unsigned start, unsigned count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
-    /// Clear data lost flag.
-    void ClearDataLost();
     
     /// Return whether CPU memory shadowing is enabled.
     bool IsShadowed() const { return shadowed_; }
     /// Return whether is dynamic.
     bool IsDynamic() const;
-    /// Return whether default pool data is lost.
-    bool IsDataLost() const { return dataLost_; }
     /// Return whether is currently locked.
     bool IsLocked() const { return lockState_ != LOCK_NONE; }
     /// Return number of indices.
@@ -108,6 +104,4 @@ private:
     void* lockScratchData_;
     /// Shadowed flag.
     bool shadowed_;
-    /// Default pool data lost flag.
-    bool dataLost_;
 };

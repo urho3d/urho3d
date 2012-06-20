@@ -76,8 +76,7 @@ VertexBuffer::VertexBuffer(Context* context) :
     lockStart_(0),
     lockCount_(0),
     lockScratchData_(0),
-    shadowed_(false),
-    dataLost_(false)
+    shadowed_(false)
 {
     UpdateOffsets();
     
@@ -313,11 +312,6 @@ void VertexBuffer::Unlock()
         lockState_ = LOCK_NONE;
         break;
     }
-}
-
-void VertexBuffer::ClearDataLost()
-{
-    dataLost_ = false;
 }
 
 bool VertexBuffer::IsDynamic() const

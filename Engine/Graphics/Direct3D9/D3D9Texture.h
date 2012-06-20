@@ -53,8 +53,6 @@ public:
     void SetBorderColor(const Color& color);
     /// %Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
-    /// Clear default pool data lost flag.
-    void ClearDataLost();
     
     /// Return texture format.
     unsigned GetFormat() const { return format_; }
@@ -66,8 +64,6 @@ public:
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
-    /// Return whether default pool data is lost.
-    bool IsDataLost() const { return dataLost_; }
     /// Return filtering mode.
     TextureFilterMode GetFilterMode() const { return filterMode_; }
     /// Return addressing mode by texture coordinate.
@@ -112,8 +108,6 @@ protected:
     int width_;
     /// Texture height.
     int height_;
-    /// Default pool data lost flag.
-    bool dataLost_;
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.

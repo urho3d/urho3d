@@ -44,8 +44,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     lockCount_(0),
     lockScratchData_(0),
     shadowed_(false),
-    dynamic_(false),
-    dataLost_(false)
+    dynamic_(false)
 {
     // Force shadowing mode if graphics subsystem does not exist
     if (!graphics_)
@@ -249,11 +248,6 @@ void IndexBuffer::Unlock()
         lockState_ = LOCK_NONE;
         break;
     }
-}
-
-void IndexBuffer::ClearDataLost()
-{
-    dataLost_ = false;
 }
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)

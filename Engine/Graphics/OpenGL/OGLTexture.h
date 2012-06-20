@@ -57,8 +57,6 @@ public:
     void SetBackupTexture(Texture* texture);
     /// Dirty the parameters.
     void SetParametersDirty();
-    /// Clear data lost flag. No-op on OpenGL.
-    void ClearDataLost();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture.
     void UpdateParameters();
     
@@ -74,8 +72,6 @@ public:
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
-    /// Return whether data is lost due to context loss.
-    bool IsDataLost() const { return dataLost_; }
     /// Return whether parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_; }
     /// Return filtering mode.
@@ -132,8 +128,6 @@ protected:
     bool shadowCompare_;
     /// Parameters dirty flag.
     bool parametersDirty_;
-    /// Data lost flag.
-    bool dataLost_;
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.

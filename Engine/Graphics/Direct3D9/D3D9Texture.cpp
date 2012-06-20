@@ -63,7 +63,6 @@ Texture::Texture(Context* context) :
     requestedLevels_(0),
     width_(0),
     height_(0),
-    dataLost_(false),
     filterMode_(FILTER_DEFAULT)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
@@ -102,11 +101,6 @@ void Texture::SetBorderColor(const Color& color)
 void Texture::SetBackupTexture(Texture* texture)
 {
     backupTexture_ = texture;
-}
-
-void Texture::ClearDataLost()
-{
-    dataLost_ = false;
 }
 
 bool Texture::IsCompressed() const

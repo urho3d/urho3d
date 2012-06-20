@@ -57,15 +57,11 @@ public:
     void* Lock(unsigned start, unsigned count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
-    /// Clear data lost flag.
-    void ClearDataLost();
     
     /// Return whether CPU memory shadowing is enabled.
     bool IsShadowed() const { return shadowed_; }
     /// Return whether is dynamic.
     bool IsDynamic() const { return dynamic_; }
-    /// Return whether data is lost due to context loss.
-    bool IsDataLost() const { return dataLost_; }
     /// Return whether is currently locked.
     bool IsLocked() const { return lockState_ != LOCK_NONE; }
     /// Return number of vertices.
@@ -122,6 +118,4 @@ private:
     bool shadowed_;
     /// Dynamic flag.
     bool dynamic_;
-    /// Data lost flag.
-    bool dataLost_;
 };

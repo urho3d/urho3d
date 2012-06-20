@@ -139,17 +139,11 @@ void Input::Update()
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
     if (window)
     {
-        unsigned flags = SDL_GetWindowFlags(window);
-        bool oldMinimized = minimized_;
-        minimized_ = (flags & SDL_WINDOW_MINIMIZED) != 0;
-        
-        flags &= (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+        unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
         if (!active_ && graphics_->GetFullscreen() && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
             activated_ = true;
         else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             MakeInactive();
-        else if (minimized_ != oldMinimized)
-            SendActivationEvent();
         
         // Activate input now if necessary
         if (activated_)
@@ -623,6 +617,17 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 input->GetSubsystem<Graphics>()->Close();
                 break;
                 
+            case SDL_WINDOWEVENT_MINIMIZED:
+                input->minimized_ = true;
+                input->SendActivationEvent();
+                break;
+                
+            case SDL_WINDOWEVENT_MAXIMIZED:
+            case SDL_WINDOWEVENT_RESTORED:
+                input->minimized_ = false;
+                input->SendActivationEvent();
+                break;
+                
             #ifdef ANDROID
             case SDL_WINDOWEVENT_SURFACE_LOST:
                 // Mark GPU objects lost
@@ -650,7 +655,8 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
     // mouse move event. Also get the new window ID in case it changed
-    unsigned newWindowID = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
+    SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    unsigned newWindowID = SDL_GetWindowID(window);
     if (newWindowID != windowID_)
     {
         MutexLock lock(GetStaticMutex());
@@ -663,6 +669,9 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SetCursorPosition(center);
     lastCursorPosition_ = center;
     activated_ = true;
+    
+    // After setting a new screen mode we should not be minimized
+    minimized_ = (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
