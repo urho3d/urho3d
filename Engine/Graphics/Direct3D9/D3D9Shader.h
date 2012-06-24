@@ -23,7 +23,10 @@
 
 #pragma once
 
+#include "HashMap.h"
+#include "HashSet.h"
 #include "Resource.h"
+#include "ShaderParser.h"
 
 class ShaderVariation;
 
@@ -44,22 +47,17 @@ public:
     virtual bool Load(Deserializer& source);
     
     /// Return a named variation. Return null if not found.
-    ShaderVariation* GetVariation(const String& name);
-    /// Release (unload) all variations.
-    void ReleaseAll();
-    
-    /// Return shader type.
-    ShaderType GetShaderType() const { return shaderType_; }
-    /// Return whether requires Shader Model 3.
-    bool IsSM3() const { return isSM3_; }
-    /// Return number of variations.
-    unsigned GetNumVariations() const { return variations_.Size(); }
+    ShaderVariation* GetVariation(ShaderType type, const String& name);
+    /// Prepare a shader variation by either compiling it or loading the already compiled bytecode.
+    bool PrepareVariation(ShaderVariation* variation);
     
 private:
-    /// Shader type.
-    ShaderType shaderType_;
-    /// Shader Model 3 flag.
-    bool isSM3_;
-    /// Shader variations. Will be in an unloaded state until requested.
-    HashMap<StringHash, SharedPtr<ShaderVariation> > variations_;
+    /// Absolute filename of the shader description file.
+    String fullFileName_;
+    /// Shader source last modified time.
+    unsigned sourceModifiedTime_;
+    /// Vertex shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
+    /// Pixel shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
 };

@@ -19,7 +19,7 @@ elseif (IOS)
     set (RESOURCE_DIR \${TARGET_BUILD_DIR}/\${FULL_PRODUCT_NAME})
     set (CMAKE_EXE_LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
     add_executable (${TARGET_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
-    add_dependencies (${TARGET_NAME} Models Shaders)
+    add_dependencies (${TARGET_NAME} Models)
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
         COMMAND rsync -a --exclude=*/.svn* ${CMAKE_SOURCE_DIR}/Bin/CoreData ${RESOURCE_DIR}
         COMMAND rsync -a --exclude=*/.svn* ${CMAKE_SOURCE_DIR}/Bin/Data ${RESOURCE_DIR}

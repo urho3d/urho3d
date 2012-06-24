@@ -63,7 +63,7 @@ class ShaderVariation : public RefCounted, public GPUObject
 {
 public:
     /// Construct.
-    ShaderVariation(Shader* owner, ShaderType type, bool isSM3);
+    ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
     virtual ~ShaderVariation();
     
@@ -89,12 +89,12 @@ public:
     ShaderType GetShaderType() const { return shaderType_; }
     /// Return full shader name.
     const String& GetName() const { return name_; }
+    /// Return parent shader resource.
+    Shader* GetOwner() const;
     /// Return whether created successfully.
     bool IsCreated() const;
     /// Return whether compile failed.
     bool IsFailed() const { return failed_; }
-    /// Return whether requires Shader Model 3.
-    bool IsSM3() const { return isSM3_; }
     /// Return whether uses a parameter.
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
@@ -103,14 +103,14 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
     
 private:
+    /// Parent shader resource.
+    WeakPtr<Shader> owner_;
     /// Shader type.
     ShaderType shaderType_;
     /// Full shader name.
     String name_;
     /// Shader bytecode.
     SharedArrayPtr<unsigned char> byteCode_;
-    /// Shader Model 3 flag.
-    bool isSM3_;
     /// Compile failed flag.
     bool failed_;
     /// Shader parameters.

@@ -35,7 +35,6 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <direct.h>
-#include <process.h>
 #include <shlobj.h>
 #else
 #include <dirent.h>
@@ -135,13 +134,34 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         String fixedFileName = GetNativePath(fileName);
         
         #ifdef WIN32
-        PODVector<const char*> argPtrs;
-        argPtrs.Push(fixedFileName.CString());
-        for (unsigned i = 0; i < arguments.Size(); ++i)
-            argPtrs.Push(arguments[i].CString());
-        argPtrs.Push(0);
+        // Add .exe extension if no extension defined
+        if (GetExtension(fixedFileName).Empty())
+            fixedFileName += ".exe";
         
-        return _spawnv(_P_WAIT, fixedFileName.CString(), &argPtrs[0]);
+        String commandLine = "\"" + fixedFileName + "\"";
+        for (unsigned i = 0; i < arguments.Size(); ++i)
+            commandLine += " " + arguments[i];
+        
+        STARTUPINFOW startupInfo;
+        PROCESS_INFORMATION processInfo;
+        memset(&startupInfo, 0, sizeof startupInfo);
+        memset(&processInfo, 0, sizeof processInfo);
+        
+        WString commandLineW(commandLine);
+        if (!CreateProcessW(NULL, (wchar_t*)commandLineW.CString(), 0, 0, 0, CREATE_NO_WINDOW, 0, 0, &startupInfo, &processInfo))
+        {
+            LOGERROR("Failed to execute command " + commandLine);
+            return -1;
+        }
+        
+        WaitForSingleObject(processInfo.hProcess, INFINITE);
+        DWORD exitCode;
+        GetExitCodeProcess(processInfo.hProcess, &exitCode);
+        
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+        
+        return exitCode;
         #else
         pid_t pid = fork();
         if (!pid)
@@ -265,7 +285,7 @@ bool FileSystem::Delete(const String& fileName)
     #endif
 }
 
-String FileSystem::GetCurrentDir()
+String FileSystem::GetCurrentDir() const
 {
     #ifdef WIN32
     wchar_t path[MAX_PATH];
@@ -280,7 +300,7 @@ String FileSystem::GetCurrentDir()
     #endif
 }
 
-bool FileSystem::CheckAccess(const String& pathName)
+bool FileSystem::CheckAccess(const String& pathName) const
 {
     String fixedPath = AddTrailingSlash(pathName);
     
@@ -303,7 +323,33 @@ bool FileSystem::CheckAccess(const String& pathName)
     return false;
 }
 
-bool FileSystem::FileExists(const String& fileName)
+unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
+{
+    if (fileName.Empty() || !CheckAccess(fileName))
+        return 0;
+    
+    #ifdef WIN32
+    WIN32_FILE_ATTRIBUTE_DATA fileAttrData;
+    memset(&fileAttrData, 0, sizeof fileAttrData);
+    if (GetFileAttributesExW(WString(fileName).CString(), GetFileExInfoStandard, &fileAttrData))
+    {
+        ULARGE_INTEGER ull;
+        ull.LowPart = fileAttrData.ftLastWriteTime.dwLowDateTime;
+        ull.HighPart = fileAttrData.ftLastWriteTime.dwHighDateTime;
+        return (unsigned)(ull.QuadPart / 10000000ULL - 11644473600ULL);
+    }
+    else
+        return 0;
+    #else
+    struct stat st;
+    if (!stat(fileName.CString(), &st))
+        return (unsigned)st.st_mtime;
+    else
+        return 0;
+    #endif
+}
+
+bool FileSystem::FileExists(const String& fileName) const
 {
     if (!CheckAccess(GetPath(fileName)))
         return false;
@@ -337,7 +383,7 @@ bool FileSystem::FileExists(const String& fileName)
     return true;
 }
 
-bool FileSystem::DirExists(const String& pathName)
+bool FileSystem::DirExists(const String& pathName) const
 {
     if (!CheckAccess(pathName))
         return false;
@@ -363,7 +409,7 @@ bool FileSystem::DirExists(const String& pathName)
     return true;
 }
 
-void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive)
+void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const
 {
     result.Clear();
     
@@ -374,7 +420,7 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
     }
 }
 
-String FileSystem::GetProgramDir()
+String FileSystem::GetProgramDir() const
 {
     #if defined(ANDROID)
     // This is an internal directory specifier pointing to the assets in the .apk
@@ -405,8 +451,8 @@ String FileSystem::GetProgramDir()
     #endif
 }
 
-String FileSystem::GetUserDocumentsDir()
-{          
+String FileSystem::GetUserDocumentsDir() const
+{
     #if defined(ANDROID)
     return AddTrailingSlash(SDL_Android_GetFilesDir());
     #elif defined(IOS)
@@ -433,7 +479,7 @@ void FileSystem::RegisterPath(const String& pathName)
 }
 
 void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
-    const String& filter, unsigned flags, bool recursive)
+    const String& filter, unsigned flags, bool recursive) const
 {
     path = AddTrailingSlash(path);
     String deltaPath;

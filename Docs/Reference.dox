@@ -460,7 +460,7 @@ On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering cont
 
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
-See \ref VertexBuffer::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
+See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D and TextureCube classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
 \section Rendering_Further Further details
 
@@ -534,7 +534,7 @@ These differences need to be observed when using the low-level rendering functio
 
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
 
-- %Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 for Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
+- %Shader resources are stored in different locations depending on the API: Bin/CoreData/Shaders/HLSL for Direct3D9, and Bin/CoreData/Shaders/GLSL for OpenGL.
 
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
 
@@ -552,7 +552,7 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the CoreData/Materials & Data/Materials subdirectories, and techniques exist in the CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
 
 A material defines the textures, shader parameters and culling mode to use, and refers to techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
@@ -620,7 +620,7 @@ The purposes of the different passes are:
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
 
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the files Ambient.xml and ForwardLit.xml in either SourceAssets/HLSLShaders or SourceAssets/GLSLShaders to see which variations are required.
+Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the files Ambient.xml and ForwardLit.xml in either Bin/CoreData/Shaders/HLSL or Bin/CoreData/Shaders/GLSL to see which variations are required.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
@@ -1306,7 +1306,7 @@ Note that as the Profiler currently manages only a single hierarchy tree, profil
 
 \section Tools_AssetImporter AssetImporter
 
-Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
+Loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
 
 Usage:
 
@@ -1333,21 +1333,9 @@ Options:
 -t    Generate tangents to model(s)
 \endverbatim
 
-\section Tools_GLShaderProcessor GLShaderProcessor
-
-GLShaderProcessor creates final GLSL source code for vertex and pixel shaders, and enumerates the possible shader combinations. Unlike \ref Tools_ShaderCompiler "ShaderCompiler", compiling the shaders is left to runtime.
-
-Usage:
-\verbatim
-GLShaderProcessor <definitionfile> <outputpath> [define1] [define2]
-
-GLSL files will be loaded from definition file directory, and finalized GLSL +
-XML files are saved to the output path, preserving the subdirectory structure.
-\endverbatim
-
 \section Tools_OgreImporter OgreImporter
 
-Tool that loads OGRE .mesh.xml and .skeleton.xml files and saves them as Urho3D .mdl (model) and .ani (animation) files. For other 3D formats and whole scene importing, see AssetImporter instead. However that tool does not handle the OGRE formats as completely as this.
+Loads OGRE .mesh.xml and .skeleton.xml files and saves them as Urho3D .mdl (model) and .ani (animation) files. For other 3D formats and whole scene importing, see AssetImporter instead. However that tool does not handle the OGRE formats as completely as this.
 
 Usage:
 
@@ -1366,7 +1354,7 @@ Note: exporting only bone rotations may help when using an animation in a differ
 
 \section Tools_PackageTool PackageTool
 
-PackageTool examines a directory recursively for files and subdirectories, and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem.
+Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem.
 
 Usage:
 
@@ -1384,7 +1372,7 @@ PackageTool Data Data.pak
 
 \section Tools_RampGenerator RampGenerator
 
-RampGenerator creates 1D and 2D ramp textures for use in light attenuation and spotlight spot shapes.
+Creates 1D and 2D ramp textures for use in light attenuation and spotlight spot shapes.
 
 Usage:
 
@@ -1398,23 +1386,28 @@ The texconv tool from the DirectX SDK needs to be available through the system P
 
 \section Tools_ShaderCompiler ShaderCompiler
 
-This tool generates HLSL shader permutations using an XML definition file that describes the permutations, and their associated HLSL preprocessor defines.
+Compiles HLSL shaders using an XML definition file that describes the shader permutations, and their associated HLSL preprocessor defines.
 
 The output consists of shader bytecode for each permutation, as well as information of the constant parameters and texture units used. See \ref FileFormats_Shader "Binary shader format" for details.
 
 Usage:
 
 \verbatim
-ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2] ..
+ShaderCompiler <definitionfile> [options]
 
-HLSL files will be loaded from definition file directory, and binary files will
-be output to the output path, preserving the subdirectory structure.
+Options:
+-tVS|PS Compile only vertex or pixel shaders, by default compile both
+-vX     Compile only the shader variation X
+-dX     Add a define. Add SM3 to compile for Shader Model 3
+-dDefine Add an arbitrary define
+
+Shader binaries will be output into the same directory as the definition file.
+Specify a wildcard to compile multiple shaders from the directory.
 \endverbatim
 
-It is possible to give additional defines from the command line. These will then be present in each permutation. SM3 is a special define which enables compilation of VS3.0 and PS3.0 code, otherwise VS2.0 and PS2.0 code is generated.
+The D3DX library from the DirectX runtime or SDK needs to be installed. Note that when running in Direct3D9 mode, the engine will automatically invoke ShaderCompiler if it can not find a shader in binary form. Depending on shader complexity this can take a substantial amount of time. To avoid this, execute the file CompileAllShaders.bat in the Bin directory to precompile all shader permutations. It is also highly recommended to not ship ShaderCompiler with Urho3D applications, but to instead precompile all shaders. After precompiling you can delete all .hlsl files from the CoreData directory of the shipping build.
 
-The D3DX library from the DirectX runtime or SDK needs to be installed.
-
+Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use similar XML definition files, but no precompiling tool exists for them; they are always compiled during runtime.
 
 \page Unicode Unicode support
 
@@ -1551,31 +1544,17 @@ uint       Number of constant parameters
 
     For each constant parameter:
     cstring    Parameter name
+    byte       Register index
+    byte       Number of registers
 
 uint       Number of texture units
 
     For each texture unit:
     cstring    Texture unit name
+    byte       Sampler index
 
-uint       Number of shader variations
-
-    For each variation:
-    cstring    Variation name
-    uint       Number of constant parameters in use
-
-        For each constant parameter in use:
-        StringHash Parameter name hash
-        byte       Register index
-        byte       Number of registers
-
-    uint       Number of texture units in use
-
-        For each texture unit in use:
-        StringHash Texture unit name hash
-        byte       Sampler index
-
-    uint       Bytecode size
-    byte[]     Bytecode
+uint       Bytecode size
+byte[]     Bytecode
 \endverbatim
 
 \page CodingConventions Coding conventions

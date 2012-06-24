@@ -1,0 +1,9 @@
+<shaders>
+    <shader type="vs" />
+    <shader type="ps">
+        <variation name="Bright" define="BRIGHT" />
+        <variation name="HBlur" define="HBLUR" />
+        <variation name="VBlur" define="VBLUR" />
+        <variation name="Combine" define="COMBINE" />
+    </shader>
+</shaders>

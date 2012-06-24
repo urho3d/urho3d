@@ -112,13 +112,8 @@ bool ShaderVariation::Create()
     }
     
     for (unsigned i = 0; i < defines_.Size(); ++i)
-    {
-        Vector<String> nameAndValue = defines_[i].Split('=');
-        if (nameAndValue.Size() < 2)
-            defines += "#define " + defines_[i] + "\n";
-        else
-            defines += "#define " + nameAndValue[0] + " " + nameAndValue[1] + "\n";
-    }
+        defines += "#define " + defines_[i] + " " + defineValues_[i] + "\n";
+    
     if (!defines_.Empty())
         defines += "\n";
     
@@ -155,7 +150,11 @@ void ShaderVariation::SetSourceCode(const SharedArrayPtr<char>& code, unsigned l
     sourceCodeLength_ = length;
 }
 
-void ShaderVariation::SetDefines(const Vector<String>& defines)
+void ShaderVariation::SetDefines(const Vector<String>& defines, const Vector<String>& defineValues)
 {
-    defines_ = defines;
+    if (defines.Size() == defineValues.Size())
+    {
+        defines_ = defines;
+        defineValues_ = defineValues;
+    }
 }

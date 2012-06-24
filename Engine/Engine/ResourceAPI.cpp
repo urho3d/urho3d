@@ -110,9 +110,10 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "bool ReloadResource(Resource@+)", asMETHOD(ResourceCache, ReloadResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool Exists(const String&in) const", asMETHODPR(ResourceCache, Exists, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "File@ GetFile(const String&in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourceDir(const String&in)", asMETHOD(ResourceCache, GetPreferredResourceDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceName(const String&in)", asMETHOD(ResourceCache, SanitateResourceName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "const String& GetResourceName(StringHash)", asMETHOD(ResourceCache, GetResourceName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourceDir(const String&in) const", asMETHOD(ResourceCache, GetPreferredResourceDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceName(const String&in) const", asMETHOD(ResourceCache, SanitateResourceName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "const String& GetResourceName(StringHash) const", asMETHOD(ResourceCache, GetResourceName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "String GetResourceFileName(const String&in) const", asMETHOD(ResourceCache, GetResourceFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(ShortStringHash, StringHash)", asMETHODPR(ResourceCache, GetResource, (ShortStringHash, StringHash), Resource*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);

@@ -1,0 +1,10 @@
+<shaders>
+    <shader type="vs">
+        <option name="Mask" define="ALPHAMASK" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+    </shader>
+    <shader type="ps">
+        <option name="AlphaMask" define="ALPHAMASK" />
+    </shader>
+</shaders>

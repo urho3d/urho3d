@@ -31,10 +31,10 @@
 
 #include "DebugNew.h"
 
-ShaderVariation::ShaderVariation(Shader* owner, ShaderType type, bool isSM3) :
+ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
+    owner_(owner),
     shaderType_(type),
-    isSM3_(isSM3),
     failed_(false)
 {
     ClearParameters();
@@ -49,20 +49,24 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!graphics_ || !byteCode_)
+    if (!graphics_)
         return false;
+    
+    // Load bytecode and/or compile shader if necessary
+    if (!byteCode_ && owner_)
+        owner_->PrepareVariation(this);
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     if (shaderType_ == VS)
     {
-        if (!device || FAILED(device->CreateVertexShader(
+        if (!byteCode_ || !device || FAILED(device->CreateVertexShader(
             (const DWORD*)byteCode_.Get(),
             (IDirect3DVertexShader9**)&object_)))
             failed_ = true;
     }
     else
     {
-        if (!device || FAILED(device->CreatePixelShader(
+        if (!byteCode_ || !device || FAILED(device->CreatePixelShader(
             (const DWORD*)byteCode_.Get(),
             (IDirect3DPixelShader9**)&object_)))
             failed_ = true;
@@ -80,14 +84,14 @@ void ShaderVariation::Release()
         
         if (shaderType_ == VS)
         {
-            if (graphics_->GetPixelShader() == this)
+            if (graphics_->GetVertexShader() == this)
                 graphics_->SetShaders(0, 0);
             
             ((IDirect3DVertexShader9*)object_)->Release();
         }
         else
         {
-            if (graphics_->GetVertexShader() == this)
+            if (graphics_->GetPixelShader() == this)
                 graphics_->SetShaders(0, 0);
             
             ((IDirect3DPixelShader9*)object_)->Release();
@@ -107,10 +111,6 @@ void ShaderVariation::SetName(const String& name)
 void ShaderVariation::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
 {
     byteCode_ = byteCode;
-    
-    // Recreate object if already created from previous bytecode
-    if (object_)
-        Create();
 }
 
 void ShaderVariation::AddParameter(StringHash param, const ShaderParameter& definition)

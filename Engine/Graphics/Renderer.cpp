@@ -510,12 +510,12 @@ Viewport* Renderer::GetViewport(unsigned index) const
 
 ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
 {
-    return GetShader(name, vsFormat_, checkExists);
+    return GetShader(VS, name, checkExists);
 }
 
 ShaderVariation* Renderer::GetPixelShader(const String& name, bool checkExists) const
 {
-    return GetShader(name, psFormat_, checkExists);
+    return GetShader(PS, name, checkExists);
 }
 
 unsigned Renderer::GetNumGeometries(bool allViews) const
@@ -994,7 +994,7 @@ Camera* Renderer::GetShadowCamera()
     return camera;
 }
 
-ShaderVariation* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
+ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool checkExists) const
 {
     String shaderName = shaderPath_;
     String variationName;
@@ -1002,11 +1002,11 @@ ShaderVariation* Renderer::GetShader(const String& name, const String& extension
     unsigned split = name.Find('_');
     if (split != String::NPOS)
     {
-        shaderName += name.Substring(0, split) + extension;
+        shaderName += name.Substring(0, split) + ".xml";
         variationName = name.Substring(split + 1);
     }
     else
-        shaderName += name + extension;
+        shaderName += name + ".xml";
     
     if (checkExists)
     {
@@ -1016,7 +1016,7 @@ ShaderVariation* Renderer::GetShader(const String& name, const String& extension
     
     Shader* shader = cache_->GetResource<Shader>(shaderName);
     if (shader)
-        return shader->GetVariation(variationName);
+        return shader->GetVariation(type, variationName);
     else
         return 0;
 }
@@ -1415,27 +1415,10 @@ void Renderer::Initialize()
     graphics_ = graphics;
     cache_ = cache;
     
-    // Check shader model support
     #ifndef USE_OPENGL
-    if (graphics_->GetSM3Support())
-    {
-        shaderPath_ = "Shaders/SM3/";
-        vsFormat_ = ".vs3";
-        psFormat_ = ".ps3";
-    }
-    else
-    {
-        shaderPath_ = "Shaders/SM2/";
-        vsFormat_ = ".vs2";
-        psFormat_ = ".ps2";
-    }
-    
+    shaderPath_ = "Shaders/HLSL/";
     #else
-    {
-        shaderPath_ = "Shaders/GLSL/";
-        vsFormat_ = ".vert";
-        psFormat_ = ".frag";
-    }
+    shaderPath_ = "Shaders/GLSL/";
     #endif
     
     if (!graphics_->GetShadowMapFormat())

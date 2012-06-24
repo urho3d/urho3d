@@ -88,7 +88,7 @@ public:
     /// Load parameters from an XML file.
     void LoadParameters(XMLFile* xml);
     /// Load parameters from an XML element.
-    void LoadParameters(const XMLElement& elem);
+    void LoadParameters(const XMLElement& element);
     
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.

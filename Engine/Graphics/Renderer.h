@@ -306,7 +306,7 @@ public:
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
     /// Get a shader program.
-    ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
+    ShaderVariation* GetShader(ShaderType type, const String& name, bool checkExists) const;
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
@@ -428,10 +428,6 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
-    /// Vertex shader format.
-    String vsFormat_;
-    /// Pixel shader format.
-    String psFormat_;
     /// Base directory for shaders.
     String shaderPath_;
     /// Frame info for rendering.

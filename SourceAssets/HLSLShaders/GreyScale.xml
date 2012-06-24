@@ -1,4 +1,0 @@
-<shaders>
-    <shader name="GreyScale" type="vs" />
-    <shader name="GreyScale" type="ps" />
-</shaders>

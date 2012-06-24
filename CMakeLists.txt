@@ -120,43 +120,6 @@ macro (add_model NAME PARAMETERS)
     set (ALL_MODELS ${ALL_MODELS} ../../Bin/Data/Models/${NAME}.mdl)
 endmacro ()
 
-# Macro for shader asset compilation
-if (USE_OPENGL)
-    macro (add_shader NAME)
-        if (IOS)
-            add_custom_command (
-                OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
-                COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-                DEPENDS ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
-            )
-        else ()
-            add_custom_command (
-                OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
-                COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
-                DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Lighting.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
-            )
-        endif ()
-        
-        set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)
-    endmacro ()
-else ()
-    macro (add_shader NAME)
-        add_custom_command (
-            OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2
-            COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM2 SM2
-            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl ScreenPos.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
-        )
-            
-        add_custom_command (
-            OUTPUT ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3
-            COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM3 SM3
-            DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl Lighting.hlsl ScreenPos.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
-        )
-
-        set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2 ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3)
-    endmacro ()
-endif ()
-
 # Add SDL as a global include directory
 include_directories (ThirdParty/SDL/include)
 
@@ -187,22 +150,18 @@ add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (Urho3D)
 
-if (USE_OPENGL)
-    add_subdirectory (SourceAssets/GLSLShaders)
-    if (NOT IOS)
-        add_subdirectory (ThirdParty/GLee)
-        add_subdirectory (Tools/GLShaderProcessor)
-    endif ()
-else ()
-    add_subdirectory (SourceAssets/HLSLShaders)
-    add_subdirectory (Tools/ShaderCompiler)
-endif ()
-
 if (NOT IOS)
+    if (USE_OPENGL)
+        add_subdirectory (ThirdParty/GLee)
+    endif ()
     add_subdirectory (ThirdParty/Assimp)
     add_subdirectory (ThirdParty/LibCpuId)
     add_subdirectory (Tools/AssetImporter)
     add_subdirectory (Tools/OgreImporter)
     add_subdirectory (Tools/PackageTool)
     add_subdirectory (Tools/RampGenerator)
+endif ()
+
+if (NOT USE_OPENGL)
+    add_subdirectory (Tools/ShaderCompiler)
 endif ()

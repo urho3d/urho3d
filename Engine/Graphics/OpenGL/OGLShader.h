@@ -46,22 +46,22 @@ public:
     virtual bool Load(Deserializer& source);
     
     /// Return a named variation. Return null if not found.
-    ShaderVariation* GetVariation(const String& name);
-    /// Release (unload) all variations.
-    void ReleaseAll();
-    
-    /// Return shader type.
-    ShaderType GetShaderType() const { return shaderType_; }
-    /// Return number of variations.
-    unsigned GetNumVariations() const { return variations_.Size(); }
+    ShaderVariation* GetVariation(ShaderType type, const String& name);
     
 private:
-    /// Shader type.
-    ShaderType shaderType_;
-    /// GLSL source code.
-    SharedArrayPtr<char> sourceCode_;
-    /// Source code length.
-    unsigned sourceCodeLength_;
-    /// Shader variations. Will be in an unloaded state until requested.
-    HashMap<StringHash, SharedPtr<ShaderVariation> > variations_;
+    /// Process source code and include files. Return true if successful.
+    bool ProcessSource(SharedArrayPtr<char>& dest, unsigned& length, const String& fileName);
+    
+    /// Vertex shader GLSL source code.
+    SharedArrayPtr<char> vsSourceCode_;
+    /// Pixel shader GLSL source code.
+    SharedArrayPtr<char> psSourceCode_;
+    /// Vertex shader source code length.
+    unsigned vsSourceCodeLength_;
+    /// Pixel shader code length.
+    unsigned psSourceCodeLength_;
+    /// Vertex shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
+    /// Pixel shader variations.
+    HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
 };

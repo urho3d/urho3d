@@ -52,7 +52,7 @@ public:
     /// Set source code.
     void SetSourceCode(const SharedArrayPtr<char>& code, unsigned length);
     /// Set defines.
-    void SetDefines(const Vector<String>& defines);
+    void SetDefines(const Vector<String>& defines, const Vector<String>& defineValues);
     
     /// Return shader type.
     ShaderType GetShaderType() const { return shaderType_; }
@@ -60,6 +60,8 @@ public:
     const String& GetName() const { return name_; }
     /// Return defines.
     const Vector<String>& GetDefines() const { return defines_; }
+    /// Return define values.
+    const Vector<String>& GetDefineValues() const { return defineValues_; }
     /// Return whether successfully compiled.
     bool IsCompiled() const { return compiled_; }
     /// Return compile error/warning string.
@@ -76,6 +78,8 @@ private:
     unsigned sourceCodeLength_;
     /// Defines to use in compiling.
     Vector<String> defines_;
+    /// Define values to use in compiling.
+    Vector<String> defineValues_;
     /// Shader compile error string.
     String compilerOutput_;
     /// Compiled flag.

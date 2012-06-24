@@ -30,6 +30,7 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Shader.h"
+#include "ShaderParser.h"
 #include "ShaderVariation.h"
 #include "XMLFile.h"
 
@@ -39,8 +40,8 @@ OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :
     Resource(context),
-    shaderType_(VS),
-    sourceCodeLength_(0)
+    vsSourceCodeLength_(0),
+    psSourceCodeLength_(0)
 {
 }
 
@@ -57,61 +58,161 @@ bool Shader::Load(Deserializer& source)
 {
     PROFILE(LoadShader);
     
-    // Clear existing variations
-    variations_.Clear();
-    
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return false;
     
     unsigned memoryUse = sizeof(Shader);
+    vsSourceCodeLength_ = 0;
+    psSourceCodeLength_ = 0;
     
-    sourceCodeLength_ = source.GetSize();
-    sourceCode_ = new char[sourceCodeLength_];
-    source.Read(&sourceCode_[0], sourceCodeLength_);
-    memoryUse += sourceCodeLength_;
-    
-    String fileName = GetFileName(source.GetName());
-    String xmlName = source.GetName() + ".xml";
-    XMLFile* file = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(xmlName);
-    if (!file)
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    if (!xml->Load(source))
         return false;
     
-    XMLElement shaderElem = file->GetRoot();
-    shaderType_ = String(shaderElem.GetAttribute("type")) == "vs" ? VS : PS;
+    ShaderParser vsParser;
+    ShaderParser psParser;
+    Vector<String> globalDefines;
+    Vector<String> globalDefineValues;
     
-    XMLElement variationElem = shaderElem.GetChild("variation");
-    while (variationElem)
+    if (!vsParser.Parse(VS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
     {
-        String variationName = variationElem.GetAttribute("name");
-        StringHash nameHash(variationName);
-        SharedPtr<ShaderVariation> newVariation(new ShaderVariation(this, shaderType_));
-        if (!variationName.Empty())
-            newVariation->SetName(fileName + "_" + variationName);
-        else
-            newVariation->SetName(fileName);
-        newVariation->SetSourceCode(sourceCode_, sourceCodeLength_);
-        newVariation->SetDefines(String(variationElem.GetAttribute("defines")).Split(' '));
-        
-        if (variations_.Contains(nameHash))
-            LOGERROR("Shader variation name hash collision: " + variationName);
-        variations_[nameHash] = newVariation;
-        
-        variationElem = variationElem.GetNext();
-        memoryUse += sizeof(ShaderVariation);
+        LOGERROR("VS: " + vsParser.GetErrorMessage());
+        return false;
+    }
+    if (!psParser.Parse(PS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
+    {
+        LOGERROR("PS: " + psParser.GetErrorMessage());
+        return false;
     }
     
+    String path, fileName, extension;
+    SplitPath(GetName(), path, fileName, extension);
+    
+    if (!ProcessSource(vsSourceCode_, vsSourceCodeLength_, path + fileName + ".vert"))
+        return false;
+    if (!ProcessSource(psSourceCode_, psSourceCodeLength_, path + fileName + ".frag"))
+        return false;
+    
+    const Vector<ShaderCombination>& vsCombinations = vsParser.GetCombinations();
+    for (Vector<ShaderCombination>::ConstIterator i = vsCombinations.Begin(); i != vsCombinations.End(); ++i)
+    {
+        StringHash nameHash(i->name_);
+        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = vsVariations_.Find(nameHash);
+        if (j == vsVariations_.End())
+            j = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
+        else
+        {
+            // If shader variation already exists, release
+            j->second_->Release();
+        }
+        
+        j->second_->SetName(i->name_);
+        j->second_->SetSourceCode(vsSourceCode_, vsSourceCodeLength_);
+        j->second_->SetDefines(i->defines_, i->defineValues_);
+    }
+    
+    const Vector<ShaderCombination>& psCombinations = psParser.GetCombinations();
+    for (Vector<ShaderCombination>::ConstIterator i = psCombinations.Begin(); i != psCombinations.End(); ++i)
+    {
+        StringHash nameHash(i->name_);
+        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = psVariations_.Find(nameHash);
+        if (j == psVariations_.End())
+            j = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
+        else
+        {
+            // If shader variation already exists, release
+            j->second_->Release();
+        }
+        
+        j->second_->SetName(i->name_);
+        j->second_->SetSourceCode(psSourceCode_, psSourceCodeLength_);
+        j->second_->SetDefines(i->defines_, i->defineValues_);
+    }
+    
+    memoryUse += (vsVariations_.Size() + psVariations_.Size()) * sizeof(ShaderVariation);
+    memoryUse += vsSourceCodeLength_;
+    memoryUse += psSourceCodeLength_;
     SetMemoryUse(memoryUse);
+    
     return true;
 }
 
-ShaderVariation* Shader::GetVariation(const String& name)
+ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
 {
     StringHash nameHash(name);
-    HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
-    if (i != variations_.End())
-        return i->second_;
+    
+    if (type == VS)
+    {
+        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(nameHash);
+        if (i != vsVariations_.End())
+            return i->second_;
+        else
+            return 0;
+    }
     else
-        return 0;
+    {
+        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(nameHash);
+        if (i != psVariations_.End())
+            return i->second_;
+        else
+            return 0;
+    }
 }
 
+bool Shader::ProcessSource(SharedArrayPtr<char>& dest, unsigned& length, const String& fileName)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (!cache)
+        return false;
+    
+    Vector<String> glslCode;
+    
+    // Load the shader source code
+    SharedPtr<File> glslFile = cache->GetFile(fileName);
+    if (!glslFile)
+        return false;
+    
+    while (!glslFile->IsEof())
+        glslCode.Push(glslFile->ReadLine());
+    
+    // Process the code for includes
+    for (unsigned i = 0; i < glslCode.Size(); ++i)
+    {
+        if (glslCode[i].StartsWith("#include"))
+        {
+            String includeFileName = GetPath(fileName) + glslCode[i].Substring(9).Replaced("\"", "").Trimmed();
+            
+            SharedPtr<File> glslIncludeFile = cache->GetFile(includeFileName);
+            if (!glslIncludeFile)
+                return false;
+            
+            // Remove the #include line, then include the code
+            glslCode.Erase(i);
+            unsigned pos = i;
+            while (!glslIncludeFile->IsEof())
+            {
+                glslCode.Insert(pos, glslIncludeFile->ReadLine());
+                ++pos;
+            }
+            // Finally insert an empty line to mark the space between files
+            glslCode.Insert(pos, "");
+        }
+    }
+    
+    // Copy the final code into one memory block
+    length = 0;
+    for (unsigned i = 0; i < glslCode.Size(); ++i)
+        length += glslCode[i].Length() + 1;
+    
+    dest = new char[length];
+    char* destPtr = dest.Get();
+    for (unsigned i = 0; i < glslCode.Size(); ++i)
+    {
+        memcpy(destPtr, glslCode[i].CString(), glslCode[i].Length());
+        destPtr += glslCode[i].Length();
+        *destPtr++ = '\n';
+    }
+    
+    return true;
+}

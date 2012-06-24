@@ -120,13 +120,15 @@ public:
     unsigned GetTotalMemoryUse() const;
     /// Return resource name from hash, or empty if not found.
     const String& GetResourceName(StringHash nameHash) const;
+    /// Return full absolute file name of resource if possible.
+    String GetResourceFileName(const String& name) const;
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
     
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
-    String GetPreferredResourceDir(const String& path);
+    String GetPreferredResourceDir(const String& path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity.
-    String SanitateResourceName(const String& name);
+    String SanitateResourceName(const String& name) const;
     /// Store a hash-to-name mapping.
     void StoreNameHash(const String& name);
     

@@ -86,6 +86,8 @@ public:
     bool IsOpen() const { return handle_ != 0; }
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
+    /// Return whether the file originates from a package.
+    bool IsPackaged() const { return offset_ != 0; }
     
 private:
     /// File name.

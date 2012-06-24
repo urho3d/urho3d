@@ -906,6 +906,7 @@ Properties:<br>
 - String typeName (readonly)
 - FileMode mode (readonly)
 - bool open (readonly)
+- bool packaged (readonly)
 - String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
@@ -986,9 +987,10 @@ Properties:<br>
 FileSystem
 
 Methods:<br>
-- bool FileExists(const String&)
-- bool DirExists(const String&)
-- String[]@ ScanDir(const String&, const String&, uint, bool)
+- bool FileExists(const String&) const
+- bool DirExists(const String&) const
+- uint GetLastModifiedTime(const String&) const
+- String[]@ ScanDir(const String&, const String&, uint, bool) const
 - bool CreateDir(const String&)
 - int SystemCommand(const String&)
 - int SystemRun(const String&, String[]@)
@@ -1050,9 +1052,10 @@ Methods:<br>
 - bool ReloadResource(Resource@)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
-- String GetPreferredResourceDir(const String&)
-- String SanitateResourceName(const String&)
-- const String& GetResourceName(StringHash)
+- String GetPreferredResourceDir(const String&) const
+- String SanitateResourceName(const String&) const
+- const String& GetResourceName(StringHash) const
+- String GetResourceFileName(const String&) const
 - Resource@ GetResource(const String&, const String&)
 - Resource@ GetResource(ShortStringHash, StringHash)
 

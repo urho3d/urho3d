@@ -1,0 +1,22 @@
+<shaders>
+    <shader type="vs">
+        <option name="VCol" define="VERTEXCOLOR" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <option name="" /> <!-- Dummy option to separate the two variation groups -->
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Billboard" define="BILLBOARD" />
+    </shader>
+    <shader type="ps">
+        <option name="Diff" define="DIFFMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />           
+        <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Ambient" define="AMBIENT" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+    </shader>
+</shaders>

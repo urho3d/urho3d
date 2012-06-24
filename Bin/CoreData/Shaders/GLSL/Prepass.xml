@@ -1,0 +1,13 @@
+<shaders>
+    <shader type="vs">
+        <option name="Normal" define="NORMALMAP" />
+        <option name="HW" define="HWDEPTH" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+    </shader>
+    <shader type="ps">
+        <option name="Normal" define="NORMALMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" />
+        <option name="HW" define="HWDEPTH" />
+    </shader>
+</shaders>

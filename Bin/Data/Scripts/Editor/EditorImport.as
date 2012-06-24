@@ -30,7 +30,7 @@ void ImportModel(const String&in fileName)
     args.Push("-p\"" + sceneResourcePath + "\"");
     args.Push("-m\"" + materialListName + "\"");
 
-    if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter.exe", args) == 0)
+    if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
     {
         Node@ newNode = editorScene.CreateChild(GetFileName(fileName));
         StaticModel@ newModel = newNode.CreateComponent("StaticModel");
@@ -73,7 +73,7 @@ void ImportScene(const String&in fileName)
         if (useLocalIDs)
             args.Push("-i");
 
-        if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter.exe", args) == 0)
+        if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
         {
             String currentFileName = sceneFileName;
             LoadScene(tempSceneName);
@@ -379,7 +379,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
     String convertedModelName = filePath + modelName + ".xml";
 
     // Convert .mesh to .mesh.xml
-    String cmdLine = "ogrexmlconverter.exe \"" + filePath + GetFullAssetName(modelName) + "\" \"" + convertedModelName + "\"";
+    String cmdLine = "ogrexmlconverter \"" + filePath + GetFullAssetName(modelName) + "\" \"" + convertedModelName + "\"";
     if (!fileSystem.FileExists(convertedModelName))
         fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
 
@@ -388,7 +388,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
     args.Push("\"" + filePath + GetFullAssetName(modelName) + ".xml\"");
     args.Push("\"" + sceneResourcePath + "Models/" + GetFileNameAndExtension(modelName).Replaced(".mesh", ".mdl") + "\"");
     args.Push("-a");
-    fileSystem.SystemRun(fileSystem.programDir + "OgreImporter.exe", args);
+    fileSystem.SystemRun(fileSystem.programDir + "OgreImporter", args);
 
     convertedModels.Push(modelName);
 }

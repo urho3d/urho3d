@@ -1,9 +1,0 @@
-<shaders>
-    <shader name="Bloom" type="vs" />
-    <shader name="Bloom" type="ps">
-        <variation name="Bright" define="BRIGHT" />
-        <variation name="HBlur" define="HBLUR" />
-        <variation name="VBlur" define="VBLUR" />
-        <variation name="Combine" define="COMBINE" />
-    </shader>
-</shaders>

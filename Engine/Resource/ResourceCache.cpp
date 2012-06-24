@@ -506,7 +506,22 @@ const String& ResourceCache::GetResourceName(StringHash nameHash) const
         return i->second_;
 }
 
-String ResourceCache::GetPreferredResourceDir(const String& path)
+String ResourceCache::GetResourceFileName(const String& name) const
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem)
+    {
+        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+        {
+            if (fileSystem->FileExists(resourceDirs_[i] + name))
+                return resourceDirs_[i] + name;
+        }
+    }
+    
+    return String();
+}
+
+String ResourceCache::GetPreferredResourceDir(const String& path) const
 {
     String fixedPath = AddTrailingSlash(path);
     
@@ -545,7 +560,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path)
     return fixedPath;
 }
 
-String ResourceCache::SanitateResourceName(const String& nameIn)
+String ResourceCache::SanitateResourceName(const String& nameIn) const
 {
     // Sanitate unsupported constructs from the resource name
     String name = GetInternalPath(nameIn);

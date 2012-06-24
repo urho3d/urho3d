@@ -24,10 +24,12 @@
 #include "Context.h"
 #include "File.h"
 #include "FileSystem.h"
+#include "GraphicsDefs.h"
 #include "List.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
 #include "Set.h"
+#include "ShaderParser.h"
 #include "StringUtils.h"
 #include "Thread.h"
 #include "XMLFile.h"
@@ -40,13 +42,6 @@
 #include <d3dx9shader.h>
 
 #include "DebugNew.h"
-
-enum ShaderType
-{
-    VS = 0,
-    PS,
-    Both
-};
 
 struct Parameter
 {
@@ -90,75 +85,41 @@ struct Parameter
     unsigned regCount_;
 };
 
-struct Variation
-{
-    Variation()
-    {
-    }
-    
-    Variation(const String& name, bool isOption) :
-        name_(name),
-        option_(isOption)
-    {
-    }
-    
-    String name_;
-    Vector<String> defines_;
-    Vector<String> defineValues_;
-    Vector<String> excludes_;
-    Vector<String> includes_;
-    Vector<String> requires_;
-    bool option_;
-};
-
 struct CompiledVariation
 {
     ShaderType type_;
     String name_;
+    String outFileName_;
     Vector<String> defines_;
     Vector<String> defineValues_;
     PODVector<unsigned char> byteCode_;
-    unsigned byteCodeOffset_;
-    Set<Parameter> constants_;
-    Set<Parameter> textureUnits_;
+    Vector<Parameter> constants_;
+    Vector<Parameter> textureUnits_;
     String errorMsg_;
 };
-
-struct Shader
-{
-    Shader(const String& name, ShaderType type) :
-        name_(name),
-        type_(type)
-    {
-    }
-    
-    String name_;
-    ShaderType type_;
-    Vector<Variation> variations_;
-};
-
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String inDir_;
-String inFile_;
 String outDir_;
 Vector<String> defines_;
 Vector<String> defineValues_;
-bool useSM3_ = false;
+String variationName_;
 volatile bool compileFailed_ = false;
+bool useSM3_ = false;
+bool compileVariation_ = false;
+bool compileVS_ = true;
+bool compilePS_ = true;
 
+List<CompiledVariation> variations_;
 List<CompiledVariation*> workList_;
-Mutex globalParamMutex_;
 Mutex workMutex_;
 String hlslCode_;
-Set<String> constants_;
-Set<String> textureUnits_;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
-void CompileVariations(const Shader& baseShader, XMLElement& shaders);
-void Compile(CompiledVariation* variation);
+void CompileShader(const String& fileName);
+void CompileVariation(CompiledVariation* variation);
 void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSize);
 
 class WorkerThread : public RefCounted, public Thread
@@ -182,7 +143,7 @@ public:
             
             // If compile(s) failed, just empty the list, but do not compile more
             if (!compileFailed_)
-                Compile(workItem);
+                CompileVariation(workItem);
         }
     }
 };
@@ -229,192 +190,168 @@ int main(int argc, char** argv)
 
 void Run(const Vector<String>& arguments)
 {
-    if (arguments.Size() < 2)
+    if (arguments.Size() < 1)
     {
         ErrorExit(
-            "Usage: ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2]\n\n"
-            "HLSL files will be loaded from definition file directory, and binary files will\n"
-            "be output to the output path, preserving the subdirectory structure.\n"
+            "ShaderCompiler <definitionfile> [options]\n\n"
+            "Options:\n"
+            "-tVS|PS Compile only vertex or pixel shaders, by default compile both\n"
+            "-vX     Compile only the shader variation X\n"
+            "-dX     Add a define. Add SM3 to compile for Shader Model 3\n\n"
+            "Shader binaries will be output into the same directory as the definition file.\n"
+            "Specify a wildcard to compile multiple shaders from the directory.\n"
         );
     }
     
-    unsigned pos = arguments[0].FindLast('/');
-    if (pos != String::NPOS)
+    String path, file, extension;
+    SplitPath(arguments[0], path, file, extension);
+    inDir_ = AddTrailingSlash(path);
+    outDir_ = inDir_;
+    
+    for (unsigned i = 1; i < arguments.Size(); ++i)
     {
-        inDir_ = arguments[0].Substring(0, pos);
-        inFile_ = arguments[0].Substring(pos + 1);
+        if (arguments[i][0] == '-' && arguments[i].Length() > 1)
+        {
+            char option = arguments[i][1];
+            String arg = arguments[i].Substring(2);
+            
+            switch (option)
+            {
+            case 'd':
+                {
+                    Vector<String> nameAndValue = arg.Split('=');
+                    if (nameAndValue.Size() == 2)
+                    {
+                        defines_.Push(nameAndValue[0]);
+                        defineValues_.Push(nameAndValue[1]);
+                        if (nameAndValue[0] == "SM3" && ToInt(nameAndValue[1]) > 0)
+                            useSM3_ = true;
+                    }
+                    else
+                    {
+                        defines_.Push(arg);
+                        defineValues_.Push("1");
+                        if (arg == "SM3")
+                            useSM3_ = true;
+                    }
+                }
+                break;
+                
+            case 't':
+                if (arg.ToLower() == "vs")
+                {
+                    compileVS_ = true;
+                    compilePS_ = false;
+                }
+                else if (arg.ToLower() == "ps")
+                {
+                    compileVS_ = false;
+                    compilePS_ = true;
+                }
+                break;
+                
+            case 'v':
+                compileVariation_ = true;
+                variationName_ = arg;
+                break;
+            }
+        }
     }
+    
+    if (!file.StartsWith("*"))
+        CompileShader(arguments[0]);
     else
     {
-        inFile_ = arguments[0];
+        Vector<String> shaderFiles;
+        fileSystem_->ScanDir(shaderFiles, inDir_, file + extension, SCAN_FILES, false);
+        for (unsigned i = 0; i < shaderFiles.Size(); ++i)
+            CompileShader(inDir_ + shaderFiles[i]);
     }
-    
-    outDir_ = arguments[1];
-    
-    inDir_ = AddTrailingSlash(inDir_);
-    outDir_ = AddTrailingSlash(outDir_);
-    
-    for (unsigned i = 2; i < arguments.Size(); ++i)
-    {
-        String arg = arguments[i].ToUpper();
-        
-        if (arg == "SM3")
-            useSM3_ = true;
-        else if (arg == "SM2")
-            useSM3_ = false;
-        
-        Vector<String> nameAndValue = arg.Split('=');
-        if (nameAndValue.Size() == 2)
-        {
-            defines_.Push(nameAndValue[0]);
-            defineValues_.Push(nameAndValue[1]);
-        }
-        else
-        {
-            defines_.Push(arg);
-            defineValues_.Push("1");
-        }
-    }
+}
+
+void CompileShader(const String& fileName)
+{
+    String file = GetFileName(fileName);
     
     XMLFile doc(context_);
     File source(context_);
-    source.Open(arguments[0]);
+    source.Open(fileName);
     if (!doc.Load(source))
-        ErrorExit("Could not open input file " + arguments[0]);
+        ErrorExit("Could not open input file " + fileName);
     
     XMLElement shaders = doc.GetRoot("shaders");
     if (!shaders)
         ErrorExit("No shaders element in " + source.GetName());
     
-    XMLFile outDoc(context_);
-    XMLElement outShaders = outDoc.CreateRoot("shaders");
-    
-    XMLElement shader = shaders.GetChild("shader");
-    while (shader)
+    if (compileVS_)
     {
-        String source = shader.GetAttribute("name");
-        ShaderType compileType = Both;
-        String type = shader.GetAttribute("type");
-        if (type == "VS" || type == "vs")
-            compileType = VS;
-        if (type == "PS" || type == "ps")
-            compileType = PS;
+        ShaderParser vsParser;
+        if (!vsParser.Parse(VS, shaders, defines_, defineValues_))
+            ErrorExit("VS: " + vsParser.GetErrorMessage());
         
-        Shader baseShader(source, compileType);
-        
-        XMLElement variation = shader.GetChild();
-        while (variation)
+        const Vector<ShaderCombination>& combinations = vsParser.GetCombinations();
+        for (unsigned i = 0; i < combinations.Size(); ++i)
         {
-            String value = variation.GetName();
-            if (value == "variation" || value == "option")
+            if (!compileVariation_ || combinations[i].name_ == variationName_)
             {
-                String name = variation.GetAttribute("name");
-                
-                Variation newVar(name, value == "option");
-                
-                String simpleDefine = variation.GetAttribute("define");
-                if (!simpleDefine.Empty())
+                CompiledVariation compile;
+                compile.type_ = VS;
+                compile.name_ = file;
+                compile.outFileName_ = inDir_ + file;
+                if (!combinations[i].name_.Empty())
                 {
-                    Vector<String> nameAndValue = simpleDefine.Split('=');
-                    if (nameAndValue.Size() == 2)
-                    {
-                        newVar.defines_.Push(nameAndValue[0]);
-                        newVar.defineValues_.Push(nameAndValue[1]);
-                    }
-                    else
-                    {
-                        newVar.defines_.Push(simpleDefine);
-                        newVar.defineValues_.Push("1");
-                    }
+                    compile.name_ += "_" + combinations[i].name_;
+                    compile.outFileName_ += "_" + combinations[i].name_;
                 }
+                compile.outFileName_ += useSM3_ ? ".vs3" : ".vs2";
+                compile.defines_ = combinations[i].defines_;
+                compile.defineValues_ = combinations[i].defineValues_;
                 
-                String simpleExclude = variation.GetAttribute("exclude");
-                if (!simpleExclude.Empty())
-                    newVar.excludes_.Push(simpleExclude);
-                
-                String simpleInclude = variation.GetAttribute("include");
-                if (!simpleInclude.Empty())
-                    newVar.includes_.Push(simpleInclude);
-                
-                String simpleRequire = variation.GetAttribute("require");
-                if (!simpleRequire.Empty())
-                    newVar.requires_.Push(simpleRequire);
-                
-                XMLElement define = variation.GetChild("define");
-                while (define)
-                {
-                    String defineName = define.GetAttribute("name");
-                    Vector<String> nameAndValue = defineName.Split('=');
-                    if (nameAndValue.Size() == 2)
-                    {
-                        newVar.defines_.Push(nameAndValue[0]);
-                        newVar.defineValues_.Push(nameAndValue[1]);
-                    }
-                    else
-                    {
-                        newVar.defines_.Push(defineName);
-                        newVar.defineValues_.Push("1");
-                    }
-                    define = define.GetNext("define");
-                }
-                
-                XMLElement exclude = variation.GetChild("exclude");
-                while (exclude)
-                {
-                    newVar.excludes_.Push(exclude.GetAttribute("name"));
-                    exclude = exclude.GetNext("exclude");
-                }
-                
-                XMLElement include = variation.GetChild("include");
-                while (include)
-                {
-                    newVar.includes_.Push(include.GetAttribute("name"));
-                    include = include.GetNext("include");
-                }
-                
-                XMLElement require = variation.GetChild("require");
-                while (require)
-                {
-                    newVar.requires_.Push(require.GetAttribute("name"));
-                    require = require.GetNext("require");
-                }
-                
-                baseShader.variations_.Push(newVar);
+                variations_.Push(compile);
+                workList_.Push(&variations_.Back());
             }
-            
-            variation = variation.GetNext();
         }
-        
-        if (baseShader.type_ != Both)
-            CompileVariations(baseShader, outShaders);
-        else
-        {
-            baseShader.type_ = VS;
-            CompileVariations(baseShader, outShaders);
-            baseShader.type_ = PS;
-            CompileVariations(baseShader, outShaders);
-        }
-        
-        shader = shader.GetNext("shader");
     }
-}
-
-void CompileVariations(const Shader& baseShader, XMLElement& shaders)
-{
-    unsigned combinations = 1;
-    Set<unsigned> usedCombinations;
-    Map<String, unsigned> nameToIndex;
-    Vector<CompiledVariation> compiledVariations;
-    unsigned numVariationGroups = 0;
     
-    const Vector<Variation>& variations = baseShader.variations_;
+    if (compilePS_)
+    {
+        ShaderParser psParser;
+        if (!psParser.Parse(PS, shaders, defines_, defineValues_))
+            ErrorExit("PS: " + psParser.GetErrorMessage());
+        
+        const Vector<ShaderCombination>& combinations = psParser.GetCombinations();
+        for (unsigned i = 0; i < combinations.Size(); ++i)
+        {
+            if (!compileVariation_ || combinations[i].name_ == variationName_)
+            {
+                CompiledVariation compile;
+                compile.type_ = PS;
+                compile.name_ = file;
+                compile.outFileName_ = inDir_ + file;
+                if (!combinations[i].name_.Empty())
+                {
+                    compile.name_ += "_" + combinations[i].name_;
+                    compile.outFileName_ += "_" + combinations[i].name_;
+                }
+                compile.outFileName_ += useSM3_ ? ".ps3" : ".ps2";
+                compile.defines_ = combinations[i].defines_;
+                compile.defineValues_ = combinations[i].defineValues_;
+                
+                variations_.Push(compile);
+                workList_.Push(&variations_.Back());
+            }
+        }
+    }
     
-    if (variations.Size() > 32)
-        ErrorExit("Maximum amount of variations exceeded");
+    if (variations_.Empty())
+    {
+        PrintLine("No variations to compile");
+        return;
+    }
     
     // Load the shader source code
     {
-        String inputFileName = inDir_ + baseShader.name_ + ".hlsl";
+        String inputFileName = inDir_ + file + ".hlsl";
         File hlslFile(context_, inputFileName);
         if (!hlslFile.IsOpen())
             ErrorExit("Could not open input file " + inputFileName);
@@ -423,147 +360,6 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         while (!hlslFile.IsEof())
             hlslCode_ += hlslFile.ReadLine() + "\n";
     }
-    
-    for (unsigned i = 0; i < variations.Size(); ++i)
-    {
-        combinations *= 2;
-        nameToIndex[variations[i].name_] = i;
-        if (!variations[i].option_ && (i == 0 || variations[i - 1].option_))
-            ++numVariationGroups;
-    }
-    
-    for (unsigned i = 0; i < combinations; ++i)
-    {
-        unsigned active = i; // Variations/options active on this particular combination
-        unsigned variationsActive = 0;
-        bool skipThis = false;
-        
-        // Check for excludes/includes/requires
-        for (unsigned j = 0; j < variations.Size(); ++j)
-        {
-            if ((active >> j) & 1)
-            {
-                for (unsigned k = 0; k < variations[j].includes_.Size(); ++k)
-                {
-                    if (nameToIndex.Contains(variations[j].includes_[k]))
-                        active |= (1 << nameToIndex[variations[j].includes_[k]]);
-                }
-                
-                for (unsigned k = 0; k < variations[j].excludes_.Size(); ++k)
-                {
-                    if (nameToIndex.Contains(variations[j].excludes_[k]))
-                        active &= ~(1 << nameToIndex[variations[j].excludes_[k]]);
-                }
-                
-                // Skip dummy separators (options without name and defines)
-                if (variations[j].name_.Empty() && variations[j].option_ && variations[j].defines_.Empty())
-                    active &= ~(1 << j);
-                
-                // If it's a variation, exclude all other variations in the same group
-                if (!variations[j].option_)
-                {
-                    for (unsigned k = j - 1; k < variations.Size(); --k)
-                    {
-                        if (!variations[k].option_)
-                            active &= ~(1 << k);
-                        else
-                            break;
-                    }
-                    for (unsigned k = j + 1; k < variations.Size(); ++k)
-                    {
-                        if (!variations[k].option_)
-                            active &= ~(1 << k);
-                        else
-                            break;
-                    }
-                    
-                    ++variationsActive;
-                }
-                
-                for (unsigned k = 0; k < variations[j].requires_.Size(); ++k)
-                {
-                    bool requireFound = false;
-                    
-                    for (unsigned l = 0; l < defines_.Size(); ++l)
-                    {
-                        if (defines_[l] == variations[j].requires_[k])
-                        {
-                            requireFound = true;
-                            break;
-                        }
-                    }
-                    
-                    for (unsigned l = 0; l < variations.Size(); ++l)
-                    {
-                        if ((active >> l) & 1 && l != j)
-                        {
-                            if (variations[l].name_ == variations[j].requires_[k])
-                            {
-                                requireFound = true;
-                                break;
-                            }
-                            for (unsigned m = 0; m < variations[l].defines_.Size(); ++m)
-                            {
-                                if (variations[l].defines_[m] == variations[j].requires_[k])
-                                {
-                                    requireFound = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (requireFound)
-                            break;
-                    }
-                    
-                    if (!requireFound)
-                        skipThis = true;
-                }
-            }
-        }
-        
-        // If variations are included, check that one from each group is active
-        if (variationsActive < numVariationGroups)
-            continue;
-        
-        if (skipThis)
-            continue;
-        
-        // Check that this combination is unique
-        if (usedCombinations.Contains(active))
-            continue;
-        
-        // Build shader variation name & defines for active variations
-        String outName;
-        Vector<String> defines;
-        Vector<String> defineValues;
-        for (unsigned j = 0; j < variations.Size(); ++j)
-        {
-            if (active & (1 << j))
-            {
-                if (variations[j].name_.Length())
-                    outName += variations[j].name_;
-                for (unsigned k = 0; k < variations[j].defines_.Size(); ++k)
-                {
-                    defines.Push(variations[j].defines_[k]);
-                    defineValues.Push(variations[j].defineValues_[k]);
-                }
-            }
-        }
-        
-        CompiledVariation compile;
-        compile.type_ = baseShader.type_;
-        compile.name_ = outName;
-        compile.defines_ = defines;
-        compile.defineValues_ = defineValues;
-        
-        compiledVariations.Push(compile);
-        usedCombinations.Insert(active);
-    }
-    
-    // Prepare the work list
-    // (all variations must be created first, so that vector resize does not change pointers)
-    for (unsigned i = 0; i < compiledVariations.Size(); ++i)
-        workList_.Push(&compiledVariations[i]);
     
     // Create and start worker threads. Use all logical CPUs except one to not lock up the computer completely
     unsigned numWorkerThreads = GetNumLogicalCPUs() - 1;
@@ -582,62 +378,14 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         workerThreads[i]->Stop();
     
     // Check that all shaders compiled
-    for (unsigned i = 0; i < compiledVariations.Size(); ++i)
+    for (List<CompiledVariation>::Iterator i = variations_.Begin(); i != variations_.End(); ++i)
     {
-        if (!compiledVariations[i].errorMsg_.Empty())
-            ErrorExit("Failed to compile shader " + baseShader.name_ + "_" + compiledVariations[i].name_ + ": " + compiledVariations[i].errorMsg_);
-    }
-    
-    // Build the output file
-    String outFileName = outDir_ + inDir_ + baseShader.name_;
-    outFileName += (baseShader.type_ == VS) ? ".vs" : ".ps";
-    outFileName += (useSM3_) ? "3" : "2";
-    
-    File outFile(context_, outFileName, FILE_WRITE);
-    if (!outFile.IsOpen())
-        ErrorExit("Could not open output file " + outFileName);
-    
-    outFile.WriteFileID("USHD");
-    outFile.WriteShort(baseShader.type_);
-    outFile.WriteShort(useSM3_ ? 3 : 2);
-    
-    outFile.WriteUInt(constants_.Size());
-    for (Set<String>::ConstIterator i = constants_.Begin(); i != constants_.End(); ++i)
-        outFile.WriteString(*i);
-    
-    outFile.WriteUInt(textureUnits_.Size());
-    for (Set<String>::ConstIterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
-        outFile.WriteString(*i);
-    
-    outFile.WriteUInt(compiledVariations.Size());
-    for (unsigned i = 0; i < compiledVariations.Size(); ++i)
-    {
-        CompiledVariation& variation = compiledVariations[i];
-        outFile.WriteString(variation.name_);
-        
-        outFile.WriteUInt(variation.constants_.Size());
-        for (Set<Parameter>::ConstIterator i = variation.constants_.Begin(); i != variation.constants_.End(); ++i)
-        {
-            outFile.WriteStringHash(StringHash(i->name_));
-            outFile.WriteUByte(i->register_);
-            outFile.WriteUByte(i->regCount_);
-        }
-        
-        outFile.WriteUInt(variation.textureUnits_.Size());
-        for (Set<Parameter>::ConstIterator i = variation.textureUnits_.Begin(); i != variation.textureUnits_.End(); ++i)
-        {
-            outFile.WriteStringHash(StringHash(i->name_));
-            outFile.WriteUByte(i->register_);
-        }
-        
-        unsigned dataSize = variation.byteCode_.Size();
-        outFile.WriteUInt(dataSize);
-        if (dataSize)
-            outFile.Write(&variation.byteCode_[0], dataSize);
+        if (!i->errorMsg_.Empty())
+            ErrorExit("Failed to compile shader " + i->name_ + ": " + i->errorMsg_);
     }
 }
 
-void Compile(CompiledVariation* variation)
+void CompileVariation(CompiledVariation* variation)
 {
     IncludeHandler includeHandler;
     PODVector<D3DXMACRO> macros;
@@ -734,24 +482,53 @@ void Compile(CompiledVariation* variation)
             bool isSampler = (name[0] == 's');
             name = name.Substring(1);
             
-            MutexLock lock(globalParamMutex_);
-            
             if (isSampler)
             {
                 // Skip if it's a G-buffer sampler
                 if (name.Find("Buffer") == String::NPOS)
                 {
                     Parameter newTextureUnit(name, reg, 1);
-                    variation->textureUnits_.Insert(newTextureUnit);
-                    textureUnits_.Insert(name);
+                    variation->textureUnits_.Push(newTextureUnit);
                 }
             }
             else
             {
                 Parameter newParam(name, reg, regCount);
-                variation->constants_.Insert(newParam);
-                constants_.Insert(name);
+                variation->constants_.Push(newParam);
             }
+        }
+        
+        File outFile(context_);
+        if (!outFile.Open(variation->outFileName_, FILE_WRITE))
+        {
+            variation->errorMsg_ = "Could not open output file " + variation->outFileName_;
+            compileFailed_ = true;
+        }
+        else
+        {
+            outFile.WriteFileID("USHD");
+            outFile.WriteShort((unsigned short)variation->type_);
+            outFile.WriteShort(useSM3_ ? 3 : 2);
+            
+            outFile.WriteUInt(variation->constants_.Size());
+            for (unsigned i = 0; i < variation->constants_.Size(); ++i)
+            {
+                outFile.WriteString(variation->constants_[i].name_);
+                outFile.WriteUByte(variation->constants_[i].register_);
+                outFile.WriteUByte(variation->constants_[i].regCount_);
+            }
+            
+            outFile.WriteUInt(variation->textureUnits_.Size());
+            for (unsigned i = 0; i < variation->textureUnits_.Size(); ++i)
+            {
+                outFile.WriteString(variation->textureUnits_[i].name_);
+                outFile.WriteUByte(variation->textureUnits_[i].register_);
+            }
+            
+            unsigned dataSize = variation->byteCode_.Size();
+            outFile.WriteUInt(dataSize);
+            if (dataSize)
+                outFile.Write(&variation->byteCode_[0], dataSize);
         }
     }
     
