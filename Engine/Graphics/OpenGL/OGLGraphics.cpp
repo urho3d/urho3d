@@ -1770,6 +1770,9 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
+    if (!closeWindow)
+        LOGINFO("OpenGL context lost");
+    
     if (clearGPUObjects)
     {
         // Shutting down: release all GPU objects that still exist

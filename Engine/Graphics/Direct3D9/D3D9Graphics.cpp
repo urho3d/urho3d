@@ -2088,6 +2088,8 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
+    LOGINFO("Device lost");
+    
     if (impl_->defaultColorSurface_)
     {
         impl_->defaultColorSurface_->Release();
