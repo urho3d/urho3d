@@ -59,7 +59,15 @@ bool Texture2D::Load(Deserializer& source)
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
-
+    
+    // If device is lost, retry later
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture load while device is lost");
+        dataPending_ = true;
+        return true;
+    }
+    
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());
     
@@ -230,13 +238,6 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
     if (!image)
     {
         LOGERROR("Null image, can not load texture");
-        return false;
-    }
-    
-    if (graphics_ && graphics_->IsDeviceLost())
-    {
-        LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
         return false;
     }
     
