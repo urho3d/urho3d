@@ -80,7 +80,7 @@ void Texture2D::OnDeviceLost()
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (pool_ == D3DPOOL_DEFAULT || !object_)
     {
         // If has a file name, reload through the resource cache. Otherwise just recreate.
         if (!GetName().Trimmed().Empty())
@@ -91,6 +91,15 @@ void Texture2D::OnDeviceReset()
             dataLost_ = true;
         }
     }
+    else if (dataPending_)
+    {
+        if (!GetName().Trimmed().Empty())
+            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+            dataLost_ = true;
+    }
+    
+    dataPending_ = false;
 }
 
 void Texture2D::Release()
@@ -171,6 +180,13 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for setting data");
+        return false;
+    }
+    
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture data assignment while device is lost");
+        dataPending_ = true;
         return false;
     }
     
@@ -267,6 +283,13 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
     if (!image)
     {
         LOGERROR("Null image, can not load texture");
+        return false;
+    }
+    
+    if (graphics_ && graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture load while device is lost");
+        dataPending_ = true;
         return false;
     }
     
@@ -379,6 +402,12 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
     
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Getting texture data while device is lost");
+        return false;
+    }
+    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     
@@ -450,11 +479,14 @@ bool Texture2D::Create()
 {
     Release();
     
-    if (!graphics_)
+    if (!graphics_ || !width_ || !height_)
         return false;
     
-    if (!width_ || !height_)
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture creation while device is lost");
         return false;
+    }
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead

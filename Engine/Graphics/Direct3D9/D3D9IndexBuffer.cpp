@@ -63,11 +63,15 @@ void IndexBuffer::OnDeviceLost()
 
 void IndexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (pool_ == D3DPOOL_DEFAULT || !object_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
     }
+    else if (dataPending_)
+        dataLost_ = !UpdateToGPU();
+    
+    dataPending_ = false;
 }
 
 void IndexBuffer::Release()
@@ -149,6 +153,14 @@ bool IndexBuffer::SetData(const void* data)
     
     if (object_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Index buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+            return false;
+        }
+        
         void* hwData = MapBuffer(0, indexCount_, true);
         if (hwData)
         {
@@ -194,6 +206,14 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     
     if (object_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Index buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+            return false;
+        }
+        
         void* hwData = MapBuffer(start, count, discard);
         if (hwData)
         {
@@ -234,7 +254,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     lockCount_ = count;
     
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
-    if (object_ && !shadowData_)
+    if (object_ && !shadowData_ && !graphics_->IsDeviceLost())
         return MapBuffer(start, count, discard);
     else if (shadowData_)
     {
@@ -334,6 +354,12 @@ bool IndexBuffer::Create()
     
     if (graphics_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Index buffer creation while device is lost");
+            return false;
+        }
+        
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         if (!device || FAILED(device->CreateIndexBuffer(
             indexCount_ * indexSize_,

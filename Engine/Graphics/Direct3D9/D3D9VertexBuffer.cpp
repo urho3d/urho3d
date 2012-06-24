@@ -98,11 +98,15 @@ void VertexBuffer::OnDeviceLost()
 
 void VertexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (pool_ == D3DPOOL_DEFAULT || !object_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
     }
+    else if (dataPending_)
+        dataLost_ = !UpdateToGPU();
+    
+    dataPending_ = false;
 }
 
 void VertexBuffer::Release()
@@ -189,6 +193,14 @@ bool VertexBuffer::SetData(const void* data)
     
     if (object_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Vertex buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+            return false;
+        }
+        
         void* hwData = MapBuffer(0, vertexCount_, true);
         if (hwData)
         {
@@ -234,6 +246,14 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     
     if (object_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Vertex buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+            return false;
+        }
+        
         void* hwData = MapBuffer(start, count, discard);
         if (hwData)
         {
@@ -274,7 +294,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
     lockCount_ = count;
     
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
-    if (object_ && !shadowData_)
+    if (object_ && !shadowData_ && !graphics_->IsDeviceLost())
         return MapBuffer(start, count, discard);
     else if (shadowData_)
     {
@@ -372,6 +392,12 @@ bool VertexBuffer::Create()
     
     if (graphics_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Vertex buffer creation while device is lost");
+            return false;
+        }
+        
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         if (!device || FAILED(device->CreateVertexBuffer(
             vertexCount_ * vertexSize_,

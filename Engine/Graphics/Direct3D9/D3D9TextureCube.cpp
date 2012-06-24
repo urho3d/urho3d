@@ -67,7 +67,7 @@ void TextureCube::OnDeviceLost()
 
 void TextureCube::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (pool_ == D3DPOOL_DEFAULT || !object_)
     {
         // If has a file name, reload through the resource cache. Otherwise just recreate.
         if (!GetName().Trimmed().Empty())
@@ -78,6 +78,15 @@ void TextureCube::OnDeviceReset()
             dataLost_ = true;
         }
     }
+    else if (dataPending_)
+    {
+        if (!GetName().Trimmed().Empty())
+            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+            dataLost_ = true;
+    }
+    
+    dataPending_ = false;
 }
 
 void TextureCube::Release()
@@ -172,6 +181,13 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for setting data");
+        return false;
+    }
+    
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture data assignment while device is lost");
+        dataPending_ = true;
         return false;
     }
     
@@ -326,6 +342,13 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
     if (!image)
     {
         LOGERROR("Null image, can not load texture");
+        return false;
+    }
+    
+    if (graphics_ && graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture load while device is lost");
+        dataPending_ = true;
         return false;
     }
     
@@ -486,6 +509,12 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         return false;
     }
     
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Getting texture data while device is lost");
+        return false;
+    }
+    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     
@@ -557,11 +586,14 @@ bool TextureCube::Create()
 {
     Release();
     
-    if (!graphics_)
+    if (!graphics_ || !width_ || !height_)
         return false;
     
-    if (!width_ || !height_)
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture creation while device is lost");
         return false;
+    }
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     if (!device || FAILED(device->CreateCubeTexture(
