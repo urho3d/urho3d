@@ -107,7 +107,11 @@ bool Shader::Load(Deserializer& source)
             j->second_->Release();
         }
         
-        j->second_->SetName(i->name_);
+        String shaderName = path + fileName + "_" + i->name_;
+        if (shaderName.EndsWith("_"))
+            shaderName.Resize(shaderName.Length() - 1);
+        
+        j->second_->SetName(shaderName);
         j->second_->SetSourceCode(vsSourceCode_, vsSourceCodeLength_);
         j->second_->SetDefines(i->defines_, i->defineValues_);
     }
@@ -125,7 +129,11 @@ bool Shader::Load(Deserializer& source)
             j->second_->Release();
         }
         
-        j->second_->SetName(i->name_);
+        String shaderName = path + fileName + "_" + i->name_;
+        if (shaderName.EndsWith("_"))
+            shaderName.Resize(shaderName.Length() - 1);
+        
+        j->second_->SetName(shaderName);
         j->second_->SetSourceCode(psSourceCode_, psSourceCodeLength_);
         j->second_->SetDefines(i->defines_, i->defineValues_);
     }
