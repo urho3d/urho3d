@@ -394,6 +394,8 @@ private:
     bool etcTextureSupport_;
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_;
+    /// Minimized flag for detecting end of minimization.
+    bool wasMinimized_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

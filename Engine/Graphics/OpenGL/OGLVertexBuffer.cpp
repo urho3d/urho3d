@@ -242,8 +242,7 @@ bool VertexBuffer::SetData(const void* data)
         else
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
         }
     }
     
@@ -293,8 +292,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         else
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
         }
     }
     

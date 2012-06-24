@@ -144,6 +144,7 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    wasMinimized_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -385,8 +386,24 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
 bool Graphics::BeginFrame()
 {
-    if (!IsInitialized() || !impl_->context_)
+    bool minimized = impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED);
+    
+    if (!IsInitialized() || IsDeviceLost())
+    {
+        wasMinimized_ = minimized;
         return false;
+    }
+
+    #ifdef IOS
+    // On iOS, check for end of minimization and apply pending GPU resource updates
+    if (wasMinimized_ && !minimized)
+    {
+        LOGDEBUG("Application restored, updating pending GPU resources");
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->OnDeviceReset();
+    }
+    #endif
+    wasMinimized_ = minimized;
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();

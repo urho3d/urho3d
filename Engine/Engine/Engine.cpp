@@ -431,10 +431,9 @@ void Engine::Render()
 {
     PROFILE(Render);
     
-    // Do not render if device lost or if minimized
+    // Do not render if device lost
     Graphics* graphics = GetSubsystem<Graphics>();
-    Input* input = GetSubsystem<Input>();
-    if (!graphics || (input && input->IsMinimized()) || !graphics->BeginFrame())
+    if (!graphics || !graphics->BeginFrame())
         return;
     
     GetSubsystem<Renderer>()->Render();

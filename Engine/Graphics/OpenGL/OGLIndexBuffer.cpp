@@ -152,8 +152,7 @@ bool IndexBuffer::SetData(const void* data)
         else
         {
             LOGWARNING("Index buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
         }
     }
     
@@ -204,8 +203,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         else
         {
             LOGWARNING("Index buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
         }
     }
     
