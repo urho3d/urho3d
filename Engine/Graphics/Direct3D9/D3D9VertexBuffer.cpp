@@ -197,7 +197,7 @@ bool VertexBuffer::SetData(const void* data)
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
-            return false;
+            return true;
         }
         
         void* hwData = MapBuffer(0, vertexCount_, true);
@@ -249,7 +249,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
-            return false;
+            return true;
         }
         
         void* hwData = MapBuffer(start, count, discard);

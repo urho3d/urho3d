@@ -157,7 +157,7 @@ bool IndexBuffer::SetData(const void* data)
         {
             LOGWARNING("Index buffer data assignment while device is lost");
             dataPending_ = true;
-            return false;
+            return true;
         }
         
         void* hwData = MapBuffer(0, indexCount_, true);
@@ -209,7 +209,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         {
             LOGWARNING("Index buffer data assignment while device is lost");
             dataPending_ = true;
-            return false;
+            return true;
         }
         
         void* hwData = MapBuffer(start, count, discard);
