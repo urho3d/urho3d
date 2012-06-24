@@ -156,8 +156,7 @@ bool IndexBuffer::SetData(const void* data)
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Index buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
             return false;
         }
         
@@ -209,8 +208,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Index buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
             return false;
         }
         

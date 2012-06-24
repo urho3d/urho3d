@@ -196,8 +196,7 @@ bool VertexBuffer::SetData(const void* data)
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
             return false;
         }
         
@@ -249,8 +248,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Vertex buffer data assignment while device is lost");
-            if (shadowData_)
-                dataPending_ = true;
+            dataPending_ = true;
             return false;
         }
         
