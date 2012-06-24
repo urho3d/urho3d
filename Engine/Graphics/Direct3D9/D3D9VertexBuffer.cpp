@@ -393,7 +393,7 @@ bool VertexBuffer::Create()
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Vertex buffer creation while device is lost");
-            return false;
+            return true;
         }
         
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();

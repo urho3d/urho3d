@@ -195,7 +195,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     {
         LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
-        return false;
+        return true;
     }
     
     if (IsCompressed())
@@ -486,7 +486,7 @@ bool Texture2D::Create()
     if (graphics_->IsDeviceLost())
     {
         LOGWARNING("Texture creation while device is lost");
-        return false;
+        return true;
     }
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();

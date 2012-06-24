@@ -329,7 +329,7 @@ bool IndexBuffer::Create()
         if (graphics_->IsDeviceLost())
         {
             LOGWARNING("Index buffer creation while device is lost");
-            return false;
+            return true;
         }
         
         graphics_->SetIndexBuffer(0);

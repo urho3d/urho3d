@@ -188,7 +188,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     {
         LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
-        return false;
+        return true;
     }
     
     if (IsCompressed())
@@ -593,7 +593,7 @@ bool TextureCube::Create()
     if (graphics_->IsDeviceLost())
     {
         LOGWARNING("Texture creation while device is lost");
-        return false;
+        return true;
     }
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
