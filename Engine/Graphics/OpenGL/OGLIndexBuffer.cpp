@@ -68,6 +68,10 @@ void IndexBuffer::OnDeviceReset()
         Create();
         dataLost_ = !UpdateToGPU();
     }
+    else if (dataPending_)
+        dataLost_ = !UpdateToGPU();
+    
+    dataPending_ = false;
 }
 
 void IndexBuffer::Release()
@@ -76,7 +80,7 @@ void IndexBuffer::Release()
     
     if (object_)
     {
-        if (!graphics_)
+        if (!graphics_ || graphics_->IsDeviceLost())
             return;
         
         if (graphics_->GetIndexBuffer() == this)
@@ -139,9 +143,18 @@ bool IndexBuffer::SetData(const void* data)
     
     if (object_)
     {
-        graphics_->SetIndexBuffer(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        if (!graphics_->IsDeviceLost())
+        {
+            graphics_->SetIndexBuffer(0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        }
+        else
+        {
+            LOGWARNING("Index buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+        }
     }
     
     dataLost_ = false;
@@ -179,12 +192,21 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     
     if (object_)
     {
-        graphics_->SetIndexBuffer(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
-        if (!discard || start != 0)
-            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
+        if (!graphics_->IsDeviceLost())
+        {
+            graphics_->SetIndexBuffer(0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_);
+            if (!discard || start != 0)
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start * indexSize_, count * indexSize_, data);
+            else
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        }
         else
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        {
+            LOGWARNING("Index buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+        }
     }
     
     return true;
@@ -306,6 +328,12 @@ bool IndexBuffer::Create()
     
     if (graphics_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Index buffer creation while device is lost");
+            return false;
+        }
+        
         graphics_->SetIndexBuffer(0);
         
         if (!object_)

@@ -1793,7 +1793,7 @@ void Graphics::Restore()
 {
     if (!impl_->window_)
         return;
-
+    
     // Ensure first that the context exists
     if (!impl_->context_)
     {

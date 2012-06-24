@@ -84,20 +84,32 @@ void Texture2D::OnDeviceLost()
 void Texture2D::OnDeviceReset()
 {
     // If has a file name, reload through the resource cache. Otherwise just recreate.
-    if (!GetName().Trimmed().Empty())
-        dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
-    else
+    if (!object_)
     {
-        Create();
-        dataLost_ = true;
+        if (!GetName().Trimmed().Empty())
+            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+        {
+            Create();
+            dataLost_ = true;
+        }
     }
+    else if (dataPending_)
+    {
+        if (!GetName().Trimmed().Empty())
+            dataLost_ = !GetSubsystem<ResourceCache>()->ReloadResource(this);
+        else
+            dataLost_ = true;
+    }
+    
+    dataPending_ = false;
 }
 
 void Texture2D::Release()
 {
     if (object_)
     {
-        if (!graphics_)
+        if (!graphics_ || graphics_->IsDeviceLost())
             return;
         
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -167,6 +179,13 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture data assignment while device is lost");
+        dataPending_ = true;
+        return false;
+    }
+    
     if (IsCompressed())
     {
         x &= ~3;
@@ -211,6 +230,13 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
     if (!image)
     {
         LOGERROR("Null image, can not load texture");
+        return false;
+    }
+    
+    if (graphics_ && graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture load while device is lost");
+        dataPending_ = true;
         return false;
     }
     
@@ -344,6 +370,12 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
     
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Getting texture data while device is lost");
+        return false;
+    }
+    
     graphics_->SetTextureForUpdate(const_cast<Texture2D*>(this));
     
     if (!IsCompressed())
@@ -354,7 +386,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
     #else
-    LOGERROR("Get texture data not supported");
+    LOGERROR("Getting texture data not supported");
     return false;
     #endif
 }
@@ -363,11 +395,14 @@ bool Texture2D::Create()
 {
     Release();
     
-    if (!graphics_)
+    if (!graphics_ || !width_ || !height_)
         return false;
     
-    if (!width_ || !height_)
+    if (graphics_->IsDeviceLost())
+    {
+        LOGWARNING("Texture creation while device is lost");
         return false;
+    }
     
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);

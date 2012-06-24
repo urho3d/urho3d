@@ -154,6 +154,10 @@ void VertexBuffer::OnDeviceReset()
         Create();
         dataLost_ = !UpdateToGPU();
     }
+    else if (dataPending_)
+        dataLost_ = !UpdateToGPU();
+    
+    dataPending_ = false;
 }
 
 void VertexBuffer::Release()
@@ -162,7 +166,7 @@ void VertexBuffer::Release()
     
     if (object_)
     {
-        if (!graphics_)
+        if (!graphics_ || graphics_->IsDeviceLost())
             return;
         
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
@@ -230,8 +234,17 @@ bool VertexBuffer::SetData(const void* data)
     
     if (object_)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        if (!graphics_->IsDeviceLost())
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        }
+        else
+        {
+            LOGWARNING("Vertex buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+        }
     }
     
     dataLost_ = false;
@@ -269,11 +282,20 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     
     if (object_)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        if (!discard || start != 0)
-            glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
+        if (!graphics_->IsDeviceLost())
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            if (!discard || start != 0)
+                glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
+            else
+                glBufferData(GL_ARRAY_BUFFER, count * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        }
         else
-            glBufferData(GL_ARRAY_BUFFER, count * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        {
+            LOGWARNING("Vertex buffer data assignment while device is lost");
+            if (shadowData_)
+                dataPending_ = true;
+        }
     }
     
     return true;
@@ -378,6 +400,12 @@ bool VertexBuffer::Create()
     
     if (graphics_)
     {
+        if (graphics_->IsDeviceLost())
+        {
+            LOGWARNING("Vertex buffer creation while device is lost");
+            return false;
+        }
+        
         if (!object_)
             glGenBuffers(1, &object_);
         if (!object_)

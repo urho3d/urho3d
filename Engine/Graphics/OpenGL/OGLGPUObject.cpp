@@ -30,7 +30,8 @@
 GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
     object_(0),
-    dataLost_(false)
+    dataLost_(false),
+    dataPending_(false)
 {
     if (graphics_)
         graphics->AddGPUObject(this);

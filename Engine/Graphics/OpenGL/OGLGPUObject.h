@@ -52,6 +52,8 @@ public:
     unsigned GetGPUObject() const { return object_; }
     /// Return whether data is lost due to context loss.
     bool IsDataLost() const { return dataLost_; }
+    /// Return whether has pending data assigned while device was lost.
+    bool HasPendingData() const { return dataPending_; }
     
 protected:
     /// Graphics subsystem.
@@ -60,4 +62,6 @@ protected:
     unsigned object_;
     /// Data lost flag.
     bool dataLost_;
+    /// Data pending flag.
+    bool dataPending_;
 };
