@@ -83,7 +83,7 @@ bool Shader::Load(Deserializer& source)
                 String hlslFileName = path + fileName + ".hlsl";
                 sourceModifiedTime_ = fileSystem->GetLastModifiedTime(hlslFileName);
                 
-                // Check also timestamps of any included files
+                // Check also timestamps of any included files and the shader description file
                 if (sourceModifiedTime_)
                 {
                     SharedPtr<File> file(new File(context_, hlslFileName));
@@ -98,6 +98,10 @@ bool Shader::Load(Deserializer& source)
                                 sourceModifiedTime_ = includeFileTime;
                         }
                     }
+                    
+                    unsigned descriptionFileTime = fileSystem->GetLastModifiedTime(fullFileName_);
+                    if (descriptionFileTime > sourceModifiedTime_)
+                        sourceModifiedTime_ = descriptionFileTime;
                 }
                 else
                 {
