@@ -361,21 +361,29 @@ void CompileShader(const String& fileName)
             hlslCode_ += hlslFile.ReadLine() + "\n";
     }
     
-    // Create and start worker threads. Use all logical CPUs except one to not lock up the computer completely
-    unsigned numWorkerThreads = GetNumLogicalCPUs() - 1;
-    if (!numWorkerThreads)
-        numWorkerThreads = 1;
-    
-    Vector<SharedPtr<WorkerThread> > workerThreads;
-    workerThreads.Resize(numWorkerThreads);
-    for (unsigned i = 0; i < workerThreads.Size(); ++i)
+    if (!compileVariation_)
     {
-        workerThreads[i] = new WorkerThread();
-        workerThreads[i]->Start();
+        // Create and start worker threads. Use all logical CPUs except one to not lock up the computer completely
+        unsigned numWorkerThreads = GetNumLogicalCPUs() - 1;
+        if (!numWorkerThreads)
+            numWorkerThreads = 1;
+        
+        Vector<SharedPtr<WorkerThread> > workerThreads;
+        workerThreads.Resize(numWorkerThreads);
+        for (unsigned i = 0; i < workerThreads.Size(); ++i)
+        {
+            workerThreads[i] = new WorkerThread();
+            workerThreads[i]->Start();
+        }
+        // This will wait until the thread functions have stopped
+        for (unsigned i = 0; i < workerThreads.Size(); ++i)
+            workerThreads[i]->Stop();
     }
-    // This will wait until the thread functions have stopped
-    for (unsigned i = 0; i < workerThreads.Size(); ++i)
-        workerThreads[i]->Stop();
+    else
+    {
+        WorkerThread dummyThread;
+        dummyThread.ThreadFunction();
+    }
     
     // Check that all shaders compiled
     for (List<CompiledVariation>::Iterator i = variations_.Begin(); i != variations_.End(); ++i)
