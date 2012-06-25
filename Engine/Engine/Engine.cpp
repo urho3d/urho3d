@@ -72,7 +72,7 @@ Engine::Engine(Context* context) :
 
 Engine::~Engine()
 {
-    // Remove subsystems that use SDL (OpenGL mode only) in reverse order of construction
+    // Remove subsystems that use SDL in reverse order of construction
     context_->RemoveSubsystem<Audio>();
     context_->RemoveSubsystem<UI>();
     context_->RemoveSubsystem<Input>();
