@@ -144,7 +144,6 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
-    wasMinimized_(false),
     numPrimitives_(0),
     numBatches_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
@@ -275,7 +274,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        // Create/restore context and GPU objects and set initial renderstate
+        Restore();
+        
         if (!impl_->context_)
         {
             LOGERROR("Could not create OpenGL context");
@@ -293,7 +294,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             Release(true, true);
             return false;
         }
-
+        
         if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil") ||
             !CheckExtension("EXT_texture_filter_anisotropic"))
         {
@@ -332,8 +333,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
-    // Let GPU objects restore themselves and set initial renderstate
-    Restore();
     CheckFeatureSupport();
     
     if (multiSample > 1)
@@ -386,24 +385,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
 bool Graphics::BeginFrame()
 {
-    bool minimized = impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED);
-    
     if (!IsInitialized() || IsDeviceLost())
-    {
-        wasMinimized_ = minimized;
         return false;
-    }
-
-    #ifdef IOS
-    // On iOS, check for end of minimization and apply pending GPU resource updates
-    if (wasMinimized_ && !minimized)
-    {
-        LOGDEBUG("Application restored, updating pending GPU resources");
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->OnDeviceReset();
-    }
-    #endif
-    wasMinimized_ = minimized;
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
@@ -1770,9 +1753,6 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
-    if (!closeWindow)
-        LOGINFO("OpenGL context lost");
-    
     if (clearGPUObjects)
     {
         // Shutting down: release all GPU objects that still exist
@@ -1793,6 +1773,10 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     
     if (impl_->context_)
     {
+        // Do not log this message if we are exiting
+        if (!clearGPUObjects)
+            LOGINFO("OpenGL context lost");
+        
         MutexLock lock(GetStaticMutex());
         
         SDL_GL_DeleteContext(impl_->context_);
@@ -1821,14 +1805,13 @@ void Graphics::Restore()
         #ifdef IOS
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
         #endif
+        ResetCachedState();
     }
     if (!impl_->context_)
         return;
     
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
-    
-    ResetCachedState();
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)

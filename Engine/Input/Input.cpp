@@ -626,6 +626,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
             case SDL_WINDOWEVENT_RESTORED:
                 input->minimized_ = false;
                 input->SendActivationEvent();
+            #ifdef IOS
+                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet.
+                // Apply them now
+                input->graphics_->Restore();
+            #endif
                 break;
                 
             #ifdef ANDROID
