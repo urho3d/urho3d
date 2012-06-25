@@ -250,8 +250,7 @@ void Script::DumpAPI()
     unsigned functions = scriptEngine_->GetGlobalFunctionCount();
     for (unsigned i = 0; i < functions; ++i)
     {
-        unsigned id = scriptEngine_->GetGlobalFunctionIdByIndex(i);
-        asIScriptFunction* function = scriptEngine_->GetFunctionById(id);
+        asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
         

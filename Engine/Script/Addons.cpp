@@ -114,8 +114,7 @@ static bool ScriptArrayTemplateCallback(asIObjectType *ot)
             // Verify that there is a default factory
             for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
             {
-                int funcId = subtype->GetFactoryIdByIndex(n);
-                asIScriptFunction *func = ot->GetEngine()->GetFunctionById(funcId);
+                asIScriptFunction *func = subtype->GetFactoryByIndex(n);
                 if( func->GetParamCount() == 0 )
                 {
                     // Found the default factory
@@ -522,7 +521,7 @@ bool CScriptArray::Less(const void *a, const void *b, bool asc, asIScriptContext
         
         // Execute object opCmp
         // TODO: Add proper error handling
-        r = ctx->Prepare(cmpFuncId); assert(r >= 0);
+        r = ctx->Prepare(cmpFunc); assert(r >= 0);
         r = ctx->SetObject((void*)a); assert(r >= 0);
         r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
         r = ctx->Execute();
@@ -579,10 +578,10 @@ bool CScriptArray::Equals(const void *a, const void *b, asIScriptContext *ctx)
         int r = 0;
         
         // Execute object opEquals if available
-        if( eqFuncId >= 0 )
+        if( eqFunc )
         {
             // TODO: Add proper error handling
-            r = ctx->Prepare(eqFuncId); assert(r >= 0);
+            r = ctx->Prepare(eqFunc); assert(r >= 0);
             r = ctx->SetObject((void*)a); assert(r >= 0);
             r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
             r = ctx->Execute();
@@ -594,10 +593,10 @@ bool CScriptArray::Equals(const void *a, const void *b, asIScriptContext *ctx)
         }
         
         // Execute object opCmp if available
-        if( cmpFuncId >= 0 )
+        if( cmpFunc )
         {
             // TODO: Add proper error handling
-            r = ctx->Prepare(cmpFuncId); assert(r >= 0);
+            r = ctx->Prepare(cmpFunc); assert(r >= 0);
             r = ctx->SetObject((void*)a); assert(r >= 0);
             r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
             r = ctx->Execute();
@@ -620,7 +619,7 @@ int CScriptArray::Find(void *value)
 int CScriptArray::Find(asUINT index, void *value)
 {
     // Subtype isn't primitive and doesn't have opEquals / opCmp
-    if( subTypeId > asTYPEID_DOUBLE && (cmpFuncId <= 0 && eqFuncId <= 0) )
+    if( subTypeId > asTYPEID_DOUBLE && (cmpFunc == 0 && eqFunc == 0) )
     {
         asIScriptContext *ctx = asGetActiveContext();
         asIObjectType* subType = objType->GetEngine()->GetObjectTypeById(subTypeId);
@@ -730,7 +729,7 @@ void CScriptArray::SortDesc(asUINT index, asUINT count)
 void CScriptArray::Sort(asUINT index, asUINT count, bool asc)
 {
     // Subtype isn't primitive and doesn't have opCmp
-    if( subTypeId > asTYPEID_DOUBLE && cmpFuncId <= 0 )
+    if( subTypeId > asTYPEID_DOUBLE && cmpFunc == 0 )
     {
         asIScriptContext *ctx = asGetActiveContext();
         asIObjectType* subType = objType->GetEngine()->GetObjectTypeById(subTypeId);
@@ -860,8 +859,8 @@ void CScriptArray::Precache()
     
     subTypeId = objType->GetSubTypeId();
     
-    cmpFuncId = -1;
-    eqFuncId = -1;
+    cmpFunc = 0;
+    eqFunc = 0;
     
     // Object - search for opCmp / opEquals
     if( subTypeId > asTYPEID_DOUBLE )
@@ -884,15 +883,15 @@ void CScriptArray::Precache()
                     {
                         if( returnTypeId == asTYPEID_INT32 && strcmp(func->GetName(), "opCmp") == 0 )
                         {
-                            cmpFuncId = subType->GetMethodIdByIndex(i);
+                            cmpFunc = subType->GetMethodByIndex(i);
                         }
                         
                         if( returnTypeId == asTYPEID_BOOL && strcmp(func->GetName(), "opEquals") == 0 )
                         {
-                            eqFuncId = subType->GetMethodIdByIndex(i);
+                            eqFunc = subType->GetMethodByIndex(i);
                         }
                         
-                        if( cmpFuncId >= 0 && eqFuncId >= 0 )
+                        if( cmpFunc != 0 && eqFunc != 0 )
                         {
                             break;
                         }

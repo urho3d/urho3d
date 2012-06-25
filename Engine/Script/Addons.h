@@ -72,8 +72,8 @@ protected:
     asIObjectType *objType;
     SArrayBuffer *buffer;
     int elementSize;
-    int cmpFuncId;
-    int eqFuncId;
+    asIScriptFunction* cmpFunc;
+    asIScriptFunction* eqFunc;
     int subTypeId;
     
     bool Less(const void *a, const void *b, bool asc, asIScriptContext *ctx);
