@@ -150,13 +150,6 @@ Script::Script(Context* context) :
     immediateContext_ = scriptEngine_->CreateContext();
     immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
     
-    // Create the function/method contexts
-    for (unsigned i = 0 ; i < MAX_SCRIPT_NESTING_LEVEL; ++i)
-    {
-        scriptFileContexts_.Push(scriptEngine_->CreateContext());
-        scriptFileContexts_[i]->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
-    }
-    
     // Register the Array & String types
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
@@ -169,11 +162,9 @@ Script::~Script()
         immediateContext_->Release();
         immediateContext_ = 0;
     }
-    for (unsigned i = 0 ; i < MAX_SCRIPT_NESTING_LEVEL; ++i)
-    {
-        if (scriptFileContexts_[i])
-            scriptFileContexts_[i]->Release();
-    }
+    
+    for (unsigned i = 0 ; i < scriptFileContexts_.Size(); ++i)
+        scriptFileContexts_[i]->Release();
     scriptFileContexts_.Clear();
     
     if (scriptEngine_)
@@ -436,9 +427,16 @@ asIObjectType* Script::GetObjectType(const char* declaration)
     return type;
 }
 
-asIScriptContext* Script::GetScriptFileContext() const
+asIScriptContext* Script::GetScriptFileContext()
 {
-    return scriptNestingLevel_ < scriptFileContexts_.Size() ? scriptFileContexts_[scriptNestingLevel_] : 0;
+    while (scriptNestingLevel_ >= scriptFileContexts_.Size())
+    {
+        asIScriptContext* newContext = scriptEngine_->CreateContext();
+        newContext->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+        scriptFileContexts_.Push(newContext);
+    }
+    
+    return scriptFileContexts_[scriptNestingLevel_];
 }
 
 void Script::OutputAPIRow(const String& row, bool removeReference)

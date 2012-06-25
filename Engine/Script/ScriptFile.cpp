@@ -170,12 +170,6 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     Script* scriptSystem = script_;
     
     asIScriptContext* context = scriptSystem->GetScriptFileContext();
-    if (!context)
-    {
-        LOGERROR("Maximum script execution nesting level exceeded");
-        return false;
-    }
-    
     if (context->Prepare(function) < 0)
         return false;
     
@@ -214,12 +208,6 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
     Script* scriptSystem = script_;
     
     asIScriptContext* context = scriptSystem->GetScriptFileContext();
-    if (!context)
-    {
-        LOGERROR("Maximum script execution nesting level exceeded");
-        return false;
-    }
-    
     if (context->Prepare(method) < 0)
         return false;
     
@@ -243,12 +231,6 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
         return 0;
     
     asIScriptContext* context = script_->GetScriptFileContext();
-    if (!context)
-    {
-        LOGERROR("Maximum script execution nesting level exceeded, can not create object");
-        return 0;
-    }
-    
     asIScriptEngine* engine = script_->GetScriptEngine();
     asIObjectType *type = engine->GetObjectTypeById(scriptModule_->GetTypeIdByDecl(className.CString()));
     if (!type)

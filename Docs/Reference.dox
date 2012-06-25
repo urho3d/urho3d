@@ -347,8 +347,6 @@ There are some complexities of the scripting system one has to watch out for:
 
 - During the execution of the script object's constructor, the object is not yet associated with the ScriptInstance, and therefore subscribing to events, or trying to access the node or scene will fail. The use of the constructor is best reserved for initializing member variables only.
 
-- There is a maximum allowed nesting level (currently 32) for execution that moves between C++ & AngelScript. Nested execution typically occurs if you send an event to another ScriptInstance from a scripted event handler. If the nesting level is exceeded, an error will be logged and the script code that would have required the extra nesting level will not be executed.
-
 - When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules, unless the classes are declared shared. See AngelScript documentation for more details.
 
 - If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development.

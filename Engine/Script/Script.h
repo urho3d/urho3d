@@ -42,9 +42,6 @@ enum ScriptLogMode
     LOGMODE_RETAINED
 };
 
-/// Maximum function/method nesting level.
-static const unsigned MAX_SCRIPT_NESTING_LEVEL = 32;
-
 /// Scripting subsystem. Allows execution of AngelScript.
 class Script : public Object
 {
@@ -100,7 +97,7 @@ private:
     /// Return current script nesting level.
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
     /// Return a script function/method execution context for the current execution nesting level.
-    asIScriptContext* GetScriptFileContext() const;
+    asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API.
     void OutputAPIRow(const String& row, bool removeReference = false);
     
