@@ -49,6 +49,23 @@
 
 #include "DebugNew.h"
 
+#if defined(_MSC_VER) && defined(_DEBUG)
+// From dbgint.h
+#define nNoMansLandSize 4
+
+typedef struct _CrtMemBlockHeader
+{
+    struct _CrtMemBlockHeader* pBlockHeaderNext;
+    struct _CrtMemBlockHeader* pBlockHeaderPrev;
+    char* szFileName;
+    int nLine;
+    size_t nDataSize;
+    int nBlockUse;
+    long lRequest;
+    unsigned char gap[nNoMansLandSize];
+} _CrtMemBlockHeader;
+#endif
+
 OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
@@ -404,6 +421,44 @@ void Engine::DumpResources()
     }
     
     LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+}
+
+void Engine::DumpMemory()
+{
+    #if defined(_MSC_VER) && defined(_DEBUG)
+    _CrtMemState state;
+    _CrtMemCheckpoint(&state);
+    _CrtMemBlockHeader* block = state.pBlockHeader;
+    unsigned total = 0;
+    unsigned blocks = 0;
+    
+    for (;;)
+    {
+        if (block && block->pBlockHeaderNext)
+            block = block->pBlockHeaderNext;
+        else
+            break;
+    }
+    
+    while (block)
+    {
+        if (block->nBlockUse > 0)
+        {
+            if (block->szFileName)
+                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
+            else
+                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
+            
+            total += block->nDataSize;
+            ++blocks;
+        }
+        block = block->pBlockHeaderPrev;
+    }
+    
+    LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
+    #else
+    LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
+    #endif
 }
 
 void Engine::Update()

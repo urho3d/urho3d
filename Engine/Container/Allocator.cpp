@@ -25,6 +25,8 @@
 
 #include "stdio.h"
 
+#include "DebugNew.h"
+
 AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSize, unsigned capacity)
 {
     if (!capacity)

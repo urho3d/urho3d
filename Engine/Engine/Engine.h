@@ -65,6 +65,8 @@ public:
     void DumpProfilingData();
     /// Dump information of all resources to the log.
     void DumpResources();
+    /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
+    void DumpMemory();
     
     /// Return the minimum frames per second.
     int GetMinFps() const { return minFps_; }

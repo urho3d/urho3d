@@ -26,6 +26,8 @@
 
 #include <cstdio>
 
+#include "DebugNew.h"
+
 char String::endZero = 0;
 
 String::String(const WString& str) :

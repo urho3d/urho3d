@@ -25,6 +25,8 @@
 
 #include <cassert>
 
+#include "DebugNew.h"
+
 RefCounted::RefCounted() :
     refCount_(new RefCount())
 {
