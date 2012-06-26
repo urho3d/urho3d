@@ -412,6 +412,9 @@ public:
         #endif
     }
     
+    /// Compare two C strings.
+    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    
     /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;
     /// Initial dynamic allocation size.

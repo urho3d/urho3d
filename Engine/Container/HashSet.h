@@ -471,7 +471,7 @@ private:
     {
         delete[] ptrs_;
         
-        ptrs_ = new HashNodeBase*[numBuckets_];
+        ptrs_ = AllocateBuckets(numBuckets_);
         for (unsigned i = 0; i < numBuckets_; ++i)
             ptrs_[i] = 0;
         

@@ -61,6 +61,7 @@ struct AttributeInfo
     /// Construct empty.
     AttributeInfo() :
         type_(VAR_NONE),
+        name_(0),
         offset_(0),
         enumNames_(0),
         mode_(AM_DEFAULT)
@@ -79,7 +80,7 @@ struct AttributeInfo
     }
     
     /// Construct offset enum attribute.
-    AttributeInfo(const char* name, unsigned offset, const String* enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(const char* name, unsigned offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(VAR_INT),
         name_(name),
         offset_(offset),
@@ -102,7 +103,7 @@ struct AttributeInfo
     }
     
     /// Construct accessor enum attribute.
-    AttributeInfo(const char* name, AttributeAccessor* accessor, const String* enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(const char* name, AttributeAccessor* accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(VAR_INT),
         name_(name),
         offset_(0),
@@ -116,11 +117,11 @@ struct AttributeInfo
     /// Attribute type.
     VariantType type_;
     /// Name.
-    String name_;
+    const char* name_;
     /// Byte offset from start of object.
     unsigned offset_;
-    /// Enum string names.
-    const String* enumNames_;
+    /// Enum names.
+    const char** enumNames_;
     /// Helper object for accessor mode.
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication.

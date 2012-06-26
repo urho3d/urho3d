@@ -28,7 +28,7 @@
 
 static String noType;
 
-void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const String& name)
+void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const char* name)
 {
     HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
@@ -38,7 +38,7 @@ void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attr
     
     for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
-        if (j->name_ == name)
+        if (!String::Compare(j->name_, name, true))
         {
             infos.Erase(j);
             break;
@@ -109,7 +109,7 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
         networkAttributes_[objectType].Push(attr);
 }
 
-void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
+void Context::RemoveAttribute(ShortStringHash objectType, const char* name)
 {
     RemoveNamedAttribute(attributes_, objectType, name);
     RemoveNamedAttribute(networkAttributes_, objectType, name);

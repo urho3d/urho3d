@@ -40,13 +40,13 @@
 
 #include "DebugNew.h"
 
-static const String typeNames[] =
+static const char* typeNames[] =
 {
     "Point",
     "Hinge",
     "Slider",
     "ConeTwist",
-    ""
+    0
 };
 
 OBJECTTYPESTATIC(Constraint);

@@ -49,7 +49,7 @@
 
 static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
-static const String typeNames[] = 
+static const char* typeNames[] = 
 {
     "Box",
     "Sphere",
@@ -58,7 +58,7 @@ static const String typeNames[] =
     "Cone",
     "TriangleMesh",
     "ConvexHull",
-    ""
+    0
 };
 
 TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :

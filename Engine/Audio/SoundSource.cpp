@@ -88,13 +88,13 @@
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const String typeNames[] =
+static const char* typeNames[] =
 {
     "Effect",
     "Ambient",
     "Voice",
     "Music",
-    ""
+    0
 };
 
 static const float AUTOREMOVE_DELAY = 0.25f;

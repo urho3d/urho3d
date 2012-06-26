@@ -140,24 +140,15 @@ bool Shader::Load(Deserializer& source)
         return false;
     }
     
-    String path, fileName, extension;
-    SplitPath(GetName(), path, fileName, extension);
-    
+    // Do not create shader variations yet, but create space for them in the hash map
     const Vector<ShaderCombination>& vsCombinations = vsParser.GetCombinations();
     for (Vector<ShaderCombination>::ConstIterator i = vsCombinations.Begin(); i != vsCombinations.End(); ++i)
     {
         StringHash nameHash(i->name_);
-        String compiledShaderName = path + fileName;
-        if (!i->name_.Empty())
-            compiledShaderName += "_" + i->name_;
-        compiledShaderName += graphics->GetSM3Support() ? ".vs3" : ".vs2";
         
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = vsVariations_.Find(nameHash);
         if (j == vsVariations_.End())
-        {
-            j = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-            j->second_->SetName(compiledShaderName);
-        }
+            j = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>()));
         else
         {
             // If shader variation already exists, release and reset bytecode
@@ -170,17 +161,10 @@ bool Shader::Load(Deserializer& source)
     for (Vector<ShaderCombination>::ConstIterator i = psCombinations.Begin(); i != psCombinations.End(); ++i)
     {
         StringHash nameHash(i->name_);
-        String compiledShaderName = path + fileName;
-        if (!i->name_.Empty())
-            compiledShaderName += "_" + i->name_;
-        compiledShaderName += graphics->GetSM3Support() ? ".ps3" : ".ps2";
         
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = psVariations_.Find(nameHash);
         if (j == psVariations_.End())
-        {
-            j = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-            j->second_->SetName(compiledShaderName);
-        }
+            j = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>()));
         else
         {
             // If shader variation already exists, release and reset bytecode
@@ -189,7 +173,7 @@ bool Shader::Load(Deserializer& source)
         }
     }
     
-    memoryUse += (vsVariations_.Size() + psVariations_.Size()) * sizeof(ShaderVariation);
+    memoryUse += (vsVariations_.Size() + psVariations_.Size()) * sizeof(SharedPtr<ShaderVariation>);
     SetMemoryUse(memoryUse);
     
     return true;
@@ -197,13 +181,36 @@ bool Shader::Load(Deserializer& source)
 
 ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
 {
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return 0;
+    
     StringHash nameHash(name);
     
     if (type == VS)
     {
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(nameHash);
         if (i != vsVariations_.End())
+        {
+            // Create the shader variation now if not created yet
+            if (!i->second_)
+            {
+                String path, fileName, extension;
+                SplitPath(GetName(), path, fileName, extension);
+                
+                String compiledShaderName = path + fileName;
+                if (!name.Empty())
+                    compiledShaderName += "_" + name;
+                compiledShaderName += graphics->GetSM3Support() ? ".vs3" : ".vs2";
+                
+                i->second_ = new ShaderVariation(this, VS);
+                i->second_->SetName(compiledShaderName);
+                
+                SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
+            }
+            
             return i->second_;
+        }
         else
             return 0;
     }
@@ -211,7 +218,26 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
     {
         HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(nameHash);
         if (i != psVariations_.End())
+        {
+            // Create the shader variation now if not created yet
+            if (!i->second_)
+            {
+                String path, fileName, extension;
+                SplitPath(GetName(), path, fileName, extension);
+                
+                String compiledShaderName = path + fileName;
+                if (!name.Empty())
+                    compiledShaderName += "_" + name;
+                compiledShaderName += graphics->GetSM3Support() ? ".ps3" : ".ps2";
+                
+                i->second_ = new ShaderVariation(this, PS);
+                i->second_->SetName(compiledShaderName);
+                
+                SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
+            }
+            
             return i->second_;
+        }
         else
             return 0;
     }

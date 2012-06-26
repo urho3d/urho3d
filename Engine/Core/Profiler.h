@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "Str.h"
 #include "Timer.h"
 
 /// Profiling data for one block in the profiling tree.
@@ -36,8 +37,6 @@ public:
         maxTime_(0),
         count_(0),
         parent_(parent),
-        lastSearchName_(0),
-        lastSearchBlock_(0),
         frameTime_(0),
         frameMaxTime_(0),
         frameCount_(0),
@@ -112,24 +111,22 @@ public:
     /// Return child block with the specified name.
     ProfilerBlock* GetChild(const char* name)
     {
-        if (name == lastSearchName_)
-            return lastSearchBlock_;
-        
-        lastSearchName_ = name;
-        
+        // First check using string pointers only, then resort to actual strcmp
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if ((*i)->name_ == name)
-            {
-                lastSearchBlock_ = *i;
                 return *i;
-            }
+        }
+        
+        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            if (!String::Compare((*i)->name_, name, true))
+                return *i;
         }
         
         ProfilerBlock* newBlock = new ProfilerBlock(this, name);
         children_.Push(newBlock);
         
-        lastSearchBlock_ = newBlock;
         return newBlock;
     }
     
@@ -145,10 +142,6 @@ public:
     unsigned count_;
     /// Parent block.
     ProfilerBlock* parent_;
-    /// Last queried child block name (optimization.)
-    const char* lastSearchName_;
-    /// Last queried child block (optimization.)
-    ProfilerBlock* lastSearchBlock_;
     /// Child blocks.
     PODVector<ProfilerBlock*> children_;
     /// Time on the previous frame.

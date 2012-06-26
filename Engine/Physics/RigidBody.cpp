@@ -50,12 +50,12 @@ static const float DEFAULT_ANGULAR_REST_THRESHOLD = 1.0f;
 static const unsigned DEFAULT_COLLISION_LAYER = 0x1;
 static const unsigned DEFAULT_COLLISION_MASK = M_MAX_UNSIGNED;
 
-static const String collisionEventModeNames[] = 
+static const char* collisionEventModeNames[] = 
 {
     "Never",
     "When Active",
     "Always",
-    ""
+    0
 };
 
 OBJECTTYPESTATIC(RigidBody);

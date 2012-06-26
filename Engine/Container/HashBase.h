@@ -114,6 +114,8 @@ public:
     }
 
 protected:
+    static HashNodeBase** AllocateBuckets(unsigned numBuckets);
+    
     /// List head node pointer.
     HashNodeBase* head_;
     /// List tail node pointer.

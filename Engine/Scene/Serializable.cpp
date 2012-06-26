@@ -271,18 +271,18 @@ bool Serializable::LoadXML(const XMLElement& source)
         while (attempts)
         {
             const AttributeInfo& attr = attributes->At(i);
-            if ((attr.mode_ & AM_FILE) && attr.name_ == name)
+            if ((attr.mode_ & AM_FILE) && !String::Compare(attr.name_, name, true))
             {
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
                     const char* value = attrElem.GetAttribute("value");
-                    const String* enumPtr = attr.enumNames_;
+                    const char** enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
-                    while (enumPtr->Length())
+                    while (*enumPtr)
                     {
-                        if (*enumPtr == value)
+                        if (!String::Compare(*enumPtr, value, true))
                         {
                             enumFound = true;
                             break;
@@ -338,13 +338,13 @@ bool Serializable::SaveXML(XMLElement& dest)
             continue;
         
         XMLElement attrElem = dest.CreateChild("attribute");
-        attrElem.SetAttribute("name", attr.name_.CString());
+        attrElem.SetAttribute("name", attr.name_);
         OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
             int enumValue = value.GetInt();
-            attrElem.SetAttribute("value", attr.enumNames_[enumValue].CString());
+            attrElem.SetAttribute("value", attr.enumNames_[enumValue]);
         }
         else
             attrElem.SetVariantValue(value);
@@ -394,7 +394,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
-        if (i->name_ == name)
+        if (!String::Compare(i->name_, name.CString(), true))
         {
             // Check that the new value's type matches the attribute type
             if (value.GetType() == i->type_)
@@ -565,7 +565,7 @@ Variant Serializable::GetAttribute(const String& name)
     
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
-        if (i->name_ == name)
+        if (!String::Compare(i->name_, name.CString(), true))
         {
             OnGetAttribute(*i, ret);
             return ret;

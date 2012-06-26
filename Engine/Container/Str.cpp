@@ -571,36 +571,12 @@ bool String::EndsWith(const String& str) const
 
 int String::Compare(const String& str, bool caseSensitive) const
 {
-    return Compare(str.CString(), caseSensitive);
+    return Compare(CString(), str.CString(), caseSensitive);
 }
 
 int String::Compare(const char* str, bool caseSensitive) const
 {
-    const char* lhs = CString();
-    const char* rhs = str;
-    
-    if (caseSensitive)
-        return strcmp(lhs, rhs);
-    else
-    {
-        if (!lhs || !rhs)
-            return lhs ? 1 : (rhs ? -1 : 0);
-        
-        for (;;)
-        {
-            char l = tolower(*lhs);
-            char r = tolower(*rhs);
-            if (!l || !r)
-                return l ? 1 : (r ? -1 : 0);
-            if (l < r)
-                return -1;
-            if (l > r)
-                return 1;
-            
-            ++lhs;
-            ++rhs;
-        }
-    }
+    return Compare(CString(), str, caseSensitive);
 }
 
 void String::SetUTF8FromLatin1(const char* str)
@@ -954,6 +930,32 @@ Vector<String> String::Split(const char* str, char separator)
     }
     
     return ret;
+}
+
+int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)
+{
+    if (!lhs || !rhs)
+        return lhs ? 1 : (rhs ? -1 : 0);
+    
+    if (caseSensitive)
+        return strcmp(lhs, rhs);
+    else
+    {
+        for (;;)
+        {
+            char l = tolower(*lhs);
+            char r = tolower(*rhs);
+            if (!l || !r)
+                return l ? 1 : (r ? -1 : 0);
+            if (l < r)
+                return -1;
+            if (l > r)
+                return 1;
+            
+            ++lhs;
+            ++rhs;
+        }
+    }
 }
 
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)

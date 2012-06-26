@@ -162,6 +162,8 @@ public:
     }
     
 protected:
+    static unsigned char* AllocateBuffer(unsigned size);
+    
     /// Size of vector.
     unsigned size_;
     /// Buffer capacity.
