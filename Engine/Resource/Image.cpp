@@ -462,7 +462,7 @@ bool Image::Load(Deserializer& source)
         }
         SetSize(width, height, components);
         SetData(pixelData);
-       
+        FreeImageData(pixelData);
     }
     
     return true;
