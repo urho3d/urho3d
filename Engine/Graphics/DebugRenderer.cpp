@@ -429,11 +429,14 @@ bool DebugRenderer::IsInside(const BoundingBox& box) const
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)
 {
     // When the amount of debug geometry is reduced, release memory
-    if (lines_.Capacity() > lines_.Size() * 2)
-        lines_.Compact();
-    if (noDepthLines_.Capacity() > noDepthLines_.Size() * 2)
-        noDepthLines_.Compact();
+    unsigned linesSize = lines_.Size();
+    unsigned noDepthLinesSize = noDepthLines_.Size();
     
     lines_.Clear();
     noDepthLines_.Clear();
+    
+    if (lines_.Capacity() > linesSize * 2)
+        lines_.Reserve(linesSize);
+    if (noDepthLines_.Capacity() > noDepthLinesSize * 2)
+        noDepthLines_.Reserve(noDepthLinesSize);
 }
