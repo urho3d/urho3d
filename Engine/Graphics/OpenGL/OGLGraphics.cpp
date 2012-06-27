@@ -146,10 +146,10 @@ Graphics::Graphics(Context* context_) :
     pvrtcTextureSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
+    maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
-    hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
-    shaderParameterFrame_(0)
+    hiresShadowMapFormat_(GL_DEPTH_COMPONENT24)
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -418,8 +418,9 @@ void Graphics::EndFrame()
     
     SDL_GL_SwapWindow(impl_->window_);
     
-    // Clean up FBO's that have not been used for a long time
+    // Clean up FBO's that have not been used for a long time, and too large scratch buffers
     CleanupFramebuffers(false);
+    CleanupScratchBuffers();
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
@@ -1700,6 +1701,9 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     if (!size)
         return 0;
     
+    if (size > maxScratchBufferRequest_)
+        maxScratchBufferRequest_ = size;
+    
     // First check for a free buffer that is large enough
     for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
     {
@@ -1751,6 +1755,22 @@ void Graphics::FreeScratchBuffer(void* buffer)
     }
     
     LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)buffer) + " not found");
+}
+
+void Graphics::CleanupScratchBuffers()
+{
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    {
+        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2)
+        {
+            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
+            i->size_ = maxScratchBufferRequest_;
+            
+            LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
+        }
+    }
+    
+    maxScratchBufferRequest_ = 0;
 }
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)

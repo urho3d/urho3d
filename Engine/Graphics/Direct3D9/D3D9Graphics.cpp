@@ -179,6 +179,7 @@ Graphics::Graphics(Context* context) :
     forceSM2_(false),
     numPrimitives_(0),
     numBatches_(0),
+    maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR)
 {
     SetTextureUnitMappings();
@@ -578,6 +579,9 @@ void Graphics::EndFrame()
     
     impl_->device_->EndScene();
     impl_->device_->Present(0, 0, 0, 0);
+    
+    // Clean up too large scratch buffers
+    CleanupScratchBuffers();
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
@@ -1791,11 +1795,13 @@ void Graphics::RemoveGPUObject(GPUObject* object)
     gpuObjects_.Erase(gpuObjects_.Find(object));
 }
 
-
 void* Graphics::ReserveScratchBuffer(unsigned size)
 {
     if (!size)
         return 0;
+    
+    if (size > maxScratchBufferRequest_)
+        maxScratchBufferRequest_ = size;
     
     // First check for a free buffer that is large enough
     for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
@@ -1846,8 +1852,24 @@ void Graphics::FreeScratchBuffer(void* buffer)
             return;
         }
     }
-    
+
     LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)buffer) + " not found");
+}
+
+void Graphics::CleanupScratchBuffers()
+{
+    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
+    {
+        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2)
+        {
+            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
+            i->size_ = maxScratchBufferRequest_;
+            
+            LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
+        }
+    }
+    
+    maxScratchBufferRequest_ = 0;
 }
 
 unsigned Graphics::GetAlphaFormat()

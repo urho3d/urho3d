@@ -328,6 +328,8 @@ public:
     void* ReserveScratchBuffer(unsigned size);
     /// Free a CPU-side scratch buffer.
     void FreeScratchBuffer(void* buffer);
+    /// Clean up too large scratch buffers.
+    void CleanupScratchBuffers();
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
@@ -398,6 +400,8 @@ private:
     unsigned numPrimitives_;
     /// Number of batches this frame.
     unsigned numBatches_;
+    /// Largest scratch buffer request this frame.
+    unsigned maxScratchBufferRequest_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
@@ -420,8 +424,6 @@ private:
     ShaderProgram* shaderProgram_;
     /// Linked shader programs.
     ShaderProgramMap shaderPrograms_;
-    /// Shader parameters global frame number.
-    unsigned shaderParameterFrame_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// OpenGL texture types in use.

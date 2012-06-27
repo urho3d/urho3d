@@ -318,6 +318,8 @@ public:
     void* ReserveScratchBuffer(unsigned size);
     /// Free a CPU-side scratch buffer.
     void FreeScratchBuffer(void* buffer);
+    /// Clean up too large scratch buffers.
+    void CleanupScratchBuffers();
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -402,6 +404,8 @@ private:
     unsigned numPrimitives_;
     /// Number of batches this frame.
     unsigned numBatches_;
+    /// Largest scratch buffer request this frame.
+    unsigned maxScratchBufferRequest_;
     /// GPU objects.
     Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
