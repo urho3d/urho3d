@@ -160,7 +160,7 @@ Graphics::Graphics(Context* context_) :
         MutexLock lock(GetStaticMutex());
         
         if (!numInstances)
-            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
         ++numInstances;
     }
 }

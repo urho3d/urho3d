@@ -203,6 +203,11 @@
 - int KEY_RCTRL
 - int KEY_LALT
 - int KEY_RALT
+- int HAT_CENTER
+- int HAT_UP
+- int HAT_RIGHT
+- int HAT_DOWN
+- int HAT_LEFT
 - uint DD_DISABLED
 - uint DD_SOURCE
 - uint DD_TARGET
@@ -722,6 +727,7 @@ AttributeInfo
 
 Properties:<br>
 - String[]@ enumNames (readonly)
+- String name (readonly)
 - VariantType type
 - String name
 - Variant defaultValue
@@ -2380,7 +2386,23 @@ Properties:<br>
 - int pressure
 
 
+JoystickState
+
+Properties:<br>
+- uint numButtons (readonly)
+- uint numAxes (readonly)
+- uint numHats (readonly)
+- bool[] buttons (readonly)
+- float[] axes (readonly)
+- int[] hats (readonly)
+- String name
+
+
 Input
+
+Methods:<br>
+- bool OpenJoystick(uint)
+- bool CloseJoystick(uint)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2398,7 +2420,10 @@ Properties:<br>
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
 - uint numTouches (readonly)
-- TouchState[] touches (readonly)
+- TouchState@[] touches (readonly)
+- uint numJoysticks (readonly)
+- String[] joystickNames (readonly)
+- JoystickState@[] joysticks (readonly)
 - bool active (readonly)
 - bool minimized (readonly)
 

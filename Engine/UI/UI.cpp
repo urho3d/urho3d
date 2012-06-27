@@ -217,10 +217,10 @@ void UI::Update(float timeStep)
         unsigned numTouches = input->GetNumTouches();
         for (unsigned i = 0; i < numTouches; ++i)
         {
-            TouchState touch = input->GetTouch(i);
-            WeakPtr<UIElement> element(GetElementAt(touch.position_));
+            TouchState* touch = input->GetTouch(i);
+            WeakPtr<UIElement> element(GetElementAt(touch->position_));
             if (element)
-                element->OnHover(element->ScreenToElement(touch.position_), touch.position_, MOUSEB_LEFT, 0, 0);
+                element->OnHover(element->ScreenToElement(touch->position_), touch->position_, MOUSEB_LEFT, 0, 0);
         }
     }
     

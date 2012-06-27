@@ -793,7 +793,7 @@ void UpdateControls()
         {
             for (uint i = 0; i < input.numTouches; ++i)
             {
-                TouchState touch = input.touches[i];
+                TouchState@ touch = input.touches[i];
 
                 if (touch.touchID == rotateTouchID)
                 {

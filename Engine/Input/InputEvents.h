@@ -25,6 +25,7 @@
 
 #include "Object.h"
 
+#include <SDL_joystick.h>
 #include <SDL_keycode.h>
 
 /// Mouse button pressed.
@@ -201,3 +202,9 @@ static const int KEY_LCTRL = SDLK_LCTRL;
 static const int KEY_RCTRL = SDLK_RCTRL;
 static const int KEY_LALT = SDLK_LALT;
 static const int KEY_RALT = SDLK_RALT;
+
+static const int HAT_CENTER = SDL_HAT_CENTERED;
+static const int HAT_UP = SDL_HAT_UP;
+static const int HAT_RIGHT = SDL_HAT_RIGHT;
+static const int HAT_DOWN = SDL_HAT_DOWN;
+static const int HAT_LEFT = SDL_HAT_LEFT;

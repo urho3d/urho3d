@@ -45,6 +45,27 @@ struct TouchState
     int pressure_;
 };
 
+/// Structure for a connected joystick.
+struct JoystickState
+{
+    /// Construct with defaults.
+    JoystickState() :
+        joystick_(0)
+    {
+    }
+    
+    /// SDL joystick.
+    SDL_Joystick* joystick_;
+    /// Joystick name.
+    String name_;
+    /// Button state.
+    PODVector<bool> buttons_;
+    /// Axis position from -1 to 1.
+    PODVector<float> axes_;
+    /// POV hat bits.
+    PODVector<int> hats_;
+};
+
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
 {
@@ -60,6 +81,10 @@ public:
     void Update();
     /// %Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
+    /// Open a joystick. Return true if successful.
+    bool OpenJoystick(unsigned index);
+    /// Close a joystick.
+    void CloseJoystick(unsigned index);
     
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
@@ -86,7 +111,13 @@ public:
     /// Return number of active finger touches.
     unsigned GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.
-    TouchState GetTouch(unsigned index) const;
+    TouchState* GetTouch(unsigned index) const;
+    /// Return number of connected joysticks.
+    unsigned GetNumJoysticks() const;
+    /// Return joystick name by index.
+    String GetJoystickName(unsigned index) const;
+    /// Return joystick state by index.
+    JoystickState* GetJoystick(unsigned index) const;
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether application window is active.
@@ -130,6 +161,8 @@ private:
     HashSet<int> keyPress_;
     /// Active finger touches.
     Map<int, TouchState> touches_;
+    /// Opened joysticks.
+    Vector<JoystickState> joysticks_;
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.

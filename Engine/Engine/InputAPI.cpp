@@ -25,6 +25,9 @@
 #include "APITemplates.h"
 #include "Input.h"
 
+void FakeAddRef(void* ptr);
+void FakeReleaseRef(void* ptr);
+
 static void RegisterInputConstants(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const int MOUSEB_LEFT", (void*)&MOUSEB_LEFT);
@@ -101,6 +104,11 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_RCTRL", (void*)&KEY_RCTRL);
     engine->RegisterGlobalProperty("const int KEY_LALT", (void*)&KEY_LALT);
     engine->RegisterGlobalProperty("const int KEY_RALT", (void*)&KEY_RALT);
+    engine->RegisterGlobalProperty("const int HAT_CENTER", (void*)&HAT_CENTER);
+    engine->RegisterGlobalProperty("const int HAT_UP", (void*)&HAT_UP);
+    engine->RegisterGlobalProperty("const int HAT_RIGHT", (void*)&HAT_RIGHT);
+    engine->RegisterGlobalProperty("const int HAT_DOWN", (void*)&HAT_DOWN);
+    engine->RegisterGlobalProperty("const int HAT_LEFT", (void*)&HAT_LEFT);
 }
 
 static Input* GetInput()
@@ -108,21 +116,69 @@ static Input* GetInput()
     return GetScriptContext()->GetSubsystem<Input>();
 }
 
-static void ConstructTouchState(TouchState* ptr)
+static unsigned JoystickStateGetNumButtons(JoystickState* ptr)
 {
-    new(ptr) TouchState();
+    return ptr->buttons_.Size();
+}
+
+static unsigned JoystickStateGetNumAxes(JoystickState* ptr)
+{
+    return ptr->axes_.Size();
+}
+
+static unsigned JoystickStateGetNumHats(JoystickState* ptr)
+{
+    return ptr->hats_.Size();
+}
+
+static bool JoystickStateGetButton(unsigned index, JoystickState* ptr)
+{
+    if (index < ptr->buttons_.Size())
+        return ptr->buttons_[index];
+    else
+        return false;
+}
+
+static float JoystickStateGetAxis(unsigned index, JoystickState* ptr)
+{
+    if (index < ptr->axes_.Size())
+        return ptr->axes_[index];
+    else
+        return 0.0f;
+}
+
+static int JoystickStateGetHat(unsigned index, JoystickState* ptr)
+{
+    if (index < ptr->hats_.Size())
+        return ptr->hats_[index];
+    else
+        return HAT_CENTER;
 }
 
 static void RegisterInput(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("TouchState", sizeof(TouchState), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS);
-    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTouchState), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("TouchState", "int touchID", offsetof(TouchState, touchID_));
-    engine->RegisterObjectProperty("TouchState", "IntVector2 position", offsetof(TouchState, position_));
-    engine->RegisterObjectProperty("TouchState", "IntVector2 delta", offsetof(TouchState, delta_));
-    engine->RegisterObjectProperty("TouchState", "int pressure", offsetof(TouchState, pressure_));
+    engine->RegisterObjectType("TouchState", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TouchState", "const int touchID", offsetof(TouchState, touchID_));
+    engine->RegisterObjectProperty("TouchState", "const IntVector2 position", offsetof(TouchState, position_));
+    engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
+    engine->RegisterObjectProperty("TouchState", "const int pressure", offsetof(TouchState, pressure_));
+    
+    engine->RegisterObjectType("JoystickState", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("JoystickState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("JoystickState", "const String name", offsetof(JoystickState, name_));
+    engine->RegisterObjectMethod("JoystickState", "uint get_numButtons() const", asFUNCTION(JoystickStateGetNumButtons), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JoystickState", "uint get_numAxes() const", asFUNCTION(JoystickStateGetNumAxes), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JoystickState", "uint get_numHats() const", asFUNCTION(JoystickStateGetNumHats), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JoystickState", "bool get_buttons(uint) const", asFUNCTION(JoystickStateGetButton), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JoystickState", "float get_axes(uint) const", asFUNCTION(JoystickStateGetAxis), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JoystickState", "int get_hats(uint) const", asFUNCTION(JoystickStateGetHat), asCALL_CDECL_OBJLAST);
     
     RegisterObject<Input>(engine, "Input");
+    engine->RegisterObjectMethod("Input", "bool OpenJoystick(uint)", asMETHOD(Input, OpenJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool CloseJoystick(uint)", asMETHOD(Input, CloseJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);
@@ -137,7 +193,10 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "int get_mouseMoveY() const", asMETHOD(Input, GetMouseMoveY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int get_mouseMoveWheel() const", asMETHOD(Input, GetMouseMoveWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "uint get_numTouches() const", asMETHOD(Input, GetNumTouches), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "TouchState get_touches(uint) const", asMETHOD(Input, GetTouch), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "TouchState@+ get_touches(uint) const", asMETHOD(Input, GetTouch), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "uint get_numJoysticks() const", asMETHOD(Input, GetNumJoysticks), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "String get_joystickNames(uint) const", asMETHOD(Input, GetJoystickName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticks(uint) const", asMETHOD(Input, GetJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_active() const", asMETHOD(Input, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_minimized() const", asMETHOD(Input, IsMinimized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);

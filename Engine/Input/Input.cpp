@@ -189,6 +189,49 @@ void Input::SetToggleFullscreen(bool enable)
     toggleFullscreen_ = enable;
 }
 
+bool Input::OpenJoystick(unsigned index)
+{
+    MutexLock lock(GetStaticMutex());
+    
+    SDL_Joystick* joystick = SDL_JoystickOpen(index);
+    if (joystick)
+    {
+        if (index <= joysticks_.Size())
+            joysticks_.Resize(index + 1);
+        
+        JoystickState& state = joysticks_[index];
+        state.joystick_ = joystick;
+        state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
+        state.axes_.Resize(SDL_JoystickNumAxes(joystick));
+        state.hats_.Resize(SDL_JoystickNumHats(joystick));
+        for (unsigned i = 0; i < state.buttons_.Size(); ++i)
+            state.buttons_[i] = false;
+        for (unsigned i = 0; i < state.axes_.Size(); ++i)
+            state.axes_[i] = 0;
+        for (unsigned i = 0; i < state.hats_.Size(); ++i)
+            state.hats_[i] = HAT_CENTER;
+        
+        return true;
+    }
+    else
+        return false;
+}
+
+void Input::CloseJoystick(unsigned index)
+{
+    MutexLock lock(GetStaticMutex());
+    
+    if (index < joysticks_.Size() && joysticks_[index].joystick_)
+    {
+        JoystickState& state = joysticks_[index];
+        SDL_JoystickClose(state.joystick_);
+        state.joystick_ = 0;
+        state.buttons_.Clear();
+        state.axes_.Clear();
+        state.hats_.Clear();
+    }
+}
+
 bool Input::GetKeyDown(int key) const
 {
     return keyDown_.Contains(key);
@@ -245,19 +288,39 @@ int Input::GetQualifiers() const
     return ret;
 }
 
-TouchState Input::GetTouch(unsigned index) const
+TouchState* Input::GetTouch(unsigned index) const
 {
     unsigned cmpIndex = 0;
     for (Map<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
-        /// \todo Do not make a value copy
         if (cmpIndex == index)
-            return i->second_;
+            return const_cast<TouchState*>(&i->second_);
         else
             ++cmpIndex;
     }
     
-    return TouchState();
+    return 0;
+}
+
+unsigned Input::GetNumJoysticks() const
+{
+    return SDL_NumJoysticks();
+}
+
+String Input::GetJoystickName(unsigned index) const
+{
+    if (index < GetNumJoysticks())
+        return String(SDL_JoystickName(index));
+    else
+        return String();
+}
+
+JoystickState* Input::GetJoystick(unsigned index) const
+{
+    if (index < joysticks_.Size())
+        return const_cast<JoystickState*>(&joysticks_[index]);
+    else
+        return 0;
 }
 
 bool Input::IsMinimized() const
@@ -329,6 +392,15 @@ void Input::ResetState()
 {
     keyDown_.Clear();
     keyPress_.Clear();
+    
+    /// \todo Check if this is necessary
+    for (Vector<JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
+    {
+        for (unsigned j = 0; j < i->buttons_.Size(); ++j)
+            i->buttons_[j] = false;
+        for (unsigned j = 0; j < i->hats_.Size(); ++j)
+            i->hats_[j] = HAT_CENTER;
+    }
     
     // When clearing touch states, send the corresponding touch end events
     for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
@@ -604,6 +676,47 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_DY] = evt.tfinger.dy * input->graphics_->GetHeight() / 32768;
             eventData[P_PRESSURE] = state.pressure_;
             input->SendEvent(E_TOUCHMOVE, eventData);
+        }
+        break;
+        
+    case SDL_JOYBUTTONDOWN:
+        // Joystick events are not targeted at a window. Check all input instances which have opened the joystick
+        for (HashMap<unsigned, Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
+        {
+            input = i->second_;
+            if (evt.jbutton.which < input->joysticks_.Size() && evt.jbutton.button <
+                input->joysticks_[evt.jbutton.which].buttons_.Size())
+                input->joysticks_[evt.jbutton.which].buttons_[evt.jbutton.button] = true;
+        }
+        break;
+        
+    case SDL_JOYBUTTONUP:
+        for (HashMap<unsigned, Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
+        {
+            input = i->second_;
+            if (evt.jbutton.which < input->joysticks_.Size() && evt.jbutton.button <
+                input->joysticks_[evt.jbutton.which].buttons_.Size())
+                input->joysticks_[evt.jbutton.which].buttons_[evt.jbutton.button] = false;
+        }
+        break;
+        
+    case SDL_JOYAXISMOTION:
+        for (HashMap<unsigned, Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
+        {
+            input = i->second_;
+            if (evt.jaxis.which < input->joysticks_.Size() && evt.jaxis.axis <
+                input->joysticks_[evt.jaxis.which].axes_.Size())
+                input->joysticks_[evt.jaxis.which].axes_[evt.jaxis.axis] = Clamp((float)evt.jaxis.value / 32767.0f, -1.0f, 1.0f);
+        }
+        break;
+        
+    case SDL_JOYHATMOTION:
+        for (HashMap<unsigned, Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
+        {
+            input = i->second_;
+            if (evt.jhat.which < input->joysticks_.Size() && evt.jhat.hat <
+                input->joysticks_[evt.jhat.which].hats_.Size())
+                input->joysticks_[evt.jhat.which].hats_[evt.jhat.hat] = evt.jhat.value;
         }
         break;
         
