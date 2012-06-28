@@ -92,7 +92,7 @@ EVENT(E_TOUCHBEGIN, TouchBegin)
     PARAM(P_TOUCHID, TouchID);              // int
     PARAM(P_X, X);                          // int
     PARAM(P_Y, Y);                          // int
-    PARAM(P_PRESSURE, Pressure);            // int
+    PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// Finger released from the screen.
@@ -111,7 +111,37 @@ EVENT(E_TOUCHMOVE, TouchMove)
     PARAM(P_Y, Y);                          // int
     PARAM(P_DX, DX);                        // int
     PARAM(P_DY, DY);                        // int
-    PARAM(P_PRESSURE, Pressure);            // int
+    PARAM(P_PRESSURE, Pressure);            // float
+}
+
+/// Joystick button pressed.
+EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Joystick button released.
+EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Joystick axis moved.
+EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_AXIS, Button);                  // int
+    PARAM(P_POSITION, Position);            // float
+}
+
+/// Joystick hat moved.
+EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_HAT, Button);                   // int
+    PARAM(P_POSITION, Position);            // int
 }
 
 /// Application activation state changed.

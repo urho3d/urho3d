@@ -75,7 +75,7 @@ class Graphics : public Object
 public:
     /// Construct.
     Graphics(Context* context);
-    /// Destruct. Close the window and release the Direct3D9 device .
+    /// Destruct. Close the window and release the Direct3D9 device.
     virtual ~Graphics();
     
     /// %Set window title.

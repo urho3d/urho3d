@@ -2383,7 +2383,7 @@ Properties:<br>
 - int touchID
 - IntVector2 position
 - IntVector2 delta
-- int pressure
+- float pressure
 
 
 JoystickState
@@ -2392,9 +2392,10 @@ Properties:<br>
 - uint numButtons (readonly)
 - uint numAxes (readonly)
 - uint numHats (readonly)
-- bool[] buttons (readonly)
-- float[] axes (readonly)
-- int[] hats (readonly)
+- bool[] buttonDown (readonly)
+- bool[] buttonPress (readonly)
+- float[] axisPosition (readonly)
+- int[] hatPosition (readonly)
 - String name
 
 

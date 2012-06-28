@@ -30,7 +30,7 @@
 
 class Graphics;
 
-/// Structure for an ongoing finger touch.
+/// Input state for a finger touch.
 struct TouchState
 {
     /// Touch (finger) ID.
@@ -42,24 +42,63 @@ struct TouchState
     /// Movement since last frame.
     IntVector2 delta_;
     /// Finger pressure.
-    int pressure_;
+    float pressure_;
 };
 
-/// Structure for a connected joystick.
+/// Input state for a joystick.
 struct JoystickState
 {
-    /// Construct with defaults.
-    JoystickState() :
-        joystick_(0)
+    /// Return number of buttons.
+    unsigned GetNumButtons() const { return buttons_.Size(); }
+    /// Return number of axes.
+    unsigned GetNumAxes() const { return axes_.Size(); }
+    /// Return number of hats.
+    unsigned GetNumHats() const { return hats_.Size(); }
+    
+    /// Check if a button is held down.
+    bool GetButtonDown(unsigned index) const
     {
+        if (index <= buttons_.Size())
+            return buttons_[index];
+        else
+            return false;
+    }
+    
+    /// Check if a button has been pressed on this frame.
+    bool GetButtonPress(unsigned index) const
+    {
+        if (index <= buttons_.Size())
+            return buttonPress_[index];
+        else
+            return false;
+    }
+    
+    /// Return axis position.
+    float GetAxisPosition(unsigned index) const
+    {
+        if (index <= axes_.Size())
+            return axes_[index];
+        else
+            return 0.0f;
+    }
+    
+    /// Return hat position.
+    int GetHatPosition(unsigned index) const
+    {
+        if (index <= hats_.Size())
+            return hats_[index];
+        else
+            return HAT_CENTER;
     }
     
     /// SDL joystick.
     SDL_Joystick* joystick_;
     /// Joystick name.
     String name_;
-    /// Button state.
+    /// Button up/down state.
     PODVector<bool> buttons_;
+    /// Button pressed on this frame.
+    PODVector<bool> buttonPress_;
     /// Axis position from -1 to 1.
     PODVector<float> axes_;
     /// POV hat bits.
