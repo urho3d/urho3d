@@ -30,7 +30,7 @@
 
 class Graphics;
 
-/// Input state for a finger touch.
+/// %Input state for a finger touch.
 struct TouchState
 {
     /// Touch (finger) ID.
@@ -45,7 +45,7 @@ struct TouchState
     float pressure_;
 };
 
-/// Input state for a joystick.
+/// %Input state for a joystick.
 struct JoystickState
 {
     /// Construct with defaults.
