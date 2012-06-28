@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     } \
     return 0; \
 }
-// Other Win32: just execute the function
+// Other Win32 or minidumps disabled: just execute the function
 #elif defined(WIN32)
 #define DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
@@ -76,7 +76,7 @@ int SDL_main(int argc, char** argv) \
     function; \
     return 0; \
 }
-// Linux or OS X
+// Linux or OS X: use main
 #else
 #define DEFINE_MAIN(function) \
 int main(int argc, char** argv) \
