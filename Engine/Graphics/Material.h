@@ -34,7 +34,7 @@ class Texture;
 class Texture2D;
 class TextureCube;
 
-/// Material's shader parameter definition.
+/// %Material's shader parameter definition.
 struct MaterialShaderParameter
 {
     /// Name.
@@ -43,7 +43,7 @@ struct MaterialShaderParameter
     Vector4 value_;
 };
 
-/// Material's technique list entry.
+/// %Material's technique list entry.
 struct TechniqueEntry
 {
     /// Construct with defaults.
