@@ -378,7 +378,7 @@ The example application is now complete. To try it out, save it as HelloWorld.as
 
 This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \ref ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
 
-For simplicity, the application is assumed to be compiled on Windows and therefore defines the WinMain() function; look at the file Urho3D.cpp in the Urho3D subdirectory on how to handle cross-platform startup. Basically, when not on Windows, you would define a main() function instead.
+For simplicity, the application is assumed to be compiled on Windows and therefore defines the WinMain() function; look at the file Urho3D.cpp in the Urho3D subdirectory on how to handle cross-platform startup. On Linux and OS X, a main() function would be used instead, and SDL_main() on Android and iOS.
 
 To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt %file:
 
