@@ -25,58 +25,14 @@
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
-#include "MiniDump.h"
+#include "Main.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ScriptFile.h"
 
 #include <exception>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include "DebugNew.h"
-
-void Run();
-
-#ifdef WIN32
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
-{
-    #if defined(_MSC_VER) && defined(_DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    #endif
-    
-    ParseArguments(GetCommandLineW());
-    
-    #if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
-    __try
-    {
-        Run();
-    }
-    __except(WriteMiniDump("Urho3D", GetExceptionInformation()))
-    {
-    }
-    #else
-    Run();
-    #endif
-
-    return 0;
-}
-#else
-#if defined(ANDROID) || defined(IOS)
-extern "C" int SDL_main(int argc, char** argv);
-
-int SDL_main(int argc, char** argv)
-#else
-int main(int argc, char** argv)
-#endif
-{
-    ParseArguments(argc, argv);
-    Run();
-    return 0;
-}
-#endif
 
 void Run()
 {
@@ -144,3 +100,4 @@ void Run()
     }
 }
 
+DEFINE_MAIN(Run());
