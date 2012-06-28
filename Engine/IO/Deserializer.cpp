@@ -26,7 +26,6 @@
 
 #include "DebugNew.h"
 
-static const String noName;
 static const float invQ = 1.0f / 32767.0f;
 
 Deserializer::Deserializer() :
@@ -47,7 +46,7 @@ Deserializer::~Deserializer()
 
 const String& Deserializer::GetName() const
 {
-    return noName;
+    return String::EMPTY;
 }
 
 unsigned Deserializer::GetChecksum()

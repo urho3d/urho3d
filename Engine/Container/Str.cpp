@@ -30,6 +30,8 @@
 
 char String::endZero = 0;
 
+const String String::EMPTY;
+
 String::String(const WString& str) :
     length_(0),
     capacity_(0),

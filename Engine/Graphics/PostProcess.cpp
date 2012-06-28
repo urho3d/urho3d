@@ -31,8 +31,6 @@
 
 #include "DebugNew.h"
 
-static const String emptyName;
-
 TextureUnit ParseTextureUnitName(const String& name);
 
 PostProcessPass::PostProcessPass()
@@ -89,7 +87,7 @@ SharedPtr<PostProcessPass> PostProcessPass::Clone()
 
 const String& PostProcessPass::GetTexture(TextureUnit unit) const
 {
-    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textureNames_[unit] : emptyName;
+    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textureNames_[unit] : String::EMPTY;
 }
 
 const Vector4& PostProcessPass::GetShaderParameter(const String& name) const

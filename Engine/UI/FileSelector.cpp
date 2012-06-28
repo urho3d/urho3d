@@ -39,8 +39,6 @@
 
 #include "DebugNew.h"
 
-static const String emptyFilter;
-
 static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry& rhs)
 {
     if (lhs.directory_ && !rhs.directory_)
@@ -292,8 +290,8 @@ const String& FileSelector::GetFilter() const
     Text* selectedFilter = static_cast<Text*>(filterList_->GetSelectedItem());
     if (selectedFilter)
         return selectedFilter->GetText();
-    
-    return emptyFilter;
+    else
+        return String::EMPTY;
 }
 
 unsigned FileSelector::GetFilterIndex() const

@@ -28,7 +28,6 @@
 #include <cstring>
 
 const Variant Variant::EMPTY;
-const String Variant::emptyString;
 const PODVector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;

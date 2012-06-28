@@ -27,8 +27,6 @@
 #include "ScriptAPI.h"
 #include "ScriptFile.h"
 
-static const String noClassName;
-
 static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)

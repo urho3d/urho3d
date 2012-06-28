@@ -196,14 +196,18 @@ void Input::SetToggleFullscreen(bool enable)
 
 bool Input::OpenJoystick(unsigned index)
 {
+    if (index >= joysticks_.Size())
+        return false;
+    
+    // Check if already opened
+    if (joysticks_[index].joystick_)
+        return true;
+    
     MutexLock lock(GetStaticMutex());
     
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (joystick)
     {
-        if (index <= joysticks_.Size())
-            joysticks_.Resize(index + 1);
-        
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
@@ -312,23 +316,24 @@ TouchState* Input::GetTouch(unsigned index) const
     return 0;
 }
 
-unsigned Input::GetNumJoysticks() const
-{
-    return SDL_NumJoysticks();
-}
-
-String Input::GetJoystickName(unsigned index) const
-{
-    if (index < GetNumJoysticks())
-        return String(SDL_JoystickName(index));
-    else
-        return String();
-}
-
-JoystickState* Input::GetJoystick(unsigned index) const
+const String& Input::GetJoystickName(unsigned index) const
 {
     if (index < joysticks_.Size())
+        return joysticks_[index].name_;
+    else
+        return String::EMPTY;
+}
+
+JoystickState* Input::GetJoystick(unsigned index)
+{
+    if (index < joysticks_.Size())
+    {
+        // If necessary, automatically open the joystick first
+        if (!joysticks_[index].joystick_)
+            OpenJoystick(index);
+        
         return const_cast<JoystickState*>(&joysticks_[index]);
+    }
     else
         return 0;
 }
@@ -361,6 +366,11 @@ void Input::Initialize()
         windowID_ = SDL_GetWindowID(graphics_->GetImpl()->GetWindow());
         inputInstances[windowID_] = this;
     }
+    
+    // Initialize joysticks
+    joysticks_.Resize(SDL_NumJoysticks());
+    for (unsigned i = 0; i < joysticks_.Size(); ++i)
+        joysticks_[i].name_ = SDL_JoystickName(i);
     
     LOGINFO("Initialized input");
 }

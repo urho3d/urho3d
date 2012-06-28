@@ -45,7 +45,6 @@
 #include "DebugNew.h"
 
 static const int STATS_INTERVAL_MSEC = 2000;
-static const String noName;
 
 PackageDownload::PackageDownload() :
     totalFragments_(0),
@@ -968,7 +967,7 @@ const String& Connection::GetDownloadName() const
         if (i->second_.initiated_)
             return i->second_.name_;
     }
-    return noName;
+    return String::EMPTY;
 }
 
 float Connection::GetDownloadProgress() const

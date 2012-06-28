@@ -48,6 +48,12 @@ struct TouchState
 /// Input state for a joystick.
 struct JoystickState
 {
+    /// Construct with defaults.
+    JoystickState() :
+        joystick_(0)
+    {
+    }
+    
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
     /// Return number of axes.
@@ -152,11 +158,11 @@ public:
     /// Return active finger touch by index.
     TouchState* GetTouch(unsigned index) const;
     /// Return number of connected joysticks.
-    unsigned GetNumJoysticks() const;
+    unsigned GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick name by index.
-    String GetJoystickName(unsigned index) const;
-    /// Return joystick state by index.
-    JoystickState* GetJoystick(unsigned index) const;
+    const String& GetJoystickName(unsigned index) const;
+    /// Return joystick state by index. Automatically open if not opened yet.
+    JoystickState* GetJoystick(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether application window is active.

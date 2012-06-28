@@ -117,8 +117,6 @@ static const unsigned glStencilOps[] =
 
 static unsigned numInstances = 0;
 
-static const String noParameter;
-
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
 OBJECTTYPESTATIC(Graphics);
@@ -1650,7 +1648,7 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
         if (i->second_ == unit)
             return i->first_;
     }
-    return noParameter;
+    return String::EMPTY;
 }
 
 Texture* Graphics::GetTexture(unsigned index) const

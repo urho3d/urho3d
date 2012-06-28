@@ -793,7 +793,7 @@ public:
     const String& GetString() const
     {
         if (type_ != VAR_STRING)
-            return emptyString;
+            return String::EMPTY;
         return *reinterpret_cast<const String*>(&value_);
     }
     
@@ -873,8 +873,6 @@ private:
     /// Variant value.
     VariantValue value_;
     
-    /// Empty string.
-    static const String emptyString;
     /// Empty buffer.
     static const PODVector<unsigned char> emptyBuffer;
     /// Empty resource reference.

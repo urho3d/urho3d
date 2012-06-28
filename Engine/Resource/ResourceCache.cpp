@@ -53,7 +53,6 @@ static const String checkDirs[] = {
     ""
 };
 
-static const String noName;
 static const SharedPtr<Resource> noResource;
 
 OBJECTTYPESTATIC(ResourceCache);
@@ -501,7 +500,7 @@ const String& ResourceCache::GetResourceName(StringHash nameHash) const
 {
     HashMap<StringHash, String>::ConstIterator i = hashToName_.Find(nameHash);
     if (i == hashToName_.End())
-        return noName;
+        return String::EMPTY;
     else
         return i->second_;
 }

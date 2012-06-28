@@ -41,7 +41,6 @@
 
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
-static const String noRow;
 
 OBJECTTYPESTATIC(Console);
 
@@ -167,7 +166,7 @@ bool Console::IsVisible() const
 
 const String& Console::GetHistoryRow(unsigned index) const
 {
-    return index < history_.Size() ? history_[index] : noRow;
+    return index < history_.Size() ? history_[index] : String::EMPTY;
 }
 
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)

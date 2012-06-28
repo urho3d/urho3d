@@ -419,6 +419,8 @@ public:
     static const unsigned NPOS = 0xffffffff;
     /// Initial dynamic allocation size.
     static const unsigned MIN_CAPACITY = 8;
+    /// Empty string.
+    static const String EMPTY;
     
 private:
     /// Move a range of characters within the string.

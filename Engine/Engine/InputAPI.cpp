@@ -157,8 +157,8 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "uint get_numTouches() const", asMETHOD(Input, GetNumTouches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "TouchState@+ get_touches(uint) const", asMETHOD(Input, GetTouch), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "uint get_numJoysticks() const", asMETHOD(Input, GetNumJoysticks), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "String get_joystickNames(uint) const", asMETHOD(Input, GetJoystickName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticks(uint) const", asMETHOD(Input, GetJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const String& get_joystickNames(uint) const", asMETHOD(Input, GetJoystickName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "JoystickState@+ get_joysticks(uint)", asMETHOD(Input, GetJoystick), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_active() const", asMETHOD(Input, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_minimized() const", asMETHOD(Input, IsMinimized), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);
