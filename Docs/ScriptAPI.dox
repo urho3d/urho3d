@@ -2334,7 +2334,6 @@ Properties:<br>
 - bool deferredSupport (readonly)
 - bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
-- bool hiresShadowSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)

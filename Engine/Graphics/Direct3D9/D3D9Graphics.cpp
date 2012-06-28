@@ -173,7 +173,6 @@ Graphics::Graphics(Context* context) :
     deferredSupport_(false),
     hardwareDepthSupport_(false),
     hardwareShadowSupport_(false),
-    hiresShadowSupport_(false),
     streamOffsetSupport_(false),
     hasSM3_(false),
     forceSM2_(false),
@@ -2000,7 +1999,6 @@ void Graphics::CheckFeatureSupport()
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     hardwareShadowSupport_ = false;
-    hiresShadowSupport_ = false;
     streamOffsetSupport_ = false;
     hasSM3_ = false;
     depthStencilFormat = D3DFMT_D24S8;
@@ -2013,10 +2011,8 @@ void Graphics::CheckFeatureSupport()
     
         // Check for hires depth support
         hiresShadowMapFormat_ = D3DFMT_D24X8;
-        if (impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
-            hiresShadowSupport_ = true;
-        else
-            hiresShadowMapFormat_ = shadowMapFormat_;
+        if (!impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+            hiresShadowMapFormat_ = 0;
     }
     else
     {
@@ -2026,10 +2022,8 @@ void Graphics::CheckFeatureSupport()
         {
             // Check for hires depth support
             hiresShadowMapFormat_ = MAKEFOURCC('D', 'F', '2', '4');
-            if (impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
-                hiresShadowSupport_ = true;
-            else
-                hiresShadowMapFormat_ = shadowMapFormat_;
+            if (!impl_->CheckFormatSupport((D3DFORMAT)hiresShadowMapFormat_, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+                hiresShadowMapFormat_ = 0;
         }
         else
         {

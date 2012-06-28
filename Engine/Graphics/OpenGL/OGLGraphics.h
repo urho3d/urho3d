@@ -239,10 +239,10 @@ public:
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether hardware depth texture is supported. On OpenGL ES this means the depth texture extension.
     bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
+    /// Return whether anisotropic texture filtering is supported.
+    bool GetAnisotropySupport() const { return anisotropySupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
-    /// Return whether 24-bit shadow maps are supported. Assume true on OpenGL.
-    bool GetHiresShadowSupport() const { return true; }
     /// Return whether stream offset is supported. Always false on OpenGL.
     bool GetStreamOffsetSupport() const { return false; }
     /// Return supported fullscreen resolutions.
@@ -390,6 +390,8 @@ private:
     bool deferredSupport_;
     /// Hardware depth support flag.
     bool hardwareDepthSupport_;
+    /// Anisotropic filtering support flag.
+    bool anisotropySupport_;
     /// DXT format support flag.
     bool dxtTextureSupport_;
     /// ETC1 format support flag.

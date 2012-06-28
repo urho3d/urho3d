@@ -139,6 +139,7 @@ Graphics::Graphics(Context* context_) :
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareDepthSupport_(false),
+    anisotropySupport_(false),
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
@@ -293,16 +294,15 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             return false;
         }
         
-        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil") ||
-            !CheckExtension("EXT_texture_filter_anisotropic"))
+        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil"))
         {
-            LOGERROR("EXT_framebuffer_object, EXT_packed_depth_stencil and "
-                "EXT_texture_filter_anisotropic OpenGL extensions are required");
+            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
             Release(true, true);
             return false;
         }
         
         dxtTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
+        anisotropySupport_ = CheckExtension("EXT_texture_filter_anisotropic");
         #else
         dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
         etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
@@ -1987,7 +1987,7 @@ void Graphics::CheckFeatureSupport()
     else
     {
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
-        hiresShadowMapFormat_ = GL_DEPTH_COMPONENT;
+        hiresShadowMapFormat_ = 0;
         hardwareDepthSupport_ = true;
     }
     #endif

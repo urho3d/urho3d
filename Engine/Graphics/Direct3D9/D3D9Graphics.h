@@ -233,8 +233,6 @@ public:
     bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
-    /// Return whether 24-bit shadow maps are supported.
-    bool GetHiresShadowSupport() const { return hiresShadowSupport_; }
     /// Return whether stream offset is supported.
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return supported fullscreen resolutions.
@@ -392,8 +390,6 @@ private:
     bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
-    /// 24-bit shadow map support flag.
-    bool hiresShadowSupport_;
     /// Stream offset support flag.
     bool streamOffsetSupport_;
     /// Shader Model 3 flag.

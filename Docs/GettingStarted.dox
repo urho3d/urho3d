@@ -18,7 +18,7 @@ To run Urho3D, the minimum system requirements are:
 
 - Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 2 support (%Shader %Model 3 recommended.)
 
-- Linux & Mac OS X: GPU with OpenGL 2.0 support and EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions.
+- Linux & Mac OS X: GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
 - Android: OS version 2.2 or newer, OpenGL ES 2.0 capable GPU.
 
