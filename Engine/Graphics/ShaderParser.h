@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 //
 
+#pragma once
+
 #include "GraphicsDefs.h"
 
 class XMLElement;
