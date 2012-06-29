@@ -36,7 +36,7 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 The build process will also convert models from the SourceAssets directory into Bin/Data/Models. After the build is complete, the programs can be run from the Bin directory.
 
-When using Xcode on Mac OS X, select Project -> %Set Active Architecture -> i386 before building. Compiling Urho3D as 64-bit is not supported.
+When using Xcode on Mac OS X, select the i386 architecture before building. Compiling Urho3D as 64-bit is not supported.
 
 To run from the Visual Studio debugger, set the Urho3D project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\\Bin\\Urho3D.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden.
 

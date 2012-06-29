@@ -123,13 +123,12 @@ Mac OS X.
 For gcc, execute make (by default, cmake_gcc.sh specifies to make a
 RelWithDebInfo build.)
 
-The build process will also compile models and shaders from the SourceAssets
-directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9,
-shader compilation requires the D3DX library from the DirectX runtime or SDK to
-be available.
+The build process will also convert models from the SourceAssets directory into
+Bin/Data/Models. After the build is complete, the programs can be run from the 
+Bin directory.
 
-When using Xcode on Mac OS X, select Project -> Set Active Architecture -> i386
-before building. Compiling Urho3D as 64-bit is not supported.
+When using Xcode on Mac OS X, select the i386 architecture before building. 
+Compiling Urho3D as 64-bit is not supported.
 
 After the build is complete, the programs can be run from the Bin directory.
 
