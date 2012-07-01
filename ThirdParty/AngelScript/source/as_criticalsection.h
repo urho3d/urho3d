@@ -52,12 +52,24 @@ BEGIN_AS_NAMESPACE
 inline bool tryEnter() { return true; }
 #define TRYENTERCRITICALSECTION(x) tryEnter()
 
+#define DECLAREREADWRITELOCK(x)    
+#define ACQUIREEXCLUSIVE(x)        
+#define RELEASEEXCLUSIVE(x)        
+#define ACQUIRESHARED(x)           
+#define RELEASESHARED(x)           
+
 #else
 
 #define DECLARECRITICALSECTION(x)  asCThreadCriticalSection x;
 #define ENTERCRITICALSECTION(x)    x.Enter()
 #define LEAVECRITICALSECTION(x)    x.Leave()
 #define TRYENTERCRITICALSECTION(x) x.TryEnter()
+
+#define DECLAREREADWRITELOCK(x)    asCThreadReadWriteLock x;
+#define ACQUIREEXCLUSIVE(x)        x.AcquireExclusive()
+#define RELEASEEXCLUSIVE(x)        x.ReleaseExclusive()
+#define ACQUIRESHARED(x)           x.AcquireShared()
+#define RELEASESHARED(x)           x.ReleaseShared()
 
 #ifdef AS_POSIX_THREADS
 
@@ -76,7 +88,25 @@ public:
 	bool TryEnter();
 
 protected:
-	pthread_mutex_t criticalSection;
+	pthread_mutex_t cs;
+};
+
+class asCThreadReadWriteLock
+{
+public:
+	asCThreadReadWriteLock();
+	~asCThreadReadWriteLock();
+
+	void AcquireExclusive();
+	void ReleaseExclusive();
+	bool TryAcquireExclusive();
+
+	void AcquireShared();
+	void ReleaseShared();
+	bool TryAcquireShared();
+
+protected:
+	pthread_rwlock_t lock;
 };
 
 #elif defined(AS_WINDOWS_THREADS)
@@ -108,8 +138,44 @@ public:
 	bool TryEnter();
 
 protected:
-	CRITICAL_SECTION criticalSection;
+	CRITICAL_SECTION cs;
 };
+
+class asCThreadReadWriteLock
+{
+public:
+	asCThreadReadWriteLock();
+	~asCThreadReadWriteLock();
+
+	void AcquireExclusive();
+	void ReleaseExclusive();
+
+	void AcquireShared();
+	void ReleaseShared();
+
+protected:
+	// The Slim Read Write Lock object, SRWLOCK, is more efficient 
+	// but it is only available from Windows Vista so we cannot use it and
+	// maintain compatibility with olders versions of Windows.
+
+	// Critical sections and semaphores are available on Windows XP and onwards. 
+	// Windows XP is oldest version we support with multithreading.
+	
+	// The implementation is based on the following article, that shows
+	// how to implement a fair read/write lock that doesn't risk starving
+	// the writers:
+
+	// http://doc.qt.nokia.com/qq/qq11-mutex.html
+
+	// TODO: Allow use of SRWLOCK through configuration in as_config.h
+
+	CRITICAL_SECTION    writeLock;
+	HANDLE              readLocks;
+};
+
+// This constant really should be a member of asCThreadReadWriteLock,
+// but it gives a compiler error on MSVC6 so I'm leaving it outside
+static const asUINT maxReaders = 10;
 
 #endif
 

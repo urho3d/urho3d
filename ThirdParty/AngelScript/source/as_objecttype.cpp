@@ -131,8 +131,6 @@ asCObjectType::asCObjectType()
 	acceptRefSubType   = true;
 
 	accessMask = 0xFFFFFFFF;
-
-	userData = 0;
 }
 
 asCObjectType::asCObjectType(asCScriptEngine *engine) 
@@ -145,8 +143,6 @@ asCObjectType::asCObjectType(asCScriptEngine *engine)
 	acceptRefSubType = true;
 
 	accessMask = 0xFFFFFFFF;
-
-	userData = 0;
 }
 
 int asCObjectType::AddRef() const
@@ -161,16 +157,54 @@ int asCObjectType::Release() const
 	return refCount.atomicDec();
 }
 
-void *asCObjectType::SetUserData(void *data)
+void *asCObjectType::SetUserData(void *data, asPWORD type)
 {
-	void *oldData = userData;
-	userData = data;
-	return oldData;
+	// As a thread might add a new new user data at the same time as another
+	// it is necessary to protect both read and write access to the userData member
+	ACQUIREEXCLUSIVE(engine->engineRWLock);
+
+	// It is not intended to store a lot of different types of userdata,
+	// so a more complex structure like a associative map would just have
+	// more overhead than a simple array.
+	for( asUINT n = 0; n < userData.GetLength(); n += 2 )
+	{
+		if( userData[n] == type )
+		{
+			void *oldData = reinterpret_cast<void*>(userData[n+1]);
+			userData[n+1] = reinterpret_cast<asPWORD>(data);
+
+			RELEASEEXCLUSIVE(engine->engineRWLock);
+
+			return oldData;
+		}
+	}
+
+	userData.PushLast(type);
+	userData.PushLast(reinterpret_cast<asPWORD>(data));
+
+	RELEASEEXCLUSIVE(engine->engineRWLock);
+
+	return 0;
 }
 
-void *asCObjectType::GetUserData() const
+void *asCObjectType::GetUserData(asPWORD type) const
 {
-	return userData;
+	// There may be multiple threads reading, but when  
+	// setting the user data nobody must be reading.
+	ACQUIRESHARED(engine->engineRWLock);
+
+	for( asUINT n = 0; n < userData.GetLength(); n += 2 )
+	{
+		if( userData[n] == type )
+		{
+			RELEASESHARED(engine->engineRWLock);
+			return reinterpret_cast<void*>(userData[n+1]);
+		}
+	}
+
+	RELEASESHARED(engine->engineRWLock);
+
+	return 0;
 }
 
 int asCObjectType::GetRefCount()
@@ -224,8 +258,15 @@ asCObjectType::~asCObjectType()
 	enumValues.SetLength(0);
 
 	// Clean the user data
-	if( userData && engine->cleanObjectTypeFunc )
-		engine->cleanObjectTypeFunc(this);
+	for( n = 0; n < userData.GetLength(); n += 2 )
+	{
+		if( userData[n+1] )
+		{
+			for( asUINT c = 0; c < engine->cleanObjectTypeFuncs.GetLength(); c++ )
+				if( engine->cleanObjectTypeFuncs[c].type == userData[n] )
+					engine->cleanObjectTypeFuncs[c].cleanFunc(this);
+		}
+	}
 }
 
 // interface
@@ -358,6 +399,8 @@ asUINT asCObjectType::GetFactoryCount() const
 	return (asUINT)beh.factories.GetLength();
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCObjectType::GetFactoryIdByIndex(asUINT index) const
 {
@@ -366,6 +409,7 @@ int asCObjectType::GetFactoryIdByIndex(asUINT index) const
 
 	return beh.factories[index];
 }
+#endif
 
 // interface
 asIScriptFunction *asCObjectType::GetFactoryByIndex(asUINT index) const
@@ -376,6 +420,8 @@ asIScriptFunction *asCObjectType::GetFactoryByIndex(asUINT index) const
 	return engine->GetFunctionById(beh.factories[index]);
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCObjectType::GetFactoryIdByDecl(const char *decl) const
 {
@@ -385,6 +431,7 @@ int asCObjectType::GetFactoryIdByDecl(const char *decl) const
 	// Let the engine parse the string and find the appropriate factory function
 	return engine->GetFactoryIdByDecl(this, decl);
 }
+#endif
 
 // interface
 asIScriptFunction *asCObjectType::GetFactoryByDecl(const char *decl) const
@@ -402,6 +449,8 @@ asUINT asCObjectType::GetMethodCount() const
 	return (asUINT)methods.GetLength();
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCObjectType::GetMethodIdByIndex(asUINT index, bool getVirtual) const
 {
@@ -417,13 +466,26 @@ int asCObjectType::GetMethodIdByIndex(asUINT index, bool getVirtual) const
 
 	return methods[index];
 }
+#endif
 
 // interface
 asIScriptFunction *asCObjectType::GetMethodByIndex(asUINT index, bool getVirtual) const
 {
-	return engine->GetFunctionById(GetMethodIdByIndex(index, getVirtual));
+	if( index >= methods.GetLength() )
+		return 0;
+
+	asCScriptFunction *func = engine->scriptFunctions[methods[index]];
+	if( !getVirtual )
+	{
+		if( func && func->funcType == asFUNC_VIRTUAL )
+			return virtualFunctionTable[func->vfTableIdx];
+	}
+
+	return func;
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCObjectType::GetMethodIdByName(const char *name, bool getVirtual) const
 {
@@ -450,13 +512,37 @@ int asCObjectType::GetMethodIdByName(const char *name, bool getVirtual) const
 
 	return id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCObjectType::GetMethodByName(const char *name, bool getVirtual) const
 {
-	return engine->GetFunctionById(GetMethodIdByName(name, getVirtual));
+	int id = -1;
+	for( size_t n = 0; n < methods.GetLength(); n++ )
+	{
+		if( engine->scriptFunctions[methods[n]]->name == name )
+		{
+			if( id == -1 )
+				id = methods[n];
+			else
+				return 0;
+		}
+	}
+
+	if( id == -1 ) return 0;
+
+	asCScriptFunction *func = engine->scriptFunctions[id];
+	if( !getVirtual )
+	{
+		if( func && func->funcType == asFUNC_VIRTUAL )
+			return virtualFunctionTable[func->vfTableIdx];
+	}
+
+	return func;
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCObjectType::GetMethodIdByDecl(const char *decl, bool getVirtual) const
 {
@@ -480,11 +566,33 @@ int asCObjectType::GetMethodIdByDecl(const char *decl, bool getVirtual) const
 
 	return id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCObjectType::GetMethodByDecl(const char *decl, bool getVirtual) const
 {
-	return engine->GetFunctionById(GetMethodIdByDecl(decl, getVirtual));
+	if( methods.GetLength() == 0 )
+		return 0;
+
+	// Get the module from one of the methods, but it will only be
+	// used to allow the parsing of types not already known by the object.
+	// It is possible for object types to be orphaned, e.g. by discarding 
+	// the module that created it. In this case it is still possible to 
+	// find the methods, but any type not known by the object will result in
+	// an invalid declaration.
+	asCModule *mod = engine->scriptFunctions[methods[0]]->module;
+	int id = engine->GetMethodIdByDecl(this, decl, mod);
+	if( id <= 0 )
+		return 0;
+
+	if( !getVirtual )
+	{
+		asCScriptFunction *func = engine->scriptFunctions[id];
+		if( func && func->funcType == asFUNC_VIRTUAL )
+			return virtualFunctionTable[func->vfTableIdx];
+	}
+
+	return engine->scriptFunctions[id];
 }
 
 // interface
@@ -562,7 +670,7 @@ asUINT asCObjectType::GetBehaviourCount() const
 	return count;
 }
 
-int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const
+asIScriptFunction *asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const
 {
 	// Find the correct behaviour
 	asUINT count = 0;
@@ -570,61 +678,61 @@ int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour
 	if( beh.destruct && count++ == index ) // only increase count if the behaviour is registered
 	{ 
 		if( outBehaviour ) *outBehaviour = asBEHAVE_DESTRUCT;
-		return beh.destruct;
+		return engine->scriptFunctions[beh.destruct];
 	}
 
 	if( beh.addref && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_ADDREF;
-		return beh.addref;
+		return engine->scriptFunctions[beh.addref];
 	}
 
 	if( beh.release && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_RELEASE;
-		return beh.release;
+		return engine->scriptFunctions[beh.release];
 	}
 
 	if( beh.gcGetRefCount && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_GETREFCOUNT;
-		return beh.gcGetRefCount;
+		return engine->scriptFunctions[beh.gcGetRefCount];
 	}
 
 	if( beh.gcSetFlag && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_SETGCFLAG;
-		return beh.gcSetFlag;
+		return engine->scriptFunctions[beh.gcSetFlag];
 	}
 
 	if( beh.gcGetFlag && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_GETGCFLAG;
-		return beh.gcGetFlag;
+		return engine->scriptFunctions[beh.gcGetFlag];
 	}
 
 	if( beh.gcEnumReferences && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_ENUMREFS;
-		return beh.gcEnumReferences;
+		return engine->scriptFunctions[beh.gcEnumReferences];
 	}
 
 	if( beh.gcReleaseAllReferences && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_RELEASEREFS;
-		return beh.gcReleaseAllReferences;
+		return engine->scriptFunctions[beh.gcReleaseAllReferences];
 	}
 
 	if( beh.templateCallback && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_TEMPLATE_CALLBACK;
-		return beh.templateCallback;
+		return engine->scriptFunctions[beh.templateCallback];
 	}
 
 	if( beh.listFactory && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_LIST_FACTORY;
-		return beh.listFactory;
+		return engine->scriptFunctions[beh.listFactory];
 	}
 
 	// For reference types, the factories are also stored in the constructor
@@ -632,7 +740,7 @@ int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour
 	if( index - count < beh.constructors.GetLength() )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_CONSTRUCT;
-		return beh.constructors[index - count];
+		return engine->scriptFunctions[beh.constructors[index - count]];
 	}
 	else 
 		count += (asUINT)beh.constructors.GetLength();
@@ -642,10 +750,10 @@ int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour
 		index = 2*(index - count);
 
 		if( outBehaviour ) *outBehaviour = static_cast<asEBehaviours>(beh.operators[index]);
-		return beh.operators[index + 1];
+		return engine->scriptFunctions[beh.operators[index + 1]];
 	}
 
-	return asINVALID_ARG;
+	return 0;
 }
 
 // interface
@@ -672,6 +780,12 @@ asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, cons
 
 	// Store the properties in the object type descriptor
 	asCObjectProperty *prop = asNEW(asCObjectProperty);
+	if( prop == 0 )
+	{
+		// Out of memory
+		return 0;
+	}
+
 	prop->name      = name;
 	prop->type      = dt;
 	prop->isPrivate = isPrivate;

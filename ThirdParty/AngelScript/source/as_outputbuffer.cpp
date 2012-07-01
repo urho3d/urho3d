@@ -65,6 +65,9 @@ void asCOutputBuffer::Clear()
 void asCOutputBuffer::Callback(asSMessageInfo *msg)
 {
 	message_t *msgInfo = asNEW(message_t);
+	if( msgInfo == 0 )
+		return;
+
 	msgInfo->section = msg->section;
 	msgInfo->row = msg->row;
 	msgInfo->col = msg->col;

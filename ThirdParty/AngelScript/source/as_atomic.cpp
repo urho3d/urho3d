@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -27,8 +27,6 @@
    Andreas Jonsson
    andreas@angelcode.com
 */
-
-// Modified by Lasse Öörni for Urho3D
  
 //
 // as_gc.cpp

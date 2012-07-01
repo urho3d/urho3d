@@ -157,6 +157,7 @@ protected:
 
 	asCString          GetScopeFromNode(asCScriptNode *n, asCScriptCode *script, asCScriptNode **next = 0);
 
+	bool               DoesTypeExist(const char *type);
 	asCObjectType     *GetObjectType(const char *type, const asCString &ns);
 	asCScriptFunction *GetFuncDef(const char *type);
 	asCObjectType     *GetObjectTypeFromTypesKnownByObject(const char *type, asCObjectType *currentType);

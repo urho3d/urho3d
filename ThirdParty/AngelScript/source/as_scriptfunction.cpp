@@ -500,6 +500,11 @@ const char *asCScriptFunction::GetVarDecl(asUINT index) const
 void asCScriptFunction::AddVariable(asCString &name, asCDataType &type, int stackOffset)
 {
 	asSScriptVariable *var = asNEW(asSScriptVariable);
+	if( var == 0 )
+	{
+		// Out of memory
+		return;
+	}
 	var->name                 = name;
 	var->type                 = type;
 	var->stackOffset          = stackOffset;

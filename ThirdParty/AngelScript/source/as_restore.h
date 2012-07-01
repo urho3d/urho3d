@@ -58,6 +58,8 @@ protected:
 	asCScriptEngine *engine;
 	bool             error;
 
+	int                ReadInner();
+
 	void               ReadData(void *data, asUINT size);
 	void               ReadString(asCString *str);
 	asCScriptFunction *ReadFunction(bool addToModule = true, bool addToEngine = true, bool addToGC = true);

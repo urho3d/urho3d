@@ -1298,7 +1298,14 @@ void asCByteCode::AddCode(asCByteCode *bc)
 
 int asCByteCode::AddInstruction()
 {
-	cByteInstruction *instr = new(engine->memoryMgr.AllocByteInstruction()) cByteInstruction();
+	void *ptr = engine->memoryMgr.AllocByteInstruction();
+	if( ptr == 0 )
+	{
+		// Out of memory
+		return 0;
+	}
+
+	cByteInstruction *instr = new(ptr) cByteInstruction();
 	if( first == 0 )
 	{
 		first = last = instr;
@@ -1314,7 +1321,14 @@ int asCByteCode::AddInstruction()
 
 int asCByteCode::AddInstructionFirst()
 {
-	cByteInstruction *instr = new(engine->memoryMgr.AllocByteInstruction()) cByteInstruction();
+	void *ptr = engine->memoryMgr.AllocByteInstruction();
+	if( ptr == 0 )
+	{
+		// Out of memory
+		return 0;
+	}
+
+	cByteInstruction *instr = new(ptr) cByteInstruction();
 	if( first == 0 )
 	{
 		first = last = instr;

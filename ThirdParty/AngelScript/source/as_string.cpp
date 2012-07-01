@@ -123,6 +123,11 @@ void asCString::Allocate(size_t len, bool keepData)
 	{
 		// Allocate a new dynamic buffer if the new one is larger than the old
 		char *buf = asNEWARRAY(char,len+1);
+		if( buf == 0 )
+		{
+			// Out of memory. Return without modifying anything
+			return;
+		}
 
 		if( keepData )
 		{

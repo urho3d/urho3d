@@ -158,7 +158,11 @@ int asCModule::AddScriptSection(const char *name, const char *code, size_t codeL
 	return asNOT_SUPPORTED;
 #else
 	if( !builder )
+	{
 		builder = asNEW(asCBuilder)(engine, this);
+		if( builder == 0 )
+			return asOUT_OF_MEMORY;
+	}
 
 	return builder->AddCode(name, code, (int)codeLength, lineOffset, (int)engine->GetScriptSectionNameIndex(name ? name : ""), engine->ep.copyScriptSections);
 #endif
@@ -237,6 +241,8 @@ int asCModule::ResetGlobalVars(asIScriptContext *ctx)
 	return CallInit(ctx);
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-20
 // interface
 int asCModule::GetFunctionIdByIndex(asUINT index) const
 {
@@ -245,6 +251,7 @@ int asCModule::GetFunctionIdByIndex(asUINT index) const
 
 	return globalFunctions[index]->id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCModule::GetFunctionByIndex(asUINT index) const
@@ -285,7 +292,7 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 					break;
 			}
 
-			r = ctx->Prepare(scriptGlobals[n]->GetInitFunc()->id);
+			r = ctx->Prepare(scriptGlobals[n]->GetInitFunc());
 			if( r >= 0 )
 			{
 				r = ctx->Execute();
@@ -410,12 +417,15 @@ void asCModule::InternalReset()
 	// Free bind information
 	for( n = 0; n < bindInformations.GetLength(); n++ )
 	{
-		asUINT id = bindInformations[n]->importedFunctionSignature->id & 0xFFFF;
-		engine->importedFunctions[id] = 0;
-		engine->freeImportedFunctionIdxs.PushLast(id);
+		if( bindInformations[n] )
+		{
+			asUINT id = bindInformations[n]->importedFunctionSignature->id & 0xFFFF;
+			engine->importedFunctions[id] = 0;
+			engine->freeImportedFunctionIdxs.PushLast(id);
 
-		asDELETE(bindInformations[n]->importedFunctionSignature, asCScriptFunction);
-		asDELETE(bindInformations[n], sBindInfo);
+			asDELETE(bindInformations[n]->importedFunctionSignature, asCScriptFunction);
+			asDELETE(bindInformations[n], sBindInfo);
+		}
 	}
 	bindInformations.SetLength(0);
 
@@ -440,6 +450,8 @@ void asCModule::InternalReset()
 	funcDefs.SetLength(0);
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-20
 // interface
 int asCModule::GetFunctionIdByName(const char *name) const
 {
@@ -462,15 +474,28 @@ int asCModule::GetFunctionIdByName(const char *name) const
 
 	return id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCModule::GetFunctionByName(const char *name) const
 {
-	int id = GetFunctionIdByName(name);
-	if( id < 0 )
-		return 0;
+	asIScriptFunction *func = 0;
+	for( size_t n = 0; n < globalFunctions.GetLength(); n++ )
+	{
+		if( globalFunctions[n]->name == name &&
+			globalFunctions[n]->nameSpace == defaultNamespace )
+		{
+			if( func == 0 )
+				func = globalFunctions[n];
+			else
+			{
+				// Multiple functions with the same name
+				return 0;
+			}
+		}
+	}
 
-	return engine->GetFunctionById(id);
+	return func;
 }
 
 // interface
@@ -527,6 +552,8 @@ asUINT asCModule::GetFunctionCount() const
 	return (asUINT)globalFunctions.GetLength();
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-20
 // interface
 int asCModule::GetFunctionIdByDecl(const char *decl) const
 {
@@ -575,12 +602,58 @@ int asCModule::GetFunctionIdByDecl(const char *decl) const
 
 	return id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCModule::GetFunctionByDecl(const char *decl) const
 {
-	int id = GetFunctionIdByDecl(decl);
-	return engine->GetFunctionById(id);
+	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	asCScriptFunction func(engine, const_cast<asCModule*>(this), asFUNC_DUMMY);
+	int r = bld.ParseFunctionDeclaration(0, decl, &func, false);
+	if( r < 0 )
+	{
+		// Invalid declaration
+		// TODO: Write error to message stream
+		return 0;
+	}
+
+	// Use the defaultNamespace implicitly unless an explicit namespace has been provided
+	asCString ns = func.nameSpace == "" ? defaultNamespace : func.nameSpace;
+
+	// TODO: optimize: Improve linear search
+	// Search script functions for matching interface
+	asIScriptFunction *f = 0;
+	for( size_t n = 0; n < globalFunctions.GetLength(); ++n )
+	{
+		if( globalFunctions[n]->objectType  == 0 && 
+			func.name                       == globalFunctions[n]->name && 
+			func.returnType                 == globalFunctions[n]->returnType &&
+			func.parameterTypes.GetLength() == globalFunctions[n]->parameterTypes.GetLength() &&
+			ns                              == globalFunctions[n]->nameSpace )
+		{
+			bool match = true;
+			for( size_t p = 0; p < func.parameterTypes.GetLength(); ++p )
+			{
+				if( func.parameterTypes[p] != globalFunctions[n]->parameterTypes[p] )
+				{
+					match = false;
+					break;
+				}
+			}
+
+			if( match )
+			{
+				if( f == 0 )
+					f = globalFunctions[n];
+				else
+					// Multiple functions
+					return 0;
+			}
+		}
+	}
+
+	return f;
 }
 
 // interface
@@ -830,6 +903,9 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const
 
 	// Store the function information
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, this, isInterface ? asFUNC_INTERFACE : asFUNC_SCRIPT);
+	if( func == 0 )
+		return asOUT_OF_MEMORY;
+
 	func->name             = name;
 	func->nameSpace        = ns;
 	func->id               = id;
@@ -890,6 +966,9 @@ int asCModule::AddImportedFunction(int id, const char *name, const asCDataType &
 
 	// Store the function information
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, this, asFUNC_IMPORTED);
+	if( func == 0 )
+		return asOUT_OF_MEMORY;
+
 	func->name       = name;
 	func->id         = id;
 	func->returnType = returnType;
@@ -901,6 +980,9 @@ int asCModule::AddImportedFunction(int id, const char *name, const asCDataType &
 	func->objectType = 0;
 
 	sBindInfo *info = asNEW(sBindInfo);
+	if( info == 0 )
+		return asOUT_OF_MEMORY;
+
 	info->importedFunctionSignature = func;
 	info->boundFunctionId = -1;
 	info->importFromModule = moduleName;
@@ -922,7 +1004,7 @@ asCScriptFunction *asCModule::GetImportedFunction(int index) const
 }
 
 // interface
-int asCModule::BindImportedFunction(asUINT index, int sourceId)
+int asCModule::BindImportedFunction(asUINT index, asIScriptFunction *func)
 {
 	// First unbind the old function
 	int r = UnbindImportedFunction(index);
@@ -932,7 +1014,10 @@ int asCModule::BindImportedFunction(asUINT index, int sourceId)
 	asCScriptFunction *dst = GetImportedFunction(index);
 	if( dst == 0 ) return asNO_FUNCTION;
 
-	asCScriptFunction *src = engine->GetScriptFunction(sourceId);
+	if( func == 0 )
+		return asINVALID_ARG;
+
+	asCScriptFunction *src = engine->GetScriptFunction(func->GetId());
 	if( src == 0 ) 
 		return asNO_FUNCTION;
 
@@ -949,8 +1034,8 @@ int asCModule::BindImportedFunction(asUINT index, int sourceId)
 			return asINVALID_INTERFACE;
 	}
 
-	bindInformations[index]->boundFunctionId = sourceId;
-	engine->scriptFunctions[sourceId]->AddRef();
+	bindInformations[index]->boundFunctionId = src->GetId();
+	src->AddRef();
 
 	return asSUCCESS;
 }
@@ -962,11 +1047,14 @@ int asCModule::UnbindImportedFunction(asUINT index)
 		return asINVALID_ARG;
 
 	// Remove reference to old module
-	int oldFuncID = bindInformations[index]->boundFunctionId;
-	if( oldFuncID != -1 )
+	if( bindInformations[index] )
 	{
-		bindInformations[index]->boundFunctionId = -1;
-		engine->scriptFunctions[oldFuncID]->Release();
+		int oldFuncID = bindInformations[index]->boundFunctionId;
+		if( oldFuncID != -1 )
+		{
+			bindInformations[index]->boundFunctionId = -1;
+			engine->scriptFunctions[oldFuncID]->Release();
+		}
 	}
 
 	return asSUCCESS;
@@ -1002,25 +1090,25 @@ int asCModule::BindAllImportedFunctions()
 	int c = GetImportedFunctionCount();
 	for( int n = 0; n < c; ++n )
 	{
-		asCScriptFunction *func = GetImportedFunction(n);
-		if( func == 0 ) return asERROR;
+		asCScriptFunction *importFunc = GetImportedFunction(n);
+		if( importFunc == 0 ) return asERROR;
 
-		asCString str = func->GetDeclarationStr();
+		asCString str = importFunc->GetDeclarationStr();
 
 		// Get module name from where the function should be imported
 		const char *moduleName = GetImportedFunctionSourceModule(n);
 		if( moduleName == 0 ) return asERROR;
 
 		asCModule *srcMod = engine->GetModule(moduleName, false);
-		int funcId = -1;
+		asIScriptFunction *func = 0;
 		if( srcMod )
-			funcId = srcMod->GetFunctionIdByDecl(str.AddressOf());
+			func = srcMod->GetFunctionByDecl(str.AddressOf());
 
-		if( funcId < 0 )
+		if( func == 0 )
 			notAllFunctionsWereBound = true;
 		else
 		{
-			if( BindImportedFunction(n, funcId) < 0 )
+			if( BindImportedFunction(n, func) < 0 )
 				notAllFunctionsWereBound = true;
 		}
 	}
@@ -1528,7 +1616,7 @@ int asCModule::CompileGlobalVar(const char *sectionName, const char *code, int l
 			if( r < 0 )
 				return r;
 
-			r = ctx->Prepare(prop->GetInitFunc()->id);
+			r = ctx->Prepare(prop->GetInitFunc());
 			if( r >= 0 )
 				r = ctx->Execute();
 
@@ -1597,6 +1685,8 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 #endif
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-20
 // interface
 int asCModule::RemoveFunction(int funcId)
 {
@@ -1605,6 +1695,7 @@ int asCModule::RemoveFunction(int funcId)
 
 	return asNO_FUNCTION;
 }
+#endif
 
 // interface
 int asCModule::RemoveFunction(asIScriptFunction *func)
@@ -1628,6 +1719,9 @@ int asCModule::RemoveFunction(asIScriptFunction *func)
 int asCModule::AddFuncDef(const char *name, const asCString &ns)
 {
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, 0, asFUNC_FUNCDEF);
+	if( func == 0 )
+		return asOUT_OF_MEMORY;
+
 	func->name      = name;
 	func->nameSpace = ns;
 

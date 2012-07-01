@@ -82,6 +82,11 @@ int asCVariableScope::DeclareVariable(const char *name, const asCDataType &type,
 	}
 
 	sVariable *var = asNEW(sVariable);
+	if( var == 0 )
+	{
+		// Out of memory. Return without allocating the var
+		return -2;
+	}
 	var->name           = name;
 	var->type           = type;
 	var->stackOffset    = stackOffset;

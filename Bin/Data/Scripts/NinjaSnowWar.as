@@ -144,6 +144,10 @@ void InitScene()
         return;
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
+    
+    // On mobile devices render the shadowmap first
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        renderer.reuseShadowMaps = false;
 }
 
 void InitNetworking()

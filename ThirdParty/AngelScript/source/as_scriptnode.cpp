@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2007 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -104,6 +104,9 @@ void asCScriptNode::UpdateSourcePos(size_t pos, size_t length)
 
 void asCScriptNode::AddChildLast(asCScriptNode *node)
 {
+	// We might get a null pointer if the parser encounter an out-of-memory situation
+	if( node == 0 ) return;
+
 	if( lastChild )
 	{
 		lastChild->next = node;

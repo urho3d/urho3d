@@ -549,6 +549,7 @@
 
 	// MacOSX and IPhone
 	#ifdef __APPLE__
+
 		#include <TargetConditionals.h>
 
 		// Is this a Mac or an IPhone?
@@ -802,23 +803,22 @@
 		#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 		#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 
-		// Urho3D: added for Android
-		#undef GNU_STYLE_VIRTUAL_METHOD
-
 		#if (defined(_ARM_) || defined(__arm__))
 			// The stdcall calling convention is not used on the arm cpu
 			#undef STDCALL
 			#define STDCALL
 
+			#undef GNU_STYLE_VIRTUAL_METHOD
+
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			// Urho3D: added complex return mask to be sure
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
 			#define AS_ARM
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define AS_ALIGN
-			
-			// Urho3D: correct complex mask
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 		#endif
 
 	// Haiku OS

@@ -66,7 +66,10 @@ static void SortFrontToBack2Pass(PODVector<Batch*>& batches)
     // First sort with state having priority
     Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
     
-    // Then rewrite distances so that different states will be ordered front to back, and sort again
+    // Then rewrite distances so that different states will be ordered front to back, and sort again.
+    // Do not do this on mobile devices as they likely use a tiled deferred approach, with which 
+    // front-to-back sorting is irrelevant
+    #ifndef GL_ES_VERSION_2_0
     float lastDistance;
     unsigned long long lastSortKey;
     for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
@@ -89,6 +92,7 @@ static void SortFrontToBack2Pass(PODVector<Batch*>& batches)
     }
     
     Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    #endif
 }
 
 void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)

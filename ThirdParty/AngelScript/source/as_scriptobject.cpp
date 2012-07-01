@@ -40,37 +40,74 @@ BEGIN_AS_NAMESPACE
 // This helper function will call the default factory, that is a script function
 asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngine *engine)
 {
-	asIScriptContext *ctx;
+	asIScriptContext *ctx = 0;
+	int r = 0;
+	bool isNested = false;
 
 	// TODO: optimize: There should be a pool for the context so it doesn't 
 	//                 have to be allocated just for creating the script object
 
 	// TODO: It must be possible for the application to debug the creation of the object too
 
-	int r = engine->CreateContext(&ctx, true);
-	if( r < 0 )
-		return 0;
+	// Use nested call in the context if there is an active context
+	ctx = asGetActiveContext();
+	if( ctx )
+	{
+		r = ctx->PushState();
 
-	r = ctx->Prepare(objType->beh.factory);
+		// It may not always be possible to reuse the current context, 
+		// in which case we'll have to create a new one any way.
+		if( r == asSUCCESS )
+			isNested = true;
+		else
+			ctx = 0;
+	}
+	
+	if( ctx == 0 )
+	{
+		r = engine->CreateContext(&ctx, true);
+		if( r < 0 )
+			return 0;
+	}
+
+	r = ctx->Prepare(engine->scriptFunctions[objType->beh.factory]);
 	if( r < 0 )
 	{
-		ctx->Release();
+		if( isNested )
+			ctx->PopState();
+		else
+			ctx->Release();
 		return 0;
 	}
 
-	r = ctx->Execute();
+	for(;;)
+	{
+		r = ctx->Execute();
+
+		// We can't allow this execution to be suspended 
+		// so resume the execution immediately
+		if( r != asEXECUTION_SUSPENDED )
+			break;
+	}
+
 	if( r != asEXECUTION_FINISHED )
 	{
-		ctx->Release();
+		if( isNested )
+			ctx->PopState();
+		else
+			ctx->Release();
 		return 0;
 	}
 
 	asIScriptObject *ptr = (asIScriptObject*)ctx->GetReturnAddress();
 
-	// Increase the reference, because the context will release it's pointer
+	// Increase the reference, because the context will release its pointer
 	ptr->AddRef();
 
-	ctx->Release();
+	if( isNested )
+		ctx->PopState();
+	else
+		ctx->Release();
 
 	return ptr;
 }
@@ -171,10 +208,15 @@ void ScriptObject_Construct(asCObjectType *objType, asCScriptObject *self)
 	new(self) asCScriptObject(objType);
 }
 
-asCScriptObject::asCScriptObject(asCObjectType *ot)
+void ScriptObject_ConstructUnitialized(asCObjectType *objType, asCScriptObject *self)
+{
+	new(self) asCScriptObject(objType, false);
+}
+
+asCScriptObject::asCScriptObject(asCObjectType *ot, bool doInitialize)
 {
 	refCount.set(1);
-	objType          = ot;
+	objType = ot;
 	objType->AddRef();
 	isDestructCalled = false;
 
@@ -196,7 +238,7 @@ asCScriptObject::asCScriptObject(asCObjectType *ot)
 			else
 			{
 				// Allocate the object and call it's constructor
-				*ptr = (asPWORD)AllocateObject(prop->type.GetObjectType(), engine);
+				*ptr = (asPWORD)AllocateObject(prop->type.GetObjectType(), engine, doInitialize);
 			}
 		}
 	}
@@ -276,11 +318,12 @@ int asCScriptObject::Release() const
 
 void asCScriptObject::CallDestructor()
 {
+	asIScriptContext *ctx = 0;
+	bool isNested = false;
+
 	// Make sure the destructor is called once only, even if the  
 	// reference count is increased and then decreased again
 	isDestructCalled = true;
-
-	asIScriptContext *ctx = 0;
 
 	// Call the destructor for this class and all the super classes
 	asCObjectType *ot = objType;
@@ -291,17 +334,40 @@ void asCScriptObject::CallDestructor()
 		{
 			if( ctx == 0 )
 			{
-				// Setup a context for calling the default constructor
-				asCScriptEngine *engine = objType->engine;
-				int r = engine->CreateContext(&ctx, true);
-				if( r < 0 ) return;
+				// Check for active context first as it is quicker
+				// to reuse than to set up a new one.
+				ctx = asGetActiveContext();
+				if( ctx )
+				{
+					int r = ctx->PushState();
+					if( r == asSUCCESS )
+						isNested = true;
+					else
+						ctx = 0;
+				}
+
+				if( ctx == 0 )
+				{
+					// Setup a context for calling the default constructor
+					asCScriptEngine *engine = objType->engine;
+					int r = engine->CreateContext(&ctx, true);
+					if( r < 0 ) return;
+				}
 			}
 
-			int r = ctx->Prepare(funcIndex);
+			int r = ctx->Prepare(objType->engine->scriptFunctions[funcIndex]);
 			if( r >= 0 )
 			{
 				ctx->SetObject(this);
-				ctx->Execute();
+
+				for(;;)
+				{
+					r = ctx->Execute();
+
+					// If the script tries to suspend itself just restart it
+					if( r != asEXECUTION_SUSPENDED )
+						break;
+				}
 
 				// There's not much to do if the execution doesn't 
 				// finish, so we just ignore the result
@@ -313,7 +379,10 @@ void asCScriptObject::CallDestructor()
 
 	if( ctx )
 	{
-		ctx->Release();
+		if( isNested )
+			ctx->PopState();
+		else
+			ctx->Release();
 	}
 }
 
@@ -486,13 +555,19 @@ int asCScriptObject::CopyFrom(asIScriptObject *other)
 	return 0;
 }
 
-void *asCScriptObject::AllocateObject(asCObjectType *objType, asCScriptEngine *engine)
+void *asCScriptObject::AllocateObject(asCObjectType *objType, asCScriptEngine *engine, bool doInitialize)
 {
 	void *ptr = 0;
 
 	if( objType->flags & asOBJ_SCRIPT_OBJECT )
 	{
-		ptr = ScriptObjectFactory(objType, engine);
+		if( doInitialize )
+			ptr = ScriptObjectFactory(objType, engine);
+		else
+		{
+			ptr = engine->CallAlloc(objType);
+			ScriptObject_ConstructUnitialized(objType, reinterpret_cast<asCScriptObject*>(ptr));
+		}
 	}
 	else if( objType->flags & asOBJ_TEMPLATE )
 	{

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -76,6 +76,8 @@ int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bo
 	if( makeCopy )
 	{
 		this->code = asNEWARRAY(char,length);
+		if( this->code == 0 )
+			return asOUT_OF_MEMORY;
 		memcpy((char*)this->code, code, length);
 		codeLength = length;
 		sharedCode = false;

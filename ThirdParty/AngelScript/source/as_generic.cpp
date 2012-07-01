@@ -68,11 +68,14 @@ asIScriptEngine *asCGeneric::GetEngine() const
 	return (asIScriptEngine*)engine;
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 int asCGeneric::GetFunctionId() const
 {
 	return sysFunction->id;
 }
+#endif
 
 // interface
 asIScriptFunction *asCGeneric::GetFunction() const
@@ -80,11 +83,14 @@ asIScriptFunction *asCGeneric::GetFunction() const
 	return sysFunction;
 }
 
+#ifdef AS_DEPRECATED
+// Deprecated since 2.24.0 - 2012-05-25
 // interface
 void *asCGeneric::GetFunctionUserData() const
 {
 	return sysFunction->userData;
 }
+#endif
 
 // interface
 void *asCGeneric::GetObject()

@@ -76,6 +76,8 @@ protected:
 	void RewindTo(const sToken *token);
 	void Error(const char *text, sToken *token);
 
+	asCScriptNode *CreateNode(eScriptNode type);
+
 	asCScriptNode *ParseFunctionDefinition();
 	asCScriptNode *ParseParameterList();
 	asCScriptNode *SuperficiallyParseExpression();

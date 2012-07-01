@@ -107,15 +107,19 @@ public:
 
 	// Script functions
 	virtual asUINT             GetFunctionCount() const;
-	// TODO: interface: Deprecate the functions that return the function id
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.24.0 - 2012-05-20
 	virtual int                GetFunctionIdByIndex(asUINT index) const;
 	virtual int                GetFunctionIdByName(const char *name) const;
 	virtual int                GetFunctionIdByDecl(const char *decl) const;
+#endif
 	virtual asIScriptFunction *GetFunctionByIndex(asUINT index) const;
 	virtual asIScriptFunction *GetFunctionByDecl(const char *decl) const;
 	virtual asIScriptFunction *GetFunctionByName(const char *name) const;
-	// TODO: interface: Deprecate RemoveFunction(int)
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.24.0 - 2012-05-20
 	virtual int                RemoveFunction(int funcId);
+#endif
 	virtual int                RemoveFunction(asIScriptFunction *func);
 
 	// Script global variables
@@ -150,7 +154,7 @@ public:
 	virtual int         GetImportedFunctionIndexByDecl(const char *decl) const;
 	virtual const char *GetImportedFunctionDeclaration(asUINT importIndex) const;
 	virtual const char *GetImportedFunctionSourceModule(asUINT importIndex) const;
-	virtual int         BindImportedFunction(asUINT index, int sourceID);
+	virtual int         BindImportedFunction(asUINT index, asIScriptFunction *func);
 	virtual int         UnbindImportedFunction(asUINT importIndex);
 	virtual int         BindAllImportedFunctions();
 	virtual int         UnbindAllImportedFunctions();

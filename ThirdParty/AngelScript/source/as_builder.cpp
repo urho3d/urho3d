@@ -176,6 +176,9 @@ void asCBuilder::Reset()
 int asCBuilder::AddCode(const char *name, const char *code, int codeLength, int lineOffset, int sectionIdx, bool makeCopy)
 {
 	asCScriptCode *script = asNEW(asCScriptCode);
+	if( script == 0 )
+		return asOUT_OF_MEMORY;
+
 	int r = script->SetCode(name, code, codeLength, makeCopy);
 	script->lineOffset = lineOffset;
 	script->idx = sectionIdx;
@@ -211,6 +214,9 @@ int asCBuilder::CompileGlobalVar(const char *sectionName, const char *code, int 
 
 	// Add the string to the script code
 	asCScriptCode *script = asNEW(asCScriptCode);
+	if( script == 0 )
+		return asOUT_OF_MEMORY;
+
 	script->SetCode(sectionName, code, true);
 	script->lineOffset = lineOffset;
 	scripts.PushLast(script);
@@ -287,6 +293,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 
 	// Add the string to the script code
 	asCScriptCode *script = asNEW(asCScriptCode);
+	if( script == 0 )
+		return asOUT_OF_MEMORY;
+
 	script->SetCode(sectionName, code, true);
 	script->lineOffset = lineOffset; 
 	scripts.PushLast(script);
@@ -317,6 +326,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	// Create the function
 	bool isConstructor, isDestructor, isPrivate, isFinal, isOverride, isShared;
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine,module,asFUNC_SCRIPT);
+	if( func == 0 )
+		return asOUT_OF_MEMORY;
+
 	GetParsedFunctionDetails(node, scripts[0], 0, func->name, func->returnType, func->parameterTypes, func->inOutFlags, func->defaultArgs, func->isReadOnly, isConstructor, isDestructor, isPrivate, isFinal, isOverride, isShared);
 	func->id               = engine->GetNextScriptFunctionId();
 	func->scriptSectionIdx = engine->GetScriptSectionNameIndex(sectionName ? sectionName : "");
@@ -349,6 +361,12 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	// Fill in the function info for the builder too
 	node->DisconnectParent();
 	sFunctionDescription *funcDesc = asNEW(sFunctionDescription);
+	if( funcDesc == 0 )
+	{
+		func->Release();
+		return asOUT_OF_MEMORY;
+	}
+
 	functions.PushLast(funcDesc);
 	funcDesc->script            = scripts[0];
 	funcDesc->node              = node;
@@ -390,10 +408,13 @@ void asCBuilder::ParseScripts()
 	for( n = 0; n < scripts.GetLength(); n++ )
 	{
 		asCParser *parser = asNEW(asCParser)(this);
-		parsers.PushLast(parser);
+		if( parser != 0 )
+		{
+			parsers.PushLast(parser);
 
-		// Parse the script file
-		parser->ParseScript(scripts[n]);
+			// Parse the script file
+			parser->ParseScript(scripts[n]);
+		}
 	}
 
 	if( numErrors == 0 )
@@ -976,8 +997,11 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 		{
 			// Strip out white space and comments to better share the string
 			asCString *defaultArgStr = asNEW(asCString);
-			*defaultArgStr = GetCleanExpressionString(n, &source);
-			func->defaultArgs.PushLast(defaultArgStr);
+			if( defaultArgStr )
+			{
+				*defaultArgStr = GetCleanExpressionString(n, &source);
+				func->defaultArgs.PushLast(defaultArgStr);
+			}
 
 			n = n->next;
 		}
@@ -1094,8 +1118,7 @@ int asCBuilder::CheckNameConflictMember(asCObjectType *t, const char *name, asCS
 int asCBuilder::CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code, const asCString &ns)
 {
 	// Check against registered object types
-	// TODO: namespace: Check in correct namespace
-	if( engine->GetObjectType(name) != 0 )
+	if( engine->GetObjectType(name, ns) != 0 )
 	{
 		if( code )
 		{
@@ -1216,6 +1239,12 @@ int asCBuilder::RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, const 
 	// necessary after all type declarations have been identified.
 
 	sFuncDef *fd = asNEW(sFuncDef);
+	if( fd == 0 )
+	{
+		node->Destroy(engine);
+		return asOUT_OF_MEMORY;
+	}
+
 	fd->name   = name;
 	fd->node   = node;
 	fd->script = file;
@@ -1292,6 +1321,12 @@ int asCBuilder::RegisterGlobalVar(asCScriptNode *node, asCScriptCode *file, cons
 
 		// Register the global variable
 		sGlobalVariableDescription *gvar = asNEW(sGlobalVariableDescription);
+		if( gvar == 0 )
+		{
+			node->Destroy(engine);
+			return asOUT_OF_MEMORY;
+		}
+			
 		globVariables.PushLast(gvar);
 
 		gvar->script      = file;
@@ -1358,6 +1393,9 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file, const as
 	CheckNameConflict(name.AddressOf(), n, file, ns);
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
+	if( decl == 0 )
+		return asOUT_OF_MEMORY;
+
 	classDeclarations.PushLast(decl);
 	decl->name             = name;
 	decl->script           = file;
@@ -1389,6 +1427,9 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file, const as
 
 	// Create a new object type for this class
 	asCObjectType *st = asNEW(asCObjectType)(engine);
+	if( st == 0 )
+		return asOUT_OF_MEMORY;
+	
 	st->flags = asOBJ_REF | asOBJ_SCRIPT_OBJECT;
 
 	if( isShared )
@@ -1452,6 +1493,9 @@ int asCBuilder::RegisterInterface(asCScriptNode *node, asCScriptCode *file, cons
 	CheckNameConflict(name.AddressOf(), n, file, ns);
 
 	sClassDeclaration *decl = asNEW(sClassDeclaration);
+	if( decl == 0 )
+		return asOUT_OF_MEMORY;
+
 	interfaceDeclarations.PushLast(decl);
 	decl->name             = name;
 	decl->script           = file;
@@ -1483,6 +1527,9 @@ int asCBuilder::RegisterInterface(asCScriptNode *node, asCScriptCode *file, cons
 
 	// Register the object type for the interface
 	asCObjectType *st = asNEW(asCObjectType)(engine);
+	if( st == 0 )
+		return asOUT_OF_MEMORY;
+
 	st->flags = asOBJ_REF | asOBJ_SCRIPT_OBJECT;
 
 	if( isShared )
@@ -1512,7 +1559,7 @@ void asCBuilder::CompileGlobalVariables()
 	bool compileSucceeded = true;
 
 	// Store state of compilation (errors, warning, output)
-	int currNumErrors = numErrors;
+	int currNumErrors   = numErrors;
 	int currNumWarnings = numWarnings;
 
 	// Backup the original message stream
@@ -1634,6 +1681,12 @@ void asCBuilder::CompileGlobalVariables()
 			{
 				// Compile the global variable
 				initFunc = asNEW(asCScriptFunction)(engine, module, asFUNC_DUMMY);
+				if( initFunc == 0 )
+				{
+					// Out of memory
+					return;
+				}
+
 				asCCompiler comp(engine);
 				int r = comp.CompileGlobalVariable(this, gvar->script, gvar->nextNode, gvar, initFunc);
 				if( r >= 0 )
@@ -1698,6 +1751,13 @@ void asCBuilder::CompileGlobalVariables()
 					asASSERT(NULL != objectType);
 
 					asSEnumValue *e = asNEW(asSEnumValue);
+					if( e == 0 )
+					{
+						// Out of memory
+						numErrors++;
+						return;
+					}
+
 					e->name = gvar->name;
 					e->value = *(int*)&gvar->constantValue;
 
@@ -2323,7 +2383,9 @@ void asCBuilder::CompileClasses()
 
 int asCBuilder::CreateVirtualFunction(asCScriptFunction *func, int idx)
 {
-	asCScriptFunction *vf =  asNEW(asCScriptFunction)(engine, module, asFUNC_VIRTUAL);
+	asCScriptFunction *vf = asNEW(asCScriptFunction)(engine, module, asFUNC_VIRTUAL);
+	if( vf == 0 )
+		return asOUT_OF_MEMORY;
 
 	vf->funcType         = asFUNC_VIRTUAL;
 	vf->name             = func->name;
@@ -2417,6 +2479,12 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	// The bytecode for the default constructor will be generated
 	// only after the potential inheritance has been established
 	sFunctionDescription *func = asNEW(sFunctionDescription);
+	if( func == 0 )
+	{
+		// Out of memory
+		return;
+	}
+
 	functions.PushLast(func);
 
 	func->script            = file;
@@ -2491,6 +2559,8 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, const asC
 		else
 		{
 			st = asNEW(asCObjectType)(engine);
+			if( st == 0 )
+				return asOUT_OF_MEMORY;
 
 			st->flags     = asOBJ_ENUM;
 			if( isShared )
@@ -2509,6 +2579,9 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, const asC
 
 		// Store the location of this declaration for reference in name collisions
 		sClassDeclaration *decl = asNEW(sClassDeclaration);
+		if( decl == 0 )
+			return asOUT_OF_MEMORY;
+
 		decl->name             = name;
 		decl->script           = file;
 		decl->objType          = st;
@@ -2591,6 +2664,9 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, const asC
 
 				// Create the global variable description so the enum value can be evaluated
 				sGlobalVariableDescription *gvar = asNEW(sGlobalVariableDescription);
+				if( gvar == 0 )
+					return asOUT_OF_MEMORY;
+
 				globVariables.PushLast(gvar);
 
 				gvar->script		  = file;
@@ -2608,6 +2684,9 @@ int asCBuilder::RegisterEnum(asCScriptNode *node, asCScriptCode *file, const asC
 				// Allocate dummy property so we can compile the value. 
 				// This will be removed later on so we don't add it to the engine.
 				gvar->property            = asNEW(asCGlobalProperty);
+				if( gvar->property == 0 )
+					return asOUT_OF_MEMORY;
+
 				gvar->property->name      = name;
 				gvar->property->nameSpace = ns;
 				gvar->property->type      = gvar->datatype;
@@ -2640,11 +2719,18 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file, const 
 
 	// If the name is not already in use add it
  	int r = CheckNameConflict(name.AddressOf(), tmp, file, ns);
+
+	asCObjectType *st = 0;
 	if( asSUCCESS == r )
 	{
 		// Create the new type
-		asCObjectType *st = asNEW(asCObjectType)(engine);
+		st = asNEW(asCObjectType)(engine);
+		if( st == 0 )
+			r = asOUT_OF_MEMORY;
+	}
 
+	if( asSUCCESS == r )
+	{
 		st->flags           = asOBJ_TYPEDEF;
 		st->size            = dataType.GetSizeInMemoryBytes();
 		st->name            = name;
@@ -2658,10 +2744,15 @@ int asCBuilder::RegisterTypedef(asCScriptNode *node, asCScriptCode *file, const 
 
 		// Store the location of this declaration for reference in name collisions
 		sClassDeclaration *decl = asNEW(sClassDeclaration);
-		decl->name             = name;
-		decl->script           = file;
-		decl->objType          = st;
-		namedTypeDeclarations.PushLast(decl);
+		if( decl == 0 )
+			r = asOUT_OF_MEMORY;
+		else
+		{
+			decl->name             = name;
+			decl->script           = file;
+			decl->objType          = st;
+			namedTypeDeclarations.PushLast(decl);
+		}
 	}
 
 	node->Destroy(engine);
@@ -2785,7 +2876,8 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 		{
 			// Strip out white space and comments to better share the string
 			asCString *defaultArgStr = asNEW(asCString);
-			*defaultArgStr = GetCleanExpressionString(n, file);
+			if( defaultArgStr )
+				*defaultArgStr = GetCleanExpressionString(n, file);
 			defaultArgs.PushLast(defaultArgStr);
 
 			n = n->next;
@@ -2910,6 +3002,9 @@ int asCBuilder::RegisterScriptFunction(int funcId, asCScriptNode *node, asCScrip
 	if( !isInterface )
 	{
 		sFunctionDescription *func = asNEW(sFunctionDescription);
+		if( func == 0 )
+			return asOUT_OF_MEMORY;
+
 		functions.PushLast(func);
 
 		func->script            = file;
@@ -3105,6 +3200,9 @@ int asCBuilder::RegisterScriptFunctionWithSignature(int funcId, asCScriptNode *n
 	else
 	{
 		sFunctionDescription *func = asNEW(sFunctionDescription);
+		if( func == 0 )
+			return asOUT_OF_MEMORY;
+
 		functions.PushLast(func);
 
 		func->script            = file;
@@ -3343,6 +3441,8 @@ int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file
 			}
 
 			signature = asNEW(sExplicitSignature);
+			if( signature == 0 )
+				return asOUT_OF_MEMORY;
 			
 			signature->returnType = emulatedType;
 
@@ -3381,6 +3481,8 @@ int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file
 			}
 
 			signature = asNEW(sExplicitSignature)(1);
+			if( signature == 0 )
+				return asOUT_OF_MEMORY;
 
 			signature->returnType = asCDataType::CreatePrimitive(ttVoid, false);
 
@@ -3947,12 +4049,52 @@ asCDataType asCBuilder::ModifyDataTypeFromNode(const asCDataType &type, asCScrip
 
 asCObjectType *asCBuilder::GetObjectType(const char *type, const asCString &ns)
 {
-	// TODO: namespace: Registered types should also allow namespaces
-	asCObjectType *ot = engine->GetObjectType(type);
+	asCObjectType *ot = engine->GetObjectType(type, ns);
 	if( !ot && module )
 		ot = module->GetObjectType(type, ns);
 
 	return ot;
+}
+
+// This function will return true if there are any types in the engine or module 
+// with the given name. The namespace is ignored in this verification.
+bool asCBuilder::DoesTypeExist(const char *type)
+{
+	asUINT n;
+
+	// TODO: optimize: Improve linear searches
+
+	// Check if it is a registered type
+	for( n = 0; n < engine->objectTypes.GetLength(); n++ )
+		if( engine->objectTypes[n] &&
+			engine->objectTypes[n]->name == type ) // TODO: template: Should we check the subtype in case of template instances?
+			return true;
+
+	for( n = 0; n < engine->registeredFuncDefs.GetLength(); n++ )
+		if( engine->registeredFuncDefs[n]->name == type )
+			return true;
+
+	// Check if it is a script type
+	if( module )
+	{
+		for( n = 0; n < module->classTypes.GetLength(); n++ )
+			if( module->classTypes[n]->name == type )
+				return true;
+
+		for( n = 0; n < module->enumTypes.GetLength(); n++ )
+			if( module->enumTypes[n]->name == type )
+				return true;
+
+		for( n = 0; n < module->typeDefs.GetLength(); n++ )
+			if( module->typeDefs[n]->name == type )
+				return true;
+
+		for( asUINT n = 0; n < module->funcDefs.GetLength(); n++ )
+			if( module->funcDefs[n]->name == type )
+				return true;
+	}
+
+	return false;
 }
 
 asCObjectType *asCBuilder::GetObjectTypeFromTypesKnownByObject(const char *type, asCObjectType *currentType)
@@ -3986,23 +4128,15 @@ asCObjectType *asCBuilder::GetObjectTypeFromTypesKnownByObject(const char *type,
 asCScriptFunction *asCBuilder::GetFuncDef(const char *type)
 {
 	for( asUINT n = 0; n < engine->registeredFuncDefs.GetLength(); n++ )
-	{
 		// TODO: access: Only return the definitions that the module has access to
 		if( engine->registeredFuncDefs[n]->name == type )
-		{
 			return engine->registeredFuncDefs[n];
-		}
-	}
 
 	if( module )
 	{
 		for( asUINT n = 0; n < module->funcDefs.GetLength(); n++ )
-		{
 			if( module->funcDefs[n]->name == type )
-			{
 				return module->funcDefs[n];
-			}
-		}
 	}
 
 	return 0;

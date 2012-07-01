@@ -58,6 +58,12 @@ asCGarbageCollector::asCGarbageCollector()
 
 void asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 {
+	if( obj == 0 || objType == 0 )
+	{
+		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_GC_RECEIVED_NULL_PTR);
+		return;
+	}
+
 	engine->CallObjectMethod(obj, objType->beh.addref);
 	asSObjTypePair ot = {obj, objType, 0};
 

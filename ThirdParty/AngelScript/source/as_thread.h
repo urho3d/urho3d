@@ -55,8 +55,11 @@ public:
 	static asCThreadLocalData *GetLocalData();
 	static int CleanupLocalData();
 
-	static void AddRef();
-	static void Release();
+	static void Prepare();
+	static void Unprepare();
+
+	// This read/write lock can be used by the application to provide simple synchronization
+	DECLAREREADWRITELOCK(appRWLock)
 
 protected:
 	asCThreadManager();
@@ -67,6 +70,8 @@ protected:
 	int refCount;
 
 #ifndef AS_NO_THREADS
+	DECLARECRITICALSECTION(criticalSection);
+
 	asCThreadLocalData *GetLocalData(asPWORD threadId);
 	void SetLocalData(asPWORD threadId, asCThreadLocalData *tld);
 

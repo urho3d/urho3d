@@ -241,6 +241,7 @@
 #define TXT_FAILED_IN_FUNC_s                       "Failed in call to function '%s'"
 #define TXT_FAILED_IN_FUNC_s_WITH_s                "Failed in call to function '%s' with '%s'"
 #define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s          "Failed in call to function '%s' with '%s' and '%s'"
+#define TXT_GC_RECEIVED_NULL_PTR                   "AddScriptObjectToGC called with null pointer"
 
 // Internal names
 

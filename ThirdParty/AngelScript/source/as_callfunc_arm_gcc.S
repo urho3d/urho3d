@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2009 Andreas Jonsson
+  Copyright (c) 2003-2012 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -28,12 +28,12 @@
   andreas@angelcode.com
 */
 
-// Modified by Lasse Öörni for Urho3D
-
 // Assembly routines for the ARM call convention
 // Written by Fredrik Ehnbom in June 2009
 
 // Adapted to GNUC by darktemplar216 in September 2009
+
+// Modified by Lasse Öörni for 8-byte stack alignment in May 2012
 
 #if defined(__arm__) || defined(__ARM__)
 

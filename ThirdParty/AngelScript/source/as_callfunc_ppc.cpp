@@ -487,7 +487,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	asBYTE argsType[2*AS_PPC_MAX_ARGS + 1 + 1 + 1];
 	memset( argsType, 0, sizeof(argsType));
 
-	asCScriptEngine            *engine  = context->engine;
+	asCScriptEngine            *engine  = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
 
 	asQWORD  retQW           = 0;

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2012 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -156,6 +156,12 @@ int asCMap<KEY, VAL>::Insert(const KEY &key, const VAL &value)
 {
 	typedef asSMapNode<KEY,VAL> node_t;
 	asSMapNode<KEY,VAL> *nnode = asNEW(node_t);
+	if( nnode == 0 )
+	{
+		// Out of memory
+		return -1;
+	}
+
 	nnode->key   = key;
 	nnode->value = value;
 

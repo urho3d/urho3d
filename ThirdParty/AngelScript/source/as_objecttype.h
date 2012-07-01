@@ -64,9 +64,9 @@ const asDWORD asOBJ_TEMPLATE_SUBTYPE = 0x20000000;
 // asOBJ_GC is used to indicate that the type can potentially 
 // form circular references, thus is garbage collected.
 
-// The fact that an object is garbage collected doesn't imply that an object that 
-// can references it also must be garbage collected, only if the garbage collected 
-// object can reference it as well.
+// The fact that an object is garbage collected doesn't imply that an other object  
+// that can reference it also must be garbage collected, only if the garbage collected 
+// object can reference the other object as well.
 
 // For registered types however, we set the flag asOBJ_GC if the GC 
 // behaviours are registered. For script types that contain any such type we 
@@ -159,16 +159,22 @@ public:
 
 	// Factories
 	asUINT             GetFactoryCount() const;
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.24.0 - 2012-05-25
 	int                GetFactoryIdByIndex(asUINT index) const;
 	int                GetFactoryIdByDecl(const char *decl) const;
+#endif
 	asIScriptFunction *GetFactoryByIndex(asUINT index) const;
 	asIScriptFunction *GetFactoryByDecl(const char *decl) const;
 
 	// Methods
 	asUINT             GetMethodCount() const;
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.24.0 - 2012-05-25
 	int                GetMethodIdByIndex(asUINT index, bool getVirtual) const;
 	int                GetMethodIdByName(const char *name, bool getVirtual) const;
 	int                GetMethodIdByDecl(const char *decl, bool getVirtual) const;
+#endif
 	asIScriptFunction *GetMethodByIndex(asUINT index, bool getVirtual) const;
 	asIScriptFunction *GetMethodByName(const char *name, bool getVirtual) const;
 	asIScriptFunction *GetMethodByDecl(const char *decl, bool getVirtual) const;
@@ -179,12 +185,12 @@ public:
 	const char *GetPropertyDeclaration(asUINT index) const;
 
 	// Behaviours
-	asUINT GetBehaviourCount() const;
-	int    GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const;
+	asUINT             GetBehaviourCount() const;
+	asIScriptFunction *GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const;
 
 	// User data
-	void *SetUserData(void *data);
-	void *GetUserData() const;
+	void *SetUserData(void *data, asPWORD type);
+	void *GetUserData(asPWORD type) const;
 
 //===========================================
 // Internal
@@ -227,8 +233,8 @@ public:
 	bool           acceptValueSubType;
 	bool           acceptRefSubType;
 
-	asCScriptEngine *engine;
-	void            *userData;
+	asCScriptEngine  *engine;
+	asCArray<asPWORD> userData;
 
 protected:
 	mutable asCAtomic refCount;
