@@ -399,8 +399,7 @@ void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
     {
         String charStr;
         charStr.AppendUTF8(c);
-        unsigned utf8Length = line_.LengthUTF8();
-        
+
         if (!text_->GetSelectionLength())
         {
             if (cursorPosition_ == line_.LengthUTF8())

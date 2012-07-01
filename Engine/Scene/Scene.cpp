@@ -51,9 +51,9 @@ Scene::Scene(Context* context) :
     replicatedComponentID_(FIRST_REPLICATED_ID),
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
+    checksum_(0),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
-    checksum_(0),
     active_(true),
     asyncLoading_(false),
     threadedUpdate_(false)

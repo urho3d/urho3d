@@ -146,9 +146,9 @@ Graphics::Graphics(Context* context_) :
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_BILINEAR),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
-    hiresShadowMapFormat_(GL_DEPTH_COMPONENT24)
+    hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
+    defaultTextureFilterMode_(FILTER_BILINEAR)
 {
     SetTextureUnitMappings();
     ResetCachedState();

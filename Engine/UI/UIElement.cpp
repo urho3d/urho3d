@@ -78,15 +78,15 @@ UIElement::UIElement(Context* context) :
     parent_(0),
     clipBorder_(IntRect::ZERO),
     priority_(0),
-    opacity_(1.0f),
     bringToFront_(false),
     bringToBack_(true),
     clipChildren_(false),
+    sortChildren_(true),
     active_(false),
-    focusMode_(FM_NOTFOCUSABLE),
     selected_(false),
     visible_(true),
     hovering_(false),
+    focusMode_(FM_NOTFOCUSABLE),
     dragDropMode_(DD_DISABLED),
     layoutMode_(LM_FREE),
     layoutSpacing_(0),
@@ -101,11 +101,11 @@ UIElement::UIElement(Context* context) :
     childOffset_(IntVector2::ZERO),
     horizontalAlignment_(HA_LEFT),
     verticalAlignment_(VA_TOP),
+    opacity_(1.0f),
     positionDirty_(true),
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
-    sortChildren_(true),
     colorGradient_(false)
 {
 }
@@ -691,7 +691,6 @@ void UIElement::UpdateLayout()
     if (layoutMode_ == LM_VERTICAL)
     {
         int minChildWidth = 0;
-        int maxChildWidth = M_MAX_INT;
         
         for (unsigned i = 0; i < children_.Size(); ++i)
         {

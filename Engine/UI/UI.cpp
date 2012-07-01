@@ -727,7 +727,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     
-    if (cursor_ && (cursor_->IsVisible()) || (dragElement_))
+    if (cursor_ && (cursor_->IsVisible() || dragElement_))
     {
         IntVector2 pos = cursor_->GetPosition();
         

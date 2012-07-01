@@ -524,7 +524,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     dir = opendir(GetNativePath(path).CString());
     if (dir)
     {
-        while (de = readdir(dir))
+        while ((de = readdir(dir)))
         {
             /// \todo Filename may be unnormalized Unicode on Mac OS X. Re-normalize as necessary
             String fileName(de->d_name);

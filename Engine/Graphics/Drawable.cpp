@@ -353,8 +353,5 @@ void Drawable::AddToOctree()
 void Drawable::RemoveFromOctree()
 {
     if (octant_)
-    {
-        Octree* octree = octant_->GetRoot();
         octant_->RemoveDrawable(this);
-    }
 }

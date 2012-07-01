@@ -52,8 +52,8 @@ OBJECTTYPESTATIC(FileSelector);
 
 FileSelector::FileSelector(Context* context) :
     Object(context),
-    ignoreEvents_(false),
-    directoryMode_(false)
+    directoryMode_(false),
+    ignoreEvents_(false)
 {
     window_ = new Window(context_);
     window_->SetLayout(LM_VERTICAL);

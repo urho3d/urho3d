@@ -40,12 +40,12 @@ struct Bone
     /// Construct with defaults.
     Bone() :
         parentIndex_(0),
-        collisionMask_(0),
-        radius_(0.0f),
         initialPosition_(Vector3::ZERO),
         initialRotation_(Quaternion::IDENTITY),
         initialScale_(Vector3::ONE),
-        animated_(true)
+        animated_(true),
+        collisionMask_(0),
+        radius_(0.0f)
     {
     }
     

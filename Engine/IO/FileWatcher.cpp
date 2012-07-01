@@ -87,6 +87,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 #else
     /// \todo Implement on Unix-like systems
     LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
+    return false;
 #endif
 }
 

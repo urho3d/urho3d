@@ -52,19 +52,19 @@ OBJECTTYPESTATIC(BillboardSet);
 
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context),
-    geometry_(new Geometry(context)),
-    vertexBuffer_(new VertexBuffer(context_)),
-    indexBuffer_(new IndexBuffer(context_)),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
     scaled_(true),
     sorted_(false),
+    geometry_(new Geometry(context)),
+    vertexBuffer_(new VertexBuffer(context_)),
+    indexBuffer_(new IndexBuffer(context_)),
     bufferSizeDirty_(true),
     bufferDirty_(true),
     forceUpdate_(false),
-    previousOffset_(Vector3::ZERO),
-    sortFrameNumber_(0)
+    sortFrameNumber_(0),
+    previousOffset_(Vector3::ZERO)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
@@ -415,7 +415,6 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     if (sorted_)
         Sort(sortedBillboards_.Begin(), sortedBillboards_.End(), CompareBillboards);
     
-    Graphics* graphics = vertexBuffer_->GetGraphics();
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;

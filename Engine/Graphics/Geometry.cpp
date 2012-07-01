@@ -41,8 +41,8 @@ Geometry::Geometry(Context* context) :
     indexCount_(0),
     vertexStart_(0),
     vertexCount_(0),
-    lodDistance_(0.0f),
-    positionBufferIndex_(M_MAX_UNSIGNED)
+    positionBufferIndex_(M_MAX_UNSIGNED),
+    lodDistance_(0.0f)
 {
     SetNumVertexBuffers(1);
 }

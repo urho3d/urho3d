@@ -32,9 +32,6 @@
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
 using namespace std;
 
-static void RegisterScriptArray_Native(asIScriptEngine *engine);
-static void RegisterScriptArray_Generic(asIScriptEngine *engine);
-
 /// %Script array buffer.
 struct SArrayBuffer
 {

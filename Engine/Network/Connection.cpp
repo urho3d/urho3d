@@ -61,8 +61,8 @@ OBJECTTYPESTATIC(Connection);
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
-    connection_(connection),
     position_(Vector3::ZERO),
+    connection_(connection),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false),
@@ -497,7 +497,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
-            const VariantMap& vars = node->GetVars();
             while (numVars)
             {
                 ShortStringHash key = msg.ReadShortStringHash();

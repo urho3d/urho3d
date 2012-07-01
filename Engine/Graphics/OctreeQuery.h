@@ -177,10 +177,10 @@ public:
         float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
         result_(result),
         ray_(ray),
-        level_(level),
-        maxDistance_(maxDistance),
         drawableFlags_(drawableFlags),
-        viewMask_(viewMask)
+        viewMask_(viewMask),
+        maxDistance_(maxDistance),
+        level_(level)
     {
     }
     

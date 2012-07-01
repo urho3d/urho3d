@@ -211,10 +211,10 @@ private:
     Mutex sceneMutex_;
     /// Next free non-local node ID.
     unsigned replicatedNodeID_;
-    /// Next free local node ID.
-    unsigned localNodeID_;
     /// Next free non-local component ID.
     unsigned replicatedComponentID_;
+    /// Next free local node ID.
+    unsigned localNodeID_;
     /// Next free local component ID.
     unsigned localComponentID_;
     /// Scene source file checksum.

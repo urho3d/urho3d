@@ -106,7 +106,6 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
     
-    unsigned frames = Max(totalFrames_, 1);
     unsigned intervalFrames = Max(intervalFrames_, 1);
     
     if (depth >= maxDepth)
