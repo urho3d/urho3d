@@ -635,8 +635,14 @@
 			// Unknown CPU type
 			#define AS_MAX_PORTABILITY
 		#endif
-		#define AS_POSIX_THREADS
- 
+		
+		// Urho3D: compile AngelScript without threading on iOS, as there will only be a single execution context
+		#ifndef AS_IPHONE
+			#define AS_POSIX_THREADS
+		#else
+			#define AS_NO_ATOMIC
+		#endif
+		
 	// Windows
 	#elif defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 		// On Windows the simple classes are returned in the EAX:EDX registers
