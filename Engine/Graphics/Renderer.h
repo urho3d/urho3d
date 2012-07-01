@@ -231,7 +231,7 @@ public:
     /// Return maximum number of shadow maps per resolution.
     int GetMaxShadowMaps() const { return maxShadowMaps_; }
     /// Return maximum number of directional light shadow map cascades.
-    int GetMaxShadowCascades() const { return maxShadowCascades_; }
+    int GetMaxShadowCascades() const;
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.

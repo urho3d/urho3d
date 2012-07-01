@@ -355,6 +355,7 @@ void Renderer::SetRenderMode(RenderMode mode)
         }
         
         ResetBuffers();
+        ResetShadowMaps();
         renderMode_ = mode;
         shadersDirty_ = true;
     }
@@ -506,6 +507,17 @@ void Renderer::SetOccluderSizeThreshold(float screenSize)
 Viewport* Renderer::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+}
+
+int Renderer::GetMaxShadowCascades() const
+{
+    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
+    #ifndef USE_OPENGL
+    if (renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support())
+        return Max(maxShadowCascades_, 3);
+    #endif
+    
+    return maxShadowCascades_;
 }
 
 ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const

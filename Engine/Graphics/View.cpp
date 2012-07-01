@@ -1933,11 +1933,6 @@ IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D*
     unsigned width = shadowMap->GetWidth();
     unsigned height = shadowMap->GetHeight();
     int maxCascades = renderer_->GetMaxShadowCascades();
-    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
-    #ifndef USE_OPENGL
-    if (renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support())
-        maxCascades = Max(maxCascades, 3);
-    #endif
     
     switch (light->GetLightType())
     {
