@@ -790,7 +790,7 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 
 \page Input %Input
 
-The Input subsystem provides keyboard and mouse input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary.
+The Input subsystem provides keyboard, mouse, joystick and touch input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary.
 
 The input events include:
 
@@ -804,12 +804,18 @@ The input events include:
 - E_TOUCHBEGIN: a finger touched the screen.
 - E_TOUCHEND: a finger was lifted from the screen.
 - E_TOUCHMOVE: a finger moved on the screen.
+- E_JOYSTICKBUTTONDOWN: a joystick button was pressed.
+- E_JOYSTICKBUTTONUP: a joystick button was released.
+- E_JOYSTICKAXISMOVE: a joystick axis was moved.
+- E_JOYSTICKHATMOVE: a joystick POV hat was moved.
 
 The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
 
-From the input subsystem you can also query whether the application is active/inactive, or minimized.
-
 In script, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
+
+To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime. 
+
+From the input subsystem you can also query whether the application is active/inactive, or minimized.
 
 
 \page Audio %Audio

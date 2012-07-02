@@ -136,7 +136,7 @@ EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
     PARAM(P_POSITION, Position);            // float
 }
 
-/// Joystick hat moved.
+/// Joystick POV hat moved.
 EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
 {
     PARAM(P_JOYSTICK, Joystick);            // int

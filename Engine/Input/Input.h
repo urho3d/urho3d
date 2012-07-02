@@ -130,6 +130,8 @@ public:
     bool OpenJoystick(unsigned index);
     /// Close a joystick.
     void CloseJoystick(unsigned index);
+    /// Redetect joysticks. Return true if successful.
+    bool DetectJoysticks();
     
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
@@ -173,6 +175,8 @@ public:
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
+    /// Setup internal joystick structures.
+    void ResetJoysticks();
     /// Activate the application.
     void MakeActive();
     /// Deactivate the application.

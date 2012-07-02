@@ -2402,7 +2402,8 @@ Input
 
 Methods:<br>
 - bool OpenJoystick(uint)
-- bool CloseJoystick(uint)
+- void CloseJoystick(uint)
+- bool DetectJoysticks()
 
 Properties:<br>
 - ShortStringHash type (readonly)

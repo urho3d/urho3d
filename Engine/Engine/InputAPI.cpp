@@ -140,7 +140,8 @@ static void RegisterInput(asIScriptEngine* engine)
     
     RegisterObject<Input>(engine, "Input");
     engine->RegisterObjectMethod("Input", "bool OpenJoystick(uint)", asMETHOD(Input, OpenJoystick), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool CloseJoystick(uint)", asMETHOD(Input, CloseJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void CloseJoystick(uint)", asMETHOD(Input, CloseJoystick), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool DetectJoysticks()", asMETHOD(Input, DetectJoysticks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);

@@ -194,6 +194,22 @@ void Input::SetToggleFullscreen(bool enable)
     toggleFullscreen_ = enable;
 }
 
+bool Input::DetectJoysticks()
+{
+    if (inputInstances.Size() > 1)
+    {
+        LOGERROR("Can not redetect joysticks with multiple application instances");
+        return false;
+    }
+    else
+    {
+        SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+        SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+        ResetJoysticks();
+        return true;
+    }
+}
+
 bool Input::OpenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
@@ -367,12 +383,17 @@ void Input::Initialize()
         inputInstances[windowID_] = this;
     }
     
-    // Initialize joysticks
+    ResetJoysticks();
+    
+    LOGINFO("Initialized input");
+}
+
+void Input::ResetJoysticks()
+{
+    joysticks_.Clear();
     joysticks_.Resize(SDL_NumJoysticks());
     for (unsigned i = 0; i < joysticks_.Size(); ++i)
         joysticks_[i].name_ = SDL_JoystickName(i);
-    
-    LOGINFO("Initialized input");
 }
 
 void Input::MakeActive()
