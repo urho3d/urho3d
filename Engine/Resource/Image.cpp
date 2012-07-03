@@ -161,11 +161,29 @@ bool CompressedLevel::Decompress(unsigned char* dest)
 {
     if (!data_)
         return false;
-    else
+    
+    switch (format_)
     {
-        DecompressImage(dest, data_, width_, height_, compressedFormat_);
+    case CF_DXT1:
+    case CF_DXT3:
+    case CF_DXT5:
+        DecompressImageDXT(dest, data_, width_, height_, format_);
+        return true;
+        
+    case CF_ETC1:
+        DecompressImageETC(dest, data_, width_, height_);
+        return true;
+        
+    case CF_PVRTC_RGB_2BPP:
+    case CF_PVRTC_RGBA_2BPP:
+    case CF_PVRTC_RGB_4BPP:
+    case CF_PVRTC_RGBA_4BPP:
+        DecompressImagePVRTC(dest, data_, width_, height_, format_);
         return true;
     }
+    
+    // Unknown format
+    return false;
 }
 
 OBJECTTYPESTATIC(Image);
@@ -694,7 +712,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
         return level;
     }
     
-    level.compressedFormat_ = compressedFormat_;
+    level.format_ = compressedFormat_;
     level.width_ = width_;
     level.height_ = height_;
     

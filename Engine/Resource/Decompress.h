@@ -25,5 +25,9 @@
 
 #include "Image.h"
 
-/// Decompress a compressed image format to RGBA.
-void DecompressImage(unsigned char* dest, unsigned char* src, unsigned width, unsigned height, CompressedFormat format);
+/// Decompress a DXT compressed image to RGBA.
+void DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format);
+/// Decompress an ETC1 compressed image to RGBA.
+void DecompressImageETC(unsigned char* dest, const void* blocks, int width, int height);
+/// Decompress a PVRTC compressed image to RGBA.
+void DecompressImagePVRTC(unsigned char* dest, const void* blocks, int width, int height, CompressedFormat format);

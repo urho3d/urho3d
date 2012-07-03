@@ -55,13 +55,13 @@ struct CompressedLevel
     {
     }
     
-    /// Decompress. The destination buffer required is width * height * 4 bytes. Return true if successful.
+    /// Decompress to RGBA. The destination buffer required is width * height * 4 bytes. Return true if successful.
     bool Decompress(unsigned char* dest);
     
     /// Compressed image data.
     unsigned char* data_;
     /// Compression format.
-    CompressedFormat compressedFormat_;
+    CompressedFormat format_;
     /// Width.
     int width_;
     /// Height.

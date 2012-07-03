@@ -398,7 +398,7 @@ static void DecompressETC(unsigned char* pDestData, const void* pSrcData)
     }
 }
 
-static void DecompressImageETC( unsigned char* rgba, const void* blocks, int width, int height )
+void DecompressImageETC( unsigned char* rgba, const void* blocks, int width, int height )
 {
     // initialise the block input
     unsigned char const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
@@ -792,9 +792,9 @@ static unsigned TwiddleUV(unsigned YSize, unsigned XSize, unsigned YPos, unsigne
     return Twiddled;
 }
 
-static void DecompressImagePVRTC(unsigned char* dest, void *src, const int XDim, const int YDim, CompressedFormat format)
+void DecompressImagePVRTC(unsigned char* dest, const void *blocks, int width, int height, CompressedFormat format)
 {
-    AMTC_BLOCK_STRUCT* pCompressedData = (AMTC_BLOCK_STRUCT*)src;
+    AMTC_BLOCK_STRUCT* pCompressedData = (AMTC_BLOCK_STRUCT*)blocks;
     int AssumeImageTiles = 1;
     int Do2bitMode = format == CF_PVRTC_RGB_2BPP || format == CF_PVRTC_RGBA_2BPP;
     
@@ -840,22 +840,22 @@ static void DecompressImagePVRTC(unsigned char* dest, void *src, const int XDim,
     }
     
     // For MBX don't allow the sizes to get too small
-    BlkXDim = _MAX(2, XDim / XBlockSize);
-    BlkYDim = _MAX(2, YDim / BLK_Y_SIZE);
+    BlkXDim = _MAX(2, width / XBlockSize);
+    BlkYDim = _MAX(2, height / BLK_Y_SIZE);
     
     // Step through the pixels of the image decompressing each one in turn
     //
     // Note that this is a hideously inefficient way to do this!
-    for(y = 0; y < YDim; y++)
+    for(y = 0; y < height; y++)
     {
-        for(x = 0; x < XDim; x++)
+        for(x = 0; x < width; x++)
         {
             // Map this pixel to the top left neighbourhood of blocks
             BlkX = (x - XBlockSize/2);
             BlkY = (y - BLK_Y_SIZE/2);
             
-            BlkX = LIMIT_COORD(BlkX, XDim, AssumeImageTiles);
-            BlkY = LIMIT_COORD(BlkY, YDim, AssumeImageTiles);
+            BlkX = LIMIT_COORD(BlkX, width, AssumeImageTiles);
+            BlkY = LIMIT_COORD(BlkY, height, AssumeImageTiles);
             
             BlkX /= XBlockSize;
             BlkY /= BLK_Y_SIZE;
@@ -928,34 +928,11 @@ static void DecompressImagePVRTC(unsigned char* dest, void *src, const int XDim,
             }
             
             // Store the result in the output image
-            uPosition = (x+y*XDim)<<2;
+            uPosition = (x+y*width)<<2;
             dest[uPosition+0] = (unsigned char)Result[0];
             dest[uPosition+1] = (unsigned char)Result[1];
             dest[uPosition+2] = (unsigned char)Result[2];
             dest[uPosition+3] = (unsigned char)Result[3];
         }
-    }
-}
-
-void DecompressImage(unsigned char* dest, unsigned char* src, unsigned width, unsigned height, CompressedFormat format)
-{
-    switch (format)
-    {
-    case CF_DXT1:
-    case CF_DXT3:
-    case CF_DXT5:
-        DecompressImageDXT(dest, src, width, height, format);
-        break;
-        
-    case CF_ETC1:
-        DecompressImageETC(dest, src, width, height);
-        break;
-        
-    case CF_PVRTC_RGB_2BPP:
-    case CF_PVRTC_RGBA_2BPP:
-    case CF_PVRTC_RGB_4BPP:
-    case CF_PVRTC_RGBA_4BPP:
-        DecompressImagePVRTC(dest, src, width, height, format);
-        break;
     }
 }
