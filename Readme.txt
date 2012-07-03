@@ -125,11 +125,7 @@ Mac OS X.
 For gcc, execute make (by default, cmake_gcc.sh specifies to make a
 RelWithDebInfo build.)
 
-The build process will also convert models from the SourceAssets directory into
-Bin/Data/Models. After the build is complete, the programs can be run from the 
-Bin directory.
-
-When using Xcode on Mac OS X, select the i386 architecture before building. 
+When using Xcode on Mac OS X, select the i386 architecture before building.
 Compiling Urho3D as 64-bit is not supported.
 
 After the build is complete, the programs can be run from the Bin directory.
@@ -152,10 +148,9 @@ CompileAllShaders.bat from the Bin directory first.
 Android build process
 ---------------------
 
-First build desktop Urho3D to make sure the models from the SourceAssets 
-directory are converted. Then copy Bin/Data and Bin/CoreData directories to the
-Android/assets directory. Finally execute the following commands in the Android
-directory:
+First copy Bin/Data and Bin/CoreData directories to the Android/assets directory
+(you can use the provided batch file CopyData.bat.) Next, execute the following
+commands in the Android directory:
 
 - android update project -p . (only needed on the first time)
 - ndk-build
@@ -182,9 +177,7 @@ name has to be replaced in several files:
 iOS build process
 -----------------
 
-First build desktop Urho3D to generate the OgreImporter utility into the Bin 
-directory. Then run cmake_ios.sh. This generates an Xcode project named
-Urho3D.xcodeproj.
+Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
 
 Open the Xcode project and check the properties for the Urho3D project (topmost
 in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK.

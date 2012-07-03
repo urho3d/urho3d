@@ -101,25 +101,6 @@ endmacro ()
 macro (finalize_lib)
 endmacro ()
 
-# Macro for model asset compilation
-macro (add_model NAME PARAMETERS)
-    if (IOS)
-        add_custom_command (
-            OUTPUT ../../Bin/Data/Models/${NAME}.mdl
-            COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
-            DEPENDS ${NAME}.mesh.xml
-        )
-    else ()
-        add_custom_command (
-            OUTPUT ../../Bin/Data/Models/${NAME}.mdl
-            COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
-            DEPENDS OgreImporter ${NAME}.mesh.xml
-        )
-    endif ()
-
-    set (ALL_MODELS ${ALL_MODELS} ../../Bin/Data/Models/${NAME}.mdl)
-endmacro ()
-
 # Add SDL as a global include directory
 include_directories (ThirdParty/SDL/include)
 
@@ -138,7 +119,6 @@ add_subdirectory (Engine/Resource)
 add_subdirectory (Engine/Scene)
 add_subdirectory (Engine/Script)
 add_subdirectory (Engine/UI)
-add_subdirectory (SourceAssets/Models)
 add_subdirectory (ThirdParty/AngelScript)
 add_subdirectory (ThirdParty/Bullet)
 add_subdirectory (ThirdParty/FreeType)
