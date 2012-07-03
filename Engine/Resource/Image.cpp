@@ -23,13 +23,12 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Decompress.h"
 #include "File.h"
 #include "FileSystem.h"
-#include "Image.h"
 #include "Log.h"
 
 #include <cstring>
-#include <squish.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -45,14 +44,12 @@
 #define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
 
-/// DirectDraw surface color key.
 struct DDColorKey
 {
     unsigned dwColorSpaceLowValue_;
     unsigned dwColorSpaceHighValue_;
 };
 
-/// DirectDraw surface pixel format.
 struct DDPixelFormat
 {
     unsigned dwSize_;
@@ -106,7 +103,6 @@ struct DDPixelFormat
     };
 };
 
-/// DirectDraw surface capabilities.
 struct DDSCaps2
 {
     unsigned dwCaps_;
@@ -119,7 +115,6 @@ struct DDSCaps2
     };
 };
 
-/// DirectDraw surface description.
 struct DDSurfaceDesc2
 {
     unsigned dwSize_;
@@ -164,28 +159,13 @@ struct DDSurfaceDesc2
 
 bool CompressedLevel::Decompress(unsigned char* dest)
 {
-    int flags = 0;
-    
-    switch (compressedFormat_)
-    {
-    case CF_DXT1:
-        flags = squish::kDxt1;
-        break;
-        
-    case CF_DXT3:
-        flags = squish::kDxt3;
-        break;
-        
-    case CF_DXT5:
-        flags = squish::kDxt5;
-        break;
-    }
-    
-    if (!flags || !data_)
+    if (!data_)
         return false;
-    
-    squish::DecompressImage(dest, width_, height_, data_, flags);
-    return true;
+    else
+    {
+        DecompressImage(dest, data_, width_, height_, compressedFormat_);
+        return true;
+    }
 }
 
 OBJECTTYPESTATIC(Image);
@@ -354,8 +334,16 @@ bool Image::Load(Deserializer& source)
         for (unsigned i = 0; i < mipmaps; ++i)
         {
             unsigned levelSize = source.ReadUInt();
+            if (levelSize + dataOffset > dataSize)
+            {
+                LOGERROR("KTX mipmap level data size exceeds file size");
+                return false;
+            }
+            
             source.Read(&data_[dataOffset], levelSize);
             dataOffset += levelSize;
+            if (source.GetPosition() & 3)
+                source.Seek((source.GetPosition() + 3) & 0xfffffffc);
         }
         
         SetMemoryUse(dataSize);

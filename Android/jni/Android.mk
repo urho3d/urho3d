@@ -167,20 +167,6 @@ LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
 include $(BUILD_STATIC_LIBRARY)
 
 
-# Squish library
-LOCAL_PATH = $(ROOT_PATH)/ThirdParty/Squish
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := Squish
-
-LOCAL_SRC_FILES := \
-    $(subst $(LOCAL_PATH)/,, \
-    $(wildcard $(LOCAL_PATH)/*.cpp))
-
-include $(BUILD_STATIC_LIBRARY)
-
-
 # StanHull library
 LOCAL_PATH = $(ROOT_PATH)/ThirdParty/StanHull
 
@@ -237,7 +223,6 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/ThirdParty/kNet/include \
     $(LOCAL_PATH)/ThirdParty/PugiXml/src \
     $(LOCAL_PATH)/ThirdParty/SDL/include \
-    $(LOCAL_PATH)/ThirdParty/Squish \
     $(LOCAL_PATH)/ThirdParty/StanHull \
     $(LOCAL_PATH)/ThirdParty/STB
 
@@ -261,7 +246,7 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/Urho3D/*.cpp) \
     $(wildcard $(LOCAL_PATH)/ThirdParty/SDL/src/main/android/*.cpp))
 
-LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL Squish StanHull STB
+LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL StanHull STB
 
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog
 

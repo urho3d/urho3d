@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Core ../IO ../Math ../../ThirdParty/STB ../../ThirdParty/PugiXml/src ../../ThirdParty/Squish
+    ../Container ../Core ../IO ../Math ../../ThirdParty/STB ../../ThirdParty/PugiXml/src
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core IO Math PugiXml Squish STB)
+target_link_libraries (${TARGET_NAME} Container Core IO Math PugiXml STB)
 enable_pch ()
 finalize_lib ()

@@ -15,7 +15,7 @@
 #---------------------------------------------------------------------------
 
 # This tag specifies the encoding used for all characters in the config file 
-# that follow. The default is UTF-8 which is also the encoding used for all 
+# that follow. The default is UTF-8 which is also the encoding used for all
 # text before the first occurrence of this tag. Doxygen uses libiconv (or the 
 # iconv built into libc) for the transcoding. See 
 # http://www.gnu.org/software/libiconv for the list of possible encodings.
@@ -56,7 +56,7 @@ OUTPUT_DIRECTORY       = Docs
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
-# format and will distribute the generated files over these directories. 
+# format and will distribute the generated files over these directories.
 # Enabling this option can be useful when feeding doxygen a huge amount of 
 # source files, where putting all generated files in the same directory would 
 # otherwise cause performance problems for the file system.
@@ -194,7 +194,7 @@ SEPARATE_MEMBER_PAGES  = NO
 # The TAB_SIZE tag can be used to set the number of spaces in a tab. 
 # Doxygen uses this value to replace tabs by spaces in code fragments.
 
-TAB_SIZE               = 8
+TAB_SIZE               = 4
 
 # This tag can be used to specify a number of aliases that acts 
 # as commands in the documentation. An alias has the form "name=value". 
@@ -356,7 +356,7 @@ LOOKUP_CACHE_SIZE      = 0
 # Private class members and static file members will be hidden unless 
 # the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES
 
-EXTRACT_ALL            = YES
+EXTRACT_ALL            = NO
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation.
@@ -372,7 +372,7 @@ EXTRACT_STATIC         = YES
 # defined locally in source files will be included in the documentation. 
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_CLASSES  = NO
 
 # This flag is only useful for Objective-C code. When set to YES local 
 # methods, which are defined in the implementation section but not in 
@@ -1046,7 +1046,7 @@ TOC_EXPAND             = NO
 GENERATE_QHP           = NO
 
 # If the QHG_LOCATION tag is specified, the QCH_FILE tag can 
-# be used to specify the file name of the resulting .qch file. 
+# be used to specify the file name of the resulting .qch file.
 # The path specified is relative to the HTML output folder.
 
 QCH_FILE               = 

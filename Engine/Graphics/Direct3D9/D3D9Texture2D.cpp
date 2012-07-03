@@ -359,6 +359,13 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         int height = image->GetHeight();
         unsigned levels = image->GetNumCompressedLevels();
         unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
+        bool needDecompress = false;
+        
+        if (!format)
+        {
+            format = Graphics::GetRGBAFormat();
+            needDecompress = true;
+        }
         
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
@@ -374,8 +381,19 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
-            SetData(i, 0, 0, level.width_, level.height_, level.data_);
-            memoryUse += level.rows_ * level.rowSize_;
+            if (!needDecompress)
+            {
+                SetData(i, 0, 0, level.width_, level.height_, level.data_);
+                memoryUse += level.rows_ * level.rowSize_;
+            }
+            else
+            {
+                unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
+                level.Decompress(rgbaData);
+                SetData(i, 0, 0, level.width_, level.height_, rgbaData);
+                memoryUse += level.width_ * level.height_ * 4;
+                delete[] rgbaData;
+            }
         }
     }
     

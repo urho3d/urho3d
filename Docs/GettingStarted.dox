@@ -211,7 +211,7 @@ The libraries are the following:
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
-Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however all of the libraries above get automatically linked as Engine library depends on all of them.
+Urho3D.exe uses the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however all of the libraries above get automatically linked as Engine library depends on all of them.
 
 Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the scripting subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
 
@@ -226,7 +226,6 @@ The third-party libraries are used for the following functionality:
 - Open Asset Import Library: reading various 3D file formats
 - pugixml: parsing XML files
 - SDL: window and OpenGL context creation, input and sound output
-- Squish: decompressing DXT images when not supported by hardware
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
 - stb_vorbis: Ogg Vorbis decoding

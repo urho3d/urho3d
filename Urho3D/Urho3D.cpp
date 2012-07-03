@@ -59,8 +59,8 @@ void Run()
         if (scriptFileName.Empty())
         {
             ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
-                "The script file should implement the function void Start() for creating the scene "
-                "content and subscribing to all necessary events, such as the application update."
+                "The script file should implement the function void Start() for initializing the "
+                "application and subscribing to all necessary events, such as the frame update."
             );
             return;
         }
