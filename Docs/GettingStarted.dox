@@ -126,6 +126,8 @@ F3          Toggle profiling display
 F4          Toggle octree debug geometry
 \endverbatim
 
+If a joystick is connected, it can also be used for controlling the player character.
+
 NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
 
 \section Running_Editor Editor

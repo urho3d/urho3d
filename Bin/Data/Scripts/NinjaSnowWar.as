@@ -10,6 +10,9 @@
 
 const float mouseSensitivity = 0.125;
 const float touchSensitivity = 2.0;
+const float joySensitivity = 0.5;
+const float joyMoveDeadZone = 0.333;
+const float joyLookDeadZone = 0.05;
 const float cameraMinDist = 25;
 const float cameraMaxDist = 500;
 const float cameraSafetyDist = 30;
@@ -822,6 +825,59 @@ void UpdateControls()
             
             if (fireTouchID >= 0)
                 playerControls.Set(CTRL_FIRE, true);
+        }
+        
+        if (input.numJoysticks > 0)
+        {
+            JoystickState@ joystick = input.joysticks[0];
+            if (joystick.buttonDown[0])
+                playerControls.Set(CTRL_JUMP, true);
+            if (joystick.buttonDown[1])
+                playerControls.Set(CTRL_FIRE, true);
+            if (joystick.numButtons >= 6)
+            {
+                if (joystick.buttonDown[4])
+                    playerControls.Set(CTRL_JUMP, true);
+                if (joystick.buttonDown[5])
+                    playerControls.Set(CTRL_FIRE, true);
+            }
+
+            if (joystick.numHats > 0)
+            {
+                if (joystick.hatPosition[0] & HAT_LEFT != 0)
+                    playerControls.Set(CTRL_LEFT, true);
+                if (joystick.hatPosition[0] & HAT_RIGHT != 0)
+                    playerControls.Set(CTRL_RIGHT, true);
+                if (joystick.hatPosition[0] & HAT_UP != 0)
+                    playerControls.Set(CTRL_UP, true);
+                if (joystick.hatPosition[0] & HAT_DOWN != 0)
+                    playerControls.Set(CTRL_DOWN, true);
+            }
+            if (joystick.numAxes >= 2)
+            {
+                if (joystick.axisPosition[0] < -joyMoveDeadZone)
+                    playerControls.Set(CTRL_LEFT, true);
+                if (joystick.axisPosition[0] > joyMoveDeadZone)
+                    playerControls.Set(CTRL_RIGHT, true);
+                if (joystick.axisPosition[1] < -joyMoveDeadZone)
+                    playerControls.Set(CTRL_UP, true);
+                if (joystick.axisPosition[1] > joyMoveDeadZone)
+                    playerControls.Set(CTRL_DOWN, true);
+            }
+            if (joystick.numAxes >= 4)
+            {
+                float lookX = joystick.axisPosition[joystick.numAxes - 2];
+                float lookY = joystick.axisPosition[joystick.numAxes - 1];
+
+                if (lookX < -joyLookDeadZone)
+                    playerControls.yaw -= joySensitivity * lookX * lookX;
+                if (lookX > joyLookDeadZone)
+                    playerControls.yaw += joySensitivity * lookX * lookX;
+                if (lookY < -joyLookDeadZone)
+                    playerControls.pitch -= joySensitivity * lookY * lookY;
+                if (lookY > joyLookDeadZone)
+                    playerControls.pitch += joySensitivity * lookY * lookY;
+            }
         }
 
         // For the triggered actions (fire & jump) check also for press, in case the FPS is low
