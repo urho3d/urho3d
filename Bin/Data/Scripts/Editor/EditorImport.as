@@ -233,7 +233,7 @@ void ImportTundraScene(const String&in fileName)
             if (!meshName.empty)
             {
                 StaticModel@ model = newNode.CreateComponent("StaticModel");
-                model.model = cache.GetResource("Model", "Models/" + GetFileNameAndExtension(meshName).Replaced(".mesh", ".mdl"));
+                model.model = cache.GetResource("Model", GetOutModelName(meshName));
                 model.drawDistance = drawDistance;
                 model.castShadows = castShadows;
                 // Set default grey material to match Tundra defaults
@@ -241,7 +241,7 @@ void ImportTundraScene(const String&in fileName)
                 // Then try to assign the actual materials
                 for (uint i = 0; i < materialNames.length; ++i)
                 {
-                    Material@ mat = cache.GetResource("Material", "Materials/" + GetFileNameAndExtension(materialNames[i]).Replaced(".material", ".xml"));
+                    Material@ mat = cache.GetResource("Material", GetOutMaterialName(materialNames[i]));
                     if (mat !is null)
                         model.materials[i] = mat;
                 }
@@ -277,11 +277,11 @@ void ImportTundraScene(const String&in fileName)
                     break;
 
                 case 4:
-                    shape.SetTriangleMesh(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, bodySize);
+                    shape.SetTriangleMesh(cache.GetResource("Model", GetOutModelName(collisionMeshName)), 0, bodySize);
                     break;
 
                 case 6:
-                    shape.SetConvexHull(cache.GetResource("Model", "Models/" + GetFileNameAndExtension(collisionMeshName).Replaced(".mesh", ".mdl")), 0, bodySize);
+                    shape.SetConvexHull(cache.GetResource("Model", GetOutModelName(collisionMeshName)), 0, bodySize);
                     break;
                 }
 
@@ -365,6 +365,21 @@ void ProcessRef(String& ref)
         ref = ref.Substring(7);
 }
 
+String GetOutModelName(const String&in ref)
+{
+    return "Models/" + GetFullAssetName(ref).Replaced('/', '_').Replaced(".mesh", ".mdl");
+}
+
+String GetOutMaterialName(const String&in ref)
+{
+    return "Materials/" + GetFullAssetName(ref).Replaced('/', '_').Replaced(".material", ".xml");
+}
+
+String GetOutTextureName(const String&in ref)
+{
+    return "Textures/" + GetFullAssetName(ref).Replaced('/', '_');
+}
+
 void ConvertModel(const String&in modelName, const String&in filePath, Array<String>@ convertedModels)
 {
     if (modelName.Trimmed().empty)
@@ -376,19 +391,24 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
             return;
     }
 
-    String convertedModelName = filePath + modelName + ".xml";
+    String meshFileName = filePath + GetFullAssetName(modelName);
+    String xmlFileName = filePath + GetFullAssetName(modelName) + ".xml";
+    String outFileName = sceneResourcePath + GetOutModelName(modelName);
 
     // Convert .mesh to .mesh.xml
-    String cmdLine = "ogrexmlconverter \"" + filePath + GetFullAssetName(modelName) + "\" \"" + convertedModelName + "\"";
-    if (!fileSystem.FileExists(convertedModelName))
+    String cmdLine = "ogrexmlconverter \"" + meshFileName + "\" \"" + xmlFileName + "\"";
+    if (!fileSystem.FileExists(xmlFileName))
         fileSystem.SystemCommand(cmdLine.Replaced('/', '\\'));
 
-    // Convert .mesh.xml to .mdl
-    Array<String> args;
-    args.Push("\"" + filePath + GetFullAssetName(modelName) + ".xml\"");
-    args.Push("\"" + sceneResourcePath + "Models/" + GetFileNameAndExtension(modelName).Replaced(".mesh", ".mdl") + "\"");
-    args.Push("-a");
-    fileSystem.SystemRun(fileSystem.programDir + "OgreImporter", args);
+    if (!fileSystem.FileExists(outFileName))
+    {
+        // Convert .mesh.xml to .mdl
+        Array<String> args;
+        args.Push("\"" + xmlFileName + "\"");
+        args.Push("\"" + outFileName + "\"");
+        args.Push("-a");
+        fileSystem.SystemRun(fileSystem.programDir + "OgreImporter", args);
+    }
 
     convertedModels.Push(modelName);
 }
@@ -405,14 +425,13 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
     }
 
     String fileName = filePath + GetFullAssetName(materialName);
-    String outFileName = sceneResourcePath + "Materials/" + GetFileName(materialName) + ".xml";
+    String outFileName = sceneResourcePath + GetOutMaterialName(materialName);
 
     if (!fileSystem.FileExists(fileName))
         return;
 
     bool mask = false;
     bool twoSided = false;
-    bool hasTexture = false;
     String textureName;
 
     File file(fileName, FILE_READ);
@@ -423,11 +442,11 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
             mask = true;
         if (line.StartsWith("cull_hardware none"))
             twoSided = true;
-        if (line.StartsWith("texture ") && !hasTexture)
+        // Todo: handle multiple textures per material
+        if (line.StartsWith("texture ") && textureName.empty)
         {
             textureName = line.Substring(8);
             ProcessRef(textureName);
-            hasTexture = true; // For now handle only the first texture
         }
     }
 
@@ -445,15 +464,17 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
 
     if (!textureName.empty)
     {
+        String outTextureName = GetOutTextureName(textureName);
         XMLElement textureElem = rootElem.CreateChild("texture");
         textureElem.SetAttribute("unit", "diffuse");
-        textureElem.SetAttribute("name", "Textures/" + textureName);
+        textureElem.SetAttribute("name", outTextureName);
 
+        // Todo: handle also materials without texture
         File outFile(outFileName, FILE_WRITE);
         outMat.Save(outFile);
         outFile.Close();
 
-        fileSystem.Copy(filePath + GetFullAssetName(textureName), sceneResourcePath + "Textures/" + textureName);
+        fileSystem.Copy(filePath + GetFullAssetName(textureName), sceneResourcePath + outTextureName);
     }
 
     convertedMaterials.Push(materialName);
