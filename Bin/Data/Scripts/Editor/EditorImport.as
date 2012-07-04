@@ -432,7 +432,10 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
 
     bool mask = false;
     bool twoSided = false;
+    bool uvScaleSet = false;
     String textureName;
+    Vector2 uvScale(1, 1);
+    Color diffuse(1, 1, 1, 1);
 
     File file(fileName, FILE_READ);
     while (!file.eof)
@@ -443,17 +446,24 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
         if (line.StartsWith("cull_hardware none"))
             twoSided = true;
         // Todo: handle multiple textures per material
-        if (line.StartsWith("texture ") && textureName.empty)
+        if (textureName.empty && line.StartsWith("texture "))
         {
             textureName = line.Substring(8);
             ProcessRef(textureName);
         }
+        if (!uvScaleSet && line.StartsWith("scale "))
+        {
+            uvScale = line.Substring(6).ToVector2();
+            uvScaleSet = true;
+        }
+        if (line.StartsWith("diffuse "))
+            diffuse = line.Substring(8).ToColor();
     }
 
     XMLFile outMat;
     XMLElement rootElem = outMat.CreateRoot("material");
     XMLElement techniqueElem = rootElem.CreateChild("technique");
-    techniqueElem.SetAttribute("name", mask ? "Techniques/DiffAlphaMask.xml" : "Techniques/Diff.xml");
+
     if (twoSided)
     {
         XMLElement cullElem = rootElem.CreateChild("cull");
@@ -464,18 +474,39 @@ void ConvertMaterial(const String&in materialName, const String&in filePath, Arr
 
     if (!textureName.empty)
     {
+        techniqueElem.SetAttribute("name", mask ? "Techniques/DiffAlphaMask.xml" : "Techniques/Diff.xml");
+
         String outTextureName = GetOutTextureName(textureName);
         XMLElement textureElem = rootElem.CreateChild("texture");
         textureElem.SetAttribute("unit", "diffuse");
         textureElem.SetAttribute("name", outTextureName);
 
-        // Todo: handle also materials without texture
-        File outFile(outFileName, FILE_WRITE);
-        outMat.Save(outFile);
-        outFile.Close();
-
         fileSystem.Copy(filePath + GetFullAssetName(textureName), sceneResourcePath + outTextureName);
     }
+    else
+        techniqueElem.SetAttribute("name", "NoTexture.xml");
+
+    if (uvScale != Vector2(1, 1))
+    {
+        XMLElement uScaleElem = rootElem.CreateChild("parameter");
+        uScaleElem.SetAttribute("name", "UOffset");
+        uScaleElem.SetVector3("value", Vector3(1 / uvScale.x, 0, 0));
+
+        XMLElement vScaleElem = rootElem.CreateChild("parameter");
+        vScaleElem.SetAttribute("name", "VOffset");
+        vScaleElem.SetVector3("value", Vector3(0, 1 / uvScale.y, 0));
+    }
+
+    if (diffuse != Color(1, 1, 1, 1))
+    {
+        XMLElement diffuseElem = rootElem.CreateChild("parameter");
+        diffuseElem.SetAttribute("name", "MatDiffColor");
+        diffuseElem.SetColor("value", diffuse);
+    }
+
+    File outFile(outFileName, FILE_WRITE);
+    outMat.Save(outFile);
+    outFile.Close();
 
     convertedMaterials.Push(materialName);
 }
