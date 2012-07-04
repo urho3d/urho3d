@@ -133,7 +133,7 @@ void InitScene()
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 100.0;
     zone.fogEnd = 300.0;
-    zone.boundingBox = BoundingBox(-1000.0, 1000.0);
+    zone.boundingBox = BoundingBox(-1000, 1000);
 
     {
         Node@ lightNode = testScene.CreateChild("GlobalLight");
@@ -144,13 +144,13 @@ void InitScene()
         light.castShadows = true;
         light.shadowBias = BiasParameters(0.0001, 0.5);
         light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8);
-        light.specularIntensity = 0.5f;
+        light.specularIntensity = 0.5;
     }
 
     {
         Node@ objectNode = testScene.CreateChild("Floor");
-        objectNode.position = Vector3(0.0, -0.5, 0.0);
-        objectNode.scale = Vector3(100.0, 0.5, 100.0);
+        objectNode.position = Vector3(0, -0.5, 0);
+        objectNode.scale = Vector3(200, 1, 200);
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -159,13 +159,14 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
+        shape.SetBox(Vector3(1, 1, 1));
     }
 
     for (uint i = 0; i < 50; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Box");
-        objectNode.position = Vector3(Random(180.0) - 90.0, 1.0, Random(180.0) - 90.0);
+        objectNode.position = Vector3(Random() * 180 - 90, 1, Random() * 180 - 90);
+        objectNode.SetScale(2);
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -174,14 +175,14 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
+        shape.SetBox(Vector3(1, 1, 1));
     }
 
     for (uint i = 0; i < 10; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Box");
-        objectNode.position = Vector3(Random(180.0) - 90.0, 10.0, Random(180.0) - 90.0);
-        objectNode.SetScale(10.0);
+        objectNode.position = Vector3(Random() * 180 - 90, 10, Random() * 180 - 90);
+        objectNode.SetScale(20);
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -191,15 +192,15 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
+        shape.SetBox(Vector3(1, 1, 1));
     }
 
     for (uint i = 0; i < 50; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Mushroom");
-        objectNode.position = Vector3(Random(180.0) - 90.0, 0.0, Random(180.0) - 90.0);
-        objectNode.rotation = Quaternion(0.0, Random(360.0), 0.0);
-        objectNode.SetScale(5.0);
+        objectNode.position = Vector3(Random() * 180 - 90, 0, Random() * 180 - 90);
+        objectNode.rotation = Quaternion(0, Random(360.0), 0);
+        objectNode.SetScale(5);
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
@@ -214,8 +215,8 @@ void InitScene()
     for (uint i = 0; i < 50; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Jack");
-        objectNode.position = Vector3(Random(180.0) - 90.0, 0.0, Random(180.0) - 90.0);
-        objectNode.rotation = Quaternion(0.0, Random(360.0), 0.0);
+        objectNode.position = Vector3(Random() * 180 - 90, 0, Random() * 180 - 90);
+        objectNode.rotation = Quaternion(0, Random() * 360, 0);
 
         AnimatedModel@ object = objectNode.CreateComponent("AnimatedModel");
         object.model = cache.GetResource("Model", "Models/Jack.mdl");
@@ -229,7 +230,7 @@ void InitScene()
         shape.SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0));
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
-        ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0f);
+        ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0);
     }
 }
 
@@ -375,12 +376,12 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
     {
         int mousedx = eventData["DX"].GetInt();
         int mousedy = eventData["DY"].GetInt();
-        yaw += mousedx / 10.0f;
-        pitch += mousedy / 10.0f;
-        if (pitch < -90.0f)
-            pitch = -90.0f;
-        if (pitch > 90.0f)
-            pitch = 90.0f;
+        yaw += mousedx / 10.0;
+        pitch += mousedy / 10.0;
+        if (pitch < -90.0)
+            pitch = -90.0;
+        if (pitch > 90.0)
+            pitch = 90.0;
 
         cameraNode.rotation = Quaternion(pitch, yaw, 0);
     }
@@ -418,7 +419,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     Node@ newNode = testScene.CreateChild();
     newNode.position = position;
     newNode.rotation = rotation;
-    newNode.SetScale(0.1);
+    newNode.SetScale(0.2);
 
     RigidBody@ body = newNode.CreateComponent("RigidBody");
     body.mass = 1.0;
@@ -426,7 +427,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
 
     CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-    shape.SetBox(Vector3(2.0, 2.0, 2.0));
+    shape.SetBox(Vector3(1, 1, 1));
 
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/Box.mdl");

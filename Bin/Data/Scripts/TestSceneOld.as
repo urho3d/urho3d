@@ -80,11 +80,11 @@ void InitScene()
         {
             Node@ newNode = testScene.CreateChild();
             newNode.position = Vector3(x * 20.5, -0.5, y * 20.5);
-            newNode.scale = Vector3(10, 0.5, 10);
+            newNode.scale = Vector3(20, 1, 20);
 
             RigidBody@ body = newNode.CreateComponent("RigidBody");
             CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-            shape.SetBox(Vector3(2.0, 2.0, 2.0));
+            shape.SetBox(Vector3(1, 1, 1));
 
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -98,11 +98,11 @@ void InitScene()
         Node@ newNode = testScene.CreateChild();
         newNode.position = Vector3(0, 5, 0);
         newNode.rotation = Quaternion(x * 90, Vector3(0, 1, 0));
-        newNode.scale = Vector3(112, 5, 0.5);
+        newNode.scale = Vector3(224, 10, 1);
 
         RigidBody@ body = newNode.CreateComponent("RigidBody");
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
+        shape.SetBox(Vector3(1, 1, 1));
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
@@ -485,12 +485,12 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
     {
         int mousedx = eventData["DX"].GetInt();
         int mousedy = eventData["DY"].GetInt();
-        yaw += mousedx / 10.0f;
-        pitch += mousedy / 10.0f;
-        if (pitch < -90.0f)
-            pitch = -90.0f;
-        if (pitch > 90.0f)
-            pitch = 90.0f;
+        yaw += mousedx / 10.0;
+        pitch += mousedy / 10.0;
+        if (pitch < -90.0)
+            pitch = -90.0;
+        if (pitch > 90.0)
+            pitch = 90.0;
 
         cameraNode.rotation = Quaternion(pitch, yaw, 0);
     }
@@ -511,7 +511,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         Node@ newNode = testScene.CreateChild();
         newNode.position = cameraNode.position;
         newNode.rotation = cameraNode.rotation;
-        newNode.SetScale(0.1);
+        newNode.SetScale(0.2);
     
         RigidBody@ body = newNode.CreateComponent("RigidBody");
         body.mass = 1.0;
@@ -519,7 +519,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
 
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2.0, 2.0, 2.0));
+        shape.SetBox(Vector3(1, 1, 1));
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
