@@ -651,6 +651,8 @@ Components of same type can be multi-edited. Where attribute values differ, the 
 
 In addition to whole scenes, single scene nodes including all their components and child nodes can be loaded and saved (%File -> Load node, %File -> Save node as.) These can act as "prefabs" for speeding up scene construction. To save a node, it needs first to be selected in the hierarchy window.
 
+Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the Bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
+
 \section EditorInstructions_Importing Importing
 
 The editor can import models or scenes from all the formats that the Open Asset Import Library supports, see http://assimp.sourceforge.net/main_features_formats.html

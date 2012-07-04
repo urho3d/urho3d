@@ -101,6 +101,18 @@ void CreateMenuBar()
     }
 
     {
+        Menu@ createMenu = CreateMenu("Create");
+        Window@ createPopup = createMenu.popup;
+        createPopup.AddChild(CreateMenuItem("Box", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Cone", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Cylinder", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Plane", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Pyramid", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Sphere", 0, 0));
+        uiMenuBar.AddChild(createMenu);
+    }
+
+    {
         Menu@ fileMenu = CreateMenu("View");
         Window@ filePopup = fileMenu.popup;
         filePopup.AddChild(CreateMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
@@ -357,6 +369,10 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Toggle update")
         ToggleUpdate();
+        
+    if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" || 
+        action == "Pyramid" || action == "Sphere")
+        CreateBuiltinObject(action);
 
     if (action == "Exit")
         engine.Exit();

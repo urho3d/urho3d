@@ -727,6 +727,18 @@ void HandleBoneHierarchyCreated(StringHash eventType, VariantMap& eventData)
         UpdateSceneWindowNode(node);
 }
 
+void CreateBuiltinObject(const String& name)
+{
+    Node@ newNode = editorScene.CreateChild(name, REPLICATED);
+    // Set the new node a certain distance from the camera
+    newNode.position = GetNewNodePosition();
+
+    StaticModel@ object = newNode.CreateComponent("StaticModel");
+    object.model = cache.GetResource("Model", "Models/" + name + ".mdl");
+
+    UpdateAndFocusNode(newNode);
+}
+
 bool CheckSceneWindowFocus()
 {
     // When we do scene operations based on key shortcuts, make sure either the 3D scene or the node list is focused,
