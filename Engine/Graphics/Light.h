@@ -136,8 +136,6 @@ struct FocusParameters
     bool nonUniform_;
     /// Auto-size (reduce resolution when far away) flag.
     bool autoSize_;
-    /// Zoom out flag.
-    bool zoomOut_;
     /// Focus quantization.
     float quantize_;
     /// Minimum view size.
