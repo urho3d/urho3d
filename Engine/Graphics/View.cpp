@@ -2509,20 +2509,6 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         if (!shadowQueue.shadowBatches_.IsEmpty())
         {
             graphics_->SetViewport(shadowQueue.shadowViewport_);
-            
-            // Set a scissor rectangle to match possible shadow map size reduction by out-zooming
-            // However, do not do this for point lights, which need to render continuously across cube faces
-            float width = (float)(shadowQueue.shadowViewport_.right_ - shadowQueue.shadowViewport_.left_);
-            if (queue.light_->GetLightType() != LIGHT_POINT)
-            {
-                float zoom = Min(shadowQueue.shadowCamera_->GetZoom(), width - 2.0f / width);
-                Rect zoomRect(Vector2(-1.0f, -1.0f) * zoom, Vector2(1.0f, 1.0f) * zoom);
-                graphics_->SetScissorTest(true, zoomRect, false);
-            }
-            else
-                graphics_->SetScissorTest(false);
-            
-            // Draw instanced and non-instanced shadow casters
             shadowQueue.shadowBatches_.Draw(graphics_, renderer_);
         }
     }
