@@ -339,6 +339,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     morphVertexBuffers_.Clear();
     morphs_.Clear();
     const Vector<ModelMorph>& morphs = model->GetMorphs();
+    unsigned morphElementMask = 0;
     for (unsigned i = 0; i < morphs.Size(); ++i)
     {
         ModelMorph newMorph;
@@ -346,13 +347,15 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         newMorph.nameHash_ = morphs[i].nameHash_;
         newMorph.weight_ = 0.0f;
         newMorph.buffers_ = morphs[i].buffers_;
+        for (Map<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
+            morphElementMask |= j->second_.elementMask_;
         morphs_.Push(newMorph);
     }
     
     // If model has morphs, must clone all geometries & vertex buffers that refer to morphable vertex data
     if (morphs.Size())
     {
-        CloneGeometries();
+        CloneGeometries(morphElementMask);
         MarkMorphsDirty();
     }
     
@@ -917,12 +920,11 @@ void AnimatedModel::MarkMorphsDirty()
     morphsDirty_ = true;
 }
 
-void AnimatedModel::CloneGeometries()
+void AnimatedModel::CloneGeometries(unsigned morphElementMask)
 {
     // Clone vertex buffers as necessary
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
     Map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
-    
     morphVertexBuffers_.Resize(originalVertexBuffers.Size());
     
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
@@ -931,9 +933,13 @@ void AnimatedModel::CloneGeometries()
         if (model_->GetMorphRangeCount(i))
         {
             SharedPtr<VertexBuffer> clone(new VertexBuffer(context_));
-            clone->SetSize(original->GetVertexCount(), original->GetElementMask(), true);
-            clone->SetData(original->GetShadowData());
-            
+            clone->SetSize(original->GetVertexCount(), morphElementMask & original->GetElementMask(), true);
+            void* dest = clone->Lock(0, original->GetVertexCount());
+            if (dest)
+            {
+                CopyMorphVertices(dest, original->GetShadowData(), original->GetVertexCount(), clone, original);
+                clone->Unlock();
+            }
             clonedVertexBuffers[original] = clone;
             morphVertexBuffers_[i] = clone;
         }
@@ -947,18 +953,39 @@ void AnimatedModel::CloneGeometries()
         for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
             SharedPtr<Geometry> original = geometries_[i][j];
-            
-            const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
-            
             SharedPtr<Geometry> clone(new Geometry(context_));
-            clone->SetNumVertexBuffers(originalBuffers.Size());
+            
+            // Add an additional vertex stream into the clone, which supplies only the morphable vertex data, while the static
+            // data comes from the original vertex buffer(s)
+            const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
+            unsigned totalBuf = originalBuffers.Size();
             for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
                 if (clonedVertexBuffers.Contains(originalBuffer))
-                    clone->SetVertexBuffer(k, clonedVertexBuffers[originalBuffer], original->GetVertexElementMask(k));
+                    ++totalBuf;
+            }
+            clone->SetNumVertexBuffers(totalBuf);
+            
+            unsigned l = 0;
+            for (unsigned k = 0; k < originalBuffers.Size(); ++k)
+            {
+                VertexBuffer* originalBuffer = originalBuffers[k];
+                unsigned originalMask = original->GetVertexElementMask(k);
+                
+                if (clonedVertexBuffers.Contains(originalBuffer))
+                {
+                    VertexBuffer* clonedBuffer = clonedVertexBuffers[originalBuffer];
+                    clone->SetVertexBuffer(l, originalBuffer, originalMask & ~clonedBuffer->GetElementMask());
+                    ++l;
+                    clone->SetVertexBuffer(l, clonedBuffer, originalMask & clonedBuffer->GetElementMask());
+                    ++l;
+                }
                 else
-                    clone->SetVertexBuffer(k, originalBuffers[k], original->GetVertexElementMask(k));
+                {
+                    clone->SetVertexBuffer(l, originalBuffer, originalMask);
+                    ++l;
+                }
             }
             
             clone->SetIndexBuffer(original->GetIndexBuffer());
@@ -967,6 +994,44 @@ void AnimatedModel::CloneGeometries()
             
             geometries_[i][j] = clone;
         }
+    }
+}
+
+void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer)
+{
+    unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
+    unsigned normalOffset = srcBuffer->GetElementOffset(ELEMENT_NORMAL);
+    unsigned tangentOffset = srcBuffer->GetElementOffset(ELEMENT_TANGENT);
+    unsigned vertexSize = srcBuffer->GetVertexSize();
+    float* dest = (float*)destVertexData;
+    unsigned char* src = (unsigned char*)srcVertexData;
+    
+    while (vertexCount--)
+    {
+        if (mask & MASK_POSITION)
+        {
+            float* posSrc = (float*)src;
+            *dest++ = posSrc[0];
+            *dest++ = posSrc[1];
+            *dest++ = posSrc[2];
+        }
+        if (mask & MASK_NORMAL)
+        {
+            float* normalSrc = (float*)(src + normalOffset);
+            *dest++ = normalSrc[0];
+            *dest++ = normalSrc[1];
+            *dest++ = normalSrc[2];
+        }
+        if (mask & MASK_TANGENT)
+        {
+            float* tangentSrc = (float*)(src + tangentOffset);
+            *dest++ = tangentSrc[0];
+            *dest++ = tangentSrc[1];
+            *dest++ = tangentSrc[2];
+            *dest++ = tangentSrc[3];
+        }
+        
+        src += vertexSize;
     }
 }
 
@@ -1095,7 +1160,6 @@ void AnimatedModel::UpdateMorphs()
                 VertexBuffer* originalBuffer = model_->GetVertexBuffers()[i];
                 unsigned morphStart = model_->GetMorphRangeStart(i);
                 unsigned morphCount = model_->GetMorphRangeCount(i);
-                unsigned vertexSize = buffer->GetVertexSize();
                 
                 if (!buffer->IsDataLost())
                 {
@@ -1103,7 +1167,8 @@ void AnimatedModel::UpdateMorphs()
                     if (dest)
                     {
                         // Reset morph range by copying data from the original vertex buffer
-                        memcpy(dest, originalBuffer->GetShadowData() + morphStart * vertexSize, morphCount * vertexSize);
+                        CopyMorphVertices(dest, originalBuffer->GetShadowData() + morphStart * originalBuffer->GetVertexSize(),
+                            morphCount, buffer, originalBuffer);
                         
                         for (unsigned j = 0; j < morphs_.Size(); ++j)
                         {
@@ -1125,9 +1190,9 @@ void AnimatedModel::UpdateMorphs()
                     void* dest = buffer->Lock(0, vertexCount, true);
                     if (dest)
                     {
-                        memcpy(dest, originalBuffer->GetShadowData(), vertexCount * vertexSize);
+                        CopyMorphVertices(dest, originalBuffer->GetShadowData(), vertexCount, buffer, originalBuffer);
                         
-                        dest = ((unsigned char*)dest) + morphStart * vertexSize;
+                        dest = ((unsigned char*)dest) + morphStart * buffer->GetVertexSize();
                         for (unsigned j = 0; j < morphs_.Size(); ++j)
                         {
                             if (morphs_[j].weight_ > 0.0f)
@@ -1152,7 +1217,7 @@ void AnimatedModel::UpdateMorphs()
 
 void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight)
 {
-    unsigned elementMask = morph.elementMask_;
+    unsigned elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
     unsigned normalOffset = buffer->GetElementOffset(ELEMENT_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(ELEMENT_TANGENT);

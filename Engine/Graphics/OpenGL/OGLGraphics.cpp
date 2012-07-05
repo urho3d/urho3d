@@ -609,7 +609,10 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         
         // If buffer and element mask have stayed the same, skip to the next buffer
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
+        {
+            newAttributes |= elementMask;
             continue;
+        }
         
         vertexBuffers_[i] = buffer;
         elementMasks_[i] = elementMask;
@@ -697,7 +700,10 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         }
         
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
+        {
+            newAttributes |= elementMask;
             continue;
+        }
         
         vertexBuffers_[i] = buffer;
         elementMasks_[i] = elementMask;

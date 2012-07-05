@@ -163,7 +163,9 @@ private:
     /// %Set mapping of subgeometry bone indices.
     void SetGeometryBoneMappings();
     /// Clone geometries as required.
-    void CloneGeometries();
+    void CloneGeometries(unsigned morphElementMask);
+    /// Copy morph vertices.
+    void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
     /// Recalculate animations. Called from UpdateNode().
     void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning.
