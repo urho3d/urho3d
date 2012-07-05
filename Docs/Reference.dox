@@ -1318,8 +1318,8 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model Export a model
-scene Export a scene
+model Output a model
+scene Output a scene
 dump  Dump scene node structure. No output file is generated
 lod   Combine several Urho3D models as LOD levels of the output model
       Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
@@ -1328,8 +1328,8 @@ Options:
 -b    Save scene in binary format, default format is XML
 -i    Use local ID's for scene nodes
 -mX   Output a material list file X (model mode only)
--na   Do not export animations
--nm   Do not export materials
+-na   Do not output animations
+-nm   Do not output materials
 -ns   Do not create subdirectories for resources
 -nz   Do not create a zone and a directional light (scene mode only)
 -pX   Set path X for scene resources. Default is output file path
@@ -1347,14 +1347,14 @@ Usage:
 OgreImporter <input file> <output file> [options]
 
 Options:
--a   Export animations
--m   Export morphs
--r   Export only rotations from animations
+-na  Do not output animations
+-nm  Do not output morphs
+-r   Output only rotations from animations
 -s   Split each submesh into own vertex buffer
 -t   Generate tangents
 \endverbatim
 
-Note: exporting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
+Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
 
 \section Tools_PackageTool PackageTool
 

@@ -613,6 +613,12 @@ static void AnimatedModelSetModel(Model* model, AnimatedModel* ptr)
     ptr->SetModel(model);
 }
 
+static const String& AnimatedModelGetMorphName(unsigned index, AnimatedModel* ptr)
+{
+    const Vector<ModelMorph>& morphs = ptr->GetMorphs();
+    return index < morphs.Size() ? morphs[index].name_ : String::EMPTY;
+}
+
 static void RegisterAnimatedModel(asIScriptEngine* engine)
 {
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
@@ -660,6 +666,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "const String& get_morphNames(uint) const", asFUNCTION(AnimatedModelGetMorphName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Zone@+ get_zone() const", asMETHOD(AnimatedModel, GetZone), asCALL_THISCALL);

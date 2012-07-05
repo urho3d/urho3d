@@ -56,7 +56,7 @@ bool useOneBuffer_ = true;
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void LoadSkeleton(const String& skeletonFileName);
-void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs);
+void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool exportMorphs);
 void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly);
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib);
 void CalculateScore(ModelVertex& vertex);
@@ -82,18 +82,18 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
-            "-a   Export animations\n"
-            "-m   Export morphs\n"
-            "-r   Export only rotations from animations\n"
+            "-na  Do not output animations\n"
+            "-nm  Do not output morphs\n"
+            "-r   Output only rotations from animations\n"
             "-s   Split each submesh into own vertex buffer\n"
             "-t   Generate tangents\n"
         );
     }
     
     bool generateTangents = false;
-    bool GetMorphs = false;
     bool splitSubMeshes = false;
-    bool exportAnimations = false;
+    bool exportAnimations = true;
+    bool exportMorphs = true;
     bool rotationsOnly = false;
     
     if (arguments.Size() > 2)
@@ -109,16 +109,18 @@ void Run(const Vector<String>& arguments)
                     generateTangents = true;
                     break;
                     
-                case 'a':
-                    exportAnimations = true;
+                case 'n':
+                    if (arg.Length() > 1)
+                    {
+                        if (arg[1] == 'a')
+                            exportAnimations = false;
+                        if (arg[1] == 'm')
+                            exportMorphs = false;
+                    }
                     break;
                     
                 case 'r':
                     rotationsOnly = true;
-                    break;
-                    
-                case 'm':
-                    GetMorphs = true;
                     break;
                     
                 case 's':
@@ -129,7 +131,7 @@ void Run(const Vector<String>& arguments)
         }
     }
     
-    LoadMesh(arguments[0], generateTangents, splitSubMeshes, GetMorphs);
+    LoadMesh(arguments[0], generateTangents, splitSubMeshes, exportMorphs);
     WriteOutput(arguments[1], exportAnimations, rotationsOnly);
     
     PrintLine("Finished");
@@ -234,7 +236,7 @@ void LoadSkeleton(const String& skeletonFileName)
     }
 }
 
-void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs)
+void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool exportMorphs)
 {
     File meshFileSource(context_);
     meshFileSource.Open(inputFileName);
@@ -244,6 +246,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     XMLElement root = meshFile_->GetRoot();
     XMLElement subMeshes = root.GetChild("submeshes");
     XMLElement skeletonLink = root.GetChild("skeletonlink");
+    if (root.IsNull())
+        ErrorExit("Could not load input file " + inputFileName);
     
     String skeletonName = skeletonLink.GetAttribute("name");
     if (!skeletonName.Empty())
@@ -470,7 +474,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 vBuf->elementMask_ |= MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
                 bool sorted = false;
                 
-                // If amount of bones_ is larger than supported by HW skinning, must remap per submesh
+                // If amount of bones is larger than supported by HW skinning, must remap per submesh
                 if (bones_.Size() > MAX_SKIN_MATRICES)
                 {
                     Map<unsigned, unsigned> usedBoneMap;
@@ -494,7 +498,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         }
                     }
                     
-                    // If still too many bones_ in one subgeometry, error
+                    // If still too many bones in one subgeometry, error
                     if (usedBoneMap.Size() > MAX_SKIN_MATRICES)
                         ErrorExit("Too many bones in submesh " + String(subMeshIndex + 1));
                     
@@ -646,7 +650,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     
     // Process poses/morphs
     // First find out all pose definitions
-    if (GetMorphs)
+    if (exportMorphs)
     {
         try
         {

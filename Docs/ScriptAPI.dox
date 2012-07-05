@@ -2115,6 +2115,7 @@ Properties:<br>
 - uint numAnimationStates (readonly)
 - AnimationState@[] animationStates (readonly)
 - uint numMorphs (readonly)
+- String[] morphNames (readonly)
 - float[] morphWeights
 - Zone@ zone (readonly)
 

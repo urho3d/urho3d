@@ -490,7 +490,10 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
             
             // Indexing might not be the same, so use the name hash instead
             for (unsigned i = 1; i < models.Size(); ++i)
-                models[i]->SetMorphWeight(morphs_[index].nameHash_, weight);
+            {
+                if (!models[i]->isMaster_)
+                    models[i]->SetMorphWeight(morphs_[index].nameHash_, weight);
+            }
         }
         
         MarkMorphsDirty();
@@ -535,7 +538,10 @@ void AnimatedModel::ResetMorphWeights()
         
         // Indexing might not be the same, so use the name hash instead
         for (unsigned i = 1; i < models.Size(); ++i)
-            models[i]->ResetMorphWeights();
+        {
+            if (!models[i]->isMaster_)
+                models[i]->ResetMorphWeights();
+        }
     }
     
     MarkMorphsDirty();
