@@ -64,7 +64,7 @@ struct JoystickState
     /// Check if a button is held down.
     bool GetButtonDown(unsigned index) const
     {
-        if (index <= buttons_.Size())
+        if (index < buttons_.Size())
             return buttons_[index];
         else
             return false;
@@ -73,7 +73,7 @@ struct JoystickState
     /// Check if a button has been pressed on this frame.
     bool GetButtonPress(unsigned index) const
     {
-        if (index <= buttons_.Size())
+        if (index < buttons_.Size())
             return buttonPress_[index];
         else
             return false;
@@ -82,7 +82,7 @@ struct JoystickState
     /// Return axis position.
     float GetAxisPosition(unsigned index) const
     {
-        if (index <= axes_.Size())
+        if (index < axes_.Size())
             return axes_[index];
         else
             return 0.0f;
@@ -91,7 +91,7 @@ struct JoystickState
     /// Return hat position.
     int GetHatPosition(unsigned index) const
     {
-        if (index <= hats_.Size())
+        if (index < hats_.Size())
             return hats_[index];
         else
             return HAT_CENTER;
