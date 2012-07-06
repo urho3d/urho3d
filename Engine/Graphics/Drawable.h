@@ -37,7 +37,7 @@ static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 static const int DRAWABLES_PER_WORK_ITEM = 16;
-static const int MAX_VERTEX_LIGHTS = 6;
+static const int MAX_VERTEX_LIGHTS = 4;
 
 class Camera;
 class Geometry;

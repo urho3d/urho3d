@@ -1,9 +1,9 @@
 <technique>
-    <pass name="base" vs="Ambient" ps="Ambient_Diff" />
-    <pass name="litbase" vs="ForwardLit" ps="ForwardLit_DiffAmbient" />
-    <pass name="light" vs="ForwardLit" ps="ForwardLit_Diff" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="base" vs="LitSolid" ps="LitSolid_Diff" />
+    <pass name="litbase" vs="LitSolid" ps="LitSolid_DiffAmbient" />
+    <pass name="light" vs="LitSolid" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffPrepass" />
+    <pass name="material" vs="LitSolid" ps="LitSolid_DiffMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="LitSolid" ps="LitSolid_DiffDeferred" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
-    <pass name="prepass" vs="Prepass" ps="Prepass" />
-    <pass name="material" vs="Material" ps="Material_Diff" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" vs="Deferred" ps="Deferred_Diff" />
 </technique>

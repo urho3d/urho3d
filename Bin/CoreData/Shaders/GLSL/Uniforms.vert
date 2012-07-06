@@ -16,4 +16,4 @@ uniform vec3 cViewUpVector;
 uniform mat4 cZone;
 uniform mat4 cLightMatrices[4];
 uniform vec4 cSkinMatrices[64*3];
-uniform vec4 cVertexLights[6*3];
+uniform vec4 cVertexLights[4*3];

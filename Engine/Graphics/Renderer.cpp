@@ -1556,7 +1556,6 @@ void Renderer::LoadPassShaders(Technique* tech, PassType type, bool allowShadows
     if (type == PASS_PREPASS || type == PASS_DEFERRED)
     {
         unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
-        vertexShaderName += hwVariations[hwDepth];
         pixelShaderName += hwVariations[hwDepth];
     }
     

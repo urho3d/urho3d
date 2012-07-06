@@ -1,6 +1,5 @@
 <shaders>
     <shader type="vs">
-        <option name="Mask" define="ALPHAMASK" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" require="SM3" />

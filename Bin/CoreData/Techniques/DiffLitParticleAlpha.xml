@@ -1,5 +1,5 @@
 <technique>
-    <pass name="base" vs="Ambient" ps="Ambient_Diff" depthwrite="false" blend="alpha" />
+    <pass name="base" vs="LitParticle" ps="LitParticle_Diff" depthwrite="false" blend="alpha" />
     <pass name="light" vs="LitParticle" ps="LitParticle_Diff" depthwrite="false" blend="addalpha" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

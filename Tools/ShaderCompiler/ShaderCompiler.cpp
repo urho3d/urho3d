@@ -389,7 +389,12 @@ void CompileShader(const String& fileName)
     for (List<CompiledVariation>::Iterator i = variations_.Begin(); i != variations_.End(); ++i)
     {
         if (!i->errorMsg_.Empty())
-            ErrorExit("Failed to compile shader " + i->name_ + ": " + i->errorMsg_);
+        {
+            if (i->type_ == VS)
+                ErrorExit("Failed to compile vertex shader " + i->name_ + ": " + i->errorMsg_);
+            else
+                ErrorExit("Failed to compile pixel shader " + i->name_ + ": " + i->errorMsg_);
+        }
     }
 }
 

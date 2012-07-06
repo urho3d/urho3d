@@ -1,9 +1,7 @@
 #include "Uniforms.frag"
 #include "Samplers.frag"
 
-#ifdef ALPHAMASK
-    varying vec2 vTexCoord;
-#endif
+varying vec2 vTexCoord;
 
 void main()
 {

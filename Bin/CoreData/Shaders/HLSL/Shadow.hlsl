@@ -10,25 +10,18 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD2,
     #endif
-    #ifdef ALPHAMASK
-        float2 iTexCoord : TEXCOORD0,
-        out float2 oTexCoord : TEXCOORD0,
-    #endif
+    float2 iTexCoord : TEXCOORD0,
+    out float2 oTexCoord : TEXCOORD0,
     out float4 oPos : POSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-
-    #ifdef ALPHAMASK
-        oTexCoord = GetTexCoord(iTexCoord);
-    #endif
+    oTexCoord = GetTexCoord(iTexCoord);
 }
 
 void PS(
-    #ifdef ALPHAMASK
-        float2 iTexCoord : TEXCOORD0,
-    #endif
+    float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     #ifdef ALPHAMASK

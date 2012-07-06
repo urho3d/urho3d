@@ -1,6 +1,6 @@
 <shaders>
     <shader type="vs">
-        <option name="VCol" define="VERTEXCOLOR" />
+        <option name="Normal" define="NORMALMAP" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -18,7 +18,8 @@
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <option name="" /> <!-- Dummy option to separate the two variation groups -->
+        <option name="Spec" define="SPECULAR" require="PERPIXEL" />
+        <option name="Shadow" define="SHADOW" require="PERPIXEL" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" require="SM3" />
@@ -26,9 +27,11 @@
     </shader>
     <shader type="ps">
         <option name="Diff" define="DIFFMAP" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
-        <variation name="" define="AMBIENT" />
+        <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
+        <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
+        <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
+        <variation name="" define="AMBIENT" />        
         <variation name="Dir">
             <define name="DIRLIGHT" />
             <define name="PERPIXEL" />
@@ -41,6 +44,15 @@
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
+        <variation name="Prepass" define="PREPASS" />
+        <variation name="Material" define="MATERIAL" exclude="Normal" />
+        <variation name="Deferred" define="DEFERRED" />
+        <option name="HW" define="HWDEPTH" require="PREPASS" />
+        <option name="HW" define="HWDEPTH" require="DEFERRED" />
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Spec" define="SPECULAR" require="PERPIXEL" />
+        <option name="Shadow" define="SHADOW" require="PERPIXEL" />
+        <option name="LQ" define="LQSHADOW" require="HWSHADOW" />
+        <option name="HW" define="HWSHADOW" require="SHADOW" />
     </shader>
 </shaders>
