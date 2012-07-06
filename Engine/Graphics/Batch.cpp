@@ -130,7 +130,9 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
     {
         offset.x_ -= 0.5f / width;
+        #if !defined(ANDROID) && !defined(IOS)
         offset.y_ -= 0.5f / height;
+        #endif
     }
     texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
     texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
@@ -559,7 +561,11 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                     intensity = Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                 float pcfValues = (1.0f - intensity);
+                #if !defined(ANDROID) && !defined(IOS)
                 float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
+                #else
+                float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 2.0f : 1.0f;
+                #endif
                 graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
             }
             
