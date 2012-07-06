@@ -29,7 +29,7 @@ void main()
         vColor = iColor;
     #endif
 
-    #if PERPIXEL
+    #ifdef PERPIXEL
         // Per-pixel forward lighting
         vec4 projWorldPos = vec4(worldPos, 1.0);
     
