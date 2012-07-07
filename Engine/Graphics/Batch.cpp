@@ -130,7 +130,8 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
     {
         offset.x_ -= 0.5f / width;
-        #if !defined(ANDROID) && !defined(IOS)
+        // Use only 2 samples offset in X direction on OpenGL ES for better performance
+        #ifndef GL_ES_VERSION_2_0
         offset.y_ -= 0.5f / height;
         #endif
     }
@@ -551,7 +552,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 float fadeEnd = shadowRange / viewFarClip;
                 float fadeRange = fadeEnd - fadeStart;
                 
+                // Do not use last cascade fade on OpenGL ES for better performance, rather compare directly against the fade end
+                #ifndef GL_ES_VERSION_2_0
                 graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeStart, 1.0f / fadeRange));
+                #else
+                graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeEnd, 1.0f / fadeRange));
+                #endif
             }
             
             {
@@ -561,7 +567,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                     intensity = Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                 float pcfValues = (1.0f - intensity);
-                #if !defined(ANDROID) && !defined(IOS)
+                // Use only 2 samples offset in X direction on OpenGL ES for better performance
+                #ifndef GL_ES_VERSION_2_0
                 float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
                 #else
                 float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 2.0f : 1.0f;

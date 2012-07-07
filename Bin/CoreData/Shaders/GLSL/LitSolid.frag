@@ -86,11 +86,11 @@ void main()
         #ifdef SHADOW
             #if defined(DIRLIGHT)
                 vec4 shadowPos = GetDirShadowPos(vShadowPos, vLightVec.w);
-                diff *= min(GetShadow(shadowPos) + GetShadowFade(vLightVec.w), 1.0);
+                diff *= GetDirShadow(shadowPos, vLightVec.w);
             #elif defined(SPOTLIGHT)
                 diff *= GetShadow(vShadowPos);
             #else
-                diff *= GetCubeShadow(vShadowPos);
+                diff *= GetPointShadow(vShadowPos);
             #endif
         #endif
     

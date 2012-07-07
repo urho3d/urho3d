@@ -61,26 +61,21 @@ float GetShadow(vec4 shadowPos)
                 texture2DProj(sShadowMap, shadowPos).r > compare,
                 texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r > compare
             );
-            return cShadowIntensity.y + dot(inLight, vec2(cShadowIntensity.x));
+            return 0.5 * (inLight.x + inLight.y);
         #endif
     #else
         // Take one sample
         #ifndef GL_ES
             float inLight = shadow2DProj(sShadowMap, shadowPos).r;
+            return cShadowIntensity.y + cShadowIntensity.x * inLight;
         #else
-            float inLight = texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? 1.0 : 0.0;
+            return texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? 1.0 : 0.0;
         #endif
-        return cShadowIntensity.y + cShadowIntensity.x * inLight;
     #endif
 }
 
-float GetShadowFade(float depth)
-{
-    return clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0);
-}
-
 #ifdef POINTLIGHT
-float GetCubeShadow(vec3 lightVec)
+float GetPointShadow(vec3 lightVec)
 {
     vec3 axis = textureCube(sFaceSelectCubeMap, lightVec).rgb;
     float depth = abs(dot(lightVec, axis));
@@ -102,6 +97,18 @@ float GetCubeShadow(vec3 lightVec)
 #endif
 
 #ifdef DIRLIGHT
+float GetDirShadow(vec4 shadowPos, float depth)
+{
+    #ifndef GL_ES
+        return min(GetShadow(shadowPos) + clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0), 1.0);
+    #else
+        if (depth < cShadowDepthFade.z)
+            return GetShadow(shadowPos);
+        else
+            return 1.0;
+    #endif
+}
+
 vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
 {
     if (depth < cShadowSplits.x)
