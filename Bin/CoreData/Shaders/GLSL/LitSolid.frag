@@ -13,8 +13,10 @@ varying vec2 vTexCoord;
         varying vec3 vNormal;
     #endif
     #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            varying vec4 vShadowPos[4];
+        #if defined(DIRLIGHT) && !defined(GL_ES)
+	    varying vec4 vShadowPos[4];
+        #elif defined(DIRLIGHT) && defined(GL_ES)
+	    varying vec4 vShadowPos[2];
         #elif defined(SPOTLIGHT)
             varying vec4 vShadowPos;
         #else

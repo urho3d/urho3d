@@ -14,6 +14,10 @@ uniform vec4 cVOffset;
 uniform vec3 cViewRightVector;
 uniform vec3 cViewUpVector;
 uniform mat4 cZone;
-uniform mat4 cLightMatrices[4];
+#ifndef GL_ES
+    uniform mat4 cLightMatrices[4];
+#else
+    uniform mat4 cLightMatrices[2];
+#endif
 uniform vec4 cSkinMatrices[64*3];
 uniform vec4 cVertexLights[4*3];

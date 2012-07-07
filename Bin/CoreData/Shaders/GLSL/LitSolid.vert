@@ -13,8 +13,10 @@ varying vec2 vTexCoord;
         varying vec3 vNormal;
     #endif
     #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            varying vec4 vShadowPos[4];
+        #if defined(DIRLIGHT) && !defined(GL_ES)
+	    varying vec4 vShadowPos[4];
+        #elif defined(DIRLIGHT) && defined(GL_ES)
+	    varying vec4 vShadowPos[2];
         #elif defined(SPOTLIGHT)
             varying vec4 vShadowPos;
         #else
@@ -66,8 +68,10 @@ void main()
             #if defined(DIRLIGHT)
                 vShadowPos[0] = cLightMatrices[0] * projWorldPos;
                 vShadowPos[1] = cLightMatrices[1] * projWorldPos;
-                vShadowPos[2] = cLightMatrices[2] * projWorldPos;
-                vShadowPos[3] = cLightMatrices[3] * projWorldPos;
+                #ifndef GL_ES
+                    vShadowPos[2] = cLightMatrices[2] * projWorldPos;
+                    vShadowPos[3] = cLightMatrices[3] * projWorldPos;
+                #endif
             #elif defined(SPOTLIGHT)
                 vShadowPos = cLightMatrices[1] * projWorldPos;
             #else

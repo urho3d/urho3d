@@ -874,8 +874,8 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         {
             #ifndef GL_ES_VERSION_2_0
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
-            #endif
             newShadowMap->SetShadowCompare(true);
+            #endif
             break;
         }
     }

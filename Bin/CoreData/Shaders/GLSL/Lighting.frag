@@ -63,12 +63,14 @@ float GetShadow(vec4 shadowPos)
     #else
         vec3 projShadowPos = shadowPos.xyz / shadowPos.w;
         #ifndef LQSHADOW
-            // Take two samples and average them
-            vec2 inLight = vec2(
+            // Take four samples and average them
+            vec4 inLight = vec4(
                 texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z,
-                texture2D(sShadowMap, vec2(projShadowPos.x + cShadowMapInvSize.x, projShadowPos.y)).r > projShadowPos.z
+                texture2D(sShadowMap, vec2(projShadowPos.x + cShadowMapInvSize.x, projShadowPos.y)).r > projShadowPos.z,
+                texture2D(sShadowMap, vec2(projShadowPos.x, projShadowPos.y + cShadowMapInvSize.y)).r > projShadowPos.z,
+                texture2D(sShadowMap, projShadowPos.xy + cShadowMapInvSize).r > projShadowPos.z
             );
-            return dot(inLight, vec2(0.5));
+            return dot(inLight, vec4(0.25));
         #else
             // Take one sample
             return texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z ? 1.0 : 0.0;
@@ -101,13 +103,14 @@ float GetPointShadow(vec3 lightVec)
 #ifdef DIRLIGHT
 float GetDirShadow(vec4 shadowPos, float depth)
 {
-    return min(GetShadow(shadowPos) + clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0), 1.0);
+    return min(GetShadow(shadowPos) + max((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0), 1.0);
 }
 
+#ifndef GL_ES
 vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
 {
     if (depth < cShadowSplits.x)
-        return shadowPos[0];
+        return shadowPos[0];   
     else if (depth < cShadowSplits.y)
         return shadowPos[1];
     else if (depth < cShadowSplits.z)
@@ -127,6 +130,15 @@ vec4 GetDirShadowPosDeferred(const mat4 shadowMatrix[4], vec4 projWorldPos, floa
     else
         return shadowMatrix[3] * projWorldPos;
 }
+#else
+vec4 GetDirShadowPos(const vec4 shadowPos[2], float depth)
+{
+    if (depth < cShadowSplits.x)
+        return shadowPos[0];   
+    else
+        return shadowPos[1];
+}
+#endif
 #endif
 #endif
 

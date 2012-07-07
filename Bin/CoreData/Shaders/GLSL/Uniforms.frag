@@ -1,5 +1,5 @@
 #ifdef GL_ES
-precision mediump float;
+    precision mediump float;
 #endif
 
 uniform vec3 cAmbientColor;
