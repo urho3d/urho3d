@@ -39,15 +39,15 @@ float GetIntensity(vec3 color)
 #ifdef SHADOW
 float GetShadow(vec4 shadowPos)
 {
-    // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
-    #ifndef LQSHADOW
-        // Take four samples and average them
-        #ifndef POINTLIGHT
-            vec2 offsets = cShadowMapInvSize * shadowPos.w;
-        #else
-            vec2 offsets = cShadowMapInvSize;
-        #endif
-        #ifndef GL_ES
+    #ifndef GL_ES
+        #ifndef LQSHADOW
+            // Take four samples and average them
+            // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
+            #ifndef POINTLIGHT
+                vec2 offsets = cShadowMapInvSize * shadowPos.w;
+            #else
+                vec2 offsets = cShadowMapInvSize;
+            #endif
             vec4 inLight = vec4(
                 shadow2DProj(sShadowMap, shadowPos).r,
                 shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
@@ -56,20 +56,22 @@ float GetShadow(vec4 shadowPos)
             );
             return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
         #else
-            float compare = shadowPos.z / shadowPos.w;
-            vec2 inLight = vec2(
-                texture2DProj(sShadowMap, shadowPos).r > compare,
-                texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r > compare
-            );
-            return 0.5 * (inLight.x + inLight.y);
-        #endif
-    #else
-        // Take one sample
-        #ifndef GL_ES
+            // Take one sample
             float inLight = shadow2DProj(sShadowMap, shadowPos).r;
             return cShadowIntensity.y + cShadowIntensity.x * inLight;
+        #endif
+    #else
+        vec3 projShadowPos = shadowPos.xyz / shadowPos.w;
+        #ifndef LQSHADOW
+            // Take two samples and average them
+            vec2 inLight = vec2(
+                texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z,
+                texture2D(sShadowMap, vec2(projShadowPos.x + cShadowMapInvSize.x, projShadowPos.y)).r > projShadowPos.z
+            );
+            return dot(inLight, vec2(0.5));
         #else
-            return texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? 1.0 : 0.0;
+            // Take one sample
+            return texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z ? 1.0 : 0.0;
         #endif
     #endif
 }

@@ -98,9 +98,9 @@ float GetVertexLightVolumetric(int index, float3 worldPos)
 #ifdef SHADOW
 float GetShadow(float4 shadowPos)
 {
-    // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
     #ifndef LQSHADOW
         // Take four samples and average them
+        // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
         #ifndef POINTLIGHT
             float2 offsets = cShadowMapInvSize * shadowPos.w;
         #else
