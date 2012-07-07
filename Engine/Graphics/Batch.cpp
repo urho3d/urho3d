@@ -552,12 +552,7 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
                 float fadeEnd = shadowRange / viewFarClip;
                 float fadeRange = fadeEnd - fadeStart;
                 
-                // Do not use last cascade fade on OpenGL ES for better performance, rather compare directly against the fade end
-                #ifndef GL_ES_VERSION_2_0
                 graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeStart, 1.0f / fadeRange));
-                #else
-                graphics->SetShaderParameter(PSP_SHADOWDEPTHFADE, Vector4(q, r, fadeEnd, 1.0f / fadeRange));
-                #endif
             }
             
             {
