@@ -548,6 +548,8 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
+- For improved performance, shadow quality is reduced: there is no smooth PCF filtering, maximum 2 shadow map samples are used in high quality mode, and shadow intensity is not configurable but always maximum.
+
 \page Materials Materials
 
 Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.

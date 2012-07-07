@@ -99,14 +99,7 @@ float GetPointShadow(vec3 lightVec)
 #ifdef DIRLIGHT
 float GetDirShadow(vec4 shadowPos, float depth)
 {
-    #ifndef GL_ES
-        return min(GetShadow(shadowPos) + clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0), 1.0);
-    #else
-        if (depth < cShadowDepthFade.z)
-            return GetShadow(shadowPos);
-        else
-            return 1.0;
-    #endif
+    return min(GetShadow(shadowPos) + clamp((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0, 1.0), 1.0);
 }
 
 vec4 GetDirShadowPos(const vec4 shadowPos[4], float depth)
