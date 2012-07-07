@@ -69,7 +69,7 @@ struct Bone
     unsigned char collisionMask_;
     /// Radius.
     float radius_;
-    /// Bounding box.
+    /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Scene node.
     WeakPtr<Node> node_;

@@ -99,7 +99,7 @@ protected:
     /// Choose LOD levels based on distance.
     void CalculateLodLevels();
     
-    /// Bounding box.
+    /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Extra per-geometry data.
     PODVector<StaticModelGeometryData> geometryData_;

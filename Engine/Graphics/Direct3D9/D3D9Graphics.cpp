@@ -28,6 +28,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "DecalSet.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -897,7 +898,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (!vs->IsFailed())
             {
                 PROFILE(CreateVertexShader);
-                
+
                 bool success = vs->Create();
                 if (success)
                     LOGDEBUG("Created vertex shader " + vs->GetName());
@@ -2252,6 +2253,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
+    DecalSet::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);

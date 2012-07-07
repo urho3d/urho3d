@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Geometry.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "IndexBuffer.h"
 #include "Log.h"
 #include "Ray.h"
@@ -101,7 +100,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
 {
     if (!indexBuffer_)
     {
-        LOGERROR("Index buffer not defined, can not define draw range");
+        LOGERROR("Null index buffer, can not define indexed draw range");
         return false;
     }
     if (indexStart + indexCount > indexBuffer_->GetIndexCount())
@@ -126,15 +125,18 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
 
 bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!indexBuffer_)
+    if (indexBuffer_)
     {
-        LOGERROR("Index buffer not defined, can not define draw range");
-        return false;
+        if (indexStart + indexCount > indexBuffer_->GetIndexCount())
+        {
+            LOGERROR("Illegal draw range");
+            return false;
+        }
     }
-    if (indexStart + indexCount > indexBuffer_->GetIndexCount())
+    else
     {
-        LOGERROR("Illegal draw range");
-        return false;
+        indexStart = 0;
+        indexCount = 0;
     }
     
     primitiveType_ = type;
@@ -156,9 +158,17 @@ void Geometry::SetLodDistance(float distance)
 
 void Geometry::Draw(Graphics* graphics)
 {
-    graphics->SetIndexBuffer(indexBuffer_);
-    graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
-    graphics->Draw(primitiveType_, indexStart_, indexCount_, vertexStart_, vertexCount_);
+    if (indexBuffer_)
+    {
+        graphics->SetIndexBuffer(indexBuffer_);
+        graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
+        graphics->Draw(primitiveType_, indexStart_, indexCount_, vertexStart_, vertexCount_);
+    }
+    else
+    {
+        graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
+        graphics->Draw(primitiveType_, vertexStart_, vertexCount_);
+    }
 }
 
 VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
@@ -169,6 +179,14 @@ VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
 unsigned Geometry::GetVertexElementMask(unsigned index) const
 {
     return index < elementMasks_.Size() ? elementMasks_[index] : 0;
+}
+
+bool Geometry::IsEmpty() const
+{
+    if (indexBuffer_)
+        return indexCount_ == 0;
+    else
+        return vertexCount_ == 0;
 }
 
 unsigned short Geometry::GetBufferHash() const

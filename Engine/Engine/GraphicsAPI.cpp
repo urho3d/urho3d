@@ -29,6 +29,7 @@
 #include "APITemplates.h"
 #include "Camera.h"
 #include "DebugRenderer.h"
+#include "DecalSet.h"
 #include "Graphics.h"
 #include "Light.h"
 #include "Material.h"
@@ -735,7 +736,7 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
 
 static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
-    RegisterComponent<ParticleEmitter>(engine, "ParticleEmitter");
+    RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
     engine->RegisterObjectMethod("ParticleEmitter", "void SetActive(bool, bool)", asMETHOD(ParticleEmitter, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
@@ -752,6 +753,20 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_active() const", asMETHOD(ParticleEmitter, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
+}
+
+static void RegisterDecalSet(asIScriptEngine* engine)
+{
+    RegisterDrawable<DecalSet>(engine, "DecalSet");
+    engine->RegisterObjectMethod("DecalSet", "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, const BoundingBox&in, float, const Vector2&in, const Vector2&in, float)", asMETHOD(DecalSet, AddDecal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void RemoveDecals(uint)", asMETHOD(DecalSet, RemoveDecals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void RemoveAllDecals()", asMETHOD(DecalSet, RemoveAllDecals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void set_material(Material@+)", asMETHOD(DecalSet, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "Material@+ get_material() const", asMETHOD(DecalSet, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "uint get_numDecals() const", asMETHOD(DecalSet, GetNumDecals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "uint get_numVertices() const", asMETHOD(DecalSet, GetNumVertices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void set_maxVertices(uint)", asMETHOD(DecalSet, SetMaxVertices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "uint get_maxVertices() const", asMETHOD(DecalSet, GetMaxVertices), asCALL_THISCALL);
 }
 
 static CScriptArray* GraphicsGetResolutions(Graphics* ptr)
@@ -1048,6 +1063,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterAnimationController(engine);
     RegisterBillboardSet(engine);
     RegisterParticleEmitter(engine);
+    RegisterDecalSet(engine);
     RegisterOctree(engine);
     RegisterGraphics(engine);
     RegisterRenderer(engine);

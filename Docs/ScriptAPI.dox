@@ -2251,6 +2251,20 @@ Properties:<br>
 - AttributeInfo[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
+- bool visible
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox worldBoundingBox (readonly)
 - Material@ material
 - bool relative
 - bool sorted
@@ -2260,6 +2274,51 @@ Properties:<br>
 - bool active (readonly)
 - uint numParticles (readonly)
 - Zone@ zone (readonly)
+
+
+DecalSet
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, const BoundingBox&, float, const Vector2&, const Vector2&, float)
+- void RemoveDecals(uint)
+- void RemoveAllDecals()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool inView (readonly)
+- bool visible
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox worldBoundingBox (readonly)
+- Material@ material
+- uint numDecals (readonly)
+- uint numVertices (readonly)
+- uint maxVertices
 
 
 RayQueryResult

@@ -28,7 +28,6 @@
 #include "Context.h"
 #include "Geometry.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "IndexBuffer.h"
 #include "MemoryBuffer.h"
 #include "Node.h"

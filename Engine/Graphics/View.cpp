@@ -784,7 +784,7 @@ void View::GetBatches()
                             const SourceBatch& srcBatch = batches[l];
                             
                             Technique* tech = GetTechnique(drawable, srcBatch.material_);
-                            if (!srcBatch.geometry_ || !tech)
+                            if (!srcBatch.geometry_ || srcBatch.geometry_->IsEmpty() || !tech)
                                 continue;
                             
                             Pass* pass = tech->GetPass(PASS_SHADOW);
@@ -898,7 +898,7 @@ void View::GetBatches()
                     continue;
                 
                 Technique* tech = GetTechnique(drawable, srcBatch.material_);
-                if (!srcBatch.geometry_ || !tech)
+                if (!srcBatch.geometry_ || srcBatch.geometry_->IsEmpty() || !tech)
                     continue;
                 
                 Batch destBatch(srcBatch);
@@ -1114,7 +1114,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         const SourceBatch& srcBatch = batches[i];
         
         Technique* tech = GetTechnique(drawable, srcBatch.material_);
-        if (!srcBatch.geometry_ || !tech)
+        if (!srcBatch.geometry_ || srcBatch.geometry_->IsEmpty() || !tech)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
@@ -2348,7 +2348,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         batch.material_ = renderer_->GetDefaultMaterial();
     
     // Convert to instanced if possible
-    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && !batch.shaderData_ && !batch.overrideView_)
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.shaderData_ && !batch.overrideView_)
         batch.geometryType_ = GEOM_INSTANCED;
     
     if (batch.geometryType_ == GEOM_INSTANCED)

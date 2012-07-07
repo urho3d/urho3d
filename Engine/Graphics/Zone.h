@@ -103,7 +103,7 @@ protected:
     bool override_;
     /// Ambient gradient mode flag.
     bool ambientGradient_;
-    /// Bounding box.
+    /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Last world-space bounding box.
     BoundingBox lastWorldBoundingBox_;

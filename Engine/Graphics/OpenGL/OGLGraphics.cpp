@@ -45,6 +45,7 @@
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
+#include "DecalSet.h"
 #include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -2309,6 +2310,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
+    DecalSet::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);
