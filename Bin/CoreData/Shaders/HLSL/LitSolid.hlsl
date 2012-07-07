@@ -226,11 +226,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef SHADOW
             #if defined(DIRLIGHT)
                 float4 shadowPos = GetDirShadowPos(iShadowPos, iLightVec.w);
-                diff *= saturate(GetShadow(shadowPos) + GetShadowFade(iLightVec.w));
+                diff *= GetDirShadow(shadowPos, iLightVec.w);
             #elif defined(SPOTLIGHT)
                 diff *= GetShadow(iShadowPos);
             #else
-                diff *= GetCubeShadow(iShadowPos);
+                diff *= GetPointShadow(iShadowPos);
             #endif
         #endif
     

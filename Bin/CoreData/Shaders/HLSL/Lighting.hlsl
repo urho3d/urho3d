@@ -136,7 +136,8 @@ float GetShadow(float4 shadowPos)
     #endif
 }
 
-float GetCubeShadow(float3 lightVec)
+#ifdef POINTLIGHT
+float GetPointShadow(float3 lightVec)
 {
     float3 axis = texCUBE(sFaceSelectCubeMap, lightVec).rgb;
     float depth = abs(dot(lightVec, axis));
@@ -159,10 +160,12 @@ float GetCubeShadow(float3 lightVec)
     float4 shadowPos = float4(indirectPos.xy, cShadowDepthFade.x + cShadowDepthFade.y / depth, 1.0);
     return GetShadow(shadowPos);
 }
+#endif
 
-float GetShadowFade(float depth)
+#ifdef DIRLIGHT
+float GetDirShadow(float4 shadowPos, float depth)
 {
-    return saturate((depth - cShadowDepthFade.z) * cShadowDepthFade.w);
+    return saturate(GetShadow(shadowPos) + saturate((depth - cShadowDepthFade.z) * cShadowDepthFade.w));
 }
 
 float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
@@ -199,5 +202,6 @@ float4 GetDirShadowPosDeferred(const float4x4 matrices[3], float4 projWorldPos, 
     else
         return mul(projWorldPos, matrices[2]);
 }
+#endif
 #endif
 #endif

@@ -101,13 +101,13 @@ void PS(
     #ifdef SHADOW
         #if defined(DIRLIGHT)
             float4 shadowPos = GetDirShadowPosDeferred(cLightMatricesPS, projWorldPos, depth);
-            diff *= saturate(GetShadow(shadowPos) + GetShadowFade(depth));
+            diff *= GetDirShadow(shadowPos, depth);
         #elif defined(SPOTLIGHT)
             float4 shadowPos = mul(projWorldPos, cLightMatricesPS[1]);
             diff *= GetShadow(shadowPos);
         #else
             float3 shadowPos = worldPos - cLightPosPS.xyz;
-            diff *= GetCubeShadow(shadowPos);
+            diff *= GetPointShadow(shadowPos);
         #endif
     #endif
 
