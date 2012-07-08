@@ -35,11 +35,10 @@ struct DecalVertex
     {
     }
     
-    /// Construct with parameters.
-    DecalVertex(const Vector3& position, const Vector3& normal, const Vector2& texCoord) :
+    /// Construct with position and normal
+    DecalVertex(const Vector3& position, const Vector3& normal) :
         position_(position),
-        normal_(normal),
-        texCoord_(texCoord)
+        normal_(normal)
     {
     }
     
@@ -117,9 +116,16 @@ class DecalSet : public Drawable
     /// Return maximum number of decal vertices.
     unsigned GetMaxVertices() const { return maxVertices_; }
     
+    /// %Set material attribute.
+    void SetMaterialAttr(ResourceRef value);
+    /// %Set decals attribute.
+    void SetDecalsAttr(VariantVector value);
+    /// Return material attribute.
+    ResourceRef GetMaterialAttr() const;
+    /// Return decals attribute.
+    VariantVector GetDecalsAttr() const;
+    
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     

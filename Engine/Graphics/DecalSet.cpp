@@ -32,6 +32,7 @@
 #include "Log.h"
 #include "Node.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "StaticModel.h"
@@ -77,7 +78,13 @@ void DecalSet::RegisterObject(Context* context)
 {
     context->RegisterFactory<DecalSet>();
     
-    /// \todo Register attributes
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(DecalSet, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_INT, "Max Vertices", GetMaxVertices, SetMaxVertices, unsigned, DEFAULT_MAX_VERTICES, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(DecalSet, Drawable);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_VARIANTVECTOR, "Decals", GetDecalsAttr, SetDecalsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }
 
 void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -129,6 +136,8 @@ void DecalSet::SetMaxVertices(unsigned num)
         
         while (decals_.Size() && numVertices_ > maxVertices_)
             RemoveDecals(1);
+        
+        MarkNetworkUpdate();
     }
 }
 
@@ -224,9 +233,6 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return false;
     }
     
-    newDecal.vertices_.Compact();
-    numVertices_ += newDecal.vertices_.Size();
-    
     // Finally transform vertices to this node's local space
     Matrix3x4 decalTransform = node_->GetWorldTransform().Inverse() * target->GetNode()->GetWorldTransform();
     CalculateUVs(newDecal, frustumTransform.Inverse(), size, aspectRatio, depth, topLeftUV, bottomRightUV);
@@ -234,6 +240,12 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     CalculateTangents(newDecal);
     
     newDecal.CalculateBoundingBox();
+    numVertices_ += newDecal.vertices_.Size();
+    
+    // Subscribe to scene post-update if defined a time-limited decal
+    Scene* scene = GetScene();
+    if (newDecal.timeToLive_ > 0.0f && scene && !HasSubscribedToEvent(scene, E_SCENEPOSTUPDATE))
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
     
     // Remove oldest decals if total vertices exceeded
     while (decals_.Size() && numVertices_ > maxVertices_)
@@ -269,16 +281,75 @@ Material* DecalSet::GetMaterial() const
     return batches_[0].material_;
 }
 
-void DecalSet::OnNodeSet(Node* node)
+void DecalSet::SetMaterialAttr(ResourceRef value)
 {
-    Drawable::OnNodeSet(node);
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetMaterial(cache->GetResource<Material>(value.id_));
+}
+
+void DecalSet::SetDecalsAttr(VariantVector value)
+{
+    Scene* scene = GetScene();
     
-    if (node)
+    RemoveAllDecals();
+    
+    unsigned index = 0;
+    unsigned numDecals = value[index++].GetInt();
+    
+    while (numDecals--)
     {
-        Scene* scene = GetScene();
-        if (scene)
+        decals_.Resize(decals_.Size() + 1);
+        
+        Decal& newDecal = decals_.Back();
+        newDecal.timer_ = value[index++].GetFloat();
+        newDecal.timeToLive_ = value[index++].GetFloat();
+        newDecal.vertices_.Resize(value[index++].GetInt());
+        
+        for (PODVector<DecalVertex>::Iterator i = newDecal.vertices_.Begin(); i != newDecal.vertices_.End(); ++i)
+        {
+            i->position_ = value[index++].GetVector3();
+            i->normal_ = value[index++].GetVector3();
+            i->texCoord_ = value[index++].GetVector2();
+            i->tangent_ = value[index++].GetVector4();
+        }
+        
+        newDecal.CalculateBoundingBox();
+        numVertices_ += newDecal.vertices_.Size();
+        
+        // Subscribe to scene post-update if defined a time-limited decal
+        if (newDecal.timeToLive_ > 0.0f && scene && !HasSubscribedToEvent(scene, E_SCENEPOSTUPDATE))
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
     }
+    
+    MarkDecalsDirty();
+}
+
+ResourceRef DecalSet::GetMaterialAttr() const
+{
+    return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
+}
+
+VariantVector DecalSet::GetDecalsAttr() const
+{
+    VariantVector ret;
+    ret.Push(decals_.Size());
+    
+    for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
+    {
+        ret.Push(i->timer_);
+        ret.Push(i->timeToLive_);
+        ret.Push(i->vertices_.Size());
+        
+        for (PODVector<DecalVertex>::ConstIterator j = i->vertices_.Begin(); j != i->vertices_.End(); ++j)
+        {
+            ret.Push(j->position_);
+            ret.Push(j->normal_);
+            ret.Push(j->texCoord_);
+            ret.Push(j->tangent_);
+        }
+    }
+    
+    return ret;
 }
 
 void DecalSet::OnWorldBoundingBoxUpdate()
@@ -349,9 +420,9 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
                 {
                     faces.Resize(faces.Size() + 1);
                     PODVector<DecalVertex>& face = faces.Back();
-                    face.Push(DecalVertex(v0, n0, Vector2::ZERO));
-                    face.Push(DecalVertex(v1, n1, Vector2::ZERO));
-                    face.Push(DecalVertex(v2, n2, Vector2::ZERO));
+                    face.Push(DecalVertex(v0, n0));
+                    face.Push(DecalVertex(v1, n1));
+                    face.Push(DecalVertex(v2, n2));
                 }
             }
             
@@ -393,9 +464,9 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
                 {
                     faces.Resize(faces.Size() + 1);
                     PODVector<DecalVertex>& face = faces.Back();
-                    face.Push(DecalVertex(v0, n0, Vector2::ZERO));
-                    face.Push(DecalVertex(v1, n1, Vector2::ZERO));
-                    face.Push(DecalVertex(v2, n2, Vector2::ZERO));
+                    face.Push(DecalVertex(v0, n0));
+                    face.Push(DecalVertex(v1, n1));
+                    face.Push(DecalVertex(v2, n2));
                 }
             }
             

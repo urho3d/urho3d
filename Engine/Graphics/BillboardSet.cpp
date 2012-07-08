@@ -231,6 +231,7 @@ void BillboardSet::SetBillboardsAttr(VariantVector value)
 {
     unsigned index = 0;
     SetNumBillboards(value[index++].GetInt());
+    
     for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
     {
         i->position_ = value[index++].GetVector3();
@@ -241,6 +242,7 @@ void BillboardSet::SetBillboardsAttr(VariantVector value)
         i->rotation_ = value[index++].GetFloat();
         i->enabled_ = value[index++].GetBool();
     }
+    
     Updated();
 }
 
@@ -249,6 +251,7 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
     MemoryBuffer buf(value);
     unsigned numBillboards = buf.ReadVLE();
     SetNumBillboards(numBillboards);
+    
     for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         i->position_ = buf.ReadVector3();
@@ -258,6 +261,7 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
         i->rotation_ = buf.ReadFloat();
         i->enabled_ = buf.ReadBool();
     }
+    
     Updated();
 }
 
@@ -270,6 +274,7 @@ VariantVector BillboardSet::GetBillboardsAttr() const
 {
     VariantVector ret;
     ret.Push(billboards_.Size());
+    
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         ret.Push(i->position_);
@@ -279,6 +284,7 @@ VariantVector BillboardSet::GetBillboardsAttr() const
         ret.Push(i->rotation_);
         ret.Push(i->enabled_);
     }
+    
     return ret;
 }
 
@@ -286,6 +292,7 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
 {
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());
+    
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
         attrBuffer_.WriteVector3(i->position_);
@@ -295,6 +302,7 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
         attrBuffer_.WriteFloat(i->rotation_);
         attrBuffer_.WriteBool(i->enabled_);
     }
+    
     return attrBuffer_.GetBuffer();
 }
 
