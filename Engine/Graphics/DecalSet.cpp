@@ -27,6 +27,7 @@
 #include "Context.h"
 #include "DecalSet.h"
 #include "Geometry.h"
+#include "GeometryUtils.h"
 #include "Graphics.h"
 #include "Log.h"
 #include "Node.h"
@@ -170,25 +171,55 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     Decal& newDecal = decals_.Back();
     newDecal.timeToLive_ = timeToLive;
     
+    Vector<PODVector<DecalVertex> > faces;
+    PODVector<DecalVertex> tempFace;
+    
     // Special handling for static models, as they may use LOD: use the fixed software LOD level for decals
     StaticModel* staticModel = dynamic_cast<StaticModel*>(target);
     if (staticModel)
     {
         for (unsigned i = 0; i < staticModel->GetNumGeometries(); ++i)
-            AddVertices(newDecal, decalFrustum.planes_[PLANE_FAR], staticModel->GetSoftwareGeometry(i), decalNormal, normalCutoff);
+            GetFaces(faces, staticModel->GetSoftwareGeometry(i), decalFrustum, decalNormal, normalCutoff);
     }
     else
     {
         // Else use the Drawable API to find out the source geometries
         const Vector<SourceBatch>& batches = target->GetBatches();
         for (unsigned i = 0; i < batches.Size(); ++i)
-            AddVertices(newDecal, decalFrustum.planes_[PLANE_FAR], batches[i].geometry_, decalNormal, normalCutoff);
+            GetFaces(faces, batches[i].geometry_, decalFrustum, decalNormal, normalCutoff);
     }
     
-    // Clip the acquired vertices with rest of the decal frustum planes
-    PODVector<DecalVertex> tempVertices;
-    for (unsigned i = PLANE_NEAR; i < PLANE_FAR; ++i)
-        ClipVertices(newDecal, decalFrustum.planes_[i], tempVertices);
+    // Clip the acquired faces against all frustum planes
+    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+    {
+        for (unsigned j = 0; j < faces.Size(); ++j)
+        {
+            PODVector<DecalVertex>& face = faces[j];
+            if (face.Empty())
+                continue;
+            
+            tempFace.Resize(face.Size() + 2);
+            unsigned outVertices = ClipPolygon((float*)&face[0], (float*)&tempFace[0], face.Size(), sizeof(DecalVertex), decalFrustum.planes_[i]);
+            tempFace.Resize(outVertices);
+            
+            face = tempFace;
+        }
+    }
+    
+    // Now triangulate the resulting faces into decal vertices
+    for (unsigned i = 0; i < faces.Size(); ++i)
+    {
+        PODVector<DecalVertex>& face = faces[i];
+        if (face.Size() < 3)
+            continue;
+        
+        for (unsigned j = 2; j < face.Size(); ++j)
+        {
+            newDecal.vertices_.Push(face[0]);
+            newDecal.vertices_.Push(face[j - 1]);
+            newDecal.vertices_.Push(face[j]);
+        }
+    }
     
     // Check if resulted in no triangles
     if (newDecal.vertices_.Empty())
@@ -219,7 +250,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     while (decals_.Size() && numVertices_ > maxVertices_)
         RemoveDecals(1);
     
-    LOGINFO("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
+    LOGDEBUG("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
     
     MarkDecalsDirty();
     return true;
@@ -269,7 +300,7 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
-void DecalSet::AddVertices(Decal& decal, const Plane& plane, Geometry* geometry, const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
 {
     if (!geometry)
         return;
@@ -303,12 +334,36 @@ void DecalSet::AddVertices(Decal& decal, const Plane& plane, Geometry* geometry,
             const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
-            const Vector3& n0 = hasNormals ? *((const Vector3*)(&srcData[indices[0] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
-            const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[indices[1] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
-            const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[indices[2] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
+            const Vector3& n0 = hasNormals ? *((const Vector3*)(&srcData[indices[0] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
+            const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[indices[1] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
+            const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[indices[2] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
             
             if (!hasNormals || decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) >= normalCutoff)
-                AddTriangle(decal.vertices_, plane, v0, v1, v2, n0, n1, n2);
+            {
+                // First check coarsely against all planes to avoid adding unnecessary faces to the clipping algorithm
+                bool outside = false;
+                for (unsigned i = PLANE_FAR; i < NUM_FRUSTUM_PLANES; --i)
+                {
+                    const Plane& plane = frustum.planes_[i];
+                    if (plane.Distance(v0) < 0.0f && plane.Distance(v1) < 0.0f && plane.Distance(v2) < 0.0f)
+                    {
+                        outside = true;
+                        break;
+                    }
+                }
+                
+                if (!outside)
+                {
+                    faces.Resize(faces.Size() + 1);
+                    PODVector<DecalVertex>& face = faces.Back();
+                    face.Push(DecalVertex(v0, n0, Vector2::ZERO));
+                    face.Push(DecalVertex(v1, n1, Vector2::ZERO));
+                    face.Push(DecalVertex(v2, n2, Vector2::ZERO));
+                }
+            }
             
             indices += 3;
         }
@@ -324,111 +379,39 @@ void DecalSet::AddVertices(Decal& decal, const Plane& plane, Geometry* geometry,
             const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
-            const Vector3& n0 = hasNormals ? *((const Vector3*)(&srcData[indices[0] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
-            const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[indices[1] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
-            const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[indices[2] * vertexSize + 3 * sizeof(float)])) : Vector3::ZERO;
+            const Vector3& n0 = hasNormals ? *((const Vector3*)(&srcData[indices[0] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
+            const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[indices[1] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
+            const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[indices[2] * vertexSize + 3 * sizeof(float)])) :
+                Vector3::ZERO;
             
             if (!hasNormals || decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) >= normalCutoff)
-                AddTriangle(decal.vertices_, plane, v0, v1, v2, n0, n1, n2);
+            {
+                bool outside = false;
+                for (unsigned i = PLANE_FAR; i < NUM_FRUSTUM_PLANES; --i)
+                {
+                    const Plane& plane = frustum.planes_[i];
+                    if (plane.Distance(v0) < 0.0f && plane.Distance(v1) < 0.0f && plane.Distance(v2) < 0.0f)
+                    {
+                        outside = true;
+                        break;
+                    }
+                }
+                
+                if (!outside)
+                {
+                    faces.Resize(faces.Size() + 1);
+                    PODVector<DecalVertex>& face = faces.Back();
+                    face.Push(DecalVertex(v0, n0, Vector2::ZERO));
+                    face.Push(DecalVertex(v1, n1, Vector2::ZERO));
+                    face.Push(DecalVertex(v2, n2, Vector2::ZERO));
+                }
+            }
             
             indices += 3;
         }
     }
-}
-
-void DecalSet::AddTriangle(PODVector<DecalVertex>& dest, const Plane& plane, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 n0, Vector3 n1, Vector3 n2)
-{
-    /// \todo This should be optimized by turning the triangles into polyhedrons during clipping and finally triangulating them
-    float d0 = plane.Distance(v0);
-    float d1 = plane.Distance(v1);
-    float d2 = plane.Distance(v2);
-    
-    // Reject triangle if all vertices behind the plane
-    if (d0 < 0.0f && d1 < 0.0f && d2 < 0.0f)
-        return;
-    // If 2 vertices behind the plane, create a new triangle in-place
-    else if (d0 < 0.0f && d1 < 0.0f)
-    {
-        v0 = ClipEdge(v0, v2, d0, d2);
-        v1 = ClipEdge(v1, v2, d1, d2);
-        n0 = ClipEdge(n0, n2, d0, d2);
-        n1 = ClipEdge(n1, n2, d1, d2);
-    }
-    else if (d0 < 0.0f && d2 < 0.0f)
-    {
-        v0 = ClipEdge(v0, v1, d0, d1);
-        v2 = ClipEdge(v2, v1, d2, d1);
-        n0 = ClipEdge(n0, n1, d0, d1);
-        n2 = ClipEdge(n2, n1, d2, d1);
-    }
-    else if (d1 < 0.0f && d2 < 0.0f)
-    {
-        v1 = ClipEdge(v1, v0, d1, d0);
-        v2 = ClipEdge(v2, v0, d2, d0);
-        n1 = ClipEdge(n1, n0, d1, d0);
-        n2 = ClipEdge(n2, n0, d2, d0);
-    }
-    // 1 vertex behind the plane: create one new triangle, and modify one in-place
-    else if (d0 < 0.0f)
-    {
-        Vector3 v3, v4, v5, n3, n4, n5;
-        v3 = ClipEdge(v0, v2, d0, d2);
-        v4 = v0 = ClipEdge(v0, v1, d0, d1);
-        v5 = v2;
-        n3 = ClipEdge(n0, n2, d0, d2);
-        n4 = n0 = ClipEdge(n0, n1, d0, d1);
-        n5 = n2;
-        
-        dest.Push(DecalVertex(v3, n3, Vector2::ZERO));
-        dest.Push(DecalVertex(v4, n4, Vector2::ZERO));
-        dest.Push(DecalVertex(v5, n5, Vector2::ZERO));
-    }
-    else if (d1 < 0.0f)
-    {
-        Vector3 v3, v4, v5, n3, n4, n5;
-        v4 = ClipEdge(v1, v0, d1, d0);
-        v5 = v1 = ClipEdge(v1, v2, d1, d2);
-        v3 = v0;
-        n4 = ClipEdge(n1, n0, d1, d0);
-        n5 = n1 = ClipEdge(n1, n2, d1, d2);
-        n3 = n0;
-        
-        dest.Push(DecalVertex(v3, n3, Vector2::ZERO));
-        dest.Push(DecalVertex(v4, n4, Vector2::ZERO));
-        dest.Push(DecalVertex(v5, n5, Vector2::ZERO));
-    }
-    else if (d2 < 0.0f)
-    {
-        Vector3 v3, v4, v5, n3, n4, n5;
-        v5 = ClipEdge(v2, v1, d2, d1);
-        v3 = v2 = ClipEdge(v2, v0, d2, d0);
-        v4 = v1;
-        n5 = ClipEdge(n2, n1, d2, d1);
-        n3 = n2 = ClipEdge(n2, n0, d2, d0);
-        n4 = n1;
-        
-        dest.Push(DecalVertex(v3, n3, Vector2::ZERO));
-        dest.Push(DecalVertex(v4, n4, Vector2::ZERO));
-        dest.Push(DecalVertex(v5, n5, Vector2::ZERO));
-    }
-    
-    dest.Push(DecalVertex(v0, n0, Vector2::ZERO));
-    dest.Push(DecalVertex(v1, n1, Vector2::ZERO));
-    dest.Push(DecalVertex(v2, n2, Vector2::ZERO));
-}
-
-void DecalSet::ClipVertices(Decal& decal, const Plane& plane, PODVector<DecalVertex>& tempVertices)
-{
-    tempVertices.Clear();
-    
-    for (unsigned i = 0; i < decal.vertices_.Size(); i += 3)
-    {
-        AddTriangle(tempVertices, plane, decal.vertices_[i].position_, decal.vertices_[i + 1].position_,
-            decal.vertices_[i + 2].position_, decal.vertices_[i].normal_, decal.vertices_[i + 1].normal_,
-            decal.vertices_[i + 2].normal_);
-    }
-    
-    decal.vertices_ = tempVertices;
 }
 
 void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV)

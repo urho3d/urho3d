@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Drawable.h"
+#include "Frustum.h"
 #include "List.h"
 
 /// Decal vertex.
@@ -121,12 +122,8 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Add vertices to decal from a geometry and clip with the initial plane.
-    void AddVertices(Decal& decal, const Plane& plane, Geometry* geometry, const Vector3& decalNormal, float normalCutoff);
-    /// Clip and add one triangle with a plane.
-    void AddTriangle(PODVector<DecalVertex>& dest, const Plane& plane, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 n0, Vector3 n1, Vector3 n2);
-    /// Clip decal's vertices with a plane.
-    void ClipVertices(Decal& decal, const Plane& plane, PODVector<DecalVertex>& tempVertices);
+    /// Get triangle faces from the target geometry.
+    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Calculate UV coordinates for the decal.
     void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
     /// Transform decal's vertices from the target geometry to the decal set local space.

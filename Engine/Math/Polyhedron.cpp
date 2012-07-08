@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Frustum.h"
+#include "GeometryUtils.h"
 #include "Polyhedron.h"
 
 Polyhedron::~Polyhedron()
@@ -91,60 +92,31 @@ void Polyhedron::AddFace(const PODVector<Vector3>& face)
 
 void Polyhedron::Clip(const Plane& plane)
 {
-    clippedVertices_.Clear();
+    unsigned totalVertices = 0;
+    unsigned totalClippedVertices = 0;
+    for (unsigned i = 0; i < faces_.Size(); ++i)
+        totalVertices += faces_[i].Size();
+    
+    // Clipping may produce max. 1 vertex more for each face
+    clippedVertices_.Resize(totalVertices + faces_.Size());
     
     for (unsigned i = 0; i < faces_.Size(); ++i)
     {
         PODVector<Vector3>& face = faces_[i];
-        outFace_.Clear();
+        if (face.Empty())
+            continue;
         
-        Vector3 lastVertex;
-        float lastDistance = 0.0f;
-        for (unsigned j = 0; j < face.Size(); ++j)
-        {
-            float distance = plane.Distance(face[j]);
-            if (distance >= 0.0f)
-            {
-                if (lastDistance < 0.0f)
-                {
-                    float t = lastDistance / (lastDistance - distance);
-                    Vector3 clippedVertex = lastVertex + t * (face[j] - lastVertex);
-                    outFace_.Push(clippedVertex);
-                    clippedVertices_.Push(clippedVertex);
-                }
-                
-                outFace_.Push(face[j]);
-            }
-            else
-            {
-                if (lastDistance >= 0.0f && j != 0)
-                {
-                    float t = lastDistance / (lastDistance - distance);
-                    Vector3 clippedVertex = lastVertex + t * (face[j] - lastVertex);
-                    outFace_.Push(clippedVertex);
-                    clippedVertices_.Push(clippedVertex);
-                }
-            }
-            
-            lastVertex = face[j];
-            lastDistance = distance;
-        }
-        // Recheck the distances of the last and first vertices and add the final clipped vertex if applicable
-        float distance = plane.Distance(face[0]);
-        if ((lastDistance < 0.0f && distance >= 0.0f) || (lastDistance >= 0.0f && distance < 0.0f))
-        {
-            float t = lastDistance / (lastDistance - distance);
-            Vector3 clippedVertex = lastVertex + t * (face[0] - lastVertex);
-            outFace_.Push(clippedVertex);
-            clippedVertices_.Push(clippedVertex);
-        }
+        outFace_.Resize(face.Size() + 2);
         
-        // Do not keep faces which are less than triangles
-        if (outFace_.Size() < 3)
-            outFace_.Clear();
+        unsigned outClippedVertices = 0;
+        unsigned outVertices = ClipPolygon((float*)&face[0], (float*)&outFace_[0], face.Size(), sizeof(Vector3), plane,
+            (float*)&clippedVertices_[totalClippedVertices], &outClippedVertices);
+        totalClippedVertices += outClippedVertices;
         
-        face = outFace_;
+        outFace_.Resize(outVertices);
     }
+    
+    clippedVertices_.Resize(totalClippedVertices);
     
     // Remove empty faces
     for (unsigned i = faces_.Size() - 1; i < faces_.Size(); --i)
