@@ -106,10 +106,10 @@ void DecalSet::UpdateBatches(const FrameInfo& frame)
 
 void DecalSet::UpdateGeometry(const FrameInfo& frame)
 {
-    if (bufferSizeDirty_ || vertexBuffer_->IsDataLost())
+    if (bufferSizeDirty_)
         UpdateBufferSize();
     
-    if (bufferDirty_)
+    if (bufferDirty_ || vertexBuffer_->IsDataLost())
         UpdateVertexBuffer();
 }
 
@@ -600,6 +600,7 @@ void DecalSet::UpdateBufferSize()
 void DecalSet::UpdateVertexBuffer()
 {
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, numVertices_);
+    
     float* dest = (float*)vertexBuffer_->Lock(0, numVertices_);
     if (dest)
     {

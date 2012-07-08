@@ -135,10 +135,10 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 {
-    if (bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
+    if (bufferSizeDirty_ || indexBuffer_->IsDataLost())
         UpdateBufferSize();
     
-    if (bufferDirty_)
+    if (bufferDirty_ || vertexBuffer_->IsDataLost())
         UpdateVertexBuffer(frame);
 }
 
