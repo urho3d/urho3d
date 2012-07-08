@@ -63,7 +63,7 @@ DecalSet::DecalSet(Context* context) :
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1);
+    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -227,10 +227,11 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     newDecal.vertices_.Compact();
     numVertices_ += newDecal.vertices_.Size();
     
-    // Finally transform vertices to the DecalSet's local space
+    // Finally transform vertices to this node's local space
     Matrix3x4 decalTransform = node_->GetWorldTransform().Inverse() * target->GetNode()->GetWorldTransform();
     CalculateUVs(newDecal, frustumTransform.Inverse(), size, aspectRatio, depth, topLeftUV, bottomRightUV);
     TransformVertices(newDecal, decalTransform, biasVector);
+    CalculateTangents(newDecal);
     
     newDecal.CalculateBoundingBox();
     
@@ -297,8 +298,9 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
     unsigned vertexSize;
     const unsigned char* indexData;
     unsigned indexSize;
+    unsigned elementMask;
     
-    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize);
+    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     if (!vertexData || !indexData)
     {
         LOGWARNING("Can not add decal, object does not have CPU-side geometry data");
@@ -307,7 +309,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
     
     unsigned indexStart = geometry->GetIndexStart();
     unsigned indexCount = geometry->GetIndexCount();
-    bool hasNormals = vertexSize >= 6 * sizeof(float);
+    bool hasNormals = (elementMask & MASK_NORMAL) != 0;
     
     const unsigned char* srcData = (const unsigned char*)vertexData;
     
@@ -429,6 +431,55 @@ void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, flo
     }
 }
 
+void DecalSet::CalculateTangents(Decal& decal)
+{
+    for (unsigned i = 0; i < decal.vertices_.Size(); i += 3)
+    {
+        // Tangent generation from
+        // http://www.terathon.com/code/tangent.html
+        const Vector3& v1 = decal.vertices_[i].position_;
+        const Vector3& v2 = decal.vertices_[i + 1].position_;
+        const Vector3& v3 = decal.vertices_[i + 2].position_;
+        
+        const Vector2& w1 = decal.vertices_[i].texCoord_;
+        const Vector2& w2 = decal.vertices_[i + 1].texCoord_;
+        const Vector2& w3 = decal.vertices_[i + 2].texCoord_;
+        
+        float x1 = v2.x_ - v1.x_;
+        float x2 = v3.x_ - v1.x_;
+        float y1 = v2.y_ - v1.y_;
+        float y2 = v3.y_ - v1.y_;
+        float z1 = v2.z_ - v1.z_;
+        float z2 = v3.z_ - v1.z_;
+        
+        float s1 = w2.x_ - w1.x_;
+        float s2 = w3.x_ - w1.x_;
+        float t1 = w2.y_ - w1.y_;
+        float t2 = w3.y_ - w1.y_;
+        
+        float r = 1.0f / (s1 * t2 - s2 * t1);
+        Vector3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+                (t2 * z1 - t1 * z2) * r);
+        Vector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+                (s1 * z2 - s2 * z1) * r);
+        
+        for (unsigned j = i; j < i + 3; ++j)
+        {
+            const Vector3& n = decal.vertices_[j].normal_;
+            Vector3 xyz;
+            float w;
+            
+            // Gram-Schmidt orthogonalize
+            xyz = (sdir - n * n.DotProduct(sdir)).Normalized();
+            
+            // Calculate handedness
+            w = n.CrossProduct(sdir).DotProduct(tdir) < 0.0f ? -1.0f : 1.0f;
+            
+            decal.vertices_[j].tangent_ = Vector4(xyz, w);
+        }
+    }
+}
+
 void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector)
 {
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
@@ -468,7 +519,7 @@ void DecalSet::UpdateBufferSize()
 {
     if (vertexBuffer_->GetVertexCount() != maxVertices_)
     {
-        vertexBuffer_->SetSize(maxVertices_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1);
+        vertexBuffer_->SetSize(maxVertices_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
         bufferDirty_ = true;
     }
     
@@ -494,6 +545,10 @@ void DecalSet::UpdateVertexBuffer()
                 *dest++ = vertex.normal_.z_;
                 *dest++ = vertex.texCoord_.x_;
                 *dest++ = vertex.texCoord_.y_;
+                *dest++ = vertex.tangent_.x_;
+                *dest++ = vertex.tangent_.y_;
+                *dest++ = vertex.tangent_.z_;
+                *dest++ = vertex.tangent_.w_;
             }
         }
         

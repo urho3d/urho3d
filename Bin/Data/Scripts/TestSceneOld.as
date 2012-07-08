@@ -441,11 +441,8 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             else
                 cameraLightNode.parent = testScene;
         }
-        
-        if (key == 'V')
-            cameraLight.perVertex = !cameraLight.perVertex;
 
-        if (key == 'C')
+        if (key == 'O')
             camera.orthographic = !camera.orthographic;
 
         if (key == 'B')
@@ -557,11 +554,18 @@ void HandlePostRenderUpdate()
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
-                
-            // Test creating a ragdoll
-            if (input.keyPress['R'] && result.drawable.typeName == "AnimatedModel")
-                CreateRagdoll(result.drawable);
         }
+        
+        if (input.keyPress['P'])
+        {
+            DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
+            if (decal is null)
+            {
+                decal = result.drawable.node.CreateComponent("DecalSet");
+                decal.material = cache.GetResource("Material", "Materials/Test.xml");
+            }
+            decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1), cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
+        }        
     }
 }
 
@@ -588,7 +592,7 @@ void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
 void CreateRagdoll(AnimatedModel@ model)
 {
     Node@ root = model.node;
-    
+
     CreateRagdollBone(root, "Bip01_Pelvis", SHAPE_CAPSULE, Vector3(0.3, 0.3, 0.3), Vector3(0.0, 0, 0), Quaternion(0, 0, 0));
     CreateRagdollBone(root, "Bip01_Spine1", SHAPE_CAPSULE, Vector3(0.3, 0.4, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
     CreateRagdollBone(root, "Bip01_L_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));

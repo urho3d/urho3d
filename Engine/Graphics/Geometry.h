@@ -87,7 +87,7 @@ public:
     /// Return buffers' combined hash value for state sorting.
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
-    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
+    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask);
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
     float GetDistance(const Ray& ray);
     

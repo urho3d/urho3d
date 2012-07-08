@@ -110,10 +110,10 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                 // Then the actual test using triangle geometry
                 for (unsigned i = 0; i < geometries_.Size(); ++i)
                 {
-                    Geometry* geom = GetSoftwareGeometry(i);
-                    if (geom)
+                    Geometry* geometry = GetSoftwareGeometry(i);
+                    if (geometry)
                     {
-                        distance = geom->GetDistance(localRay);
+                        distance = geometry->GetDistance(localRay);
                         if (distance <= query.maxDistance_)
                         {
                             RayQueryResult result;
@@ -167,8 +167,8 @@ unsigned StaticModel::GetNumOccluderTriangles()
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        Geometry* geom = GetSoftwareGeometry(i);
-        if (!geom)
+        Geometry* geometry = GetSoftwareGeometry(i);
+        if (!geometry)
             continue;
         
         // Check that the material is suitable for occlusion (default material always is)
@@ -176,7 +176,7 @@ unsigned StaticModel::GetNumOccluderTriangles()
         if (mat && !mat->GetOcclusion())
             continue;
         
-        triangles += geom->GetIndexCount() / 3;
+        triangles += geometry->GetIndexCount() / 3;
     }
     
     return triangles;
@@ -188,17 +188,17 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        Geometry* geom = GetSoftwareGeometry(i);
-        if (!geom)
+        Geometry* geometry = GetSoftwareGeometry(i);
+        if (!geometry)
             continue;
         
         // Check that the material is suitable for occlusion (default material always is) and set culling mode
-        Material* mat = batches_[i].material_;
-        if (mat)
+        Material* material = batches_[i].material_;
+        if (material)
         {
-            if (!mat->GetOcclusion())
+            if (!material->GetOcclusion())
                 continue;
-            buffer->SetCullMode(mat->GetCullMode());
+            buffer->SetCullMode(material->GetCullMode());
         }
         else
             buffer->SetCullMode(CULL_CCW);
@@ -207,14 +207,15 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned vertexSize;
         const unsigned char* indexData;
         unsigned indexSize;
+        unsigned elementMask;
         
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
+        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         // Check for valid geometry data
         if (!vertexData || !indexData)
             continue;
         
-        unsigned indexStart = geom->GetIndexStart();
-        unsigned indexCount = geom->GetIndexCount();
+        unsigned indexStart = geometry->GetIndexStart();
+        unsigned indexCount = geometry->GetIndexCount();
         
         // Draw and check for running out of triangles
         if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))

@@ -49,6 +49,8 @@ struct DecalVertex
     Vector3 normal_;
     /// Texture coordinates coordinates.
     Vector2 texCoord_;
+    /// Tangent.
+    Vector4 tangent_;
 };
 
 /// One decal in a decal set.
@@ -126,6 +128,8 @@ private:
     void GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Calculate UV coordinates for the decal.
     void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
+    /// Calculate tangents for the decal.
+    void CalculateTangents(Decal& decal);
     /// Transform decal's vertices from the target geometry to the decal set local space.
     void TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector);
     /// Remove a decal by iterator and return iterator to the next decal.

@@ -206,20 +206,27 @@ unsigned short Geometry::GetBufferHash() const
 }
 
 
-void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize)
+void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask)
 {
     if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
     {
         vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
         if (vertexData)
+        {
             vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
+            elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
+        }
         else
+        {
             vertexSize = 0;
+            elementMask = 0;
+        }
     }
     else
     {
         vertexData = 0;
         vertexSize = 0;
+        elementMask = 0;
     }
     
     if (indexBuffer_)
@@ -239,12 +246,13 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 
 float Geometry::GetDistance(const Ray& ray)
 {
-    const unsigned char* rawVertexData = 0;
-    const unsigned char* rawIndexData = 0;
-    unsigned vertexSize = 0;
-    unsigned indexSize = 0;
+    const unsigned char* rawVertexData;
+    const unsigned char* rawIndexData;
+    unsigned vertexSize;
+    unsigned indexSize;
+    unsigned elementMask;
     
-    GetRawData(rawVertexData, vertexSize, rawIndexData, indexSize);
+    GetRawData(rawVertexData, vertexSize, rawIndexData, indexSize, elementMask);
     if (!rawVertexData || !rawIndexData)
         return M_INFINITY;
     

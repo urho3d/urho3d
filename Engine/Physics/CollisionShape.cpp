@@ -83,8 +83,9 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         const unsigned char* indexData;
         unsigned vertexSize;
         unsigned indexSize;
+        unsigned elementMask;
         
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
+        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
             continue;
         
@@ -152,8 +153,9 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         const unsigned char* indexData;
         unsigned vertexSize;
         unsigned indexSize;
+        unsigned elementMask;
         
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
+        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
             continue;
         
