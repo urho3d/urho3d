@@ -465,7 +465,7 @@ void HandlePostRenderUpdate()
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
 
-            if (input.keyPress['P'])
+            if (input.mouseButtonPress[MOUSEB_MIDDLE])
             {
                 DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
                 if (decal is null)

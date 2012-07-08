@@ -95,6 +95,7 @@ Key and mouse controls:
 WSAD        Move
 Left mouse  Create a new physics object; characters will ragdoll when hit
 Right mouse Hold and move mouse to rotate view
+Mid mouse   Paint a decal into the mouse cursor hit location
 Space       Toggle debug geometry
 F1          Toggle AngelScript console
 F5          Save scene
@@ -104,7 +105,8 @@ T           Toggle profiling display
 O           Toggle orthographic camera
 F           Toggle FXAA edge filter
 B           Toggle bloom post-process
-P           Paint a decal into the mouse cursor hit location
+P           Toggle scene animation (TestSceneOld only)
+L           Toggle camera light detached/attached (TestSceneOld only)
 \endverbatim
 
 TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
