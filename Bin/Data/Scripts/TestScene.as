@@ -464,7 +464,7 @@ void HandlePostRenderUpdate()
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
-                
+
             if (input.keyPress['H'])
             {
                 DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
@@ -473,7 +473,7 @@ void HandlePostRenderUpdate()
                     decal = result.drawable.node.CreateComponent("DecalSet");
                     decal.material = cache.GetResource("Material", "Materials/Mushroom.xml");
                 }
-                decal.AddDecal(result.drawable, rayHitPos, cameraNode.worldRotation, BoundingBox(Vector3(-0.1, -0.1, -0.1), Vector3(0.1, 0.1, 0.1)), 0.001f, Vector2(0, 0), Vector2(1, 1), 2.0);
+                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1), cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
             }
         }
     }

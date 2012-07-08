@@ -119,7 +119,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         }
     }
     
-    distance_ = frame.camera_->GetDistance(worldPos);
+    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
     // Calculate scaled distance for animation LOD
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);

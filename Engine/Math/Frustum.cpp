@@ -104,6 +104,20 @@ void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix3x4& t
     UpdatePlanes();
 }
 
+void Frustum::Define(const BoundingBox& box, const Matrix3x4& transform)
+{
+    vertices_[0] = transform * Vector3(box.max_.x_, box.max_.y_, box.min_.z_);
+    vertices_[1] = transform * Vector3(box.max_.x_, box.min_.y_, box.min_.z_);
+    vertices_[2] = transform * Vector3(box.min_.x_, box.min_.y_, box.min_.z_);
+    vertices_[3] = transform * Vector3(box.min_.x_, box.max_.y_, box.min_.z_);
+    vertices_[4] = transform * Vector3(box.max_.x_, box.max_.y_, box.max_.z_);
+    vertices_[5] = transform * Vector3(box.max_.x_, box.min_.y_, box.max_.z_);
+    vertices_[6] = transform * Vector3(box.min_.x_, box.min_.y_, box.max_.z_);
+    vertices_[7] = transform * Vector3(box.min_.x_, box.max_.y_, box.max_.z_);
+    
+    UpdatePlanes();
+}
+
 void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 {
     nearZ = Max(nearZ, 0.0f);

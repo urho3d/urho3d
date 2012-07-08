@@ -289,7 +289,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
     if (!depthTest)
         dest = &noDepthLines_;
     
-    const unsigned char* vertexDataChar = (const unsigned char*)vertexData;
+    const unsigned char* srcData = (const unsigned char*)vertexData;
     unsigned oldSize = dest->Size();
     dest->Resize(oldSize + indexCount);
     DebugLine* destLines = &dest->At(oldSize);
@@ -302,9 +302,9 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
         
         while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
             destLines[0].start_ = transform * v0;
             destLines[0].end_ = transform * v1;
@@ -329,9 +329,9 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
         
         while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
             destLines[0].start_ = transform * v0;
             destLines[0].end_ = transform * v1;

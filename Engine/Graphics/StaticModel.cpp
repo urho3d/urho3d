@@ -110,14 +110,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                 // Then the actual test using triangle geometry
                 for (unsigned i = 0; i < geometries_.Size(); ++i)
                 {
-                    unsigned lodLevel;
-                    // Check whether to use same LOD as visible, or a specific LOD
-                    if (softwareLodLevel_ == M_MAX_UNSIGNED)
-                        lodLevel = geometryData_[i].lodLevel_;
-                    else
-                        lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
-                    
-                    Geometry* geom = geometries_[i][lodLevel];
+                    Geometry* geom = GetSoftwareGeometry(i);
                     if (geom)
                     {
                         distance = geom->GetDistance(localRay);
@@ -142,7 +135,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
 void StaticModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(worldTransform.Translation());
+    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
     if (batches_.Size() > 1)
     {
@@ -174,14 +167,7 @@ unsigned StaticModel::GetNumOccluderTriangles()
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        unsigned lodLevel;
-        // Check whether to use same LOD as visible, or a specific LOD
-        if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = geometryData_[i].lodLevel_;
-        else
-            lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
-        
-        Geometry* geom = geometries_[i][lodLevel];
+        Geometry* geom = GetSoftwareGeometry(i);
         if (!geom)
             continue;
         
@@ -202,14 +188,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        unsigned lodLevel;
-        // Check whether to use same LOD as visible, or a specific LOD
-        if (softwareLodLevel_ == M_MAX_UNSIGNED)
-            lodLevel = geometryData_[i].lodLevel_;
-        else
-            lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
-        
-        Geometry* geom = geometries_[i][lodLevel];
+        Geometry* geom = GetSoftwareGeometry(i);
         if (!geom)
             continue;
         
@@ -306,6 +285,21 @@ void StaticModel::SetSoftwareLodLevel(unsigned level)
 Material* StaticModel::GetMaterial(unsigned index) const
 {
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
+}
+
+Geometry* StaticModel::GetSoftwareGeometry(unsigned index) const
+{
+    if (index >= geometries_.Size())
+        return 0;
+    
+    unsigned lodLevel;
+    // Check whether to use same LOD as visible, or a specific LOD
+    if (softwareLodLevel_ == M_MAX_UNSIGNED)
+        lodLevel = geometryData_[index].lodLevel_;
+    else
+        lodLevel = Clamp(softwareLodLevel_, 0, geometries_[index].Size());
+    
+    return geometries_[index][lodLevel];
 }
 
 void StaticModel::SetBoundingBox(const BoundingBox& box)

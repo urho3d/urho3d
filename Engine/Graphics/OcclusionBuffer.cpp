@@ -151,7 +151,7 @@ void OcclusionBuffer::Clear()
 bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData,
     unsigned indexSize, unsigned indexStart, unsigned indexCount)
 {
-    const unsigned char* vertexDataChar = (const unsigned char*)vertexData;
+    const unsigned char* srcData = (const unsigned char*)vertexData;
     
     Matrix4 modelViewProj = viewProj_ * model;
     depthHierarchyDirty_ = true;
@@ -170,9 +170,9 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsig
             if (numTriangles_ >= maxTriangles_)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);
@@ -192,9 +192,9 @@ bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsig
             if (numTriangles_ >= maxTriangles_)
                 return false;
             
-            const Vector3& v0 = *((const Vector3*)(&vertexDataChar[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&vertexDataChar[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&vertexDataChar[indices[2] * vertexSize]));
+            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
             vertices[0] = ModelTransform(modelViewProj, v0);
             vertices[1] = ModelTransform(modelViewProj, v1);
@@ -617,20 +617,20 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
                 unsigned newIdx = numTriangles * 3;
                 triangles[numTriangles] = true;
                 ++numTriangles;
-                    
-                vertices[newIdx] = ClipEdge(vertices[index], vertices[index + 1], d0, d1);
-                vertices[newIdx + 1] = vertices[index + 1];
-                vertices[newIdx + 2] = vertices[index] = ClipEdge(vertices[index], vertices[index + 2], d0, d2);
+                
+                vertices[newIdx] = ClipEdge(vertices[index], vertices[index + 2], d0, d2);
+                vertices[newIdx + 1] = vertices[index] = ClipEdge(vertices[index], vertices[index + 1], d0, d1);
+                vertices[newIdx + 2] = vertices[index + 2];
             }
             else if (d1 < 0.0f)
             {
                 unsigned newIdx = numTriangles * 3;
                 triangles[numTriangles] = true;
                 ++numTriangles;
-                    
-                vertices[newIdx + 1] = ClipEdge(vertices[index + 1], vertices[index + 2], d1, d2);
-                vertices[newIdx + 2] = vertices[index + 2];
-                vertices[newIdx] = vertices[index + 1] = ClipEdge(vertices[index + 1], vertices[index], d1, d0);
+                
+                vertices[newIdx + 1] = ClipEdge(vertices[index + 1], vertices[index], d1, d0);
+                vertices[newIdx + 2] = vertices[index + 1] = ClipEdge(vertices[index + 1], vertices[index + 2], d1, d2);
+                vertices[newIdx] = vertices[index];
             }
             else if (d2 < 0.0f)
             {
@@ -638,9 +638,9 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
                 triangles[numTriangles] = true;
                 ++numTriangles;
                 
-                vertices[newIdx + 2] = ClipEdge(vertices[index + 2], vertices[index], d2, d0);
-                vertices[newIdx] = vertices[index];
-                vertices[newIdx + 1] = vertices[index + 2] = ClipEdge(vertices[index + 2], vertices[index + 1], d2, d1);
+                vertices[newIdx + 2] = ClipEdge(vertices[index + 2], vertices[index + 1], d2, d1);
+                vertices[newIdx] = vertices[index + 2] = ClipEdge(vertices[index + 2], vertices[index], d2, d0);
+                vertices[newIdx + 1] = vertices[index + 1];
             }
         }
     }

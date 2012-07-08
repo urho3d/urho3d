@@ -99,7 +99,7 @@ class DecalSet : public Drawable
     /// %Set maximum number of decal vertices.
     void SetMaxVertices(unsigned num);
     /// Add a decal at world coordinates, using an existing drawable's geometry for reference. Return true if successful.
-    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, const BoundingBox& size, float depthBias, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive);
+    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.25f, float depthBias = 0.0001f);
     /// Remove n oldest decals.
     void RemoveDecals(unsigned num);
     /// Remove all decals.
@@ -121,6 +121,16 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
+    /// Add vertices to decal from a geometry and clip with the initial plane.
+    void AddVertices(Decal& decal, const Plane& plane, Geometry* geometry, const Vector3& decalNormal, float normalCutoff);
+    /// Clip and add one triangle with a plane.
+    void AddTriangle(PODVector<DecalVertex>& dest, const Plane& plane, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 n0, Vector3 n1, Vector3 n2);
+    /// Clip decal's vertices with a plane.
+    void ClipVertices(Decal& decal, const Plane& plane, PODVector<DecalVertex>& tempVertices);
+    /// Calculate UV coordinates for the decal.
+    void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
+    /// Transform decal's vertices from the target geometry to the decal set local space.
+    void TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector);
     /// Remove a decal by iterator and return iterator to the next decal.
     List<Decal>::Iterator RemoveDecal(List<Decal>::Iterator i);
     /// Mark decals and the bounding box dirty.

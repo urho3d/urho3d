@@ -77,6 +77,8 @@ public:
     Material* GetMaterial(unsigned index) const;
     /// Return software LOD level.
     unsigned GetSoftwareLodLevel() const { return softwareLodLevel_; }
+    /// Return geometry to use in software rendering or raycasts.
+    Geometry* GetSoftwareGeometry(unsigned index) const;
     
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);

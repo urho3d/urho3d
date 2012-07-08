@@ -229,7 +229,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(worldTransform.Translation());
+    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
     // Note: per-geometry distances do not take skinning into account
     if (batches_.Size() > 1)

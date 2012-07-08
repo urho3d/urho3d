@@ -531,6 +531,10 @@ Properties:<br>
 Frustum
 
 Methods:<br>
+- void Define(float, float, float, float, float, const Matrix3x4&)
+- void Define(const Vector3&, const Vector3&, const Matrix3x4&)
+- void Define(const BoundingBox&, const Matrix3x4&)
+- void DefineOrtho(float, float, float, float, float, const Matrix3x4&)
 - void Transform(const Matrix3&)
 - void Transform(const Matrix3x4&)
 - Intersection IsInside(const Vector3&)
@@ -2289,7 +2293,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, const BoundingBox&, float, const Vector2&, const Vector2&, float)
+- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.25, float arg10 = 0.0001)
 - void RemoveDecals(uint)
 - void RemoveAllDecals()
 
