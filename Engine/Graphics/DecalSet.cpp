@@ -42,18 +42,6 @@
 static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 static const unsigned DEFAULT_MAX_VERTICES = 1024;
 
-inline Vector3 ClipEdge(const Vector3& v0, const Vector3& v1, float d0, float d1)
-{
-    float t = d0 / (d0 - d1);
-    return v0 + t * (v1 - v0);
-}
-
-inline Vector2 ClipEdge(const Vector2& v0, const Vector2& v1, float d0, float d1)
-{
-    float t = d0 / (d0 - d1);
-    return v0 + t * (v1 - v0);
-}
-
 void Decal::CalculateBoundingBox()
 {
     boundingBox_.Clear();
