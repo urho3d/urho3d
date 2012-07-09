@@ -25,12 +25,32 @@
 #include "GeometryUtils.h"
 #include "Plane.h"
 
-inline void ClipEdge(float* output, float* v0, float* v1, float d0, float d1, unsigned components)
+inline void ClipEdge(float* output, float* v0, float* v1, float d0, float d1, unsigned components, unsigned blendWeightsComp)
 {
     float t = d0 / (d0 - d1);
     
-    for (unsigned i = 0; i < components; ++i)
-        output[i] = v0[i] + t * (v1[i] - v0[i]);
+    if (!blendWeightsComp)
+    {
+       for (unsigned i = 0; i < components; ++i)
+            output[i] = v0[i] + t * (v1[i] - v0[i]);
+    }
+    else
+    {
+        for (unsigned i = 0; i < blendWeightsComp; ++i)
+            output[i] = v0[i] + t * (v1[i] - v0[i]);
+        
+        // Blend weights / indices can not be easily interpolated, choose the one that is nearer to the split plane
+        if (Abs(d0) < Abs(d1))
+        {
+            for (unsigned i = blendWeightsComp; i < components; ++i)
+                output[i] = v0[i];
+        }
+        else
+        {
+            for (unsigned i = blendWeightsComp; i < components; ++i)
+                output[i] = v1[i];
+        }
+    }
 }
 
 inline void CopyVertex(float* output, float* input, unsigned components)
@@ -39,9 +59,10 @@ inline void CopyVertex(float* output, float* input, unsigned components)
         output[i] = input[i];
 }
 
-unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane, float* clip, unsigned* clipVertexCount)
+unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane, unsigned blendWeightsOffset, float* clip, unsigned* clipVertexCount)
 {
     unsigned components = vertexSize / sizeof(float);
+    unsigned blendWeightsComp = blendWeightsOffset / sizeof(float);
     unsigned outVertexCount = 0;
     float* lastVertex = input;
     float lastDistance = 0.0f;
@@ -58,7 +79,7 @@ unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned
         {
             if (lastDistance < 0.0f)
             {
-                ClipEdge(output, lastVertex, vertex, lastDistance, distance, components);
+                ClipEdge(output, lastVertex, vertex, lastDistance, distance, components, blendWeightsComp);
                 if (clip && clipVertexCount)
                 {
                     CopyVertex(clip, output, components);
@@ -78,7 +99,7 @@ unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned
         {
             if (lastDistance >= 0.0f && i != 0)
             {
-                ClipEdge(output, lastVertex, vertex, lastDistance, distance, components);
+                ClipEdge(output, lastVertex, vertex, lastDistance, distance, components, blendWeightsComp);
                 if (clip && clipVertexCount)
                 {
                     CopyVertex(clip, output, components);
@@ -101,7 +122,7 @@ unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned
         float distance = plane.Distance(position);
         if ((lastDistance < 0.0f && distance >= 0.0f) || (lastDistance >= 0.0f && distance < 0.0f))
         {
-            ClipEdge(output, lastVertex, vertex, lastDistance, distance, components);
+            ClipEdge(output, lastVertex, vertex, lastDistance, distance, components, blendWeightsComp);
             if (clip && clipVertexCount)
             {
                 CopyVertex(clip, output, components);

@@ -433,7 +433,7 @@ float Camera::GetDistance(const Vector3& worldPos) const
         return (worldPos - cameraPos).Length();
     }
     else
-        return fabsf((GetInverseWorldTransform() * worldPos).z_);
+        return Abs((GetInverseWorldTransform() * worldPos).z_);
 }
 
 float Camera::GetDistanceSquared(const Vector3& worldPos) const

@@ -79,6 +79,8 @@ public:
     
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
+    /// Return element offset from an element mask.
+    static unsigned GetElementOffset(unsigned elementMask, VertexElement element);
     
     /// Vertex element sizes.
     static const unsigned elementSize[];

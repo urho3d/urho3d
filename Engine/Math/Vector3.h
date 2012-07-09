@@ -171,7 +171,7 @@ public:
     /// Calculate dot product.
     float DotProduct(const Vector3& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector3& rhs) const { return fabsf(x_ * rhs.x_) + fabsf(y_ * rhs.y_) + fabsf(z_ * rhs.z_); }
+    float AbsDotProduct(const Vector3& rhs) const { return ::Abs(x_ * rhs.x_) + ::Abs(y_ * rhs.y_) + ::Abs(z_ * rhs.z_); }
     
     /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
@@ -184,7 +184,7 @@ public:
     }
     
     /// Return absolute vector.
-    Vector3 Abs() const { return Vector3(fabsf(x_), fabsf(y_), fabsf(z_)); }
+    Vector3 Abs() const { return Vector3(::Abs(x_), ::Abs(y_), ::Abs(z_)); }
     /// Linear interpolation with another vector.
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     /// Test for equality with another vector with epsilon.

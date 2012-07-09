@@ -25,6 +25,6 @@
 
 class Plane;
 
-/// Clip a convex polygon with a plane. Output may be two vertices more than input. Vertices can have additional float values which will be interpolated. Return number of output vertices. Optionally put clipped vertices into a separate output array.
-unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane, float* clip = 0, unsigned* clipVertexCount = 0);
+/// Clip a polygon with a plane. Output may have up to 2x vertices of input. Vertices can have additional float values which will be interpolated, and/or blend weights which will just be copied from the nearer vertex. Optionally put clipped vertices into a separate output array. Return number of output vertices.
+unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane, unsigned blendWeightsOffset = 0, float* clip = 0, unsigned* clipVertexCount = 0);
 

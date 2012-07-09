@@ -74,8 +74,11 @@ public:
     unsigned GetElementOffset(VertexElement element) const { return elementOffset_[element]; }
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
+    
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
+    /// Return element offset from an element mask.
+    static unsigned GetElementOffset(unsigned elementMask, VertexElement element);
     
     /// Vertex element sizes in bytes.
     static const unsigned elementSize[];

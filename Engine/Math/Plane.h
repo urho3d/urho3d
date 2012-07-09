@@ -60,7 +60,7 @@ public:
         Vector3 dist2 = v2 - v0;
         
         normal_ = (dist1.CrossProduct(dist2)).Normalized();
-        absNormal_ = Vector3(fabsf(normal_.x_), fabsf(normal_.y_), fabsf(normal_.z_));
+        absNormal_ = Vector3(Abs(normal_.x_), Abs(normal_.y_), Abs(normal_.z_));
         intercept_ = normal_.DotProduct(v0);
     }
 
@@ -68,7 +68,7 @@ public:
     void Define(const Vector3& normal, const Vector3& point)
     {
         normal_ = normal;
-        absNormal_ = Vector3(fabsf(normal_.x_), fabsf(normal_.y_), fabsf(normal_.z_));
+        absNormal_ = Vector3(Abs(normal_.x_), Abs(normal_.y_), Abs(normal_.z_));
         intercept_ = normal_.DotProduct(point);
     }
     

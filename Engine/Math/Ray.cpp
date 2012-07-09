@@ -54,7 +54,7 @@ Vector3 Ray::ClosestPoint(const Ray& ray) const
     float d2121 = p21.DotProduct(p21);
     
     float d = d2121 * d4343 - d4321 * d4321;
-    if (fabsf(d) < M_EPSILON)
+    if (Abs(d) < M_EPSILON)
         return origin_;
     float n = d1343 * d4321 - d1321 * d4343;
     float a = n / d;
@@ -65,7 +65,7 @@ Vector3 Ray::ClosestPoint(const Ray& ray) const
 float Ray::HitDistance(const Plane& plane) const
 {
     float d = plane.normal_.DotProduct(direction_);
-    if (fabsf(d) >= M_EPSILON)
+    if (Abs(d) >= M_EPSILON)
     {
         float t = -(plane.normal_.DotProduct(origin_) - plane.intercept_) / d;
         if (t >= 0.0f)

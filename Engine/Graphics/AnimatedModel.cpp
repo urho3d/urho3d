@@ -384,7 +384,11 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             }
         }
         else
+        {
             batches_[i].geometryType_ = GEOM_STATIC;
+            batches_[i].shaderData_ = 0;
+            batches_[i].shaderDataSize_ = 0;
+        }
     }
     
     MarkNetworkUpdate();

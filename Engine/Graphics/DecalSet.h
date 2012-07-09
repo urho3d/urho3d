@@ -26,6 +26,7 @@
 #include "Drawable.h"
 #include "Frustum.h"
 #include "List.h"
+#include "Skeleton.h"
 
 /// Decal vertex.
 struct DecalVertex
@@ -42,6 +43,21 @@ struct DecalVertex
     {
     }
     
+    /// Construct with position, normal and skinning information
+    DecalVertex(const Vector3& position, const Vector3& normal, const void* skinningData) :
+        position_(position),
+        normal_(normal)
+    {
+        const float* blendWeights = (const float*)skinningData;
+        const unsigned char* blendIndices = ((const unsigned char*)skinningData) + 4 * sizeof(float);
+        
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            blendWeights_[i] = blendWeights[i];
+            blendIndices_[i] = blendIndices[i];
+        }
+    }
+    
     /// Position.
     Vector3 position_;
     /// Normal.
@@ -50,6 +66,10 @@ struct DecalVertex
     Vector2 texCoord_;
     /// Tangent.
     Vector4 tangent_;
+    /// Blend weights.
+    float blendWeights_[4];
+    /// Blend indices.
+    unsigned char blendIndices_[4];
 };
 
 /// One decal in a decal set.
@@ -128,10 +148,14 @@ class DecalSet : public Drawable
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// Get triangle faces from the target geometry.
     void GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    /// Get triangle face from the target geometry.
+    void GetFace(Vector<PODVector<DecalVertex> >& faces, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Calculate UV coordinates for the decal.
     void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
     /// Calculate tangents for the decal.
@@ -148,6 +172,8 @@ private:
     void UpdateBufferSize();
     /// Rewrite decal vertex buffer.
     void UpdateVertexBuffer();
+    /// Recalculate skinning.
+    void UpdateSkinning();
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
@@ -157,16 +183,24 @@ private:
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Decals.
     List<Decal> decals_;
+    /// Bones used for skinned decals.
+    Vector<Bone> bones_;
+    /// Skinning matrices.
+    PODVector<Matrix3x4> skinMatrices_;
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Vertices in the current decals.
     unsigned numVertices_;
     /// Maximum vertices.
     unsigned maxVertices_;
+    /// Skinned mode flag.
+    bool skinned_;
     /// Buffer needs resize flag.
     bool bufferSizeDirty_;
     /// Vertex buffer needs rewrite flag.
     bool bufferDirty_;
     /// Bounding box needs update flag.
     bool boundingBoxDirty_;
+    /// Skinning dirty flag.
+    bool skinningDirty_;
 };

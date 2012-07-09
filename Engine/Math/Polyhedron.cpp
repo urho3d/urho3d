@@ -106,11 +106,11 @@ void Polyhedron::Clip(const Plane& plane)
         if (face.Empty())
             continue;
         
-        outFace_.Resize(face.Size() + 2);
+        outFace_.Resize(face.Size() * 2);
         
         unsigned outClippedVertices = 0;
         unsigned outVertices = ClipPolygon((float*)&face[0], (float*)&outFace_[0], face.Size(), sizeof(Vector3), plane,
-            (float*)&clippedVertices_[totalClippedVertices], &outClippedVertices);
+            0, (float*)&clippedVertices_[totalClippedVertices], &outClippedVertices);
         totalClippedVertices += outClippedVertices;
         
         outFace_.Resize(outVertices);

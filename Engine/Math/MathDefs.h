@@ -60,6 +60,8 @@ inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs
 inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
 /// Return the larger of two floats.
 inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
+/// Return absolute value of a float.
+inline float Abs(float value) { return value >= 0.0f ? value : -value; }
 
 /// Clamp a float to a range.
 inline float Clamp(float value, float min, float max)
@@ -78,6 +80,8 @@ inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs 
 inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
 /// Return the larger of two integers.
 inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
+/// Return absolute value of an integer
+inline int Abs(int value) { return value >= 0 ? value : -value; }
 
 /// Clamp an integer to a range.
 inline int Clamp(int value, int min, int max)

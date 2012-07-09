@@ -375,17 +375,33 @@ void VertexBuffer::UpdateOffsets()
     vertexSize_ = elementOffset;
 }
 
-unsigned VertexBuffer::GetVertexSize(unsigned mask)
+unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 {
     unsigned vertexSize = 0;
     
     for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
     {
-        if (mask & (1 << i))
+        if (elementMask & (1 << i))
             vertexSize += elementSize[i];
     }
     
     return vertexSize;
+}
+
+unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement element)
+{
+    unsigned offset = 0;
+    
+    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    {
+        if (i == element)
+            break;
+        
+        if (elementMask & (1 << i))
+            offset += elementSize[i];
+    }
+    
+    return offset;
 }
 
 bool VertexBuffer::Create()

@@ -228,7 +228,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
                 float viewCenterZ = viewMatrix.m20_ * center.x_ + viewMatrix.m21_ * center.y_ + viewMatrix.m22_ * center.z_ +
                     viewMatrix.m23_;
                 Vector3 edge = geomBox.Size() * 0.5f;
-                float viewEdgeZ = fabsf(viewMatrix.m20_) * edge.x_ + fabsf(viewMatrix.m21_) * edge.y_ + fabsf(viewMatrix.m22_) *
+                float viewEdgeZ = Abs(viewMatrix.m20_) * edge.x_ + Abs(viewMatrix.m21_) * edge.y_ + Abs(viewMatrix.m22_) *
                     edge.z_;
                 
                 drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
@@ -2123,8 +2123,8 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     {
         if (parameters.focus_)
         {
-            float viewSizeX = Max(fabsf(shadowCasterBox.min_.x_), fabsf(shadowCasterBox.max_.x_));
-            float viewSizeY = Max(fabsf(shadowCasterBox.min_.y_), fabsf(shadowCasterBox.max_.y_));
+            float viewSizeX = Max(Abs(shadowCasterBox.min_.x_), Abs(shadowCasterBox.max_.x_));
+            float viewSizeY = Max(Abs(shadowCasterBox.min_.y_), Abs(shadowCasterBox.max_.y_));
             float viewSize = Max(viewSizeX, viewSizeY);
             // Scale the quantization parameters, because view size is in projection space (-1.0 - 1.0)
             float invOrthoSize = 1.0f / shadowCamera->GetOrthoSize();

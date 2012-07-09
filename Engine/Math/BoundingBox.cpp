@@ -129,9 +129,9 @@ void BoundingBox::Transform(const Matrix3& transform)
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
     Vector3 newEdge = Vector3(
-        fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
-        fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
-        fabsf(transform.m20_) * oldEdge.x_ + fabsf(transform.m21_) * oldEdge.y_ + fabsf(transform.m22_) * oldEdge.z_
+        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
+        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
+        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
     );
     
     min_ = newCenter - newEdge;
@@ -143,9 +143,9 @@ void BoundingBox::Transform(const Matrix3x4& transform)
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
     Vector3 newEdge = Vector3(
-        fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
-        fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
-        fabsf(transform.m20_) * oldEdge.x_ + fabsf(transform.m21_) * oldEdge.y_ + fabsf(transform.m22_) * oldEdge.z_
+        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
+        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
+        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
     );
     
     min_ = newCenter - newEdge;
@@ -157,9 +157,9 @@ BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
     Vector3 newEdge = Vector3(
-        fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
-        fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
-        fabsf(transform.m20_) * oldEdge.x_ + fabsf(transform.m21_) * oldEdge.y_ + fabsf(transform.m22_) * oldEdge.z_
+        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
+        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
+        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
     );
     
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
@@ -170,9 +170,9 @@ BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
     Vector3 newEdge = Vector3(
-        fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
-        fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
-        fabsf(transform.m20_) * oldEdge.x_ + fabsf(transform.m21_) * oldEdge.y_ + fabsf(transform.m22_) * oldEdge.z_
+        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
+        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
+        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
     );
     
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
