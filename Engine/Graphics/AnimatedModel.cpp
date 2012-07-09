@@ -119,10 +119,7 @@ bool AnimatedModel::LoadXML(const XMLElement& source)
 void AnimatedModel::ApplyAttributes()
 {
     if (assignBonesPending_)
-    {
         AssignBoneNodes();
-        assignBonesPending_ = false;
-    }
 }
 
 void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -867,6 +864,8 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
 
 void AnimatedModel::AssignBoneNodes()
 {
+    assignBonesPending_ = false;
+    
     if (!node_)
         return;
     

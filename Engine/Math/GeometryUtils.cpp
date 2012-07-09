@@ -59,7 +59,8 @@ inline void CopyVertex(float* output, float* input, unsigned components)
         output[i] = input[i];
 }
 
-unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane, unsigned blendWeightsOffset, float* clip, unsigned* clipVertexCount)
+unsigned ClipPolygon(float* input, float* output, unsigned vertexCount, unsigned vertexSize, const Plane& plane,
+    unsigned blendWeightsOffset, float* clip, unsigned* clipVertexCount)
 {
     unsigned components = vertexSize / sizeof(float);
     unsigned blendWeightsComp = blendWeightsOffset / sizeof(float);

@@ -812,7 +812,7 @@ void PolyhedronAddFaceArray(CScriptArray* arr, Polyhedron* ptr)
     
     face.Resize(numVertices);
     for (unsigned i = 0; i < numVertices; ++i)
-        face[i] = *(static_cast<Vector3*>(arr->At(i)));
+        face[i] = *((Vector3*)arr->At(i));
     ptr->AddFace(face);
 }
 

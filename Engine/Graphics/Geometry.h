@@ -80,8 +80,6 @@ public:
     unsigned GetVertexStart() const { return vertexStart_; }
     /// Return number of used vertices.
     unsigned GetVertexCount() const { return vertexCount_; }
-    /// Return whether draw range is empty.
-    bool IsEmpty() const;
     /// Return LOD distance.
     float GetLodDistance() const { return lodDistance_; }
     /// Return buffers' combined hash value for state sorting.

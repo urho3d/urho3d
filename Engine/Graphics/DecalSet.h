@@ -104,6 +104,8 @@ class DecalSet : public Drawable
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -175,6 +177,8 @@ private:
     void UpdateSkinning();
     /// Update the batch (geometry type, shader data.)
     void UpdateBatch();
+    /// Find bones after loading.
+    void AssignBoneNodes();
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
@@ -196,7 +200,7 @@ private:
     unsigned maxVertices_;
     /// Skinned mode flag.
     bool skinned_;
-    /// Buffer needs resize flag.
+    /// Vertex buffer needs resize flag.
     bool bufferSizeDirty_;
     /// Vertex buffer needs rewrite flag.
     bool bufferDirty_;
@@ -204,4 +208,6 @@ private:
     bool boundingBoxDirty_;
     /// Skinning dirty flag.
     bool skinningDirty_;
+    /// Bone nodes assignment pending flag.
+    bool assignBonesPending_;
 };

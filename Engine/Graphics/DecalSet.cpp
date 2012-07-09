@@ -42,8 +42,9 @@
 
 static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 static const unsigned DEFAULT_MAX_VERTICES = 512;
-static const unsigned UNSKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
-static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
+static const unsigned STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
+static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS |
+    MASK_BLENDINDICES;
 
 void Decal::CalculateBoundingBox()
 {
@@ -64,7 +65,8 @@ DecalSet::DecalSet(Context* context) :
     bufferSizeDirty_(true),
     bufferDirty_(true),
     boundingBoxDirty_(true),
-    skinningDirty_(false)
+    skinningDirty_(false),
+    assignBonesPending_(false)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
@@ -87,6 +89,12 @@ void DecalSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_INT, "Max Vertices", GetMaxVertices, SetMaxVertices, unsigned, DEFAULT_MAX_VERTICES, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(DecalSet, Drawable);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_VARIANTVECTOR, "Decals", GetDecalsAttr, SetDecalsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+}
+
+void DecalSet::ApplyAttributes()
+{
+    if (assignBonesPending_)
+        AssignBoneNodes();
 }
 
 void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -148,7 +156,9 @@ void DecalSet::SetMaxVertices(unsigned num)
     }
 }
 
-bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff, float depthBias)
+bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size,
+    float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff,
+    float depthBias)
 {
     PROFILE(AddDecal);
     
@@ -161,7 +171,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return false;
     }
     
-    // Check for animated target and switch into skinned/unskinned mode if necessary
+    // Check for animated target and switch into skinned/static mode if necessary
     AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
     if ((animatedModel && !skinned_) || (!animatedModel && skinned_))
     {
@@ -352,18 +362,19 @@ void DecalSet::SetMaterialAttr(ResourceRef value)
 
 void DecalSet::SetDecalsAttr(VariantVector value)
 {
-    Scene* scene = GetScene();
+    unsigned index = 0;
     
+    Scene* scene = GetScene();
     RemoveAllDecals();
     
-    unsigned index = 0;
+    skinned_ = value[index++].GetBool();
     unsigned numDecals = value[index++].GetInt();
     
     while (numDecals--)
     {
         decals_.Resize(decals_.Size() + 1);
-        
         Decal& newDecal = decals_.Back();
+        
         newDecal.timer_ = value[index++].GetFloat();
         newDecal.timeToLive_ = value[index++].GetFloat();
         newDecal.vertices_.Resize(value[index++].GetInt());
@@ -374,6 +385,16 @@ void DecalSet::SetDecalsAttr(VariantVector value)
             i->normal_ = value[index++].GetVector3();
             i->texCoord_ = value[index++].GetVector2();
             i->tangent_ = value[index++].GetVector4();
+            if (skinned_)
+            {
+                Vector4 weights = value[index++].GetVector4();
+                unsigned indices = value[index++].GetInt();
+                i->blendWeights_[0] = weights.x_;
+                i->blendWeights_[1] = weights.y_;
+                i->blendWeights_[2] = weights.z_;
+                i->blendWeights_[3] = weights.w_;
+                *((unsigned*)i->blendIndices_) = indices;
+            }
         }
         
         newDecal.CalculateBoundingBox();
@@ -384,7 +405,40 @@ void DecalSet::SetDecalsAttr(VariantVector value)
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
     }
     
+    if (skinned_)
+    {
+        unsigned numBones = value[index++].GetInt();
+        skinMatrices_.Resize(numBones);
+        
+        while (numBones--)
+        {
+            bones_.Resize(bones_.Size() + 1);
+            Bone& newBone = bones_.Back();
+            
+            newBone.name_ = value[index++].GetString();
+            newBone.collisionMask_ = value[index++].GetInt();
+            if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
+                newBone.radius_ = value[index++].GetFloat();
+            if (newBone.collisionMask_ & BONECOLLISION_BOX)
+            {
+                newBone.boundingBox_.min_ = value[index++].GetVector3();
+                newBone.boundingBox_.max_ = value[index++].GetVector3();
+                newBone.boundingBox_.defined_ = true;
+            }
+            
+            Vector4* offsetMatrix = (Vector4*)newBone.offsetMatrix_.Data();
+            offsetMatrix[0] = value[index++].GetVector4();
+            offsetMatrix[1] = value[index++].GetVector4();
+            offsetMatrix[2] = value[index++].GetVector4();
+        }
+        
+        assignBonesPending_ = true;
+        skinningDirty_ = true;
+    }
+    
+    UpdateBatch();
     MarkDecalsDirty();
+    bufferSizeDirty_ = true;
 }
 
 ResourceRef DecalSet::GetMaterialAttr() const
@@ -395,6 +449,7 @@ ResourceRef DecalSet::GetMaterialAttr() const
 VariantVector DecalSet::GetDecalsAttr() const
 {
     VariantVector ret;
+    ret.Push(skinned_);
     ret.Push(decals_.Size());
     
     for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
@@ -409,6 +464,34 @@ VariantVector DecalSet::GetDecalsAttr() const
             ret.Push(j->normal_);
             ret.Push(j->texCoord_);
             ret.Push(j->tangent_);
+            if (skinned_)
+            {
+                unsigned* indices = (unsigned*)j->blendIndices_;
+                ret.Push(Vector4(j->blendWeights_[0], j->blendWeights_[1], j->blendWeights_[2], j->blendWeights_[3]));
+                ret.Push(*indices);
+            }
+        }
+    }
+    
+    if (skinned_)
+    {
+        ret.Push(bones_.Size());
+        
+        for (Vector<Bone>::ConstIterator i = bones_.Begin(); i != bones_.End(); ++i)
+        {
+            ret.Push(i->name_);
+            ret.Push((int)i->collisionMask_);
+            if (i->collisionMask_ & BONECOLLISION_SPHERE)
+                ret.Push(i->radius_);
+            if (i->collisionMask_ & BONECOLLISION_BOX)
+            {
+                ret.Push(i->boundingBox_.min_);
+                ret.Push(i->boundingBox_.max_);
+            }
+            const Vector4* offsetMatrix = (const Vector4*)i->offsetMatrix_.Data();
+            ret.Push(offsetMatrix[0]);
+            ret.Push(offsetMatrix[1]);
+            ret.Push(offsetMatrix[2]);
         }
     }
     
@@ -455,7 +538,8 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     }
 }
 
-void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
+    const Vector3& decalNormal, float normalCutoff)
 {
     Geometry* geometry;
     
@@ -494,7 +578,8 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum,
+                decalNormal, normalCutoff);
             indices += 3;
         }
     }
@@ -506,13 +591,16 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum,
+                decalNormal, normalCutoff);
             indices += 3;
         }
     }
 }
 
-void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData,
+    unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum,
+    const Vector3& decalNormal, float normalCutoff)
 {
     bool hasNormals = (elementMask & MASK_NORMAL) != 0;
     bool hasSkinning = skinned_ && (elementMask & MASK_BLENDWEIGHTS) != 0;
@@ -572,7 +660,8 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     }
 }
 
-bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices)
+bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices,
+    unsigned char* newBlendIndices)
 {
     AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
     if (!animatedModel)
@@ -654,7 +743,8 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
     return true;
 }
 
-void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV)
+void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth,
+    const Vector2& topLeftUV, const Vector2& bottomRightUV)
 {
     Matrix4 projection(Matrix4::ZERO);
     
@@ -768,7 +858,7 @@ void DecalSet::CalculateBoundingBox()
 void DecalSet::UpdateBufferSize()
 {
     if (!skinned_)
-        vertexBuffer_->SetSize(maxVertices_, UNSKINNED_ELEMENT_MASK);
+        vertexBuffer_->SetSize(maxVertices_, STATIC_ELEMENT_MASK);
     else
         vertexBuffer_->SetSize(maxVertices_, SKINNED_ELEMENT_MASK);
     
@@ -849,6 +939,23 @@ void DecalSet::UpdateBatch()
         batches_[0].geometryType_ = GEOM_STATIC;
         batches_[0].shaderData_ = 0;
         batches_[0].shaderDataSize_ = 0;
+    }
+}
+
+void DecalSet::AssignBoneNodes()
+{
+    assignBonesPending_ = false;
+    
+    if (!node_)
+        return;
+    
+    // Find the bone nodes from the node hierarchy and add listeners
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
+    {
+        Node* boneNode = node_->GetChild(i->name_, true);
+        if (boneNode)
+            boneNode->AddListener(this);
+        i->node_ = boneNode;
     }
 }
 

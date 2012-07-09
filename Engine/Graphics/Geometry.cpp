@@ -181,14 +181,6 @@ unsigned Geometry::GetVertexElementMask(unsigned index) const
     return index < elementMasks_.Size() ? elementMasks_[index] : 0;
 }
 
-bool Geometry::IsEmpty() const
-{
-    if (indexBuffer_)
-        return indexCount_ == 0;
-    else
-        return vertexCount_ == 0;
-}
-
 unsigned short Geometry::GetBufferHash() const
 {
     unsigned short hash = 0;
