@@ -140,6 +140,10 @@ public:
     VariantVector GetAnimationStatesAttr() const;
     /// Return morphs attribute.
     const PODVector<unsigned char>& GetMorphsAttr() const;
+    /// Return per-geometry bone mappings.
+    const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    /// Return per-geometry skin matrices. If empty, uses global skinning
+    const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
     
 protected:
     /// Handle node being assigned.

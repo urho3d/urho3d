@@ -104,19 +104,6 @@ void DecalSet::UpdateBatches(const FrameInfo& frame)
     
     batches_[0].distance_ = distance_;
     batches_[0].worldTransform_ = &worldTransform;
-    
-    if (skinMatrices_.Size())
-    {
-        batches_[0].geometryType_ = GEOM_SKINNED;
-        batches_[0].shaderData_ = skinMatrices_[0].Data();
-        batches_[0].shaderDataSize_ = skinMatrices_.Size() * 12;
-    }
-    else
-    {
-        batches_[0].geometryType_ = GEOM_STATIC;
-        batches_[0].shaderData_ = 0;
-        batches_[0].shaderDataSize_ = 0;
-    }
 }
 
 void DecalSet::UpdateGeometry(const FrameInfo& frame)
@@ -135,6 +122,8 @@ UpdateGeometryType DecalSet::GetUpdateGeometryType()
 {
     if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
+    else if (skinningDirty_)
+        return UPDATE_WORKER_THREAD;
     else
         return UPDATE_NONE;
 }
@@ -172,7 +161,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return false;
     }
     
-    // Check for animated target and switch into skinned mode if necessary
+    // Check for animated target and switch into skinned/unskinned mode if necessary
     AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
     if ((animatedModel && !skinned_) || (!animatedModel && skinned_))
     {
@@ -182,6 +171,52 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     }
     
     Matrix3x4 targetTransform = target->GetNode()->GetWorldTransform().Inverse();
+    
+    // For an animated model, adjust the decal position back to the bind pose
+    // To do this, need to find the bone the decal is colliding with
+    if (animatedModel)
+    {
+        Skeleton& skeleton = animatedModel->GetSkeleton();
+        unsigned numBones = skeleton.GetNumBones();
+        unsigned bestIndex = M_MAX_UNSIGNED;
+        float bestDistance = M_INFINITY;
+        
+        for (unsigned i = 0; i < numBones; ++i)
+        {
+            Bone* bone = skeleton.GetBone(i);
+            if (!bone->node_ || !bone->collisionMask_)
+                continue;
+            
+            // Represent the decal as a sphere, try to find the closest match
+            Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * (worldPosition + worldRotation * (0.5f * depth *
+                Vector3::FORWARD)), size);
+            float distance = (worldPosition - bone->node_->GetWorldPosition()).Length();
+            
+            if (bone->collisionMask_ & BONECOLLISION_BOX)
+            {
+                if (bone->boundingBox_.IsInside(decalSphere) != OUTSIDE && distance < bestDistance)
+                {
+                    bestIndex = i;
+                    bestDistance = distance;
+                }
+            }
+            else if (bone->collisionMask_ & BONECOLLISION_SPHERE)
+            {
+                Sphere boneSphere(Vector3::ZERO, bone->radius_);
+                if (boneSphere.IsInside(decalSphere) != OUTSIDE && distance < bestDistance)
+                {
+                    bestIndex = i;
+                    bestDistance = distance;
+                }
+            }
+        }
+        
+        if (bestIndex < numBones)
+        {
+            Bone* bone = skeleton.GetBone(bestIndex);
+            targetTransform = (bone->node_->GetWorldTransform() * bone->offsetMatrix_).Inverse();
+        }
+    }
     
     // Build the decal frustum
     Frustum decalFrustum;
@@ -198,20 +233,9 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     Vector<PODVector<DecalVertex> > faces;
     PODVector<DecalVertex> tempFace;
     
-    // Special handling for static/animated models, as they may use LOD: use the fixed software LOD level for decals
-    StaticModel* staticModel = dynamic_cast<StaticModel*>(target);
-    if (staticModel)
-    {
-        for (unsigned i = 0; i < staticModel->GetNumGeometries(); ++i)
-            GetFaces(faces, staticModel->GetSoftwareGeometry(i), decalFrustum, decalNormal, normalCutoff);
-    }
-    else
-    {
-        // Else use the Drawable API to find out the source geometries
-        const Vector<SourceBatch>& batches = target->GetBatches();
-        for (unsigned i = 0; i < batches.Size(); ++i)
-            GetFaces(faces, batches[i].geometry_, decalFrustum, decalNormal, normalCutoff);
-    }
+    unsigned numBatches = target->GetBatches().Size();
+    for (unsigned i = 0; i < numBatches; ++i)
+        GetFaces(faces, target, i, decalFrustum, decalNormal, normalCutoff);
     
     // Clip the acquired faces against all frustum planes
     for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
@@ -264,7 +288,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     // Finally transform vertices to this node's local space
     Matrix3x4 decalTransform = node_->GetWorldTransform().Inverse() * target->GetNode()->GetWorldTransform();
     CalculateUVs(newDecal, frustumTransform.Inverse(), size, aspectRatio, depth, topLeftUV, bottomRightUV);
-    TransformVertices(newDecal, decalTransform, biasVector);
+    TransformVertices(newDecal, skinned_ ? Matrix3x4::IDENTITY : decalTransform, biasVector);
     CalculateTangents(newDecal);
     
     newDecal.CalculateBoundingBox();
@@ -303,14 +327,16 @@ void DecalSet::RemoveAllDecals()
         MarkDecalsDirty();
     }
     
-    // Remove all bones and skinning matrices
+    // Remove all bones and skinning matrices and stop listening to the bone nodes
     for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
     {
         if (i->node_)
             i->node_->RemoveListener(this);
     }
+    
     bones_.Clear();
     skinMatrices_.Clear();
+    UpdateBatch();
 }
 
 Material* DecalSet::GetMaterial() const
@@ -411,7 +437,7 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     }
     else
     {
-        // If uses skinning, update world bounding box based on them
+        // When using skinning, update world bounding box based on the bones
         worldBoundingBox_.defined_ = false;
         
         for (Vector<Bone>::ConstIterator i = bones_.Begin(); i != bones_.End(); ++i)
@@ -429,8 +455,17 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     }
 }
 
-void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
 {
+    Geometry* geometry;
+    
+    // Special handling for static/animated models, as they may use LOD: use the fixed software LOD level for decals
+    StaticModel* staticModel = dynamic_cast<StaticModel*>(target);
+    if (staticModel)
+        geometry = staticModel->GetSoftwareGeometry(batchIndex);
+    else
+        geometry = target->GetBatches()[batchIndex].geometry_;
+    
     if (!geometry)
         return;
     
@@ -459,7 +494,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
             indices += 3;
         }
     }
@@ -471,13 +506,13 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geomet
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum, decalNormal, normalCutoff);
             indices += 3;
         }
     }
 }
 
-void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff)
 {
     bool hasNormals = (elementMask & MASK_NORMAL) != 0;
     bool hasSkinning = skinned_ && (elementMask & MASK_BLENDWEIGHTS) != 0;
@@ -491,8 +526,8 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, const unsigned ch
     const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[i1 * vertexSize + normalOffset])) : Vector3::ZERO;
     const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[i2 * vertexSize + normalOffset])) : Vector3::ZERO;
     const void* s0 = hasSkinning ? (const void*)(&srcData[i0 * vertexSize + skinningOffset]) : (const void*)0;
-    const void* s1 = hasSkinning ? (const void*)(&srcData[i0 * vertexSize + skinningOffset]) : (const void*)0;
-    const void* s2 = hasSkinning ? (const void*)(&srcData[i0 * vertexSize + skinningOffset]) : (const void*)0;
+    const void* s1 = hasSkinning ? (const void*)(&srcData[i1 * vertexSize + skinningOffset]) : (const void*)0;
+    const void* s2 = hasSkinning ? (const void*)(&srcData[i2 * vertexSize + skinningOffset]) : (const void*)0;
     
     // Check if face is too much away from the decal normal
     if (hasNormals && decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
@@ -516,10 +551,107 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, const unsigned ch
     }
     else
     {
-        face.Push(DecalVertex(v0, n0, s0));
-        face.Push(DecalVertex(v1, n1, s1));
-        face.Push(DecalVertex(v2, n2, s2));
+        const float* bw0 = (const float*)s0;
+        const float* bw1 = (const float*)s1;
+        const float* bw2 = (const float*)s2;
+        const unsigned char* bi0 = ((const unsigned char*)s0) + sizeof(float) * 4;
+        const unsigned char* bi1 = ((const unsigned char*)s1) + sizeof(float) * 4;
+        const unsigned char* bi2 = ((const unsigned char*)s2) + sizeof(float) * 4;
+        unsigned char nbi0[4];
+        unsigned char nbi1[4];
+        unsigned char nbi2[4];
+        
+        // Make sure all bones are found and that there is room in the skinning matrices
+        if (!GetBones(target, batchIndex, bw0, bi0, nbi0) || !GetBones(target, batchIndex, bw1, bi1, nbi1) ||
+            !GetBones(target, batchIndex, bw2, bi2, nbi2))
+            return;
+        
+        face.Push(DecalVertex(v0, n0, bw0, nbi0));
+        face.Push(DecalVertex(v1, n1, bw1, nbi1));
+        face.Push(DecalVertex(v2, n2, bw2, nbi2));
     }
+}
+
+bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices)
+{
+    AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
+    if (!animatedModel)
+        return false;
+    
+    // Check whether target is using global or per-geometry skinning
+    const Vector<PODVector<Matrix3x4> >& geometrySkinMatrices = animatedModel->GetGeometrySkinMatrices();
+    const Vector<PODVector<unsigned> >& geometryBoneMappings = animatedModel->GetGeometryBoneMappings();
+    
+    for (unsigned i = 0; i < 4; ++i)
+    {
+        if (blendWeights[i] > 0.0f)
+        {
+            Bone* bone = 0;
+            if (geometrySkinMatrices.Empty())
+                bone = animatedModel->GetSkeleton().GetBone(blendIndices[i]);
+            else if (blendIndices[i] < geometryBoneMappings[batchIndex].Size())
+                bone = animatedModel->GetSkeleton().GetBone(geometryBoneMappings[batchIndex][blendIndices[i]]);
+            
+            if (!bone)
+            {
+                LOGWARNING("Out of range bone index for skinned decal");
+                return false;
+            }
+            
+            bool found = false;
+            unsigned index;
+            
+            for (index = 0; index < bones_.Size(); ++index)
+            {
+                if (bones_[index].node_ == bone->node_)
+                {
+                    // Check also that the offset matrix matches, in case we for example have a separate attachment AnimatedModel
+                    // with a different bind pose
+                    const float* offsetA = bones_[index].offsetMatrix_.Data();
+                    const float* offsetB = bone->offsetMatrix_.Data();
+                    unsigned j;
+                    for (j = 0; j < 12; ++j)
+                    {
+                        if (!Equals(offsetA[j], offsetB[j]))
+                            break;
+                    }
+                    if (j == 12)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!found)
+            {
+                if (bones_.Size() >= MAX_SKIN_MATRICES)
+                {
+                    LOGWARNING("Maximum skinned decal bone count reached");
+                    return false;
+                }
+                else
+                {
+                    // Copy the bone from the model to the decal
+                    index = bones_.Size();
+                    bones_.Resize(bones_.Size() + 1);
+                    bones_[index] = *bone;
+                    skinMatrices_.Resize(skinMatrices_.Size() + 1);
+                    skinningDirty_ = true;
+                    
+                    // Start listening to bone transform changes to update skinning, update amount of shader data in the batch
+                    bone->node_->AddListener(this);
+                    UpdateBatch();
+                }
+            }
+            
+            newBlendIndices[i] = index;
+        }
+        else
+            newBlendIndices[i] = 0;
+    }
+    
+    return true;
 }
 
 void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV)
@@ -669,6 +801,14 @@ void DecalSet::UpdateVertexBuffer()
                 *dest++ = vertex.tangent_.y_;
                 *dest++ = vertex.tangent_.z_;
                 *dest++ = vertex.tangent_.w_;
+                if (skinned_)
+                {
+                    *dest++ = vertex.blendWeights_[0];
+                    *dest++ = vertex.blendWeights_[1];
+                    *dest++ = vertex.blendWeights_[2];
+                    *dest++ = vertex.blendWeights_[3];
+                    *dest++ = *((float*)vertex.blendIndices_);
+                }
             }
         }
         
@@ -694,6 +834,22 @@ void DecalSet::UpdateSkinning()
     }
     
     skinningDirty_ = false;
+}
+
+void DecalSet::UpdateBatch()
+{
+    if (skinMatrices_.Size())
+    {
+        batches_[0].geometryType_ = GEOM_SKINNED;
+        batches_[0].shaderData_ = skinMatrices_[0].Data();
+        batches_[0].shaderDataSize_ = skinMatrices_.Size() * 12;
+    }
+    else
+    {
+        batches_[0].geometryType_ = GEOM_STATIC;
+        batches_[0].shaderData_ = 0;
+        batches_[0].shaderDataSize_ = 0;
+    }
 }
 
 void DecalSet::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)

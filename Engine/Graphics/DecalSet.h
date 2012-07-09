@@ -36,21 +36,18 @@ struct DecalVertex
     {
     }
     
-    /// Construct with position and normal
+    /// Construct with position and normal.
     DecalVertex(const Vector3& position, const Vector3& normal) :
         position_(position),
         normal_(normal)
     {
     }
     
-    /// Construct with position, normal and skinning information
-    DecalVertex(const Vector3& position, const Vector3& normal, const void* skinningData) :
+    // Construct with position, normal and skinning information.
+    DecalVertex(const Vector3& position, const Vector3& normal, const float* blendWeights, const unsigned char* blendIndices) :
         position_(position),
         normal_(normal)
     {
-        const float* blendWeights = (const float*)skinningData;
-        const unsigned char* blendIndices = ((const unsigned char*)skinningData) + 4 * sizeof(float);
-        
         for (unsigned i = 0; i < 4; ++i)
         {
             blendWeights_[i] = blendWeights[i];
@@ -153,9 +150,11 @@ protected:
     
 private:
     /// Get triangle faces from the target geometry.
-    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Geometry* geometry, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Get triangle face from the target geometry.
-    void GetFace(Vector<PODVector<DecalVertex> >& faces, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    void GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    /// Get bones referenced by skinning data and remap the skinning indices. Return true if successful.
+    bool GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices);
     /// Calculate UV coordinates for the decal.
     void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
     /// Calculate tangents for the decal.
@@ -174,6 +173,8 @@ private:
     void UpdateVertexBuffer();
     /// Recalculate skinning.
     void UpdateSkinning();
+    /// Update the batch (geometry type, shader data.)
+    void UpdateBatch();
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
