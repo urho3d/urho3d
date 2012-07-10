@@ -29,6 +29,7 @@
 #include "DecalSet.h"
 #include "Geometry.h"
 #include "Graphics.h"
+#include "IndexBuffer.h"
 #include "Log.h"
 #include "Node.h"
 #include "Profiler.h"
@@ -604,14 +605,51 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     if (!geometry)
         return;
     
-    const unsigned char* vertexData;
-    unsigned vertexSize;
-    const unsigned char* indexData;
-    unsigned indexSize;
-    unsigned elementMask;
+    const unsigned char* positionData = 0;
+    const unsigned char* normalData = 0;
+    const unsigned char* skinningData = 0;
+    const unsigned char* indexData = 0;
+    unsigned positionStride;
+    unsigned normalStride;
+    unsigned skinningStride;
+    unsigned indexStride;
     
-    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (!vertexData || !indexData)
+    IndexBuffer* ib = geometry->GetIndexBuffer();
+    if (ib)
+    {
+        indexData = ib->GetShadowData();
+        indexStride = ib->GetIndexSize();
+    }
+    
+    // For morphed models positions, normals and skinning may be in different buffers
+    for (unsigned i = 0; i < geometry->GetNumVertexBuffers(); ++i)
+    {
+        VertexBuffer* vb = geometry->GetVertexBuffer(i);
+        if (!vb)
+            continue;
+        
+        unsigned elementMask = geometry->GetVertexElementMask(i);
+        unsigned char* data = vb->GetShadowData();
+        
+        if ((elementMask & MASK_POSITION) && data)
+        {
+            positionData = data;
+            positionStride = vb->GetVertexSize();
+        }
+        if ((elementMask & MASK_NORMAL) && data)
+        {
+            normalData = data + vb->GetElementOffset(ELEMENT_NORMAL);
+            normalStride = vb->GetVertexSize();
+        }
+        if ((elementMask & MASK_BLENDWEIGHTS) && data)
+        {
+            skinningData = data + vb->GetElementOffset(ELEMENT_BLENDWEIGHTS);
+            skinningStride = vb->GetVertexSize();
+        }
+    }
+    
+    // Positions and indices are needed
+    if (!positionData || !indexData)
     {
         LOGWARNING("Can not add decal, object does not have CPU-side geometry data");
         return;
@@ -619,18 +657,17 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     
     unsigned indexStart = geometry->GetIndexStart();
     unsigned indexCount = geometry->GetIndexCount();
-    const unsigned char* srcData = (const unsigned char*)vertexData;
     
     // 16-bit indices
-    if (indexSize == sizeof(unsigned short))
+    if (indexStride == sizeof(unsigned short))
     {
         const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
         const unsigned short* indicesEnd = indices + indexCount;
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum,
-                decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
+                positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
             indices += 3;
         }
     }
@@ -642,31 +679,30 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         
         while (indices < indicesEnd)
         {
-            GetFace(faces, target, batchIndex, srcData, indices[0], indices[1], indices[2], vertexSize, elementMask, frustum,
-                decalNormal, normalCutoff);
+            GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
+                positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
             indices += 3;
         }
     }
 }
 
-void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData,
-    unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum,
-    const Vector3& decalNormal, float normalCutoff)
+void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1,
+    unsigned i2, const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
+    unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal,
+    float normalCutoff)
 {
-    bool hasNormals = (elementMask & MASK_NORMAL) != 0;
-    bool hasSkinning = skinned_ && (elementMask & MASK_BLENDWEIGHTS) != 0;
-    unsigned normalOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_NORMAL);
-    unsigned skinningOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_BLENDWEIGHTS);
+    bool hasNormals = normalData != 0;
+    bool hasSkinning = skinned_ && skinningData != 0;
     
-    const Vector3& v0 = *((const Vector3*)(&srcData[i0 * vertexSize]));
-    const Vector3& v1 = *((const Vector3*)(&srcData[i1 * vertexSize]));
-    const Vector3& v2 = *((const Vector3*)(&srcData[i2 * vertexSize]));
-    const Vector3& n0 = hasNormals ? *((const Vector3*)(&srcData[i0 * vertexSize + normalOffset])) : Vector3::ZERO;
-    const Vector3& n1 = hasNormals ? *((const Vector3*)(&srcData[i1 * vertexSize + normalOffset])) : Vector3::ZERO;
-    const Vector3& n2 = hasNormals ? *((const Vector3*)(&srcData[i2 * vertexSize + normalOffset])) : Vector3::ZERO;
-    const void* s0 = hasSkinning ? (const void*)(&srcData[i0 * vertexSize + skinningOffset]) : (const void*)0;
-    const void* s1 = hasSkinning ? (const void*)(&srcData[i1 * vertexSize + skinningOffset]) : (const void*)0;
-    const void* s2 = hasSkinning ? (const void*)(&srcData[i2 * vertexSize + skinningOffset]) : (const void*)0;
+    const Vector3& v0 = *((const Vector3*)(&positionData[i0 * positionStride]));
+    const Vector3& v1 = *((const Vector3*)(&positionData[i1 * positionStride]));
+    const Vector3& v2 = *((const Vector3*)(&positionData[i2 * positionStride]));
+    const Vector3& n0 = hasNormals ? *((const Vector3*)(&normalData[i0 * normalStride])) : Vector3::ZERO;
+    const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : Vector3::ZERO;
+    const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : Vector3::ZERO;
+    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : (const unsigned char*)0;
+    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : (const unsigned char*)0;
+    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : (const unsigned char*)0;
     
     // Check if face is too much away from the decal normal
     if (hasNormals && decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
@@ -693,9 +729,9 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
         const float* bw0 = (const float*)s0;
         const float* bw1 = (const float*)s1;
         const float* bw2 = (const float*)s2;
-        const unsigned char* bi0 = ((const unsigned char*)s0) + sizeof(float) * 4;
-        const unsigned char* bi1 = ((const unsigned char*)s1) + sizeof(float) * 4;
-        const unsigned char* bi2 = ((const unsigned char*)s2) + sizeof(float) * 4;
+        const unsigned char* bi0 = s0 + sizeof(float) * 4;
+        const unsigned char* bi1 = s1 + sizeof(float) * 4;
+        const unsigned char* bi2 = s2 + sizeof(float) * 4;
         unsigned char nbi0[4];
         unsigned char nbi1[4];
         unsigned char nbi2[4];

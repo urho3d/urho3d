@@ -58,13 +58,14 @@ OBJECTTYPESTATIC(AnimatedModel);
 AnimatedModel::AnimatedModel(Context* context) :
     StaticModel(context),
     animationLodFrameNumber_(0),
+    morphElementMask_(0),
     animationLodBias_(1.0f),
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
     invisibleLodFactor_(0.0f),
     animationDirty_(false),
     animationOrderDirty_(false),
-    morphsDirty_(true),
+    morphsDirty_(false),
     skinningDirty_(true),
     isMaster_(true),
     loading_(false),
@@ -260,19 +261,6 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
-    
-    // If model has morphs, check if the morph vertex buffer(s) have lost data (only possible in OpenGL mode)
-    if (morphs_.Size())
-    {
-        for (unsigned i = 0; i < morphVertexBuffers_.Size(); ++i)
-        {
-            if (morphVertexBuffers_[i] && morphVertexBuffers_[i]->IsDataLost())
-            {
-                morphsDirty_ = true;
-                break;
-            }
-        }
-    }
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -332,11 +320,11 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
         geometryBoneMappings_.Push(geometryBoneMappings[i]);
     
-    // Copy morphs
+    // Copy morphs. Note: morph vertex buffers will be created later on-demand
     morphVertexBuffers_.Clear();
     morphs_.Clear();
     const Vector<ModelMorph>& morphs = model->GetMorphs();
-    unsigned morphElementMask = 0;
+    morphElementMask_ = 0;
     for (unsigned i = 0; i < morphs.Size(); ++i)
     {
         ModelMorph newMorph;
@@ -345,15 +333,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         newMorph.weight_ = 0.0f;
         newMorph.buffers_ = morphs[i].buffers_;
         for (Map<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
-            morphElementMask |= j->second_.elementMask_;
+            morphElementMask_ |= j->second_.elementMask_;
         morphs_.Push(newMorph);
-    }
-    
-    // If model has morphs, must clone all geometries & vertex buffers that refer to morphable vertex data
-    if (morphs.Size())
-    {
-        CloneGeometries(morphElementMask);
-        MarkMorphsDirty();
     }
     
     // Copy bounding box & skeleton
@@ -479,6 +460,10 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 {
     if (index >= morphs_.Size())
         return;
+    
+    // If morph vertex buffers have not been created yet, create now
+    if (weight > 0.0f && morphVertexBuffers_.Empty())
+        CloneGeometries();
     
     weight = Clamp(weight, 0.0f, 1.0f);
     
@@ -923,9 +908,8 @@ void AnimatedModel::MarkMorphsDirty()
     morphsDirty_ = true;
 }
 
-void AnimatedModel::CloneGeometries(unsigned morphElementMask)
+void AnimatedModel::CloneGeometries()
 {
-    // Clone vertex buffers as necessary
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
     Map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
     morphVertexBuffers_.Resize(originalVertexBuffers.Size());
@@ -936,7 +920,8 @@ void AnimatedModel::CloneGeometries(unsigned morphElementMask)
         if (model_->GetMorphRangeCount(i))
         {
             SharedPtr<VertexBuffer> clone(new VertexBuffer(context_));
-            clone->SetSize(original->GetVertexCount(), morphElementMask & original->GetElementMask(), true);
+            clone->SetShadowed(true);
+            clone->SetSize(original->GetVertexCount(), morphElementMask_ & original->GetElementMask(), true);
             void* dest = clone->Lock(0, original->GetVertexCount());
             if (dest)
             {
@@ -998,6 +983,10 @@ void AnimatedModel::CloneGeometries(unsigned morphElementMask)
             geometries_[i][j] = clone;
         }
     }
+    
+    // Make sure the rendering batches use the new cloned geometries
+    ResetLodLevels();
+    MarkMorphsDirty();
 }
 
 void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer)
@@ -1164,52 +1153,24 @@ void AnimatedModel::UpdateMorphs()
                 unsigned morphStart = model_->GetMorphRangeStart(i);
                 unsigned morphCount = model_->GetMorphRangeCount(i);
                 
-                if (!buffer->IsDataLost())
+                void* dest = buffer->Lock(morphStart, morphCount);
+                if (dest)
                 {
-                    void* dest = buffer->Lock(morphStart, morphCount);
-                    if (dest)
+                    // Reset morph range by copying data from the original vertex buffer
+                    CopyMorphVertices(dest, originalBuffer->GetShadowData() + morphStart * originalBuffer->GetVertexSize(),
+                        morphCount, buffer, originalBuffer);
+                    
+                    for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
-                        // Reset morph range by copying data from the original vertex buffer
-                        CopyMorphVertices(dest, originalBuffer->GetShadowData() + morphStart * originalBuffer->GetVertexSize(),
-                            morphCount, buffer, originalBuffer);
-                        
-                        for (unsigned j = 0; j < morphs_.Size(); ++j)
+                        if (morphs_[j].weight_ > 0.0f)
                         {
-                            if (morphs_[j].weight_ > 0.0f)
-                            {
-                                Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
-                                if (k != morphs_[j].buffers_.End())
-                                    ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
-                            }
+                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            if (k != morphs_[j].buffers_.End())
+                                ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
                         }
-                        
-                        buffer->Unlock();
-                    }
-                }
-                else
-                {
-                    // Data is lost, need to copy whole original buffer
-                    unsigned vertexCount = buffer->GetVertexCount();
-                    void* dest = buffer->Lock(0, vertexCount, true);
-                    if (dest)
-                    {
-                        CopyMorphVertices(dest, originalBuffer->GetShadowData(), vertexCount, buffer, originalBuffer);
-                        
-                        dest = ((unsigned char*)dest) + morphStart * buffer->GetVertexSize();
-                        for (unsigned j = 0; j < morphs_.Size(); ++j)
-                        {
-                            if (morphs_[j].weight_ > 0.0f)
-                            {
-                                Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
-                                if (k != morphs_[j].buffers_.End())
-                                    ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
-                            }
-                        }
-                        
-                        buffer->Unlock();
                     }
                     
-                    buffer->ClearDataLost();
+                    buffer->Unlock();
                 }
             }
         }

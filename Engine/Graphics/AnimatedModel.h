@@ -166,8 +166,8 @@ private:
     void SetSkeleton(const Skeleton& skeleton, bool createBones);
     /// %Set mapping of subgeometry bone indices.
     void SetGeometryBoneMappings();
-    /// Clone geometries as required.
-    void CloneGeometries(unsigned morphElementMask);
+    /// Clone geometries for vertex morphing.
+    void CloneGeometries();
     /// Copy morph vertices.
     void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
     /// Recalculate animations. Called from UpdateNode().
@@ -201,6 +201,8 @@ private:
     mutable VectorBuffer attrBuffer_;
     /// The frame number animation LOD distance was last calculated on.
     unsigned animationLodFrameNumber_;
+    /// Morph vertex element mask.
+    unsigned morphElementMask_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.

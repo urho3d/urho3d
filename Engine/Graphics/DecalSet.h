@@ -154,7 +154,7 @@ private:
     /// Get triangle faces from the target geometry.
     void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Get triangle face from the target geometry.
-    void GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const unsigned char* srcData, unsigned i0, unsigned i1, unsigned i2, unsigned vertexSize, unsigned elementMask, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    void GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2, const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData, unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
     /// Get bones referenced by skinning data and remap the skinning indices. Return true if successful.
     bool GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices);
     /// Calculate UV coordinates for the decal.
