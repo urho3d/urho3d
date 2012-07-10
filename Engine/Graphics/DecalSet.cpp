@@ -28,7 +28,6 @@
 #include "Context.h"
 #include "DecalSet.h"
 #include "Geometry.h"
-#include "GeometryUtils.h"
 #include "Graphics.h"
 #include "Log.h"
 #include "Node.h"
@@ -45,6 +44,62 @@ static const unsigned DEFAULT_MAX_VERTICES = 512;
 static const unsigned STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
 static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS |
     MASK_BLENDINDICES;
+
+static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
+{
+    DecalVertex ret;
+    float t = d0 / (d0 - d1);
+    
+    ret.position_ = v0.position_ + t * (v1.position_ - v0.position_);
+    ret.normal_ = v0.normal_ + t * (v1.normal_ - v0.normal_);
+    if (skinned)
+    {
+        // Blend weights / indices can not be easily interpolated, choose the one that is nearer to the split plane
+        const DecalVertex& src = Abs(d0) < Abs(d1) ? v0 : v1;
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            ret.blendWeights_[i] = src.blendWeights_[i];
+            ret.blendIndices_[i] = src.blendIndices_[i];
+        }
+    }
+    
+    return ret;
+}
+
+static void ClipPolygon(PODVector<DecalVertex>& dest, const PODVector<DecalVertex>& src, const Plane& plane, bool skinned)
+{
+    unsigned last;
+    float lastDistance = 0.0f;
+    dest.Clear();
+    
+    if (src.Empty())
+        return;
+    
+    for (unsigned i = 0; i < src.Size(); ++i)
+    {
+        float distance = plane.Distance(src[i].position_);
+        if (distance >= 0.0f)
+        {
+            if (lastDistance < 0.0f)
+                dest.Push(ClipEdge(src[last], src[i], lastDistance, distance, skinned));
+            
+            dest.Push(src[i]);
+        }
+        else
+        {
+            if (lastDistance >= 0.0f && i != 0)
+                dest.Push(ClipEdge(src[last], src[i], lastDistance, distance, skinned));
+        }
+        
+        last = i;
+        lastDistance = distance;
+    }
+    
+    // Recheck the distances of the last and first vertices and add the final clipped vertex if applicable
+    float distance = plane.Distance(src[0].position_);
+    if ((lastDistance < 0.0f && distance >= 0.0f) || (lastDistance >= 0.0f && distance < 0.0f))
+        dest.Push(ClipEdge(src[last], src[0], lastDistance, distance, skinned));
+}
 
 void Decal::CalculateBoundingBox()
 {
@@ -256,11 +311,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             if (face.Empty())
                 continue;
             
-            tempFace.Resize(face.Size() + 2);
-            unsigned outVertices = ClipPolygon((float*)&face[0], (float*)&tempFace[0], face.Size(), sizeof(DecalVertex),
-                decalFrustum.planes_[i], skinned_ ? (sizeof(DecalVertex) - 4 * sizeof(float) - 4 * sizeof(unsigned char)) : 0);
-            tempFace.Resize(outVertices);
-            
+            ClipPolygon(tempFace, face, decalFrustum.planes_[i], skinned_);
             face = tempFace;
         }
     }
