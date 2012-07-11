@@ -79,6 +79,8 @@ struct Decal
     {
     }
     
+    /// Add a vertex.
+    void AddVertex(const DecalVertex& vertex);
     /// Calculate local-space bounding box.
     void CalculateBoundingBox();
     
@@ -90,6 +92,8 @@ struct Decal
     BoundingBox boundingBox_;
     /// Decal vertices.
     PODVector<DecalVertex> vertices_;
+    /// Decal indices.
+    PODVector<unsigned short> indices_;
 };
 
 /// Decal component.
@@ -159,8 +163,6 @@ private:
     bool GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices);
     /// Calculate UV coordinates for the decal.
     void CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV);
-    /// Calculate tangents for the decal.
-    void CalculateTangents(Decal& decal);
     /// Transform decal's vertices from the target geometry to the decal set local space.
     void TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector);
     /// Remove a decal by iterator and return iterator to the next decal.
@@ -169,10 +171,10 @@ private:
     void MarkDecalsDirty();
     /// Recalculate the local-space bounding box.
     void CalculateBoundingBox();
-    /// Resize decal vertex buffer.
+    /// Resize decal vertex and index buffers.
     void UpdateBufferSize();
-    /// Rewrite decal vertex buffer.
-    void UpdateVertexBuffer();
+    /// Rewrite decal vertex and index buffers.
+    void UpdateBuffers();
     /// Recalculate skinning.
     void UpdateSkinning();
     /// Update the batch (geometry type, shader data.)
@@ -186,6 +188,8 @@ private:
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Index buffer.
+    SharedPtr<IndexBuffer> indexBuffer_;
     /// Decals.
     List<Decal> decals_;
     /// Bones used for skinned decals.
@@ -196,8 +200,12 @@ private:
     BoundingBox boundingBox_;
     /// Vertices in the current decals.
     unsigned numVertices_;
+    /// Indices in the current decals.
+    unsigned numIndices_;
     /// Maximum vertices.
     unsigned maxVertices_;
+    /// Maximum indices.
+    unsigned maxIndices_;
     /// Skinned mode flag.
     bool skinned_;
     /// Vertex buffer needs resize flag.

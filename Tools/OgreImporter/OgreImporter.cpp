@@ -28,6 +28,7 @@
 #include "OgreImporterUtils.h"
 #include "ProcessUtils.h"
 #include "Sort.h"
+#include "Tangent.h"
 #include "XMLFile.h"
 
 #ifdef WIN32
@@ -796,92 +797,20 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 ModelIndexBuffer& iBuf = indexBuffers_[subGeometries_[i][j].indexBuffer_];
                 unsigned indexStart = subGeometries_[i][j].indexStart_;
                 unsigned indexCount = subGeometries_[i][j].indexCount_;
-                unsigned vertexCount = vBuf.vertices_.Size();
                 
                 // If already has tangents, do not regenerate
-                if (vBuf.elementMask_ & MASK_TANGENT)
+                if (vBuf.elementMask_ & MASK_TANGENT || vBuf.vertices_.Empty() || iBuf.indices_.Empty())
                     continue;
                 
                 vBuf.elementMask_ |= MASK_TANGENT;
                 
-                // Tangent generation from
-                // http://www.terathon.com/code/tangent.html
-                Vector3 *tan1 = new Vector3[vertexCount * 2];
-                Vector3 *tan2 = tan1 + vertexCount;
-                memset(tan1, 0, sizeof(Vector3) * vertexCount * 2);
-                
-                if ((vBuf.elementMask_ & (MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1)) != (MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1))
+                if ((vBuf.elementMask_ & (MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1)) != (MASK_POSITION | MASK_NORMAL |
+                    MASK_TEXCOORD1))
                     ErrorExit("To generate tangents, positions normals and texcoords are required");
                 
-                unsigned minVertex = M_MAX_UNSIGNED;
-                unsigned maxVertex = 0;
-                
-                for (unsigned a = indexStart; a < indexStart + indexCount; ++a)
-                {
-                    if (iBuf.indices_[a] < minVertex)
-                        minVertex = iBuf.indices_[a];
-                    if (iBuf.indices_[a] > maxVertex)
-                        maxVertex = iBuf.indices_[a];
-                }
-                
-                for (unsigned a = indexStart; a < indexStart + indexCount; a += 3)
-                {
-                    unsigned i1 = iBuf.indices_[a+0];
-                    unsigned i2 = iBuf.indices_[a+1];
-                    unsigned i3 = iBuf.indices_[a+2];
-                    
-                    const Vector3& v1 = vBuf.vertices_[i1].position_;
-                    const Vector3& v2 = vBuf.vertices_[i2].position_;
-                    const Vector3& v3 = vBuf.vertices_[i3].position_;
-                    
-                    const Vector2& w1 = vBuf.vertices_[i1].texCoord1_;
-                    const Vector2& w2 = vBuf.vertices_[i2].texCoord1_;
-                    const Vector2& w3 = vBuf.vertices_[i3].texCoord1_;
-                    
-                    float x1 = v2.x_ - v1.x_;
-                    float x2 = v3.x_ - v1.x_;
-                    float y1 = v2.y_ - v1.y_;
-                    float y2 = v3.y_ - v1.y_;
-                    float z1 = v2.z_ - v1.z_;
-                    float z2 = v3.z_ - v1.z_;
-                    
-                    float s1 = w2.x_ - w1.x_;
-                    float s2 = w3.x_ - w1.x_;
-                    float t1 = w2.y_ - w1.y_;
-                    float t2 = w3.y_ - w1.y_;
-                    
-                    float r = 1.0f / (s1 * t2 - s2 * t1);
-                    Vector3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
-                            (t2 * z1 - t1 * z2) * r);
-                    Vector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
-                            (s1 * z2 - s2 * z1) * r);
-                    
-                    tan1[i1] += sdir;
-                    tan1[i2] += sdir;
-                    tan1[i3] += sdir;
-                    
-                    tan2[i1] += tdir;
-                    tan2[i2] += tdir;
-                    tan2[i3] += tdir;
-                }
-                
-                for (unsigned a = minVertex; a <= maxVertex; a++)
-                {
-                    const Vector3& n = vBuf.vertices_[a].normal_;
-                    const Vector3& t = tan1[a];
-                    Vector3 xyz;
-                    float w;
-                    
-                    // Gram-Schmidt orthogonalize
-                    xyz = (t - n * n.DotProduct(t)).Normalized();
-                    
-                    // Calculate handedness
-                    w = n.CrossProduct(t).DotProduct(tan2[a]) < 0.0f ? -1.0f : 1.0f;
-                    
-                    vBuf.vertices_[a].tangent_ = Vector4(xyz, w);
-                }
-                
-                delete[] tan1;
+                GenerateTangents(&vBuf.vertices_[0], sizeof(ModelVertex), &iBuf.indices_[0], sizeof(unsigned), indexStart,
+                    indexCount, offsetof(ModelVertex, normal_), offsetof(ModelVertex, texCoord1_), offsetof(ModelVertex,
+                    tangent_));
                 
                 PrintLine("Generated tangents");
             }

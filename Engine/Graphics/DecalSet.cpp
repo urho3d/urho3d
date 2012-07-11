@@ -36,6 +36,7 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "Tangent.h"
 #include "VertexBuffer.h"
 
 #include "DebugNew.h"
@@ -102,6 +103,22 @@ static void ClipPolygon(PODVector<DecalVertex>& dest, const PODVector<DecalVerte
         dest.Push(ClipEdge(src[last], src[0], lastDistance, distance, skinned));
 }
 
+void Decal::AddVertex(const DecalVertex& vertex)
+{
+    for (unsigned i = 0; i < vertices_.Size(); ++i)
+    {
+        if (vertex.position_.Equals(vertices_[i].position_) && vertex.normal_.Equals(vertices_[i].normal_))
+        {
+            indices_.Push(i);
+            return;
+        }
+    }
+    
+    unsigned short newIndex = vertices_.Size();
+    vertices_.Push(vertex);
+    indices_.Push(newIndex);
+}
+
 void Decal::CalculateBoundingBox()
 {
     boundingBox_.Clear();
@@ -115,8 +132,11 @@ DecalSet::DecalSet(Context* context) :
     Drawable(context),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
+    indexBuffer_(new IndexBuffer(context_)),
     numVertices_(0),
+    numIndices_(0),
     maxVertices_(DEFAULT_MAX_VERTICES),
+    maxIndices_(DEFAULT_MAX_VERTICES * 2),
     skinned_(false),
     bufferSizeDirty_(true),
     bufferDirty_(true),
@@ -125,6 +145,8 @@ DecalSet::DecalSet(Context* context) :
     assignBonesPending_(false)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
+    
+    geometry_->SetIndexBuffer(indexBuffer_);
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -175,8 +197,8 @@ void DecalSet::UpdateGeometry(const FrameInfo& frame)
     if (bufferSizeDirty_)
         UpdateBufferSize();
     
-    if (bufferDirty_ || vertexBuffer_->IsDataLost())
-        UpdateVertexBuffer();
+    if (bufferDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
+        UpdateBuffers();
     
     if (skinningDirty_)
         UpdateSkinning();
@@ -184,7 +206,7 @@ void DecalSet::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType DecalSet::GetUpdateGeometryType()
 {
-    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost())
+    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else if (skinningDirty_)
         return UPDATE_WORKER_THREAD;
@@ -200,12 +222,17 @@ void DecalSet::SetMaterial(Material* material)
 
 void DecalSet::SetMaxVertices(unsigned num)
 {
+    // Never expand to 32 bit indices
+    if (num > 65536)
+        num = 65536;
+    
     if (num != maxVertices_)
     {
         bufferSizeDirty_ = true;
         maxVertices_ = num;
+        maxIndices_ = num * 2;
         
-        while (decals_.Size() && numVertices_ > maxVertices_)
+        while (decals_.Size() && (numVertices_ > maxVertices_ || numIndices_ > maxIndices_))
             RemoveDecals(1);
         
         MarkNetworkUpdate();
@@ -326,9 +353,9 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         
         for (unsigned j = 2; j < face.Size(); ++j)
         {
-            newDecal.vertices_.Push(face[0]);
-            newDecal.vertices_.Push(face[j - 1]);
-            newDecal.vertices_.Push(face[j]);
+            newDecal.AddVertex(face[0]);
+            newDecal.AddVertex(face[j - 1]);
+            newDecal.AddVertex(face[j]);
         }
     }
     
@@ -339,7 +366,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return true;
     }
     
-    if (newDecal.vertices_.Size() > maxVertices_)
+    if (newDecal.vertices_.Size() > maxVertices_ || newDecal.indices_.Size() > maxIndices_)
     {
         LOGWARNING("Can not add decal, vertex count " + String(newDecal.vertices_.Size()) + " exceeds maximum " +
             String(maxVertices_));
@@ -351,10 +378,13 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     Matrix3x4 decalTransform = node_->GetWorldTransform().Inverse() * target->GetNode()->GetWorldTransform();
     CalculateUVs(newDecal, frustumTransform.Inverse(), size, aspectRatio, depth, topLeftUV, bottomRightUV);
     TransformVertices(newDecal, skinned_ ? Matrix3x4::IDENTITY : decalTransform, biasVector);
-    CalculateTangents(newDecal);
+    GenerateTangents(&newDecal.vertices_[0], sizeof(DecalVertex), &newDecal.indices_[0], sizeof(unsigned short), 0,
+        newDecal.indices_.Size(), offsetof(DecalVertex, normal_), offsetof(DecalVertex, texCoord_), offsetof(DecalVertex,
+        tangent_));
     
     newDecal.CalculateBoundingBox();
     numVertices_ += newDecal.vertices_.Size();
+    numIndices_ += newDecal.indices_.Size();
     
     // Subscribe to scene post-update if defined a time-limited decal
     Scene* scene = GetScene();
@@ -362,7 +392,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
     
     // Remove oldest decals if total vertices exceeded
-    while (decals_.Size() && numVertices_ > maxVertices_)
+    while (decals_.Size() && (numVertices_ > maxVertices_ || numIndices_ > maxIndices_))
         RemoveDecals(1);
     
     LOGDEBUG("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
@@ -386,6 +416,7 @@ void DecalSet::RemoveAllDecals()
     {
         decals_.Clear();
         numVertices_ = 0;
+        numIndices_ = 0;
         MarkDecalsDirty();
     }
     
@@ -430,6 +461,7 @@ void DecalSet::SetDecalsAttr(VariantVector value)
         newDecal.timer_ = value[index++].GetFloat();
         newDecal.timeToLive_ = value[index++].GetFloat();
         newDecal.vertices_.Resize(value[index++].GetInt());
+        newDecal.indices_.Resize(value[index++].GetInt());
         
         for (PODVector<DecalVertex>::Iterator i = newDecal.vertices_.Begin(); i != newDecal.vertices_.End(); ++i)
         {
@@ -449,8 +481,12 @@ void DecalSet::SetDecalsAttr(VariantVector value)
             }
         }
         
+        for (PODVector<unsigned short>::Iterator i = newDecal.indices_.Begin(); i != newDecal.indices_.End(); ++i)
+            *i = value[index++].GetInt();
+        
         newDecal.CalculateBoundingBox();
         numVertices_ += newDecal.vertices_.Size();
+        numIndices_ += newDecal.indices_.Size();
         
         // Subscribe to scene post-update if defined a time-limited decal
         if (newDecal.timeToLive_ > 0.0f && scene && !HasSubscribedToEvent(scene, E_SCENEPOSTUPDATE))
@@ -509,6 +545,7 @@ VariantVector DecalSet::GetDecalsAttr() const
         ret.Push(i->timer_);
         ret.Push(i->timeToLive_);
         ret.Push(i->vertices_.Size());
+        ret.Push(i->indices_.Size());
         
         for (PODVector<DecalVertex>::ConstIterator j = i->vertices_.Begin(); j != i->vertices_.End(); ++j)
         {
@@ -523,6 +560,9 @@ VariantVector DecalSet::GetDecalsAttr() const
                 ret.Push(*indices);
             }
         }
+        
+        for (PODVector<unsigned short>::ConstIterator j = i->indices_.Begin(); j != i->indices_.End(); ++j)
+            ret.Push((int)*j);
     }
     
     if (skinned_)
@@ -858,55 +898,6 @@ void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, flo
     }
 }
 
-void DecalSet::CalculateTangents(Decal& decal)
-{
-    for (unsigned i = 0; i < decal.vertices_.Size(); i += 3)
-    {
-        // Tangent generation from
-        // http://www.terathon.com/code/tangent.html
-        const Vector3& v1 = decal.vertices_[i].position_;
-        const Vector3& v2 = decal.vertices_[i + 1].position_;
-        const Vector3& v3 = decal.vertices_[i + 2].position_;
-        
-        const Vector2& w1 = decal.vertices_[i].texCoord_;
-        const Vector2& w2 = decal.vertices_[i + 1].texCoord_;
-        const Vector2& w3 = decal.vertices_[i + 2].texCoord_;
-        
-        float x1 = v2.x_ - v1.x_;
-        float x2 = v3.x_ - v1.x_;
-        float y1 = v2.y_ - v1.y_;
-        float y2 = v3.y_ - v1.y_;
-        float z1 = v2.z_ - v1.z_;
-        float z2 = v3.z_ - v1.z_;
-        
-        float s1 = w2.x_ - w1.x_;
-        float s2 = w3.x_ - w1.x_;
-        float t1 = w2.y_ - w1.y_;
-        float t2 = w3.y_ - w1.y_;
-        
-        float r = 1.0f / (s1 * t2 - s2 * t1);
-        Vector3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
-                (t2 * z1 - t1 * z2) * r);
-        Vector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
-                (s1 * z2 - s2 * z1) * r);
-        
-        for (unsigned j = i; j < i + 3; ++j)
-        {
-            const Vector3& n = decal.vertices_[j].normal_;
-            Vector3 xyz;
-            float w;
-            
-            // Gram-Schmidt orthogonalize
-            xyz = (sdir - n * n.DotProduct(sdir)).Normalized();
-            
-            // Calculate handedness
-            w = n.CrossProduct(sdir).DotProduct(tdir) < 0.0f ? -1.0f : 1.0f;
-            
-            decal.vertices_[j].tangent_ = Vector4(xyz, w);
-        }
-    }
-}
-
 void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector)
 {
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
@@ -919,6 +910,7 @@ void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform, const
 List<Decal>::Iterator DecalSet::RemoveDecal(List<Decal>::Iterator i)
 {
     numVertices_ -= i->vertices_.Size();
+    numIndices_ -= i->indices_.Size();
     MarkDecalsDirty();
     return decals_.Erase(i);
 }
@@ -944,55 +936,62 @@ void DecalSet::CalculateBoundingBox()
 
 void DecalSet::UpdateBufferSize()
 {
-    if (!skinned_)
-        vertexBuffer_->SetSize(maxVertices_, STATIC_ELEMENT_MASK);
-    else
-        vertexBuffer_->SetSize(maxVertices_, SKINNED_ELEMENT_MASK);
-    
+    vertexBuffer_->SetSize(maxVertices_, skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK);
+    indexBuffer_->SetSize(maxIndices_, false);
     geometry_->SetVertexBuffer(0, vertexBuffer_);
+    
     bufferDirty_ = true;
     bufferSizeDirty_ = false;
 }
 
-void DecalSet::UpdateVertexBuffer()
+void DecalSet::UpdateBuffers()
 {
-    geometry_->SetDrawRange(TRIANGLE_LIST, 0, 0, 0, numVertices_);
+    geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
     
-    float* dest = (float*)vertexBuffer_->Lock(0, numVertices_);
-    if (dest)
+    float* vertices = (float*)vertexBuffer_->Lock(0, numVertices_);
+    unsigned short* indices = (unsigned short*)indexBuffer_->Lock(0, numIndices_);
+    unsigned short indexStart = 0;
+    
+    if (vertices && indices)
     {
         for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
         {
             for (unsigned j = 0; j < i->vertices_.Size(); ++j)
             {
                 const DecalVertex& vertex = i->vertices_[j];
-                *dest++ = vertex.position_.x_;
-                *dest++ = vertex.position_.y_;
-                *dest++ = vertex.position_.z_;
-                *dest++ = vertex.normal_.x_;
-                *dest++ = vertex.normal_.y_;
-                *dest++ = vertex.normal_.z_;
-                *dest++ = vertex.texCoord_.x_;
-                *dest++ = vertex.texCoord_.y_;
-                *dest++ = vertex.tangent_.x_;
-                *dest++ = vertex.tangent_.y_;
-                *dest++ = vertex.tangent_.z_;
-                *dest++ = vertex.tangent_.w_;
+                *vertices++ = vertex.position_.x_;
+                *vertices++ = vertex.position_.y_;
+                *vertices++ = vertex.position_.z_;
+                *vertices++ = vertex.normal_.x_;
+                *vertices++ = vertex.normal_.y_;
+                *vertices++ = vertex.normal_.z_;
+                *vertices++ = vertex.texCoord_.x_;
+                *vertices++ = vertex.texCoord_.y_;
+                *vertices++ = vertex.tangent_.x_;
+                *vertices++ = vertex.tangent_.y_;
+                *vertices++ = vertex.tangent_.z_;
+                *vertices++ = vertex.tangent_.w_;
                 if (skinned_)
                 {
-                    *dest++ = vertex.blendWeights_[0];
-                    *dest++ = vertex.blendWeights_[1];
-                    *dest++ = vertex.blendWeights_[2];
-                    *dest++ = vertex.blendWeights_[3];
-                    *dest++ = *((float*)vertex.blendIndices_);
+                    *vertices++ = vertex.blendWeights_[0];
+                    *vertices++ = vertex.blendWeights_[1];
+                    *vertices++ = vertex.blendWeights_[2];
+                    *vertices++ = vertex.blendWeights_[3];
+                    *vertices++ = *((float*)vertex.blendIndices_);
                 }
             }
+            
+            for (unsigned j = 0; j < i->indices_.Size(); ++j)
+                *indices++ = i->indices_[j] + indexStart;
+            
+            indexStart += i->vertices_.Size();
         }
-        
-        vertexBuffer_->Unlock();
     }
     
+    vertexBuffer_->Unlock();
     vertexBuffer_->ClearDataLost();
+    indexBuffer_->Unlock();
+    indexBuffer_->ClearDataLost();
     bufferDirty_ = false;
 }
 
