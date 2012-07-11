@@ -765,8 +765,11 @@ static void RegisterDecalSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DecalSet", "Material@+ get_material() const", asMETHOD(DecalSet, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_numDecals() const", asMETHOD(DecalSet, GetNumDecals), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_numVertices() const", asMETHOD(DecalSet, GetNumVertices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "uint get_numIndices() const", asMETHOD(DecalSet, GetNumVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_maxVertices(uint)", asMETHOD(DecalSet, SetMaxVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_maxVertices() const", asMETHOD(DecalSet, GetMaxVertices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void set_maxIndices(uint)", asMETHOD(DecalSet, SetMaxIndices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "uint get_maxIndices() const", asMETHOD(DecalSet, GetMaxIndices), asCALL_THISCALL);
 }
 
 static CScriptArray* GraphicsGetResolutions(Graphics* ptr)

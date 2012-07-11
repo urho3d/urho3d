@@ -2322,7 +2322,9 @@ Properties:<br>
 - Material@ material
 - uint numDecals (readonly)
 - uint numVertices (readonly)
+- uint numIndices (readonly)
 - uint maxVertices
+- uint maxIndices
 
 
 RayQueryResult
