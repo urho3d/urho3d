@@ -388,10 +388,17 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return true;
     }
     
-    if (newDecal.vertices_.Size() > maxVertices_ || newDecal.indices_.Size() > maxIndices_)
+    if (newDecal.vertices_.Size() > maxVertices_)
     {
         LOGWARNING("Can not add decal, vertex count " + String(newDecal.vertices_.Size()) + " exceeds maximum " +
             String(maxVertices_));
+        decals_.Pop();
+        return false;
+    }
+    if (newDecal.indices_.Size() > maxIndices_)
+    {
+        LOGWARNING("Can not add decal, index count " + String(newDecal.indices_.Size()) + " exceeds maximum " +
+            String(maxIndices_));
         decals_.Pop();
         return false;
     }

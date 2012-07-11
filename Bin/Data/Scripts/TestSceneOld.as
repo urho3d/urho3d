@@ -500,11 +500,11 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ui.cursor.visible = false;
 
     // Test creating a new physics object
-    if (button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+    if (button == MOUSEB_LEFT && !input.qualifierDown(QUAL_SHIFT) && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
         Vector3 position = eventData["Pos"].GetVector3();
         Quaternion rotation = eventData["Rot"].GetQuaternion();
-    
+
         Node@ newNode = testScene.CreateChild();
         newNode.position = cameraNode.position;
         newNode.rotation = cameraNode.rotation;
@@ -555,7 +555,7 @@ void HandlePostRenderUpdate()
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
 
-            if (input.mouseButtonPress[MOUSEB_MIDDLE])
+            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
             {
                 DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
                 if (decal is null)

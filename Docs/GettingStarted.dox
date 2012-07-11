@@ -95,7 +95,7 @@ Key and mouse controls:
 WSAD        Move
 Left mouse  Create a new physics object; characters will ragdoll when hit
 Right mouse Hold and move mouse to rotate view
-Mid mouse   Paint a decal into the mouse cursor hit location
+Shift+LMB   Paint a decal into the mouse cursor hit location
 Space       Toggle debug geometry
 F1          Toggle AngelScript console
 F5          Save scene
