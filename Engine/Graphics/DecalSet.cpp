@@ -538,11 +538,7 @@ void DecalSet::SetDecalsAttr(VariantVector value)
                 newBone.radius_ = boneData.ReadFloat();
             if (newBone.collisionMask_ & BONECOLLISION_BOX)
                 newBone.boundingBox_ = boneData.ReadBoundingBox();
-            
-            Vector4* offsetMatrix = (Vector4*)newBone.offsetMatrix_.Data();
-            offsetMatrix[0] = boneData.ReadVector4();
-            offsetMatrix[1] = boneData.ReadVector4();
-            offsetMatrix[2] = boneData.ReadVector4();
+            boneData.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
         }
         
         assignBonesPending_ = true;
@@ -609,11 +605,7 @@ VariantVector DecalSet::GetDecalsAttr() const
                 boneData.WriteFloat(i->radius_);
             if (i->collisionMask_ & BONECOLLISION_BOX)
                 boneData.WriteBoundingBox(i->boundingBox_);
-            
-            const Vector4* offsetMatrix = (const Vector4*)i->offsetMatrix_.Data();
-            boneData.WriteVector4(offsetMatrix[0]);
-            boneData.WriteVector4(offsetMatrix[1]);
-            boneData.WriteVector4(offsetMatrix[2]);
+            boneData.Write(i->offsetMatrix_.Data(), sizeof(Matrix3x4));
             
             ret.Push(boneData.GetBuffer());
         }
