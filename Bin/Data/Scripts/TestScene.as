@@ -394,7 +394,8 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ui.cursor.visible = false;
 
     // Test creating a new physics object
-    if (button == MOUSEB_LEFT && !input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+    if (button == MOUSEB_LEFT && !input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null &&
+        ui.focusElement is null)
     {
         VariantMap eventData;
         eventData["Pos"] = cameraNode.position;
@@ -465,7 +466,8 @@ void HandlePostRenderUpdate()
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
 
-            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true)
+                is null && ui.focusElement is null)
             {
                 DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
                 if (decal is null)
@@ -473,7 +475,8 @@ void HandlePostRenderUpdate()
                     decal = result.drawable.node.CreateComponent("DecalSet");
                     decal.material = cache.GetResource("Material", "Materials/Test.xml");
                 }
-                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1), cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
+                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
+                    cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
             }
         }
     }
@@ -509,7 +512,7 @@ void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
 void CreateRagdoll(AnimatedModel@ model)
 {
     Node@ root = model.node;
-    
+
     CreateRagdollBone(root, "Bip01_Pelvis", SHAPE_CAPSULE, Vector3(0.3, 0.3, 0.3), Vector3(0.0, 0, 0), Quaternion(0, 0, 0));
     CreateRagdollBone(root, "Bip01_Spine1", SHAPE_CAPSULE, Vector3(0.3, 0.4, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
     CreateRagdollBone(root, "Bip01_L_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
@@ -539,12 +542,13 @@ void CreateRagdoll(AnimatedModel@ model)
         skel.bones[i].animated = false;
 }
 
-void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position, const Quaternion&in rotation)
+void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position,
+    const Quaternion&in rotation)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     if (boneNode is null || boneNode.HasComponent("RigidBody"))
         return;
-    
+
     // In networked operation both client and server detect collisions separately, and create ragdolls on their own
     // (bones are not synced over network.) To prevent replicated component ID range clashes when the client creates
     // any components, it is important that the LOCAL creation mode is specified.
@@ -562,13 +566,14 @@ void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, con
     shape.rotation = rotation;
 }
 
-void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type, const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
+void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type,
+    const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     Node@ parentNode = root.GetChild(parentName, true);
     if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
         return;
-        
+
     Constraint@ constraint = boneNode.CreateComponent("Constraint", LOCAL);
     constraint.constraintType = type;
     constraint.disableCollision = true;

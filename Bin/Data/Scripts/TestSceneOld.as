@@ -500,7 +500,8 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ui.cursor.visible = false;
 
     // Test creating a new physics object
-    if (button == MOUSEB_LEFT && !input.qualifierDown(QUAL_SHIFT) && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+    if (button == MOUSEB_LEFT && !input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null &&
+        ui.focusElement is null)
     {
         Vector3 position = eventData["Pos"].GetVector3();
         Quaternion rotation = eventData["Rot"].GetQuaternion();
@@ -555,7 +556,8 @@ void HandlePostRenderUpdate()
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
 
-            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true)
+                is null && ui.focusElement is null)
             {
                 DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
                 if (decal is null)
@@ -563,7 +565,8 @@ void HandlePostRenderUpdate()
                     decal = result.drawable.node.CreateComponent("DecalSet");
                     decal.material = cache.GetResource("Material", "Materials/Test.xml");
                 }
-                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1), cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
+                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
+                    cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
             }
         }
     }
@@ -622,12 +625,13 @@ void CreateRagdoll(AnimatedModel@ model)
         skel.bones[i].animated = false;
 }
 
-void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position, const Quaternion&in rotation)
+void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position,
+    const Quaternion&in rotation)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     if (boneNode is null || boneNode.HasComponent("RigidBody"))
         return;
-    
+
     RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL);
     body.mass = 1.0;
     body.linearDamping = 0.05;
@@ -642,13 +646,14 @@ void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, con
     shape.rotation = rotation;
 }
 
-void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type, const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
+void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type,
+    const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
 {
     Node@ boneNode = root.GetChild(boneName, true);
     Node@ parentNode = root.GetChild(parentName, true);
     if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
         return;
-        
+
     Constraint@ constraint = boneNode.CreateComponent("Constraint", LOCAL);
     constraint.constraintType = type;
     constraint.disableCollision = true;
