@@ -647,7 +647,7 @@ void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
 
 void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
 {
-    if (!instances_.Size())
+    if (!instances_.Size() || (!geometry_->GetIndexCount() && !geometry_->GetVertexCount()))
         return;
     
     // Draw as individual objects if instancing not supported
