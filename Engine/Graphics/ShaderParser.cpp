@@ -184,6 +184,61 @@ void ShaderParser::BuildCombinations(Vector<ShaderOption>& options, const Vector
             ++numVariationGroups;
     }
     
+    // Preprocess includes/excludes for faster combination handling
+    for (Vector<ShaderOption>::Iterator i = options.Begin(); i != options.End(); ++i)
+    {
+        i->excludeIndices_.Resize(i->excludes_.Size());
+        i->includeIndices_.Resize(i->includes_.Size());
+        
+        for (unsigned j = 0; j < i->excludes_.Size(); ++j)
+            i->excludeIndices_[j] = nameToIndex[i->excludes_[j]];
+        for (unsigned j = 0; j < i->includes_.Size(); ++j)
+            i->includeIndices_[j] = nameToIndex[i->includes_[j]];
+    }
+    
+    // Preprocess requirements
+    for (unsigned i = 0; i < options.Size(); ++i)
+    {
+        for (unsigned j = 0; j < options[i].requires_.Size(); ++j)
+        {
+            unsigned bits = 0;
+            for (unsigned l = 0; l < options.Size(); ++l)
+            {
+                if (l != i)
+                {
+                    if (options[l].name_ == options[i].requires_[j])
+                        bits |= 1 << l;
+                    else
+                    {
+                        for (unsigned m = 0; m < options[l].defines_.Size(); ++m)
+                        {
+                            if (options[l].defines_[m] == options[i].requires_[j])
+                            {
+                                bits |= 1 << l;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // If requirements are not satisfied by any option, check global defines
+            if (!bits)
+            {
+                for (unsigned l = 0; l < globalDefines.Size(); ++l)
+                {
+                    if (globalDefines[l] == options[i].requires_[j])
+                    {
+                        bits |= 0x80000000;
+                        break;
+                    }
+                }
+            }
+            
+            options[i].requirementBits_.Push(bits);
+        }
+    }
+    
     for (unsigned i = 0; i < combinations; ++i)
     {
         // Variations/options active on this particular combination
@@ -191,22 +246,16 @@ void ShaderParser::BuildCombinations(Vector<ShaderOption>& options, const Vector
         unsigned variationsActive = 0;
         bool skipThis = false;
         
-        // Check for excludes/includes/requires
+        // Check for excludes & includes first
         for (unsigned j = 0; j < options.Size(); ++j)
         {
             if ((active >> j) & 1)
             {
-                for (unsigned k = 0; k < options[j].includes_.Size(); ++k)
-                {
-                    if (nameToIndex.Contains(options[j].includes_[k]))
-                        active |= (1 << nameToIndex[options[j].includes_[k]]);
-                }
+                for (unsigned k = 0; k < options[j].includeIndices_.Size(); ++k)
+                    active |= 1 << options[j].includeIndices_[k];
                 
-                for (unsigned k = 0; k < options[j].excludes_.Size(); ++k)
-                {
-                    if (nameToIndex.Contains(options[j].excludes_[k]))
-                        active &= ~(1 << nameToIndex[options[j].excludes_[k]]);
-                }
+                for (unsigned k = 0; k < options[j].excludeIndices_.Size(); ++k)
+                    active &= ~(1 << options[j].excludeIndices_[k]);
                 
                 // Skip dummy separators (options without name and defines)
                 if (options[j].name_.Empty() && !options[j].isVariation_ && options[j].defines_.Empty())
@@ -232,53 +281,31 @@ void ShaderParser::BuildCombinations(Vector<ShaderOption>& options, const Vector
                     
                     ++variationsActive;
                 }
-                
-                for (unsigned k = 0; k < options[j].requires_.Size(); ++k)
-                {
-                    bool requireFound = false;
-                    
-                    for (unsigned l = 0; l < globalDefines.Size(); ++l)
-                    {
-                        if (globalDefines[l] == options[j].requires_[k])
-                        {
-                            requireFound = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!requireFound)
-                    {
-                        for (unsigned l = 0; l < options.Size(); ++l)
-                        {
-                            if ((active >> l) & 1 && l != j)
-                            {
-                                if (options[l].name_ == options[j].requires_[k])
-                                {
-                                    requireFound = true;
-                                    break;
-                                }
-                                for (unsigned m = 0; m < options[l].defines_.Size(); ++m)
-                                {
-                                    if (options[l].defines_[m] == options[j].requires_[k])
-                                    {
-                                        requireFound = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (requireFound)
-                                break;
-                        }
-                    }
-                    
-                    if (!requireFound)
-                        skipThis = true;
-                }
             }
         }
         
         // Check that combination is correct: a variation chosen from all groups, and is unique
-        if (variationsActive < numVariationGroups || skipThis || usedCombinations.Contains(active))
+        if (variationsActive < numVariationGroups || usedCombinations.Contains(active))
+            continue;
+        
+        // Check for required defines, which may yet cause this combination to be skipped
+        unsigned compareBits = active | 0x80000000;
+        for (unsigned j = 0; j < options.Size(); ++j)
+        {
+            if (active & (1 << j))
+            {
+                for (unsigned l = 0; l < options[j].requirementBits_.Size(); ++l)
+                {
+                    if (!(compareBits & options[j].requirementBits_[l]))
+                    {
+                        skipThis = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (skipThis)
             continue;
         
         ShaderCombination newCombination;
