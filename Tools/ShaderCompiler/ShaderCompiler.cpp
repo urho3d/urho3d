@@ -28,7 +28,6 @@
 #include "List.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
-#include "Set.h"
 #include "ShaderParser.h"
 #include "StringUtils.h"
 #include "Thread.h"
@@ -289,23 +288,26 @@ void CompileShader(const String& fileName)
         if (!vsParser.Parse(VS, shaders, defines_, defineValues_))
             ErrorExit("VS: " + vsParser.GetErrorMessage());
         
-        const Vector<ShaderCombination>& combinations = vsParser.GetCombinations();
-        for (unsigned i = 0; i < combinations.Size(); ++i)
+        const HashMap<String, unsigned>& combinations = vsParser.GetAllCombinations();
+        for (HashMap<String, unsigned>::ConstIterator i = combinations.Begin(); i != combinations.End(); ++i)
         {
-            if (!compileVariation_ || combinations[i].name_ == variationName_)
+            if (!compileVariation_ || i->first_ == variationName_)
             {
+                ShaderCombination src;
                 CompiledVariation compile;
+                vsParser.GetCombination(src, i->first_);
+                
                 compile.type_ = VS;
                 compile.name_ = file;
                 compile.outFileName_ = inDir_ + file;
-                if (!combinations[i].name_.Empty())
+                if (!src.name_.Empty())
                 {
-                    compile.name_ += "_" + combinations[i].name_;
-                    compile.outFileName_ += "_" + combinations[i].name_;
+                    compile.name_ += "_" + src.name_;
+                    compile.outFileName_ += "_" + src.name_;
                 }
                 compile.outFileName_ += useSM3_ ? ".vs3" : ".vs2";
-                compile.defines_ = combinations[i].defines_;
-                compile.defineValues_ = combinations[i].defineValues_;
+                compile.defines_ = src.defines_;
+                compile.defineValues_ = src.defineValues_;
                 
                 variations_.Push(compile);
                 workList_.Push(&variations_.Back());
@@ -319,23 +321,26 @@ void CompileShader(const String& fileName)
         if (!psParser.Parse(PS, shaders, defines_, defineValues_))
             ErrorExit("PS: " + psParser.GetErrorMessage());
         
-        const Vector<ShaderCombination>& combinations = psParser.GetCombinations();
-        for (unsigned i = 0; i < combinations.Size(); ++i)
+        const HashMap<String, unsigned>& combinations = psParser.GetAllCombinations();
+        for (HashMap<String, unsigned>::ConstIterator i = combinations.Begin(); i != combinations.End(); ++i)
         {
-            if (!compileVariation_ || combinations[i].name_ == variationName_)
+            if (!compileVariation_ || i->first_ == variationName_)
             {
+                ShaderCombination src;
                 CompiledVariation compile;
+                psParser.GetCombination(src, i->first_);
+                
                 compile.type_ = PS;
                 compile.name_ = file;
                 compile.outFileName_ = inDir_ + file;
-                if (!combinations[i].name_.Empty())
+                if (!src.name_.Empty())
                 {
-                    compile.name_ += "_" + combinations[i].name_;
-                    compile.outFileName_ += "_" + combinations[i].name_;
+                    compile.name_ += "_" + src.name_;
+                    compile.outFileName_ += "_" + src.name_;
                 }
                 compile.outFileName_ += useSM3_ ? ".ps3" : ".ps2";
-                compile.defines_ = combinations[i].defines_;
-                compile.defineValues_ = combinations[i].defineValues_;
+                compile.defines_ = src.defines_;
+                compile.defineValues_ = src.defineValues_;
                 
                 variations_.Push(compile);
                 workList_.Push(&variations_.Back());

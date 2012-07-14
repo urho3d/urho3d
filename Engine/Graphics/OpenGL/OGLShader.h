@@ -24,8 +24,8 @@
 #pragma once
 
 #include "ArrayPtr.h"
-#include "HashMap.h"
 #include "Resource.h"
+#include "ShaderParser.h"
 
 class ShaderVariation;
 
@@ -60,6 +60,10 @@ private:
     unsigned vsSourceCodeLength_;
     /// Pixel shader code length.
     unsigned psSourceCodeLength_;
+    /// Vertex shader variation parser.
+    ShaderParser vsParser_;
+    /// Pixel shader variation parser.
+    ShaderParser psParser_;
     /// Vertex shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
     /// Pixel shader variations.

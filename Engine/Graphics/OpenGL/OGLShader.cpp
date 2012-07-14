@@ -30,7 +30,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Shader.h"
-#include "ShaderParser.h"
 #include "ShaderVariation.h"
 #include "XMLFile.h"
 
@@ -62,7 +61,6 @@ bool Shader::Load(Deserializer& source)
     if (!graphics)
         return false;
     
-    unsigned memoryUse = sizeof(Shader);
     vsSourceCodeLength_ = 0;
     psSourceCodeLength_ = 0;
     
@@ -70,19 +68,14 @@ bool Shader::Load(Deserializer& source)
     if (!xml->Load(source))
         return false;
     
-    ShaderParser vsParser;
-    ShaderParser psParser;
-    Vector<String> globalDefines;
-    Vector<String> globalDefineValues;
-    
-    if (!vsParser.Parse(VS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
+    if (!vsParser_.Parse(VS, xml->GetRoot("shaders")))
     {
-        LOGERROR("VS: " + vsParser.GetErrorMessage());
+        LOGERROR("VS: " + vsParser_.GetErrorMessage());
         return false;
     }
-    if (!psParser.Parse(PS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
+    if (!psParser_.Parse(PS, xml->GetRoot("shaders")))
     {
-        LOGERROR("PS: " + psParser.GetErrorMessage());
+        LOGERROR("PS: " + psParser_.GetErrorMessage());
         return false;
     }
     
@@ -94,54 +87,13 @@ bool Shader::Load(Deserializer& source)
     if (!ProcessSource(psSourceCode_, psSourceCodeLength_, path + fileName + ".frag"))
         return false;
     
-    const Vector<ShaderCombination>& vsCombinations = vsParser.GetCombinations();
-    for (Vector<ShaderCombination>::ConstIterator i = vsCombinations.Begin(); i != vsCombinations.End(); ++i)
-    {
-        StringHash nameHash(i->name_);
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = vsVariations_.Find(nameHash);
-        if (j == vsVariations_.End())
-            j = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-        else
-        {
-            // If shader variation already exists, release
-            j->second_->Release();
-        }
-        
-        String shaderName = path + fileName + "_" + i->name_;
-        if (shaderName.EndsWith("_"))
-            shaderName.Resize(shaderName.Length() - 1);
-        
-        j->second_->SetName(shaderName);
-        j->second_->SetSourceCode(vsSourceCode_, vsSourceCodeLength_);
-        j->second_->SetDefines(i->defines_, i->defineValues_);
-    }
+    // If variations had already been created, release them
+    for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Begin(); i != vsVariations_.End(); ++i)
+        i->second_->Release();
+    for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Begin(); i != psVariations_.End(); ++i)
+        i->second_->Release();
     
-    const Vector<ShaderCombination>& psCombinations = psParser.GetCombinations();
-    for (Vector<ShaderCombination>::ConstIterator i = psCombinations.Begin(); i != psCombinations.End(); ++i)
-    {
-        StringHash nameHash(i->name_);
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator j = psVariations_.Find(nameHash);
-        if (j == psVariations_.End())
-            j = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-        else
-        {
-            // If shader variation already exists, release
-            j->second_->Release();
-        }
-        
-        String shaderName = path + fileName + "_" + i->name_;
-        if (shaderName.EndsWith("_"))
-            shaderName.Resize(shaderName.Length() - 1);
-        
-        j->second_->SetName(shaderName);
-        j->second_->SetSourceCode(psSourceCode_, psSourceCodeLength_);
-        j->second_->SetDefines(i->defines_, i->defineValues_);
-    }
-    
-    memoryUse += (vsVariations_.Size() + psVariations_.Size()) * sizeof(ShaderVariation);
-    memoryUse += vsSourceCodeLength_;
-    memoryUse += psSourceCodeLength_;
-    SetMemoryUse(memoryUse);
+    SetMemoryUse(sizeof(Shader) + 2 * sizeof(ShaderParser) + vsSourceCodeLength_ + psSourceCodeLength_);
     
     return true;
 }
@@ -152,17 +104,59 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
     
     if (type == VS)
     {
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(nameHash);
-        if (i != vsVariations_.End())
+        if (vsParser_.HasCombination(name))
+        {
+            HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(nameHash);
+            // Create the shader variation now if not created yet
+            if (i == vsVariations_.End())
+            {
+                ShaderCombination combination;
+                vsParser_.GetCombination(combination, name);
+                
+                i = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
+                
+                String path, fileName, extension;
+                SplitPath(GetName(), path, fileName, extension);
+                String fullName = path + fileName + "_" + name;
+                if (fullName.EndsWith("_"))
+                    fullName.Resize(fullName.Length() - 1);
+                
+                i->second_->SetName(fullName);
+                i->second_->SetSourceCode(vsSourceCode_, vsSourceCodeLength_);
+                i->second_->SetDefines(combination.defines_, combination.defineValues_);
+            }
+            
             return i->second_;
+        }
         else
             return 0;
     }
     else
     {
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(nameHash);
-        if (i != psVariations_.End())
+        if (psParser_.HasCombination(name))
+        {
+            HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(nameHash);
+            // Create the shader variation now if not created yet
+            if (i == psVariations_.End())
+            {
+                ShaderCombination combination;
+                psParser_.GetCombination(combination, name);
+                
+                i = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
+                
+                String path, fileName, extension;
+                SplitPath(GetName(), path, fileName, extension);
+                String fullName = path + fileName + "_" + name;
+                if (fullName.EndsWith("_"))
+                    fullName.Resize(fullName.Length() - 1);
+                
+                i->second_->SetName(fullName);
+                i->second_->SetSourceCode(psSourceCode_, psSourceCodeLength_);
+                i->second_->SetDefines(combination.defines_, combination.defineValues_);
+            }
+            
             return i->second_;
+        }
         else
             return 0;
     }

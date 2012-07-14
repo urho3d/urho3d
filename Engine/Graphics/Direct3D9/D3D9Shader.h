@@ -56,6 +56,10 @@ private:
     String fullFileName_;
     /// Shader source last modified time.
     unsigned sourceModifiedTime_;
+    /// Vertex shader variation parser.
+    ShaderParser vsParser_;
+    /// Pixel shader variation parser.
+    ShaderParser psParser_;
     /// Vertex shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
     /// Pixel shader variations.

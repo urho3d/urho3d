@@ -1651,11 +1651,10 @@ void Graphics::ResetStreamFrequencies()
 
 void Graphics::SetForceSM2(bool enable)
 {
-    forceSM2_ = enable;
-    
-    // If screen mode has been set, recheck features
-    if (IsInitialized())
-        CheckFeatureSupport();
+    if (!IsInitialized())
+        forceSM2_ = enable;
+    else
+        LOGERROR("Force Shader Model 2 can not be changed after setting the initial screen mode");
 }
 
 bool Graphics::IsInitialized() const

@@ -190,7 +190,7 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
-    /// %Set force Shader Model 2 flag.
+    /// %Set force Shader Model 2 flag. Only effective before setting the initial screen mode.
     void SetForceSM2(bool enable);
     
     /// Return whether rendering initialized.

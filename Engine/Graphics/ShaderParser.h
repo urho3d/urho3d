@@ -24,6 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "HashMap.h"
 
 class XMLElement;
 
@@ -72,17 +73,29 @@ public:
     
     /// Return error message if parsing failed.
     String GetErrorMessage() const { return errorMessage_; }
-    /// Return shader combinations.
-    const Vector<ShaderCombination>& GetCombinations() const { return combinations_; }
+    /// Return number of combinations.
+    unsigned GetNumCombinations() const { return combinations_.Size(); }
+   /// Return all combinations.
+    const HashMap<String, unsigned>& GetAllCombinations() const { return combinations_; }
+    /// Return whether a shader combination exists.
+    bool HasCombination(const String& name) const;
+    /// Return a combination by name.
+    bool GetCombination(ShaderCombination& dest, const String& name) const;
     
 private:
     /// Parse options for a shader.
-    bool ParseOptions(Vector<ShaderOption>& dest, const XMLElement& element);
+    bool ParseOptions(const XMLElement& element);
     /// Construct shader combinations from the options.
-    void BuildCombinations(Vector<ShaderOption>& options, const Vector<String>& globalDefines, const Vector<String>& globalDefineValues);
+    void BuildCombinations();
     
     /// Error message.
     String errorMessage_;
-    /// Shader combinations.
-    Vector<ShaderCombination> combinations_;
+    /// Global defines.
+    Vector<String> globalDefines_;
+    /// Global define values.
+    Vector<String> globalDefineValues_;
+    /// Shader options.
+    Vector<ShaderOption> options_;
+    /// Available combinations.
+    HashMap<String, unsigned> combinations_;
 };
