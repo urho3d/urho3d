@@ -88,6 +88,8 @@ public:
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask);
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
     float GetDistance(const Ray& ray);
+    /// Return whether has empty draw range.
+    bool IsEmpty() const { return indexCount_ == 0 && vertexCount_ == 0; }
     
 private:
     /// Locate vertex buffer with position data.

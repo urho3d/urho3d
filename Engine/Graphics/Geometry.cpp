@@ -114,11 +114,19 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     indexCount_ = indexCount;
     
     // Get min.vertex index and num of vertices from index buffer. If it fails, use full range as fallback
-    vertexStart_ = 0;
-    vertexCount_ = vertexBuffers_[0]->GetVertexCount();
-    
-    if (getUsedVertexRange)
-        indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
+    if (indexCount)
+    {
+        vertexStart_ = 0;
+        vertexCount_ = vertexBuffers_[0]->GetVertexCount();
+        
+        if (getUsedVertexRange)
+            indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
+    }
+    else
+    {
+        vertexStart_ = 0;
+        vertexCount_ = 0;
+    }
     
     return true;
 }
