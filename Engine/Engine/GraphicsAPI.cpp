@@ -758,7 +758,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 static void RegisterDecalSet(asIScriptEngine* engine)
 {
     RegisterDrawable<DecalSet>(engine, "DecalSet");
-    engine->RegisterObjectMethod("DecalSet", "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float timeToLive = 0.0, float normalCutoff = 0.25, float depthBias = 0.0005, uint subGeometry = 0xffffffff)", asMETHOD(DecalSet, AddDecal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float timeToLive = 0.0, float normalCutoff = 0.1, float depthBias = 0.001, uint subGeometry = 0xffffffff)", asMETHOD(DecalSet, AddDecal), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void RemoveDecals(uint)", asMETHOD(DecalSet, RemoveDecals), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void RemoveAllDecals()", asMETHOD(DecalSet, RemoveAllDecals), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_material(Material@+)", asMETHOD(DecalSet, SetMaterial), asCALL_THISCALL);

@@ -126,7 +126,7 @@ class DecalSet : public Drawable
     /// %Set maximum number of decal vertex indices.
     void SetMaxIndices(unsigned num);
     /// Add a decal at world coordinates, using an existing drawable's geometry for reference. Return true if successful.
-    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.25f, float depthBias = 0.0005f, unsigned subGeometry = M_MAX_UNSIGNED);
+    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, float depthBias = 0.001f, unsigned subGeometry = M_MAX_UNSIGNED);
     /// Remove n oldest decals.
     void RemoveDecals(unsigned num);
     /// Remove all decals.

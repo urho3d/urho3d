@@ -429,7 +429,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                         decal.maxVertices = 2048;
                         decal.maxIndices = 4096;
                     }
-                    decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
+                    decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.5),
                         cameraNode.worldRotation, 0.5, 1.0, 1.0, Vector2(0, 0), Vector2(1, 1));
                 }
             }
