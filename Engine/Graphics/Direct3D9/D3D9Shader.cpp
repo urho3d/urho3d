@@ -148,7 +148,8 @@ bool Shader::Load(Deserializer& source)
         i->second_->SetByteCode(SharedArrayPtr<unsigned char>());
     }
     
-    SetMemoryUse(sizeof(Shader) + 2 * sizeof(ShaderParser));
+    SetMemoryUse(sizeof(Shader) + 2 * sizeof(ShaderParser) + (vsVariations_.Size() + psVariations_.Size()) *
+        sizeof(ShaderVariation));
     return true;
 }
 

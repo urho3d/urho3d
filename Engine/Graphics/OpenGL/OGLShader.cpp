@@ -93,7 +93,8 @@ bool Shader::Load(Deserializer& source)
     for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Begin(); i != psVariations_.End(); ++i)
         i->second_->Release();
     
-    SetMemoryUse(sizeof(Shader) + 2 * sizeof(ShaderParser) + vsSourceCodeLength_ + psSourceCodeLength_);
+    SetMemoryUse(sizeof(Shader) + 2 * sizeof(ShaderParser) + (vsVariations_.Size() + psVariations_.Size()) *
+        sizeof(ShaderVariation));
     
     return true;
 }
@@ -124,6 +125,8 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
                 i->second_->SetName(fullName);
                 i->second_->SetSourceCode(vsSourceCode_, vsSourceCodeLength_);
                 i->second_->SetDefines(combination.defines_, combination.defineValues_);
+                
+                SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
             }
             
             return i->second_;
@@ -153,6 +156,8 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
                 i->second_->SetName(fullName);
                 i->second_->SetSourceCode(psSourceCode_, psSourceCodeLength_);
                 i->second_->SetDefines(combination.defines_, combination.defineValues_);
+                
+                SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
             }
             
             return i->second_;
