@@ -263,7 +263,7 @@ void DecalSet::SetMaxIndices(unsigned num)
 
 bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size,
     float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff,
-    float depthBias)
+    float depthBias, unsigned subGeometry)
 {
     PROFILE(AddDecal);
     
@@ -349,8 +349,15 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     PODVector<DecalVertex> tempFace;
     
     unsigned numBatches = target->GetBatches().Size();
-    for (unsigned i = 0; i < numBatches; ++i)
-        GetFaces(faces, target, i, decalFrustum, decalNormal, normalCutoff);
+    
+    // Use either a specified subgeometry in the target, or all
+    if (subGeometry < numBatches)
+        GetFaces(faces, target, subGeometry, decalFrustum, decalNormal, normalCutoff);
+    else
+    {
+        for (unsigned i = 0; i < numBatches; ++i)
+            GetFaces(faces, target, i, decalFrustum, decalNormal, normalCutoff);
+    }
     
     // Clip the acquired faces against all frustum planes
     for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)

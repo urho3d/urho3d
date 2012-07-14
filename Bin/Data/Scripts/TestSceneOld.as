@@ -499,32 +499,52 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     if (button == MOUSEB_RIGHT)
         ui.cursor.visible = false;
 
-    // Test creating a new physics object
-    if (button == MOUSEB_LEFT && !input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true) is null &&
-        ui.focusElement is null)
+    // Test either creating a new physics object or painting a decal (SHIFT down)
+    if (button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
-        Vector3 position = eventData["Pos"].GetVector3();
-        Quaternion rotation = eventData["Rot"].GetQuaternion();
-
-        Node@ newNode = testScene.CreateChild();
-        newNode.position = cameraNode.position;
-        newNode.rotation = cameraNode.rotation;
-        newNode.SetScale(0.2);
+        if (!input.qualifierDown[QUAL_SHIFT])
+        {
+            Node@ newNode = testScene.CreateChild();
+            newNode.position = cameraNode.position;
+            newNode.rotation = cameraNode.rotation;
+            newNode.SetScale(0.2);
+        
+            RigidBody@ body = newNode.CreateComponent("RigidBody");
+            body.mass = 1.0;
+            body.friction = 1.0;
+            body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
     
-        RigidBody@ body = newNode.CreateComponent("RigidBody");
-        body.mass = 1.0;
-        body.friction = 1.0;
-        body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
-
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(1, 1, 1));
-
-        StaticModel@ object = newNode.CreateComponent("StaticModel");
-        object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Test.xml");
-        object.castShadows = true;
-        object.shadowDistance = 150.0;
-        object.drawDistance = 200.0;
+            CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+            shape.SetBox(Vector3(1, 1, 1));
+    
+            StaticModel@ object = newNode.CreateComponent("StaticModel");
+            object.model = cache.GetResource("Model", "Models/Box.mdl");
+            object.material = cache.GetResource("Material", "Materials/Test.xml");
+            object.castShadows = true;
+            object.shadowDistance = 150.0;
+            object.drawDistance = 200.0;
+        }
+        else
+        {
+            IntVector2 pos = ui.cursorPosition;
+            if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
+            {
+                Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+                RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
+                if (result.drawable !is null)
+                {
+                    Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
+                    DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
+                    if (decal is null)
+                    {
+                        decal = result.drawable.node.CreateComponent("DecalSet");
+                        decal.material = cache.GetResource("Material", "Materials/Test.xml");
+                    }
+                    decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
+                        cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
+                }
+            }
+        }
     }
 }
 
@@ -555,19 +575,6 @@ void HandlePostRenderUpdate()
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             testScene.debugRenderer.AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
-
-            if (input.mouseButtonPress[MOUSEB_LEFT] && input.qualifierDown[QUAL_SHIFT] && ui.GetElementAt(ui.cursorPosition, true)
-                is null && ui.focusElement is null)
-            {
-                DecalSet@ decal = result.drawable.node.GetComponent("DecalSet");
-                if (decal is null)
-                {
-                    decal = result.drawable.node.CreateComponent("DecalSet");
-                    decal.material = cache.GetResource("Material", "Materials/Test.xml");
-                }
-                decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
-                    cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
-            }
         }
     }
 }
