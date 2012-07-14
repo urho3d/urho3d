@@ -154,7 +154,7 @@ void InitScene()
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Test.xml");
+        object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.occluder = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
@@ -170,7 +170,7 @@ void InitScene()
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Test.xml");
+        object.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
         object.castShadows = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
@@ -186,7 +186,7 @@ void InitScene()
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Test.xml");
+        object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.castShadows = true;
         object.occluder = true;
 
@@ -425,10 +425,12 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                     if (decal is null)
                     {
                         decal = result.drawable.node.CreateComponent("DecalSet");
-                        decal.material = cache.GetResource("Material", "Materials/Test.xml");
+                        decal.material = cache.GetResource("Material", "Materials/UrhoDecal.xml");
+                        decal.maxVertices = 2048;
+                        decal.maxIndices = 4096;
                     }
                     decal.AddDecal(result.drawable, rayHitPos - cameraNode.worldRotation * Vector3(0, 0, 0.1),
-                        cameraNode.worldRotation, 0.1, 1.0, 0.2, Vector2(0, 0), Vector2(1, 1));
+                        cameraNode.worldRotation, 0.5, 1.0, 1.0, Vector2(0, 0), Vector2(1, 1));
                 }
             }
         }
@@ -455,7 +457,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
 
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/Box.mdl");
-    object.material = cache.GetResource("Material", "Materials/Test.xml");
+    object.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
     object.castShadows = true;
     object.shadowDistance = 150.0;
     object.drawDistance = 200.0;

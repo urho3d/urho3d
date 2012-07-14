@@ -1,0 +1,9 @@
+<material>
+    <technique name="Techniques/DiffNormal.xml" quality="1" />
+    <technique name="Techniques/Diff.xml" quality="0" />
+    <texture unit="diffuse" name="Textures/StoneDiffuse.dds" />
+    <texture unit="normal" name="Textures/StoneNormal.dds" />
+    <parameter name="MatSpecColor" value="0.5 0.5 0.5 16" />
+    <parameter name="UOffset" value="0.25 0 0 0" />
+    <parameter name="VOffset" value="0 0.25 0 0" />
+</material>
