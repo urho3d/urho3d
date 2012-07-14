@@ -306,7 +306,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         Skeleton& skeleton = animatedModel->GetSkeleton();
         unsigned numBones = skeleton.GetNumBones();
         unsigned bestIndex = M_MAX_UNSIGNED;
-        float bestDistance = M_INFINITY;
+        float bestSize = 0.0f;
         
         for (unsigned i = 0; i < numBones; ++i)
         {
@@ -314,26 +314,28 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             if (!bone->node_ || !bone->collisionMask_)
                 continue;
             
-            // Represent the decal as a sphere, try to find the closest match
+            // Represent the decal as a sphere, try to find the biggest colliding bone
             Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * (worldPosition + worldRotation * (0.5f * depth *
-                Vector3::FORWARD)), size);
+                Vector3::FORWARD)), 0.5f * size / bone->node_->GetWorldScale().Length());
             float distance = (worldPosition - bone->node_->GetWorldPosition()).Length();
             
             if (bone->collisionMask_ & BONECOLLISION_BOX)
             {
-                if (bone->boundingBox_.IsInside(decalSphere) != OUTSIDE && distance < bestDistance)
+                float size = bone->boundingBox_.HalfSize().Length();
+                if (bone->boundingBox_.IsInside(decalSphere) != OUTSIDE && size > bestSize)
                 {
                     bestIndex = i;
-                    bestDistance = distance;
+                    bestSize = size;
                 }
             }
             else if (bone->collisionMask_ & BONECOLLISION_SPHERE)
             {
                 Sphere boneSphere(Vector3::ZERO, bone->radius_);
-                if (boneSphere.IsInside(decalSphere) != OUTSIDE && distance < bestDistance)
+                float size = bone->radius_;
+                if (boneSphere.IsInside(decalSphere) != OUTSIDE && size > bestSize)
                 {
                     bestIndex = i;
-                    bestDistance = distance;
+                    bestSize = size;
                 }
             }
         }
