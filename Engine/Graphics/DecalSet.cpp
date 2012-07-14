@@ -62,12 +62,24 @@ static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float 
     ret.normal_ = v0.normal_ + t * (v1.normal_ - v0.normal_);
     if (skinned)
     {
-        // Blend weights / indices can not be easily interpolated, choose the one that is nearer to the split plane
-        const DecalVertex& src = Abs(d0) < Abs(d1) ? v0 : v1;
-        for (unsigned i = 0; i < 4; ++i)
+        if (*((unsigned*)v0.blendIndices_) != *((unsigned*)v1.blendIndices_))
         {
-            ret.blendWeights_[i] = src.blendWeights_[i];
-            ret.blendIndices_[i] = src.blendIndices_[i];
+            // Blend weights and indices: if indices are different, choose the vertex nearer to the split plane
+            const DecalVertex& src = Abs(d0) < Abs(d1) ? v0 : v1;
+            for (unsigned i = 0; i < 4; ++i)
+            {
+                ret.blendWeights_[i] = src.blendWeights_[i];
+                ret.blendIndices_[i] = src.blendIndices_[i];
+            }
+        }
+        else
+        {
+            // If indices are same, can interpolate the weights
+            for (unsigned i = 0; i < 4; ++i)
+            {
+                ret.blendWeights_[i] = v0.blendWeights_[i] + t * (v1.blendWeights_[i] - v0.blendWeights_[i]);
+                ret.blendIndices_[i] = v0.blendIndices_[i];
+            }
         }
     }
     
