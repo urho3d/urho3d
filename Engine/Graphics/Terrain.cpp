@@ -261,6 +261,26 @@ Material* Terrain::GetMaterial() const
     return material_;
 }
 
+float Terrain::GetHeight(const Vector3& worldPosition) const
+{
+    if (node_)
+    {
+        Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
+        float xPos = position.x_ - patchWorldOrigin_.x_ / spacing_.x_;
+        float zPos = -position.z_ - patchWorldOrigin_.y_ / spacing_.z_;
+        
+        float h1 = GetRawHeight((unsigned)xPos, (unsigned)zPos);
+        float h2 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos);
+        float h3 = GetRawHeight((unsigned)xPos, (unsigned)zPos + 1);
+        float h4 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos + 1);
+        
+        float h = Lerp(Lerp(h1, h2, fmodf(xPos, 1.0f)), Lerp(h3, h4, fmodf(xPos, 1.0f)), fmodf(zPos, 1.0f));
+        return node_->GetWorldScale().y_ * h + node_->GetWorldPosition().y_;
+    }
+    else
+        return 0.0f;
+}
+
 void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
 {
     BoundingBox box;
@@ -279,8 +299,8 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
         {
             for (unsigned x1 = 0; x1 <= patchSize_; ++x1)
             {
-                unsigned xPos = x * patchSize_ + x1;
-                unsigned zPos = z * patchSize_ + z1;
+                int xPos = x * patchSize_ + x1;
+                int zPos = z * patchSize_ + z1;
                 
                 // Position
                 Vector3 position((float)x1 * spacing_.x_, GetRawHeight(xPos, zPos), -(float)z1 * spacing_.z_);
@@ -291,14 +311,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 box.Merge(position);
                 
                 // Normal
-                float xSlope = GetRawHeight(xPos - 1, zPos) - GetRawHeight(xPos + 1, zPos);
-                float zSlope = GetRawHeight(xPos, zPos + 1) - GetRawHeight(xPos, zPos - 1);
-                if (xPos != 0 && xPos != size_.x_ - 1)
-                    xSlope *= 0.5f;
-                if (zPos != 0 && zPos != size_.y_ - 1)
-                    zSlope *= 0.5f;
-                
-                Vector3 normal = Vector3(xSlope, 1.0f, zSlope).Normalized();
+                Vector3 normal = GetNormal(xPos, zPos);
                 *vertexData++ = normal.x_;
                 *vertexData++ = normal.y_;
                 *vertexData++ = normal.z_;
@@ -335,14 +348,12 @@ void Terrain::OnMarkedDirty(Node* node)
 
 void Terrain::CreateGeometry()
 {
+    Scene* scene = GetScene();
+    Octree* octree = scene ? scene->GetComponent<Octree>() : 0;
+    if (!heightMap_ || !node_ || !octree)
+        return;
+    
     PROFILE(CreateTerrainGeometry);
-    
-    if (!heightMap_ || !node_ || !GetScene())
-        return;
-    
-    Octree* octree = GetScene()->GetComponent<Octree>();
-    if (!octree)
-        return;
     
     patches_.Clear();
     patchNodes_.Clear();
@@ -373,15 +384,16 @@ void Terrain::CreateGeometry()
     {
         for (unsigned x = 0; x < patchesX_; ++x)
         {
-            // Note: terrain nodes are not created as part of the scene, as it's runtime generated scene hierarchy we never want
-            // to save, serialize through network, or show in the editor
+            // Note: terrain nodes are not created as part of the scene, as it's runtime generated scene hierarchy
+            // we never want to save, serialize through network, or show in the editor
             Node* patchNode = new Node(context_);
             patchNode->SetID(FIRST_LOCAL_ID);
             
-            TerrainPatch* patch = patchNode->CreateComponent<TerrainPatch>(LOCAL);
+            TerrainPatch* patch = new TerrainPatch(context_);
             patch->owner_ = this;
             patch->x_ = x;
             patch->z_ = z;
+            patchNode->AddComponent(patch, FIRST_LOCAL_ID, LOCAL);
             octree->AddManualDrawable(patch);
             
             // Copy initial drawable parameters
@@ -456,4 +468,26 @@ float Terrain::GetRawHeight(unsigned x, unsigned z) const
     x = Clamp((int)x, 0, (int)size_.x_ - 1);
     z = Clamp((int)z, 0, (int)size_.y_ - 1);
     return heightData_[z * size_.x_ + x];
+}
+
+Vector3 Terrain::GetNormal(unsigned x, unsigned z) const
+{
+    float baseHeight = GetRawHeight(x, z);
+    float nSlope = GetRawHeight(x, z - 1) - baseHeight;
+    float neSlope = GetRawHeight(x + 1, z - 1) - baseHeight;
+    float eSlope = GetRawHeight(x + 1, z) - baseHeight;
+    float seSlope = GetRawHeight(x + 1, z + 1) - baseHeight;
+    float sSlope = GetRawHeight(x, z + 1) - baseHeight;
+    float swSlope = GetRawHeight(x - 1, z + 1) - baseHeight;
+    float wSlope = GetRawHeight(x - 1, z) - baseHeight;
+    float nwSlope = GetRawHeight(x - 1, z - 1) - baseHeight;
+    
+    return (Vector3(0.0f, 1.0f, -nSlope) +
+        Vector3(-neSlope, 1.0f, -neSlope) +
+        Vector3(-eSlope, 1.0f, 0.0f) +
+        Vector3(-seSlope, 1.0f, seSlope) +
+        Vector3(0.0f, 1.0f, sSlope) +
+        Vector3(swSlope, 1.0f, swSlope) + 
+        Vector3(wSlope, 1.0f, 0.0f) +
+        Vector3(nwSlope, 1.0f, -nwSlope)).Normalized();
 }

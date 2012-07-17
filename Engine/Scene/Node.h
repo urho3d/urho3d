@@ -319,12 +319,12 @@ public:
     void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
-    
-protected:
     /// Create a component with specific ID.
     Component* CreateComponent(ShortStringHash type, unsigned id, CreateMode mode);
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
+    /// Add a pre-created component.
+    void AddComponent(Component* component, unsigned id, CreateMode mode);
     
 private:
     /// Recalculate the world transform.

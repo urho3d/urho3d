@@ -63,11 +63,6 @@ TerrainPatch::~TerrainPatch()
 {
 }
 
-void TerrainPatch::RegisterObject(Context* context)
-{
-    context->RegisterFactory<TerrainPatch>();
-}
-
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     /// \todo Implement
@@ -110,8 +105,7 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
     unsigned westLod = west_ ? west_->lodLevel_ : lodLevel_;
     unsigned eastLod = east_ ? east_->lodLevel_ : lodLevel_;
     
-    if (owner_)
-        owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
+    owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
     
     lodDirty_ = false;
 }

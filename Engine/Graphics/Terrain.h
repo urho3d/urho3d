@@ -85,8 +85,8 @@ public:
     Image* GetHeightMap() const;
     /// Return material.
     Material* GetMaterial() const;
-    /// Return height at world coordinates, or 0 if outside the terrain.
-    float GetHeight(const Vector3& worldPosition);
+    /// Return height at world coordinates.
+    float GetHeight(const Vector3& worldPosition) const;
     /// Return raw height data.
     const float* GetHeightData() const { return heightData_.Get(); }
     /// Return number of terrain patches.
@@ -136,6 +136,8 @@ private:
     void SetPatchTransform(TerrainPatch* patch);
     /// Return an uninterpolated terrain height value, clamping to edges.
     float GetRawHeight(unsigned x, unsigned z) const;
+    /// Get terrain normal at position.
+    Vector3 GetNormal(unsigned x, unsigned z) const;
     
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
