@@ -45,10 +45,11 @@ enum PrimitiveType
 enum GeometryType
 {
     GEOM_STATIC = 0,
-    GEOM_SKINNED,
-    GEOM_INSTANCED,
-    GEOM_BILLBOARD,
-    MAX_GEOMETRYTYPES
+    GEOM_SKINNED = 1,
+    GEOM_INSTANCED = 2,
+    GEOM_BILLBOARD = 3,
+    GEOM_STATIC_NOINSTANCING = 4,
+    MAX_GEOMETRYTYPES = 4,
 };
 
 /// Blending mode.

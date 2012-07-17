@@ -168,6 +168,7 @@ DecalSet::DecalSet(Context* context) :
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
+    batches_[0].geometryType_ = GEOM_STATIC_NOINSTANCING;
 }
 
 DecalSet::~DecalSet()

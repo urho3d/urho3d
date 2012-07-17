@@ -29,6 +29,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "DecalSet.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -45,9 +46,10 @@
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
-#include "DecalSet.h"
 #include "StringUtils.h"
 #include "Technique.h"
+#include "Terrain.h"
+#include "TerrainPatch.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
@@ -2311,6 +2313,8 @@ void RegisterGraphicsLibrary(Context* context)
     BillboardSet::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
     DecalSet::RegisterObject(context);
+    Terrain::RegisterObject(context);
+    TerrainPatch::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);

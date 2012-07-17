@@ -2348,8 +2348,12 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         batch.material_ = renderer_->GetDefaultMaterial();
     
     // Convert to instanced if possible
-    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.shaderData_ && !batch.overrideView_)
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.shaderData_ &&
+        !batch.overrideView_)
         batch.geometryType_ = GEOM_INSTANCED;
+    
+    if (batch.geometryType_ == GEOM_STATIC_NOINSTANCING)
+        batch.geometryType_ = GEOM_STATIC;
     
     if (batch.geometryType_ == GEOM_INSTANCED)
     {

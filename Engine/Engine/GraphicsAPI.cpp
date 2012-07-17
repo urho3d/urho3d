@@ -39,6 +39,7 @@
 #include "Scene.h"
 #include "SmoothedTransform.h"
 #include "Technique.h"
+#include "Terrain.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "Skybox.h"
@@ -770,7 +771,47 @@ static void RegisterDecalSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DecalSet", "uint get_maxVertices() const", asMETHOD(DecalSet, GetMaxVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_maxIndices(uint)", asMETHOD(DecalSet, SetMaxIndices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_maxIndices() const", asMETHOD(DecalSet, GetMaxIndices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "Zone@+ get_zone() const", asMETHOD(DecalSet, GetZone), asCALL_THISCALL);
 }
+
+static void RegisterTerrain(asIScriptEngine* engine)
+{
+    RegisterComponent<Terrain>(engine, "Terrain");
+    engine->RegisterObjectMethod("Terrain", "void set_material(Material@+)", asMETHOD(Terrain, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Material@+ get_material() const", asMETHOD(Terrain, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_heightMap(Image@+)", asMETHOD(Terrain, SetHeightMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Image@+ get_heightMap() const", asMETHOD(Terrain, GetHeightMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_patchSize(uint)", asMETHOD(Terrain, SetPatchSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_patchSize() const", asMETHOD(Terrain, GetPatchSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_spacing(const Vector3&in)", asMETHOD(Terrain, SetSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "const Vector3& get_spacing() const", asMETHOD(Terrain, GetSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "const IntVector2& get_size() const", asMETHOD(Terrain, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_visible(bool)", asMETHOD(Terrain, SetVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "bool get_visible() const", asMETHOD(Terrain, IsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_castShadows(bool)", asMETHOD(Terrain, SetCastShadows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "bool get_castShadows() const", asMETHOD(Terrain, GetCastShadows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_occluder(bool)", asMETHOD(Terrain, SetOccluder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "bool get_occluder() const", asMETHOD(Terrain, IsOccluder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_occludee(bool)", asMETHOD(Terrain, SetOccludee), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "bool get_occludee() const", asMETHOD(Terrain, IsOccludee), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_drawDistance(float)", asMETHOD(Terrain, SetDrawDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "float get_drawDistance() const", asMETHOD(Terrain, GetDrawDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_shadowDistance(float)", asMETHOD(Terrain, SetShadowDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "float get_shadowDistance() const", asMETHOD(Terrain, GetShadowDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_lodBias(float)", asMETHOD(Terrain, SetLodBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "float get_lodBias() const", asMETHOD(Terrain, GetLodBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_viewMask(uint)", asMETHOD(Terrain, SetViewMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_viewMask() const", asMETHOD(Terrain, GetViewMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_lightMask(uint)", asMETHOD(Terrain, SetLightMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_lightMask() const", asMETHOD(Terrain, GetLightMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_shadowMask(uint)", asMETHOD(Terrain, SetShadowMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_shadowMask() const", asMETHOD(Terrain, GetShadowMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_zoneMask(uint)", asMETHOD(Terrain, SetZoneMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_zoneMask() const", asMETHOD(Terrain, GetZoneMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_maxLights(uint)", asMETHOD(Terrain, SetMaxLights), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_maxLights() const", asMETHOD(Terrain, GetMaxLights), asCALL_THISCALL);
+}
+
 
 static CScriptArray* GraphicsGetResolutions(Graphics* ptr)
 {
@@ -1067,6 +1108,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterBillboardSet(engine);
     RegisterParticleEmitter(engine);
     RegisterDecalSet(engine);
+    RegisterTerrain(engine);
     RegisterOctree(engine);
     RegisterGraphics(engine);
     RegisterRenderer(engine);
