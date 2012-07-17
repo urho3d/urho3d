@@ -266,15 +266,29 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
     if (node_)
     {
         Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-        float xPos = position.x_ - patchWorldOrigin_.x_ / spacing_.x_;
-        float zPos = -position.z_ - patchWorldOrigin_.y_ / spacing_.z_;
+        float xPos = (position.x_ - patchWorldOrigin_.x_) / spacing_.x_;
+        float zPos = (-position.z_ - patchWorldOrigin_.y_) / spacing_.z_;
+        float xFrac = xPos - floorf(xPos);
+        float zFrac = zPos - floorf(zPos);
+        float h1, h2, h3;
         
-        float h1 = GetRawHeight((unsigned)xPos, (unsigned)zPos);
-        float h2 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos);
-        float h3 = GetRawHeight((unsigned)xPos, (unsigned)zPos + 1);
-        float h4 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos + 1);
+        if (xFrac + zFrac >= 1.0f)
+        {
+            h1 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos + 1);
+            h2 = GetRawHeight((unsigned)xPos, (unsigned)zPos + 1);
+            h3 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos);
+            xFrac = 1.0f - xFrac;
+            zFrac = 1.0f - zFrac;
+        }
+        else
+        {
+            h1 = GetRawHeight((unsigned)xPos, (unsigned)zPos);
+            h2 = GetRawHeight((unsigned)xPos + 1, (unsigned)zPos);
+            h3 = GetRawHeight((unsigned)xPos, (unsigned)zPos + 1);
+        }
         
-        float h = Lerp(Lerp(h1, h2, fmodf(xPos, 1.0f)), Lerp(h3, h4, fmodf(xPos, 1.0f)), fmodf(zPos, 1.0f));
+        float h = h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
+        /// \todo This assumes that the terrain node is upright
         return node_->GetWorldScale().y_ * h + node_->GetWorldPosition().y_;
     }
     else
