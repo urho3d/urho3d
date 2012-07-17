@@ -32,6 +32,7 @@ class Geometry;
 class Model;
 class PhysicsWorld;
 class RigidBody;
+class Terrain;
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;
@@ -47,7 +48,8 @@ enum ShapeType
     SHAPE_CAPSULE,
     SHAPE_CONE,
     SHAPE_TRIANGLEMESH,
-    SHAPE_CONVEXHULL
+    SHAPE_CONVEXHULL,
+    SHAPE_TERRAIN
 };
 
 /// Base class for collision shape geometry data.
@@ -85,6 +87,26 @@ struct ConvexData : public CollisionGeometryData
     unsigned vertexCount_;
 };
 
+/// Heightfield geometry data.
+struct HeightfieldData : public CollisionGeometryData
+{
+    /// Construct from a terrain.
+    HeightfieldData(Terrain* terrain);
+    /// Destruct. Free geometry data.
+    ~HeightfieldData();
+    
+    /// Height data.
+    SharedArrayPtr<float> heightData_;
+    /// Vertex spacing.
+    Vector3 spacing_;
+    /// Heightmap size.
+    IntVector2 size_;
+    /// Minimum height.
+    float minHeight_;
+    /// Maximum height.
+    float maxHeight_;
+};
+
 /// Physics collision shape component.
 class CollisionShape : public Component
 {
@@ -119,6 +141,8 @@ public:
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// %Set as a convex hull.
     void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// %Set as a terrain. Only works if the same scene node contains a Terrain component.
+    void SetTerrain();
     /// %Set shape type.
     void SetShapeType(ShapeType type);
     /// %Set shape size.
@@ -175,6 +199,8 @@ private:
     btCompoundShape* GetParentCompoundShape();
     /// Update the collision shape after attribute changes.
     void UpdateShape();
+    /// Update terrain collision shape from the terrain component.
+    void HandleTerrainCreated(StringHash eventType, VariantMap& eventData);
     
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;

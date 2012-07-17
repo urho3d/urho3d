@@ -88,7 +88,7 @@ public:
     /// Return height at world coordinates.
     float GetHeight(const Vector3& worldPosition) const;
     /// Return raw height data.
-    const float* GetHeightData() const { return heightData_.Get(); }
+    SharedArrayPtr<float> GetHeightData() const { return heightData_; }
     /// Return number of terrain patches.
     unsigned GetNumPatches() const { return patches_.Size(); }
     /// Return terrain patch.
@@ -138,6 +138,8 @@ private:
     float GetRawHeight(unsigned x, unsigned z) const;
     /// Get terrain normal at position.
     Vector3 GetNormal(unsigned x, unsigned z) const;
+    /// Handle heightmap image reload finished.
+    void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
     
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "DrawableEvents.h"
 #include "Geometry.h"
 #include "Image.h"
 #include "IndexBuffer.h"
@@ -31,6 +32,7 @@
 #include "Node.h"
 #include "Octree.h"
 #include "Profiler.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
@@ -126,6 +128,12 @@ bool Terrain::SetHeightMap(Image* image)
         LOGERROR("Can not use a compressed image as a terrain heightmap");
         return false;
     }
+    
+    // Unsubscribe from the reload event of previous image (if any), then subscribe to the new
+    if (heightMap_)
+        UnsubscribeFromEvent(heightMap_, E_RELOADFINISHED);
+    if (image)
+        SubscribeToEvent(image, E_RELOADFINISHED, HANDLER(Terrain, HandleHeightMapReloadFinished));
     
     heightMap_ = image;
     
@@ -267,7 +275,7 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
     {
         Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
         float xPos = (position.x_ - patchWorldOrigin_.x_) / spacing_.x_;
-        float zPos = (-position.z_ - patchWorldOrigin_.y_) / spacing_.z_;
+        float zPos = (position.z_ - patchWorldOrigin_.y_) / spacing_.z_;
         float xFrac = xPos - floorf(xPos);
         float zFrac = zPos - floorf(zPos);
         float h1, h2, h3;
@@ -317,7 +325,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 int zPos = z * patchSize_ + z1;
                 
                 // Position
-                Vector3 position((float)x1 * spacing_.x_, GetRawHeight(xPos, zPos), -(float)z1 * spacing_.z_);
+                Vector3 position((float)x1 * spacing_.x_, GetRawHeight(xPos, zPos), (float)z1 * spacing_.z_);
                 *vertexData++ = position.x_;
                 *vertexData++ = position.y_;
                 *vertexData++ = position.z_;
@@ -331,7 +339,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = normal.z_;
                 
                 // Texture coordinate
-                Vector2 texCoord((float)xPos / (float)size_.x_, (float)zPos / (float)size_.y_);
+                Vector2 texCoord((float)xPos / (float)size_.x_, 1.0f - (float)zPos / (float)size_.y_);
                 *vertexData++ = texCoord.x_;
                 *vertexData++ = texCoord.y_;
                 
@@ -395,7 +403,7 @@ void Terrain::CreateGeometry()
     for (int z = 0; z < size_.y_; ++z)
     {
         for (int x = 0; x < size_.x_; ++x)
-            *dest++ = (float)src[imgRow * z + imgComps * x] * spacing_.y_;
+            *dest++ = (float)src[imgRow * (size_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
     }
     
     // Create scene nodes for patches
@@ -449,12 +457,13 @@ void Terrain::CreateGeometry()
         {
             for (unsigned x = 0; x < patchSize_; ++x)
             {
+                *indexData++ = x + (z + 1) * vertexDataRow;
+                *indexData++ = x + z * vertexDataRow + 1;
                 *indexData++ = x + z * vertexDataRow;
-                *indexData++ = x + z * vertexDataRow + 1;
+                
                 *indexData++ = x + (z + 1) * vertexDataRow;
-                *indexData++ = x + z * vertexDataRow + 1;
                 *indexData++ = x + (z + 1) * vertexDataRow + 1;
-                *indexData++ = x + (z + 1) * vertexDataRow;
+                *indexData++ = x + z * vertexDataRow + 1;
             }
         }
         
@@ -467,6 +476,12 @@ void Terrain::CreateGeometry()
         SetPatchTransform(*i);
         UpdatePatchGeometry(*i);
     }
+    
+    using namespace TerrainCreated;
+    
+    VariantMap eventData;
+    eventData[P_NODE] = (void*)node_;
+    SendEvent(E_TERRAINCREATED, eventData);
 }
 
 void Terrain::SetPatchTransform(TerrainPatch* patch)
@@ -475,7 +490,7 @@ void Terrain::SetPatchTransform(TerrainPatch* patch)
     unsigned x = patch->x_;
     unsigned z = patch->z_;
     
-    Matrix3x4 patchTransform(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, -patchWorldOrigin_.y_ -
+    Matrix3x4 patchTransform(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, patchWorldOrigin_.y_ +
         (float)z * patchWorldSize_.y_), Quaternion::IDENTITY, 1.0f);
     Matrix3x4 combinedTransform = node_->GetWorldTransform() * patchTransform;
     patchNode->SetTransform(combinedTransform.Translation(), combinedTransform.Rotation(), combinedTransform.Scale());
@@ -503,12 +518,17 @@ Vector3 Terrain::GetNormal(unsigned x, unsigned z) const
     float wSlope = GetRawHeight(x - 1, z) - baseHeight;
     float nwSlope = GetRawHeight(x - 1, z - 1) - baseHeight;
     
-    return (Vector3(0.0f, 1.0f, -nSlope) +
-        Vector3(-neSlope, 1.0f, -neSlope) +
+    return (Vector3(0.0f, 1.0f, nSlope) +
+        Vector3(-neSlope, 1.0f, neSlope) +
         Vector3(-eSlope, 1.0f, 0.0f) +
-        Vector3(-seSlope, 1.0f, seSlope) +
-        Vector3(0.0f, 1.0f, sSlope) +
-        Vector3(swSlope, 1.0f, swSlope) + 
+        Vector3(-seSlope, 1.0f, -seSlope) +
+        Vector3(0.0f, 1.0f, -sSlope) +
+        Vector3(swSlope, 1.0f, -swSlope) + 
         Vector3(wSlope, 1.0f, 0.0f) +
-        Vector3(nwSlope, 1.0f, -nwSlope)).Normalized();
+        Vector3(nwSlope, 1.0f, nwSlope)).Normalized();
+}
+
+void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    CreateGeometry();
 }

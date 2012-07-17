@@ -25,6 +25,7 @@
 #include "CollisionShape.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "DrawableEvents.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Model.h"
@@ -34,6 +35,7 @@
 #include "ResourceCache.h"
 #include "RigidBody.h"
 #include "Scene.h"
+#include "Terrain.h"
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
@@ -41,6 +43,7 @@
 #include <BulletCollision/CollisionShapes/btConeShape.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 #include <BulletCollision/CollisionShapes/btCylinderShape.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
@@ -58,6 +61,7 @@ static const char* typeNames[] =
     "Cone",
     "TriangleMesh",
     "ConvexHull",
+    "Terrain",
     0
 };
 
@@ -196,6 +200,35 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
 }
 
 ConvexData::~ConvexData()
+{
+}
+
+HeightfieldData::HeightfieldData(Terrain* terrain) :
+    heightData_(terrain->GetHeightData()),
+    spacing_(terrain->GetSpacing()),
+    size_(terrain->GetSize()),
+    minHeight_(0.0f),
+    maxHeight_(0.0f)
+{
+    if (heightData_)
+    {
+        unsigned points = size_.x_ * size_.y_;
+        float* data = heightData_.Get();
+        
+        for (unsigned i = 0; i < points; ++i)
+        {
+            if (!i)
+                minHeight_ = maxHeight_ = data[i];
+            else
+            {
+                minHeight_ = Min(minHeight_, data[i]);
+                maxHeight_ = Max(maxHeight_, data[i]);
+            }
+        }
+    }
+}
+
+HeightfieldData::~HeightfieldData()
 {
 }
 
@@ -385,6 +418,22 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
     MarkNetworkUpdate();
 }
 
+void CollisionShape::SetTerrain()
+{
+    Terrain* terrain = GetComponent<Terrain>();
+    if (!terrain)
+    {
+        LOGERROR("No terrain component, can not set terrain shape");
+        return;
+    }
+    
+    shapeType_ = SHAPE_TERRAIN;
+    
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
 void CollisionShape::SetShapeType(ShapeType type)
 {
     if (type != shapeType_)
@@ -488,8 +537,16 @@ void CollisionShape::NotifyRigidBody()
         compound->removeChildShape(shape_);
         
         // Then add with updated offset
+        Vector3 position = position_;
+        // For terrains, undo the height centering performed automatically by Bullet
+        if (shapeType_ == SHAPE_TERRAIN && geometry_)
+        {
+            HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
+            position.y_ += (heightfield->minHeight_ + heightfield->maxHeight_) * 0.5f;
+        }
+        
         btTransform offset;
-        offset.setOrigin(ToBtVector3(node_->GetWorldScale() * position_));
+        offset.setOrigin(ToBtVector3(node_->GetWorldScale() * position));
         offset.setRotation(ToBtQuaternion(rotation_));
         compound->addChildShape(offset, shape_);
         
@@ -527,6 +584,8 @@ void CollisionShape::ReleaseShape()
     
     if (physicsWorld_)
         physicsWorld_->CleanupGeometryCache();
+    
+    UnsubscribeFromEvent(E_TERRAINCREATED);
 }
 
 void CollisionShape::OnNodeSet(Node* node)
@@ -568,6 +627,13 @@ void CollisionShape::OnMarkedDirty(Node* node)
         case SHAPE_CONVEXHULL:
             shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
             break;
+            
+        case SHAPE_TERRAIN:
+            {
+                HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
+                shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
+                    newWorldScale * size_));
+            }
         }
         
         NotifyRigidBody();
@@ -668,6 +734,25 @@ void CollisionShape::UpdateShape()
                 shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
             }
             break;
+            
+        case SHAPE_TERRAIN:
+            size_ = size_.Abs();
+            {
+                Terrain* terrain = GetComponent<Terrain>();
+                if (terrain && terrain->GetHeightData())
+                {
+                    geometry_ = new HeightfieldData(terrain);
+                    HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
+                    
+                    shape_ = new btHeightfieldTerrainShape(heightfield->size_.x_, heightfield->size_.y_,
+                        heightfield->heightData_.Get(), 1.0f, heightfield->minHeight_, heightfield->maxHeight_, 1, PHY_FLOAT,
+                        false);
+                    shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
+                        newWorldScale * size_));
+                }
+                SubscribeToEvent(terrain, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
+            }
+            break;
         }
         
         if (shape_)
@@ -681,4 +766,10 @@ void CollisionShape::UpdateShape()
     
     if (physicsWorld_)
         physicsWorld_->CleanupGeometryCache();
+}
+
+void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
+{
+    UpdateShape();
+    NotifyRigidBody();
 }

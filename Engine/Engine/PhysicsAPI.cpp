@@ -65,6 +65,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterEnumValue("ShapeType", "SHAPE_CONE", SHAPE_CONE);
     engine->RegisterEnumValue("ShapeType", "SHAPE_TRIANGLEMESH", SHAPE_TRIANGLEMESH);
     engine->RegisterEnumValue("ShapeType", "SHAPE_CONVEXHULL", SHAPE_CONVEXHULL);
+    engine->RegisterEnumValue("ShapeType", "SHAPE_TERRAIN", SHAPE_TERRAIN);
     
     RegisterComponent<CollisionShape>(engine, "CollisionShape");
     engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
@@ -74,6 +75,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void SetCone(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCone), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, uint, const Vector3&in scale = Vector3(1, 1, 1), const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetTerrain()", asMETHOD(CollisionShape, SetTerrain), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_shapeType(ShapeType)", asMETHOD(CollisionShape, SetShapeType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "ShapeType get_shapeType() const", asMETHOD(CollisionShape, GetShapeType), asCALL_THISCALL);

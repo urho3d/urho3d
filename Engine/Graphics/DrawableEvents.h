@@ -30,3 +30,9 @@ EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
 {
     PARAM(P_NODE, Node);                    // Node pointer
 }
+
+/// Terrain geometry created.
+EVENT(E_TERRAINCREATED, TerrainCreated)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
