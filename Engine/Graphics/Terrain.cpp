@@ -288,7 +288,7 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
         }
         
         float h = h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
-        /// \todo This assumes that the terrain node is upright
+        /// \todo This assumes that the terrain scene node is upright
         return node_->GetWorldScale().y_ * h + node_->GetWorldPosition().y_;
     }
     else
@@ -301,7 +301,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     unsigned vertexDataRow = patchSize_ + 1;
     VertexBuffer* vertexBuffer = patch->vertexBuffer_;
     if (vertexBuffer->GetVertexCount() != vertexDataRow * vertexDataRow)
-        vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1);
+        vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     
     if (vertexData)
@@ -334,6 +334,13 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 Vector2 texCoord((float)xPos / (float)size_.x_, (float)zPos / (float)size_.y_);
                 *vertexData++ = texCoord.x_;
                 *vertexData++ = texCoord.y_;
+                
+                // Tangent
+                Vector3 xyz = (Vector3::RIGHT - normal * normal.DotProduct(Vector3::RIGHT)).Normalized();
+                *vertexData++ = xyz.x_;
+                *vertexData++ = xyz.y_;
+                *vertexData++ = xyz.z_;
+                *vertexData++ = 1.0f;
             }
         }
         

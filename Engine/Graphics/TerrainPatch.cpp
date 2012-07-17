@@ -52,7 +52,7 @@ TerrainPatch::TerrainPatch(Context* context) :
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1);
+    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
