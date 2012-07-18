@@ -150,23 +150,10 @@ void Terrain::SetPatchSize(unsigned size)
 
 bool Terrain::SetHeightMap(Image* image)
 {
-    if (image && image->IsCompressed())
-    {
-        LOGERROR("Can not use a compressed image as a terrain heightmap");
-        return false;
-    }
+    bool success = SetHeightMapInternal(image, true);
     
-    // Unsubscribe from the reload event of previous image (if any), then subscribe to the new
-    if (heightMap_)
-        UnsubscribeFromEvent(heightMap_, E_RELOADFINISHED);
-    if (image)
-        SubscribeToEvent(image, E_RELOADFINISHED, HANDLER(Terrain, HandleHeightMapReloadFinished));
-    
-    heightMap_ = image;
-    
-    CreateGeometry();
     MarkNetworkUpdate();
-    return true;
+    return success;
 }
 
 void Terrain::SetMaterial(Material* material)
@@ -456,11 +443,7 @@ void Terrain::SetHeightMapAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Image* image = cache->GetResource<Image>(value.id_);
-    if (image != heightMap_ && (!image || !image->IsCompressed()))
-    {
-        heightMap_ = image;
-        recreateTerrain_ = true;
-    }
+    SetHeightMapInternal(image, false);
 }
 
 void Terrain::SetPatchSizeAttr(unsigned value)
@@ -667,6 +650,30 @@ Vector3 Terrain::GetNormal(unsigned x, unsigned z) const
         Vector3(swSlope, 1.0f, -swSlope) + 
         Vector3(wSlope, 1.0f, 0.0f) +
         Vector3(nwSlope, 1.0f, nwSlope)).Normalized();
+}
+
+bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
+{
+    if (image && image->IsCompressed())
+    {
+        LOGERROR("Can not use a compressed image as a terrain heightmap");
+        return false;
+    }
+    
+    // Unsubscribe from the reload event of previous image (if any), then subscribe to the new
+    if (heightMap_)
+        UnsubscribeFromEvent(heightMap_, E_RELOADFINISHED);
+    if (image)
+        SubscribeToEvent(image, E_RELOADFINISHED, HANDLER(Terrain, HandleHeightMapReloadFinished));
+    
+    heightMap_ = image;
+    
+    if (recreateNow)
+        CreateGeometry();
+    else
+        recreateTerrain_ = true;
+    
+    return true;
 }
 
 void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)

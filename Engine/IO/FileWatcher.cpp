@@ -139,7 +139,7 @@ void FileWatcher::ThreadFunction()
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
                 
-                if (record->Action == FILE_ACTION_MODIFIED) // Modify
+                if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME)
                 {
                     String fileName;
                     const wchar_t* src = record->FileName;

@@ -145,6 +145,8 @@ private:
     float GetRawHeight(unsigned x, unsigned z) const;
     /// Get terrain normal at position.
     Vector3 GetNormal(unsigned x, unsigned z) const;
+    /// Set heightmap image and optionally recreate the geometry immediately. Return true if successful.
+    bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
     
