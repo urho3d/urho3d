@@ -780,12 +780,12 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "Material@+ get_material() const", asMETHOD(Terrain, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_heightMap(Image@+)", asMETHOD(Terrain, SetHeightMap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "Image@+ get_heightMap() const", asMETHOD(Terrain, GetHeightMap), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "void set_patchSize(uint)", asMETHOD(Terrain, SetPatchSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "uint get_patchSize() const", asMETHOD(Terrain, GetPatchSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_patchSize(int)", asMETHOD(Terrain, SetPatchSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "int get_patchSize() const", asMETHOD(Terrain, GetPatchSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_spacing(const Vector3&in)", asMETHOD(Terrain, SetSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "const Vector3& get_spacing() const", asMETHOD(Terrain, GetSpacing), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "const IntVector2& get_size() const", asMETHOD(Terrain, GetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "uint get_numPatches() const", asMETHOD(Terrain, GetNumPatches), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "const IntVector2& get_numVertices() const", asMETHOD(Terrain, GetNumVertices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "const IntVector2& get_numPatches() const", asMETHOD(Terrain, GetNumPatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ get_patches(uint) const", asMETHOD(Terrain, GetPatch), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_visible(bool)", asMETHOD(Terrain, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "bool get_visible() const", asMETHOD(Terrain, IsVisible), asCALL_THISCALL);

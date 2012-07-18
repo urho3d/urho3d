@@ -44,7 +44,7 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
+    /// %Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
     /// %Set ambient color
     void SetAmbientColor(const Color& color);

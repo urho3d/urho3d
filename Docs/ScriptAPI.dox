@@ -1995,7 +1995,7 @@ Properties:<br>
 - Material@[] materials
 - BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
-- uint softwareLodLevel
+- uint occlusionLodLevel
 - Zone@ zone (readonly)
 
 
@@ -2040,7 +2040,6 @@ Properties:<br>
 - Material@[] materials
 - BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
-- uint softwareLodLevel
 - Zone@ zone (readonly)
 
 
@@ -2112,7 +2111,6 @@ Properties:<br>
 - Material@[] materials
 - BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
-- uint softwareLodLevel
 - float animationLodBias
 - float invisibleLodFactor
 - Skeleton@ skeleton (readonly)
@@ -2293,7 +2291,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.25, float arg10 = 0.0005)
+- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.1, float arg10 = 0.001, uint arg11 = 0xffffffff)
 - void RemoveDecals(uint)
 - void RemoveAllDecals()
 
@@ -2325,6 +2323,89 @@ Properties:<br>
 - uint numIndices (readonly)
 - uint maxVertices
 - uint maxIndices
+- Zone@ zone (readonly)
+
+
+TerrainPatch
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool inView (readonly)
+- bool visible
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox worldBoundingBox (readonly)
+
+
+Terrain
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- float GetHeight(const Vector3&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Material@ material
+- Image@ heightMap
+- int patchSize
+- Vector3 spacing
+- IntVector2 numVertices (readonly)
+- IntVector2 numPatches (readonly)
+- TerrainPatch@[] patches (readonly)
+- bool visible
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
 
 
 RayQueryResult
@@ -4110,6 +4191,7 @@ Methods:<br>
 - void SetCone(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetTriangleMesh(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
 - void SetConvexHull(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
+- void SetTerrain()
 - void SetTransform(const Vector3&, const Quaternion&)
 
 Properties:<br>

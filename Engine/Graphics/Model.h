@@ -76,7 +76,7 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set bounding box.
+    /// %Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
     /// %Set vertex buffers.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts);

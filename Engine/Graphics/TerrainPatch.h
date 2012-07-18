@@ -29,10 +29,9 @@ class Geometry;
 class Terrain;
 class VertexBuffer;
 
+/// Individually rendered part of a heightmap terrain.
 class TerrainPatch : public Drawable
 {
-    friend class Terrain;
-    
     OBJECT(TerrainPatch);
     
 public:
@@ -51,10 +50,46 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
+    /// Return the geometry for a specific LOD level.
+    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
+    
+    /// Set owner terrain.
+    void SetOwner(Terrain* terrain);
+    /// Set neighbor patches.
+    void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east);
+    /// Set material.
+    void SetMaterial(Material* material);
+    /// Set local-space bounding box.
+    void SetBoundingBox(const BoundingBox& box);
+    /// Set patch coordinates.
+    void SetCoordinates(const IntVector2& coordinates);
+    
+    /// Return visible geometry.
+    Geometry* GetGeometry() const;
+    /// Return max LOD geometry.
+    Geometry* GetMaxLodGeometry() const;
+    /// Return vertex buffer.
+    VertexBuffer* GetVertexBuffer() const;
+    /// Return owner terrain.
+    Terrain* GetOwner() const;
+    /// Return north neighbor patch.
+    TerrainPatch* GetNorthPatch() const;
+    /// Return south neighbor patch.
+    TerrainPatch* GetSouthPatch() const;
+    /// Return west neighbor patch.
+    TerrainPatch* GetWestPatch() const;
+    /// Return east neighbor patch.
+    TerrainPatch* GetEastPatch() const;
+    /// Return local-space bounding box.
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return patch coordinates.
+    const IntVector2& GetCoordinates() const { return coordinates_; }
+    /// Return current LOD level.
+    unsigned GetLodLevel() const { return lodLevel_; }
     
 protected:
     /// Recalculate the world-space bounding box.
@@ -63,6 +98,8 @@ protected:
 private:
     /// Geometry.
     SharedPtr<Geometry> geometry_;
+    /// Geometry that is locked to the max LOD level. Used for decals.
+    SharedPtr<Geometry> maxLodGeometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Parent terrain.
@@ -77,10 +114,8 @@ private:
     WeakPtr<TerrainPatch> east_;
     /// Local-space bounding box.
     BoundingBox boundingBox_;
-    /// Patch X-coordinate in the terrain.
-    unsigned x_;
-    /// Patch Z-coordinate in the terrain.
-    unsigned z_;
+    /// Patch coordinates in the terrain. (0,0) is the northwest corner.
+    IntVector2 coordinates_;
     /// Current LOD level.
     unsigned lodLevel_;
     /// Geometrical error per LOD level.

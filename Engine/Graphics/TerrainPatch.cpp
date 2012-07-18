@@ -43,13 +43,16 @@ OBJECTTYPESTATIC(TerrainPatch);
 TerrainPatch::TerrainPatch(Context* context) :
     Drawable(context),
     geometry_(new Geometry(context)),
+    maxLodGeometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context)),
+    coordinates_(IntVector2::ZERO),
     lodLevel_(0),
     lodDirty_(true)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -156,17 +159,31 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
             vertexBuffer_->ClearDataLost();
     }
     
-    unsigned northLod = north_ ? north_->lodLevel_ : lodLevel_;
-    unsigned southLod = south_ ? south_->lodLevel_ : lodLevel_;
-    unsigned westLod = west_ ? west_->lodLevel_ : lodLevel_;
-    unsigned eastLod = east_ ? east_->lodLevel_ : lodLevel_;
-    
     if (owner_)
-        owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
+        owner_->UpdatePatchLod(this);
     
     lodDirty_ = false;
 }
 
+UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
+{
+    // If any of the neighbour patches have changed LOD, must update stitching
+    if (vertexBuffer_->IsDataLost())
+        return UPDATE_MAIN_THREAD;
+    else if (lodDirty_ || (north_ && north_->lodDirty_) || (south_ && south_->lodDirty_) || (west_ && west_->lodDirty_) ||
+        (east_ && east_->lodDirty_))
+        return UPDATE_WORKER_THREAD;
+    else
+        return UPDATE_NONE;
+}
+
+Geometry* TerrainPatch::GetLodGeometry(unsigned batchIndex, unsigned level)
+{
+    if (!level)
+        return maxLodGeometry_;
+    else
+        return geometry_;
+}
 
 unsigned TerrainPatch::GetNumOccluderTriangles()
 {
@@ -212,16 +229,73 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     return success;
 }
 
-UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
+void TerrainPatch::SetOwner(Terrain* terrain)
 {
-    // If any of the neighbour patches have changed LOD, must update stitching
-    if (vertexBuffer_->IsDataLost())
-        return UPDATE_MAIN_THREAD;
-    else if (lodDirty_ || (north_ && north_->lodDirty_) || (south_ && south_->lodDirty_) || (west_ && west_->lodDirty_) ||
-        (east_ && east_->lodDirty_))
-        return UPDATE_WORKER_THREAD;
-    else
-        return UPDATE_NONE;
+    owner_ = terrain;
+}
+
+void TerrainPatch::SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east)
+{
+    north_ = north;
+    south_ = south;
+    west_ = west;
+    east_ = east;
+}
+
+void TerrainPatch::SetMaterial(Material* material)
+{
+    batches_[0].material_ = material;
+}
+
+void TerrainPatch::SetBoundingBox(const BoundingBox& box)
+{
+    boundingBox_ = box;
+    OnMarkedDirty(node_);
+}
+
+void TerrainPatch::SetCoordinates(const IntVector2& coordinates)
+{
+    coordinates_ = coordinates;
+}
+
+Geometry* TerrainPatch::GetGeometry() const
+{
+    return geometry_;
+}
+
+Geometry* TerrainPatch::GetMaxLodGeometry() const
+{
+    return maxLodGeometry_;
+}
+
+VertexBuffer* TerrainPatch::GetVertexBuffer() const
+{
+    return vertexBuffer_;
+}
+
+Terrain* TerrainPatch::GetOwner() const
+{
+    return owner_;
+}
+
+TerrainPatch* TerrainPatch::GetNorthPatch() const
+{
+    return north_;
+}
+
+TerrainPatch* TerrainPatch::GetSouthPatch() const
+{
+    return south_;
+}
+
+TerrainPatch* TerrainPatch::GetWestPatch() const
+{
+    return west_;
+}
+
+TerrainPatch* TerrainPatch::GetEastPatch() const
+{
+    return east_;
 }
 
 void TerrainPatch::OnWorldBoundingBoxUpdate()

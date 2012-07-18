@@ -206,7 +206,7 @@ ConvexData::~ConvexData()
 HeightfieldData::HeightfieldData(Terrain* terrain) :
     heightData_(terrain->GetHeightData()),
     spacing_(terrain->GetSpacing()),
-    size_(terrain->GetSize()),
+    size_(terrain->GetNumVertices()),
     minHeight_(0.0f),
     maxHeight_(0.0f)
 {
@@ -760,7 +760,6 @@ void CollisionShape::UpdateShape()
                     shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
                         newWorldScale * size_));
                 }
-                SubscribeToEvent(terrain, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
             }
             break;
         }

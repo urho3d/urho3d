@@ -177,10 +177,6 @@ unsigned StaticModel::GetNumOccluderTriangles()
 {
     unsigned triangles = 0;
     
-    // Do not draw occlusion for StaticModel subclasses
-    if (GetType() != StaticModel::GetTypeStatic())
-        return triangles;
-    
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
@@ -201,10 +197,6 @@ unsigned StaticModel::GetNumOccluderTriangles()
 bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 {
     bool success = true;
-    
-    // Do not draw occlusion for StaticModel subclasses
-    if (GetType() != StaticModel::GetTypeStatic())
-        return success;
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {

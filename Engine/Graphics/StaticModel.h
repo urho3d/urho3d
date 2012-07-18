@@ -92,7 +92,7 @@ public:
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// %Set the bounding box.
+    /// %Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
     /// %Set number of geometries.
     void SetNumGeometries(unsigned num);

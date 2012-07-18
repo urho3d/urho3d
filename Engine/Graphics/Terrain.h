@@ -30,6 +30,7 @@ class Material;
 class Node;
 class TerrainPatch;
 
+/// Heightmap terrain component.
 class Terrain : public Component
 {
     OBJECT(Terrain);
@@ -48,7 +49,7 @@ public:
     virtual void ApplyAttributes();
     
     /// Set patch quads per side. Must be a power of two.
-    void SetPatchSize(unsigned size);
+    void SetPatchSize(int size);
     /// Set vertex (XZ) and height (Y) spacing.
     void SetSpacing(const Vector3& spacing);
     /// Set heightmap image. Dimensions should be a power of two + 1. Return true if successful.
@@ -81,17 +82,17 @@ public:
     void SetOccludee(bool enable);
     
     /// Return patch quads per side.
-    unsigned GetPatchSize() const { return patchSize_; }
+    int GetPatchSize() const { return patchSize_; }
     /// Return vertex and height spacing.
     const Vector3& GetSpacing() const { return spacing_; }
-    /// Return heightmap size.
-    const IntVector2& GetSize() const { return size_; }
+    /// Return heightmap size in vertices.
+    const IntVector2& GetNumVertices() const { return numVertices_; }
+    /// Return heightmap size in patches.
+    const IntVector2& GetNumPatches() const { return numPatches_; }
     /// Return heightmap image.
     Image* GetHeightMap() const;
     /// Return material.
     Material* GetMaterial() const;
-    /// Return number of patches.
-    unsigned GetNumPatches() const { return patches_.Size(); }
     /// Return patch by index.
     TerrainPatch* GetPatch(unsigned index) const;
     /// Return height at world coordinates.
@@ -126,13 +127,13 @@ public:
     /// Regenerate patch geometry.
     void UpdatePatchGeometry(TerrainPatch* patch);
     /// Update patch based on LOD and neighbor LOD.
-    void UpdatePatchLOD(TerrainPatch* patch, unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod);
+    void UpdatePatchLod(TerrainPatch* patch);
     /// %Set heightmap attribute.
     void SetHeightMapAttr(ResourceRef value);
     /// %Set material attribute.
     void SetMaterialAttr(ResourceRef value);
     /// %Set patch size attribute.
-    void SetPatchSizeAttr(unsigned value);
+    void SetPatchSizeAttr(int value);
     /// Return heightmap attribute.
     ResourceRef GetHeightMapAttr() const;
     /// Return material attribute.
@@ -142,9 +143,9 @@ private:
     /// Fully regenerate terrain geometry.
     void CreateGeometry();
     /// Return an uninterpolated terrain height value, clamping to edges.
-    float GetRawHeight(unsigned x, unsigned z) const;
+    float GetRawHeight(int x, int z) const;
     /// Get terrain normal at position.
-    Vector3 GetNormal(unsigned x, unsigned z) const;
+    Vector3 GetNormal(int x, int z) const;
     /// Set heightmap image and optionally recreate the geometry immediately. Return true if successful.
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
@@ -160,22 +161,20 @@ private:
     SharedPtr<Material> material_;
     /// Terrain patches.
     Vector<WeakPtr<TerrainPatch> > patches_;
-    /// Patch size, quads per side.
-    unsigned patchSize_;
-    /// Number of terrain LOD levles.
-    unsigned numLodLevels_;
     /// Vertex and height spacing.
     Vector3 spacing_;
-    /// Heightmap size.
-    IntVector2 size_;
     /// Origin of patches on the XZ-plane.
     Vector2 patchWorldOrigin_;
     /// Size of a patch on the XZ-plane.
     Vector2 patchWorldSize_;
-    /// Number of patches on the X-axis.
-    unsigned patchesX_;
-    /// Number of patches on the Z-axis.
-    unsigned patchesZ_;
+    /// Terrain size in vertices.
+    IntVector2 numVertices_;
+    /// Terrain size in patches.
+    IntVector2 numPatches_;
+    /// Patch size, quads per side.
+    int patchSize_;
+    /// Number of terrain LOD levels.
+    unsigned numLodLevels_;
     /// Visible flag.
     bool visible_;
     /// Shadowcaster flag.

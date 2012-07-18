@@ -44,24 +44,23 @@
 
 OBJECTTYPESTATIC(Terrain);
 
-static const unsigned DEFAULT_PATCH_SIZE = 16;
+static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
 static const unsigned DEFAULT_LOD_LEVELS = 3;
 static const unsigned MAX_LOD_LEVELS = 4;
-static const unsigned MIN_PATCH_SIZE = 4;
-static const unsigned MAX_PATCH_SIZE = 128;
-static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
+static const int DEFAULT_PATCH_SIZE = 16;
+static const int MIN_PATCH_SIZE = 4;
+static const int MAX_PATCH_SIZE = 128;
 
 Terrain::Terrain(Context* context) :
     Component(context),
     indexBuffer_(new IndexBuffer(context)),
-    patchSize_(DEFAULT_PATCH_SIZE),
     spacing_(DEFAULT_SPACING),
-    size_(IntVector2::ZERO),
     patchWorldSize_(Vector2::ZERO),
     patchWorldOrigin_(Vector2::ZERO),
-    patchesX_(0),
-    patchesZ_(0),
+    numVertices_(IntVector2::ZERO),
+    numPatches_(IntVector2::ZERO),
     numLodLevels_(DEFAULT_LOD_LEVELS),
+    patchSize_(DEFAULT_PATCH_SIZE),
     visible_(true),
     castShadows_(false),
     occluder_(false),
@@ -90,7 +89,7 @@ void Terrain::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Terrain, VAR_VECTOR3, "Vertex Spacing", spacing_, DEFAULT_SPACING, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Patch Size", GetPatchSize, SetPatchSizeAttr, unsigned, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Occluder", IsOccluder, SetOccluder, bool,  false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
@@ -134,7 +133,7 @@ void Terrain::SetSpacing(const Vector3& spacing)
     }
 }
 
-void Terrain::SetPatchSize(unsigned size)
+void Terrain::SetPatchSize(int size)
 {
     if (size < MIN_PATCH_SIZE || size > MAX_PATCH_SIZE || !IsPowerOfTwo(size))
         return;
@@ -162,7 +161,7 @@ void Terrain::SetMaterial(Material* material)
     for (unsigned i = 0; i < patches_.Size(); ++i)
     {
         if (patches_[i])
-            patches_[i]->batches_[0].material_ = material;
+            patches_[i]->SetMaterial(material);
     }
     
     MarkNetworkUpdate();
@@ -363,9 +362,11 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
 
 void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
 {
-    BoundingBox box;
     unsigned vertexDataRow = patchSize_ + 1;
-    VertexBuffer* vertexBuffer = patch->vertexBuffer_;
+    VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
+    Geometry* geometry = patch->GetGeometry();
+    Geometry* maxLodGeometry = patch->GetMaxLodGeometry();
+    
     if (vertexBuffer->GetVertexCount() != vertexDataRow * vertexDataRow)
         vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
@@ -373,18 +374,18 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     float* positionData = (float*)cpuVertexData.Get();
+    BoundingBox box;
     
     if (vertexData)
     {
-        unsigned x = patch->x_;
-        unsigned z = patch->z_;
+        const IntVector2& coords = patch->GetCoordinates();
         
-        for (unsigned z1 = 0; z1 <= patchSize_; ++z1)
+        for (int z1 = 0; z1 <= patchSize_; ++z1)
         {
-            for (unsigned x1 = 0; x1 <= patchSize_; ++x1)
+            for (int x1 = 0; x1 <= patchSize_; ++x1)
             {
-                int xPos = x * patchSize_ + x1;
-                int zPos = z * patchSize_ + z1;
+                int xPos = coords.x_ * patchSize_ + x1;
+                int zPos = coords.y_ * patchSize_ + z1;
                 
                 // Position
                 Vector3 position((float)x1 * spacing_.x_, GetRawHeight(xPos, zPos), (float)z1 * spacing_.z_);
@@ -404,7 +405,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = normal.z_;
                 
                 // Texture coordinate
-                Vector2 texCoord((float)xPos / (float)size_.x_, 1.0f - (float)zPos / (float)size_.y_);
+                Vector2 texCoord((float)xPos / (float)numVertices_.x_, 1.0f - (float)zPos / (float)numVertices_.y_);
                 *vertexData++ = texCoord.x_;
                 *vertexData++ = texCoord.y_;
                 
@@ -421,15 +422,16 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
         vertexBuffer->ClearDataLost();
     }
     
-    patch->boundingBox_ = box;
-    patch->geometry_->SetIndexBuffer(indexBuffer_);
-    patch->geometry_->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
-    patch->geometry_->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
-    patch->OnMarkedDirty(patch->GetNode());
+    patch->SetBoundingBox(box);
+    geometry->SetIndexBuffer(indexBuffer_);
+    geometry->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
+    geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+    maxLodGeometry->SetIndexBuffer(indexBuffer_);
+    maxLodGeometry->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
+    maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
 }
 
-void Terrain::UpdatePatchLOD(TerrainPatch* patch, unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod,
-    unsigned eastLod)
+void Terrain::UpdatePatchLod(TerrainPatch* patch)
 {
 }
 
@@ -446,7 +448,7 @@ void Terrain::SetHeightMapAttr(ResourceRef value)
     SetHeightMapInternal(image, false);
 }
 
-void Terrain::SetPatchSizeAttr(unsigned value)
+void Terrain::SetPatchSizeAttr(int value)
 {
     if (value < MIN_PATCH_SIZE || value > MAX_PATCH_SIZE || !IsPowerOfTwo(value))
         return;
@@ -492,17 +494,16 @@ void Terrain::CreateGeometry()
     patchWorldSize_ = Vector2(spacing_.x_ * (float)patchSize_, spacing_.z_ * (float)patchSize_);
     if (heightMap_)
     {
-        patchesX_ = (heightMap_->GetWidth() - 1) / patchSize_;
-        patchesZ_ = (heightMap_->GetHeight() - 1) / patchSize_;
-        size_ = IntVector2(patchesX_ * patchSize_ + 1, patchesZ_ * patchSize_ + 1);
-        patchWorldOrigin_ = Vector2(-0.5f * (float)patchesX_ * patchWorldSize_.x_, -0.5f * (float)patchesZ_ * patchWorldSize_.y_);
-        heightData_ = new float[size_.x_ * size_.y_];
+        numPatches_ = IntVector2((heightMap_->GetWidth() - 1) / patchSize_, (heightMap_->GetHeight() - 1) / patchSize_);
+        numVertices_ = IntVector2(numPatches_.x_ * patchSize_ + 1, numPatches_.y_ * patchSize_ + 1);
+        patchWorldOrigin_ = Vector2(-0.5f * (float)numPatches_.x_ * patchWorldSize_.x_, -0.5f * (float)numPatches_.y_ *
+            patchWorldSize_.y_);
+        heightData_ = new float[numVertices_.x_ * numVertices_.y_];
     }
     else
     {
-        patchesX_ = 0;
-        patchesZ_ = 0;
-        size_ = IntVector2::ZERO;
+        numPatches_ = IntVector2::ZERO;
+        numVertices_ = IntVector2::ZERO;
         patchWorldOrigin_ = Vector2::ZERO;
         heightData_.Reset();
     }
@@ -516,9 +517,9 @@ void Terrain::CreateGeometry()
         Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
         if (coords.Size() == 2)
         {
-            unsigned x = ToUInt(coords[0]);
-            unsigned z = ToUInt(coords[1]);
-            if (x < patchesX_ && z < patchesZ_)
+            int x = ToInt(coords[0]);
+            int z = ToInt(coords[1]);
+            if (x < numPatches_.x_ && z < numPatches_.y_)
                 nodeOk = true;
         }
         
@@ -536,16 +537,16 @@ void Terrain::CreateGeometry()
         unsigned imgComps = heightMap_->GetComponents();
         unsigned imgRow = heightMap_->GetWidth() * imgComps;
         
-        for (int z = 0; z < size_.y_; ++z)
+        for (int z = 0; z < numVertices_.y_; ++z)
         {
-            for (int x = 0; x < size_.x_; ++x)
-                *dest++ = (float)src[imgRow * (size_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
+            for (int x = 0; x < numVertices_.x_; ++x)
+                *dest++ = (float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
         }
         
         // Create patches and set node transforms
-        for (unsigned z = 0; z < patchesZ_; ++z)
+        for (int z = 0; z < numPatches_.y_; ++z)
         {
-            for (unsigned x = 0; x < patchesX_; ++x)
+            for (int x = 0; x < numPatches_.x_; ++x)
             {
                 String nodeName = "Patch_" + String(x) + "_" + String(z);
                 Node* patchNode = node_->GetChild(nodeName);
@@ -556,12 +557,11 @@ void Terrain::CreateGeometry()
                     (float)z * patchWorldSize_.y_));
                 
                 TerrainPatch* patch = patchNode->GetOrCreateComponent<TerrainPatch>();
-                patch->owner_ = this;
-                patch->x_ = x;
-                patch->z_ = z;
+                patch->SetOwner(this);
+                patch->SetCoordinates(IntVector2(x, z));
                 
                 // Copy initial drawable parameters
-                patch->batches_[0].material_ = material_;
+                patch->SetMaterial(material_);
                 patch->SetDrawDistance(drawDistance_);
                 patch->SetShadowDistance(shadowDistance_);
                 patch->SetLodBias(lodBias_);
@@ -587,9 +587,9 @@ void Terrain::CreateGeometry()
         
         if (indexData)
         {
-            for (unsigned z = 0; z < patchSize_; ++z)
+            for (int z = 0; z < patchSize_; ++z)
             {
-                for (unsigned x = 0; x < patchSize_; ++x)
+                for (int x = 0; x < patchSize_; ++x)
                 {
                     *indexData++ = x + (z + 1) * vertexDataRow;
                     *indexData++ = x + z * vertexDataRow + 1;
@@ -620,17 +620,17 @@ void Terrain::CreateGeometry()
     }
 }
 
-float Terrain::GetRawHeight(unsigned x, unsigned z) const
+float Terrain::GetRawHeight(int x, int z) const
 {
     if (!heightData_)
         return 0.0f;
     
-    x = Clamp((int)x, 0, (int)size_.x_ - 1);
-    z = Clamp((int)z, 0, (int)size_.y_ - 1);
-    return heightData_[z * size_.x_ + x];
+    x = Clamp(x, 0, numVertices_.x_ - 1);
+    z = Clamp(z, 0, numVertices_.y_ - 1);
+    return heightData_[z * numVertices_.x_ + x];
 }
 
-Vector3 Terrain::GetNormal(unsigned x, unsigned z) const
+Vector3 Terrain::GetNormal(int x, int z) const
 {
     float baseHeight = GetRawHeight(x, z);
     float nSlope = GetRawHeight(x, z - 1) - baseHeight;

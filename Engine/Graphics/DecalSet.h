@@ -28,7 +28,7 @@
 #include "List.h"
 #include "Skeleton.h"
 
-/// Decal vertex.
+/// %Decal vertex.
 struct DecalVertex
 {
     /// Construct with defaults.
@@ -96,7 +96,7 @@ struct Decal
     PODVector<unsigned short> indices_;
 };
 
-/// Decal component.
+/// %Decal renderer component.
 class DecalSet : public Drawable
 {
     OBJECT(DecalSet);
