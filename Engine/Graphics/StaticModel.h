@@ -53,6 +53,8 @@ public:
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
+    /// Return the geometry for a specific LOD level.
+    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
@@ -64,8 +66,8 @@ public:
     void SetMaterial(Material* material);
     /// %Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
-    /// %Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible.
-    void SetSoftwareLodLevel(unsigned level);
+    /// %Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
+    void SetOcclusionLodLevel(unsigned level);
     
     /// Return model.
     Model* GetModel() const { return model_; }
@@ -75,10 +77,8 @@ public:
     unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index) const;
-    /// Return software LOD level.
-    unsigned GetSoftwareLodLevel() const { return softwareLodLevel_; }
-    /// Return geometry to use in software rendering or raycasts.
-    Geometry* GetSoftwareGeometry(unsigned index) const;
+    /// Return occlusion LOD level.
+    unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
     
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
@@ -109,8 +109,8 @@ protected:
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Model.
     SharedPtr<Model> model_;
-    /// Software LOD level, used in raycasting and occlusion.
-    unsigned softwareLodLevel_;
+    /// Occlusion LOD level.
+    unsigned occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
     

@@ -106,7 +106,6 @@
 			<attribute name="Light Mask" value="-1" />
 			<attribute name="Shadow Mask" value="-1" />
 			<attribute name="Zone Mask" value="-1" />
-			<attribute name="Ray/Occl. LOD Level" value="-1" />
 		</component>
 		<component type="CollisionShape" id="16777221">
 			<attribute name="Shape Type" value="TriangleMesh" />
@@ -160,7 +159,6 @@
 			<attribute name="Light Mask" value="-1" />
 			<attribute name="Shadow Mask" value="-1" />
 			<attribute name="Zone Mask" value="-1" />
-			<attribute name="Ray/Occl. LOD Level" value="-1" />
 		</component>
 	</node>
 </scene>

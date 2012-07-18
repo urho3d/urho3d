@@ -44,11 +44,6 @@ TerrainPatch::TerrainPatch(Context* context) :
     Drawable(context),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context)),
-    owner_(0),
-    north_(0),
-    south_(0),
-    west_(0),
-    east_(0),
     lodLevel_(0),
     lodDirty_(true)
 {
@@ -63,6 +58,11 @@ TerrainPatch::TerrainPatch(Context* context) :
 
 TerrainPatch::~TerrainPatch()
 {
+}
+
+void TerrainPatch::RegisterObject(Context* context)
+{
+    context->RegisterFactory<TerrainPatch>();
 }
 
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -101,23 +101,17 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
             float distance = localRay.HitDistance(boundingBox_);
             if (distance <= query.maxDistance_)
             {
-                // Then the actual test using triangle geometry
-                const void* indexData = geometry_->GetIndexBuffer() ? geometry_->GetIndexBuffer()->GetShadowData() : 0;
-                if (indexData && cpuVertexData_)
+                distance = geometry_->GetHitDistance(localRay);
+                
+                if (distance <= query.maxDistance_)
                 {
-                    distance = localRay.HitDistance(cpuVertexData_.Get(), sizeof(Vector3), indexData, sizeof(unsigned short),
-                        geometry_->GetIndexStart(), geometry_->GetIndexCount());
-                    
-                    if (distance <= query.maxDistance_)
-                    {
-                        RayQueryResult result;
-                        result.drawable_ = this;
-                        result.node_ = GetNode();
-                        result.distance_ = distance;
-                        result.subObject_ = M_MAX_UNSIGNED;
-                        results.Push(result);
-                        break;
-                    }
+                    RayQueryResult result;
+                    result.drawable_ = this;
+                    result.node_ = GetNode();
+                    result.distance_ = distance;
+                    result.subObject_ = M_MAX_UNSIGNED;
+                    results.Push(result);
+                    break;
                 }
             }
         }
@@ -155,14 +149,20 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
 void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
 {
     if (vertexBuffer_->IsDataLost())
-        owner_->UpdatePatchGeometry(this);
+    {
+        if (owner_)
+            owner_->UpdatePatchGeometry(this);
+        else
+            vertexBuffer_->ClearDataLost();
+    }
     
     unsigned northLod = north_ ? north_->lodLevel_ : lodLevel_;
     unsigned southLod = south_ ? south_->lodLevel_ : lodLevel_;
     unsigned westLod = west_ ? west_->lodLevel_ : lodLevel_;
     unsigned eastLod = east_ ? east_->lodLevel_ : lodLevel_;
     
-    owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
+    if (owner_)
+        owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
     
     lodDirty_ = false;
 }
@@ -193,13 +193,20 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     else
         buffer->SetCullMode(CULL_CCW);
     
-    const unsigned char* indexData = geometry_->GetIndexBuffer() ? geometry_->GetIndexBuffer()->GetShadowData() : 0;
-    if (!indexData || !cpuVertexData_)
-        return success;
+    const unsigned char* vertexData;
+    unsigned vertexSize;
+    const unsigned char* indexData;
+    unsigned indexSize;
+    unsigned elementMask;
     
+    geometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    // Check for valid geometry data
+    if (!vertexData || !indexData)
+        return success;
+
     // Draw and check for running out of triangles
-    if (!buffer->Draw(node_->GetWorldTransform(), cpuVertexData_.Get(), sizeof(Vector3), indexData, sizeof(unsigned short),
-        geometry_->GetIndexStart(), geometry_->GetIndexCount()))
+    if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, geometry_->GetIndexStart(),
+        geometry_->GetIndexCount()))
         success = false;
     
     return success;

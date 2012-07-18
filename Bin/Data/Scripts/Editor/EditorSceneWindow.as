@@ -57,6 +57,7 @@ void CreateSceneWindow()
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
     SubscribeToEvent("BoneHierarchyCreated", "HandleBoneHierarchyCreated");
+    SubscribeToEvent("TerrainCreated", "HandleTerrainCreated");
 }
 
 void ShowSceneWindow()
@@ -720,6 +721,14 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
 }
 
 void HandleBoneHierarchyCreated(StringHash eventType, VariantMap& eventData)
+{
+    Node@ node = eventData["Node"].GetNode();
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    if (list.numItems > 0 && GetNodeListIndex(node) != NO_ITEM)
+        UpdateSceneWindowNode(node);
+}
+
+void HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
 {
     Node@ node = eventData["Node"].GetNode();
     ListView@ list = sceneWindow.GetChild("NodeList", true);

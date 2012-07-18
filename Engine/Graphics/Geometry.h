@@ -55,6 +55,10 @@ public:
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// %Set the LOD distance.
     void SetLodDistance(float distance);
+    /// Override raw vertex data to be returned for CPU-side operations.
+    void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned vertexSize, unsigned elementMask);
+    /// Override raw index data to be returned for CPU-side operations.
+    void SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize);
     /// Draw.
     void Draw(Graphics* graphics);
     
@@ -87,7 +91,7 @@ public:
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask);
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
-    float GetDistance(const Ray& ray);
+    float GetHitDistance(const Ray& ray);
     /// Return whether has empty draw range.
     bool IsEmpty() const { return indexCount_ == 0 && vertexCount_ == 0; }
     
@@ -101,6 +105,10 @@ private:
     PODVector<unsigned> elementMasks_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
+    /// Raw vertex data override.
+    SharedArrayPtr<unsigned char> rawVertexData_;
+    /// Raw index data override.
+    SharedArrayPtr<unsigned char> rawIndexData_;
     /// Primitive type.
     PrimitiveType primitiveType_;
     /// Start index.
@@ -113,6 +121,12 @@ private:
     unsigned vertexCount_;
     /// Index of vertex buffer with position data.
     unsigned positionBufferIndex_;
+    /// Raw vertex data override size.
+    unsigned rawVertexSize_;
+    /// Raw vertex data override element mask.
+    unsigned rawElementMask_;
+    /// Raw index data override size.
+    unsigned rawIndexSize_;
     /// LOD distance.
     float lodDistance_;
 };

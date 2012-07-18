@@ -63,12 +63,14 @@ void CreateNodeWindow()
         return;
 
     // Fill resource picker data
-    Array<String> textureFilters = {"*.dds", "*.jpg", "*.png"};
+    Array<String> imageFilters = {"*.png", "*.jpg"};
+    Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.ktx", "*.pvr"};
+    resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
+    resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
     resourcePickers.Push(ResourcePicker("Material", "*.xml"));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
-    resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
     resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
 

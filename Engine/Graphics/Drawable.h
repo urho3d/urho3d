@@ -130,6 +130,8 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
+    /// Return the geometry for a specific LOD level.
+    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
     /// Return number of occlusion geometry triangles.
     virtual unsigned GetNumOccluderTriangles() { return 0; }
     /// Draw to occlusion buffer. Return true if did not run out of triangles.

@@ -44,7 +44,7 @@ OBJECTTYPESTATIC(StaticModel);
 
 StaticModel::StaticModel(Context* context) :
     Drawable(context),
-    softwareLodLevel_(M_MAX_UNSIGNED)
+    occlusionLodLevel_(M_MAX_UNSIGNED)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     materialsAttr_.type_ = Material::GetTypeStatic();
@@ -68,7 +68,7 @@ void StaticModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(StaticModel, Drawable);
-    ATTRIBUTE(StaticModel, VAR_INT, "Ray/Occl. LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "Occlusion LOD Level", occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -108,12 +108,12 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             if (distance <= query.maxDistance_)
             {
                 // Then the actual test using triangle geometry
-                for (unsigned i = 0; i < geometries_.Size(); ++i)
+                for (unsigned i = 0; i < batches_.Size(); ++i)
                 {
-                    Geometry* geometry = GetSoftwareGeometry(i);
+                    Geometry* geometry = batches_[i].geometry_;
                     if (geometry)
                     {
-                        distance = geometry->GetDistance(localRay);
+                        distance = geometry->GetHitDistance(localRay);
                         if (distance <= query.maxDistance_)
                         {
                             RayQueryResult result;
@@ -161,13 +161,29 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
     }
 }
 
+Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
+{
+    if (batchIndex >= geometries_.Size())
+        return 0;
+    
+    // If level is out of range, use visible
+    if (level < geometries_[batchIndex].Size())
+        return geometries_[batchIndex][level];
+    else
+        return batches_[batchIndex].geometry_;
+}
+
 unsigned StaticModel::GetNumOccluderTriangles()
 {
     unsigned triangles = 0;
     
+    // Do not draw occlusion for StaticModel subclasses
+    if (GetType() != StaticModel::GetTypeStatic())
+        return triangles;
+    
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        Geometry* geometry = GetSoftwareGeometry(i);
+        Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
         if (!geometry)
             continue;
         
@@ -186,9 +202,13 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 {
     bool success = true;
     
+    // Do not draw occlusion for StaticModel subclasses
+    if (GetType() != StaticModel::GetTypeStatic())
+        return success;
+    
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        Geometry* geometry = GetSoftwareGeometry(i);
+        Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
         if (!geometry)
             continue;
         
@@ -277,30 +297,15 @@ bool StaticModel::SetMaterial(unsigned index, Material* material)
     return true;
 }
 
-void StaticModel::SetSoftwareLodLevel(unsigned level)
+void StaticModel::SetOcclusionLodLevel(unsigned level)
 {
-    softwareLodLevel_ = level;
+    occlusionLodLevel_ = level;
     MarkNetworkUpdate();
 }
 
 Material* StaticModel::GetMaterial(unsigned index) const
 {
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
-}
-
-Geometry* StaticModel::GetSoftwareGeometry(unsigned index) const
-{
-    if (index >= geometries_.Size())
-        return 0;
-    
-    unsigned lodLevel;
-    // Check whether to use same LOD as visible, or a specific LOD
-    if (softwareLodLevel_ == M_MAX_UNSIGNED)
-        lodLevel = geometryData_[index].lodLevel_;
-    else
-        lodLevel = Clamp(softwareLodLevel_, 0, geometries_[index].Size());
-    
-    return geometries_[index][lodLevel];
 }
 
 void StaticModel::SetBoundingBox(const BoundingBox& box)

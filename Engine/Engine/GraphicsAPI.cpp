@@ -40,6 +40,7 @@
 #include "SmoothedTransform.h"
 #include "Technique.h"
 #include "Terrain.h"
+#include "TerrainPatch.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "Skybox.h"
@@ -590,8 +591,8 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "Material@+ get_materials(uint) const", asMETHOD(StaticModel, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "const BoundingBox& get_boundingBox() const", asMETHOD(StaticModel, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_numGeometries() const", asMETHOD(StaticModel, GetNumGeometries), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticModel", "void set_softwareLodLevel(uint) const", asMETHOD(StaticModel, SetSoftwareLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticModel", "uint get_softwareLodLevel() const", asMETHOD(StaticModel, GetSoftwareLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "void set_occlusionLodLevel(uint) const", asMETHOD(StaticModel, SetOcclusionLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "uint get_occlusionLodLevel() const", asMETHOD(StaticModel, GetOcclusionLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
 }
 
@@ -605,8 +606,6 @@ static void RegisterSkybox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skybox", "Material@+ get_materials(uint) const", asMETHOD(Skybox, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "const BoundingBox& get_boundingBox() const", asMETHOD(Skybox, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "uint get_numGeometries() const", asMETHOD(Skybox, GetNumGeometries), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "void set_softwareLodLevel(uint) const", asMETHOD(Skybox, SetSoftwareLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "uint get_softwareLodLevel() const", asMETHOD(Skybox, GetSoftwareLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
 }
 
@@ -658,8 +657,6 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_materials(uint) const", asMETHOD(AnimatedModel, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_boundingBox() const", asMETHOD(AnimatedModel, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numGeometries() const", asMETHOD(AnimatedModel, GetNumGeometries), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_softwareLodLevel(uint) const", asMETHOD(AnimatedModel, SetSoftwareLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_softwareLodLevel() const", asMETHOD(AnimatedModel, GetSoftwareLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_animationLodBias(float)", asMETHOD(AnimatedModel, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHOD(AnimatedModel, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_invisibleLodFactor(float)", asMETHOD(AnimatedModel, SetInvisibleLodFactor), asCALL_THISCALL);
@@ -776,6 +773,7 @@ static void RegisterDecalSet(asIScriptEngine* engine)
 
 static void RegisterTerrain(asIScriptEngine* engine)
 {
+    RegisterDrawable<TerrainPatch>(engine, "TerrainPatch");
     RegisterComponent<Terrain>(engine, "Terrain");
     engine->RegisterObjectMethod("Terrain", "float GetHeight(const Vector3&in) const", asMETHOD(Terrain, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_material(Material@+)", asMETHOD(Terrain, SetMaterial), asCALL_THISCALL);
@@ -787,6 +785,8 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "void set_spacing(const Vector3&in)", asMETHOD(Terrain, SetSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "const Vector3& get_spacing() const", asMETHOD(Terrain, GetSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "const IntVector2& get_size() const", asMETHOD(Terrain, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "uint get_numPatches() const", asMETHOD(Terrain, GetNumPatches), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ get_patches(uint) const", asMETHOD(Terrain, GetPatch), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_visible(bool)", asMETHOD(Terrain, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "bool get_visible() const", asMETHOD(Terrain, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_castShadows(bool)", asMETHOD(Terrain, SetCastShadows), asCALL_THISCALL);

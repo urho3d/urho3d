@@ -32,8 +32,10 @@
 #include "Node.h"
 #include "Octree.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Scene.h"
+#include "StringUtils.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "VertexBuffer.h"
@@ -72,7 +74,7 @@ Terrain::Terrain(Context* context) :
     shadowDistance_(0.0f),
     lodBias_(1.0f),
     maxLights_(0),
-    terrainDirty_(false)
+    recreateTerrain_(false)
 {
     indexBuffer_->SetShadowed(true);
 }
@@ -84,6 +86,41 @@ Terrain::~Terrain()
 void Terrain::RegisterObject(Context* context)
 {
     context->RegisterFactory<Terrain>();
+    
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(Terrain, VAR_VECTOR3, "Vertex Spacing", spacing_, DEFAULT_SPACING, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Patch Size", GetPatchSize, SetPatchSizeAttr, unsigned, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Occluder", IsOccluder, SetOccluder, bool,  false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Max Lights", GetMaxLights, SetMaxLights, unsigned, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "View Mask", GetViewMask, SetViewMask, unsigned, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
+}
+
+void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    Component::OnSetAttribute(attr, src);
+    
+    // Change of any non-accessor attribute requires recreation of the terrain
+    if (!attr.accessor_)
+        recreateTerrain_ = true;
+}
+
+void Terrain::ApplyAttributes()
+{
+    if (recreateTerrain_)
+    {
+        CreateGeometry();
+        recreateTerrain_ = false;
+    }
 }
 
 void Terrain::SetSpacing(const Vector3& spacing)
@@ -99,19 +136,12 @@ void Terrain::SetSpacing(const Vector3& spacing)
 
 void Terrain::SetPatchSize(unsigned size)
 {
-    size = Clamp((int)size, (int)MIN_PATCH_SIZE, (int)MAX_PATCH_SIZE);
+    if (size < MIN_PATCH_SIZE || size > MAX_PATCH_SIZE || !IsPowerOfTwo(size))
+        return;
     
-    if (size != patchSize_ && IsPowerOfTwo(size))
+    if (size != patchSize_)
     {
         patchSize_ = size;
-        
-        unsigned lodSize = size;
-        numLodLevels_ = 1;
-        while (lodSize > MIN_PATCH_SIZE && numLodLevels_ < MAX_LOD_LEVELS)
-        {
-            lodSize >>= 1;
-            ++numLodLevels_;
-        }
         
         CreateGeometry();
         MarkNetworkUpdate();
@@ -120,10 +150,7 @@ void Terrain::SetPatchSize(unsigned size)
 
 bool Terrain::SetHeightMap(Image* image)
 {
-    if (!image)
-        return false;
-    
-    if (image->IsCompressed())
+    if (image && image->IsCompressed())
     {
         LOGERROR("Can not use a compressed image as a terrain heightmap");
         return false;
@@ -146,7 +173,10 @@ void Terrain::SetMaterial(Material* material)
 {
     material_ = material;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->batches_[0].material_ = material;
+    {
+        if (patches_[i])
+            patches_[i]->batches_[0].material_ = material;
+    }
     
     MarkNetworkUpdate();
 }
@@ -155,7 +185,10 @@ void Terrain::SetDrawDistance(float distance)
 {
     drawDistance_ = distance;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetDrawDistance(distance);
+    {
+        if (patches_[i])
+            patches_[i]->SetDrawDistance(distance);
+    }
     
     MarkNetworkUpdate();
 }
@@ -164,7 +197,10 @@ void Terrain::SetShadowDistance(float distance)
 {
     shadowDistance_ = distance;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetShadowDistance(distance);
+    {
+        if (patches_[i])
+            patches_[i]->SetShadowDistance(distance);
+    }
     
     MarkNetworkUpdate();
 }
@@ -173,7 +209,10 @@ void Terrain::SetLodBias(float bias)
 {
     lodBias_ = bias;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetLodBias(bias);
+    {
+        if (patches_[i])
+            patches_[i]->SetLodBias(bias);
+    }
     
     MarkNetworkUpdate();
 }
@@ -182,7 +221,10 @@ void Terrain::SetViewMask(unsigned mask)
 {
     viewMask_ = mask;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetViewMask(mask);
+    {
+        if (patches_[i])
+            patches_[i]->SetViewMask(mask);
+    }
     
     MarkNetworkUpdate();
 }
@@ -191,7 +233,10 @@ void Terrain::SetLightMask(unsigned mask)
 {
     lightMask_ = mask;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetLightMask(mask);
+    {
+        if (patches_[i])
+            patches_[i]->SetLightMask(mask);
+    }
     
     MarkNetworkUpdate();
 }
@@ -200,7 +245,10 @@ void Terrain::SetShadowMask(unsigned mask)
 {
     shadowMask_ = mask;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetShadowMask(mask);
+    {
+        if (patches_[i])
+            patches_[i]->SetShadowMask(mask);
+    }
     
     MarkNetworkUpdate();
 }
@@ -209,7 +257,10 @@ void Terrain::SetZoneMask(unsigned mask)
 {
     zoneMask_ = mask;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetZoneMask(mask);
+    {
+        if (patches_[i])
+            patches_[i]->SetZoneMask(mask);
+    }
     
     MarkNetworkUpdate();
 }
@@ -218,7 +269,10 @@ void Terrain::SetMaxLights(unsigned num)
 {
     maxLights_ = num;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetMaxLights(num);
+    {
+        if (patches_[i])
+            patches_[i]->SetMaxLights(num);
+    }
     
     MarkNetworkUpdate();
 }
@@ -227,7 +281,10 @@ void Terrain::SetVisible(bool enable)
 {
     visible_ = enable;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetVisible(enable);
+    {
+        if (patches_[i])
+            patches_[i]->SetVisible(enable);
+    }
     
     MarkNetworkUpdate();
 }
@@ -236,7 +293,10 @@ void Terrain::SetCastShadows(bool enable)
 {
     castShadows_ = enable;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetCastShadows(enable);
+    {
+        if (patches_[i])
+            patches_[i]->SetCastShadows(enable);
+    }
     
     MarkNetworkUpdate();
 }
@@ -245,7 +305,10 @@ void Terrain::SetOccluder(bool enable)
 {
     occluder_ = enable;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetOccluder(enable);
+    {
+        if (patches_[i])
+            patches_[i]->SetOccluder(enable);
+    }
     
     MarkNetworkUpdate();
 }
@@ -254,7 +317,10 @@ void Terrain::SetOccludee(bool enable)
 {
     occluder_ = enable;
     for (unsigned i = 0; i < patches_.Size(); ++i)
-        patches_[i]->SetOccludee(enable);
+    {
+        if (patches_[i])
+            patches_[i]->SetOccludee(enable);
+    }
     
     MarkNetworkUpdate();
 }
@@ -267,6 +333,11 @@ Image* Terrain::GetHeightMap() const
 Material* Terrain::GetMaterial() const
 {
     return material_;
+}
+
+TerrainPatch* Terrain::GetPatch(unsigned index) const
+{
+    return index < patches_.Size() ? patches_[index] : (TerrainPatch*)0;
 }
 
 float Terrain::GetHeight(const Vector3& worldPosition) const
@@ -310,10 +381,11 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     VertexBuffer* vertexBuffer = patch->vertexBuffer_;
     if (vertexBuffer->GetVertexCount() != vertexDataRow * vertexDataRow)
         vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
-    patch->cpuVertexData_ = new Vector3[vertexDataRow * vertexDataRow];
+    
+    SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[vertexDataRow * vertexDataRow * sizeof(Vector3)]);
     
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
-    float* cpuVertexData = (float*)patch->cpuVertexData_.Get();
+    float* positionData = (float*)cpuVertexData.Get();
     
     if (vertexData)
     {
@@ -332,9 +404,9 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = position.x_;
                 *vertexData++ = position.y_;
                 *vertexData++ = position.z_;
-                *cpuVertexData++ = position.x_;
-                *cpuVertexData++ = position.y_;
-                *cpuVertexData++ = position.z_;
+                *positionData++ = position.x_;
+                *positionData++ = position.y_;
+                *positionData++ = position.z_;
                 
                 box.Merge(position);
                 
@@ -365,6 +437,7 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     patch->boundingBox_ = box;
     patch->geometry_->SetIndexBuffer(indexBuffer_);
     patch->geometry_->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
+    patch->geometry_->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
     patch->OnMarkedDirty(patch->GetNode());
 }
 
@@ -373,133 +446,195 @@ void Terrain::UpdatePatchLOD(TerrainPatch* patch, unsigned lod, unsigned northLo
 {
 }
 
-void Terrain::OnMarkedDirty(Node* node)
+void Terrain::SetMaterialAttr(ResourceRef value)
 {
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetMaterial(cache->GetResource<Material>(value.id_));
+}
+
+void Terrain::SetHeightMapAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Image* image = cache->GetResource<Image>(value.id_);
+    if (image != heightMap_ && (!image || !image->IsCompressed()))
+    {
+        heightMap_ = image;
+        recreateTerrain_ = true;
+    }
+}
+
+void Terrain::SetPatchSizeAttr(unsigned value)
+{
+    if (value < MIN_PATCH_SIZE || value > MAX_PATCH_SIZE || !IsPowerOfTwo(value))
+        return;
     
-    for (Vector<SharedPtr<TerrainPatch> >::Iterator i = patches_.Begin(); i != patches_.End(); ++i)
-        SetPatchTransform(*i);
+    if (value != patchSize_)
+    {
+        patchSize_ = value;
+        recreateTerrain_ = true;
+    }
+}
+
+ResourceRef Terrain::GetMaterialAttr() const
+{
+    return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+ResourceRef Terrain::GetHeightMapAttr() const
+{
+    return GetResourceRef(heightMap_, Image::GetTypeStatic());
 }
 
 void Terrain::CreateGeometry()
 {
-    Scene* scene = GetScene();
-    Octree* octree = scene ? scene->GetComponent<Octree>() : 0;
-    if (!heightMap_ || !node_ || !octree)
+    recreateTerrain_ = false;
+    
+    if (!node_)
         return;
     
     PROFILE(CreateTerrainGeometry);
     
-    patches_.Clear();
-    patchNodes_.Clear();
+    unsigned prevNumPatches = patches_.Size();
     
-    // Determine total terrain size & copy heightmap data
-    patchesX_ = (heightMap_->GetWidth() - 1) / patchSize_;
-    patchesZ_ = (heightMap_->GetHeight() - 1) / patchSize_;
-    size_ = IntVector2(patchesX_ * patchSize_ + 1, patchesZ_ * patchSize_ + 1);
+    // Determine number of LOD levels
+    unsigned lodSize = patchSize_;
+    numLodLevels_ = 1;
+    while (lodSize > MIN_PATCH_SIZE && numLodLevels_ < MAX_LOD_LEVELS)
+    {
+        lodSize >>= 1;
+        ++numLodLevels_;
+    }
+    
+    // Determine total terrain size
     patchWorldSize_ = Vector2(spacing_.x_ * (float)patchSize_, spacing_.z_ * (float)patchSize_);
-    patchWorldOrigin_ = Vector2(-0.5f * (float)patchesX_ * patchWorldSize_.x_, -0.5f * (float)patchesZ_ * patchWorldSize_.y_);
-    heightData_ = new float[size_.x_ * size_.y_];
-    
-    const unsigned char* src = heightMap_->GetData();
-    float* dest = heightData_;
-    unsigned imgComps = heightMap_->GetComponents();
-    unsigned imgRow = heightMap_->GetWidth() * imgComps;
-    
-    for (int z = 0; z < size_.y_; ++z)
+    if (heightMap_)
     {
-        for (int x = 0; x < size_.x_; ++x)
-            *dest++ = (float)src[imgRow * (size_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
+        patchesX_ = (heightMap_->GetWidth() - 1) / patchSize_;
+        patchesZ_ = (heightMap_->GetHeight() - 1) / patchSize_;
+        size_ = IntVector2(patchesX_ * patchSize_ + 1, patchesZ_ * patchSize_ + 1);
+        patchWorldOrigin_ = Vector2(-0.5f * (float)patchesX_ * patchWorldSize_.x_, -0.5f * (float)patchesZ_ * patchWorldSize_.y_);
+        heightData_ = new float[size_.x_ * size_.y_];
+    }
+    else
+    {
+        patchesX_ = 0;
+        patchesZ_ = 0;
+        size_ = IntVector2::ZERO;
+        patchWorldOrigin_ = Vector2::ZERO;
+        heightData_.Reset();
     }
     
-    // Create scene nodes for patches
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    
-    for (unsigned z = 0; z < patchesZ_; ++z)
+    // Remove old patch nodes which are not needed
+    PODVector<Node*> oldPatchNodes;
+    node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
+    for (PODVector<Node*>::Iterator i = oldPatchNodes.Begin(); i != oldPatchNodes.End(); ++i)
     {
-        for (unsigned x = 0; x < patchesX_; ++x)
+        bool nodeOk = false;
+        Vector<String> coords = (*i)->GetName().Substring(6).Split('_');
+        if (coords.Size() == 2)
         {
-            // Note: terrain nodes are not created as part of the scene, as it's runtime generated scene hierarchy
-            // we never want to save, serialize through network, or show in the editor
-            Node* patchNode = new Node(context_);
-            patchNode->SetID(FIRST_LOCAL_ID);
-            
-            TerrainPatch* patch = new TerrainPatch(context_);
-            patch->owner_ = this;
-            patch->x_ = x;
-            patch->z_ = z;
-            patchNode->AddComponent(patch, FIRST_LOCAL_ID, LOCAL);
-            octree->AddManualDrawable(patch);
-            
-            // Copy initial drawable parameters
-            patch->batches_[0].material_ = material_;
-            patch->SetDrawDistance(drawDistance_);
-            patch->SetShadowDistance(shadowDistance_);
-            patch->SetLodBias(lodBias_);
-            patch->SetViewMask(viewMask_);
-            patch->SetLightMask(lightMask_);
-            patch->SetShadowMask(shadowMask_);
-            patch->SetZoneMask(zoneMask_);
-            patch->SetMaxLights(maxLights_);
-            patch->SetVisible(visible_);
-            patch->SetCastShadows(castShadows_);
-            patch->SetOccluder(occluder_);
-            patch->SetOccludee(occludee_);
-            
-            patches_.Push(SharedPtr<TerrainPatch>(patch));
-            patchNodes_.Push(SharedPtr<Node>(patchNode));
+            unsigned x = ToUInt(coords[0]);
+            unsigned z = ToUInt(coords[1]);
+            if (x < patchesX_ && z < patchesZ_)
+                nodeOk = true;
         }
+        
+        if (!nodeOk)
+            node_->RemoveChild(*i);
     }
     
-    // Create the shared index data
-    /// \todo Create LOD levels
-    indexBuffer_->SetSize(patchSize_ * patchSize_ * 6, false);
-    unsigned vertexDataRow = patchSize_ + 1;
-    unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indexBuffer_->GetIndexCount());
+    patches_.Clear();
     
-    if (indexData)
+    if (heightMap_)
     {
-        for (unsigned z = 0; z < patchSize_; ++z)
+        // Copy heightmap data
+        const unsigned char* src = heightMap_->GetData();
+        float* dest = heightData_;
+        unsigned imgComps = heightMap_->GetComponents();
+        unsigned imgRow = heightMap_->GetWidth() * imgComps;
+        
+        for (int z = 0; z < size_.y_; ++z)
         {
-            for (unsigned x = 0; x < patchSize_; ++x)
+            for (int x = 0; x < size_.x_; ++x)
+                *dest++ = (float)src[imgRow * (size_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
+        }
+        
+        // Create patches and set node transforms
+        for (unsigned z = 0; z < patchesZ_; ++z)
+        {
+            for (unsigned x = 0; x < patchesX_; ++x)
             {
-                *indexData++ = x + (z + 1) * vertexDataRow;
-                *indexData++ = x + z * vertexDataRow + 1;
-                *indexData++ = x + z * vertexDataRow;
+                String nodeName = "Patch_" + String(x) + "_" + String(z);
+                Node* patchNode = node_->GetChild(nodeName);
+                if (!patchNode)
+                    patchNode = node_->CreateChild(nodeName, LOCAL);
                 
-                *indexData++ = x + (z + 1) * vertexDataRow;
-                *indexData++ = x + (z + 1) * vertexDataRow + 1;
-                *indexData++ = x + z * vertexDataRow + 1;
+                patchNode->SetPosition(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, patchWorldOrigin_.y_ +
+                    (float)z * patchWorldSize_.y_));
+                
+                TerrainPatch* patch = patchNode->GetOrCreateComponent<TerrainPatch>();
+                patch->owner_ = this;
+                patch->x_ = x;
+                patch->z_ = z;
+                
+                // Copy initial drawable parameters
+                patch->batches_[0].material_ = material_;
+                patch->SetDrawDistance(drawDistance_);
+                patch->SetShadowDistance(shadowDistance_);
+                patch->SetLodBias(lodBias_);
+                patch->SetViewMask(viewMask_);
+                patch->SetLightMask(lightMask_);
+                patch->SetShadowMask(shadowMask_);
+                patch->SetZoneMask(zoneMask_);
+                patch->SetMaxLights(maxLights_);
+                patch->SetVisible(visible_);
+                patch->SetCastShadows(castShadows_);
+                patch->SetOccluder(occluder_);
+                patch->SetOccludee(occludee_);
+                
+                patches_.Push(WeakPtr<TerrainPatch>(patch));
             }
         }
         
-        indexBuffer_->Unlock();
+        // Create the shared index data
+        /// \todo Create LOD levels
+        indexBuffer_->SetSize(patchSize_ * patchSize_ * 6, false);
+        unsigned vertexDataRow = patchSize_ + 1;
+        unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indexBuffer_->GetIndexCount());
+        
+        if (indexData)
+        {
+            for (unsigned z = 0; z < patchSize_; ++z)
+            {
+                for (unsigned x = 0; x < patchSize_; ++x)
+                {
+                    *indexData++ = x + (z + 1) * vertexDataRow;
+                    *indexData++ = x + z * vertexDataRow + 1;
+                    *indexData++ = x + z * vertexDataRow;
+                    
+                    *indexData++ = x + (z + 1) * vertexDataRow;
+                    *indexData++ = x + (z + 1) * vertexDataRow + 1;
+                    *indexData++ = x + z * vertexDataRow + 1;
+                }
+            }
+            
+            indexBuffer_->Unlock();
+        }
+        
+        // Create vertex data for patches
+        for (Vector<WeakPtr<TerrainPatch> >::Iterator i = patches_.Begin(); i != patches_.End(); ++i)
+            UpdatePatchGeometry(*i);
     }
     
-    // Create vertex data for patches, and set transform
-    for (Vector<SharedPtr<TerrainPatch> >::Iterator i = patches_.Begin(); i != patches_.End(); ++i)
+    // Send event only if new geometry was generated, or the old was cleared
+    if (patches_.Size() || prevNumPatches)
     {
-        SetPatchTransform(*i);
-        UpdatePatchGeometry(*i);
+        using namespace TerrainCreated;
+        
+        VariantMap eventData;
+        eventData[P_NODE] = (void*)node_;
+        node_->SendEvent(E_TERRAINCREATED, eventData);
     }
-    
-    using namespace TerrainCreated;
-    
-    VariantMap eventData;
-    eventData[P_NODE] = (void*)node_;
-    SendEvent(E_TERRAINCREATED, eventData);
-}
-
-void Terrain::SetPatchTransform(TerrainPatch* patch)
-{
-    Node* patchNode = patch->GetNode();
-    unsigned x = patch->x_;
-    unsigned z = patch->z_;
-    
-    Matrix3x4 patchTransform(Vector3(patchWorldOrigin_.x_ + (float)x * patchWorldSize_.x_, 0.0f, patchWorldOrigin_.y_ +
-        (float)z * patchWorldSize_.y_), Quaternion::IDENTITY, 1.0f);
-    Matrix3x4 combinedTransform = node_->GetWorldTransform() * patchTransform;
-    patchNode->SetTransform(combinedTransform.Translation(), combinedTransform.Rotation(), combinedTransform.Scale());
 }
 
 float Terrain::GetRawHeight(unsigned x, unsigned z) const

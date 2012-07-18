@@ -72,7 +72,6 @@
 			<attribute name="Light Mask" value="-1" />
 			<attribute name="Shadow Mask" value="-1" />
 			<attribute name="Zone Mask" value="-1" />
-			<attribute name="Ray/Occl. LOD Level" value="-1" />
 			<attribute name="Bone Animation Enabled">
 				<variant type="Bool" value="true" />
 				<variant type="Bool" value="true" />

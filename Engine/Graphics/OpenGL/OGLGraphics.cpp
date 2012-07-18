@@ -49,6 +49,7 @@
 #include "StringUtils.h"
 #include "Technique.h"
 #include "Terrain.h"
+#include "TerrainPatch.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
@@ -2313,6 +2314,7 @@ void RegisterGraphicsLibrary(Context* context)
     ParticleEmitter::RegisterObject(context);
     DecalSet::RegisterObject(context);
     Terrain::RegisterObject(context);
+    TerrainPatch::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);

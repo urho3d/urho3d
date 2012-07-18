@@ -302,7 +302,16 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             worldTransform = Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale());
         else
             worldTransform = node_->GetWorldTransform();
-        Vector3 worldPosition = worldTransform * position_;
+        
+        Vector3 position = position_;
+        // For terrains, undo the height centering performed automatically by Bullet
+        if (shapeType_ == SHAPE_TERRAIN && geometry_)
+        {
+            HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
+            position.y_ += (heightfield->minHeight_ + heightfield->maxHeight_) * 0.5f;
+        }
+        
+        Vector3 worldPosition = worldTransform * position;
         Quaternion worldRotation = worldTransform.Rotation() * rotation_;
         
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
@@ -584,8 +593,6 @@ void CollisionShape::ReleaseShape()
     
     if (physicsWorld_)
         physicsWorld_->CleanupGeometryCache();
-    
-    UnsubscribeFromEvent(E_TERRAINCREATED);
 }
 
 void CollisionShape::OnNodeSet(Node* node)
@@ -602,6 +609,9 @@ void CollisionShape::OnNodeSet(Node* node)
                 LOGERROR("No physics world component in scene, can not create collision shape");
         }
         node->AddListener(this);
+        
+        // Terrain collision shape depends on the terrain component's geometry updates. Subscribe to them
+        SubscribeToEvent(node, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
         
         UpdateShape();
         NotifyRigidBody();
@@ -770,6 +780,9 @@ void CollisionShape::UpdateShape()
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
 {
-    UpdateShape();
-    NotifyRigidBody();
+    if (shapeType_ == SHAPE_TERRAIN)
+    {
+        UpdateShape();
+        NotifyRigidBody();
+    }
 }

@@ -41,6 +41,9 @@ Geometry::Geometry(Context* context) :
     vertexStart_(0),
     vertexCount_(0),
     positionBufferIndex_(M_MAX_UNSIGNED),
+    rawVertexSize_(0),
+    rawElementMask_(0),
+    rawIndexSize_(0),
     lodDistance_(0.0f)
 {
     SetNumVertexBuffers(1);
@@ -164,6 +167,19 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
+void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned vertexSize, unsigned elementMask)
+{
+    rawVertexData_ = data;
+    rawVertexSize_ = vertexSize;
+    rawElementMask_ = elementMask;
+}
+
+void Geometry::SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize)
+{
+    rawIndexData_ = data;
+    rawIndexSize_ = indexSize;
+}
+
 void Geometry::Draw(Graphics* graphics)
 {
     if (indexBuffer_ && indexCount_ > 0)
@@ -208,55 +224,72 @@ unsigned short Geometry::GetBufferHash() const
 
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask)
 {
-    if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
+    if (rawVertexData_)
     {
-        vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
-        if (vertexData)
+        vertexData = rawVertexData_.Get();
+        vertexSize = rawVertexSize_;
+        elementMask = rawElementMask_;
+    }
+    else
+    {
+        if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
         {
-            vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
-            elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
+            vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
+            if (vertexData)
+            {
+                vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
+                elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
+            }
+            else
+            {
+                vertexSize = 0;
+                elementMask = 0;
+            }
         }
         else
         {
+            vertexData = 0;
             vertexSize = 0;
             elementMask = 0;
         }
     }
-    else
-    {
-        vertexData = 0;
-        vertexSize = 0;
-        elementMask = 0;
-    }
     
-    if (indexBuffer_)
+    if (rawIndexData_)
     {
-        indexData = indexBuffer_->GetShadowData();
-        if (indexData)
-            indexSize = indexBuffer_->GetIndexSize();
-        else
-            indexSize = 0;
+        indexData = rawIndexData_.Get();
+        indexSize = rawIndexSize_;
     }
     else
     {
-        indexData = 0;
-        indexSize = 0;
+        if (indexBuffer_)
+        {
+            indexData = indexBuffer_->GetShadowData();
+            if (indexData)
+                indexSize = indexBuffer_->GetIndexSize();
+            else
+                indexSize = 0;
+        }
+        else
+        {
+            indexData = 0;
+            indexSize = 0;
+        }
     }
 }
 
-float Geometry::GetDistance(const Ray& ray)
+float Geometry::GetHitDistance(const Ray& ray)
 {
-    const unsigned char* rawVertexData;
-    const unsigned char* rawIndexData;
+    const unsigned char* vertexData;
+    const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
     unsigned elementMask;
     
-    GetRawData(rawVertexData, vertexSize, rawIndexData, indexSize, elementMask);
-    if (!rawVertexData || !rawIndexData)
+    GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    if (!vertexData || !indexData)
         return M_INFINITY;
     
-    return ray.HitDistance(rawVertexData, vertexSize, rawIndexData, indexSize, indexStart_, indexCount_);
+    return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
 }
 
 void Geometry::GetPositionBufferIndex()

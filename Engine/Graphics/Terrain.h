@@ -42,6 +42,11 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
+    
     /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(unsigned size);
     /// Set vertex (XZ) and height (Y) spacing.
@@ -85,16 +90,14 @@ public:
     Image* GetHeightMap() const;
     /// Return material.
     Material* GetMaterial() const;
+    /// Return number of patches.
+    unsigned GetNumPatches() const { return patches_.Size(); }
+    /// Return patch by index.
+    TerrainPatch* GetPatch(unsigned index) const;
     /// Return height at world coordinates.
     float GetHeight(const Vector3& worldPosition) const;
     /// Return raw height data.
     SharedArrayPtr<float> GetHeightData() const { return heightData_; }
-    /// Return number of terrain patches.
-    unsigned GetNumPatches() const { return patches_.Size(); }
-    /// Return terrain patch.
-    TerrainPatch* GetPatch(unsigned index) const;
-    /// Return scene node of terrain patch.
-    Node* GetPatchNode(unsigned index);
     /// Return draw distance.
     float GetDrawDistance() const { return drawDistance_; }
     /// Return shadow draw distance.
@@ -124,16 +127,20 @@ public:
     void UpdatePatchGeometry(TerrainPatch* patch);
     /// Update patch based on LOD and neighbor LOD.
     void UpdatePatchLOD(TerrainPatch* patch, unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod);
-    
-protected:
-    /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    /// %Set heightmap attribute.
+    void SetHeightMapAttr(ResourceRef value);
+    /// %Set material attribute.
+    void SetMaterialAttr(ResourceRef value);
+    /// %Set patch size attribute.
+    void SetPatchSizeAttr(unsigned value);
+    /// Return heightmap attribute.
+    ResourceRef GetHeightMapAttr() const;
+    /// Return material attribute.
+    ResourceRef GetMaterialAttr() const;
     
 private:
     /// Fully regenerate terrain geometry.
     void CreateGeometry();
-    /// Set the scene node transform for a patch.
-    void SetPatchTransform(TerrainPatch* patch);
     /// Return an uninterpolated terrain height value, clamping to edges.
     float GetRawHeight(unsigned x, unsigned z) const;
     /// Get terrain normal at position.
@@ -150,9 +157,7 @@ private:
     /// Material.
     SharedPtr<Material> material_;
     /// Terrain patches.
-    Vector<SharedPtr<TerrainPatch> > patches_;
-    /// Terrain patch scene nodes.
-    Vector<SharedPtr<Node> > patchNodes_;
+    Vector<WeakPtr<TerrainPatch> > patches_;
     /// Patch size, quads per side.
     unsigned patchSize_;
     /// Number of terrain LOD levles.
@@ -194,5 +199,5 @@ private:
     /// Maximum lights.
     unsigned maxLights_;
     /// Terrain needs regeneration flag.
-    bool terrainDirty_;
+    bool recreateTerrain_;
 };

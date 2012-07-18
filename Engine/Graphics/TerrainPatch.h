@@ -40,6 +40,8 @@ public:
     TerrainPatch(Context* context);
     /// Destruct.
     ~TerrainPatch();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
     
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
@@ -63,18 +65,16 @@ private:
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
-    /// CPU-side position-only vertex data for raycasting and occlusion.
-    SharedArrayPtr<Vector3> cpuVertexData_;
     /// Parent terrain.
-    Terrain* owner_;
+    WeakPtr<Terrain> owner_;
     /// North neighbor patch.
-    TerrainPatch* north_;
+    WeakPtr<TerrainPatch> north_;
     /// South neighbor patch.
-    TerrainPatch* south_;
+    WeakPtr<TerrainPatch> south_;
     /// West neighbor patch.
-    TerrainPatch* west_;
+    WeakPtr<TerrainPatch> west_;
     /// East neighbor patch.
-    TerrainPatch* east_;
+    WeakPtr<TerrainPatch> east_;
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Patch X-coordinate in the terrain.

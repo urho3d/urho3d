@@ -679,15 +679,8 @@ void DecalSet::OnWorldBoundingBoxUpdate()
 void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
     const Vector3& decalNormal, float normalCutoff)
 {
-    Geometry* geometry;
-    
-    // Special handling for static/animated models, as they may use LOD: use the fixed software LOD level for decals
-    StaticModel* staticModel = dynamic_cast<StaticModel*>(target);
-    if (staticModel)
-        geometry = staticModel->GetSoftwareGeometry(batchIndex);
-    else
-        geometry = target->GetBatches()[batchIndex].geometry_;
-    
+    // Try to use the most accurate LOD level if possible
+    Geometry* geometry = target->GetLodGeometry(batchIndex, 0);
     if (!geometry)
         return;
     
@@ -695,10 +688,10 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     const unsigned char* normalData = 0;
     const unsigned char* skinningData = 0;
     const unsigned char* indexData = 0;
-    unsigned positionStride;
-    unsigned normalStride;
-    unsigned skinningStride;
-    unsigned indexStride;
+    unsigned positionStride = 0;
+    unsigned normalStride = 0;
+    unsigned skinningStride = 0;
+    unsigned indexStride = 0;
     
     IndexBuffer* ib = geometry->GetIndexBuffer();
     if (ib)
@@ -737,8 +730,14 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     // Positions and indices are needed
     if (!positionData || !indexData)
     {
-        LOGWARNING("Can not add decal, object does not have CPU-side geometry data");
-        return;
+        // As a fallback, try to get the geometry's raw vertex/index data
+        unsigned elementMask;
+        geometry->GetRawData(positionData, positionStride, indexData, indexStride, elementMask);
+        if (!positionData || !indexData)
+        {
+            LOGWARNING("Can not add decal, object does not have CPU-side geometry data");
+            return;
+        }
     }
     
     unsigned indexStart = geometry->GetIndexStart();

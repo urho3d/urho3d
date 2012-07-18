@@ -108,7 +108,7 @@ inline bool IsPowerOfTwo(unsigned value)
 inline unsigned NextPowerOfTwo(unsigned value)
 {
     unsigned ret = 1;
-    while (ret < value)
+    while (ret < value && ret < 0x80000000)
         ret <<= 1;
     return ret;
 }
