@@ -111,7 +111,7 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
 
 Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
 {
-    // By default return just the batch geometry
+    // By default return the visible batch geometry
     if (batchIndex < batches_.Size())
         return batches_[batchIndex].geometry_;
     else

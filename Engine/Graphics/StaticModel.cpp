@@ -166,7 +166,7 @@ Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
     if (batchIndex >= geometries_.Size())
         return 0;
     
-    // If level is out of range, use visible
+    // If level is out of range, use visible geometry
     if (level < geometries_[batchIndex].Size())
         return geometries_[batchIndex][level];
     else
