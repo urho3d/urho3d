@@ -27,6 +27,8 @@
 #include "Geometry.h"
 #include "IndexBuffer.h"
 #include "Node.h"
+#include "OcclusionBuffer.h"
+#include "OctreeQuery.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "VertexBuffer.h"
@@ -65,7 +67,62 @@ TerrainPatch::~TerrainPatch()
 
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    /// \todo Implement
+    RayQueryLevel level = query.level_;
+    
+    switch (level)
+    {
+    case RAY_AABB_NOSUBOBJECTS:
+    case RAY_AABB:
+        Drawable::ProcessRayQuery(query, results);
+        break;
+        
+    case RAY_OBB:
+        {
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+            float distance = localRay.HitDistance(boundingBox_);
+            if (distance <= query.maxDistance_)
+            {
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = GetNode();
+                result.distance_ = distance;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
+        }
+        break;
+        
+    case RAY_TRIANGLE:
+        {
+            // Do a pretest using the OBB
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+            float distance = localRay.HitDistance(boundingBox_);
+            if (distance <= query.maxDistance_)
+            {
+                // Then the actual test using triangle geometry
+                const void* indexData = geometry_->GetIndexBuffer() ? geometry_->GetIndexBuffer()->GetShadowData() : 0;
+                if (indexData && cpuVertexData_)
+                {
+                    distance = localRay.HitDistance(cpuVertexData_.Get(), sizeof(Vector3), indexData, sizeof(unsigned short),
+                        geometry_->GetIndexStart(), geometry_->GetIndexCount());
+                    
+                    if (distance <= query.maxDistance_)
+                    {
+                        RayQueryResult result;
+                        result.drawable_ = this;
+                        result.node_ = GetNode();
+                        result.distance_ = distance;
+                        result.subObject_ = M_MAX_UNSIGNED;
+                        results.Push(result);
+                        break;
+                    }
+                }
+            }
+        }
+        break;
+    }
 }
 
 void TerrainPatch::UpdateBatches(const FrameInfo& frame)
@@ -108,6 +165,44 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
     owner_->UpdatePatchLOD(this, lodLevel_, northLod, southLod, westLod, eastLod);
     
     lodDirty_ = false;
+}
+
+
+unsigned TerrainPatch::GetNumOccluderTriangles()
+{
+    // Check that the material is suitable for occlusion (default material always is)
+    Material* mat = batches_[0].material_;
+    if (mat && !mat->GetOcclusion())
+        return 0;
+    else
+        return geometry_->GetIndexCount() / 3;
+}
+
+bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
+{
+    bool success = true;
+    
+    // Check that the material is suitable for occlusion (default material always is) and set culling mode
+    Material* material = batches_[0].material_;
+    if (material)
+    {
+        if (!material->GetOcclusion())
+            return success;
+        buffer->SetCullMode(material->GetCullMode());
+    }
+    else
+        buffer->SetCullMode(CULL_CCW);
+    
+    const unsigned char* indexData = geometry_->GetIndexBuffer() ? geometry_->GetIndexBuffer()->GetShadowData() : 0;
+    if (!indexData || !cpuVertexData_)
+        return success;
+    
+    // Draw and check for running out of triangles
+    if (!buffer->Draw(node_->GetWorldTransform(), cpuVertexData_.Get(), sizeof(Vector3), indexData, sizeof(unsigned short),
+        geometry_->GetIndexStart(), geometry_->GetIndexCount()))
+        success = false;
+    
+    return success;
 }
 
 UpdateGeometryType TerrainPatch::GetUpdateGeometryType()

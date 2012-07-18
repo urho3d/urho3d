@@ -49,6 +49,10 @@ public:
     virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
+    /// Return number of occlusion geometry triangles.
+    virtual unsigned GetNumOccluderTriangles();
+    /// Draw to occlusion buffer. Return true if did not run out of triangles.
+    virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
 protected:
     /// Recalculate the world-space bounding box.
@@ -59,6 +63,8 @@ private:
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// CPU-side position-only vertex data for raycasting and occlusion.
+    SharedArrayPtr<Vector3> cpuVertexData_;
     /// Parent terrain.
     Terrain* owner_;
     /// North neighbor patch.

@@ -310,7 +310,10 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     VertexBuffer* vertexBuffer = patch->vertexBuffer_;
     if (vertexBuffer->GetVertexCount() != vertexDataRow * vertexDataRow)
         vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    patch->cpuVertexData_ = new Vector3[vertexDataRow * vertexDataRow];
+    
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
+    float* cpuVertexData = (float*)patch->cpuVertexData_.Get();
     
     if (vertexData)
     {
@@ -329,6 +332,9 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = position.x_;
                 *vertexData++ = position.y_;
                 *vertexData++ = position.z_;
+                *cpuVertexData++ = position.x_;
+                *cpuVertexData++ = position.y_;
+                *cpuVertexData++ = position.z_;
                 
                 box.Merge(position);
                 
