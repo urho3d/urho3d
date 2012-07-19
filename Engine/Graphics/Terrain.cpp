@@ -46,7 +46,7 @@ OBJECTTYPESTATIC(Terrain);
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
 static const unsigned MAX_LOD_LEVELS = 8;
-static const int DEFAULT_PATCH_SIZE = 16;
+static const int DEFAULT_PATCH_SIZE = 64;
 static const int MIN_PATCH_SIZE = 4;
 static const int MAX_PATCH_SIZE = 128;
 
@@ -756,8 +756,8 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
                 }
             }
             
-            // Set error metric always at least same as vertex spacing to prevent horizontal stretches getting too low LOD
-            maxError = Max(maxError, 0.5f * (spacing_.x_ + spacing_.z_));
+            // Set error to be at least same as (half vertex spacing x LOD) to prevent horizontal stretches getting too inaccurate
+            maxError = Max(maxError, 0.25f * (spacing_.x_ + spacing_.z_) * (float)(1 << i));
         }
         
         lodErrors.Push(maxError);
