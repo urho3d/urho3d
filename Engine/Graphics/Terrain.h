@@ -156,8 +156,6 @@ private:
     void CalculateLodErrors(TerrainPatch* patch);
     /// Set neighbors for a patch.
     void SetNeighbors(TerrainPatch* patch);
-    /// Get draw range index for a given LOD and neighbor LODs.
-    unsigned GetDrawRangeIndex(unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod);
     /// Set heightmap image and optionally recreate the geometry immediately. Return true if successful.
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.

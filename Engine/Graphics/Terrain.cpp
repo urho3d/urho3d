@@ -45,10 +45,14 @@
 OBJECTTYPESTATIC(Terrain);
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
-static const unsigned MAX_LOD_LEVELS = 8;
+static const unsigned MAX_LOD_LEVELS = 4;
 static const int DEFAULT_PATCH_SIZE = 64;
 static const int MIN_PATCH_SIZE = 4;
 static const int MAX_PATCH_SIZE = 128;
+static const unsigned STITCH_NORTH = 1;
+static const unsigned STITCH_SOUTH = 2;
+static const unsigned STITCH_WEST = 4;
+static const unsigned STITCH_EAST = 8;
 
 Terrain::Terrain(Context* context) :
     Component(context),
@@ -369,15 +373,15 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
-    unsigned vertexDataRow = patchSize_ + 1;
+    unsigned row = patchSize_ + 1;
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
     Geometry* geometry = patch->GetGeometry();
     Geometry* maxLodGeometry = patch->GetMaxLodGeometry();
     
-    if (vertexBuffer->GetVertexCount() != vertexDataRow * vertexDataRow)
-        vertexBuffer->SetSize(vertexDataRow * vertexDataRow, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    if (vertexBuffer->GetVertexCount() != row * row)
+        vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
-    SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[vertexDataRow * vertexDataRow * sizeof(Vector3)]);
+    SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
     
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     float* positionData = (float*)cpuVertexData.Get();
@@ -445,11 +449,25 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
 void Terrain::UpdatePatchLod(TerrainPatch* patch)
 {
-    /// \todo Use stitching
-    unsigned lodLevel = patch->GetLodLevel();
     Geometry* geometry = patch->GetGeometry();
-    if (lodLevel < drawRanges_.Size())
-        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lodLevel].first_, drawRanges_[lodLevel].second_);
+    
+    // All LOD levels except the coarsest have 16 versions for stitching
+    unsigned lodLevel = patch->GetLodLevel();
+    unsigned drawRangeIndex = lodLevel << 4;
+    if (lodLevel < numLodLevels_ - 1)
+    {
+        if (patch->GetNorthPatch() && patch->GetNorthPatch()->GetLodLevel() > lodLevel)
+            drawRangeIndex |= STITCH_NORTH;
+        if (patch->GetSouthPatch() && patch->GetSouthPatch()->GetLodLevel() > lodLevel)
+            drawRangeIndex |= STITCH_SOUTH;
+        if (patch->GetWestPatch() && patch->GetWestPatch()->GetLodLevel() > lodLevel)
+            drawRangeIndex |= STITCH_WEST;
+        if (patch->GetEastPatch() && patch->GetEastPatch()->GetLodLevel() > lodLevel)
+            drawRangeIndex |= STITCH_EAST;
+    }
+    
+    if (drawRangeIndex < drawRanges_.Size())
+        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[drawRangeIndex].first_, drawRanges_[drawRangeIndex].second_);
 }
 
 void Terrain::SetMaterialAttr(ResourceRef value)
@@ -621,46 +639,152 @@ void Terrain::CreateGeometry()
 
 void Terrain::CreateIndexData()
 {
-    /// \todo Create stitching combinations
-    unsigned totalIndexSize = 0;
-    unsigned vertexDataRow = patchSize_ + 1;
+    PODVector<unsigned short> indices;
+    drawRanges_.Clear();
+    unsigned row = patchSize_ + 1;
     
     for (unsigned i = 0; i < numLodLevels_; ++i)
     {
-        unsigned lodPatchSize = patchSize_ >> i;
-        totalIndexSize += lodPatchSize * lodPatchSize * 6;
-    }
-    
-    drawRanges_.Clear();
-    indexBuffer_->SetSize(totalIndexSize, false);
-    unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indexBuffer_->GetIndexCount());
-    
-    if (indexData)
-    {
-        unsigned index = 0;
+        unsigned combinations = (i < numLodLevels_ - 1) ? 16 : 1;
+        int skip = 1 << i;
         
-        for (unsigned i = 0; i < numLodLevels_; ++i)
+        for (unsigned j = 0; j < combinations; ++j)
         {
-            unsigned indexStart = index;
-            int skip = 1 << i;
+            unsigned indexStart = indices.Size();
             
-            for (int z = 0; z < patchSize_; z += skip)
+            int zStart = 0;
+            int xStart = 0;
+            int zEnd = patchSize_;
+            int xEnd = patchSize_;
+            
+            if (j & STITCH_NORTH)
+                zEnd -= skip;
+            if (j & STITCH_SOUTH)
+                zStart += skip;
+            if (j & STITCH_WEST)
+                xStart += skip;
+            if (j & STITCH_EAST)
+                xEnd -= skip;
+            
+            // Build the main grid
+            for (int z = zStart; z < zEnd; z += skip)
             {
-                for (int x = 0; x < patchSize_; x += skip)
+                for (int x = xStart; x < xEnd; x += skip)
                 {
-                    *indexData++ = x + (z + skip) * vertexDataRow;
-                    *indexData++ = x + z * vertexDataRow + skip;
-                    *indexData++ = x + z * vertexDataRow;
-                    *indexData++ = x + (z + skip) * vertexDataRow;
-                    *indexData++ = x + (z + skip) * vertexDataRow + skip;
-                    *indexData++ = x + z * vertexDataRow + skip;
-                    index += 6;
+                    indices.Push((z + skip) * row + x);
+                    indices.Push(z * row + x + skip);
+                    indices.Push(z * row + x);
+                    indices.Push((z + skip) * row + x);
+                    indices.Push((z + skip) * row + x + skip);
+                    indices.Push(z * row + x + skip);
                 }
             }
             
-            drawRanges_.Push(MakePair(indexStart, index - indexStart));
+            // Build the north edge
+            if (j & STITCH_NORTH)
+            {
+                int z = patchSize_ - skip;
+                for (int x = 0; x < patchSize_; x += skip * 2)
+                {
+                    if (x > 0 || (j & STITCH_WEST) == 0)
+                    {
+                        indices.Push((z + skip) * row + x);
+                        indices.Push(z * row + x + skip);
+                        indices.Push(z * row + x);
+                    }
+                    indices.Push((z + skip) * row + x);
+                    indices.Push((z + skip) * row + x + 2 * skip);
+                    indices.Push(z * row + x + skip);
+                    if (x < patchSize_ - skip * 2 || (j & STITCH_EAST) == 0)
+                    {
+                        indices.Push((z + skip) * row + x + 2 * skip);
+                        indices.Push(z * row + x + 2 * skip);
+                        indices.Push(z * row + x + skip);
+                    }
+                }
+            }
+            
+            // Build the south edge
+            if (j & STITCH_SOUTH)
+            {
+                int z = 0;
+                for (int x = 0; x < patchSize_; x += skip * 2)
+                {
+                    if (x > 0 || (j & STITCH_WEST) == 0)
+                    {
+                        indices.Push((z + skip) * row + x);
+                        indices.Push((z + skip) * row + x + skip);
+                        indices.Push(z * row + x);
+                    }
+                    indices.Push(z * row + x);
+                    indices.Push((z + skip) * row + x + skip);
+                    indices.Push(z * row + x + 2 * skip);
+                    if (x < patchSize_ - skip * 2 || (j & STITCH_EAST) == 0)
+                    {
+                        indices.Push((z + skip) * row + x + skip);
+                        indices.Push((z + skip) * row + x + 2 * skip);
+                        indices.Push(z * row + x + 2 * skip);
+                    }
+                }
+            }
+            
+            // Build the west edge
+            if (j & STITCH_WEST)
+            {
+                int x = 0;
+                for (int z = 0; z < patchSize_; z += skip * 2)
+                {
+                    if (z > 0 || (j & STITCH_SOUTH) == 0)
+                    {
+                        indices.Push(z * row + x);
+                        indices.Push((z + skip) * row + x + skip);
+                        indices.Push(z * row + x + skip);
+                    }
+                    indices.Push((z + 2 * skip) * row + x);
+                    indices.Push((z + skip) * row + x + skip);
+                    indices.Push(z * row + x);
+                    if (x < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
+                    {
+                        indices.Push((z + 2 * skip) * row + x);
+                        indices.Push((z + 2 * skip) * row + x + skip);
+                        indices.Push((z + skip) * row + x + skip);
+                    }
+                }
+            }
+            
+            // Build the east edge
+            if (j & STITCH_EAST)
+            {
+                int x = patchSize_ - skip;
+                for (int z = 0; z < patchSize_; z += skip * 2)
+                {
+                    if (z > 0 || (j & STITCH_SOUTH) == 0)
+                    {
+                        indices.Push(z * row + x);
+                        indices.Push((z + skip) * row + x);
+                        indices.Push(z * row + x + skip);
+                    }
+                    indices.Push((z + skip) * row + x);
+                    indices.Push((z + 2 * skip) * row + x + skip);
+                    indices.Push(z * row + x + skip);
+                    if (z < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
+                    {
+                        indices.Push((z + skip) * row + x);
+                        indices.Push((z + 2 * skip) * row + x);
+                        indices.Push((z + 2 * skip) * row + x + skip);
+                    }
+                }
+            }
+            
+            drawRanges_.Push(MakePair(indexStart, indices.Size() - indexStart));
         }
-        
+    }
+    
+    indexBuffer_->SetSize(indices.Size(), false);
+    unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indices.Size());
+    if (indexData)
+    {
+        memcpy(indexData, &indices[0], indices.Size() * sizeof(unsigned short));
         indexBuffer_->Unlock();
     }
 }
@@ -769,32 +893,6 @@ void Terrain::SetNeighbors(TerrainPatch* patch)
     const IntVector2& coords = patch->GetCoordinates();
     patch->SetNeighbors(GetPatch(coords.x_, coords.y_ + 1), GetPatch(coords.x_, coords.y_ - 1),
         GetPatch(coords.x_ - 1, coords.y_), GetPatch(coords.x_ + 1, coords.y_));
-}
-
-unsigned Terrain::GetDrawRangeIndex(unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod)
-{
-    /*
-    // If neighbor patches have more accurate LOD, no need to perform stitching
-    northLod = Max((int)lod, (int)northLod);
-    southLod = Max((int)lod, (int)southLod);
-    westLod = Max((int)lod, (int)westLod);
-    eastLod = Max((int)lod, (int)eastLod);
-    
-    unsigned index = 0;
-    
-    // Skip higher LOD levels
-    for (unsigned i = 0; i < lod; ++i)
-        index += 16;
-    
-    // Each LOD level can stitch to max. 1 level coarser LOD to reduce amount of draw range combinations
-    index += northLod > lod ? 1 : 0;
-    index += southLod > lod ? 2 : 0;
-    index += westLod > lod ? 4 : 0;
-    index += eastLod > lod ? 8 : 0;
-    
-    return index;
-    */
-    return lod;
 }
 
 bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)

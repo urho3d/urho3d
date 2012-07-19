@@ -496,6 +496,7 @@ void OcclusionBuffer::DrawTriangle(Vector4* vertices)
 {
     unsigned clipMask = 0;
     unsigned andClipMask = 0;
+    bool drawOk = false;
     Vector3 projected[3];
     
     // Build the clip plane mask for the triangle
@@ -536,7 +537,10 @@ void OcclusionBuffer::DrawTriangle(Vector4* vertices)
         projected[2] = ViewportTransform(vertices[2]);
         
         if (CheckFacing(projected[0], projected[1], projected[2]))
+        {
             DrawTriangle2D(projected);
+            drawOk = true;
+        }
     }
     else
     {
@@ -570,10 +574,16 @@ void OcclusionBuffer::DrawTriangle(Vector4* vertices)
                 projected[2] = ViewportTransform(vertices[index + 2]);
                 
                 if (CheckFacing(projected[0], projected[1], projected[2]))
+                {
                     DrawTriangle2D(projected);
+                    drawOk = true;
+                }
             }
         }
     }
+    
+    if (drawOk)
+        ++numTriangles_;
 }
 
 void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles)
@@ -709,8 +719,6 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
 {
     int top, middle, bottom;
     bool middleIsRight;
-    
-    numTriangles_++;
     
     // Sort vertices in Y-direction
     if (vertices[0].y_ < vertices[1].y_)

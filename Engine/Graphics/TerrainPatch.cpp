@@ -178,7 +178,7 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
 {
-    // If any of the neighbour patches have changed LOD, must update stitching
+    // If any of the neighbor patches have changed LOD, must also update own LOD because of stitching
     if (vertexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else if (lodDirty_ || (north_ && north_->lodDirty_) || (south_ && south_->lodDirty_) || (west_ && west_->lodDirty_) ||
