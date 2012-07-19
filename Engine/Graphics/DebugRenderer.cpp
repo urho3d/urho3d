@@ -344,10 +344,10 @@ void DebugRenderer::Render()
     for (unsigned i = 0; i < lines_.Size(); ++i)
     {
         const DebugLine& line = lines_[i];
-            
+        
         *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
         *((unsigned*)dest) = line.color_; dest++;
-            
+        
         *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
         *((unsigned*)dest) = line.color_; dest++;
     }
@@ -355,10 +355,10 @@ void DebugRenderer::Render()
     for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
     {
         const DebugLine& line = noDepthLines_[i];
-            
+        
         *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
         *((unsigned*)dest) = line.color_; dest++;
-            
+        
         *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
         *((unsigned*)dest) = line.color_; dest++;
     }

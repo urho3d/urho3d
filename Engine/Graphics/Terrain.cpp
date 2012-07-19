@@ -675,29 +675,27 @@ float Terrain::GetRawHeight(int x, int z) const
     return heightData_[z * numVertices_.x_ + x];
 }
 
-float Terrain::GetLodHeight(float x, float z, unsigned lodLevel) const
+float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
 {
     unsigned offset = 1 << lodLevel;
-    unsigned xPos = (unsigned)x;
-    unsigned zPos = (unsigned)z;
     float divisor = (float)offset;
-    float xFrac = (x / divisor) - floorf(x / divisor);
-    float zFrac = (z / divisor) - floorf(z / divisor);
+    float xFrac = (float)(x % offset) / divisor;
+    float zFrac = (float)(x % offset) / divisor;
     float h1, h2, h3;
     
     if (xFrac + zFrac >= 1.0f)
     {
-        h1 = GetRawHeight(xPos + offset, zPos + offset);
-        h2 = GetRawHeight(xPos, zPos + offset);
-        h3 = GetRawHeight(xPos + offset, zPos);
+        h1 = GetRawHeight(x + offset, z + offset);
+        h2 = GetRawHeight(x, z + offset);
+        h3 = GetRawHeight(x + offset, z);
         xFrac = 1.0f - xFrac;
         zFrac = 1.0f - zFrac;
     }
     else
     {
-        h1 = GetRawHeight(xPos, zPos);
-        h2 = GetRawHeight(xPos + offset, zPos);
-        h3 = GetRawHeight(xPos, zPos + offset);
+        h1 = GetRawHeight(x, z);
+        h2 = GetRawHeight(x + offset, z);
+        h3 = GetRawHeight(x, z + offset);
     }
     
     return h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
@@ -752,7 +750,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
                 {
                     if (x % divisor || z % divisor)
                     {
-                        float error = Abs(GetLodHeight((float)x, (float)z, i) - GetRawHeight(x, z));
+                        float error = Abs(GetLodHeight(x, z, i) - GetRawHeight(x, z));
                         maxError = Max(error, maxError);
                     }
                 }

@@ -149,7 +149,7 @@ private:
     /// Return an uninterpolated terrain height value, clamping to edges.
     float GetRawHeight(int x, int z) const;
     /// Return interpolated height for a specific LOD level.
-    float GetLodHeight(float x, float z, unsigned lodLevel) const;
+    float GetLodHeight(int x, int z, unsigned lodLevel) const;
     /// Get terrain normal at position.
     Vector3 GetNormal(int x, int z) const;
     /// Calculate LOD errors for a patch.
