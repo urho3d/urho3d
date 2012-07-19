@@ -29,6 +29,7 @@
 #include "Geometry.h"
 #include "Graphics.h"
 #include "IndexBuffer.h"
+#include "Material.h"
 #include "MemoryBuffer.h"
 #include "Node.h"
 #include "Profiler.h"

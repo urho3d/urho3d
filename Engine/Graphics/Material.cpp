@@ -95,9 +95,10 @@ OBJECTTYPESTATIC(Material);
 
 Material::Material(Context* context) :
     Resource(context),
-    auxViewFrameNumber_(0),
     cullMode_(CULL_CCW),
     shadowCullMode_(CULL_CCW),
+    depthBias_(BiasParameters(0.0f, 0.0f)),
+    auxViewFrameNumber_(0),
     occlusion_(true)
 {
     SetNumTechniques(1);
@@ -202,6 +203,10 @@ bool Material::Load(Deserializer& source)
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value"), cullModeNames, CULL_CCW));
     
+    XMLElement depthBiasElem = rootElem.GetChild("depthbias");
+    if (depthBiasElem)
+        SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
+    
     // Calculate memory use
     unsigned memoryUse = sizeof(Material);
     
@@ -259,6 +264,11 @@ bool Material::Save(Serializer& dest)
     
     XMLElement shadowCullElem = materialElem.CreateChild("shadowcull");
     shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
+    
+    // Write depth bias
+    XMLElement depthBiasElem = materialElem.CreateChild("depthbias");
+    depthBiasElem.SetFloat("constant", depthBias_.constantBias_);
+    depthBiasElem.SetFloat("slopescaled", depthBias_.slopeScaledBias_);
     
     return xml->Save(dest);
 }
@@ -338,6 +348,12 @@ void Material::SetCullMode(CullMode mode)
 void Material::SetShadowCullMode(CullMode mode)
 {
     shadowCullMode_ = mode;
+}
+
+void Material::SetDepthBias(const BiasParameters& parameters)
+{
+    depthBias_ = parameters;
+    depthBias_.Validate();
 }
 
 void Material::RemoveShaderParameter(const String& name)

@@ -26,7 +26,7 @@
 #include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
-#include "Light.h"
+#include "Material.h"
 #include "Node.h"
 #include "Renderer.h"
 #include "Profiler.h"
@@ -67,7 +67,7 @@ static void SortFrontToBack2Pass(PODVector<Batch*>& batches)
     Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
     
     // Then rewrite distances so that different states will be ordered front to back, and sort again.
-    // Do not do this on mobile devices as they likely use a tiled deferred approach, with which 
+    // Do not do this on mobile devices as they likely use a tiled deferred approach, with which
     // front-to-back sorting is irrelevant
     #ifndef GL_ES_VERSION_2_0
     float lastDistance;
@@ -205,9 +205,15 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     // Set pass / material-specific renderstates
     if (pass_ && material_)
     {
+        bool isShadowPass = pass_->GetType() == PASS_SHADOW;
+        
         graphics->SetBlendMode(pass_->GetBlendMode());
-        renderer->SetCullMode(pass_->GetType() != PASS_SHADOW ? material_->GetCullMode() : material_->GetShadowCullMode(),
-            camera_);
+        renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera_);
+        if (!isShadowPass)
+        {
+            const BiasParameters& depthBias = material_->GetDepthBias();
+            graphics->SetDepthBias(depthBias.constantBias_, depthBias.slopeScaledBias_);
+        }
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite());
     }

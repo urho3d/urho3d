@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
+#include "Material.h"
 #include "Node.h"
 #include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
@@ -276,26 +277,6 @@ VertexBuffer* TerrainPatch::GetVertexBuffer() const
 Terrain* TerrainPatch::GetOwner() const
 {
     return owner_;
-}
-
-TerrainPatch* TerrainPatch::GetNorthPatch() const
-{
-    return north_;
-}
-
-TerrainPatch* TerrainPatch::GetSouthPatch() const
-{
-    return south_;
-}
-
-TerrainPatch* TerrainPatch::GetWestPatch() const
-{
-    return west_;
-}
-
-TerrainPatch* TerrainPatch::GetEastPatch() const
-{
-    return east_;
 }
 
 void TerrainPatch::OnWorldBoundingBoxUpdate()

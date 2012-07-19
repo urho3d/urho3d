@@ -30,7 +30,6 @@
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 #include "IndexBuffer.h"
-#include "Light.h"
 #include "Log.h"
 #include "Material.h"
 #include "OcclusionBuffer.h"

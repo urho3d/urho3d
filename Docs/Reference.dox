@@ -569,6 +569,7 @@ A material definition looks like this:
     <parameter ... />
     <cull value="cw|ccw|none" />
     <shadowcull value="cw|ccw|none" />
+    <depthbias constant="x" slopescaled="y" />
 </material>
 \endcode
 
@@ -584,7 +585,7 @@ When a material defines several techniques for different LOD levels and quality 
 
 %Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported.
 
-Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass.
+Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
 \section Materials_Textures Material textures
 

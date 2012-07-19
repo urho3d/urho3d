@@ -25,7 +25,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
-#include "Light.h"
+#include "Material.h"
 #include "Octree.h"
 #include "Scene.h"
 #include "Sort.h"
@@ -34,6 +34,21 @@
 #include "DebugNew.h"
 
 static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+
+SourceBatch::SourceBatch() :
+    distance_(0.0f),
+    geometry_(0),
+    worldTransform_(&Matrix3x4::IDENTITY),
+    shaderData_(0),
+    shaderDataSize_(0),
+    geometryType_(GEOM_STATIC),
+    overrideView_(false)
+{
+}
+
+SourceBatch::~SourceBatch()
+{
+}
 
 OBJECTTYPESTATIC(Drawable);
 

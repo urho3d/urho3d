@@ -31,6 +31,7 @@
 #include "Graphics.h"
 #include "IndexBuffer.h"
 #include "Log.h"
+#include "Material.h"
 #include "MemoryBuffer.h"
 #include "Node.h"
 #include "Profiler.h"
@@ -276,7 +277,7 @@ void DecalSet::SetMaxIndices(unsigned num)
 
 bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size,
     float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff,
-    float depthBias, unsigned subGeometry)
+    unsigned subGeometry)
 {
     PROFILE(AddDecal);
     
@@ -298,6 +299,8 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         bufferSizeDirty_ = true;
     }
     
+    // Center the decal frustum on the world position
+    Vector3 adjustedWorldPosition = worldPosition - 0.5f * depth * (worldRotation * Vector3::FORWARD);
     Matrix3x4 targetTransform = target->GetNode()->GetWorldTransform().Inverse();
     
     // For an animated model, adjust the decal position back to the bind pose
@@ -316,9 +319,9 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
                 continue;
             
             // Represent the decal as a sphere, try to find the biggest colliding bone
-            Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * (worldPosition + worldRotation * (0.5f * depth *
-                Vector3::FORWARD)), 0.5f * size / bone->node_->GetWorldScale().Length());
-            float distance = (worldPosition - bone->node_->GetWorldPosition()).Length();
+            Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * adjustedWorldPosition, 0.5f * size /
+                bone->node_->GetWorldScale().Length());
+            float distance = (adjustedWorldPosition - bone->node_->GetWorldPosition()).Length();
             
             if (bone->collisionMask_ & BONECOLLISION_BOX)
             {
@@ -350,10 +353,9 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     
     // Build the decal frustum
     Frustum decalFrustum;
-    Matrix3x4 frustumTransform = targetTransform * Matrix3x4(worldPosition, worldRotation, 1.0f);
+    Matrix3x4 frustumTransform = targetTransform * Matrix3x4(adjustedWorldPosition, worldRotation, 1.0f);
     decalFrustum.DefineOrtho(size, aspectRatio, 1.0, 0.0f, depth, frustumTransform);
     
-    Vector3 biasVector = targetTransform * Vector4(worldRotation * (Vector3::BACK * depthBias), 0.0f);
     Vector3 decalNormal = (targetTransform * Vector4(worldRotation * Vector3::BACK, 0.0f)).Normalized();
     
     decals_.Resize(decals_.Size() + 1);
@@ -425,10 +427,18 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
         return false;
     }
     
-    // Finally transform vertices to this node's local space
+    // Calculate UVs
+    Matrix4 projection(Matrix4::ZERO);
+    projection.m11_ = (1.0f / (size * 0.5f));
+    projection.m00_ = projection.m11_ / aspectRatio;
+    projection.m22_ = 1.0f / depth;
+    projection.m33_ = 1.0f;
+    
+    CalculateUVs(newDecal, frustumTransform.Inverse(), projection, topLeftUV, bottomRightUV);
+    
+    // Transform vertices to this node's local space and generate tangents
     Matrix3x4 decalTransform = node_->GetWorldTransform().Inverse() * target->GetNode()->GetWorldTransform();
-    CalculateUVs(newDecal, frustumTransform.Inverse(), size, aspectRatio, depth, topLeftUV, bottomRightUV);
-    TransformVertices(newDecal, skinned_ ? Matrix3x4::IDENTITY : decalTransform, biasVector);
+    TransformVertices(newDecal, skinned_ ? Matrix3x4::IDENTITY : decalTransform);
     GenerateTangents(&newDecal.vertices_[0], sizeof(DecalVertex), &newDecal.indices_[0], sizeof(unsigned short), 0,
         newDecal.indices_.Size(), offsetof(DecalVertex, normal_), offsetof(DecalVertex, texCoord_), offsetof(DecalVertex,
         tangent_));
@@ -782,15 +792,26 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     const Vector3& v0 = *((const Vector3*)(&positionData[i0 * positionStride]));
     const Vector3& v1 = *((const Vector3*)(&positionData[i1 * positionStride]));
     const Vector3& v2 = *((const Vector3*)(&positionData[i2 * positionStride]));
-    const Vector3& n0 = hasNormals ? *((const Vector3*)(&normalData[i0 * normalStride])) : Vector3::ZERO;
-    const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : Vector3::ZERO;
-    const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : Vector3::ZERO;
+    
+    // Calculate unsmoothed face normals if no normal data
+    Vector3 faceNormal = Vector3::ZERO;
+    if (!hasNormals)
+    {
+        Vector3 dist1 = v1 - v0;
+        Vector3 dist2 = v2 - v0;
+        faceNormal = (dist1.CrossProduct(dist2)).Normalized();
+    }
+    
+    const Vector3& n0 = hasNormals ? *((const Vector3*)(&normalData[i0 * normalStride])) : faceNormal;
+    const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : faceNormal;
+    const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : faceNormal;
+    
     const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : (const unsigned char*)0;
     const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : (const unsigned char*)0;
     const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : (const unsigned char*)0;
     
     // Check if face is too much away from the decal normal
-    if (hasNormals && decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
+    if (decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
         return;
     
     // Check if face is culled completely by any of the planes
@@ -915,22 +936,9 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
     return true;
 }
 
-void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, float aspectRatio, float depth,
-    const Vector2& topLeftUV, const Vector2& bottomRightUV)
+void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, const Matrix4& projection, const Vector2& topLeftUV,
+    const Vector2& bottomRightUV)
 {
-    Matrix4 projection(Matrix4::ZERO);
-    
-    float h = (1.0f / (size * 0.5f));
-    float w = h / aspectRatio;
-    float q = 1.0f / depth;
-    float r = 0.0f;
-    
-    projection.m00_ = w;
-    projection.m11_ = h;
-    projection.m22_ = q;
-    projection.m23_ = r;
-    projection.m33_ = 1.0f;
-    
     Matrix4 viewProj = projection * view;
     
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
@@ -943,11 +951,11 @@ void DecalSet::CalculateUVs(Decal& decal, const Matrix3x4& view, float size, flo
     }
 }
 
-void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform, const Vector3& biasVector)
+void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform)
 {
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
     {
-        i->position_ = transform * (i->position_ + biasVector);
+        i->position_ = transform * i->position_;
         i->normal_ = (transform * i->normal_).Normalized();
     }
 }

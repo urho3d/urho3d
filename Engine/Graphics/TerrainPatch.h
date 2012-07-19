@@ -77,13 +77,13 @@ public:
     /// Return owner terrain.
     Terrain* GetOwner() const;
     /// Return north neighbor patch.
-    TerrainPatch* GetNorthPatch() const;
+    TerrainPatch* GetNorthPatch() const { return north_; }
     /// Return south neighbor patch.
-    TerrainPatch* GetSouthPatch() const;
+    TerrainPatch* GetSouthPatch() const { return south_; }
     /// Return west neighbor patch.
-    TerrainPatch* GetWestPatch() const;
+    TerrainPatch* GetWestPatch() const { return west_; }
     /// Return east neighbor patch.
-    TerrainPatch* GetEastPatch() const;
+    TerrainPatch* GetEastPatch() const { return east_; }
     /// Return local-space bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return patch coordinates.

@@ -56,8 +56,8 @@ static const char* typeNames[] =
 
 void BiasParameters::Validate()
 {
-    constantBias_ = Clamp(constantBias_, 0.0f, 1.0f);
-    slopeScaledBias_ = Clamp(slopeScaledBias_, 0.0f, 16.0f);
+    constantBias_ = Clamp(constantBias_, -1.0f, 1.0f);
+    slopeScaledBias_ = Clamp(slopeScaledBias_, -16.0f, 16.0f);
 }
 
 void CascadeParameters::Validate()

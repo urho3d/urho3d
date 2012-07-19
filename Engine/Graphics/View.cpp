@@ -27,8 +27,8 @@
 #include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
-#include "Light.h"
 #include "Log.h"
+#include "Material.h"
 #include "OcclusionBuffer.h"
 #include "Octree.h"
 #include "Renderer.h"
@@ -475,9 +475,10 @@ void View::Render()
     camera_->SetFlipVertical(false);
     #endif
     
-    graphics_->SetViewTexture(0);
+    graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
+    graphics_->SetViewTexture(0);
     graphics_->ResetStreamFrequencies();
     
     // Run post-processes or framebuffer blitting now
@@ -2433,6 +2434,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     
     // Use replace blend mode for the first pre-pass light volume, and additive for the rest
     graphics_->SetBlendMode(renderMode_ == RENDER_PREPASS && light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
+    graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     
     if (type != LIGHT_DIRECTIONAL)

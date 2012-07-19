@@ -25,6 +25,7 @@
 
 #include "GraphicsDefs.h"
 #include "HashMap.h"
+#include "Light.h"
 #include "Resource.h"
 #include "Vector4.h"
 
@@ -95,6 +96,8 @@ public:
     void SetCullMode(CullMode mode);
     /// %Set culling mode for shadows.
     void SetShadowCullMode(CullMode mode);
+    /// %Set depth bias.
+    void SetDepthBias(const BiasParameters& parameters);
     /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers.
@@ -126,6 +129,8 @@ public:
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows.
     CullMode GetShadowCullMode() const { return shadowCullMode_; }
+    /// Return depth bias.
+    const BiasParameters& GetDepthBias() const { return depthBias_; }
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
     /// Return whether should render occlusion.
@@ -148,12 +153,14 @@ private:
     SharedPtr<Texture> textures_[MAX_MATERIAL_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
-    /// Last auxiliary view rendered frame number.
-    unsigned auxViewFrameNumber_;
     /// Normal culling mode.
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
     CullMode shadowCullMode_;
+    /// Depth bias parameters.
+    BiasParameters depthBias_;
+    /// Last auxiliary view rendered frame number.
+    unsigned auxViewFrameNumber_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.

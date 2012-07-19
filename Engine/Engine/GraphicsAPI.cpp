@@ -285,8 +285,30 @@ static Material* MaterialClone(const String& cloneName, Material* ptr)
     return clone.Get();
 }
 
+static void ConstructBiasParameters(BiasParameters* ptr)
+{
+    new(ptr) BiasParameters(0.0f, 0.0f);
+}
+
+static void ConstructBiasParametersCopy(BiasParameters& parameters, BiasParameters* ptr)
+{
+    new(ptr) BiasParameters(parameters);
+}
+
+static void ConstructBiasParametersInit(float constantBias, float slopeScaledBias, BiasParameters* ptr)
+{
+    new(ptr) BiasParameters(constantBias, slopeScaledBias);
+}
+
 static void RegisterMaterial(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBiasParameters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(const BiasParameters&in)", asFUNCTION(ConstructBiasParametersCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
+    engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
+    
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
     engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
@@ -367,6 +389,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHOD(Material, GetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shadowCullMode(CullMode)", asMETHOD(Material, SetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
 }
 
 static PostProcess* PostProcessClone(PostProcess* ptr)
@@ -440,21 +464,6 @@ static void RegisterDrawable(asIScriptEngine* engine)
     RegisterDrawable<Drawable>(engine, "Drawable");
 }
 
-static void ConstructBiasParameters(BiasParameters* ptr)
-{
-    new(ptr) BiasParameters(0.0f, 0.0f);
-}
-
-static void ConstructBiasParametersCopy(BiasParameters& parameters, BiasParameters* ptr)
-{
-    new(ptr) BiasParameters(parameters);
-}
-
-static void ConstructBiasParametersInit(float constantBias, float slopeScaledBias, BiasParameters* ptr)
-{
-    new(ptr) BiasParameters(constantBias, slopeScaledBias);
-}
-
 static void ConstructCascadeParameters(CascadeParameters* ptr)
 {
     new(ptr) CascadeParameters(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -491,13 +500,6 @@ static void RegisterLight(asIScriptEngine* engine)
     engine->RegisterEnumValue("LightType", "LIGHT_DIRECTIONAL", LIGHT_DIRECTIONAL);
     engine->RegisterEnumValue("LightType", "LIGHT_SPOT", LIGHT_SPOT);
     engine->RegisterEnumValue("LightType", "LIGHT_POINT", LIGHT_POINT);
-    
-    engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBiasParameters), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(const BiasParameters&in)", asFUNCTION(ConstructBiasParametersCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
-    engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
     
     engine->RegisterObjectType("CascadeParameters", sizeof(CascadeParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructCascadeParameters), asCALL_CDECL_OBJLAST);
@@ -756,7 +758,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 static void RegisterDecalSet(asIScriptEngine* engine)
 {
     RegisterDrawable<DecalSet>(engine, "DecalSet");
-    engine->RegisterObjectMethod("DecalSet", "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float timeToLive = 0.0, float normalCutoff = 0.1, float depthBias = 0.001, uint subGeometry = 0xffffffff)", asMETHOD(DecalSet, AddDecal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "bool AddDecal(Drawable@+, const Vector3&in, const Quaternion&in, float, float, float, const Vector2&in, const Vector2&in, float timeToLive = 0.0, float normalCutoff = 0.1, uint subGeometry = 0xffffffff)", asMETHOD(DecalSet, AddDecal), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void RemoveDecals(uint)", asMETHOD(DecalSet, RemoveDecals), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void RemoveAllDecals()", asMETHOD(DecalSet, RemoveAllDecals), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_material(Material@+)", asMETHOD(DecalSet, SetMaterial), asCALL_THISCALL);

@@ -27,6 +27,7 @@
 #include "Context.h"
 #include "Geometry.h"
 #include "Log.h"
+#include "Material.h"
 #include "Model.h"
 #include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
