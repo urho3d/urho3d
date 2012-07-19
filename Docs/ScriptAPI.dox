@@ -1680,6 +1680,13 @@ Properties:<br>
 - RenderSurface@[] renderSurface (readonly)
 
 
+BiasParameters
+
+Properties:<br>
+- float constantBias
+- float slopeScaledBias
+
+
 Pass
 
 Properties:<br>
@@ -1733,6 +1740,7 @@ Properties:<br>
 - bool occlusion (readonly)
 - CullMode cullMode
 - CullMode shadowCullMode
+- BiasParameters depthBias
 
 
 PostProcessPass
@@ -1820,13 +1828,6 @@ Properties:<br>
 - uint zoneMask
 - uint maxLights
 - BoundingBox worldBoundingBox (readonly)
-
-
-BiasParameters
-
-Properties:<br>
-- float constantBias
-- float slopeScaledBias
 
 
 CascadeParameters
@@ -2291,7 +2292,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.1, float arg10 = 0.001, uint arg11 = 0xffffffff)
+- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.1, uint arg10 = 0xffffffff)
 - void RemoveDecals(uint)
 - void RemoveAllDecals()
 
@@ -2378,6 +2379,7 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - float GetHeight(const Vector3&) const
+- TerrainPatch@ GetPatch(int, int) const
 
 Properties:<br>
 - ShortStringHash type (readonly)

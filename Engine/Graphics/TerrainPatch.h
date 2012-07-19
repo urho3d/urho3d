@@ -67,6 +67,8 @@ public:
     void SetBoundingBox(const BoundingBox& box);
     /// Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
+    /// Reset to LOD level 0.
+    void ResetLod();
     
     /// Return visible geometry.
     Geometry* GetGeometry() const;
@@ -84,6 +86,8 @@ public:
     TerrainPatch* GetWestPatch() const { return west_; }
     /// Return east neighbor patch.
     TerrainPatch* GetEastPatch() const { return east_; }
+    /// Return geometrical error array.
+    PODVector<float>& GetLodErrors() { return lodErrors_; }
     /// Return local-space bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return patch coordinates.
@@ -112,14 +116,14 @@ private:
     WeakPtr<TerrainPatch> west_;
     /// East neighbor patch.
     WeakPtr<TerrainPatch> east_;
+    /// Geometrical error per LOD level.
+    PODVector<float> lodErrors_;
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Patch coordinates in the terrain. (0,0) is the northwest corner.
     IntVector2 coordinates_;
     /// Current LOD level.
     unsigned lodLevel_;
-    /// Geometrical error per LOD level.
-    PODVector<float> lodErrors_;
     /// LOD level dirty flag.
     bool lodDirty_;
 };

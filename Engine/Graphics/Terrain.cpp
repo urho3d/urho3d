@@ -45,8 +45,7 @@
 OBJECTTYPESTATIC(Terrain);
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
-static const unsigned DEFAULT_LOD_LEVELS = 3;
-static const unsigned MAX_LOD_LEVELS = 4;
+static const unsigned MAX_LOD_LEVELS = 8;
 static const int DEFAULT_PATCH_SIZE = 16;
 static const int MIN_PATCH_SIZE = 4;
 static const int MAX_PATCH_SIZE = 128;
@@ -59,7 +58,7 @@ Terrain::Terrain(Context* context) :
     patchWorldOrigin_(Vector2::ZERO),
     numVertices_(IntVector2::ZERO),
     numPatches_(IntVector2::ZERO),
-    numLodLevels_(DEFAULT_LOD_LEVELS),
+    numLodLevels_(1),
     patchSize_(DEFAULT_PATCH_SIZE),
     visible_(true),
     castShadows_(false),
@@ -326,6 +325,14 @@ TerrainPatch* Terrain::GetPatch(unsigned index) const
     return index < patches_.Size() ? patches_[index] : (TerrainPatch*)0;
 }
 
+TerrainPatch* Terrain::GetPatch(int x, int z) const
+{
+    if (x < 0 || x >= numPatches_.x_ || z < 0 || z >= numPatches_.y_)
+        return 0;
+    else
+        return GetPatch(z * numPatches_.x_ + x);
+}
+
 float Terrain::GetHeight(const Vector3& worldPosition) const
 {
     if (node_)
@@ -360,7 +367,7 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
         return 0.0f;
 }
 
-void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
+void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
     unsigned vertexDataRow = patchSize_ + 1;
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
@@ -423,16 +430,26 @@ void Terrain::UpdatePatchGeometry(TerrainPatch* patch)
     }
     
     patch->SetBoundingBox(box);
-    geometry->SetIndexBuffer(indexBuffer_);
-    geometry->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
-    geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
-    maxLodGeometry->SetIndexBuffer(indexBuffer_);
-    maxLodGeometry->SetDrawRange(TRIANGLE_LIST, 0, indexBuffer_->GetIndexCount());
-    maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+    
+    if (drawRanges_.Size())
+    {
+        patch->ResetLod();
+        geometry->SetIndexBuffer(indexBuffer_);
+        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_);
+        geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        maxLodGeometry->SetIndexBuffer(indexBuffer_);
+        maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+    }
 }
 
 void Terrain::UpdatePatchLod(TerrainPatch* patch)
 {
+    /// \todo Use stitching
+    unsigned lodLevel = patch->GetLodLevel();
+    Geometry* geometry = patch->GetGeometry();
+    if (lodLevel < drawRanges_.Size())
+        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lodLevel].first_, drawRanges_[lodLevel].second_);
 }
 
 void Terrain::SetMaterialAttr(ResourceRef value)
@@ -580,33 +597,15 @@ void Terrain::CreateGeometry()
         }
         
         // Create the shared index data
-        /// \todo Create LOD levels
-        indexBuffer_->SetSize(patchSize_ * patchSize_ * 6, false);
-        unsigned vertexDataRow = patchSize_ + 1;
-        unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indexBuffer_->GetIndexCount());
-        
-        if (indexData)
-        {
-            for (int z = 0; z < patchSize_; ++z)
-            {
-                for (int x = 0; x < patchSize_; ++x)
-                {
-                    *indexData++ = x + (z + 1) * vertexDataRow;
-                    *indexData++ = x + z * vertexDataRow + 1;
-                    *indexData++ = x + z * vertexDataRow;
-                    
-                    *indexData++ = x + (z + 1) * vertexDataRow;
-                    *indexData++ = x + (z + 1) * vertexDataRow + 1;
-                    *indexData++ = x + z * vertexDataRow + 1;
-                }
-            }
-            
-            indexBuffer_->Unlock();
-        }
+        CreateIndexData();
         
         // Create vertex data for patches
         for (Vector<WeakPtr<TerrainPatch> >::Iterator i = patches_.Begin(); i != patches_.End(); ++i)
-            UpdatePatchGeometry(*i);
+        {
+            CreatePatchGeometry(*i);
+            CalculateLodErrors(*i);
+            SetNeighbors(*i);
+        }
     }
     
     // Send event only if new geometry was generated, or the old was cleared
@@ -620,6 +619,52 @@ void Terrain::CreateGeometry()
     }
 }
 
+void Terrain::CreateIndexData()
+{
+    /// \todo Create stitching combinations
+    unsigned totalIndexSize = 0;
+    unsigned vertexDataRow = patchSize_ + 1;
+    
+    for (unsigned i = 0; i < numLodLevels_; ++i)
+    {
+        unsigned lodPatchSize = patchSize_ >> i;
+        totalIndexSize += lodPatchSize * lodPatchSize * 6;
+    }
+    
+    drawRanges_.Clear();
+    indexBuffer_->SetSize(totalIndexSize, false);
+    unsigned short* indexData = (unsigned short*)indexBuffer_->Lock(0, indexBuffer_->GetIndexCount());
+    
+    if (indexData)
+    {
+        unsigned index = 0;
+        
+        for (unsigned i = 0; i < numLodLevels_; ++i)
+        {
+            unsigned indexStart = index;
+            int skip = 1 << i;
+            
+            for (int z = 0; z < patchSize_; z += skip)
+            {
+                for (int x = 0; x < patchSize_; x += skip)
+                {
+                    *indexData++ = x + (z + skip) * vertexDataRow;
+                    *indexData++ = x + z * vertexDataRow + skip;
+                    *indexData++ = x + z * vertexDataRow;
+                    *indexData++ = x + (z + skip) * vertexDataRow;
+                    *indexData++ = x + (z + skip) * vertexDataRow + skip;
+                    *indexData++ = x + z * vertexDataRow + skip;
+                    index += 6;
+                }
+            }
+            
+            drawRanges_.Push(MakePair(indexStart, index - indexStart));
+        }
+        
+        indexBuffer_->Unlock();
+    }
+}
+
 float Terrain::GetRawHeight(int x, int z) const
 {
     if (!heightData_)
@@ -628,6 +673,34 @@ float Terrain::GetRawHeight(int x, int z) const
     x = Clamp(x, 0, numVertices_.x_ - 1);
     z = Clamp(z, 0, numVertices_.y_ - 1);
     return heightData_[z * numVertices_.x_ + x];
+}
+
+float Terrain::GetLodHeight(float x, float z, unsigned lodLevel) const
+{
+    unsigned offset = 1 << lodLevel;
+    unsigned xPos = (unsigned)x;
+    unsigned zPos = (unsigned)z;
+    float divisor = (float)offset;
+    float xFrac = (x / divisor) - floorf(x / divisor);
+    float zFrac = (z / divisor) - floorf(z / divisor);
+    float h1, h2, h3;
+    
+    if (xFrac + zFrac >= 1.0f)
+    {
+        h1 = GetRawHeight(xPos + offset, zPos + offset);
+        h2 = GetRawHeight(xPos, zPos + offset);
+        h3 = GetRawHeight(xPos + offset, zPos);
+        xFrac = 1.0f - xFrac;
+        zFrac = 1.0f - zFrac;
+    }
+    else
+    {
+        h1 = GetRawHeight(xPos, zPos);
+        h2 = GetRawHeight(xPos + offset, zPos);
+        h3 = GetRawHeight(xPos, zPos + offset);
+    }
+    
+    return h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
 }
 
 Vector3 Terrain::GetNormal(int x, int z) const
@@ -641,15 +714,89 @@ Vector3 Terrain::GetNormal(int x, int z) const
     float swSlope = GetRawHeight(x - 1, z + 1) - baseHeight;
     float wSlope = GetRawHeight(x - 1, z) - baseHeight;
     float nwSlope = GetRawHeight(x - 1, z - 1) - baseHeight;
+    float up = 0.5f * (spacing_.x_ + spacing_.z_);
     
-    return (Vector3(0.0f, 1.0f, nSlope) +
-        Vector3(-neSlope, 1.0f, neSlope) +
-        Vector3(-eSlope, 1.0f, 0.0f) +
-        Vector3(-seSlope, 1.0f, -seSlope) +
-        Vector3(0.0f, 1.0f, -sSlope) +
-        Vector3(swSlope, 1.0f, -swSlope) + 
-        Vector3(wSlope, 1.0f, 0.0f) +
-        Vector3(nwSlope, 1.0f, nwSlope)).Normalized();
+    return (Vector3(0.0f, up, nSlope) +
+        Vector3(-neSlope, up, neSlope) +
+        Vector3(-eSlope, up, 0.0f) +
+        Vector3(-seSlope, up, -seSlope) +
+        Vector3(0.0f, up, -sSlope) +
+        Vector3(swSlope, up, -swSlope) + 
+        Vector3(wSlope, up, 0.0f) +
+        Vector3(nwSlope, up, nwSlope)).Normalized();
+}
+
+void Terrain::CalculateLodErrors(TerrainPatch* patch)
+{
+    PROFILE(CalculateLodErrors);
+    
+    const IntVector2& coords = patch->GetCoordinates();
+    PODVector<float>& lodErrors = patch->GetLodErrors();
+    lodErrors.Clear();
+    
+    int xStart = coords.x_ * patchSize_;
+    int zStart = coords.y_ * patchSize_;
+    int xEnd = xStart + patchSize_;
+    int zEnd = zStart + patchSize_;
+    
+    for (unsigned i = 0; i < numLodLevels_; ++i)
+    {
+        float maxError = 0.0f;
+        int divisor = 1 << i;
+        
+        if (i > 0)
+        {
+            for (int z = zStart; z <= zEnd; ++z)
+            {
+                for (int x = xStart; x <= xEnd; ++x)
+                {
+                    if (x % divisor || z % divisor)
+                    {
+                        float error = Abs(GetLodHeight((float)x, (float)z, i) - GetRawHeight(x, z));
+                        maxError = Max(error, maxError);
+                    }
+                }
+            }
+            
+            // Set error metric always at least same as vertex spacing to prevent horizontal stretches getting too low LOD
+            maxError = Max(maxError, 0.5f * (spacing_.x_ + spacing_.z_));
+        }
+        
+        lodErrors.Push(maxError);
+    }
+}
+
+void Terrain::SetNeighbors(TerrainPatch* patch)
+{
+    const IntVector2& coords = patch->GetCoordinates();
+    patch->SetNeighbors(GetPatch(coords.x_, coords.y_ + 1), GetPatch(coords.x_, coords.y_ - 1),
+        GetPatch(coords.x_ - 1, coords.y_), GetPatch(coords.x_ + 1, coords.y_));
+}
+
+unsigned Terrain::GetDrawRangeIndex(unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod)
+{
+    /*
+    // If neighbor patches have more accurate LOD, no need to perform stitching
+    northLod = Max((int)lod, (int)northLod);
+    southLod = Max((int)lod, (int)southLod);
+    westLod = Max((int)lod, (int)westLod);
+    eastLod = Max((int)lod, (int)eastLod);
+    
+    unsigned index = 0;
+    
+    // Skip higher LOD levels
+    for (unsigned i = 0; i < lod; ++i)
+        index += 16;
+    
+    // Each LOD level can stitch to max. 1 level coarser LOD to reduce amount of draw range combinations
+    index += northLod > lod ? 1 : 0;
+    index += southLod > lod ? 2 : 0;
+    index += westLod > lod ? 4 : 0;
+    index += eastLod > lod ? 8 : 0;
+    
+    return index;
+    */
+    return lod;
 }
 
 bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)

@@ -37,7 +37,7 @@
 #include "DebugNew.h"
 
 static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
-static const float LOD_CONSTANT = 1.0f;
+static const float LOD_CONSTANT = 8.0f;
 
 OBJECTTYPESTATIC(TerrainPatch);
 
@@ -48,7 +48,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     vertexBuffer_(new VertexBuffer(context)),
     coordinates_(IntVector2::ZERO),
     lodLevel_(0),
-    lodDirty_(true)
+    lodDirty_(false)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
@@ -128,7 +128,7 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
     
-    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
+    float scale = worldTransform.Scale().DotProduct(DOT_SCALE);
     lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     batches_[0].distance_ = distance_;
@@ -137,11 +137,21 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     unsigned newLodLevel = 0;
     for (unsigned i = 0; i < lodErrors_.Size(); ++i)
     {
-        if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT)
+        if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT / (float)frame.viewSize_.y_)
             break;
         else
             newLodLevel = i;
     }
+    
+    // Check that the LOD is not more than 1 coarser than neighbors
+    if (north_)
+        newLodLevel = Min((int)newLodLevel, north_->GetLodLevel() + 1);
+    if (south_)
+        newLodLevel = Min((int)newLodLevel, south_->GetLodLevel() + 1);
+    if (west_)
+        newLodLevel = Min((int)newLodLevel, west_->GetLodLevel() + 1);
+    if (east_)
+        newLodLevel = Min((int)newLodLevel, east_->GetLodLevel() + 1);
     
     if (newLodLevel != lodLevel_)
     {
@@ -155,7 +165,7 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
     if (vertexBuffer_->IsDataLost())
     {
         if (owner_)
-            owner_->UpdatePatchGeometry(this);
+            owner_->CreatePatchGeometry(this);
         else
             vertexBuffer_->ClearDataLost();
     }
@@ -257,6 +267,12 @@ void TerrainPatch::SetBoundingBox(const BoundingBox& box)
 void TerrainPatch::SetCoordinates(const IntVector2& coordinates)
 {
     coordinates_ = coordinates;
+}
+
+void TerrainPatch::ResetLod()
+{
+    lodLevel_ = 0;
+    lodDirty_ = false;
 }
 
 Geometry* TerrainPatch::GetGeometry() const

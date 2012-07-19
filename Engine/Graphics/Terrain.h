@@ -95,6 +95,8 @@ public:
     Material* GetMaterial() const;
     /// Return patch by index.
     TerrainPatch* GetPatch(unsigned index) const;
+    /// Return patch by patch coordinates.
+    TerrainPatch* GetPatch(int x, int z) const;
     /// Return height at world coordinates.
     float GetHeight(const Vector3& worldPosition) const;
     /// Return raw height data.
@@ -125,7 +127,7 @@ public:
     bool IsOccludee() const { return occludee_; }
     
     /// Regenerate patch geometry.
-    void UpdatePatchGeometry(TerrainPatch* patch);
+    void CreatePatchGeometry(TerrainPatch* patch);
     /// Update patch based on LOD and neighbor LOD.
     void UpdatePatchLod(TerrainPatch* patch);
     /// %Set heightmap attribute.
@@ -142,10 +144,20 @@ public:
 private:
     /// Fully regenerate terrain geometry.
     void CreateGeometry();
+    /// Create index data shared by all patches.
+    void CreateIndexData();
     /// Return an uninterpolated terrain height value, clamping to edges.
     float GetRawHeight(int x, int z) const;
+    /// Return interpolated height for a specific LOD level.
+    float GetLodHeight(float x, float z, unsigned lodLevel) const;
     /// Get terrain normal at position.
     Vector3 GetNormal(int x, int z) const;
+    /// Calculate LOD errors for a patch.
+    void CalculateLodErrors(TerrainPatch* patch);
+    /// Set neighbors for a patch.
+    void SetNeighbors(TerrainPatch* patch);
+    /// Get draw range index for a given LOD and neighbor LODs.
+    unsigned GetDrawRangeIndex(unsigned lod, unsigned northLod, unsigned southLod, unsigned westLod, unsigned eastLod);
     /// Set heightmap image and optionally recreate the geometry immediately. Return true if successful.
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
@@ -161,6 +173,8 @@ private:
     SharedPtr<Material> material_;
     /// Terrain patches.
     Vector<WeakPtr<TerrainPatch> > patches_;
+    /// Draw ranges for different LODs and stitching combinations.
+    PODVector<Pair<unsigned, unsigned> > drawRanges_;
     /// Vertex and height spacing.
     Vector3 spacing_;
     /// Origin of patches on the XZ-plane.

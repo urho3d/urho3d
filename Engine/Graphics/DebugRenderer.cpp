@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+// Cap the amount of lines to prevent crash when eg. debug rendering large heightfields
+static const unsigned MAX_LINES = 1000000;
+
 OBJECTTYPESTATIC(DebugRenderer);
 
 DebugRenderer::DebugRenderer(Context* context) :
@@ -70,6 +73,17 @@ void DebugRenderer::SetView(Camera* camera)
 
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest)
 {
+    if (lines_.Size() + noDepthLines_.Size() >= MAX_LINES)
+        return;
+    
+    // Perform sphere culling to reject lines outside the view
+    /// \todo This is slow to do on a per line basis
+    Vector3 center = (start + end) * 0.5f;
+    Vector3 extent = end - center;
+    Sphere sphere(center, extent.Length());
+    if (frustum_.IsInsideFast(sphere) == OUTSIDE)
+        return;
+    
     if (depthTest)
         lines_.Push(DebugLine(start, end, color.ToUInt()));
     else
@@ -78,6 +92,15 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Colo
 
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest)
 {
+    if (lines_.Size() + noDepthLines_.Size() >= MAX_LINES)
+        return;
+    
+    Vector3 center = (start + end) * 0.5f;
+    Vector3 extent = end - center;
+    Sphere sphere(center, extent.Length());
+    if (frustum_.IsInsideFast(sphere) == OUTSIDE)
+        return;
+    
     if (depthTest)
         lines_.Push(DebugLine(start, end, color));
     else
@@ -92,18 +115,9 @@ void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
     Vector3 start = node->GetWorldPosition();
     Quaternion rotation = node->GetWorldRotation();
     
-    if (depthTest)
-    {
-        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt()));
-        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt()));
-        lines_.Push(DebugLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt()));
-    }
-    else
-    {
-        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt()));
-        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt()));
-        noDepthLines_.Push(DebugLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt()));
-    }
+    AddLine(start, start + rotation * (scale * Vector3::RIGHT), Color::RED.ToUInt(), depthTest);
+    AddLine(start, start + rotation * (scale * Vector3::UP), Color::GREEN.ToUInt(), depthTest);
+    AddLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt(), depthTest);
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
@@ -120,22 +134,18 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     
     unsigned uintColor = color.ToUInt();
     
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
-    
-    dest->Push(DebugLine(min, v1, uintColor));
-    dest->Push(DebugLine(v1, v2, uintColor));
-    dest->Push(DebugLine(v2, v3, uintColor));
-    dest->Push(DebugLine(v3, min, uintColor));
-    dest->Push(DebugLine(v4, v5, uintColor));
-    dest->Push(DebugLine(v5, max, uintColor));
-    dest->Push(DebugLine(max, v6, uintColor));
-    dest->Push(DebugLine(v6, v4, uintColor));
-    dest->Push(DebugLine(min, v4, uintColor));
-    dest->Push(DebugLine(v1, v5, uintColor));
-    dest->Push(DebugLine(v2, max, uintColor));
-    dest->Push(DebugLine(v3, v6, uintColor));
+    AddLine(min, v1, uintColor, depthTest);
+    AddLine(v1, v2, uintColor, depthTest);
+    AddLine(v2, v3, uintColor, depthTest);
+    AddLine(v3, min, uintColor, depthTest);
+    AddLine(v4, v5, uintColor, depthTest);
+    AddLine(v5, max, uintColor, depthTest);
+    AddLine(max, v6, uintColor, depthTest);
+    AddLine(v6, v4, uintColor, depthTest);
+    AddLine(min, v4, uintColor, depthTest);
+    AddLine(v1, v5, uintColor, depthTest);
+    AddLine(v2, max, uintColor, depthTest);
+    AddLine(v3, v6, uintColor, depthTest);
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
@@ -154,22 +164,18 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     
     unsigned uintColor = color.ToUInt();
     
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
-    
-    dest->Push(DebugLine(v0, v1, uintColor));
-    dest->Push(DebugLine(v1, v2, uintColor));
-    dest->Push(DebugLine(v2, v3, uintColor));
-    dest->Push(DebugLine(v3, v0, uintColor));
-    dest->Push(DebugLine(v4, v5, uintColor));
-    dest->Push(DebugLine(v5, v7, uintColor));
-    dest->Push(DebugLine(v7, v6, uintColor));
-    dest->Push(DebugLine(v6, v4, uintColor));
-    dest->Push(DebugLine(v0, v4, uintColor));
-    dest->Push(DebugLine(v1, v5, uintColor));
-    dest->Push(DebugLine(v2, v7, uintColor));
-    dest->Push(DebugLine(v3, v6, uintColor));
+    AddLine(v0, v1, uintColor, depthTest);
+    AddLine(v1, v2, uintColor, depthTest);
+    AddLine(v2, v3, uintColor, depthTest);
+    AddLine(v3, v0, uintColor, depthTest);
+    AddLine(v4, v5, uintColor, depthTest);
+    AddLine(v5, v7, uintColor, depthTest);
+    AddLine(v7, v6, uintColor, depthTest);
+    AddLine(v6, v4, uintColor, depthTest);
+    AddLine(v0, v4, uintColor, depthTest);
+    AddLine(v1, v5, uintColor, depthTest);
+    AddLine(v2, v7, uintColor, depthTest);
+    AddLine(v3, v6, uintColor, depthTest);
 }
 
 
@@ -178,31 +184,23 @@ void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool 
     const Vector3* vertices = frustum.vertices_;
     unsigned uintColor = color.ToUInt();
     
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
-    
-    dest->Push(DebugLine(vertices[0], vertices[1], uintColor));
-    dest->Push(DebugLine(vertices[1], vertices[2], uintColor));
-    dest->Push(DebugLine(vertices[2], vertices[3], uintColor));
-    dest->Push(DebugLine(vertices[3], vertices[0], uintColor));
-    dest->Push(DebugLine(vertices[4], vertices[5], uintColor));
-    dest->Push(DebugLine(vertices[5], vertices[6], uintColor));
-    dest->Push(DebugLine(vertices[6], vertices[7], uintColor));
-    dest->Push(DebugLine(vertices[7], vertices[4], uintColor));
-    dest->Push(DebugLine(vertices[0], vertices[4], uintColor));
-    dest->Push(DebugLine(vertices[1], vertices[5], uintColor));
-    dest->Push(DebugLine(vertices[2], vertices[6], uintColor));
-    dest->Push(DebugLine(vertices[3], vertices[7], uintColor));
+    AddLine(vertices[0], vertices[1], uintColor, depthTest);
+    AddLine(vertices[1], vertices[2], uintColor, depthTest);
+    AddLine(vertices[2], vertices[3], uintColor, depthTest);
+    AddLine(vertices[3], vertices[0], uintColor, depthTest);
+    AddLine(vertices[4], vertices[5], uintColor, depthTest);
+    AddLine(vertices[5], vertices[6], uintColor, depthTest);
+    AddLine(vertices[6], vertices[7], uintColor, depthTest);
+    AddLine(vertices[7], vertices[4], uintColor, depthTest);
+    AddLine(vertices[0], vertices[4], uintColor, depthTest);
+    AddLine(vertices[1], vertices[5], uintColor, depthTest);
+    AddLine(vertices[2], vertices[6], uintColor, depthTest);
+    AddLine(vertices[3], vertices[7], uintColor, depthTest);
 }
 
 void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest)
 {
     unsigned uintColor = color.ToUInt();
-    
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
     
     for (unsigned i = 0; i < poly.faces_.Size(); ++i)
     {
@@ -210,7 +208,7 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
         if (face.Size() >= 3)
         {
             for (unsigned j = 0; j < face.Size(); ++j)
-                dest->Push(DebugLine(face[j], face[(j + 1) % face.Size()], uintColor));
+                AddLine(face[j], face[(j + 1) % face.Size()], uintColor, depthTest);
         }
     }
 }
@@ -248,12 +246,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     if (!bones.Size())
         return;
     
-    DebugLine newLine;
-    newLine.color_ = color.ToUInt();
-    
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
+    unsigned uintColor = color.ToUInt();
     
     for (unsigned i = 0; i < bones.Size(); ++i)
     {
@@ -265,18 +258,19 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
         if (!boneNode)
             continue;
         
-        newLine.start_ = boneNode->GetWorldPosition();
+        Vector3 start = boneNode->GetWorldPosition();
+        Vector3 end;
         
         unsigned j = bones[i].parentIndex_;
         Node* parentNode = boneNode->GetParent();
         
         // If bone has a parent defined, and it also skins geometry, draw a line to it. Else draw the bone as a point
         if (parentNode && (bones[j].radius_ >= M_EPSILON || bones[j].boundingBox_.Size().LengthSquared() >= M_EPSILON))
-            newLine.end_ = parentNode->GetWorldPosition();
+            end = parentNode->GetWorldPosition();
         else
-            newLine.end_ = newLine.start_;
+            end = start;
         
-        dest->Push(newLine);
+        AddLine(start, end, uintColor, depthTest);
     }
 }
 
@@ -284,15 +278,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
     unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)
 {
     unsigned uintColor = color.ToUInt();
-    
-    PODVector<DebugLine>* dest = &lines_;
-    if (!depthTest)
-        dest = &noDepthLines_;
-    
     const unsigned char* srcData = (const unsigned char*)vertexData;
-    unsigned oldSize = dest->Size();
-    dest->Resize(oldSize + indexCount);
-    DebugLine* destLines = &dest->At(oldSize);
     
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))
@@ -302,24 +288,15 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
         
         while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
+            Vector3 v0 = transform * *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            Vector3 v1 = transform * *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            Vector3 v2 = transform * *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
-            destLines[0].start_ = transform * v0;
-            destLines[0].end_ = transform * v1;
-            destLines[0].color_ = uintColor;
-            
-            destLines[1].start_ = destLines[0].end_;
-            destLines[1].end_ = transform * v2;
-            destLines[1].color_ = uintColor;
-            
-            destLines[2].start_ = destLines[1].end_;
-            destLines[2].end_ = destLines[0].start_;
-            destLines[2].color_ = uintColor;
+            AddLine(v0, v1, uintColor, depthTest);
+            AddLine(v1, v2, uintColor, depthTest);
+            AddLine(v2, v0, uintColor, depthTest);
             
             indices += 3;
-            destLines += 3;
         }
     }
     else
@@ -329,24 +306,15 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
         
         while (indices < indicesEnd)
         {
-            const Vector3& v0 = *((const Vector3*)(&srcData[indices[0] * vertexSize]));
-            const Vector3& v1 = *((const Vector3*)(&srcData[indices[1] * vertexSize]));
-            const Vector3& v2 = *((const Vector3*)(&srcData[indices[2] * vertexSize]));
+            Vector3 v0 = transform * *((const Vector3*)(&srcData[indices[0] * vertexSize]));
+            Vector3 v1 = transform * *((const Vector3*)(&srcData[indices[1] * vertexSize]));
+            Vector3 v2 = transform * *((const Vector3*)(&srcData[indices[2] * vertexSize]));
             
-            destLines[0].start_ = transform * v0;
-            destLines[0].end_ = transform * v1;
-            destLines[0].color_ = uintColor;
-            
-            destLines[1].start_ = destLines[0].end_;
-            destLines[1].end_ = transform * v2;
-            destLines[1].color_ = uintColor;
-            
-            destLines[2].start_ = destLines[1].end_;
-            destLines[2].end_ = destLines[0].start_;
-            destLines[2].color_ = uintColor;
+            AddLine(v0, v1, uintColor, depthTest);
+            AddLine(v1, v2, uintColor, depthTest);
+            AddLine(v2, v0, uintColor, depthTest);
             
             indices += 3;
-            destLines += 3;
         }
     }
 }
