@@ -46,7 +46,7 @@ OBJECTTYPESTATIC(Terrain);
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
 static const unsigned MAX_LOD_LEVELS = 4;
-static const int DEFAULT_PATCH_SIZE = 64;
+static const int DEFAULT_PATCH_SIZE = 32;
 static const int MIN_PATCH_SIZE = 4;
 static const int MAX_PATCH_SIZE = 128;
 static const unsigned STITCH_NORTH = 1;
@@ -373,6 +373,8 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
+    PROFILE(CreatePatchGeometry);
+    
     unsigned row = patchSize_ + 1;
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
     Geometry* geometry = patch->GetGeometry();
@@ -572,10 +574,23 @@ void Terrain::CreateGeometry()
         unsigned imgComps = heightMap_->GetComponents();
         unsigned imgRow = heightMap_->GetWidth() * imgComps;
         
-        for (int z = 0; z < numVertices_.y_; ++z)
+        if (imgComps == 1)
         {
-            for (int x = 0; x < numVertices_.x_; ++x)
-                *dest++ = (float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] * spacing_.y_;
+            for (int z = 0; z < numVertices_.y_; ++z)
+            {
+                for (int x = 0; x < numVertices_.x_; ++x)
+                    *dest++ = (float)src[imgRow * (numVertices_.y_ - 1 - z) + x] * spacing_.y_;
+            }
+        }
+        else
+        {
+            // If more than 1 component, use the green channel for more accuracy
+            for (int z = 0; z < numVertices_.y_; ++z)
+            {
+                for (int x = 0; x < numVertices_.x_; ++x)
+                    *dest++ = ((float)src[imgRow * (numVertices_.y_ - 1 - z) + imgComps * x] + (float)src[imgRow *
+                        (numVertices_.y_ - 1 - z) + imgComps * x + 1] / 256.0f) * spacing_.y_;
+            }
         }
         
         // Create patches and set node transforms
@@ -639,6 +654,8 @@ void Terrain::CreateGeometry()
 
 void Terrain::CreateIndexData()
 {
+    PROFILE(CreateIndexData);
+    
     PODVector<unsigned short> indices;
     drawRanges_.Clear();
     unsigned row = patchSize_ + 1;

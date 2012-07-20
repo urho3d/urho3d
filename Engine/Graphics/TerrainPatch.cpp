@@ -30,6 +30,7 @@
 #include "Node.h"
 #include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
+#include "Profiler.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "VertexBuffer.h"
@@ -143,20 +144,25 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
             newLodLevel = i;
     }
     
-    // Check that the LOD is not more than 1 coarser than neighbors
-    if (north_)
-        newLodLevel = Min((int)newLodLevel, north_->GetLodLevel() + 1);
-    if (south_)
-        newLodLevel = Min((int)newLodLevel, south_->GetLodLevel() + 1);
-    if (west_)
-        newLodLevel = Min((int)newLodLevel, west_->GetLodLevel() + 1);
-    if (east_)
-        newLodLevel = Min((int)newLodLevel, east_->GetLodLevel() + 1);
+    unsigned correctedLodLevel = GetCorrectedLodLevel(newLodLevel);
     
-    if (newLodLevel != lodLevel_)
+    if (correctedLodLevel != lodLevel_)
     {
-        lodLevel_ = newLodLevel;
+        lodLevel_ = correctedLodLevel;
         lodDirty_ = true;
+        
+        // If correction took place, recursively check also neighbor patches for correct LOD for stitching
+        if (newLodLevel != correctedLodLevel)
+        {
+            if (north_)
+                north_->CheckLodConstraints();
+            if (south_)
+                south_->CheckLodConstraints();
+            if (west_)
+                west_->CheckLodConstraints();
+            if (east_)
+                east_->CheckLodConstraints();
+        }
     }
 }
 
@@ -298,4 +304,38 @@ Terrain* TerrainPatch::GetOwner() const
 void TerrainPatch::OnWorldBoundingBoxUpdate()
 {
     worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+}
+
+unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
+{
+    if (north_)
+        lodLevel = Min((int)lodLevel, north_->GetLodLevel() + 1);
+    if (south_)
+        lodLevel = Min((int)lodLevel, south_->GetLodLevel() + 1);
+    if (west_)
+        lodLevel = Min((int)lodLevel, west_->GetLodLevel() + 1);
+    if (east_)
+        lodLevel = Min((int)lodLevel, east_->GetLodLevel() + 1);
+    
+    return lodLevel;
+}
+
+void TerrainPatch::CheckLodConstraints()
+{
+    unsigned correctedLodLevel = GetCorrectedLodLevel(lodLevel_);
+    
+    if (correctedLodLevel != lodLevel_)
+    {
+        lodLevel_ = correctedLodLevel;
+        lodDirty_ = true;
+        
+        if (north_)
+            north_->CheckLodConstraints();
+        if (south_)
+            south_->CheckLodConstraints();
+        if (west_)
+            west_->CheckLodConstraints();
+        if (east_)
+            east_->CheckLodConstraints();
+    }
 }

@@ -100,6 +100,11 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
+    /// Return a corrected LOD level to ensure stitching can work correctly.
+    unsigned GetCorrectedLodLevel(unsigned lodLevel);
+    /// Recursively ensure own and neighbor patch LOD level to correctly support pstitching.
+    void CheckLodConstraints();
+    
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Geometry that is locked to the max LOD level. Used for decals.
