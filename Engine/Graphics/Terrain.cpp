@@ -474,10 +474,10 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     {
         patch->ResetLod();
         geometry->SetIndexBuffer(indexBuffer_);
-        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_);
+        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
         geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
-        maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_);
+        maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
         maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
 }
@@ -491,18 +491,23 @@ void Terrain::UpdatePatchLod(TerrainPatch* patch)
     unsigned drawRangeIndex = lodLevel << 4;
     if (lodLevel < numLodLevels_ - 1)
     {
-        if (patch->GetNorthPatch() && patch->GetNorthPatch()->GetLodLevel() > lodLevel)
+        TerrainPatch* north = patch->GetNorthPatch();
+        TerrainPatch* south = patch->GetSouthPatch();
+        TerrainPatch* west = patch->GetWestPatch();
+        TerrainPatch* east = patch->GetEastPatch();
+        
+        if (north && north->GetLodLevel() > lodLevel)
             drawRangeIndex |= STITCH_NORTH;
-        if (patch->GetSouthPatch() && patch->GetSouthPatch()->GetLodLevel() > lodLevel)
+        if (south && south->GetLodLevel() > lodLevel)
             drawRangeIndex |= STITCH_SOUTH;
-        if (patch->GetWestPatch() && patch->GetWestPatch()->GetLodLevel() > lodLevel)
+        if (west && west->GetLodLevel() > lodLevel)
             drawRangeIndex |= STITCH_WEST;
-        if (patch->GetEastPatch() && patch->GetEastPatch()->GetLodLevel() > lodLevel)
+        if (east && east->GetLodLevel() > lodLevel)
             drawRangeIndex |= STITCH_EAST;
     }
     
     if (drawRangeIndex < drawRanges_.Size())
-        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[drawRangeIndex].first_, drawRanges_[drawRangeIndex].second_);
+        geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[drawRangeIndex].first_, drawRanges_[drawRangeIndex].second_, false);
 }
 
 void Terrain::SetMaterialAttr(ResourceRef value)
