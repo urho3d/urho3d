@@ -602,7 +602,9 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         if (graphics->HasTextureUnit(TU_NORMAL))
             graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
         if (graphics->HasTextureUnit(TU_SPECULAR))
-            graphics->SetTexture(TU_NORMAL, textures[TU_SPECULAR]);
+            graphics->SetTexture(TU_SPECULAR, textures[TU_SPECULAR]);
+        if (graphics->HasTextureUnit(TU_EMISSIVE))
+            graphics->SetTexture(TU_EMISSIVE, textures[TU_EMISSIVE]);
         if (graphics->HasTextureUnit(TU_ENVIRONMENT))
             graphics->SetTexture(TU_ENVIRONMENT, textures[TU_ENVIRONMENT]);
     }

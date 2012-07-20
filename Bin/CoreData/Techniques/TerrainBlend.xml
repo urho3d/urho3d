@@ -1,0 +1,9 @@
+<technique>
+    <pass name="base" vs="TerrainBlend" ps="TerrainBlend" />
+    <pass name="litbase" vs="TerrainBlend" ps="TerrainBlend_Ambient" />
+    <pass name="light" vs="TerrainBlend" ps="TerrainBlend" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="TerrainBlend" ps="TerrainBlend_Prepass" />
+    <pass name="material" vs="TerrainBlend" ps="TerrainBlend_Material" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="TerrainBlend" ps="TerrainBlend_Deferred" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

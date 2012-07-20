@@ -5,12 +5,16 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+sampler2D sWeightMap0 : register(S0);
+sampler2D sDetailMap1 : register(S1);
+sampler2D sDetailMap2 : register(S2);
+sampler2D sDetailMap3 : register(S3);
+
+uniform float2 cDetailTiling;
+
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
-    #ifdef NORMALMAP
-        float4 iTangent : TANGENT,
-    #endif
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
         int4 iBlendIndices : BLENDINDICES,
@@ -22,11 +26,9 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
+    out float3 oNormal : TEXCOORD2,
     #ifdef PERPIXEL
         out float4 oLightVec : TEXCOORD1,
-        #ifndef NORMALMAP
-            out float3 oNormal : TEXCOORD2,
-        #endif
         #ifdef SPECULAR
             out float3 oEyeVec : TEXCOORD3,
         #endif
@@ -47,13 +49,10 @@ void VS(float4 iPos : POSITION,
         #endif
     #else
         out float4 oVertexLight : TEXCOORD1,
-        out float3 oNormal : TEXCOORD2,
-        #ifdef NORMALMAP
-            out float3 oTangent : TEXCOORD3,
-            out float3 oBitangent : TEXCOORD4,
-        #else
-            out float4 oScreenPos : TEXCOORD3,
-        #endif
+        out float4 oScreenPos : TEXCOORD3,
+    #endif
+    #ifdef VERTEXCOLOR
+        out float4 oColor : COLOR0,
     #endif
     out float4 oPos : POSITION)
 {
@@ -61,18 +60,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
-
-    #if defined(PERPIXEL) && defined(NORMALMAP)
-        float3 oNormal;
-        float3 oTangent;
-        float3 oBitangent;
-    #endif
-
     oNormal = GetWorldNormal(modelMatrix);
-    #ifdef NORMALMAP
-        oTangent = GetWorldTangent(modelMatrix);
-        oBitangent = cross(oTangent, oNormal) * iTangent.w;
-    #endif
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -83,7 +71,7 @@ void VS(float4 iPos : POSITION,
         #else
             oLightVec = float4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(oPos));
         #endif
-    
+
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             #if defined(DIRLIGHT)
@@ -107,13 +95,7 @@ void VS(float4 iPos : POSITION,
             oCubeMaskVec = mul(oLightVec.xyz, (float3x3)cLightMatrices[0]);
         #endif
 
-        #ifdef NORMALMAP
-            float3x3 tbn = float3x3(oTangent, oBitangent, oNormal);
-            oLightVec.xyz = mul(tbn, oLightVec.xyz);
-            #ifdef SPECULAR
-                oEyeVec = mul(tbn, cCameraPos - worldPos);
-            #endif
-        #elif defined(SPECULAR)
+        #ifdef SPECULAR
             oEyeVec = cCameraPos - worldPos;
         #endif
     #else
@@ -124,19 +106,15 @@ void VS(float4 iPos : POSITION,
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 oVertexLight.rgb += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
-        #ifndef NORMALMAP
-            oScreenPos = GetScreenPos(oPos);
-        #endif
+
+        oScreenPos = GetScreenPos(oPos);
     #endif
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef PERPIXEL
         float4 iLightVec : TEXCOORD1,
-        #ifndef NORMALMAP
-            float3 iNormal : TEXCOORD2,
-        #endif
+        float3 iNormal : TEXCOORD2,
         #ifdef SPECULAR
             float3 iEyeVec : TEXCOORD3,
         #endif
@@ -158,12 +136,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #else
         float4 iVertexLight : TEXCOORD1,
         float3 iNormal : TEXCOORD2,
-        #ifdef NORMALMAP
-            float3 iTangent : TEXCOORD3,
-            float3 iBitangent : TEXCOORD4,
-        #else
-            float4 iScreenPos : TEXCOORD3,
-        #endif
+        float4 iScreenPos : TEXCOORD3,
     #endif
     #if defined(PREPASS) && !defined(HWDEPTH)
         out float4 oDepth : COLOR1,
@@ -178,23 +151,15 @@ void PS(float2 iTexCoord : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
     // Get material diffuse albedo
-    #ifdef DIFFMAP
-        float4 diffInput = tex2D(sDiffMap, iTexCoord);
-        #ifdef ALPHAMASK
-            if (diffInput.a < 0.5)
-                discard;
-        #endif
-        float4 diffColor = cMatDiffColor * diffInput;
-    #else
-        float4 diffColor = cMatDiffColor;
-    #endif
-    
+    float3 weights = tex2D(sWeightMap0, iTexCoord).rgb;
+    float sumWeights = weights.r + weights.g + weights.b;
+    weights /= sumWeights;
+    float2 detailTexCoord = cDetailTiling * iTexCoord;
+    float4 diffColor = cMatDiffColor * (weights.r * tex2D(sDetailMap1, detailTexCoord) +
+        weights.g * tex2D(sDetailMap2, detailTexCoord) + weights.b * tex2D(sDetailMap3, detailTexCoord));
+
     // Get material specular albedo
-    #ifdef SPECMAP
-        float3 specColor = cMatSpecColor.rgb * tex2D(sSpecMap, iTexCoord).rgb;
-    #else
-        float3 specColor = cMatSpecColor.rgb;
-    #endif
+    float3 specColor = cMatSpecColor.rgb;
 
     #if defined(PERPIXEL)
         // Per-pixel forward lighting
@@ -203,18 +168,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 finalColor;
         float diff;
 
-        #ifdef NORMALMAP
-            float3 normal = DecodeNormal(tex2D(sNormalMap, iTexCoord));
-        #else
-            float3 normal = normalize(iNormal);
-        #endif
+        float3 normal = normalize(iNormal);
 
         #ifdef DIRLIGHT
-            #ifdef NORMALMAP
-                lightDir = normalize(iLightVec.xyz);
-            #else
-                lightDir = iLightVec.xyz;
-            #endif
+            lightDir = iLightVec.xyz;
             diff = GetDiffuseDir(normal, lightDir);
         #else
             diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir);
@@ -254,12 +211,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
-        #ifdef NORMALMAP
-            float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
-            float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn);
-        #else
-            float3 normal = iNormal;
-        #endif
+        float3 normal = iNormal;
 
         float specPower = cMatSpecColor.a / 255.0;
 
@@ -269,12 +221,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        #ifdef NORMALMAP
-            float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
-            float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord)), tbn);
-        #else
-            float3 normal = iNormal;
-        #endif
+        float3 normal = iNormal;
 
         // If using SM2, light volume shader may not have instructions left to normalize the normal. Therefore do it here
         #if !defined(SM3)

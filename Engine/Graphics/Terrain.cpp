@@ -371,6 +371,39 @@ float Terrain::GetHeight(const Vector3& worldPosition) const
         return 0.0f;
 }
 
+Vector3 Terrain::GetNormal(const Vector3& worldPosition) const
+{
+    if (node_)
+    {
+        Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
+        float xPos = (position.x_ - patchWorldOrigin_.x_) / spacing_.x_;
+        float zPos = (position.z_ - patchWorldOrigin_.y_) / spacing_.z_;
+        float xFrac = xPos - floorf(xPos);
+        float zFrac = zPos - floorf(zPos);
+        Vector3 n1, n2, n3;
+        
+        if (xFrac + zFrac >= 1.0f)
+        {
+            n1 = GetRawNormal((unsigned)xPos + 1, (unsigned)zPos + 1);
+            n2 = GetRawNormal((unsigned)xPos, (unsigned)zPos + 1);
+            n3 = GetRawNormal((unsigned)xPos + 1, (unsigned)zPos);
+            xFrac = 1.0f - xFrac;
+            zFrac = 1.0f - zFrac;
+        }
+        else
+        {
+            n1 = GetRawNormal((unsigned)xPos, (unsigned)zPos);
+            n2 = GetRawNormal((unsigned)xPos + 1, (unsigned)zPos);
+            n3 = GetRawNormal((unsigned)xPos, (unsigned)zPos + 1);
+        }
+        
+        Vector3 n = (n1 * (1.0f - xFrac - zFrac) + n2 * xFrac + n3 * zFrac).Normalized();
+        return node_->GetWorldRotation() * n;
+    }
+    else
+        return Vector3::UP;
+}
+
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
     PROFILE(CreatePatchGeometry);
@@ -412,7 +445,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 box.Merge(position);
                 
                 // Normal
-                Vector3 normal = GetNormal(xPos, zPos);
+                Vector3 normal = GetRawNormal(xPos, zPos);
                 *vertexData++ = normal.x_;
                 *vertexData++ = normal.y_;
                 *vertexData++ = normal.z_;
@@ -842,7 +875,7 @@ float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
     return h1 * (1.0f - xFrac - zFrac) + h2 * xFrac + h3 * zFrac;
 }
 
-Vector3 Terrain::GetNormal(int x, int z) const
+Vector3 Terrain::GetRawNormal(int x, int z) const
 {
     float baseHeight = GetRawHeight(x, z);
     float nSlope = GetRawHeight(x, z - 1) - baseHeight;

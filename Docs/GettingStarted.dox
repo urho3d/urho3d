@@ -113,6 +113,8 @@ TestScene also includes a network replication test, where clients can connect, m
 
 There is also a variation of TestScene ported from Urho3D 1.0, TestSceneOld. It lacks networking features, but is provided for examining backward compatibility and performance. It can be run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as
 
+Yet another variation of TestScene demonstrates terrain rendering. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as
+
 \section Running_NinjaSnowWar NinjaSnowWar
 
 A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as

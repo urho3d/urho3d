@@ -48,8 +48,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     maxLodGeometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context)),
     coordinates_(IntVector2::ZERO),
-    lodLevel_(0),
-    lodDirty_(false)
+    lodLevel_(0)
 {
     drawableFlags_ = DRAWABLE_GEOMETRY;
     
@@ -144,26 +143,7 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
             newLodLevel = i;
     }
     
-    unsigned correctedLodLevel = GetCorrectedLodLevel(newLodLevel);
-    
-    if (correctedLodLevel != lodLevel_)
-    {
-        lodLevel_ = correctedLodLevel;
-        lodDirty_ = true;
-        
-        // If correction took place, recursively check also neighbor patches for correct LOD for stitching
-        if (newLodLevel != correctedLodLevel)
-        {
-            if (north_)
-                north_->CheckLodConstraints();
-            if (south_)
-                south_->CheckLodConstraints();
-            if (west_)
-                west_->CheckLodConstraints();
-            if (east_)
-                east_->CheckLodConstraints();
-        }
-    }
+    lodLevel_ = GetCorrectedLodLevel(newLodLevel);
 }
 
 void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
@@ -178,20 +158,14 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
     
     if (owner_)
         owner_->UpdatePatchLod(this);
-    
-    lodDirty_ = false;
 }
 
 UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
 {
-    // If any of the neighbor patches have changed LOD, must also update own LOD because of stitching
     if (vertexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
-    else if (lodDirty_ || (north_ && north_->lodDirty_) || (south_ && south_->lodDirty_) || (west_ && west_->lodDirty_) ||
-        (east_ && east_->lodDirty_))
+    else 
         return UPDATE_WORKER_THREAD;
-    else
-        return UPDATE_NONE;
 }
 
 Geometry* TerrainPatch::GetLodGeometry(unsigned batchIndex, unsigned level)
@@ -278,7 +252,6 @@ void TerrainPatch::SetCoordinates(const IntVector2& coordinates)
 void TerrainPatch::ResetLod()
 {
     lodLevel_ = 0;
-    lodDirty_ = false;
 }
 
 Geometry* TerrainPatch::GetGeometry() const
@@ -318,24 +291,4 @@ unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
         lodLevel = Min((int)lodLevel, east_->GetLodLevel() + 1);
     
     return lodLevel;
-}
-
-void TerrainPatch::CheckLodConstraints()
-{
-    unsigned correctedLodLevel = GetCorrectedLodLevel(lodLevel_);
-    
-    if (correctedLodLevel != lodLevel_)
-    {
-        lodLevel_ = correctedLodLevel;
-        lodDirty_ = true;
-        
-        if (north_)
-            north_->CheckLodConstraints();
-        if (south_)
-            south_->CheckLodConstraints();
-        if (west_)
-            west_->CheckLodConstraints();
-        if (east_)
-            east_->CheckLodConstraints();
-    }
 }

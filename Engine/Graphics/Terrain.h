@@ -99,6 +99,8 @@ public:
     TerrainPatch* GetPatch(int x, int z) const;
     /// Return height at world coordinates.
     float GetHeight(const Vector3& worldPosition) const;
+    /// Return normal at world coordinates.
+    Vector3 GetNormal(const Vector3& worldPosition) const;
     /// Return raw height data.
     SharedArrayPtr<float> GetHeightData() const { return heightData_; }
     /// Return draw distance.
@@ -150,8 +152,8 @@ private:
     float GetRawHeight(int x, int z) const;
     /// Return interpolated height for a specific LOD level.
     float GetLodHeight(int x, int z, unsigned lodLevel) const;
-    /// Get terrain normal at position.
-    Vector3 GetNormal(int x, int z) const;
+    /// Get slope-based terrain normal at position.
+    Vector3 GetRawNormal(int x, int z) const;
     /// Calculate LOD errors for a patch.
     void CalculateLodErrors(TerrainPatch* patch);
     /// Set neighbors for a patch.
