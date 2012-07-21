@@ -145,7 +145,7 @@ void InitScene()
         light.castShadows = true;
         light.shadowBias = BiasParameters(0.0001, 0.5);
         light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8);
-        light.specularIntensity = 1.0;
+        light.specularIntensity = 0.5;
     }
 
     Terrain@ terrain;
@@ -162,6 +162,7 @@ void InitScene()
         RigidBody@ body = terrainNode.CreateComponent("RigidBody");
         CollisionShape@ shape = terrainNode.CreateComponent("CollisionShape");
         shape.SetTerrain();
+        shape.margin = 0.01;
     }
 
     for (uint i = 0; i < 1000; ++i)
