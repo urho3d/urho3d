@@ -129,7 +129,7 @@ void InitScene()
 
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
-    zone.ambientColor = Color(0.1, 0.1, 0.1);
+    zone.ambientColor = Color(0.2, 0.2, 0.2);
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 100.0;
     zone.fogEnd = 300.0;
@@ -137,7 +137,7 @@ void InitScene()
 
     {
         Node@ lightNode = testScene.CreateChild("GlobalLight");
-        lightNode.direction = Vector3(0.5, -0.5, 0.5);
+        lightNode.direction = Vector3(0.4, -0.5, 0.3);
 
         Light@ light = lightNode.CreateComponent("Light");
         light.lightType = LIGHT_DIRECTIONAL;
@@ -154,7 +154,7 @@ void InitScene()
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Stone.xml");
+        object.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
         object.occluder = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
@@ -170,7 +170,7 @@ void InitScene()
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
+        object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.castShadows = true;
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
@@ -357,13 +357,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         if (key == KEY_F5)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_WRITE);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/TestScene.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
         if (key == KEY_F7)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_READ);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/TestScene.xml", FILE_READ);
             if (xmlFile.open)
                 testScene.LoadXML(xmlFile);
         }

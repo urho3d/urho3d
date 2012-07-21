@@ -130,7 +130,7 @@ void InitScene()
 
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
-    zone.ambientColor = Color(0.1, 0.1, 0.1);
+    zone.ambientColor = Color(0.2, 0.2, 0.2);
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 500.0;
     zone.fogEnd = 1000.0;
@@ -308,13 +308,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         if (key == KEY_F5)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_WRITE);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Terrain.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
         if (key == KEY_F7)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Scene.xml", FILE_READ);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Terrain.xml", FILE_READ);
             if (xmlFile.open)
                 testScene.LoadXML(xmlFile);
         }
@@ -402,8 +402,8 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     body.mass = 1.0;
     body.friction = 1.0;
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
-    body.ccdRadius = 0.25;
-    body.ccdMotionThreshold = 0.5;
+    body.ccdRadius = 0.15;
+    body.ccdMotionThreshold = 0.2;
 
     CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
     shape.SetBox(Vector3(1, 1, 1));

@@ -162,10 +162,9 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType TerrainPatch::GetUpdateGeometryType()
 {
-    if (vertexBuffer_->IsDataLost())
-        return UPDATE_MAIN_THREAD;
-    else 
-        return UPDATE_WORKER_THREAD;
+    // Because there is a latency in starting worker thread updates, and the update of terrain patch LOD should not take
+    // much time, always update in the main thread
+    return UPDATE_MAIN_THREAD;
 }
 
 Geometry* TerrainPatch::GetLodGeometry(unsigned batchIndex, unsigned level)

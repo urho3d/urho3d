@@ -106,7 +106,7 @@ void InitScene()
 
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/StoneLargeH.xml");
+        object.material = cache.GetResource("Material", "Materials/StoneTiledH.xml");
         object.castShadows = true;
         object.occluder = true;
     }
@@ -456,13 +456,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         if (key == KEY_F5)
         {
-            File@ xmlFile = File("Data/Scenes/SceneOld.xml", FILE_WRITE);
+            File@ xmlFile = File("Data/Scenes/TestSceneOld.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
         if (key == KEY_F7)
         {
-            File@ xmlFile = File("Data/Scenes/SceneOld.xml", FILE_READ);
+            File@ xmlFile = File("Data/Scenes/TestSceneOld.xml", FILE_READ);
             if (xmlFile.open)
             {
                 testScene.LoadXML(xmlFile);
