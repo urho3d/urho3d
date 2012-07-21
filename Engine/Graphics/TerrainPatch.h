@@ -67,6 +67,8 @@ public:
     void SetBoundingBox(const BoundingBox& box);
     /// Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
+    /// Set vertical offset for occlusion geometry.
+    void SetOcclusionOffset(float offset);
     /// Reset to LOD level 0.
     void ResetLod();
     
@@ -96,6 +98,8 @@ public:
     const IntVector2& GetCoordinates() const { return coordinates_; }
     /// Return current LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+    /// Return vertical offset for occlusion geometry..
+    float GetOcclusionOffset() const { return occlusionOffset_; }
     
 protected:
     /// Recalculate the world-space bounding box.
@@ -131,4 +135,6 @@ private:
     IntVector2 coordinates_;
     /// Current LOD level.
     unsigned lodLevel_;
+    /// Vertical offset for occlusion geometry.
+    float occlusionOffset_;
 };

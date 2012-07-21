@@ -475,7 +475,6 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     {
         unsigned lastDrawRange = drawRanges_.Size() - 1;
         
-        patch->ResetLod();
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
         geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
@@ -486,6 +485,10 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         minLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lastDrawRange].first_, drawRanges_[lastDrawRange].second_, false);
         minLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
+    
+    // Offset the occlusion geometry by half vertex spacing to reduce possibility of over-eager occlusion
+    patch->SetOcclusionOffset(0.25f * (spacing_.x_ + spacing_.z_));
+    patch->ResetLod();
 }
 
 void Terrain::UpdatePatchLod(TerrainPatch* patch)
