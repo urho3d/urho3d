@@ -14,7 +14,7 @@ int numLights = 0;
 int numObjects = 1;
 
 Array<String> modelNames = {"Models/Box.mdl", "Models/Mushroom.mdl", "Models/Jack.mdl"};
-Array<String> materialNames = {"Materials/Test.xml", "Materials/Mushroom.xml", "Materials/Jack.xml"};
+Array<String> materialNames = {"Materials/Stone.xml", "Materials/Mushroom.xml", "Materials/Jack.xml"};
 Array<Vector3> modelScales = {Vector3(0.6, 0.6, 0.6), Vector3(1, 1, 1), Vector3(1, 1, 1)};
 Array<Light@> lights;
 Array<StaticModel@> objects;

@@ -35,6 +35,7 @@
 #include <windows.h>
 #endif
 
+#include <cstddef>
 #include <cstring>
 
 #include "DebugNew.h"
