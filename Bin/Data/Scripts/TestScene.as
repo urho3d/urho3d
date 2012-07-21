@@ -137,7 +137,7 @@ void InitScene()
 
     {
         Node@ lightNode = testScene.CreateChild("GlobalLight");
-        lightNode.direction = Vector3(0.4, -0.5, 0.3);
+        lightNode.direction = Vector3(0.3, -0.5, 0.4);
 
         Light@ light = lightNode.CreateComponent("Light");
         light.lightType = LIGHT_DIRECTIONAL;
