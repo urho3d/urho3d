@@ -412,6 +412,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
     Geometry* geometry = patch->GetGeometry();
     Geometry* maxLodGeometry = patch->GetMaxLodGeometry();
+    Geometry* minLodGeometry = patch->GetMinLodGeometry();
     
     if (vertexBuffer->GetVertexCount() != row * row)
         vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
@@ -472,6 +473,8 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     
     if (drawRanges_.Size())
     {
+        unsigned lastDrawRange = drawRanges_.Size() - 1;
+        
         patch->ResetLod();
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
@@ -479,6 +482,9 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
         maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        minLodGeometry->SetIndexBuffer(indexBuffer_);
+        minLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lastDrawRange].first_, drawRanges_[lastDrawRange].second_, false);
+        minLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
 }
 

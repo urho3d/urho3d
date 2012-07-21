@@ -158,6 +158,7 @@ void InitScene()
         terrain.spacing = Vector3(2, 0.5, 2);
         terrain.heightMap = cache.GetResource("Image", "Textures/HeightMap.png");
         terrain.material = cache.GetResource("Material", "Materials/Terrain.xml");
+        terrain.occluder = true;
 
         RigidBody@ body = terrainNode.CreateComponent("RigidBody");
         CollisionShape@ shape = terrainNode.CreateComponent("CollisionShape");

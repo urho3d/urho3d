@@ -46,6 +46,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     Drawable(context),
     geometry_(new Geometry(context)),
     maxLodGeometry_(new Geometry(context)),
+    minLodGeometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context)),
     coordinates_(IntVector2::ZERO),
     lodLevel_(0)
@@ -54,6 +55,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    minLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -182,7 +184,7 @@ unsigned TerrainPatch::GetNumOccluderTriangles()
     if (mat && !mat->GetOcclusion())
         return 0;
     else
-        return geometry_->GetIndexCount() / 3;
+        return minLodGeometry_->GetIndexCount() / 3;
 }
 
 bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
@@ -206,14 +208,14 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     unsigned indexSize;
     unsigned elementMask;
     
-    geometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    minLodGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     // Check for valid geometry data
     if (!vertexData || !indexData)
         return success;
-
+    
     // Draw and check for running out of triangles
-    if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, geometry_->GetIndexStart(),
-        geometry_->GetIndexCount()))
+    if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
+        minLodGeometry_->GetIndexCount()))
         success = false;
     
     return success;
@@ -261,6 +263,11 @@ Geometry* TerrainPatch::GetGeometry() const
 Geometry* TerrainPatch::GetMaxLodGeometry() const
 {
     return maxLodGeometry_;
+}
+
+Geometry* TerrainPatch::GetMinLodGeometry() const
+{
+    return minLodGeometry_;
 }
 
 VertexBuffer* TerrainPatch::GetVertexBuffer() const
