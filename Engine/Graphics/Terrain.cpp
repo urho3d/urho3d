@@ -486,8 +486,8 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         minLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
     
-    // Offset the occlusion geometry by half vertex spacing to reduce possibility of over-eager occlusion
-    patch->SetOcclusionOffset(0.25f * (spacing_.x_ + spacing_.z_));
+    // Offset the occlusion geometry by vertex spacing to reduce possibility of over-aggressive occlusion
+    patch->SetOcclusionOffset(-0.5f * (spacing_.x_ + spacing_.z_));
     patch->ResetLod();
 }
 

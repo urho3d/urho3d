@@ -101,6 +101,7 @@ class DecalSet : public Drawable
 {
     OBJECT(DecalSet);
     
+public:
     /// Construct.
     DecalSet(Context* context);
     /// Destruct.
@@ -119,13 +120,13 @@ class DecalSet : public Drawable
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
-    /// %Set material.
+    /// %Set material. The material should use a small negative depth bias to avoid Z-fighting.
     void SetMaterial(Material* material);
     /// %Set maximum number of decal vertices.
     void SetMaxVertices(unsigned num);
     /// %Set maximum number of decal vertex indices.
     void SetMaxIndices(unsigned num);
-    /// Add a decal at world coordinates, using an existing drawable's geometry for reference. Return true if successful.
+    /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED);
     /// Remove n oldest decals.
     void RemoveDecals(unsigned num);

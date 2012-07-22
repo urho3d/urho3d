@@ -52,7 +52,7 @@ public:
     void SetPatchSize(int size);
     /// Set vertex (XZ) and height (Y) spacing.
     void SetSpacing(const Vector3& spacing);
-    /// Set heightmap image. Dimensions should be a power of two + 1. Return true if successful.
+    /// Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
     bool SetHeightMap(Image* image);
     /// Set material.
     void SetMaterial(Material* material);
@@ -76,7 +76,7 @@ public:
     void SetVisible(bool enable);
     /// %Set shadowcaster flag for patches.
     void SetCastShadows(bool enable);
-    /// %Set occlusion flag for patches.
+    /// %Set occlusion flag for patches. Occlusion uses the coarsest LOD and may potentially be too aggressive, so use with caution.
     void SetOccluder(bool enable);
     /// %Set occludee flag for patches.
     void SetOccludee(bool enable);

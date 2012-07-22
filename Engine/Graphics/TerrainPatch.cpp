@@ -190,14 +190,12 @@ unsigned TerrainPatch::GetNumOccluderTriangles()
 
 bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
 {
-    bool success = true;
-    
     // Check that the material is suitable for occlusion (default material always is) and set culling mode
     Material* material = batches_[0].material_;
     if (material)
     {
         if (!material->GetOcclusion())
-            return success;
+            return true;
         buffer->SetCullMode(material->GetCullMode());
     }
     else
@@ -212,17 +210,14 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     minLodGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     // Check for valid geometry data
     if (!vertexData || !indexData)
-        return success;
+        return true;
     
-    Matrix3x4 occlusionTransform(node_->GetWorldPosition() + node_->GetWorldTransform() * Vector4(0.0f, -occlusionOffset_, 0.0f,
+    Matrix3x4 occlusionTransform(node_->GetWorldPosition() + node_->GetWorldTransform() * Vector4(0.0f, occlusionOffset_, 0.0f,
         0.0f), node_->GetWorldRotation(), node_->GetWorldScale());
     
     // Draw and check for running out of triangles
-    if (!buffer->Draw(occlusionTransform, vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
-        minLodGeometry_->GetIndexCount()))
-        success = false;
-    
-    return success;
+    return buffer->Draw(occlusionTransform, vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
+        minLodGeometry_->GetIndexCount());
 }
 
 void TerrainPatch::SetOwner(Terrain* terrain)

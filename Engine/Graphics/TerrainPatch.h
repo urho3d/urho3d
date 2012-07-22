@@ -67,7 +67,7 @@ public:
     void SetBoundingBox(const BoundingBox& box);
     /// Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
-    /// Set vertical offset for occlusion geometry.
+    /// Set vertical offset for occlusion geometry. Should be negative.
     void SetOcclusionOffset(float offset);
     /// Reset to LOD level 0.
     void ResetLod();

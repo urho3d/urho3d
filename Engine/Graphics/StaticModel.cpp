@@ -231,8 +231,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned indexCount = geometry->GetIndexCount();
         
         // Draw and check for running out of triangles
-        if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
-            success = false;
+        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount);
         
         if (!success)
             break;

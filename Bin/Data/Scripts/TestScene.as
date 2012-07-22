@@ -129,7 +129,7 @@ void InitScene()
 
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
-    zone.ambientColor = Color(0.1, 0.1, 0.1);
+    zone.ambientColor = Color(0.15, 0.15, 0.15);
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 100.0;
     zone.fogEnd = 300.0;
@@ -137,7 +137,7 @@ void InitScene()
 
     {
         Node@ lightNode = testScene.CreateChild("GlobalLight");
-        lightNode.direction = Vector3(0.45, -0.55, 0.5);
+        lightNode.direction = Vector3(0.35, -0.5, 0.425);
 
         Light@ light = lightNode.CreateComponent("Light");
         light.lightType = LIGHT_DIRECTIONAL;
