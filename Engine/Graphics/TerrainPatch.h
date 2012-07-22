@@ -57,17 +57,17 @@ public:
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
-    /// Set owner terrain.
+    /// %Set owner terrain.
     void SetOwner(Terrain* terrain);
-    /// Set neighbor patches.
+    /// %Set neighbor patches.
     void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east);
-    /// Set material.
+    /// %Set material.
     void SetMaterial(Material* material);
-    /// Set local-space bounding box.
+    /// %Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// Set patch coordinates.
+    /// %Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
-    /// Set vertical offset for occlusion geometry. Should be negative.
+    /// %Set vertical offset for occlusion geometry. Should be negative.
     void SetOcclusionOffset(float offset);
     /// Reset to LOD level 0.
     void ResetLod();

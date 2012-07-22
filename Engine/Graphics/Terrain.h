@@ -48,13 +48,13 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     
-    /// Set patch quads per side. Must be a power of two.
+    /// %Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);
-    /// Set vertex (XZ) and height (Y) spacing.
+    /// %Set vertex (XZ) and height (Y) spacing.
     void SetSpacing(const Vector3& spacing);
-    /// Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
+    /// %Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
     bool SetHeightMap(Image* image);
-    /// Set material.
+    /// %Set material.
     void SetMaterial(Material* material);
     /// %Set draw distance for patches.
     void SetDrawDistance(float distance);
