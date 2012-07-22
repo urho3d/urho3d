@@ -1219,8 +1219,18 @@ public:
 
 void btCollisionWorld::debugDrawObject(const btTransform& worldTransform, const btCollisionShape* shape, const btVector3& color)
 {
+	// Urho3D: perform AABB visibility test first
+	btVector3 aabbMin, aabbMax;
+	shape->getAabb(worldTransform, aabbMin, aabbMax);
+	if (!getDebugDrawer()->isVisible(aabbMin, aabbMax))
+		return;
+
 	// Draw a small simplex at the center of the object
 	getDebugDrawer()->drawTransform(worldTransform,1);
+
+	// Urho3D: never draw heightfields as they are potentially huge
+	if (shape->getShapeType() == TERRAIN_SHAPE_PROXYTYPE)
+		return;
 
 	if (shape->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 	{

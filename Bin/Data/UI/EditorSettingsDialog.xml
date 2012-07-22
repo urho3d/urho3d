@@ -132,15 +132,15 @@
         <element type="Text" style="FileSelectorFilterText" name="PickZones">
             <text value="Zones" />
         </element>
-        <element type="Text" style="FileSelectorFilterText" name="PickCollisionShapes">
-            <text value="Col.shapes" />
+        <element type="Text" style="FileSelectorFilterText" name="PickRigidBodies">
+            <text value="Rigidbodies" />
         </element>
         <element type="DropDownList" name="PickModeEdit">
             <fixedwidth value="100" />
             <popupitem name="PickGeometries" />
             <popupitem name="PickLights" />
             <popupitem name="PickZones" />
-            <popupitem name="PickCollisionShapes" />
+            <popupitem name="PickRigidBodies" />
         </element>
     </element>
     <element>

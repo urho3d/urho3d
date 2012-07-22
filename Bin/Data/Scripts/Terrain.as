@@ -292,7 +292,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (key == ' ')
         {
             drawDebug++;
-            if (drawDebug > 1)
+            if (drawDebug > 2)
                 drawDebug = 0;
         }
 
@@ -432,7 +432,9 @@ void HandlePostRenderUpdate()
     // Draw rendering debug geometry without depth test to see the effect of occlusion
     if (drawDebug == 1)
         renderer.DrawDebugGeometry(false);
-
+    if (drawDebug == 2)
+        testScene.physicsWorld.DrawDebugGeometry(true);
+    
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {

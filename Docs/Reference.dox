@@ -384,8 +384,8 @@ Graphics implements the low-level functionality:
 - Setting the screen mode
 - Keeping track of GPU resources
 - Keeping track of rendering context state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
-- Handling lost device
 - Performing primitive rendering operations
+- Handling lost device
 
 Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.
 

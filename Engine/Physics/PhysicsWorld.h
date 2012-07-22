@@ -97,6 +97,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Check if an AABB is visible for debug drawing.
+    virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax);
     /// Draw a physics debug line.
     virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
     /// Log warning from the physics engine.

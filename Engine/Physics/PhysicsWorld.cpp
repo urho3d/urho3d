@@ -161,6 +161,14 @@ void PhysicsWorld::RegisterObject(Context* context)
     ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Interpolation", interpolation_, true, AM_FILE);
 }
 
+bool PhysicsWorld::isVisible(const btVector3& aabbMin, const btVector3& aabbMax)
+{
+    if (debugRenderer_)
+        return debugRenderer_->IsInside(BoundingBox(ToVector3(aabbMin), ToVector3(aabbMax)));
+    else
+        return false;
+}
+
 void PhysicsWorld::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
     if (debugRenderer_)

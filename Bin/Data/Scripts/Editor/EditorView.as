@@ -373,12 +373,18 @@ void ViewRaycast(bool mouseClick)
         if (result.drawable !is null)
         {
             Drawable@ drawable = result.drawable;
-            if (debug !is null)
+            // If selecting a terrain patch, select the parent terrain instead
+            if (drawable.typeName != "TerrainPatch")
             {
-                debug.AddNode(drawable.node, 1.0, false);
-                drawable.DrawDebugGeometry(debug, false);
+                selected = drawable;
+                if (debug !is null)
+                {
+                    debug.AddNode(drawable.node, 1.0, false);
+                    drawable.DrawDebugGeometry(debug, false);
+                }
             }
-            selected = drawable;
+            else if (drawable.node.parent !is null)
+                selected = drawable.node.parent.GetComponent("Terrain");
         }
     }
     else

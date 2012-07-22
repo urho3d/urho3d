@@ -13,6 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 #ifndef BT_IDEBUG_DRAW__H
 #define BT_IDEBUG_DRAW__H
@@ -51,6 +52,9 @@ class	btIDebugDraw
 	};
 
 	virtual ~btIDebugDraw() {};
+
+	// Urho3D: added function to test visibility of an AABB
+	virtual bool    isVisible(const btVector3& aabbMin,const btVector3& aabbMax)=0;
 
 	virtual void	drawLine(const btVector3& from,const btVector3& to,const btVector3& color)=0;
 		

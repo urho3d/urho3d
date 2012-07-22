@@ -76,14 +76,6 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Colo
     if (lines_.Size() + noDepthLines_.Size() >= MAX_LINES)
         return;
     
-    // Perform sphere culling to reject lines outside the view
-    /// \todo This is slow to do on a per line basis
-    Vector3 center = (start + end) * 0.5f;
-    Vector3 extent = end - center;
-    Sphere sphere(center, extent.Length());
-    if (frustum_.IsInsideFast(sphere) == OUTSIDE)
-        return;
-    
     if (depthTest)
         lines_.Push(DebugLine(start, end, color.ToUInt()));
     else
@@ -93,12 +85,6 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Colo
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest)
 {
     if (lines_.Size() + noDepthLines_.Size() >= MAX_LINES)
-        return;
-    
-    Vector3 center = (start + end) * 0.5f;
-    Vector3 extent = end - center;
-    Sphere sphere(center, extent.Length());
-    if (frustum_.IsInsideFast(sphere) == OUTSIDE)
         return;
     
     if (depthTest)
