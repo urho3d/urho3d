@@ -50,11 +50,12 @@ Urho3D uses the following third-party libraries:
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
 
-DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong Engine.
+DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
+Engine.
 
 Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
 
-Ninja model and terrain/smoke/flare/status bar textures from OGRE.
+Ninja model and terrain / smoke / flare / status bar textures from OGRE.
 
 BlueHighway font from Larabie Fonts.
 
