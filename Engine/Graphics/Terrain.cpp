@@ -868,7 +868,7 @@ float Terrain::GetLodHeight(int x, int z, unsigned lodLevel) const
     unsigned offset = 1 << lodLevel;
     float divisor = (float)offset;
     float xFrac = (float)(x % offset) / divisor;
-    float zFrac = (float)(x % offset) / divisor;
+    float zFrac = (float)(z % offset) / divisor;
     float h1, h2, h3;
     
     if (xFrac + zFrac >= 1.0f)
