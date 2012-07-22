@@ -156,8 +156,8 @@ V1.16
 V1.2
 
 - Android and iOS support.
-- Decal rendering.
-- Terrain rendering.
+- %Decal rendering.
+- %Terrain rendering.
 - Joystick input support.
 - Use SDL library for windowing and input on all platforms.
 - KTX and PVR image loading (for ETC1 & PVRTC compressed textures.)
