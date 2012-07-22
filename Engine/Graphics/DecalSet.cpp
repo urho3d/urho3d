@@ -281,7 +281,8 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
 {
     PROFILE(AddDecal);
     
-    if (!node_)
+    // Do not add decals in headless mode
+    if (!node_ || !GetSubsystem<Graphics>())
         return false;
     
     if (!target || !target->GetNode())

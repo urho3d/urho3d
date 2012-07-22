@@ -235,3 +235,13 @@ V1.16   - Switched to Bullet physics library.
         - Rendering and networking performance optimizations.
         - Use Squish library to implement software DXT decompression when not
           supported in hardware.
+
+V1.2    - Android and iOS support.
+        - Decal rendering.
+        - Terrain rendering.
+        - Joystick input support.
+        - Use SDL library for windowing and input on all platforms.
+        - KTX and PVR image loading (for ETC1 & PVRTC compressed textures.)
+        - Removed need for shader preprocessing; reorganized shaders to be more
+          friendly to base custom shaders on.
+        - Inbuilt geometry shapes in the editor.

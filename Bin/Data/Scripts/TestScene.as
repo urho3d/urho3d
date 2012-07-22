@@ -426,8 +426,12 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                     {
                         decal = result.drawable.node.CreateComponent("DecalSet");
                         decal.material = cache.GetResource("Material", "Materials/UrhoDecal.xml");
-                        decal.maxVertices = 2048;
-                        decal.maxIndices = 4096;
+                        // Increase max. vertices/indices if the target is skinned
+                        if (result.drawable.typeName == "AnimatedModel")
+                        {
+                            decal.maxVertices = 2048;
+                            decal.maxIndices = 4096;
+                        }
                     }
                     decal.AddDecal(result.drawable, rayHitPos, cameraNode.worldRotation, 0.5, 1.0, 1.0, Vector2(0, 0),
                         Vector2(1, 1));
