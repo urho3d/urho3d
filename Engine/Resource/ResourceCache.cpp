@@ -284,7 +284,7 @@ void ResourceCache::ReleaseAllResources(bool force)
         {
             HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
             // If other references exist, do not release, unless forced
-            if (current->second_.Refs() == 1 || force)
+            if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
             {
                 i->second_.resources_.Erase(current);
                 released = true;

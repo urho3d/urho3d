@@ -2493,6 +2493,7 @@ Renderer
 
 Methods:<br>
 - void DrawDebugGeometry(bool) const
+- void ReloadShaders() const
 
 Properties:<br>
 - ShortStringHash type (readonly)

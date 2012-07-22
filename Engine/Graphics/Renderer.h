@@ -202,6 +202,9 @@ public:
     void SetOcclusionBufferSize(int size);
     /// %Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
+    /// Force reload of shaders.
+    void ReloadShaders();
+    
     /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.

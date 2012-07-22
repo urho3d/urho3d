@@ -130,7 +130,7 @@ void InitScene()
 
     Node@ zoneNode = testScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
-    zone.ambientColor = Color(0.2, 0.2, 0.2);
+    zone.ambientColor = Color(0.15, 0.15, 0.15);
     zone.fogColor = Color(0.5, 0.5, 0.7);
     zone.fogStart = 500.0;
     zone.fogEnd = 1000.0;

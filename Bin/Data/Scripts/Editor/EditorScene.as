@@ -82,6 +82,8 @@ void SetResourcePath(String newPath, bool usePreferredDir = true)
         return;
 
     cache.ReleaseAllResources(false);
+    renderer.ReloadShaders();
+
     // Remove the old scene resource path if any. However make sure that the default data paths do not get removed
     if (!sceneResourcePath.empty && sceneResourcePath.Find(fileSystem.programDir) < 0)
         cache.RemoveResourceDir(sceneResourcePath);

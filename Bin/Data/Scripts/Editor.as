@@ -24,6 +24,8 @@ void Start()
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
     cache.autoReloadResources = true;
+    // Set default resource path
+    SetResourcePath(fileSystem.programDir + "Data");
 
     CreateScene();
     CreateUI();

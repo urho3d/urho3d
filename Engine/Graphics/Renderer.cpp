@@ -503,6 +503,11 @@ void Renderer::SetOccluderSizeThreshold(float screenSize)
     occluderSizeThreshold_ = Max(screenSize, 0.0f);
 }
 
+void Renderer::ReloadShaders()
+{
+    shadersDirty_ = true;
+}
+
 Viewport* Renderer::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
