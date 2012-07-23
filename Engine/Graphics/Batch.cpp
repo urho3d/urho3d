@@ -597,16 +597,12 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         }
         
         const SharedPtr<Texture>* textures = material_->GetTextures();
-        if (graphics->HasTextureUnit(TU_DIFFUSE))
-            graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
-        if (graphics->HasTextureUnit(TU_NORMAL))
-            graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
-        if (graphics->HasTextureUnit(TU_SPECULAR))
-            graphics->SetTexture(TU_SPECULAR, textures[TU_SPECULAR]);
-        if (graphics->HasTextureUnit(TU_EMISSIVE))
-            graphics->SetTexture(TU_EMISSIVE, textures[TU_EMISSIVE]);
-        if (graphics->HasTextureUnit(TU_ENVIRONMENT))
-            graphics->SetTexture(TU_ENVIRONMENT, textures[TU_ENVIRONMENT]);
+        for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        {
+            TextureUnit unit = (TextureUnit)i;
+            if (graphics->HasTextureUnit(unit))
+                graphics->SetTexture(i, textures[i]);
+        }
     }
     
     // Set light-related textures
