@@ -192,7 +192,7 @@ void Run(const Vector<String>& arguments)
     if (arguments.Size() < 1)
     {
         ErrorExit(
-            "ShaderCompiler <definitionfile> [options]\n\n"
+            "ShaderCompiler <definitionfile> <outputpath> [options]\n\n"
             "Options:\n"
             "-tVS|PS Compile only vertex or pixel shaders, by default compile both\n"
             "-vX     Compile only the shader variation X\n"
@@ -205,7 +205,7 @@ void Run(const Vector<String>& arguments)
     String path, file, extension;
     SplitPath(arguments[0], path, file, extension);
     inDir_ = AddTrailingSlash(path);
-    outDir_ = inDir_;
+    outDir_ = AddTrailingSlash(arguments[1]);
     
     for (unsigned i = 1; i < arguments.Size(); ++i)
     {
@@ -299,7 +299,7 @@ void CompileShader(const String& fileName)
                 
                 compile.type_ = VS;
                 compile.name_ = file;
-                compile.outFileName_ = inDir_ + file;
+                compile.outFileName_ = outDir_ + file;
                 if (!src.name_.Empty())
                 {
                     compile.name_ += "_" + src.name_;
@@ -332,7 +332,7 @@ void CompileShader(const String& fileName)
                 
                 compile.type_ = PS;
                 compile.name_ = file;
-                compile.outFileName_ = inDir_ + file;
+                compile.outFileName_ = outDir_ + file;
                 if (!src.name_.Empty())
                 {
                     compile.name_ += "_" + src.name_;

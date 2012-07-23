@@ -52,10 +52,6 @@ public:
     bool PrepareVariation(ShaderVariation* variation);
     
 private:
-    /// Absolute filename of the shader description file.
-    String fullFileName_;
-    /// Shader source last modified time.
-    unsigned sourceModifiedTime_;
     /// Vertex shader variation parser.
     ShaderParser vsParser_;
     /// Pixel shader variation parser.
@@ -64,4 +60,14 @@ private:
     HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
     /// Pixel shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
+    /// Absolute filename of the shader description file.
+    String fullFileName_;
+    /// Compiled vertex shader file extension.
+    String vsExtension_;
+    /// Compiled vertex shader file extension.
+    String psExtension_;
+    /// Subdirectory for compiled shaders.
+    String subDir_;
+    /// Shader source last modified time.
+    unsigned sourceModifiedTime_;
 };
