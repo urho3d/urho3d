@@ -667,12 +667,12 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
             
             for (unsigned i = 0; i < instances_.Size(); ++i)
             {
-                graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+                if (graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, instances_[i].worldTransform_))
+                    graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+                
                 graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                     geometry_->GetVertexStart(), geometry_->GetVertexCount());
             }
-            
-            graphics->ClearTransformSources();
         }
         else
         {
@@ -947,18 +947,15 @@ void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) cons
 unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
 {
     unsigned total = 0;
-    unsigned maxIndexCount = renderer->GetMaxInstanceTriangles() * 3;
     
-    // As this function is for the purpose of calculating how much space is needed in the instancing buffer, do not add groups
-    // that have too many triangles to be instanced
     for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
     {
-        if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
+        if (i->second_.geometryType_ == GEOM_INSTANCED)
             total += i->second_.instances_.Size();
     }
     for (HashMap<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
-        if (i->second_.geometry_->GetIndexCount() <= maxIndexCount)
+       if (i->second_.geometryType_ == GEOM_INSTANCED)
             total += i->second_.instances_.Size();
     }
     

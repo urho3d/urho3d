@@ -2353,9 +2353,6 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         !batch.overrideView_)
         batch.geometryType_ = GEOM_INSTANCED;
     
-    if (batch.geometryType_ == GEOM_STATIC_NOINSTANCING)
-        batch.geometryType_ = GEOM_STATIC;
-    
     if (batch.geometryType_ == GEOM_INSTANCED)
     {
         HashMap<BatchGroupKey, BatchGroup>* groups = batch.isBase_ ? &batchQueue.baseBatchGroups_ : &batchQueue.batchGroups_;

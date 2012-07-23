@@ -1060,6 +1060,9 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             (unsigned)maxInstanceTriangles_ * 3))
             geomType = GEOM_STATIC;
         
+        if (geomType == GEOM_STATIC_NOINSTANCING)
+            geomType = GEOM_STATIC;
+        
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
         PassType type = batch.pass_->GetType();
         if (type == PASS_LIGHT || type == PASS_LITBASE)
