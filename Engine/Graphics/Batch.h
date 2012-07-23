@@ -214,6 +214,8 @@ public:
     void SortBackToFront();
     /// Sort instanced and non-instanced draw calls front to back.
     void SortFrontToBack();
+    /// Sort batches front to back while also maintaining state sorting.
+    void SortFrontToBack2Pass(PODVector<Batch*>& batches);
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
     void SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex);
     /// Draw.
@@ -229,6 +231,13 @@ public:
     HashMap<BatchGroupKey, BatchGroup> baseBatchGroups_;
     /// Instanced draw calls.
     HashMap<BatchGroupKey, BatchGroup> batchGroups_;
+    /// Shader remapping table for 2-pass state and distance sort.
+    HashMap<unsigned, unsigned> shaderRemapping_;
+    /// Material remapping table for 2-pass state and distance sort.
+    HashMap<unsigned short, unsigned short> materialRemapping_;
+    /// Geometry remapping table for 2-pass state and distance sort.
+    HashMap<unsigned short, unsigned short> geometryRemapping_;
+    
     /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
     /// Sorted non-instanced draw calls with base flag.

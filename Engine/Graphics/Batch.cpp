@@ -45,13 +45,21 @@ inline bool CompareBatchesFrontToBack(Batch* lhs, Batch* rhs)
     if (lhs->sortKey_ == rhs->sortKey_)
         return lhs->distance_ < rhs->distance_;
     else
-        return lhs->sortKey_ > rhs->sortKey_;
+        return lhs->sortKey_ < rhs->sortKey_;
+}
+
+inline bool CompareBatchesFrontToBackDistance(Batch* lhs, Batch* rhs)
+{
+    if (lhs->distance_ == rhs->distance_)
+        return lhs->sortKey_ < rhs->sortKey_;
+    else
+        return lhs->distance_ < rhs->distance_;
 }
 
 inline bool CompareBatchesBackToFront(Batch* lhs, Batch* rhs)
 {
     if (lhs->distance_ == rhs->distance_)
-        return lhs->sortKey_ > rhs->sortKey_;
+        return lhs->sortKey_ < rhs->sortKey_;
     else
         return lhs->distance_ > rhs->distance_;
 }
@@ -59,40 +67,6 @@ inline bool CompareBatchesBackToFront(Batch* lhs, Batch* rhs)
 inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceData& rhs)
 {
     return lhs.distance_ < rhs.distance_;
-}
-
-static void SortFrontToBack2Pass(PODVector<Batch*>& batches)
-{
-    // First sort with state having priority
-    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
-    
-    // Then rewrite distances so that different states will be ordered front to back, and sort again.
-    // Do not do this on mobile devices as they likely use a tiled deferred approach, with which
-    // front-to-back sorting is irrelevant
-    #ifndef GL_ES_VERSION_2_0
-    float lastDistance;
-    unsigned long long lastSortKey;
-    for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
-    {
-        Batch* batch = *i;
-        
-        if (i == batches.Begin() || batch->sortKey_ != lastSortKey)
-        {
-            lastSortKey = batch->sortKey_;
-            lastDistance = batch->distance_;
-        }
-        else
-        {
-            lastDistance *= 1.000001f;
-            batch->distance_ = lastDistance;
-        }
-        
-        // Leave only the base & alphamask bits to the sort key
-        batch->sortKey_ &= 0xc000000000000000ULL;
-    }
-    
-    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
-    #endif
 }
 
 void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
@@ -181,18 +155,18 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
 
 void Batch::CalculateSortKey()
 {
-    unsigned shaders = ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) & 0x3fff;
-    if (isBase_)
-        shaders |= 0x8000;
-    if (pass_ && !pass_->GetAlphaMask())
-        shaders |= 0x4000;
+    unsigned shaderID = ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) & 0x3fff;
+    if (!isBase_)
+        shaderID |= 0x8000;
+    if (pass_ && pass_->GetAlphaMask())
+        shaderID |= 0x4000;
     
-    unsigned lightQueue = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffff;
-    unsigned material = (*((unsigned*)&material_) / sizeof(Material)) & 0xffff;
-    unsigned geometry = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
+    unsigned lightQueueID = (*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffff;
+    unsigned materialID = (*((unsigned*)&material_) / sizeof(Material)) & 0xffff;
+    unsigned geometryID = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
     
-    sortKey_ = (((unsigned long long)shaders) << 48) | (((unsigned long long)lightQueue) << 32) |
-        (((unsigned long long)material) << 16) | geometry;
+    sortKey_ = (((unsigned long long)shaderID) << 48) | (((unsigned long long)lightQueueID) << 32) |
+        (((unsigned long long)materialID) << 16) | geometryID;
 }
 
 void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransform) const
@@ -831,6 +805,66 @@ void BatchQueue::SortFrontToBack()
     
     SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBaseBatchGroups_));
     SortFrontToBack2Pass(reinterpret_cast<PODVector<Batch*>& >(sortedBatchGroups_));
+}
+
+void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
+{
+    // Mobile devices likely use a tiled deferred approach, with which front-to-back sorting is irrelevant. The 2-pass
+    // method is also time consuming, so just sort with state having priority
+    #ifdef GL_ES_VERSION_2_0
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    #else
+    // For desktop, first sort by distance and remap shader/material/geometry IDs in the sort key
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBackDistance);
+    
+    unsigned freeShaderID = 0;
+    unsigned short freeMaterialID = 0;
+    unsigned short freeGeometryID = 0;
+    
+    for (PODVector<Batch*>::Iterator i = batches.Begin(); i != batches.End(); ++i)
+    {
+        Batch* batch = *i;
+        
+        unsigned shaderID = (batch->sortKey_ >> 32);
+        HashMap<unsigned, unsigned>::ConstIterator j = shaderRemapping_.Find(shaderID);
+        if (j != shaderRemapping_.End())
+            shaderID = j->second_;
+        else
+        {
+            shaderID = shaderRemapping_[shaderID] = freeShaderID | (shaderID & 0xc0000000);
+            ++freeShaderID;
+        }
+        
+        unsigned short materialID = (unsigned short)(batch->sortKey_ & 0xffff0000);
+        HashMap<unsigned short, unsigned short>::ConstIterator k = materialRemapping_.Find(materialID);
+        if (k != materialRemapping_.End())
+            materialID = k->second_;
+        else
+        {
+            materialID = materialRemapping_[materialID] = freeMaterialID;
+            ++freeMaterialID;
+        }
+        
+        unsigned short geometryID = (unsigned short)(batch->sortKey_ & 0xffff);
+        HashMap<unsigned short, unsigned short>::ConstIterator l = geometryRemapping_.Find(geometryID);
+        if (l != geometryRemapping_.End())
+            geometryID = l->second_;
+        else
+        {
+            geometryID = geometryRemapping_[geometryID] = freeGeometryID;
+            ++freeGeometryID;
+        }
+        
+        batch->sortKey_ = (((unsigned long long)shaderID) << 32) || (((unsigned long long)materialID) << 16) | geometryID;
+    }
+    
+    shaderRemapping_.Clear();
+    materialRemapping_.Clear();
+    geometryRemapping_.Clear();
+    
+    // Finally sort again with the rewritten ID's
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    #endif
 }
 
 void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
