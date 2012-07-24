@@ -40,28 +40,28 @@
 
 #include "DebugNew.h"
 
-inline bool CompareBatchesFrontToBack(Batch* lhs, Batch* rhs)
+inline bool CompareBatchesState(Batch* lhs, Batch* rhs)
 {
-    if (lhs->sortKey_ == rhs->sortKey_)
-        return lhs->distance_ < rhs->distance_;
-    else
+    if (lhs->sortKey_ != rhs->sortKey_)
         return lhs->sortKey_ < rhs->sortKey_;
+    else
+        return lhs->distance_ < rhs->distance_;
 }
 
-inline bool CompareBatchesFrontToBackDistance(Batch* lhs, Batch* rhs)
+inline bool CompareBatchesFrontToBack(Batch* lhs, Batch* rhs)
 {
-    if (lhs->distance_ == rhs->distance_)
-        return lhs->sortKey_ < rhs->sortKey_;
-    else
+    if (lhs->distance_ != rhs->distance_)
         return lhs->distance_ < rhs->distance_;
+    else
+        return lhs->sortKey_ < rhs->sortKey_;
 }
 
 inline bool CompareBatchesBackToFront(Batch* lhs, Batch* rhs)
 {
-    if (lhs->distance_ == rhs->distance_)
-        return lhs->sortKey_ < rhs->sortKey_;
-    else
+    if (lhs->distance_ != rhs->distance_)
         return lhs->distance_ > rhs->distance_;
+    else
+        return lhs->sortKey_ < rhs->sortKey_;
 }
 
 inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceData& rhs)
@@ -812,10 +812,10 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     // Mobile devices likely use a tiled deferred approach, with which front-to-back sorting is irrelevant. The 2-pass
     // method is also time consuming, so just sort with state having priority
     #ifdef GL_ES_VERSION_2_0
-    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    Sort(batches.Begin(), batches.End(), CompareBatchesState);
     #else
     // For desktop, first sort by distance and remap shader/material/geometry IDs in the sort key
-    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBackDistance);
+    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
     
     unsigned freeShaderID = 0;
     unsigned short freeMaterialID = 0;
@@ -863,7 +863,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     geometryRemapping_.Clear();
     
     // Finally sort again with the rewritten ID's
-    Sort(batches.Begin(), batches.End(), CompareBatchesFrontToBack);
+    Sort(batches.Begin(), batches.End(), CompareBatchesState);
     #endif
 }
 
