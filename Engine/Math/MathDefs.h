@@ -116,8 +116,8 @@ inline unsigned NextPowerOfTwo(unsigned value)
 /// Update a hash with the given 8-bit value using the SDBM algorithm.
 inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
 /// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
-inline float Random() { return (Rand() & 32767) / 32768.0f; }
-/// Return a random float between 0.0 and range, inclusive.
-inline float Random(float range) { return (Rand() & 32767) * range / 32767.0f; }
-/// Return a random integer between 0 and range, inclusive.
-inline int Random(int range) { return ((Rand() & 32767) * range + 16384) / 32767; }
+inline float Random() { return Rand() / 32768.0f; }
+/// Return a random float between 0.0 and range, inclusive from both ends.
+inline float Random(float range) { return Rand() * range / 32767.0f; }
+/// Return a random integer between 0 and range - 1.
+inline int Random(int range) { return (Rand() * (range - 1) + 16384) / 32767; }

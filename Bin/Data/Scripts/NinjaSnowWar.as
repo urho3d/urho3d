@@ -521,7 +521,7 @@ void HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     Connection@ connection = GetEventSender();
     // If user has empty name, invent one
     if (connection.identity["UserName"].GetString().Trimmed().empty)
-        connection.identity["UserName"] = "user" + RandomInt(999);
+        connection.identity["UserName"] = "user" + RandomInt(1000);
     // Assign scene to begin replicating it to the client
     connection.scene = gameScene;
 }
