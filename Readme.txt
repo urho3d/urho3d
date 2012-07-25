@@ -50,6 +50,10 @@ Urho3D uses the following third-party libraries:
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
 
+Contributions and bugfixes from:
+- Miika Santala
+- Magic.Lixin
+
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
 
