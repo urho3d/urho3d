@@ -195,8 +195,8 @@ void LoadSkeleton(const String& skeletonFileName)
             String bone = boneParent.GetAttribute("bone");
             String parent = boneParent.GetAttribute("parent");
             unsigned i = 0, j = 0;
-            for (i = 0; i < bones_.Size() && bones_[i].name_ != bone; ++i)
-            for (j = 0; j < bones_.Size() && bones_[j].name_ != parent; ++j)
+            for (i = 0; i < bones_.Size() && bones_[i].name_ != bone; ++i);
+            for (j = 0; j < bones_.Size() && bones_[j].name_ != parent; ++j);
             
             if (i >= bones_.Size() || j >= bones_.Size())
                 ErrorExit("Found indeterminate parent bone assignment");
