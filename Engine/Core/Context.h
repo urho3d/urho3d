@@ -25,7 +25,6 @@
 
 #include "Attribute.h"
 #include "Object.h"
-#include "HashMap.h"
 #include "HashSet.h"
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.

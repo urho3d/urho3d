@@ -178,17 +178,17 @@ static void RegisterScrollView(asIScriptEngine* engine)
 void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
 {
     unsigned numItems = selections->GetSize();
-    Set<unsigned> dest;
+    PODVector<unsigned> dest;
     
     for (unsigned i = 0; i < numItems; ++i)
-        dest.Insert(*((unsigned*)selections->At(i)));
+        dest.Push(*((unsigned*)selections->At(i)));
     
     ptr->SetSelections(dest);
 }
 
 static CScriptArray* ListViewGetSelections(ListView* ptr)
 {
-    return SetToArray<unsigned>(ptr->GetSelections(), "Array<uint>");
+    return VectorToArray<unsigned>(ptr->GetSelections(), "Array<uint>");
 }
 
 static CScriptArray* ListViewGetItems(ListView* ptr)

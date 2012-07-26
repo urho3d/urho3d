@@ -479,9 +479,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 // If amount of bones is larger than supported by HW skinning, must remap per submesh
                 if (bones_.Size() > MAX_SKIN_MATRICES)
                 {
-                    Map<unsigned, unsigned> usedBoneMap;
+                    HashMap<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
-                    for (Map<unsigned, PODVector<BoneWeightAssignment> >::Iterator i =
+                    for (HashMap<unsigned, PODVector<BoneWeightAssignment> >::Iterator i =
                         subGeometryLodLevel.boneWeights_.Begin(); i != subGeometryLodLevel.boneWeights_.End(); ++i)
                     {
                         // Sort the bone assigns by weight
@@ -506,13 +506,13 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     
                     // Write mapping of vertex buffer bone indices to original bone indices
                     subGeometryLodLevel.boneMapping_.Resize(usedBoneMap.Size());
-                    for (Map<unsigned, unsigned>::Iterator j = usedBoneMap.Begin(); j != usedBoneMap.End(); ++j)
+                    for (HashMap<unsigned, unsigned>::Iterator j = usedBoneMap.Begin(); j != usedBoneMap.End(); ++j)
                         subGeometryLodLevel.boneMapping_[j->second_] = j->first_;
                     
                     sorted = true;
                 }
                 
-                for (Map<unsigned, PODVector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
+                for (HashMap<unsigned, PODVector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
                     i != subGeometryLodLevel.boneWeights_.End(); ++i)
                 {
                     // Sort the bone assigns by weight, if not sorted yet in bone remapping pass
@@ -758,7 +758,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                 
                                 ModelVertex newVertex;
                                 newVertex.position_ = vec;
-                                newMorph.buffers_[bufIndex].vertices_[vertexIndex] = newVertex;
+                                newMorph.buffers_[bufIndex].vertices_.Push(MakePair(vertexIndex, newVertex));
                                 poseOffset = poseOffset.GetNext("poseoffset");
                             }
                             

@@ -24,7 +24,7 @@
 #pragma once
 
 #include "ScrollView.h"
-#include "Set.h"
+#include "HashSet.h"
 
 /// %ListView selection highlight mode.
 enum HighlightMode
@@ -74,7 +74,7 @@ public:
     /// %Set selection.
     void SetSelection(unsigned index);
     /// %Set multiple selected items. If multiselect disabled, sets only the first.
-    void SetSelections(const Set<unsigned>& indices);
+    void SetSelections(const PODVector<unsigned>& indices);
     /// Add item to the selection, multiselect mode only.
     void AddSelection(unsigned index);
     /// Remove item from the selection.
@@ -111,7 +111,7 @@ public:
     /// Return first selected index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
     /// Return all selected indices.
-    Set<unsigned> GetSelections() const { return selections_; }
+    PODVector<unsigned> GetSelections() const;
     /// Return first selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
@@ -138,7 +138,7 @@ protected:
     void EnsureItemVisibility(UIElement* item);
     
     /// Current selection.
-    Set<unsigned> selections_;
+    HashSet<unsigned> selections_;
     /// Highlight mode.
     HighlightMode highlightMode_;
     /// Multiselect flag.
@@ -155,6 +155,8 @@ protected:
     unsigned lastClickedItem_;
     
 private:
+    /// %Set multiple selected items, used internally.
+    void SetSelections(const HashSet<unsigned>& indices);
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
     /// Handle global focus change to check whether an invisible item was focused.

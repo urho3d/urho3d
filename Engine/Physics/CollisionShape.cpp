@@ -707,8 +707,8 @@ void CollisionShape::UpdateShape()
                 // Check the geometry cache
                 String id = "TriMesh_" + model_->GetName() + "_" + String(lodLevel_);
                 
-                Map<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
-                Map<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
+                HashMap<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
+                HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
                 if (j != cache.End())
                     geometry_ = j->second_;
                 else
@@ -729,8 +729,8 @@ void CollisionShape::UpdateShape()
                 // Check the geometry cache
                 String id = "Convex_" + model_->GetName() + "_" + String(lodLevel_);
                 
-                Map<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
-                Map<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
+                HashMap<String, SharedPtr<CollisionGeometryData> >& cache = physicsWorld_->GetGeometryCache();
+                HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator j = cache.Find(id);
                 if (j != cache.End())
                     geometry_ = j->second_;
                 else

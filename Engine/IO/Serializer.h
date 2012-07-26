@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Map.h"
+#include "HashMap.h"
 #include "StringHash.h"
 
 class Color;
@@ -39,7 +39,7 @@ struct ResourceRef;
 struct ResourceRefList;
 
 typedef Vector<Variant> VariantVector;
-typedef Map<ShortStringHash, Variant> VariantMap;
+typedef HashMap<ShortStringHash, Variant> VariantMap;
 
 /// Abstract stream for writing.
 class Serializer

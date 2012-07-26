@@ -438,10 +438,10 @@ void PhysicsWorld::SetDebugDepthTest(bool enable)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (Map<String, SharedPtr<CollisionGeometryData> >::Iterator i = geometryCache_.Begin();
+    for (HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator i = geometryCache_.Begin();
         i != geometryCache_.End();)
     {
-        Map<String, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
+        HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
             geometryCache_.Erase(current);
     }

@@ -55,7 +55,7 @@ struct ModelMorph
     /// Current morph weight.
     float weight_;
     /// Morph data per vertex buffer.
-    Map<unsigned, VertexBufferMorph> buffers_;
+    HashMap<unsigned, VertexBufferMorph> buffers_;
 };
 
 /// 3D model resource.

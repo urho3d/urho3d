@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "HashMap.h"
 #include "Object.h"
 
 /// %File entry within the package file.

@@ -112,7 +112,7 @@ private:
     /// Script function/method execution contexts.
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
-    Map<const char*, asIObjectType*> objectTypes_;
+    HashMap<const char*, asIObjectType*> objectTypes_;
     /// Script engine logging mode.
     ScriptLogMode logMode_;
     /// Retained mode log messages.

@@ -143,7 +143,6 @@ public:
         Clear();
         FreeNode(Tail());
         AllocatorUninitialize(allocator_);
-        delete[] ptrs_;
     }
     
     /// Assign a hash set.
@@ -168,10 +167,10 @@ public:
         return *this;
     }
     
-    /// Test for equality with another hash set. Warning: this is much slower than checking equality of two sets.
+    /// Test for equality with another hash set.
     bool operator == (const HashSet<T>& rhs) const
     {
-        if (rhs.size_ != size_)
+        if (rhs.Size() != Size())
             return false;
         
         ConstIterator it = Begin();
@@ -185,10 +184,10 @@ public:
         return true;
     }
     
-    /// Test for inequality with another hash set. Warning: this is much slower than checking inequality of two sets.
+    /// Test for inequality with another hash set.
     bool operator != (const HashSet<T>& rhs) const
     {
-        if (rhs.size_ != size_)
+        if (rhs.Size() != Size())
             return true;
         
         ConstIterator it = Begin();
@@ -208,24 +207,24 @@ public:
         // If no pointers yet, allocate with minimum bucket count
         if (!ptrs_)
         {
-            numBuckets_ = MIN_BUCKETS;
+            AllocateBuckets(Size(), MIN_BUCKETS);
             Rehash();
         }
         
-        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
         
         Node* existing = FindNode(key, hashKey);
         if (existing)
             return Iterator(existing);
         
         Node* newNode = InsertNode(Tail(), key);
-        newNode->down_ = ptrs_[hashKey];
-        ptrs_[hashKey] = newNode;
+        newNode->down_ = Ptrs()[hashKey];
+        Ptrs()[hashKey] = newNode;
         
         // Rehash if the maximum load factor has been exceeded
-        if (size_ > numBuckets_ * MAX_LOAD_FACTOR)
+        if (Size() > NumBuckets() * MAX_LOAD_FACTOR)
         {
-            numBuckets_ <<= 1;
+            AllocateBuckets(Size(), NumBuckets() << 1);
             Rehash();
         }
         
@@ -250,10 +249,10 @@ public:
     /// Erase a key. Return true if was found.
     bool Erase(const T& key)
     {
-        if (!numBuckets_)
+        if (!ptrs_)
             return false;
         
-        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
         
         Node* previous;
         Node* node = FindNode(key, hashKey, previous);
@@ -263,7 +262,7 @@ public:
         if (previous)
             previous->down_ = node->down_;
         else
-            ptrs_[hashKey] = node->down_;
+            Ptrs()[hashKey] = node->down_;
         EraseNode(node);
         
         return true;
@@ -275,18 +274,16 @@ public:
     /// Clear the set.
     void Clear()
     {
-        while (size_)
+        while (Size())
             EraseNode(Head());
         
-        // Reset bucket pointers
-        for (unsigned i = 0; i < numBuckets_; ++i)
-            ptrs_[i] = 0;
+        ResetPtrs();
     }
     
     /// Rehash to a specific bucket count, which must be a power of two. Return true if successful.
     bool Rehash(unsigned numBuckets)
     {
-        if (numBuckets == numBuckets_)
+        if (numBuckets == NumBuckets())
             return true;
         if (!numBuckets || numBuckets < size_ / MAX_LOAD_FACTOR)
             return false;
@@ -298,7 +295,7 @@ public:
         if (check != 1)
             return false;
         
-        numBuckets_ = numBuckets;
+        AllocateBuckets(Size(), numBuckets);
         Rehash();
         return true;
     }
@@ -306,10 +303,10 @@ public:
     /// Return iterator to the key, or end iterator if not found.
     Iterator Find(const T& key)
     {
-        if (!numBuckets_)
+        if (!ptrs_)
             return End();
         
-        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
         Node* node = FindNode(key, hashKey);
         if (node)
             return Iterator(node);
@@ -320,10 +317,10 @@ public:
     /// Return const iterator to the key, or end iterator if not found.
     ConstIterator Find(const T& key) const
     {
-        if (!numBuckets_)
+        if (!ptrs_)
             return End();
         
-        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
         Node* node = FindNode(key, hashKey);
         if (node)
             return ConstIterator(node);
@@ -334,10 +331,10 @@ public:
     /// Return whether contains a key.
     bool Contains(const T& key) const
     {
-        if (!numBuckets_)
+        if (!ptrs_)
             return false;
         
-        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
         return FindNode(key, hashKey) != 0;
     }
     
@@ -353,10 +350,6 @@ public:
     const T& Front() const { return *Begin(); }
     /// Return last key.
     const T& Back() const { return *(--End()); }
-    /// Return number of keys.
-    unsigned Size() const { return size_; }
-    /// Return whether set is empty.
-    bool Empty() const { return size_ == 0; }
     
 private:
     /// Return the head node.
@@ -367,7 +360,7 @@ private:
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey) const
     {
-        Node* node = reinterpret_cast<Node*>(ptrs_[hashKey]);
+        Node* node = reinterpret_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->key_ == key)
@@ -383,7 +376,7 @@ private:
     {
         previous = 0;
         
-        Node* node = reinterpret_cast<Node*>(ptrs_[hashKey]);
+        Node* node = reinterpret_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->key_ == key)
@@ -413,7 +406,7 @@ private:
         if (dest == Head())
             head_ = newNode;
         
-        ++size_;
+        SetSize(Size() + 1);
         
         return newNode;
     }
@@ -436,7 +429,7 @@ private:
             head_ = next;
         
         FreeNode(node);
-        --size_;
+        SetSize(Size() - 1);
         
         return next;
     }
@@ -466,21 +459,15 @@ private:
         AllocatorFree(allocator_, node);
     }
     
-    /// Reallocate and rehash the buckets.
+    /// Rehash the buckets.
     void Rehash()
     {
-        delete[] ptrs_;
-        
-        ptrs_ = AllocateBuckets(numBuckets_);
-        for (unsigned i = 0; i < numBuckets_; ++i)
-            ptrs_[i] = 0;
-        
         for (Iterator it = Begin(); it != End(); ++it)
         {
             Node* node = reinterpret_cast<Node*>(it.ptr_);
-            unsigned hashKey = MakeHash(*it) & (numBuckets_ - 1);
-            node->down_ = ptrs_[hashKey];
-            ptrs_[hashKey] = node;
+            unsigned hashKey = MakeHash(*it) & (NumBuckets() - 1);
+            node->down_ = Ptrs()[hashKey];
+            Ptrs()[hashKey] = node;
         }
     }
 };

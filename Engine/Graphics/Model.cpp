@@ -300,7 +300,7 @@ bool Model::Save(Serializer& dest)
         dest.WriteUInt(morphs_[i].buffers_.Size());
         
         // Write morph vertex buffers
-        for (Map<unsigned int, VertexBufferMorph>::ConstIterator j = morphs_[i].buffers_.Begin();
+        for (HashMap<unsigned int, VertexBufferMorph>::ConstIterator j = morphs_[i].buffers_.Begin();
             j != morphs_[i].buffers_.End(); ++j)
         {
             dest.WriteUInt(j->first_);

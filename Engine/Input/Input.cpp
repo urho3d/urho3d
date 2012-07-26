@@ -114,7 +114,7 @@ void Input::Update()
     }
     
     // Reset touch delta movement
-    for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         TouchState& state = i->second_;
         state.lastPosition_ = state.position_;
@@ -321,7 +321,7 @@ int Input::GetQualifiers() const
 TouchState* Input::GetTouch(unsigned index) const
 {
     unsigned cmpIndex = 0;
-    for (Map<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
+    for (HashMap<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         if (cmpIndex == index)
             return const_cast<TouchState*>(&i->second_);
@@ -444,7 +444,7 @@ void Input::ResetState()
     }
     
     // When clearing touch states, send the corresponding touch end events
-    for (Map<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
         TouchState& state = i->second_;
         

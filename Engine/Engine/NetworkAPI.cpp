@@ -123,30 +123,8 @@ static Network* GetNetwork()
 
 static CScriptArray* NetworkGetClientConnections(Network* ptr)
 {
-    const Map<kNet::MessageConnection*, SharedPtr<Connection> >& connections = ptr->GetClientConnections();
-    
-    asIScriptContext *context = asGetActiveContext();
-    if (context)
-    {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType("Array<Connection@>");
-        CScriptArray* arr = new CScriptArray(connections.Size(), type);
-        
-        unsigned index = 0;
-        for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = connections.Begin();
-            i != connections.End(); ++i)
-        {
-            // Increment reference count for storing in the array
-            Connection* connection = i->second_;
-            if (connection)
-                connection->AddRef();
-            *(static_cast<Connection**>(arr->At(index))) = connection;
-            ++index;
-        }
-        
-        return arr;
-    }
-    else
-        return 0;
+    const Vector<SharedPtr<Connection> >& connections = ptr->GetClientConnections();
+    return VectorToHandleArray(connections, "Array<Connection@>");
 }
 
 static void NetworkBroadcastRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)

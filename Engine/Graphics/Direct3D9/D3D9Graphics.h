@@ -25,7 +25,6 @@
 
 #include "ArrayPtr.h"
 #include "Color.h"
-#include "HashMap.h"
 #include "Image.h"
 #include "Object.h"
 #include "Rect.h"

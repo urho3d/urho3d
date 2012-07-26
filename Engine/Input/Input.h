@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "Map.h"
 #include "HashSet.h"
 #include "InputEvents.h"
 #include "Object.h"
@@ -209,7 +208,7 @@ private:
     /// Key pressed state.
     HashSet<int> keyPress_;
     /// Active finger touches.
-    Map<int, TouchState> touches_;
+    HashMap<int, TouchState> touches_;
     /// Opened joysticks.
     Vector<JoystickState> joysticks_;
     /// Mouse buttons' down state.

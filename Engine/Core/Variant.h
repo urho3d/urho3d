@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Color.h"
-#include "Map.h"
+#include "HashMap.h"
 #include "Quaternion.h"
 #include "StringHash.h"
 #include "Vector4.h"
@@ -141,7 +141,7 @@ class Variant;
 /// Vector of variants.
 typedef Vector<Variant> VariantVector;
 /// Map of variants.
-typedef Map<ShortStringHash, Variant> VariantMap;
+typedef HashMap<ShortStringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
 class Variant

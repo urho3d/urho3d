@@ -331,7 +331,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         newMorph.nameHash_ = morphs[i].nameHash_;
         newMorph.weight_ = 0.0f;
         newMorph.buffers_ = morphs[i].buffers_;
-        for (Map<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
+        for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
             morphElementMask_ |= j->second_.elementMask_;
         morphs_.Push(newMorph);
     }
@@ -910,7 +910,7 @@ void AnimatedModel::MarkMorphsDirty()
 void AnimatedModel::CloneGeometries()
 {
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
-    Map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
+    HashMap<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
     morphVertexBuffers_.Resize(originalVertexBuffers.Size());
     
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
@@ -1163,7 +1163,7 @@ void AnimatedModel::UpdateMorphs()
                     {
                         if (morphs_[j].weight_ > 0.0f)
                         {
-                            Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                            HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())
                                 ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
                         }

@@ -47,7 +47,6 @@
 #include "Zone.h"
 
 #include "Sort.h"
-#include "Set.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -71,7 +70,7 @@ struct OutModel
     
     String outName_;
     aiNode* rootNode_;
-    Set<unsigned> meshIndices_;
+    HashSet<unsigned> meshIndices_;
     PODVector<aiMesh*> meshes_;
     PODVector<aiNode*> meshNodes_;
     PODVector<aiNode*> bones_;
@@ -111,7 +110,7 @@ void DumpNodes(aiNode* rootNode, unsigned level);
 void ExportModel(const String& outName);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model);
-void CollectBonesFinal(PODVector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node);
+void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel& model);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
@@ -121,9 +120,9 @@ void ExportScene(const String& outName);
 void CollectSceneModels(OutScene& scene, aiNode* node);
 void BuildAndSaveScene(OutScene& scene);
 
-void ExportMaterials(Set<String>& usedTextures);
-void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures);
-void CopyTextures(const Set<String>& usedTextures, const String& sourcePath);
+void ExportMaterials(HashSet<String>& usedTextures);
+void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
+void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath);
 
 void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
@@ -340,7 +339,7 @@ void Run(const Vector<String>& arguments)
         
         if (!noMaterials)
         {
-            Set<String> usedTextures;
+            HashSet<String> usedTextures;
             ExportMaterials(usedTextures);
             CopyTextures(usedTextures, GetPath(inFile));
         }
@@ -470,8 +469,8 @@ void CollectMeshes(OutModel& model, aiNode* node)
 
 void CollectBones(OutModel& model)
 {
-    Set<aiNode*> necessary;
-    Set<aiNode*> rootNodes;
+    HashSet<aiNode*> necessary;
+    HashSet<aiNode*> rootNodes;
     
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
@@ -508,7 +507,7 @@ void CollectBones(OutModel& model)
     if (rootNodes.Size() > 1)
     {
         aiNode* commonParent = (*rootNodes.Begin())->mParent;
-        for (Set<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
+        for (HashSet<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
         {
             if (*i != commonParent)
             {
@@ -536,7 +535,7 @@ void CollectBones(OutModel& model)
     }
 }
 
-void CollectBonesFinal(PODVector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node)
+void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
 {
     if (necessary.Find(node) != necessary.End())
     {
@@ -1179,7 +1178,7 @@ void BuildAndSaveScene(OutScene& scene)
         outScene->Save(file);
 }
 
-void ExportMaterials(Set<String>& usedTextures)
+void ExportMaterials(HashSet<String>& usedTextures)
 {
     if (useSubdirs_)
         context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Materials");
@@ -1188,7 +1187,7 @@ void ExportMaterials(Set<String>& usedTextures)
         BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
 }
 
-void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
+void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 {
     // Material must have name so it can be successfully saved
     aiString matNameStr;
@@ -1285,12 +1284,12 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
     outMaterial.Save(outFile);
 }
 
-void CopyTextures(const Set<String>& usedTextures, const String& sourcePath)
+void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
     if (useSubdirs_)
         context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Textures");
     
-    for (Set<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
+    for (HashSet<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
         PrintLine("Copying texture " + (*i));
         context_->GetSubsystem<FileSystem>()->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);

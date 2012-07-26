@@ -171,7 +171,7 @@ public:
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
     /// Return the collision geometry cache.
-    Map<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
+    HashMap<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
     /// Return whether node dirtying should be disregarded.
@@ -216,7 +216,7 @@ private:
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for collision geometry data.
-    Map<String, SharedPtr<CollisionGeometryData> > geometryCache_;
+    HashMap<String, SharedPtr<CollisionGeometryData> > geometryCache_;
     /// Simulation steps per second.
     unsigned fps_;
     /// Time accumulator for non-interpolated mode.

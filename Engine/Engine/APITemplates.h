@@ -28,12 +28,13 @@
 #include "Context.h"
 #include "Drawable.h"
 #include "File.h"
+#include "HashSet.h"
 #include "Node.h"
 #include "Renderer.h"
 #include "Resource.h"
 #include "Script.h"
 #include "ScriptInstance.h"
-#include "Set.h"
+#include "Sort.h"
 #include "SoundSource.h"
 #include "Texture.h"
 
@@ -161,28 +162,6 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
             if (ptr)
                 ptr->AddRef();
             *(static_cast<T**>(arr->At(i))) = ptr;
-        }
-        
-        return arr;
-    }
-    else
-        return 0;
-}
-
-/// Template function for Set to array conversion.
-template <class T> CScriptArray* SetToArray(const Set<T>& set, const char* arrayName)
-{
-    asIScriptContext *context = asGetActiveContext();
-    if (context)
-    {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = new CScriptArray(set.Size(), type);
-        
-        unsigned index = 0;
-        for (typename Set<T>::ConstIterator i = set.Begin(); i != set.End(); ++i)
-        {
-            *(static_cast<T*>(arr->At(index))) = *i;
-            ++index;
         }
         
         return arr;

@@ -155,7 +155,7 @@ void InitScene()
     // Create animated models
     for (uint i = 0; i < NUM_OBJECTS; ++i)
     {
-        Node@ newNode = testScene.CreateChild();
+        Node@ newNode = testScene.CreateChild("Jack");
         newNode.position = Vector3(Random() * 180 - 90, 0, Random() * 180 - 90);
         newNode.rotation = Quaternion(Random() * 360, Vector3(0, 1, 0));
         newNode.SetScale(1 + Random() * 0.25);
@@ -183,7 +183,7 @@ void InitScene()
     // Create floating smoke clouds
     for (uint i = 0; i < NUM_BILLBOARDNODES; ++i)
     {
-        Node@ newNode = testScene.CreateChild();
+        Node@ newNode = testScene.CreateChild("Smoke");
         newNode.position = Vector3(Random() * 200 - 100, Random() * 15 + 5, Random() * 200 - 100);
 
         BillboardSet@ billboard = newNode.CreateComponent("BillboardSet");
@@ -207,7 +207,7 @@ void InitScene()
     // Create lights
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
-        Node@ newNode = testScene.CreateChild();
+        Node@ newNode = testScene.CreateChild("Light");
         Light@ light = newNode.CreateComponent("Light");
 
         Vector3 position(
@@ -471,6 +471,20 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 camera = cameraNode.GetComponent("Camera");
                 cameraLightNode = cameraNode.GetChild("CameraLight");
                 renderer.viewports[0] = Viewport(testScene, camera);
+                // Reacquire animating objects
+                animatingObjects.Clear();
+                billboards.Clear();
+                lights.Clear();
+                for (uint i = 0; i < testScene.numChildren; ++i)
+                {
+                    Node@ node = testScene.children[i];
+                    if (node.name == "Jack")
+                        animatingObjects.Push(node);
+                    else if (node.name == "Smoke")
+                        billboards.Push(node);
+                    else if (node.name == "Light")
+                        lights.Push(node);
+                }
             }
         }
     }

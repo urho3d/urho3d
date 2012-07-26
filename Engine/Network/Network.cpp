@@ -159,8 +159,8 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     connection->RegisterInboundMessageHandler(this);
     
     // Create a new client connection corresponding to this MessageConnection
-    Connection* newConnection = new Connection(context_, true, kNet::SharedPtr<kNet::MessageConnection>(connection));
-    clientConnections_[connection] = newConnection;
+    SharedPtr<Connection> newConnection(new Connection(context_, true, kNet::SharedPtr<kNet::MessageConnection>(connection)));
+    clientConnections_.Push(newConnection);
     LOGINFO("Client " + newConnection->ToString() + " connected");
     
     using namespace ClientConnected;
@@ -175,19 +175,22 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     connection->Disconnect(0);
     
     // Remove the client connection that corresponds to this MessageConnection
-    Map<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
-    if (i != clientConnections_.End())
+    for (Vector<SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
     {
-        Connection* connection = i->second_;
-        LOGINFO("Client " + connection->ToString() + " disconnected");
-        
-        using namespace ClientDisconnected;
-        
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)connection;
-        connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
-        
-        clientConnections_.Erase(i);
+        if ((*i)->GetMessageConnection() == connection)
+        {
+            Connection* connection = *i;
+            LOGINFO("Client " + connection->ToString() + " disconnected");
+            
+            using namespace ClientDisconnected;
+            
+            VariantMap eventData;
+            eventData[P_CONNECTION] = (void*)connection;
+            connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
+            
+            clientConnections_.Erase(i);
+            break;
+        }
     }
 }
 
@@ -285,18 +288,16 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
-        i != clientConnections_.End(); ++i)
-        i->second_->SendRemoteEvent(eventType, inOrder, eventData);
+    for (Vector<SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
+        (*i)->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
-        i != clientConnections_.End(); ++i)
+    for (Vector<SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
     {
-        if (i->second_->GetScene() == scene)
-            i->second_->SendRemoteEvent(eventType, inOrder, eventData);
+        if ((*i)->GetScene() == scene)
+            (*i)->SendRemoteEvent(eventType, inOrder, eventData);
     }
 }
 
@@ -314,11 +315,10 @@ void Network::BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool in
     }
     
     Scene* scene = receiver->GetScene();
-    for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
-        i != clientConnections_.End(); ++i)
+    for (Vector<SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
     {
-        if (i->second_->GetScene() == scene)
-            i->second_->SendRemoteEvent(receiver, eventType, inOrder, eventData);
+        if ((*i)->GetScene() == scene)
+            (*i)->SendRemoteEvent(receiver, eventType, inOrder, eventData);
     }
 }
 
@@ -351,10 +351,13 @@ void Network::SetPackageCacheDir(const String& path)
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
-    if (i != clientConnections_.End())
-        return i->second_;
-    else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
+    for (Vector<SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
+    {
+        if ((*i)->GetMessageConnection() == connection)
+            return *i;
+    }
+    
+    if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
         return serverConnection_;
     else
         return 0;
@@ -427,10 +430,10 @@ void Network::PostUpdate(float timeStep)
                 PROFILE(PrepareServerUpdate);
                 
                 networkScenes_.Clear();
-                for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+                for (Vector<SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                     i != clientConnections_.End(); ++i)
                 {
-                    Scene* scene = i->second_->GetScene();
+                    Scene* scene = (*i)->GetScene();
                     if (scene)
                         networkScenes_.Insert(scene);
                 }
@@ -443,12 +446,12 @@ void Network::PostUpdate(float timeStep)
                 PROFILE(SendServerUpdate);
                 
                 // Then send server updates for each client connection
-                for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+                for (Vector<SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                     i != clientConnections_.End(); ++i)
                 {
-                    i->second_->SendServerUpdate();
-                    i->second_->SendRemoteEvents();
-                    i->second_->SendPackages();
+                    (*i)->SendServerUpdate();
+                    (*i)->SendRemoteEvents();
+                    (*i)->SendPackages();
                 }
             }
         }

@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Drawable.h"
-#include "HashMap.h"
 #include "MathDefs.h"
 #include "Ptr.h"
 #include "Rect.h"

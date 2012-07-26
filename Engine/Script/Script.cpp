@@ -418,7 +418,7 @@ void Script::ClearObjectTypeCache()
 
 asIObjectType* Script::GetObjectType(const char* declaration)
 {
-    Map<const char*, asIObjectType*>::ConstIterator i = objectTypes_.Find(declaration);
+    HashMap<const char*, asIObjectType*>::ConstIterator i = objectTypes_.Find(declaration);
     if (i != objectTypes_.End())
         return i->second_;
     

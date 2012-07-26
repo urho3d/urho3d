@@ -95,7 +95,7 @@ public:
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
-    const Map<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
+    const Vector<SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
     /// Return whether the server is running.
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
@@ -123,7 +123,7 @@ private:
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.
-    Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    Vector<SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events.
     HashSet<StringHash> allowedRemoteEvents_;
     /// Networked scenes.

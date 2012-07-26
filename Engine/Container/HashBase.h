@@ -96,12 +96,16 @@ public:
     /// Construct.
     HashBase() :
         ptrs_(0),
-        allocator_(0),
-        size_(0),
-        numBuckets_(0)
+        allocator_(0)
     {
     }
 
+    /// Destruct.
+    ~HashBase()
+    {
+        delete[] ptrs_;
+    }
+    
     /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
@@ -109,12 +113,24 @@ public:
         ::Swap(tail_, rhs.tail_);
         ::Swap(ptrs_, rhs.ptrs_);
         ::Swap(allocator_, rhs.allocator_);
-        ::Swap(size_, rhs.size_);
-        ::Swap(numBuckets_, rhs.numBuckets_);
     }
-
+    
+    /// Return number of elements.
+    unsigned Size() const { return ptrs_ ? (reinterpret_cast<unsigned*>(ptrs_))[0] : 0; }
+    /// Return number of buckets.
+    unsigned NumBuckets() const { return ptrs_ ? (reinterpret_cast<unsigned*>(ptrs_))[1] : 0; }
+    /// Return whether has no elements.
+    bool Empty() const { return Size() == 0; }
+    
 protected:
-    static HashNodeBase** AllocateBuckets(unsigned numBuckets);
+    /// Allocate bucket head pointers + room for size and bucket count variables.
+    void AllocateBuckets(unsigned size, unsigned numBuckets);
+    /// Reset bucket head pointers.
+    void ResetPtrs();
+    /// Set new size.
+    void SetSize(unsigned size) { if (ptrs_) (reinterpret_cast<unsigned*>(ptrs_))[0] = size; }
+    /// Return bucket head pointers.
+    HashNodeBase** Ptrs() const { return ptrs_ ? ptrs_ + 2 : 0; }
     
     /// List head node pointer.
     HashNodeBase* head_;
@@ -124,8 +140,4 @@ protected:
     HashNodeBase** ptrs_;
     /// Node allocator.
     AllocatorBlock* allocator_;
-    /// Number of nodes.
-    unsigned size_;
-    /// Number of buckets.
-    unsigned numBuckets_;
 };

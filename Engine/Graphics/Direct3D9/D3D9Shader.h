@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "HashMap.h"
 #include "HashSet.h"
 #include "Resource.h"
 #include "ShaderParser.h"
