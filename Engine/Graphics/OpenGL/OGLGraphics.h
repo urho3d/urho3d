@@ -49,7 +49,7 @@ class Vector3;
 class Vector4;
 class VertexBuffer;
 
-typedef Map<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 static const unsigned NUM_SCREEN_BUFFERS = 2;
 static const unsigned NUM_TEMP_MATRICES = 8;
@@ -431,7 +431,7 @@ private:
     /// OpenGL texture types in use.
     unsigned textureTypes_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
-    Map<String, TextureUnit> textureUnits_;
+    HashMap<String, TextureUnit> textureUnits_;
     /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.

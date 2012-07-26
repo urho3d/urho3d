@@ -1643,7 +1643,7 @@ VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
 {
-    Map<String, TextureUnit>::Iterator i = textureUnits_.Find(name);
+    HashMap<String, TextureUnit>::Iterator i = textureUnits_.Find(name);
     if (i != textureUnits_.End())
         return i->second_;
     else
@@ -1652,7 +1652,7 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
 
 const String& Graphics::GetTextureUnitName(TextureUnit unit)
 {
-    for (Map<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
+    for (HashMap<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
     {
         if (i->second_ == unit)
             return i->first_;
@@ -1857,8 +1857,8 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
     unsigned currentFbo = impl_->boundFbo_;
     
     // Go through all FBOs and clean up the surface from them
-    for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();
-        ++i)
+    for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
+        i != impl_->frameBuffers_.End(); ++i)
     {
         for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
         {
@@ -2044,7 +2044,7 @@ void Graphics::CommitFramebuffer()
     
     unsigned long long fboKey = (rtSize.x_ << 16 | rtSize.y_) | (((unsigned long long)format) << 32);
     
-    Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
+    HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
     if (i == impl_->frameBuffers_.End())
     {
         FrameBufferObject newFbo;
@@ -2200,9 +2200,10 @@ void Graphics::CleanupFramebuffers(bool contextLost)
 {
     if (!contextLost)
     {
-        for (Map<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i != impl_->frameBuffers_.End();)
+        for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
+            i != impl_->frameBuffers_.End();)
         {
-            Map<unsigned long long, FrameBufferObject>::Iterator current = i++;
+            HashMap<unsigned long long, FrameBufferObject>::Iterator current = i++;
             if (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) >
                 MAX_FRAMEBUFFER_AGE)
             {

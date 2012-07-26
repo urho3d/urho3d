@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Color.h"
-#include "Map.h"
+#include "HashMap.h"
 #include "Timer.h"
 
 #if defined(ANDROID)
@@ -114,7 +114,7 @@ private:
     /// Current pixel format.
     int pixelFormat_;
     /// Map for FBO's per resolution and format.
-    Map<unsigned long long, FrameBufferObject> frameBuffers_;
+    HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
     /// Need FBO commit flag.
     bool fboDirty_;
 };
