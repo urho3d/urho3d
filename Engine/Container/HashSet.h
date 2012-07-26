@@ -285,7 +285,7 @@ public:
     {
         if (numBuckets == NumBuckets())
             return true;
-        if (!numBuckets || numBuckets < size_ / MAX_LOAD_FACTOR)
+        if (!numBuckets || numBuckets < Size() / MAX_LOAD_FACTOR)
             return false;
         
         // Check for being power of two
