@@ -59,6 +59,10 @@ OcclusionBuffer::~OcclusionBuffer()
 
 bool OcclusionBuffer::SetSize(int width, int height)
 {
+    // Force the height to an even amount of pixels for better mip generation
+    if (height & 1)
+        ++height;
+    
     if (width == width_ && height == height_)
         return true;
     
@@ -71,12 +75,9 @@ bool OcclusionBuffer::SetSize(int width, int height)
         return false;
     }
     
-    // Force the height to an even amount of pixels for better mip generation
-    if (height & 1)
-        ++height;
-    
     width_ = width;
     height_ = height;
+    
     // Reserve extra memory in case 3D clipping is not exact
     fullBuffer_ = new int[width * (height + 2) + 2];
     buffer_ = fullBuffer_.Get() + width + 1;
