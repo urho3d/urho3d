@@ -111,7 +111,7 @@ public:
     /// Return first selected index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
     /// Return all selected indices.
-    PODVector<unsigned> GetSelections() const;
+    const PODVector<unsigned>& GetSelections() const { return selections_; }
     /// Return first selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
     /// Return all selected items.
@@ -138,7 +138,7 @@ protected:
     void EnsureItemVisibility(UIElement* item);
     
     /// Current selection.
-    HashSet<unsigned> selections_;
+    PODVector<unsigned> selections_;
     /// Highlight mode.
     HighlightMode highlightMode_;
     /// Multiselect flag.
@@ -155,8 +155,6 @@ protected:
     unsigned lastClickedItem_;
     
 private:
-    /// %Set multiple selected items, used internally.
-    void SetSelections(const HashSet<unsigned>& indices);
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
     /// Handle global focus change to check whether an invisible item was focused.

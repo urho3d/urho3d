@@ -585,8 +585,10 @@ void SceneSelectAll()
     {
         BeginSelectionModify();
         Array<Node@> rootLevelNodes = editorScene.GetChildren();
+        Array<uint> indices;
         for (uint i = 0; i < rootLevelNodes.length; ++i)
-            list.AddSelection(GetNodeListIndex(rootLevelNodes[i]));
+            indices.Push(GetNodeListIndex(rootLevelNodes[i]));
+        list.SetSelections(indices);
         EndSelectionModify();
     }
 }

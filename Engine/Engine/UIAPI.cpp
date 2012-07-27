@@ -222,6 +222,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void RemoveSelection(uint)", asMETHOD(ListView, RemoveSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void ToggleSelection(uint)", asMETHOD(ListView, ToggleSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void ChangeSelection(int, bool)", asMETHOD(ListView, ChangeSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void SetSelections(Array<uint>@+)", asFUNCTION(ListViewSetSelections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "void ClearSelection()", asMETHOD(ListView, ClearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetChildItemsVisible(uint, bool)", asMETHODPR(ListView, SetChildItemsVisible, (unsigned, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetChildItemsVisible(bool)", asMETHODPR(ListView, SetChildItemsVisible, (bool), void), asCALL_THISCALL);
@@ -242,7 +243,6 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_items(uint) const", asMETHOD(ListView, GetItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_selection(uint)", asMETHOD(ListView, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "uint get_selection() const", asMETHOD(ListView, GetSelection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void set_selections(Array<uint>@+)", asFUNCTION(ListViewSetSelections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "Array<uint>@ get_selections() const", asFUNCTION(ListViewGetSelections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_selectedItem() const", asMETHOD(ListView, GetSelectedItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "Array<UIElement@>@ get_selectedItems() const", asFUNCTION(ListViewGetSelectedItems), asCALL_CDECL_OBJLAST);

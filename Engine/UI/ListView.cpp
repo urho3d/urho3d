@@ -279,15 +279,12 @@ void ListView::InsertItem(unsigned index, UIElement* item)
     // If necessary, shift the following selections
     if (!selections_.Empty())
     {
-        HashSet<unsigned> prevSelections = selections_;
-        selections_.Clear();
-        for (HashSet<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+        for (unsigned i = 0; i < selections_.Size(); ++i)
         {
-            if (*j >= index)
-                selections_.Insert(*j + 1);
-            else
-                selections_.Insert(*j);
+            if (selections_[i] >= index)
+                ++selections_[i];
         }
+        
         UpdateSelectionEffect();
     }
 }
@@ -301,7 +298,7 @@ void ListView::RemoveItem(UIElement* item)
         if (GetItem(i) == item)
         {
             item->SetSelected(false);
-            selections_.Erase(i);
+            selections_.Erase(selections_.Find(i));
             
             // Remove any child items in hierarchy mode
             unsigned removed = 1;
@@ -330,15 +327,12 @@ void ListView::RemoveItem(UIElement* item)
             // If necessary, shift the following selections
             if (!selections_.Empty())
             {
-                HashSet<unsigned> prevSelections = selections_;
-                selections_.Clear();
-                for (HashSet<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
+                for (unsigned j = 0; j < selections_.Size(); ++j)
                 {
-                    if (*j > i)
-                        selections_.Insert(*j - removed);
-                    else
-                        selections_.Insert(*j);
+                    if (selections_[j] > i)
+                        selections_[j] -= removed;
                 }
+                
                 UpdateSelectionEffect();
             }
             break;
@@ -368,18 +362,72 @@ void ListView::RemoveAllItems()
 
 void ListView::SetSelection(unsigned index)
 {
-    HashSet<unsigned> indices;
-    indices.Insert(index);
+    PODVector<unsigned> indices;
+    indices.Push(index);
     SetSelections(indices);
     EnsureItemVisibility(index);
 }
 
 void ListView::SetSelections(const PODVector<unsigned>& indices)
 {
-    HashSet<unsigned> newSelection;
+    unsigned numItems = GetNumItems();
+    
+    // Remove first items that should no longer be selected
+    for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
+    {
+        unsigned index = *i;
+        if (!indices.Contains(index))
+        {
+            i = selections_.Erase(i);
+            
+            using namespace ItemSelected;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_SELECTION] = index;
+            SendEvent(E_ITEMDESELECTED, eventData);
+        }
+        else
+            ++i;
+    }
+    
+    bool added = false;
+    
+    // Then add missing items
     for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
-        newSelection.Insert(*i);
-    SetSelections(newSelection);
+    {
+        unsigned index = *i;
+        if (index < numItems)
+        {
+            // In singleselect mode, resend the event even for the same selection
+            bool duplicate = selections_.Contains(index);
+            if (!duplicate || !multiselect_)
+            {
+                if (!duplicate)
+                {
+                    selections_.Push(index);
+                    added = true;
+                }
+                
+                using namespace ItemSelected;
+                
+                VariantMap eventData;
+                eventData[P_ELEMENT] = (void*)this;
+                eventData[P_SELECTION] = *i;
+                SendEvent(E_ITEMSELECTED, eventData);
+            }
+        }
+        // If no multiselect enabled, allow setting only one item
+        if (!multiselect_)
+            break;
+    }
+    
+    // Re-sort selections if necessary
+    if (added)
+        Sort(selections_.Begin(), selections_.End());
+    
+    UpdateSelectionEffect();
+    SendEvent(E_SELECTIONCHANGED);
 }
 
 void ListView::AddSelection(unsigned index)
@@ -391,10 +439,24 @@ void ListView::AddSelection(unsigned index)
         if (index >= GetNumItems())
             return;
         
-        HashSet<unsigned> newSelections = selections_;
-        newSelections.Insert(index);
-        SetSelections(newSelections);
+        PODVector<unsigned>::Iterator i = selections_.Find(index);
+        if (i == selections_.End())
+        {
+            selections_.Push(index);
+            
+            using namespace ItemSelected;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_SELECTION] = index;
+            SendEvent(E_ITEMSELECTED, eventData);
+            
+            Sort(selections_.Begin(), selections_.End());
+        }
+        
         EnsureItemVisibility(index);
+        UpdateSelectionEffect();
+        SendEvent(E_SELECTIONCHANGED);
     }
 }
 
@@ -403,10 +465,22 @@ void ListView::RemoveSelection(unsigned index)
     if (index >= GetNumItems())
         return;
     
-    HashSet<unsigned> newSelections = selections_;
-    newSelections.Erase(index);
-    SetSelections(newSelections);
+    PODVector<unsigned>::Iterator i = selections_.Find(index);
+    if (i != selections_.End())
+    {
+        selections_.Erase(i);
+        
+        using namespace ItemSelected;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_SELECTION] = index;
+        SendEvent(E_ITEMDESELECTED, eventData);
+    }
+    
     EnsureItemVisibility(index);
+    UpdateSelectionEffect();
+    SendEvent(E_SELECTIONCHANGED);
 }
 
 void ListView::ToggleSelection(unsigned index)
@@ -466,7 +540,7 @@ void ListView::ChangeSelection(int delta, bool additive)
 
 void ListView::ClearSelection()
 {
-    SetSelections(HashSet<unsigned>());
+    SetSelections(PODVector<unsigned>());
     UpdateSelectionEffect();
 }
 
@@ -594,17 +668,6 @@ unsigned ListView::GetSelection() const
         return GetSelections().Front();
 }
 
-PODVector<unsigned> ListView::GetSelections() const
-{
-    PODVector<unsigned> sortedIndices;
-    
-    for (HashSet<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
-        sortedIndices.Push(*i);
-    Sort(sortedIndices.Begin(), sortedIndices.End());
-    
-    return sortedIndices;
-}
-
 UIElement* ListView::GetSelectedItem() const
 {
     return contentElement_->GetChild(GetSelection());
@@ -613,13 +676,8 @@ UIElement* ListView::GetSelectedItem() const
 PODVector<UIElement*> ListView::GetSelectedItems() const
 {
     PODVector<UIElement*> ret;
-    PODVector<unsigned> sortedIndices;
     
-    for (HashSet<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
-        sortedIndices.Push(*i);
-    Sort(sortedIndices.Begin(), sortedIndices.End());
-    
-    for (PODVector<unsigned>::ConstIterator i = sortedIndices.Begin(); i != sortedIndices.End(); ++i)
+    for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
@@ -672,59 +730,6 @@ void ListView::EnsureItemVisibility(UIElement* item)
     SetViewPosition(newView);
 }
 
-void ListView::SetSelections(const HashSet<unsigned>& indices)
-{
-    unsigned numItems = GetNumItems();
-    
-    // Remove first items that should no longer be selected
-    for (HashSet<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
-    {
-        unsigned index = *i;
-        if (!indices.Contains(index))
-        {
-            HashSet<unsigned>::Iterator current = i++;
-            selections_.Erase(current);
-            
-            using namespace ItemSelected;
-            
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
-            eventData[P_SELECTION] = index;
-            SendEvent(E_ITEMDESELECTED, eventData);
-        }
-        else
-            ++i;
-    }
-    
-    // Then add missing items
-    for (HashSet<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
-    {
-        unsigned index = *i;
-        if (index < numItems)
-        {
-            // In singleselect mode, resend the event even for the same selection
-            if (selections_.Find(index) == selections_.End() || !multiselect_)
-            {
-                selections_.Insert(*i);
-                
-                using namespace ItemSelected;
-                
-                VariantMap eventData;
-                eventData[P_ELEMENT] = (void*)this;
-                eventData[P_SELECTION] = *i;
-                SendEvent(E_ITEMSELECTED, eventData);
-            }
-        }
-        // If no multiselect enabled, allow setting only one item
-        if (!multiselect_)
-            break;
-    }
-    
-    SendEvent(E_SELECTIONCHANGED);
-    
-    UpdateSelectionEffect();
-}
-
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
@@ -766,34 +771,34 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                     {
                         unsigned first = selections_.Front();
                         unsigned last = selections_.Back();
-                        HashSet<unsigned> newSelections = selections_;
+                        PODVector<unsigned> newSelections = selections_;
                         if (i == first || i == last)
                         {
                             for (unsigned j = first; j <= last; ++j)
-                                newSelections.Insert(j);
+                                newSelections.Push(j);
                         }
                         else if (i < first)
                         {
                             for (unsigned j = i; j <= first; ++j)
-                                newSelections.Insert(j);
+                                newSelections.Push(j);
                         }
                         else if (i < last)
                         {
                             if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
                             {
                                 for (unsigned j = first; j <= i; ++j)
-                                    newSelections.Insert(j);
+                                    newSelections.Push(j);
                             }
                             else
                             {
                                 for (unsigned j = i; j <= last; ++j)
-                                    newSelections.Insert(j);
+                                    newSelections.Push(j);
                             }
                         }
                         else if (i > last)
                         {
                             for (unsigned j = last; j <= i; ++j)
-                                newSelections.Insert(j);
+                                newSelections.Push(j);
                         }
                         SetSelections(newSelections);
                     }

@@ -3466,6 +3466,7 @@ Methods:<br>
 - void RemoveSelection(uint)
 - void ToggleSelection(uint)
 - void ChangeSelection(int, bool)
+- void SetSelections(uint[]@)
 - void ClearSelection()
 - void SetChildItemsVisible(uint, bool)
 - void SetChildItemsVisible(bool)
@@ -3530,7 +3531,7 @@ Properties:<br>
 - uint numItems (readonly)
 - UIElement@[] items (readonly)
 - uint selection
-- uint[]@ selections
+- uint[]@ selections (readonly)
 - UIElement@ selectedItem (readonly)
 - UIElement@[]@ selectedItems (readonly)
 - HighlightMode highlightMode
