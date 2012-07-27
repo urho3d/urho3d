@@ -77,6 +77,8 @@ public:
     /// Destruct. Close the window and release the Direct3D9 device.
     virtual ~Graphics();
     
+    /// %Set external window handle. Call before setting mode for the first time.
+    void SetExternalWindow(void* window);
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);
     /// %Set screen mode. Return true if successful.
@@ -196,6 +198,8 @@ public:
     bool IsInitialized() const;
     /// Return graphics implementation, which holds the actual API-specific resources.
     GraphicsImpl* GetImpl() const { return impl_; }
+    /// Return OS-specific external window handle. Null if not in use.
+    void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
     /// Return window width.
@@ -339,7 +343,7 @@ private:
     /// Create the application window.
     bool OpenWindow(int width, int height);
     /// Adjust the window for new resolution and fullscreen mode.
-    void AdjustWindow(int newWidth, int newHeight, bool newFullscreen);
+    void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen);
     /// Create the Direct3D interface.
     bool CreateInterface();
     /// Create the Direct3D device.
@@ -361,6 +365,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
+    /// External window, null if not in use (default.)
+    void* externalWindow_;
     /// Window width.
     int width_;
     /// Window height.

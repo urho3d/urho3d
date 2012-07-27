@@ -133,6 +133,7 @@ bool CheckExtension(const String& name)
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
+    externalWindow_(0),
     width_(0),
     height_(0),
     multiSample_(1),
@@ -182,6 +183,14 @@ Graphics::~Graphics()
         if (!numInstances)
             SDL_Quit();
     }
+}
+
+void Graphics::SetExternalWindow(void* window)
+{
+    if (!impl_->window_)
+        externalWindow_ = window;
+    else
+        LOGERROR("Window already opened, can not set external window");
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -269,7 +278,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         if (fullscreen)
             flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
         
-        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+        if (!externalWindow_)
+            impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+        else
+        {
+            impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
+            fullscreen = false;
+        }
         if (!impl_->window_)
         {
             LOGERROR("Could not open window");
@@ -389,6 +404,16 @@ bool Graphics::BeginFrame()
     if (!IsInitialized() || IsDeviceLost())
         return false;
     
+    // If using an external window, check it for size changes, and reset screen mode if necessary
+    if (externalWindow_)
+    {
+        int width, height;
+        
+        SDL_GetWindowSize(impl_->window_, &width, &height);
+        if (width != width_ || height != height_)
+            SetMode(width, height);
+    }
+
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
     

@@ -162,6 +162,7 @@ OBJECTTYPESTATIC(Graphics);
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
+    externalWindow_(0),
     width_(0),
     height_(0),
     multiSample_(1),
@@ -249,6 +250,14 @@ Graphics::~Graphics()
     }
 }
 
+void Graphics::SetExternalWindow(void* window)
+{
+    if (!impl_->window_)
+        externalWindow_ = window;
+    else
+        LOGERROR("Window already opened, can not set external window");
+}
+
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
@@ -328,6 +337,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             multiSample = 1;
     }
     
+    AdjustWindow(width, height, fullscreen);
+    
     if (fullscreen)
     {
         impl_->presentParams_.BackBufferFormat = fullscreenFormat;
@@ -364,8 +375,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
-    
-    AdjustWindow(width, height, fullscreen);
     
     if (!impl_->device_)
     {
@@ -527,6 +536,16 @@ bool Graphics::BeginFrame()
 {
     if (!IsInitialized())
         return false;
+    
+    // If using an external window, check it for size changes, and reset screen mode if necessary
+    if (externalWindow_)
+    {
+        int width, height;
+        
+        SDL_GetWindowSize(impl_->window_, &width, &height);
+        if (width != width_ || height != height_)
+            SetMode(width, height);
+    }
     
     // Check for lost device before rendering
     HRESULT hr = impl_->device_->TestCooperativeLevel();
@@ -1915,7 +1934,10 @@ unsigned Graphics::GetDepthStencilFormat()
 
 bool Graphics::OpenWindow(int width, int height)
 {
-    impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+    if (!externalWindow_)
+        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+    else
+        impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
     
     if (!impl_->window_)
     {
@@ -1926,10 +1948,19 @@ bool Graphics::OpenWindow(int width, int height)
     return true;
 }
 
-void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
+void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen)
 {
-    SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
-    SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
+    if (!externalWindow_)
+    {
+        SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
+    }
+    else
+    {
+        // If external window, must ask its dimensions instead of trying to set them
+        SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+        newFullscreen = false;
+    }
 }
 
 bool Graphics::CreateInterface()
@@ -2144,10 +2175,9 @@ void Graphics::OnDeviceReset()
     else
     {
         if (!depthTexture_)
-        {
             depthTexture_ = new Texture2D(context_);
-            depthTexture_->SetSize(width_, height_, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
-        }
+        
+        depthTexture_->SetSize(width_, height_, (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z'), TEXTURE_DEPTHSTENCIL);
         
         impl_->defaultDepthStencilSurface_ = (IDirect3DSurface9*)depthTexture_->GetRenderSurface()->GetSurface();
         systemDepthStencil_ = false;
