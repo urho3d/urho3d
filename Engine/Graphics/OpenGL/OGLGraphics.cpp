@@ -236,96 +236,101 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         }
     }
     
-    // Close the existing window and OpenGL context, mark GPU objects as lost
-    Release(false, true);
-    
+    // With an external window, only the size can change after initial setup, so do not recreate context
+    if (!externalWindow_ || !impl_->context_)
     {
-        // SDL window parameters are static, so need to operate under static lock
-        MutexLock lock(GetStaticMutex());
-        
-        #ifdef IOS
-        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-        #endif
-        
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-        #ifndef GL_ES_VERSION_2_0
-        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        #else
-        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
-        #endif
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-        
-        if (multiSample > 1)
+        // Close the existing window and OpenGL context, mark GPU objects as lost
+        Release(false, true);
+    
         {
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+            // SDL window parameters are static, so need to operate under static lock
+            MutexLock lock(GetStaticMutex());
+        
+            #ifdef IOS
+            SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+            #endif
+            
+            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+            SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+            #ifndef GL_ES_VERSION_2_0
+            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+            #else
+            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
+            #endif
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            
+            if (multiSample > 1)
+            {
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+            }
+            else
+            {
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+            }
+            
+            unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+            int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+            int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+            if (fullscreen)
+                flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+            
+            if (!externalWindow_)
+                impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+            else
+            {
+                if (!impl_->window_)
+                    impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
+                fullscreen = false;
+            }
+            if (!impl_->window_)
+            {
+                LOGERROR("Could not open window");
+                return false;
+            }
+            
+            // Create/restore context and GPU objects and set initial renderstate
+            Restore();
+            
+            if (!impl_->context_)
+            {
+                LOGERROR("Could not create OpenGL context");
+                return false;
+            }
+            
+            // If OpenGL extensions not yet initialized, initialize now
+            #ifndef GL_ES_VERSION_2_0
+            if (!GLeeInitialized())
+                GLeeInit();
+            
+            if (!_GLEE_VERSION_2_0)
+            {
+                LOGERROR("OpenGL 2.0 is required");
+                Release(true, true);
+                return false;
+            }
+            
+            if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil"))
+            {
+                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+                Release(true, true);
+                return false;
+            }
+        
+            dxtTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
+            anisotropySupport_ = CheckExtension("EXT_texture_filter_anisotropic");
+            #else
+            dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
+            etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
+            pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
+            #endif
         }
-        else
-        {
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-        }
-        
-        unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-        int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-        int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-        if (fullscreen)
-            flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
-        
-        if (!externalWindow_)
-            impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
-        else
-        {
-            impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
-            fullscreen = false;
-        }
-        if (!impl_->window_)
-        {
-            LOGERROR("Could not open window");
-            return false;
-        }
-        
-        // Create/restore context and GPU objects and set initial renderstate
-        Restore();
-        
-        if (!impl_->context_)
-        {
-            LOGERROR("Could not create OpenGL context");
-            return false;
-        }
-        
-        // If OpenGL extensions not yet initialized, initialize now
-        #ifndef GL_ES_VERSION_2_0
-        if (!GLeeInitialized())
-            GLeeInit();
-        
-        if (!_GLEE_VERSION_2_0)
-        {
-            LOGERROR("OpenGL 2.0 is required");
-            Release(true, true);
-            return false;
-        }
-        
-        if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil"))
-        {
-            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
-            Release(true, true);
-            return false;
-        }
-        
-        dxtTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
-        anisotropySupport_ = CheckExtension("EXT_texture_filter_anisotropic");
-        #else
-        dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
-        etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
-        pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
-        #endif
     }
     
     // Set vsync
@@ -336,11 +341,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
     #endif
     
-    SDL_GetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
+    
+    SDL_GetWindowSize(impl_->window_, &width_, &height_);
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -1845,8 +1851,13 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         MutexLock lock(GetStaticMutex());
         
         SDL_ShowCursor(SDL_TRUE);
-        SDL_DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        
+        // Do not destroy external window except when shutting down
+        if (!externalWindow_ || clearGPUObjects)
+        {
+            SDL_DestroyWindow(impl_->window_);
+            impl_->window_ = 0;
+        }
     }
 }
 
