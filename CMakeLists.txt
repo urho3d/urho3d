@@ -1,7 +1,14 @@
+# Set project name
+project (Urho3D)
+
 # Set minimum version
 cmake_minimum_required (VERSION 2.6)
 
-# Disable "unnecessary" build types
+if (COMMAND cmake_policy)
+    cmake_policy (SET CMP0003 NEW)
+endif ()
+
+# Disable unnecessary build types
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configurations" FORCE)
 
 # IOS-specific setup
@@ -12,13 +19,6 @@ if (IOS)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
     set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
 endif ()
-
-if (COMMAND cmake_policy)
-    cmake_policy (SET CMP0003 NEW)
-endif ()
-
-# Set project name
-project (Urho3D)
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 set (ENABLE_SSE 1)
