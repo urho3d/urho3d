@@ -51,9 +51,9 @@ public:
     /// Release texture.
     virtual void Release();
     
-    /// %Set size, format and usage. Zero size will follow application window size. Return true if successful.
+    /// Set size, format and usage. Zero size will follow application window size. Return true if successful.
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-    /// %Set data either partially or fully on a mip level. Return true if successful.
+    /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
     /// Load from an image. Return true if successful.
     bool Load(SharedPtr<Image> image, bool useAlpha = false);

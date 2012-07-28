@@ -33,7 +33,7 @@ public:
     /// Destruct.
     ~Condition();
     
-    /// %Set the condition. Will be automatically reset once a waiting thread wakes up.
+    /// Set the condition. Will be automatically reset once a waiting thread wakes up.
     void Set();
     
     /// Wait on the condition.

@@ -45,33 +45,33 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set near clip distance.
+    /// Set near clip distance.
     void SetNearClip(float nearClip);
-    /// %Set far clip distance.
+    /// Set far clip distance.
     void SetFarClip(float farClip);
-    /// %Set field of view.
+    /// Set field of view.
     void SetFov(float fov);
-    /// %Set orthographic mode view uniform size.
+    /// Set orthographic mode view uniform size.
     void SetOrthoSize(float orthoSize);
-    /// %Set orthographic mode view size.
+    /// Set orthographic mode view size.
     void SetOrthoSize(const Vector2& orthoSize);
-    /// %Set aspect ratio.
+    /// Set aspect ratio.
     void SetAspectRatio(float aspectRatio);
-    /// %Set zoom.
+    /// Set zoom.
     void SetZoom(float zoom);
-    /// %Set LOD bias.
+    /// Set LOD bias.
     void SetLodBias(float bias);
-    /// %Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
+    /// Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set view override flags.
+    /// Set view override flags.
     void SetViewOverrideFlags(unsigned flags);
-    /// %Set orthographic mode enabled/disabled.
+    /// Set orthographic mode enabled/disabled.
     void SetOrthographic(bool enable);
-    /// %Set automatic aspect ratio based on viewport dimensions.
+    /// Set automatic aspect ratio based on viewport dimensions.
     void SetAutoAspectRatio(bool enable);
-    /// %Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+    /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
-    /// %Set vertical flipping mode.
+    /// Set vertical flipping mode.
     void SetFlipVertical(bool enable);
     
     /// Return far clip distance.

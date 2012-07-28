@@ -37,17 +37,17 @@ public:
     /// Destruct.
     ~Pass();
     
-    /// %Set blend mode.
+    /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// %Set depth compare mode.
+    /// Set depth compare mode.
     void SetDepthTestMode(CompareMode mode);
-    /// %Set depth write on/off.
+    /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// %Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
+    /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
     void SetAlphaMask(bool enable);
-    /// %Set vertex shader name.
+    /// Set vertex shader name.
     void SetVertexShader(const String& name);
-    /// %Set pixel shader name.
+    /// Set pixel shader name.
     void SetPixelShader(const String& name);
     /// Reset shader pointers.
     void ReleaseShaders();
@@ -110,7 +110,7 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// %Set whether requires %Shader %Model 3.
+    /// Set whether requires %Shader %Model 3.
     void SetIsSM3(bool enable);
     /// Create a new pass.
     Pass* CreatePass(PassType pass);

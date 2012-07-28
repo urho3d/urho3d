@@ -43,17 +43,17 @@ public:
     /// Destruct.
     virtual ~Geometry();
     
-    /// %Set number of vertex buffer.
+    /// Set number of vertex buffer.
     bool SetNumVertexBuffers(unsigned num);
-    /// %Set a vertex buffer by index.
+    /// Set a vertex buffer by index.
     bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT);
-    /// %Set the index buffer.
+    /// Set the index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
-    /// %Set the draw range.
+    /// Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true);
-    /// %Set the draw range.
+    /// Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
-    /// %Set the LOD distance.
+    /// Set the LOD distance.
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
     void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned vertexSize, unsigned elementMask);

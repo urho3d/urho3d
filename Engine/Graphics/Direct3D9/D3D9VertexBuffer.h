@@ -47,11 +47,11 @@ public:
     
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
-    /// %Set size and vertex elements and dynamic mode. Previous data will be lost.
+    /// Set size and vertex elements and dynamic mode. Previous data will be lost.
     bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false);
-    /// %Set all data in the buffer.
+    /// Set all data in the buffer.
     bool SetData(const void* data);
-    /// %Set a data range in the buffer. Optionally discard data outside the range.
+    /// Set a data range in the buffer. Optionally discard data outside the range.
     bool SetDataRange(const void* data, unsigned start, unsigned count, bool discard = false);
     /// Lock the buffer for write-only editing. Return data pointer if successful. Optionally discard data outside the range.
     void* Lock(unsigned start, unsigned count, bool discard = false);

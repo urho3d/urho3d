@@ -690,15 +690,15 @@ public:
     /// Test for inequality with a ShortStringHash.
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     
-    /// %Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
-    /// %Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const char* type, const char* value);
-    /// %Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(VariantType type, const String& value);
-    /// %Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
+    /// Set from type and value string. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(VariantType type, const char* value);
-    /// %Set buffer type from a memory area.
+    /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
     
     /// Return int or zero on type mismatch.
@@ -865,7 +865,7 @@ public:
     static const Variant EMPTY;
     
 private:
-    /// %Set new type and allocate/deallocate memory as necessary.
+    /// Set new type and allocate/deallocate memory as necessary.
     void SetType(VariantType newType);
     
     /// Variant type.

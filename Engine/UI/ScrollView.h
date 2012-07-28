@@ -43,7 +43,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// React to mouse wheel.
     virtual void OnWheel(int delta, int buttons, int qualifiers);
@@ -52,17 +52,17 @@ public:
     /// React to resize.
     virtual void OnResize();
     
-    /// %Set content element.
+    /// Set content element.
     void SetContentElement(UIElement* element);
-    /// %Set view offset from the top-left corner.
+    /// Set view offset from the top-left corner.
     void SetViewPosition(const IntVector2& position);
-    /// %Set view offset from the top-left corner.
+    /// Set view offset from the top-left corner.
     void SetViewPosition(int x, int y);
-    /// %Set scrollbars' visibility.
+    /// Set scrollbars' visibility.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
-    /// %Set arrow key scroll step. Also sets it on the scrollbars.
+    /// Set arrow key scroll step. Also sets it on the scrollbars.
     void SetScrollStep(float step);
-    /// %Set arrow key page step.
+    /// Set arrow key page step.
     void SetPageStep(float step);
     
     /// Return view offset from the top-left corner.

@@ -48,13 +48,13 @@ public:
     bool LoadWav(Deserializer& source);
     /// Load Ogg Vorbis format sound data. Does not decode at load, but will be rather be decoded while playing.
     bool LoadOggVorbis(Deserializer& source);
-    /// %Set sound size in bytes. Also resets the sound to be uncompressed and one-shot.
+    /// Set sound size in bytes. Also resets the sound to be uncompressed and one-shot.
     void SetSize(unsigned dataSize);
-    /// %Set uncompressed sound data.
+    /// Set uncompressed sound data.
     void SetData(const void* data, unsigned dataSize);
-    /// %Set uncompressed sound data format.
+    /// Set uncompressed sound data format.
     void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
-    /// %Set loop on/off. If loop is enabled, sets the full sound as loop range.
+    /// Set loop on/off. If loop is enabled, sets the full sound as loop range.
     void SetLooped(bool enable);
     /// Define loop.
     void SetLoop(unsigned repeatOffset, unsigned endOffset);

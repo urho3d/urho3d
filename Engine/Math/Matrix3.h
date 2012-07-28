@@ -167,7 +167,7 @@ public:
         );
     }
     
-    /// %Set scaling elements.
+    /// Set scaling elements.
     void SetScale(const Vector3& scale)
     {
         m00_ = scale.x_;
@@ -175,7 +175,7 @@ public:
         m22_ = scale.z_;
     }
     
-    /// %Set uniform scaling elements.
+    /// Set uniform scaling elements.
     void SetScale(float scale)
     {
         m00_ = scale;

@@ -42,7 +42,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
@@ -59,9 +59,9 @@ public:
     void RemoveItem(unsigned index);
     /// Remove all items.
     void RemoveAllItems();
-    /// %Set selection.
+    /// Set selection.
     void SetSelection(unsigned index);
-    /// %Set whether popup should be automatically resized to match the dropdown button width.
+    /// Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
     
     /// Return number of items.

@@ -89,9 +89,9 @@ protected:
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied.
     virtual void OnMarkedDirty(Node* node) {};
-    /// %Set ID. Called by Scene.
+    /// Set ID. Called by Scene.
     void SetID(unsigned id);
-    /// %Set scene node. Called by Node when creating the component.
+    /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
     
     /// Scene node.

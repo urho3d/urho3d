@@ -55,7 +55,7 @@ public:
     void Write(int level, const String& message);
     /// Write raw output to the log.
     void WriteRaw(const String& message);
-    /// %Set logging level.
+    /// Set logging level.
     void SetLevel(int level);
     
     /// Return logging level.

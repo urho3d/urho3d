@@ -132,29 +132,29 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set draw distance.
+    /// Set draw distance.
     void SetDrawDistance(float distance);
-    /// %Set shadow draw distance.
+    /// Set shadow draw distance.
     void SetShadowDistance(float distance);
-    /// %Set LOD bias.
+    /// Set LOD bias.
     void SetLodBias(float bias);
-    /// %Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
+    /// Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
+    /// Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// %Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
+    /// Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
     void SetShadowMask(unsigned mask);
-    /// %Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
+    /// Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     void SetZoneMask(unsigned mask);
-    /// %Set maximum number of per-pixel lights. Default 0 is unlimited.
+    /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// %Set visible flag.
+    /// Set visible flag.
     void SetVisible(bool enable);
-    /// %Set shadowcaster flag.
+    /// Set shadowcaster flag.
     void SetCastShadows(bool enable);
-    /// %Set occlusion flag.
+    /// Set occlusion flag.
     void SetOccluder(bool enable);
-    /// %Set occludee flag.
+    /// Set occludee flag.
     void SetOccludee(bool enable);
     /// Mark for update before octree reinsertion.
     void MarkForUpdate();
@@ -190,11 +190,11 @@ public:
     /// Return draw call source data.
     const Vector<SourceBatch>& GetBatches() const { return batches_; }
     
-    /// %Set new zone.
+    /// Set new zone.
     void SetZone(Zone* zone, bool temporary = false);
-    /// %Set sorting value.
+    /// Set sorting value.
     void SetSortValue(float value);
-    /// %Set view-space depth bounds.
+    /// Set view-space depth bounds.
     void SetMinMaxZ(float minZ, float maxZ);
     /// Mark in view (either the main camera, or a shadow camera view) this frame.
     void MarkInView(const FrameInfo& frame, bool mainView = true);
@@ -208,7 +208,7 @@ public:
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
     void LimitVertexLights();
-    /// %Set base pass flag for a batch.
+    /// Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }

@@ -47,13 +47,13 @@ public:
     
     /// Update smoothing.
     void Update(float constant, float squaredSnapThreshold);
-    /// %Set target position relative to parent node.
+    /// Set target position relative to parent node.
     void SetTargetPosition(const Vector3& position);
-    /// %Set target rotation relative to parent node.
+    /// Set target rotation relative to parent node.
     void SetTargetRotation(const Quaternion& rotation);
-    /// %Set target position in world space.
+    /// Set target position in world space.
     void SetTargetWorldPosition(const Vector3& position);
-    /// %Set target rotation in world space.
+    /// Set target rotation in world space.
     void SetTargetWorldRotation(const Quaternion& rotation);
     
     /// Return target position relative to parent node.

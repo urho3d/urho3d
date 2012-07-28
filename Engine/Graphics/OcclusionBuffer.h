@@ -64,13 +64,13 @@ public:
     /// Destruct.
     virtual ~OcclusionBuffer();
     
-    /// %Set occlusion buffer size.
+    /// Set occlusion buffer size.
     bool SetSize(int width, int height);
-    /// %Set camera view to render from.
+    /// Set camera view to render from.
     void SetView(Camera* camera);
-    /// %Set maximum triangles to render.
+    /// Set maximum triangles to render.
     void SetMaxTriangles(unsigned triangles);
-    /// %Set culling mode.
+    /// Set culling mode.
     void SetCullMode(CullMode mode);
     /// Reset number of triangles.
     void Reset();

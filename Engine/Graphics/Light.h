@@ -168,39 +168,39 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set light type.
+    /// Set light type.
     void SetLightType(LightType type);
-    /// %Set vertex lighting mode.
+    /// Set vertex lighting mode.
     void SetPerVertex(bool enable);
-    /// %Set color.
+    /// Set color.
     void SetColor(const Color& color);
-    /// %Set specular intensity.
+    /// Set specular intensity.
     void SetSpecularIntensity(float intensity);
-    /// %Set range.
+    /// Set range.
     void SetRange(float range);
-    /// %Set spotlight field of view.
+    /// Set spotlight field of view.
     void SetFov(float fov);
-    /// %Set spotlight aspect ratio.
+    /// Set spotlight aspect ratio.
     void SetAspectRatio(float aspectRatio);
-    /// %Set fade out start distance.
+    /// Set fade out start distance.
     void SetFadeDistance(float distance);
-    /// %Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
+    /// Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
     void SetShadowFadeDistance(float distance);
-    /// %Set shadow depth bias parameters.
+    /// Set shadow depth bias parameters.
     void SetShadowBias(const BiasParameters& parameters);
-    /// %Set directional light cascaded shadow parameters.
+    /// Set directional light cascaded shadow parameters.
     void SetShadowCascade(const CascadeParameters& parameters);
-    /// %Set shadow map focusing parameters.
+    /// Set shadow map focusing parameters.
     void SetShadowFocus(const FocusParameters& parameters);
-    /// %Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
-    /// %Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
+    /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
     void SetShadowResolution(float resolution);
-    /// %Set shadow camera near/far clip distance ratio.
+    /// Set shadow camera near/far clip distance ratio.
     void SetShadowNearFarRatio(float nearFarRatio);
-    /// %Set range attenuation texture.
+    /// Set range attenuation texture.
     void SetRampTexture(Texture* texture);
-    /// %Set spotlight attenuation texture.
+    /// Set spotlight attenuation texture.
     void SetShapeTexture(Texture* texture);
     
     /// Return light type.
@@ -240,11 +240,11 @@ public:
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     
-    /// %Set sort value based on intensity and view distance.
+    /// Set sort value based on intensity and view distance.
     void SetIntensitySortValue(float distance);
-    /// %Set sort value based on overall intensity over a bounding box.
+    /// Set sort value based on overall intensity over a bounding box.
     void SetIntensitySortValue(const BoundingBox& box);
-    /// %Set light queue used for this light. Called by View.
+    /// Set light queue used for this light. Called by View.
     void SetLightQueue(LightBatchQueue* queue);
     /// Return directional light quad transform for either near or far split.
     Matrix3x4 GetDirLightTransform(Camera* camera, bool getNearQuad = false);
@@ -253,9 +253,9 @@ public:
     /// Return light queue. Called by View.
     LightBatchQueue* GetLightQueue() const { return lightQueue_; }
     
-    /// %Set ramp texture attribute.
+    /// Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);
-    /// %Set shape texture attribute.
+    /// Set shape texture attribute.
     void SetShapeTextureAttr(ResourceRef value);
     /// Return ramp texture attribute.
     ResourceRef GetRampTextureAttr() const;

@@ -52,9 +52,9 @@ public:
     /// Release texture.
     virtual void Release();
     
-    /// %Set size, format and usage. Return true if successful.
+    /// Set size, format and usage. Return true if successful.
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-    /// %Set data either partially or fully on a face's mip level. Return true if successful.
+    /// Set data either partially or fully on a face's mip level. Return true if successful.
     bool SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
     /// Load one face from a stream. Return true if successful.
     bool Load(CubeMapFace face, Deserializer& source);

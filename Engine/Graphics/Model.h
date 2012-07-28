@@ -76,25 +76,25 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set local-space bounding box.
+    /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set vertex buffers.
+    /// Set vertex buffers.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts);
-    /// %Set index buffers.
+    /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);
-    /// %Set number of geometries.
+    /// Set number of geometries.
     void SetNumGeometries(unsigned num);
-    /// %Set number of LOD levels in a geometry.
+    /// Set number of LOD levels in a geometry.
     bool SetNumGeometryLodLevels(unsigned index, unsigned num);
-    /// %Set geometry.
+    /// Set geometry.
     bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
-    /// %Set geometry center.
+    /// Set geometry center.
     bool SetGeometryCenter(unsigned index, const Vector3& center);
-    /// %Set skeleton.
+    /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton);
-    /// %Set bone mappings when model has more bones than the skinning shader can handle.
+    /// Set bone mappings when model has more bones than the skinning shader can handle.
     void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
-    /// %Set vertex morphs.
+    /// Set vertex morphs.
     void SetMorphs(const Vector<ModelMorph>& morphs);
     
     /// Return bounding box.

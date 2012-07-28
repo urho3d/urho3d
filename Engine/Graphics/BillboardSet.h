@@ -71,17 +71,17 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
-    /// %Set material.
+    /// Set material.
     void SetMaterial(Material* material);
-    /// %Set number of billboards.
+    /// Set number of billboards.
     void SetNumBillboards(unsigned num);
-    /// %Set whether billboards are relative to the scene node.
+    /// Set whether billboards are relative to the scene node.
     void SetRelative(bool enable);
-    /// %Set whether scene node scale affects billboards' size.
+    /// Set whether scene node scale affects billboards' size.
     void SetScaled(bool enable);
-    /// %Set whether billboards are sorted by distance.
+    /// Set whether billboards are sorted by distance.
     void SetSorted(bool enable);
-    /// %Set animation LOD bias.
+    /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
     /// Call after changing the billboards.
     void Updated();
@@ -103,11 +103,11 @@ public:
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
     
-    /// %Set material attribute.
+    /// Set material attribute.
     void SetMaterialAttr(ResourceRef value);
-    /// %Set billboards attribute.
+    /// Set billboards attribute.
     void SetBillboardsAttr(VariantVector value);
-    /// %Set billboards attribute for network replication.
+    /// Set billboards attribute for network replication.
     void SetNetBillboardsAttr(const PODVector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;

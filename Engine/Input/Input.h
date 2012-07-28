@@ -123,9 +123,9 @@ public:
     
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
-    /// %Set whether ALT-ENTER fullscreen toggle is enabled.
+    /// Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
-    /// %Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
+    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
     /// Open a joystick. Return true if successful.
     bool OpenJoystick(unsigned index);

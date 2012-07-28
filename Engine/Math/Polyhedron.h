@@ -101,9 +101,9 @@ public:
     Vector<PODVector<Vector3> > faces_;
     
 private:
-    /// %Set a triangle face by index.
+    /// Set a triangle face by index.
     void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2);
-    /// %Set a quadrilateral face by index.
+    /// Set a quadrilateral face by index.
     void SetFace(unsigned index, const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
     /// Internal vector for clipped vertices.
     PODVector<Vector3> clippedVertices_;

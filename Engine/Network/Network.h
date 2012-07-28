@@ -83,7 +83,7 @@ public:
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote node event to all client connections in the scene with this node.
     void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// %Set network update FPS.
+    /// Set network update FPS.
     void SetUpdateFps(int fps);
     /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed.
     void RegisterRemoteEvent(StringHash eventType);
@@ -91,7 +91,7 @@ public:
     void UnregisterRemoteEvent(StringHash eventType);
     /// Unregister all remote events. This results in all being allowed.
     void UnregisterAllRemoteEvents();
-    /// %Set the package download cache directory.
+    /// Set the package download cache directory.
     void SetPackageCacheDir(const String& path);
     
     /// Return network update FPS.

@@ -82,13 +82,13 @@ public:
     /// Destruct. Release the OpenGL context and close the window.
     virtual ~Graphics();
     
-    /// %Set external window handle. Only effective before setting the initial screen mode. On Windows it is necessary to set up OpenGL pixel format manually for the window.
+    /// Set external window handle. Only effective before setting the initial screen mode. On Windows it is necessary to set up OpenGL pixel format manually for the window.
     void SetExternalWindow(void* window);
-    /// %Set window title.
+    /// Set window title.
     void SetWindowTitle(const String& windowTitle);
-    /// %Set screen mode. Return true if successful.
+    /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
-    /// %Set screen resolution only. Return true if successful.
+    /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Toggle between full screen and windowed mode.
     bool ToggleFullscreen();
@@ -110,31 +110,31 @@ public:
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed, instanced geometry. No-op on OpenGL.
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
-    /// %Set vertex buffer.
+    /// Set vertex buffer.
     void SetVertexBuffer(VertexBuffer* buffer);
-    /// %Set multiple vertex buffers.
+    /// Set multiple vertex buffers.
     bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
-    /// %Set multiple vertex buffers.
+    /// Set multiple vertex buffers.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
-    /// %Set index buffer.
+    /// Set index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
-    /// %Set shaders.
+    /// Set shaders.
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// %Set shader float constants.
+    /// Set shader float constants.
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
-    /// %Set shader float constant.
+    /// Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
-    /// %Set shader color constant.
+    /// Set shader color constant.
     void SetShaderParameter(StringHash param, const Color& color);
-    /// %Set shader 3x3 matrix constant.
+    /// Set shader 3x3 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3& matrix);
-    /// %Set shader 3D vector constant.
+    /// Set shader 3D vector constant.
     void SetShaderParameter(StringHash param, const Vector3& vector);
-    /// %Set shader 4x4 matrix constant.
+    /// Set shader 4x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix4& matrix);
-    /// %Set shader 4D vector constant.
+    /// Set shader 4D vector constant.
     void SetShaderParameter(StringHash param, const Vector4& vector);
-    /// %Set shader 4x3 matrix constant.
+    /// Set shader 4x3 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
@@ -150,13 +150,13 @@ public:
     void ClearTransformSources();
     /// Clean up unused shader programs.
     void CleanupShaderPrograms();
-    /// %Set texture.
+    /// Set texture.
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture.
     void SetTextureForUpdate(Texture* texture);
-    /// %Set default texture filtering mode.
+    /// Set default texture filtering mode.
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
-    /// %Set texture anisotropy.
+    /// Set texture anisotropy.
     void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
@@ -166,41 +166,41 @@ public:
     void ResetRenderTarget(unsigned index);
     /// Reset depth-stencil surface.
     void ResetDepthStencil();
-    /// %Set rendertarget.
+    /// Set rendertarget.
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
-    /// %Set rendertarget.
+    /// Set rendertarget.
     void SetRenderTarget(unsigned index, Texture2D* texture);
-    /// %Set depth-stencil surface.
+    /// Set depth-stencil surface.
     void SetDepthStencil(RenderSurface* depthStencil);
-    /// %Set depth-stencil surface.
+    /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// %Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
+    /// Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
     void SetViewTexture(Texture* texture);
-    /// %Set viewport.
+    /// Set viewport.
     void SetViewport(const IntRect& rect);
-    /// %Set blending mode.
+    /// Set blending mode.
     void SetBlendMode(BlendMode mode);
-    /// %Set color write on/off.
+    /// Set color write on/off.
     void SetColorWrite(bool enable);
-    /// %Set hardware culling mode.
+    /// Set hardware culling mode.
     void SetCullMode(CullMode mode);
-    /// %Set depth bias.
+    /// Set depth bias.
     void SetDepthBias(float constantBias, float slopeScaledBias);
-    /// %Set depth compare.
+    /// Set depth compare.
     void SetDepthTest(CompareMode mode);
-    /// %Set depth write on/off.
+    /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// %Set scissor test.
+    /// Set scissor test.
     void SetScissorTest(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
-    /// %Set scissor test.
+    /// Set scissor test.
     void SetScissorTest(bool enable, const IntRect& rect);
-    /// %Set stencil test.
+    /// Set stencil test.
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
-    /// %Set vertex buffer stream frequency. No-op on OpenGL.
+    /// Set vertex buffer stream frequency. No-op on OpenGL.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
     void ResetStreamFrequencies();
-    /// %Set force Shader Model 2 flag. No-op on OpenGL.
+    /// Set force Shader Model 2 flag. No-op on OpenGL.
     void SetForceSM2(bool enable);
 
     /// Return whether rendering initialized.

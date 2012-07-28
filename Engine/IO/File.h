@@ -60,7 +60,7 @@ public:
     
     /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
-    /// %Set position from the beginning of the file.
+    /// Set position from the beginning of the file.
     virtual unsigned Seek(unsigned position);
     /// Write bytes to the file. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size);

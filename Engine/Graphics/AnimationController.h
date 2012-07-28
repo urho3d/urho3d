@@ -58,17 +58,17 @@ struct AnimationControl
     float fadeTime_;
     /// Animation autofade on stop -time, 0 if disabled.
     float autoFadeTime_;
-    /// %Set time command time-to-live.
+    /// Set time command time-to-live.
     float setTimeTtl_;
-    /// %Set weight command time-to-live.
+    /// Set weight command time-to-live.
     float setWeightTtl_;
-    /// %Set time command.
+    /// Set time command.
     unsigned short setTime_;
-    /// %Set weight command.
+    /// Set weight command.
     unsigned char setWeight_;
-    /// %Set time command revision.
+    /// Set time command revision.
     unsigned char setTimeRev_;
-    /// %Set weight command revision.
+    /// Set weight command revision.
     unsigned char setWeightRev_;
 };
 
@@ -102,19 +102,19 @@ public:
     /// Fade other animations on the same layer to target weight. Return true on success.
     bool FadeOthers(const String& name, float targetWeight, float fadeTime);
     
-    /// %Set animation blending layer priority. Return true on success.
+    /// Set animation blending layer priority. Return true on success.
     bool SetLayer(const String& name, unsigned char layer);
-    /// %Set animation start bone. Return true on success.
+    /// Set animation start bone. Return true on success.
     bool SetStartBone(const String& name, const String& startBoneName);
-    /// %Set animation time position. Return true on success.
+    /// Set animation time position. Return true on success.
     bool SetTime(const String& name, float time);
-    /// %Set animation weight. Return true on success.
+    /// Set animation weight. Return true on success.
     bool SetWeight(const String& name, float weight);
-    /// %Set animation looping. Return true on success.
+    /// Set animation looping. Return true on success.
     bool SetLooped(const String& name, bool enable);
-    /// %Set animation speed. Return true on success.
+    /// Set animation speed. Return true on success.
     bool SetSpeed(const String& name, float speed);
-    /// %Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success.
+    /// Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success.
     bool SetAutoFade(const String& name, float fadeOutTime);
     
     /// Return whether an animation is active.
@@ -146,9 +146,9 @@ public:
     /// Return animation autofade time.
     float GetAutoFade(const String& name) const;
     
-    /// %Set animations attribute.
+    /// Set animations attribute.
     void SetAnimationsAttr(VariantVector value);
-    /// %Set animations attribute for network replication.
+    /// Set animations attribute for network replication.
     void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
     /// Return animations attribute.
     VariantVector GetAnimationsAttr() const;

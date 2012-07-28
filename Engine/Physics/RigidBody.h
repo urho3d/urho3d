@@ -67,51 +67,51 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set mass. Zero mass makes the body static.
+    /// Set mass. Zero mass makes the body static.
     void SetMass(float mass);
-    /// %Set rigid body world-space position.
+    /// Set rigid body world-space position.
     void SetPosition(Vector3 position);
-    /// %Set rigid body world-space rotation.
+    /// Set rigid body world-space rotation.
     void SetRotation(Quaternion rotation);
-    /// %Set rigid body world-space position and rotation.
+    /// Set rigid body world-space position and rotation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set linear velocity.
+    /// Set linear velocity.
     void SetLinearVelocity(Vector3 velocity);
-    /// %Set linear degrees of freedom.
+    /// Set linear degrees of freedom.
     void SetLinearFactor(Vector3 factor);
-    /// %Set linear velocity deactivation threshold.
+    /// Set linear velocity deactivation threshold.
     void SetLinearRestThreshold(float threshold);
-    /// %Set linear velocity damping factor.
+    /// Set linear velocity damping factor.
     void SetLinearDamping(float damping);
-    /// %Set angular velocity.
+    /// Set angular velocity.
     void SetAngularVelocity(Vector3 angularVelocity);
-    /// %Set angular degrees of freedom.
+    /// Set angular degrees of freedom.
     void SetAngularFactor(Vector3 factor);
-    /// %Set angular velocity deactivation threshold.
+    /// Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
-    /// %Set angular velocity damping factor.
+    /// Set angular velocity damping factor.
     void SetAngularDamping(float factor);
-    /// %Set friction coefficient.
+    /// Set friction coefficient.
     void SetFriction(float friction);
-    /// %Set restitution coefficient.
+    /// Set restitution coefficient.
     void SetRestitution(float restitution);
-    /// %Set continuous collision detection swept sphere radius.
+    /// Set continuous collision detection swept sphere radius.
     void SetCcdRadius(float radius);
-    /// %Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
+    /// Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
     void SetCcdMotionThreshold(float threshold);
-    /// %Set whether gravity is applied to rigid body.
+    /// Set whether gravity is applied to rigid body.
     void SetUseGravity(bool enable);
-    /// %Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
+    /// Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
     void SetKinematic(bool enable);
-    /// %Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
+    /// Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
     void SetPhantom(bool enable);
-    /// %Set collision layer.
+    /// Set collision layer.
     void SetCollisionLayer(unsigned layer);
-    /// %Set collision mask.
+    /// Set collision mask.
     void SetCollisionMask(unsigned mask);
-    /// %Set collision group and mask.
+    /// Set collision group and mask.
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
-    /// %Set collision event signaling mode. Default is to signal when active.
+    /// Set collision event signaling mode. Default is to signal when active.
     void SetCollisionEventMode(CollisionEventMode mode);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
@@ -189,7 +189,7 @@ public:
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
     /// Update mass and inertia of rigid body.
     void UpdateMass();
-    /// %Set network angular velocity attribute.
+    /// Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;

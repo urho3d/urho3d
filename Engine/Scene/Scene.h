@@ -95,11 +95,11 @@ public:
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Clear scene completely of nodes and components.
     void Clear();
-    /// %Set active flag. Only active scenes will be updated automatically.
+    /// Set active flag. Only active scenes will be updated automatically.
     void SetActive(bool enable);
-    /// %Set network client motion smoothing constant.
+    /// Set network client motion smoothing constant.
     void SetSmoothingConstant(float constant);
-    /// %Set network client motion smoothing snap threshold.
+    /// Set network client motion smoothing snap threshold.
     void SetSnapThreshold(float threshold);
     /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
@@ -157,7 +157,7 @@ public:
     void ComponentAdded(Component* component);
     /// Component removed. Remove from ID map.
     void ComponentRemoved(Component* component);
-    /// %Set node user variable reverse mappings.
+    /// Set node user variable reverse mappings.
     void SetVarNamesAttr(String value);
     /// Return node user variable reverse mappings.
     String GetVarNamesAttr() const;

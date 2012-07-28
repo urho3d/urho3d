@@ -79,13 +79,13 @@ public:
     
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
-    /// %Set script file only. Recreate object if necessary.
+    /// Set script file only. Recreate object if necessary.
     void SetScriptFile(ScriptFile* scriptFile);
-    /// %Set class name only. Recreate object if necessary.
+    /// Set class name only. Recreate object if necessary.
     void SetClassName(const String& className);
     /// Enable or disable scripted updates and event handlers.
     void SetActive(bool active);
-    /// %Set fixed updates per second. 0 (default) uses the physics frame rate.
+    /// Set fixed updates per second. 0 (default) uses the physics frame rate.
     void SetFixedUpdateFps(int fps);
     /// Query for a method by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = VariantVector());
@@ -107,13 +107,13 @@ public:
     /// Return fixed updates per second.
     int GetFixedUpdateFps() const { return fixedUpdateFps_; }
     
-    /// %Set script file attribute.
+    /// Set script file attribute.
     void SetScriptFileAttr(ResourceRef value);
-    /// %Set delayed method calls attribute.
+    /// Set delayed method calls attribute.
     void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
-    /// %Set fixed update time accumulator attribute.
+    /// Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
-    /// %Set script data attribute by calling a script function.
+    /// Set script data attribute by calling a script function.
     void SetScriptDataAttr(PODVector<unsigned char> data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;

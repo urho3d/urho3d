@@ -111,7 +111,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -141,91 +141,91 @@ public:
     /// React to resize.
     virtual void OnResize();
     
-    /// %Set name.
+    /// Set name.
     void SetName(const String& name);
-    /// %Set position.
+    /// Set position.
     void SetPosition(const IntVector2& position);
-    /// %Set position.
+    /// Set position.
     void SetPosition(int x, int y);
-    /// %Set size.
+    /// Set size.
     void SetSize(const IntVector2& size);
-    /// %Set size.
+    /// Set size.
     void SetSize(int width, int height);
-    /// %Set width only.
+    /// Set width only.
     void SetWidth(int width);
-    /// %Set height only.
+    /// Set height only.
     void SetHeight(int height);
-    /// %Set minimum size.
+    /// Set minimum size.
     void SetMinSize(const IntVector2& minSize);
-    /// %Set minimum size.
+    /// Set minimum size.
     void SetMinSize(int width, int height);
-    /// %Set minimum width.
+    /// Set minimum width.
     void SetMinWidth(int width);
-    /// %Set minimum height.
+    /// Set minimum height.
     void SetMinHeight(int height);
-    /// %Set maximum size.
+    /// Set maximum size.
     void SetMaxSize(const IntVector2& maxSize);
-    /// %Set maximum size.
+    /// Set maximum size.
     void SetMaxSize(int width, int height);
-    /// %Set maximum width.
+    /// Set maximum width.
     void SetMaxWidth(int width);
-    /// %Set maximum height.
+    /// Set maximum height.
     void SetMaxHeight(int height);
-    /// %Set fixed size.
+    /// Set fixed size.
     void SetFixedSize(const IntVector2& size);
-    /// %Set fixed size.
+    /// Set fixed size.
     void SetFixedSize(int width, int height);
-    /// %Set fixed width.
+    /// Set fixed width.
     void SetFixedWidth(int width);
-    /// %Set fixed height.
+    /// Set fixed height.
     void SetFixedHeight(int height);
-    /// %Set horizontal and vertical alignment.
+    /// Set horizontal and vertical alignment.
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
-    /// %Set horizontal alignment.
+    /// Set horizontal alignment.
     void SetHorizontalAlignment(HorizontalAlignment align);
-    /// %Set vertical alignment.
+    /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// %Set child element clipping border.
+    /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
-    /// %Set color on all corners.
+    /// Set color on all corners.
     void SetColor(const Color& color);
-    /// %Set color on one corner.
+    /// Set color on one corner.
     void SetColor(Corner corner, const Color& color);
-    /// %Set priority.
+    /// Set priority.
     void SetPriority(int priority);
-    /// %Set opacity.
+    /// Set opacity.
     void SetOpacity(float opacity);
-    /// %Set whether should be brought to front when focused.
+    /// Set whether should be brought to front when focused.
     void SetBringToFront(bool enable);
-    /// %Set whether should be put to background when another element is focused.
+    /// Set whether should be put to background when another element is focused.
     void SetBringToBack(bool enable);
-    /// %Set whether should clip child elements. Default false.
+    /// Set whether should clip child elements. Default false.
     void SetClipChildren(bool enable);
-    /// %Set whether should sort child elements according to priority. Default true.
+    /// Set whether should sort child elements according to priority. Default true.
     void SetSortChildren(bool enable);
-    /// %Set whether reacts to input.
+    /// Set whether reacts to input.
     void SetActive(bool enable);
-    /// %Set whether is focused. Only one element can be focused at a time.
+    /// Set whether is focused. Only one element can be focused at a time.
     void SetFocus(bool enable);
-    /// %Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
+    /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
     void SetSelected(bool enable);
-    /// %Set whether is visible.
+    /// Set whether is visible.
     void SetVisible(bool enable);
-    /// %Set focus mode.
+    /// Set focus mode.
     void SetFocusMode(FocusMode mode);
-    /// %Set drag and drop flags.
+    /// Set drag and drop flags.
     void SetDragDropMode(unsigned mode);
-    /// %Set style from an XML file. Find the style element by name.
+    /// Set style from an XML file. Find the style element by name.
     void SetStyle(XMLFile* file, const String& typeName);
-    /// %Set style from an XML file. Find the style element automatically.
+    /// Set style from an XML file. Find the style element automatically.
     void SetStyleAuto(XMLFile* file);
-    /// %Set layout.
+    /// Set layout.
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
-    /// %Set layout mode only.
+    /// Set layout mode only.
     void SetLayoutMode(LayoutMode mode);
-    /// %Set layout spacing.
+    /// Set layout spacing.
     void SetLayoutSpacing(int spacing);
-    /// %Set layout border.
+    /// Set layout border.
     void SetLayoutBorder(const IntRect& border);
     /// Manually update layout. Should not be necessary in most cases, but is provided for completeness.
     void UpdateLayout();
@@ -245,9 +245,9 @@ public:
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// %Set parent element. Same as parent->AddChild(this).
+    /// Set parent element. Same as parent->AddChild(this).
     void SetParent(UIElement* parent);
-    /// %Set a user variable.
+    /// Set a user variable.
     void SetVar(ShortStringHash key, const Variant& value);
     
     /// Return name.
@@ -356,11 +356,11 @@ public:
     /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
     int GetLayoutMinSize() const { return layoutMinSize_; }
     
-    /// %Set child offset.
+    /// Set child offset.
     void SetChildOffset(const IntVector2& offset);
-    /// %Set hovering state.
+    /// Set hovering state.
     void SetHovering(bool enable);
-    /// %Set temporary visibility status without updating layout or sending events. Used internally.
+    /// Set temporary visibility status without updating layout or sending events. Used internally.
     void SetTempVisible(bool enable);
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);

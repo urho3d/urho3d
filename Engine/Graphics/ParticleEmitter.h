@@ -85,7 +85,7 @@ public:
     
     /// Load emitter parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
-    /// %Set emitter active/inactive state and optionally reset active/inactive timer.
+    /// Set emitter active/inactive state and optionally reset active/inactive timer.
     void SetActive(bool enable, bool resetPeriod = false);
     
     /// Return parameter XML file.
@@ -95,9 +95,9 @@ public:
     /// Return whether emitter is active.
     bool IsActive() const { return active_; }
     
-    /// %Set parameter source attribute.
+    /// Set parameter source attribute.
     void SetParameterSourceAttr(ResourceRef value);
-    /// %Set particles attribute.
+    /// Set particles attribute.
     void SetParticlesAttr(VariantVector value);
     /// Return parameter source attribute.
     ResourceRef GetParameterSourceAttr() const;
@@ -108,11 +108,11 @@ protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
-    /// %Set number of particles.
+    /// Set number of particles.
     void SetNumParticles(int num);
-    /// %Set color of particles.
+    /// Set color of particles.
     void SetParticleColor(const Color& color);
-    /// %Set color fade of particles.
+    /// Set color fade of particles.
     void SetParticleColors(const Vector<ColorFade>& colors);
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();

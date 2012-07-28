@@ -63,9 +63,9 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() {}
     
-    /// %Set attribute by index. Return true if successfully set.
+    /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
-    /// %Set attribute by name. Return true if successfully set.
+    /// Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
     /// Allocate network attribute state.
     void AllocateNetworkState();

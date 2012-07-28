@@ -23,7 +23,7 @@
 
 #pragma once
 
-/// %Set the random seed. The default seed is 1.
+/// Set the random seed. The default seed is 1.
 void SetRandomSeed(unsigned seed);
 /// Return the current random seed.
 unsigned GetRandomSeed();

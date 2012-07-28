@@ -40,18 +40,18 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     
-    /// %Set checked state.
+    /// Set checked state.
     void SetChecked(bool enable);
-    /// %Set checked image offset.
+    /// Set checked image offset.
     void SetCheckedOffset(const IntVector2& rect);
-    /// %Set checked image offset.
+    /// Set checked image offset.
     void SetCheckedOffset(int x, int y);
     
     /// Return whether is checked.

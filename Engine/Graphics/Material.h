@@ -79,23 +79,23 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set number of techniques.
+    /// Set number of techniques.
     void SetNumTechniques(unsigned num);
-    /// %Set technique.
+    /// Set technique.
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
-    /// %Set shader parameter.
+    /// Set shader parameter.
     void SetShaderParameter(const String& name, const Vector4& value);
-    /// %Set texture.
+    /// Set texture.
     void SetTexture(TextureUnit unit, Texture* texture);
-    /// %Set texture coordinate transform.
+    /// Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
-    /// %Set texture coordinate transform.
+    /// Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, float repeat);
-    /// %Set culling mode.
+    /// Set culling mode.
     void SetCullMode(CullMode mode);
-    /// %Set culling mode for shadows.
+    /// Set culling mode for shadows.
     void SetShadowCullMode(CullMode mode);
-    /// %Set depth bias.
+    /// Set depth bias.
     void SetDepthBias(const BiasParameters& parameters);
     /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);

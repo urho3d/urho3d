@@ -52,7 +52,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -71,9 +71,9 @@ public:
     void RemoveItem(unsigned index);
     /// Remove all items.
     void RemoveAllItems();
-    /// %Set selection.
+    /// Set selection.
     void SetSelection(unsigned index);
-    /// %Set multiple selected items. If multiselect disabled, sets only the first.
+    /// Set multiple selected items. If multiselect disabled, sets only the first.
     void SetSelections(const PODVector<unsigned>& indices);
     /// Add item to the selection, multiselect mode only.
     void AddSelection(unsigned index);
@@ -85,7 +85,7 @@ public:
     void ChangeSelection(int delta, bool additive = false);
     /// Clear selection.
     void ClearSelection();
-    /// %Set selected items' highlight mode.
+    /// Set selected items' highlight mode.
     void SetHighlightMode(HighlightMode mode);
     /// Enable multiselect.
     void SetMultiselect(bool enable);
@@ -93,7 +93,7 @@ public:
     void SetHierarchyMode(bool enable);
     /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
-    /// %Set item doubleclick interval in seconds.
+    /// Set item doubleclick interval in seconds.
     void SetDoubleClickInterval(float interval);
     /// Show or hide child items starting from index. Only has effect in hierarchy mode.
     void SetChildItemsVisible(unsigned index, bool enable);

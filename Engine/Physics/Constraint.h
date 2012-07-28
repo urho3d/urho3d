@@ -63,29 +63,29 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set constraint type and recreate the constraint.
+    /// Set constraint type and recreate the constraint.
     void SetConstraintType(ConstraintType type);
-    /// %Set other body to connect to. Set to null to connect to the static world.
+    /// Set other body to connect to. Set to null to connect to the static world.
     void SetOtherBody(RigidBody* body);
-    /// %Set constraint position relative to own body.
+    /// Set constraint position relative to own body.
     void SetPosition(const Vector3& position);
-    /// %Set constraint rotation relative to own body.
+    /// Set constraint rotation relative to own body.
     void SetRotation(const Quaternion& rotation);
-    /// %Set constraint rotation relative to own body by specifying the axis.
+    /// Set constraint rotation relative to own body by specifying the axis.
     void SetAxis(const Vector3& axis);
-    /// %Set constraint position relative to the other body. If connected to the static world, is a world-space position.
+    /// Set constraint position relative to the other body. If connected to the static world, is a world-space position.
     void SetOtherPosition(const Vector3& position);
-    /// %Set constraint rotation relative to the other body. If connected to the static world, is a world-space rotation.
+    /// Set constraint rotation relative to the other body. If connected to the static world, is a world-space rotation.
     void SetOtherRotation(const Quaternion& rotation);
-    /// %Set constraint rotation relative to the other body by specifying the axis.
+    /// Set constraint rotation relative to the other body by specifying the axis.
     void SetOtherAxis(const Vector3& axis);
-    /// %Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    /// Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
     void SetWorldPosition(const Vector3& position);
-    /// %Set high limit. Interpretation is constraint type specific.
+    /// Set high limit. Interpretation is constraint type specific.
     void SetHighLimit(const Vector2& limit);
-    /// %Set low limit. Interpretation is constraint type specific.
+    /// Set low limit. Interpretation is constraint type specific.
     void SetLowLimit(const Vector2& limit);
-    /// %Set whether to disable collisions between connected bodies.
+    /// Set whether to disable collisions between connected bodies.
     void SetDisableCollision(bool disable);
     
     /// Return physics world.

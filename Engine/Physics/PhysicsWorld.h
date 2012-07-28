@@ -107,7 +107,7 @@ public:
     virtual void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) {}
     /// Draw physics debug 3D text. Not implemented.
     virtual void draw3dText(const btVector3& location,const char* textString) {}
-    /// %Set debug draw flags.
+    /// Set debug draw flags.
     virtual void setDebugMode(int debugMode) { debugMode_ = debugMode; }
     /// Return debug draw flags.
     virtual int getDebugMode() const { return debugMode_; }
@@ -118,13 +118,13 @@ public:
     void Update(float timeStep);
     /// Refresh collisions only without updating dynamics.
     void UpdateCollisions();
-    /// %Set simulation steps per second.
+    /// Set simulation steps per second.
     void SetFps(int fps);
-    /// %Set gravity.
+    /// Set gravity.
     void SetGravity(Vector3 gravity);
-    /// %Set whether to interpolate between simulation steps.
+    /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
-    /// %Set maximum angular velocity for network replication.
+    /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
     void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
@@ -161,9 +161,9 @@ public:
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// %Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
+    /// Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
     void SetDebugRenderer(DebugRenderer* debug);
-    /// %Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
+    /// Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
     void SetDebugDepthTest(bool enable);
     
     /// Return the Bullet physics world.

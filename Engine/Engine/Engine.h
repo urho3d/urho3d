@@ -51,13 +51,13 @@ public:
     Console* CreateConsole();
     /// Create the debug hud.
     DebugHud* CreateDebugHud();
-    /// %Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
+    /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
     void SetMinFps(int fps);
-    /// %Set maximum frames per second. The engine will sleep if FPS is higher than this.
+    /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
     void SetMaxFps(int fps);
-    /// %Set maximum frames per second when the application is inactive.
+    /// Set maximum frames per second when the application is inactive.
     void SetMaxInactiveFps(int fps);
-    /// %Set whether to pause update events and audio when minimized.
+    /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
     /// Close the application window and set the exit flag.
     void Exit();

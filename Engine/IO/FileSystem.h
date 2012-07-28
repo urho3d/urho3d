@@ -44,7 +44,7 @@ public:
     /// Destruct.
     ~FileSystem();
     
-    /// %Set the current working directory.
+    /// Set the current working directory.
     bool SetCurrentDir(const String& pathName);
     /// Create a directory.
     bool CreateDir(const String& pathName);

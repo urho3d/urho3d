@@ -38,17 +38,17 @@ public:
     /// Destruct.
     ~PostProcessPass();
     
-    /// %Set vertex shader name.
+    /// Set vertex shader name.
     void SetVertexShader(const String& name);
-    /// %Set pixel shader name.
+    /// Set pixel shader name.
     void SetPixelShader(const String& name);
-    /// %Set texture name. This can be a named rendertarget, or a texture resource name.
+    /// Set texture name. This can be a named rendertarget, or a texture resource name.
     void SetTexture(TextureUnit unit, const String& name);
-    /// %Set shader parameter.
+    /// Set shader parameter.
     void SetShaderParameter(const String& name, const Vector4& value);
     /// Remove shader parameter.
     void RemoveShaderParameter(const String& name);
-    /// %Set output rendertarget name.
+    /// Set output rendertarget name.
     void SetOutput(const String& name);
     /// Clone the post-process pass.
     SharedPtr<PostProcessPass> Clone();
@@ -109,17 +109,17 @@ public:
     
     /// Load parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
-    /// %Set number of passes.
+    /// Set number of passes.
     void SetNumPasses(unsigned passes);
     /// Create a rendertarget. Width and height are either absolute pixels or viewport size divisors. Return true if successful.
     bool CreateRenderTarget(const String& name, unsigned width, unsigned height, unsigned format, bool sizeDivisor, bool filtered);
     /// Remove a rendertarget.
     void RemoveRenderTarget(const String& name);
-    /// %Set global shader parameter.
+    /// Set global shader parameter.
     void SetShaderParameter(const String& name, const Vector4& value);
     /// Remove global shader parameter.
     void RemoveShaderParameter(const String& name);
-    /// %Set active flag.
+    /// Set active flag.
     void SetActive(bool active);
     /// Clone the post-process.
     SharedPtr<PostProcess> Clone();

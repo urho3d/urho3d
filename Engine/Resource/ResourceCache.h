@@ -82,7 +82,7 @@ public:
     void ReleaseAllResources(bool force = false);
     /// Reload a resource. Return false and release it if fails.
     bool ReloadResource(Resource* resource);
-    /// %Set memory budget for a specific resource type, default 0 is unlimited.
+    /// Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     /// Enable or disable automatic reloading of resources as files are modified.
     void SetAutoReloadResources(bool enable);

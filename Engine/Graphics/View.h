@@ -130,9 +130,9 @@ private:
     void ProcessLight(LightQueryResult& query, unsigned threadIndex);
     /// Process shadow casters' visibilities and build their combined view- or projection-space bounding box.
     void ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex);
-    /// %Set up initial shadow camera view(s).
+    /// Set up initial shadow camera view(s).
     void SetupShadowCameras(LightQueryResult& query);
-    /// %Set up a directional light shadow camera
+    /// Set up a directional light shadow camera
     void SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float nearSplit, float farSplit);
     /// Finalize shadow camera view after shadow casters and the shadow map are known.
     void FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRect& shadowViewport, const BoundingBox& shadowCasterBox);
@@ -168,7 +168,7 @@ private:
     void AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, bool allowInstancing = true, bool allowShadows = true);
     /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
-    /// %Set up a light volume rendering batch.
+    /// Set up a light volume rendering batch.
     void SetupLightVolumeBatch(Batch& batch);
     /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
     void DrawFullscreenQuad(Camera* camera, bool nearQuad);

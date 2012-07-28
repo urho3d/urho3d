@@ -48,37 +48,37 @@ public:
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     
-    /// %Set patch quads per side. Must be a power of two.
+    /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);
-    /// %Set vertex (XZ) and height (Y) spacing.
+    /// Set vertex (XZ) and height (Y) spacing.
     void SetSpacing(const Vector3& spacing);
-    /// %Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
+    /// Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
     bool SetHeightMap(Image* image);
-    /// %Set material.
+    /// Set material.
     void SetMaterial(Material* material);
-    /// %Set draw distance for patches.
+    /// Set draw distance for patches.
     void SetDrawDistance(float distance);
-    /// %Set shadow draw distance for patches.
+    /// Set shadow draw distance for patches.
     void SetShadowDistance(float distance);
-    /// %Set LOD bias for patches. Affects which terrain LOD to display.
+    /// Set LOD bias for patches. Affects which terrain LOD to display.
     void SetLodBias(float bias);
-    /// %Set view mask for patches. Is and'ed with camera's view mask to see if the object should be rendered.
+    /// Set view mask for patches. Is and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set light mask for patches. Is and'ed with light's and zone's light mask to see if the object should be lit.
+    /// Set light mask for patches. Is and'ed with light's and zone's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// %Set shadow mask for patches. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
+    /// Set shadow mask for patches. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
     void SetShadowMask(unsigned mask);
-    /// %Set zone mask for patches. Is and'ed with zone's zone mask to see if the object should belong to the zone.
+    /// Set zone mask for patches. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     void SetZoneMask(unsigned mask);
-    /// %Set maximum number of per-pixel lights for patches. Default 0 is unlimited.
+    /// Set maximum number of per-pixel lights for patches. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// %Set visible flag for patches.
+    /// Set visible flag for patches.
     void SetVisible(bool enable);
-    /// %Set shadowcaster flag for patches.
+    /// Set shadowcaster flag for patches.
     void SetCastShadows(bool enable);
-    /// %Set occlusion flag for patches. Occlusion uses the coarsest LOD and may potentially be too aggressive, so use with caution.
+    /// Set occlusion flag for patches. Occlusion uses the coarsest LOD and may potentially be too aggressive, so use with caution.
     void SetOccluder(bool enable);
-    /// %Set occludee flag for patches.
+    /// Set occludee flag for patches.
     void SetOccludee(bool enable);
     
     /// Return patch quads per side.
@@ -132,11 +132,11 @@ public:
     void CreatePatchGeometry(TerrainPatch* patch);
     /// Update patch based on LOD and neighbor LOD.
     void UpdatePatchLod(TerrainPatch* patch);
-    /// %Set heightmap attribute.
+    /// Set heightmap attribute.
     void SetHeightMapAttr(ResourceRef value);
-    /// %Set material attribute.
+    /// Set material attribute.
     void SetMaterialAttr(ResourceRef value);
-    /// %Set patch size attribute.
+    /// Set patch size attribute.
     void SetPatchSizeAttr(int value);
     /// Return heightmap attribute.
     ResourceRef GetHeightMapAttr() const;

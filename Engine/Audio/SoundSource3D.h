@@ -41,13 +41,13 @@ public:
     /// Update sound source.
     virtual void Update(float timeStep);
     
-    /// %Set attenuation parameters.
+    /// Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
-    /// %Set near distance. Distances closer than this do not have an effect.
+    /// Set near distance. Distances closer than this do not have an effect.
     void SetNearDistance(float distance);
-    /// %Set far distance. Beyond this sound will be completely attenuated.
+    /// Set far distance. Beyond this sound will be completely attenuated.
     void SetFarDistance(float distance);
-    /// %Set rolloff power factor, defines attenuation function shape.
+    /// Set rolloff power factor, defines attenuation function shape.
     void SetRolloffFactor(float factor);
     /// Calculate attenuation and panning based on current position and listener position.
     void CalculateAttenuation();

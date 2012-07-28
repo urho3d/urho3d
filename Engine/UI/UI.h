@@ -46,9 +46,9 @@ public:
     /// Destruct.
     virtual ~UI();
     
-    /// %Set cursor UI element.
+    /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
-    /// %Set focused UI element.
+    /// Set focused UI element.
     void SetFocusElement(UIElement* element);
     /// Clear the UI (excluding the cursor.)
     void Clear();
@@ -60,7 +60,7 @@ public:
     void Render();
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
     SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
-    /// %Set clipboard text.
+    /// Set clipboard text.
     void SetClipBoardText(const String& text);
     
     /// Return root UI element.

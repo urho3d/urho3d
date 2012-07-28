@@ -127,37 +127,37 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set as a sphere.
+    /// Set as a sphere.
     void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a box.
+    /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a cylinder.
+    /// Set as a cylinder.
     void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a capsule.
+    /// Set as a capsule.
     void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-   /// %Set as a cone.
+   /// Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a triangle mesh.
+    /// Set as a triangle mesh.
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a convex hull.
+    /// Set as a convex hull.
     void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// %Set as a terrain. Only works if the same scene node contains a Terrain component.
+    /// Set as a terrain. Only works if the same scene node contains a Terrain component.
     void SetTerrain();
-    /// %Set shape type.
+    /// Set shape type.
     void SetShapeType(ShapeType type);
-    /// %Set shape size.
+    /// Set shape size.
     void SetSize(const Vector3& size);
-    /// %Set offset position.
+    /// Set offset position.
     void SetPosition(const Vector3& position);
-    /// %Set offset rotation.
+    /// Set offset rotation.
     void SetRotation(const Quaternion& rotation);
-    /// %Set offset transform.
+    /// Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set collision margin.
+    /// Set collision margin.
     void SetMargin(float margin);
-    /// %Set triangle mesh / convex hull model.
+    /// Set triangle mesh / convex hull model.
     void SetModel(Model* model);
-    /// %Set model LOD level.
+    /// Set model LOD level.
     void SetLodLevel(unsigned lodLevel);
     
     /// Return Bullet collision shape.
@@ -181,7 +181,7 @@ public:
     
     /// Update the new collision shape to the RigidBody, and tell it to update its mass.
     void NotifyRigidBody();
-    /// %Set model attribute.
+    /// Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;

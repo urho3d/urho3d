@@ -72,9 +72,9 @@ public:
     /// Release shader.
     virtual void Release();
     
-    /// %Set name.
+    /// Set name.
     void SetName(const String& name);
-    /// %Set bytecode.
+    /// Set bytecode.
     void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
     /// Add a parameter.
     void AddParameter(StringHash param, const ShaderParameter& definition);

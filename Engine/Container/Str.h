@@ -291,7 +291,7 @@ public:
     Iterator Erase(const Iterator& start, const Iterator& end);
     /// Resize the string.
     void Resize(unsigned newLength);
-    /// %Set new capacity.
+    /// Set new capacity.
     void Reserve(unsigned newCapacity);
     /// Reallocate so that no extra memory is used.
     void Compact();

@@ -39,7 +39,7 @@ public:
     /// Reset to initial state.
     void Reset();
     
-    /// %Set or release buttons.
+    /// Set or release buttons.
     void Set(unsigned buttons, bool down = true)
     {
         if (down)

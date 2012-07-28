@@ -40,20 +40,20 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// React to the popup being shown.
     virtual void OnShowPopup();
     
-    /// %Set popup element to show on selection.
+    /// Set popup element to show on selection.
     void SetPopup(UIElement* element);
-    /// %Set popup element offset.
+    /// Set popup element offset.
     void SetPopupOffset(const IntVector2& offset);
-    /// %Set popup element offset.
+    /// Set popup element offset.
     void SetPopupOffset(int x, int y);
     /// Force the popup to show or hide.
     void ShowPopup(bool enable);
-    /// %Set accelerator key (set zero key code to disable.)
+    /// Set accelerator key (set zero key code to disable.)
     void SetAccelerator(int key, int qualifiers);
     
     /// Return popup element.

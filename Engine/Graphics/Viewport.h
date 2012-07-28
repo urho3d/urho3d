@@ -47,11 +47,11 @@ public:
     /// Destruct.
     ~Viewport();
     
-    /// %Set scene.
+    /// Set scene.
     void SetScene(Scene* scene);
-    /// %Set camera.
+    /// Set camera.
     void SetCamera(Camera* camera);
-    /// %Set rectangle.
+    /// Set rectangle.
     void SetRect(const IntRect& rect);
     /// Add a post-processing effect at the end of the chain.
     void AddPostProcess(PostProcess* effect);

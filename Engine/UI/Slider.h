@@ -40,7 +40,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -55,11 +55,11 @@ public:
     /// React to resize.
     virtual void OnResize();
     
-    /// %Set orientation type.
+    /// Set orientation type.
     void SetOrientation(Orientation orientation);
-    /// %Set slider range maximum value (minimum value is always 0.)
+    /// Set slider range maximum value (minimum value is always 0.)
     void SetRange(float range);
-    /// %Set slider current value.
+    /// Set slider current value.
     void SetValue(float value);
     /// Change value by a delta.
     void ChangeValue(float delta);

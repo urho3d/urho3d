@@ -1,3 +1,6 @@
+# Disable unnecessary build types
+set (CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configurations" FORCE)
+
 # Set project name
 project (Urho3D)
 
@@ -7,9 +10,6 @@ cmake_minimum_required (VERSION 2.6)
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
-
-# Disable unnecessary build types
-set (CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configurations" FORCE)
 
 # IOS-specific setup
 if (IOS)

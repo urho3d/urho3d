@@ -59,19 +59,19 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set fileselector UI style.
+    /// Set fileselector UI style.
     void SetStyle(XMLFile* style);
-    /// %Set title text.
+    /// Set title text.
     void SetTitle(const String& text);
-    /// %Set button texts.
+    /// Set button texts.
     void SetButtonTexts(const String& okText, const String& cancelText);
-    /// %Set current path.
+    /// Set current path.
     void SetPath(const String& path);
-    /// %Set current filename.
+    /// Set current filename.
     void SetFileName(const String& fileName);
-    /// %Set filters.
+    /// Set filters.
     void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
-    /// %Set directory selection mode. Default false.
+    /// Set directory selection mode. Default false.
     void SetDirectoryMode(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
@@ -110,7 +110,7 @@ public:
     bool GetDirectoryMode() const { return directoryMode_; }
     
 private:
-    /// %Set the text of an edit field and ignore the resulting event.
+    /// Set the text of an edit field and ignore the resulting event.
     void SetLineEditText(LineEdit* edit, const String& text);
     /// Refresh the directory listing.
     void RefreshFiles();

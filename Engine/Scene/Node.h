@@ -75,39 +75,39 @@ public:
     
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
-    /// %Set name.
+    /// Set name.
     void SetName(const String& name);
-    /// %Set position relative to parent node.
+    /// Set position relative to parent node.
     void SetPosition(const Vector3& position);
-    /// %Set rotation relative to parent node.
+    /// Set rotation relative to parent node.
     void SetRotation(const Quaternion& rotation);
-    /// %Set direction relative to parent node. Positive Z equals identity.
+    /// Set direction relative to parent node. Positive Z equals identity.
     void SetDirection(const Vector3& direction);
-    /// %Set uniform scale relative to parent node.
+    /// Set uniform scale relative to parent node.
     void SetScale(float scale);
-    /// %Set scale relative to parent node.
+    /// Set scale relative to parent node.
     void SetScale(const Vector3& scale);
-    /// %Set transform relative to parent node.
+    /// Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set transform relative to parent node.
+    /// Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// %Set transform relative to parent node.
+    /// Set transform relative to parent node.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// %Set position relative to world space.
+    /// Set position relative to world space.
     void SetWorldPosition(const Vector3& position);
-    /// %Set rotation relative to world space.
+    /// Set rotation relative to world space.
     void SetWorldRotation(const Quaternion& rotation);
-    /// %Set direction relative to world space.
+    /// Set direction relative to world space.
     void SetWorldDirection(const Vector3& direction);
-    /// %Set uniform scale relative to world space.
+    /// Set uniform scale relative to world space.
     void SetWorldScale(float scale);
-    /// %Set scale relative to world space.
+    /// Set scale relative to world space.
     void SetWorldScale(const Vector3& scale);
-    /// %Set transform relative to world space.
+    /// Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set transform relative to world space.
+    /// Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// %Set transform relative to world space.
+    /// Set transform relative to world space.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     /// Move the scene node.
     void Translate(const Vector3& delta);
@@ -127,7 +127,7 @@ public:
     void Scale(float scale);
     /// Modify scale.
     void Scale(const Vector3& scale);
-    /// %Set owner connection for networking.
+    /// Set owner connection for networking.
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
@@ -153,9 +153,9 @@ public:
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// %Set parent scene node. Retains the world transform.
+    /// Set parent scene node. Retains the world transform.
     void SetParent(Node* parent);
-    /// %Set a user variable.
+    /// Set a user variable.
     void SetVar(ShortStringHash key, const Variant& value);
     /// Add listener component that is notified of node being dirtied. Can either be in the same node or another.
     void AddListener(Component* component);
@@ -289,15 +289,15 @@ public:
     /// Template version of checking whether has a specific component.
     template <class T> bool HasComponent() const;
     
-    /// %Set ID. Called by Scene.
+    /// Set ID. Called by Scene.
     void SetID(unsigned id);
-    /// %Set scene. Called by Scene.
+    /// Set scene. Called by Scene.
     void SetScene(Scene* scene);
-    /// %Set network position attribute.
+    /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);
-    /// %Set network rotation attribute.
+    /// Set network rotation attribute.
     void SetNetRotationAttr(const PODVector<unsigned char>& value);
-    /// %Set network parent attribute.
+    /// Set network parent attribute.
     void SetNetParentAttr(const PODVector<unsigned char>& value);
     /// Return network position attribute.
     const Vector3& GetNetPositionAttr() const;

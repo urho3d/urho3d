@@ -44,21 +44,21 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
+    /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set ambient color
+    /// Set ambient color
     void SetAmbientColor(const Color& color);
-    /// %Set fog color.
+    /// Set fog color.
     void SetFogColor(const Color& color);
-    /// %Set fog start distance.
+    /// Set fog start distance.
     void SetFogStart(float start);
-    /// %Set fog end distance.
+    /// Set fog end distance.
     void SetFogEnd(float end);
-    /// %Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
+    /// Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
-    /// %Set override mode. If camera is inside an override zone, it will also be used for all drawables.
+    /// Set override mode. If camera is inside an override zone, it will also be used for all drawables.
     void SetOverride(bool enable);
-    /// %Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
+    /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
     void SetAmbientGradient(bool enable);
     
     /// Return bounding box.

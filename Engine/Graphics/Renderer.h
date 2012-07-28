@@ -162,45 +162,45 @@ public:
     /// Destruct.
     virtual ~Renderer();
     
-    /// %Set number of viewports to render.
+    /// Set number of viewports to render.
     void SetNumViewports(unsigned num);
-    /// %Set a viewport. Return true if successful.
+    /// Set a viewport. Return true if successful.
     bool SetViewport(unsigned index, Viewport* viewport);
-    /// %Set rendering mode (forward / light pre-pass / deferred.)
+    /// Set rendering mode (forward / light pre-pass / deferred.)
     void SetRenderMode(RenderMode mode);
-    /// %Set specular lighting on/off.
+    /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// %Set texture anisotropy.
+    /// Set texture anisotropy.
     void SetTextureAnisotropy(int level);
-    /// %Set texture filtering.
+    /// Set texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// %Set texture quality level.
+    /// Set texture quality level.
     void SetTextureQuality(int quality);
-    /// %Set material quality level.
+    /// Set material quality level.
     void SetMaterialQuality(int quality);
-    /// %Set shadows on/off.
+    /// Set shadows on/off.
     void SetDrawShadows(bool enable);
-    /// %Set shadow map resolution.
+    /// Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// %Set shadow quality (amount of samples and bit depth.)
+    /// Set shadow quality (amount of samples and bit depth.)
     void SetShadowQuality(int quality);
-    /// %Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
+    /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
-    /// %Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
+    /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
     void SetMaxShadowMaps(int shadowMaps);
-    /// %Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
+    /// Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
     void SetMaxShadowCascades(int cascades);
-    /// %Set dynamic instancing on/off.
+    /// Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
-    /// %Set maximum number of triangles per object for instancing.
+    /// Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
-    /// %Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
+    /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
     void SetMaxSortedInstances(int instances);
-    /// %Set maximum number of occluder trianges.
+    /// Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
-    /// %Set occluder buffer width.
+    /// Set occluder buffer width.
     void SetOcclusionBufferSize(int size);
-    /// %Set required screen size (1.0 = full screen) for occluders.
+    /// Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
     /// Force reload of shaders.
     void ReloadShaders();
@@ -312,7 +312,7 @@ public:
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
     void SetLightVolumeBatchShaders(Batch& batch);
-    /// %Set cull mode while taking possible projection flipping into account.
+    /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);

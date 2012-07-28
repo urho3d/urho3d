@@ -60,13 +60,13 @@ public:
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
-    /// %Set model.
+    /// Set model.
     void SetModel(Model* model);
-    /// %Set material on all geometries.
+    /// Set material on all geometries.
     void SetMaterial(Material* material);
-    /// %Set material on one geometry. Return true if successful.
+    /// Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
-    /// %Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
+    /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
     void SetOcclusionLodLevel(unsigned level);
     
     /// Return model.
@@ -80,9 +80,9 @@ public:
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
     
-    /// %Set model attribute.
+    /// Set model attribute.
     void SetModelAttr(ResourceRef value);
-    /// %Set materials attribute.
+    /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
@@ -92,9 +92,9 @@ public:
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// %Set local-space bounding box.
+    /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set number of geometries.
+    /// Set number of geometries.
     void SetNumGeometries(unsigned num);
     /// Reset LOD levels.
     void ResetLodLevels();

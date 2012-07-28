@@ -264,7 +264,7 @@ public:
         );
     }
     
-    /// %Set translation elements.
+    /// Set translation elements.
     void SetTranslation(const Vector3& translation)
     {
         m03_ = translation.x_;
@@ -272,7 +272,7 @@ public:
         m23_ = translation.z_;
     }
     
-    /// %Set rotation elements from a 3x3 matrix.
+    /// Set rotation elements from a 3x3 matrix.
     void SetRotation(const Matrix3& rotation)
     {
         m00_ = rotation.m00_;
@@ -286,7 +286,7 @@ public:
         m22_ = rotation.m22_;
     }
     
-    /// %Set scaling elements.
+    /// Set scaling elements.
     void SetScale(const Vector3& scale)
     {
         m00_ = scale.x_;
@@ -294,7 +294,7 @@ public:
         m22_ = scale.z_;
     }
     
-    /// %Set uniform scaling elements.
+    /// Set uniform scaling elements.
     void SetScale(float scale)
     {
         m00_ = scale;

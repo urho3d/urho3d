@@ -92,9 +92,9 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// %Set size and number of color components.
+    /// Set size and number of color components.
     void SetSize(int width, int height, unsigned components);
-    /// %Set data.
+    /// Set data.
     void SetData(const unsigned char* pixelData);
     /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName);

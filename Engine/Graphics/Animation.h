@@ -79,11 +79,11 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set animation name.
+    /// Set animation name.
     void SetAnimationName(const String& name);
-    /// %Set animation length.
+    /// Set animation length.
     void SetLength(float length);
-    /// %Set all animation tracks.
+    /// Set all animation tracks.
     void SetTracks(const Vector<AnimationTrack>& tracks);
     
     /// Return animation name.

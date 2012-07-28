@@ -75,7 +75,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling.
+    /// Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling.
     void SetView(Camera* camera);
     /// Add a line.
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);

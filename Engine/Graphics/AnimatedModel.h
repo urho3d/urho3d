@@ -64,7 +64,7 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set model.
+    /// Set model.
     void SetModel(Model* model, bool createBones = true);
     /// Add an animation.
     AnimationState* AddAnimationState(Animation* animation);
@@ -78,15 +78,15 @@ public:
     void RemoveAnimationState(AnimationState* state);
     /// Remove all animations.
     void RemoveAllAnimationStates();
-    /// %Set animation LOD bias.
+    /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
-    /// %Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
+    /// Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
     void SetInvisibleLodFactor(float factor);
-    /// %Set vertex morph weight by index.
+    /// Set vertex morph weight by index.
     void SetMorphWeight(unsigned index, float weight);
-    /// %Set vertex morph weight by name.
+    /// Set vertex morph weight by name.
     void SetMorphWeight(const String& name, float weight);
-    /// %Set vertex morph weight by name hash.
+    /// Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
     /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
@@ -124,13 +124,13 @@ public:
     /// Return whether is the master (first) animated model.
     bool IsMaster() const { return isMaster_; }
     
-    /// %Set model attribute.
+    /// Set model attribute.
     void SetModelAttr(ResourceRef value);
-    /// %Set bones' animation enabled attribute.
+    /// Set bones' animation enabled attribute.
     void SetBonesEnabledAttr(VariantVector value);
-    /// %Set animation states attribute.
+    /// Set animation states attribute.
     void SetAnimationStatesAttr(VariantVector value);
-    /// %Set morphs attribute.
+    /// Set morphs attribute.
     void SetMorphsAttr(const PODVector<unsigned char>& value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
@@ -162,9 +162,9 @@ private:
     void MarkAnimationOrderDirty();
     /// Mark morphs to require an update.
     void MarkMorphsDirty();
-    /// %Set skeleton.
+    /// Set skeleton.
     void SetSkeleton(const Skeleton& skeleton, bool createBones);
-    /// %Set mapping of subgeometry bone indices.
+    /// Set mapping of subgeometry bone indices.
     void SetGeometryBoneMappings();
     /// Clone geometries for vertex morphing.
     void CloneGeometries();

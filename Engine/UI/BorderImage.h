@@ -43,22 +43,22 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data.
+    /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
-    /// %Set textures.
+    /// Set textures.
     void SetTexture(Texture* texture);
-    /// %Set part of texture to use as the image.
+    /// Set part of texture to use as the image.
     void SetImageRect(const IntRect& rect);
     /// Use whole texture as the image.
     void SetFullImageRect();
-    /// %Set image border dimensions.
+    /// Set image border dimensions.
     void SetBorder(const IntRect& rect);
-    /// %Set offset to image rectangle used on hover.
+    /// Set offset to image rectangle used on hover.
     void SetHoverOffset(const IntVector2& offset);
-    /// %Set offset to image rectangle used on hover.
+    /// Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
     
     /// Return texture.

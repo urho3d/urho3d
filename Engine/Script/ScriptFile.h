@@ -82,7 +82,7 @@ public:
 private:
     /// Add a script section, checking for includes recursively. Return true if successful.
     bool AddScriptSection(asIScriptEngine* engine, Deserializer& source);
-    /// %Set parameters for a function or method.
+    /// Set parameters for a function or method.
     void SetParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters);
     /// Release the script module.
     void ReleaseModule();
