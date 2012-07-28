@@ -26,8 +26,6 @@
 
 #include "DebugNew.h"
 
-static String noType;
-
 void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const char* name)
 {
     HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
@@ -151,7 +149,7 @@ const String& Context::GetTypeName(ShortStringHash type) const
 {
     // Search factories to find the hash-to-name mapping
     HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
-    return i != factories_.End() ? i->second_->GetTypeName() : noType;
+    return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
 
