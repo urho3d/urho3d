@@ -234,6 +234,15 @@ void UI::RenderUpdate()
     
     PROFILE(GetUIBatches);
     
+    // If the OS cursor is visible, do not render the UI's own cursor
+    bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
+    bool uiCursorVisible = false;
+    if (osCursorVisible && cursor_)
+    {
+        uiCursorVisible = cursor_->IsVisible();
+        cursor_->SetTempVisible(false);
+    }
+    
     // Get batches & quads from the UI elements
     batches_.Clear();
     quads_.Clear();
@@ -243,6 +252,10 @@ void UI::RenderUpdate()
     // If no drag, reset cursor shape for next frame
     if (cursor_ && !dragElement_)
         cursor_->SetShape(CS_NORMAL);
+    
+    // Restore UI cursor visibility state
+    if (osCursorVisible && cursor_)
+        cursor_->SetTempVisible(uiCursorVisible);
 }
 
 void UI::Render()
@@ -778,17 +791,26 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     
     if (cursor_)
     {
+        Input* input = GetSubsystem<Input>();
         const IntVector2& rootSize = rootElement_->GetSize();
         
-        // Move cursor only when visible
-        if (cursor_->IsVisible())
+        if (!input->IsMouseVisible())
         {
-            IntVector2 pos = cursor_->GetPosition();
-            pos.x_ += eventData[P_DX].GetInt();
-            pos.y_ += eventData[P_DY].GetInt();
-            pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
-            pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
-            cursor_->SetPosition(pos);
+            // Relative mouse motion: move cursor only when visible
+            if (cursor_->IsVisible())
+            {
+                IntVector2 pos = cursor_->GetPosition();
+                pos.x_ += eventData[P_DX].GetInt();
+                pos.y_ += eventData[P_DY].GetInt();
+                pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
+                pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
+                cursor_->SetPosition(pos);
+            }
+        }
+        else
+        {
+            // Absolute mouse motion: move always
+            cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
         }
         
         if (dragElement_ && mouseButtons_)

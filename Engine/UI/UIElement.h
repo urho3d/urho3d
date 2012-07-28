@@ -360,6 +360,8 @@ public:
     void SetChildOffset(const IntVector2& offset);
     /// %Set hovering state.
     void SetHovering(bool enable);
+    /// %Set temporary visibility status without updating layout or sending events. Used internally.
+    void SetTempVisible(bool enable);
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.

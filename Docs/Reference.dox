@@ -387,7 +387,7 @@ Graphics implements the low-level functionality:
 - Performing primitive rendering operations
 - Handling lost device
 
-Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.
+Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function.  There is also an experimental option of rendering to an existing window by passing its OS-specific handle to \ref Graphics::SetExternalWindow "SetExternalWindow()" before setting the initial screen mode.
 
 When setting the initial screen mode, Graphics does a few checks:
 
@@ -795,7 +795,7 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 
 \page Input %Input
 
-The Input subsystem provides keyboard, mouse, joystick and touch input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary.
+The Input subsystem provides keyboard, mouse, joystick and touch input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the operating system mouse cursor. It will be hidden by default, so the UI should be used to render a software cursor if necessary. For editor-like applications the operating system cursor can be made visible by calling \ref Input::SetMouseVisible "SetMouseVisible()".
 
 The input events include:
 

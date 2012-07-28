@@ -77,7 +77,7 @@ public:
     /// Destruct. Close the window and release the Direct3D9 device.
     virtual ~Graphics();
     
-    /// %Set external window handle. Call before setting mode for the first time.
+    /// %Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);

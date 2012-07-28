@@ -2559,6 +2559,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- bool mouseVisible
 - bool toggleFullscreen
 - bool[] keyDown (readonly)
 - bool[] keyPress (readonly)
@@ -2567,6 +2568,7 @@ Properties:<br>
 - bool[] qualifierDown (readonly)
 - bool[] qualifierPress (readonly)
 - int qualifiers (readonly)
+- IntVector2 mousePosition (readonly)
 - IntVector2 mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)

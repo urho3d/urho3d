@@ -125,6 +125,8 @@ public:
     void Update();
     /// %Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
+    /// %Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
+    void SetMouseVisible(bool enable);
     /// Open a joystick. Return true if successful.
     bool OpenJoystick(unsigned index);
     /// Close a joystick.
@@ -146,6 +148,8 @@ public:
     bool GetQualifierPress(int qualifier) const;
     /// Return the currently held down qualifiers.
     int GetQualifiers() const;
+    /// Return mouse position within window. Should only be used with a visible mouse cursor.
+    IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
     const IntVector2& GetMouseMove() const { return mouseMove_; }
     /// Return horizontal mouse movement since last frame.
@@ -166,6 +170,8 @@ public:
     JoystickState* GetJoystick(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+    /// Return whether the operating system mouse cursor is visible.
+    bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether application window is active.
     bool IsActive() { return active_; }
     /// Return whether application window is minimized.
@@ -191,9 +197,7 @@ private:
     /// Handle mousewheel change.
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
-    void SetCursorPosition(const IntVector2& position);
-    /// Internal function to get the mouse cursor position.
-    IntVector2 GetCursorPosition() const;
+    void SetMousePosition(const IntVector2& position);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
@@ -216,7 +220,7 @@ private:
     /// Mouse buttons' pressed state.
     unsigned mouseButtonPress_;
     /// Last mouse position for calculating movement.
-    IntVector2 lastCursorPosition_;
+    IntVector2 lastMousePosition_;
     /// Mouse movement since last frame.
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
@@ -225,6 +229,8 @@ private:
     unsigned windowID_;
     /// Fullscreen toggle flag.
     bool toggleFullscreen_;
+    /// Operating system mouse cursor visible flag.
+    bool mouseVisible_;
     /// Active flag.
     bool active_;
     /// Minimized flag.

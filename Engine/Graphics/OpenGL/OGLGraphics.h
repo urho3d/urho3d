@@ -82,7 +82,7 @@ public:
     /// Destruct. Release the OpenGL context and close the window.
     virtual ~Graphics();
     
-    /// %Set external window handle. Call before setting mode for the first time.
+    /// %Set external window handle. Only effective before setting the initial screen mode. On Windows it is necessary to set up OpenGL pixel format manually for the window.
     void SetExternalWindow(void* window);
     /// %Set window title.
     void SetWindowTitle(const String& windowTitle);

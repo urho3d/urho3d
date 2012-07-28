@@ -67,6 +67,7 @@ Input::Input(Context* context) :
     Object(context),
     windowID_(0),
     toggleFullscreen_(true),
+    mouseVisible_(false),
     active_(false),
     minimized_(false),
     activated_(false),
@@ -145,7 +146,8 @@ void Input::Update()
     if (window)
     {
         unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-        if (!active_ && graphics_->GetFullscreen() && flags == (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+        if (!active_ && (graphics_->GetFullscreen() || mouseVisible_) && flags == (SDL_WINDOW_INPUT_FOCUS |
+            SDL_WINDOW_MOUSE_FOCUS))
             activated_ = true;
         else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             MakeInactive();
@@ -160,13 +162,18 @@ void Input::Update()
     // Check for mouse move
     if (active_)
     {
-        IntVector2 mousePos = GetCursorPosition();
-        mouseMove_ = mousePos - lastCursorPosition_;
+        IntVector2 mousePosition = GetMousePosition();
+        mouseMove_ = mousePosition - lastMousePosition_;
         
         // Recenter the mouse cursor manually
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        SetCursorPosition(center);
-        lastCursorPosition_ = center;
+        if (!mouseVisible_)
+        {
+            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+            SetMousePosition(center);
+            lastMousePosition_ = center;
+        }
+        else
+            lastMousePosition_ = mousePosition;
         
         if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
         {
@@ -180,11 +187,35 @@ void Input::Update()
             using namespace MouseMove;
             
             VariantMap eventData;
+            if (mouseVisible_)
+            {
+                eventData[P_X] = mousePosition.x_;
+                eventData[P_Y] = mousePosition.y_;
+            }
             eventData[P_DX] = mouseMove_.x_;
             eventData[P_DY] = mouseMove_.y_;
             eventData[P_BUTTONS] = mouseButtonDown_;
             eventData[P_QUALIFIERS] = GetQualifiers();
             SendEvent(E_MOUSEMOVE, eventData);
+        }
+    }
+}
+
+void Input::SetMouseVisible(bool enable)
+{
+    // External windows can only support visible mouse cursor
+    if (graphics_ && graphics_->GetExternalWindow())
+        enable = true;
+    
+    if (enable != mouseVisible_)
+    {
+        mouseVisible_ = enable;
+        if (initialized_)
+        {
+            if (!mouseVisible_ && active_)
+                SDL_ShowCursor(SDL_FALSE);
+            else
+                SDL_ShowCursor(SDL_TRUE);
         }
     }
 }
@@ -318,6 +349,18 @@ int Input::GetQualifiers() const
     return ret;
 }
 
+IntVector2 Input::GetMousePosition() const
+{
+    IntVector2 ret = IntVector2::ZERO;
+    
+    if (!graphics_ || !graphics_->IsInitialized())
+        return ret;
+    
+    SDL_GetMouseState(&ret.x_, &ret.y_);
+    
+    return ret;
+}
+
 TouchState* Input::GetTouch(unsigned index) const
 {
     unsigned cmpIndex = 0;
@@ -371,6 +414,10 @@ void Input::Initialize()
     
     graphics_ = graphics;
     
+    // In external window mode only visible mouse is supported
+    if (graphics_->GetExternalWindow())
+        mouseVisible_ = true;
+    
     // Set the initial activation
     activated_ = true;
     initialized_ = true;
@@ -407,8 +454,13 @@ void Input::MakeActive()
     activated_ = false;
     
     // Re-establish mouse cursor hiding as necessary
-    SDL_ShowCursor(SDL_FALSE);
-    suppressNextMouseMove_ = true;
+    if (!mouseVisible_)
+    {
+        SDL_ShowCursor(SDL_FALSE);
+        suppressNextMouseMove_ = true;
+    }
+    else
+        lastMousePosition_ = GetMousePosition();
     
     SendActivationEvent();
 }
@@ -480,8 +532,9 @@ void Input::SendActivationEvent()
 
 void Input::SetMouseButton(int button, bool newState)
 {
-    // After deactivation in windowed mode, activate by a left-click inside the window
-    if (initialized_ && !graphics_->GetFullscreen())
+    // After deactivation in windowed hidden mouse mode, activate only after a left-click inside the window
+    // This allows glitchfree window dragging on all operating systems
+    if (initialized_ && !graphics_->GetFullscreen() && !mouseVisible_)
     {
         if (!active_ && newState && button == MOUSEB_LEFT)
             activated_ = true;
@@ -573,25 +626,12 @@ void Input::SetMouseWheel(int delta)
     }
 }
 
-void Input::SetCursorPosition(const IntVector2& position)
+void Input::SetMousePosition(const IntVector2& position)
 {
     if (!graphics_)
         return;
     
     SDL_WarpMouseInWindow(graphics_->GetImpl()->GetWindow(), position.x_, position.y_);
-}
-
-
-IntVector2 Input::GetCursorPosition() const
-{
-    IntVector2 ret = lastCursorPosition_;
-    
-    if (!graphics_ || !graphics_->IsInitialized())
-        return ret;
-    
-    SDL_GetMouseState(&ret.x_, &ret.y_);
-    
-    return ret;
 }
 
 void Input::HandleSDLEvent(void* sdlEvent)
@@ -864,8 +904,8 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         windowID_ = newWindowID;
     }
     IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-    SetCursorPosition(center);
-    lastCursorPosition_ = center;
+    SetMousePosition(center);
+    lastMousePosition_ = center;
     activated_ = true;
     
     // After setting a new screen mode we should not be minimized

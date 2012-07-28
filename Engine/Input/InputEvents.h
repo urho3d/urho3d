@@ -47,6 +47,8 @@ EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 /// Mouse moved.
 EVENT(E_MOUSEMOVE, MouseMove)
 {
+    PARAM(P_X, X);                          // int (only when mouse visible)
+    PARAM(P_Y, Y);                          // int (only when mouse visible)
     PARAM(P_DX, DX);                        // int
     PARAM(P_DY, DY);                        // int
     PARAM(P_BUTTONS, Buttons);              // int
