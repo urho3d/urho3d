@@ -747,7 +747,12 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
         AnimationState* state = AddAnimationState(cache->GetResource<Animation>(animRef.id_));
         if (state)
         {
-            state->SetStartBone(skeleton_.GetBone(value[index++].GetStringHash()));
+            const Variant& startBone = value[index++];
+            // Allow bone name also as String for handcrafted XML data
+            if (startBone.GetType() == VAR_INT)
+                state->SetStartBone(skeleton_.GetBone(startBone.GetStringHash()));
+            else if (startBone.GetType() == VAR_STRING)
+                state->SetStartBone(skeleton_.GetBone(startBone.GetString()));
             state->SetLooped(value[index++].GetBool());
             state->SetWeight(value[index++].GetFloat());
             state->SetTime(value[index++].GetFloat());
