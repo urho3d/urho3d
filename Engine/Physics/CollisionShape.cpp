@@ -81,7 +81,10 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
+        {
+            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for triangle mesh collision");
             continue;
+        }
         
         const unsigned char* vertexData;
         const unsigned char* indexData;
@@ -91,7 +94,10 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
+        {
+            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for triangle mesh collision");
             continue;
+        }
         
         unsigned indexStart = geom->GetIndexStart();
         unsigned indexCount = geom->GetIndexCount();
@@ -151,7 +157,10 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
+        {
+            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for convex hull collision");
             continue;
+        };
         
         const unsigned char* vertexData;
         const unsigned char* indexData;
@@ -161,7 +170,10 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
+        {
+            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for convex hull collision");
             continue;
+        }
         
         unsigned vertexStart = geom->GetVertexStart();
         unsigned vertexCount = geom->GetVertexCount();

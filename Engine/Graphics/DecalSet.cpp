@@ -746,7 +746,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         geometry->GetRawData(positionData, positionStride, indexData, indexStride, elementMask);
         if (!positionData || !indexData)
         {
-            LOGWARNING("Can not add decal, object does not have CPU-side geometry data");
+            LOGWARNING("Can not add decal, target drawable has no CPU-side geometry data");
             return;
         }
     }
