@@ -881,7 +881,7 @@ Both a RigidBody and at least one CollisionShape component must exist in a scene
 
 CollisionShape provides two APIs for defining the collision geometry. Either setting individual properties such as the \ref CollisionShape::SetShapeType "shape type" or \ref CollisionShape::SetSize "size", or specifying both the shape type and all its properties at once: see for example \ref CollisionShape::SetBox "SetBox()", \ref CollisionShape::SetCapsule "SetCapsule()" or \ref CollisionShape::SetTriangleMesh "SetTriangleMesh()".
 
-RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0.
+RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull shape can be used instead.
 
 The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetPhantom "phantom mode" to only report collisions without actually applying collision forces. Finally, the \ref RigidBody::SetFriction "friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions.
 
