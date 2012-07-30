@@ -1201,8 +1201,10 @@ Each attribute can have a combination of the following flags:
 - AM_NET: Is used for network replication.
 - AM_LATESTDATA: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
 - AM_NOEDIT: Is an internal attribute and is not to be shown for editing.
+- AM_NODEID: Is a node ID and may need rewriting when instantiating scene content.
+- AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
 
-The default flags are AM_FILE and AM_NET.
+The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
 
 \page Network Networking
 
