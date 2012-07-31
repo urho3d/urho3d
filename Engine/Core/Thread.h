@@ -42,7 +42,7 @@ public:
     /// Set thread priority. The thread must have been started first.
     void SetPriority(int priority);
     
-    /// Return whether thread exists
+    /// Return whether thread exists.
     bool IsStarted() const { return handle_ != 0; }
     
 protected:
