@@ -166,12 +166,12 @@ bool Serializer::WriteFileID(const String& value)
 
 bool Serializer::WriteStringHash(const StringHash& value)
 {
-    return WriteUInt(value.GetValue());
+    return WriteUInt(value.Value());
 }
 
 bool Serializer::WriteShortStringHash(const ShortStringHash& value)
 {
-    return WriteUShort(value.GetValue());
+    return WriteUShort(value.Value());
 }
 
 bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)

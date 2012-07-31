@@ -171,14 +171,14 @@ public:
     Variant(const StringHash& value) :
         type_(VAR_NONE)
     {
-        *this = (int)value.GetValue();
+        *this = (int)value.Value();
     }
     
     /// Construct from a short string hash (convert to integer.)
     Variant(const ShortStringHash& value) :
         type_(VAR_NONE)
     {
-        *this = (int)value.GetValue();
+        *this = (int)value.Value();
     }
     
     /// Construct from a bool.
@@ -356,7 +356,7 @@ public:
     Variant& operator = (const StringHash& rhs)
     {
         SetType(VAR_INT);
-        value_.int_ = (int)rhs.GetValue();
+        value_.int_ = (int)rhs.Value();
         return *this;
     }
     
@@ -364,7 +364,7 @@ public:
     Variant& operator = (const ShortStringHash& rhs)
     {
         SetType(VAR_INT);
-        value_.int_ = (int)rhs.GetValue();
+        value_.int_ = (int)rhs.Value();
         return *this;
     }
     
@@ -641,7 +641,7 @@ public:
     bool operator == (const StringHash& rhs) const
     {
         if (type_ == VAR_INT)
-            return (unsigned)value_.int_ == rhs.GetValue();
+            return (unsigned)value_.int_ == rhs.Value();
         else
             return false;
     }
@@ -650,7 +650,7 @@ public:
     bool operator == (const ShortStringHash& rhs) const
     {
         if (type_ == VAR_INT)
-            return (unsigned short)value_.int_ == rhs.GetValue();
+            return (unsigned short)value_.int_ == rhs.Value();
         else
             return false;
     }
