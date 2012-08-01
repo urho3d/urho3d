@@ -70,11 +70,13 @@ Scene::~Scene()
     // Remove scene reference and owner from all nodes that still exist
     for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
     {
+        i->second_->SetID(0);
         i->second_->SetScene(0);
         i->second_->SetOwner(0);
     }
     for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
     {
+        i->second_->SetID(0);
         i->second_->SetScene(0);
         i->second_->SetOwner(0);
     }
@@ -608,6 +610,7 @@ void Scene::NodeAdded(Node* node)
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
+            i->second_->SetID(0);
             i->second_->SetScene(0);
             i->second_->SetOwner(0);
         }
@@ -623,6 +626,7 @@ void Scene::NodeAdded(Node* node)
         if (i != localNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
+            i->second_->SetID(0);
             i->second_->SetScene(0);
             i->second_->SetOwner(0);
         }
@@ -659,7 +663,10 @@ void Scene::ComponentAdded(Component* component)
     {
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
+        {
             LOGWARNING("Overwriting component with ID " + String(id));
+            i->second_->SetID(0);
+        }
         
         replicatedComponents_[id] = component;
     }
@@ -667,7 +674,10 @@ void Scene::ComponentAdded(Component* component)
     {
         HashMap<unsigned, Component*>::Iterator i = localComponents_.Find(id);
         if (i != localComponents_.End() && i->second_ != component)
+        {
             LOGWARNING("Overwriting component with ID " + String(id));
+            i->second_->SetID(0);
+        }
         
         localComponents_[id] = component;
     }
