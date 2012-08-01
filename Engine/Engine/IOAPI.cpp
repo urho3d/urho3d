@@ -106,8 +106,10 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Error(const String&in)", asFUNCTION(LogError), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Log", "int get_level() const", asMETHOD(Log, GetLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void set_level(int)", asMETHOD(Log, SetLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "int get_level() const", asMETHOD(Log, GetLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_timeStamp(bool)", asMETHOD(Log, SetTimeStamp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "bool get_timeStamp() const", asMETHOD(Log, GetTimeStamp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "const String& get_lastMessage()", asMETHOD(Log, GetLastMessage), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
     

@@ -57,6 +57,7 @@ Log::Log(Context* context) :
     #else
     level_(LOG_INFO),
     #endif
+    timeStamp_(true),
     inWrite_(false)
 {
 }
@@ -94,12 +95,16 @@ void Log::Write(int level, const String& message)
     
     inWrite_ = true;
     lastMessage_ = message;
+    String formattedMessage = levelPrefixes[level] + ": " + message;
     
-    time_t sysTime;
-    time(&sysTime);
-    const char* dateTime = ctime(&sysTime);
-    String dateTimeString = String(dateTime).Replaced("\n", "");
-    String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
+    if (timeStamp_)
+    {
+        time_t sysTime;
+        time(&sysTime);
+        const char* dateTime = ctime(&sysTime);
+        String dateTimeString = String(dateTime).Replaced("\n", "");
+        formattedMessage = "[" + dateTimeString + "] " + formattedMessage;
+    }
     
     #if defined(ANDROID)
     int androidLevel = ANDROID_LOG_DEBUG + level;
@@ -157,6 +162,11 @@ void Log::WriteRaw(const String& message)
 void Log::SetLevel(int level)
 {
     level_ = level;
+}
+
+void Log::SetTimeStamp(bool enable)
+{
+    timeStamp_ = enable;
 }
 
 void WriteToLog(Context* context, int level, const String& message)

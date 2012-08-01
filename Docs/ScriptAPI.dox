@@ -775,6 +775,7 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - int level
+- bool timeStamp
 - String lastMessage (readonly)
 
 

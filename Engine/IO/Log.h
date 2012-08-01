@@ -57,9 +57,13 @@ public:
     void WriteRaw(const String& message);
     /// Set logging level.
     void SetLevel(int level);
+    /// Set whether to timestamp log messages.
+    void SetTimeStamp(bool enable);
     
     /// Return logging level.
     int GetLevel() const { return level_; }
+    /// Return whether log messages are timestamped.
+    bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
     const String& GetLastMessage() const { return lastMessage_; }
     
@@ -70,6 +74,8 @@ private:
     String lastMessage_;
     /// Logging level.
     int level_;
+    /// Timestamp log messages flag.
+    bool timeStamp_;
     /// In write flag to prevent recursion.
     bool inWrite_;
 };
