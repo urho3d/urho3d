@@ -67,6 +67,9 @@ Scene::Scene(Context* context) :
 
 Scene::~Scene()
 {
+    RemoveAllChildren();
+    RemoveAllComponents();
+    
     // Remove scene reference and owner from all nodes that still exist
     for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
     {
