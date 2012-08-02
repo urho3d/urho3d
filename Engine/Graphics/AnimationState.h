@@ -53,7 +53,7 @@ public:
     void SetTime(float time);
     /// Modify blending weight.
     void AddWeight(float delta);
-    /// Modify time position. Animation triggers will be fired.
+    /// Modify time position. %Animation triggers will be fired.
     void AddTime(float delta);
     /// Set blending layer.
     void SetLayer(unsigned char layer);
