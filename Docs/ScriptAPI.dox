@@ -53,6 +53,7 @@
 - String GetFileName(const String&)
 - String GetExtension(const String&)
 - String GetFileNameAndExtension(const String&)
+- String ReplaceExtension(const String&)
 - String AddTrailingSlash(const String&)
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
@@ -1781,6 +1782,9 @@ Animation
 Methods:<br>
 - bool Load(File@)
 - bool Save(File@)
+- void AddTrigger(float, bool, const Variant&)
+- void RemoveTrigger(uint)
+- void RemoveAllTriggers()
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1791,6 +1795,7 @@ Properties:<br>
 - String animationName (readonly)
 - float length (readonly)
 - uint numTracks (readonly)
+- uint numTriggers (readonly)
 
 
 Drawable

@@ -25,11 +25,19 @@
 #include "Animation.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "Serializer.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
+
+inline bool CompareTriggers(AnimationTriggerPoint& lhs, AnimationTriggerPoint& rhs)
+{
+    return lhs.time_ < rhs.time_;
+}
 
 void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
 {
@@ -113,6 +121,31 @@ bool Animation::Load(Deserializer& source)
         }
     }
     
+    // Optionally read triggers from an XML file
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String xmlName = ReplaceExtension(GetName(), ".xml");
+    
+    if (cache->Exists(xmlName))
+    {
+        XMLFile* file = cache->GetResource<XMLFile>(xmlName);
+        if (file)
+        {
+            XMLElement rootElem = file->GetRoot();
+            XMLElement triggerElem = rootElem.GetChild("trigger");
+            while (triggerElem)
+            {
+                if (triggerElem.HasAttribute("normalizedtime"))
+                    AddTrigger(triggerElem.GetFloat("normalizedtime"), true, triggerElem.GetVariant());
+                else if (triggerElem.HasAttribute("time"))
+                    AddTrigger(triggerElem.GetFloat("time"), false, triggerElem.GetVariant());
+                
+                triggerElem = triggerElem.GetNext("trigger");
+            }
+            
+            memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
+        }
+    }
+    
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -147,6 +180,30 @@ bool Animation::Save(Serializer& dest)
         }
     }
     
+    // If triggers have been defined, write an XML file for them
+    if (triggers_.Size())
+    {
+        File* destFile = dynamic_cast<File*>(&dest);
+        if (destFile)
+        {
+            String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
+            
+            SharedPtr<XMLFile> xml(new XMLFile(context_));
+            XMLElement rootElem = xml->CreateRoot("animation");
+            
+            for (unsigned i = 0; i < triggers_.Size(); ++i)
+            {
+                XMLElement triggerElem = rootElem.CreateChild("trigger");
+                triggerElem.SetFloat("time", triggers_[i].time_);
+                triggerElem.SetVariant(triggers_[i].data_);
+            }
+            
+            xml->Save(File(context_, xmlName, FILE_WRITE));
+        }
+        else
+            LOGWARNING("Can not save animation trigger data when not saving into a file");
+    }
+    
     return true;
 }
 
@@ -166,9 +223,25 @@ void Animation::SetTracks(const Vector<AnimationTrack>& tracks)
     tracks_ = tracks;
 }
 
-unsigned Animation::GetNumTracks() const
+void Animation::AddTrigger(float time, bool timeIsNormalized, const Variant& data)
 {
-    return tracks_.Size();
+    AnimationTriggerPoint newTrigger;
+    newTrigger.time_ = timeIsNormalized ? time * length_ : time;
+    newTrigger.data_ = data;
+    triggers_.Push(newTrigger);
+    
+    Sort(triggers_.Begin(), triggers_.End(), CompareTriggers);
+}
+
+void Animation::RemoveTrigger(unsigned index)
+{
+    if (index < triggers_.Size())
+        triggers_.Erase(index);
+}
+
+void Animation::RemoveAllTriggers()
+{
+    triggers_.Clear();
 }
 
 const AnimationTrack* Animation::GetTrack(unsigned index) const

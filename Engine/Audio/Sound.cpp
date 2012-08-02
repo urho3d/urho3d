@@ -373,10 +373,7 @@ unsigned Sound::GetSampleSize() const
 void Sound::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    String soundPath, soundName, soundExt;
-    SplitPath(GetName(), soundPath, soundName, soundExt);
-    String xmlName = soundPath + soundName + ".xml";
+    String xmlName = ReplaceExtension(GetName(), ".xml");
     
     if (!cache->Exists(xmlName))
         return;

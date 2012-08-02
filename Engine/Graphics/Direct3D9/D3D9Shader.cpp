@@ -85,7 +85,8 @@ bool Shader::Load(Deserializer& source)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
-        if (cache && fileSystem && !fileSystem->HasRegisteredPaths())
+        
+        if (fileSystem && !fileSystem->HasRegisteredPaths())
         {
             fullFileName_ = cache->GetResourceFileName(GetName());
             if (!fullFileName_.Empty())

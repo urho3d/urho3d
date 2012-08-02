@@ -703,6 +703,19 @@ Note that AnimationController does not by default stop non-looping animations au
 
 By default an Animation is played back by using all the available bone tracks. However an animation can be only partially applied by setting a start bone, see \ref AnimationState::SetStartBone "SetStartBone()". Once set, the bone tracks will be applied hierarchically starting from the start bone. For example, to apply an animation only to a bipedal character's upper body, which is typically parented to the spine bone, one could set the spine as the start bone.
 
+\section SkeletalAnimation_Triggers Animation triggers
+
+Animations can be accompanied with trigger data that contains timestamped Variant data to be interpreted by the application. This trigger data is in XML format next to the animation file itself. When an animation contains triggers, the AnimatedModel's scene node sends the E_ANIMATIONTRIGGER event each time a trigger point is crossed. The event data contains the timestamp, the animation name, and the variant data. Triggers will fire when the animation is advanced using \ref AnimationState::AddTime "AddTime()", but not when setting the absolute animation time position.
+
+The trigger data definition is below. Either normalized (0 = animation start, 1 = animation end) or non-normalized (time in seconds) timestamps can be used. See Bin/Data/Models/Ninja_Walk.xml and Bin/Data/Models/Ninja_Stealth.xml for examples; NinjaSnowWar implements footstep particle effects using animation triggers.
+
+\code
+<animation>
+    <trigger time="t" normalizedtime="t" type="Int|Bool|Float|String..." value="x" />
+    <trigger ... />
+</animation>
+\endcode
+<particleemitter>
 
 \page Particles %Particle systems
 
@@ -710,7 +723,7 @@ The ParticleEmitter class derives from BillboardSet to implement a particle syst
 
 The particle system's properties can be set through a XML description file, see \ref ParticleEmitter::LoadParameters "LoadParameters()".
 
-Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:s
+Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 
 \code
 <particleemitter>

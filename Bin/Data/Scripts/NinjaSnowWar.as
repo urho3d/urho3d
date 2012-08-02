@@ -1,5 +1,6 @@
 // Remake of NinjaSnowWar in script
 
+#include "Scripts/NinjaSnowWar/FootSteps.as"
 #include "Scripts/NinjaSnowWar/LightFlash.as"
 #include "Scripts/NinjaSnowWar/Ninja.as"
 #include "Scripts/NinjaSnowWar/Player.as"
@@ -705,7 +706,41 @@ void SendHiscores(int playerIndex)
 Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
 {
     XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
-    return gameScene.InstantiateXML(xml, position, rotation);
+    return scene.InstantiateXML(xml, position, rotation);
+}
+
+Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration, CreateMode mode = REPLICATED)
+{
+    Node@ newNode = scene.CreateChild("", mode);
+    newNode.position = position;
+
+    // Create the particle emitter
+    ParticleEmitter@ emitter = newNode.CreateComponent("ParticleEmitter");
+    emitter.parameters = cache.GetResource("XMLFile", effectName);
+
+    // Create a GameObject for managing the effect lifetime
+    GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
+    object.duration = duration;
+
+    return newNode;
+}
+
+Node@ SpawnSound(const Vector3&in position, const String&in soundName, float duration)
+{
+    Node@ newNode = scene.CreateChild();
+    newNode.position = position;
+
+    // Create the sound source
+    SoundSource3D@ source = newNode.CreateComponent("SoundSource3D");
+    Sound@ sound = cache.GetResource("Sound", soundName);
+    source.SetDistanceAttenuation(200, 5000, 1);
+    source.Play(sound);
+
+    // Create a GameObject for managing the sound lifetime
+    GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
+    object.duration = duration;
+
+    return newNode;
 }
 
 void SpawnObjects(float timeStep)

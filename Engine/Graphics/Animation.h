@@ -57,6 +57,15 @@ struct AnimationTrack
     Vector<AnimationKeyFrame> keyFrames_;
 };
 
+/// Animation trigger point.
+struct AnimationTriggerPoint
+{
+    /// Trigger time.
+    float time_;
+    /// Trigger data.
+    Variant data_;
+};
+
 static const unsigned char CHANNEL_POSITION = 0x1;
 static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
@@ -85,6 +94,12 @@ public:
     void SetLength(float length);
     /// Set all animation tracks.
     void SetTracks(const Vector<AnimationTrack>& tracks);
+    /// Add a trigger point.
+    void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
+    /// Remove a trigger point by index.
+    void RemoveTrigger(unsigned index);
+    /// Remove all trigger points.
+    void RemoveAllTriggers();
     
     /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }
@@ -95,13 +110,17 @@ public:
     /// Return all animation tracks.
     const Vector<AnimationTrack>& GetTracks() const { return tracks_; }
     /// Return number of animation tracks.
-    unsigned GetNumTracks() const;
+    unsigned GetNumTracks() const { return tracks_.Size(); }
     /// Return animation track by index.
     const AnimationTrack* GetTrack(unsigned index) const;
     /// Return animation track by bone name.
     const AnimationTrack* GetTrack(const String& name) const;
     /// Return animation track by bone name hash.
     const AnimationTrack* GetTrack(StringHash nameHash) const;
+    /// Return animation trigger points.
+    const Vector<AnimationTriggerPoint>& GetTriggers() const { return triggers_; }
+    /// Return number of animation trigger points.
+    unsigned GetNumTriggers() const {return triggers_.Size(); }
     
 private:
     /// Animation name.
@@ -112,4 +131,6 @@ private:
     float length_;
     /// Animation tracks.
     Vector<AnimationTrack> tracks_;
+    /// Animation trigger points.
+    Vector<AnimationTriggerPoint> triggers_;
 };

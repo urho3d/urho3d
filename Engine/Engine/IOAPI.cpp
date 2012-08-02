@@ -295,6 +295,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String GetFileName(const String&in)", asFUNCTION(GetFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetExtension(const String&in)", asFUNCTION(GetExtension), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetFileNameAndExtension(const String&in)", asFUNCTION(GetFileNameAndExtension), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String ReplaceExtension(const String&in)", asFUNCTION(ReplaceExtension), asCALL_CDECL);
     engine->RegisterGlobalFunction("String AddTrailingSlash(const String&in)", asFUNCTION(AddTrailingSlash), asCALL_CDECL);
     engine->RegisterGlobalFunction("String RemoveTrailingSlash(const String&in)", asFUNCTION(RemoveTrailingSlash), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetParentPath(const String&in)", asFUNCTION(GetParentPath), asCALL_CDECL);

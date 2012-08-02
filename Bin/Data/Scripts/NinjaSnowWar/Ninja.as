@@ -99,6 +99,10 @@ class Ninja : GameObject
         Vector3 vel = body.linearVelocity;
         if (onGround)
         {
+            // If landed, play a particle effect at feet (use the AnimatedModel node)
+            if (inAirTime > 0.5)
+                SpawnParticleEffect(node.children[0].worldPosition, "Particle/SnowExplosion.xml", 1);
+
             inAirTime = 0;
             onGroundTime += timeStep;
         }

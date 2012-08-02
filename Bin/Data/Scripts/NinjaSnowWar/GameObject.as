@@ -34,8 +34,8 @@ class GameObject : ScriptObject
         lastDamageCreatorID = 0;
         creatorID = 0;
 
-        if (runClient)
-            Print("Warning! Logic object created on client!");
+        // if (runClient)
+        //     Print("Warning! Logic object created on client!");
     }
 
     void FixedUpdate(float timeStep)
@@ -77,46 +77,6 @@ class GameObject : ScriptObject
         source.SetDistanceAttenuation(200, 5000, 1);
         source.Play(sound);
         source.autoRemove = true;
-    }
-
-    Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const String&in className)
-    {
-        XMLFile@ xml = cache.GetResource("XMLFile", "Objects/" + className + ".xml");
-        return scene.InstantiateXML(xml, position, rotation);
-    }
-
-    Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration)
-    {
-        Node@ newNode = scene.CreateChild();
-        newNode.position = position;
-
-        // Create the particle emitter
-        ParticleEmitter@ emitter = newNode.CreateComponent("ParticleEmitter");
-        emitter.parameters = cache.GetResource("XMLFile", effectName);
-
-        // Create a GameObject for managing the effect lifetime
-        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
-        object.duration = duration;
-
-        return newNode;
-    }
-
-    Node@ SpawnSound(const Vector3&in position, const String&in soundName, float duration)
-    {
-        Node@ newNode = scene.CreateChild();
-        newNode.position = position;
-
-        // Create the sound source
-        SoundSource3D@ source = newNode.CreateComponent("SoundSource3D");
-        Sound@ sound = cache.GetResource("Sound", soundName);
-        source.SetDistanceAttenuation(200, 5000, 1);
-        source.Play(sound);
-
-        // Create a GameObject for managing the sound lifetime
-        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
-        object.duration = duration;
-
-        return newNode;
     }
 
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)

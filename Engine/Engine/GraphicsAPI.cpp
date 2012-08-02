@@ -448,8 +448,12 @@ static void RegisterAnimation(asIScriptEngine* engine)
 {
     RegisterResource<Animation>(engine, "Animation");
     engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHOD(Animation, AddTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void RemoveTrigger(uint)", asMETHOD(Animation, RemoveTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHOD(Animation, RemoveAllTriggers), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHOD(Animation, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHOD(Animation, GetNumTracks), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHOD(Animation, GetNumTriggers), asCALL_THISCALL);
 }
 
 static void RegisterDrawable(asIScriptEngine* engine)

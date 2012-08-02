@@ -26,6 +26,7 @@
 #include "Animation.h"
 #include "AnimationState.h"
 #include "Deserializer.h"
+#include "DrawableEvents.h"
 #include "Serializer.h"
 #include "XMLElement.h"
 
@@ -139,7 +140,8 @@ void AnimationState::AddTime(float delta)
     if (delta == 0.0f || length == 0.0f)
         return;
     
-    float time = GetTime() + delta;
+    float oldTime = GetTime();
+    float time = oldTime + delta;
     if (looped_)
     {
         while (time >= length)
@@ -149,6 +151,39 @@ void AnimationState::AddTime(float delta)
     }
     
     SetTime(time);
+    
+    // Process animation triggers
+    if (model_ && animation_->GetNumTriggers())
+    {
+        if (delta > 0.0f)
+        {
+            if (oldTime > time)
+                oldTime -= length;
+        }
+        if (delta < 0.0f)
+        {
+            if (time > oldTime)
+                time -= length;
+        }
+        if (oldTime > time)
+            Swap(oldTime, time);
+        
+        const Vector<AnimationTriggerPoint>& triggers = animation_->GetTriggers();
+        for (Vector<AnimationTriggerPoint>::ConstIterator i = triggers.Begin(); i != triggers.End(); ++i)
+        {
+            if (oldTime <= i->time_ && time > i->time_)
+            {
+                using namespace AnimationTrigger;
+                
+                VariantMap eventData;
+                eventData[P_NODE] = (void*)model_->GetNode();
+                eventData[P_NAME] = animation_->GetAnimationName();
+                eventData[P_TIME] = i->time_;
+                eventData[P_DATA] = i->data_;
+                model_->GetNode()->SendEvent(E_ANIMATIONTRIGGER, eventData);
+            }
+        }
+    }
 }
 
 void AnimationState::SetLayer(unsigned char layer)

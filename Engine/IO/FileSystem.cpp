@@ -606,6 +606,13 @@ String GetFileNameAndExtension(const String& fileName)
     return file + extension;
 }
 
+String ReplaceExtension(const String& fullPath, const String& newExtension)
+{
+    String path, file, extension;
+    SplitPath(fullPath, path, file, extension);
+    return path + file + newExtension;
+}
+
 String AddTrailingSlash(const String& pathName)
 {
     String ret = pathName;

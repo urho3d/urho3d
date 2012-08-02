@@ -49,11 +49,11 @@ public:
     void SetLooped(bool looped);
     /// Set blending weight.
     void SetWeight(float weight);
-    /// Set time position.
+    /// Set time position. Does not fire animation triggers.
     void SetTime(float time);
     /// Modify blending weight.
     void AddWeight(float delta);
-    /// Modify time position.
+    /// Modify time position. Animation triggers will be fired.
     void AddTime(float delta);
     /// Set blending layer.
     void SetLayer(unsigned char layer);

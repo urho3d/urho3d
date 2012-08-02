@@ -100,6 +100,8 @@ String GetFileName(const String& fullPath);
 String GetExtension(const String& fullPath);
 /// Return the filename and extension from a full path. The extension will be converted to lowercase.
 String GetFileNameAndExtension(const String& fullPath);
+/// Replace the extension of a file name with another.
+String ReplaceExtension(const String& fullPath, const String& newExtension);
 /// Add a slash at the end of the path if missing and convert to internal format (use slashes.)
 String AddTrailingSlash(const String& pathName);
 /// Remove the slash from the end of a path if exists and convert to internal format (use slashes.)

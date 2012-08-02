@@ -325,10 +325,7 @@ unsigned Texture::GetDataType(unsigned format)
 void Texture::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-    String xmlName = texPath + texName + ".xml";
+    String xmlName = ReplaceExtension(GetName(), ".xml");
     
     if (cache->Exists(xmlName))
     {
