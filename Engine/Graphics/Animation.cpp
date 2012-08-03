@@ -198,7 +198,8 @@ bool Animation::Save(Serializer& dest)
                 triggerElem.SetVariant(triggers_[i].data_);
             }
             
-            xml->Save(File(context_, xmlName, FILE_WRITE));
+            File xmlFile(context_, xmlName, FILE_WRITE);
+            xml->Save(xmlFile);
         }
         else
             LOGWARNING("Can not save animation trigger data when not saving into a file");
