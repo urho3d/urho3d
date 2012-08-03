@@ -487,8 +487,14 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
     }
     if (type == VAR_RESOURCEREF)
     {
-        ShortStringHash resourceType = serializables[0].attributeInfos[index].type == VAR_RESOURCEREF ?
-            serializables[0].attributes[index].GetResourceRef().type : serializables[0].attributes[index].GetResourceRefList().type;
+        ShortStringHash resourceType;
+        VariantType attrType = serializables[0].attributeInfos[index].type;
+        if (attrType == VAR_RESOURCEREF)
+            resourceType = serializables[0].attributes[index].GetResourceRef().type;
+        else if (attrType == VAR_RESOURCEREFLIST)
+            resourceType = serializables[0].attributes[index].GetResourceRefList().type;
+        else if (attrType == VAR_VARIANTVECTOR)
+            resourceType = serializables[0].attributes[index].GetVariantVector()[subIndex].GetResourceRef().type;
 
         // Create the resource name on a separate non-interactive line to allow for more space
         CreateAttributeEditorParentTitle(list, name);
