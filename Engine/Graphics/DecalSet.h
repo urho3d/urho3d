@@ -59,7 +59,7 @@ struct DecalVertex
     Vector3 position_;
     /// Normal.
     Vector3 normal_;
-    /// Texture coordinates coordinates.
+    /// Texture coordinates.
     Vector2 texCoord_;
     /// Tangent.
     Vector4 tangent_;
