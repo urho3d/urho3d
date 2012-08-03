@@ -42,6 +42,7 @@
 static const String methodDeclarations[] = {
     "void Start()",
     "void Stop()",
+    "void DelayedStart()",
     "void Update(float)",
     "void PostUpdate(float)",
     "void FixedUpdate(float)",
@@ -58,6 +59,7 @@ ScriptInstance::ScriptInstance(Context* context) :
     script_(GetSubsystem<Script>()),
     scriptObject_(0),
     active_(true),
+    delayedStart_(false),
     fixedUpdateFps_(0),
     fixedUpdateInterval_(0.0f),
     fixedUpdateAcc_(0.0f),
@@ -86,8 +88,8 @@ void ScriptInstance::RegisterObject(Context* context)
 
 void ScriptInstance::ApplyAttributes()
 {
-    if (scriptObject_ && methods_[METHOD_FINISHUPDATE])
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_FINISHUPDATE]);
+    if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
 }
 
 bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& className)
@@ -336,7 +338,6 @@ void ScriptInstance::ReleaseObject()
         
         UnsubscribeFromAllEvents();
         ClearMethods();
-        ClearDelayedExecute();
         
         scriptObject_->SetUserData(0);
         scriptObject_->Release();
@@ -375,6 +376,8 @@ void ScriptInstance::GetSupportedMethods()
                 SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
         }
     }
+    
+    delayedStart_ = false;
 }
 
 void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
@@ -399,6 +402,13 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
             ++i;
     }
     
+    // Execute delayed start before first update
+    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        delayedStart_ = true;
+    }
+    
     if (methods_[METHOD_UPDATE])
     {
         VariantVector parameters;
@@ -414,6 +424,12 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     
     using namespace ScenePostUpdate;
     
+    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        delayedStart_ = true;
+    }
+    
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
@@ -425,6 +441,12 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
         return;
     
     using namespace PhysicsPreStep;
+    
+    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        delayedStart_ = true;
+    }
     
     if (!fixedUpdateFps_)
     {
@@ -452,6 +474,12 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
         return;
     
     using namespace PhysicsPostStep;
+    
+    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        delayedStart_ = true;
+    }
     
     if (!fixedUpdateFps_)
     {

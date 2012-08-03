@@ -36,13 +36,14 @@ enum ScriptInstanceMethod
 {
     METHOD_START = 0,
     METHOD_STOP,
+    METHOD_DELAYEDSTART,
     METHOD_UPDATE,
     METHOD_POSTUPDATE,
     METHOD_FIXEDUPDATE,
     METHOD_FIXEDPOSTUPDATE,
     METHOD_LOAD,
     METHOD_SAVE,
-    METHOD_FINISHUPDATE,
+    METHOD_APPLYATTRIBUTES,
     MAX_SCRIPT_METHODS
 };
 
@@ -160,6 +161,8 @@ private:
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
     /// Active flag.
     bool active_;
+    /// DelayedStart called flag.
+    bool delayedStart_;
     /// Fixed update FPS.
     int fixedUpdateFps_;
     /// Fixed update time interval.
