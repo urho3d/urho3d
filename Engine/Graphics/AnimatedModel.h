@@ -76,6 +76,8 @@ public:
     void RemoveAnimationState(StringHash animationNameHash);
     /// Remove an animation by AnimationState pointer.
     void RemoveAnimationState(AnimationState* state);
+    /// Remove an animation by index.
+    void RemoveAnimationState(unsigned index);
     /// Remove all animations.
     void RemoveAllAnimationStates();
     /// Set animation LOD bias.

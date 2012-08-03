@@ -76,7 +76,7 @@ void CreateNodeWindow()
 
     // Fill vector structure data
     Array<String> billboardVariables = {
-        "Number Of Billboards",
+        "Billboard Count",
         "   Position",
         "   Size", 
         "   UV Coordinates", 
@@ -85,6 +85,17 @@ void CreateNodeWindow()
         "   Is Enabled"
     };
     vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));
+    
+    Array<String> animationStateVariables = {
+        "Anim State Count",
+        "   Animation",
+        "   Start Bone",
+        "   Is Looped",
+        "   Weight",
+        "   Time",
+        "   Layer"
+    };
+    vectorStructs.Push(VectorStruct("AnimatedModel", "Animation States", animationStateVariables, 1));
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
     ui.root.AddChild(nodeWindow);
@@ -906,6 +917,12 @@ void PickResource(StringHash eventType, VariantMap& eventData)
         String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetResourceRefList().type);
         @resourcePicker = GetResourcePicker(resourceType);
     }
+    else if (info.type == VAR_VARIANTVECTOR)
+    {
+        String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetVariantVector()
+            [resourcePickSubIndex].GetResourceRef().type);
+        @resourcePicker = GetResourcePicker(resourceType);
+    }
     else
         @resourcePicker = null;
 
@@ -981,6 +998,16 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
                 target.attributes[resourcePickIndex] = Variant(refList);
                 target.ApplyAttributes();
             }
+        }
+        else if (info.type == VAR_VARIANTVECTOR)
+        {
+            Array<Variant>@ attrs = target.attributes[resourcePickIndex].GetVariantVector();
+            ResourceRef ref = attrs[resourcePickSubIndex].GetResourceRef();
+            ref.type = ShortStringHash(resourcePicker.resourceType);
+            ref.id = StringHash(resourceName);
+            attrs[resourcePickSubIndex] = ref;
+            target.attributes[resourcePickIndex] = Variant(attrs);
+            target.ApplyAttributes();
         }
     }
 

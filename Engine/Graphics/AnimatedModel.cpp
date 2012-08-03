@@ -91,10 +91,10 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD Factor", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
 }
 
@@ -397,6 +397,19 @@ void AnimatedModel::RemoveAnimationState(Animation* animation)
 {
     if (animation)
         RemoveAnimationState(animation->GetNameHash());
+    else
+    {
+        for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
+        {
+            AnimationState* state = *i;
+            if (!state->GetAnimation())
+            {
+                animationStates_.Erase(i);
+                MarkAnimationDirty();
+                return;
+            }
+        }
+    }
 }
 
 void AnimatedModel::RemoveAnimationState(const String& animationName)
@@ -410,11 +423,15 @@ void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
-        // Check both the animation and the resource name
-        if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
+        if (animation)
         {
-            animationStates_.Erase(i);
-            MarkAnimationDirty();
+            // Check both the animation and the resource name
+            if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
+            {
+                animationStates_.Erase(i);
+                MarkAnimationDirty();
+                return;
+            }
         }
     }
 }
@@ -429,6 +446,15 @@ void AnimatedModel::RemoveAnimationState(AnimationState* state)
             MarkAnimationDirty();
             return;
         }
+    }
+}
+
+void AnimatedModel::RemoveAnimationState(unsigned index)
+{
+    if (index < animationStates_.Size())
+    {
+        animationStates_.Erase(index);
+        MarkAnimationDirty();
     }
 }
 
@@ -579,10 +605,12 @@ AnimationState* AnimatedModel::GetAnimationState(const String& animationName) co
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
-        
-        // Check both the animation and the resource name
-        if (animation->GetName() == animationName || animation->GetAnimationName() == animationName)
-            return *i;
+        if (animation)
+        {
+            // Check both the animation and the resource name
+            if (animation->GetName() == animationName || animation->GetAnimationName() == animationName)
+                return *i;
+        }
     }
     
     return 0;
@@ -593,10 +621,12 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
-        
-        // Check both the animation and the resource name
-        if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
-            return *i;
+        if (animation)
+        {
+            // Check both the animation and the resource name
+            if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
+                return *i;
+        }
     }
     
     return 0;
@@ -741,26 +771,33 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     RemoveAllAnimationStates();
     unsigned index = 0;
-    while (index < value.Size())
+    unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    while (numStates)
     {
-        const ResourceRef& animRef = value[index++].GetResourceRef();
-        AnimationState* state = AddAnimationState(cache->GetResource<Animation>(animRef.id_));
-        if (state)
+        if (index < value.Size() - 5)
         {
-            const Variant& startBone = value[index++];
-            // Allow bone name also as String for handcrafted XML data
-            if (startBone.GetType() == VAR_INT)
-                state->SetStartBone(skeleton_.GetBone(startBone.GetStringHash()));
-            else if (startBone.GetType() == VAR_STRING)
-                state->SetStartBone(skeleton_.GetBone(startBone.GetString()));
-            state->SetLooped(value[index++].GetBool());
-            state->SetWeight(value[index++].GetFloat());
-            state->SetTime(value[index++].GetFloat());
-            state->SetLayer(value[index++].GetInt());
+            // Note: null animation is allowed here for editing
+            const ResourceRef& animRef = value[index++].GetResourceRef();
+            SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.id_)));
+            animationStates_.Push(newState);
+            
+            newState->SetStartBone(skeleton_.GetBone(value[index++].GetString()));
+            newState->SetLooped(value[index++].GetBool());
+            newState->SetWeight(value[index++].GetFloat());
+            newState->SetTime(value[index++].GetFloat());
+            newState->SetLayer(value[index++].GetInt());
         }
         else
-            index += 5;
+        {
+            // If not enough data, just add an empty animation state
+            SharedPtr<AnimationState> newState(new AnimationState(this, 0));
+            animationStates_.Push(newState);
+        }
+        
+        --numStates;
     }
+    
+    MarkAnimationOrderDirty();
 }
 
 void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
@@ -787,12 +824,14 @@ VariantVector AnimatedModel::GetBonesEnabledAttr() const
 VariantVector AnimatedModel::GetAnimationStatesAttr() const
 {
     VariantVector ret;
+    ret.Push(animationStates_.Size());
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
+        Animation* animation = state->GetAnimation();
         Bone* startBone = state->GetStartBone();
-        ret.Push(ResourceRef(Animation::GetTypeStatic(), state->GetAnimation()->GetNameHash()));
-        ret.Push(startBone ? startBone->nameHash_ : StringHash());
+        ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
+        ret.Push(startBone ? startBone->name_ : String());
         ret.Push(state->IsLooped());
         ret.Push(state->GetWeight());
         ret.Push(state->GetTime());

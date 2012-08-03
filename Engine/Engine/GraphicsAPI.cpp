@@ -650,6 +650,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(AnimationState@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (AnimationState*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(uint)", asMETHODPR(AnimatedModel, RemoveAnimationState, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAllAnimationStates()", asMETHOD(AnimatedModel, RemoveAllAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(uint, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (unsigned, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void ResetMorphWeights()", asMETHOD(AnimatedModel, ResetMorphWeights), asCALL_THISCALL);

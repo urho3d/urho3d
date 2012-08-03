@@ -43,8 +43,12 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
 {
     SetStartBone(0);
     
-    // Setup a cache for last keyframe of each track
-    lastKeyFrame_.Resize(animation_->GetNumTracks());
+    if (animation_)
+    {
+        // Setup a cache for last keyframe of each track
+        lastKeyFrame_.Resize(animation_->GetNumTracks());
+    }
+    
     for (unsigned i = 0; i < lastKeyFrame_.Size(); ++i)
         lastKeyFrame_[i] = 0;
 }
@@ -55,7 +59,7 @@ AnimationState::~AnimationState()
 
 void AnimationState::SetStartBone(Bone* startBone)
 {
-    if (!model_)
+    if (!model_ || !animation_)
         return;
     
     Skeleton& skeleton = model_->GetSkeleton();
@@ -117,6 +121,9 @@ void AnimationState::SetWeight(float weight)
 
 void AnimationState::SetTime(float time)
 {
+    if (!animation_)
+        return;
+    
     time = Clamp(time, 0.0f, animation_->GetLength());
     if (time != time_)
     {
@@ -136,6 +143,9 @@ void AnimationState::AddWeight(float delta)
 
 void AnimationState::AddTime(float delta)
 {
+    if (!animation_)
+        return;
+    
     float length = animation_->GetLength();
     if (delta == 0.0f || length == 0.0f)
         return;
@@ -203,12 +213,12 @@ Bone* AnimationState::GetStartBone() const
 
 float AnimationState::GetLength() const
 {
-    return animation_->GetLength();
+    return animation_ ? animation_->GetLength() : 0.0f;
 }
 
 void AnimationState::Apply()
 {
-    if (!IsEnabled())
+    if (!animation_ || !IsEnabled())
         return;
     
     // Check first if full weight or blending
