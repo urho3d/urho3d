@@ -333,7 +333,6 @@ bool SceneDelete()
 
     BeginSelectionModify();
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.contentElement.DisableLayoutUpdate();
 
     // Remove nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -386,8 +385,6 @@ bool SceneDelete()
             list.selection = index;
     }
 
-    list.contentElement.EnableLayoutUpdate();
-    list.contentElement.UpdateLayout();
     EndSelectionModify();
     return true;
 }
