@@ -80,25 +80,6 @@ void Node::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 
-void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)
-{
-    // Make a weak pointer to self to check for destruction during event handling
-    WeakPtr<Node> self(this);
-    
-    // If this is a targeted event, forward it to all components
-    if (!broadcast)
-    {
-        for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
-        {
-            components_[i]->OnEvent(sender, broadcast, eventType, eventData);
-            if (self.Expired())
-                return;
-        }
-    }
-    else
-        Object::OnEvent(sender, broadcast, eventType, eventData);
-}
-
 void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);

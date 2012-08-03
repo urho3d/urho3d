@@ -300,25 +300,25 @@ void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOr
     }
 }
 
-void Network::BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData)
+void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    if (!receiver)
+    if (!node)
     {
-        LOGERROR("Null node for remote node event");
+        LOGERROR("Null sender node for remote node event");
         return;
     }
-    if (receiver->GetID() >= FIRST_LOCAL_ID)
+    if (node->GetID() >= FIRST_LOCAL_ID)
     {
-        LOGERROR("Node has a local ID, can not send remote node event");
+        LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
     }
     
-    Scene* scene = receiver->GetScene();
+    Scene* scene = node->GetScene();
     for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
         i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
-            i->second_->SendRemoteEvent(receiver, eventType, inOrder, eventData);
+            i->second_->SendRemoteEvent(node, eventType, inOrder, eventData);
     }
 }
 

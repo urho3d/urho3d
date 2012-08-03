@@ -1,7 +1,7 @@
 <particleemitter>
     <material name="Materials/Particle.xml" />
     <updateinvisible enable="true" />
-    <numparticles value="10" />
+    <numparticles value="5" />
     <activetime value="0.1" />
     <inactivetime value="0" />
     <interval value="0.02" />
@@ -11,6 +11,6 @@
     <particlesize value="25 25" />
     <timetolive value="0.5" />
     <constantforce value="0.0 -200 0.0" />
-    <colorfade color="0.125 0.125 0.25 1.0" time="0.0" />
+    <colorfade color="0.1 0.1 0.2 1.0" time="0.0" />
     <colorfade color="0.0 0.0 0.0 1.0" time="0.5" />
 </particleemitter>

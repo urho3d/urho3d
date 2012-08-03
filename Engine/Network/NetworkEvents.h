@@ -88,3 +88,9 @@ EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
 {
     PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
+
+/// Remote event: adds Connection parameter to the event data
+EVENT(E_REMOTEEVENTDATA, RemoteEventData)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+}

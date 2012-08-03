@@ -56,8 +56,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Handle event. Targeted events will be forwarded to all components.
-    virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Load from binary data. Return true if successful.

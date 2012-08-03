@@ -585,7 +585,7 @@ void PhysicsWorld::SendCollisionEvents()
             nodeCollisionData[NodeCollision::P_NEWCOLLISION] = newCollision;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
             
-            SendEvent(nodeA, E_NODECOLLISION, nodeCollisionData);
+            nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
             
             // Skip if either of the nodes has been removed as a response to the event
             if (!nodeWeakA || !nodeWeakB)
@@ -606,7 +606,7 @@ void PhysicsWorld::SendCollisionEvents()
             nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyA;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
             
-            SendEvent(nodeB, E_NODECOLLISION, nodeCollisionData);
+            nodeB->SendEvent(E_NODECOLLISION, nodeCollisionData);
         }
     }
     

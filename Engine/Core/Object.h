@@ -46,7 +46,7 @@ public:
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
     /// Handle event.
-    virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
+    virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
     
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
@@ -66,10 +66,6 @@ public:
     void SendEvent(StringHash eventType);
     /// Send event with parameters to all subscribers.
     void SendEvent(StringHash eventType, VariantMap& eventData);
-    /// Send event to a specific receiver.
-    void SendEvent(Object* receiver, StringHash eventType);
-    /// Send event with parameters to a specific receiver.
-    void SendEvent(Object* receiver, StringHash eventType, VariantMap& eventData);
     
     /// Return execution context.
     Context* GetContext() const { return context_; }

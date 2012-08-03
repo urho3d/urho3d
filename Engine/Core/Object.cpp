@@ -38,7 +38,7 @@ Object::~Object()
     context_->RemoveEventSender(this);
 }
 
-void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)
+void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData)
 {
     // Make a copy of the context pointer in case the object is destroyed during event handler invocation
     Context* context = context_;
@@ -237,7 +237,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 next = *i;
             
             unsigned oldSize = group->Size();
-            receiver->OnEvent(this, true, eventType, eventData);
+            receiver->OnEvent(this, eventType, eventData);
             
             // If self has been destroyed as a result of event handling, exit
             if (self.Expired())
@@ -270,7 +270,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     next = *i;
                 
                 unsigned oldSize = group->Size();
-                receiver->OnEvent(this, true, eventType, eventData);
+                receiver->OnEvent(this, eventType, eventData);
                 
                 if (self.Expired())
                 {
@@ -296,7 +296,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (!processed.Contains(receiver))
                 {
                     unsigned oldSize = group->Size();
-                    receiver->OnEvent(this, true, eventType, eventData);
+                    receiver->OnEvent(this, eventType, eventData);
                     
                     if (self.Expired())
                     {
@@ -312,31 +312,6 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
     
     context->EndSendEvent();
-}
-
-void Object::SendEvent(Object* receiver, StringHash eventType)
-{
-    if (receiver)
-    {
-        VariantMap noEventData;
-        Context* context = context_;
-        
-        context->BeginSendEvent(this);
-        receiver->OnEvent(this, false, eventType, noEventData);
-        context->EndSendEvent();
-    }
-}
-
-void Object::SendEvent(Object* receiver, StringHash eventType, VariantMap& eventData)
-{
-    if (receiver)
-    {
-        Context* context = context_;
-        
-        context->BeginSendEvent(this);
-        receiver->OnEvent(this, false, eventType, eventData);
-        context->EndSendEvent();
-    }
 }
 
 Object* Object::GetSubsystem(ShortStringHash type) const

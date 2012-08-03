@@ -46,8 +46,8 @@ class Serializable;
 /// Queued remote event.
 struct RemoteEvent
 {
-    /// Receiver node ID (0 if not a remote node event.)
-    unsigned receiverID_;
+    /// Remote sender node ID (0 if not a remote node event.)
+    unsigned senderID_;
     /// Event type.
     StringHash eventType_;
     /// Event data.
@@ -107,8 +107,8 @@ public:
     void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Send a remote event.
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Send a remote node event.
-    void SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    /// Send a remote event with the specified node as sender.
+    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network.

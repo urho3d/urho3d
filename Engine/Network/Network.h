@@ -81,8 +81,8 @@ public:
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote event to all client connections in a specific scene.
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Broadcast a remote node event to all client connections in the scene with this node.
-    void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    /// Broadcast a remote event with the specified node as a sender. Is sent to all client connections in the node's scene.
+    void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Set network update FPS.
     void SetUpdateFps(int fps);
     /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed.

@@ -609,18 +609,11 @@ static String AttributeInfoGetName(AttributeInfo* ptr)
     return String(ptr->name_);
 }
 
-static void SendEvent(const String& eventType, VariantMap& parameters)
+static void SendEvent(const String& eventType, VariantMap& eventData)
 {
     Object* sender = GetScriptContextEventListenerObject();
     if (sender)
-        sender->SendEvent(StringHash(eventType), parameters);
-}
-
-static void SendTargetedEvent(Object* receiver, const String& eventType, VariantMap& parameters)
-{
-    Object* sender = GetScriptContextEventListenerObject();
-    if (sender)
-        sender->SendEvent(receiver, StringHash(eventType), parameters);
+        sender->SendEvent(StringHash(eventType), eventData);
 }
 
 static void SubscribeToEvent(const String& eventType, const String& handlerName)
@@ -691,8 +684,7 @@ void RegisterObject(asIScriptEngine* engine)
     
     RegisterObject<Object>(engine, "Object");
     
-    engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap&)", asFUNCTION(SendEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SendEvent(Object@+, const String&in, VariantMap&)", asFUNCTION(SendTargetedEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(SendEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String&in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);

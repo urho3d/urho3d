@@ -49,7 +49,7 @@ class Ninja : GameObject
 
     void Start()
     {
-        SubscribeToEvent("NodeCollision", "HandleNodeCollision");
+        SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
         aimX = node.rotation.yaw;
     }
 

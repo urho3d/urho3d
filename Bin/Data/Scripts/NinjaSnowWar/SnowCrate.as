@@ -15,7 +15,7 @@ class SnowCrate : GameObject
     
     void Start()
     {
-        SubscribeToEvent("NodeCollision", "HandleNodeCollision");
+        SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
     }
     
     void FixedUpdate(float timeStep)

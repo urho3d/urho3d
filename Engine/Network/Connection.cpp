@@ -104,14 +104,14 @@ void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const Varia
     }
     
     RemoteEvent queuedEvent;
-    queuedEvent.receiverID_ = 0;
+    queuedEvent.senderID_ = 0;
     queuedEvent.eventType_ = eventType;
     queuedEvent.eventData_ = eventData;
     queuedEvent.inOrder_ = inOrder;
     remoteEvents_.Push(queuedEvent);
 }
 
-void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData)
+void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
     if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
     {
@@ -119,24 +119,24 @@ void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOr
         return;
     }
     
-    if (!receiver)
+    if (!node)
     {
-        LOGERROR("Null node for remote node event");
+        LOGERROR("Null sender node for remote node event");
         return;
     }
-    if (receiver->GetScene() != scene_)
+    if (node->GetScene() != scene_)
     {
-        LOGERROR("Node is not in the connection's scene, can not send remote node event");
+        LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
-    if (receiver->GetID() >= FIRST_LOCAL_ID)
+    if (node->GetID() >= FIRST_LOCAL_ID)
     {
-        LOGERROR("Node has a local ID, can not send remote node event");
+        LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
     }
     
     RemoteEvent queuedEvent;
-    queuedEvent.receiverID_ = receiver->GetID();
+    queuedEvent.senderID_ = node->GetID();
     queuedEvent.eventType_ = eventType;
     queuedEvent.eventData_ = eventData;
     queuedEvent.inOrder_ = inOrder;
@@ -270,7 +270,7 @@ void Connection::SendRemoteEvents()
     for (Vector<RemoteEvent>::ConstIterator i = remoteEvents_.Begin(); i != remoteEvents_.End(); ++i)
     {
         msg_.Clear();
-        if (!i->receiverID_)
+        if (!i->senderID_)
         {
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
@@ -278,7 +278,7 @@ void Connection::SendRemoteEvents()
         }
         else
         {
-            msg_.WriteNetID(i->receiverID_);
+            msg_.WriteNetID(i->senderID_);
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
             SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_);
@@ -882,6 +882,8 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 
 void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
 {
+    using namespace RemoteEventData;
+    
     if (msgID == MSG_REMOTEEVENT)
     {
         StringHash eventType = msg.ReadStringHash();
@@ -892,6 +894,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         }
         
         VariantMap eventData = msg.ReadVariantMap();
+        eventData[P_CONNECTION] = (void*)this;
         SendEvent(eventType, eventData);
     }
     else
@@ -911,13 +914,14 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         }
         
         VariantMap eventData = msg.ReadVariantMap();
-        Node* receiver = scene_->GetNode(nodeID);
-        if (!receiver)
+        Node* sender = scene_->GetNode(nodeID);
+        if (!sender)
         {
-            LOGWARNING("Missing receiver for remote node event, discarding");
+            LOGWARNING("Missing sender for remote node event, discarding");
             return;
         }
-        SendEvent(receiver, eventType, eventData);
+        eventData[P_CONNECTION] = (void*)this;
+        sender->SendEvent(eventType, eventData);
     }
 }
 

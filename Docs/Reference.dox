@@ -73,7 +73,7 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 \page Events Events
 
-The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. It supports both broadcast and targeted events. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
+The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
 Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 16-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
 
@@ -93,7 +93,7 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. As no target object is specified, this is a broadcast event. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
 
 \code
 using namespace Update;
@@ -110,8 +110,6 @@ VariantMap eventData;
 eventData["TimeStep"] = timeStep;
 SendEvent("Update", eventData);
 \endcode
-
-A targeted event sent to a Node will be handled specially: it will be forwarded to all its components. This can be used to implement game-specific messaging, such as scoring and damage handling. The \ref Physics "physics simulation" uses this mechanism to inform the participating scene nodes of physics collisions.
 
 
 \page MainLoop Main loop and frame update
@@ -918,7 +916,7 @@ Hinge, slider and cone twist constraints support defining limits for the motion.
 The physics world sends 3 types of events during its update step:
 
 - E_PHYSICSPRESTEP before the simulation is stepped.
-- E_PHYSICSCOLLISION (and E_NODECOLLISION to the participating scene nodes) for each collision during the simulation step.
+- E_PHYSICSCOLLISION for each collision during the simulation step. The participating scene nodes will also send E_NODECOLLISION events.
 - E_PHYSICSPOSTSTEP after the simulation has been stepped.
 
 Note that if the rendering framerate is high, the physics might not be stepped at all on each frame: in that case those events will not be sent.
@@ -1227,7 +1225,7 @@ The Network library provides reliable and unreliable UDP messaging using kNet. A
 
 Bidirectional communication between the server and the client can happen either using raw network messages, which are binary-serialized data, or remote events, which operate like ordinary events, but are processed on the receiving end only. Code on the server can send messages or remote events either to one client, all clients assigned into a particular scene, or to all connected clients. In contrast the client can only send messages or remote events to the server, not directly to other clients.
 
-Note that if a particular networked application does not need scene replication, network messages (and remote events that are not targeted) can also be transmitted without assigning the client to a scene. The Chat example does just that: it does not create a scene either on the server or the client.
+Note that if a particular networked application does not need scene replication, network messages and remote events can also be transmitted without assigning the client to a scene. The Chat example does just that: it does not create a scene either on the server or the client.
 
 \section Network_Connecting Connecting to a server
 
@@ -1265,7 +1263,7 @@ There are some things to watch out for:
 
 - To avoid going through the whole scene when sending network updates, nodes and components explicitly mark themselves for update when necessary. When writing your own replicated C++ components, call \ref Component::MarkNetworkUpdate "MarkNetworkUpdate()" in member functions that modify any networked attribute.
 
-- The server update logic orders replication messages so that parent nodes are created and updated before their children. Remote events are queued and only sent after the replication update to ensure that if they target a newly created node, it will already exist on the receiving end. However, it is also possible to specify unordered transmission for a remote event, in which case that guarantee does not hold.
+- The server update logic orders replication messages so that parent nodes are created and updated before their children. Remote events are queued and only sent after the replication update to ensure that if they originate from a newly created node, it will already exist on the receiving end. However, it is also possible to specify unordered transmission for a remote event, in which case that guarantee does not hold.
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
@@ -1305,7 +1303,7 @@ For high performance, consider using unordered messages, because for in-order me
 
 \section Network_RemoteEvents Remote events
 
-A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally target a specific Node in the receiver's scene. This is different from ordinary events, which can optionally target any Object within the execution context.
+A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally set to be originate from a specific Node in the receiver's scene ("remote node event.")
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
@@ -1313,6 +1311,18 @@ For safety, allowed remote event types should be registered so that a client can
 
 Like with ordinary events, in script event types are strings instead of name hashes for convenience.
 
+Remote events will always have the originating connection as a parameter in the event data. Here is how to get it in both C++ and script (in C++, include NetworkEvents.h):
+
+C++:
+\code
+using namespace RemoteEventData;
+Connection* remoteSender = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+\endcode
+
+%Script:
+\code
+Connection@ remoteSender = eventData["Connection"].GetConnection();
+\endcode
 
 \page Multithreading Multithreading
 
