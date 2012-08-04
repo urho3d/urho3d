@@ -367,6 +367,10 @@ void Scene::Clear()
     RemoveAllComponents();
     fileName_ = String();
     checksum_ = 0;
+    replicatedNodeID_ = FIRST_REPLICATED_ID;
+    replicatedComponentID_ = FIRST_REPLICATED_ID;
+    localNodeID_ = FIRST_LOCAL_ID;
+    localComponentID_ = FIRST_LOCAL_ID;
 }
 
 void Scene::SetActive(bool enable)
