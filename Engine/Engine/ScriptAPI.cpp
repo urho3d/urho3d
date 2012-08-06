@@ -139,7 +139,7 @@ static bool ScriptInstanceExecuteNoParams(const String& declaration, ScriptInsta
     return ptr->Execute(declaration);
 }
 
-static void ScriptInstanceDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
+static void ScriptInstanceDelayedExecute(float delay, bool repeat, const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
 {
     if (!srcParams)
         return;
@@ -151,12 +151,12 @@ static void ScriptInstanceDelayedExecute(float delay, const String& declaration,
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
     
-    ptr->DelayedExecute(delay, declaration, destParams);
+    ptr->DelayedExecute(delay, repeat, declaration, destParams);
 }
 
-static void ScriptInstanceDelayedExecuteNoParams(float delay, const String& declaration, ScriptInstance* ptr)
+static void ScriptInstanceDelayedExecuteNoParams(float delay, bool repeat, const String& declaration, ScriptInstance* ptr)
 {
-    ptr->DelayedExecute(delay, declaration);
+    ptr->DelayedExecute(delay, repeat, declaration);
 }
 
 static ScriptInstance* GetSelf()
@@ -164,7 +164,7 @@ static ScriptInstance* GetSelf()
     return GetScriptContextInstance();
 }
 
-static void SelfDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams)
+static void SelfDelayedExecute(float delay, bool repeat, const String& declaration, CScriptArray* srcParams)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if (!ptr || !srcParams)
@@ -177,21 +177,21 @@ static void SelfDelayedExecute(float delay, const String& declaration, CScriptAr
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
     
-    ptr->DelayedExecute(delay, declaration, destParams);
+    ptr->DelayedExecute(delay, repeat, declaration, destParams);
 }
 
-static void SelfDelayedExecuteNoParams(float delay, const String& declaration)
+static void SelfDelayedExecuteNoParams(float delay, bool repeat, const String& declaration)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
-        ptr->DelayedExecute(delay, declaration);
+        ptr->DelayedExecute(delay, repeat, declaration);
 }
 
-static void SelfClearDelayedExecute()
+static void SelfClearDelayedExecute(const String& declaration)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
-        ptr->ClearDelayedExecute();
+        ptr->ClearDelayedExecute(declaration);
 }
 
 static void SelfRemove()
@@ -214,9 +214,9 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", asMETHODPR(ScriptInstance, CreateObject, (ScriptFile*, const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in)", asFUNCTION(ScriptInstanceExecuteNoParams), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceDelayedExecute), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, const String&in)", asFUNCTION(ScriptInstanceDelayedExecuteNoParams), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ScriptInstance", "void ClearDelayedExecute()", asMETHOD(ScriptInstance, ClearDelayedExecute), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceDelayedExecute), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in)", asFUNCTION(ScriptInstanceDelayedExecuteNoParams), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptInstance, ClearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_active(bool)", asMETHOD(ScriptInstance, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool get_active() const", asMETHOD(ScriptInstance, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_fixedUpdateFps(int)", asMETHOD(ScriptInstance, SetFixedUpdateFps), asCALL_THISCALL);
@@ -229,9 +229,9 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
     
     // Register convenience functions for controlling delayed execution on self, similar to event sending
-    engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void ClearDelayedExecute()", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void ClearDelayedExecute(const String&in declaration = String())", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Remove()", asFUNCTION(SelfRemove), asCALL_CDECL);
 }
 

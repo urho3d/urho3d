@@ -312,6 +312,31 @@ ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 
 Note that these are not actual Node member functions on the C++ side, as the %Scene library is not allowed to depend on scripting.
 
+\section Script_DelayedCalls Delayed method calls
+
+Delayed method calls can be used in script objects to implement time-delayed actions. Use the DelayedExecute() function in script object code to add a method to be executed later. The parameters are the delay in seconds, repeat flag, the full declaration of the function, and optionally parameters, which must be placed in a Variant array. For example:
+
+\code
+class Test : ScriptObject
+{
+    void Start()
+    {
+        Array<Variant> parameters;
+        parameters.Push(Variant(100));
+        DelayedExecute(1.0, false, "void Trigger(int)", parameters);
+    }
+    
+    void Trigger(int parameter)
+    {
+        Print("Delayed function triggered with parameter " + parameter);
+    }
+}
+\endcode
+
+Delayed method calls can be removed by full declaration using the ClearDelayedExecute() function. If an empty declaration (default) is given as parameter, all delayed calls are removed.
+
+When a scene is saved/loaded, any pending delayed calls are also saved and restored properly.
+
 \section Script_ScriptAPI The script API
 
 Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access) are not. Also for scripting convenience some things have been changed from the C++ API:
@@ -346,7 +371,7 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 There are some complexities of the scripting system one has to watch out for:
 
-- During the execution of the script object's constructor, the object is not yet associated with the ScriptInstance, and therefore subscribing to events, or trying to access the node or scene will fail. The use of the constructor is best reserved for initializing member variables only.
+- During the execution of the script object's constructor, the object is not yet associated with the ScriptInstance, and therefore subscribing to events, adding delayed method calls, or trying to access the node or scene will fail. The use of the constructor is best reserved for initializing member variables only.
 
 - When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules, unless the classes are declared shared. See AngelScript documentation for more details.
 

@@ -50,8 +50,12 @@ enum ScriptInstanceMethod
 /// Delay-executed method call.
 struct DelayedMethodCall
 {
+   /// Period for repeating calls.
+    float period_;
     /// Delay time remaining until execution.
     float delay_;
+    /// Repeat flag.
+    bool repeat_;
     /// Method declaration.
     String declaration_;
     /// Parameters.
@@ -92,10 +96,10 @@ public:
     bool Execute(const String& declaration, const VariantVector& parameters = VariantVector());
     /// Execute a method.
     bool Execute(asIScriptFunction* method, const VariantVector& parameters = VariantVector());
-    /// Add a delay-executed method call.
-    void DelayedExecute(float delay, const String& declaration, const VariantVector& parameters = VariantVector());
-    /// Clear pending delay-executed method calls.
-    void ClearDelayedExecute();
+    /// Add a delay-executed method call, optionally repeating.
+    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = VariantVector());
+    /// Clear pending delay-executed method calls. If empty declaration given, clears all.
+    void ClearDelayedExecute(const String& declaration = String());
     
     /// Return script file.
     ScriptFile* GetScriptFile() const { return scriptFile_; }

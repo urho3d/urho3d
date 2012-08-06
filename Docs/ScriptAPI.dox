@@ -65,9 +65,9 @@
 - uint GetRGBAFormat()
 - uint GetFloatFormat()
 - uint GetDepthStencilFormat()
-- void DelayedExecute(float, const String&, const Variant[]@)
-- void DelayedExecute(float, const String&)
-- void ClearDelayedExecute()
+- void DelayedExecute(float, bool, const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&)
+- void ClearDelayedExecute(const String& arg0 = String ( ))
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
 - Time@ time
@@ -2083,6 +2083,7 @@ Methods:<br>
 - void RemoveAnimationState(Animation@)
 - void RemoveAnimationState(const String&)
 - void RemoveAnimationState(AnimationState@)
+- void RemoveAnimationState(uint)
 - void RemoveAllAnimationStates()
 - void SetMorphWeight(uint, float)
 - void ResetMorphWeights()
@@ -4395,9 +4396,9 @@ Methods:<br>
 - bool CreateObject(ScriptFile@, const String&)
 - bool Execute(const String&, const Variant[]@)
 - bool Execute(const String&)
-- void DelayedExecute(float, const String&, const Variant[]@)
-- void DelayedExecute(float, const String&)
-- void ClearDelayedExecute()
+- void DelayedExecute(float, bool, const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&)
+- void ClearDelayedExecute(const String& arg0 = String ( ))
 
 Properties:<br>
 - ShortStringHash type (readonly)
