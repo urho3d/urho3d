@@ -23,6 +23,7 @@ Text@ cameraPosText;
 
 EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
+FillMode fillMode = FILL_SOLID;
 
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
@@ -63,6 +64,12 @@ Array<String> pickModeText = {
     "Lights",
     "Zones",
     "Rigidbodies"
+};
+
+Array<String> fillModeText = {
+    "Solid",
+    "Wire",
+    "Point"
 };
 
 void CreateCamera()
@@ -125,6 +132,7 @@ void UpdateStats(float timeStep)
         "Mode: " + editModeText[editMode] +
         "  Axis: " + axisModeText[axisMode] +
         "  Pick: " + pickModeText[pickMode] +
+        "  Fill: " + fillModeText[fillMode] +
         "  Updates: " + (runUpdate ? "Running" : "Paused"));
 
     renderStatsText.text = String(
@@ -247,6 +255,9 @@ void MoveCamera(float timeStep)
     // Update audio listener
     audio.listenerPosition = cameraNode.position;
     audio.listenerRotation = cameraNode.rotation;
+    
+    // Update camera fill mode
+    camera.fillMode = fillMode;
 }
 
 void SteppedObjectManipulation(int key)

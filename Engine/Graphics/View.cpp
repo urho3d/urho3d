@@ -1189,6 +1189,8 @@ void View::RenderBatchesForward()
     graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, farClipZone_->GetFogColor());
     #endif
     
+    graphics_->SetFillMode(camera_->GetFillMode());
+    
     // Render opaque object unlit base pass
     if (!baseQueue_.IsEmpty())
     {
@@ -1210,6 +1212,7 @@ void View::RenderBatchesForward()
                 graphics_->SetRenderTarget(0, renderTarget);
                 graphics_->SetDepthStencil(depthStencil);
                 graphics_->SetViewport(viewRect_);
+                graphics_->SetFillMode(camera_->GetFillMode());
             }
             
             i->litBatches_.Draw(i->light_, graphics_, renderer_);
@@ -1226,6 +1229,7 @@ void View::RenderBatchesForward()
     graphics_->SetColorWrite(true);
     graphics_->SetDepthTest(CMP_LESSEQUAL);
     graphics_->SetDepthWrite(false);
+    graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
@@ -1233,6 +1237,8 @@ void View::RenderBatchesForward()
     graphics_->ClearParameterSource(SP_MATERIAL);
     DrawFullscreenQuad(camera_, false);
     #endif
+    
+    graphics_->SetFillMode(camera_->GetFillMode());
     
     // Render pre-alpha custom pass
     if (!preAlphaQueue_.IsEmpty())
@@ -1254,6 +1260,8 @@ void View::RenderBatchesForward()
         PROFILE(RenderPostAlpha);
         postAlphaQueue_.Draw(graphics_, renderer_);
     }
+    
+    graphics_->SetFillMode(FILL_SOLID);
     
     // Resolve multisampled backbuffer now if necessary
     if (resolve)
@@ -1303,12 +1311,16 @@ void View::RenderBatchesDeferred()
     graphics_->SetViewport(viewRect_);
     graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
     
+    graphics_->SetFillMode(camera_->GetFillMode());
+    
     // Render G-buffer batches
     if (!gbufferQueue_.IsEmpty())
     {
         PROFILE(RenderGBuffer);
         gbufferQueue_.Draw(graphics_, renderer_, false, true);
     }
+    
+    graphics_->SetFillMode(FILL_SOLID);
     
     // Clear the light accumulation buffer (light pre-pass only.) However, skip the clear if the first light is a directional
     // light with full mask
@@ -1384,6 +1396,8 @@ void View::RenderBatchesDeferred()
     graphics_->ClearParameterSource(SP_MATERIAL);
     DrawFullscreenQuad(camera_, false);
     
+    graphics_->SetFillMode(camera_->GetFillMode());
+    
     // Render opaque objects with deferred lighting result (light pre-pass only)
     if (!baseQueue_.IsEmpty())
     {
@@ -1414,6 +1428,8 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderPostAlpha);
         postAlphaQueue_.Draw(graphics_, renderer_);
     }
+    
+    graphics_->SetFillMode(FILL_SOLID);
 }
 
 void View::AllocateScreenBuffers()
@@ -2487,6 +2503,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetTexture(TU_SHADOWMAP, 0);
     
     graphics_->SetColorWrite(false);
+    graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     graphics_->SetDepthStencil(shadowMap);

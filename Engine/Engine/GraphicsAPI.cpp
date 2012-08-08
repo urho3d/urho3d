@@ -60,6 +60,11 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint VO_DISABLE_SHADOWS", (void*)&VO_DISABLE_SHADOWS);
     engine->RegisterGlobalProperty("const uint VO_DISABLE_OCCLUSION", (void*)&VO_DISABLE_OCCLUSION);
     
+    engine->RegisterEnum("FillMode");
+    engine->RegisterEnumValue("FillMode", "FILL_SOLID", FILL_SOLID);
+    engine->RegisterEnumValue("FillMode", "FILL_WIREFRAME", FILL_WIREFRAME);
+    engine->RegisterEnumValue("FillMode", "FILL_POINT", FILL_POINT);
+    
     RegisterComponent<Camera>(engine, "Camera");
     engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
@@ -90,6 +95,8 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "uint get_viewMask() const", asMETHOD(Camera, GetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewOverrideFlags(uint)", asMETHOD(Camera, SetViewOverrideFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint get_viewOverrideFlags() const", asMETHOD(Camera, GetViewOverrideFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void set_fillMode(FillMode)", asMETHOD(Camera, SetFillMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "FillMode get_fillMode() const", asMETHOD(Camera, GetFillMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Frustum& get_frustum() const", asMETHOD(Camera, GetFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Matrix4& get_projection() const", asMETHODPR(Camera, GetProjection, () const, const Matrix4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Camera, GetInverseWorldTransform), asCALL_THISCALL);

@@ -109,6 +109,13 @@ static const unsigned glDestBlend[] =
     GL_DST_ALPHA
 };
 
+static const unsigned glFillMode[] =
+{
+    GL_FILL,
+    GL_LINE,
+    GL_POINT
+};
+
 static const unsigned glStencilOps[] =
 {
     GL_KEEP,
@@ -1437,6 +1444,17 @@ void Graphics::SetDepthWrite(bool enable)
     }
 }
 
+void Graphics::SetFillMode(FillMode mode)
+{
+    #ifndef GL_ES_VERSION_2_0
+    if (mode != fillMode_)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, glFillMode[mode]);
+        fillMode_ = mode;
+    }
+    #endif
+}
+
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
     // During some light rendering loops, a full rect is toggled on/off repeatedly.
@@ -2287,6 +2305,7 @@ void Graphics::ResetCachedState()
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_ALWAYS;
     depthWrite_ = false;
+    fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;

@@ -87,6 +87,14 @@ enum CullMode
     MAX_CULLMODES
 };
 
+/// Fill mode.
+enum FillMode
+{
+    FILL_SOLID = 0,
+    FILL_WIREFRAME,
+	FILL_POINT
+};
+
 /// Stencil operation.
 enum StencilOp
 {

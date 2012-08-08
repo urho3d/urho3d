@@ -1531,6 +1531,7 @@ Properties:<br>
 - Vector2 projectionOffset
 - uint viewMask
 - uint viewOverrideFlags
+- FillMode fillMode
 - Frustum frustum (readonly)
 - Matrix4 projection (readonly)
 - Matrix3x4 inverseWorldTransform (readonly)

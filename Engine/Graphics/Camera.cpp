@@ -34,6 +34,14 @@ static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_FOV = 45.0f;
 static const float DEFAULT_ORTHOSIZE = 20.0f;
 
+static const char* fillModeNames[] =
+{
+    "Solid",
+    "Wireframe",
+    "Point",
+    0
+};
+
 static const Matrix4 flipMatrix(
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, -1.0f, 0.0f, 0.0f,
@@ -58,6 +66,7 @@ Camera::Camera(Context* context) :
     lodBias_(1.0f),
     viewMask_(DEFAULT_VIEWMASK),
     viewOverrideFlags_(VO_NONE),
+    fillMode_(FILL_SOLID),
     projectionOffset_(Vector2::ZERO),
     autoAspectRatio_(true),
     flipVertical_(false)
@@ -76,6 +85,7 @@ void Camera::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Camera, "Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
@@ -159,6 +169,12 @@ void Camera::SetViewMask(unsigned mask)
 void Camera::SetViewOverrideFlags(unsigned flags)
 {
     viewOverrideFlags_ = flags;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetFillMode(FillMode mode)
+{
+    fillMode_ = mode;
     MarkNetworkUpdate();
 }
 

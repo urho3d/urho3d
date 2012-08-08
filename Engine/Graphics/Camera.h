@@ -25,6 +25,7 @@
 
 #include "Frustum.h"
 #include "Component.h"
+#include "GraphicsDefs.h"
 #include "Ray.h"
 
 static const unsigned VO_NONE = 0x0;
@@ -57,6 +58,8 @@ public:
     void SetOrthoSize(const Vector2& orthoSize);
     /// Set aspect ratio.
     void SetAspectRatio(float aspectRatio);
+    /// Set polygon fill mode to use when rendering a scene.
+    void SetFillMode(FillMode mode);
     /// Set zoom.
     void SetZoom(float zoom);
     /// Set LOD bias.
@@ -92,6 +95,8 @@ public:
     unsigned GetViewMask() const { return viewMask_; }
     /// Return view override flags.
     unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
+    /// Return fill mode.
+    FillMode GetFillMode() const { return fillMode_; }
     /// Return orthographic flag.
     bool IsOrthographic() const { return orthographic_; }
     /// Return auto aspect ratio flag.
@@ -175,6 +180,8 @@ private:
     unsigned viewMask_;
     /// View override flags.
     unsigned viewOverrideFlags_;
+    /// Fill mode.
+    FillMode fillMode_;
     /// Projection offset.
     Vector2 projectionOffset_;
     /// Auto aspect ratio flag.

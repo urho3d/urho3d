@@ -551,6 +551,12 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             if (pickMode >= MAX_PICK_MODES)
                 pickMode = PICK_GEOMETRIES;
         }
+        else if (key == '7')
+        {
+            fillMode = FillMode(fillMode + 1);
+            if (fillMode > FILL_POINT)
+                fillMode = FILL_SOLID;
+        }
         else
             SteppedObjectManipulation(key);
     }

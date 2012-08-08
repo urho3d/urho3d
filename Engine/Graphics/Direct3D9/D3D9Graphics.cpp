@@ -135,6 +135,13 @@ static const D3DCULL d3dCullMode[] =
     D3DCULL_CW
 };
 
+static const D3DFILLMODE d3dFillMode[] =
+{
+    D3DFILL_SOLID,
+    D3DFILL_WIREFRAME,
+    D3DFILL_POINT
+};
+
 static const D3DSTENCILOP d3dStencilOp[] =
 {
     D3DSTENCILOP_KEEP,
@@ -1506,6 +1513,14 @@ void Graphics::SetDepthWrite(bool enable)
         depthWrite_ = enable;
     }
 }
+void Graphics::SetFillMode(FillMode mode)
+{
+    if (mode != fillMode_)
+    {
+        impl_->device_->SetRenderState(D3DRS_FILLMODE, d3dFillMode[mode]);
+        fillMode_ = mode;
+    }
+}
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
@@ -2234,6 +2249,7 @@ void Graphics::ResetCachedState()
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
+    fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
