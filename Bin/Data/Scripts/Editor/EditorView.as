@@ -243,6 +243,10 @@ void MoveCamera(float timeStep)
         if (moved)
             UpdateNodeAttributes();
     }
+    
+    // Update audio listener
+    audio.listenerPosition = cameraNode.position;
+    audio.listenerRotation = cameraNode.rotation;
 }
 
 void SteppedObjectManipulation(int key)

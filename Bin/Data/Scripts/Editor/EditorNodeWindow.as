@@ -65,6 +65,7 @@ void CreateNodeWindow()
     // Fill resource picker data
     Array<String> imageFilters = {"*.png", "*.jpg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.ktx", "*.pvr"};
+    Array<String> soundFilters = {"*.wav","*.ogg"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
@@ -73,6 +74,7 @@ void CreateNodeWindow()
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Sound", soundFilters));
 
     // Fill vector structure data
     Array<String> billboardVariables = {
@@ -231,7 +233,7 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
 
         LoadAttributeEditor(list, serializables, i);
     }
-    
+
     if (fullUpdate)
         list.viewPosition = oldViewPos;
 }
