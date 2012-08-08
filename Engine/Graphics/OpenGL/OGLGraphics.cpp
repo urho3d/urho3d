@@ -109,12 +109,14 @@ static const unsigned glDestBlend[] =
     GL_DST_ALPHA
 };
 
+#ifndef GL_ES_VERSION_2_0
 static const unsigned glFillMode[] =
 {
     GL_FILL,
     GL_LINE,
     GL_POINT
 };
+#endif
 
 static const unsigned glStencilOps[] =
 {
