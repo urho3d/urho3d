@@ -144,7 +144,7 @@ breakpoint will be obnoxious as the mouse cursor will likely be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
-following arguments: Scripts/TestScene.as -w
+following arguments: Scripts/NinjaSnowWar.as -w
 
 To make the Urho3D examples start faster on Windows & Direct3D9 mode, run 
 CompileAllShaders.bat from the Bin directory first.

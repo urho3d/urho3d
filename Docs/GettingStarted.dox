@@ -40,7 +40,7 @@ After the build is complete, the programs can be run from the Bin directory.
 
 To run from the Visual Studio debugger, set the Urho3D project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\\Bin\\Urho3D.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden.
 
-To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
+To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/NinjaSnowWar.as -w
 
 To make the Urho3D examples start faster on Windows & Direct3D9 mode, run CompileAllShaders.bat from the Bin directory first.
 
@@ -83,37 +83,7 @@ The scripting language used is AngelScript (http://www.angelcode.com/angelscript
 
 On Android and iOS there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
 
-Currently, five example application scripts exist:
-
-\section Running_TestScene TestScene
-
-Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory, or use the command Urho3D.exe Scripts/TestScene.as
-
-Key and mouse controls:
-
-\verbatim
-WSAD        Move
-Left mouse  Create a new physics object; characters will ragdoll when hit
-Right mouse Hold and move mouse to rotate view
-Shift+LMB   Paint a decal into the mouse cursor hit location
-Space       Toggle debug geometry
-F1          Toggle AngelScript console
-F5          Save scene
-F7          Load scene
-1 to 9      Toggle rendering options
-T           Toggle profiling display
-O           Toggle orthographic camera
-F           Toggle FXAA edge filter
-B           Toggle bloom post-process
-P           Toggle scene animation (TestSceneOld only)
-L           Toggle camera light detached/attached (TestSceneOld only)
-\endverbatim
-
-TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
-
-There is also a variation of TestScene ported from Urho3D 1.0, TestSceneOld. It lacks networking features, but is provided for examining backward compatibility and performance. It can be run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as
-
-Yet another variation of TestScene demonstrates terrain rendering. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as
+Currently eight example application scripts exist:
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -135,20 +105,52 @@ If a joystick is connected, it can also be used for controlling the player chara
 
 NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
 
+\section Running_TestScene TestScene
+
+Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory, or use the command Urho3D.exe Scripts/TestScene.as
+
+Key and mouse controls:
+
+\verbatim
+WSAD        Move
+Left mouse  Create a new physics object; characters will ragdoll when hit
+Right mouse Hold and move mouse to rotate view
+Shift+LMB   Paint a decal into the mouse cursor hit location
+Space       Toggle debug geometry
+F1          Toggle AngelScript console
+F5          Save scene
+F7          Load scene
+1 to 9      Toggle rendering options
+T           Toggle profiling display
+O           Toggle orthographic camera
+F           Toggle FXAA edge filter
+B           Toggle bloom post-process
+\endverbatim
+
+TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
+
 \section Running_Editor Editor
 
 %Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
 
-\section Running_Chat Chat
-
-Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
-
-On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages;
-either press return or click "Send" to send them. Press ESC to exit.
-
-To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
-
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
+
+\section Running_Terrain Terrain
+
+%Terrain rendering example. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as. %Controls are the same as in TestScene.
+
+\section Running_Physics Physics
+
+A stress test of 1000 moving physics objects, which also showcases the performance difference instancing can make. Run with Physics.bat, or use the command Urho3D.exe Scripts/Physics.as. %Controls as in TestScene.
+
+\section Running_TestSceneOld TestSceneOld
+
+A variation of TestScene ported from Urho3D 1.0. It lacks networking features, but is provided for examining backward compatibility and performance. Run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as. %Controls are like in TestScene, and additionally:
+
+\verbatim
+P           Toggle scene animation
+L           Toggle camera light detached/attached
+\endverbatim
 
 \section Running_LightTest LightTest
 
@@ -170,6 +172,15 @@ C           Toggle orthographic camera
 F           Toggle FXAA edge filter
 R           Re-randomize light and object positions
 \endverbatim
+
+\section Running_Chat Chat
+
+Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
+
+On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages;
+either press return or click "Send" to send them. Press ESC to exit.
+
+To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
 
 \section Running_Commandline Command line options
 
