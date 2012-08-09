@@ -381,11 +381,13 @@ void Scene::SetActive(bool enable)
 void Scene::SetSmoothingConstant(float constant)
 {
     smoothingConstant_ = Max(constant, M_EPSILON);
+    Node::MarkNetworkUpdate();
 }
 
 void Scene::SetSnapThreshold(float threshold)
 {
     snapThreshold_ = Max(threshold, 0.0f);
+    Node::MarkNetworkUpdate();
 }
 
 void Scene::AddRequiredPackageFile(PackageFile* package)
