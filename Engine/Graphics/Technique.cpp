@@ -59,7 +59,7 @@ static const String blendModeNames[] =
     ""
 };
 
-static const String CompareModeNames[] =
+static const String compareModeNames[] =
 {
     "always",
     "equal",
@@ -188,7 +188,7 @@ bool Technique::Load(Deserializer& source)
                 if (depthTest == "false")
                     newPass->SetDepthTestMode(CMP_ALWAYS);
                 else
-                    newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, CompareModeNames, CMP_LESS));
+                    newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, compareModeNames, CMP_LESS));
             }
             
             if (passElem.HasAttribute("depthwrite"))
