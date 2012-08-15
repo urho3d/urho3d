@@ -28,6 +28,9 @@
 #include <SDL_joystick.h>
 #include <SDL_keycode.h>
 
+namespace Urho3D
+{
+
 /// Mouse button pressed.
 EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {
@@ -240,3 +243,5 @@ static const int HAT_UP = SDL_HAT_UP;
 static const int HAT_RIGHT = SDL_HAT_RIGHT;
 static const int HAT_DOWN = SDL_HAT_DOWN;
 static const int HAT_LEFT = SDL_HAT_LEFT;
+
+}

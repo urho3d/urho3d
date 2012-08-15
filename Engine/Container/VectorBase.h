@@ -25,6 +25,9 @@
 
 #include "Swap.h"
 
+namespace Urho3D
+{
+
 /// Random access iterator.
 template <class T> struct RandomAccessIterator
 {
@@ -156,9 +159,9 @@ public:
     /// Swap with another vector.
     void Swap(VectorBase& rhs)
     {
-        ::Swap(size_, rhs.size_);
-        ::Swap(capacity_, rhs.capacity_);
-        ::Swap(buffer_, rhs.buffer_);
+        Urho3D::Swap(size_, rhs.size_);
+        Urho3D::Swap(capacity_, rhs.capacity_);
+        Urho3D::Swap(buffer_, rhs.buffer_);
     }
     
 protected:
@@ -171,3 +174,5 @@ protected:
     /// Buffer.
     unsigned char* buffer_;
 };
+
+}

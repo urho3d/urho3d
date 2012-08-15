@@ -221,7 +221,7 @@ OPTIMIZE_OUTPUT_FOR_C  = NO
 
 # Set the OPTIMIZE_OUTPUT_JAVA tag to YES if your project consists of Java 
 # sources only. Doxygen will then generate output that is more tailored for 
-# Java. For instance, namespaces will be presented as packages, qualified 
+# Java. For instance, namespaces will be presented as packages, qualified
 # scopes will look different, etc.
 
 OPTIMIZE_OUTPUT_JAVA   = NO
@@ -303,9 +303,9 @@ INLINE_GROUPED_CLASSES = NO
 
 # When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and 
 # unions with only public data fields will be shown inline in the documentation 
-# of the scope in which they are defined (i.e. file, namespace, or group 
-# documentation), provided this scope is documented. If set to NO (the default), 
-# structs, classes, and unions are shown on a separate page (for HTML and Man 
+# of the scope in which they are defined (i.e. file, namespace, or group
+# documentation), provided this scope is documented. If set to NO (the default),
+# structs, classes, and unions are shown on a separate page (for HTML and Man
 # pages) or section (for LaTeX and RTF).
 
 INLINE_SIMPLE_STRUCTS  = NO
@@ -314,17 +314,17 @@ INLINE_SIMPLE_STRUCTS  = NO
 # is documented as struct, union, or enum with the name of the typedef. So 
 # typedef struct TypeS {} TypeT, will appear in the documentation as a struct 
 # with name TypeT. When disabled the typedef will appear as a member of a file, 
-# namespace, or class. And the struct will be named TypeS. This can typically 
-# be useful for C code in case the coding convention dictates that all compound 
+# namespace, or class. And the struct will be named TypeS. This can typically
+# be useful for C code in case the coding convention dictates that all compound
 # types are typedef'ed and only the typedef is referenced, never the tag name.
 
 TYPEDEF_HIDES_STRUCT   = NO
 
-# The SYMBOL_CACHE_SIZE determines the size of the internal cache use to 
-# determine which symbols to keep in memory and which to flush to disk. 
-# When the cache is full, less often used symbols will be written to disk. 
-# For small to medium size projects (<1000 input files) the default value is 
-# probably good enough. For larger projects a too small cache size can cause 
+# The SYMBOL_CACHE_SIZE determines the size of the internal cache use to
+# determine which symbols to keep in memory and which to flush to disk.
+# When the cache is full, less often used symbols will be written to disk.
+# For small to medium size projects (<1000 input files) the default value is
+# probably good enough. For larger projects a too small cache size can cause
 # doxygen to be busy swapping symbols to and from disk most of the time 
 # causing a significant performance penalty. 
 # If the system has enough physical memory increasing the cache will improve the 
@@ -338,7 +338,7 @@ SYMBOL_CACHE_SIZE      = 0
 
 # Similar to the SYMBOL_CACHE_SIZE the size of the symbol lookup cache can be 
 # set using LOOKUP_CACHE_SIZE. This cache is used to resolve symbols given 
-# their name and scope. Since this can be an expensive process and often the 
+# their name and scope. Since this can be an expensive process and often the
 # same symbol appear multiple times in the code, doxygen keeps a cache of 
 # pre-resolved symbols. If the cache is too small doxygen will become slower. 
 # If the cache is too large, memory is wasted. The cache size is given by this 
@@ -381,18 +381,18 @@ EXTRACT_LOCAL_CLASSES  = NO
 
 EXTRACT_LOCAL_METHODS  = NO
 
-# If this flag is set to YES, the members of anonymous namespaces will be 
-# extracted and appear in the documentation as a namespace called 
-# 'anonymous_namespace{file}', where file will be replaced with the base 
-# name of the file that contains the anonymous namespace. By default 
+# If this flag is set to YES, the members of anonymous namespaces will be
+# extracted and appear in the documentation as a namespace called
+# 'anonymous_namespace{file}', where file will be replaced with the base
+# name of the file that contains the anonymous namespace. By default
 # anonymous namespaces are hidden.
 
 EXTRACT_ANON_NSPACES   = NO
 
 # If the HIDE_UNDOC_MEMBERS tag is set to YES, Doxygen will hide all 
-# undocumented members of documented classes, files or namespaces. 
-# If set to NO (the default) these members will be included in the 
-# various overviews, but no documentation section is generated. 
+# undocumented members of documented classes, files or namespaces.
+# If set to NO (the default) these members will be included in the
+# various overviews, but no documentation section is generated.
 # This option has no effect if EXTRACT_ALL is enabled.
 
 HIDE_UNDOC_MEMBERS     = NO
@@ -433,8 +433,8 @@ INTERNAL_DOCS          = NO
 
 CASE_SENSE_NAMES       = NO
 
-# If the HIDE_SCOPE_NAMES tag is set to NO (the default) then Doxygen 
-# will show members with their full class and namespace scopes in the 
+# If the HIDE_SCOPE_NAMES tag is set to NO (the default) then Doxygen
+# will show members with their full class and namespace scopes in the
 # documentation. If set to YES the scope will be hidden.
 
 HIDE_SCOPE_NAMES       = NO
@@ -562,11 +562,11 @@ SHOW_DIRECTORIES       = NO
 
 SHOW_FILES             = YES
 
-# Set the SHOW_NAMESPACES tag to NO to disable the generation of the 
-# Namespaces page.  This will remove the Namespaces entry from the Quick Index 
+# Set the SHOW_NAMESPACES tag to NO to disable the generation of the
+# Namespaces page.  This will remove the Namespaces entry from the Quick Index
 # and from the Folder Tree View (if specified). The default is YES.
 
-SHOW_NAMESPACES        = NO
+SHOW_NAMESPACES        = YES
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that 
 # doxygen should invoke to get the current version for each file (typically from 

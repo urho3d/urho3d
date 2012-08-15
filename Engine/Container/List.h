@@ -25,6 +25,9 @@
 
 #include "ListBase.h"
 
+namespace Urho3D
+{
+
 /// Doubly-linked list template class.
 template <class T> class List : public ListBase
 {
@@ -398,3 +401,5 @@ private:
         AllocatorFree(allocator_, node);
     }
 };
+
+}

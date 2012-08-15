@@ -29,6 +29,16 @@
 
 #include <LinearMath/btIDebugDraw.h>
 
+class btCollisionConfiguration;
+class btBroadphaseInterface;
+class btConstraintSolver;
+class btDiscreteDynamicsWorld;
+class btDispatcher;
+class btDynamicsWorld;
+
+namespace Urho3D
+{
+
 class CollisionShape;
 class Deserializer;
 class Constraint;
@@ -38,13 +48,6 @@ class RigidBody;
 class Scene;
 class Serializer;
 class XMLElement;
-
-class btCollisionConfiguration;
-class btBroadphaseInterface;
-class btConstraintSolver;
-class btDiscreteDynamicsWorld;
-class btDispatcher;
-class btDynamicsWorld;
 
 struct CollisionGeometryData;
 
@@ -237,3 +240,5 @@ private:
 
 /// Register Physics library objects.
 void RegisterPhysicsLibrary(Context* context);
+
+}

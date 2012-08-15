@@ -25,6 +25,9 @@
 #include "Frustum.h"
 #include "Polyhedron.h"
 
+namespace Urho3D
+{
+
 Polyhedron::~Polyhedron()
 {
 }
@@ -302,4 +305,6 @@ void Polyhedron::SetFace(unsigned index, const Vector3& v0, const Vector3& v1, c
     face[1] = v1;
     face[2] = v2;
     face[3] = v3;
+}
+
 }

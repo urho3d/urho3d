@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(DropDownList);
 
 DropDownList::DropDownList(Context* context) :
@@ -225,4 +228,6 @@ void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventDat
     newEventData[P_ELEMENT] = (void*)this;
     newEventData[P_SELECTION] = GetSelection();
     SendEvent(E_ITEMSELECTED, newEventData);
+}
+
 }

@@ -38,6 +38,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int MIN_BUFFERLENGTH = 20;
 static const int MIN_MIXRATE = 11025;
 static const int MAX_MIXRATE = 48000;
@@ -289,4 +292,6 @@ void RegisterAudioLibrary(Context* context)
     Sound::RegisterObject(context);
     SoundSource::RegisterObject(context);
     SoundSource3D::RegisterObject(context);
+}
+
 }

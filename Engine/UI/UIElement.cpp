@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String horizontalAlignments[] =
 {
     "left",
@@ -1296,3 +1299,5 @@ IntVector2 UIElement::GetLayoutChildPosition(UIElement* child)
     return ret;
 }
 
+
+}

@@ -25,6 +25,9 @@
 
 #include "UIElement.h"
 
+namespace Urho3D
+{
+
 static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
@@ -144,3 +147,5 @@ protected:
     /// Sizes of each character.
     PODVector<IntVector2> charSizes_;
 };
+
+}

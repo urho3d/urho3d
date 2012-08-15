@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     model_(model),
     animation_(animation),
@@ -347,4 +350,6 @@ void AnimationState::Apply()
             }
         }
     }
+}
+
 }

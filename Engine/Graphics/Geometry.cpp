@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Geometry);
 
 Geometry::Geometry(Context* context) :
@@ -305,4 +308,6 @@ void Geometry::GetPositionBufferIndex()
     
     // No vertex buffer with positions
     positionBufferIndex_ = M_MAX_UNSIGNED;
+}
+
 }

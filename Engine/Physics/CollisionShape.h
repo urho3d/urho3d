@@ -28,16 +28,19 @@
 #include "Component.h"
 #include "Quaternion.h"
 
+class btBvhTriangleMeshShape;
+class btCollisionShape;
+class btCompoundShape;
+class btTriangleMesh;
+
+namespace Urho3D
+{
+
 class Geometry;
 class Model;
 class PhysicsWorld;
 class RigidBody;
 class Terrain;
-
-class btBvhTriangleMeshShape;
-class btCollisionShape;
-class btCompoundShape;
-class btTriangleMesh;
 
 /// Collision shape type.
 enum ShapeType
@@ -229,3 +232,5 @@ private:
     /// Recrease collision shape flag.
     bool recreateShape_;
 };
+
+}

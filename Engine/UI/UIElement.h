@@ -28,6 +28,9 @@
 #include "Vector2.h"
 #include "XMLFile.h"
 
+namespace Urho3D
+{
+
 /// %UI element horizontal alignment.
 enum HorizontalAlignment
 {
@@ -96,7 +99,6 @@ static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
 class ResourceCache;
-class asIScriptEngine;
 
 /// Base class for %UI elements.
 class UIElement : public Object
@@ -462,3 +464,5 @@ private:
     /// Has color gradient flag.
     bool colorGradient_;
 };
+
+}

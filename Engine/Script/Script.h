@@ -25,15 +25,19 @@
 
 #include "Object.h"
 
-class Scene;
-class ScriptFile;
-class ScriptInstance;
 class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptModule;
 
 struct asSMessageInfo;
+
+namespace Urho3D
+{
+
+class Scene;
+class ScriptFile;
+class ScriptInstance;
 
 /// Script engine logging mode.
 enum ScriptLogMode
@@ -123,3 +127,5 @@ private:
 
 /// Register Script library objects.
 void RegisterScriptLibrary(Context* context);
+
+}

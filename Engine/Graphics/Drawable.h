@@ -27,6 +27,9 @@
 #include "Component.h"
 #include "GraphicsDefs.h"
 
+namespace Urho3D
+{
+
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;
@@ -326,4 +329,6 @@ protected:
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
 {
     return lhs->GetSortValue() < rhs->GetSortValue();
+}
+
 }

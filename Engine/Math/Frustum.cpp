@@ -24,6 +24,9 @@
 #include "Precompiled.h"
 #include "Frustum.h"
 
+namespace Urho3D
+{
+
 inline Vector3 ClipEdgeZ(const Vector3& v0, const Vector3& v1, float clipZ)
 {
     return Vector3(
@@ -194,4 +197,6 @@ void Frustum::UpdatePlanes()
     planes_[PLANE_DOWN].Define(vertices_[6], vertices_[5], vertices_[1]);
     planes_[PLANE_FAR].Define(vertices_[5], vertices_[6], vertices_[7]);
     defined_ = true;
+}
+
 }

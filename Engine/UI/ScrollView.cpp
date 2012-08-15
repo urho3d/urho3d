@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float STEP_FACTOR = 300.0f;
 
 OBJECTTYPESTATIC(ScrollView);
@@ -321,4 +324,6 @@ void ScrollView::HandleScrollBarVisibleChanged(StringHash eventType, VariantMap&
 void ScrollView::HandleElementResized(StringHash eventType, VariantMap& eventData)
 {
     UpdateViewSize();
+}
+
 }

@@ -40,6 +40,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 inline bool CompareBatchesState(Batch* lhs, Batch* rhs)
 {
     if (lhs->sortKey_ != rhs->sortKey_)
@@ -994,4 +997,6 @@ unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
     }
     
     return total;
+}
+
 }

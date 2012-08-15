@@ -27,6 +27,9 @@
 #include "Object.h"
 #include "HashSet.h"
 
+namespace Urho3D
+{
+
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context : public RefCounted
 {
@@ -154,3 +157,5 @@ template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { 
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
+
+}

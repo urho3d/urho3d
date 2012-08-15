@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String renderModeTexts[] = {
     "Forward",
     "Prepass",
@@ -258,4 +261,6 @@ void DebugHud::HandleUpdate(StringHash eventType, VariantMap& eventData)
     using namespace Update;
     
     Update();
+}
+
 }

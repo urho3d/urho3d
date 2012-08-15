@@ -26,6 +26,9 @@
 #include "ArrayPtr.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 /// Supported compressed image formats.
 enum CompressedFormat
 {
@@ -139,3 +142,5 @@ private:
     /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
 };
+
+}

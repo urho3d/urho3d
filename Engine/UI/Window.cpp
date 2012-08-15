@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int DEFAULT_RESIZE_BORDER = 4;
 
 OBJECTTYPESTATIC(Window);
@@ -274,4 +277,6 @@ bool Window::CheckAlignment() const
         return true;
     else
         return false;
+}
+
 }

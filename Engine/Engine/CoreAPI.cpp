@@ -27,6 +27,9 @@
 #include "ProcessUtils.h"
 #include "StringUtils.h"
 
+namespace Urho3D
+{
+
 static void ConstructStringHash(StringHash* ptr)
 {
     new(ptr) StringHash();
@@ -703,4 +706,6 @@ void RegisterCoreAPI(asIScriptEngine* engine)
     RegisterProcessUtils(engine);
     RegisterObject(engine);
     RegisterTimer(engine);
+}
+
 }

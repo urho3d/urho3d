@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Frame begin event.
 EVENT(E_BEGINFRAME, BeginFrame)
 {
@@ -59,4 +62,6 @@ EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
 /// Frame end event.
 EVENT(E_ENDFRAME, EndFrame)
 {
+}
+
 }

@@ -25,6 +25,9 @@
 
 #include "Hash.h"
 
+namespace Urho3D
+{
+
 /// %Pair template class.
 template <class T, class U> class Pair
 {
@@ -79,4 +82,6 @@ public:
 template <class T, class U> Pair<T, U> MakePair(const T& first, const U& second)
 {
     return Pair<T, U>(first, second);
+}
+
 }

@@ -28,6 +28,9 @@
 #include <d3d9.h>
 #include <SDL.h>
 
+namespace Urho3D
+{
+
 /// %Graphics implementation. Holds API-specific objects.
 class GraphicsImpl
 {
@@ -92,3 +95,5 @@ private:
     /// Destination blend mode.
     D3DBLEND destBlend_;
 };
+
+}

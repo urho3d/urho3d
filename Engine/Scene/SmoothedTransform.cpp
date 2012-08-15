@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 
@@ -180,4 +183,6 @@ void SmoothedTransform::HandleUpdateSmoothing(StringHash eventType, VariantMap& 
     float constant = eventData[P_CONSTANT].GetFloat();
     float squaredSnapThreshold = eventData[P_SQUAREDSNAPTHRESHOLD].GetFloat();
     Update(constant, squaredSnapThreshold);
+}
+
 }

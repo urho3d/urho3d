@@ -27,6 +27,9 @@
 #include "Component.h"
 #include "Frustum.h"
 
+namespace Urho3D
+{
+
 class BoundingBox;
 class Camera;
 class Polyhedron;
@@ -126,3 +129,5 @@ private:
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
 };
+
+}

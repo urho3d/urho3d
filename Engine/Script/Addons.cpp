@@ -30,6 +30,9 @@
 #include <stdio.h>
 
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
+namespace Urho3D
+{
+
 using namespace std;
 
 /// %Script array buffer.
@@ -1486,4 +1489,6 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String& opAddAssign(bool)", asFUNCTION(StringAddAssignBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd(bool) const", asFUNCTION(StringAddBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String opAdd_r(bool) const", asFUNCTION(StringAddBoolReverse), asCALL_CDECL_OBJLAST);
+}
+
 }

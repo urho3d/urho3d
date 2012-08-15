@@ -25,6 +25,9 @@
 
 #include "Component.h"
 
+namespace Urho3D
+{
+
 class Image;
 class Material;
 class Node;
@@ -216,3 +219,5 @@ private:
     /// Terrain needs regeneration flag.
     bool recreateTerrain_;
 };
+
+}

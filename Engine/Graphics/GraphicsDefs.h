@@ -26,6 +26,11 @@
 #include "HashBase.h"
 #include "StringHash.h"
 
+namespace Urho3D
+{
+
+class Vector3;
+
 /// Rendering modes.
 enum RenderMode
 {
@@ -245,6 +250,9 @@ extern StringHash PSP_SHADOWMAPINVSIZE;
 extern StringHash PSP_SHADOWSPLITS;
 extern StringHash PSP_LIGHTMATRICES;
 
+// Scale calculation from bounding box diagonal
+extern Vector3 DOT_SCALE;
+
 /// Texture units.
 enum TextureUnit
 {
@@ -318,3 +326,5 @@ static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;
 static const int MAX_SKIN_MATRICES = 64;
 static const int MAX_CONSTANT_REGISTERS = 256;
+
+}

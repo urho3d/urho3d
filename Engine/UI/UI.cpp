@@ -54,6 +54,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :
@@ -1055,4 +1058,6 @@ void RegisterUILibrary(Context* context)
     Menu::RegisterObject(context);
     DropDownList::RegisterObject(context);
     FileSelector::RegisterObject(context);
+}
+
 }

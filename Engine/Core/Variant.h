@@ -29,6 +29,9 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 /// Variant's supported types.
 enum VariantType
 {
@@ -884,3 +887,5 @@ private:
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
 };
+
+}

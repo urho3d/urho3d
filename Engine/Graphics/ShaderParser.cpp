@@ -26,6 +26,9 @@
 #include "ShaderParser.h"
 #include "XMLElement.h"
 
+namespace Urho3D
+{
+
 bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vector<String>& globalDefines, const Vector<String>& globalDefineValues)
 {
     if (globalDefines.Size() != globalDefineValues.Size())
@@ -355,4 +358,6 @@ void ShaderParser::BuildCombinations()
         combinations_[combinationName] = active;
         usedCombinations.Insert(active);
     }
+}
+
 }

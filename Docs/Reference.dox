@@ -1,3 +1,6 @@
+namespace Urho3D
+{
+
 /**
 
 \page Containers Container types
@@ -1647,3 +1650,5 @@ byte[]     Bytecode
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
 */
+
+}

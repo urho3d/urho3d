@@ -33,6 +33,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float MIN_ROW_SPACING = 0.5f;
 
 static const String horizontalAlignments[] =
@@ -564,4 +567,6 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     case HA_RIGHT:
         return GetSize().x_ - rowWidth;
     }
+}
+
 }

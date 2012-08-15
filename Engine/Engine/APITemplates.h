@@ -41,6 +41,9 @@
 #include <angelscript.h>
 #include <cstring>
 
+namespace Urho3D
+{
+
 /// Template function for dynamic cast between two script classes.
 template <class T, class U> U* RefCast(T* t)
 {
@@ -851,4 +854,6 @@ template <class T> void RegisterButton(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "float get_repeatDelay() const", asMETHOD(T, GetRepeatDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_repeatRate(float)", asMETHOD(T, SetRepeatRate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_repeatRate() const", asMETHOD(T, GetRepeatRate), asCALL_THISCALL);
+}
+
 }

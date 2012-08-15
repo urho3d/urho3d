@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     shaderType_(type),
@@ -157,4 +160,6 @@ void ShaderVariation::SetDefines(const Vector<String>& defines, const Vector<Str
         defines_ = defines;
         defineValues_ = defineValues;
     }
+}
+
 }

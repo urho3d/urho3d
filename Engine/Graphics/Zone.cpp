@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const Vector3 DEFAULT_BOUNDING_BOX_MIN(-10.0f, -10.0f, -10.0f);
 static const Vector3 DEFAULT_BOUNDING_BOX_MAX(10.0f, 10.0f, 10.0f);
 static const Color DEFAULT_AMBIENT_COLOR(0.1f, 0.1f, 0.1f);
@@ -294,4 +297,6 @@ void Zone::UpdateAmbientGradient()
             lastAmbientEndZone_ = bestZone;
         }
     }
+}
+
 }

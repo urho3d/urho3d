@@ -26,6 +26,9 @@
 #include "Ptr.h"
 #include "Rect.h"
 
+namespace Urho3D
+{
+
 class Camera;
 class PostProcess;
 class Scene;
@@ -88,3 +91,5 @@ private:
     Vector<SharedPtr<PostProcess> > postProcesses_;
 };
 
+
+}

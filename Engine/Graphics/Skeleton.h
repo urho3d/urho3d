@@ -26,6 +26,9 @@
 #include "BoundingBox.h"
 #include "Node.h"
 
+namespace Urho3D
+{
+
 static const unsigned BONECOLLISION_NONE = 0x0;
 static const unsigned BONECOLLISION_SPHERE = 0x1;
 static const unsigned BONECOLLISION_BOX = 0x2;
@@ -116,3 +119,5 @@ private:
     /// Root bone index.
     unsigned rootBoneIndex_;
 };
+
+}

@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(IndexBuffer);
 
 IndexBuffer::IndexBuffer(Context* context) :
@@ -410,4 +413,6 @@ void IndexBuffer::UnmapBuffer()
         ((IDirect3DIndexBuffer9*)object_)->Unlock();
         lockState_ = LOCK_NONE;
     }
+}
+
 }

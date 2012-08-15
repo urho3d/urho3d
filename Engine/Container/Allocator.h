@@ -25,6 +25,9 @@
 
 #include <new>
 
+namespace Urho3D
+{
+
 struct AllocatorBlock;
 struct AllocatorNode;
 
@@ -115,3 +118,5 @@ private:
     /// Allocator block.
     AllocatorBlock* allocator_;
 };
+
+}

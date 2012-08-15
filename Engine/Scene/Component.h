@@ -26,6 +26,9 @@
 #include "Matrix3x4.h"
 #include "Serializable.h"
 
+namespace Urho3D
+{
+
 class DebugRenderer;
 class Node;
 class Scene;
@@ -104,3 +107,5 @@ protected:
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Component::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
+
+}

@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Variable timestep scene update.
 EVENT(E_SCENEUPDATE, SceneUpdate)
 {
@@ -77,3 +80,5 @@ EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
 {
     PARAM(P_SCENE, Scene);                  // Scene pointer
 };
+
+}

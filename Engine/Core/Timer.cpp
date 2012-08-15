@@ -36,6 +36,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 bool HiresTimer::supported(false);
 long long HiresTimer::frequency(1000);
 
@@ -216,4 +219,6 @@ void HiresTimer::Reset()
     gettimeofday(&time, NULL);
     startTime_ = time.tv_sec * 1000000LL + time.tv_usec;
     #endif
+}
+
 }

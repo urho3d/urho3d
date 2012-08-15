@@ -44,6 +44,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int STATS_INTERVAL_MSEC = 2000;
 
 PackageDownload::PackageDownload() :
@@ -1345,4 +1348,6 @@ void Connection::OnPackagesReady()
         if (!success)
             OnSceneLoadFailed();
     }
+}
+
 }

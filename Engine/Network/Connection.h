@@ -37,6 +37,9 @@
 #undef SendMessage
 #endif
 
+namespace Urho3D
+{
+
 class File;
 class MemoryBuffer;
 class Node;
@@ -243,3 +246,5 @@ private:
     /// Show statistics flag.
     bool logStatistics_;
 };
+
+}

@@ -31,13 +31,16 @@
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
 
-class MemoryBuffer;
-class Scene;
-
 namespace kNet
 {
     class MessageConnection;
 }
+
+namespace Urho3D
+{
+
+class MemoryBuffer;
+class Scene;
 
 /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
@@ -146,3 +149,5 @@ private:
 
 /// Register Network library objects.
 void RegisterNetworkLibrary(Context* context);
+
+}

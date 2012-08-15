@@ -33,6 +33,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Texture2D);
 
 Texture2D::Texture2D(Context* context) :
@@ -550,4 +553,6 @@ bool Texture2D::Create()
     }
     
     return true;
+}
+
 }

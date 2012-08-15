@@ -25,6 +25,9 @@
 #include "Tangent.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 inline unsigned GetIndex(unsigned index, const void* indexData, unsigned indexSize)
 {
     if (indexSize == sizeof(unsigned short))
@@ -115,4 +118,6 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
     }
     
     delete[] tan1;
+}
+
 }

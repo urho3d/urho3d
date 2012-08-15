@@ -29,9 +29,12 @@
 
 #ifdef WIN32
 #include <windows.h>
+#endif
+
+namespace Urho3D
+{
 
 static const unsigned BUFFERSIZE = 4096;
-#endif
 
 OBJECTTYPESTATIC(FileWatcher);
 
@@ -179,4 +182,6 @@ bool FileWatcher::GetNextChange(String& dest)
         changes_.Erase(changes_.Begin());
         return true;
     }
+}
+
 }

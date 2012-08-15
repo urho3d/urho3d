@@ -26,10 +26,14 @@
 #include "Component.h"
 #include "ScriptEventListener.h"
 
-class Script;
-class ScriptFile;
 class asIScriptFunction;
 class asIScriptObject;
+
+namespace Urho3D
+{
+
+class Script;
+class ScriptFile;
 
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
@@ -191,3 +195,5 @@ Scene* GetScriptContextScene();
 ScriptEventListener* GetScriptContextEventListener();
 /// Return the event listener of the active script context as an Object pointer.
 Object* GetScriptContextEventListenerObject();
+
+}

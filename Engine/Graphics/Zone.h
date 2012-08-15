@@ -26,6 +26,9 @@
 #include "Color.h"
 #include "Drawable.h"
 
+namespace Urho3D
+{
+
 /// %Component that describes global rendering properties
 class Zone : public Drawable
 {
@@ -126,3 +129,5 @@ protected:
     /// Last zone used for ambient gradient end color.
     WeakPtr<Zone> lastAmbientEndZone_;
 };
+
+}

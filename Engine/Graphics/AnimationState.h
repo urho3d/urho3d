@@ -26,6 +26,9 @@
 #include "HashMap.h"
 #include "Ptr.h"
 
+namespace Urho3D
+{
+
 class Animation;
 class AnimatedModel;
 class Deserializer;
@@ -98,3 +101,5 @@ private:
     /// Blending layer.
     unsigned char layer_;
 };
+
+}

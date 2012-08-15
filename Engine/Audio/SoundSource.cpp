@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 #define INC_POS_LOOPED() \
     pos += intAdd; \
     fractPos += fractAdd; \
@@ -1209,4 +1212,6 @@ void SoundSource::FreeDecoder()
     }
     
     decodeBuffer_.Reset();
+}
+
 }

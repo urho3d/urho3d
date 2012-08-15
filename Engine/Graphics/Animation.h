@@ -28,6 +28,9 @@
 #include "Ptr.h"
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
 {
@@ -57,7 +60,7 @@ struct AnimationTrack
     Vector<AnimationKeyFrame> keyFrames_;
 };
 
-/// Animation trigger point.
+/// %Animation trigger point.
 struct AnimationTriggerPoint
 {
     /// Trigger time.
@@ -134,3 +137,5 @@ private:
     /// Animation trigger points.
     Vector<AnimationTriggerPoint> triggers_;
 };
+
+}

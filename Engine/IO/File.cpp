@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 #ifdef WIN32
 static const wchar_t* openMode[] =
 {
@@ -377,4 +380,6 @@ void File::Flush()
 void File::SetName(const String& name)
 {
     fileName_ = name;
+}
+
 }

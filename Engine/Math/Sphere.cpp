@@ -25,6 +25,9 @@
 #include "Frustum.h"
 #include "Polyhedron.h"
 
+namespace Urho3D
+{
+
 void Sphere::Define(const Vector3* vertices, unsigned count)
 {
     if (!count)
@@ -251,4 +254,6 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
         return OUTSIDE;
     else
         return INSIDE;
+}
+
 }

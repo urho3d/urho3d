@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 /// Pushbutton %UI element.
 class Button : public BorderImage
 {
@@ -92,3 +95,5 @@ protected:
     /// Current pressed state.
     bool pressed_;
 };
+
+}

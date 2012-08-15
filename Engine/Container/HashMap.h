@@ -26,6 +26,9 @@
 #include "HashBase.h"
 #include "Pair.h"
 
+namespace Urho3D
+{
+
 /// Hash map template class.
 template <class T, class U> class HashMap : public HashBase
 {
@@ -535,3 +538,5 @@ private:
         }
     }
 };
+
+}

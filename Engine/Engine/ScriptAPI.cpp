@@ -27,6 +27,9 @@
 #include "ScriptAPI.h"
 #include "ScriptFile.h"
 
+namespace Urho3D
+{
+
 static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)
@@ -257,4 +260,6 @@ void RegisterScriptAPI(asIScriptEngine* engine)
     RegisterScriptFile(engine);
     RegisterScriptInstance(engine);
     RegisterScript(engine);
+}
+
 }

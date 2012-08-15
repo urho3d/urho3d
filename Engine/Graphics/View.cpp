@@ -49,6 +49,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const Vector3 directions[] =
 {
     Vector3(1.0f, 0.0f, 0.0f),
@@ -2548,4 +2551,6 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
     if (!depthStencil)
         depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
     return depthStencil;
+}
+
 }

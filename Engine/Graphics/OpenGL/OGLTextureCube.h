@@ -27,6 +27,9 @@
 #include "Ptr.h"
 #include "Texture.h"
 
+namespace Urho3D
+{
+
 class Deserializer;
 class Image;
 
@@ -75,3 +78,5 @@ private:
     /// Memory use per face.
     unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
 };
+
+}

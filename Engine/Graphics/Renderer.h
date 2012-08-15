@@ -30,6 +30,9 @@
 #include "Mutex.h"
 #include "Viewport.h"
 
+namespace Urho3D
+{
+
 class Geometry;
 class Drawable;
 class Light;
@@ -488,3 +491,5 @@ private:
     /// Initialized flag.
     bool initialized_;
 };
+
+}

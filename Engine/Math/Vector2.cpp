@@ -26,6 +26,9 @@
 
 #include <cstdio>
 
+namespace Urho3D
+{
+
 const Vector2 Vector2::ZERO(0.0f, 0.0f);
 const Vector2 Vector2::LEFT(-1.0f, 0.0f);
 const Vector2 Vector2::RIGHT(1.0f, 0.0f);
@@ -47,4 +50,6 @@ String IntVector2::ToString() const
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%d %d", x_, y_);
     return String(tempBuffer);
+}
+
 }

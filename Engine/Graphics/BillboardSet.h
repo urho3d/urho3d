@@ -28,6 +28,9 @@
 #include "Rect.h"
 #include "VectorBuffer.h"
 
+namespace Urho3D
+{
+
 class IndexBuffer;
 class Graphics;
 class VertexBuffer;
@@ -162,3 +165,5 @@ private:
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 };
+
+}

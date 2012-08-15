@@ -33,6 +33,9 @@
 #include <SDL_rwops.h>
 #endif
 
+namespace Urho3D
+{
+
 /// File open mode.
 enum FileMode
 {
@@ -111,3 +114,5 @@ private:
     /// Content checksum.
     unsigned checksum_;
 };
+
+}

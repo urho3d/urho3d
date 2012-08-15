@@ -26,6 +26,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const char* name)
 {
     HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
@@ -194,4 +197,6 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
 void Context::EndSendEvent()
 {
     eventSenders_.Pop();
+}
+
 }

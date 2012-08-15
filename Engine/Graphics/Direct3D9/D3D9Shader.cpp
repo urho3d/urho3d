@@ -37,6 +37,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :
@@ -301,4 +304,6 @@ bool Shader::PrepareVariation(ShaderVariation* variation)
         LOGERROR("Shader " + shaderName + " has zero length bytecode");
         return false;
     }
+}
+
 }

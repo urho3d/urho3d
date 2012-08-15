@@ -26,6 +26,9 @@
 #include "GraphicsDefs.h"
 #include "Viewport.h"
 
+namespace Urho3D
+{
+
 class Camera;
 class Scene;
 class Texture;
@@ -88,3 +91,5 @@ private:
     /// Linked depth buffer.
     WeakPtr<RenderSurface> linkedDepthStencil_;
 };
+
+}

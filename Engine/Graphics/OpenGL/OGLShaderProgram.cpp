@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
@@ -215,4 +218,6 @@ const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
         return &i->second_;
     else
         return 0;
+}
+
 }

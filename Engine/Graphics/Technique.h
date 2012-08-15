@@ -26,6 +26,9 @@
 #include "GraphicsDefs.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 class ShaderVariation;
 
 /// %Material rendering pass, which defines shaders and render state.
@@ -141,3 +144,5 @@ private:
     /// Passes.
     SharedPtr<Pass> passes_[MAX_PASSES];
 };
+
+}

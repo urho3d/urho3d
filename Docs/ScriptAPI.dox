@@ -1,3 +1,6 @@
+namespace Urho3D
+{
+
 /**
 \page ScriptAPI Scripting API
 
@@ -4490,3 +4493,5 @@ Properties:<br>
 - bool headless (readonly)
 
 */
+
+}

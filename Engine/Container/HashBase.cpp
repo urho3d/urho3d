@@ -25,6 +25,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 void HashBase::AllocateBuckets(unsigned size, unsigned numBuckets)
 {
     if (ptrs_)
@@ -49,4 +52,6 @@ void HashBase::ResetPtrs()
     HashNodeBase** ptrs = Ptrs();
     for (unsigned i = 0; i < numBuckets; ++i)
         ptrs[i] = 0;
+}
+
 }

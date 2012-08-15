@@ -28,6 +28,9 @@
 #include <cstdlib>
 #include <cmath>
 
+namespace Urho3D
+{
+
 #ifndef M_PI
 static const float M_PI = 3.141592653589793238462643f;
 #endif
@@ -121,3 +124,5 @@ inline float Random() { return Rand() / 32768.0f; }
 inline float Random(float range) { return Rand() * range / 32767.0f; }
 /// Return a random integer between 0 and range - 1.
 inline int Random(int range) { return (Rand() * (range - 1) + 16384) / 32767; }
+
+}

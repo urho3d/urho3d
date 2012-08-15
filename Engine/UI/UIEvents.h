@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
@@ -188,4 +191,6 @@ EVENT(E_FILESELECTED, FileSelected)
 {
     PARAM(P_FILENAME, FileName);            // String
     PARAM(P_OK, Ok);                        // bool
+}
+
 }

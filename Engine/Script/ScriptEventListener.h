@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Interface class for event listeners that forward events to script.
 class ScriptEventListener
 {
@@ -34,3 +37,5 @@ public:
     /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
 };
+
+}

@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Operating system window message.
 EVENT(E_WINDOWMESSAGE, WindowMessage)
 {
@@ -56,4 +59,6 @@ EVENT(E_BEGINRENDERING, BeginRendering)
 /// Frame rendering ended.
 EVENT(E_ENDRENDERING, EndRendering)
 {
+}
+
 }

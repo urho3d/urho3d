@@ -25,6 +25,9 @@
 
 #include "HashBase.h"
 
+namespace Urho3D
+{
+
 /// Hash set template class.
 template <class T> class HashSet : public HashBase
 {
@@ -471,3 +474,5 @@ private:
         }
     }
 };
+
+}

@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Server connection established.
 EVENT(E_SERVERCONNECTED, ServerConnected)
 {
@@ -93,4 +96,6 @@ EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
 EVENT(E_REMOTEEVENTDATA, RemoteEventData)
 {
     PARAM(P_CONNECTION, Connection);      // Connection pointer
+}
+
 }

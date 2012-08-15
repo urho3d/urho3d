@@ -30,6 +30,9 @@
 
 #include <cstring>
 
+namespace Urho3D
+{
+
 static const unsigned MAX_NETWORK_ATTRIBUTES = 64;
 
 class Component;
@@ -192,3 +195,5 @@ struct SceneReplicationState : ReplicationState
         dirtyNodes_.Clear();
     }
 };
+
+}

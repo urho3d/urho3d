@@ -34,6 +34,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String addressModeNames[] =
 {
     "wrap",
@@ -265,4 +268,6 @@ void Texture::CheckTextureBudget(ShortStringHash type)
     // Therefore free unused materials first
     if (textureUse > textureBudget)
         cache->ReleaseResources(Material::GetTypeStatic());
+}
+
 }

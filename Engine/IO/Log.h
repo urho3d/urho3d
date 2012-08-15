@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Debug message level. By default only shown in debug mode.
 static const int LOG_DEBUG = 0;
 /// Informative message level.
@@ -90,3 +93,5 @@ void WriteToLogRaw(Context* context, const String& message);
 #define LOGWARNING(message) WriteToLog(context_, LOG_WARNING, message)
 #define LOGERROR(message) WriteToLog(context_, LOG_ERROR, message)
 #define LOGRAW(message) WriteToLogRaw(context_, message)
+
+}

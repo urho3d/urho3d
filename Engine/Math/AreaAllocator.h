@@ -25,6 +25,9 @@
 
 #include "Rect.h"
 
+namespace Urho3D
+{
+
 /// Rectangular area allocator.
 class AreaAllocator
 {
@@ -46,3 +49,5 @@ private:
     /// Free rectangles.
     PODVector<IntRect> freeAreas_;
 };
+
+}

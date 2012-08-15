@@ -30,6 +30,9 @@
 #include "Quaternion.h"
 #include "Thread.h"
 
+namespace Urho3D
+{
+
 class AudioImpl;
 class Sound;
 class SoundSource;
@@ -133,3 +136,5 @@ private:
 
 /// Register Sound library objects.
 void RegisterAudioLibrary(Context* context);
+
+}

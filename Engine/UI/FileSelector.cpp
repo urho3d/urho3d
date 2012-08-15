@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry& rhs)
 {
     if (lhs.directory_ && !rhs.directory_)
@@ -499,4 +502,6 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
     newEventData[P_FILENAME] = String();
     newEventData[P_OK] = false;
     SendEvent(E_FILESELECTED, newEventData);
+}
+
 }

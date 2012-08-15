@@ -27,6 +27,9 @@
 
 #include <cstring>
 
+namespace Urho3D
+{
+
 const Variant Variant::EMPTY;
 const PODVector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
@@ -542,4 +545,6 @@ VariantType Variant::GetTypeFromName(const char* typeName)
     }
     
     return VAR_NONE;
+}
+
 }

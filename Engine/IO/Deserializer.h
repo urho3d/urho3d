@@ -27,6 +27,9 @@
 #include "Rect.h"
 #include "Variant.h"
 
+namespace Urho3D
+{
+
 /// Abstract stream for reading.
 class Deserializer
 {
@@ -126,3 +129,5 @@ protected:
     /// Stream size.
     unsigned size_;
 };
+
+}

@@ -25,6 +25,9 @@
 
 #include "SoundSource.h"
 
+namespace Urho3D
+{
+
 class Audio;
 
 /// %Sound source component with three-dimensional position.
@@ -67,3 +70,5 @@ protected:
     /// Rolloff power factor.
     float rolloffFactor_;
 };
+
+}

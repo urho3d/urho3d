@@ -37,7 +37,9 @@
 
 #include "DebugNew.h"
 
-static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+namespace Urho3D
+{
+
 static const float LOD_CONSTANT = 8.0f;
 
 OBJECTTYPESTATIC(TerrainPatch);
@@ -301,4 +303,6 @@ unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
         lodLevel = Min((int)lodLevel, east_->GetLodLevel() + 1);
     
     return lodLevel;
+}
+
 }

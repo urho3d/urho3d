@@ -50,6 +50,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float dirLightVertexData[] =
 {
     -1, 1, 0,
@@ -1831,4 +1834,6 @@ void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
         
         Update(eventData[P_TIMESTEP].GetFloat());
     }
+}
+
 }

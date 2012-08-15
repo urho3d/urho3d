@@ -29,6 +29,8 @@
 #include "Serializer.h"
 #include "Matrix3x4.h"
 
+using namespace Urho3D;
+
 struct Triangle
 {
     unsigned v0_;

@@ -26,6 +26,9 @@
 #include "GraphicsDefs.h"
 #include "Viewport.h"
 
+namespace Urho3D
+{
+
 class Texture;
 
 /// %Color or depth-stencil surface that can be rendered into.
@@ -78,3 +81,5 @@ private:
     /// Linked depth buffer.
     WeakPtr<RenderSurface> linkedDepthStencil_;
 };
+
+}

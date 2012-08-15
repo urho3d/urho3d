@@ -26,6 +26,9 @@
 #include "Str.h"
 #include "Timer.h"
 
+namespace Urho3D
+{
+
 /// Profiling data for one block in the profiling tree.
 class ProfilerBlock
 {
@@ -249,3 +252,5 @@ private:
 #else
 #define PROFILE(name)
 #endif
+
+}

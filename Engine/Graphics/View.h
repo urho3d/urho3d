@@ -29,6 +29,9 @@
 #include "Object.h"
 #include "Polyhedron.h"
 
+namespace Urho3D
+{
+
 class Camera;
 class DebugRenderer;
 class Light;
@@ -262,3 +265,5 @@ private:
     /// Post-transparent pass batches.
     BatchQueue postAlphaQueue_;
 };
+
+}

@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int DEFAULT_UPDATE_FPS = 30;
 
 OBJECTTYPESTATIC(Network);
@@ -236,7 +239,6 @@ bool Network::StartServer(unsigned short port)
     
     PROFILE(StartServer);
     
-    /// \todo Investigate why server fails to restart after stopping when false is specified for reuse
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
         LOGINFO("Started server on port " + String(port));
@@ -524,4 +526,6 @@ void Network::OnServerDisconnected()
 void RegisterNetworkLibrary(Context* context)
 {
     NetworkPriority::RegisterObject(context);
+}
+
 }

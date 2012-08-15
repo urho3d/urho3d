@@ -36,6 +36,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
@@ -411,4 +414,6 @@ const FontFace* Font::GetFace(int pointSize)
     newFace->texture_ = StaticCast<Texture>(texture);
     faces_[pointSize] = newFace;
     return newFace;
+}
+
 }

@@ -28,6 +28,9 @@
 #include "SmoothedTransform.h"
 #include "Sort.h"
 
+namespace Urho3D
+{
+
 static void RegisterSerializable(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint AM_FILE", (void*)&AM_FILE);
@@ -203,4 +206,6 @@ void RegisterSceneAPI(asIScriptEngine* engine)
     RegisterNode(engine);
     RegisterSmoothedTransform(engine);
     RegisterScene(engine);
+}
+
 }

@@ -28,6 +28,9 @@
 #include "Object.h"
 #include "GraphicsDefs.h"
 
+namespace Urho3D
+{
+
 /// Hardware index buffer.
 class IndexBuffer : public Object, public GPUObject
 {
@@ -99,3 +102,5 @@ private:
     /// Dynamic flag.
     bool dynamic_;
 };
+
+}

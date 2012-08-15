@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// SoundSource type enumeration for master gain control.
 enum SoundType
 {
@@ -33,3 +36,5 @@ enum SoundType
     SOUND_MASTER,
     MAX_SOUND_TYPES
 };
+
+}

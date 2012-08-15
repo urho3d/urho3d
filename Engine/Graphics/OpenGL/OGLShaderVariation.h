@@ -28,6 +28,9 @@
 #include "GraphicsDefs.h"
 #include "RefCounted.h"
 
+namespace Urho3D
+{
+
 class Shader;
 class ShaderProgram;
 
@@ -85,3 +88,5 @@ private:
     /// Compiled flag.
     bool compiled_;
 };
+
+}

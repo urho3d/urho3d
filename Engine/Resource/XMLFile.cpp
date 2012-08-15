@@ -34,6 +34,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 /// XML writer for pugixml.
 class XMLWriter : public pugi::xml_writer
 {
@@ -124,4 +127,6 @@ XMLElement XMLFile::GetRoot(const String& name)
         return XMLElement();
     else
         return XMLElement(this, root.internal_object());
+}
+
 }

@@ -29,6 +29,9 @@
 #include "Rect.h"
 #include "Sphere.h"
 
+namespace Urho3D
+{
+
 /// Frustum planes.
 enum FrustumPlane
 {
@@ -176,3 +179,5 @@ public:
     /// Defined flag.
     bool defined_;
 };
+
+}

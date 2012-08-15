@@ -26,6 +26,11 @@
 #include "Component.h"
 #include "Vector3.h"
 
+class btTypedConstraint;
+
+namespace Urho3D
+{
+
 /// Supported constraint types.
 enum ConstraintType
 {
@@ -37,7 +42,6 @@ enum ConstraintType
 
 class PhysicsWorld;
 class RigidBody;
-class btTypedConstraint;
 
 /// Physics constraint component. Connects two rigid bodies together, or one rigid body to a static point.
 class Constraint : public Component
@@ -165,3 +169,5 @@ private:
     /// Coordinate frames dirty flag.
     bool framesDirty_;
 };
+
+}

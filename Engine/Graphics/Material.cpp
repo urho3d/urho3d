@@ -38,6 +38,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 const String textureUnitNames[] =
 {
     "diffuse",
@@ -448,4 +451,6 @@ void Material::CheckSpecular()
         specular_ = i->second_.value_.x_ > 0.0f || i->second_.value_.y_ > 0.0f || i->second_.value_.z_ > 0.0f;
     else
         specular_ = false;
+}
+
 }

@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String shapeNames[] =
 {
     "normal",
@@ -117,4 +120,6 @@ void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
         quads[i].right_ -= offset.x_;
         quads[i].bottom_ -= offset.y_;
     }
+}
+
 }

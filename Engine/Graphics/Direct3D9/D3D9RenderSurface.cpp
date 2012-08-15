@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
     surface_(0),
@@ -97,4 +100,6 @@ int RenderSurface::GetHeight() const
 TextureUsage RenderSurface::GetUsage() const
 {
     return parentTexture_->GetUsage();
+}
+
 }

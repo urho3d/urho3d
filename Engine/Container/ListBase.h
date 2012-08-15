@@ -26,6 +26,9 @@
 #include "Allocator.h"
 #include "Swap.h"
 
+namespace Urho3D
+{
+
 /// Doubly-linked list node base class.
 struct ListNodeBase
 {
@@ -94,10 +97,10 @@ public:
     /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
-        ::Swap(head_, rhs.head_);
-        ::Swap(tail_, rhs.tail_);
-        ::Swap(allocator_, rhs.allocator_);
-        ::Swap(size_, rhs.size_);
+        Urho3D::Swap(head_, rhs.head_);
+        Urho3D::Swap(tail_, rhs.tail_);
+        Urho3D::Swap(allocator_, rhs.allocator_);
+        Urho3D::Swap(size_, rhs.size_);
     }
     
 protected:
@@ -110,3 +113,5 @@ protected:
     /// Number of nodes.
     unsigned size_;
 };
+
+}

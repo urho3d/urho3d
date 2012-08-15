@@ -27,6 +27,9 @@
 #include "Timer.h"
 #include "WorkQueue.h"
 
+namespace Urho3D
+{
+
 /// Worker thread managed by the work queue.
 class WorkerThread : public Thread, public RefCounted
 {
@@ -216,4 +219,6 @@ void WorkQueue::ProcessItems(unsigned threadIndex)
             }
         }
     }
+}
+
 }

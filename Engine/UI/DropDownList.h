@@ -25,6 +25,9 @@
 
 #include "Menu.h"
 
+namespace Urho3D
+{
+
 class ListView;
 
 /// %Menu %UI element that displays a popup list view.
@@ -93,3 +96,5 @@ private:
     /// Handle listview item selected event.
     void HandleItemSelected(StringHash eventType, VariantMap& eventData);
 };
+
+}

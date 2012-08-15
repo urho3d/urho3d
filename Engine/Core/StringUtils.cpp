@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 unsigned CountElements(const char* buffer, char separator)
 {
     if (!buffer)
@@ -371,4 +374,6 @@ unsigned GetStringListIndex(const char* value, const String* strings, unsigned d
     }
     
     return defaultIndex;
+}
+
 }

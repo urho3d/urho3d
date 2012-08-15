@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 #ifdef WIN32
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
@@ -109,4 +112,6 @@ void Thread::SetPriority(int priority)
     if (thread)
         pthread_setschedprio(*thread, priority);
     #endif
+}
+
 }

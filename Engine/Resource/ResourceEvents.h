@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Resource reloading started.
 EVENT(E_RELOADSTARTED, ReloadStarted)
 {
@@ -38,4 +41,6 @@ EVENT(E_RELOADFINISHED, ReloadFinished)
 /// Resource reloading failed.
 EVENT(E_RELOADFAILED, ReloadFailed)
 {
+}
+
 }

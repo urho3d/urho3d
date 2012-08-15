@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
@@ -597,4 +600,6 @@ const Vector<AttributeInfo>* Serializable::GetAttributes() const
 const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
 {
     return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
+}
+
 }

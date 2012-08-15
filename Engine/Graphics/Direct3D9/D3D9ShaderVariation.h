@@ -29,6 +29,9 @@
 #include "RefCounted.h"
 #include "ArrayPtr.h"
 
+namespace Urho3D
+{
+
 class Shader;
 
 /// %Shader parameter definition.
@@ -118,3 +121,5 @@ private:
     /// Texture unit use flags.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
 };
+
+}

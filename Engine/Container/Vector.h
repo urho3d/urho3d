@@ -29,6 +29,9 @@
 #include <cstring>
 #include <new>
 
+namespace Urho3D
+{
+
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
 {
@@ -807,3 +810,5 @@ private:
             memcpy(dest, src, count * sizeof(T));
     }
 };
+
+}

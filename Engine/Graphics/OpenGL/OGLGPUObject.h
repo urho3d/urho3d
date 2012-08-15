@@ -25,6 +25,9 @@
 
 #include "Ptr.h"
 
+namespace Urho3D
+{
+
 class Graphics;
 
 /// Base class for GPU resources.
@@ -65,3 +68,5 @@ protected:
     /// Data pending flag.
     bool dataPending_;
 };
+
+}

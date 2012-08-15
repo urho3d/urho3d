@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 VectorBuffer::VectorBuffer()
 {
 }
@@ -166,4 +169,6 @@ void VectorBuffer::Resize(unsigned size)
     size_ = size;
     if (position_ > size_)
         position_ = size_;
+}
+
 }

@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// Operating system mutual exclusion primitive.
 class Mutex
 {
@@ -55,3 +58,5 @@ private:
     /// Mutex reference.
     Mutex& mutex_;
 };
+
+}

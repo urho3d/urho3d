@@ -26,6 +26,9 @@
 #include "Rect.h"
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 class Polyhedron;
 class Frustum;
 class Matrix3;
@@ -303,3 +306,5 @@ public:
     /// Defined flag.
     bool defined_;
 };
+
+}

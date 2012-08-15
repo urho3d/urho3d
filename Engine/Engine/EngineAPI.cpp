@@ -27,6 +27,9 @@
 #include "DebugHud.h"
 #include "Engine.h"
 
+namespace Urho3D
+{
+
 static Console* GetConsole()
 {
     return GetScriptContext()->GetSubsystem<Console>();
@@ -118,4 +121,6 @@ void RegisterEngineAPI(asIScriptEngine* engine)
     RegisterConsole(engine);
     RegisterDebugHud(engine);
     RegisterEngine(engine);
+}
+
 }

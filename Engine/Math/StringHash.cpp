@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 const StringHash StringHash::ZERO;
 const ShortStringHash ShortStringHash::ZERO;
 
@@ -87,4 +90,6 @@ String ShortStringHash::ToString() const
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%04X", value_);
     return String(tempBuffer);
+}
+
 }

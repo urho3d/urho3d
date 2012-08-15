@@ -26,6 +26,9 @@
 #include "Object.h"
 #include "Timer.h"
 
+namespace Urho3D
+{
+
 class Engine;
 class Font;
 class Text;
@@ -103,3 +106,5 @@ private:
     /// Show 3D geometry primitive/batch count flag.
     bool useRendererStats_;
 };
+
+}

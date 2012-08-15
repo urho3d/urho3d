@@ -26,6 +26,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Object::Object(Context* context) :
     context_(context)
 {
@@ -415,4 +418,6 @@ void Object::RemoveEventSender(Object* sender)
             handler = eventHandlers_.Next(handler);
         }
     }
+}
+
 }

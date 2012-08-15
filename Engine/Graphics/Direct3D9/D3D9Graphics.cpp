@@ -58,6 +58,9 @@
 #pragma warning(disable:4355)
 #endif
 
+namespace Urho3D
+{
+
 extern "C" HWND WIN_GetWindowHandle(SDL_Window* window);
 
 static const D3DCMPFUNC d3dCmpFunc[] =
@@ -2306,4 +2309,6 @@ void RegisterGraphicsLibrary(Context* context)
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);
+}
+
 }

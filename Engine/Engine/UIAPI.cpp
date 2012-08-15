@@ -36,6 +36,9 @@
 #include "UI.h"
 #include "Window.h"
 
+namespace Urho3D
+{
+
 static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
@@ -468,4 +471,6 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterWindow(engine);
     RegisterFileSelector(engine);
     RegisterUI(engine);
+}
+
 }

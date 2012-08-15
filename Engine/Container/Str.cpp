@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 char String::endZero = 0;
 
 const String String::EMPTY;
@@ -390,9 +393,9 @@ void String::Clear()
 
 void String::Swap(String& str)
 {
-    ::Swap(length_, str.length_);
-    ::Swap(capacity_, str.capacity_);
-    ::Swap(buffer_, str.buffer_);
+    Urho3D::Swap(length_, str.length_);
+    Urho3D::Swap(capacity_, str.capacity_);
+    Urho3D::Swap(buffer_, str.buffer_);
 }
 
 String String::Substring(unsigned pos) const
@@ -1043,4 +1046,6 @@ void WString::Resize(unsigned newSize)
         buffer_ = newBuffer;
         length_ = newSize;
     }
+}
+
 }

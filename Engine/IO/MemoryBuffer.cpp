@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
     Deserializer(size),
     buffer_((unsigned char*)data),
@@ -129,4 +132,6 @@ unsigned MemoryBuffer::Write(const void* data, unsigned size)
         *destPtr = *srcPtr;
     
     return size;
+}
+
 }

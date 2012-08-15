@@ -26,6 +26,9 @@
 #include "Quaternion.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 /// 4x4 matrix for arbitrary linear transforms including projection.
 class Matrix4
 {
@@ -453,3 +456,5 @@ public:
 
 /// Multiply a 4x4 matrix with a scalar
 inline Matrix4 operator * (float lhs, const Matrix4& rhs) { return rhs * lhs; }
+
+}

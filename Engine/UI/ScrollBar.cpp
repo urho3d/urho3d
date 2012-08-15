@@ -28,6 +28,9 @@
 #include "Slider.h"
 #include "UIEvents.h"
 
+namespace Urho3D
+{
+
 static const float DEFAULT_SCROLL_STEP = 0.1f;
 static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
@@ -247,4 +250,6 @@ void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
     newEventData[ScrollBarChanged::P_ELEMENT] = (void*)this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
+}
+
 }

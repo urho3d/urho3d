@@ -27,6 +27,9 @@
 #include "Skeleton.h"
 #include "StaticModel.h"
 
+namespace Urho3D
+{
+
 class Animation;
 class AnimationState;
 
@@ -228,3 +231,5 @@ private:
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
 };
+
+}

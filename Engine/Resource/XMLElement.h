@@ -33,6 +33,9 @@ namespace pugi
     struct xml_node_struct;
 }
 
+namespace Urho3D
+{
+
 class XMLFile;
 
 /// Element in an XML file.
@@ -204,3 +207,5 @@ private:
     /// Pugixml node.
     pugi::xml_node_struct* node_;
 };
+
+}

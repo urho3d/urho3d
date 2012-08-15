@@ -27,6 +27,9 @@
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
 
+namespace Urho3D
+{
+
 /// Hardware vertex buffer.
 class VertexBuffer : public Object, public GPUObject
 {
@@ -122,3 +125,5 @@ private:
     /// Dynamic flag.
     bool dynamic_;
 };
+
+}

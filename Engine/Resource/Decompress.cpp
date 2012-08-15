@@ -26,6 +26,9 @@
 
 // DXT decompression based on the Squish library, modified for Urho3D
 
+namespace Urho3D
+{
+
 /* -----------------------------------------------------------------------------
 
     Copyright (c) 2006 Simon Brown                          si@sjbrown.co.uk
@@ -935,4 +938,6 @@ void DecompressImagePVRTC(unsigned char* dest, const void *blocks, int width, in
             dest[uPosition+3] = (unsigned char)Result[3];
         }
     }
+}
+
 }

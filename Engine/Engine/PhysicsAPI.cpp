@@ -29,6 +29,9 @@
 #include "RigidBody.h"
 #include "Scene.h"
 
+namespace Urho3D
+{
+
 static PhysicsWorld* SceneGetPhysicsWorld(Scene* ptr)
 {
     return ptr->GetComponent<PhysicsWorld>();
@@ -270,4 +273,6 @@ void RegisterPhysicsAPI(asIScriptEngine* engine)
     RegisterRigidBody(engine);
     RegisterConstraint(engine);
     RegisterPhysicsWorld(engine);
+}
+
 }

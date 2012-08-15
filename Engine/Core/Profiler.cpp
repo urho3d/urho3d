@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int LINE_MAX_LENGTH = 256;
 static const int NAME_MAX_LENGTH = 30;
 
@@ -153,4 +156,6 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     
     for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
         GetData(*i, output, depth, maxDepth, showUnused, showTotal);
+}
+
 }

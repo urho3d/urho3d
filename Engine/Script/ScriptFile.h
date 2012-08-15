@@ -27,15 +27,19 @@
 #include "Resource.h"
 #include "ScriptEventListener.h"
 
-class Script;
-class ScriptInstance;
-class Variant;
 class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
+
+namespace Urho3D
+{
+
+class Script;
+class ScriptInstance;
+class Variant;
 
 /// %Script file resource.
 class ScriptFile : public Resource, public ScriptEventListener
@@ -107,3 +111,5 @@ private:
 
 /// Get currently executing script file.
 ScriptFile* GetScriptContextFile();
+
+}

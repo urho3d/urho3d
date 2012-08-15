@@ -29,6 +29,9 @@
 #include "Resource.h"
 #include "Ptr.h"
 
+namespace Urho3D
+{
+
 class Geometry;
 class IndexBuffer;
 class Graphics;
@@ -154,3 +157,5 @@ private:
     /// Vertex buffer morph range vertex count.
     PODVector<unsigned> morphRangeCounts_;
 };
+
+}

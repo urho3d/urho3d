@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 /// %UI element that can be toggled between unchecked and checked state.
 class CheckBox : public BorderImage
 {
@@ -65,3 +68,5 @@ protected:
     /// Current checked state.
     bool checked_;
 };
+
+}

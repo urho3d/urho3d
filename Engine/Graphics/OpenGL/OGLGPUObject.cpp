@@ -27,6 +27,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
     object_(0),
@@ -51,4 +54,6 @@ void GPUObject::OnDeviceLost()
 void GPUObject::ClearDataLost()
 {
     dataLost_ = false;
+}
+
 }

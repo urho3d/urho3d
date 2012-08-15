@@ -40,6 +40,9 @@ extern "C" void SDL_IOS_LogMessage(const char* message);
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String levelPrefixes[] =
 {
     "DEBUG",
@@ -181,4 +184,6 @@ void WriteToLogRaw(Context* context, const String& message)
     Log* log = context->GetSubsystem<Log>();
     if (log)
         log->WriteRaw(message);
+}
+
 }

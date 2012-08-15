@@ -26,6 +26,9 @@
 #include "GraphicsDefs.h"
 #include "Object.h"
 
+namespace Urho3D
+{
+
 class Texture2D;
 class XMLFile;
 
@@ -154,3 +157,5 @@ private:
     /// Active flag.
     bool active_;
 };
+
+}

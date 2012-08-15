@@ -31,6 +31,9 @@ namespace pugi
     class xml_document;
 }
 
+namespace Urho3D
+{
+
 /// XML document resource.
 class XMLFile : public Resource
 {
@@ -61,3 +64,5 @@ private:
     /// Pugixml document.
     pugi::xml_document* document_;
 };
+
+}

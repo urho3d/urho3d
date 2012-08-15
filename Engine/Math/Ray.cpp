@@ -28,6 +28,9 @@
 #include "Ray.h"
 #include "Sphere.h"
 
+namespace Urho3D
+{
+
 Vector3 Ray::Project(const Vector3& point) const
 {
     Vector3 offset = point - origin_;
@@ -280,4 +283,6 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* 
     }
     
     return nearest;
+}
+
 }

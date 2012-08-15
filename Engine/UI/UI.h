@@ -26,6 +26,9 @@
 #include "Object.h"
 #include "UIBatch.h"
 
+namespace Urho3D
+{
+
 class Cursor;
 class Graphics;
 class ResourceCache;
@@ -162,3 +165,5 @@ private:
 
 /// Register UI library objects.
 void RegisterUILibrary(Context* context);
+
+}

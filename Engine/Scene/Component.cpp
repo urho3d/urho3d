@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Component);
 
 Component::Component(Context* context) :
@@ -192,4 +195,6 @@ void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type)
         node_->GetComponents(dest, type);
     else
         dest.Clear();
+}
+
 }

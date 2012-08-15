@@ -28,6 +28,9 @@
 #include "Ptr.h"
 #include "Texture.h"
 
+namespace Urho3D
+{
+
 /// 2D texture resource.
 class Texture2D : public Texture
 {
@@ -69,3 +72,5 @@ private:
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
 };
+
+}

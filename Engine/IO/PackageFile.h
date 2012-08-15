@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// %File entry within the package file.
 struct PackageEntry
 {
@@ -80,3 +83,5 @@ private:
     /// Package file checksum.
     unsigned checksum_;
 };
+
+}

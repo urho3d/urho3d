@@ -29,6 +29,9 @@
 #include "GraphicsDefs.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLElement;
@@ -139,3 +142,5 @@ protected:
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };
+
+}

@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
@@ -138,4 +141,6 @@ void ShaderVariation::OptimizeParameters()
 bool ShaderVariation::IsCreated() const
 {
     return object_ != 0;
+}
+
 }

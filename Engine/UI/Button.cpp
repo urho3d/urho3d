@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Button);
 
 Button::Button(Context* context) :
@@ -173,4 +176,6 @@ void Button::SetPressed(bool enable)
 {
     pressed_ = enable;
     SetChildOffset(pressed_ ? labelOffset_ : IntVector2::ZERO);
+}
+
 }

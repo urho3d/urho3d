@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 class BorderImage;
 class Engine;
 class Font;
@@ -105,3 +108,5 @@ private:
     /// Currently printing a log message flag.
     bool inLogMessage_;
 };
+
+}

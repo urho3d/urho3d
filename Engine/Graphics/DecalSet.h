@@ -28,6 +28,9 @@
 #include "List.h"
 #include "Skeleton.h"
 
+namespace Urho3D
+{
+
 /// %Decal vertex.
 struct DecalVertex
 {
@@ -226,3 +229,5 @@ private:
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
 };
+
+}

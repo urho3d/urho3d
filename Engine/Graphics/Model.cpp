@@ -37,6 +37,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 unsigned LookupVertexBuffer(VertexBuffer* buffer, const Vector<SharedPtr<VertexBuffer> >& buffers)
 {
     for (unsigned i = 0; i < buffers.Size(); ++i)
@@ -499,4 +502,6 @@ unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const
 unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
 {
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
+}
+
 }

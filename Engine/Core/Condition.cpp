@@ -30,6 +30,9 @@
 #include <pthread.h>
 #endif
 
+namespace Urho3D
+{
+
 #ifdef WIN32
 Condition::Condition() :
     event_(0)
@@ -89,3 +92,5 @@ void Condition::Wait()
     pthread_mutex_unlock(mutex);
 }
 #endif
+
+}

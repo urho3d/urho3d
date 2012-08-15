@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Skeleton::Skeleton() :
     rootBoneIndex_(M_MAX_UNSIGNED)
 {
@@ -156,4 +159,6 @@ Bone* Skeleton::GetBone(StringHash nameHash)
     }
     
     return 0;
+}
+
 }

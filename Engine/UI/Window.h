@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 /// %Window movement and resizing modes.
 enum WindowDragMode
 {
@@ -105,3 +108,5 @@ protected:
     /// Original size at drag begin.
     IntVector2 dragBeginSize_;
 };
+
+}

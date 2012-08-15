@@ -30,6 +30,9 @@
 
 #include <angelscript.h>
 
+namespace Urho3D
+{
+
 static float Sin(float angle)
 {
     return sinf(angle * M_DEGTORAD);
@@ -1011,4 +1014,6 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterPlane(engine);
     RegisterRay(engine);
     RegisterColor(engine);
+}
+
 }

@@ -29,6 +29,9 @@
 #include "Ray.h"
 #include "Sphere.h"
 
+namespace Urho3D
+{
+
 class Drawable;
 class Node;
 
@@ -197,3 +200,5 @@ public:
     /// Raycast detail level.
     RayQueryLevel level_;
 };
+
+}

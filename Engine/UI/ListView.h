@@ -26,6 +26,9 @@
 #include "ScrollView.h"
 #include "HashSet.h"
 
+namespace Urho3D
+{
+
 /// %ListView selection highlight mode.
 enum HighlightMode
 {
@@ -164,3 +167,5 @@ private:
     /// Handle being defocused.
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
 };
+
+}

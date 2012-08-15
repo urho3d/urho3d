@@ -70,6 +70,9 @@ inline void SetFPUState(unsigned control)
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 #ifdef WIN32
 static bool consoleOpened = false;
 #endif
@@ -366,4 +369,6 @@ unsigned GetNumLogicalCPUs()
 Mutex& GetStaticMutex()
 {
     return staticMutex;
+}
+
 }

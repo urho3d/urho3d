@@ -35,6 +35,9 @@
 #include <dbghelp.h>
 #include <shlObj.h>
 
+namespace Urho3D
+{
+
 static bool miniDumpWritten = false;
 
 int WriteMiniDump(const char* applicationName, void* exceptionPointers)
@@ -80,5 +83,7 @@ int WriteMiniDump(const char* applicationName, void* exceptionPointers)
         ErrorDialog(applicationName, "An unexpected error occurred. Could not write minidump.");
     
     return EXCEPTION_EXECUTE_HANDLER;
+}
+
 }
 #endif

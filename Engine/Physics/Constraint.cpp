@@ -40,6 +40,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const char* typeNames[] =
 {
     "Point",
@@ -518,4 +521,6 @@ void Constraint::ApplyLimits()
         }
         break;
     }
+}
+
 }

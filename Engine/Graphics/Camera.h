@@ -28,6 +28,9 @@
 #include "GraphicsDefs.h"
 #include "Ray.h"
 
+namespace Urho3D
+{
+
 static const unsigned VO_NONE = 0x0;
 static const unsigned VO_LOW_MATERIAL_QUALITY = 0x1;
 static const unsigned VO_DISABLE_SHADOWS = 0x2;
@@ -189,3 +192,5 @@ private:
     /// Flip vertical flag.
     bool flipVertical_;
 };
+
+}

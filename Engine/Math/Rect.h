@@ -25,6 +25,9 @@
 
 #include "Vector2.h"
 
+namespace Urho3D
+{
+
 /// Two-dimensional bounding rectangle.
 class Rect
 {
@@ -214,3 +217,5 @@ public:
     /// Zero-sized rect.
     static const IntRect ZERO;
 };
+
+}

@@ -46,7 +46,8 @@
 
 #include "DebugNew.h"
 
-static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+namespace Urho3D
+{
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
@@ -1273,4 +1274,6 @@ void AnimatedModel::HandleModelReloadFinished(StringHash eventType, VariantMap& 
     Model* currentModel = model_;
     model_ = 0; // Set null to allow to be re-set
     SetModel(currentModel);
+}
+
 }

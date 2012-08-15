@@ -44,6 +44,9 @@
 #define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
 
+namespace Urho3D
+{
+
 struct DDColorKey
 {
     unsigned dwColorSpaceLowValue_;
@@ -788,4 +791,6 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             ++i;
         }
     }
+}
+
 }

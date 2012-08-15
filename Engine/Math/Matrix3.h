@@ -25,6 +25,9 @@
 
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 /// 3x3 matrix for rotation and scaling.
 class Matrix3
 {
@@ -269,3 +272,5 @@ public:
 
 /// Multiply a 3x3 matrix with a scalar.
 inline Matrix3 operator * (float lhs, const Matrix3& rhs) { return rhs * lhs; }
+
+}

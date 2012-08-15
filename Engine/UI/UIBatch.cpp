@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 void UIBatch::Begin(PODVector<UIQuad>* quads)
 {
     if (quads)
@@ -292,4 +295,6 @@ unsigned UIBatch::GetInterpolatedColor(UIElement& element, int x, int y)
         color.a_ *= element.GetDerivedOpacity();
         return color.ToUInt();
     }
+}
+
 }

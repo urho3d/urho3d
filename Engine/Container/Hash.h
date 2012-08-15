@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// Pointer hash function.
 template <class T> unsigned MakeHash(T* value)
 {
@@ -99,4 +102,6 @@ template<> inline unsigned MakeHash(const char& value)
 template<> inline unsigned MakeHash(const unsigned char& value)
 {
     return value;
+}
+
 }

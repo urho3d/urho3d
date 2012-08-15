@@ -26,6 +26,9 @@
 #include "Object.h"
 #include "Timer.h"
 
+namespace Urho3D
+{
+
 class Console;
 class DebugHud;
 
@@ -115,3 +118,5 @@ private:
     /// Headless mode flag.
     bool headless_;
 };
+
+}

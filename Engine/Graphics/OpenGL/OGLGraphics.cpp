@@ -76,6 +76,9 @@
 #define glCheckFramebufferStatusEXT glCheckFramebufferStatus
 #endif
 
+namespace Urho3D
+{
+
 static const unsigned glCmpFunc[] =
 {
     GL_ALWAYS,
@@ -2377,4 +2380,6 @@ void RegisterGraphicsLibrary(Context* context)
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);
+}
+
 }

@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 class HashBase;
 class ListBase;
 class String;
@@ -42,3 +45,5 @@ template<> void Swap<VectorBase>(VectorBase& first, VectorBase& second);
 template<> void Swap<ListBase>(ListBase& first, ListBase& second);
 template<> void Swap<TreeBase>(TreeBase& first, TreeBase& second);
 template<> void Swap<HashBase>(HashBase& first, HashBase& second);
+
+}

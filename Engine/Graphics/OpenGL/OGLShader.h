@@ -27,6 +27,9 @@
 #include "Resource.h"
 #include "ShaderParser.h"
 
+namespace Urho3D
+{
+
 class ShaderVariation;
 
 /// %Shader resource consisting of several shader variations.
@@ -69,3 +72,5 @@ private:
     /// Pixel shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
 };
+
+}

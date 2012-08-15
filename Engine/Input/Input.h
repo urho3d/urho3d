@@ -27,6 +27,9 @@
 #include "InputEvents.h"
 #include "Object.h"
 
+namespace Urho3D
+{
+
 class Graphics;
 
 /// %Input state for a finger touch.
@@ -242,3 +245,5 @@ private:
     /// Initialized flag.
     bool initialized_;
 };
+
+}

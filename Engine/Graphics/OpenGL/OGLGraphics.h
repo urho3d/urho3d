@@ -32,6 +32,9 @@
 #include "Object.h"
 #include "Rect.h"
 
+namespace Urho3D
+{
+
 class Image;
 class IndexBuffer;
 class Matrix3;
@@ -502,3 +505,5 @@ private:
 
 /// Register Graphics library objects.
 void RegisterGraphicsLibrary(Context* context_);
+
+}

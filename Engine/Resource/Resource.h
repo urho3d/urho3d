@@ -26,6 +26,9 @@
 #include "Object.h"
 #include "Timer.h"
 
+namespace Urho3D
+{
+
 class Deserializer;
 class Serializer;
 
@@ -102,4 +105,6 @@ template <class T> Vector<StringHash> GetResourceHashes(const Vector<SharedPtr<T
 template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T> >& resources)
 {
     return ResourceRefList(T::GetTypeStatic(), GetResourceHashes(resources));
+}
+
 }

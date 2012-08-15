@@ -26,6 +26,9 @@
 #include "AudioDefs.h"
 #include "Component.h"
 
+namespace Urho3D
+{
+
 class Audio;
 class Sound;
 
@@ -168,3 +171,5 @@ private:
     /// Previous decode buffer position.
     unsigned decodePosition_;
 };
+
+}

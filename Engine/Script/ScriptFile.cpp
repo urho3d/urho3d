@@ -37,6 +37,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(ScriptFile);
 
 ScriptFile::ScriptFile(Context* context) :
@@ -550,4 +553,6 @@ ScriptFile* GetScriptContextFile()
         return static_cast<ScriptFile*>(module->GetUserData());
     else
         return 0;
+}
+
 }

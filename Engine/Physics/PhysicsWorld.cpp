@@ -45,6 +45,9 @@
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
+namespace Urho3D
+{
+
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
 
@@ -619,4 +622,6 @@ void RegisterPhysicsLibrary(Context* context)
     RigidBody::RegisterObject(context);
     Constraint::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
+}
+
 }

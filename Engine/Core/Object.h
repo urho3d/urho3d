@@ -27,6 +27,9 @@
 #include "Ptr.h"
 #include "Variant.h"
 
+namespace Urho3D
+{
+
 class Context;
 class EventHandler;
 
@@ -255,3 +258,5 @@ private:
 #define PARAM(paramID, paramName) static const ShortStringHash paramID(#paramName)
 #define HANDLER(className, function) (new EventHandlerImpl<className>(this, &className::function))
 #define HANDLER_USERDATA(className, function, userData) (new EventHandlerImpl<className>(this, &className::function, userData))
+
+}

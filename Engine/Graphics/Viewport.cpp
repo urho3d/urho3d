@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Viewport::Viewport() :
     rect_(IntRect::ZERO)
 {
@@ -143,4 +146,6 @@ Camera* Viewport::GetCamera() const
 PostProcess* Viewport::GetPostProcess(unsigned index) const
 {
     return index < postProcesses_.Size() ? postProcesses_[index] : (PostProcess*)0;
+}
+
 }

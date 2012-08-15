@@ -25,6 +25,9 @@
 
 #include "UIElement.h"
 
+namespace Urho3D
+{
+
 class Button;
 class Slider;
 
@@ -112,3 +115,5 @@ private:
     /// Handle slider movement.
     void HandleSliderChanged(StringHash eventType, VariantMap& eventData);
 };
+
+}

@@ -35,6 +35,9 @@
 #include "DebugNew.h"
 
 // Normalize rotation quaternion after this many incremental updates to prevent distortion
+namespace Urho3D
+{
+
 static const int NORMALIZE_ROTATION_EVERY = 32;
 
 OBJECTTYPESTATIC(Node);
@@ -1309,4 +1312,6 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     }
     
     return cloneNode;
+}
+
 }

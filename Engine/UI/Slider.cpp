@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Slider);
 
 Slider::Slider(Context* context) :
@@ -200,4 +203,6 @@ void Slider::UpdateSlider()
         knob_->SetSize(GetSize());
         knob_->SetPosition(0, 0);
     }
+}
+
 }

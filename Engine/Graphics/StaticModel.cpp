@@ -39,7 +39,8 @@
 
 #include "DebugNew.h"
 
-static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+namespace Urho3D
+{
 
 OBJECTTYPESTATIC(StaticModel);
 
@@ -388,4 +389,6 @@ void StaticModel::HandleModelReloadFinished(StringHash eventType, VariantMap& ev
     Model* currentModel = model_;
     model_ = 0; // Set null to allow to be re-set
     SetModel(currentModel);
+}
+
 }

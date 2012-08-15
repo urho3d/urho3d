@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :
@@ -222,4 +225,6 @@ bool Shader::ProcessSource(SharedArrayPtr<char>& dest, unsigned& length, const S
     }
     
     return true;
+}
+
 }

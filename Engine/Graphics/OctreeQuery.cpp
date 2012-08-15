@@ -26,6 +26,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
 {
     if (inside)
@@ -120,4 +123,6 @@ void FrustumOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool in
         
         ++start;
     }
+}
+
 }

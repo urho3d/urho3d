@@ -44,7 +44,9 @@
 
 #include "DebugNew.h"
 
-static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+namespace Urho3D
+{
+
 static const unsigned MIN_VERTICES = 4;
 static const unsigned MIN_INDICES = 6;
 static const unsigned MAX_VERTICES = 65536;
@@ -1115,4 +1117,6 @@ void DecalSet::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData
         else
             ++i;
     }
+}
+
 }

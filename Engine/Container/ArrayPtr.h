@@ -28,6 +28,9 @@
 
 #include <cassert>
 
+namespace Urho3D
+{
+
 /// Shared array pointer template class. Uses non-intrusive reference counting.
 template <class T> class SharedArrayPtr
 {
@@ -435,4 +438,6 @@ template <class T, class U> WeakArrayPtr<T> DynamicCast(const WeakArrayPtr<U>& p
     WeakArrayPtr<T> ret;
     ret.DynamicCast(ptr);
     return ret;
+}
+
 }

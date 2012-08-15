@@ -26,6 +26,9 @@
 #include "GraphicsDefs.h"
 #include "HashMap.h"
 
+namespace Urho3D
+{
+
 class XMLElement;
 
 /// Option definition and combination rules for constructing shader variations.
@@ -99,3 +102,5 @@ private:
     /// Available combinations.
     HashMap<String, unsigned> combinations_;
 };
+
+}

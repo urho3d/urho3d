@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float DEFAULT_NEARCLIP = 0.1f;
 static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_FOV = 45.0f;
@@ -502,4 +505,6 @@ void Camera::OnMarkedDirty(Node* node)
 {
     frustumDirty_ = true;
     inverseWorldDirty_ = true;
+}
+
 }

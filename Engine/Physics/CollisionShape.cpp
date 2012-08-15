@@ -50,6 +50,9 @@
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <hull.h>
 
+namespace Urho3D
+{
+
 static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
 static const char* typeNames[] = 
@@ -796,4 +799,6 @@ void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& even
         UpdateShape();
         NotifyRigidBody();
     }
+}
+
 }

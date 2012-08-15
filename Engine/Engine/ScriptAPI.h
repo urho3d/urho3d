@@ -23,8 +23,12 @@
 
 #pragma once
 
-class Context;
 class asIScriptEngine;
+
+namespace Urho3D
+{
+
+class Context;
 
 /// Register the Math library to script.
 void RegisterMathAPI(asIScriptEngine* engine);
@@ -52,3 +56,5 @@ void RegisterPhysicsAPI(asIScriptEngine* engine);
 void RegisterScriptAPI(asIScriptEngine* engine);
 /// Register the Engine library to script.
 void RegisterEngineAPI(asIScriptEngine* engine);
+
+}

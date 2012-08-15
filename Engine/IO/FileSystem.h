@@ -26,6 +26,9 @@
 #include "Object.h"
 #include "HashSet.h"
 
+namespace Urho3D
+{
+
 /// Return files.
 static const unsigned SCAN_FILES = 0x1;
 /// Return directories.
@@ -114,3 +117,5 @@ String GetInternalPath(const String& pathName);
 String GetNativePath(const String& pathName);
 /// Convert a path to the format required by the operating system in wide characters
 WString GetWideNativePath(const String& pathName);
+
+}

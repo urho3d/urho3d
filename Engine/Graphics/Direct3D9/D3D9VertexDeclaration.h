@@ -29,6 +29,9 @@
 
 #include <d3d9.h>
 
+namespace Urho3D
+{
+
 class Graphics;
 class VertexBuffer;
 
@@ -68,3 +71,5 @@ private:
     /// Direct3D vertex declaration.
     IDirect3DVertexDeclaration9* declaration_;
 };
+
+}

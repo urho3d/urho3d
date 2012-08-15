@@ -33,6 +33,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const ShortStringHash indentHash("Indent");
 
 static const String highlightModes[] =
@@ -849,4 +852,6 @@ void ListView::HandleDefocused(StringHash eventType, VariantMap& eventData)
         ClearSelection();
     
     UpdateSelectionEffect();
+}
+
 }

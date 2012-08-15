@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 SceneResolver::SceneResolver()
 {
 }
@@ -121,4 +124,6 @@ void SceneResolver::Resolve()
     
     // Attributes have been resolved, so no need to remember the nodes after this
     Reset();
+}
+
 }

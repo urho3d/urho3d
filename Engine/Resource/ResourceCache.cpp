@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String checkDirs[] = {
     "Fonts",
     "Materials",
@@ -698,4 +701,6 @@ void RegisterResourceLibrary(Context* context)
 {
     Image::RegisterObject(context);
     XMLFile::RegisterObject(context);
+}
+
 }

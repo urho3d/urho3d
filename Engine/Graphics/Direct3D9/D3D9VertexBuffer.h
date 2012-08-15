@@ -27,6 +27,9 @@
 #include "GraphicsDefs.h"
 #include "ArrayPtr.h"
 
+namespace Urho3D
+{
+
 /// Hardware vertex buffer.
 class VertexBuffer : public Object, public GPUObject
 {
@@ -124,3 +127,5 @@ private:
     /// Shadowed flag.
     bool shadowed_;
 };
+
+}

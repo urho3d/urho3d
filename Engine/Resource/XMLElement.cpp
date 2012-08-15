@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 XMLElement::XMLElement() :
     node_(0)
 {
@@ -673,4 +676,6 @@ Vector4 XMLElement::GetVector(const String& name) const
 XMLFile* XMLElement::GetFile() const
 {
     return file_;
+}
+
 }

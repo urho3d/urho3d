@@ -26,6 +26,9 @@
 #include "Str.h"
 #include "VectorBase.h"
 
+namespace Urho3D
+{
+
 template<> void Swap<String>(String& first, String& second)
 {
     first.Swap(second);
@@ -44,4 +47,6 @@ template<> void Swap<ListBase>(ListBase& first, ListBase& second)
 template<> void Swap<HashBase>(HashBase& first, HashBase& second)
 {
     first.Swap(second);
+}
+
 }

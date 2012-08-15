@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 const unsigned VertexBuffer::elementSize[] =
 {
     3 * sizeof(float), // Position
@@ -441,4 +444,6 @@ bool VertexBuffer::UpdateToGPU()
         return SetData(shadowData_.Get());
     else
         return false;
+}
+
 }

@@ -29,6 +29,9 @@
 #include "GraphicsDefs.h"
 #include "Timer.h"
 
+namespace Urho3D
+{
+
 class BoundingBox;
 class Camera;
 class IndexBuffer;
@@ -165,3 +168,5 @@ private:
     /// Reduced size depth buffers.
     Vector<SharedArrayPtr<DepthValue> > mipBuffers_;
 };
+
+}

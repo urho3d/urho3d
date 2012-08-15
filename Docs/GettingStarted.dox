@@ -1,5 +1,7 @@
-/**
+namespace Urho3D
+{
 
+/**
 \page Building Building Urho3D
 
 \section Building_Prerequisites Building prerequisites
@@ -452,6 +454,12 @@ To start with, we need the include files for all the engine classes we are going
 #include <Windows.h>
 \endcode
 
+All Urho3D classes reside inside the namespace Urho3D, so a using directive is convenient:
+
+\code
+using namespace Urho3D;
+\endcode
+
 To be able to subscribe to events, we need to subclass Object (if we did not use events, we could do everything procedurally, for example directly in WinMain, but that would be somewhat ugly.) We name the class HelloWorld, with functions that match the script version, plus a constructor. Note the shared pointers to the scene that we will create, and to the ResourceCache, which is perhaps the most often used subsystem, and therefore convenient to store here. Also note the OBJECT(className) macro, which inserts code for object type identification:
 
 \code
@@ -683,3 +691,5 @@ To do the actual importing, the editor will invoke AssetImporter.exe from the sa
 Importing lights is not properly supported yet. Instead, when a scene is imported, a zone for ambient lighting and a single directional light are created, so that you can at least see something.
 
 */
+
+}

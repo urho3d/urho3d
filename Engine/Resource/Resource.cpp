@@ -25,6 +25,9 @@
 #include "Log.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Resource);
 
 Resource::Resource(Context* context) :
@@ -70,4 +73,6 @@ unsigned Resource::GetUseTimer()
     }
     else
         return useTimer_.GetMSec(false);
+}
+
 }

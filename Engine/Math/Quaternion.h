@@ -25,6 +25,9 @@
 
 #include "Matrix3.h"
 
+namespace Urho3D
+{
+
 /// Rotation represented as a four-dimensional normalized vector.
 class Quaternion
 {
@@ -209,7 +212,7 @@ public:
     /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Test for equality with another quaternion with epsilon.
-    bool Equals(const Quaternion& rhs) const { return ::Equals(w_, rhs.w_) && ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_) && ::Equals(z_, rhs.z_); }
+    bool Equals(const Quaternion& rhs) const { return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
     
     /// Return Euler angles in degrees.
     Vector3 EulerAngles() const;
@@ -240,3 +243,5 @@ public:
     /// Identity quaternion.
     static const Quaternion IDENTITY;
 };
+
+}

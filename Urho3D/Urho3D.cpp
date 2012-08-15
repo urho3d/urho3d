@@ -34,6 +34,8 @@
 
 #include "DebugNew.h"
 
+using namespace Urho3D;
+
 void Run()
 {
     try

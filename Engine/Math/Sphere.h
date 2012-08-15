@@ -25,6 +25,9 @@
 
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 class BoundingBox;
 class Polyhedron;
 class Frustum;
@@ -212,3 +215,5 @@ public:
     /// Defined flag.
     bool defined_;
 };
+
+}

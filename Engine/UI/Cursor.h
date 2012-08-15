@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 /// %Cursor shapes recognized by the UI subsystem.
 enum CursorShape
 {
@@ -83,3 +86,5 @@ protected:
     /// Shape definitions.
     CursorShapeInfo shapeInfos_[CS_MAX_SHAPES];
 };
+
+}

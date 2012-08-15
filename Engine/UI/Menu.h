@@ -25,6 +25,9 @@
 
 #include "Button.h"
 
+namespace Urho3D
+{
+
 /// %Menu %UI element that optionally shows a popup.
 class Menu : public Button
 {
@@ -87,3 +90,5 @@ private:
     /// Handle keypress for checking accelerator.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };
+
+}

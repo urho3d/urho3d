@@ -40,6 +40,9 @@
 #include "DebugNew.h"
 
 // Cap the amount of lines to prevent crash when eg. debug rendering large heightfields
+namespace Urho3D
+{
+
 static const unsigned MAX_LINES = 1000000;
 
 OBJECTTYPESTATIC(DebugRenderer);
@@ -393,4 +396,6 @@ void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)
         lines_.Reserve(linesSize);
     if (noDepthLines_.Capacity() > noDepthLinesSize * 2)
         noDepthLines_.Reserve(noDepthLinesSize);
+}
+
 }

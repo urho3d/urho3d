@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 class Font;
 class Text;
 
@@ -144,3 +147,5 @@ private:
     /// Handle being defocused.
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
 };
+
+}

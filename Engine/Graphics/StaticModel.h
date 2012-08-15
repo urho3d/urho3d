@@ -25,6 +25,9 @@
 
 #include "Drawable.h"
 
+namespace Urho3D
+{
+
 class Model;
 
 /// Static model per-geometry extra data.
@@ -118,3 +121,5 @@ private:
     /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
 };
+
+}

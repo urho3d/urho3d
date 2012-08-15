@@ -36,6 +36,9 @@
 #pragma warning(disable:4355)
 #endif
 
+namespace Urho3D
+{
+
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
 static const int RAYCASTS_PER_WORK_ITEM = 4;
@@ -611,4 +614,6 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     }
     
     drawableReinsertions_.Clear();
+}
+
 }

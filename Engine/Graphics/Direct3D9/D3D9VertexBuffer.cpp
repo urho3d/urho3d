@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 const unsigned VertexBuffer::elementSize[] =
 {
     3 * sizeof(float), // Position
@@ -464,4 +467,6 @@ void VertexBuffer::UnmapBuffer()
         ((IDirect3DVertexBuffer9*)object_)->Unlock();
         lockState_ = LOCK_NONE;
     }
+}
+
 }

@@ -24,6 +24,9 @@
 #include "Precompiled.h"
 #include "Matrix4.h"
 
+namespace Urho3D
+{
+
 const Matrix4 Matrix4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f,
@@ -105,4 +108,6 @@ Matrix4 Matrix4::Inverse() const
         i10, i11, i12, i13,
         i20, i21, i22, i23,
         i30, i31, i32, i33);
+}
+
 }

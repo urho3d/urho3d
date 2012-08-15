@@ -27,6 +27,9 @@
 #include "Resource.h"
 #include "ShaderParser.h"
 
+namespace Urho3D
+{
+
 class ShaderVariation;
 
 /// %Shader resource consisting of several shader variations.
@@ -70,3 +73,5 @@ private:
     /// Shader source last modified time.
     unsigned sourceModifiedTime_;
 };
+
+}

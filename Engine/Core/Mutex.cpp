@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 #ifdef WIN32
 Mutex::Mutex() :
     handle_(new CRITICAL_SECTION)
@@ -95,4 +98,6 @@ MutexLock::MutexLock(Mutex& mutex) :
 MutexLock::~MutexLock()
 {
     mutex_.Release();
+}
+
 }

@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(BorderImage);
 
 BorderImage::BorderImage(Context* context) :
@@ -182,4 +185,6 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
     
     // Reset hovering for next frame
     hovering_ = false;
+}
+
 }

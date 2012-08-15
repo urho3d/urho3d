@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// Operating system thread.
 class Thread
 {
@@ -51,3 +54,5 @@ protected:
     /// Running flag.
     volatile bool shouldRun_;
 };
+
+}

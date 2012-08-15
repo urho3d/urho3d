@@ -25,6 +25,9 @@
 
 #include "Component.h"
 
+namespace Urho3D
+{
+
 /// No ongoing smoothing.
 static const unsigned SMOOTH_NONE = 0;
 /// Ongoing position smoothing.
@@ -88,3 +91,5 @@ private:
     /// Subscribed to smoothing update event flag.
     bool subscribed_;
 };
+
+}

@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static HashMap<unsigned, Input*> inputInstances;
 
 /// Return the Input subsystem instance corresponding to an SDL window ID.
@@ -917,4 +920,6 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     // Update input right at the beginning of the frame
     if (initialized_)
         Update();
+}
+
 }

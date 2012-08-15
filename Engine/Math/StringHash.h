@@ -25,6 +25,9 @@
 
 #include "Str.h"
 
+namespace Urho3D
+{
+
 /// 32-bit hash value for a string.
 class StringHash
 {
@@ -188,3 +191,5 @@ private:
 
 #define HASH(str) (StringHash(#str))
 #define SHORTHASH(str) (ShortStringHash(#str))
+
+}

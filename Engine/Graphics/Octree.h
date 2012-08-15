@@ -28,6 +28,9 @@
 #include "Mutex.h"
 #include "OctreeQuery.h"
 
+namespace Urho3D
+{
+
 class Octree;
 
 static const int NUM_OCTANTS = 8;
@@ -215,3 +218,5 @@ private:
     /// Subdivision level.
     unsigned numLevels_;
 };
+
+}

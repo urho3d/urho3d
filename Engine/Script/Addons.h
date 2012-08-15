@@ -27,6 +27,9 @@
 
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
 
+namespace Urho3D
+{
+
 struct SArrayBuffer;
 struct SArrayCache;
 
@@ -108,3 +111,5 @@ protected:
 void RegisterArray(asIScriptEngine* engine);
 /// Register String to script.
 void RegisterString(asIScriptEngine* engine);
+
+}

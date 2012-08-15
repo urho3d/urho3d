@@ -26,6 +26,9 @@
 #include "ArrayPtr.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 class Graphics;
 class Texture;
 
@@ -109,3 +112,5 @@ private:
     /// Size of font data.
     unsigned fontDataSize_;
 };
+
+}

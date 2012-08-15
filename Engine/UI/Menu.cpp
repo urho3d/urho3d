@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const ShortStringHash originHash("Origin");
 
 OBJECTTYPESTATIC(Menu);
@@ -231,4 +234,6 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (eventData[P_KEY].GetInt() == acceleratorKey_ && (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() ==
         acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
         HandlePressedReleased(eventType, eventData);
+}
+
 }

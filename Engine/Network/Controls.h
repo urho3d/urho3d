@@ -25,6 +25,9 @@
 
 #include "Variant.h"
 
+namespace Urho3D
+{
+
 class XMLElement;
 
 /// %Controls sent over the network.
@@ -66,3 +69,5 @@ public:
     /// Extra control data.
     VariantMap extraData_;
 };
+
+}

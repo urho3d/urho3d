@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(LineEdit);
 
 LineEdit::LineEdit(Context* context) :
@@ -565,4 +568,6 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
 void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 {
     text_->ClearSelection();
+}
+
 }

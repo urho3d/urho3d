@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 TextureUnit ParseTextureUnitName(const String& name);
 
 PostProcessPass::PostProcessPass()
@@ -299,4 +302,6 @@ const Vector4& PostProcess::GetShaderParameter(const String& name) const
 {
     HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(StringHash(name));
     return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
+}
+
 }

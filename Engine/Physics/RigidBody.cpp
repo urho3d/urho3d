@@ -42,6 +42,9 @@
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <BulletCollision/CollisionShapes/btCompoundShape.h>
 
+namespace Urho3D
+{
+
 static const float DEFAULT_MASS = 0.0f;
 static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
@@ -863,4 +866,6 @@ void RigidBody::HandleTargetRotation(StringHash eventType, VariantMap& eventData
     // Copy the smoothing target rotation to the rigid body
     if (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms())
         SetRotation(static_cast<SmoothedTransform*>(GetEventSender())->GetTargetWorldRotation());
+}
+
 }

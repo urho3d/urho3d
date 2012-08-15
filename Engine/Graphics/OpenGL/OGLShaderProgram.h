@@ -28,6 +28,9 @@
 #include "HashMap.h"
 #include "RefCounted.h"
 
+namespace Urho3D
+{
+
 class Graphics;
 class ShaderVariation;
 
@@ -86,3 +89,5 @@ private:
     /// Linked flag.
     bool linked_;
 };
+
+}

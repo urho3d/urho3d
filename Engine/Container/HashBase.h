@@ -27,6 +27,9 @@
 #include "Hash.h"
 #include "Swap.h"
 
+namespace Urho3D
+{
+
 /// Hash set/map node base class.
 struct HashNodeBase
 {
@@ -109,10 +112,10 @@ public:
     /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
-        ::Swap(head_, rhs.head_);
-        ::Swap(tail_, rhs.tail_);
-        ::Swap(ptrs_, rhs.ptrs_);
-        ::Swap(allocator_, rhs.allocator_);
+        Urho3D::Swap(head_, rhs.head_);
+        Urho3D::Swap(tail_, rhs.tail_);
+        Urho3D::Swap(ptrs_, rhs.ptrs_);
+        Urho3D::Swap(allocator_, rhs.allocator_);
     }
     
     /// Return number of elements.
@@ -141,3 +144,5 @@ protected:
     /// Node allocator.
     AllocatorBlock* allocator_;
 };
+
+}

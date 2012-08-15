@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(ParticleEmitter);
 
 ParticleEmitter::ParticleEmitter(Context* context) :
@@ -578,4 +581,6 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         MarkForUpdate();
     }
+}
+
 }

@@ -27,6 +27,9 @@
 #include "GraphicsDefs.h"
 #include "Rect.h"
 
+namespace Urho3D
+{
+
 class PixelShader;
 class Graphics;
 class ShaderVariation;
@@ -106,3 +109,5 @@ public:
     /// Number of quads.
     unsigned quadCount_;
 };
+
+}

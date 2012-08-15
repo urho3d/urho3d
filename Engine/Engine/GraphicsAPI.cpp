@@ -50,6 +50,9 @@
 #pragma warning(disable:4345)
 #endif
 
+namespace Urho3D
+{
+
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
@@ -1130,4 +1133,6 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterOctree(engine);
     RegisterGraphics(engine);
     RegisterRenderer(engine);
+}
+
 }

@@ -26,6 +26,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Controls::Controls()
 {
     Reset();
@@ -41,4 +44,6 @@ void Controls::Reset()
     yaw_ = 0.0f;
     pitch_ = 0.0f;
     extraData_.Clear();
+}
+
 }

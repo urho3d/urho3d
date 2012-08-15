@@ -26,6 +26,9 @@
 #include "Ptr.h"
 #include "Variant.h"
 
+namespace Urho3D
+{
+
 /// Attribute shown only in the editor, but not serialized.
 static const unsigned AM_EDIT = 0x0;
 /// Attribute used for file serialization.
@@ -129,3 +132,5 @@ struct AttributeInfo
     /// Attribute mode: whether to use for serialization, network replication, or both.
     unsigned mode_;
 };
+
+}

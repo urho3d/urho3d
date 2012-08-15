@@ -66,6 +66,9 @@ typedef struct _CrtMemBlockHeader
 } _CrtMemBlockHeader;
 #endif
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
@@ -579,4 +582,6 @@ void Engine::RegisterSubsystems()
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new UI(context_));
     context_->RegisterSubsystem(new Audio(context_));
+}
+
 }

@@ -39,6 +39,9 @@
 #pragma warning(disable:4355)
 #endif
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(TextureCube);
 
 TextureCube::TextureCube(Context* context) :
@@ -561,4 +564,6 @@ bool TextureCube::Create()
     graphics_->SetTexture(0, 0);
     
     return success;
+}
+
 }

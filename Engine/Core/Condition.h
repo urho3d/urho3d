@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// %Condition on which a thread can wait.
 class Condition
 {
@@ -47,3 +50,5 @@ private:
     /// Operating system specific event.
     void* event_;
 };
+
+}

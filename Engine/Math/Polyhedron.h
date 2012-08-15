@@ -25,6 +25,9 @@
 
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 class BoundingBox;
 class Frustum;
 class Matrix3;
@@ -110,3 +113,5 @@ private:
     /// Internal vector for the new face being constructed.
     PODVector<Vector3> outFace_;
 };
+
+}

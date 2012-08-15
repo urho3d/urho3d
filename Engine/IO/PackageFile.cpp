@@ -26,6 +26,9 @@
 #include "Log.h"
 #include "PackageFile.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(PackageFile);
 
 PackageFile::PackageFile(Context* context) :
@@ -95,4 +98,6 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
         return &i->second_;
     else
         return 0;
+}
+
 }

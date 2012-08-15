@@ -27,6 +27,9 @@
 
 #include <cstdio>
 
+namespace Urho3D
+{
+
 const Color Color::WHITE;
 const Color Color::YELLOW(1.0f, 1.0f, 0.0f);
 const Color Color::RED(1.0f, 0.0f, 0.0f);
@@ -39,4 +42,6 @@ String Color::ToString() const
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%g %g %g %g", r_, g_, b_, a_);
     return String(tempBuffer);
+}
+
 }

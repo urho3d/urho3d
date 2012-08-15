@@ -28,6 +28,9 @@
 #include "Object.h"
 #include "Thread.h"
 
+namespace Urho3D
+{
+
 class FileSystem;
 
 /// Watches a directory and its subdirectories for files being modified
@@ -69,3 +72,5 @@ private:
     // Directory handle for the path being watched
     void* dirHandle_;
 };
+
+}

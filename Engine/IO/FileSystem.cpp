@@ -58,6 +58,9 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(FileSystem);
 
 FileSystem::FileSystem(Context* context) :
@@ -661,4 +664,6 @@ WString GetWideNativePath(const String& pathName)
 #else
     return WString(pathName);
 #endif
+}
+
 }

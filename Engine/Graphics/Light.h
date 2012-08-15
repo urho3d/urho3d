@@ -27,6 +27,9 @@
 #include "Drawable.h"
 #include "Frustum.h"
 
+namespace Urho3D
+{
+
 class Camera;
 class Texture;
 class Texture2D;
@@ -306,3 +309,5 @@ private:
     /// Per-vertex lighting flag.
     bool perVertex_;
 };
+
+}

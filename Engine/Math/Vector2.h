@@ -26,6 +26,9 @@
 #include "MathDefs.h"
 #include "Str.h"
 
+namespace Urho3D
+{
+
 /// Two-dimensional vector.
 class Vector2
 {
@@ -153,13 +156,13 @@ public:
     /// Calculate dot product.
     float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector2& rhs) const { return ::Abs(x_ * rhs.x_) + ::Abs(y_ * rhs.y_); }
+    float AbsDotProduct(const Vector2& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_); }
     /// Return absolute vector.
-    Vector2 Abs() const { return Vector2(::Abs(x_), ::Abs(y_)); }
+    Vector2 Abs() const { return Vector2(Urho3D::Abs(x_), Urho3D::Abs(y_)); }
     /// Linear interpolation with another vector.
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     ///// Test for equality with another vectir with epsilon.
-    bool Equals(const Vector2& rhs) const { return ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_); }
+    bool Equals(const Vector2& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_); }
     
     /// Return normalized to unit length.
     Vector2 Normalized() const
@@ -284,3 +287,5 @@ public:
 
 /// Multiply IntVector2 with a scalar.
 inline IntVector2 operator * (int lhs, const IntVector2& rhs) { return rhs * lhs; }
+
+}

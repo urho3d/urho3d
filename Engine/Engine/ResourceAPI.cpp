@@ -27,6 +27,9 @@
 #include "PackageFile.h"
 #include "ResourceCache.h"
 
+namespace Urho3D
+{
+
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest);
 
 void RegisterResource(asIScriptEngine* engine)
@@ -247,4 +250,6 @@ void RegisterResourceAPI(asIScriptEngine* engine)
     RegisterImage(engine);
     RegisterXMLElement(engine);
     RegisterXMLFile(engine);
+}
+
 }

@@ -29,6 +29,9 @@
 #include "ProcessUtils.h"
 #include "VectorBuffer.h"
 
+namespace Urho3D
+{
+
 void FakeAddRef(void* ptr)
 {
 }
@@ -331,4 +334,6 @@ void RegisterIOAPI(asIScriptEngine* engine)
     RegisterSerialization(engine);
     RegisterFileSystem(engine);
     RegisterPackageFile(engine);
+}
+
 }

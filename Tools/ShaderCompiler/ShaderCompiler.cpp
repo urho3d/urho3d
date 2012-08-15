@@ -42,6 +42,8 @@
 
 #include "DebugNew.h"
 
+using namespace Urho3D;
+
 struct Parameter
 {
     Parameter()

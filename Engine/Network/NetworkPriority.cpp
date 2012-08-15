@@ -27,6 +27,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float DEFAULT_BASE_PRIORITY = 100.0f;
 static const float DEFAULT_DISTANCE_FACTOR = 0.0f;
 static const float DEFAULT_MIN_PRIORITY = 0.0f;
@@ -92,4 +95,6 @@ bool NetworkPriority::CheckUpdate(float distance, float& accumulator)
     }
     else
         return false;
+}
+
 }

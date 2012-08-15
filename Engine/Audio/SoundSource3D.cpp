@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float DEFAULT_NEARDISTANCE = 0.0f;
 static const float DEFAULT_FARDISTANCE = 100.0f;
 static const float DEFAULT_ROLLOFF = 2.0f;
@@ -106,4 +109,6 @@ void SoundSource3D::CalculateAttenuation()
         attenuation_ = attenuation;
         panning_ = panning;
     }
+}
+
 }

@@ -27,6 +27,9 @@
 
 #include <cassert>
 
+namespace Urho3D
+{
+
 /// Shared pointer template class with intrusive reference counting.
 template <class T> class SharedPtr
 {
@@ -442,4 +445,6 @@ template <class T, class U> WeakPtr<T> DynamicCast(const WeakPtr<U>& ptr)
     WeakPtr<T> ret;
     ret.DynamicCast(ptr);
     return ret;
+}
+
 }

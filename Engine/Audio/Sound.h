@@ -26,6 +26,9 @@
 #include "ArrayPtr.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 /// %Sound resource.
 class Sound : public Resource
 {
@@ -120,3 +123,5 @@ private:
     /// Compressed sound length.
     float compressedLength_;
 };
+
+}

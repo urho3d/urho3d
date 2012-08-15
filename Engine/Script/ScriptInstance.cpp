@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String methodDeclarations[] = {
     "void Start()",
     "void Stop()",
@@ -614,3 +617,5 @@ Object* GetScriptContextEventListenerObject()
         return 0;
 }
 
+
+}

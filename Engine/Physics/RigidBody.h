@@ -28,12 +28,15 @@
 
 #include <LinearMath/btMotionState.h>
 
+class btCompoundShape;
+class btRigidBody;
+
+namespace Urho3D
+{
+
 class CollisionShape;
 class PhysicsWorld;
 class SmoothedTransform;
-
-class btCompoundShape;
-class btRigidBody;
 
 /// Rigid body collision event signaling mode.
 enum CollisionEventMode
@@ -245,3 +248,5 @@ private:
     /// Readd body to world flag.
     bool readdBody_;
 };
+
+}

@@ -24,6 +24,9 @@
 #include "Precompiled.h"
 #include "Random.h"
 
+namespace Urho3D
+{
+
 static unsigned randomSeed = 1;
 
 void SetRandomSeed(unsigned seed)
@@ -40,4 +43,6 @@ int Rand()
 {
     randomSeed = randomSeed * 214013 + 2531011;
     return (randomSeed >> 16) & 32767;
+}
+
 }

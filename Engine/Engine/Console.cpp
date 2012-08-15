@@ -39,6 +39,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
 
@@ -257,4 +260,6 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     }
     
     inLogMessage_ = false;
+}
+
 }

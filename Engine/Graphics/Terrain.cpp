@@ -42,6 +42,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Terrain);
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
@@ -986,4 +989,6 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
 void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     CreateGeometry();
+}
+
 }

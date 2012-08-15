@@ -29,6 +29,9 @@
 #include "SceneResolver.h"
 #include "XMLElement.h"
 
+namespace Urho3D
+{
+
 class File;
 class PackageFile;
 
@@ -232,3 +235,5 @@ private:
 
 /// Register Scene library objects.
 void RegisterSceneLibrary(Context* context);
+
+}

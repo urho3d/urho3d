@@ -27,6 +27,9 @@
 #include "Ptr.h"
 #include "Texture.h"
 
+namespace Urho3D
+{
+
 class Deserializer;
 class Image;
 
@@ -79,3 +82,5 @@ private:
     /// Currently locked face.
     CubeMapFace lockedFace_;
 };
+
+}

@@ -25,6 +25,9 @@
 
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 class String;
 
 /// RGBA color.
@@ -198,3 +201,5 @@ public:
     /// Time.
     float time_;
 };
+
+}

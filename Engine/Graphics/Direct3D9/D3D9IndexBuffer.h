@@ -28,6 +28,9 @@
 #include "GraphicsDefs.h"
 #include "ArrayPtr.h"
 
+namespace Urho3D
+{
+
 /// Hardware index buffer.
 class IndexBuffer : public Object, public GPUObject
 {
@@ -105,3 +108,5 @@ private:
     /// Shadowed flag.
     bool shadowed_;
 };
+
+}

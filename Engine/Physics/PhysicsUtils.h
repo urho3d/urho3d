@@ -29,6 +29,9 @@
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btQuaternion.h>
 
+namespace Urho3D
+{
+
 inline btVector3 ToBtVector3(const Vector3& vector)
 {
     return btVector3(vector.x_, vector.y_, vector.z_);
@@ -47,4 +50,6 @@ inline Vector3 ToVector3(const btVector3& vector)
 inline Quaternion ToQuaternion(const btQuaternion& quaternion)
 {
     return Quaternion(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
+}
+
 }

@@ -27,6 +27,9 @@
 #include "GraphicsDefs.h"
 #include "Object.h"
 
+namespace Urho3D
+{
+
 class IndexBuffer;
 class Ray;
 class Graphics;
@@ -130,3 +133,5 @@ private:
     /// LOD distance.
     float lodDistance_;
 };
+
+}

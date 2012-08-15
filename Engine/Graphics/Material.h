@@ -28,6 +28,9 @@
 #include "Resource.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 class Pass;
 class Technique;
 class Texture;
@@ -165,3 +168,5 @@ private:
     /// Specular lighting flag.
     bool specular_;
 };
+
+}

@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(Skybox);
 
 Skybox::Skybox(Context* context) :
@@ -73,4 +76,6 @@ void Skybox::OnWorldBoundingBoxUpdate()
 {
     // The skybox is supposed to be visible everywhere, so set a humongous bounding box
     worldBoundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
+}
+
 }

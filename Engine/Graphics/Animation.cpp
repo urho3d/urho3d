@@ -34,6 +34,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 inline bool CompareTriggers(AnimationTriggerPoint& lhs, AnimationTriggerPoint& rhs)
 {
     return lhs.time_ < rhs.time_;
@@ -270,4 +273,6 @@ const AnimationTrack* Animation::GetTrack(StringHash nameHash) const
     }
     
     return 0;
+}
+
 }

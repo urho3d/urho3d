@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 /// %Object property info for scripting API dump.
 struct PropertyInfo
 {
@@ -233,7 +236,7 @@ void Script::ClearLogMessages()
 
 void Script::DumpAPI()
 {
-    LOGRAW("/**\n\\page ScriptAPI Scripting API \n\n");
+    LOGRAW("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
     
     Vector<PropertyInfo> globalPropertyInfos;
     Vector<String> globalFunctions;
@@ -354,7 +357,7 @@ void Script::DumpAPI()
         }
     }
     
-    LOGRAW("*/\n");
+    LOGRAW("*/\n\n}\n");
 }
 
 void Script::MessageCallback(const asSMessageInfo* msg)
@@ -455,4 +458,6 @@ void RegisterScriptLibrary(Context* context)
 {
     ScriptFile::RegisterObject(context);
     ScriptInstance::RegisterObject(context);
+}
+
 }

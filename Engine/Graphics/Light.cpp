@@ -36,6 +36,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_RANGE = 10.0f;
 static const float DEFAULT_FOV = 30.0f;
@@ -531,4 +534,6 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
 void Light::SetLightQueue(LightBatchQueue* queue)
 {
     lightQueue_ = queue;
+}
+
 }

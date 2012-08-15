@@ -25,8 +25,13 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Log message event.
 EVENT(E_LOGMESSAGE, LogMessage)
 {
     PARAM(P_MESSAGE, Message);              // String
+}
+
 }

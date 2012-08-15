@@ -25,6 +25,9 @@
 
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 class BoundingBox;
 class Frustum;
 class Plane;
@@ -97,3 +100,5 @@ public:
     /// Ray direction.
     Vector3 direction_;
 };
+
+}

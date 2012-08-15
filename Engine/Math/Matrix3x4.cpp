@@ -24,6 +24,9 @@
 #include "Precompiled.h"
 #include "Matrix3x4.h"
 
+namespace Urho3D
+{
+
 const Matrix3x4 Matrix3x4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f,
@@ -86,4 +89,6 @@ Matrix3x4 Matrix3x4::Inverse() const
     ret.m23_ = -(m03_ * ret.m20_ + m13_ * ret.m21_ + m23_ * ret.m22_);
     
     return ret;
+}
+
 }

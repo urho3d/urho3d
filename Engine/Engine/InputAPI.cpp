@@ -25,6 +25,9 @@
 #include "APITemplates.h"
 #include "Input.h"
 
+namespace Urho3D
+{
+
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
@@ -172,4 +175,6 @@ void RegisterInputAPI(asIScriptEngine* engine)
 {
     RegisterInputConstants(engine);
     RegisterInput(engine);
+}
+
 }

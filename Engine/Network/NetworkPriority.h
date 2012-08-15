@@ -25,6 +25,9 @@
 
 #include "Component.h"
 
+namespace Urho3D
+{
+
 /// %Network interest management settings component.
 class NetworkPriority : public Component
 {
@@ -69,3 +72,5 @@ private:
     /// Update owner at full rate flag.
     bool alwaysUpdateOwner_;
 };
+
+}

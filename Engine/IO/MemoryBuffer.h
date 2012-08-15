@@ -26,6 +26,9 @@
 #include "Deserializer.h"
 #include "Serializer.h"
 
+namespace Urho3D
+{
+
 /// Memory area that can be read and written to as a stream.
 class MemoryBuffer : public Deserializer, public Serializer
 {
@@ -57,3 +60,5 @@ private:
     /// Read-only flag.
     bool readOnly_;
 };
+
+}

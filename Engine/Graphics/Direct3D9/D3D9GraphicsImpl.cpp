@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 GraphicsImpl::GraphicsImpl() :
     window_(0),
     interface_(0),
@@ -54,4 +57,6 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
         return true;
     else
         return false;
+}
+
 }

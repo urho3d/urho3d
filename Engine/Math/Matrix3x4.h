@@ -25,6 +25,9 @@
 
 #include "Matrix4.h"
 
+namespace Urho3D
+{
+
 /// 3x4 matrix for scene node transform calculations.
 class Matrix3x4
 {
@@ -404,4 +407,6 @@ inline Matrix4 operator * (const Matrix4& lhs, const Matrix3x4& rhs)
         lhs.m30_ * rhs.m02_ + lhs.m31_ * rhs.m12_ + lhs.m32_ * rhs.m22_,
         lhs.m30_ * rhs.m03_ + lhs.m31_ * rhs.m13_ + lhs.m32_ * rhs.m23_ + lhs.m33_
     );
+}
+
 }

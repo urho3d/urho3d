@@ -26,6 +26,9 @@
 
 #include <cstdio>
 
+namespace Urho3D
+{
+
 const Quaternion Quaternion::IDENTITY;
 
 void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
@@ -246,4 +249,6 @@ String Quaternion::ToString() const
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%g %g %g %g", w_, x_, y_, z_);
     return String(tempBuffer);
+}
+
 }

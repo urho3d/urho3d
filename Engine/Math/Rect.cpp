@@ -26,6 +26,9 @@
 
 #include <cstdio>
 
+namespace Urho3D
+{
+
 const Rect Rect::FULL(-1.0f, -1.0f, 1.0f, 1.0f);
 const Rect Rect::POSITIVE(0.0f, 0.0f, 1.0f, 1.0f);
 const Rect Rect::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
@@ -70,4 +73,6 @@ void Rect::Clip(const Rect& rect)
         min_.y_ = max_.y_;
         max_.y_ = temp;
     }
+}
+
 }

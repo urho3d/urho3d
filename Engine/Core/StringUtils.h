@@ -29,6 +29,9 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 /// Parse a bool from a string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
 bool ToBool(const String& source);
 /// Parse a bool from a C string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
@@ -85,3 +88,5 @@ String ToStringHex(unsigned value);
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return an index to a string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
 unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
+
+}

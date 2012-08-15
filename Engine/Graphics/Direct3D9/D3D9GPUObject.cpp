@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
     object_(0),
@@ -47,4 +50,6 @@ GPUObject::~GPUObject()
 void GPUObject::ClearDataLost()
 {
     dataLost_ = false;
+}
+
 }

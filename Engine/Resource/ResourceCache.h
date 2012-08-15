@@ -26,6 +26,9 @@
 #include "File.h"
 #include "Resource.h"
 
+namespace Urho3D
+{
+
 class FileWatcher;
 class PackageFile;
 
@@ -183,3 +186,5 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 
 /// Register Resource library subsystems and objects.
 void RegisterResourceLibrary(Context* context);
+
+}

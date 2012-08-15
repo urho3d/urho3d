@@ -25,6 +25,9 @@
 
 #include "Object.h"
 
+namespace Urho3D
+{
+
 /// Physics world is about to be stepped.
 EVENT(E_PHYSICSPRESTEP, PhysicsPreStep)
 {
@@ -59,4 +62,6 @@ EVENT(E_NODECOLLISION, NodeCollision)
     PARAM(P_OTHERBODY, OtherBody);          // RigidBody pointer
     PARAM(P_NEWCOLLISION, NewCollision);    // bool
     PARAM(P_CONTACTS, Contacts);            // Buffer containing position (Vector3), normal (Vector3), distance (float), impulse (float) for each contact
+}
+
 }

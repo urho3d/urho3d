@@ -36,6 +36,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static String noBoneName;
 
 static const unsigned char CTRL_LOOPED = 0x1;
@@ -721,4 +724,6 @@ void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap
     using namespace ScenePostUpdate;
     
     Update(eventData[P_TIMESTEP].GetFloat());
+}
+
 }

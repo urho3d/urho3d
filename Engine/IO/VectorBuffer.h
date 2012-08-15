@@ -26,6 +26,9 @@
 #include "Deserializer.h"
 #include "Serializer.h"
 
+namespace Urho3D
+{
+
 /// Dynamically sized buffer that can be read and written to as a stream.
 class VectorBuffer : public Deserializer, public Serializer
 {
@@ -68,3 +71,5 @@ private:
     /// Dynamic data buffer.
     PODVector<unsigned char> buffer_;
 };
+
+}

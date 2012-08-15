@@ -40,6 +40,9 @@
 #define glDeleteRenderbuffersEXT glDeleteRenderbuffers
 #endif
 
+namespace Urho3D
+{
+
 RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
     parentTexture_(parentTexture),
     target_(target),
@@ -145,4 +148,6 @@ int RenderSurface::GetHeight() const
 TextureUsage RenderSurface::GetUsage() const
 {
     return parentTexture_->GetUsage();
+}
+
 }

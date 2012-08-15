@@ -37,6 +37,8 @@
 
 #include "DebugNew.h"
 
+using namespace Urho3D;
+
 struct FileEntry
 {
     String name_;

@@ -25,6 +25,9 @@
 
 #include "BillboardSet.h"
 
+namespace Urho3D
+{
+
 /// Determines the emitter shape.
 enum EmitterType
 {
@@ -194,3 +197,5 @@ private:
     /// Rendering renderer framenumber on which was last updated.
     unsigned lastUpdateFrameNumber_;
 };
+
+}

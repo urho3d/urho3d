@@ -25,6 +25,9 @@
 
 #include "Vector2.h"
 
+namespace Urho3D
+{
+
 /// Three-dimensional vector.
 class Vector3
 {
@@ -171,7 +174,7 @@ public:
     /// Calculate dot product.
     float DotProduct(const Vector3& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector3& rhs) const { return ::Abs(x_ * rhs.x_) + ::Abs(y_ * rhs.y_) + ::Abs(z_ * rhs.z_); }
+    float AbsDotProduct(const Vector3& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_); }
     
     /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
@@ -184,11 +187,11 @@ public:
     }
     
     /// Return absolute vector.
-    Vector3 Abs() const { return Vector3(::Abs(x_), ::Abs(y_), ::Abs(z_)); }
+    Vector3 Abs() const { return Vector3(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_)); }
     /// Linear interpolation with another vector.
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     /// Test for equality with another vector with epsilon.
-    bool Equals(const Vector3& rhs) const { return ::Equals(x_, rhs.x_) && ::Equals(y_, rhs.y_) && ::Equals(z_, rhs.z_); }
+    bool Equals(const Vector3& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
     
     /// Return normalized to unit length.
     Vector3 Normalized() const
@@ -232,3 +235,5 @@ public:
 
 /// Multiply Vector3 with a scalar.
 inline Vector3 operator * (float lhs, const Vector3& rhs) { return rhs * lhs; }
+
+}

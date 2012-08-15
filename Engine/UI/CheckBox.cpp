@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(CheckBox);
 
 CheckBox::CheckBox(Context* context) :
@@ -96,4 +99,6 @@ void CheckBox::SetCheckedOffset(const IntVector2& offset)
 void CheckBox::SetCheckedOffset(int x, int y)
 {
     checkedOffset_ = IntVector2(x, y);
+}
+
 }

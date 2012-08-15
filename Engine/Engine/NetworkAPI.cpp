@@ -28,6 +28,9 @@
 #include "NetworkPriority.h"
 #include "Protocol.h"
 
+namespace Urho3D
+{
+
 static void ConstructControls(Controls* ptr)
 {
     new(ptr) Controls();
@@ -188,4 +191,6 @@ void RegisterNetworkAPI(asIScriptEngine* engine)
     RegisterNetworkPriority(engine);
     RegisterConnection(engine);
     RegisterNetwork(engine);
+}
+
 }

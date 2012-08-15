@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// Reference count structure.
 struct RefCount
 {
@@ -76,3 +79,5 @@ private:
     /// Pointer to the reference count structure.
     RefCount* refCount_;
 };
+
+}

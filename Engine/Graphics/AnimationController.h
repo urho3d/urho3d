@@ -25,6 +25,9 @@
 
 #include "Component.h"
 
+namespace Urho3D
+{
+
 class AnimatedModel;
 class Animation;
 class AnimationState;
@@ -172,3 +175,5 @@ private:
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 };
+
+}

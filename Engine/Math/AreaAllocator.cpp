@@ -24,6 +24,9 @@
 #include "Precompiled.h"
 #include "AreaAllocator.h"
 
+namespace Urho3D
+{
+
 AreaAllocator::AreaAllocator(int width, int height)
 {
     Reset(width, height);
@@ -158,4 +161,6 @@ void AreaAllocator::Cleanup()
         if (!erased)
             ++i;
     }
+}
+
 }

@@ -28,6 +28,9 @@
 #include <cstring>
 #include <ctype.h>
 
+namespace Urho3D
+{
+
 static const int CONVERSION_BUFFER_LENGTH = 128;
 
 class WString;
@@ -503,3 +506,5 @@ private:
     /// String buffer, null if not allocated.
     wchar_t* buffer_;
 };
+
+}

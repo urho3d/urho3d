@@ -25,6 +25,9 @@
 
 #include "BorderImage.h"
 
+namespace Urho3D
+{
+
 /// %Slider bar %UI element.
 class Slider : public BorderImage
 {
@@ -92,3 +95,5 @@ protected:
     /// Original slider position at drag begin.
     IntVector2 dragBeginPosition_;
 };
+
+}

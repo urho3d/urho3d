@@ -27,6 +27,9 @@
 #include "Mutex.h"
 #include "Object.h"
 
+namespace Urho3D
+{
+
 class WorkerThread;
 
 /// Work queue item.
@@ -90,3 +93,5 @@ private:
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
 };
+
+}

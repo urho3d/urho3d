@@ -29,6 +29,9 @@
 #include "Rect.h"
 #include "Vector4.h"
 
+namespace Urho3D
+{
+
 class Camera;
 class Drawable;
 class Geometry;
@@ -282,3 +285,5 @@ struct LightBatchQueue
     /// Light volume draw calls.
     PODVector<Batch> volumeBatches_;
 };
+
+}

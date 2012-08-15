@@ -23,8 +23,12 @@
 
 #include "Precompiled.h"
 #include "StringHash.h"
+#include "Vector3.h"
 
 #include "DebugNew.h"
+
+namespace Urho3D
+{
 
 StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
@@ -63,3 +67,7 @@ StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
 StringHash PSP_SHADOWSPLITS("ShadowSplits");
 StringHash PSP_LIGHTMATRICES("LightMatricesPS");
+
+Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+
+}

@@ -58,6 +58,9 @@
 
 #include <SDL.h>
 
+namespace Urho3D
+{
+
 class Context;
 
 /// Cached state of a frame buffer object
@@ -118,3 +121,5 @@ private:
     /// Need FBO commit flag.
     bool fboDirty_;
 };
+
+}

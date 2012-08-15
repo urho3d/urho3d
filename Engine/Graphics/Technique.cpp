@@ -33,6 +33,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const String passNames[] =
 {
     "base",
@@ -248,4 +251,6 @@ void Technique::MarkShadersLoaded(unsigned frameNumber)
 const String& Technique::GetPassName(PassType pass)
 {
     return passNames[pass];
+}
+
 }

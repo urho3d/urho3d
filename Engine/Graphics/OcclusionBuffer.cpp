@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const unsigned CLIPMASK_X_POS = 0x1;
 static const unsigned CLIPMASK_X_NEG = 0x2;
 static const unsigned CLIPMASK_Y_POS = 0x4;
@@ -873,4 +876,6 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
             row += width_;
         }
     }
+}
+
 }

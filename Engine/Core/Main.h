@@ -30,11 +30,14 @@
 #include <windows.h>
 #endif
 
+using namespace Urho3D;
+
 // Define a platform-specific main function, which in turn executes the user-defined function
 
 // MSVC debug mode: use memory leak reporting
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define DEFINE_MAIN(function) \
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); \

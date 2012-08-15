@@ -26,6 +26,9 @@
 #include "HashMap.h"
 #include "Ptr.h"
 
+namespace Urho3D
+{
+
 class Component;
 class Node;
 
@@ -53,3 +56,5 @@ private:
     /// Components.
     HashMap<unsigned, WeakPtr<Component> > components_;
 };
+
+}

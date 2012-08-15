@@ -59,6 +59,8 @@
 
 #include "DebugNew.h"
 
+using namespace Urho3D;
+
 struct OutModel
 {
     OutModel() :

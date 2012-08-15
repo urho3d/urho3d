@@ -27,6 +27,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 RefCounted::RefCounted() :
     refCount_(new RefCount())
 {
@@ -72,4 +75,6 @@ int RefCounted::WeakRefs() const
 {
     // Subtract one to not return the internally held reference
     return refCount_->weakRefs_ - 1;
+}
+
 }

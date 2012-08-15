@@ -25,6 +25,9 @@
 
 #include "Vector3.h"
 
+namespace Urho3D
+{
+
 /// Surface in three-dimensional space.
 class Plane
 {
@@ -82,3 +85,5 @@ public:
     /// Plane intercept parameter.
     float intercept_;
 };
+
+}

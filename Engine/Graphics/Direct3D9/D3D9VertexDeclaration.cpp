@@ -29,6 +29,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 const BYTE d3dElementType[] =
 {
     D3DDECLTYPE_FLOAT3, // Position
@@ -229,4 +232,6 @@ void VertexDeclaration::Release()
         declaration_->Release();
         declaration_ = 0;
     }
+}
+
 }

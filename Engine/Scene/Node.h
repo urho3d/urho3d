@@ -27,6 +27,9 @@
 #include "Serializable.h"
 #include "VectorBuffer.h"
 
+namespace Urho3D
+{
+
 class Component;
 class Connection;
 class Scene;
@@ -407,4 +410,6 @@ template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest) const
         if (component)
             dest.Push(component);
     }
+}
+
 }

@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 GLenum glWrapModes[] =
 {
     GL_REPEAT,
@@ -408,4 +411,6 @@ void Texture::CheckTextureBudget(ShortStringHash type)
     // Therefore free unused materials first
     if (textureUse > textureBudget)
         cache->ReleaseResources(Material::GetTypeStatic());
+}
+
 }

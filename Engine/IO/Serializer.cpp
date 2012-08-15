@@ -28,6 +28,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 static const float q = 32767.0f;
 
 Serializer::~Serializer()
@@ -333,4 +336,6 @@ bool Serializer::WriteLine(const String& value)
     success &= WriteUByte(13);
     success &= WriteUByte(10);
     return success;
+}
+
 }

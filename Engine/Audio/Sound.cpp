@@ -35,6 +35,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 /// WAV format header.
 struct WavHeader
 {
@@ -411,4 +414,6 @@ void Sound::LoadParameters()
         
         paramElem = paramElem.GetNext();
     }
+}
+
 }

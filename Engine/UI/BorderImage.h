@@ -25,6 +25,9 @@
 
 #include "UIElement.h"
 
+namespace Urho3D
+{
+
 class Texture;
 class Texture2D;
 
@@ -83,3 +86,5 @@ protected:
     /// Offset to image rectangle on hover.
     IntVector2 hoverOffset_;
 };
+
+}

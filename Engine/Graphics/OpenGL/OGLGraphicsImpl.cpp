@@ -31,6 +31,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 GraphicsImpl::GraphicsImpl() :
     window_(0),
     context_(0),
@@ -41,4 +44,6 @@ GraphicsImpl::GraphicsImpl() :
     pixelFormat_(0),
     fboDirty_(false)
 {
+}
+
 }

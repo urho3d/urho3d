@@ -25,6 +25,9 @@
 
 #include "UIElement.h"
 
+namespace Urho3D
+{
+
 class BorderImage;
 class ScrollBar;
 
@@ -113,3 +116,5 @@ private:
     /// Handle content element resized.
     void HandleElementResized(StringHash eventType, VariantMap& eventData);
 };
+
+}

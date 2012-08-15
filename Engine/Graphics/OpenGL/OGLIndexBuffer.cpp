@@ -32,6 +32,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 OBJECTTYPESTATIC(IndexBuffer);
 
 IndexBuffer::IndexBuffer(Context* context) :
@@ -355,4 +358,6 @@ bool IndexBuffer::UpdateToGPU()
         return SetData(shadowData_.Get());
     else
         return false;
+}
+
 }

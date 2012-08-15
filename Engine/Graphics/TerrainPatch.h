@@ -25,6 +25,9 @@
 
 #include "Drawable.h"
 
+namespace Urho3D
+{
+
 class Geometry;
 class Terrain;
 class VertexBuffer;
@@ -138,3 +141,5 @@ private:
     /// Vertical offset for occlusion geometry.
     float occlusionOffset_;
 };
+
+}

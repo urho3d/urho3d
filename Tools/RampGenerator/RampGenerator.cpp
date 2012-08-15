@@ -35,6 +35,8 @@
 
 #include "DebugNew.h"
 
+using namespace Urho3D;
+
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 

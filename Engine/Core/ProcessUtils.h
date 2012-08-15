@@ -25,6 +25,9 @@
 
 #include "Str.h"
 
+namespace Urho3D
+{
+
 class Mutex;
 
 /// Initialize the FPU to round-to-nearest, single precision mode.
@@ -63,3 +66,5 @@ unsigned GetNumPhysicalCPUs();
 unsigned GetNumLogicalCPUs();
 /// Return the static library init/shutdown mutex.
 Mutex& GetStaticMutex();
+
+}

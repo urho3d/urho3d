@@ -26,6 +26,9 @@
 #include "Swap.h"
 #include "VectorBase.h"
 
+namespace Urho3D
+{
+
 static const int QUICKSORT_THRESHOLD = 16;
 
 // Based on Comparison of several sorting algorithms by Juha Nieminen
@@ -137,4 +140,6 @@ template <class T, class U> void Sort(RandomAccessIterator<T> begin, RandomAcces
 {
     InitialQuickSort(begin, end, compare);
     InsertionSort(begin, end, compare);
+}
+
 }

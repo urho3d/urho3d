@@ -23,6 +23,9 @@
 
 #pragma once
 
+namespace Urho3D
+{
+
 /// Singly-linked list node base class.
 struct LinkedListNode
 {
@@ -165,3 +168,5 @@ private:
     /// First element.
     T* head_;
 };
+
+}

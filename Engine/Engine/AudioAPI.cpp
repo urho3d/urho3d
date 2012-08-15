@@ -27,6 +27,9 @@
 #include "Sound.h"
 #include "SoundSource3D.h"
 
+namespace Urho3D
+{
+
 void RegisterSound(asIScriptEngine* engine)
 {
     RegisterResource<Sound>(engine, "Sound");
@@ -94,4 +97,6 @@ void RegisterAudioAPI(asIScriptEngine* engine)
     RegisterSound(engine);
     RegisterSoundSources(engine);
     RegisterAudio(engine);
+}
+
 }
