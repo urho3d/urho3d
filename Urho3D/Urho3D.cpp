@@ -62,7 +62,29 @@ void Run()
         {
             ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
                 "The script file should implement the function void Start() for initializing the "
-                "application and subscribing to all necessary events, such as the frame update."
+                "application and subscribing to all necessary events, such as the frame update.\n"
+                #ifndef WIN32
+                "\nCommand line options:\n"
+                "-x<res>     Horizontal resolution\n"
+                "-y<res>     Vertical resolution\n"
+                "-m<level>   Enable hardware multisampling\n"
+                "-v          Enable vertical sync\n"
+                "-t          Enable triple buffering\n"
+                "-w          Start in windowed mode\n"
+                "-b<length>  Sound buffer length in milliseconds\n"
+                "-r<freq>    Sound mixing frequency in Hz\n"
+                "-headless   Headless mode. No application window will be created\n"
+                "-logdebug   Display debug level log messages also in release mode\n"
+                "-prepass    Use light pre-pass rendering\n"
+                "-deferred   Use deferred rendering\n"
+                "-lqshadows  Use low-quality (1-sample) shadow filtering\n"
+                "-noshadows  Disable shadow rendering\n"
+                "-nolimit    Disable frame limiter\n"
+                "-nothreads  Disable worker threads\n"
+                "-nosound    Disable sound output\n"
+                "-noip       Disable sound mixing interpolation\n"
+                "-sm2        Force SM2.0 rendering\n"
+                #endif
             );
             return;
         }

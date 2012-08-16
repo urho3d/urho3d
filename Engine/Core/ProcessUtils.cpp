@@ -328,7 +328,7 @@ String GetConsoleInput()
 String GetPlatform()
 {
     #if defined(ANDROID)
-    return "Android";    
+    return "Android";
     #elif defined(IOS)
     return "iOS";
     #elif defined(WIN32)
