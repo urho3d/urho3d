@@ -293,18 +293,34 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             if (fullscreen)
                 flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
             
-            if (!externalWindow_)
-                impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
-            else
+            for (;;)
             {
-                if (!impl_->window_)
-                    impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
-                fullscreen = false;
-            }
-            if (!impl_->window_)
-            {
-                LOGERROR("Could not open window");
-                return false;
+                if (!externalWindow_)
+                    impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+                else
+                {
+                    if (!impl_->window_)
+                        impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
+                    fullscreen = false;
+                }
+                
+                if (impl_->window_)
+                    break;
+                else
+                {
+                    if (multiSample > 1)
+                    {
+                        // If failed with multisampling, retry first without
+                        multiSample = 1;
+                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+                    }
+                    else
+                    {
+                        LOGERROR("Could not open window");
+                        return false;
+                    }
+                }
             }
             
             // Create/restore context and GPU objects and set initial renderstate
