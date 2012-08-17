@@ -28,6 +28,7 @@
 #ifdef WIN32
 #include "MiniDump.h"
 #include <windows.h>
+#include <crtdbg.h>
 #endif
 
 using namespace Urho3D;
@@ -37,7 +38,6 @@ using namespace Urho3D;
 // MSVC debug mode: use memory leak reporting
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define DEFINE_MAIN(function) \
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); \
