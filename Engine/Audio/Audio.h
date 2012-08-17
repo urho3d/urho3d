@@ -37,7 +37,7 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// %Audio subsystem. Uses either DirectSound or SDL for sound output
+/// %Audio subsystem.
 class Audio : public Object
 {
     OBJECT(Audio);
