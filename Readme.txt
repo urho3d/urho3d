@@ -53,6 +53,7 @@ Urho3D uses the following third-party libraries:
 Contributions and bugfixes from:
 - Miika Santala
 - Magic.Lixin
+- skaiware
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.

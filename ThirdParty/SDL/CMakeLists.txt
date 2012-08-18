@@ -19,13 +19,17 @@ elseif (APPLE)
         src/audio/coreaudio/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
     )
 else ()
-    # On Linux, make sure development libraries exist 
+    # On Linux, make sure development libraries exist, and use their include file directories  
     find_package (OpenGL REQUIRED)
     find_package (X11 REQUIRED)
     if (NOT X11_Xrandr_FOUND)
         message (FATAL_ERROR "Could not find XRandR (libxrandr-dev)")
     endif ()
     find_package (ALSA REQUIRED)
+
+    include_directories (${OpenGL_INCLUDE_DIRS})
+    include_directories (${X11_INCLUDE_DIRS})  
+    include_directories (${ALSA_INCLUDE_DIRS}) 
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/x11/*.c
