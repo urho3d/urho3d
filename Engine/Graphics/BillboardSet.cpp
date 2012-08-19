@@ -375,7 +375,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     // If using animation LOD, accumulate time and see if it is time to update
     if (animationLodBias_ > 0.0f && lodDistance_ > 0.0f)
     {
-        animationLodTimer_ += animationLodBias_ * frame.timeStep_ * frame.viewSize_.y_ * ANIMATION_LOD_BASESCALE;
+        animationLodTimer_ += animationLodBias_ * frame.timeStep_ * ANIMATION_LOD_BASESCALE;
         if (animationLodTimer_ >= lodDistance_)
             animationLodTimer_ = fmodf(animationLodTimer_, lodDistance_);
         else

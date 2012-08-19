@@ -320,8 +320,6 @@ static const unsigned MASK_INSTANCEMATRIX3 = 0x1000;
 static const unsigned MASK_DEFAULT = 0xffffffff;
 static const unsigned NO_ELEMENT = 0xffffffff;
 
-static const float ANIMATION_LOD_BASESCALE = 2.5f;
-
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;
 static const int MAX_SKIN_MATRICES = 64;

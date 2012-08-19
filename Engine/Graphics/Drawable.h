@@ -40,6 +40,7 @@ static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
 static const int DRAWABLES_PER_WORK_ITEM = 16;
 static const int MAX_VERTEX_LIGHTS = 4;
+static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
 class Geometry;

@@ -1111,7 +1111,7 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
         // Check for first time update
         if (animationLodTimer_ >= 0.0f)
         {
-            animationLodTimer_ += animationLodBias_ * frame.timeStep_ * frame.viewSize_.y_ * ANIMATION_LOD_BASESCALE;
+            animationLodTimer_ += animationLodBias_ * frame.timeStep_ * ANIMATION_LOD_BASESCALE;
             if (animationLodTimer_ >= animationLodDistance_)
                 animationLodTimer_ = fmodf(animationLodTimer_, animationLodDistance_);
             else

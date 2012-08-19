@@ -40,7 +40,7 @@
 namespace Urho3D
 {
 
-static const float LOD_CONSTANT = 8.0f;
+static const float LOD_CONSTANT = 1.0f / 150.0f;
 
 OBJECTTYPESTATIC(TerrainPatch);
 
@@ -142,7 +142,7 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
     unsigned newLodLevel = 0;
     for (unsigned i = 0; i < lodErrors_.Size(); ++i)
     {
-        if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT / (float)frame.viewSize_.y_)
+        if (lodErrors_[i] / lodDistance_ > LOD_CONSTANT)
             break;
         else
             newLodLevel = i;
