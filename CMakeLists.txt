@@ -73,6 +73,10 @@ elseif (NOT IOS)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
     endif ()
+    if (WIN32)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libstdc++ -static-libgcc")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+    endif ()
 endif ()
 
 # Macro for precompiled headers
