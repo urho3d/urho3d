@@ -630,7 +630,7 @@ void Renderer::Update(float timeStep)
         if (!updatedOctrees_.Contains(octree))
         {
             frame_.camera_ = viewport->GetCamera();
-            frame_.viewSize_ = IntVector2(viewRect.right_ - viewRect.left_, viewRect.bottom_ - viewRect.top_);
+            frame_.viewSize_ = viewRect.Size();
             if (frame_.viewSize_ == IntVector2::ZERO)
                 frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
             octree->Update(frame_);

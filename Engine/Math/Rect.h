@@ -200,8 +200,15 @@ public:
     bool operator == (const IntRect& rhs) const { return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_; }
     /// Test for inequality with another rect.
     bool operator != (const IntRect& rhs) const { return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_; }
+    
+    /// Return size.
+    IntVector2 Size() const { return IntVector2(Width(), Height()); }
+    /// Return width.
+    int Width() const { return right_ - left_; }
+    /// Return height.
+    int Height() const { return bottom_ - top_; }
     /// Return integer data.
-    const int* GetData() const { return &left_; }
+    const int* Data() const { return &left_; }
     /// Return as string.
     String ToString() const;
     

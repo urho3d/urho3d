@@ -523,7 +523,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     /// \todo Any user-set scissor test will be lost
     IntVector2 viewSize = GetRenderTargetDimensions();
     if (viewport_.left_ != 0 || viewport_.top_ != 0 || viewport_.right_ != viewSize.x_ || viewport_.bottom_ != viewSize.y_)
-        SetScissorTest(true, IntRect(0, 0, viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_));
+        SetScissorTest(true, IntRect(0, 0, viewport_.Width(), viewport_.Height()));
     else
         SetScissorTest(false);
     
@@ -558,7 +558,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
     SetTextureForUpdate(destination);
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.left_, height_ - vpCopy.bottom_,
-        vpCopy.right_ - vpCopy.left_, vpCopy.bottom_ - vpCopy.top_);
+        vpCopy.Width(), vpCopy.Height());
     SetTexture(0, 0);
     
     return true;
@@ -1372,7 +1372,7 @@ void Graphics::SetViewport(const IntRect& rect)
     rectCopy.bottom_ = Clamp(rectCopy.bottom_, 0, rtSize.y_);
     
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
-    glViewport(rectCopy.left_, rtSize.y_ - rectCopy.bottom_, rectCopy.right_ - rectCopy.left_, rectCopy.bottom_ - rectCopy.top_);
+    glViewport(rectCopy.left_, rtSize.y_ - rectCopy.bottom_, rectCopy.Width(), rectCopy.Height());
     viewport_ = rectCopy;
     
     // Disable scissor test, needs to be re-enabled by the user
@@ -1486,7 +1486,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
     if (enable)
     {
         IntVector2 rtSize(GetRenderTargetDimensions());
-        IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
+        IntVector2 viewSize(viewport_.Size());
         IntVector2 viewPos(viewport_.left_, viewport_.top_);
         IntRect intRect;
         int expand = borderInclusive ? 1 : 0;
@@ -1507,7 +1507,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         if (enable && scissorRect_ != intRect)
         {
             // Use Direct3D convention with the vertical coordinates ie. 0 is top
-            glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.right_ - intRect.left_, intRect.bottom_ - intRect.top_);
+            glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.Width(), intRect.Height());
             scissorRect_ = intRect;
         }
     }
@@ -1527,7 +1527,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 void Graphics::SetScissorTest(bool enable, const IntRect& rect)
 {
     IntVector2 rtSize(GetRenderTargetDimensions());
-    IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
+    IntVector2 viewSize(viewport_.Size());
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
     if (enable)
@@ -1549,7 +1549,7 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         if (enable && scissorRect_ != intRect)
         {
             // Use Direct3D convention with the vertical coordinates ie. 0 is top
-            glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.right_ - intRect.left_, intRect.bottom_ - intRect.top_);
+            glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.Width(), intRect.Height());
             scissorRect_ = intRect;
         }
     }

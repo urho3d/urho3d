@@ -117,7 +117,7 @@ float Deserializer::ReadFloat()
 IntRect Deserializer::ReadIntRect()
 {
     IntRect ret;
-    Read((void*)ret.GetData(), sizeof ret);
+    Read((void*)ret.Data(), sizeof ret);
     return ret;
 }
 

@@ -95,8 +95,8 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     );
     
     Vector2 scale(
-        0.5f * (float)(viewport.right_ - viewport.left_) / width,
-        0.5f * (float)(viewport.bottom_ - viewport.top_) / height
+        0.5f * (float)viewport.Width() / width,
+        0.5f * (float)viewport.Height() / height
     );
     
     #ifdef USE_OPENGL
@@ -264,8 +264,8 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     {
         float rtWidth = (float)rtSize.x_;
         float rtHeight = (float)rtSize.y_;
-        float widthRange = 0.5f * (viewport.right_ - viewport.left_) / rtWidth;
-        float heightRange = 0.5f * (viewport.bottom_ - viewport.top_) / rtHeight;
+        float widthRange = 0.5f * viewport.Width() / rtWidth;
+        float heightRange = 0.5f * viewport.Height() / rtHeight;
         
         #ifdef USE_OPENGL
         Vector4 bufferUVOffset(((float)viewport.left_) / rtWidth + widthRange,

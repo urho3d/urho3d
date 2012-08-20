@@ -104,7 +104,7 @@ void Cursor::SetShape(CursorShape shape)
     CursorShapeInfo& info = shapeInfos_[shape_];
     texture_ = info.texture_;
     imageRect_ = info.imageRect_;
-    SetSize(info.imageRect_.right_ - info.imageRect_.left_, info.imageRect_.bottom_ - info.imageRect_.top_);
+    SetSize(info.imageRect_.Size());
 }
 
 void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

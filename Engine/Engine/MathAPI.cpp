@@ -123,6 +123,9 @@ static void RegisterIntRect(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(ConstructIntRectInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntRect", "IntRect& opAssign(const IntRect&in)", asMETHOD(IntRect, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", asMETHOD(IntRect, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "IntVector2 get_size() const", asMETHOD(IntRect, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int get_width() const", asMETHOD(IntRect, Width), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "int get_height() const", asMETHOD(IntRect, Height), asCALL_THISCALL);
     engine->RegisterObjectProperty("IntRect", "int left", offsetof(IntRect, left_));
     engine->RegisterObjectProperty("IntRect", "int top", offsetof(IntRect, top_));
     engine->RegisterObjectProperty("IntRect", "int right", offsetof(IntRect, right_));
@@ -1000,8 +1003,8 @@ static void RegisterColor(asIScriptEngine* engine)
 void RegisterMathAPI(asIScriptEngine* engine)
 {
     RegisterMathFunctions(engine);
-    RegisterIntRect(engine);
     RegisterIntVector2(engine);
+    RegisterIntRect(engine);
     RegisterVector2(engine);
     RegisterVector3(engine);
     RegisterVector4(engine);

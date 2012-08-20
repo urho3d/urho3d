@@ -358,7 +358,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     else
         viewRect_ = IntRect(0, 0, rtWidth, rtHeight);
     
-    viewSize_ = IntVector2(viewRect_.right_ - viewRect_.left_, viewRect_.bottom_ - viewRect_.top_);
+    viewSize_ = viewRect_.Size();
     rtSize_ = IntVector2(rtWidth, rtHeight);
     
     // On OpenGL flip the viewport if rendering to a texture for consistent UV addressing with Direct3D9
@@ -2124,7 +2124,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     const BoundingBox& shadowCasterBox)
 {
     const FocusParameters& parameters = light->GetShadowFocus();
-    float shadowMapWidth = (float)(shadowViewport.right_ - shadowViewport.left_);
+    float shadowMapWidth = (float)(shadowViewport.Width());
     LightType type = light->GetLightType();
     
     if (type == LIGHT_DIRECTIONAL)
@@ -2179,7 +2179,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
 {
     Node* shadowCameraNode = shadowCamera->GetNode();
     const FocusParameters& parameters = light->GetShadowFocus();
-    float shadowMapWidth = (float)(shadowViewport.right_ - shadowViewport.left_);
+    float shadowMapWidth = (float)(shadowViewport.Width());
     
     float minX = viewBox.min_.x_;
     float minY = viewBox.min_.y_;

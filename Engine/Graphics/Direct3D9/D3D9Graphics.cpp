@@ -1414,8 +1414,8 @@ void Graphics::SetViewport(const IntRect& rect)
     vp.MaxZ = 1.0f;
     vp.X = rectCopy.left_;
     vp.Y = rectCopy.top_;
-    vp.Width = rectCopy.right_ - rectCopy.left_;
-    vp.Height = rectCopy.bottom_ - rectCopy.top_;
+    vp.Width = rectCopy.Width();
+    vp.Height = rectCopy.Height();
     
     impl_->device_->SetViewport(&vp);
     viewport_ = rectCopy;
@@ -1535,7 +1535,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
     if (enable)
     {
         IntVector2 rtSize(GetRenderTargetDimensions());
-        IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
+        IntVector2 viewSize(viewport_.Size());
         IntVector2 viewPos(viewport_.left_, viewport_.top_);
         IntRect intRect;
         int expand = borderInclusive ? 1 : 0;
@@ -1578,7 +1578,7 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 void Graphics::SetScissorTest(bool enable, const IntRect& rect)
 {
     IntVector2 rtSize(GetRenderTargetDimensions());
-    IntVector2 viewSize(viewport_.right_ - viewport_.left_, viewport_.bottom_ - viewport_.top_);
+    IntVector2 viewSize(viewport_.Size());
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
     if (enable)

@@ -291,15 +291,6 @@ Properties:<br>
 - bool empty (readonly)
 
 
-IntRect
-
-Properties:<br>
-- int left
-- int top
-- int right
-- int bottom
-
-
 IntVector2
 
 Methods:<br>
@@ -308,6 +299,18 @@ Methods:<br>
 Properties:<br>
 - int x
 - int y
+
+
+IntRect
+
+Properties:<br>
+- IntVector2 size (readonly)
+- int width (readonly)
+- int height (readonly)
+- int left
+- int top
+- int right
+- int bottom
 
 
 Vector2

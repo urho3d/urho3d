@@ -79,7 +79,7 @@ bool Serializer::WriteFloat(float value)
 
 bool Serializer::WriteIntRect(const IntRect& value)
 {
-    return Write(value.GetData(), sizeof value) == sizeof value;
+    return Write(value.Data(), sizeof value) == sizeof value;
 }
 
 bool Serializer::WriteIntVector2(const IntVector2& value)
