@@ -96,6 +96,15 @@ public:
         SetUTF8FromWChar(str);
     }
     
+    /// Construct from a null-terminated wide character array.
+    String(wchar_t* str) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        SetUTF8FromWChar(str);
+    }
+    
     /// Construct from a wide character string.
     String(const WString& str);
     

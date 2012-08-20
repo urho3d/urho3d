@@ -23,12 +23,13 @@
 
 #pragma once
 
-#if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
 namespace Urho3D
 {
 
+#if defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
 /// Write a minidump. Needs to be called from within a structured exception handler.
 int WriteMiniDump(const char* applicationName, void* exceptionPointers);
 #endif
 
 }
+

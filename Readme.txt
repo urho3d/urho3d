@@ -131,6 +131,11 @@ Mac OS X.
 For gcc, execute make (by default, cmake_gcc.sh specifies to make a
 RelWithDebInfo build.)
 
+On Windows, using other compilers than Visual Studio is not officially
+supported. MinGW may work (cmake -G "MinGW Makefiles"), but may lack required
+DirectX headers. They can be copied to a MinGW installation from the following 
+package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
+
 When using Xcode on Mac OS X, select the i386 architecture before building.
 Compiling Urho3D as 64-bit is not supported.
 
@@ -147,7 +152,7 @@ To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
 following arguments: Scripts/NinjaSnowWar.as -w
 
-To make the Urho3D examples start faster on Windows & Direct3D9 mode, run 
+To make the Urho3D examples start faster on Windows & Direct3D9 mode, run
 CompileAllShaders.bat from the Bin directory first.
 
 

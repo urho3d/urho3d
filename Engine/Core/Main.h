@@ -28,7 +28,9 @@
 #ifdef WIN32
 #include "MiniDump.h"
 #include <windows.h>
+#ifdef _MSC_VER
 #include <crtdbg.h>
+#endif
 #endif
 
 using namespace Urho3D;

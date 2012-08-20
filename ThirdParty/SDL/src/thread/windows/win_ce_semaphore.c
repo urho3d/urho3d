@@ -28,9 +28,15 @@
       and it is not clear how to handle a mixture of WCE semaphores and normal
       events and mutexes.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_THREAD_WINDOWS
+
+// Urho3D: disable code when not actually on WCE
+#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
 
 #include "../../core/windows/SDL_windows.h"
 
@@ -227,6 +233,8 @@ CleanUp(SYNCHHANDLE hSynch, DWORD Flags)
     /* Everything worked */
     return hSynch;
 }
+
+#endif
 
 #endif /* SDL_THREAD_WINDOWS */
 
