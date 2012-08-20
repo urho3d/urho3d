@@ -977,7 +977,7 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         if (delta > 0)
         {
             Resize(length_ + delta);
-            MoveRange(pos + srcLength, pos + length, length_ - pos - length);
+            MoveRange(pos + srcLength, pos + length, length_ - pos - length - delta);
         }
     }
     else
