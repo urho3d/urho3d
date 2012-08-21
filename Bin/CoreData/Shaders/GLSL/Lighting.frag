@@ -70,10 +70,10 @@ float GetShadow(vec4 shadowPos)
                 texture2D(sShadowMap, vec2(projShadowPos.x, projShadowPos.y + cShadowMapInvSize.y)).r > projShadowPos.z,
                 texture2D(sShadowMap, projShadowPos.xy + cShadowMapInvSize).r > projShadowPos.z
             );
-            return dot(inLight, vec4(0.25));
+            return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
         #else
             // Take one sample
-            return texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z ? 1.0 : 0.0;
+            return cShadowIntensity.y + (texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z) ? cShadowIntensity.x : 0.0;
         #endif
     #endif
 }

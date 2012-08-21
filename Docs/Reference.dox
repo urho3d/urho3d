@@ -581,7 +581,7 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
-- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering, directional lights can have a maximum of 2 cascades, and shadow intensity is always at maximum.
+- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights can have a maximum of 2 cascades.
 
 \page Materials Materials
 
