@@ -61,18 +61,9 @@ void main()
     #endif
 
     #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            vec4 shadowPos = GetDirShadowPosDeferred(cLightMatricesPS, projWorldPos, depth);
-            diff *= GetDirShadow(shadowPos, depth);
-        #elif defined(SPOTLIGHT)
-            vec4 shadowPos = cLightMatricesPS[1] * projWorldPos;
-            diff *= GetShadow(shadowPos);
-        #else
-            vec3 shadowPos = worldPos - cLightPosPS.xyz;
-            diff *= GetPointShadow(shadowPos);
-        #endif
+        diff *= GetShadowDeferred(projWorldPos, depth);
     #endif
-
+    
     #if defined(SPOTLIGHT)
         vec4 spotPos = cLightMatricesPS[0] * projWorldPos;
         lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);

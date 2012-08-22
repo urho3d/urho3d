@@ -33,13 +33,7 @@ void VS(float4 iPos : POSITION,
             out float3 oEyeVec : TEXCOORD3,
         #endif
         #ifdef SHADOW
-            #if defined(DIRLIGHT)
-                out float4 oShadowPos[4] : TEXCOORD4,
-            #elif defined(SPOTLIGHT)
-                out float4 oShadowPos : TEXCOORD4,
-            #else
-                out float3 oShadowPos : TEXCOORD4,
-            #endif
+            out float4 oShadowPos[NUMCASCADES] : TEXCOORD4,
         #endif
         #ifdef SPOTLIGHT
             out float4 oSpotPos : TEXCOORD5,
@@ -74,16 +68,7 @@ void VS(float4 iPos : POSITION,
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #if defined(DIRLIGHT)
-                oShadowPos[0] = mul(projWorldPos, cLightMatrices[0]);
-                oShadowPos[1] = mul(projWorldPos, cLightMatrices[1]);
-                oShadowPos[2] = mul(projWorldPos, cLightMatrices[2]);
-                oShadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
-            #elif defined(SPOTLIGHT)
-                oShadowPos = mul(projWorldPos, cLightMatrices[1]);
-            #else
-                oShadowPos = worldPos - cLightPos.xyz;
-            #endif
+            GetShadowPos(projWorldPos, oShadowPos);
         #endif
 
         #ifdef SPOTLIGHT
@@ -119,13 +104,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float3 iEyeVec : TEXCOORD3,
         #endif
         #ifdef SHADOW
-            #if defined(DIRLIGHT)
-                float4 iShadowPos[4] : TEXCOORD4,
-            #elif defined(SPOTLIGHT)
-                float4 iShadowPos : TEXCOORD4,
-            #else
-                float3 iShadowPos : TEXCOORD4,
-            #endif
+            float4 iShadowPos[NUMCASCADES] : TEXCOORD4,
         #endif
         #ifdef SPOTLIGHT
             float4 iSpotPos : TEXCOORD5,
@@ -178,14 +157,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
     
         #ifdef SHADOW
-            #if defined(DIRLIGHT)
-                float4 shadowPos = GetDirShadowPos(iShadowPos, iLightVec.w);
-                diff *= GetDirShadow(shadowPos, iLightVec.w);
-            #elif defined(SPOTLIGHT)
-                diff *= GetShadow(iShadowPos);
-            #else
-                diff *= GetPointShadow(iShadowPos);
-            #endif
+            diff *= GetShadow(iShadowPos, iLightVec.w);
         #endif
     
         #if defined(SPOTLIGHT)

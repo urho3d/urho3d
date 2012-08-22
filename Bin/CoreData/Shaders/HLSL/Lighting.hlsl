@@ -96,6 +96,28 @@ float GetVertexLightVolumetric(int index, float3 worldPos)
 #endif
 
 #ifdef SHADOW
+
+#ifdef DIRLIGHT
+    #define NUMCASCADES 4
+#else
+    #define NUMCASCADES 1
+#endif
+
+void GetShadowPos(float4 projWorldPos, out float4 shadowPos[NUMCASCADES])
+{
+    // Shadow projection: transform from world space to shadow space
+    #if defined(DIRLIGHT)
+        shadowPos[0] = mul(projWorldPos, cLightMatrices[0]);
+        shadowPos[1] = mul(projWorldPos, cLightMatrices[1]);
+        shadowPos[2] = mul(projWorldPos, cLightMatrices[2]);
+        shadowPos[3] = mul(projWorldPos, cLightMatrices[3]);
+    #elif defined(SPOTLIGHT)
+        shadowPos[0] = mul(projWorldPos, cLightMatrices[1]);
+    #else
+        shadowPos[0] = float4(projWorldPos.xyz - cLightPos.xyz, 0.0);
+    #endif
+}
+
 float GetShadow(float4 shadowPos)
 {
     #ifndef LQSHADOW
@@ -145,12 +167,8 @@ float GetPointShadow(float3 lightVec)
     // Expand the maximum component of the light vector to get full 0.0 - 1.0 UV range from the cube map,
     // and to avoid sampling across faces. Some GPU's filter across faces, while others do not, and in this
     // case filtering across faces is wrong
-    // Note: when doing also alpha masking on SM2, the texture sampling becomes too complex, so there is no
-    // choice but to skip it
-    #if defined(SM3) || !defined(ALPHAMASK)
     const float factor = 1.0 / 256.0;
     lightVec += factor * axis * lightVec;
-    #endif
 
     // Read the 2D UV coordinates, adjust according to shadow map size and add face offset
     float4 indirectPos = texCUBE(sIndirectionCubeMap, lightVec);
@@ -163,45 +181,74 @@ float GetPointShadow(float3 lightVec)
 #endif
 
 #ifdef DIRLIGHT
-float GetDirShadow(float4 shadowPos, float depth)
+float GetDirShadowFade(float inLight, float depth)
 {
-    return saturate(GetShadow(shadowPos) + saturate((depth - cShadowDepthFade.z) * cShadowDepthFade.w));
+    return saturate(inLight + saturate((depth - cShadowDepthFade.z) * cShadowDepthFade.w));
 }
 
-float4 GetDirShadowPos(const float4 iShadowPos[4], float depth)
+float GetDirShadow(const float4 iShadowPos[NUMCASCADES], float depth)
 {
+    float4 shadowPos;
+
     if (depth < cShadowSplits.x)
-        return iShadowPos[0];
+        shadowPos = iShadowPos[0];
     else if (depth < cShadowSplits.y)
-        return iShadowPos[1];
+        shadowPos = iShadowPos[1];
     else if (depth < cShadowSplits.z)
-        return iShadowPos[2];
+        shadowPos = iShadowPos[2];
     else
-        return iShadowPos[3];
+        shadowPos = iShadowPos[3];
+        
+    return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 
-#ifdef SM3
-float4 GetDirShadowPosDeferred(const float4x4 matrices[4], float4 projWorldPos, float depth)
+float GetDirShadowDeferred(float4 projWorldPos, float depth)
 {
-    if (depth < cShadowSplits.x)
-        return mul(projWorldPos, matrices[0]);
-    else if (depth < cShadowSplits.y)
-        return mul(projWorldPos, matrices[1]);
-    else if (depth < cShadowSplits.z)
-        return mul(projWorldPos, matrices[2]);
-    else
-        return mul(projWorldPos, matrices[3]);
-}
-#else
-float4 GetDirShadowPosDeferred(const float4x4 matrices[3], float4 projWorldPos, float depth)
-{
-    if (depth < cShadowSplits.x)
-        return mul(projWorldPos, matrices[0]);
-    else if (depth < cShadowSplits.y)
-        return mul(projWorldPos, matrices[1]);
-    else
-        return mul(projWorldPos, matrices[2]);
+    float4 shadowPos;
+
+    #ifdef SM3
+        if (depth < cShadowSplits.x)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[0]);
+        else if (depth < cShadowSplits.y)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[1]);
+        else if (depth < cShadowSplits.z)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[2]);
+        else
+            shadowPos = mul(projWorldPos, cLightMatricesPS[3]);
+    #else
+        if (depth < cShadowSplits.x)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[0]);
+        else if (depth < cShadowSplits.y)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[1]);
+        else if (depth < cShadowSplits.z)
+            shadowPos = mul(projWorldPos, cLightMatricesPS[2]);
+    #endif
+
+    return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 #endif
-#endif
+
+float GetShadow(float4 iShadowPos[NUMCASCADES], float depth)
+{
+    #if defined(DIRLIGHT)
+        return GetDirShadow(iShadowPos, depth);
+    #elif defined(SPOTLIGHT)
+        return GetShadow(iShadowPos[0]);
+    #else
+        return GetPointShadow(iShadowPos[0].xyz);
+    #endif
+}
+
+float GetShadowDeferred(float4 projWorldPos, float depth)
+{
+    #if defined(DIRLIGHT)
+        return GetDirShadowDeferred(projWorldPos, depth);
+    #elif defined(SPOTLIGHT)
+        float4 shadowPos = mul(projWorldPos, cLightMatricesPS[1]);
+        return GetShadow(shadowPos);
+    #else
+        float3 shadowPos = projWorldPos.xyz - cLightPosPS.xyz;
+        return GetPointShadow(shadowPos);
+    #endif
+}
 #endif

@@ -13,15 +13,7 @@ varying vec2 vTexCoord;
         varying vec3 vNormal;
     #endif
     #ifdef SHADOW
-        #if defined(DIRLIGHT) && !defined(GL_ES)
-	    varying vec4 vShadowPos[4];
-        #elif defined(DIRLIGHT) && defined(GL_ES)
-	    varying vec4 vShadowPos[2];
-        #elif defined(SPOTLIGHT)
-            varying vec4 vShadowPos;
-        #else
-            varying vec3 vShadowPos;
-        #endif
+        varying vec4 vShadowPos[NUMCASCADES];
     #endif
     #ifdef SPOTLIGHT
         varying vec4 vSpotPos;
@@ -86,14 +78,7 @@ void main()
         #endif
     
         #ifdef SHADOW
-            #if defined(DIRLIGHT)
-                vec4 shadowPos = GetDirShadowPos(vShadowPos, vLightVec.w);
-                diff *= GetDirShadow(shadowPos, vLightVec.w);
-            #elif defined(SPOTLIGHT)
-                diff *= GetShadow(vShadowPos);
-            #else
-                diff *= GetPointShadow(vShadowPos);
-            #endif
+            diff *= GetShadow(vShadowPos, vLightVec.w);
         #endif
     
         #if defined(SPOTLIGHT)

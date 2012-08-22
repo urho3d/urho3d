@@ -62,16 +62,7 @@ void main()
     #endif
 
     #ifdef SHADOW
-        #if defined(DIRLIGHT)
-            vec4 shadowPos = GetDirShadowPosDeferred(cLightMatricesPS, projWorldPos, depth);
-            diff *= GetDirShadow(shadowPos, depth);
-        #elif defined(SPOTLIGHT)
-            vec4 shadowPos = cLightMatricesPS[1] * projWorldPos;
-            diff *= GetShadow(shadowPos);
-        #else
-            vec3 shadowPos = worldPos - cLightPosPS.xyz;
-            diff *= GetPointShadow(shadowPos);
-        #endif
+        diff *= GetShadowDeferred(projWorldPos, depth);
     #endif
 
     #if defined(SPOTLIGHT)

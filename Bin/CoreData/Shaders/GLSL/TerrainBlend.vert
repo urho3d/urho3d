@@ -11,15 +11,7 @@ varying vec2 vTexCoord;
     #endif
     varying vec3 vNormal;
     #ifdef SHADOW
-        #if defined(DIRLIGHT) && !defined(GL_ES)
-	    varying vec4 vShadowPos[4];
-        #elif defined(DIRLIGHT) && defined(GL_ES)
-	    varying vec4 vShadowPos[2];
-        #elif defined(SPOTLIGHT)
-            varying vec4 vShadowPos;
-        #else
-            varying vec3 vShadowPos;
-        #endif
+        varying vec4 vShadowPos[NUMCASCADES];
     #endif
     #ifdef SPOTLIGHT
         varying vec4 vSpotPos;
@@ -47,18 +39,7 @@ void main()
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #if defined(DIRLIGHT)
-                vShadowPos[0] = cLightMatrices[0] * projWorldPos;
-                vShadowPos[1] = cLightMatrices[1] * projWorldPos;
-                #ifndef GL_ES
-                    vShadowPos[2] = cLightMatrices[2] * projWorldPos;
-                    vShadowPos[3] = cLightMatrices[3] * projWorldPos;
-                #endif
-            #elif defined(SPOTLIGHT)
-                vShadowPos = cLightMatrices[1] * projWorldPos;
-            #else
-                vShadowPos = worldPos - cLightPos.xyz;
-            #endif
+            GetShadowPos(projWorldPos, vShadowPos);
         #endif
 
         #ifdef SPOTLIGHT
