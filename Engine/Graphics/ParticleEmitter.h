@@ -194,7 +194,9 @@ private:
     bool active_;
     /// Update when invisible flag.
     bool updateInvisible_;
-    /// Rendering renderer framenumber on which was last updated.
+    /// Last scene timestep.
+    float lastTimeStep_;
+    /// Rendering framenumber on which was last updated.
     unsigned lastUpdateFrameNumber_;
 };
 

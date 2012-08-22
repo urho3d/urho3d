@@ -69,6 +69,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     sizeMul_(1.0f),
     active_(true),
     updateInvisible_(false),
+    lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED)
 {
     SetParticleColor(Color(1.0f, 1.0f, 1.0f));
@@ -99,8 +100,6 @@ void ParticleEmitter::RegisterObject(Context* context)
 
 void ParticleEmitter::Update(const FrameInfo& frame)
 {
-    float timeStep = frame.timeStep_;
-    
     // If there is an amount mismatch between particles and billboards, correct it
     if (particles_.Size() != billboards_.Size())
         SetNumBillboards(particles_.Size());
@@ -108,7 +107,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     bool needBillboardUpdate = false;
     
     // Check active/inactive period switching
-    periodTimer_ += timeStep;
+    periodTimer_ += lastTimeStep_;
     if (active_)
     {
         if (activeTime_ && periodTimer_ >= activeTime_)
@@ -129,7 +128,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     // Check for emitting a new particle
     if (active_)
     {
-        emissionTimer_ += timeStep;
+        emissionTimer_ += lastTimeStep_;
         if (emissionTimer_ > 0.0f)
         {
             emissionTimer_ -= Lerp(intervalMin_, intervalMax_, Random(1.0f));
@@ -160,32 +159,32 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 billboard.enabled_ = false;
                 continue;
             }
-            particle.timer_ += timeStep;
+            particle.timer_ += lastTimeStep_;
             
             // Velocity & position
             if (constanceForce_ != Vector3::ZERO)
             {
                 if (relative_)
-                    particle.velocity_ += timeStep * relativeConstantForce;
+                    particle.velocity_ += lastTimeStep_ * relativeConstantForce;
                 else
-                    particle.velocity_ += timeStep * constanceForce_;
+                    particle.velocity_ += lastTimeStep_ * constanceForce_;
             }
             if (dampingForce_ != 0.0f)
             {
                 Vector3 force = -dampingForce_ * particle.velocity_;
-                particle.velocity_ += timeStep * force;
+                particle.velocity_ += lastTimeStep_ * force;
             }
-            billboard.position_ += timeStep * particle.velocity_ * scaleVector;
+            billboard.position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
             
             // Rotation
-            billboard.rotation_ += timeStep * particle.rotationSpeed_;
+            billboard.rotation_ += lastTimeStep_ * particle.rotationSpeed_;
             
             // Scaling
             if (sizeAdd_ != 0.0f || sizeMul_ != 1.0f)
             {
-                particle.scale_ += timeStep * sizeAdd_;
+                particle.scale_ += lastTimeStep_ * sizeAdd_;
                 if (sizeMul_ != 1.0f)
-                    particle.scale_ *= (timeStep * (sizeMul_ - 1.0f)) + 1.0f;
+                    particle.scale_ *= (lastTimeStep_ * (sizeMul_ - 1.0f)) + 1.0f;
                 billboard.size_ = particle.size_ * particle.scale_;
             }
             
@@ -575,6 +574,11 @@ void ParticleEmitter::GetVector3MinMax(const XMLElement& element, Vector3& minVa
 
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Store scene's timestep and use it instead of global timestep, as time scale may be other than 1
+    using namespace ScenePostUpdate;
+    
+    lastTimeStep_ = eventData[P_TIMESTEP].GetFloat();
+    
     // If no invisible update, check that the billboardset is in view (framenumber has changed)
     if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {

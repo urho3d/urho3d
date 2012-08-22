@@ -1430,6 +1430,7 @@ Properties:<br>
 - Node@ parent
 - VariantMap vars (readonly)
 - bool active
+- float timeScale
 - float smoothingConstant
 - float snapThreshold
 - bool asyncLoading (readonly)

@@ -100,6 +100,8 @@ public:
     void Clear();
     /// Set active flag. Only active scenes will be updated automatically.
     void SetActive(bool enable);
+    /// Set update time scale. 1.0 = real time (default.)
+    void SetTimeScale(float scale);
     /// Set network client motion smoothing constant.
     void SetSmoothingConstant(float constant);
     /// Set network client motion smoothing snap threshold.
@@ -129,6 +131,8 @@ public:
     const String& GetFileName() const { return fileName_; }
     /// Return source file checksum.
     unsigned GetChecksum() const { return checksum_; }
+    /// Return update time scale.
+    float GetTimeScale() const { return timeScale_; }
     /// Return motion smoothing constant.
     float GetSmoothingConstant() const { return smoothingConstant_; }
     /// Return motion smoothing snap threshold.
@@ -221,6 +225,8 @@ private:
     unsigned localComponentID_;
     /// Scene source file checksum.
     unsigned checksum_;
+    /// Scene update time scale.
+    float timeScale_;
     /// Motion smoothing constant.
     float smoothingConstant_;
     /// Motion smoothing snap threshold.
