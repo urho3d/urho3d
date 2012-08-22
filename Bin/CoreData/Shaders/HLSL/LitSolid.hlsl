@@ -188,17 +188,8 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float3 normal = normalize(iNormal);
         #endif
 
-        #ifdef DIRLIGHT
-            #ifdef NORMALMAP
-                lightDir = normalize(iLightVec.xyz);
-            #else
-                lightDir = iLightVec.xyz;
-            #endif
-            diff = GetDiffuseDir(normal, lightDir);
-        #else
-            diff = GetDiffusePointOrSpot(normal, iLightVec.xyz, lightDir);
-        #endif
-    
+        diff = GetDiffuse(normal, iLightVec.xyz, lightDir);
+
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iLightVec.w);
         #endif

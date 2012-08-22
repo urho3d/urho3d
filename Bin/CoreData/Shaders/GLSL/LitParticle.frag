@@ -43,12 +43,8 @@ void main()
         vec3 finalColor;
         float diff;
     
-        #ifdef DIRLIGHT
-            diff = GetDiffuseDirVolumetric();
-        #else
-            diff = GetDiffusePointOrSpotVolumetric(vLightVec.xyz);
-        #endif
-    
+        diff = GetDiffuseVolumetric(vLightVec.xyz);
+
         #if defined(SPOTLIGHT)
             lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
         #elif defined(CUBEMASK)

@@ -54,11 +54,10 @@ void main()
     float diff;
 
     #ifdef DIRLIGHT
-        lightDir = cLightDirPS;
-        diff = GetDiffuseDir(normal, lightDir);
+        diff = GetDiffuse(normal, cLightDirPS, lightDir);
     #else
         vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
-        diff = GetDiffusePointOrSpot(normal, lightVec, lightDir);
+        diff = GetDiffuse(normal, lightVec, lightDir);
     #endif
 
     #ifdef SHADOW

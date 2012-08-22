@@ -114,12 +114,8 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 finalColor;
         float diff;
     
-        #ifdef DIRLIGHT
-            diff = GetDiffuseDirVolumetric();
-        #else
-            diff = GetDiffusePointOrSpotVolumetric(iLightVec.xyz);
-        #endif
-    
+        diff = GetDiffuseVolumetric(iLightVec.xyz);
+
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)

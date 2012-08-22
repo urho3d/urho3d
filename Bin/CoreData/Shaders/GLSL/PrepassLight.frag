@@ -53,11 +53,10 @@ void main()
 
     // Accumulate light at half intensity to allow 2x "overburn"
     #ifdef DIRLIGHT
-        lightDir = cLightDirPS;
-        diff = 0.5 * GetDiffuseDir(normal, lightDir);
+        diff = 0.5 * GetDiffuse(normal, cLightDirPS, lightDir);
     #else
         vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
-        diff = 0.5 * GetDiffusePointOrSpot(normal, lightVec, lightDir);
+        diff = 0.5 * GetDiffuse(normal, lightVec, lightDir);
     #endif
 
     #ifdef SHADOW

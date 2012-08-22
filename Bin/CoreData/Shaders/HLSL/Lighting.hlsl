@@ -1,26 +1,31 @@
 #pragma warning(disable:3571)
 
-float GetDiffuseDir(float3 normal, float3 lightDir)
+float GetDiffuse(float3 normal, float3 lightVec, out float3 lightDir)
 {
-    return saturate(dot(normal, lightDir));
+    #ifdef DIRLIGHT
+        #ifdef NORMALMAP
+            // In normal mapped forward lighting, the tangent space light vector needs renormalization
+            lightDir = normalize(lightVec);
+        #else
+            lightDir = lightVec;
+        #endif
+
+        return saturate(dot(normal, lightDir));
+    #else
+        float lightDist = length(lightVec);
+        lightDir = lightVec / lightDist;
+        return saturate(dot(normal, lightDir)) * tex1D(sLightRampMap, lightDist).r;
+    #endif
 }
 
-float GetDiffusePointOrSpot(float3 normal, float3 lightVec, out float3 lightDir)
+float GetDiffuseVolumetric(float3 lightVec)
 {
-    float lightDist = length(lightVec);
-    lightDir = lightVec / lightDist;
-    return saturate(dot(normal, lightDir)) * tex1D(sLightRampMap, lightDist).r;
-}
-
-float GetDiffuseDirVolumetric()
-{
-    return 1.0;
-}
-
-float GetDiffusePointOrSpotVolumetric(float3 lightVec)
-{
-    float lightDist = length(lightVec);
-    return tex1D(sLightRampMap, lightDist).r;
+    #ifdef DIRLIGHT
+        return 1.0;
+    #else
+        float lightDist = length(lightVec);
+        return tex1D(sLightRampMap, lightDist).r;
+    #endif
 }
 
 float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularPower)

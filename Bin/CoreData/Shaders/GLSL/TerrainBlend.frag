@@ -54,12 +54,7 @@ void main()
 
         vec3 normal = normalize(vNormal);
 
-        #ifdef DIRLIGHT
-            lightDir = vLightVec.xyz;
-            diff = GetDiffuseDir(normal, lightDir);
-        #else
-            diff = GetDiffusePointOrSpot(normal, vLightVec.xyz, lightDir);
-        #endif
+        diff = GetDiffuse(normal, vLightVec.xyz, lightDir);
 
         #ifdef SHADOW
             diff *= GetShadow(vShadowPos, vLightVec.w);
