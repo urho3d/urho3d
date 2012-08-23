@@ -26,6 +26,7 @@
 #include "Color.h"
 #include "HashMap.h"
 #include "Quaternion.h"
+#include "Rect.h"
 #include "StringHash.h"
 #include "Vector4.h"
 
@@ -50,7 +51,9 @@ enum VariantType
     VAR_RESOURCEREF,
     VAR_RESOURCEREFLIST,
     VAR_VARIANTVECTOR,
-    VAR_VARIANTMAP
+    VAR_VARIANTMAP,
+    VAR_RECT,
+    VAR_INTRECT
 };
 
 /// Union for the possible variant values. Also stores non-POD objects such as String which must not exceed 16 bytes in size.
@@ -289,6 +292,20 @@ public:
         *this = value;
     }
     
+    /// Construct from a rect.
+    Variant(const Rect& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+    
+    /// Construct from an integer rect.
+    Variant(const IntRect& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+    
     /// Construct from type and value.
     Variant(const String& type, const String& value) :
         type_(VAR_NONE)
@@ -491,6 +508,22 @@ public:
         return *this;
     }
     
+    /// Assign from a rect.
+    Variant& operator = (const Rect& rhs)
+    {
+        SetType(VAR_RECT);
+        *(reinterpret_cast<Rect*>(&value_)) = rhs;
+        return *this;
+    }
+    
+    /// Assign from an integer rect.
+    Variant& operator = (const IntRect& rhs)
+    {
+        SetType(VAR_INTRECT);
+        *(reinterpret_cast<IntRect*>(&value_)) = rhs;
+        return *this;
+    }
+    
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for inequality with another variant.
@@ -640,6 +673,24 @@ public:
             return false;
     }
     
+    /// Test for equality with a rect. To return true, both the type and value must match.
+    bool operator == (const Rect& rhs) const
+    {
+        if (type_ == VAR_RECT)
+            return *(reinterpret_cast<const Rect*>(&value_)) == rhs;
+        else
+            return false;
+    }
+    
+    /// Test for equality with an integer rect. To return true, both the type and value must match.
+    bool operator == (const IntRect& rhs) const
+    {
+        if (type_ == VAR_INTRECT)
+            return *(reinterpret_cast<const IntRect*>(&value_)) == rhs;
+        else
+            return false;
+    }
+    
     /// Test for equality with a StringHash. To return true, both the type and value must match.
     bool operator == (const StringHash& rhs) const
     {
@@ -688,6 +739,10 @@ public:
     bool operator != (const VariantVector& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a variant map.
     bool operator != (const VariantMap& rhs) const { return !(*this == rhs); }
+    /// Test for inequality with a rect.
+    bool operator != (const Rect& rhs) const { return !(*this == rhs); }
+    /// Test for inequality with an integer rect.
+    bool operator != (const IntRect& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a StringHash.
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a ShortStringHash.
@@ -840,14 +895,30 @@ public:
         return *reinterpret_cast<const VariantVector*>(&value_);
     }
     
-    /// Return a variant map or empty on type mismatch
+    /// Return a variant map or empty on type mismatch.
     const VariantMap& GetVariantMap() const
     {
         if (type_ != VAR_VARIANTMAP)
             return emptyVariantMap;
         return *reinterpret_cast<const VariantMap*>(&value_);
     }
-
+    
+    /// Return a rect or empty on type mismatch.
+    const Rect& GetRect() const
+    {
+        if (type_ != VAR_RECT)
+            return Rect::ZERO;
+        return *reinterpret_cast<const Rect*>(&value_);
+    }
+    
+    /// Return an integer rect or empty on type mismatch.
+    const IntRect& GetIntRect() const
+    {
+        if (type_ != VAR_INTRECT)
+            return IntRect::ZERO;
+        return *reinterpret_cast<const IntRect*>(&value_);
+    }
+    
     /// Return the value, template version.
     template <class T> T Get() const;
     /// Return value's type.

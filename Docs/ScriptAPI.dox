@@ -489,6 +489,7 @@ Methods:<br>
 - void Merge(const Rect&)
 - void Clip(const Rect&)
 - void Clear()
+- bool Equals(const Rect&) const
 
 Properties:<br>
 - Vector2 min

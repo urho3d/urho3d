@@ -696,6 +696,7 @@ static void RegisterRect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Rect", "void Merge(const Rect&in)", asMETHODPR(Rect, Merge, (const Rect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void Clip(const Rect&in)", asMETHODPR(Rect, Clip, (const Rect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void Clear()", asMETHOD(Rect, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "bool Equals(const Rect&in) const", asMETHOD(Rect, Equals), asCALL_THISCALL);
     engine->RegisterObjectProperty("Rect", "Vector2 min", offsetof(Rect, min_));
     engine->RegisterObjectProperty("Rect", "Vector2 max", offsetof(Rect, max_));
     engine->RegisterObjectProperty("Rect", "float left", offsetof(Rect, min_.x_));

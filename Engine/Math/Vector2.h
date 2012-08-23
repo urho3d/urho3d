@@ -161,7 +161,7 @@ public:
     Vector2 Abs() const { return Vector2(Urho3D::Abs(x_), Urho3D::Abs(y_)); }
     /// Linear interpolation with another vector.
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
-    ///// Test for equality with another vectir with epsilon.
+    /// Test for equality with another vector with epsilon.
     bool Equals(const Vector2& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_); }
     
     /// Return normalized to unit length.
