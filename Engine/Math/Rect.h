@@ -158,7 +158,7 @@ public:
     /// Return half-size.
     Vector2 HalfSize() const { return (max_ - min_) * 0.5f; }
     /// Test for equality with another rect with epsilon.
-    bool Equals(const Rect& rhs) const { return min_.Equals(rhs.min_) && max_.Equals(rhs.min_); }
+    bool Equals(const Rect& rhs) const { return min_.Equals(rhs.min_) && max_.Equals(rhs.max_); }
     
     /// Return float data.
     const void* Data() const { return &min_.x_; }
