@@ -702,6 +702,7 @@ Methods:<br>
 - const ResourceRefList& GetResourceRefList() const
 - Variant[]@ GetVariantVector() const
 - const VariantMap& GetVariantMap() const
+- const IntRect& GetIntRect() const
 - void FromString(const String&, const String&)
 - void FromString(VariantType, const String&)
 - String ToString() const
