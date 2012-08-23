@@ -55,7 +55,6 @@ static const String typeNames[] =
     "ResourceRefList",
     "VariantVector",
     "VariantMap",
-    "Rect",
     "IntRect"
     ""
 };
@@ -123,7 +122,6 @@ bool Variant::operator == (const Variant& rhs) const
     case VAR_VECTOR4:
     case VAR_QUATERNION:
     case VAR_COLOR:
-    case VAR_RECT:
         // Hack: use the Vector4 compare for all these classes, as they have the same memory structure
         return *(reinterpret_cast<const Vector4*>(&value_)) == *(reinterpret_cast<const Vector4*>(&rhs.value_));
         
@@ -254,10 +252,6 @@ void Variant::FromString(VariantType type, const char* value)
         }
         break;
         
-    case VAR_RECT:
-        *this = ToRect(value);
-        break;
-        
     case VAR_INTRECT:
         *this = ToIntRect(value);
         break;
@@ -339,9 +333,6 @@ String Variant::ToString() const
         // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String();
-        
-    case VAR_RECT:
-        return (reinterpret_cast<const Rect*>(&value_))->ToString();
         
     case VAR_INTRECT:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
@@ -479,11 +470,6 @@ template<> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
-template<> const Rect& Variant::Get<const Rect&>() const
-{
-    return GetRect();
-}
-
 template<> const IntRect& Variant::Get<const IntRect&>() const
 {
     return GetIntRect();
@@ -547,11 +533,6 @@ template<> Color Variant::Get<Color>() const
 template<> String Variant::Get<String>() const
 {
     return GetString();
-}
-
-template<> Rect Variant::Get<Rect>() const
-{
-    return GetRect();
 }
 
 template<> IntRect Variant::Get<IntRect>() const

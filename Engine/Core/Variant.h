@@ -52,7 +52,6 @@ enum VariantType
     VAR_RESOURCEREFLIST,
     VAR_VARIANTVECTOR,
     VAR_VARIANTMAP,
-    VAR_RECT,
     VAR_INTRECT
 };
 
@@ -508,14 +507,6 @@ public:
         return *this;
     }
     
-    /// Assign from a rect.
-    Variant& operator = (const Rect& rhs)
-    {
-        SetType(VAR_RECT);
-        *(reinterpret_cast<Rect*>(&value_)) = rhs;
-        return *this;
-    }
-    
     /// Assign from an integer rect.
     Variant& operator = (const IntRect& rhs)
     {
@@ -669,15 +660,6 @@ public:
     {
         if (type_ == VAR_VARIANTMAP)
             return *(reinterpret_cast<const VariantMap*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a rect. To return true, both the type and value must match.
-    bool operator == (const Rect& rhs) const
-    {
-        if (type_ == VAR_RECT)
-            return *(reinterpret_cast<const Rect*>(&value_)) == rhs;
         else
             return false;
     }
@@ -901,14 +883,6 @@ public:
         if (type_ != VAR_VARIANTMAP)
             return emptyVariantMap;
         return *reinterpret_cast<const VariantMap*>(&value_);
-    }
-    
-    /// Return a rect or empty on type mismatch.
-    const Rect& GetRect() const
-    {
-        if (type_ != VAR_RECT)
-            return Rect::ZERO;
-        return *reinterpret_cast<const Rect*>(&value_);
     }
     
     /// Return an integer rect or empty on type mismatch.
