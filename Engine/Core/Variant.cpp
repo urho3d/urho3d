@@ -55,7 +55,8 @@ static const String typeNames[] =
     "ResourceRefList",
     "VariantVector",
     "VariantMap",
-    "IntRect"
+    "IntRect",
+    "IntVector2"
     ""
 };
 
@@ -148,6 +149,9 @@ bool Variant::operator == (const Variant& rhs) const
         
     case VAR_INTRECT:
         return *(reinterpret_cast<const IntRect*>(&value_)) == *(reinterpret_cast<const IntRect*>(&rhs.value_));
+        
+    case VAR_INTVECTOR2:
+        return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
         
     default:
         return true;
@@ -256,6 +260,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntRect(value);
         break;
         
+    case VAR_INTVECTOR2:
+        *this = ToIntVector2(value);
+        break;
+        
     default:
         SetType(VAR_NONE);
     }
@@ -335,6 +343,9 @@ String Variant::ToString() const
         return String();
         
     case VAR_INTRECT:
+        return (reinterpret_cast<const IntRect*>(&value_))->ToString();
+        
+    case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
         
     default:
@@ -475,6 +486,11 @@ template<> const IntRect& Variant::Get<const IntRect&>() const
     return GetIntRect();
 }
 
+template<> const IntVector2& Variant::Get<const IntVector2&>() const
+{
+    return GetIntVector2();
+}
+
 template<> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>& >() const
 {
     return GetBuffer();
@@ -538,6 +554,11 @@ template<> String Variant::Get<String>() const
 template<> IntRect Variant::Get<IntRect>() const
 {
     return GetIntRect();
+}
+
+template<> IntVector2 Variant::Get<IntVector2>() const
+{
+    return GetIntVector2();
 }
 
 template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const

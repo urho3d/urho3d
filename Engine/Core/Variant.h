@@ -52,7 +52,8 @@ enum VariantType
     VAR_RESOURCEREFLIST,
     VAR_VARIANTVECTOR,
     VAR_VARIANTMAP,
-    VAR_INTRECT
+    VAR_INTRECT,
+    VAR_INTVECTOR2
 };
 
 /// Union for the possible variant values. Also stores non-POD objects such as String which must not exceed 16 bytes in size.
@@ -291,15 +292,15 @@ public:
         *this = value;
     }
     
-    /// Construct from a rect.
-    Variant(const Rect& value) :
+    /// Construct from an integer rect.
+    Variant(const IntRect& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from an integer rect.
-    Variant(const IntRect& value) :
+    /// Construct from an IntVector2.
+    Variant(const IntVector2& value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -515,6 +516,14 @@ public:
         return *this;
     }
     
+    /// Assign from an IntVector2.
+    Variant& operator = (const IntVector2& rhs)
+    {
+        SetType(VAR_INTVECTOR2);
+        *(reinterpret_cast<IntVector2*>(&value_)) = rhs;
+        return *this;
+    }
+    
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for inequality with another variant.
@@ -673,6 +682,15 @@ public:
             return false;
     }
     
+    /// Test for equality with an IntVector2. To return true, both the type and value must match.
+    bool operator == (const IntVector2& rhs) const
+    {
+        if (type_ == VAR_INTVECTOR2)
+            return *(reinterpret_cast<const IntVector2*>(&value_)) == rhs;
+        else
+            return false;
+    }
+    
     /// Test for equality with a StringHash. To return true, both the type and value must match.
     bool operator == (const StringHash& rhs) const
     {
@@ -721,10 +739,10 @@ public:
     bool operator != (const VariantVector& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a variant map.
     bool operator != (const VariantMap& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a rect.
-    bool operator != (const Rect& rhs) const { return !(*this == rhs); }
     /// Test for inequality with an integer rect.
     bool operator != (const IntRect& rhs) const { return !(*this == rhs); }
+    /// Test for inequality with an IntVector2.
+    bool operator != (const IntVector2& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a StringHash.
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a ShortStringHash.
@@ -891,6 +909,14 @@ public:
         if (type_ != VAR_INTRECT)
             return IntRect::ZERO;
         return *reinterpret_cast<const IntRect*>(&value_);
+    }
+    
+    /// Return an IntVector2 or empty on type mismatch.
+    const IntVector2& GetIntVector2() const
+    {
+        if (type_ != VAR_INTVECTOR2)
+            return IntVector2::ZERO;
+        return *reinterpret_cast<const IntVector2*>(&value_);
     }
     
     /// Return the value, template version.

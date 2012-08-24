@@ -703,6 +703,7 @@ Methods:<br>
 - Variant[]@ GetVariantVector() const
 - const VariantMap& GetVariantMap() const
 - const IntRect& GetIntRect() const
+- const IntVector2& GetIntVector2() const
 - void FromString(const String&, const String&)
 - void FromString(VariantType, const String&)
 - String ToString() const
