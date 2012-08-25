@@ -48,15 +48,14 @@ ScrollBar::ScrollBar(Context* context) :
 {
     active_ = true;
     
-    backButton_ = new Button(context_);
+    backButton_ = CreateChild<Button>();
+    backButton_->SetInternal(true);
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
-    forwardButton_ = new Button(context_);
+    slider_ = CreateChild<Slider>();
+    slider_->SetInternal(true);
+    forwardButton_ = CreateChild<Button>();
+    forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
-    slider_ = new Slider(context_);
-    
-    AddChild(backButton_);
-    AddChild(slider_);
-    AddChild(forwardButton_);
     
     SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));

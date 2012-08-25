@@ -376,7 +376,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     root = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
     if (!root)
     {
-        LOGERROR("Could not create UI element " + type);
+        LOGERROR("Could not create unknown UI element " + type);
         return root;
     }
     root->SetName(rootElem.GetAttribute("name"));
@@ -655,7 +655,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
         SharedPtr<UIElement> child = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
         if (!child)
         {
-            LOGERROR("Could not create UI element " + type);
+            LOGERROR("Could not create unknown UI element " + type);
             childElem = childElem.GetNext("element");
             continue;
         }

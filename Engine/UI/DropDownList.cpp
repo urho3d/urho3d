@@ -40,15 +40,17 @@ DropDownList::DropDownList(Context* context) :
     resizePopup_(false)
 {
     Window* window = new Window(context_);
+    window->SetInternal(true);
     SetPopup(window);
     
     listView_ = new ListView(context_);
+    listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
     listView_->SetFocusMode(FM_NOTFOCUSABLE);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
-    placeholder_ = new UIElement(context_);
-    AddChild(placeholder_);
+    placeholder_ = CreateChild<UIElement>();
+    placeholder_->SetInternal(true);
     
     SubscribeToEvent(listView_, E_ITEMSELECTED, HANDLER(DropDownList, HandleItemSelected));
 }

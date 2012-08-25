@@ -48,19 +48,18 @@ ScrollView::ScrollView(Context* context) :
     active_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
     
-    horizontalScrollBar_ = new ScrollBar(context_);
+    horizontalScrollBar_ = CreateChild<ScrollBar>();
+    horizontalScrollBar_->SetInternal(true);
     horizontalScrollBar_->SetAlignment(HA_LEFT, VA_BOTTOM);
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);
-    verticalScrollBar_ = new ScrollBar(context_);
+    verticalScrollBar_ = CreateChild<ScrollBar>();
+    verticalScrollBar_->SetInternal(true);
     verticalScrollBar_->SetAlignment(HA_RIGHT, VA_TOP);
     verticalScrollBar_->SetOrientation(O_VERTICAL);
-    scrollPanel_ = new BorderImage(context_);
+    scrollPanel_ = CreateChild<BorderImage>();
+    scrollPanel_->SetInternal(true);
     scrollPanel_->SetActive(true);
     scrollPanel_->SetClipChildren(true);
-    
-    AddChild(horizontalScrollBar_);
-    AddChild(verticalScrollBar_);
-    AddChild(scrollPanel_);
     
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
     SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));

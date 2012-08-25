@@ -237,6 +237,8 @@ public:
     void EnableLayoutUpdate();
     /// Bring UI element to front.
     void BringToFront();
+    /// Create and add a child element and return it.
+    UIElement* CreateChild(ShortStringHash type, const String& name = String());
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -251,6 +253,10 @@ public:
     void SetParent(UIElement* parent);
     /// Set a user variable.
     void SetVar(ShortStringHash key, const Variant& value);
+    /// Mark as internally created. Internally created elements are not re-created during deserialization.
+    void SetInternal(bool enable);
+    /// Template version of creating a child element.
+    template <class T> T* CreateChild(const String& name = String());
     
     /// Return name.
     const String& GetName() const { return name_; }
@@ -310,6 +316,8 @@ public:
     bool IsVisible() const { return visible_; }
     /// Return whether the cursor is hovering on this element.
     bool IsHovering() const { return hovering_; }
+    /// Return whether is internally created.
+    bool IsInternal() const { return internal_; }
     /// Return whether has different color in at least one corner.
     bool HasColorGradient() const { return colorGradient_; }
     /// Return focus mode.
@@ -404,6 +412,8 @@ protected:
     bool visible_;
     /// Hovering flag.
     bool hovering_;
+    /// Internally created flag.
+    bool internal_;
     /// Focus mode.
     FocusMode focusMode_;
     /// Drag and drop flags.
@@ -465,4 +475,7 @@ private:
     bool colorGradient_;
 };
 
+template <class T> T* UIElement::CreateChild(const String& name) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name)); }
+
 }
+

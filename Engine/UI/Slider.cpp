@@ -43,8 +43,8 @@ Slider::Slider(Context* context) :
     dragSlider_(false)
 {
     active_ = true;
-    knob_ = new BorderImage(context_);
-    AddChild(knob_);
+    knob_ = CreateChild<BorderImage>();
+    knob_->SetInternal(true);
     
     UpdateSlider();
 }

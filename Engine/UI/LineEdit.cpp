@@ -54,11 +54,11 @@ LineEdit::LineEdit(Context* context) :
     active_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
     
-    text_ = new Text(context_);
-    cursor_ = new BorderImage(context_);
+    text_ = CreateChild<Text>();
+    text_->SetInternal(true);
+    cursor_ = CreateChild<BorderImage>();
+    cursor_->SetInternal(true);
     cursor_->SetPriority(1); // Show over text
-    AddChild(text_);
-    AddChild(cursor_);
     
     SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));

@@ -690,6 +690,11 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHODPR(T, IsDataLost, () const, bool), asCALL_THISCALL);
 }
 
+static UIElement* UIElementCreateChild(const String& typeName, const String& name, UIElement* ptr)
+{
+    return ptr->CreateChild(ShortStringHash(typeName), name);
+}
+
 static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
 {
     PODVector<UIElement*> elements;
@@ -735,6 +740,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", asMETHOD(T, DisableLayoutUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void EnableLayoutUpdate()", asMETHOD(T, EnableLayoutUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void BringToFront()", asMETHOD(T, BringToFront), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String())", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void InsertChild(uint, UIElement@+)", asMETHOD(T, InsertChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+)", asMETHOD(T, RemoveChild), asCALL_THISCALL);

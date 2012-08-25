@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Log.h"
 #include "ResourceCache.h"
 #include "Sort.h"
 #include "StringUtils.h"
@@ -89,6 +90,7 @@ UIElement::UIElement(Context* context) :
     selected_(false),
     visible_(true),
     hovering_(false),
+    internal_(false),
     focusMode_(FM_NOTFOCUSABLE),
     dragDropMode_(DD_DISABLED),
     layoutMode_(LM_FREE),
@@ -775,6 +777,22 @@ void UIElement::BringToFront()
         ptr->SetPriority(maxPriority);
 }
 
+UIElement* UIElement::CreateChild(ShortStringHash type, const String& name)
+{
+    // Check that creation succeeds and that the object in fact is a UI element
+    SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
+    if (!newElement)
+    {
+        LOGERROR("Could not create unknown UI element type " + type.ToString());
+        return 0;
+    }
+    
+    newElement->SetName(name);
+    
+    AddChild(newElement);
+    return newElement;
+}
+
 void UIElement::AddChild(UIElement* element)
 {
     InsertChild(children_.Size(), element);
@@ -852,6 +870,11 @@ void UIElement::SetParent(UIElement* parent)
 void UIElement::SetVar(ShortStringHash key, const Variant& value)
 {
     vars_[key] = value;
+}
+
+void UIElement::SetInternal(bool enable)
+{
+    internal_ = enable;
 }
 
 IntVector2 UIElement::GetScreenPosition()
