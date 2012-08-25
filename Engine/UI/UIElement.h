@@ -253,7 +253,7 @@ public:
     void SetParent(UIElement* parent);
     /// Set a user variable.
     void SetVar(ShortStringHash key, const Variant& value);
-    /// Mark as internally created. Internally created elements are not re-created during deserialization.
+    /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String());
