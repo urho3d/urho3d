@@ -720,7 +720,7 @@ static VariantMap& UIElementGetVars(UIElement* ptr)
 /// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className)
 {
-    RegisterObject<T>(engine, className);
+    RegisterSerializable<T>(engine, className);
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
