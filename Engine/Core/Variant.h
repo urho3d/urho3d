@@ -67,9 +67,26 @@ struct VariantValue
         void* ptr_;
     };
     
-    float y_;
-    float z_;
-    float w_;
+    union
+    {
+        int int2_;
+        float float2_;
+        void* ptr2_;
+    };
+    
+    union
+    {
+        int int3_;
+        float float3_;
+        void* ptr3_;
+    };
+    
+    union
+    {
+        int int4_;
+        float float4_;
+        void* ptr4_;
+    };
 };
 
 /// Typed resource reference.
