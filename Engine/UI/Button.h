@@ -54,9 +54,9 @@ public:
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     
-    /// Set pressed image offset.
+    /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(const IntVector2& offset);
-    /// Set pressed image offset.
+    /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(int x, int y);
     /// Set pressed label offset.
     void SetLabelOffset(const IntVector2& offset);

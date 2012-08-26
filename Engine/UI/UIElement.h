@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "Serializable.h"
 #include "UIBatch.h"
 #include "Vector2.h"
 #include "XMLFile.h"
@@ -101,7 +101,7 @@ class Cursor;
 class ResourceCache;
 
 /// Base class for %UI elements.
-class UIElement : public Object
+class UIElement : public Serializable
 {
     OBJECT(UIElement);
     
@@ -113,6 +113,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.

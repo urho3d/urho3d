@@ -75,7 +75,7 @@ public:
     /// Set maximum text length. 0 for unlimited.
     void SetMaxLength(unsigned length);
     /// Set echo character for password entry and such. 0 (default) shows the actual text.
-    void SetEchoCharacter(char c);
+    void SetEchoCharacter(unsigned c);
     /// Set whether can move cursor with arrows or mouse, default true.
     void SetCursorMovable(bool enable);
     /// Set whether selections are allowed, default true.
@@ -92,7 +92,7 @@ public:
     /// Return maximum text length.
     unsigned GetMaxLength() const { return maxLength_; }
     /// Return echo character.
-    char GetEchoCharacter() const { return echoCharacter_; }
+    unsigned GetEchoCharacter() const { return echoCharacter_; }
     /// Return whether can move cursor with arrows or mouse.
     bool IsCursorMovable() const { return cursorMovable_; }
     /// Return whether selections are allowed.
@@ -133,7 +133,7 @@ protected:
     /// Maximum text length.
     unsigned maxLength_;
     /// Echo character.
-    char echoCharacter_;
+    unsigned echoCharacter_;
     /// Cursor movable flag.
     bool cursorMovable_;
     /// Text selectable flag.

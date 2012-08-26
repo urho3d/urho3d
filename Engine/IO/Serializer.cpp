@@ -269,6 +269,12 @@ bool Serializer::WriteVariantData(const Variant& value)
         
     case VAR_VARIANTMAP:
         return WriteVariantMap(value.GetVariantMap());
+        
+    case VAR_INTRECT:
+        return WriteIntRect(value.GetIntRect());
+        
+    case VAR_INTVECTOR2:
+        return WriteIntVector2(value.GetIntVector2());
     }
     
     return false;

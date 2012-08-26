@@ -376,4 +376,18 @@ unsigned GetStringListIndex(const char* value, const String* strings, unsigned d
     return defaultIndex;
 }
 
+unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive)
+{
+    unsigned i = 0;
+    
+    while (strings[i])
+    {
+        if (!String::Compare(value, strings[i], caseSensitive))
+            return i;
+        ++i;
+    }
+    
+    return defaultIndex;
+}
+
 }

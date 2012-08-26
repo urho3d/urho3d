@@ -49,6 +49,12 @@ BorderImage::~BorderImage()
 void BorderImage::RegisterObject(Context* context)
 {
     context->RegisterFactory<BorderImage>();
+    
+    COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
+    ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void BorderImage::SetStyle(const XMLElement& element)
@@ -67,6 +73,17 @@ void BorderImage::SetStyle(const XMLElement& element)
         SetBorder(element.GetChild("border").GetIntRect("value"));
     if (element.HasChild("hoveroffset"))
         SetHoverOffset(element.GetChild("hoveroffset").GetIntVector2("value"));
+}
+
+void BorderImage::SetTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetTexture(cache->GetResource<Texture2D>(value.id_));
+}
+
+ResourceRef BorderImage::GetTextureAttr() const
+{
+    return GetResourceRef(texture_, Texture2D::GetTypeStatic());
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

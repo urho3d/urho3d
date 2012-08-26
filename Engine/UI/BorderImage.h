@@ -73,6 +73,11 @@ public:
     /// Return offset to image rectangle used on hover.
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
     
+    /// Set texture attribute.
+    void SetTextureAttr(ResourceRef value);
+    /// Return texture attribute.
+    ResourceRef GetTextureAttr() const;
+    
 protected:
     /// Return UI rendering batches with offset to image rectangle.
     void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset);

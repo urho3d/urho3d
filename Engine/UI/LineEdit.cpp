@@ -71,6 +71,15 @@ LineEdit::~LineEdit()
 void LineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<LineEdit>();
+    
+    COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Cursor Position", GetCursorPosition, SetCursorPosition, unsigned, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
+    ATTRIBUTE(LineEdit, VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
 }
 
 void LineEdit::SetStyle(const XMLElement& element)
@@ -466,7 +475,7 @@ void LineEdit::SetMaxLength(unsigned length)
     maxLength_ = length;
 }
 
-void LineEdit::SetEchoCharacter(char c)
+void LineEdit::SetEchoCharacter(unsigned c)
 {
     echoCharacter_ = c;
     UpdateText();
@@ -496,9 +505,8 @@ void LineEdit::UpdateText()
     else
     {
         String echoText;
-        echoText.Resize(utf8Length);
         for (unsigned i = 0; i < utf8Length; ++i)
-            echoText[i] = echoCharacter_;
+            echoText.AppendUTF8(echoCharacter_);
         text_->SetText(echoText);
     }
     if (cursorPosition_ > utf8Length)

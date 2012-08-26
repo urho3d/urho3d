@@ -47,6 +47,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
@@ -105,6 +107,11 @@ public:
     const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
     /// Return size of each character.
     const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
+    
+    /// Set font attribute.
+    void SetFontAttr(ResourceRef value);
+    /// Return font attribute.
+    ResourceRef GetFontAttr() const;
     
 protected:
     /// Update text when text, font or spacing changed.

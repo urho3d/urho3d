@@ -38,11 +38,11 @@ namespace Urho3D
 
 static const float MIN_ROW_SPACING = 0.5f;
 
-static const String horizontalAlignments[] =
+static const char* horizontalAlignments[] =
 {
-    "left",
-    "center",
-    "right",
+    "Left",
+    "Center",
+    "Right",
     ""
 };
 
@@ -69,6 +69,25 @@ Text::~Text()
 void Text::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text>();
+    
+    COPY_BASE_ATTRIBUTES(Text, UIElement);
+    ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
+    ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
+    ATTRIBUTE(Text, VAR_STRING, "Text", text_, String(), AM_FILE);
+    ENUM_ATTRIBUTE(Text, "Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
+    ATTRIBUTE(Text, VAR_FLOAT, "Row Spacing", rowSpacing_, 1.0f, AM_FILE);
+    ATTRIBUTE(Text, VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
+    ATTRIBUTE(Text, VAR_INT, "Selection Start", selectionStart_, 0, AM_FILE);
+    ATTRIBUTE(Text, VAR_INT, "Selection Length", selectionLength_, 0, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::BLACK, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::BLACK, AM_FILE);
+}
+
+void Text::ApplyAttributes()
+{
+    fontSize_ = Max(fontSize_, 1);
+    ValidateSelection();
+    UpdateText();
 }
 
 void Text::SetStyle(const XMLElement& element)
@@ -123,7 +142,7 @@ void Text::SetStyle(const XMLElement& element)
         String horiz = element.GetChild("textalignment").GetAttributeLower("value");
         if (!horiz.Empty())
         {
-            textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT);
+            textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz.CString(), horizontalAlignments, HA_LEFT);
             changed = true;
         }
     }
@@ -347,6 +366,17 @@ void Text::SetSelectionColor(const Color& color)
 void Text::SetHoverColor(const Color& color)
 {
     hoverColor_ = color;
+}
+
+void Text::SetFontAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    font_ = cache->GetResource<Font>(value.id_);
+}
+
+ResourceRef Text::GetFontAttr() const
+{
+    return GetResourceRef(font_, Font::GetTypeStatic());
 }
 
 void Text::UpdateText(bool inResize)

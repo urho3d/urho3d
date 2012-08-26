@@ -322,6 +322,12 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_VARIANTMAP:
         return Variant(ReadVariantMap());
         
+    case VAR_INTRECT:
+        return Variant(ReadIntRect());
+        
+    case VAR_INTVECTOR2:
+        return Variant(ReadIntVector2());
+        
     default:
         return Variant();
     }

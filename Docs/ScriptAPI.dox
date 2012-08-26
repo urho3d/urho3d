@@ -3755,7 +3755,7 @@ Properties:<br>
 - uint cursorPosition
 - float cursorBlinkRate
 - uint maxLength
-- uint8 echoCharacter
+- uint echoCharacter
 - bool cursorMovable
 - bool textSelectable
 - bool textCopyable

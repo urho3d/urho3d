@@ -49,6 +49,9 @@ CheckBox::~CheckBox()
 void CheckBox::RegisterObject(Context* context)
 {
     context->RegisterFactory<CheckBox>();
+    
+    COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
+    REF_ACCESSOR_ATTRIBUTE(CheckBox, VAR_INTVECTOR2,"Checked Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void CheckBox::SetStyle(const XMLElement& element)

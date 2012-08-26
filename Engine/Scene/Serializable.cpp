@@ -285,7 +285,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                     bool enumFound = false;
                     while (*enumPtr)
                     {
-                        if (!String::Compare(*enumPtr, value, true))
+                        if (!String::Compare(*enumPtr, value, false))
                         {
                             enumFound = true;
                             break;

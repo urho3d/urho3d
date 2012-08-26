@@ -36,38 +36,46 @@
 namespace Urho3D
 {
 
-static const String horizontalAlignments[] =
+static const char* horizontalAlignments[] =
 {
-    "left",
-    "center",
-    "right",
-    ""
+    "Left",
+    "Center",
+    "Right",
+    0
 };
 
-static const String verticalAlignments[] =
+static const char* verticalAlignments[] =
 {
-    "top",
-    "center",
-    "bottom",
-    ""
+    "Top",
+    "Center",
+    "Bottom",
+    0
 };
 
-static const String focusModes[] =
+static const char* focusModes[] =
 {
-    "notfocusable",
-    "resetfocus",
-    "focusable",
-    "focusabledefocusable",
-    ""
+    "NotFocusable",
+    "ResetFocus",
+    "Focusable",
+    "FocusableDefocusable",
+    0
 };
 
-static const String dragDropModes[] =
+static const char* dragDropModes[] =
 {
-    "disabled",
-    "source",
-    "target",
-    "sourceandtarget",
-    ""
+    "Disabled",
+    "Source",
+    "Target",
+    "SourceAndTarget",
+    0
+};
+
+static const char* layoutModes[] =
+{
+    "Free",
+    "Horizontal",
+    "Vertical",
+    0
 };
 
 static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
@@ -75,10 +83,30 @@ static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
     return lhs->GetPriority() < rhs->GetPriority();
 }
 
+template<> HorizontalAlignment Variant::Get<HorizontalAlignment>() const
+{
+    return (HorizontalAlignment)GetInt();
+}
+
+template<> VerticalAlignment Variant::Get<VerticalAlignment>() const
+{
+    return (VerticalAlignment)GetInt();
+}
+
+template<> FocusMode Variant::Get<FocusMode>() const
+{
+    return (FocusMode)GetInt();
+}
+
+template<> LayoutMode Variant::Get<LayoutMode>() const
+{
+    return (LayoutMode)GetInt();
+}
+
 OBJECTTYPESTATIC(UIElement);
 
 UIElement::UIElement(Context* context) :
-    Object(context),
+    Serializable(context),
     parent_(0),
     clipBorder_(IntRect::ZERO),
     priority_(0),
@@ -133,6 +161,45 @@ UIElement::~UIElement()
 void UIElement::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIElement>();
+    
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String(), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
+    ATTRIBUTE(UIElement, VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
+    ATTRIBUTE(UIElement, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
+    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
+    ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Active", IsActive, SetActive, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE);
+}
+
+void UIElement::ApplyAttributes()
+{
+    colorGradient_ = false;
+    derivedColorDirty_ = true;
+    
+    for (unsigned i = 1; i < MAX_UIELEMENT_CORNERS; ++i)
+    {
+        if (color_[i] != color_[0])
+            colorGradient_ = true;
+    }
 }
 
 void UIElement::SetStyle(const XMLElement& element)
@@ -180,9 +247,9 @@ void UIElement::SetStyle(const XMLElement& element)
         if (alignElem.HasAttribute("v"))
             vert = alignElem.GetAttributeLower("v");
         if (!horiz.Empty())
-            SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT));
+            SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz.CString(), horizontalAlignments, HA_LEFT));
         if (!vert.Empty())
-            SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert, verticalAlignments, VA_TOP));
+            SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert.CString(), verticalAlignments, VA_TOP));
     }
     if (element.HasChild("clipborder"))
         SetClipBorder(element.GetChild("clipborder").GetIntRect("value"));
@@ -219,14 +286,14 @@ void UIElement::SetStyle(const XMLElement& element)
     if (element.HasChild("focusmode"))
     {
         String focusMode = element.GetChild("focusmode").GetAttributeLower("value");
-        SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, FM_NOTFOCUSABLE));
+        SetFocusMode((FocusMode)GetStringListIndex(focusMode.CString(), focusModes, FM_NOTFOCUSABLE));
         if (focusMode == "defocusable")
             SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
     if (element.HasChild("dragdropmode"))
     {
         String dragDropMode = element.GetChild("dragdropmode").GetAttributeLower("value");
-        SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, DD_DISABLED));
+        SetDragDropMode(GetStringListIndex(dragDropMode.CString(), dragDropModes, DD_DISABLED));
     }
     if (element.HasChild("layout"))
     {

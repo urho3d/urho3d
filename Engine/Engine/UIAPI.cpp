@@ -300,8 +300,8 @@ static void RegisterLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "float get_cursorBlinkRate() const", asMETHOD(LineEdit, GetCursorBlinkRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_maxLength(uint)", asMETHOD(LineEdit, SetMaxLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "uint get_maxLength() const", asMETHOD(LineEdit, GetMaxLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "void set_echoCharacter(uint8)", asMETHOD(LineEdit, SetEchoCharacter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "uint8 get_echoCharacter() const", asMETHOD(LineEdit, GetEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void set_echoCharacter(uint)", asMETHOD(LineEdit, SetEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "uint get_echoCharacter() const", asMETHOD(LineEdit, GetEchoCharacter), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_cursorMovable(bool)", asMETHOD(LineEdit, SetCursorMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool get_cursorMovable() const", asMETHOD(LineEdit, IsCursorMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void set_textSelectable(bool)", asMETHOD(LineEdit, SetTextSelectable), asCALL_THISCALL);
