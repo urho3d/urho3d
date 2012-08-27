@@ -202,6 +202,84 @@ void UIElement::ApplyAttributes()
     }
 }
 
+bool UIElement::LoadXML(const XMLElement& source)
+{
+    if (!Serializable::LoadXML(source))
+        return false;
+    
+    // Attributes can be applied immediately, as there are no element reference attributes
+    ApplyAttributes();
+    
+    unsigned nextInternalChild = 0;
+    
+    // Load child elements. Internal elements are not to be created as they already exist
+    XMLElement childElem = source.GetChild("node");
+    while (childElem)
+    {
+        bool internalElem = childElem.GetBool("internal");
+        String typeName = childElem.GetAttribute("type");
+        UIElement* child = 0;
+        
+        if (!internalElem)
+        {
+            child = CreateChild(ShortStringHash(typeName));
+            if (!child)
+                return false;
+        }
+        else
+        {
+            for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+            {
+                if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
+                {
+                    child = children_[i];
+                    nextInternalChild = i + 1;
+                    break;
+                }
+            }
+        }
+        
+        if (child)
+        {
+            if (!child->LoadXML(childElem))
+                return false;
+        }
+        else
+            LOGWARNING("Could not find matching internal child element of type " + typeName);
+        
+        childElem = childElem.GetNext();
+    }
+    
+    return true;
+}
+
+bool UIElement::SaveXML(XMLElement& dest)
+{
+    // Write type and internal flag
+    if (!dest.SetString("type", GetTypeName()))
+        return false;
+    if (internal_)
+    {
+        if (!dest.SetBool("internal", internal_))
+            return false;
+    }
+    
+    // Write attributes
+    if (!Serializable::SaveXML(dest))
+        return false;
+    
+    // Write child elements
+    for (unsigned i = 0; i < children_.Size(); ++i)
+    {
+        UIElement* element = children_[i];
+        XMLElement childElem = dest.CreateChild("element");
+        if (!element->SaveXML(childElem))
+            return false;
+    }
+    
+    return true;
+}
+
 void UIElement::SetStyle(const XMLElement& element)
 {
     if (element.HasAttribute("name"))
@@ -372,6 +450,26 @@ void UIElement::OnChar(unsigned c, int buttons, int qualifiers)
 
 void UIElement::OnResize()
 {
+}
+
+
+bool UIElement::LoadXML(Deserializer& source)
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    if (!xml->Load(source))
+        return false;
+    
+    return LoadXML(xml->GetRoot());
+}
+
+bool UIElement::SaveXML(Serializer& dest)
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    XMLElement rootElem = xml->CreateRoot("element");
+    if (!SaveXML(rootElem))
+        return false;
+    
+    return xml->Save(dest);
 }
 
 void UIElement::SetName(const String& name)

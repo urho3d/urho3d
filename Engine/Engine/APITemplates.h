@@ -343,7 +343,7 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in)", asMETHODPR(T, GetAttribute, (const String&), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Serializable", className);
@@ -690,6 +690,22 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHODPR(T, IsDataLost, () const, bool), asCALL_THISCALL);
 }
 
+static bool UIElementLoadXML(File* file, UIElement* ptr)
+{
+    if (file)
+        return ptr->LoadXML(*file);
+    else
+        return false;
+}
+
+static bool UIElementSaveXML(File* file, UIElement* ptr)
+{
+    if (file)
+        return ptr->SaveXML(*file);
+    else
+        return false;
+}
+
 static UIElement* UIElementCreateChild(const String& typeName, const String& name, UIElement* ptr)
 {
     return ptr->CreateChild(ShortStringHash(typeName), name);
@@ -724,6 +740,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
+    engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTION(UIElementLoadXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetStyle(XMLFile@+, const String&in)", asMETHODPR(T, SetStyle, (XMLFile*, const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetStyleAuto(XMLFile@+)", asMETHODPR(T, SetStyleAuto, (XMLFile*), void), asCALL_THISCALL);

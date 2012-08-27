@@ -115,6 +115,10 @@ public:
     
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
+    /// Load from XML data. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source);
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest);
     /// Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
@@ -144,6 +148,11 @@ public:
     virtual void OnChar(unsigned c, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
+    
+    /// Load from an XML file. Return true if successful.
+    bool LoadXML(Deserializer& source);
+    /// Save to an XML file. Return true if successful.
+    bool SaveXML(Serializer& dest);
     
     /// Set name.
     void SetName(const String& name);

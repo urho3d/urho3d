@@ -85,6 +85,8 @@ void Text::RegisterObject(Context* context)
 
 void Text::ApplyAttributes()
 {
+    UIElement::ApplyAttributes();
+    
     fontSize_ = Max(fontSize_, 1);
     ValidateSelection();
     UpdateText();

@@ -346,7 +346,7 @@ String Variant::ToString() const
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
         
     case VAR_INTVECTOR2:
-        return (reinterpret_cast<const IntRect*>(&value_))->ToString();
+        return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
         
     default:
         return String();
