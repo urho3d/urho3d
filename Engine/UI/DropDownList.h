@@ -45,6 +45,8 @@ public:
     
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to the popup being shown.

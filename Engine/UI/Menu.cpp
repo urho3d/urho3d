@@ -68,6 +68,23 @@ void Menu::OnShowPopup()
 {
 }
 
+bool Menu::SaveXML(XMLElement& dest)
+{
+    // Hack: parent the popup during serialization
+    bool popupShown = popup_ && popup_->IsVisible();
+    if (popup_)
+    {
+        InsertChild(0, popup_);
+        popup_->SetVisible(false);
+    }
+    
+    bool success = UIElement::SaveXML(dest);
+    
+    ShowPopup(popupShown);
+    
+    return success;
+}
+
 void Menu::SetPopup(UIElement* popup)
 {
     if (popup == this)

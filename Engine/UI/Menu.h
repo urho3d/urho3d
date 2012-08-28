@@ -41,6 +41,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Save as XML data. Return true if successful.
+    virtual bool SaveXML(XMLElement& dest);
+    
     /// React to the popup being shown.
     virtual void OnShowPopup();
     

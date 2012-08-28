@@ -43,7 +43,7 @@ DropDownList::DropDownList(Context* context) :
     window->SetInternal(true);
     SetPopup(window);
     
-    // Hack: parent the popup to the dropdownlist until first shown to allow loading style from XML
+    // Hack: parent the popup until first shown to allow loading style from XML
     AddChild(window);
     window->SetVisible(false);
     
@@ -71,10 +71,32 @@ void DropDownList::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
 
+bool DropDownList::SaveXML(XMLElement& dest)
+{
+    // Hack: parent the popup and the list items during serialization
+    bool popupShown = popup_ && popup_->IsVisible();
+    if (popup_)
+    {
+        InsertChild(0, popup_);
+        popup_->SetVisible(false);
+    }
+    
+    while (listView_->GetNumItems())
+        placeholder_->AddChild(listView_->GetItem(0));
+    
+    bool success = UIElement::SaveXML(dest);
+    
+    while (placeholder_->GetNumChildren())
+        listView_->AddItem(placeholder_->GetChild(0));
+    
+    ShowPopup(popupShown);
+    
+    return success;
+}
+
 void DropDownList::ApplyAttributes()
 {
     // Hack: if the placeholder has any child elements defined, move them to the list
-    /// \todo This will not be serialized back to XML as expected
     while (placeholder_->GetNumChildren())
         AddItem(placeholder_->GetChild(0));
 }
