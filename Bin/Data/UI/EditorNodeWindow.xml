@@ -1,90 +1,104 @@
-<element type="Window" name="NodeWindow">
-    <movable enable="true" />
-    <resizable enable="true" />
-    <resizeborder value="6 6 6 6" />
-    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+<element type="Window">
+    <attribute name="Name" value="NodeWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" />
-        <element type="Text" name="WindowTitle">
-            <text value="Node / component edit" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Node / component edit" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton" />
-    </element>
-    <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
-    </element>
-    <element type="Text" name="NodeTitle">
-        <fixedheight value="17" />
-    </element>
-    <element type="ListView" name="NodeAttributeList">
-        <highlight value="always" />
-        <fixedheight value="74" />
-        <horizontalscrollbar>
-            <visible enable="false" />
-        </horizontalscrollbar>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="4" />
-        <element type="LineEdit" name="VarNameEdit">
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarInt">
-            <text value="Int" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarBool">
-            <text value="Bool" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarFloat">
-            <text value="Float" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarString">
-            <text value="String" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarVector3">
-            <text value="Vector3" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="VarColor">
-            <text value="Color" />
-        </element>
-        <element type="DropDownList" name="NewVarDropDown">
-            <fixedsize value="50 17" />
-            <layout mode="free" />
-            <placeholder>
-                <visible enable="false" />
-            </placeholder>
-            <element type="Text">
-                <text value="New" />
-                <alignment horizontal="center" vertical="center" />
-            </element>
-            <popup>
-                <layout border="4 4 4 4" />   
-            </popup>
-            <popupitem name="VarInt" />
-            <popupitem name="VarBool" />
-            <popupitem name="VarFloat" />
-            <popupitem name="VarString" />
-            <popupitem name="VarVector3" />
-            <popupitem name="VarColor" />
-        </element>
-        <element type="Button" name="DeleteVarButton">
-            <fixedsize value="50 17" />
-            <element type="Text">
-                <text value="Del" />
-                <alignment horizontal="center" vertical="center" />
-            </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
     </element>
-    <element type="Text" name="ComponentTitle">
-        <fixedheight value="17" />
+    <element type="Text">
+        <attribute name="Name" value="NodeTitle" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
     </element>
-    <element type="ListView" name="ComponentAttributeList">
-        <highlight value="always" />
-        <horizontalscrollbar>
-            <visible enable="false" />
-        </horizontalscrollbar>
+    <element type="ListView">
+        <attribute name="Name" value="NodeAttributeList" />
+        <attribute name="Highlight Mode" value="Always" />
+        <attribute name="Min Size" value="0 74" />
+        <attribute name="Max Size" value="2147483647 74" />
+        <element type="ScrollBar" internal="true">
+            <attribute name="Is Visible" value="false" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
+        <element type="LineEdit">
+            <attribute name="Name" value="VarNameEdit" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="NewVarDropDown" />
+            <attribute name="Min Size" value="50 17" />
+            <attribute name="Max Size" value="50 17" />
+            <element internal="true">
+                <attribute name="Is Visible" value="false" />
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Int" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Bool" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Float" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="String" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Vector3" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Color" />
+                </element>
+            </element>
+            <element type="Text">
+                <attribute name="Text" value="New" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="DeleteVarButton" />
+            <attribute name="Min Size" value="50 17" />
+            <attribute name="Max Size" value="50 17" />
+            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Del" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
+    </element>
+    <element type="Text">
+        <attribute name="Name" value="ComponentTitle" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+    </element>
+    <element type="ListView">
+        <attribute name="Name" value="ComponentAttributeList" />
+        <attribute name="Highlight Mode" value="Always" />
+        <element type="ScrollBar" internal="true">
+            <attribute name="Is Visible" value="false" />
+        </element>
     </element>
 </element>

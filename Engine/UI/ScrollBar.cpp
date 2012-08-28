@@ -35,6 +35,8 @@ static const float DEFAULT_SCROLL_STEP = 0.1f;
 static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
 
+extern const char* orientations[];
+
 OBJECTTYPESTATIC(ScrollBar);
 
 ScrollBar::ScrollBar(Context* context) :
@@ -72,64 +74,33 @@ ScrollBar::~ScrollBar()
 void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>();
+    
+    ENUM_ACCESSOR_ATTRIBUTE(ScrollBar, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
+    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Left Image Rect", leftRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
+    ATTRIBUTE(ScrollBar, VAR_INTRECT, "Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
+    COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
 }
 
-void ScrollBar::SetStyle(const XMLElement& element)
+void ScrollBar::ApplyAttributes()
 {
-    UIElement::SetStyle(element);
+    UIElement::ApplyAttributes();
     
-    if (element.HasChild("range"))
+    // Reapply orientation to the button images
+    if (slider_->GetOrientation() == O_HORIZONTAL)
     {
-        XMLElement rangeElem = element.GetChild("range");
-        SetRange(rangeElem.GetFloat("max"));
-        SetValue(rangeElem.GetFloat("value"));
+        backButton_->SetImageRect(leftRect_);
+        forwardButton_->SetImageRect(rightRect_);
     }
-    if (element.HasChild("scrollstep"))
-        SetScrollStep(element.GetChild("scrollstep").GetFloat("value"));
-    if (element.HasChild("stepfactor"))
-        SetStepFactor(element.GetChild("stepfactor").GetFloat("value"));
-    
-    XMLElement backButtonElem = element.GetChild("backbutton");
-    if (backButtonElem)
+    else
     {
-        XMLElement imageElem = backButtonElem.GetChild("imagerect");
-        if (imageElem.HasAttribute("horizontal"))
-            leftRect_ = imageElem.GetIntRect("horizontal");
-        if (imageElem.HasAttribute("vertical"))
-            upRect_ = imageElem.GetIntRect("vertical");
-        if (imageElem.HasAttribute("h"))
-            leftRect_ = imageElem.GetIntRect("h");
-        if (imageElem.HasAttribute("v"))
-            upRect_ = imageElem.GetIntRect("v");
-        backButton_->SetStyle(backButtonElem);
-    }
-    
-    XMLElement forwardButtonElem = element.GetChild("forwardbutton");
-    if (forwardButtonElem)
-    {
-        XMLElement imageElem = forwardButtonElem.GetChild("imagerect");
-        if (imageElem.HasAttribute("horizontal"))
-            rightRect_ = imageElem.GetIntRect("horizontal");
-        if (imageElem.HasAttribute("vertical"))
-            downRect_ = imageElem.GetIntRect("vertical");
-        if (imageElem.HasAttribute("h"))
-            rightRect_ = imageElem.GetIntRect("h");
-        if (imageElem.HasAttribute("v"))
-            downRect_ = imageElem.GetIntRect("v");
-        forwardButton_->SetStyle(forwardButtonElem);
-    }
-    
-    XMLElement sliderElem = element.GetChild("slider");
-    if (sliderElem)
-        slider_->SetStyle(sliderElem);
-    
-    if (element.HasChild("orientation"))
-    {
-        String orientation = element.GetChild("orientation").GetAttributeLower("value");
-        if (orientation == "horizontal" || orientation == "h")
-            SetOrientation(O_HORIZONTAL);
-        if (orientation == "vertical" || orientation == "v")
-            SetOrientation(O_VERTICAL);
+        backButton_->SetImageRect(upRect_);
+        forwardButton_->SetImageRect(downRect_);
     }
 }
 

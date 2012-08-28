@@ -48,8 +48,6 @@ class Window : public BorderImage
 {
     OBJECT(Window);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     Window(Context* context);
@@ -58,8 +56,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.

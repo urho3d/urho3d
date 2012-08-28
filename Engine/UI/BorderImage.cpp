@@ -50,29 +50,11 @@ void BorderImage::RegisterObject(Context* context)
 {
     context->RegisterFactory<BorderImage>();
     
-    COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-}
-
-void BorderImage::SetStyle(const XMLElement& element)
-{
-    UIElement::SetStyle(element);
-    
-    if (element.HasChild("texture"))
-        SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>(element.GetChild("texture").GetAttribute("name")));
-    if (element.HasChild("imagerect"))
-    {
-        XMLElement imageElem = element.GetChild("imagerect");
-        if (imageElem.HasAttribute("value"))
-            SetImageRect(imageElem.GetIntRect("value"));
-    }
-    if (element.HasChild("border"))
-        SetBorder(element.GetChild("border").GetIntRect("value"));
-    if (element.HasChild("hoveroffset"))
-        SetHoverOffset(element.GetChild("hoveroffset").GetIntVector2("value"));
+    REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
 }
 
 void BorderImage::SetTextureAttr(ResourceRef value)

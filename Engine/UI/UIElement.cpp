@@ -213,11 +213,13 @@ bool UIElement::LoadXML(const XMLElement& source)
     unsigned nextInternalChild = 0;
     
     // Load child elements. Internal elements are not to be created as they already exist
-    XMLElement childElem = source.GetChild("node");
+    XMLElement childElem = source.GetChild("element");
     while (childElem)
     {
         bool internalElem = childElem.GetBool("internal");
         String typeName = childElem.GetAttribute("type");
+        if (typeName.Empty())
+            typeName = "UIElement";
         UIElement* child = 0;
         
         if (!internalElem)
@@ -247,7 +249,7 @@ bool UIElement::LoadXML(const XMLElement& source)
         else
             LOGWARNING("Could not find matching internal child element of type " + typeName);
         
-        childElem = childElem.GetNext();
+        childElem = childElem.GetNext("element");
     }
     
     return true;
@@ -278,121 +280,6 @@ bool UIElement::SaveXML(XMLElement& dest)
     }
     
     return true;
-}
-
-void UIElement::SetStyle(const XMLElement& element)
-{
-    if (element.HasAttribute("name"))
-        name_ = element.GetAttribute("name");
-    if (element.HasChild("position"))
-        SetPosition(element.GetChild("position").GetIntVector2("value"));
-    if (element.HasChild("size"))
-        SetSize(element.GetChild("size").GetIntVector2("value"));
-    if (element.HasChild("width"))
-        SetWidth(element.GetChild("width").GetInt("value"));
-    if (element.HasChild("height"))
-        SetHeight(element.GetChild("height").GetInt("value"));
-    if (element.HasChild("minsize"))
-        SetMinSize(element.GetChild("minsize").GetIntVector2("value"));
-    if (element.HasChild("minwidth"))
-        SetMinWidth(element.GetChild("minwidth").GetInt("value"));
-    if (element.HasChild("minheight"))
-        SetMinHeight(element.GetChild("minheight").GetInt("value"));
-    if (element.HasChild("maxsize"))
-        SetMaxSize(element.GetChild("maxsize").GetIntVector2("value"));
-    if (element.HasChild("maxwidth"))
-        SetMinWidth(element.GetChild("maxwidth").GetInt("value"));
-    if (element.HasChild("maxheight"))
-        SetMinHeight(element.GetChild("maxheight").GetInt("value"));
-    if (element.HasChild("fixedsize"))
-        SetFixedSize(element.GetChild("fixedsize").GetIntVector2("value"));
-    if (element.HasChild("fixedwidth"))
-        SetFixedWidth(element.GetChild("fixedwidth").GetInt("value"));
-    if (element.HasChild("fixedheight"))
-        SetFixedHeight(element.GetChild("fixedheight").GetInt("value"));
-    if (element.HasChild("alignment"))
-    {
-        XMLElement alignElem = element.GetChild("alignment");
-        
-        String horiz;
-        String vert;
-        if (alignElem.HasAttribute("horizontal"))
-            horiz = alignElem.GetAttributeLower("horizontal");
-        if (alignElem.HasAttribute("vertical"))
-            vert = alignElem.GetAttributeLower("vertical");
-        if (alignElem.HasAttribute("h"))
-            horiz = alignElem.GetAttributeLower("h");
-        if (alignElem.HasAttribute("v"))
-            vert = alignElem.GetAttributeLower("v");
-        if (!horiz.Empty())
-            SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz.CString(), horizontalAlignments, HA_LEFT));
-        if (!vert.Empty())
-            SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert.CString(), verticalAlignments, VA_TOP));
-    }
-    if (element.HasChild("clipborder"))
-        SetClipBorder(element.GetChild("clipborder").GetIntRect("value"));
-    if (element.HasChild("priority"))
-        SetPriority(element.GetChild("priority").GetInt("value"));
-    if (element.HasChild("opacity"))
-        SetOpacity(element.GetChild("opacity").GetFloat("value"));
-    if (element.HasChild("color"))
-    {
-        XMLElement colorElem = element.GetChild("color");
-        if (colorElem.HasAttribute("value"))
-            SetColor(colorElem.GetColor("value"));
-        if (colorElem.HasAttribute("topleft"))
-            SetColor(C_TOPLEFT, colorElem.GetColor("topleft"));
-        if (colorElem.HasAttribute("topright"))
-            SetColor(C_TOPRIGHT, colorElem.GetColor("topright"));
-        if (colorElem.HasAttribute("bottomleft"))
-            SetColor(C_BOTTOMLEFT, colorElem.GetColor("bottomleft"));
-        if (colorElem.HasAttribute("bottomright"))
-            SetColor(C_BOTTOMRIGHT, colorElem.GetColor("bottomright"));
-    }
-    if (element.HasChild("bringtofront"))
-        SetBringToFront(element.GetChild("bringtofront").GetBool("enable"));
-    if (element.HasChild("bringtoback"))
-        SetBringToBack(element.GetChild("bringtoback").GetBool("enable"));
-    if (element.HasChild("clipchildren"))
-        SetClipChildren(element.GetChild("clipchildren").GetBool("enable"));
-    if (element.HasChild("enabled"))
-        SetActive(element.GetChild("enabled").GetBool("enable"));
-    if (element.HasChild("selected"))
-        SetSelected(element.GetChild("selected").GetBool("enable"));
-    if (element.HasChild("visible"))
-        SetVisible(element.GetChild("visible").GetBool("enable"));
-    if (element.HasChild("focusmode"))
-    {
-        String focusMode = element.GetChild("focusmode").GetAttributeLower("value");
-        SetFocusMode((FocusMode)GetStringListIndex(focusMode.CString(), focusModes, FM_NOTFOCUSABLE));
-        if (focusMode == "defocusable")
-            SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
-    }
-    if (element.HasChild("dragdropmode"))
-    {
-        String dragDropMode = element.GetChild("dragdropmode").GetAttributeLower("value");
-        SetDragDropMode(GetStringListIndex(dragDropMode.CString(), dragDropModes, DD_DISABLED));
-    }
-    if (element.HasChild("layout"))
-    {
-        XMLElement layoutElem = element.GetChild("layout");
-        String mode = layoutElem.GetAttributeLower("mode");
-        if (mode == "free")
-            layoutMode_ = LM_FREE;
-        if (mode == "horizontal" || mode == "h")
-            layoutMode_ = LM_HORIZONTAL;
-        if (mode == "vertical" || mode == "v")
-            layoutMode_ = LM_VERTICAL;
-        
-        if (layoutElem.HasAttribute("spacing"))
-            layoutSpacing_ = Max(layoutElem.GetInt("spacing"), 0);
-        if (layoutElem.HasAttribute("border"))
-            SetLayoutBorder(layoutElem.GetIntRect("border"));
-        else
-            UpdateLayout();
-    }
-    if (element.HasChild("vars"))
-        vars_ = element.GetChild("vars").GetVariantMap();
 }
 
 void UIElement::Update(float timeStep)
@@ -452,6 +339,69 @@ void UIElement::OnResize()
 {
 }
 
+bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
+{
+    // Apply the style first, but only for non-internal elements
+    if (!internal_ && styleFile)
+    {
+        // Use style override if defined, otherwise type name
+        String styleName = source.GetAttribute("style");
+        if (styleName.Empty())
+            styleName = GetTypeName();
+        
+        SetStyle(styleFile, styleName);
+    }
+    
+    // Then load rest of the attributes from the source
+    if (!Serializable::LoadXML(source))
+        return false;
+    
+    unsigned nextInternalChild = 0;
+    
+    // Load child elements. Internal elements are not to be created as they already exist
+    XMLElement childElem = source.GetChild("element");
+    while (childElem)
+    {
+        bool internalElem = childElem.GetBool("internal");
+        String typeName = childElem.GetAttribute("type");
+        if (typeName.Empty())
+            typeName = "UIElement";
+        UIElement* child = 0;
+        
+        if (!internalElem)
+        {
+            child = CreateChild(ShortStringHash(typeName));
+            if (!child)
+                return false;
+        }
+        else
+        {
+            for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+            {
+                if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
+                {
+                    child = children_[i];
+                    nextInternalChild = i + 1;
+                    break;
+                }
+            }
+        }
+        
+        if (child)
+        {
+            if (!child->LoadXML(childElem, styleFile))
+                return false;
+        }
+        else
+            LOGWARNING("Could not find matching internal child element of type " + typeName);
+        
+        childElem = childElem.GetNext("element");
+    }
+    
+    ApplyAttributes();
+    
+    return true;
+}
 
 bool UIElement::LoadXML(Deserializer& source)
 {
@@ -768,6 +718,12 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
         }
         childElem = childElem.GetNext("element");
     }
+}
+
+
+void UIElement::SetStyle(const XMLElement& element)
+{
+    LoadXML(element);
 }
 
 void UIElement::SetStyleAuto(XMLFile* file)

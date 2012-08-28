@@ -70,111 +70,29 @@ void Text::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text>();
     
-    COPY_BASE_ATTRIBUTES(Text, UIElement);
     ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     ATTRIBUTE(Text, VAR_STRING, "Text", text_, String(), AM_FILE);
     ENUM_ATTRIBUTE(Text, "Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     ATTRIBUTE(Text, VAR_FLOAT, "Row Spacing", rowSpacing_, 1.0f, AM_FILE);
     ATTRIBUTE(Text, VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
-    ATTRIBUTE(Text, VAR_INT, "Selection Start", selectionStart_, 0, AM_FILE);
-    ATTRIBUTE(Text, VAR_INT, "Selection Length", selectionLength_, 0, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::BLACK, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::BLACK, AM_FILE);
+    COPY_BASE_ATTRIBUTES(Text, UIElement);
 }
 
 void Text::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
     
+    // Decode to Unicode now
+    unicodeText_.Clear();
+    for (unsigned i = 0; i < text_.Length();)
+        unicodeText_.Push(text_.NextUTF8Char(i));
+    
     fontSize_ = Max(fontSize_, 1);
     ValidateSelection();
     UpdateText();
-}
-
-void Text::SetStyle(const XMLElement& element)
-{
-    UIElement::SetStyle(element);
-    
-    // Recalculating the text is expensive, so do it only once at the end if something changed
-    bool changed = false;
-    
-    if (element.HasChild("font"))
-    {
-        XMLElement fontElem = element.GetChild("font");
-        String fontName = fontElem.GetAttribute("name");
-        
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        if (cache->Exists(fontName))
-        {
-            Font* font = cache->GetResource<Font>(fontName);
-            if (font)
-            {
-                font_ = font;
-                fontSize_ = Max(fontElem.GetInt("size"), 1);
-                changed = true;
-            }
-        }
-        else if (element.HasChild("fallbackfont"))
-        {
-            fontElem = element.GetChild("fallbackfont");
-            String fontName = fontElem.GetAttribute("name");
-            Font* font = cache->GetResource<Font>(fontName);
-            if (font)
-            {
-                font_ = font;
-                fontSize_ = Max(fontElem.GetInt("size"), 1);
-                changed = true;
-            }
-        }
-    }
-    if (element.HasChild("text"))
-    {
-        // Do not call SetText() as that would possibly resize the element
-        text_ = String(element.GetChild("text").GetAttribute("value")).Replaced("\\n", "\n");
-        
-        unicodeText_.Clear();
-        for (unsigned i = 0; i < text_.Length();)
-            unicodeText_.Push(text_.NextUTF8Char(i));
-        
-        changed = true;
-    }
-    if (element.HasChild("textalignment"))
-    {
-        String horiz = element.GetChild("textalignment").GetAttributeLower("value");
-        if (!horiz.Empty())
-        {
-            textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz.CString(), horizontalAlignments, HA_LEFT);
-            changed = true;
-        }
-    }
-    if (element.HasChild("rowspacing"))
-    {
-        rowSpacing_ = Max(element.GetChild("rowspacing").GetFloat("value"), MIN_ROW_SPACING);
-        changed = true;
-    }
-    if (element.HasChild("wordwrap"))
-    {
-        wordWrap_ = element.GetChild("wordwrap").GetBool("enable");
-        changed = true;
-    }
-    if (element.HasChild("selection"))
-    {
-        XMLElement selectionElem = element.GetChild("selection");
-        selectionStart_ = selectionElem.GetInt("start");
-        selectionLength_ = selectionElem.GetInt("length");
-        changed = true;
-    }
-    if (element.HasChild("selectioncolor"))
-        SetSelectionColor(element.GetChild("selectioncolor").GetColor("value"));
-    if (element.HasChild("hovercolor"))
-        SetHoverColor(element.GetChild("hovercolor").GetColor("value"));
-    
-    if (changed)
-    {
-        ValidateSelection();
-        UpdateText();
-    }
 }
 
 void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

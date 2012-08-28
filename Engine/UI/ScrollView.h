@@ -36,8 +36,6 @@ class ScrollView : public UIElement
 {
     OBJECT(ScrollView);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     ScrollView(Context* context);
@@ -46,8 +44,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// React to mouse wheel.
     virtual void OnWheel(int delta, int buttons, int qualifiers);
     /// React to a key press.

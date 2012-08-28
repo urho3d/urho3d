@@ -33,8 +33,6 @@ class Menu : public Button
 {
     OBJECT(Menu);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     Menu(Context* context);
@@ -43,8 +41,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// React to the popup being shown.
     virtual void OnShowPopup();
     

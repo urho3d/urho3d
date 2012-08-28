@@ -1,77 +1,91 @@
-<element type="Window" name="SceneWindow">
-    <movable enable="true" />
-    <resizable enable="true" />
-    <resizeborder value="6 6 6 6" />
-    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+<element type="Window">
+    <attribute name="Name" value="SceneWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
     <element>
-        <fixedheight value="16" />
-        <layout mode="horizontal" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
-            <text value="Scene hierarchy" />
+            <attribute name="Text" value="Scene hierarchy" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton" />
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
     </element>
     <element>
-        <fixedheight value="18" />
-        <layout mode="horizontal" spacing="4" />
-        <element type="Button" name="ExpandAllButton">
-            <fixedwidth value="70" />
-            <element type="Text">
-                <font name="Anonymous Pro.ttf" size="9" />
-                <text value="Expand" />
-                <alignment horizontal="center" vertical="center" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Button">
+            <attribute name="Name" value="ExpandAllButton" />
+            <attribute name="Min Size" value="70 17" />
+            <attribute name="Max Size" value="70 17" />
+            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">>
+                <attribute name="Text" value="Expand" />
+                <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
-        <element type="Button" name="CollapseAllButton">
-            <fixedwidth value="70" />
+        <element type="Button">
+            <attribute name="Name" value="CollapseAllButton" />
+            <attribute name="Min Size" value="70 17" />
+            <attribute name="Max Size" value="70 17" />
+            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
-                <font name="Anonymous Pro.ttf" size="9" />
-                <text value="Collapse" />
-                <alignment horizontal="center" vertical="center" />
+                <attribute name="Text" value="Collapse" />
+                <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
-        <element />
     </element>
-    <element type="ListView" name="NodeList">
-        <hierarchy enable="true" />
-        <highlight value="always" />
-        <multiselect enable="true" />
+    <element type="ListView">
+        <attribute name="Name" value="NodeList" />
+        <attribute name="Hierarchy Mode" value="true" />
+        <attribute name="Highlight Mode" value="Always" />
+        <attribute name="Multiselect" value="true" />
     </element>
     <element>
-        <fixedheight value="22" />
-        <layout mode="horizontal" spacing="4" />
+        <attribute name="Min Size" value="0 22" />
+        <attribute name="Max Size" value="2147483647 22" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
         <element />
-        <element type="DropDownList" name="NewNodeList">
-            <fixedsize value="90 22" />
-            <layout border="4 4 4 4" />
-            <placeholder>
-                <visible enable="false" />
-            </placeholder>
-            <element type="Text">
-                <text value="New Node" />
-                <textalignment value="center" />
+        <element type="DropDownList">
+            <attribute name="Name" value="NewNodeList" />
+            <attribute name="Min Size" value="90 22" />
+            <attribute name="Max Size" value="90 22" />
+            <attribute name="Layout Border" value="4 4 4 4" />
+            <element internal="true">
+                <attribute name="Is Visible" value="false" />
             </element>
-            <popup>
-                <layout border="4 4 4 4" />   
-            </popup>         
+            <element type="Text">
+                <attribute name="Text" value="New Node" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
         </element>
         <element />
-        <element type="DropDownList" name="NewComponentList">
-            <fixedsize value="90 22" />
-            <layout border="4 4 4 4" />
-            <placeholder>
-                <visible enable="false" />
-            </placeholder>
-            <element type="Text">
-                <text value="New Comp" />
-                <textalignment value="center" />
+        <element type="DropDownList">
+            <attribute name="Name" value="NewComponentList" />
+            <attribute name="Min Size" value="90 22" />
+            <attribute name="Max Size" value="90 22" />
+            <attribute name="Layout Border" value="4 4 4 4" />
+            <element internal="true">
+                <attribute name="Is Visible" value="false" />
             </element>
-            <popup>
-                <layout border="4 4 4 4" />   
-            </popup>
+            <element type="Text">
+                <attribute name="Text" value="New Comp" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
         </element>
         <element />
     </element>

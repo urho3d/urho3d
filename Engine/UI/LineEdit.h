@@ -36,8 +36,6 @@ class LineEdit : public BorderImage
 {
     OBJECT(LineEdit);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     LineEdit(Context* context);
@@ -46,8 +44,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// Perform UI element update.
     virtual void Update(float timeStep);
     

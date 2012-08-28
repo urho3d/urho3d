@@ -63,6 +63,8 @@ public:
     void Render();
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
     SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
+    /// Save a UI layout to an XML file. Return true if successful.
+    bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
     void SetClipBoardText(const String& text);
     
@@ -96,8 +98,6 @@ private:
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly);
     /// Return the first element in hierarchy that can alter focus.
     UIElement* GetFocusableElement(UIElement* element);
-    /// Load a UI layout from an XML file recursively.
-    void LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.

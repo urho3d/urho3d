@@ -38,13 +38,18 @@ namespace Urho3D
 
 static const ShortStringHash indentHash("Indent");
 
-static const String highlightModes[] =
+static const char* highlightModes[] =
 {
-    "never",
-    "focus",
-    "always",
+    "Never",
+    "Focus",
+    "Always",
     ""
 };
+
+template<> HighlightMode Variant::Get<HighlightMode>() const
+{
+    return (HighlightMode)GetInt();
+}
 
 int GetItemIndent(UIElement* item)
 {
@@ -84,52 +89,13 @@ ListView::~ListView()
 void ListView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ListView>();
-}
-
-void ListView::SetStyle(const XMLElement& element)
-{
-    ScrollView::SetStyle(element);
     
-    UIElement* root = GetRoot();
-    XMLElement itemElem = element.GetChild("listitem");
-    if (root)
-    {
-        while (itemElem)
-        {
-            if (itemElem.HasAttribute("name"))
-            {
-                UIElement* item = root->GetChild(itemElem.GetAttribute("name"), true);
-                AddItem(item);
-                if (itemElem.HasAttribute("indent"))
-                    item->SetVar(indentHash, itemElem.GetInt("indent"));
-                itemElem = itemElem.GetNext("listitem");
-            }
-        }
-    }
-    
-    if (element.HasChild("highlight"))
-    {
-        String highlight = element.GetChild("highlight").GetAttributeLower("value");
-        SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, HM_FOCUS));
-    }
-    if (element.HasChild("multiselect"))
-        SetMultiselect(element.GetChild("multiselect").GetBool("enable"));
-    if (element.HasChild("hierarchy"))
-        SetHierarchyMode(element.GetChild("hierarchy").GetBool("enable"));
-    if (element.HasChild("clearselection"))
-        SetClearSelectionOnDefocus(element.GetChild("clearselection").GetBool("enable"));
-    if (element.HasChild("doubleclickinterval"))
-        SetDoubleClickInterval(element.GetChild("doubleclickinterval").GetFloat("value"));
-    
-    XMLElement selectionElem = element.GetChild("selection");
-    while (selectionElem)
-    {
-        AddSelection(selectionElem.GetInt("value"));
-        selectionElem = selectionElem.GetNext("selection");
-    }
-    
-    // Set the container's layout border to match scroll panel clipping, so that elements are not left partially hidden
-    contentElement_->SetLayoutBorder(scrollPanel_->GetClipBorder());
+    ENUM_ACCESSOR_ATTRIBUTE(ListView, "Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Clear Sel. On Defocus", GetClearSelectionOnDefocus, SetClearSelectionOnDefocus, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(ListView, ScrollView);
 }
 
 void ListView::Update(float timeStep)
@@ -260,8 +226,9 @@ void ListView::OnResize()
 {
     ScrollView::OnResize();
     
-    // Set the content element width to match the scrollpanel
-    contentElement_->SetWidth(scrollPanel_->GetWidth());
+    // Set the content element width to match the scrollpanel minus clipping
+    IntRect panelBorder = scrollPanel_->GetClipBorder();
+    contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
 }
 
 void ListView::AddItem(UIElement* item)
@@ -719,8 +686,8 @@ void ListView::EnsureItemVisibility(UIElement* item)
     if (!item || !item->IsVisible())
         return;
     
-    IntVector2 currentOffset = item->GetScreenPosition() - scrollPanel_->GetScreenPosition() - contentElement_->GetPosition();
     IntVector2 newView = GetViewPosition();
+    IntVector2 currentOffset = item->GetPosition() - newView;
     const IntRect& clipBorder = scrollPanel_->GetClipBorder();
     IntVector2 windowSize(scrollPanel_->GetWidth() - clipBorder.left_ - clipBorder.right_, scrollPanel_->GetHeight() -
         clipBorder.top_ - clipBorder.bottom_);

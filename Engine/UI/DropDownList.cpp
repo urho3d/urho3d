@@ -43,6 +43,10 @@ DropDownList::DropDownList(Context* context) :
     window->SetInternal(true);
     SetPopup(window);
     
+    // Hack: parent the popup to the dropdownlist until first shown to allow loading style from XML
+    AddChild(window);
+    window->SetVisible(false);
+    
     listView_ = new ListView(context_);
     listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
@@ -62,40 +66,17 @@ DropDownList::~DropDownList()
 void DropDownList::RegisterObject(Context* context)
 {
     context->RegisterFactory<DropDownList>();
+    
+    COPY_BASE_ATTRIBUTES(DropDownList, Menu);
+    ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
 
-void DropDownList::SetStyle(const XMLElement& element)
+void DropDownList::ApplyAttributes()
 {
-    Menu::SetStyle(element);
-    
-    XMLElement listElem = element.GetChild("listview");
-    if (listElem)
-        listView_->SetStyle(listElem);
-    
-    XMLElement popupElem = element.GetChild("popup");
-    if (popupElem)
-        popup_->SetStyle(popupElem);
-    
-    XMLElement placeholderElem = element.GetChild("placeholder");
-    if (placeholderElem)
-        placeholder_->SetStyle(placeholderElem);
-    
-    UIElement* root = GetRoot();
-    XMLElement itemElem = element.GetChild("popupitem");
-    if (root)
-    {
-        while (itemElem)
-        {
-            if (itemElem.HasAttribute("name"))
-                AddItem(root->GetChild(itemElem.GetAttribute("name"), true));
-            itemElem = itemElem.GetNext("popupitem");
-        }
-    }
-    
-    if (element.HasChild("selection"))
-        SetSelection(element.GetChild("selection").GetInt("value"));
-    if (element.HasChild("resizepopup"))
-        SetResizePopup(element.GetChild("resizepopup").GetBool("enable"));
+    // Hack: if the placeholder has any child elements defined, move them to the list
+    /// \todo This will not be serialized back to XML as expected
+    while (placeholder_->GetNumChildren())
+        AddItem(placeholder_->GetChild(0));
 }
 
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
@@ -130,6 +111,7 @@ void DropDownList::OnShowPopup()
     const IntRect& border = popup_->GetLayoutBorder();
     popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_, contentSize.y_ + border.top_ + 
         border.bottom_);
+    listView_->SetViewPosition(IntVector2::ZERO);
     
     // Check if popup fits below the button. If not, show above instead
     bool showAbove = false;

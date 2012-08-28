@@ -60,6 +60,7 @@ ScrollView::ScrollView(Context* context) :
     scrollPanel_->SetInternal(true);
     scrollPanel_->SetActive(true);
     scrollPanel_->SetClipChildren(true);
+    scrollPanel_->SetPriority(-1);
     
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
     SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));
@@ -74,36 +75,21 @@ ScrollView::~ScrollView()
 void ScrollView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollView>();
+    
+    REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPosition, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
 }
 
-void ScrollView::SetStyle(const XMLElement& element)
+void ScrollView::ApplyAttributes()
 {
-    UIElement::SetStyle(element);
-    
-    if (element.HasChild("viewposition"))
-        SetViewPosition(element.GetChild("viewposition").GetIntVector2("value"));
-    if (element.HasChild("scrollstep"))
-        SetScrollStep(element.GetChild("scrollstep").GetFloat("value"));
-    if (element.HasChild("pagestep"))
-        SetScrollStep(element.GetChild("pagestep").GetFloat("value"));
-    
-    XMLElement horizElem = element.GetChild("horizontalscrollbar");
-    if (horizElem)
-        horizontalScrollBar_->SetStyle(horizElem);
-    XMLElement vertElem = element.GetChild("verticalscrollbar");
-    if (vertElem)
-        verticalScrollBar_->SetStyle(vertElem);
-    XMLElement panelElem = element.GetChild("scrollpanel");
-    if (panelElem)
-        scrollPanel_->SetStyle(panelElem);
-    
-    UIElement* root = GetRoot();
-    if (root && element.HasChild("contentelement"))
-        SetContentElement(root->GetChild(element.GetChild("contentelement").GetAttribute("name"), true));
+    UIElement::ApplyAttributes();
     
     // Set the scrollbar orientations again and perform size update now that the style is known
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);
     verticalScrollBar_->SetOrientation(O_VERTICAL);
+    
     OnResize();
 }
 
@@ -254,9 +240,10 @@ void ScrollView::UpdateViewSize()
     IntVector2 size(IntVector2::ZERO);
     if (contentElement_)
         size = contentElement_->GetSize();
+    IntRect panelBorder = scrollPanel_->GetClipBorder();
     
-    viewSize_.x_ = Max(size.x_, scrollPanel_->GetWidth());
-    viewSize_.y_ = Max(size.y_, scrollPanel_->GetHeight());
+    viewSize_.x_ = Max(size.x_, scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
+    viewSize_.y_ = Max(size.y_, scrollPanel_->GetHeight() - panelBorder.top_ - panelBorder.bottom_);
     UpdateView(viewPosition_);
     UpdateScrollBars();
 }
@@ -265,7 +252,10 @@ void ScrollView::UpdateScrollBars()
 {
     ignoreEvents_ = true;
     
-    const IntVector2& size = scrollPanel_->GetSize();
+    IntVector2 size = scrollPanel_->GetSize();
+    IntRect panelBorder = scrollPanel_->GetClipBorder();
+    size.x_ -= panelBorder.left_ + panelBorder.right_;
+    size.y_ -= panelBorder.top_ + panelBorder.bottom_;
     
     if (horizontalScrollBar_ && size.x_ > 0 && viewSize_.x_ > 0)
     {
@@ -286,10 +276,11 @@ void ScrollView::UpdateScrollBars()
 void ScrollView::UpdateView(const IntVector2& position)
 {
     IntVector2 oldPosition = viewPosition_;
+    IntRect panelBorder = scrollPanel_->GetClipBorder();
     
-    viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_ - scrollPanel_->GetWidth());
-    viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_ - scrollPanel_->GetHeight());
-    scrollPanel_->SetChildOffset(-viewPosition_);
+    viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_);
+    viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_);
+    scrollPanel_->SetChildOffset(IntVector2(-viewPosition_.x_ + panelBorder.left_, -viewPosition_.y_ + panelBorder.top_));
     
     if (viewPosition_ != oldPosition)
     {
@@ -305,11 +296,16 @@ void ScrollView::UpdateView(const IntVector2& position)
 
 void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventData)
 {
+    IntVector2 size = scrollPanel_->GetSize();
+    IntRect panelBorder = scrollPanel_->GetClipBorder();
+    size.x_ -= panelBorder.left_ + panelBorder.right_;
+    size.y_ -= panelBorder.top_ + panelBorder.bottom_;
+    
     if (!ignoreEvents_)
     {
         UpdateView(IntVector2(
-            (int)(horizontalScrollBar_->GetValue() * (float)scrollPanel_->GetWidth()),
-            (int)(verticalScrollBar_->GetValue() * (float)scrollPanel_->GetHeight())
+            (int)(horizontalScrollBar_->GetValue() * (float)size.x_),
+            (int)(verticalScrollBar_->GetValue() * (float)size.y_)
         ));
     }
 }

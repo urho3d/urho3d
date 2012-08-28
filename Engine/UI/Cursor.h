@@ -57,8 +57,6 @@ class Cursor : public BorderImage
 {
     OBJECT(Cursor);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     Cursor(Context* context);
@@ -67,8 +65,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
@@ -79,6 +75,11 @@ public:
     
     /// Get current shape.
     CursorShape GetShape() const { return shape_; }
+    
+    /// Set shapes attribute.
+    void SetShapesAttr(VariantVector value);
+    /// Return shapes attribute.
+    VariantVector GetShapesAttr() const;
     
 protected:
     /// Current shape index.

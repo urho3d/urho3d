@@ -72,51 +72,18 @@ void LineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<LineEdit>();
     
-    COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Cursor Position", GetCursorPosition, SetCursorPosition, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
     ATTRIBUTE(LineEdit, VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
+    COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
 }
 
-void LineEdit::SetStyle(const XMLElement& element)
+void LineEdit::ApplyAttributes()
 {
-    BorderImage::SetStyle(element);
-    
-    if (element.HasChild("maxlength"))
-        SetMaxLength(element.GetChild("maxlength").GetInt("value"));
-    if (element.HasChild("cursormovable"))
-        SetCursorMovable(element.GetChild("cursormovable").GetBool("enable"));
-    if (element.HasChild("textselectable"))
-        SetTextSelectable(element.GetChild("textselectable").GetBool("enable"));
-    if (element.HasChild("textcopyable"))
-        SetTextCopyable(element.GetChild("textcopyable").GetBool("enable"));
-    
-    XMLElement textElem = element.GetChild("text");
-    if (textElem)
-    {
-        if (textElem.HasAttribute("value"))
-            SetText(textElem.GetAttribute("value"));
-        text_->SetStyle(textElem);
-    }
-    
-    XMLElement cursorElem = element.GetChild("cursor");
-    if (cursorElem)
-        cursor_->SetStyle(cursorElem);
-    
-    if (element.HasChild("cursorposition"))
-        SetCursorPosition(element.GetChild("cursorposition").GetInt("value"));
-    if (element.HasChild("cursorblinkrate"))
-        SetCursorBlinkRate(element.GetChild("cursorblinkrate").GetFloat("value"));
-    if (element.HasChild("echocharacter"))
-    {
-        String text = element.GetChild("echocharacter").GetAttribute("value");
-        if (text.Length())
-            SetEchoCharacter(text[0]);
-    }
+    UIElement::ApplyAttributes();
     
     // Set the text's position to match clipping, so that text left edge is not left partially hidden
     text_->SetPosition(clipBorder_.left_, clipBorder_.top_);

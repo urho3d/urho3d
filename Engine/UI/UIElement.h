@@ -119,8 +119,6 @@ public:
     virtual bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// Return UI rendering batches.
@@ -149,6 +147,8 @@ public:
     /// React to resize.
     virtual void OnResize();
     
+    /// Load from XML data with style. Return true if successful.
+    bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
@@ -230,6 +230,8 @@ public:
     void SetDragDropMode(unsigned mode);
     /// Set style from an XML file. Find the style element by name.
     void SetStyle(XMLFile* file, const String& typeName);
+    /// Set style from an XML element.
+    void SetStyle(const XMLElement& element);
     /// Set style from an XML file. Find the style element automatically.
     void SetStyleAuto(XMLFile* file);
     /// Set layout.

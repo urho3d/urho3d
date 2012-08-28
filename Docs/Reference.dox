@@ -1006,221 +1006,41 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - UIElement: container for other elements, renders nothing by itself
 - Window: a movable and resizable window
 
-The root UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
+The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
-Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
+Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
 \section UI_Defining Defining UI elements in XML
 
-Each UI element knows to load its properties from an XML file. There are two distinct use cases for this: either defining just the UI element style and leaving the actual position and dimensions to be filled in later, or fully defining a set of UI elements. For an example of defining element styles, see the file Data/UI/DefaultStyle.xml.
+User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file Data/UI/DefaultStyle.xml.
 
-The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
+The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
-The XML data for each UI element follows. Everything is optional and defaults will be used if missing. Note the redundant ways in which to define element size. Also note the element class hierarchy; for example a Button derives from BorderImage, and all elements derive from UIElement. See the comments in the elements' header files for descriptions of each property.
+See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the Data/UI directory for examples. The serialization format is similar to scene XML serialization, with two important differences:
 
-\subsection UI_UIElement UIElement
+1) The element type to instantiate, and the style to use for it can be set separately. For example the following element definition
 
 \code
-<element name="ElementName" type="UIElement" >
-    <position value="x y" />
-    <size value="x y" />
-    <width value="x" />
-    <height value="y" />
-    <minsize value="x y" />
-    <minwidth value="x" />
-    <minheight value="y" />
-    <maxsize value="x y" />
-    <maxwidth value="x" />
-    <maxheight value="y" />
-    <fixedsize value="x y" />
-    <fixedwidth value="x" />
-    <fixedheight value="y" />
-    <alignment horizontal="left|center|right" vertical="top|center|bottom" />
-    <clipborder value="l t r b" />
-    <priority value="p" />
-    <opacity value="o" />
-    <color value="r g b a" | topleft="r g b a" topright="r g b a" bottomleft="r g b a" bottomright="r g b a" />
-    <bringtofront enable="true|false" />
-    <bringtoback enable="true|false" />
-    <clipchildren enable="true|false" />
-    <enabled enable="true|false" />
-    <selected enable="true|false" />
-    <visible enable="true|false" />
-    <focusmode value="notfocusable|resetfocus|focusable|focusabledefocusable" />
-    <layout mode="free|horizontal|vertical" spacing="s" border="l t r b" />
-    <vars>
-        <variant name="n" type="t" value="v" />
-        ...
-    </vars>
+<element type="Button" style="CloseButton" />
+\endcode
+
+tells to instantiate a Button element, and that it should use the style "CloseButton" defined in the style XML file.
+
+2) Internal sub-elements, for example the scroll bars of a ScrollView, need to be marked as such to avoid instantiating them as duplicates. This is done by adding the attribute internal="true" to the XML element, and is required in  both layout and style XML files. Furthermore, the elements must be listed in the order they have been added as children of the parent element (if in doubt, see the element's C++ constructor code. Omitting elements in the middle is OK.) For example:
+
+\code
+<element type="ScrollView" />
+    <element type="ScrollBar" internal="true" />
+        ...customize the horizontal scroll bar attributes here...
+    </element>
+    <element type="ScrollBar" internal="true" />
+        ...customize the vertical scroll bar attributes here...
+    </element>
 </element>
 \endcode
 
-\subsection UI_BorderImage BorderImage
+Note that when %UI elements are serialized back to XML using \ref UI::SaveLayout "SaveLayout()" it is no longer possible to separate what was defined in the style XML file, and what in the actual layout file. Instead all attributes will be serialized.
 
-\code
-<element type="BorderImage">
-    <texture name="TextureName" />
-    <imagerect value="l t r b" />
-    <border value="l t r b" />
-    <hoveroffset value="x y" />
-</element>
-\endcode
-
-\subsection UI_Button Button
-
-\code
-<element type="Button">
-    <pressedoffset value="x y" />
-    <labeloffset value="x y" />
-    <repeat delay="d" rate="r" />
-</element>
-\endcode
-
-\subsection UI_Checkbox Checkbox
-
-\code
-<element type="Checkbox">
-    <checkedoffset value="x y" />
-</element>
-\endcode
-
-\subsection UI_Cursor Cursor
-
-\code
-<element type="Cursor">
-    <shape name="normal|resizevertical|resizediagonal_topright|resizehorizontal|resizediagonal_topleft|acceptdrop|rejectdrop"
-        texture="TextureName" imagerect="l t r b" hotspot="x y" />
-    ...
-</element>
-\endcode
-
-\subsection UI_Menu Menu
-
-If a popup element is specified, it will be searched for by name from the UI element hierarchy.
-
-\code
-<element type="Menu">
-    <popup name="ElementName" />
-    <popupoffset value="x y" />
-</element>
-\endcode
-
-\subsection UI_Text Text
-
-\code
-<element type="Text">
-    <font name="FontName" size="s" />
-    <text value="..." />
-    <textalignment value="left|center|right" />
-    <rowspacing value="s" />
-    <selection start="s" length="l" />
-    <selectioncolor value="r g b a" />
-    <hovercolor value="r g b a" />
-</element>
-\endcode
-
-\subsection UI_Window Window
-
-\code
-<element type="Window">
-    <resizeborder value="l t r b" />
-    <movable enable="true|false" />
-    <resizable enable="true|false" />
-</element>
-\endcode
-
-\subsection UI_DropDownList DropDownList
-
-The styles of the listview, popup and placeholder sub-elements can be specified within the respective XML elements. The listview can be pre-filled by specifying popup items; they will be searched for by name from the UI element hierarchy.
-
-\code
-<element type="DropDownList">
-    <selection value="s" />
-    <resizepopup enable="true|false" />
-    <listview />
-    <popup />
-    <placeholder />
-    <popupitem name="ElementName" />
-    ...
-</element>
-\endcode
-
-\subsection UI_LineEdit LineEdit
-
-The style of the cursor sub-element can specified with the "cursor" XML element.
-\code
-<element type="LineEdit">
-    <maxlength value="l" />
-    <cursormovable enable="true|false" />
-    <textselectable enable="true|false" />
-    <textcopyable enable="true|false" />
-    <text value="..." />
-    <cursorposition value="p" />
-    <cursorblinkrate value="r" />
-    <echocharacter value="c" />
-    <cursor />
-</element>
-\endcode
-
-\subsection UI_Slider Slider
-
-The style of the knob sub-element can specified with the "knob" XML element.
-
-\code
-<element type="Slider">
-    <orientation value="horizontal|vertical" />
-    <range max="m" value="v" />
-    <knob />
-</element>
-\endcode
-
-\subsection UI_ScrollBar ScrollBar
-
-The styles of the back button, forward button and the slider can be specified with the respective XML elements. Note the buttons' nonstandard imagerect element, which specifies the image to use for both a horizontal and a vertical button.
-
-\code
-<element type="ScrollBar">
-    <orientation value="horizontal|vertical" />
-    <range max="m" value="v" />
-    <scrollstep value="s" />
-    <stepfactor value="f" />
-    <backbutton>
-        <imagerect horizontal="l t r b" vertical="l t r b" />
-    </backbutton>
-    <forwardbutton>
-        <imagerect horizontal="l t r b" vertical="l t r b" />
-    </forwardbutton>
-    <slider />
-</element>
-\endcode
-
-\subsection UI_ScrollView ScrollView
-
-The styles of the horizontal and vertical scrollbars can be specified with the respective XML elements. If a content element is specified, it will be searched for by name from the UI element hierarchy.
-
-\code
-<element type="ScrollView">
-    <viewposition value="x y" />
-    <scrollstep value="s" />
-    <pagestep value="p" />
-    <horizontalscrollbar />
-    <verticalscrollbar />
-    <contentelement name="ElementName" />
-</element>
-\endcode
-
-\subsection UI_ListView ListView
-
-\code
-<element type="ListView">
-    <selection value="s" />
-    <highlight value="never|focus|always" />
-    <multiselect enable="true|false" />
-    <hierarchy enable="true|false" />
-    <clearselection enable="true|false" />
-    <doubleclickinterval value="i" />
-</element>
-\endcode
 
 \section UI_Layouts UI element layout
 

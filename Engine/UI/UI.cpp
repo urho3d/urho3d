@@ -369,28 +369,29 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
         return root;
     }
     
-    String type = rootElem.GetAttribute("type");
-    if (type.Empty())
-        type = "UIElement";
+    String typeName = rootElem.GetAttribute("type");
+    if (typeName.Empty())
+        typeName = "UIElement";
     
-    root = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
+    root = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(typeName)));
     if (!root)
     {
-        LOGERROR("Could not create unknown UI element " + type);
+        LOGERROR("Could not create unknown UI element " + typeName);
         return root;
     }
-    root->SetName(rootElem.GetAttribute("name"));
     
-    String styleName = rootElem.HasAttribute("style") ? rootElem.GetAttribute("style") : rootElem.GetAttribute("type");
-    // First set the base style from the style file if exists, then apply UI layout overrides
-    if (styleFile)
-        root->SetStyle(styleFile, styleName);
-    root->SetStyle(rootElem);
-    
-    // Load rest of the elements recursively
-    LoadLayout(root, rootElem, styleFile);
-    
+    root->LoadXML(rootElem, styleFile);
     return root;
+}
+
+bool UI::SaveLayout(Serializer& dest, UIElement* element)
+{
+    PROFILE(SaveUILayout);
+    
+    if (element)
+        return element->SaveXML(dest);
+    else
+        return false;
 }
 
 void UI::SetClipBoardText(const String& text)
@@ -640,41 +641,6 @@ UIElement* UI::GetFocusableElement(UIElement* element)
         element = element->GetParent();
     }
     return element;
-}
-
-void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)
-{
-    XMLElement childElem = elem.GetChild("element");
-    while (childElem)
-    {
-        // Create element
-        String type = childElem.GetAttribute("type");
-        if (type.Empty())
-            type = "UIElement";
-        
-        SharedPtr<UIElement> child = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
-        if (!child)
-        {
-            LOGERROR("Could not create unknown UI element " + type);
-            childElem = childElem.GetNext("element");
-            continue;
-        }
-        child->SetName(childElem.GetAttribute("name"));
-        
-        // Add to the hierarchy
-        current->AddChild(child);
-        
-        // First set the base style from the style file if exists, then apply UI layout overrides
-        String styleName = childElem.HasAttribute("style") ? childElem.GetAttribute("style") : childElem.GetAttribute("type");
-        if (styleFile)
-            child->SetStyle(styleFile, styleName);
-        child->SetStyle(childElem);
-        
-        // Load the children recursively
-        LoadLayout(child, childElem, styleFile);
-        
-        childElem = childElem.GetNext("element");
-    }
 }
 
 void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)

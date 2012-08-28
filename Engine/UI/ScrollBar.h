@@ -36,8 +36,6 @@ class ScrollBar : public UIElement
 {
     OBJECT(ScrollBar);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     ScrollBar(Context* context);
@@ -46,8 +44,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// React to resize.
     virtual void OnResize();
     

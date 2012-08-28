@@ -45,8 +45,6 @@ class ListView : public ScrollView
 {
     OBJECT(ListView);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     ListView(Context* context);
@@ -55,8 +53,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// React to a key press.

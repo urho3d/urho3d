@@ -1,411 +1,496 @@
 <elements>
     <element type="Button">
-        <size value="16 16" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="16 0 32 16" />
-        <border value="4 4 4 4" />
-        <pressedoffset value="16 0" />
-        <hoveroffset value="0 16" />
-        <labeloffset value="-1 1" />
+        <attribute name="Size" value="16 16" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="16 0 32 16" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Pressed Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Label Offset" value="-1 1" />
     </element>
     <element type="CheckBox">
-        <size value="16 16" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="64 0 80 16" />
-        <border value="4 4 4 4" />
-        <checkedoffset value="16 0" />
-        <hoveroffset value="0 16" />
+        <attribute name="Size" value="16 16" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="64 0 80 16" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Checked Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
     </element>
     <element type="CloseButton">
-        <fixedsize value="16 16" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="128 0 144 16" />
-        <border value="4 4 4 4" />
-        <pressedoffset value="16 0" />
-        <hoveroffset value="0 16" />
-        <labeloffset value="-1 1" />
+        <attribute name="Size" value="16 16" />
+        <attribute name="Min Size" value="16 16" />
+        <attribute name="Max Size" value="16 16" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="128 0 144 16" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Pressed Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Label Offset" value="-1 1" />
     </element>
     <element type="Cursor">
-        <shape name="normal" texture="Textures/UI.png" imagerect="0 0 12 24" hotspot="0 0" />
-        <shape name="resizevertical" texture="Textures/UI.png" imagerect="0 64 20 84" hotspot="9 9" />
-        <shape name="resizediagonal_topright" texture="Textures/UI.png" imagerect="20 64 40 84" hotspot="9 9" />
-        <shape name="resizehorizontal" texture="Textures/UI.png" imagerect="40 64 60 84" hotspot="9 9" />
-        <shape name="resizediagonal_topleft" texture="Textures/UI.png" imagerect="60 64 80 84" hotspot="9 9" />
-        <shape name="rejectdrop" texture="Textures/UI.png" imagerect="80 64 100 84" hotspot="9 9" />
-        <shape name="acceptdrop" texture="Textures/UI.png" imagerect="100 64 128 90" hotspot="0 0" />
+        <attribute name="Shapes">
+            <variant type="Int" value="7" />
+            <variant type="String" value="Normal" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="0 0 12 24" />
+            <variant type="IntVector2" value="0 0" />
+            <variant type="String" value="ResizeVertical" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="0 64 20 84" />
+            <variant type="IntVector2" value="9 9" />
+            <variant type="String" value="ResizeDiagonalTopRight" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="20 64 40 84" />
+            <variant type="IntVector2" value="9 9" />
+            <variant type="String" value="ResizeHorizontal" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="40 64 60 84" />
+            <variant type="IntVector2" value="9 9" />
+            <variant type="String" value="ResizeDiagonalTopLeft" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="60 64 80 84" />
+            <variant type="IntVector2" value="9 9" />
+            <variant type="String" value="RejectDrop" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="80 64 100 84" />
+            <variant type="IntVector2" value="9 9" />
+            <variant type="String" value="AcceptDrop" />
+            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="IntRect" value="100 64 128 90" />
+            <variant type="IntVector2" value="0 0" />
+        </attribute>
     </element>
     <element type="DropDownList">
-        <texture name="Textures/UI.png" />
-        <imagerect value="16 0 32 16" />
-        <border value="4 4 4 4" />
-        <pressedoffset value="16 0" />
-        <hoveroffset value="0 16" />
-        <labeloffset value="-1 1" />
-        <layout mode="horizontal" border="4 2 4 2" />
-        <popup>
-            <texture name="Textures/UI.png" />
-            <imagerect value="48 0 64 16" />
-            <border value="3 3 3 3" />
-            <layout border="4 2 4 2" />
-        </popup>
-        <listview>
-            <horizontalscrollbar>
-                <height value="12" />
-                <backbutton>
-                    <texture name="Textures/UI.png" />
-                    <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                    <border value="3 3 3 3" />
-                    <pressedoffset value="64 0" />
-                    <hoveroffset value="0 16" />
-                </backbutton>
-                <forwardbutton>
-                    <texture name="Textures/UI.png" />
-                    <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                    <border value="3 3 3 3" />
-                    <pressedoffset value="64 0" />
-                    <hoveroffset value="0 16" />
-                </forwardbutton>
-                <slider>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="48 0 64 16" />
-                    <border value="3 3 3 3" />
-                    <knob>
-                        <texture name="Textures/UI.png" />
-                        <imagerect value="16 0 32 16" />
-                        <border value="4 4 4 4" />
-                        <hoveroffset value="0 16" />
-                    </knob>
-                </slider>
-            </horizontalscrollbar>
-            <verticalscrollbar>
-                <width value="12" />
-                <backbutton>
-                    <texture name="Textures/UI.png" />
-                    <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                    <border value="3 3 3 3" />
-                    <pressedoffset value="64 0" />
-                    <hoveroffset value="0 16" />
-                </backbutton>
-                <forwardbutton>
-                    <texture name="Textures/UI.png" />
-                    <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                    <border value="3 3 3 3" />
-                    <pressedoffset value="64 0" />
-                    <hoveroffset value="0 16" />
-                </forwardbutton>
-                <slider>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="48 0 64 16" />
-                    <border value="3 3 3 3" />
-                    <knob>
-                        <texture name="Textures/UI.png" />
-                        <imagerect value="16 0 32 16" />
-                        <border value="4 4 4 4" />
-                        <hoveroffset value="0 16" />
-                    </knob>
-                </slider>
-            </verticalscrollbar>
-            <scrollpanel>
-                <color value="0 0 0 0" />
-            </scrollpanel>
-        </listview>
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="16 0 32 16" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Pressed Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
+        <attribute name="Label Offset" value="-1 1" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="4 1 4 1" />
+        <element type="Window" internal="true">
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="48 0 64 16" />
+            <attribute name="Border" value="3 3 3 3" />
+            <attribute name="Layout Border" value="2 2 2 2" />
+            <element type="ListView" internal="true">
+                <element type="ScrollBar" internal="true">
+                    <attribute name="Size" value="0 12" />
+                    <attribute name="Left Image Rect" value="32 32 48 48" />
+                    <attribute name="Up Image Rect" value="0 32 16 48" />
+                    <attribute name="Right Image Rect" value="48 32 64 48" />
+                    <attribute name="Down Image Rect" value="16 32 32 48" />
+                    <element type="Button" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <attribute name="Pressed Image Offset" value="64 0" />
+                        <attribute name="Hover Image Offset" value="0 16" />
+                    </element>
+                    <element type="Slider" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Image Rect" value="48 0 64 16" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <element type="BorderImage" internal="true">
+                            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                            <attribute name="Image Rect" value="48 0 64 16" />
+                            <attribute name="Border" value="4 4 4 4" />
+                            <attribute name="Hover Image Offset" value="0 16" />
+                        </element>
+                    </element>
+                    <element type="Button" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <attribute name="Pressed Image Offset" value="64 0" />
+                        <attribute name="Hover Image Offset" value="0 16" />
+                    </element>
+                </element>
+                <element type="ScrollBar" internal="true">
+                    <attribute name="Size" value="12 0" />
+                    <attribute name="Left Image Rect" value="32 32 48 48" />
+                    <attribute name="Up Image Rect" value="0 32 16 48" />
+                    <attribute name="Right Image Rect" value="48 32 64 48" />
+                    <attribute name="Down Image Rect" value="16 32 32 48" />
+                    <element type="Button" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <attribute name="Pressed Image Offset" value="64 0" />
+                        <attribute name="Hover Image Offset" value="0 16" />
+                    </element>
+                    <element type="Slider" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Image Rect" value="48 0 64 16" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <element type="BorderImage" internal="true">
+                            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                            <attribute name="Image Rect" value="48 0 64 16" />
+                            <attribute name="Border" value="4 4 4 4" />
+                            <attribute name="Hover Image Offset" value="0 16" />
+                        </element>
+                    </element>
+                    <element type="Button" internal="true">
+                        <attribute name="Size" value="12 12" />
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Border" value="3 3 3 3" />
+                        <attribute name="Pressed Image Offset" value="64 0" />
+                        <attribute name="Hover Image Offset" value="0 16" />
+                    </element>
+                </element>
+                <element type="BorderImage" internal="true">
+                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                    <attribute name="Image Rect" value="96 0 112 16" />
+                    <attribute name="Border" value="2 2 2 2" />
+                </element>
+            </element>
+        </element>
     </element>
     <element type="LineEdit">
-        <texture name="Textures/UI.png" />
-        <imagerect value="112 0 128 16" />
-        <border value="2 2 2 2" />
-        <clipborder value="1 1 1 1" />
-        <hoveroffset value="0 16" />
-        <text>
-            <font name="Fonts/Anonymous Pro.ttf" size="11" />
-            <hovercolor value="0.45 0.70 0.45" />
-            <selectioncolor value="0.70 0.70 0.70" />
-        </text>
-        <cursor>
-            <size value="4 16" />
-            <texture name="Textures/UI.png" />
-            <imagerect value="12 0 16 16" />
-        </cursor>
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Border" value="2 2 2 2" />
+        <attribute name="Clip Border" value="1 1 1 1" />
+        <attribute name="Hover Image Offset" value="0 16" />
+        <element type="Text" internal="true">
+            <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+            <attribute name="Font Size" value="11" />
+            <attribute name="Hover Color" value="0.45 0.70 0.45" />
+            <attribute name="Selection Color" value="0.70 0.70 0.70" />
+        </element>
+        <element type="BorderImage" internal="true">
+            <attribute name="Size" value="4 16" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="12 0 16 16" />
+        </element>
     </element>
     <element type="ListView">
-        <horizontalscrollbar>
-            <height value="12" />
-            <backbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </backbutton>
-            <forwardbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </forwardbutton>
-            <slider>
-                <texture name="Textures/UI.png" />
-                <imagerect value="48 0 64 16" />
-                <border value="3 3 3 3" />
-                <knob>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="16 0 32 16" />
-                    <border value="4 4 4 4" />
-                    <hoveroffset value="0 16" />
-                </knob>
-            </slider>
-        </horizontalscrollbar>
-        <verticalscrollbar>
-            <width value="12" />
-            <backbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </backbutton>
-            <forwardbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </forwardbutton>
-            <slider>
-                <texture name="Textures/UI.png" />
-                <imagerect value="48 0 64 16" />
-                <border value="3 3 3 3" />
-                <knob>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="16 0 32 16" />
-                    <border value="4 4 4 4" />
-                    <hoveroffset value="0 16" />
-                </knob>
-            </slider>
-        </verticalscrollbar>
-        <scrollpanel>
-            <texture name="Textures/UI.png" />
-            <imagerect value="112 0 128 16" />
-            <border value="2 2 2 2" />
-            <clipborder value="1 1 1 1" />
-        </scrollpanel>
+        <element type="ScrollBar" internal="true">
+            <attribute name="Size" value="0 12" />
+            <attribute name="Left Image Rect" value="32 32 48 48" />
+            <attribute name="Up Image Rect" value="0 32 16 48" />
+            <attribute name="Right Image Rect" value="48 32 64 48" />
+            <attribute name="Down Image Rect" value="16 32 32 48" />
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+            <element type="Slider" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Border" value="3 3 3 3" />
+                <element type="BorderImage" internal="true">
+                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                    <attribute name="Image Rect" value="48 0 64 16" />
+                    <attribute name="Border" value="4 4 4 4" />
+                    <attribute name="Hover Image Offset" value="0 16" />
+                </element>
+            </element>
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+        </element>
+        <element type="ScrollBar" internal="true">
+            <attribute name="Size" value="12 0" />
+            <attribute name="Left Image Rect" value="32 32 48 48" />
+            <attribute name="Up Image Rect" value="0 32 16 48" />
+            <attribute name="Right Image Rect" value="48 32 64 48" />
+            <attribute name="Down Image Rect" value="16 32 32 48" />
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+            <element type="Slider" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Border" value="3 3 3 3" />
+                <element type="BorderImage" internal="true">
+                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                    <attribute name="Image Rect" value="48 0 64 16" />
+                    <attribute name="Border" value="4 4 4 4" />
+                    <attribute name="Hover Image Offset" value="0 16" />
+                </element>
+            </element>
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+        </element>
+        <element type="BorderImage" internal="true">
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="112 0 128 16" />
+            <attribute name="Border" value="2 2 2 2" />
+            <attribute name="Clip Border" value="1 1 1 1" />
+        </element>
     </element>
     <element type="Menu">
-        <texture name="Textures/UI.png" />
-        <imagerect value="96 0 112 16" />
-        <border value="2 2 2 2" />
-        <pressedoffset value="16 0" />
-        <hoveroffset value="0 16" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="96 0 112 16" />
+        <attribute name="Border" value="2 2 2 2" />
+        <attribute name="Pressed Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
     </element>
     <element type="ScrollBar">
-        <backbutton>
-            <size value="12 12" />
-            <texture name="Textures/UI.png" />
-            <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-            <border value="3 3 3 3" />
-            <pressedoffset value="64 0" />
-            <hoveroffset value="0 16" />
-        </backbutton>
-        <forwardbutton>
-            <size value="12 12" />
-            <texture name="Textures/UI.png" />
-            <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-            <border value="3 3 3 3" />
-            <pressedoffset value="64 0" />
-            <hoveroffset value="0 16" />
-        </forwardbutton>
-        <slider>
-            <size value="12 12" />
-            <texture name="Textures/UI.png" />
-            <imagerect value="48 0 64 16" />
-            <border value="3 3 3 3" />
-            <knob>
-                <texture name="Textures/UI.png" />
-                <imagerect value="16 0 32 16" />
-                <border value="4 4 4 4" />
-                <hoveroffset value="0 16" />
-            </knob>
-        </slider>
+        <attribute name="Left Image Rect" value="32 32 48 48" />
+        <attribute name="Up Image Rect" value="0 32 16 48" />
+        <attribute name="Right Image Rect" value="48 32 64 48" />
+        <attribute name="Down Image Rect" value="16 32 32 48" />
+        <element type="Button" internal="true">
+            <attribute name="Size" value="12 12" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Border" value="3 3 3 3" />
+            <attribute name="Pressed Image Offset" value="64 0" />
+            <attribute name="Hover Image Offset" value="0 16" />
+        </element>
+        <element type="Slider" internal="true">
+            <attribute name="Size" value="12 12" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="48 0 64 16" />
+            <attribute name="Border" value="3 3 3 3" />
+            <element type="BorderImage" internal="true">
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Border" value="4 4 4 4" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+        </element>
+        <element type="Button" internal="true">
+            <attribute name="Size" value="12 12" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Border" value="3 3 3 3" />
+            <attribute name="Pressed Image Offset" value="64 0" />
+            <attribute name="Hover Image Offset" value="0 16" />
+        </element>
     </element>
     <element type="ScrollView">
-        <horizontalscrollbar>
-            <height value="12" />
-            <backbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </backbutton>
-            <forwardbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </forwardbutton>
-            <slider>
-                <texture name="Textures/UI.png" />
-                <imagerect value="48 0 64 16" />
-                <border value="3 3 3 3" />
-                <knob>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="16 0 32 16" />
-                    <border value="4 4 4 4" />
-                    <hoveroffset value="0 16" />
-                </knob>
-            </slider>
-        </horizontalscrollbar>
-        <verticalscrollbar>
-            <width value="12" />
-            <backbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </backbutton>
-            <forwardbutton>
-                <texture name="Textures/UI.png" />
-                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
-                <border value="3 3 3 3" />
-                <pressedoffset value="64 0" />
-                <hoveroffset value="0 16" />
-            </forwardbutton>
-            <slider>
-                <texture name="Textures/UI.png" />
-                <imagerect value="48 0 64 16" />
-                <border value="3 3 3 3" />
-                <knob>
-                    <texture name="Textures/UI.png" />
-                    <imagerect value="16 0 32 16" />
-                    <border value="4 4 4 4" />
-                    <hoveroffset value="0 16" />
-                </knob>
-            </slider>
-        </verticalscrollbar>
-        <scrollpanel>
-            <texture name="Textures/UI.png" />
-            <imagerect value="112 0 128 16" />
-            <border value="2 2 2 2" />
-            <clipborder value="1 1 1 1" />
-        </scrollpanel>
+        <element type="ScrollBar" internal="true">
+            <attribute name="Size" value="0 12" />
+            <attribute name="Left Image Rect" value="32 32 48 48" />
+            <attribute name="Up Image Rect" value="0 32 16 48" />
+            <attribute name="Right Image Rect" value="48 32 64 48" />
+            <attribute name="Down Image Rect" value="16 32 32 48" />
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+            <element type="Slider" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Border" value="3 3 3 3" />
+                <element type="BorderImage" internal="true">
+                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                    <attribute name="Image Rect" value="48 0 64 16" />
+                    <attribute name="Border" value="4 4 4 4" />
+                    <attribute name="Hover Image Offset" value="0 16" />
+                </element>
+            </element>
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+        </element>
+        <element type="ScrollBar" internal="true">
+            <attribute name="Size" value="12 0" />
+            <attribute name="Left Image Rect" value="32 32 48 48" />
+            <attribute name="Up Image Rect" value="0 32 16 48" />
+            <attribute name="Right Image Rect" value="48 32 64 48" />
+            <attribute name="Down Image Rect" value="16 32 32 48" />
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+            <element type="Slider" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Border" value="3 3 3 3" />
+                <element type="BorderImage" internal="true">
+                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                    <attribute name="Image Rect" value="48 0 64 16" />
+                    <attribute name="Border" value="4 4 4 4" />
+                    <attribute name="Hover Image Offset" value="0 16" />
+                </element>
+            </element>
+            <element type="Button" internal="true">
+                <attribute name="Size" value="12 12" />
+                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                <attribute name="Border" value="3 3 3 3" />
+                <attribute name="Pressed Image Offset" value="64 0" />
+                <attribute name="Hover Image Offset" value="0 16" />
+            </element>
+        </element>
+        <element type="BorderImage" internal="true">
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="112 0 128 16" />
+            <attribute name="Border" value="2 2 2 2" />
+            <attribute name="Clip Border" value="1 1 1 1" />
+        </element>
     </element>
-    <element type="Slider">
-        <size value="12 12" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="48 0 64 16" />
-        <border value="3 3 3 3" />
-        <knob>
-            <texture name="Textures/UI.png" />
-            <imagerect value="16 0 32 16" />
-            <border value="4 4 4 4" />
-            <hoveroffset value="0 16" />
-        </knob>
+    <element type="Slider" internal="true">
+        <attribute name="Size" value="12 12" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Border" value="3 3 3 3" />
+        <element type="BorderImage" internal="true">
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="48 0 64 16" />
+            <attribute name="Border" value="4 4 4 4" />
+            <attribute name="Hover Image Offset" value="0 16" />
+        </element>
     </element>
     <element type="Window">
-        <texture name="Textures/UI.png" />
-        <imagerect value="48 0 64 16" />
-        <border value="3 3 3 3" />
-        <resizeborder value="8 8 8 8" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Border" value="3 3 3 3" />
+        <attribute name="Resize Border" value="8 8 8 8" />
     </element>
     <element type="Text">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="DebugHudText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="ConsoleBackground">
-        <color topleft="0 0.25 0 0.75" topright="0 0.25 0 0.75" bottomleft="0.25 0.75 0.25 0.75" bottomright="0.25 0.75 0.25 0.75" />
-        <layout spacing="0" border="4 4 4 4" />
+        <attribute name="Top Left Color" value="0 0.25 0 0.75" />
+        <attribute name="Top Right Color" value="0 0.25 0 0.75" />
+        <attribute name="Bottom Left Color" value="0.25 0.75 0.25 0.75" />
+        <attribute name="Bottom Right Color" value="0.25 0.75 0.25 0.75" />
+        <attribute name="Layout Border" value="4 4 4 4" />
     </element>
     <element type="ConsoleText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="ConsoleLineEdit">
-        <color value="0 0 0 0.5" />
-        <text>
-            <font name="Fonts/Anonymous Pro.ttf" size="11" />
-            <selectioncolor value="0 0.5 0 0.75" />
-        </text>
-        <cursor>
-            <size value="4 16" />
-            <texture name="Textures/UI.png" />
-            <imagerect value="12 0 16 16" />
-        </cursor>
+        <attribute name="Top Left Color" value="0 0 0 0.5" />
+        <attribute name="Top Right Color" value="0 0 0 0.5" />
+        <attribute name="Bottom Left Color" value="0 0 0 0.5" />
+        <attribute name="Bottom Right Color" value="0 0 0 0.5" />
+        <element type="Text" internal="true">
+            <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+            <attribute name="Font Size" value="11" />
+            <attribute name="Selection Color" value="0 0.5 0 0.75" />
+        </element>
+        <element type="BorderImage" internal="true">
+            <attribute name="Size" value="4 16" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="12 0 16 16" />
+        </element>
     </element>
     <element type="FileSelector">
-        <size value="400 300" />
-        <movable enable="true" />
-        <resizable enable="true" />
-        <resizeborder value="6 6 6 6" />
-        <layout mode="vertical" spacing="4" border="6 6 6 6" />
+        <attribute name="Size" value="400 300" />
+        <attribute name="Is Movable" value="true" />
+        <attribute name="Is Resizable" value="true" />
+        <attribute name="Resize Border" value="6 6 6 6" />
+        <attribute name="Layout Mode" value="vertical" />
+        <attribute name="Layout Spacing" value="4" />
+        <attribute name="Layout Border" value="6 6 6 6" />
     </element>
     <element type="FileSelectorButton">
-        <fixedsize value="80 22" />
+        <attribute name="Min Size" value="80 22" />
+        <attribute name="Max Size" value="80 22" />
     </element>
     <element type="FileSelectorButtonText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="FileSelectorFilterList">
-        <fixedwidth value="64" />
-        <resizepopup enable="true" />
+        <attribute name="Min Size" value="64 0" />
+        <attribute name="Max Size" value="64 2147483647" />
+        <attribute name="Resize Popup" value="true" />
     </element>
     <element type="FileSelectorFilterText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
-        <hovercolor value="0.45 0.70 0.45" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
+        <attribute name="Hover Color" value="0.45 0.70 0.45" />
     </element>
     <element type="FileSelectorTitleLayout">
-        <fixedheight value="16" />
-        <layout spacing="4" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="FileSelectorLayout">
-        <layout spacing="4" />
+        <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="FileSelectorListText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
-        <hovercolor value="0.45 0.70 0.45" />
-        <selectioncolor value="0.70 0.70 0.70" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
+        <attribute name="Hover Color" value="0.45 0.70 0.45" />
+        <attribute name="Selection Color" value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="EditorDivider">
-        <texture name="Textures/UI.png" />
-        <imagerect value="112 0 128 16" />
-        <border value="2 2 2 2" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Border" value="2 2 2 2" />
     </element>
     <element type="EditorMenuBar">
-        <texture name="Textures/UI.png" />
-        <imagerect value="96 0 112 16" />
-        <border value="2 2 2 2" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="96 0 112 16" />
+        <attribute name="Border" value="2 2 2 2" />
     </element>
     <element type="EditorMenuText">
-        <font name="Fonts/Anonymous Pro.ttf" size="11" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+        <attribute name="Font Size" value="11" />
     </element>
     <element type="EditorAttributeText">
-        <font name="Fonts/BlueHighway.ttf" size="12" />
+        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font Size" value="12" />
     </element>
     <element type="EditorEnumAttributeText">
-        <font name="Fonts/BlueHighway.ttf" size="12" />
-        <hovercolor value="0.45 0.70 0.45" />
+        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font Size" value="12" />
+        <attribute name="Hover Color" value="0.45 0.70 0.45" />
     </element>
     <element type="EditorAttributeEdit">
-        <texture name="Textures/UI.png" />
-        <imagerect value="112 0 128 16" />
-        <border value="2 2 2 2" />
-        <clipborder value="1 1 1 1" />
-        <hoveroffset value="0 16" />
-        <text>
-            <font name="Fonts/Anonymous Pro.ttf" size="11" />
-            <hovercolor value="0.45 0.70 0.45" />
-            <selectioncolor value="0.70 0.70 0.70" />
-        </text>
-        <cursor>
-            <size value="4 16" />
-            <texture name="Textures/UI.png" />
-            <imagerect value="12 0 16 16" />
-        </cursor>
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Border" value="2 2 2 2" />
+        <attribute name="Clip Border" value="1 1 1 1" />
+        <attribute name="Hover Image Offset" value="0 16" />
+        <element type="Text" internal="true">
+            <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
+            <attribute name="Font Size" value="11" />
+            <attribute name="Hover Color" value="0.45 0.70 0.45" />
+            <attribute name="Selection Color" value="0.70 0.70 0.70" />
+        </element>
+        <element type="BorderImage" internal="true">
+            <attribute name="Size" value="4 16" />
+            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Image Rect" value="12 0 16 16" />
+        </element>
     </element>
 </elements>

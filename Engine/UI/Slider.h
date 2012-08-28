@@ -33,8 +33,6 @@ class Slider : public BorderImage
 {
     OBJECT(Slider);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     Slider(Context* context);
@@ -43,8 +41,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// React to mouse hover.

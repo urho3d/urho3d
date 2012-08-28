@@ -158,6 +158,16 @@ void UpdateStats(float timeStep)
     cameraPosText.size = cameraPosText.minSize;
 }
 
+void UpdateView()
+{
+    // Update audio listener
+    audio.listenerPosition = cameraNode.position;
+    audio.listenerRotation = cameraNode.rotation;
+    
+    // Update camera fill mode
+    camera.fillMode = fillMode;
+}
+
 void MoveCamera(float timeStep)
 {
     // Move camera
@@ -251,13 +261,6 @@ void MoveCamera(float timeStep)
         if (moved)
             UpdateNodeAttributes();
     }
-    
-    // Update audio listener
-    audio.listenerPosition = cameraNode.position;
-    audio.listenerRotation = cameraNode.rotation;
-    
-    // Update camera fill mode
-    camera.fillMode = fillMode;
 }
 
 void SteppedObjectManipulation(int key)
@@ -506,5 +509,5 @@ void ToggleOctreeDebug()
 
 void ToggleUpdate()
 {
-    runUpdate  = !runUpdate;
+    runUpdate = !runUpdate;
 }

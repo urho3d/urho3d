@@ -33,6 +33,18 @@
 namespace Urho3D
 {
 
+const char* orientations[] =
+{
+    "Horizontal",
+    "Vertical",
+    0
+};
+
+template<> Orientation Variant::Get<Orientation>() const
+{
+    return (Orientation)GetInt();
+}
+
 OBJECTTYPESTATIC(Slider);
 
 Slider::Slider(Context* context) :
@@ -56,30 +68,11 @@ Slider::~Slider()
 void Slider::RegisterObject(Context* context)
 {
     context->RegisterFactory<Slider>();
-}
-
-void Slider::SetStyle(const XMLElement& element)
-{
-    BorderImage::SetStyle(element);
     
-    if (element.HasChild("orientation"))
-    {
-        String orientation = element.GetChild("orientation").GetAttributeLower("value");
-        if (orientation == "horizontal" || orientation == "h")
-            SetOrientation(O_HORIZONTAL);
-        if (orientation == "vertical" || orientation == "v")
-            SetOrientation(O_VERTICAL);
-    }
-    if (element.HasChild("range"))
-    {
-        XMLElement rangeElem = element.GetChild("range");
-        SetRange(rangeElem.GetFloat("max"));
-        SetValue(rangeElem.GetFloat("value"));
-    }
-    
-    XMLElement knobElem = element.GetChild("knob");
-    if (knobElem)
-        knob_->SetStyle(knobElem);
+    ENUM_ACCESSOR_ATTRIBUTE(Slider, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(Slider, BorderImage);
 }
 
 void Slider::Update(float timeStep)

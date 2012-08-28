@@ -33,8 +33,6 @@ class CheckBox : public BorderImage
 {
     OBJECT(CheckBox);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     CheckBox(Context* context);
@@ -43,8 +41,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to mouse click.

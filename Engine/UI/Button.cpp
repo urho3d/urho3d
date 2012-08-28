@@ -54,26 +54,11 @@ void Button::RegisterObject(Context* context)
 {
     context->RegisterFactory<Button>();
     
-    COPY_BASE_ATTRIBUTES(Button, BorderImage);
-    REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Label Offset", GetLabelOffset, SetLabelOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
-}
-
-void Button::SetStyle(const XMLElement& element)
-{
-    BorderImage::SetStyle(element);
-    
-    if (element.HasChild("pressedoffset"))
-        SetPressedOffset(element.GetChild("pressedoffset").GetIntVector2("value"));
-    if (element.HasChild("labeloffset"))
-        SetLabelOffset(element.GetChild("labeloffset").GetIntVector2("value"));
-    if (element.HasChild("repeat"))
-    {
-        XMLElement repeatElem = element.GetChild("repeat");
-        SetRepeat(repeatElem.GetFloat("delay"), repeatElem.GetFloat("rate"));
-    }
+    COPY_BASE_ATTRIBUTES(Button, BorderImage);
 }
 
 void Button::Update(float timeStep)

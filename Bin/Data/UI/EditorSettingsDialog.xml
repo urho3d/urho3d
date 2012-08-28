@@ -1,317 +1,409 @@
-<element type="Window" name="EditorSettingsDialog">
-    <fixedwidth value="400" />
-    <movable enable="true" />
-    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+<element type="Window">
+    <attribute name="Name" value="EditorSettingsDialog" />
+    <attribute name="Min Size" value="400 0" />
+    <attribute name="Max Size" value="400 2147483647" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
     <element>
-        <fixedheight value="16" />
-        <layout mode="horizontal" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
-            <text value="Editor settings" />
+            <attribute name="Text" value="Editor settings" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton" />
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
     </element>
     <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
     </element>
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
         <element type="Text">
-            <text value="Near clip distance" />
+            <attribute name="Text" value="Near clip distance" />
         </element>
-        <element type="LineEdit" name="NearClipEdit">
-            <fixedwidth value="100" />
+        <element type="LineEdit">
+            <attribute name="Name" value="NearClipEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
         </element>
     </element>
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
         <element type="Text">
-            <text value="Far clip distance" />
+            <attribute name="Text" value="Far clip distance" />
         </element>
-        <element type="LineEdit" name="FarClipEdit">
-            <fixedwidth value="100" />
+        <element type="LineEdit">
+            <attribute name="Name" value="FarClipEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
+        <element type="Text">
+            <attribute name="Text" value="Field of view" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="FOVEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
+        <element type="Text">
+            <attribute name="Text" value="Movement speed" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="SpeedEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
+        <element type="Text">
+            <attribute name="Text" value="New node distance" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="DistanceEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Node move step" />
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="MoveSnapToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+        <element type="Text">
+            <attribute name="Min Size" value="34 0" />
+            <attribute name="Max Size" value="34 2147483647" />
+            <attribute name="Text" value="Snap" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="MoveStepEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Node rotate step" />
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="RotateSnapToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+        <element type="Text">
+            <attribute name="Min Size" value="34 0" />
+            <attribute name="Max Size" value="34 2147483647" />
+            <attribute name="Text" value="Snap" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="RotateStepEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Node scale step" />
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="ScaleSnapToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+        <element type="Text">
+            <attribute name="Min Size" value="34 0" />
+            <attribute name="Max Size" value="34 2147483647" />
+            <attribute name="Text" value="Snap" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="ScaleStepEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Pick components of type" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="PickModeEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Geometries" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Lights" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Zones" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Rigidbodies" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="CheckBox">
+            <attribute name="Name" value="LocalIDToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+        <element type="Text">
+            <attribute name="Text" value="Use local entity IDs on import" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <attribute name="Min Size" value="0 4" />
+        <attribute name="Max Size" value="2147483647 4" />
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Rendering mode" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="RenderModeEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Forward" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Pre-pass" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Deferred" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Texture quality" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="TextureQualityEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Low" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Medium" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="High" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Material quality" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="MaterialQualityEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Low" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Medium" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="High" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Shadow resolution" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="ShadowResolutionEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="Off" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="512x512" />
+                </element>
+               <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="1024x1024" />
+                </element>
+               <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="2048x2048" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="Shadow quality" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="ShadowQualityEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="1-tap 16bit" />
+                </element>
+                <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="1-tap 24bit" />
+                </element>
+               <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="4-tap 16bit" />
+                </element>
+               <element type="Text" style="FileSelectorFilterText">
+                    <attribute name="Text" value="4-tap 24bit" />
+                </element>
+            </element>
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="20" />
+        <element type="Text">
+            <attribute name="Text" value="Max occluder triangles" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="MaxOccluderTrianglesEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
          </element>
     </element>
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
-        <element type="Text">
-            <text value="Field of view" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="CheckBox">
+            <attribute name="Name" value="SpecularLightingToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
         </element>
-        <element type="LineEdit" name="FOVEdit">
-            <fixedwidth value="100" />
+        <element type="Text">
+            <attribute name="Text" value="Specular lighting" />
         </element>
     </element>
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="CheckBox">
+            <attribute name="Name" value="DynamicInstancingToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
         <element type="Text">
-            <text value="Movement speed" />
-        </element>
-        <element type="LineEdit" name="SpeedEdit">
-            <fixedwidth value="100" />
-        </element>
-    </element>
-    <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
-        <element type="Text">
-            <text value="New node distance" />
-        </element>
-        <element type="LineEdit" name="DistanceEdit">
-            <fixedwidth value="100" />
+            <attribute name="Text" value="Dynamic instancing" />
         </element>
     </element>
     <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Node move step" />
-        </element>
-        <element type="CheckBox" name="MoveSnapToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <fixedwidth value="34" />
-            <text value="Snap" />
-        </element>
-        <element type="LineEdit" name="MoveStepEdit">
-            <fixedwidth value="100" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Node rotate step" />
-        </element>
-        <element type="CheckBox" name="RotateSnapToggle">
-            <fixedsize value="16 16" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="CheckBox">
+            <attribute name="Name" value="FrameLimiterToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
-            <fixedwidth value="34" />
-            <text value="Snap" />
-        </element>
-        <element type="LineEdit" name="RotateStepEdit">
-            <fixedwidth value="100" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Node scale step" />
-        </element>
-        <element type="CheckBox" name="ScaleSnapToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <fixedwidth value="34" />
-            <text value="Snap" />
-        </element>
-        <element type="LineEdit" name="ScaleStepEdit">
-            <fixedwidth value="100" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Pick components of type" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="PickGeometries">
-            <text value="Geometries" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="PickLights">
-            <text value="Lights" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="PickZones">
-            <text value="Zones" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="PickRigidBodies">
-            <text value="Rigidbodies" />
-        </element>
-        <element type="DropDownList" name="PickModeEdit">
-            <fixedwidth value="100" />
-            <popupitem name="PickGeometries" />
-            <popupitem name="PickLights" />
-            <popupitem name="PickZones" />
-            <popupitem name="PickRigidBodies" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="LocalIDToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Use local entity IDs on import" />
-        </element>
-    </element>
-    <element type="BorderImage" style="EditorDivider">
-        <fixedheight value="4" />
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Rendering mode" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="RenderForward">
-            <text value="Forward" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="RenderPrepass">
-            <text value="Pre-pass" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="RenderDeferred">
-            <text value="Deferred" />
-        </element>
-        <element type="DropDownList" name="RenderModeEdit">
-            <fixedwidth value="100" />
-            <popupitem name="RenderForward" />
-            <popupitem name="RenderPrepass" />
-            <popupitem name="RenderDeferred" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Texture quality" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="TextureLow">
-            <text value="Low" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="TextureMedium">
-            <text value="Medium" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="TextureHigh">
-            <text value="High" />
-        </element>
-        <element type="DropDownList" name="TextureQualityEdit">
-            <fixedwidth value="100" />
-            <popupitem name="TextureLow" />
-            <popupitem name="TextureMedium" />
-            <popupitem name="TextureHigh" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Material quality" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="MaterialLow">
-            <text value="Low" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="MaterialMedium">
-            <text value="Medium" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="MaterialHigh">
-            <text value="High" />
-        </element>
-        <element type="DropDownList" name="MaterialQualityEdit">
-            <fixedwidth value="100" />
-            <popupitem name="MaterialLow" />
-            <popupitem name="MaterialMedium" />
-            <popupitem name="MaterialHigh" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Shadow resolution" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowResOff">
-            <text value="Off" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowResLow">
-            <text value="512x512" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowResMedium">
-            <text value="1024x1024" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowResHigh">
-            <text value="2048x2048" />
-        </element>
-        <element type="DropDownList" name="ShadowResolutionEdit">
-            <fixedwidth value="100" />
-            <popupitem name="ShadowResOff" />
-            <popupitem name="ShadowResLow" />
-            <popupitem name="ShadowResMedium" />
-            <popupitem name="ShadowResHigh" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="Text">
-            <text value="Shadow quality" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality0">
-            <text value="1-tap 16bit" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality1">
-            <text value="1-tap 24bit" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality2">
-            <text value="4-tap 16bit" />
-        </element>
-        <element type="Text" style="FileSelectorFilterText" name="ShadowQuality3">
-            <text value="4-tap 24bit" />
-        </element>
-        <element type="DropDownList" name="ShadowQualityEdit">
-            <fixedwidth value="100" />
-            <popupitem name="ShadowQuality0" />
-            <popupitem name="ShadowQuality1" />
-            <popupitem name="ShadowQuality2" />
-            <popupitem name="ShadowQuality3" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="20" />
-        <element type="Text">
-            <text value="Max occluder triangles" />
-        </element>
-        <element type="LineEdit" name="MaxOccluderTrianglesEdit">
-            <fixedwidth value="100" />
-         </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="SpecularLightingToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Specular lighting" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="DynamicInstancingToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Dynamic instancing" />
-        </element>
-    </element>
-    <element>
-        <fixedheight value="17" />
-        <layout mode="horizontal" spacing="8" />
-        <element type="CheckBox" name="FrameLimiterToggle">
-            <fixedsize value="16 16" />
-        </element>
-        <element type="Text">
-            <text value="Frame limiter" />
+            <attribute name="Text" value="Frame limiter" />
         </element>
     </element>
 </element>

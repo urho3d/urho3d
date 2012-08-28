@@ -33,16 +33,16 @@
 namespace Urho3D
 {
 
-static const String shapeNames[] =
+static const char* shapeNames[] =
 {
-    "normal",
-    "resizevertical",
-    "resizediagonal_topright",
-    "resizehorizontal",
-    "resizediagonal_topleft",
-    "acceptdrop",
-    "rejectdrop",
-    ""
+    "Normal",
+    "ResizeVertical",
+    "ResizeDiagonalTopRight",
+    "ResizeHorizontal",
+    "ResizeDiagonalTopLeft",
+    "AcceptDrop",
+    "RejectDrop",
+    0
 };
 
 OBJECTTYPESTATIC(Cursor);
@@ -69,20 +69,9 @@ Cursor::~Cursor()
 void Cursor::RegisterObject(Context* context)
 {
     context->RegisterFactory<Cursor>();
-}
-
-void Cursor::SetStyle(const XMLElement& element)
-{
-    UIElement::SetStyle(element);
     
-    XMLElement shapeElem = element.GetChild("shape");
-    while (shapeElem)
-    {
-        CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetAttributeLower("name"), shapeNames, CS_NORMAL);
-        DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(shapeElem.GetAttribute("texture")),
-            shapeElem.GetIntRect("imagerect"), shapeElem.GetIntVector2("hotspot"));
-        shapeElem = shapeElem.GetNext("shape");
-    }
+    ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, VariantVector(), AM_FILE);
+    COPY_BASE_ATTRIBUTES(Cursor, BorderImage);
 }
 
 void Cursor::DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot)
@@ -105,6 +94,54 @@ void Cursor::SetShape(CursorShape shape)
     texture_ = info.texture_;
     imageRect_ = info.imageRect_;
     SetSize(info.imageRect_.Size());
+}
+
+void Cursor::SetShapesAttr(VariantVector value)
+{
+    unsigned index = 0;
+    if (!value.Size())
+        return;
+    
+    unsigned numShapes = value[index++].GetUInt();
+    while (numShapes-- && (index + 4) <= value.Size())
+    {
+        CursorShape shape = (CursorShape)GetStringListIndex(value[index++].GetString().CString(), shapeNames, CS_MAX_SHAPES);
+        if (shape != CS_MAX_SHAPES)
+        {
+            ResourceRef ref = value[index++].GetResourceRef();
+            IntRect imageRect = value[index++].GetIntRect();
+            IntVector2 hotSpot = value[index++].GetIntVector2();
+            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(ref.id_), imageRect, hotSpot);
+        }
+        else
+            index += 3;
+    }
+}
+
+VariantVector Cursor::GetShapesAttr() const
+{
+    VariantVector ret;
+    
+    unsigned numShapes = 0;
+    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
+    {
+        if (shapeInfos_[i].imageRect_ != IntRect::ZERO)
+            ++numShapes;
+    }
+    
+    ret.Push(numShapes);
+    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
+    {
+        if (shapeInfos_[i].imageRect_ != IntRect::ZERO)
+        {
+            ret.Push(String(shapeNames[i]));
+            ret.Push(GetResourceRef(shapeInfos_[i].texture_, Texture2D::GetTypeStatic()));
+            ret.Push(shapeInfos_[i].imageRect_);
+            ret.Push(shapeInfos_[i].hotSpot_);
+        }
+    }
+    
+    return ret;
 }
 
 void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

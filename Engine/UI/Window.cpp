@@ -55,18 +55,12 @@ Window::~Window()
 void Window::RegisterObject(Context* context)
 {
     context->RegisterFactory<Window>();
-}
-
-void Window::SetStyle(const XMLElement& element)
-{
-    BorderImage::SetStyle(element);
     
-    if (element.HasChild("resizeborder"))
-        SetResizeBorder(element.GetChild("resizeborder").GetIntRect("value"));
-    if (element.HasChild("movable"))
-        SetMovable(element.GetChild("movable").GetBool("enable"));
-    if (element.HasChild("resizable"))
-        SetResizable(element.GetChild("resizable").GetBool("enable"));
+    REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTRECT, "Resize Border", GetResizeBorder, SetResizeBorder, IntRect, IntRect(DEFAULT_RESIZE_BORDER, \
+        DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER), AM_FILE);
+    ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Resizable", IsResizable, SetResizable, bool, false, AM_FILE);
+    COPY_BASE_ATTRIBUTES(Window, BorderImage);
 }
 
 void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

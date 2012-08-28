@@ -122,6 +122,14 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     case VAR_VARIANTMAP:
         *(reinterpret_cast<VariantMap*>(dest)) = src.GetVariantMap();
         break;
+        
+    case VAR_INTRECT:
+        *(reinterpret_cast<IntRect*>(dest)) = src.GetIntRect();
+        break;
+        
+    case VAR_INTVECTOR2:
+        *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
+        break;
     }
 }
 
@@ -197,6 +205,14 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         
     case VAR_VARIANTMAP:
         dest = *(reinterpret_cast<const VariantMap*>(src));
+        break;
+        
+    case VAR_INTRECT:
+        dest = *(reinterpret_cast<const IntRect*>(src));
+        break;
+        
+    case VAR_INTVECTOR2:
+        dest = *(reinterpret_cast<const IntVector2*>(src));
         break;
     }
 }

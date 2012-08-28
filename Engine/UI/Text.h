@@ -37,8 +37,6 @@ class Text : public UIElement
 {
     OBJECT(Text);
     
-    using UIElement::SetStyle;
-    
 public:
     /// Construct.
     Text(Context* context);
@@ -49,8 +47,6 @@ public:
     
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
-    /// Set UI element style from XML data.
-    virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to resize.

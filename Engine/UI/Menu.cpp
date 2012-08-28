@@ -59,22 +59,9 @@ Menu::~Menu()
 void Menu::RegisterObject(Context* context)
 {
     context->RegisterFactory<Menu>();
-}
-
-void Menu::SetStyle(const XMLElement& element)
-{
-    Button::SetStyle(element);
     
-    XMLElement popupElem = element.GetChild("popup");
-    if (popupElem && popupElem.HasAttribute("name"))
-    {
-        UIElement* root = GetRoot();
-        if (root)
-            SetPopup(root->GetChild(popupElem.GetAttribute("name"), true));
-    }
-    
-    if (element.HasChild("popupoffset"))
-        SetPopupOffset(element.GetChild("popupoffset").GetIntVector2("value"));
+    REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    COPY_BASE_ATTRIBUTES(Menu, Button);
 }
 
 void Menu::OnShowPopup()

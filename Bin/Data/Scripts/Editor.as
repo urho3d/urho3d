@@ -61,6 +61,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateStats(timeStep);
     UpdateScene(timeStep);
     UpdateGizmo();
+    UpdateView();
 }
 
 void LoadConfig()
