@@ -133,7 +133,6 @@ void DropDownList::OnShowPopup()
     const IntRect& border = popup_->GetLayoutBorder();
     popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_, contentSize.y_ + border.top_ + 
         border.bottom_);
-    listView_->SetViewPosition(IntVector2::ZERO);
     
     // Check if popup fits below the button. If not, show above instead
     bool showAbove = false;
