@@ -277,9 +277,11 @@ void ScrollView::UpdateView(const IntVector2& position)
 {
     IntVector2 oldPosition = viewPosition_;
     IntRect panelBorder = scrollPanel_->GetClipBorder();
+    IntVector2 panelSize(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_, scrollPanel_->GetHeight() -
+        panelBorder.top_ - panelBorder.bottom_);
     
-    viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_);
-    viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_);
+    viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_ - panelSize.x_);
+    viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_ - panelSize.y_);
     scrollPanel_->SetChildOffset(IntVector2(-viewPosition_.x_ + panelBorder.left_, -viewPosition_.y_ + panelBorder.top_));
     
     if (viewPosition_ != oldPosition)
