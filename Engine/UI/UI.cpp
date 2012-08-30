@@ -348,6 +348,15 @@ void UI::Render()
     }
 }
 
+SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile)
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    if (!xml->Load(source))
+        return SharedPtr<UIElement>();
+    else
+        return LoadLayout(xml, styleFile);
+}
+
 SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 {
     PROFILE(LoadUILayout);

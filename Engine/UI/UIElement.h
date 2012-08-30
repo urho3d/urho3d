@@ -117,6 +117,8 @@ public:
     virtual void ApplyAttributes();
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source);
+    /// Load from XML data with style. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     /// Perform UI element update.
@@ -147,8 +149,6 @@ public:
     /// React to resize.
     virtual void OnResize();
     
-    /// Load from XML data with style. Return true if successful.
-    bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.

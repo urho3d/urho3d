@@ -68,7 +68,14 @@ void DropDownList::RegisterObject(Context* context)
     context->RegisterFactory<DropDownList>();
     
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
+    ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, M_MAX_UNSIGNED, AM_FILE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
+}
+
+void DropDownList::ApplyAttributes()
+{
+    // Reapply selection after possible items have been loaded
+    SetSelection(selectionAttr_);
 }
 
 bool DropDownList::SaveXML(XMLElement& dest)
@@ -200,6 +207,14 @@ unsigned DropDownList::GetSelection() const
 UIElement* DropDownList::GetSelectedItem() const
 {
     return listView_->GetSelectedItem();
+}
+
+void DropDownList::SetSelectionAttr(unsigned index)
+{
+    selectionAttr_ = index;
+    
+    // We may not have the list items yet. Apply the index again in ApplyAttributes().
+    SetSelection(index);
 }
 
 void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventData)

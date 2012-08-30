@@ -418,6 +418,32 @@ static UI* GetUI()
     return GetScriptContext()->GetSubsystem<UI>();
 }
 
+static UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
+{
+    if (file)
+    {
+        SharedPtr<UIElement> root = ptr->LoadLayout(*file);
+        if (root)
+            root->AddRef();
+        return root.Get();
+    }
+    else
+        return 0;
+}
+
+static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, UI* ptr)
+{
+    if (file)
+    {
+        SharedPtr<UIElement> root = ptr->LoadLayout(*file);
+        if (root)
+            root->AddRef();
+        return root.Get();
+    }
+    else
+        return 0;
+}
+
 static UIElement* UILoadLayout(XMLFile* file, UI* ptr)
 {
     SharedPtr<UIElement> root = ptr->LoadLayout(file);
@@ -446,6 +472,8 @@ static void RegisterUI(asIScriptEngine* engine)
 {
     RegisterObject<UI>(engine, "UI");
     engine->RegisterObjectMethod("UI", "void Clear()", asMETHOD(UI, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+)", asFUNCTION(UILoadLayoutFromFile), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(File@+, XMLFile@+)", asFUNCTION(UILoadLayoutFromFileWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ LoadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);

@@ -204,11 +204,25 @@ void UIElement::ApplyAttributes()
 
 bool UIElement::LoadXML(const XMLElement& source)
 {
+    return LoadXML(source, 0);
+}
+
+bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
+{
+    // Apply the style first, but only for non-internal elements
+    if (!internal_ && styleFile)
+    {
+        // Use style override if defined, otherwise type name
+        String styleName = source.GetAttribute("style");
+        if (styleName.Empty())
+            styleName = GetTypeName();
+        
+        SetStyle(styleFile, styleName);
+    }
+    
+    // Then load rest of the attributes from the source
     if (!Serializable::LoadXML(source))
         return false;
-    
-    // Attributes can be applied immediately, as there are no element reference attributes
-    ApplyAttributes();
     
     unsigned nextInternalChild = 0;
     
@@ -243,7 +257,7 @@ bool UIElement::LoadXML(const XMLElement& source)
         
         if (child)
         {
-            if (!child->LoadXML(childElem))
+            if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
         else
@@ -251,6 +265,8 @@ bool UIElement::LoadXML(const XMLElement& source)
         
         childElem = childElem.GetNext("element");
     }
+    
+    ApplyAttributes();
     
     return true;
 }
@@ -337,70 +353,6 @@ void UIElement::OnChar(unsigned c, int buttons, int qualifiers)
 
 void UIElement::OnResize()
 {
-}
-
-bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
-{
-    // Apply the style first, but only for non-internal elements
-    if (!internal_ && styleFile)
-    {
-        // Use style override if defined, otherwise type name
-        String styleName = source.GetAttribute("style");
-        if (styleName.Empty())
-            styleName = GetTypeName();
-        
-        SetStyle(styleFile, styleName);
-    }
-    
-    // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source))
-        return false;
-    
-    unsigned nextInternalChild = 0;
-    
-    // Load child elements. Internal elements are not to be created as they already exist
-    XMLElement childElem = source.GetChild("element");
-    while (childElem)
-    {
-        bool internalElem = childElem.GetBool("internal");
-        String typeName = childElem.GetAttribute("type");
-        if (typeName.Empty())
-            typeName = "UIElement";
-        UIElement* child = 0;
-        
-        if (!internalElem)
-        {
-            child = CreateChild(ShortStringHash(typeName));
-            if (!child)
-                return false;
-        }
-        else
-        {
-            for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
-            {
-                if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
-                {
-                    child = children_[i];
-                    nextInternalChild = i + 1;
-                    break;
-                }
-            }
-        }
-        
-        if (child)
-        {
-            if (!child->LoadXML(childElem, styleFile))
-                return false;
-        }
-        else
-            LOGWARNING("Could not find matching internal child element of type " + typeName);
-        
-        childElem = childElem.GetNext("element");
-    }
-    
-    ApplyAttributes();
-    
-    return true;
 }
 
 bool UIElement::LoadXML(Deserializer& source)

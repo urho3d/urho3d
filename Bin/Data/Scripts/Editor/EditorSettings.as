@@ -4,7 +4,7 @@ bool subscribedToEditorSettings = false;
 
 void CreateEditorSettingsDialog()
 {
-    if (!(settingsDialog is null))
+    if (settingsDialog !is null)
         return;
     
     settingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"), uiStyle);

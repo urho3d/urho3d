@@ -43,6 +43,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     /// Return UI rendering batches.
@@ -82,6 +84,9 @@ public:
     /// Return whether popup should be automatically resized.
     bool GetResizePopup() const { return resizePopup_; }
     
+    /// Set selection attribute.
+    void SetSelectionAttr(unsigned index);
+    
 protected:
     /// Listview element.
     SharedPtr<ListView> listView_;
@@ -93,6 +98,9 @@ protected:
 private:
     /// Handle listview item selected event.
     void HandleItemSelected(StringHash eventType, VariantMap& eventData);
+    
+    /// Selected item index attribute.
+    unsigned selectionAttr_;
 };
 
 }

@@ -4279,6 +4279,8 @@ UI
 
 Methods:<br>
 - void Clear()
+- UIElement@ LoadLayout(File@)
+- UIElement@ LoadLayout(File@, XMLFile@)
 - UIElement@ LoadLayout(XMLFile@)
 - UIElement@ LoadLayout(XMLFile@, XMLFile@)
 - bool SaveLayout(File@, UIElement@)
