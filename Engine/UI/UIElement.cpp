@@ -247,7 +247,7 @@ bool UIElement::LoadXML(const XMLElement& source)
                 return false;
         }
         else
-            LOGWARNING("Could not find matching internal child element of type " + typeName);
+            LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
         
         childElem = childElem.GetNext("element");
     }

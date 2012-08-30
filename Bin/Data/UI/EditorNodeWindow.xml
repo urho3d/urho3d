@@ -47,26 +47,34 @@
             <attribute name="Name" value="NewVarDropDown" />
             <attribute name="Min Size" value="50 17" />
             <attribute name="Max Size" value="50 17" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Int" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Bool" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Float" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="String" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Vector3" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Color" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>    
             <element internal="true">
                 <attribute name="Is Visible" value="false" />
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Int" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Bool" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Float" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="String" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Vector3" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Color" />
-                </element>
             </element>
             <element type="Text">
                 <attribute name="Text" value="New" />

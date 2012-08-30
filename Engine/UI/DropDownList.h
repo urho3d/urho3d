@@ -43,8 +43,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     /// Return UI rendering batches.

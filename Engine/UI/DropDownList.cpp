@@ -73,7 +73,7 @@ void DropDownList::RegisterObject(Context* context)
 
 bool DropDownList::SaveXML(XMLElement& dest)
 {
-    // Hack: parent the popup and the list items during serialization
+    // Hack: parent the popup during serialization
     bool popupShown = popup_ && popup_->IsVisible();
     if (popup_)
     {
@@ -81,24 +81,11 @@ bool DropDownList::SaveXML(XMLElement& dest)
         popup_->SetVisible(false);
     }
     
-    while (listView_->GetNumItems())
-        placeholder_->AddChild(listView_->GetItem(0));
-    
     bool success = UIElement::SaveXML(dest);
-    
-    while (placeholder_->GetNumChildren())
-        listView_->AddItem(placeholder_->GetChild(0));
     
     ShowPopup(popupShown);
     
     return success;
-}
-
-void DropDownList::ApplyAttributes()
-{
-    // Hack: if the placeholder has any child elements defined, move them to the list
-    while (placeholder_->GetNumChildren())
-        AddItem(placeholder_->GetChild(0));
 }
 
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

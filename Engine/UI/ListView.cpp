@@ -71,6 +71,7 @@ ListView::ListView(Context* context) :
     lastClickedItem_(M_MAX_UNSIGNED)
 {
     UIElement* container = new UIElement(context_);
+    container->SetInternal(true);
     container->SetActive(true);
     container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);

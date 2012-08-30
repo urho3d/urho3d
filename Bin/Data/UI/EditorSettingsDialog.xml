@@ -180,18 +180,24 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Geometries" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Lights" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Zones" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Rigidbodies" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Geometries" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Lights" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Zones" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Rigidbodies" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>
@@ -227,15 +233,21 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Forward" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Pre-pass" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Deferred" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Forward" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Pre-pass" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Deferred" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>
@@ -253,15 +265,21 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Low" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Medium" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="High" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Low" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Medium" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="High" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>
@@ -279,15 +297,21 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Low" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Medium" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="High" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Low" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Medium" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="High" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>
@@ -305,18 +329,24 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="Off" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="512x512" />
-                </element>
-               <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="1024x1024" />
-                </element>
-               <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="2048x2048" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Off" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="512x512" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="1024x1024" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="2048x2048" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>
@@ -334,18 +364,24 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element internal="true">
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="1-tap 16bit" />
-                </element>
-                <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="1-tap 24bit" />
-                </element>
-               <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="4-tap 16bit" />
-                </element>
-               <element type="Text" style="FileSelectorFilterText">
-                    <attribute name="Text" value="4-tap 24bit" />
+            <element type="Window" internal="true">
+                <element type="ListView" internal="true">
+                    <element type="BorderImage" internal="true">
+                        <element internal="true">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="1-tap 16bit" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="1-tap 24bit" />
+                            </element>
+                           <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="4-tap 16bit" />
+                            </element>
+                           <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="4-tap 24bit" />
+                            </element>
+                        </element>
+                    </element>
                 </element>
             </element>
         </element>

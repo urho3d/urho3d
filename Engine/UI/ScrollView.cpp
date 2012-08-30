@@ -90,6 +90,10 @@ void ScrollView::ApplyAttributes()
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);
     verticalScrollBar_->SetOrientation(O_VERTICAL);
     
+    // If the scroll panel has a child, it should be the content element, which has some special handling
+    if (scrollPanel_->GetNumChildren())
+        SetContentElement(scrollPanel_->GetChild(0));
+    
     OnResize();
 }
 
