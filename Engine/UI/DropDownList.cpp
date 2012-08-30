@@ -43,10 +43,6 @@ DropDownList::DropDownList(Context* context) :
     window->SetInternal(true);
     SetPopup(window);
     
-    // Hack: parent the popup until first shown to allow loading style from XML
-    AddChild(window);
-    window->SetVisible(false);
-    
     listView_ = new ListView(context_);
     listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
@@ -76,23 +72,6 @@ void DropDownList::ApplyAttributes()
 {
     // Reapply selection after possible items have been loaded
     SetSelection(selectionAttr_);
-}
-
-bool DropDownList::SaveXML(XMLElement& dest)
-{
-    // Hack: parent the popup during serialization
-    bool popupShown = popup_ && popup_->IsVisible();
-    if (popup_)
-    {
-        InsertChild(0, popup_);
-        popup_->SetVisible(false);
-    }
-    
-    bool success = UIElement::SaveXML(dest);
-    
-    ShowPopup(popupShown);
-    
-    return success;
 }
 
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
@@ -125,7 +104,7 @@ void DropDownList::OnShowPopup()
     content->UpdateLayout();
     const IntVector2& contentSize = content->GetSize();
     const IntRect& border = popup_->GetLayoutBorder();
-    popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_, contentSize.y_ + border.top_ + 
+    popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_, contentSize.y_ + border.top_ +
         border.bottom_);
     
     // Check if popup fits below the button. If not, show above instead

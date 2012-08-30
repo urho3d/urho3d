@@ -47,7 +47,7 @@
             <attribute name="Name" value="NewVarDropDown" />
             <attribute name="Min Size" value="50 17" />
             <attribute name="Max Size" value="50 17" />
-            <element type="Window" internal="true">
+            <element type="Window" internal="true" popup="true">
                 <element type="ListView" internal="true">
                     <element type="BorderImage" internal="true">
                         <element internal="true">

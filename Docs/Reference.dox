@@ -1016,7 +1016,7 @@ User interface elements derive from Serializable, so they can be serialized to/f
 
 The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
-See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the Data/UI directory for examples. The serialization format is similar to scene XML serialization, with two important differences:
+See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the Data/UI directory for examples. The serialization format is similar to scene XML serialization, with three important differences:
 
 1) The element type to instantiate, and the style to use for it can be set separately. For example the following element definition
 
@@ -1026,7 +1026,7 @@ See the elements' C++ code for all supported attributes, and look at the editor'
 
 tells to instantiate a Button element, and that it should use the style "CloseButton" defined in the style XML file.
 
-2) Internal sub-elements, for example the scroll bars of a ScrollView, need to be marked as such to avoid instantiating them as duplicates. This is done by adding the attribute internal="true" to the XML element, and is required in  both layout and style XML files. Furthermore, the elements must be listed in the order they have been added as children of the parent element (if in doubt, see the element's C++ constructor code. Omitting elements in the middle is OK.) For example:
+2) Internal child elements, for example the scroll bars of a ScrollView, need to be marked as such to avoid instantiating them as duplicates. This is done by adding the attribute internal="true" to the XML element, and is required in  both layout and style XML files. Furthermore, the elements must be listed in the order they have been added as children of the parent element (if in doubt, see the element's C++ constructor code. Omitting elements in the middle is OK.) For example:
 
 \code
 <element type="ScrollView" />
@@ -1038,6 +1038,8 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
     </element>
 </element>
 \endcode
+
+3) The popup element shown by Menu and DropDownList is not an actual child element. In XML serialization, it is nevertheless stored as a child element, but is marked with the attribute popup="true".
 
 Note that when %UI elements are serialized back to XML using \ref UI::SaveLayout "SaveLayout()" it is no longer possible to separate what was defined in the style XML file, and what in the actual layout file. Instead all attributes will be serialized.
 

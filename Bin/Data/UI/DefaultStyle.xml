@@ -69,7 +69,7 @@
         <attribute name="Label Offset" value="-1 1" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="4 1 4 1" />
-        <element type="Window" internal="true">
+        <element type="Window" internal="true" popup="true">
             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Image Rect" value="48 0 64 16" />
             <attribute name="Border" value="3 3 3 3" />

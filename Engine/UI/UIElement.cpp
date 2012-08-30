@@ -237,11 +237,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         UIElement* child = 0;
         
         if (!internalElem)
-        {
             child = CreateChild(ShortStringHash(typeName));
-            if (!child)
-                return false;
-        }
         else
         {
             for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
@@ -253,6 +249,9 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
                     break;
                 }
             }
+            
+            if (!child)
+                LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
         }
         
         if (child)
@@ -260,8 +259,6 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
             if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
-        else
-            LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
         
         childElem = childElem.GetNext("element");
     }

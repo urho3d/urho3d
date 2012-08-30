@@ -33,6 +33,8 @@ class Menu : public Button
 {
     OBJECT(Menu);
     
+    using UIElement::LoadXML;
+    
 public:
     /// Construct.
     Menu(Context* context);
@@ -41,6 +43,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Load from XML data with style. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     

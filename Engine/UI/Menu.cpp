@@ -68,21 +68,123 @@ void Menu::OnShowPopup()
 {
 }
 
-bool Menu::SaveXML(XMLElement& dest)
+bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
 {
-    // Hack: parent the popup during serialization
-    bool popupShown = popup_ && popup_->IsVisible();
-    if (popup_)
+    // Apply the style first, but only for non-internal elements
+    if (!internal_ && styleFile)
     {
-        InsertChild(0, popup_);
-        popup_->SetVisible(false);
+        // Use style override if defined, otherwise type name
+        String styleName = source.GetAttribute("style");
+        if (styleName.Empty())
+            styleName = GetTypeName();
+        
+        SetStyle(styleFile, styleName);
     }
     
-    bool success = UIElement::SaveXML(dest);
+    // Then load rest of the attributes from the source
+    if (!Serializable::LoadXML(source))
+        return false;
     
-    ShowPopup(popupShown);
+    unsigned nextInternalChild = 0;
     
-    return success;
+    // Load child elements. Internal elements are not to be created as they already exist
+    XMLElement childElem = source.GetChild("element");
+    while (childElem)
+    {
+        bool internalElem = childElem.GetBool("internal");
+        bool popupElem = childElem.GetBool("popup");
+        String typeName = childElem.GetAttribute("type");
+        if (typeName.Empty())
+            typeName = "UIElement";
+        UIElement* child = 0;
+        
+        if (!internalElem)
+        {
+            if (!popupElem)
+                child = CreateChild(ShortStringHash(typeName));
+            else
+            {
+                // Do not add the popup element as a child even temporarily, as that can break layouts
+                SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(typeName)));
+                if (!popup)
+                    LOGERROR("Could not create popup element type " + ShortStringHash(typeName).ToString());
+                else
+                {
+                    child = popup;
+                    SetPopup(popup);
+                }
+            }
+        }
+        else
+        {
+            // An internal popup element should already exist
+            if (popupElem)
+                child = popup_;
+            else
+            {
+                for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
+                {
+                    if (children_[i]->IsInternal() && children_[i]->GetTypeName() == typeName)
+                    {
+                        child = children_[i];
+                        nextInternalChild = i + 1;
+                        break;
+                    }
+                }
+                
+                if (!child)
+                    LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
+            }
+        }
+        
+        if (child)
+        {
+            if (!child->LoadXML(childElem, styleFile))
+                return false;
+        }
+        
+        childElem = childElem.GetNext("element");
+    }
+    
+    ApplyAttributes();
+    
+    return true;
+}
+
+bool Menu::SaveXML(XMLElement& dest)
+{
+    // Write type and internal flag
+    if (!dest.SetString("type", GetTypeName()))
+        return false;
+    if (internal_)
+    {
+        if (!dest.SetBool("internal", internal_))
+            return false;
+    }
+    
+    // Write attributes
+    if (!Serializable::SaveXML(dest))
+        return false;
+    
+    // Write child elements
+    for (unsigned i = 0; i < children_.Size(); ++i)
+    {
+        UIElement* element = children_[i];
+        XMLElement childElem = dest.CreateChild("element");
+        if (!element->SaveXML(childElem))
+            return false;
+    }
+    
+    // Save the popup element as a "virtual" child element
+    if (popup_)
+    {
+        XMLElement childElem = dest.CreateChild("element");
+        childElem.SetBool("popup", true);
+        if (!popup_->SaveXML(childElem))
+            return false;
+    }
+    
+    return true;
 }
 
 void Menu::SetPopup(UIElement* popup)

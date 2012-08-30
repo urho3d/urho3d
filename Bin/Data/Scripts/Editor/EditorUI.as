@@ -41,7 +41,7 @@ void CreateCursor()
     cursor.style = uiStyle;
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
-    if (GetPlatform() == "Android")
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
         ui.cursor.visible = false;
 }
 
