@@ -632,7 +632,10 @@ Node* Node::Clone(CreateMode mode)
 {
     // The scene itself can not be cloned
     if (this == scene_ || !parent_)
+    {
+        LOGERROR("Can not clone node without a parent");
         return 0;
+    }
     
     PROFILE(CloneNode);
     
