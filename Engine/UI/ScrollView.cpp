@@ -60,7 +60,6 @@ ScrollView::ScrollView(Context* context) :
     scrollPanel_->SetInternal(true);
     scrollPanel_->SetActive(true);
     scrollPanel_->SetClipChildren(true);
-    scrollPanel_->SetPriority(-1);
     
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
     SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));
