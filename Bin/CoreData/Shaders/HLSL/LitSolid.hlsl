@@ -5,6 +5,11 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+// With SM2 alpha-masked point light shadows become too complex, so disable specular lighting
+#if !defined(SM3) && defined(POINTLIGHT) && defined(SHADOW) && defined(ALPHAMASK)
+    #undef SPECULAR
+#endif
+
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
