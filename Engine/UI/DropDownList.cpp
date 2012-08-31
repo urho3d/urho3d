@@ -37,7 +37,8 @@ OBJECTTYPESTATIC(DropDownList);
 
 DropDownList::DropDownList(Context* context) :
     Menu(context),
-    resizePopup_(false)
+    resizePopup_(false),
+    selectionAttr_(0)
 {
     Window* window = new Window(context_);
     window->SetInternal(true);
@@ -64,7 +65,7 @@ void DropDownList::RegisterObject(Context* context)
     context->RegisterFactory<DropDownList>();
     
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
-    ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, M_MAX_UNSIGNED, AM_FILE);
+    ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
 

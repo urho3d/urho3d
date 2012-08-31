@@ -42,6 +42,7 @@ ScrollView::ScrollView(Context* context) :
     UIElement(context),
     viewPosition_(IntVector2::ZERO),
     viewSize_(IntVector2::ZERO),
+    viewPositionAttr_(IntVector2::ZERO),
     pageStep_(1.0f)
 {
     clipChildren_ = true;
@@ -75,7 +76,7 @@ void ScrollView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollView>();
     
-    REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPosition, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
     COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
@@ -94,6 +95,9 @@ void ScrollView::ApplyAttributes()
         SetContentElement(scrollPanel_->GetChild(0));
     
     OnResize();
+    
+    // Reapply view position with proper content element and size
+    SetViewPosition(viewPositionAttr_);
 }
 
 void ScrollView::OnWheel(int delta, int buttons, int qualifiers)
@@ -236,6 +240,12 @@ void ScrollView::SetPageStep(float step)
 float ScrollView::GetScrollStep() const
 {
     return horizontalScrollBar_->GetScrollStep();
+}
+
+void ScrollView::SetViewPositionAttr(const IntVector2& value)
+{
+    viewPositionAttr_ = value;
+    SetViewPosition(value);
 }
 
 void ScrollView::UpdateViewSize()

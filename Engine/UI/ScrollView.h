@@ -81,6 +81,9 @@ public:
     /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
     
+    /// Set view position attribut.
+    void SetViewPositionAttr(const IntVector2& value);
+    
 protected:
     /// Update view size from the content element.
     void UpdateViewSize();
@@ -101,6 +104,8 @@ protected:
     IntVector2 viewPosition_;
     /// Total view size.
     IntVector2 viewSize_;
+    /// View offset attribute.
+    IntVector2 viewPositionAttr_;
     /// Arrow key page step.
     float pageStep_;
     /// Ignore scrollbar events flag. Used to prevent possible endless loop when setting position.
