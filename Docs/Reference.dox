@@ -594,7 +594,7 @@ A material definition looks like this:
 \code
 <material>
     <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
-    <texture unit="diffuse|normal|specular|detail|environment|emissive" name="TextureName" />
+    <texture unit="diffuse|normal|specular|emissive|environment" name="TextureName" />
     <texture ... />
     <parameter name="name" value="x y z w" />
     <parameter ... />
@@ -809,7 +809,7 @@ In addition to configuring programmatically, the PostProcess can be configured w
     <rendertarget name="RenderTargetName" size="x y" | sizedivisor="x y" format="rgb|rgba|float" filter="true|false" />
     <parameter name="GlobalShaderParameterName" value="x y z w" />
     <pass vs="VertexShaderName" ps="PixelShaderName" output="viewport|RenderTargetName" />
-        <texture unit="diffuse|normal|specular|detail|environment|emissive" name="viewport|RenderTargetName|TextureName" />
+        <texture unit="diffuse|normal|specular|emissive|environment" name="viewport|RenderTargetName|TextureName" />
         <parameter name="ShaderParameterName" value="x y z w" />
     </pass>
 </postprocess>

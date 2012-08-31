@@ -47,7 +47,6 @@ const String textureUnitNames[] =
     "normal",
     "specular",
     "emissive",
-    "detail",
     "environment",
     ""
 };
