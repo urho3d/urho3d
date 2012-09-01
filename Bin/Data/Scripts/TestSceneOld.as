@@ -110,7 +110,7 @@ void InitScene()
         object.castShadows = true;
         object.occluder = true;
     }
-    
+
     // Create static mushroom with physics
     {
         Node@ newNode = testScene.CreateChild();
@@ -127,19 +127,19 @@ void InitScene()
         object.castShadows = true;
         object.occluder = true;
     }
-    
+
     // Create mushroom groups
     for (uint i = 0; i < NUM_INSTANCENODES; ++i)
     {
         Node@ newNode = testScene.CreateChild();
         newNode.position = Vector3(Random() * 160 - 80, 0, Random() * 160 - 80);
-        
+
         for (uint j = 0; j < NUM_INSTANCES; ++j)
         {
             Vector3 position = Vector3(Random() * 20 - 10, 0, Random() * 20 - 10);
             float angle = Random() * 360;
             float size = 1 + Random() * 2;
-            
+
             Node@ instance = newNode.CreateChild();
             instance.position = position;
             instance.rotation = Quaternion(angle, Vector3(0, 1, 0));
@@ -166,6 +166,9 @@ void InitScene()
         object.drawDistance = 300;
         object.castShadows = true;
         object.maxLights = 2;
+
+        // Because there are many animated models in the scene, test reducing animation LOD for less CPU use
+        object.animationLodBias = 0.75;
 
         // Create a capsule shape for detecting collisions
         RigidBody@ body = newNode.CreateComponent("RigidBody");
@@ -235,6 +238,7 @@ void InitScene()
         light.shadowDistance = 200;
         light.shadowFadeDistance = 150;
         light.shadowResolution = 0.5;
+
         // The spot lights will not have anything near them, so move the near plane of the shadow camera farther
         // for better shadow depth resolution
         light.shadowNearFarRatio = 0.01;
@@ -447,10 +451,10 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         if (key == 'B')
             bloom.active = !bloom.active;
-            
+
         if (key == 'F')
             edgeFilter.active = !edgeFilter.active;
-        
+
         if (key == 'T')
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 
@@ -522,15 +526,15 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             newNode.position = cameraNode.position;
             newNode.rotation = cameraNode.rotation;
             newNode.SetScale(0.2);
-        
+
             RigidBody@ body = newNode.CreateComponent("RigidBody");
             body.mass = 1.0;
             body.friction = 1.0;
             body.linearVelocity = cameraNode.rotation * Vector3(0.0, 1.0, 10.0);
-    
+
             CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
             shape.SetBox(Vector3(1, 1, 1));
-    
+
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
             object.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
