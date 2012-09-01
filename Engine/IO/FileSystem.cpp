@@ -394,8 +394,14 @@ bool FileSystem::DirExists(const String& pathName) const
     if (!CheckAccess(pathName))
         return false;
     
+    #ifndef WIN32
+    // Always return true for the root directory
+    if (pathName == "/")
+	return true;
+    #endif
+
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
-    
+
     #ifdef ANDROID
     /// \todo Actually check for existence, now true is always returned for directories within the APK
     if (fixedName.StartsWith("/apk/"))
