@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "HashSet.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Sort.h"
@@ -829,8 +830,10 @@ void UIElement::BringToFront()
         return;
     
     // Get the highest priority used by all other top level elements, assign that to the new front element
-    // and decrease others' priority by one. However, take into account only active (enabled) elements
-    // and those which have the BringToBack flag set
+    // and decrease others' priority where necessary. However, take into account only active (enabled)
+    // elements and those which have the BringToBack flag set
+    HashSet<int> usedPriorities;
+    
     int maxPriority = M_MIN_INT;
     const Vector<SharedPtr<UIElement> >& rootChildren = root->GetChildren();
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
@@ -839,12 +842,28 @@ void UIElement::BringToFront()
         if (other->IsActive() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
+            usedPriorities.Insert(priority);
             maxPriority = Max(priority, maxPriority);
-            other->SetPriority(priority - 1);
         }
     }
-    if (maxPriority != M_MIN_INT)
+    
+    if (maxPriority != M_MIN_INT && maxPriority >= ptr->GetPriority())
+    {
         ptr->SetPriority(maxPriority);
+        
+        int minPriority = maxPriority;
+        while (usedPriorities.Contains(minPriority))
+            --minPriority;
+        
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
+        {
+            UIElement* other = *i;
+            int priority = other->GetPriority();
+            
+            if (other->IsActive() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
+                other->SetPriority(priority - 1);
+        }
+    }
 }
 
 UIElement* UIElement::CreateChild(ShortStringHash type, const String& name)
