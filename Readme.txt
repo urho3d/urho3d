@@ -256,3 +256,11 @@ V1.2    - Android and iOS support.
         - Removed need for shader preprocessing; reorganized shaders to be more
           friendly to base custom shaders on.
         - Inbuilt geometry shapes in the editor.
+        
+V1.21   - Bugfixes and code cleanup.
+        - External window support (experimental.)
+        - UI elements refactored to use attributes for serialization.
+        - Animation state editing and animation trigger events.
+        - Scene update time scale can be modified.
+        - Improved the delayed method call system.
+
