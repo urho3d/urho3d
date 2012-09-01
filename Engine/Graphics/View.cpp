@@ -1885,6 +1885,10 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
+        float drawDistance = drawable->GetDrawDistance();
+        if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
+            maxShadowDistance = drawDistance;
+        
         if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
             continue;
         
