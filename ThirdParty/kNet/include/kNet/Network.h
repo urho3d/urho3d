@@ -16,11 +16,15 @@
 /** @file Network.h
 	@brief The class Network. The root point for creating client and server objects. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #if defined(UNIX) || defined(ANDROID)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+// Urho3D: include also unistd.h
+#include <unistd.h>
 #endif
 
 #include "kNetBuildConfig.h"
