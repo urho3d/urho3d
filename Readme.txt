@@ -104,17 +104,15 @@ To run Urho3D, the minimum system requirements are:
 - Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c,
   GPU with Shader Model 2 support (Shader Model 3 recommended.)
 
-- Linux & Mac OS X: GPU with OpenGL 2.0 support, EXT_framebuffer_object and
-  EXT_packed_depth_stencil extensions.
+- Linux & Mac OS X: CPU with SSE instructions support, GPU with OpenGL 2.0
+  support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
 - Android: OS version 2.2 or newer, OpenGL ES 2.0 capable GPU.
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-For Windows, SSE and Windows XP requirements can be eliminated by disabling SSE,
-crash dump support and file watcher from the root CMakeLists.txt. Windows 2000
-will then be the absolute minimum.
-
+SSE requirement can be removed by commenting out the line "set (ENABLE_SSE 1)"
+from the root CMakeLists.txt.
 
 Desktop build process
 ---------------------

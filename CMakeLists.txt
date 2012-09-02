@@ -23,15 +23,13 @@ endif ()
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 set (ENABLE_SSE 1)
 
-# Enable structured exception handling and minidumps on MSVC only. Note: minidump generation requires
-# a Windows XP or newer version of dbghelp.dll, so disable it if you want Windows 2000 compatibility.
+# Enable structured exception handling and minidumps on MSVC only.
 if (MSVC)
     set (ENABLE_MINIDUMPS 1)
     add_definitions (-DENABLE_MINIDUMPS)
 endif ()
 
-# Enable file watcher support for automatic resource reloads. On Windows this uses a function that
-# requires Windows XP or newer, so disable it if you want Windows 2000 compatibility.
+# Enable file watcher support for automatic resource reloads.
 add_definitions (-DENABLE_FILEWATCHER)
 
 # Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not
