@@ -268,10 +268,10 @@ unsigned Texture::GetRowDataSize(int width) const
     #endif
         return width * 4;
         
+    #ifndef GL_ES_VERSION_2_0
     case GL_RGBA16:
         return width * 8;
         
-    #ifndef GL_ES_VERSION_2_0
     case GL_RGBA16F_ARB:
     case GL_RGBA32F_ARB:
         return width * 16;
@@ -319,10 +319,7 @@ unsigned Texture::GetExternalFormat(unsigned format)
     else
         return format;
     #else
-    if (format == GL_RGBA16)
-        return GL_RGBA;
-    else
-        return format;
+    return format;
     #endif
 }
 
@@ -341,7 +338,7 @@ unsigned Texture::GetDataType(unsigned format)
     #else
     if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES)
         return GL_UNSIGNED_INT;
-    else if (format == GL_DEPTH_COMPONENT16 || format == GL_RGBA16)
+    else if (format == GL_DEPTH_COMPONENT16)
         return GL_UNSIGNED_SHORT;
     else
         return GL_UNSIGNED_BYTE;

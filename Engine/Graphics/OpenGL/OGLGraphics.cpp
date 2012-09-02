@@ -1995,7 +1995,11 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetRGBA16Format()
 {
+    #ifndef GL_ES_VERSION_2_0
     return GL_RGBA16;
+    #else
+    return GL_RGBA;
+    #endif
 }
 
 unsigned Graphics::GetRGBAFloat16Format()
@@ -2003,7 +2007,7 @@ unsigned Graphics::GetRGBAFloat16Format()
     #ifndef GL_ES_VERSION_2_0
     return GL_RGBA16F_ARB;
     #else
-    return GL_RGBA16;
+    return GL_RGBA;
     #endif
 }
 
@@ -2012,7 +2016,7 @@ unsigned Graphics::GetRGBAFloat32Format()
     #ifndef GL_ES_VERSION_2_0
     return GL_RGBA32F_ARB;
     #else
-    return GL_RGBA16;
+    return GL_RGBA;
     #endif
 }
 
@@ -2021,7 +2025,7 @@ unsigned Graphics::GetRG16Format()
     #ifndef GL_ES_VERSION_2_0
     return GL_RG16;
     #else
-    return 0;
+    return GL_RGBA;
     #endif
 }
 
@@ -2030,7 +2034,7 @@ unsigned Graphics::GetRGFloat16Format()
     #ifndef GL_ES_VERSION_2_0
     return GL_RG16F;
     #else
-    return 0;
+    return GL_RGBA;
     #endif
 }
 
@@ -2039,7 +2043,7 @@ unsigned Graphics::GetRGFloat32Format()
     #ifndef GL_ES_VERSION_2_0
     return GL_RG32F;
     #else
-    return 0;
+    return GL_RGBA;
     #endif
 }
 
