@@ -339,12 +339,28 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific single channel float texture format.
-    static unsigned GetFloatFormat();
+    /// Return the API-specific RGBA 16-bit texture format.
+    static unsigned GetRGBA16Format();
+    /// Return the API-specific RGBA 16-bit float texture format.
+    static unsigned GetRGBAFloat16Format();
+    /// Return the API-specific RGBA 32-bit float texture format.
+    static unsigned GetRGBAFloat32Format();
+    /// Return the API-specific RG 16-bit texture format.
+    static unsigned GetRG16Format();
+    /// Return the API-specific RG 16-bit float texture format.
+    static unsigned GetRGFloat16Format();
+    /// Return the API-specific RG 32-bit float texture format.
+    static unsigned GetRGFloat32Format();
+    /// Return the API-specific single channel 16-bit float texture format.
+    static unsigned GetFloat16Format();
+    /// Return the API-specific single channel 32-bit float texture format.
+    static unsigned GetFloat32Format();
     /// Return the API-specific linear depth texture format.
     static unsigned GetLinearDepthFormat();
     /// Return the API-specific hardware depth-stencil texture format.
     static unsigned GetDepthStencilFormat();
+    /// Return the API-specific texture format from a textual description, for example "rgb".
+    static unsigned GetFormat(const String& formatName);
     
 private:
     /// Create the application window.

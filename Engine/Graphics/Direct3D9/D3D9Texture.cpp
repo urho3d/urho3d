@@ -159,6 +159,7 @@ unsigned Texture::GetRowDataSize(int width) const
     case D3DFMT_R5G6B5:
     case D3DFMT_A4R4G4B4:
     case D3DFMT_A8L8:
+    case D3DFMT_R16F:
         return width * 2;
 
     case D3DFMT_X8R8G8B8:
@@ -166,9 +167,19 @@ unsigned Texture::GetRowDataSize(int width) const
         return width * 3;
 
     case D3DFMT_A8R8G8B8:
+    case D3DFMT_G16R16:
     case D3DFMT_R32F:
+    case D3DFMT_G16R16F:
     case D3DFMT_D24S8:
+    case D3DFMT_D32:
         return width * 4;
+        
+    case D3DFMT_A16B16G16R16:
+    case D3DFMT_A16B16G16R16F:
+        return width * 8;
+        
+    case D3DFMT_A32B32G32R32F:
+        return width * 16;
         
     case D3DFMT_DXT1:
         return ((width + 3) >> 2) * 8;

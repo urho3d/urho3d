@@ -1993,7 +1993,66 @@ unsigned Graphics::GetRGBAFormat()
     return GL_RGBA;
 }
 
-unsigned Graphics::GetFloatFormat()
+unsigned Graphics::GetRGBA16Format()
+{
+    return GL_RGBA16;
+}
+
+unsigned Graphics::GetRGBAFloat16Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_RGBA16F_ARB;
+    #else
+    return GL_RGBA16;
+    #endif
+}
+
+unsigned Graphics::GetRGBAFloat32Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_RGBA32F_ARB;
+    #else
+    return GL_RGBA16;
+    #endif
+}
+
+unsigned Graphics::GetRG16Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_RG16;
+    #else
+    return 0;
+    #endif
+}
+
+unsigned Graphics::GetRGFloat16Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_RG16F;
+    #else
+    return 0;
+    #endif
+}
+
+unsigned Graphics::GetRGFloat32Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_RG32F;
+    #else
+    return 0;
+    #endif
+}
+
+unsigned Graphics::GetFloat16Format()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_LUMINANCE16F_ARB;
+    #else
+    return GL_LUMINANCE;
+    #endif
+}
+
+unsigned Graphics::GetFloat32Format()
 {
     #ifndef GL_ES_VERSION_2_0
     return GL_LUMINANCE32F_ARB;
@@ -2016,6 +2075,42 @@ unsigned Graphics::GetDepthStencilFormat()
     #else
     return GL_DEPTH_COMPONENT;
     #endif
+}
+
+unsigned Graphics::GetFormat(const String& formatName)
+{
+    String nameLower = formatName.ToLower().Trimmed();
+    
+    if (nameLower == "a")
+        return GetAlphaFormat();
+    if (nameLower == "l")
+        return GetLuminanceFormat();
+    if (nameLower == "la")
+        return GetLuminanceAlphaFormat();
+    if (nameLower == "rgb")
+        return GetRGBFormat();
+    if (nameLower == "rgba")
+        return GetRGBAFormat();
+    if (nameLower == "rgba16")
+        return GetRGBA16Format();
+    if (nameLower == "rgba16f")
+        return GetRGBAFloat16Format();
+    if (nameLower == "rgba32f")
+        return GetRGBAFloat32Format();
+    if (nameLower == "rg16")
+        return GetRG16Format();
+    if (nameLower == "rg16f")
+        return GetRGFloat16Format();
+    if (nameLower == "rg32f")
+        return GetRGFloat32Format();
+    if (nameLower == "r16f")
+        return GetFloat16Format();
+    if (nameLower == "r32f" || nameLower == "float")
+        return GetFloat32Format();
+    if (nameLower == "d24s8")
+        return GetDepthStencilFormat();
+    
+    return GetRGBFormat();
 }
 
 void Graphics::CheckFeatureSupport()

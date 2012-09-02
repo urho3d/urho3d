@@ -1935,7 +1935,42 @@ unsigned Graphics::GetRGBAFormat()
     return D3DFMT_A8R8G8B8;
 }
 
-unsigned Graphics::GetFloatFormat()
+unsigned Graphics::GetRGBA16Format()
+{
+    return D3DFMT_A16B16G16R16;
+}
+
+unsigned Graphics::GetRGBAFloat16Format()
+{
+    return D3DFMT_A16B16G16R16F;
+}
+
+unsigned Graphics::GetRGBAFloat32Format()
+{
+    return D3DFMT_A32B32G32R32F;
+}
+
+unsigned Graphics::GetRG16Format()
+{
+    return D3DFMT_G16R16;
+}
+
+unsigned Graphics::GetRGFloat16Format()
+{
+    return D3DFMT_G16R16F;
+}
+
+unsigned Graphics::GetRGFloat32Format()
+{
+    return D3DFMT_G32R32F;
+}
+
+unsigned Graphics::GetFloat16Format()
+{
+    return D3DFMT_R16F;
+}
+
+unsigned Graphics::GetFloat32Format()
 {
     return D3DFMT_R32F;
 }
@@ -1948,6 +1983,42 @@ unsigned Graphics::GetLinearDepthFormat()
 unsigned Graphics::GetDepthStencilFormat()
 {
     return depthStencilFormat;
+}
+
+unsigned Graphics::GetFormat(const String& formatName)
+{
+    String nameLower = formatName.ToLower().Trimmed();
+    
+    if (nameLower == "a")
+        return GetAlphaFormat();
+    if (nameLower == "l")
+        return GetLuminanceFormat();
+    if (nameLower == "la")
+        return GetLuminanceAlphaFormat();
+    if (nameLower == "rgb")
+        return GetRGBFormat();
+    if (nameLower == "rgba")
+        return GetRGBAFormat();
+    if (nameLower == "rgba16")
+        return GetRGBA16Format();
+    if (nameLower == "rgba16f")
+        return GetRGBAFloat16Format();
+    if (nameLower == "rgba32f")
+        return GetRGBAFloat32Format();
+    if (nameLower == "rg16")
+        return GetRG16Format();
+    if (nameLower == "rg16f")
+        return GetRGFloat16Format();
+    if (nameLower == "rg32f")
+        return GetRGFloat32Format();
+    if (nameLower == "r16f")
+        return GetFloat16Format();
+    if (nameLower == "r32f" || nameLower == "float")
+        return GetFloat32Format();
+    if (nameLower == "d24s8")
+        return GetDepthStencilFormat();
+    
+    return GetRGBFormat();
 }
 
 bool Graphics::OpenWindow(int width, int height)

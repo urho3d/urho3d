@@ -130,12 +130,8 @@ bool PostProcess::LoadParameters(XMLFile* file)
     {
         String name = rtElem.GetAttribute("name");
         
-        unsigned format = Graphics::GetRGBFormat();
-        String formatName = rtElem.GetAttributeLower("format");
-        if (formatName == "rgba")
-            format = Graphics::GetRGBAFormat();
-        else if (formatName == "float")
-            format = Graphics::GetFloatFormat();
+        String formatName = rtElem.GetAttribute("format");
+        unsigned format = Graphics::GetFormat(formatName);
         
         bool sizeDivisor = false;
         bool filtered = false;

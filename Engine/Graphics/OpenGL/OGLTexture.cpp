@@ -261,11 +261,22 @@ unsigned Texture::GetRowDataSize(int width) const
         
     case GL_RGBA:
     #ifndef GL_ES_VERSION_2_0
+    case GL_LUMINANCE16F_ARB:
     case GL_LUMINANCE32F_ARB:
     case GL_DEPTH24_STENCIL8_EXT:
+    case GL_RG16:
     #endif
         return width * 4;
         
+    case GL_RGBA16:
+        return width * 8;
+        
+    #ifndef GL_ES_VERSION_2_0
+    case GL_RGBA16F_ARB:
+    case GL_RGBA32F_ARB:
+        return width * 16;
+    #endif
+    
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
         
@@ -299,12 +310,19 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_DEPTH_COMPONENT;
     else if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_DEPTH_STENCIL_EXT;
-    else if (format == GL_LUMINANCE32F_ARB)
+    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB)
         return GL_LUMINANCE;
+    else if (format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
+        return GL_RG;
+    else if (format == GL_RGBA16 || format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB)
+        return GL_RGBA;
     else
         return format;
     #else
-    return format;
+    if (format == GL_RGBA16)
+        return GL_RGBA;
+    else
+        return format;
     #endif
 }
 
@@ -313,12 +331,17 @@ unsigned Texture::GetDataType(unsigned format)
     #ifndef GL_ES_VERSION_2_0
     if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_UNSIGNED_INT_24_8_EXT;
+    else if (format == GL_RG16 || format == GL_RGBA16)
+        return GL_UNSIGNED_SHORT;
+    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_RGBA16F_ARB ||
+        format == GL_RGBA32F_ARB)
+        return GL_FLOAT;
     else
         return GL_UNSIGNED_BYTE;
     #else
     if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24_OES)
         return GL_UNSIGNED_INT;
-    else if (format == GL_DEPTH_COMPONENT16)
+    else if (format == GL_DEPTH_COMPONENT16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
     else
         return GL_UNSIGNED_BYTE;

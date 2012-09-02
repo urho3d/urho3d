@@ -66,8 +66,16 @@ namespace Urho3D
 - uint GetLuminanceAlphaFormat()
 - uint GetRGBFormat()
 - uint GetRGBAFormat()
-- uint GetFloatFormat()
+- uint GetRGBA16Format()
+- uint GetRGBAFloat16Format()
+- uint GetRGBAFloat32Format()
+- uint GetRG16Format()
+- uint GetRGFloat16Format()
+- uint GetRGFloat32Format()
+- uint GetFloat16Format()
+- uint GetFloat32Format()
 - uint GetDepthStencilFormat()
+- uint GetFormat(const String&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - void DelayedExecute(float, bool, const String&)
 - void ClearDelayedExecute(const String& arg0 = String ( ))
@@ -1689,7 +1697,7 @@ Properties:<br>
 - Color borderColor
 - Texture@ backupTexture
 - bool dataLost (readonly)
-- RenderSurface@[] renderSurface (readonly)
+- RenderSurface@[] renderSurfaces (readonly)
 
 
 BiasParameters

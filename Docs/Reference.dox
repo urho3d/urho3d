@@ -806,7 +806,7 @@ In addition to configuring programmatically, the PostProcess can be configured w
 
 \code
 <postprocess>
-    <rendertarget name="RenderTargetName" size="x y" | sizedivisor="x y" format="rgb|rgba|float" filter="true|false" />
+    <rendertarget name="RenderTargetName" size="x y" | sizedivisor="x y" format="rgb|rgba|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|r16f|r32f" filter="true|false" />
     <parameter name="GlobalShaderParameterName" value="x y z w" />
     <pass vs="VertexShaderName" ps="PixelShaderName" output="viewport|RenderTargetName" />
         <texture unit="diffuse|normal|specular|emissive|environment" name="viewport|RenderTargetName|TextureName" />
