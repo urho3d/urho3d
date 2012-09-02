@@ -12,7 +12,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-
+// Modified by Lasse Öörni for Urho3D
 
 #ifndef BT_SCALAR_H
 #define BT_SCALAR_H
@@ -67,7 +67,8 @@ inline int	btGetVersion()
  			#define btFsel(a,b,c) __fsel((a),(b),(c))
 		#else
 
-#if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
+// Urho3D: allow to disable SSE
+#if (defined (ENABLE_SSE) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
 			#define BT_USE_SSE
 			#include <emmintrin.h>
 #endif
@@ -143,7 +144,8 @@ inline int	btGetVersion()
 #else
 	//non-windows systems
 
-#if (defined (__APPLE__) && defined (__i386__) && (!defined (BT_USE_DOUBLE_PRECISION)))
+// Urho3D: allow to disable SSE
+#if (defined (ENABLE_SSE) && defined (__APPLE__) && defined (__i386__) && (!defined (BT_USE_DOUBLE_PRECISION)))
 	#define BT_USE_SSE
 	#include <emmintrin.h>
 

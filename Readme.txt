@@ -111,8 +111,9 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-SSE requirement can be removed by commenting out the line "set (ENABLE_SSE 1)"
-from the root CMakeLists.txt.
+SSE requirement can be eliminated by commenting out lines that enable it from
+the root CMakeLists.txt.
+
 
 Desktop build process
 ---------------------

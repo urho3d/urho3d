@@ -22,6 +22,7 @@ endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 set (ENABLE_SSE 1)
+add_definitions (-DENABLE_SSE)
 
 # Enable structured exception handling and minidumps on MSVC only.
 if (MSVC)
