@@ -26,6 +26,7 @@
 #include "DebugRenderer.h"
 #include "Node.h"
 #include "Octree.h"
+#include "Scene.h"
 #include "XMLElement.h"
 #include "Zone.h"
 
@@ -195,6 +196,14 @@ bool Zone::IsInside(const Vector3& point) const
 
 void Zone::OnMarkedDirty(Node* node)
 {
+    // Due to the octree query, is not safe from worker threads
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
     Drawable::OnMarkedDirty(node);
     
     // When marked dirty, clear the cached zone from all drawables inside the zone bounding box,

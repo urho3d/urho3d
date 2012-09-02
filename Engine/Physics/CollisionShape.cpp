@@ -638,6 +638,14 @@ void CollisionShape::OnMarkedDirty(Node* node)
     Vector3 newWorldScale = node_->GetWorldScale();
     if (!newWorldScale.Equals(cachedWorldScale_) && shape_)
     {
+        // Physics operations are not safe from worker threads
+        Scene* scene = GetScene();
+        if (scene && scene->IsThreadedUpdate())
+        {
+            scene->DelayedMarkedDirty(this);
+            return;
+        }
+        
         switch (shapeType_)
         {
         case SHAPE_BOX:
