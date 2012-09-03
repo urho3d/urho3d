@@ -1545,7 +1545,7 @@ void Renderer::LoadMaterialShaders(Technique* tech)
     LoadPassShaders(tech, PASS_SHADOW);
 }
 
-void Renderer::LoadPassShaders(Technique* tech, PassType type, bool allowShadows)
+void Renderer::LoadPassShaders(Technique* tech, PassType type)
 {
     Pass* pass = tech->GetPass(type);
     if (!pass)
@@ -1578,14 +1578,7 @@ void Renderer::LoadPassShaders(Technique* tech, PassType type, bool allowShadows
     
     if (type == PASS_LIGHT || type == PASS_LITBASE)
     {
-        // Load forward pixel lit variations. If material is transparent, and shadow maps are reused,
-        // do not load shadowed variations
-        if (reuseShadowMaps_)
-        {
-            if (!tech->HasPass(PASS_BASE) || tech->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
-                allowShadows = false;
-        }
-        
+        // Load forward pixel lit variations
         vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
         pixelShaders.Resize(MAX_LIGHT_PS_VARIATIONS);
         
@@ -1593,20 +1586,12 @@ void Renderer::LoadPassShaders(Technique* tech, PassType type, bool allowShadows
         {
             unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-            if (l < LVS_SHADOW || allowShadows)
-                vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
-            else
-                vertexShaders[j].Reset();
+            vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
         {
             if (j & LPS_SHADOW)
-            {
-                if (allowShadows)
-                    pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows]);
-                else
-                    pixelShaders[j].Reset();
-            }
+                pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] + shadowVariations[shadows]);
             else
                 pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j]);
         }
