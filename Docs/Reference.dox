@@ -573,6 +573,8 @@ OpenGL ES 2.0 has further limitations:
 
 - Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS) compressed textures are supported through the .ktx and .pvr file formats.
 
+- %Texture formats such as 16-bit and 32-bit floating point are not available. Corresponding integer 8-bit formats will be returned instead.
+
 - %Light pre-pass and deferred rendering are not supported due to missing multiple rendertarget support, and limited rendertarget formats.
 
 - Wireframe and point fill modes are not supported.
