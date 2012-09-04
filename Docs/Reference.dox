@@ -918,7 +918,7 @@ The physics simulation has its own fixed update rate, which by default is 60Hz. 
 The other physics components are:
 
 - RigidBody: a physics object instance. Its parameters include mass, linear/angular velocities, friction and restitution.
-- CollisionShape: defines physics collision geometry. The supported shapes are box, sphere, cylinder, capsule, cone, triangle mesh and convex hull.
+- CollisionShape: defines physics collision geometry. The supported shapes are box, sphere, cylinder, capsule, cone, triangle mesh, convex hull and heightfield terrain (requires the Terrain component in the same node.)
 - Constraint: connects two RigidBodies together, or one RigidBody to a static point in the world. Point, hinge, slider and cone twist constraints are supported.
 
 \section Physics_Movement Movement and collision
@@ -1305,7 +1305,7 @@ Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use simil
 The String class supports UTF-8 encoding. However, by default strings are treated as a sequence of bytes without regard to the encoding. There is a separate
 API for operating on Unicode characters, see for example \ref String::LengthUTF8 "LengthUTF8()", \ref String::AtUTF8 "AtUTF8()" and \ref String::SubstringUTF8 "SubstringUTF8()". Urho3D itself needs to be aware of the Unicode characters only in the \ref UI "user interface", when displaying text and manipulating it through user input.
 
-On Windows, wide char strings are used in all calls to the operating system, such accessing the command line, files, and the window title. The WString class is used as a helper for conversion. On Linux & Mac OS X 8-bit strings are used directly and they are assumed to contain UTF-8.
+On Windows, wide char strings are used in all calls to the operating system, such as accessing the command line, files, and the window title. The WString class is used as a helper for conversion. On Linux & Mac OS X 8-bit strings are used directly and they are assumed to contain UTF-8.
 
 Note that \ref FileSystem::ScanDir "ScanDir()" function may return filenames in unnormalized Unicode on Mac OS X. Unicode re-normalization is not yet implemented.
 
