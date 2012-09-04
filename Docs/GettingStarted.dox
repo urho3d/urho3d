@@ -171,8 +171,8 @@ Right mouse Hold and move mouse to rotate view
 F1          Toggle AngelScript console
 1 to 9      Toggle rendering options
 T           Toggle profiling display
+O           Toggle orthographic camera
 V           Toggle vertex lighting
-C           Toggle orthographic camera
 F           Toggle FXAA edge filter
 R           Re-randomize light and object positions
 \endverbatim

@@ -238,7 +238,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyPress['9'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
-        if (input.keyPress['C'])
+        if (input.keyPress['O'])
             camera.orthographic = !camera.orthographic;
 
         if (input.keyPress['F'])
