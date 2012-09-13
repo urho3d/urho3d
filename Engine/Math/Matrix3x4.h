@@ -71,6 +71,23 @@ public:
     {
     }
     
+    /// Copy-construct from a 4x4 matrix which is assumed to contain no projection.
+    Matrix3x4(const Matrix4& matrix) :
+        m00_(matrix.m00_),
+        m01_(matrix.m01_),
+        m02_(matrix.m02_),
+        m03_(matrix.m03_),
+        m10_(matrix.m10_),
+        m11_(matrix.m11_),
+        m12_(matrix.m12_),
+        m13_(matrix.m13_),
+        m20_(matrix.m20_),
+        m21_(matrix.m21_),
+        m22_(matrix.m22_),
+        m23_(matrix.m23_)
+    {
+    }
+    
     // Construct from values.
     Matrix3x4(float v00, float v01, float v02, float v03,
             float v10, float v11, float v12, float v13,
@@ -145,6 +162,24 @@ public:
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
         m23_ = 0.0;
+        return *this;
+    }
+    
+    /// Assign from a 4x4 matrix which is assumed to contain no projection.
+    Matrix3x4& operator = (const Matrix4& rhs)
+    {
+        m00_ = rhs.m00_;
+        m01_ = rhs.m01_;
+        m02_ = rhs.m02_;
+        m03_ = rhs.m03_;
+        m10_ = rhs.m10_;
+        m11_ = rhs.m11_;
+        m12_ = rhs.m12_;
+        m13_ = rhs.m13_;
+        m20_ = rhs.m20_;
+        m21_ = rhs.m21_;
+        m22_ = rhs.m22_;
+        m23_ = rhs.m23_;
         return *this;
     }
     
