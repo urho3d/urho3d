@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 /**
  *  \file SDL_video.h

@@ -80,7 +80,7 @@ int cpuid_exists_by_eflags(void)
  * are implemented in separate .asm files. Otherwise, use inline assembly
  */
 #ifdef INLINE_ASM_SUPPORTED
-// Modified by Lasse Öörni for Urho3D: fixed crash on Linux / recent GCC
+// Modified by Lasse Oorni for Urho3D: fixed crash on Linux / recent GCC
 void exec_cpuid(uint32_t *regs)
 {
 #ifdef COMPILER_GCC

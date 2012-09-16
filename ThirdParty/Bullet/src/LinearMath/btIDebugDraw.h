@@ -13,7 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #ifndef BT_IDEBUG_DRAW__H
 #define BT_IDEBUG_DRAW__H

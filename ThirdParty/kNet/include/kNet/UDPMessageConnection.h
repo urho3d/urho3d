@@ -16,7 +16,7 @@
 /** @file UDPMessageConnection.h
 	@brief The UDPMessageConnection class. */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #include "MessageConnection.h"
 #include "SequentialIntegerSet.h"

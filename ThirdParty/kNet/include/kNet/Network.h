@@ -16,7 +16,7 @@
 /** @file Network.h
 	@brief The class Network. The root point for creating client and server objects. */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #if defined(UNIX) || defined(ANDROID)
 #include <sys/types.h>

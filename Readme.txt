@@ -1,4 +1,4 @@
-Urho3D - cross-platform rendering and game engine
+ï»¿Urho3D - cross-platform rendering and game engine
 -------------------------------------------------
 
 http://urho3d.googlecode.com
@@ -9,15 +9,15 @@ Licensed under the MIT license, see License.txt for details.
 Credits
 -------
 
-Urho3D engine & example code by Lasse Öörni (loorni@gmail.com)
+Urho3D engine & example code by Lasse Ã–Ã¶rni (loorni@gmail.com)
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
-- Rectangle packing by Jukka Jylänki (clb)
+- Rectangle packing by Jukka JylÃ¤nki (clb)
   http://clb.demon.fi/projects/rectangle-bin-packing
 - Tangent generation from Terathon
   http://www.terathon.com/code/tangent.html
-- Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
+- Fast, Minimum Storage Ray/Triangle Intersection by MÃ¶ller & Trumbore
   http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
 - Linear-Speed Vertex Cache Optimisation by Tom Forsyth
   http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
@@ -66,7 +66,7 @@ BlueHighway font from Larabie Fonts.
 
 Anonymous Pro font by Mark Simonson.
 
-NinjaSnowWar sounds by Veli-Pekka Tätilä.
+NinjaSnowWar sounds by Veli-Pekka TÃ¤tilÃ¤.
 
 
 

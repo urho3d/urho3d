@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #include <new>
 #include "as_config.h"
