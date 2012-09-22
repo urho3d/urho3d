@@ -105,13 +105,13 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 	// Remove global variables
 	for( n = 0; n < globalProps.GetLength(); n++ )
 	{
-		int index = engine->registeredGlobalProps.IndexOf(globalProps[n]);
+		int index = engine->registeredGlobalProps.GetIndex(globalProps[n]);
 		if( index >= 0 )
 		{
 			globalProps[n]->Release();
 
 			// TODO: global: Should compact the registeredGlobalProps array
-			engine->registeredGlobalProps[index] = 0;
+			engine->registeredGlobalProps.Erase(index);
 		}
 	}
 	globalProps.SetLength(0);

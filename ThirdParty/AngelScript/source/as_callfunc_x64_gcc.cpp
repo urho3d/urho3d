@@ -235,21 +235,22 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	int argumentCount = ( int )descr->parameterTypes.GetLength();
 	for( int a = 0; a < argumentCount; ++a ) 
 	{
-		if( descr->parameterTypes[a].IsFloatType() && !descr->parameterTypes[a].IsReference() ) 
+		const asCDataType &parmType = descr->parameterTypes[a];
+		if( parmType.IsFloatType() && !parmType.IsReference() ) 
 		{
 			argsType[argIndex] = x64FLOATARG;
 			memcpy(paramBuffer + argIndex, stack_pointer, sizeof(float));
 			argIndex++;
 			stack_pointer++;
 		}
-		else if( descr->parameterTypes[a].IsDoubleType() && !descr->parameterTypes[a].IsReference() ) 
+		else if( parmType.IsDoubleType() && !parmType.IsReference() ) 
 		{
 			argsType[argIndex] = x64FLOATARG;
 			memcpy(paramBuffer + argIndex, stack_pointer, sizeof(double));
 			argIndex++;
 			stack_pointer += 2;
 		}
-		else if( IsVariableArgument( descr->parameterTypes[a] ) ) 
+		else if( IsVariableArgument( parmType ) ) 
 		{
 			// The variable args are really two, one pointer and one type id
 			argsType[argIndex] = x64INTARG;
@@ -259,12 +260,12 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			argIndex += 2;
 			stack_pointer += 3;
 		}
-		else if( descr->parameterTypes[a].IsPrimitive() ||
-		         descr->parameterTypes[a].IsReference() || 
-		         descr->parameterTypes[a].IsObjectHandle() )
+		else if( parmType.IsPrimitive() ||
+		         parmType.IsReference() || 
+		         parmType.IsObjectHandle() )
 		{
 			argsType[argIndex] = x64INTARG;
-			if( descr->parameterTypes[a].GetSizeOnStackDWords() == 1 )
+			if( parmType.GetSizeOnStackDWords() == 1 )
 			{
 				memcpy(paramBuffer + argIndex, stack_pointer, sizeof(asDWORD));
 				stack_pointer++;
@@ -279,47 +280,49 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		else
 		{
 			// An object is being passed by value
-			if( (descr->parameterTypes[a].GetObjectType()->flags & COMPLEX_MASK) ||
-			    descr->parameterTypes[a].GetSizeInMemoryDWords() > 4 )
+			if( (parmType.GetObjectType()->flags & COMPLEX_MASK) ||
+			    parmType.GetSizeInMemoryDWords() > 4 )
 			{
 				// Copy the address of the object
 				argsType[argIndex] = x64INTARG;
 				memcpy(paramBuffer + argIndex, stack_pointer, sizeof(asQWORD));
 				argIndex++;
 			}
-			else if( descr->parameterTypes[a].GetObjectType()->flags & asOBJ_APP_CLASS_ALLINTS )
+			else if( (parmType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLINTS) ||
+			         (parmType.GetObjectType()->flags & asOBJ_APP_PRIMITIVE) )
 			{
 				// Copy the value of the object
-				if( descr->parameterTypes[a].GetSizeInMemoryDWords() > 2 )
+				if( parmType.GetSizeInMemoryDWords() > 2 )
 				{
 					argsType[argIndex] = x64INTARG;
 					argsType[argIndex+1] = x64INTARG;
-					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, descr->parameterTypes[a].GetSizeInMemoryBytes());
+					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, parmType.GetSizeInMemoryBytes());
 					argIndex += 2;
 				}
 				else
 				{
 					argsType[argIndex] = x64INTARG;
-					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, descr->parameterTypes[a].GetSizeInMemoryBytes());
+					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, parmType.GetSizeInMemoryBytes());
 					argIndex++;
 				}
 				// Delete the original memory
 				engine->CallFree(*(void**)stack_pointer);
 			}
-			else if( descr->parameterTypes[a].GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS )
+			else if( (parmType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS) ||
+			         (parmType.GetObjectType()->flags & asOBJ_APP_FLOAT) )
 			{
 				// Copy the value of the object
-				if( descr->parameterTypes[a].GetSizeInMemoryDWords() > 2 )
+				if( parmType.GetSizeInMemoryDWords() > 2 )
 				{
 					argsType[argIndex] = x64FLOATARG;
 					argsType[argIndex+1] = x64FLOATARG;
-					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, descr->parameterTypes[a].GetSizeInMemoryBytes());
+					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, parmType.GetSizeInMemoryBytes());
 					argIndex += 2;
 				}
 				else
 				{
 					argsType[argIndex] = x64FLOATARG;
-					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, descr->parameterTypes[a].GetSizeInMemoryBytes());
+					memcpy(paramBuffer + argIndex, *(asDWORD**)stack_pointer, parmType.GetSizeInMemoryBytes());
 					argIndex++;
 				}
 				// Delete the original memory

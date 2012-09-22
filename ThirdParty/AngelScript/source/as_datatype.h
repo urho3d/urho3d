@@ -51,6 +51,9 @@ class asCScriptEngine;
 class asCObjectType;
 class asCScriptFunction;
 
+// TODO: refactor: Reference should not be part of the datatype. This should be stored separately, e.g. in asCTypeInfo
+//                 MakeReference, MakeReadOnly, IsReference, IsReadOnly should be removed
+
 class asCDataType
 {
 public:
@@ -89,6 +92,7 @@ public:
 	bool IsHandleToConst()  const;
 	bool IsArrayType()      const;
 	bool IsEnumType()       const;
+	bool IsAnyType()        const {return tokenType == ttQuestion;}
 
 	bool IsSamePrimitiveBaseType(const asCDataType &dt)    const;
 	bool IsEqualExceptRef(const asCDataType &)             const;

@@ -775,7 +775,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
     unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
     while (numStates)
     {
-        if (index < value.Size() - 5)
+        if (index + 5 < value.Size())
         {
             // Note: null animation is allowed here for editing
             const ResourceRef& animRef = value[index++].GetResourceRef();

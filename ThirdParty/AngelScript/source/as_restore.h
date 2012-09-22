@@ -50,12 +50,13 @@ class asCReader
 public:
 	asCReader(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine);
 
-	int Read();
+	int Read(bool *wasDebugInfoStripped);
 
 protected:
 	asCModule       *module;
 	asIBinaryStream *stream;
 	asCScriptEngine *engine;
+	bool             noDebugInfo;
 	bool             error;
 
 	int                ReadInner();
@@ -123,7 +124,7 @@ protected:
 class asCWriter
 {
 public:
-	asCWriter(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine);
+	asCWriter(asCModule *module, asIBinaryStream *stream, asCScriptEngine *engine, bool stripDebugInfo);
 
 	int Write();
 
@@ -131,6 +132,7 @@ protected:
 	asCModule       *module;
 	asIBinaryStream *stream;
 	asCScriptEngine *engine;
+	bool             stripDebugInfo;
 
 	void WriteData(const void *data, asUINT size);
 

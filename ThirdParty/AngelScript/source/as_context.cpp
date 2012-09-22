@@ -54,11 +54,11 @@
 
 BEGIN_AS_NAMESPACE
 
-// We need at least 2 DWORDs reserved for exception handling
-// We need at least 1 DWORD reserved for calling system functions
+// We need at least 2 PTRs reserved for exception handling
+// We need at least 1 PTR reserved for calling system functions
 const int RESERVE_STACK = 2*AS_PTR_SIZE;
 
-// For each script function call we push 5 DWORDs on the call stack
+// For each script function call we push 5 PTRs on the call stack
 const int CALLSTACK_FRAME_SIZE = 5;
 
 
@@ -208,7 +208,7 @@ bool asCContext::IsNested(asUINT *nestCount) const
 		if( s && s[0] == 0 )
 		{
 			if( nestCount )
-				*nestCount++;
+				(*nestCount)++;
 			else
 				return true;
 		}
@@ -306,7 +306,7 @@ int asCContext::Prepare(int funcId)
 
 		funcId = m_initialFunction->GetId();
 	}
-	return Prepare(engine->GetFunctionById(funcId));
+	return Prepare(m_engine->GetFunctionById(funcId));
 }
 #endif
 
@@ -322,7 +322,7 @@ int asCContext::Prepare(asIScriptFunction *func)
 	if( func == 0 )
 	{
 		asCString str;
-		str.Format(TXT_FAILED_IN_FUNC_s_WITH_s, "Prepare", "null");
+		str.Format(TXT_FAILED_IN_FUNC_s_WITH_s_d, "Prepare", "null", asNO_FUNCTION);
 		m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 		return asNO_FUNCTION;
 	}
@@ -330,7 +330,7 @@ int asCContext::Prepare(asIScriptFunction *func)
 	if( m_status == asEXECUTION_ACTIVE || m_status == asEXECUTION_SUSPENDED )
 	{
 		asCString str;
-		str.Format(TXT_FAILED_IN_FUNC_s, "Prepare");
+		str.Format(TXT_FAILED_IN_FUNC_s_d, "Prepare", asCONTEXT_ACTIVE);
 		m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 		return asCONTEXT_ACTIVE;
 	}
@@ -1057,9 +1057,9 @@ int asCContext::Execute()
 	if( m_status != asEXECUTION_SUSPENDED && m_status != asEXECUTION_PREPARED )
 	{
 		asCString str;
-		str.Format(TXT_FAILED_IN_FUNC_s, "Execute");
+		str.Format(TXT_FAILED_IN_FUNC_s_d, "Execute", asCONTEXT_NOT_PREPARED);
 		m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
-		return asERROR;
+		return asCONTEXT_NOT_PREPARED;
 	}
 
 	m_status = asEXECUTION_ACTIVE;
@@ -1145,8 +1145,29 @@ int asCContext::Execute()
 		}
 	}
 
+	asUINT gcPreObjects = 0;
+	if( m_engine->ep.autoGarbageCollect )
+		m_engine->gc.GetStatistics(&gcPreObjects, 0, 0, 0, 0);
+
 	while( m_status == asEXECUTION_ACTIVE )
 		ExecuteNext();
+
+	if( m_engine->ep.autoGarbageCollect )
+	{
+		asUINT gcPosObjects = 0;
+		m_engine->gc.GetStatistics(&gcPosObjects, 0, 0, 0, 0);
+		if( gcPosObjects > gcPreObjects )
+		{
+			// Execute as many steps as there were new objects created
+			while( gcPosObjects-- > gcPreObjects )
+				m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE);
+		}
+		else if( gcPosObjects > 0 )
+		{
+			// Execute at least one step, even if no new objects were created
+			m_engine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE);
+		}
+	}
 
 	m_doSuspend = false;
 	m_regs.doProcessSuspend = m_lineCallback;
@@ -1350,6 +1371,10 @@ int asCContext::GetLineNumber(asUINT stackLevel, int *column, const char **secti
 		asPWORD *s = m_callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
 		func = (asCScriptFunction*)s[1];
 		bytePos = (asDWORD*)s[2];
+
+		// Subract 1 from the bytePos, because we want the line where 
+		// the call was made, and not the instruction after the call
+		bytePos -= 1;
 	}
 
 	asDWORD line = func->GetLineNumber(int(bytePos - func->byteCode.AddressOf()));
@@ -1402,7 +1427,7 @@ bool asCContext::ReserveStackSpace(asUINT size)
 		}
 
 		m_stackIndex++;
-		if( (int)m_stackBlocks.GetLength() == m_stackIndex )
+		if( m_stackBlocks.GetLength() == m_stackIndex )
 		{
 			// Allocate the new stack block, with twice the size of the previous
 			asDWORD *stack = asNEWARRAY(asDWORD,(m_stackBlockSize << m_stackIndex));
@@ -2124,41 +2149,48 @@ void asCContext::ExecuteNext()
 	// Comparisons
 	case asBC_CMPd:
 		{
-			double dbl = *(double*)(l_fp - asBC_SWORDARG0(l_bc)) - *(double*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( dbl == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( dbl < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else               *(int*)&m_regs.valueRegister =  1;
+			// Do a comparison of the values, rather than a subtraction  
+			// in order to get proper behaviour for infinity values.
+			double dbl1 = *(double*)(l_fp - asBC_SWORDARG0(l_bc));
+			double dbl2 = *(double*)(l_fp - asBC_SWORDARG1(l_bc));
+			if( dbl1 == dbl2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( dbl1 < dbl2 ) *(int*)&m_regs.valueRegister = -1;
+			else                   *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
 
 	case asBC_CMPu:
 		{
-			asDWORD d = *(asDWORD*)(l_fp - asBC_SWORDARG0(l_bc));
+			asDWORD d1 = *(asDWORD*)(l_fp - asBC_SWORDARG0(l_bc));
 			asDWORD d2 = *(asDWORD*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( d == d2 )     *(int*)&m_regs.valueRegister =  0;
-			else if( d < d2 ) *(int*)&m_regs.valueRegister = -1;
-			else              *(int*)&m_regs.valueRegister =  1;
+			if( d1 == d2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( d1 < d2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
 
 	case asBC_CMPf:
 		{
-			float f = *(float*)(l_fp - asBC_SWORDARG0(l_bc)) - *(float*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( f == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( f < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else             *(int*)&m_regs.valueRegister =  1;
+			// Do a comparison of the values, rather than a subtraction  
+			// in order to get proper behaviour for infinity values.
+			float f1 = *(float*)(l_fp - asBC_SWORDARG0(l_bc));
+			float f2 = *(float*)(l_fp - asBC_SWORDARG1(l_bc));
+			if( f1 == f2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( f1 < f2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
 
 	case asBC_CMPi:
 		{
-			int i = *(int*)(l_fp - asBC_SWORDARG0(l_bc)) - *(int*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( i == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( i < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else             *(int*)&m_regs.valueRegister =  1;
+			int i1 = *(int*)(l_fp - asBC_SWORDARG0(l_bc));
+			int i2 = *(int*)(l_fp - asBC_SWORDARG1(l_bc));
+			if( i1 == i2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( i1 < i2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
@@ -2167,20 +2199,24 @@ void asCContext::ExecuteNext()
 	// Comparisons with constant value
 	case asBC_CMPIi:
 		{
-			int i = *(int*)(l_fp - asBC_SWORDARG0(l_bc)) - asBC_INTARG(l_bc);
-			if( i == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( i < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else             *(int*)&m_regs.valueRegister =  1;
+			int i1 = *(int*)(l_fp - asBC_SWORDARG0(l_bc));
+			int i2 = asBC_INTARG(l_bc);
+			if( i1 == i2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( i1 < i2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
 
 	case asBC_CMPIf:
 		{
-			float f = *(float*)(l_fp - asBC_SWORDARG0(l_bc)) - asBC_FLOATARG(l_bc);
-			if( f == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( f < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else             *(int*)&m_regs.valueRegister =  1;
+			// Do a comparison of the values, rather than a subtraction  
+			// in order to get proper behaviour for infinity values.
+			float f1 = *(float*)(l_fp - asBC_SWORDARG0(l_bc));
+			float f2 = asBC_FLOATARG(l_bc);
+			if( f1 == f2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( f1 < f2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
@@ -2341,6 +2377,12 @@ void asCContext::ExecuteNext()
 
 			if( objType->flags & asOBJ_SCRIPT_OBJECT )
 			{
+				// Need to move the values back to the context as the construction
+				// of the script object may reuse the context for nested calls.
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
 				// Pre-allocate the memory
 				asDWORD *mem = (asDWORD*)m_engine->CallAlloc(objType);
 
@@ -2350,19 +2392,14 @@ void asCContext::ExecuteNext()
 				// Call the constructor to initalize the memory
 				asCScriptFunction *f = m_engine->scriptFunctions[func];
 
-				asDWORD **a = (asDWORD**)*(asPWORD*)(l_sp + f->GetSpaceNeededForArguments());
+				asDWORD **a = (asDWORD**)*(asPWORD*)(m_regs.stackPointer + f->GetSpaceNeededForArguments());
 				if( a ) *a = mem;
 
 				// Push the object pointer on the stack
-				l_sp -= AS_PTR_SIZE;
-				*(asPWORD*)l_sp = (asPWORD)mem;
+				m_regs.stackPointer -= AS_PTR_SIZE;
+				*(asPWORD*)m_regs.stackPointer = (asPWORD)mem;
 
-				l_bc += 2+AS_PTR_SIZE;
-
-				// Need to move the values back to the context
-				m_regs.programPointer    = l_bc;
-				m_regs.stackPointer      = l_sp;
-				m_regs.stackFramePointer = l_fp;
+				m_regs.programPointer += 2+AS_PTR_SIZE;
 
 				CallScriptFunction(f);
 
@@ -2577,9 +2614,9 @@ void asCContext::ExecuteNext()
 		break;
 
 	case asBC_ClrVPtr:
-		// TODO: optimize: Is this instruction really necessary? 
-		//                 CallScriptFunction() can clear the null handles upon entry, just as is done for 
-		//                 all other object variables
+		// TODO: runtime optimize: Is this instruction really necessary? 
+		//                         CallScriptFunction() can clear the null handles upon entry, just as is done for 
+		//                         all other object variables
 		// Clear pointer variable
 		*(asPWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = 0;
 		l_bc++;
@@ -3365,21 +3402,22 @@ void asCContext::ExecuteNext()
 
 	case asBC_CMPi64:
 		{
-			asINT64 i = *(asINT64*)(l_fp - asBC_SWORDARG0(l_bc)) - *(asINT64*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( i == 0 )     *(int*)&m_regs.valueRegister =  0;
-			else if( i < 0 ) *(int*)&m_regs.valueRegister = -1;
-			else             *(int*)&m_regs.valueRegister =  1;
+			asINT64 i1 = *(asINT64*)(l_fp - asBC_SWORDARG0(l_bc));
+			asINT64 i2 = *(asINT64*)(l_fp - asBC_SWORDARG1(l_bc));
+			if( i1 == i2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( i1 < i2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
 
 	case asBC_CMPu64:
 		{
-			asQWORD d = *(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc));
+			asQWORD d1 = *(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc));
 			asQWORD d2 = *(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc));
-			if( d == d2 )     *(int*)&m_regs.valueRegister =  0;
-			else if( d < d2 ) *(int*)&m_regs.valueRegister = -1;
-			else              *(int*)&m_regs.valueRegister =  1;
+			if( d1 == d2 )     *(int*)&m_regs.valueRegister =  0;
+			else if( d1 < d2 ) *(int*)&m_regs.valueRegister = -1;
+			else               *(int*)&m_regs.valueRegister =  1;
 			l_bc += 2;
 		}
 		break;
@@ -3888,7 +3926,7 @@ void asCContext::CleanStack()
 	while( m_callStack.GetLength() > 0 )
 	{
 		// Only clean up until the top most marker for a nested call
-		asPWORD *s = m_callStack.AddressOf() + (GetCallstackSize()-1)*CALLSTACK_FRAME_SIZE;
+		asPWORD *s = m_callStack.AddressOf() + m_callStack.GetLength() - CALLSTACK_FRAME_SIZE;
 		if( s[0] == 0 )
 			break;
 
@@ -3903,7 +3941,10 @@ void asCContext::CleanStack()
 // Interface
 bool asCContext::IsVarInScope(asUINT varIndex, asUINT stackLevel)
 {
-	asASSERT( stackLevel < GetCallstackSize() );
+	// Don't return anything if there is no bytecode, e.g. before calling Execute()
+	if( m_regs.programPointer == 0 ) return false;
+
+	if( stackLevel >= GetCallstackSize() ) return false;
 
 	asCScriptFunction *func;
 	asUINT pos;
@@ -4141,9 +4182,9 @@ void asCContext::CleanStackFrame()
 	// Clean object and parameters
 	int offset = 0;
 	if( m_currentFunction->objectType )
-	{
 		offset += AS_PTR_SIZE;
-	}
+	if( m_currentFunction->DoesReturnOnStack() )
+		offset += AS_PTR_SIZE;
 	for( asUINT n = 0; n < m_currentFunction->parameterTypes.GetLength(); n++ )
 	{
 		if( m_currentFunction->parameterTypes[n].IsObject() && !m_currentFunction->parameterTypes[n].IsReference() )
@@ -4427,6 +4468,9 @@ int asCContext::GetVarTypeId(asUINT varIndex, asUINT stackLevel)
 // interface
 void *asCContext::GetAddressOfVar(asUINT varIndex, asUINT stackLevel)
 {
+	// Don't return anything if there is no bytecode, e.g. before calling Execute()
+	if( m_regs.programPointer == 0 ) return 0;
+
 	if( stackLevel >= GetCallstackSize() ) return 0;
 
 	asCScriptFunction *func;

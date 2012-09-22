@@ -125,6 +125,7 @@ protected:
 	asUINT                             detectIdx;
 	asUINT                             numDetected;
 	asSMapNode<void*, asSIntTypePair> *gcMapCursor;
+	bool                               isProcessing;
 
 	// Critical section for multithreaded access
 	DECLARECRITICALSECTION(gcCritical)   // Used for adding/removing objects

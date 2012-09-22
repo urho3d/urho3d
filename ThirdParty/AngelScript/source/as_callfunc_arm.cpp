@@ -80,12 +80,39 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		callConv++;
 	}
 
-	asDWORD paramBuffer[64];
+	asDWORD paramBuffer[64+2];
+	// Android needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
+	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
+	//                         doesn't have to be done for functions that don't have any 64bit types
+#ifndef AS_ANDROID
 	if( sysFunc->takesObjByVal )
+#endif
 	{
+#ifdef AS_ANDROID
+		// mask is used as a toggler to skip uneven registers.
+		int mask = 1;
+
+		// Check for object pointer as first argument
+		switch( callConv )
+		{
+			case ICC_THISCALL:
+			case ICC_CDECL_OBJFIRST:
+			case ICC_VIRTUAL_THISCALL:
+			case ICC_THISCALL_RETURNINMEM:
+			case ICC_CDECL_OBJFIRST_RETURNINMEM:
+			case ICC_VIRTUAL_THISCALL_RETURNINMEM:
+				mask = 0;
+				break;
+			default:
+				break;
+		}
+		// Check for hidden address in case of return by value
+		if( sysFunc->hostReturnInMemory )
+			mask = !mask;
+#endif
 		paramSize = 0;
 		int spos = 0;
-		int dpos = 1;
+		int dpos = 2;
 		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 		{
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
@@ -99,6 +126,15 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				else
 #endif
 				{
+#ifdef AS_ANDROID
+					if( (descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_CLASS_ALIGN8) &&
+						((dpos & 1) == mask) )
+					{
+						// 64 bit value align
+						dpos++;
+						paramSize++;
+					}
+#endif
 					// Copy the object's memory to the buffer
 					memcpy(&paramBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
 
@@ -111,6 +147,19 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			}
 			else
 			{
+#ifdef AS_ANDROID
+				// Should an alignment be performed?
+				if( !descr->parameterTypes[n].IsObjectHandle() && 
+					!descr->parameterTypes[n].IsReference() && 
+					descr->parameterTypes[n].GetSizeOnStackDWords() == 2 && 
+					((dpos & 1) == mask) )
+				{
+					// 64 bit value align
+					dpos++;
+					paramSize++;
+				}
+#endif
+
 				// Copy the value directly
 				paramBuffer[dpos++] = args[spos++];
 				if( descr->parameterTypes[n].GetSizeOnStackDWords() > 1 )
@@ -119,7 +168,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			}
 		}
 		// Keep a free location at the beginning
-		args = &paramBuffer[1];
+		args = &paramBuffer[2];
 	}
 
 	switch( callConv )

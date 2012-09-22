@@ -101,57 +101,76 @@ static CScriptArray* ScriptArrayFactory(asIObjectType *ot)
 
 // This optional callback is called when the template type is first used by the compiler.
 // It allows the application to validate if the template can be instanciated for the requested 
-// subtype at compile time, instead of at runtime.
-static bool ScriptArrayTemplateCallback(asIObjectType *ot)
+// subtype at compile time, instead of at runtime. The output argument dontGarbageCollect
+// allow the callback to tell the engine if the template instance type shouldn't be garbage collected, 
+// i.e. no asOBJ_GC flag. 
+static bool ScriptArrayTemplateCallback(asIObjectType *ot, bool &dontGarbageCollect)
 {
-    // Make sure the subtype can be instanciated with a default factory/constructor, 
-    // otherwise we won't be able to instanciate the elements. 
-    int typeId = ot->GetSubTypeId();
-    if( typeId == asTYPEID_VOID )
-        return false;
-    if( (typeId & asTYPEID_MASK_OBJECT) && !(typeId & asTYPEID_OBJHANDLE) )
-    {
-        asIObjectType *subtype = ot->GetEngine()->GetObjectTypeById(typeId);
-        asDWORD flags = subtype->GetFlags();
-        if( (flags & asOBJ_VALUE) && !(flags & asOBJ_POD) )
-        {
-            // Verify that there is a default constructor
-            for( asUINT n = 0; n < subtype->GetBehaviourCount(); n++ )
-            {
-                asEBehaviours beh;
-                asIScriptFunction *func = subtype->GetBehaviourByIndex(n, &beh);
-                if( beh != asBEHAVE_CONSTRUCT ) continue;
+	// Urho3D: nothing is garbage collected
+	dontGarbageCollect = true;
 
-                if( func->GetParamCount() == 0 )
-                {
-                    // Found the default constructor
-                    return true;
-                }
-            }
+	// Make sure the subtype can be instanciated with a default factory/constructor, 
+	// otherwise we won't be able to instanciate the elements. 
+	int typeId = ot->GetSubTypeId();
+	if( typeId == asTYPEID_VOID )
+		return false;
+	if( (typeId & asTYPEID_MASK_OBJECT) && !(typeId & asTYPEID_OBJHANDLE) )
+	{
+		asIObjectType *subtype = ot->GetEngine()->GetObjectTypeById(typeId);
+		asDWORD flags = subtype->GetFlags();
+		if( (flags & asOBJ_VALUE) && !(flags & asOBJ_POD) )
+		{
+			// Verify that there is a default constructor
+			bool found = false;
+			for( asUINT n = 0; n < subtype->GetBehaviourCount(); n++ )
+			{
+				asEBehaviours beh;
+				asIScriptFunction *func = subtype->GetBehaviourByIndex(n, &beh);
+				if( beh != asBEHAVE_CONSTRUCT ) continue;
 
-            // There is no default constructor
-            return false;
-        }
-        else if( (flags & asOBJ_REF) )
-        {
-            // Verify that there is a default factory
-            for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
-            {
-                asIScriptFunction *func = subtype->GetFactoryByIndex(n);
-                if( func->GetParamCount() == 0 )
-                {
-                    // Found the default factory
-                    return true;
-                }
-            }    
+				if( func->GetParamCount() == 0 )
+				{
+					// Found the default constructor
+					found = true;
+					break;
+				}
+			}
 
-            // No default factory
-            return false;
-        }
-    }
+			if( !found )
+			{
+				// There is no default constructor
+				return false;
+			}
+		}
+		else if( (flags & asOBJ_REF) )
+		{
+			// Verify that there is a default factory
+			bool found = false;
+			for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
+			{
+				asIScriptFunction *func = subtype->GetFactoryByIndex(n);
+				if( func->GetParamCount() == 0 )
+				{
+					// Found the default factory
+					found = true;
+					break;
+				}
+			}	
 
-    // The type is ok
-    return true;
+			if( !found )
+			{
+				// No default factory
+				return false;
+			}
+		}
+
+		// If the object type is not garbage collected then the array also doesn't need to be
+		if( !(flags & asOBJ_GC) )
+			dontGarbageCollect = true;
+	}
+
+	// The type is ok
+	return true;
 }
 
 CScriptArray &CScriptArray::operator=(const CScriptArray &other)
@@ -1232,7 +1251,7 @@ void RegisterArray(asIScriptEngine* engine)
     // Register the object type user data clean up
     engine->SetObjectTypeUserDataCleanupCallback(CleanupObjectTypeArrayCache, ARRAY_CACHE);
     engine->RegisterObjectType("Array<class T>", 0, asOBJ_REF | asOBJ_TEMPLATE);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in)", asFUNCTION(ScriptArrayTemplateCallback), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in, bool&out)", asFUNCTION(ScriptArrayTemplateCallback), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in)", asFUNCTIONPR(ScriptArrayFactory, (asIObjectType*), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in, uint)", asFUNCTIONPR(ScriptArrayFactory2, (asIObjectType*, asUINT), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in, uint, const T& in)", asFUNCTIONPR(ScriptArrayFactoryDefVal, (asIObjectType*, asUINT, void *), CScriptArray*), asCALL_CDECL);

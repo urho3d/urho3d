@@ -142,6 +142,7 @@ public:
 	virtual asIScriptFunction *GetFuncdefByIndex(asUINT index) const;
 
 	// Typedefs
+	// TODO: interface: Should perhaps rename this to Alias, since it doesn't really create a new type
 	virtual int         RegisterTypedef(const char *type, const char *decl);
 	virtual asUINT      GetTypedefCount() const;
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId, const char **nameSpace, const char **configGroup = 0, asDWORD *accessMask = 0) const;
@@ -267,7 +268,7 @@ public:
 
 	int CreateContext(asIScriptContext **context, bool isInternal);
 
-	asCObjectType *GetObjectType(const char *type, const asCString &ns);
+	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns);
 
 	int AddBehaviourFunction(asCScriptFunction &func, asSSystemFunctionInterface &internal);
 
@@ -308,6 +309,10 @@ public:
 
 	int GetScriptSectionNameIndex(const char *name);
 
+	// Namespace management
+	asSNameSpace *AddNameSpace(const char *name);
+	asSNameSpace *FindNameSpace(const char *name);
+
 //===========================================================
 // internal properties
 //===========================================================
@@ -322,13 +327,13 @@ public:
 	asCObjectType    globalPropertyBehaviours;
 
 	// Registered interface
-	asCArray<asCObjectType *>      registeredObjTypes;
-	asCArray<asCObjectType *>      registeredTypeDefs;
-	asCArray<asCObjectType *>      registeredEnums;
-	asCArray<asCGlobalProperty *>  registeredGlobalProps;
-	asCArray<asCScriptFunction *>  registeredGlobalFuncs;
-	asCArray<asCScriptFunction *>  registeredFuncDefs;
-	asCScriptFunction             *stringFactory;
+	asCArray<asCObjectType *>          registeredObjTypes;
+	asCArray<asCObjectType *>          registeredTypeDefs;
+	asCArray<asCObjectType *>          registeredEnums;
+	asCSymbolTable<asCGlobalProperty>  registeredGlobalProps;
+	asCArray<asCScriptFunction *>      registeredGlobalFuncs;
+	asCArray<asCScriptFunction *>      registeredFuncDefs;
+	asCScriptFunction                 *stringFactory;
 	bool configFailed;
 
 	// Stores all known object types, both application registered, and script declared
@@ -341,6 +346,11 @@ public:
 	// Stores all global properties, both those registered by application, and those declared by scripts.
 	// The id of a global property is the index in this array.
 	asCArray<asCGlobalProperty *> globalProperties;
+
+	// This map is used to quickly find a property by its memory address
+	// It is used principally during building, cleanup, and garbage detection for script functions
+	asCMap<void*, asCGlobalProperty*> varAddressMap;
+
 	asCArray<int>                 freeGlobalPropertyIds;
 
 	// Stores all functions, i.e. registered functions, script functions, class methods, behaviours, etc.
@@ -384,7 +394,7 @@ public:
 	asCArray<asCConfigGroup*>  configGroups;
 	asCConfigGroup            *currentGroup;
 	asDWORD                    defaultAccessMask;
-	asCString                  defaultNamespace;
+	asSNameSpace              *defaultNamespace;
 
 	// Message callback
 	bool                        msgCallback;
@@ -393,7 +403,14 @@ public:
 
     asIJITCompiler              *jitCompiler;
 
+	// Namespaces
+	// These are shared between all entities and are 
+	// only deleted once the engine is destroyed
+	asCArray<asSNameSpace*> nameSpaces;
+
 	// String constants
+	// These are shared between all scripts and are
+	// only deleted once the engine is destroyed
 	asCArray<asCString*>          stringConstants;
 	asCMap<asCStringPointer, int> stringToIdMap;
 

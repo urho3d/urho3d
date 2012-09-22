@@ -44,8 +44,11 @@
 #include "as_datatype.h"
 #include "as_atomic.h"
 #include "as_scriptfunction.h"
+#include "as_symboltable.h"
 
 BEGIN_AS_NAMESPACE
+
+struct asSNameSpace;
 
 class asCObjectProperty
 {
@@ -76,7 +79,7 @@ public:
 	asCString          name;
 	asCDataType        type;
 	asUINT             id;
-	asCString          nameSpace;
+	asSNameSpace      *nameSpace;
 
 	void SetInitFunc(asCScriptFunction *initFunc);
 	asCScriptFunction *GetInitFunc();
@@ -104,6 +107,24 @@ public:
 	// engine can keep track of how many references to the property there are.
 	asCAtomic refCount;
 	bool      gcFlag;
+};
+
+class asCCompGlobPropType : public asIFilter
+{
+public:
+	const asCDataType &m_type;
+
+	asCCompGlobPropType(const asCDataType &type) : m_type(type) {}
+
+	bool operator()(const void *p) const
+	{
+		const asCGlobalProperty* prop = reinterpret_cast<const asCGlobalProperty*>(p);
+		return prop->type == m_type;
+	}
+
+private:
+	// The assignment operator is required for MSVC9, otherwise it will complain that it is not possible to auto generate the operator
+	asCCompGlobPropType &operator=(const asCCompGlobPropType &) {return *this;}
 };
 
 END_AS_NAMESPACE

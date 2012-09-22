@@ -322,7 +322,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 #ifdef LARGE_OBJS_PASS_BY_REF
 			    func->parameterTypes[n].GetSizeInMemoryDWords() < AS_LARGE_OBJ_MIN_SIZE &&
 #endif
-			    !(func->parameterTypes[n].GetObjectType()->flags & (asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )
+			    !(func->parameterTypes[n].GetObjectType()->flags & (asOBJ_APP_PRIMITIVE | asOBJ_APP_FLOAT | asOBJ_APP_CLASS_ALLINTS | asOBJ_APP_CLASS_ALLFLOATS)) )
 			{
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
@@ -461,7 +461,25 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	}
 
 	context->m_callingSystemFunction = descr;
+#ifdef AS_NO_EXCEPTIONS
 	retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2);
+#else
+	// This try/catch block is to catch potential exception that may 
+	// be thrown by the registered function. The implementation of the
+	// CallSystemFunctionNative() must make sure not to have any manual
+	// clean-up after the call to the real function, or that won't be 
+	// executed in case of an exception.
+	try
+	{
+		retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2);
+	}
+	catch(...)
+	{
+		// Convert the exception to a script exception so the VM can 
+		// properly report the error to the application and then clean up
+		context->SetException(TXT_EXCEPTION_CAUGHT);
+	}
+#endif
 	context->m_callingSystemFunction = 0;
 
 #if defined(COMPLEX_OBJS_PASSED_BY_REF) || defined(AS_LARGE_OBJS_PASSED_BY_REF)

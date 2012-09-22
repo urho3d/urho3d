@@ -59,8 +59,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22400
-#define ANGELSCRIPT_VERSION_STRING "2.24.0"
+#define ANGELSCRIPT_VERSION        22500
+#define ANGELSCRIPT_VERSION_STRING "2.25.0"
 
 // Data types
 
@@ -146,10 +146,12 @@ enum asEObjTypeFlags
 	asOBJ_APP_CLASS_ALLINTS          = 0x8000,
 	asOBJ_APP_CLASS_ALLFLOATS        = 0x10000,
 	asOBJ_NOCOUNT                    = 0x20000,
-	asOBJ_MASK_VALID_FLAGS           = 0x3FFFF,
+	asOBJ_APP_CLASS_ALIGN8           = 0x40000,
+	asOBJ_MASK_VALID_FLAGS           = 0x7FFFF,
 	asOBJ_SCRIPT_OBJECT              = 0x80000,
 	asOBJ_SHARED                     = 0x100000,
-	asOBJ_NOINHERIT                  = 0x200000
+	asOBJ_NOINHERIT                  = 0x200000,
+	asOBJ_SCRIPT_FUNCTION            = 0x400000
 };
 
 // Behaviours
@@ -354,6 +356,13 @@ typedef unsigned int   asUINT;
     typedef unsigned __int64 asQWORD;
     typedef __int64 asINT64;
   #endif
+#endif
+
+// Is the target a 64bit system?
+#if defined(__LP64__) || defined(__amd64__) || defined(__x86_64__) || defined(_M_X64)
+	#ifndef AS_64BIT_PTR
+		#define AS_64BIT_PTR
+	#endif
 #endif
 
 typedef void (*asFUNCTION_t)();
@@ -702,8 +711,8 @@ public:
 	virtual int         UnbindAllImportedFunctions() = 0;
 
 	// Bytecode saving and loading
-	virtual int SaveByteCode(asIBinaryStream *out) const = 0;
-	virtual int LoadByteCode(asIBinaryStream *in) = 0;
+	virtual int SaveByteCode(asIBinaryStream *out, bool stripDebugInfo = false) const = 0;
+	virtual int LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped = 0) = 0;
 
 	// User data
 	virtual void *SetUserData(void *data) = 0;
@@ -943,12 +952,15 @@ public:
 	virtual int              AddRef() const = 0;
 	virtual int              Release() const = 0;
 
+	// Miscellaneous
 	virtual int              GetId() const = 0;
 	virtual asEFuncType      GetFuncType() const = 0;
 	virtual const char      *GetModuleName() const = 0;
 	virtual const char      *GetScriptSectionName() const = 0;
 	virtual const char      *GetConfigGroup() const = 0;
 	virtual asDWORD          GetAccessMask() const = 0;
+
+	// Function signature
 	virtual asIObjectType   *GetObjectType() const = 0;
 	virtual const char      *GetObjectName() const = 0;
 	virtual const char      *GetName() const = 0;
@@ -959,10 +971,13 @@ public:
 	virtual bool             IsFinal() const = 0;
 	virtual bool             IsOverride() const = 0;
 	virtual bool             IsShared() const = 0;
-
 	virtual asUINT           GetParamCount() const = 0;
 	virtual int              GetParamTypeId(asUINT index, asDWORD *flags = 0) const = 0;
 	virtual int              GetReturnTypeId() const = 0;
+
+	// Type id for function pointers 
+	virtual int              GetTypeId() const = 0;
+	virtual bool             IsCompatibleWithTypeId(int typeId) const = 0;
 
 	// Debug information
 	virtual asUINT           GetVarCount() const = 0;
@@ -997,7 +1012,7 @@ public:
 // Use our own memset() and memcpy() implementations for better portability
 inline void asMemClear(void *_p, size_t size)
 {
-	char *p = (char *)_p;
+	char *p = reinterpret_cast<char *>(_p);
 	const char *e = p + size;
 	for( ; p < e; p++ )
 		*p = 0;
@@ -1005,8 +1020,8 @@ inline void asMemClear(void *_p, size_t size)
 
 inline void asMemCopy(void *_d, const void *_s, size_t size)
 {
-	char *d = (char *)_d;
-	const char *s = (const char *)_s;
+	char *d = reinterpret_cast<char *>(_d);
+	const char *s = reinterpret_cast<const char *>(_s);
 	const char *e = s + size;
 	for( ; s < e; d++, s++ )
 		*d = *s;
@@ -1104,9 +1119,8 @@ struct asSMethodPtr<SINGLE_PTR_SIZE+2*sizeof(int)>
 		/*
 		// Microsoft has a terrible optimization on class methods with virtual inheritance.
 		// They are hardcoding an important offset, which is not coming in the method pointer.
-#ifdef _MSC_VER
-		if( sizeof(void*) == 4 )
-		{
+
+#if defined(_MSC_VER) && !defined(AS_64BIT_PTR)
 			// Method pointers for virtual inheritance is not supported,
 			// as it requires the location of the vbase table, which is 
 			// only available to the C++ compiler, but not in the method
@@ -1124,8 +1138,7 @@ struct asSMethodPtr<SINGLE_PTR_SIZE+2*sizeof(int)>
 
 			// Copy the virtual table index to the 4th dword so that AngelScript
 			// can properly detect and deny the use of methods with virtual inheritance.
-			*(((asDWORD*)&p)+3) = *(((asDWORD*)&p)+2);
-		}
+			*(static_cast<asDWORD*>(&p)+3) = *(static_cast<asDWORD*>(&p)+2);
 #endif
 		*/
 		return p;
@@ -1185,9 +1198,9 @@ class asIJITCompiler
 {
 public:
 	virtual int  CompileFunction(asIScriptFunction *function, asJITFunction *output) = 0;
-    virtual void ReleaseJITFunction(asJITFunction func) = 0;
+	virtual void ReleaseJITFunction(asJITFunction func) = 0;
 public:
-    virtual ~asIJITCompiler() {}
+	virtual ~asIJITCompiler() {}
 };
 
 // Byte code instructions
@@ -1386,6 +1399,7 @@ enum asEBCInstr
 	asBC_MAXBYTECODE	= 189,
 
 	// Temporary tokens. Can't be output to the final program
+	asBC_DiscardVar		= 250,
 	asBC_VarDecl		= 251,
 	asBC_Block			= 252,
 	asBC_ObjInfo		= 253,
@@ -1726,13 +1740,13 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO_DUMMY(247),
 	asBCINFO_DUMMY(248),
 	asBCINFO_DUMMY(249),
-	asBCINFO_DUMMY(250),
 
-	asBCINFO(VarDecl,   W_ARG,          0),
-	asBCINFO(Block,     INFO,           0),
-	asBCINFO(ObjInfo,	rW_DW_ARG,		0),
-	asBCINFO(LINE,		INFO,			0),
-	asBCINFO(LABEL,		INFO,			0)
+	asBCINFO(DiscardVar,	W_ARG,			0),
+	asBCINFO(VarDecl,		W_ARG,			0),
+	asBCINFO(Block,			INFO,			0),
+	asBCINFO(ObjInfo,		rW_DW_ARG,		0),
+	asBCINFO(LINE,			INFO,			0),
+	asBCINFO(LABEL,			INFO,			0)
 };
 
 // Macros to access bytecode instruction arguments

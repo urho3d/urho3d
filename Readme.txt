@@ -36,7 +36,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.24.0a (http://www.angelcode.com/angelscript/)
+- AngelScript 2.25.0 (http://www.angelcode.com/angelscript/)
 - Bullet 2.80 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
@@ -262,4 +262,3 @@ V1.21   - Bugfixes and code cleanup.
         - Animation state editing and animation trigger events.
         - Scene update time scale can be modified.
         - Improved the delayed method call system.
-

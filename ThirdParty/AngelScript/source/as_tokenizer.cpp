@@ -386,6 +386,17 @@ bool asCTokenizer::IsKeyWord(const char *source, size_t sourceLength, size_t &to
 	const asCMap<asCStringPointer,eTokenType> *map;
 	int maxLength;
 
+	// Optimization for large array init-lists
+	// This makes a significant improvement when parsing
+	// very long initialization lists, yet doesn't cause
+	// a noticeable impact in other situations.
+	if (source[0] == ',')
+	{
+		tokenType = ttListSeparator;
+		tokenLength = 1;
+		return true;
+	}
+
 	if( (source[0] >= 'a' && source[0] <= 'z') ||
 		(source[0] >= 'A' && source[0] <= 'Z') )
 	{

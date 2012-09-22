@@ -74,7 +74,9 @@ protected:
 
 	void GetToken(sToken *token);
 	void RewindTo(const sToken *token);
+	void SetPos(size_t pos);
 	void Error(const char *text, sToken *token);
+	void Info(const char *text, sToken *token);
 
 	asCScriptNode *CreateNode(eScriptNode type);
 
@@ -117,6 +119,7 @@ protected:
 	asCScriptNode *ParseFuncDef();
 	asCScriptNode *ParseGlobalVar();
 	asCScriptNode *ParseClass();
+	asCScriptNode *ParseMixin();
 	asCScriptNode *ParseInitList();
 	asCScriptNode *ParseInterface();
 	asCScriptNode *ParseInterfaceMethod();
@@ -175,6 +178,7 @@ protected:
 	asCScriptCode   *script;
 	asCScriptNode   *scriptNode;
 
+	sToken       lastToken;
 	size_t       sourcePos;
 };
 

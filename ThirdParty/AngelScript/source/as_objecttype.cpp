@@ -121,16 +121,17 @@ void RegisterObjectTypeGCBehaviours(asCScriptEngine *engine)
 #endif
 }
 
-asCObjectType::asCObjectType()
+asCObjectType::asCObjectType() 
 {
-	engine      = 0; 
+	engine = 0; 
 	refCount.set(0); 
 	derivedFrom = 0;
 
 	acceptValueSubType = true;
-	acceptRefSubType   = true;
+	acceptRefSubType = true;
 
 	accessMask = 0xFFFFFFFF;
+	nameSpace = 0;
 }
 
 asCObjectType::asCObjectType(asCScriptEngine *engine) 
@@ -143,6 +144,7 @@ asCObjectType::asCObjectType(asCScriptEngine *engine)
 	acceptRefSubType = true;
 
 	accessMask = 0xFFFFFFFF;
+	nameSpace = engine->nameSpaces[0];
 }
 
 int asCObjectType::AddRef() const
@@ -317,7 +319,7 @@ const char *asCObjectType::GetName() const
 // interface
 const char *asCObjectType::GetNamespace() const
 {
-	return nameSpace.AddressOf();
+	return nameSpace->name.AddressOf();
 }
 
 // interface

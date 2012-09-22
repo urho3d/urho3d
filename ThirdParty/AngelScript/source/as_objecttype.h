@@ -124,6 +124,7 @@ struct asSEnumValue
 };
 
 class asCScriptEngine;
+struct asSNameSpace;
 
 void RegisterObjectTypeGCBehaviours(asCScriptEngine *engine);
 
@@ -196,7 +197,6 @@ public:
 // Internal
 //===========================================
 public:
-	asCObjectType(); 
 	asCObjectType(asCScriptEngine *engine);
 	~asCObjectType();
 
@@ -214,7 +214,7 @@ public:
 	asCObjectProperty *AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate);
 
 	asCString                    name;
-	asCString                    nameSpace;
+	asSNameSpace                *nameSpace;
 	int                          size;
 	asCArray<asCObjectProperty*> properties;
 	asCArray<int>                methods;
@@ -237,6 +237,9 @@ public:
 	asCArray<asPWORD> userData;
 
 protected:
+	friend class asCScriptEngine;
+	asCObjectType();
+
 	mutable asCAtomic refCount;
 	mutable bool      gcFlag;
 };

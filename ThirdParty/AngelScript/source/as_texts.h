@@ -62,7 +62,7 @@
 #define TXT_CHANGE_SIGN                          "Implicit conversion changed sign of value"
 #define TXT_COMPILING_s                          "Compiling %s"
 #define TXT_COMPOUND_ASGN_WITH_PROP              "Compound assignments with property accessors are not allowed"
-#define TXT_CONSTRUCTOR_NAME_ERROR               "The constructor name must be the same as the class"
+#define TXT_CONSTRUCTOR_NAME_ERROR               "The name of constructors and destructors must be the same as the class"
 
 #define TXT_DATA_TYPE_CANT_BE_s           "Data type can't be '%s'"
 #define TXT_DECL_IN_SWITCH                "Variables cannot be declared in switch cases, except inside statement blocks"
@@ -85,6 +85,7 @@
 #define TXT_EXPECTED_POST_OPERATOR        "Expected post operator"
 #define TXT_EXPECTED_PRE_OPERATOR         "Expected pre operator"
 #define TXT_EXPECTED_STRING               "Expected string"
+#define TXT_EXPR_DOESNT_EVAL_TO_FUNC      "Expression doesn't evaluate to a function"
 #define TXT_EXPR_MUST_BE_BOOL             "Expression must be of boolean type"
 
 #define TXT_FAILED_TO_COMPILE_DEF_ARG_d_IN_FUNC_s "Failed while compiling default arg for parameter %d in function '%s'"
@@ -124,6 +125,9 @@
 #define TXT_METHOD_CANT_HAVE_NAME_OF_CLASS          "The method cannot be named with the class name"
 #define TXT_METHOD_s_DOES_NOT_OVERRIDE              "Method '%s' marked as override but does not replace any base class or interface method"
 #define TXT_MISSING_IMPLEMENTATION_OF_s             "Missing implementation of '%s'"
+#define TXT_MIXIN_CANNOT_BE_DECLARED_AS_s           "Mixin class cannot be declared as '%s'"
+#define TXT_MIXIN_CANNOT_HAVE_CONSTRUCTOR           "Mixin classes cannot have constructors or destructors"
+#define TXT_MIXIN_CLASS_CANNOT_INHERIT              "Mixin class cannot inherit from classes or implement interfaces"
 #define TXT_MORE_THAN_ONE_MATCHING_OP               "Found more than one matching operator"
 #define TXT_MULTIPLE_MATCHING_SIGNATURES_TO_s       "Multiple matching signatures to '%s'"
 #define TXT_MULTIPLE_PROP_GET_ACCESSOR_FOR_s        "Found multiple get accessors for property '%s'"
@@ -132,10 +136,12 @@
 #define TXT_MUST_BE_OBJECT                          "Only objects have constructors"
 #define TXT_MUST_RETURN_VALUE                       "Must return a value"
 
+#define TXT_NAMESPACE_s_DOESNT_EXIST               "Namespace '%s' doesn't exist."
 #define TXT_NAME_CONFLICT_s_EXTENDED_TYPE          "Name conflict. '%s' is an extended data type."
 #define TXT_NAME_CONFLICT_s_GLOBAL_PROPERTY        "Name conflict. '%s' is a global property."
 #define TXT_NAME_CONFLICT_s_IS_NAMED_TYPE          "Name conflict. '%s' is a named type."
 #define TXT_NAME_CONFLICT_s_IS_FUNCDEF             "Name conflict. '%s' is a funcdef."
+#define TXT_NAME_CONFLICT_s_IS_MIXIN               "Name conflict. '%s' is a mixin class."
 #define TXT_NAME_CONFLICT_s_STRUCT                 "Name conflict. '%s' is a class."
 #define TXT_NAME_CONFLICT_s_OBJ_PROPERTY           "Name conflict. '%s' is an object property."
 #define TXT_NAME_CONFLICT_s_METHOD                 "Name conflict. '%s' is a class method."
@@ -200,6 +206,7 @@
 #define TXT_SWITCH_MUST_BE_INTEGRAL                    "Switch expressions must be integral numbers"
 
 #define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE  "Type '%s' is not available for this module"
+#define TXT_TOO_MANY_JUMP_LABELS             "The function has too many jump labels to handle. Split the function into smaller ones."
 
 #define TXT_UNEXPECTED_END_OF_FILE        "Unexpected end of file"
 #define TXT_UNEXPECTED_TOKEN_s            "Unexpected token '%s'"
@@ -209,6 +216,12 @@
 #define TXT_UNUSED_SCRIPT_NODE            "Unused script node"
 
 #define TXT_VALUE_TOO_LARGE_FOR_TYPE      "Value is too large for data type"
+
+#define TXT_WHILE_PARSING_ARG_LIST        "While parsing argument list"
+#define TXT_WHILE_PARSING_EXPRESSION      "While parsing expression"
+#define TXT_WHILE_PARSING_INIT_LIST       "While parsing initialization list"
+#define TXT_WHILE_PARSING_STATEMENT_BLOCK "While parsing statement block"
+#define TXT_WHILE_INCLUDING_MIXIN         "Previous error occurred while including mixin"
 
 // Global variable initialization
 
@@ -238,10 +251,11 @@
 #define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST        "Template subtype '%s' doesn't exist"
 #define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s      "Failed to read subtype of template type '%s'"
 #define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s         "Attempting to instanciate invalid template type '%s<%s>'"
-#define TXT_FAILED_IN_FUNC_s                       "Failed in call to function '%s'"
-#define TXT_FAILED_IN_FUNC_s_WITH_s                "Failed in call to function '%s' with '%s'"
-#define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s          "Failed in call to function '%s' with '%s' and '%s'"
+#define TXT_FAILED_IN_FUNC_s_d                     "Failed in call to function '%s' (Code: %d)"
+#define TXT_FAILED_IN_FUNC_s_WITH_s_d              "Failed in call to function '%s' with '%s' (Code: %d)"
+#define TXT_FAILED_IN_FUNC_s_WITH_s_AND_s_d        "Failed in call to function '%s' with '%s' and '%s' (Code: %d)"
 #define TXT_GC_RECEIVED_NULL_PTR                   "AddScriptObjectToGC called with null pointer"
+#define TXT_EXCEPTION_IN_NESTED_CALL               "An exception occurred in a nested call"
 
 // Internal names
 
@@ -258,5 +272,6 @@
 #define TXT_INVALID_CALLING_CONVENTION    "Invalid calling convention"
 #define TXT_UNBOUND_FUNCTION              "Unbound function called"
 #define TXT_OUT_OF_BOUNDS                 "Out of range"
+#define TXT_EXCEPTION_CAUGHT              "Caught an exception from the application"
 
 #endif

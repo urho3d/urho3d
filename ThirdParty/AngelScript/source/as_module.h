@@ -40,6 +40,7 @@
 #define AS_MODULE_H
 
 #include "as_config.h"
+#include "as_symboltable.h"
 #include "as_atomic.h"
 #include "as_string.h"
 #include "as_array.h"
@@ -57,6 +58,7 @@ class asCCompiler;
 class asCBuilder;
 class asCContext;
 class asCConfigGroup;
+struct asSNameSpace;
 
 struct sBindInfo
 {
@@ -70,6 +72,7 @@ struct sObjectTypePair
 	asCObjectType *a;
 	asCObjectType *b;
 };
+
 
 // TODO: import: Remove function imports. When I have implemented function 
 //               pointers the function imports should be deprecated.
@@ -160,8 +163,8 @@ public:
 	virtual int         UnbindAllImportedFunctions();
 
 	// Bytecode Saving/Loading
-	virtual int SaveByteCode(asIBinaryStream *out) const;
-	virtual int LoadByteCode(asIBinaryStream *in);
+	virtual int SaveByteCode(asIBinaryStream *out, bool stripDebugInfo) const;
+	virtual int LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped);
 
 	// User data
 	virtual void *SetUserData(void *data);
@@ -187,25 +190,18 @@ public:
 
 	void JITCompile();
 
-	int  AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, const asCString &ns = "");
+	int  AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, asSNameSpace *ns = 0);
 	int  AddScriptFunction(asCScriptFunction *func);
 	int  AddImportedFunction(int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, int paramCount, const asCString &moduleName);
-	int  AddFuncDef(const char *name, const asCString &ns);
+	int  AddFuncDef(const char *name, asSNameSpace *ns);
 
 	int  GetNextImportedFunctionId();
 
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.23.0 - 2012-01-30
-	void ResolveInterfaceIds(asCArray<void*> *substitutions = 0);
-	bool AreInterfacesEqual(asCObjectType *a, asCObjectType *b, asCArray<sObjectTypePair> &equals);
-	bool AreTypesEqual(const asCDataType &a, const asCDataType &b, asCArray<sObjectTypePair> &equals);
-#endif
-
 	asCScriptFunction *GetImportedFunction(int funcId) const;
 
-	asCObjectType *GetObjectType(const char *type, const asCString &ns);
+	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns);
 
-	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, const asCString &ns);
+	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, asSNameSpace *ns);
 
 
 	asCString name;
@@ -214,18 +210,18 @@ public:
 	asCBuilder      *builder;
 	void            *userData;
 	asDWORD          accessMask;
-	asCString        defaultNamespace;
+	asSNameSpace    *defaultNamespace;
 
 	// This array holds all functions, class members, factories, etc that were compiled with the module
-	asCArray<asCScriptFunction *>  scriptFunctions;
+	asCArray<asCScriptFunction *>     scriptFunctions;
 	// This array holds global functions declared in the module
-	asCArray<asCScriptFunction *>  globalFunctions;
+	asCSymbolTable<asCScriptFunction> globalFunctions;
 	// This array holds imported functions in the module
-	asCArray<sBindInfo *>          bindInformations;
+	asCArray<sBindInfo *>             bindInformations;
 
 	// This array holds the global variables declared in the script
-	asCArray<asCGlobalProperty *>  scriptGlobals;
-	bool                           isGlobalVarInitialized;
+	asCSymbolTable<asCGlobalProperty> scriptGlobals;
+	bool                              isGlobalVarInitialized;
 
 	// This array holds class and interface types
 	asCArray<asCObjectType*>       classTypes;

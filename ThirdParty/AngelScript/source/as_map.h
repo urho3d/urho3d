@@ -52,10 +52,12 @@ public:
 	
 	const KEY &GetKey(const asSMapNode<KEY,VAL> *cursor) const;
 	const VAL &GetValue(const asSMapNode<KEY,VAL> *cursor) const;
-	VAL &GetValue(asSMapNode<KEY,VAL> *cursor);
+	VAL       &GetValue(asSMapNode<KEY,VAL> *cursor);
 
 	void Erase(asSMapNode<KEY,VAL> *cursor);
 	void EraseAll();
+
+	void SwapWith(asCMap<KEY,VAL> &other);
 
 	// Returns true as long as cursor is valid
 
@@ -70,6 +72,9 @@ public:
 	int CheckIntegrity(asSMapNode<KEY,VAL> *node) const;
 
 protected:
+	// Don't allow value assignment
+	asCMap &operator=(const asCMap &) { return *this; }
+
 	void BalanceInsert(asSMapNode<KEY,VAL> *node);
 	void BalanceErase(asSMapNode<KEY,VAL> *child, asSMapNode<KEY,VAL> *parent);
 
@@ -120,6 +125,19 @@ template <class KEY, class VAL>
 asCMap<KEY, VAL>::~asCMap()
 {
 	EraseAll();
+}
+
+template <class KEY, class VAL>
+void asCMap<KEY,VAL>::SwapWith(asCMap<KEY,VAL> &other)
+{
+	asSMapNode<KEY,VAL> *tmpRoot  = root;
+	int                  tmpCount = count;
+
+	root  = other.root;
+	count = other.count;
+
+	other.root  = tmpRoot;
+	other.count = tmpCount;
 }
 
 template <class KEY, class VAL>

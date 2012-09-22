@@ -233,7 +233,8 @@ void BillboardSet::SetMaterialAttr(ResourceRef value)
 void BillboardSet::SetBillboardsAttr(VariantVector value)
 {
     unsigned index = 0;
-    SetNumBillboards(value[index++].GetInt());
+    unsigned numBillboards = index < value.Size() ? value[index++].GetUInt() : 0;
+    SetNumBillboards(numBillboards);
     
     for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
     {
