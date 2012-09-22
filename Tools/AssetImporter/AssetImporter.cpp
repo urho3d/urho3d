@@ -52,9 +52,9 @@
 #include <windows.h>
 #endif
 
-#include <assimp.hpp>
-#include <aiScene.h>
-#include <aiPostProcess.h>
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include <cstring>
 
 #include "DebugNew.h"
@@ -313,9 +313,8 @@ void Run(const Vector<String>& arguments)
         
         resourcePath_ = AddTrailingSlash(resourcePath_);
         
-        Assimp::Importer importer;
         PrintLine("Reading file " + inFile);
-        scene_ = importer.ReadFile(GetNativePath(inFile).CString(), flags);
+        scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile);
         
