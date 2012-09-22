@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2009, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -54,6 +54,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+static const aiImporterDesc desc = {
+	"CharacterStudio Motion Importer (MoCap)",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"csm" 
+};
+
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 CSMImporter::CSMImporter()
@@ -83,9 +97,9 @@ bool CSMImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 
 // ------------------------------------------------------------------------------------------------
 // Build a string of all file extensions supported
-void CSMImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* CSMImporter::GetInfo () const
 {
-	extensions.insert("csm");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -134,7 +148,7 @@ void CSMImporter::InternReadFile( const std::string& pFile,
 			else if (TokenMatchI(buffer,"rate",4))	{
 				SkipSpaces(&buffer);
 				float d;
-				buffer = fast_atof_move(buffer,d);
+				buffer = fast_atoreal_move<float>(buffer,d);
 				anim->mTicksPerSecond = d;
 			}
 			else if (TokenMatchI(buffer,"order",5))	{
@@ -214,15 +228,15 @@ void CSMImporter::InternReadFile( const std::string& pFile,
 						else	{
 							aiVectorKey* sub = s->mPositionKeys + s->mNumPositionKeys;
 							sub->mTime = (double)frame;
-							buffer = fast_atof_move(buffer, (float&)sub->mValue.x);
+							buffer = fast_atoreal_move<float>(buffer, (float&)sub->mValue.x);
 
 							if(!SkipSpacesAndLineEnd(&buffer))
 								throw DeadlyImportError("CSM: Unexpected EOF occured reading sample y coord");
-							buffer = fast_atof_move(buffer, (float&)sub->mValue.y);
+							buffer = fast_atoreal_move<float>(buffer, (float&)sub->mValue.y);
 
 							if(!SkipSpacesAndLineEnd(&buffer))
 								throw DeadlyImportError("CSM: Unexpected EOF occured reading sample z coord");
-							buffer = fast_atof_move(buffer, (float&)sub->mValue.z);
+							buffer = fast_atoreal_move<float>(buffer, (float&)sub->mValue.z);
 
 							++s->mNumPositionKeys;
 						}

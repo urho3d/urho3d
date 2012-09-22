@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -56,6 +56,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+static const aiImporterDesc desc = {
+	"LightWave/Modo Object Importer",
+	"",
+	"",
+	"http://www.newtek.com/lightwave.html\nhttp://www.luxology.com/modo/",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"lwo lxo"
+};
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 LWOImporter::LWOImporter()
@@ -71,8 +84,9 @@ LWOImporter::~LWOImporter()
 bool LWOImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool checkSig) const
 {
 	const std::string extension = GetExtension(pFile);
-	if (extension == "lwo" || extension == "lxo")
+	if (extension == "lwo" || extension == "lxo") {
 		return true;
+	}
 
 	// if check for extension is not enough, check for the magic tokens 
 	if (!extension.length() || checkSig) {
@@ -92,6 +106,13 @@ void LWOImporter::SetupProperties(const Importer* pImp)
 	configSpeedFlag  = ( 0 != pImp->GetPropertyInteger(AI_CONFIG_FAVOUR_SPEED,0) ? true : false);
 	configLayerIndex = pImp->GetPropertyInteger (AI_CONFIG_IMPORT_LWO_ONE_LAYER_ONLY,UINT_MAX); 
 	configLayerName  = pImp->GetPropertyString  (AI_CONFIG_IMPORT_LWO_ONE_LAYER_ONLY,"");
+}
+
+// ------------------------------------------------------------------------------------------------
+// Get list of file extensions
+const aiImporterDesc* LWOImporter::GetInfo () const
+{
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -537,7 +558,7 @@ void LWOImporter::GenerateNodeGraph(std::map<uint16_t,aiNode*>& apcNodes)
 	root->mName.Set("<LWORoot>");
 
 	//Set parent of all children, inserting pivots
-	std::cout << "Set parent of all children" << std::endl;
+	//std::cout << "Set parent of all children" << std::endl;
 	std::map<uint16_t, aiNode*> mapPivot;
 	for (std::map<uint16_t,aiNode*>::iterator itapcNodes = apcNodes.begin(); itapcNodes != apcNodes.end(); ++itapcNodes) {
 
@@ -569,7 +590,7 @@ void LWOImporter::GenerateNodeGraph(std::map<uint16_t,aiNode*>& apcNodes)
 	}
 
 	//Merge pivot map into node map
-	std::cout << "Merge pivot map into node map" << std::endl;
+	//std::cout << "Merge pivot map into node map" << std::endl;
 	for (std::map<uint16_t, aiNode*>::iterator itMapPivot = mapPivot.begin(); itMapPivot != mapPivot.end(); ++itMapPivot) {
 		apcNodes[itMapPivot->first] = itMapPivot->second;
 	}

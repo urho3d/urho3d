@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -54,6 +54,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+static const aiImporterDesc desc = {
+	"OFF Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	0,
+	0,
+	"off" 
+};
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 OFFImporter::OFFImporter()
@@ -82,9 +95,9 @@ bool OFFImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 }
 
 // ------------------------------------------------------------------------------------------------
-void OFFImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* OFFImporter::GetInfo () const
 {
-	extensions.insert("off");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -131,9 +144,9 @@ void OFFImporter::InternReadFile( const std::string& pFile,
 		aiVector3D& v = tempPositions[i];
 
 		sz = line; SkipSpaces(&sz);
-		sz = fast_atof_move(sz,(float&)v.x); SkipSpaces(&sz);
-		sz = fast_atof_move(sz,(float&)v.y); SkipSpaces(&sz);
-		fast_atof_move(sz,(float&)v.z);
+		sz = fast_atoreal_move<float>(sz,(float&)v.x); SkipSpaces(&sz);
+		sz = fast_atoreal_move<float>(sz,(float&)v.y); SkipSpaces(&sz);
+		fast_atoreal_move<float>(sz,(float&)v.z);
 	}
 
 	

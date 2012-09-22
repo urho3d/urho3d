@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -1240,7 +1240,7 @@ void XFileParser::ReadUntilEndOfLine()
 // ------------------------------------------------------------------------------------------------
 unsigned short XFileParser::ReadBinWord()
 {
-	assert(End - P >= 2);
+	ai_assert(End - P >= 2);
 	const unsigned char* q = (const unsigned char*) P;
 	unsigned short tmp = q[0] | (q[1] << 8);
 	P += 2;
@@ -1250,7 +1250,7 @@ unsigned short XFileParser::ReadBinWord()
 // ------------------------------------------------------------------------------------------------
 unsigned int XFileParser::ReadBinDWord()
 {
-	assert(End - P >= 4);
+	ai_assert(End - P >= 4);
 	const unsigned char* q = (const unsigned char*) P;
 	unsigned int tmp = q[0] | (q[1] << 8) | (q[2] << 16) | (q[3] << 24);
 	P += 4;
@@ -1368,7 +1368,7 @@ float XFileParser::ReadFloat()
 	}
 
 	float result = 0.0f;
-	P = fast_atof_move( P, result);
+	P = fast_atoreal_move<float>( P, result);
 
 	CheckForSeparator();
 

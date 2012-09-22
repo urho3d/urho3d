@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -219,22 +219,29 @@ void ObjFileMtlImporter::getFloatValue( float &value )
 //	Creates a material from loaded data.
 void ObjFileMtlImporter::createMaterial()
 {	
-	std::string strName( "" );
-	m_DataIt = getName<DataArrayIt>( m_DataIt, m_DataItEnd, strName );
-	if ( m_DataItEnd == m_DataIt )
-		return;
+	std::string line( "" );
+	while ( !isNewLine( *m_DataIt ) ) {
+		line += *m_DataIt;
+		++m_DataIt;
+	}
+	
+	std::vector<std::string> token;
+	const unsigned int numToken = tokenize<std::string>( line, token, " " );
+	std::string name( "" );
+	if ( numToken == 1 ) {
+		name = AI_DEFAULT_MATERIAL_NAME;
+	} else {
+		name = token[ 1 ];
+	}
 
-	std::map<std::string, ObjFile::Material*>::iterator it = m_pModel->m_MaterialMap.find( strName );
-	if ( m_pModel->m_MaterialMap.end() == it)
-	{
+	std::map<std::string, ObjFile::Material*>::iterator it = m_pModel->m_MaterialMap.find( name );
+	if ( m_pModel->m_MaterialMap.end() == it) {
 		// New Material created
 		m_pModel->m_pCurrentMaterial = new ObjFile::Material();	
-		m_pModel->m_pCurrentMaterial->MaterialName.Set( strName );
-		m_pModel->m_MaterialLib.push_back( strName );
-		m_pModel->m_MaterialMap[ strName ] = m_pModel->m_pCurrentMaterial;
-	}
-	else
-	{
+		m_pModel->m_pCurrentMaterial->MaterialName.Set( name );
+		m_pModel->m_MaterialLib.push_back( name );
+		m_pModel->m_MaterialMap[ name ] = m_pModel->m_pCurrentMaterial;
+	} else {
 		// Use older material
 		m_pModel->m_pCurrentMaterial = (*it).second;
 	}

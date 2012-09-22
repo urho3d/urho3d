@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "AssimpPCH.h"
-#include "../include/aiVersion.h"
+#include "../include/assimp/version.h"
 
 // ------------------------------------------------------------------------------------------------
 /* Uncomment this line to prevent Assimp from catching unknown exceptions.
@@ -804,7 +804,8 @@ const aiScene* Importer::ApplyPostProcessing(unsigned int pFlags)
 	}
 
 	// update private scene flags
-	ScenePriv(pimpl->mScene)->mPPStepsApplied |= pFlags;
+  if( pimpl->mScene )
+  	ScenePriv(pimpl->mScene)->mPPStepsApplied |= pFlags;
 
 	// clear any data allocated by post-process steps
 	pimpl->mPPShared->Clean();
@@ -818,12 +819,44 @@ const aiScene* Importer::ApplyPostProcessing(unsigned int pFlags)
 // Helper function to check whether an extension is supported by ASSIMP
 bool Importer::IsExtensionSupported(const char* szExtension) const
 {
-	return NULL != FindLoader(szExtension);
+	return NULL != GetImporter(szExtension);
+}
+
+// ------------------------------------------------------------------------------------------------
+size_t Importer::GetImporterCount() const
+{
+	return pimpl->mImporter.size();
+}
+
+// ------------------------------------------------------------------------------------------------
+const aiImporterDesc* Importer::GetImporterInfo(size_t index) const
+{
+	if (index >= pimpl->mImporter.size()) {
+		return NULL;
+	}
+	return pimpl->mImporter[index]->GetInfo();
+}
+
+
+// ------------------------------------------------------------------------------------------------
+BaseImporter* Importer::GetImporter (size_t index) const
+{
+	if (index >= pimpl->mImporter.size()) {
+		return NULL;
+	}
+	return pimpl->mImporter[index];
 }
 
 // ------------------------------------------------------------------------------------------------
 // Find a loader plugin for a given file extension
-BaseImporter* Importer::FindLoader (const char* szExtension) const
+BaseImporter* Importer::GetImporter (const char* szExtension) const
+{
+	return GetImporter(GetImporterIndex(szExtension));
+}
+
+// ------------------------------------------------------------------------------------------------
+// Find a loader plugin for a given file extension
+size_t Importer::GetImporterIndex (const char* szExtension) const
 {
 	ai_assert(szExtension);
 	ASSIMP_BEGIN_EXCEPTION_REGION();
@@ -833,7 +866,7 @@ BaseImporter* Importer::FindLoader (const char* szExtension) const
 
 	std::string ext(szExtension);
 	if (ext.empty()) {
-		return NULL;
+		return static_cast<size_t>(-1);
 	}
 	std::transform(ext.begin(),ext.end(), ext.begin(), tolower);
 
@@ -844,12 +877,12 @@ BaseImporter* Importer::FindLoader (const char* szExtension) const
 		(*i)->GetExtensionList(str);
 		for (std::set<std::string>::const_iterator it = str.begin(); it != str.end(); ++it) {
 			if (ext == *it) {
-				return (*i);
+				return std::distance(static_cast< std::vector<BaseImporter*>::const_iterator >(pimpl->mImporter.begin()), i);
 			}
 		}
 	}
-	ASSIMP_END_EXCEPTION_REGION(BaseImporter*);
-	return NULL;
+	ASSIMP_END_EXCEPTION_REGION(size_t);
+	return static_cast<size_t>(-1);
 }
 
 // ------------------------------------------------------------------------------------------------

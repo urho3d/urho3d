@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_CIOSYSTEM_H_INCLUDED
 #define AI_CIOSYSTEM_H_INCLUDED
 
-#include "../include/aiFileIO.h"
+#include "../include/assimp/cfileio.h"
 
 namespace Assimp	{
 	
@@ -114,10 +114,9 @@ public:
 
 	// ...................................................................
 	bool Exists( const char* pFile) const {
-		CIOSystemWrapper* pip = const_cast<CIOSystemWrapper*>(this);
-		IOStream* p = pip->Open(pFile);
+		aiFile* p = mFileSystem->OpenProc(mFileSystem,pFile,"rb");		
 		if (p){
-			pip->Close(p);
+			mFileSystem->CloseProc(mFileSystem,p);
 			return true;
 		}
 		return false;

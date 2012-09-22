@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -318,20 +318,28 @@ boost::shared_ptr<const EXPRESS::DataType> EXPRESS::DataType::Parse(const char*&
 	else if (*cur == '\'' ) {
 		// string literal
 		const char* start = ++cur;
-		for(;*cur != '\'';++cur) {
-			if (*cur == '\0') {
+
+		for(;*cur != '\'';++cur)	{
+			if (*cur == '\0')	{
 				throw STEP::SyntaxError("string literal not closed",line);
 			}
 		}
-		if (cur[1]=='\'') {
-			for(cur+=2;*cur != '\'';++cur) {
-				if (*cur == '\0') {
-					throw STEP::SyntaxError("string literal not closed",line);
+
+		if (cur[1] == '\'')	{
+			// Vesanen: more than 2 escaped ' in one literal!
+			do	{
+				for(cur += 2;*cur != '\'';++cur)	{
+					if (*cur == '\0')	{
+						throw STEP::SyntaxError("string literal not closed",line);
+					}
 				}
 			}
+			while(cur[1] == '\'');
 		}
-		inout = cur+1;
-		return boost::make_shared<EXPRESS::STRING>(std::string(start, static_cast<size_t>(cur-start) ));
+
+		inout = cur + 1;
+
+		return boost::make_shared<EXPRESS::STRING>(std::string(start, static_cast<size_t>(cur - start)));
 	}
 	else if (*cur == '\"' ) {
 		throw STEP::SyntaxError("binary data not supported yet",line);
@@ -342,9 +350,8 @@ boost::shared_ptr<const EXPRESS::DataType> EXPRESS::DataType::Parse(const char*&
 	const char* start = cur;
 	for(;*cur  && *cur != ',' && *cur != ')' && !IsSpace(*cur);++cur) {
 		if (*cur == '.') {
-			// XXX many STEP files contain extremely accurate data, float's precision may not suffice in many cases
-			float f;
-			inout = fast_atof_move(start,f);
+			double f;
+			inout = fast_atoreal_move<double>(start,f);
 			return boost::make_shared<EXPRESS::REAL>(f);
 		}
 	}

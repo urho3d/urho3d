@@ -1,10 +1,10 @@
 /** Implementation of the BVH loader */
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -21,10 +21,10 @@ copyright notice, this list of conditions and the
 following disclaimer in the documentation and/or other
 materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
 contributors may be used to endorse or promote products
 derived from this software without specific prior
-written permission of the ASSIMP Development Team.
+written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -48,6 +48,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SkeletonMeshBuilder.h"
 
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"BVH Importer (MoCap)",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"bvh"
+};
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -74,6 +87,13 @@ bool BVHLoader::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool cs
 		return SearchFileHeaderForToken(pIOHandler,pFile,tokens,1);
 	}
 	return false;
+}
+
+// ------------------------------------------------------------------------------------------------
+// Loader meta information
+const aiImporterDesc* BVHLoader::GetInfo () const
+{
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -374,7 +394,7 @@ float BVHLoader::GetNextTokenAsFloat()
 	// check if the float is valid by testing if the atof() function consumed every char of the token
 	const char* ctoken = token.c_str();
 	float result = 0.0f;
-	ctoken = fast_atof_move( ctoken, result);
+	ctoken = fast_atoreal_move<float>( ctoken, result);
 
 	if( ctoken != token.c_str() + token.length())
 		ThrowException( boost::str( boost::format( "Expected a floating point number, but found \"%s\".") % token));

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -1614,7 +1614,7 @@ void Parser::ParseLV4MeshBonesVertices(unsigned int iNumVertices,ASE::Mesh& mesh
 
 					// then parse the vertex weight
 					if (!SkipSpaces(&filePtr))break;
-					filePtr = fast_atof_move(filePtr,pairOut.second);
+					filePtr = fast_atoreal_move<float>(filePtr,pairOut.second);
 
 					// -1 marks unused entries
 					if (-1 != pairOut.first)
@@ -2131,7 +2131,7 @@ void Parser::ParseLV4MeshFloat(float& fOut)
 		return;
 	}
 	// parse the first float
-	filePtr = fast_atof_move(filePtr,fOut);
+	filePtr = fast_atoreal_move<float>(filePtr,fOut);
 }
 // ------------------------------------------------------------------------------------------------
 void Parser::ParseLV4MeshLong(unsigned int& iOut)

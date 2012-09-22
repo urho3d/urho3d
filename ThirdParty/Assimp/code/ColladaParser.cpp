@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ copyright notice, this list of conditions and the
 following disclaimer in the documentation and/or other
 materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
 contributors may be used to endorse or promote products
 derived from this software without specific prior
-written permission of the ASSIMP Development Team.
+written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -500,7 +500,7 @@ void ColladaParser::ReadController( Collada::Controller& pController)
 	      for( unsigned int a = 0; a < 16; a++)
 	      {
 		      // read a number
-          content = fast_atof_move( content, pController.mBindShapeMatrix[a]);
+          content = fast_atoreal_move<float>( content, pController.mBindShapeMatrix[a]);
 		      // skip whitespace after it
 		      SkipSpacesAndLineEnd( &content);
 	      }
@@ -980,13 +980,13 @@ void ColladaParser::ReadLight( Collada::Light& pLight)
 				// text content contains 3 floats
 				const char* content = GetTextContent();
 				  
-				content = fast_atof_move( content, (float&)pLight.mColor.r);
+				content = fast_atoreal_move<float>( content, (float&)pLight.mColor.r);
 				SkipSpacesAndLineEnd( &content);
 				
-				content = fast_atof_move( content, (float&)pLight.mColor.g);
+				content = fast_atoreal_move<float>( content, (float&)pLight.mColor.g);
 				SkipSpacesAndLineEnd( &content);
 
-				content = fast_atof_move( content, (float&)pLight.mColor.b);
+				content = fast_atoreal_move<float>( content, (float&)pLight.mColor.b);
 				SkipSpacesAndLineEnd( &content);
 
 				TestClosing( "color");
@@ -1025,6 +1025,14 @@ void ColladaParser::ReadLight( Collada::Light& pLight)
 			else if (IsElement("intensity")) {
 				pLight.mIntensity = ReadFloatFromTextContent();
 				TestClosing("intensity");
+			}
+			else if (IsElement("falloff")) {
+				pLight.mOuterAngle = ReadFloatFromTextContent();
+				TestClosing("falloff");
+			}
+			else if (IsElement("hotspot_beam")) {
+				pLight.mFalloffAngle = ReadFloatFromTextContent();
+				TestClosing("hotspot_beam");
 			}
 		}
 		else if( mReader->getNodeType() == irr::io::EXN_ELEMENT_END) {
@@ -1342,16 +1350,16 @@ void ColladaParser::ReadEffectColor( aiColor4D& pColor, Sampler& pSampler)
 				// text content contains 4 floats
 				const char* content = GetTextContent(); 
 
-				content = fast_atof_move( content, (float&)pColor.r);
+				content = fast_atoreal_move<float>( content, (float&)pColor.r);
 				SkipSpacesAndLineEnd( &content);
 
-				content = fast_atof_move( content, (float&)pColor.g);
+				content = fast_atoreal_move<float>( content, (float&)pColor.g);
 				SkipSpacesAndLineEnd( &content);
 
-				content = fast_atof_move( content, (float&)pColor.b);
+				content = fast_atoreal_move<float>( content, (float&)pColor.b);
 				SkipSpacesAndLineEnd( &content);
 
-				content = fast_atof_move( content, (float&)pColor.a);
+				content = fast_atoreal_move<float>( content, (float&)pColor.a);
 				SkipSpacesAndLineEnd( &content);
 				TestClosing( "color");
 			} 
@@ -1404,7 +1412,7 @@ void ColladaParser::ReadEffectFloat( float& pFloat)
 			{
 				// text content contains a single floats
 				const char* content = GetTextContent();
-				content = fast_atof_move( content, pFloat);
+				content = fast_atoreal_move<float>( content, pFloat);
 				SkipSpacesAndLineEnd( &content);
 
 				TestClosing( "float");
@@ -1639,6 +1647,7 @@ void ColladaParser::ReadDataArray()
 {
 	std::string elmName = mReader->getNodeName();
 	bool isStringArray = (elmName == "IDREF_array" || elmName == "Name_array");
+  bool isEmptyElement = mReader->isEmptyElement();
 
 	// read attributes
 	int indexID = GetAttribute( "id");
@@ -1646,13 +1655,15 @@ void ColladaParser::ReadDataArray()
 	int indexCount = GetAttribute( "count");
 	unsigned int count = (unsigned int) mReader->getAttributeValueAsInt( indexCount);
 	const char* content = TestTextContent();
-	if (content) { // some exporters write empty data arrays, silently skip over them
 
-		// read values and store inside an array in the data library
-		mDataLibrary[id] = Data();
-		Data& data = mDataLibrary[id];
-		data.mIsStringArray = isStringArray;
+  // read values and store inside an array in the data library
+  mDataLibrary[id] = Data();
+  Data& data = mDataLibrary[id];
+  data.mIsStringArray = isStringArray;
 
+  // some exporters write empty data arrays, but we need to conserve them anyways because others might reference them
+  if (content) 
+  { 
 		if( isStringArray)
 		{
 			data.mStrings.reserve( count);
@@ -1681,7 +1692,7 @@ void ColladaParser::ReadDataArray()
 
 				float value;
 				// read a number
-				content = fast_atof_move( content, value);
+				content = fast_atoreal_move<float>( content, value);
 				data.mValues.push_back( value);
 				// skip whitespace after it
 				SkipSpacesAndLineEnd( &content);
@@ -1689,8 +1700,9 @@ void ColladaParser::ReadDataArray()
 		}
 	}
 
-	// test for closing tag
-	TestClosing( elmName.c_str());
+  // test for closing tag
+  if( !isEmptyElement )
+    TestClosing( elmName.c_str());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -2107,7 +2119,7 @@ void ColladaParser::ReadPrimitives( Mesh* pMesh, std::vector<InputChannel>& pPer
 		for( size_t b = 0; b < numPoints; b++)
 		{
 			// read all indices for this vertex. Yes, in a hacky local array
-			assert( numOffsets < 20 && perVertexOffset < 20);
+			ai_assert( numOffsets < 20 && perVertexOffset < 20);
 			size_t vindex[20];
 			for( size_t offsets = 0; offsets < numOffsets; ++offsets)
 				vindex[offsets] = *idx++;
@@ -2305,7 +2317,7 @@ void ColladaParser::ReadSceneNode( Node* pNode)
 					child->mName = mReader->getAttributeValue( attrName);
 
 				// TODO: (thom) support SIDs
-				// assert( TestAttribute( "sid") == -1);
+				// ai_assert( TestAttribute( "sid") == -1);
 
 				if (pNode) 
 				{
@@ -2445,7 +2457,7 @@ void ColladaParser::ReadNodeTransformation( Node* pNode, TransformType pType)
 	for( unsigned int a = 0; a < sNumParameters[pType]; a++)
 	{
 		// read a number
-		content = fast_atof_move( content, tf.f[a]);
+		content = fast_atoreal_move<float>( content, tf.f[a]);
 		// skip whitespace after it
 		SkipSpacesAndLineEnd( &content);
 	}
@@ -2697,11 +2709,11 @@ const char* ColladaParser::TestTextContent()
 {
 	// present node should be the beginning of an element
 	if( mReader->getNodeType() != irr::io::EXN_ELEMENT || mReader->isEmptyElement())
-		ThrowException( "Expected opening element");
+		return NULL;
 
 	// read contents of the element
-	if( !mReader->read())
-		ThrowException( "Unexpected end of file while reading n element.");
+	if( !mReader->read() )
+		return NULL;
 	if( mReader->getNodeType() != irr::io::EXN_TEXT)
 		return NULL;
 
@@ -2773,7 +2785,7 @@ aiMatrix4x4 ColladaParser::CalculateResultTransform( const std::vector<Transform
 				break;
 			}
 			default: 
-				assert( false);
+				ai_assert( false);
 				break;
 		}
 	}

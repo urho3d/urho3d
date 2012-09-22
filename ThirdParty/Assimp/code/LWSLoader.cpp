@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -56,6 +56,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Importer.h"
 
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"LightWave Scene Importer",
+	"",
+	"",
+	"http://www.newtek.com/lightwave.html=",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"lws mot" 
+};
 
 // ------------------------------------------------------------------------------------------------
 // Recursive parsing of LWS files
@@ -141,10 +154,9 @@ bool LWSImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler,bool c
 
 // ------------------------------------------------------------------------------------------------
 // Get list of file extensions
-void LWSImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* LWSImporter::GetInfo () const
 {
-	extensions.insert("lws");
-	extensions.insert("mot");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -189,9 +201,9 @@ void LWSImporter::ReadEnvelope(const LWS::Element& dad, LWO::Envelope& fill )
 
 			float f;
 			SkipSpaces(&c);
-			c = fast_atof_move(c,key.value);
+			c = fast_atoreal_move<float>(c,key.value);
 			SkipSpaces(&c);
-			c = fast_atof_move(c,f);
+			c = fast_atoreal_move<float>(c,f);
 
 			key.time = f;
 
@@ -224,7 +236,7 @@ void LWSImporter::ReadEnvelope(const LWS::Element& dad, LWO::Envelope& fill )
 			}
 			for (unsigned int i = 0; i < num;++i) {
 				SkipSpaces(&c);
-				c = fast_atof_move(c,key.params[i]);
+				c = fast_atoreal_move<float>(c,key.params[i]);
 			}
 		}
 		else if ((*it).tokens[0] == "Behaviors") {
@@ -265,10 +277,10 @@ void LWSImporter::ReadEnvelope_Old(
 
 			// parse value and time, skip the rest for the moment.
 			LWO::Key key;
-			const char* c = fast_atof_move((*it).tokens[0].c_str(),key.value);
+			const char* c = fast_atoreal_move<float>((*it).tokens[0].c_str(),key.value);
 			SkipSpaces(&c);
 			float f;
-			fast_atof_move((*it).tokens[0].c_str(),f);
+			fast_atoreal_move<float>((*it).tokens[0].c_str(),f);
 			key.time = f;
 
 			envl.keys.push_back(key);
@@ -452,8 +464,9 @@ std::string LWSImporter::FindLWOFile(const std::string& in)
 	}
 	else tmp = in;
 
-	if (io->Exists(tmp))
+	if (io->Exists(tmp)) {
 		return in;
+	}
 
 	// file is not accessible for us ... maybe it's packed by 
 	// LightWave's 'Package Scene' command?
@@ -468,8 +481,10 @@ std::string LWSImporter::FindLWOFile(const std::string& in)
 		return test;
 
 	test = ".." + io->getOsSeparator() + test; 
-	if (io->Exists(test))
+	if (io->Exists(test)) {
 		return test;
+	}
+
 
 	// return original path, maybe the IOsystem knows better
 	return tmp;
@@ -735,7 +750,7 @@ void LWSImporter::InternReadFile( const std::string& pFile, aiScene* pScene,
 			if (nodes.empty() || nodes.back().type != LWS::NodeDesc::LIGHT)
 				DefaultLogger::get()->error("LWS: Unexpected keyword: \'LightIntensity\'");
 
-			else fast_atof_move(c, nodes.back().lightIntensity );
+			else fast_atoreal_move<float>(c, nodes.back().lightIntensity );
 			
 		}
 		// 'LightType': set type of currently active light
@@ -776,11 +791,11 @@ void LWSImporter::InternReadFile( const std::string& pFile, aiScene* pScene,
 				DefaultLogger::get()->error("LWS: Unexpected keyword: \'LightColor\'");
 
 			else {
-				c = fast_atof_move(c, (float&) nodes.back().lightColor.r );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().lightColor.r );
 				SkipSpaces(&c);
-				c = fast_atof_move(c, (float&) nodes.back().lightColor.g );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().lightColor.g );
 				SkipSpaces(&c);
-				c = fast_atof_move(c, (float&) nodes.back().lightColor.b );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().lightColor.b );
 			}
 		}
 
@@ -789,11 +804,11 @@ void LWSImporter::InternReadFile( const std::string& pFile, aiScene* pScene,
 			if (nodes.empty())
 				DefaultLogger::get()->error("LWS: Unexpected keyword: \'PivotPosition\'");
 			else {
-				c = fast_atof_move(c, (float&) nodes.back().pivotPos.x );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().pivotPos.x );
 				SkipSpaces(&c);
-				c = fast_atof_move(c, (float&) nodes.back().pivotPos.y );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().pivotPos.y );
 				SkipSpaces(&c);
-				c = fast_atof_move(c, (float&) nodes.back().pivotPos.z );
+				c = fast_atoreal_move<float>(c, (float&) nodes.back().pivotPos.z );
                 // Mark pivotPos as set
                 nodes.back().isPivotSet = true;
 			}

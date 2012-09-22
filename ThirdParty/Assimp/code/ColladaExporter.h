@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_COLLADAEXPORTER_H_INC
 #define AI_COLLADAEXPORTER_H_INC
 
-#include "../include/aiAssert.h"
+#include "../include/assimp/ai_assert.h"
 #include <sstream>
 
 struct aiScene;
@@ -67,6 +67,9 @@ protected:
 
 	/// Writes the asset header
 	void WriteHeader();
+
+  /// Writes the material setup
+  void WriteMaterials();
 
 	/// Writes the geometry library
 	void WriteGeometryLibrary();
@@ -105,6 +108,38 @@ protected:
 	std::string startstr;
 	/// current line end string for simple stream insertion
 	std::string endstr;
+
+  // pair of color and texture - texture precedences color
+  struct Surface 
+  { 
+    aiColor4D color; 
+    std::string texture; 
+    size_t channel; 
+    Surface() { channel = 0; }
+  };
+
+  // summarize a material in an convinient way. 
+  struct Material
+  {
+    std::string name;
+    Surface ambient, diffuse, specular, emissive, reflective, normal;
+    float shininess; /// specular exponent
+
+    Material() { shininess = 16.0f; }
+  };
+
+  std::vector<Material> materials;
+
+protected:
+  /// Dammit C++ - y u no compile two-pass? No I have to add all methods below the struct definitions
+  /// Reads a single surface entry from the given material keys
+  void ReadMaterialSurface( Surface& poSurface, const aiMaterial* pSrcMat, aiTextureType pTexture, const char* pKey, size_t pType, size_t pIndex);
+  /// Writes an image entry for the given surface
+  void WriteImageEntry( const Surface& pSurface, const std::string& pNameAdd);
+  /// Writes the two parameters necessary for referencing a texture in an effect entry
+  void WriteTextureParamEntry( const Surface& pSurface, const std::string& pTypeName, const std::string& pMatName);
+  /// Writes a color-or-texture entry into an effect definition
+  void WriteTextureColorEntry( const Surface& pSurface, const std::string& pTypeName, const std::string& pImageName);
 };
 
 }

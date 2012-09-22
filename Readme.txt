@@ -42,7 +42,7 @@ Urho3D uses the following third-party libraries:
 - GLee 5.4 (http://elf-stone.com/)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
-- Open Asset Import Library, svn rev 1102 (http://assimp.sourceforge.net/)
+- Open Asset Import Library 3.0 (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
 - SDL 2.0 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ copyright notice, this list of conditions and the
 following disclaimer in the documentation and/or other
 materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
 contributors may be used to endorse or promote products
 derived from this software without specific prior
-written permission of the ASSIMP Development Team.
+written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssimpPCH.h"
 #ifndef ASSIMP_BUILD_NO_DAE_IMPORTER
 
-#include "../include/aiAnim.h"
+#include "../include/assimp/anim.h"
 #include "ColladaLoader.h"
 #include "ColladaParser.h"
 
@@ -55,6 +55,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "time.h"
 
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"Collada Importer",
+	"",
+	"",
+	"http://collada.org",
+	aiImporterFlags_SupportTextFlavour,
+	1,
+	3,
+	1,
+	5,
+	"dae" 
+};
+
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -91,9 +105,9 @@ bool ColladaLoader::CanRead( const std::string& pFile, IOSystem* pIOHandler, boo
 
 // ------------------------------------------------------------------------------------------------
 // Get file extension list
-void ColladaLoader::GetExtensionList( std::set<std::string>& extensions )
+const aiImporterDesc* ColladaLoader::GetInfo () const
 {
-	extensions.insert("dae");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -230,13 +244,13 @@ void ColladaLoader::ResolveNodeInstances( const ColladaParser& pParser, const Co
 	{
 		// find the corresponding node in the library
 		const ColladaParser::NodeLibrary::const_iterator itt = pParser.mNodeLibrary.find((*it).mNode);
-		Collada::Node* nd = itt == pParser.mNodeLibrary.end() ? NULL : (*itt).second;
+		const Collada::Node* nd = itt == pParser.mNodeLibrary.end() ? NULL : (*itt).second;
 
 		// FIX for http://sourceforge.net/tracker/?func=detail&aid=3054873&group_id=226462&atid=1067632
 		// need to check for both name and ID to catch all. To avoid breaking valid files,
 		// the workaround is only enabled when the first attempt to resolve the node has failed.
 		if (!nd) {
-			nd = const_cast<Collada::Node*>(FindNode(pParser.mRootNode,(*it).mNode));
+			nd = FindNode(pParser.mRootNode,(*it).mNode);
 		}
 		if (!nd) 
 			DefaultLogger::get()->error("Collada: Unable to resolve reference to instanced node " + (*it).mNode);
@@ -619,7 +633,9 @@ aiMesh* ColladaLoader::CreateMesh( const ColladaParser& pParser, const Collada::
 
 		// build a temporary array of pointers to the start of each vertex's weights
 		typedef std::vector< std::pair<size_t, size_t> > IndexPairVector;
-		std::vector<IndexPairVector::const_iterator> weightStartPerVertex( pSrcController->mWeightCounts.size());
+		std::vector<IndexPairVector::const_iterator> weightStartPerVertex;
+		weightStartPerVertex.resize(pSrcController->mWeightCounts.size(),pSrcController->mWeights.end());
+
 		IndexPairVector::const_iterator pit = pSrcController->mWeights.begin();
 		for( size_t a = 0; a < pSrcController->mWeightCounts.size(); ++a)
 		{
@@ -910,7 +926,7 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
 			const Collada::AnimationChannel& srcChannel = *cit;
 			Collada::ChannelEntry entry;
 
-			// we except the animation target to be of type "nodeName/transformID.subElement". Ignore all others
+			// we expect the animation target to be of type "nodeName/transformID.subElement". Ignore all others
 			// find the slash that separates the node name - there should be only one
 			std::string::size_type slashPos = srcChannel.mTarget.find( '/');
 			if( slashPos == std::string::npos)
@@ -979,122 +995,134 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
 			if( e.mTimeAccessor->mCount != e.mValueAccessor->mCount)
 				throw DeadlyImportError( boost::str( boost::format( "Time count / value count mismatch in animation channel \"%s\".") % e.mChannel->mTarget));
 
-			// find bounding times
-			startTime = std::min( startTime, ReadFloat( *e.mTimeAccessor, *e.mTimeData, 0, 0));
-			endTime = std::max( endTime, ReadFloat( *e.mTimeAccessor, *e.mTimeData, e.mTimeAccessor->mCount-1, 0));
+      if( e.mTimeAccessor->mCount > 0 )
+      {
+			  // find bounding times
+			  startTime = std::min( startTime, ReadFloat( *e.mTimeAccessor, *e.mTimeData, 0, 0));
+  			endTime = std::max( endTime, ReadFloat( *e.mTimeAccessor, *e.mTimeData, e.mTimeAccessor->mCount-1, 0));
+      }
 		}
 
-		// create a local transformation chain of the node's transforms
-		std::vector<Collada::Transform> transforms = srcNode->mTransforms;
+    std::vector<aiMatrix4x4> resultTrafos;
+    if( !entries.empty() && entries.front().mTimeAccessor->mCount > 0 )
+    {
+		  // create a local transformation chain of the node's transforms
+		  std::vector<Collada::Transform> transforms = srcNode->mTransforms;
 
-		// now for every unique point in time, find or interpolate the key values for that time
-		// and apply them to the transform chain. Then the node's present transformation can be calculated.
-		float time = startTime;
-		std::vector<aiMatrix4x4> resultTrafos;
-		while( 1)
-		{
-			for( std::vector<Collada::ChannelEntry>::iterator it = entries.begin(); it != entries.end(); ++it)
-			{
-				Collada::ChannelEntry& e = *it;
+		  // now for every unique point in time, find or interpolate the key values for that time
+		  // and apply them to the transform chain. Then the node's present transformation can be calculated.
+		  float time = startTime;
+		  while( 1)
+		  {
+			  for( std::vector<Collada::ChannelEntry>::iterator it = entries.begin(); it != entries.end(); ++it)
+			  {
+				  Collada::ChannelEntry& e = *it;
 
-				// find the keyframe behind the current point in time
-				size_t pos = 0;
-				float postTime = 0.f;
-				while( 1)
-				{
-					if( pos >= e.mTimeAccessor->mCount)
-						break;
-					postTime = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos, 0);
-					if( postTime >= time)
-						break;
-					++pos;
-				}
+				  // find the keyframe behind the current point in time
+				  size_t pos = 0;
+				  float postTime = 0.f;
+				  while( 1)
+				  {
+					  if( pos >= e.mTimeAccessor->mCount)
+						  break;
+					  postTime = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos, 0);
+					  if( postTime >= time)
+						  break;
+					  ++pos;
+				  }
 
-				pos = std::min( pos, e.mTimeAccessor->mCount-1);
+				  pos = std::min( pos, e.mTimeAccessor->mCount-1);
 
-				// read values from there
-				float temp[16];
-				for( size_t c = 0; c < e.mValueAccessor->mSize; ++c)
-					temp[c] = ReadFloat( *e.mValueAccessor, *e.mValueData, pos, c);
+				  // read values from there
+				  float temp[16];
+				  for( size_t c = 0; c < e.mValueAccessor->mSize; ++c)
+					  temp[c] = ReadFloat( *e.mValueAccessor, *e.mValueData, pos, c);
 
-				// if not exactly at the key time, interpolate with previous value set
-				if( postTime > time && pos > 0)
-				{
-					float preTime = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos-1, 0);
-					float factor = (time - postTime) / (preTime - postTime);
+				  // if not exactly at the key time, interpolate with previous value set
+				  if( postTime > time && pos > 0)
+				  {
+					  float preTime = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos-1, 0);
+					  float factor = (time - postTime) / (preTime - postTime);
 
-					for( size_t c = 0; c < e.mValueAccessor->mSize; ++c)
-					{
-						float v = ReadFloat( *e.mValueAccessor, *e.mValueData, pos-1, c);
-						temp[c] += (v - temp[c]) * factor;
-					}
-				}
+					  for( size_t c = 0; c < e.mValueAccessor->mSize; ++c)
+					  {
+						  float v = ReadFloat( *e.mValueAccessor, *e.mValueData, pos-1, c);
+						  temp[c] += (v - temp[c]) * factor;
+					  }
+				  }
 
-				// Apply values to current transformation
-				std::copy( temp, temp + e.mValueAccessor->mSize, transforms[e.mTransformIndex].f + e.mSubElement);
-			}
+				  // Apply values to current transformation
+				  std::copy( temp, temp + e.mValueAccessor->mSize, transforms[e.mTransformIndex].f + e.mSubElement);
+			  }
 
-			// Calculate resulting transformation
-			aiMatrix4x4 mat = pParser.CalculateResultTransform( transforms);
+			  // Calculate resulting transformation
+			  aiMatrix4x4 mat = pParser.CalculateResultTransform( transforms);
 
-			// out of lazyness: we store the time in matrix.d4
-			mat.d4 = time;
-			resultTrafos.push_back( mat);
+			  // out of lazyness: we store the time in matrix.d4
+			  mat.d4 = time;
+			  resultTrafos.push_back( mat);
 
-			// find next point in time to evaluate. That's the closest frame larger than the current in any channel
-			float nextTime = 1e20f;
-			for( std::vector<Collada::ChannelEntry>::iterator it = entries.begin(); it != entries.end(); ++it)
-			{
-				Collada::ChannelEntry& e = *it;
+			  // find next point in time to evaluate. That's the closest frame larger than the current in any channel
+			  float nextTime = 1e20f;
+			  for( std::vector<Collada::ChannelEntry>::iterator it = entries.begin(); it != entries.end(); ++it)
+			  {
+				  Collada::ChannelEntry& e = *it;
 
-				// find the next time value larger than the current
-				size_t pos = 0;
-				while( pos < e.mTimeAccessor->mCount)
-				{
-					float t = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos, 0);
-					if( t > time)
-					{
-						nextTime = std::min( nextTime, t);
-						break;
-					}
-					++pos;
-				}
-			}
+				  // find the next time value larger than the current
+				  size_t pos = 0;
+				  while( pos < e.mTimeAccessor->mCount)
+				  {
+					  float t = ReadFloat( *e.mTimeAccessor, *e.mTimeData, pos, 0);
+					  if( t > time)
+					  {
+						  nextTime = std::min( nextTime, t);
+						  break;
+					  }
+					  ++pos;
+				  }
+			  }
 
-			// no more keys on any channel after the current time -> we're done
-			if( nextTime > 1e19)
-				break;
+			  // no more keys on any channel after the current time -> we're done
+			  if( nextTime > 1e19)
+				  break;
 
-			// else construct next keyframe at this following time point
-			time = nextTime;
-		}
+			  // else construct next keyframe at this following time point
+			  time = nextTime;
+		  }
+    }
 
-		// there should be some keyframes
-		ai_assert( resultTrafos.size() > 0);
+		// there should be some keyframes, but we aren't that fixated on valid input data
+//		ai_assert( resultTrafos.size() > 0);
 
 		// build an animation channel for the given node out of these trafo keys
-		aiNodeAnim* dstAnim = new aiNodeAnim;
-		dstAnim->mNodeName = nodeName;
-		dstAnim->mNumPositionKeys = resultTrafos.size();
-		dstAnim->mNumRotationKeys= resultTrafos.size();
-		dstAnim->mNumScalingKeys = resultTrafos.size();
-		dstAnim->mPositionKeys = new aiVectorKey[resultTrafos.size()];
-		dstAnim->mRotationKeys = new aiQuatKey[resultTrafos.size()];
-		dstAnim->mScalingKeys = new aiVectorKey[resultTrafos.size()];
+    if( !resultTrafos.empty() )
+    {
+		  aiNodeAnim* dstAnim = new aiNodeAnim;
+		  dstAnim->mNodeName = nodeName;
+		  dstAnim->mNumPositionKeys = resultTrafos.size();
+		  dstAnim->mNumRotationKeys= resultTrafos.size();
+		  dstAnim->mNumScalingKeys = resultTrafos.size();
+		  dstAnim->mPositionKeys = new aiVectorKey[resultTrafos.size()];
+		  dstAnim->mRotationKeys = new aiQuatKey[resultTrafos.size()];
+		  dstAnim->mScalingKeys = new aiVectorKey[resultTrafos.size()];
 
-		for( size_t a = 0; a < resultTrafos.size(); ++a)
-		{
-			aiMatrix4x4 mat = resultTrafos[a];
-			double time = double( mat.d4); // remember? time is stored in mat.d4
-      mat.d4 = 1.0f;
+		  for( size_t a = 0; a < resultTrafos.size(); ++a)
+		  {
+			  aiMatrix4x4 mat = resultTrafos[a];
+			  double time = double( mat.d4); // remember? time is stored in mat.d4
+        mat.d4 = 1.0f;
 
-			dstAnim->mPositionKeys[a].mTime = time;
-			dstAnim->mRotationKeys[a].mTime = time;
-			dstAnim->mScalingKeys[a].mTime = time;
-			mat.Decompose( dstAnim->mScalingKeys[a].mValue, dstAnim->mRotationKeys[a].mValue, dstAnim->mPositionKeys[a].mValue);
-		}
+			  dstAnim->mPositionKeys[a].mTime = time;
+			  dstAnim->mRotationKeys[a].mTime = time;
+			  dstAnim->mScalingKeys[a].mTime = time;
+			  mat.Decompose( dstAnim->mScalingKeys[a].mValue, dstAnim->mRotationKeys[a].mValue, dstAnim->mPositionKeys[a].mValue);
+		  }
 
-		anims.push_back( dstAnim);
+		  anims.push_back( dstAnim);
+    } else
+    {
+      DefaultLogger::get()->warn( "Collada loader: found empty animation channel, ignored. Please check your exporter.");
+    }
 	}
 
 	if( !anims.empty())
@@ -1240,7 +1268,7 @@ void ColladaLoader::FillMaterials( const ColladaParser& pParser, aiScene* /*pSce
 
 		// transparency, a very hard one. seemingly not all files are following the
 		// specification here .. but we can trick.
-		if (effect.mTransparency > 0.f && effect.mTransparency < 1.f) {
+		if (effect.mTransparency >= 0.f && effect.mTransparency < 1.f) {
 			effect.mTransparency = 1.f- effect.mTransparency;
 			mat.AddProperty( &effect.mTransparency, 1, AI_MATKEY_OPACITY );
 			mat.AddProperty( &effect.mTransparent, 1, AI_MATKEY_COLOR_TRANSPARENT );
@@ -1273,7 +1301,7 @@ void ColladaLoader::FillMaterials( const ColladaParser& pParser, aiScene* /*pSce
 
 // ------------------------------------------------------------------------------------------------
 // Constructs materials from the collada material definitions
-void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* /*pScene*/)
+void ColladaLoader::BuildMaterials( ColladaParser& pParser, aiScene* /*pScene*/)
 {
 	newMats.reserve(pParser.mMaterialLibrary.size());
 
@@ -1281,10 +1309,10 @@ void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* /*pSc
 	{
 		const Collada::Material& material = matIt->second;
 		// a material is only a reference to an effect
-		ColladaParser::EffectLibrary::const_iterator effIt = pParser.mEffectLibrary.find( material.mEffect);
+		ColladaParser::EffectLibrary::iterator effIt = pParser.mEffectLibrary.find( material.mEffect);
 		if( effIt == pParser.mEffectLibrary.end())
 			continue;
-		const Collada::Effect& effect = effIt->second;
+		Collada::Effect& effect = effIt->second;
 
 		// create material
 		aiMaterial* mat = new aiMaterial;
@@ -1293,7 +1321,7 @@ void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* /*pSc
 
 		// store the material
 		mMaterialIndexByName[matIt->first] = newMats.size();
-		newMats.push_back( std::pair<Collada::Effect*, aiMaterial*>(const_cast<Collada::Effect*>(&effect),mat) );
+		newMats.push_back( std::pair<Collada::Effect*, aiMaterial*>( &effect,mat) );
 	}
 	// ScenePreprocessor generates a default material automatically if none is there.
 	// All further code here in this loader works well without a valid material so
@@ -1396,6 +1424,33 @@ void ColladaLoader::ConvertPath (aiString& ss)
 		memmove(ss.data,ss.data+7,ss.length);
 		ss.data[ss.length] = '\0';
 	}
+
+  // Maxon Cinema Collada Export writes "file:///C:\andsoon" with three slashes... 
+  // I need to filter it without destroying linux paths starting with "/somewhere"
+  if( ss.data[0] == '/' && isalpha( ss.data[1]) && ss.data[2] == ':' )
+  {
+    ss.length--;
+    memmove( ss.data, ss.data+1, ss.length);
+    ss.data[ss.length] = 0;
+  }
+
+  // find and convert all %xyz special chars
+  char* out = ss.data;
+  for( const char* it = ss.data; it != ss.data + ss.length; /**/ )
+  {
+    if( *it == '%' )
+    {
+      size_t nbr = strtoul16( ++it, &it);
+      *out++ = (char)(nbr & 0xFF);
+    } else
+    {
+      *out++ = *it++;
+    }
+  }
+
+  // adjust length and terminator of the shortened string
+  *out = 0;
+  ss.length = (ptrdiff_t) (out - ss.data);
 }
 
 // ------------------------------------------------------------------------------------------------

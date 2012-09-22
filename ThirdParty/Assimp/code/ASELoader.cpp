@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -58,6 +58,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace Assimp;
 using namespace Assimp::ASE;
 
+static const aiImporterDesc desc = {
+	"ASE Importer",
+	"",
+	"",
+	"Similar to 3DS but text-encoded",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"ase ask" 
+};
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 ASEImporter::ASEImporter()
@@ -86,10 +99,10 @@ bool ASEImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 }
 
 // ------------------------------------------------------------------------------------------------
-void ASEImporter::GetExtensionList(std::set<std::string>& extensions)
+// Loader meta information
+const aiImporterDesc* ASEImporter::GetInfo () const
 {
-	extensions.insert("ase");
-	extensions.insert("ask");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1152,7 +1165,7 @@ void ASEImporter::ConvertMeshes(ASE::Mesh& mesh, std::vector<aiMesh*>& avOutMesh
 
 		// copy vertex bones
 		if (!mesh.mBones.empty() && !mesh.mBoneVertices.empty())	{
-			std::vector<aiVertexWeight>* avBonesOut = new std::vector<aiVertexWeight>[mesh.mBones.size()];
+			std::vector<std::vector<aiVertexWeight> > avBonesOut( mesh.mBones.size() );
 
 			// find all vertex weights for this bone
 			unsigned int quak = 0;
@@ -1188,9 +1201,6 @@ void ASEImporter::ConvertMeshes(ASE::Mesh& mesh, std::vector<aiMesh*>& avOutMesh
 					++pcBone;
 				}
 			}
-
-			// delete allocated storage
-			delete[] avBonesOut;
 		}
 	}
 }

@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -84,7 +84,7 @@ void FillMaterial(aiMaterial* mat,const IFC::IfcSurfaceStyle* surf,ConversionDat
 			if (const IFC::IfcSurfaceStyleRendering* ren = shade->ToPtr<IFC::IfcSurfaceStyleRendering>()) {
 
 				if (ren->Transparency) {
-					const float t = 1.f-ren->Transparency.Get();
+					const float t = 1.f-static_cast<float>(ren->Transparency.Get());
 					mat->AddProperty(&t,1, AI_MATKEY_OPACITY);
 				}
 
@@ -115,7 +115,7 @@ void FillMaterial(aiMaterial* mat,const IFC::IfcSurfaceStyle* surf,ConversionDat
 					if(const EXPRESS::REAL* rt = ren->SpecularHighlight.Get()->ToPtr<EXPRESS::REAL>()) {
 						// at this point we don't distinguish between the two distinct ways of
 						// specifying highlight intensities. leave this to the user.
-						const float e = *rt;
+						const float e = static_cast<float>(*rt);
 						mat->AddProperty(&e,1,AI_MATKEY_SHININESS);
 					}
 					else {
@@ -141,7 +141,7 @@ unsigned int ProcessMaterials(const IFC::IfcRepresentationItem& item, Conversion
 		name.Set("<IFCDefault>");
 		mat->AddProperty(&name,AI_MATKEY_NAME);
 
-		aiColor4D col = aiColor4D(0.6f,0.6f,0.6f,1.0f);
+		const aiColor4D col = aiColor4D(0.6f,0.6f,0.6f,1.0f);
 		mat->AddProperty(&col,1, AI_MATKEY_COLOR_DIFFUSE);
 
 		conv.materials.push_back(mat.release());

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -106,11 +106,35 @@ void BaseImporter::SetupProperties(const Importer* /*pImp*/)
 }
 
 // ------------------------------------------------------------------------------------------------
+void BaseImporter::GetExtensionList(std::set<std::string>& extensions)
+{
+	const aiImporterDesc* desc = GetInfo();
+	ai_assert(desc != NULL);
+
+	const char* ext = desc->mFileExtensions;
+	ai_assert(ext != NULL);
+
+	const char* last = ext;
+	do {
+		if (!*ext || *ext == ' ') {
+			extensions.insert(std::string(last,ext-last));
+			ai_assert(ext-last > 0);
+			last = ext;
+			while(*last == ' ') {
+				++last;
+			}
+		}
+	}
+	while(*ext++);
+}
+
+// ------------------------------------------------------------------------------------------------
 /*static*/ bool BaseImporter::SearchFileHeaderForToken(IOSystem* pIOHandler,
 	const std::string&	pFile,
 	const char**		tokens, 
 	unsigned int		numTokens,
-	unsigned int		searchBytes /* = 200 */)
+	unsigned int		searchBytes /* = 200 */,
+	bool				tokensSol /* false */)
 {
 	ai_assert(NULL != tokens && 0 != numTokens && 0 != searchBytes);
 	if (!pIOHandler)
@@ -142,7 +166,13 @@ void BaseImporter::SetupProperties(const Importer* /*pImp*/)
 		for (unsigned int i = 0; i < numTokens;++i)	{
 			ai_assert(NULL != tokens[i]);
 
-			if (::strstr(buffer,tokens[i]))	{
+
+			const char* r = strstr(buffer,tokens[i]);
+			if (!r) 
+				continue;
+			// We got a match, either we don't care where it is, or it happens to
+			// be in the beginning of the file / line
+			if (!tokensSol || r == buffer || r[-1] == '\r' || r[-1] == '\n') {
 				DefaultLogger::get()->debug(std::string("Found positive match for header keyword: ") + tokens[i]);
 				return true;
 			}
@@ -507,9 +537,10 @@ void BatchLoader::LoadAll()
 		pp |= aiProcess_ValidateDataStructure;
 #endif
 		// setup config properties if necessary
-		data->pImporter->pimpl->mFloatProperties  = (*it).map.floats;
-		data->pImporter->pimpl->mIntProperties    = (*it).map.ints;
-		data->pImporter->pimpl->mStringProperties = (*it).map.strings;
+		ImporterPimpl* pimpl = data->pImporter->Pimpl();
+		pimpl->mFloatProperties  = (*it).map.floats;
+		pimpl->mIntProperties    = (*it).map.ints;
+		pimpl->mStringProperties = (*it).map.strings;
 
 		if (!DefaultLogger::isNullLogger())
 		{
@@ -517,7 +548,7 @@ void BatchLoader::LoadAll()
 			DefaultLogger::get()->info("File: " + (*it).file);
 		}
 		data->pImporter->ReadFile((*it).file,pp);
-		(*it).scene = const_cast<aiScene*>(data->pImporter->GetOrphanedScene());
+		(*it).scene = data->pImporter->GetOrphanedScene();
 		(*it).loaded = true;
 
 		DefaultLogger::get()->info("%%% END EXTERNAL FILE %%%");

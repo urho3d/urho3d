@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -54,6 +54,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace Assimp;
 using namespace std;
 
+static const aiImporterDesc desc = {
+	"BlitzBasic 3D Importer",
+	"",
+	"",
+	"http://www.blitzbasic.com/",
+	aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	0,
+	0,
+	"b3d" 
+};
+
 // (fixme, Aramis) quick workaround to get rid of all those signed to unsigned warnings
 #ifdef _MSC_VER 
 #	pragma warning (disable: 4018)
@@ -74,8 +87,10 @@ bool B3DImporter::CanRead( const std::string& pFile, IOSystem* /*pIOHandler*/, b
 }
 
 // ------------------------------------------------------------------------------------------------
-void B3DImporter::GetExtensionList( std::set<std::string>& extensions ){
-	extensions.insert("b3d");
+// Loader meta information
+const aiImporterDesc* B3DImporter::GetInfo () const
+{
+	return &desc;
 }
 
 #ifdef DEBUG_B3D

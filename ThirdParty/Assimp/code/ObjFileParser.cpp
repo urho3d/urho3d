@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObjTools.h"
 #include "ObjFileData.h"
 #include "ParsingUtils.h"
-#include "../include/aiTypes.h"
+#include "../include/assimp/types.h"
 #include "DefaultIOSystem.h"
 
 namespace Assimp	
@@ -84,8 +84,8 @@ ObjFileParser::ObjFileParser(std::vector<char> &Data,const std::string &strModel
 //	Destructor
 ObjFileParser::~ObjFileParser()
 {
-	delete m_pModel->m_pDefaultMaterial;
-	m_pModel->m_pDefaultMaterial = NULL;
+	/*delete m_pModel->m_pDefaultMaterial;
+	m_pModel->m_pDefaultMaterial = NULL;*/
 
 	delete m_pModel;
 	m_pModel = NULL;
@@ -377,6 +377,15 @@ void ObjFileParser::getFace(aiPrimitiveType type)
 //	Get values for a new material description
 void ObjFileParser::getMaterialDesc()
 {
+	// Each material request a new object.
+	// Sometimes the object is already created (see 'o' tag by example), but it is not initialized !
+	// So, we create a new object only if the current on is already initialized !
+	if (m_pModel->m_pCurrent != NULL &&
+		(	m_pModel->m_pCurrent->m_Meshes.size() > 1 ||
+			(m_pModel->m_pCurrent->m_Meshes.size() == 1 && m_pModel->m_Meshes[m_pModel->m_pCurrent->m_Meshes[0]]->m_Faces.size() != 0)	)
+		)
+		m_pModel->m_pCurrent = NULL;
+
 	// Get next data for material data
 	m_DataIt = getNextToken<DataArrayIt>(m_DataIt, m_DataItEnd);
 	if (m_DataIt == m_DataItEnd)

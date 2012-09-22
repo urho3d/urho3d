@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <map>
-#include "../include/aiTypes.h"
-#include "../include/aiMesh.h"
+#include "../include/assimp/types.h"
+#include "../include/assimp/mesh.h"
 
 namespace Assimp
 {
@@ -58,7 +58,7 @@ struct Material;
 
 // ------------------------------------------------------------------------------------------------
 //!	\struct	Face
-//!	\brief	Datastructure for a simple obj-face, descripes discredisation and materials
+//!	\brief	Data structure for a simple obj-face, describes discredit,l.ation and materials
 struct Face
 {
 	typedef std::vector<unsigned int> IndexArray;
@@ -96,8 +96,10 @@ struct Face
 	{	
 		delete m_pVertices;
 		m_pVertices = NULL;
+
 		delete m_pNormals;
 		m_pNormals = NULL;
+
 		delete m_pTexturCoords;
 		m_pTexturCoords = NULL;
 	}
@@ -162,7 +164,7 @@ struct Material
 	aiColor3D ambient;
 	//!	Diffuse color
 	aiColor3D diffuse;
-	//!	Speculao color
+	//!	Specular color
 	aiColor3D specular;
 	//!	Alpha value
 	float alpha;
@@ -228,7 +230,6 @@ struct Mesh
 		{
 			delete *it;
 		}
-
 	}
 };
 
@@ -259,7 +260,7 @@ struct Model
 	std::vector<aiVector3D> m_Vertices;
 	//!	vector with all generated normals
 	std::vector<aiVector3D> m_Normals;
-	//!	Groupmap
+	//!	Group map
 	GroupMap m_Groups;
 	//!	Group to face id assignment
 	std::vector<unsigned int> *m_pGroupFaceIDs;
@@ -273,7 +274,6 @@ struct Model
 	std::vector<Mesh*> m_Meshes;
 	//!	Material map
 	std::map<std::string, Material*> m_MaterialMap;
-
 
 	//!	\brief	Default constructor
 	Model() :
@@ -292,28 +292,26 @@ struct Model
 	{
 		// Clear all stored object instances
 		for (std::vector<Object*>::iterator it = m_Objects.begin();
-			it != m_Objects.end(); ++it)
-		{
+			it != m_Objects.end(); ++it) {
 			delete *it;
 		}
 		m_Objects.clear();
 		
 		// Clear all stored mesh instances
 		for (std::vector<Mesh*>::iterator it = m_Meshes.begin();
-			it != m_Meshes.end(); ++it)
-		{
+			it != m_Meshes.end(); ++it) {
 			delete *it;
 		}
-
 		m_Meshes.clear();
 
-		for(GroupMapIt it = m_Groups.begin();
-			it != m_Groups.end(); ++it)
-		{
+		for(GroupMapIt it = m_Groups.begin(); it != m_Groups.end(); ++it) {
 			delete it->second;
 		}
-		
 		m_Groups.clear();
+
+		for ( std::map<std::string, Material*>::iterator it = m_MaterialMap.begin(); it != m_MaterialMap.end(); ++it ) {
+//			delete it->second;
+		}
 	}
 };
 

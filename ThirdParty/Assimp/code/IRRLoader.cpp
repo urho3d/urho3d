@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -61,6 +61,18 @@ using namespace Assimp;
 using namespace irr;
 using namespace irr::io;
 
+static const aiImporterDesc desc = {
+	"Irrlicht Scene Reader",
+	"",
+	"",
+	"http://irrlicht.sourceforge.net/",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"irr xml" 
+};
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -98,10 +110,9 @@ bool IRRImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 }
 
 // ------------------------------------------------------------------------------------------------
-void IRRImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* IRRImporter::GetInfo () const
 {
-	extensions.insert("irr");
-	extensions.insert("xml");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -457,7 +468,7 @@ void IRRImporter::ComputeAnimations(Node* root, aiNode* real, std::vector<aiNode
 					key.mTime = i * tdelta;
 
 					const float t = (float) ( in.speed * key.mTime );
-					key.mValue = in.circleCenter  + in.circleRadius * ((vecU*::cos(t)) + (vecV*::sin(t)));
+					key.mValue = in.circleCenter  + in.circleRadius * ((vecU*::cosf(t)) + (vecV*::sinf(t)));
 				}
 
 				// This animation is repeated and repeated ...
@@ -546,7 +557,7 @@ void IRRImporter::ComputeAnimations(Node* root, aiNode* real, std::vector<aiNode
 					t2 = (h1 * p1 + p2 * h2 + t1 * h3 + h4 * t2);
 
 					// build a simple translation matrix from it
-					key.mValue = t2.x;
+					key.mValue = t2;
 					key.mTime  = (double) i;
 				}
 			}

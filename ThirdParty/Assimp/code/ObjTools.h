@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -146,7 +146,8 @@ inline char_t skipLine( char_t it, char_t end, unsigned int &uiLine )
 	return it;
 }
 
-/**	@brief	Get a name, must be separated with a blank.
+/**	@brief	Get a name from the current line. Preserve space in the middle,
+ *    but trim it at the end.
  *	@param	it		set to current position
  *	@param	end		set to end of scratch buffer for readout
  *	@param	name	Separated name
@@ -161,8 +162,14 @@ inline char_t getName( char_t it, char_t end, std::string &name )
 		return end;
 	
 	char *pStart = &( *it );
-	while ( !isEndOfBuffer( it, end ) && !isSeparator( *it ) )
+	while ( !isEndOfBuffer( it, end ) && !isNewLine( *it ) ) {
 		++it;
+	}
+
+	while(isEndOfBuffer( it, end ) || isNewLine( *it ) || isSeparator(*it)) {
+		--it;
+	}
+	++it;
 
 	// Get name
 	std::string strName( pStart, &(*it) );
@@ -213,6 +220,38 @@ inline char_t getFloat( char_t it, char_t end, float &value )
 	value = (float) fast_atof( buffer );
 
 	return it;
+}
+
+/**	@brief	Will perform a simple tokenize.
+ *	@param	str			String to tokenize.
+ *	@param	tokens		Array with tokens, will be empty if no token was found.
+ *	@param	delimiters	Delimiter for tokenize.
+ *	@return	Number of found token.
+ */
+template<class string_type>
+unsigned int tokenize( const string_type& str, std::vector<string_type>& tokens, 
+						 const string_type& delimiters ) 
+{
+	// Skip delimiters at beginning.
+	typename string_type::size_type lastPos = str.find_first_not_of( delimiters, 0 );
+
+	// Find first "non-delimiter".
+	typename string_type::size_type pos = str.find_first_of( delimiters, lastPos );
+	while ( string_type::npos != pos || string_type::npos != lastPos )
+	{
+		// Found a token, add it to the vector.
+		string_type tmp = str.substr(lastPos, pos - lastPos);
+		if ( !tmp.empty() && ' ' != tmp[ 0 ] )
+			tokens.push_back( tmp );
+
+		// Skip delimiters.  Note the "not_of"
+		lastPos = str.find_first_not_of( delimiters, pos );
+
+		// Find next "non-delimiter"
+		pos = str.find_first_of( delimiters, lastPos );
+	}
+
+	return static_cast<unsigned int>( tokens.size() );
 }
 
 } // Namespace Assimp

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -51,6 +51,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+static const aiImporterDesc desc = {
+	"Stereolithography (STL) Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour | aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	0,
+	0,
+	"stl" 
+};
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -80,9 +92,9 @@ bool STLImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 }
 
 // ------------------------------------------------------------------------------------------------
-void STLImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* STLImporter::GetInfo () const
 {
-	extensions.insert("stl");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -239,11 +251,11 @@ void STLImporter::LoadASCIIFile()
 			{
 				sz += 7;
 				SkipSpaces(&sz);
-				sz = fast_atof_move(sz, (float&)vn->x ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->x ); 
 				SkipSpaces(&sz);
-				sz = fast_atof_move(sz, (float&)vn->y ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->y ); 
 				SkipSpaces(&sz);
-				sz = fast_atof_move(sz, (float&)vn->z ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->z ); 
 				*(vn+1) = *vn;
 				*(vn+2) = *vn;
 			}
@@ -259,11 +271,11 @@ void STLImporter::LoadASCIIFile()
 				sz += 7;
 				SkipSpaces(&sz);
 				aiVector3D* vn = &pMesh->mVertices[(curFace-1)*3 + curVertex++];
-				sz = fast_atof_move(sz, (float&)vn->x ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->x ); 
 				SkipSpaces(&sz);
-				sz = fast_atof_move(sz, (float&)vn->y ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->y ); 
 				SkipSpaces(&sz);
-				sz = fast_atof_move(sz, (float&)vn->z ); 
+				sz = fast_atoreal_move<float>(sz, (float&)vn->z ); 
 			}
 		}
 		else if (!::strncmp(sz,"endsolid",8))	{

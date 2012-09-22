@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -51,6 +51,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MS3DLoader.h"
 #include "StreamReader.h"
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"Milkshape 3D Importer",
+	"",
+	"",
+	"http://chumbalum.swissquake.ch/",
+	aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	0,
+	0,
+	"ms3d" 
+};
 
 // ASSIMP_BUILD_MS3D_ONE_NODE_PER_MESH
 //   (enable old code path, which generates extra nodes per mesh while
@@ -89,9 +102,9 @@ bool MS3DImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool
 }
 
 // ------------------------------------------------------------------------------------------------
-void MS3DImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* MS3DImporter::GetInfo () const
 {
-	extensions.insert("ms3d");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -582,8 +595,12 @@ void MS3DImporter::InternReadFile( const std::string& pFile,
 	if(joints.size()) {
 #ifndef ASSIMP_BUILD_MS3D_ONE_NODE_PER_MESH
 		rt->mChildren = new aiNode*[1]();
-#endif
+		rt->mNumChildren = 1;
+
+		aiNode* jt = rt->mChildren[0] = new aiNode();
+#else
 		aiNode* jt = rt->mChildren[pScene->mNumMeshes] = new aiNode();
+#endif
 		jt->mParent = rt;
 		CollectChildJoints(joints,jt);
 		jt->mName.Set("<MS3DJointRoot>");

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -53,6 +53,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MD2FileData.h" 
 
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"Quake Mesh / 3D GameStudio Mesh Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	7,
+	0,
+	"mdl"
+};
 
 // ------------------------------------------------------------------------------------------------
 // Ugly stuff ... nevermind
@@ -116,9 +129,9 @@ void MDLImporter::SetupProperties(const Importer* pImp)
 
 // ------------------------------------------------------------------------------------------------
 // Get a list of all supported extensions
-void MDLImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* MDLImporter::GetInfo () const
 {
-	extensions.insert( "mdl" );
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -191,7 +204,7 @@ void MDLImporter::InternReadFile( const std::string& pFile,
 		iGSFileVersion = 7;
 		InternReadFile_3DGS_MDL7();
 	}
-	// IDST/IDSQ Format (CS:S/HL², etc ...)
+	// IDST/IDSQ Format (CS:S/HL^2, etc ...)
 	else if (AI_MDL_MAGIC_NUMBER_BE_HL2a == iMagicWord || AI_MDL_MAGIC_NUMBER_LE_HL2a == iMagicWord ||
 		AI_MDL_MAGIC_NUMBER_BE_HL2b == iMagicWord || AI_MDL_MAGIC_NUMBER_LE_HL2b == iMagicWord)
 	{
@@ -970,7 +983,7 @@ void MDLImporter::ReadFaces_3DGS_MDL7(const MDL::IntGroupInfo_MDL7& groupInfo,
 	MDL::IntGroupData_MDL7& groupData)
 {
 	const MDL::Header_MDL7 *pcHeader = (const MDL::Header_MDL7*)this->mBuffer; 
-	BE_NCONST MDL::Triangle_MDL7* pcGroupTris = groupInfo.pcGroupTris;
+	MDL::Triangle_MDL7* pcGroupTris = groupInfo.pcGroupTris;
 
 	// iterate through all triangles and build valid display lists
 	unsigned int iOutIndex = 0;
@@ -986,7 +999,7 @@ void MDLImporter::ReadFaces_3DGS_MDL7(const MDL::IntGroupInfo_MDL7& groupInfo,
 			unsigned int iIndex = pcGroupTris->v_index[c];
 			if(iIndex > (unsigned int)groupInfo.pcGroup->numverts)	{
 				// (we might need to read this section a second time - to process frame vertices correctly)
-				const_cast<MDL::Triangle_MDL7*>(pcGroupTris)->v_index[c] = iIndex = groupInfo.pcGroup->numverts-1;
+				pcGroupTris->v_index[c] = iIndex = groupInfo.pcGroup->numverts-1;
 				DefaultLogger::get()->warn("Index overflow in MDL7 vertex list");
 			}
 
@@ -1083,7 +1096,7 @@ void MDLImporter::ReadFaces_3DGS_MDL7(const MDL::IntGroupInfo_MDL7& groupInfo,
 			}
 		}
 		// get the next triangle in the list
-		pcGroupTris = (BE_NCONST MDL::Triangle_MDL7*)((const char*)pcGroupTris + pcHeader->triangle_stc_size);
+		pcGroupTris = (MDL::Triangle_MDL7*)((const char*)pcGroupTris + pcHeader->triangle_stc_size);
 	}
 }
 
@@ -1422,7 +1435,7 @@ void MDLImporter::InternReadFile_3DGS_MDL7( )
 		szCurrent += pcHeader->skinpoint_stc_size * groupInfo.pcGroup->num_stpts;
 
 		// now get a pointer to all triangle in the group
-		groupInfo.pcGroupTris = (BE_NCONST MDL::Triangle_MDL7*)szCurrent;
+		groupInfo.pcGroupTris = (Triangle_MDL7*)szCurrent;
 		szCurrent += pcHeader->triangle_stc_size * groupInfo.pcGroup->numtris;
 
 		// now get a pointer to all vertices in the group

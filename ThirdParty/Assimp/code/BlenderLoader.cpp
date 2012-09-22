@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -63,21 +63,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #	endif
 #endif
 
+namespace Assimp {
+	template<> const std::string LogFunctions<BlenderImporter>::log_prefix = "BLEND: ";
+}
+
 using namespace Assimp;
 using namespace Assimp::Blender;
 using namespace Assimp::Formatter;
 
-template<> const std::string LogFunctions<BlenderImporter>::log_prefix = "BLEND: ";
-static const aiLoaderDesc blenderDesc = {
+static const aiImporterDesc blenderDesc = {
 	"Blender 3D Importer \nhttp://www.blender3d.org",
-	"Assimp Team",
 	"",
 	"",
-	aiLoaderFlags_SupportBinaryFlavour | aiLoaderFlags_Experimental,
+	"No animation support yet",
+	aiImporterFlags_SupportBinaryFlavour,
 	0,
 	0,
 	2,
-	50
+	50,
+	"blend"
 };
 
 
@@ -120,9 +124,9 @@ void BlenderImporter::GetExtensionList(std::set<std::string>& app)
 
 // ------------------------------------------------------------------------------------------------
 // Loader registry entry
-const aiLoaderDesc& BlenderImporter::GetInfo () const
+const aiImporterDesc* BlenderImporter::GetInfo () const
 {
-	return blenderDesc;
+	return &blenderDesc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -295,7 +299,11 @@ void BlenderImporter::ExtractScene(Scene& out, const FileDatabase& file)
 
 	// we need a scene somewhere to start with. 
 	for_each(const FileBlockHead& bl,file.entries) {
-		if (bl.id == "SC") {
+
+		// Fix: using the DNA index is more reliable to locate scenes
+		//if (bl.id == "SC") {
+
+		if (bl.dna_index == (*it).second) {
 			block = &bl;
 			break;
 		}
@@ -874,7 +882,7 @@ aiNode* BlenderImporter::ConvertNode(const Scene& in, const Object* obj, Convers
 	std::deque<const Object*> children;
 	for(std::set<const Object*>::iterator it = conv_data.objects.begin(); it != conv_data.objects.end() ;) {
 		const Object* object = *it;
-		if (object->parent.get() == obj) {
+		if (object->parent == obj) {
 			children.push_back(object);
 
 			conv_data.objects.erase(it++);

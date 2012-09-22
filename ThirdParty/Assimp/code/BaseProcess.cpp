@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -67,7 +67,7 @@ BaseProcess::~BaseProcess()
 // ------------------------------------------------------------------------------------------------
 void BaseProcess::ExecuteOnScene( Importer* pImp)
 {
-	ai_assert(NULL != pImp && NULL != pImp->pimpl->mScene);
+	ai_assert(NULL != pImp && NULL != pImp->Pimpl()->mScene);
 
 	progress = pImp->GetProgressHandler();
 	ai_assert(progress);
@@ -77,17 +77,17 @@ void BaseProcess::ExecuteOnScene( Importer* pImp)
 	// catch exceptions thrown inside the PostProcess-Step
 	try
 	{
-		Execute(pImp->pimpl->mScene);
+		Execute(pImp->Pimpl()->mScene);
 
 	} catch( const std::exception& err )	{
 
 		// extract error description
-		pImp->pimpl->mErrorString = err.what();
-		DefaultLogger::get()->error(pImp->pimpl->mErrorString);
+		pImp->Pimpl()->mErrorString = err.what();
+		DefaultLogger::get()->error(pImp->Pimpl()->mErrorString);
 
 		// and kill the partially imported data
-		delete pImp->pimpl->mScene;
-		pImp->pimpl->mScene = NULL;
+		delete pImp->Pimpl()->mScene;
+		pImp->Pimpl()->mScene = NULL;
 	}
 }
 

@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -48,11 +48,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ASSIMP_INTERNAL_BUILD
 
 // ----------------------------------------------------------------------------------------
-/* General compile config taken from aiDefines.h. It is important that the user compiles
- * using exactly the same settings in aiDefines.h. Settings in AssimpPCH.h may differ,
+/* General compile config taken from defs.h. It is important that the user compiles
+ * using exactly the same settings in defs.h. Settings in AssimpPCH.h may differ,
  * they won't affect the public API.
  */
-#include "../include/aiDefines.h"
+#include "../include/assimp/defs.h"
 
 // Include our stdint.h replacement header for MSVC, take the global header for gcc/mingw
 #if defined( _MSC_VER) && (_MSC_VER < 1600)
@@ -132,13 +132,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/lexical_cast.hpp>
 
 // Public ASSIMP headers
-#include "../include/DefaultLogger.h"
-#include "../include/IOStream.h"
-#include "../include/IOSystem.h"
-#include "../include/aiScene.h"
-#include "../include/aiPostProcess.h"
-#include "../include/assimp.hpp"
-#include "../include/export.hpp"
+#include "../include/assimp/DefaultLogger.hpp"
+#include "../include/assimp/IOStream.hpp"
+#include "../include/assimp/IOSystem.hpp"
+#include "../include/assimp/scene.h"
+#include "../include/assimp/importerdesc.h"
+#include "../include/assimp/postprocess.h"
+#include "../include/assimp/Importer.hpp"
+#include "../include/assimp/Exporter.hpp"
 
 // Internal utility headers
 #include "BaseImporter.h"

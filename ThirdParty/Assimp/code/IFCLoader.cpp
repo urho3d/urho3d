@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -57,13 +57,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StreamReader.h"
 #include "MemoryIOWrapper.h"
 
+namespace Assimp {
+	template<> const std::string LogFunctions<IFCImporter>::log_prefix = "IFC: ";
+}
 
 using namespace Assimp;
 using namespace Assimp::Formatter;
 using namespace Assimp::IFC;
-
-template<> const std::string LogFunctions<IFCImporter>::log_prefix = "IFC: ";
-
 
 /* DO NOT REMOVE this comment block. The genentitylist.sh script
  * just looks for names adhering to the IfcSomething naming scheme
@@ -92,6 +92,20 @@ void MakeTreeRelative(ConversionData& conv);
 void ConvertUnit(const EXPRESS::DataType& dt,ConversionData& conv);
 
 } // anon
+
+static const aiImporterDesc desc = {
+	"Industry Foundation Classes (IFC) Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportBinaryFlavour,
+	0,
+	0,
+	0,
+	0,
+	"ifc" 
+};
+
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -125,9 +139,9 @@ bool IFCImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, bool 
 
 // ------------------------------------------------------------------------------------------------
 // List all extensions handled by this loader
-void IFCImporter::GetExtensionList(std::set<std::string>& app) 
+const aiImporterDesc* IFCImporter::GetInfo () const
 {
-	app.insert("ifc");
+	return &desc;
 }
 
 
@@ -155,7 +169,7 @@ void IFCImporter::InternReadFile( const std::string& pFile,
 	}
 
 	boost::scoped_ptr<STEP::DB> db(STEP::ReadFileHeader(stream));
-	const STEP::HeaderInfo& head = const_cast<const STEP::DB&>(*db).GetHeader();
+	const STEP::HeaderInfo& head = static_cast<const STEP::DB&>(*db).GetHeader();
 
 	if(!head.fileSchema.size() || head.fileSchema.substr(0,3) != "IFC") {
 		ThrowException("Unrecognized file schema: " + head.fileSchema);
@@ -228,7 +242,7 @@ void IFCImporter::InternReadFile( const std::string& pFile,
 
 	// apply world coordinate system (which includes the scaling to convert to meters and a -90 degrees rotation around x)
 	aiMatrix4x4 scale, rot;
-	aiMatrix4x4::Scaling(aiVector3D(conv.len_scale,conv.len_scale,conv.len_scale),scale);
+	aiMatrix4x4::Scaling(static_cast<aiVector3D>(IfcVector3(conv.len_scale)),scale);
 	aiMatrix4x4::RotationX(-AI_MATH_HALF_PI_F,rot);
 
 	pScene->mRootNode->mTransformation = rot * scale * conv.wcs * pScene->mRootNode->mTransformation;
@@ -325,7 +339,10 @@ void SetCoordinateSpace(ConversionData& conv)
 void ResolveObjectPlacement(aiMatrix4x4& m, const IfcObjectPlacement& place, ConversionData& conv)
 {
 	if (const IfcLocalPlacement* const local = place.ToPtr<IfcLocalPlacement>()){
-		ConvertAxisPlacement(m, *local->RelativePlacement, conv);
+		IfcMatrix4 tmp;
+		ConvertAxisPlacement(tmp, *local->RelativePlacement, conv);
+
+		m = static_cast<aiMatrix4x4>(tmp);
 
 		if (local->PlacementRelTo) {
 			aiMatrix4x4 tmp;
@@ -356,10 +373,10 @@ bool ProcessMappedItem(const IfcMappedItem& mapped, aiNode* nd_src, std::vector<
 	nd->mName.Set("IfcMappedItem");
 		
 	// handle the Cartesian operator
-	aiMatrix4x4 m;
+	IfcMatrix4 m;
 	ConvertTransformOperator(m, *mapped.MappingTarget);
 
-	aiMatrix4x4 msrc;
+	IfcMatrix4 msrc;
 	ConvertAxisPlacement(msrc,*mapped.MappingSource->MappingOrigin,conv);
 
 	msrc = m*msrc;
@@ -367,7 +384,7 @@ bool ProcessMappedItem(const IfcMappedItem& mapped, aiNode* nd_src, std::vector<
 	std::vector<unsigned int> meshes;
 	const size_t old_openings = conv.collect_openings ? conv.collect_openings->size() : 0;
 	if (conv.apply_openings) {
-		aiMatrix4x4 minv = msrc;
+		IfcMatrix4 minv = msrc;
 		minv.Inverse();
 		BOOST_FOREACH(TempOpening& open,*conv.apply_openings){
 			open.Transform(minv);
@@ -401,7 +418,7 @@ bool ProcessMappedItem(const IfcMappedItem& mapped, aiNode* nd_src, std::vector<
 		}
 	}
 
-	nd->mTransformation =  nd_src->mTransformation * msrc;
+	nd->mTransformation =  nd_src->mTransformation * static_cast<aiMatrix4x4>( msrc );
 	subnodes_src.push_back(nd.release());
 
 	return true;
@@ -468,7 +485,7 @@ struct RateRepresentationPredicate {
 	}
 
 	bool operator() (const IfcRepresentation* a, const IfcRepresentation* b) const {
-		return Rate(a) <= Rate(b);
+		return Rate(a) < Rate(b);
 	}
 };
 
@@ -543,7 +560,7 @@ aiNode* ProcessSpatialStructure(aiNode* parent, const IfcProduct& el, Conversion
 
 	std::vector<TempOpening> openings;
 
-	aiMatrix4x4 myInv;
+	IfcMatrix4 myInv;
 	bool didinv = false;
 
 	// convert everything contained directly within this structure,
@@ -733,7 +750,7 @@ void ProcessSpatialStructures(ConversionData& conv)
 void MakeTreeRelative(aiNode* start, const aiMatrix4x4& combined)
 {
 	// combined is the parent's absolute transformation matrix
-	aiMatrix4x4 old = start->mTransformation;
+	const aiMatrix4x4 old = start->mTransformation;
 
 	if (!combined.IsIdentity()) {
 		start->mTransformation = aiMatrix4x4(combined).Inverse() * start->mTransformation;
@@ -748,7 +765,7 @@ void MakeTreeRelative(aiNode* start, const aiMatrix4x4& combined)
 // ------------------------------------------------------------------------------------------------
 void MakeTreeRelative(ConversionData& conv)
 {
-	MakeTreeRelative(conv.out->mRootNode,aiMatrix4x4());
+	MakeTreeRelative(conv.out->mRootNode,IfcMatrix4());
 }
 
 } // !anon

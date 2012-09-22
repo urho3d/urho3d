@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -46,6 +46,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObjFileImporter.h"
 #include "ObjFileParser.h"
 #include "ObjFileData.h"
+
+static const aiImporterDesc desc = {
+	"Wavefront Object Importer",
+	"",
+	"",
+	"surfaces not supported",
+	aiImporterFlags_SupportTextFlavour,
+	0,
+	0,
+	0,
+	0,
+	"obj"
+};
+
 
 namespace Assimp	{
 
@@ -87,6 +101,12 @@ bool ObjFileImporter::CanRead( const std::string& pFile, IOSystem*  pIOHandler ,
 		static const char *pTokens[] = { "mtllib", "usemtl", "v ", "vt ", "vn ", "o ", "g ", "s ", "f " };
 		return BaseImporter::SearchFileHeaderForToken(pIOHandler, pFile, pTokens, 9 );
 	}
+}
+
+// ------------------------------------------------------------------------------------------------
+const aiImporterDesc* ObjFileImporter::GetInfo () const
+{
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -477,9 +497,7 @@ void ObjFileImporter::createMaterials(const ObjFile::Model* pModel, aiScene* pSc
 	
 	pScene->mMaterials = new aiMaterial*[ numMaterials ];
 	for ( unsigned int matIndex = 0; matIndex < numMaterials; matIndex++ )
-	{
-		aiMaterial* mat = new aiMaterial;
-		
+	{		
 		// Store material name
 		std::map<std::string, ObjFile::Material*>::const_iterator it;
 		it = pModel->m_MaterialMap.find( pModel->m_MaterialLib[ matIndex ] );
@@ -488,6 +506,7 @@ void ObjFileImporter::createMaterials(const ObjFile::Model* pModel, aiScene* pSc
 		if ( pModel->m_MaterialMap.end() == it )
 			continue;
 
+		aiMaterial* mat = new aiMaterial;
 		ObjFile::Material *pCurrentMaterial = (*it).second;
 		mat->AddProperty( &pCurrentMaterial->MaterialName, AI_MATKEY_NAME );
 
@@ -508,6 +527,7 @@ void ObjFileImporter::createMaterials(const ObjFile::Model* pModel, aiScene* pSc
 			sm = aiShadingMode_Gouraud;
 			DefaultLogger::get()->error("OBJ: unexpected illumination model (0-2 recognized)");
 		}
+	
 		mat->AddProperty<int>( &sm, 1, AI_MATKEY_SHADING_MODEL);
 
 		// multiplying the specular exponent with 2 seems to yield better results

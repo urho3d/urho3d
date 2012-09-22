@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ copyright notice, this list of conditions and the
 following disclaimer in the documentation and/or other
 materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
 contributors may be used to endorse or promote products
 derived from this software without specific prior
-written permission of the ASSIMP Development Team.
+written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -50,6 +50,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConvertToLHProcess.h"
 
 using namespace Assimp;
+
+static const aiImporterDesc desc = {
+	"Collada Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour | aiImporterFlags_SupportBinaryFlavour | aiImporterFlags_SupportCompressedFlavour,
+	1,
+	3,
+	1,
+	5,
+	"x" 
+};
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -78,9 +91,10 @@ bool XFileImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, boo
 }
 
 // ------------------------------------------------------------------------------------------------
-void XFileImporter::GetExtensionList(std::set<std::string>& extensions)
+// Get file extension list
+const aiImporterDesc* XFileImporter::GetInfo () const
 {
-	extensions.insert("x");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -341,7 +355,7 @@ void XFileImporter::CreateMeshes( aiScene* pScene, aiNode* pNode, const std::vec
 			}
 
 			// there should be as much new vertices as we calculated before
-			assert( newIndex == numVertices);
+			ai_assert( newIndex == numVertices);
 
 			// convert all bones of the source mesh which influence vertices in this newly created mesh
 			const std::vector<XFile::Bone>& bones = sourceMesh->mBones;

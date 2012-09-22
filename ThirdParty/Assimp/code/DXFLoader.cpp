@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -86,6 +86,20 @@ static aiColor4D g_aclrDxfIndexColors[] =
 #define AI_DXF_NUM_INDEX_COLORS (sizeof(g_aclrDxfIndexColors)/sizeof(g_aclrDxfIndexColors[0]))
 #define AI_DXF_ENTITIES_MAGIC_BLOCK "$ASSIMP_ENTITIES_MAGIC"
 
+
+static const aiImporterDesc desc = {
+	"Drawing Interchange Format (DXF) Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour | aiImporterFlags_LimitedSupport,
+	0,
+	0,
+	0,
+	0,
+	"dxf" 
+};
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 DXFImporter::DXFImporter()
@@ -105,9 +119,9 @@ bool DXFImporter::CanRead( const std::string& pFile, IOSystem* /*pIOHandler*/, b
 
 // ------------------------------------------------------------------------------------------------
 // Get a list of all supported file extensions
-void DXFImporter::GetExtensionList(std::set<std::string>& extensions)
+const aiImporterDesc* DXFImporter::GetInfo () const
 {
-	extensions.insert("dxf");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -220,20 +234,21 @@ void DXFImporter::ConvertMeshes(aiScene* pScene, DXF::FileData& output)
 		throw DeadlyImportError("DXF: no data blocks loaded");
 	}
 
+	DXF::Block* entities = 0;
+	
 	// index blocks by name
 	DXF::BlockMap blocks_by_name;
-	BOOST_FOREACH (const DXF::Block& bl, output.blocks) {
+	BOOST_FOREACH (DXF::Block& bl, output.blocks) {
 		blocks_by_name[bl.name] = &bl;
+		if ( !entities && bl.name == AI_DXF_ENTITIES_MAGIC_BLOCK ) {
+			entities = &bl;
+		}
 	}
 
-	const DXF::BlockMap::iterator bit = blocks_by_name.find(AI_DXF_ENTITIES_MAGIC_BLOCK);
-	if (bit == blocks_by_name.end()) {
+	if (!entities) {
 		throw DeadlyImportError("DXF: no ENTITIES data block loaded");
 	}
 
-	// ENTITIES is currently the only block that needs to be modified,
-	// this is the reason that blocks_by_name stores const by default.
-	DXF::Block& entities = const_cast<DXF::Block&>( *(*bit).second );
 	typedef std::map<std::string, unsigned int> LayerMap;
 
 	LayerMap layers;
@@ -241,10 +256,10 @@ void DXFImporter::ConvertMeshes(aiScene* pScene, DXF::FileData& output)
 
 	// now expand all block references in the primary ENTITIES block
 	// XXX this involves heavy memory copying, consider a faster solution for future versions.
-	ExpandBlockReferences(entities,blocks_by_name);
+	ExpandBlockReferences(*entities,blocks_by_name);
 
 	unsigned int cur = 0;
-	BOOST_FOREACH (boost::shared_ptr<const DXF::PolyLine> pl, entities.lines) {
+	BOOST_FOREACH (boost::shared_ptr<const DXF::PolyLine> pl, entities->lines) {
 		if (pl->positions.size()) {
 
 			std::map<std::string, unsigned int>::iterator it = layers.find(pl->layer);

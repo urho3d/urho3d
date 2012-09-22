@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <map>
 #include <vector>
-#include "./../include/aiTypes.h"
+#include "./../include/assimp/types.h"
 
 struct aiScene;
 
@@ -187,18 +187,22 @@ public:
 		const Importer* pImp
 		);
 
-protected:
+	
+	// -------------------------------------------------------------------
+	/** Called by #Importer::GetImporterInfo to get a description of 
+	 *  some loader features. Importers must provide this information. */
+	virtual const aiImporterDesc* GetInfo() const = 0;
+
+
 
 	// -------------------------------------------------------------------
-	/** Called by Importer::GetExtensionList() for each loaded importer.
-	 *  Implementations are expected to insert() all file extensions
-	 *  handled by them into the extension set. A loader capable of
-	 *  reading certain files with the extension BLA would place the
-	 *  string bla (lower-case!) in the output set.
-	 * @param extensions Output set. */
-	virtual void GetExtensionList(
-		std::set<std::string>& extensions
-		) = 0;
+	/** Called by #Importer::GetExtensionList for each loaded importer.
+	 *  Take the extension list contained in the structure returned by
+	 *  #GetInfo and insert all file extensions into the given set.
+	 *  @param extension set to collect file extensions in*/
+	void GetExtensionList(std::set<std::string>& extensions);
+
+protected:
 
 	// -------------------------------------------------------------------
 	/** Imports the given file into the given scene structure. The 
@@ -271,8 +275,8 @@ public: // static utilities
 		const std::string&	file,
 		const char** tokens, 
 		unsigned int numTokens,
-		unsigned int searchBytes = 200);
-
+		unsigned int searchBytes = 200,
+		bool tokensSol = false);
 
 	// -------------------------------------------------------------------
 	/** @brief Check whether a file has a specific file extension

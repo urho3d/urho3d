@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -120,7 +120,7 @@ bool GenFaceNormalsProcess::GenMeshFaceNormals (aiMesh* pMesh)
 		if (face.mNumIndices < 3)	{
 			// either a point or a line -> no well-defined normal vector
 			for (unsigned int i = 0;i < face.mNumIndices;++i) {
-				pMesh->mNormals[face.mIndices[i]] = qnan;
+				pMesh->mNormals[face.mIndices[i]] = aiVector3D(qnan);
 			}
 			continue;
 		}
@@ -128,7 +128,7 @@ bool GenFaceNormalsProcess::GenMeshFaceNormals (aiMesh* pMesh)
 		const aiVector3D* pV1 = &pMesh->mVertices[face.mIndices[0]];
 		const aiVector3D* pV2 = &pMesh->mVertices[face.mIndices[1]];
 		const aiVector3D* pV3 = &pMesh->mVertices[face.mIndices[face.mNumIndices-1]];
-		aiVector3D vNor = ((*pV2 - *pV1) ^ (*pV3 - *pV1)).Normalize();
+		const aiVector3D vNor = ((*pV2 - *pV1) ^ (*pV3 - *pV1)).Normalize();
 
 		for (unsigned int i = 0;i < face.mNumIndices;++i) {
 			pMesh->mNormals[face.mIndices[i]] = vNor;

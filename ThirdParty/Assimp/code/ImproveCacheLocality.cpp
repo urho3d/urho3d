@@ -1,9 +1,9 @@
 /*
 ---------------------------------------------------------------------------
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 
 All rights reserved.
 
@@ -20,10 +20,10 @@ conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -202,14 +202,12 @@ float ImproveCacheLocalityProcess::ProcessMesh( aiMesh* pMesh, unsigned int mesh
 	std::vector<bool> abEmitted(pMesh->mNumFaces,false);
 
 	// dead-end vertex index stack
-	std::stack<unsigned int> sDeadEndVStack;
+	std::stack<unsigned int, std::vector<unsigned int> > sDeadEndVStack;
 
 	// create a copy of the piNumTriPtr buffer
 	unsigned int* const piNumTriPtr = adj.mLiveTriangles;
-	const unsigned int* const piNumTriPtrNoModify = new unsigned int[pMesh->mNumVertices];
-	memcpy(const_cast<unsigned int* const> (piNumTriPtrNoModify),piNumTriPtr,
-		pMesh->mNumVertices * sizeof(unsigned int));
-
+	const std::vector<unsigned int> piNumTriPtrNoModify(piNumTriPtr, piNumTriPtr + pMesh->mNumVertices);
+	
 	// get the largest number of referenced triangles and allocate the "candidate buffer"
 	unsigned int iMaxRefTris = 0; {
 		const unsigned int* piCur = adj.mLiveTriangles;
@@ -377,6 +375,6 @@ float ImproveCacheLocalityProcess::ProcessMesh( aiMesh* pMesh, unsigned int mesh
 	delete[] piCachingStamps;
 	delete[] piIBOutput;
 	delete[] piCandidates;
-	delete[] piNumTriPtrNoModify;
+
 	return fACMR2;
 }

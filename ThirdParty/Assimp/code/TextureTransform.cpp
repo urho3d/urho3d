@@ -1,8 +1,8 @@
 /*
-Open Asset Import Library (ASSIMP)
+Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2010, ASSIMP Development Team
+Copyright (c) 2006-2012, assimp team
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms, 
@@ -18,10 +18,10 @@ following conditions are met:
   following disclaimer in the documentation and/or other
   materials provided with the distribution.
 
-* Neither the name of the ASSIMP team, nor the names of its
+* Neither the name of the assimp team, nor the names of its
   contributors may be used to endorse or promote products
   derived from this software without specific prior
-  written permission of the ASSIMP Development Team.
+  written permission of the assimp team.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
@@ -241,52 +241,53 @@ void TextureTransformStep::Execute( aiScene* pScene)
 				update.index = prop->mIndex;
 
 				// Get textured properties and transform
-				for (unsigned int a2 = 0; a2 < mat->mNumProperties;++a2)
-				{
+				for (unsigned int a2 = 0; a2 < mat->mNumProperties;++a2)  {
 					aiMaterialProperty* prop2 = mat->mProperties[a2];
-					if (prop2->mSemantic != prop->mSemantic || prop2->mIndex != prop->mIndex)
+					if (prop2->mSemantic != prop->mSemantic || prop2->mIndex != prop->mIndex) {
 						continue;
+					}
 
-					if ( !::strcmp( prop2->mKey.data, "$tex.uvwsrc"))
-					{
+					if ( !::strcmp( prop2->mKey.data, "$tex.uvwsrc")) {
 						info.uvIndex = *((int*)prop2->mData);
 
 						// Store a direct pointer for later use
 						update.directShortcut = (unsigned int*) prop2->mData;
 					}
 
-					else if ( !::strcmp( prop2->mKey.data, "$tex.mapmodeu"))
+					else if ( !::strcmp( prop2->mKey.data, "$tex.mapmodeu")) {
 						info.mapU = *((aiTextureMapMode*)prop2->mData);
-
-					else if ( !::strcmp( prop2->mKey.data, "$tex.mapmodev"))
+					}
+					else if ( !::strcmp( prop2->mKey.data, "$tex.mapmodev")) {
 						info.mapV = *((aiTextureMapMode*)prop2->mData);
-
-					else if ( !::strcmp( prop2->mKey.data, "$tex.uvtrafo"))
-					{
+					}
+					else if ( !::strcmp( prop2->mKey.data, "$tex.uvtrafo"))  {
 						// ValidateDS should check this
 						ai_assert(prop2->mDataLength >= 20); 
 						::memcpy(&info.mTranslation.x,prop2->mData,sizeof(float)*5);
-						delete[] prop2->mData;
 
 						// Directly remove this property from the list 
 						mat->mNumProperties--;
-						for (unsigned int a3 = a2; a3 < mat->mNumProperties;++a3)
+						for (unsigned int a3 = a2; a3 < mat->mNumProperties;++a3) {
 							mat->mProperties[a3] = mat->mProperties[a3+1];
+						}
 
-						// Warn: could be an underflow, but nevertheless it should work
+						delete prop2;
+
+						// Warn: could be an underflow, but this does not invoke undefined behaviour
 						--a2; 
 					}
 				}
 
 				// Find out which transformations are to be evaluated
-				if (!(configFlags & AI_UVTRAFO_ROTATION))
+				if (!(configFlags & AI_UVTRAFO_ROTATION)) {
 					info.mRotation = 0.f;
-
-				if (!(configFlags & AI_UVTRAFO_SCALING))
+				}
+				if (!(configFlags & AI_UVTRAFO_SCALING)) {
 					info.mScaling = aiVector2D(1.f,1.f);
-
-				if (!(configFlags & AI_UVTRAFO_TRANSLATION))
+				}
+				if (!(configFlags & AI_UVTRAFO_TRANSLATION)) {
 					info.mTranslation = aiVector2D(0.f,0.f);
+				}
 
 				// Do some preprocessing
 				PreProcessUVTransform(info);
