@@ -100,7 +100,7 @@ Engine::~Engine()
     context_->RemoveSubsystem<Graphics>();
 }
 
-bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments)
+bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments, void* externalWindow)
 {
     if (initialized_)
         return true;
@@ -257,6 +257,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         Graphics* graphics = GetSubsystem<Graphics>();
         Renderer* renderer = GetSubsystem<Renderer>();
         
+        if (externalWindow)
+            graphics->SetExternalWindow(externalWindow);
         graphics->SetForceSM2(forceSM2);
         graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(width, height, fullscreen, vsync, tripleBuffer, multiSample))

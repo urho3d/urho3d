@@ -44,8 +44,7 @@ public:
     virtual ~Engine();
     
     /// Initialize and show the application window. Return true if successful.
-    bool Initialize(const String& windowTitle = "Urho3D", const String& logName = "Urho3D.log", const Vector<String>&
-        arguments = Vector<String>());
+    bool Initialize(const String& windowTitle = "Urho3D", const String& logName = "Urho3D.log", const Vector<String>& arguments = Vector<String>(), void* externalWindow = 0);
     /// Initialize script subsystem and register the script API. Return true if successful (engine must be initialized first.)
     bool InitializeScripting();
     /// Run one frame.
