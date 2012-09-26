@@ -466,7 +466,7 @@ bool Image::Load(Deserializer& source)
         unsigned char* pixelData = GetImageData(source, width, height, components);
         if (!pixelData)
         {
-            LOGERROR("Could not load image: " + String(stbi_failure_reason()));
+            LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
             return false;
         }
         SetSize(width, height, components);

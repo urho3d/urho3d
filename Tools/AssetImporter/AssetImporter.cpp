@@ -136,6 +136,7 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
+unsigned GetNumValidFaces(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
@@ -313,6 +314,9 @@ void Run(const Vector<String>& arguments)
         
         resourcePath_ = AddTrailingSlash(resourcePath_);
         
+        if (command != "dump" && outFile.Empty())
+            ErrorExit("No output file defined");
+        
         PrintLine("Reading file " + inFile);
         scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
@@ -461,7 +465,7 @@ void CollectMeshes(OutModel& model, aiNode* node)
         model.meshes_.Push(mesh);
         model.meshNodes_.Push(node);
         model.totalVertices_ += mesh->mNumVertices;
-        model.totalIndices_ += mesh->mNumFaces * 3;
+        model.totalIndices_ += GetNumValidFaces(mesh) * 3;
     }
     
     for (unsigned i = 0; i < node->mNumChildren; ++i)
@@ -639,9 +643,15 @@ void BuildAndSaveModel(OutModel& model)
             combineBuffers = false;
     }
     
+    /// \todo Skip empty submeshes (if no valid faces)
+    
     if (!combineBuffers)
     {
         PrintLine("Writing separate buffers");
+        
+        Vector<SharedPtr<VertexBuffer> > vbVector;
+        Vector<SharedPtr<IndexBuffer> > ibVector;
+        
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             // Get the world transform of the mesh for baking into the vertices
@@ -658,13 +668,14 @@ void BuildAndSaveModel(OutModel& model)
             SharedPtr<Geometry> geom(new Geometry(context_));
             
             aiMesh* mesh = model.meshes_[i];
-            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
-                String(mesh->mNumFaces * 3) + " indices");
-            
             bool largeIndices = mesh->mNumVertices > 65535;
             unsigned elementMask = GetElementMask(mesh);
+            unsigned validFaces = GetNumValidFaces(mesh);
             
-            ib->SetSize(mesh->mNumFaces * 3, largeIndices);
+            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+                String(validFaces * 3) + " indices");
+            
+            ib->SetSize(validFaces * 3, largeIndices);
             vb->SetSize(mesh->mNumVertices, elementMask);
             
             // Build the index data
@@ -699,32 +710,34 @@ void BuildAndSaveModel(OutModel& model)
             Vector3 center = Vector3::ZERO;
             for (unsigned j = 0; j < mesh->mNumFaces; ++j)
             {
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+                if (mesh->mFaces[j].mNumIndices == 3)
+                {
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+                }
             }
-            if (mesh->mNumFaces)
-                center /= (float)mesh->mNumFaces * 3;
+            if (validFaces)
+                center /= (float)validFaces * 3;
             
-            // Define the model buffers
-            Vector<SharedPtr<VertexBuffer> > vbVector;
-            Vector<SharedPtr<IndexBuffer> > ibVector;
-            PODVector<unsigned> emptyMorphRange;
             vbVector.Push(vb);
             ibVector.Push(ib);
-            outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
-            outModel->SetIndexBuffers(ibVector);
             
             // Define the geometry
             geom->SetIndexBuffer(ib);
             geom->SetVertexBuffer(0, vb);
-            geom->SetDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
+            geom->SetDrawRange(TRIANGLE_LIST, 0, validFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
             outModel->SetGeometryCenter(i, center);
             if (model.bones_.Size() > MAX_SKIN_MATRICES)
                 allBoneMappings.Push(boneMappings);
         }
+        
+        // Define the model buffers
+        PODVector<unsigned> emptyMorphRange;
+        outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+        outModel->SetIndexBuffers(ibVector);
     }
     else
     {
@@ -754,8 +767,10 @@ void BuildAndSaveModel(OutModel& model)
             SharedPtr<Geometry> geom(new Geometry(context_));
             
             aiMesh* mesh = model.meshes_[i];
+            unsigned validFaces = GetNumValidFaces(mesh);
+            
             PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
-                String(mesh->mNumFaces * 3) + " indices");
+                String(validFaces * 3) + " indices");
             
             // Build the index data
             if (!largeIndices)
@@ -787,12 +802,15 @@ void BuildAndSaveModel(OutModel& model)
             Vector3 center = Vector3::ZERO;
             for (unsigned j = 0; j < mesh->mNumFaces; ++j)
             {
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
-                center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+                if (mesh->mFaces[j].mNumIndices == 3)
+                {
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+                }
             }
             if (mesh->mNumFaces)
-                center /= (float)mesh->mNumFaces * 3;
+                center /= (float)validFaces * 3;
             
             // Define the model buffers
             Vector<SharedPtr<VertexBuffer> > vbVector;
@@ -806,7 +824,7 @@ void BuildAndSaveModel(OutModel& model)
             // Define the geometry
             geom->SetIndexBuffer(ib);
             geom->SetVertexBuffer(0, vb);
-            geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, mesh->mNumFaces * 3, true);
+            geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, validFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
             outModel->SetGeometryCenter(i, center);
@@ -814,7 +832,7 @@ void BuildAndSaveModel(OutModel& model)
                 allBoneMappings.Push(boneMappings);
             
             startVertexOffset += mesh->mNumVertices;
-            startIndexOffset += mesh->mNumFaces * 3;
+            startIndexOffset += validFaces * 3;
         }
     }
     
@@ -1061,7 +1079,7 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
             model.meshes_.Push(mesh);
             model.meshNodes_.Push(meshes[i].first_);
             model.totalVertices_ += mesh->mNumVertices;
-            model.totalIndices_ += mesh->mNumFaces * 3;
+            model.totalIndices_ += GetNumValidFaces(mesh) * 3;
         }
         
         // Check if a model with identical mesh indices already exists. If yes, do not export twice
@@ -1498,18 +1516,37 @@ String GetMeshMaterialName(aiMesh* mesh)
         return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
 }
 
+unsigned GetNumValidFaces(aiMesh* mesh)
+{
+    unsigned ret = 0;
+    
+    for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+    {
+        if (mesh->mFaces[j].mNumIndices == 3)
+            ++ret;
+    }
+    
+    return ret;
+}
+
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset)
 {
-    *dest++ = mesh->mFaces[index].mIndices[0] + offset;
-    *dest++ = mesh->mFaces[index].mIndices[1] + offset;
-    *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+    if (mesh->mFaces[index].mNumIndices == 3)
+    {
+        *dest++ = mesh->mFaces[index].mIndices[0] + offset;
+        *dest++ = mesh->mFaces[index].mIndices[1] + offset;
+        *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+    }
 }
 
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset)
 {
-    *dest++ = mesh->mFaces[index].mIndices[0] + offset;
-    *dest++ = mesh->mFaces[index].mIndices[1] + offset;
-    *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+    if (mesh->mFaces[index].mNumIndices == 3)
+    {
+        *dest++ = mesh->mFaces[index].mIndices[0] + offset;
+        *dest++ = mesh->mFaces[index].mIndices[1] + offset;
+        *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+    }
 }
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,

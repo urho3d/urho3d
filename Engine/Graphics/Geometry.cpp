@@ -111,7 +111,8 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     }
     if (indexStart + indexCount > indexBuffer_->GetIndexCount())
     {
-        LOGERROR("Illegal draw range");
+        LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) + ", index buffer has " +
+            String(indexBuffer_->GetIndexCount()) + " indices");
         return false;
     }
     
@@ -143,7 +144,8 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     {
         if (indexStart + indexCount > indexBuffer_->GetIndexCount())
         {
-            LOGERROR("Illegal draw range");
+            LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) +
+                ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
             return false;
         }
     }
