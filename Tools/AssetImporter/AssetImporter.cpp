@@ -645,69 +645,95 @@ void BuildAndSaveModel(OutModel& model)
     
     /// \todo Skip empty submeshes (if no valid faces)
     
-    if (!combineBuffers)
+    SharedPtr<IndexBuffer> ib;
+    SharedPtr<VertexBuffer> vb;
+    Vector<SharedPtr<VertexBuffer> > vbVector;
+    Vector<SharedPtr<IndexBuffer> > ibVector;
+    unsigned startVertexOffset = 0;
+    unsigned startIndexOffset = 0;
+    
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
-        PrintLine("Writing separate buffers");
+        aiMesh* mesh = model.meshes_[i];
+        unsigned elementMask = GetElementMask(mesh);
+        unsigned validFaces = GetNumValidFaces(mesh);
         
-        Vector<SharedPtr<VertexBuffer> > vbVector;
-        Vector<SharedPtr<IndexBuffer> > ibVector;
+        bool largeIndices;
+        if (combineBuffers)
+            largeIndices = model.totalIndices_ > 65535;
+        else
+            largeIndices = mesh->mNumVertices > 65535;
         
-        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+        // Create new buffers if necessary
+        if (!combineBuffers || vbVector.Empty())
         {
-            // Get the world transform of the mesh for baking into the vertices
-            Matrix3x4 vertexTransform;
-            Matrix3 normalTransform;
-            Vector3 pos, scale;
-            Quaternion rot;
-            GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
-            vertexTransform = Matrix3x4(pos, rot, scale);
-            normalTransform = rot.RotationMatrix();
+            vb = new VertexBuffer(context_);
+            ib = new IndexBuffer(context_);
             
-            SharedPtr<IndexBuffer> ib(new IndexBuffer(context_));
-            SharedPtr<VertexBuffer> vb(new VertexBuffer(context_));
-            SharedPtr<Geometry> geom(new Geometry(context_));
-            
-            aiMesh* mesh = model.meshes_[i];
-            bool largeIndices = mesh->mNumVertices > 65535;
-            unsigned elementMask = GetElementMask(mesh);
-            unsigned validFaces = GetNumValidFaces(mesh);
-            
-            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
-                String(validFaces * 3) + " indices");
-            
-            ib->SetSize(validFaces * 3, largeIndices);
-            vb->SetSize(mesh->mNumVertices, elementMask);
-            
-            // Build the index data
-            void* indexData = ib->GetShadowData();
-            if (!largeIndices)
+            if (combineBuffers)
             {
-                unsigned short* dest = (unsigned short*)indexData;
-                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-                    WriteShortIndices(dest, mesh, j, 0);
+                ib->SetSize(model.totalIndices_, largeIndices);
+                vb->SetSize(model.totalVertices_, elementMask);
             }
             else
             {
-                unsigned* dest = (unsigned*)indexData;
-                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-                    WriteLargeIndices(dest, mesh, j, 0);
+                ib->SetSize(validFaces * 3, largeIndices);
+                vb->SetSize(mesh->mNumVertices, elementMask);
             }
             
-            // Build the vertex data
-            // If there are bones, get blend data
-            Vector<PODVector<unsigned char> > blendIndices;
-            Vector<PODVector<float> > blendWeights;
-            PODVector<unsigned> boneMappings;
-            if (model.bones_.Size())
-                GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
-            
-            void* vertexData = vb->GetShadowData();
-            float* dest = (float*)vertexData;
-            for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-                WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
-            
-            // Calculate the geometry center
-            Vector3 center = Vector3::ZERO;
+            vbVector.Push(vb);
+            ibVector.Push(ib);
+            startVertexOffset = 0;
+            startIndexOffset = 0;
+        }
+        
+        // Get the world transform of the mesh for baking into the vertices
+        Matrix3x4 vertexTransform;
+        Matrix3 normalTransform;
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
+        vertexTransform = Matrix3x4(pos, rot, scale);
+        normalTransform = rot.RotationMatrix();
+        
+        SharedPtr<Geometry> geom(new Geometry(context_));
+        
+        PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+            String(validFaces * 3) + " indices");
+        
+        unsigned char* vertexData = vb->GetShadowData();
+        unsigned char* indexData = ib->GetShadowData();
+        
+        // Build the index data
+        if (!largeIndices)
+        {
+            unsigned short* dest = (unsigned short*)indexData + startIndexOffset;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                WriteShortIndices(dest, mesh, j, startVertexOffset);
+        }
+        else
+        {
+            unsigned* dest = (unsigned*)indexData + startIndexOffset;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                WriteLargeIndices(dest, mesh, j, startVertexOffset);
+        }
+        
+        // Build the vertex data
+        // If there are bones, get blend data
+        Vector<PODVector<unsigned char> > blendIndices;
+        Vector<PODVector<float> > blendWeights;
+        PODVector<unsigned> boneMappings;
+        if (model.bones_.Size())
+            GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
+        
+        float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
+        for (unsigned j = 0; j < mesh->mNumVertices; ++j)
+            WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
+        
+        // Calculate the geometry center
+        Vector3 center = Vector3::ZERO;
+        if (validFaces)
+        {
             for (unsigned j = 0; j < mesh->mNumFaces; ++j)
             {
                 if (mesh->mFaces[j].mNumIndices == 3)
@@ -717,123 +743,31 @@ void BuildAndSaveModel(OutModel& model)
                     center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
                 }
             }
-            if (validFaces)
-                center /= (float)validFaces * 3;
             
-            vbVector.Push(vb);
-            ibVector.Push(ib);
-            
-            // Define the geometry
-            geom->SetIndexBuffer(ib);
-            geom->SetVertexBuffer(0, vb);
-            geom->SetDrawRange(TRIANGLE_LIST, 0, validFaces * 3, true);
-            outModel->SetNumGeometryLodLevels(i, 1);
-            outModel->SetGeometry(i, 0, geom);
-            outModel->SetGeometryCenter(i, center);
-            if (model.bones_.Size() > MAX_SKIN_MATRICES)
-                allBoneMappings.Push(boneMappings);
+            center /= (float)validFaces * 3;
         }
         
         // Define the model buffers
+        Vector<SharedPtr<VertexBuffer> > vbVector;
+        Vector<SharedPtr<IndexBuffer> > ibVector;
         PODVector<unsigned> emptyMorphRange;
+        vbVector.Push(vb);
+        ibVector.Push(ib);
         outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
         outModel->SetIndexBuffers(ibVector);
-    }
-    else
-    {
-        SharedPtr<IndexBuffer> ib(new IndexBuffer(context_));
-        SharedPtr<VertexBuffer> vb(new VertexBuffer(context_));
         
-        bool largeIndices = model.totalIndices_ > 65535;
-        ib->SetSize(model.totalIndices_, largeIndices);
-        vb->SetSize(model.totalVertices_, elementMask);
+        // Define the geometry
+        geom->SetIndexBuffer(ib);
+        geom->SetVertexBuffer(0, vb);
+        geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, validFaces * 3, true);
+        outModel->SetNumGeometryLodLevels(i, 1);
+        outModel->SetGeometry(i, 0, geom);
+        outModel->SetGeometryCenter(i, center);
+        if (model.bones_.Size() > MAX_SKIN_MATRICES)
+            allBoneMappings.Push(boneMappings);
         
-        unsigned startVertexOffset = 0;
-        unsigned startIndexOffset = 0;
-        void* indexData = ib->GetShadowData();
-        void* vertexData = vb->GetShadowData();
-        
-        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
-        {
-            // Get the world transform of the mesh for baking into the vertices
-            Matrix3x4 vertexTransform;
-            Matrix3 normalTransform;
-            Vector3 pos, scale;
-            Quaternion rot;
-            GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
-            vertexTransform = Matrix3x4(pos, rot, scale);
-            normalTransform = rot.RotationMatrix();
-            
-            SharedPtr<Geometry> geom(new Geometry(context_));
-            
-            aiMesh* mesh = model.meshes_[i];
-            unsigned validFaces = GetNumValidFaces(mesh);
-            
-            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
-                String(validFaces * 3) + " indices");
-            
-            // Build the index data
-            if (!largeIndices)
-            {
-                unsigned short* dest = (unsigned short*)indexData + startIndexOffset;
-                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-                    WriteShortIndices(dest, mesh, j, startVertexOffset);
-            }
-            else
-            {
-                unsigned* dest = (unsigned*)indexData + startIndexOffset;
-                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-                    WriteLargeIndices(dest, mesh, j, startVertexOffset);
-            }
-            
-            // Build the vertex data
-            // If there are bones, get blend data
-            Vector<PODVector<unsigned char> > blendIndices;
-            Vector<PODVector<float> > blendWeights;
-            PODVector<unsigned> boneMappings;
-            if (model.bones_.Size())
-                GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
-            
-            float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
-            for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-                WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
-            
-            // Calculate the geometry center
-            Vector3 center = Vector3::ZERO;
-            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-            {
-                if (mesh->mFaces[j].mNumIndices == 3)
-                {
-                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
-                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
-                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
-                }
-            }
-            if (mesh->mNumFaces)
-                center /= (float)validFaces * 3;
-            
-            // Define the model buffers
-            Vector<SharedPtr<VertexBuffer> > vbVector;
-            Vector<SharedPtr<IndexBuffer> > ibVector;
-            PODVector<unsigned> emptyMorphRange;
-            vbVector.Push(vb);
-            ibVector.Push(ib);
-            outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
-            outModel->SetIndexBuffers(ibVector);
-            
-            // Define the geometry
-            geom->SetIndexBuffer(ib);
-            geom->SetVertexBuffer(0, vb);
-            geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, validFaces * 3, true);
-            outModel->SetNumGeometryLodLevels(i, 1);
-            outModel->SetGeometry(i, 0, geom);
-            outModel->SetGeometryCenter(i, center);
-            if (model.bones_.Size() > MAX_SKIN_MATRICES)
-                allBoneMappings.Push(boneMappings);
-            
-            startVertexOffset += mesh->mNumVertices;
-            startIndexOffset += validFaces * 3;
-        }
+        startVertexOffset += mesh->mNumVertices;
+        startIndexOffset += validFaces * 3;
     }
     
     outModel->SetBoundingBox(box);
