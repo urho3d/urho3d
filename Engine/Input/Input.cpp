@@ -906,9 +906,14 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         inputInstances[newWindowID] = this;
         windowID_ = newWindowID;
     }
-    IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-    SetMousePosition(center);
-    lastMousePosition_ = center;
+    
+    if (!mouseVisible_)
+    {
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        SetMousePosition(center);
+        lastMousePosition_ = center;
+    }
+    
     activated_ = true;
     
     // After setting a new screen mode we should not be minimized
