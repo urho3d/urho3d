@@ -1220,7 +1220,7 @@ SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags)
 }
 
 SDL_Window *
-SDL_CreateWindowFrom(const void *data)
+SDL_CreateWindowFrom(const void *data, Uint32 flags)
 {
     SDL_Window *window;
 
@@ -1238,6 +1238,16 @@ SDL_CreateWindowFrom(const void *data)
         _this->windows->prev = window;
     }
     _this->windows = window;
+
+    // Urho3D: load OpenGL if initializing an external OpenGL window
+    if (flags & SDL_WINDOW_OPENGL) {
+        if (!_this->GL_CreateContext) {
+            SDL_SetError("No OpenGL support in video driver");
+            return NULL;
+        }
+        SDL_GL_LoadLibrary(NULL);
+        window->flags |= SDL_WINDOW_OPENGL;
+    }
 
     if (!_this->CreateWindowFrom ||
         _this->CreateWindowFrom(_this, window, data) < 0) {
@@ -2511,22 +2521,9 @@ SDL_GL_CreateContext(SDL_Window * window)
     SDL_GLContext ctx = NULL;
     CHECK_WINDOW_MAGIC(window, NULL);
 
-    // Urho3D: set up OpenGL support dynamically if necessary for external windows
     if (!(window->flags & SDL_WINDOW_OPENGL)) {
-        #if (SDL_VIDEO_OPENGL && __MACOSX__) || __IPHONEOS__ || __ANDROID__
-            window->flags |= SDL_WINDOW_OPENGL;
-        #else
-            window->flags |= SDL_WINDOW_OPENGL;
-            if (!_this->GL_CreateContext) {
-                SDL_SetError("No OpenGL support in video driver");
-                return NULL;
-            }
-            SDL_GL_LoadLibrary(NULL);
-        #endif
-        /*
         SDL_SetError("The specified window isn't an OpenGL window");
         return NULL;
-        */
     }
 
     ctx = _this->GL_CreateContext(_this, window);

@@ -300,7 +300,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
                 else
                 {
                     if (!impl_->window_)
-                        impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
+                        impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                     fullscreen = false;
                 }
                 

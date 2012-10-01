@@ -400,12 +400,14 @@ extern DECLSPEC SDL_Window * SDLCALL SDL_CreateWindow(const char *title,
  *  \brief Create an SDL window from an existing native window.
  *  
  *  \param data A pointer to driver-dependent window creation data
- *  
+ *  \param flags The flags for the window, specify SDL_WINDOW_OPENGL to setup
+ *               OpenGL pixel format
+ *
  *  \return The id of the window created, or zero if window creation failed.
  *  
  *  \sa SDL_DestroyWindow()
  */
-extern DECLSPEC SDL_Window * SDLCALL SDL_CreateWindowFrom(const void *data);
+extern DECLSPEC SDL_Window * SDLCALL SDL_CreateWindowFrom(const void *data, Uint32 flags);
 
 /**
  *  \brief Get the numeric ID of a window, for logging purposes.

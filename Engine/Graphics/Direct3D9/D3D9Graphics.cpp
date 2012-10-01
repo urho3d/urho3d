@@ -2026,7 +2026,7 @@ bool Graphics::OpenWindow(int width, int height)
     if (!externalWindow_)
         impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
     else
-        impl_->window_ = SDL_CreateWindowFrom(externalWindow_);
+        impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
     
     if (!impl_->window_)
     {
