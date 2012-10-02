@@ -123,6 +123,8 @@ void InitScene()
 
         renderer.viewports[0] = Viewport(testScene, camera);
         renderer.viewports[0].AddPostProcess(edgeFilter);
+
+        audio.listener = cameraNode.CreateComponent("SoundListener");
     }
 }
 

@@ -329,6 +329,8 @@ void CreateCamera()
         renderer.viewports[0] = Viewport(testScene, camera);
         renderer.viewports[0].AddPostProcess(edgeFilter);
         renderer.viewports[0].AddPostProcess(bloom);
+        
+        audio.listener = cameraNode.CreateComponent("SoundListener");
     }
 }
 
@@ -475,6 +477,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 camera = cameraNode.GetComponent("Camera");
                 cameraLightNode = cameraNode.GetChild("CameraLight");
                 renderer.viewports[0] = Viewport(testScene, camera);
+                audio.listener = cameraNode.GetComponent("SoundListener");                
                 // Reacquire animating objects
                 animatingObjects.Clear();
                 billboards.Clear();

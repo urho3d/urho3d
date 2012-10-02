@@ -35,6 +35,7 @@ namespace Urho3D
 
 class AudioImpl;
 class Sound;
+class SoundListener;
 class SoundSource;
 
 /// %Audio subsystem.
@@ -58,12 +59,8 @@ public:
     void Stop();
     /// Set master gain on a specific sound type such as sound effects, music or voice.
     void SetMasterGain(SoundType type, float gain);
-    /// Set listener position.
-    void SetListenerPosition(const Vector3& position);
-    /// Set listener rotation.
-    void SetListenerRotation(const Quaternion& rotation);
-    /// Set listener position and rotation.
-    void SetListenerTransform(const Vector3& position, const Quaternion& rotation);
+    /// Set active sound listener for 3D sounds.
+    void SetListener(SoundListener* listener);
     /// Stop any sound source playing a certain sound clip.
     void StopSound(Sound* sound);
     
@@ -81,10 +78,8 @@ public:
     bool IsInitialized() const { return deviceID_ != 0; }
     /// Return master gain for a specific sound source type.
     float GetMasterGain(SoundType type) const;
-    /// Return listener position.
-    const Vector3& GetListenerPosition() const { return listenerPosition_; }
-    /// Return listener rotation.
-    const Quaternion& GetListenerRotation() const { return listenerRotation_; }
+    /// Return active sound listener.
+    SoundListener* GetListener() const;
     /// Return all sound sources.
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
     
@@ -92,7 +87,7 @@ public:
     void AddSoundSource(SoundSource* soundSource);
     /// Remove a sound source. Called by SoundSource.
     void RemoveSoundSource(SoundSource* soundSource);
-    /// Return audio thread mutex
+    /// Return audio thread mutex.
     Mutex& GetMutex() { return audioMutex_; }
     /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
@@ -128,10 +123,8 @@ private:
     float masterGain_[MAX_SOUND_TYPES];
     /// Sound sources.
     PODVector<SoundSource*> soundSources_;
-    /// Listener position.
-    Vector3 listenerPosition_;
-    /// Listener rotation.
-    Quaternion listenerRotation_;
+    /// Sound listener.
+    WeakPtr<SoundListener> listener_;
 };
 
 /// Register Sound library objects.

@@ -197,7 +197,10 @@ void CreateCamera()
     gameCamera.farClip = 16000.0;
 
     if (!engine.headless)
+    {
         renderer.viewports[0] = Viewport(gameScene, gameCamera);
+        audio.listener = gameCameraNode.CreateComponent("SoundListener");
+    }
 }
 
 void CreateOverlays()
@@ -1028,9 +1031,6 @@ void UpdateCamera()
 
     gameCameraNode.position = minDist + rayDir * rayDistance;
     gameCameraNode.rotation = dir;
-
-    audio.listenerPosition = pos;
-    audio.listenerRotation = dir;
 }
 
 void UpdateFreelookCamera()

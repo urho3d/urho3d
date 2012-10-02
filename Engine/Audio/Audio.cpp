@@ -32,6 +32,7 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Sound.h"
+#include "SoundListener.h"
 #include "SoundSource3D.h"
 
 #include <SDL.h>
@@ -54,9 +55,7 @@ Audio::Audio(Context* context) :
     Object(context),
     deviceID_(0),
     sampleSize_(0),
-    playing_(false),
-    listenerPosition_(Vector3::ZERO),
-    listenerRotation_(Quaternion::IDENTITY)
+    playing_(false)
 {
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Audio, HandleRenderUpdate));
     
@@ -172,20 +171,9 @@ void Audio::SetMasterGain(SoundType type, float gain)
     masterGain_[type] = Clamp(gain, 0.0f, 1.0f);
 }
 
-void Audio::SetListenerPosition(const Vector3& position)
+void Audio::SetListener(SoundListener* listener)
 {
-    listenerPosition_ = position;
-}
-
-void Audio::SetListenerRotation(const Quaternion& rotation)
-{
-    listenerRotation_ = rotation;
-}
-
-void Audio::SetListenerTransform(const Vector3& position, const Quaternion& rotation)
-{
-    listenerPosition_ = position;
-    listenerRotation_ = rotation;
+    listener_ = listener;
 }
 
 void Audio::StopSound(Sound* soundClip)
@@ -203,6 +191,11 @@ float Audio::GetMasterGain(SoundType type) const
         return 0.0f;
     
     return masterGain_[type];
+}
+
+SoundListener* Audio::GetListener() const
+{
+    return listener_;
 }
 
 void Audio::AddSoundSource(SoundSource* channel)
@@ -292,6 +285,7 @@ void RegisterAudioLibrary(Context* context)
     Sound::RegisterObject(context);
     SoundSource::RegisterObject(context);
     SoundSource3D::RegisterObject(context);
+    SoundListener::RegisterObject(context);
 }
 
 }

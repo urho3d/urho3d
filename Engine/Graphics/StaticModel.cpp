@@ -35,7 +35,6 @@
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "StaticModel.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 

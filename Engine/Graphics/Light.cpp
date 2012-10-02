@@ -32,7 +32,6 @@
 #include "ResourceCache.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 

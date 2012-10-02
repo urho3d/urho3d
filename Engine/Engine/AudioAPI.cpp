@@ -25,6 +25,7 @@
 #include "APITemplates.h"
 #include "Audio.h"
 #include "Sound.h"
+#include "SoundListener.h"
 #include "SoundSource3D.h"
 
 namespace Urho3D
@@ -65,6 +66,11 @@ void RegisterSoundSources(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SoundSource3D", "float get_rolloffFactor() const", asMETHOD(SoundSource3D, RollAngleoffFactor), asCALL_THISCALL);
 }
 
+void RegisterSoundListener(asIScriptEngine* engine)
+{
+    RegisterComponent<SoundListener>(engine, "SoundListener");
+}
+
 static Audio* GetAudio()
 {
     return GetScriptContext()->GetSubsystem<Audio>();
@@ -76,13 +82,10 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool interpolate = true)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void SetListenerTransform(const Vector3&in, const Quaternion&in)", asMETHOD(Audio, SetListenerTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_masterGain(SoundType, float)", asMETHOD(Audio, SetMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "float get_masterGain(SoundType) const", asMETHOD(Audio, GetMasterGain), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void set_listenerPosition(const Vector3&in)", asMETHOD(Audio, SetListenerPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "const Vector3& get_listenerPosition() const", asMETHOD(Audio, GetListenerPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void set_listenerRotation(const Quaternion&in)", asMETHOD(Audio, SetListenerRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "const Quaternion& get_listenerRotation() const", asMETHOD(Audio, GetListenerRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void set_listener(SoundListener@+)", asMETHOD(Audio, SetListener), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "SoundListener@+ get_listener() const", asMETHOD(Audio, GetListener), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_sampleSize() const", asMETHOD(Audio, GetSampleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "int get_mixRate() const", asMETHOD(Audio, GetMixRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_stereo() const", asMETHOD(Audio, IsStereo), asCALL_THISCALL);
@@ -95,6 +98,7 @@ void RegisterAudio(asIScriptEngine* engine)
 void RegisterAudioAPI(asIScriptEngine* engine)
 {
     RegisterSound(engine);
+    RegisterSoundListener(engine);
     RegisterSoundSources(engine);
     RegisterAudio(engine);
 }

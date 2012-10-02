@@ -27,7 +27,6 @@
 #include "Node.h"
 #include "Octree.h"
 #include "Scene.h"
-#include "XMLElement.h"
 #include "Zone.h"
 
 #include "DebugNew.h"

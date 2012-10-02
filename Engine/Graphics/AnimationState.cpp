@@ -28,7 +28,6 @@
 #include "Deserializer.h"
 #include "DrawableEvents.h"
 #include "Serializer.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 

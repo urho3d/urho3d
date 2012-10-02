@@ -26,8 +26,8 @@
 #include "Context.h"
 #include "Node.h"
 #include "Sound.h"
+#include "SoundListener.h"
 #include "SoundSource3D.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 
@@ -101,14 +101,25 @@ void SoundSource3D::CalculateAttenuation()
     float interval = farDistance_ - nearDistance_;
     if (interval > 0.0f && node_)
     {
-        Vector3 relativePos(audio_->GetListenerRotation().Inverse() * (node_->GetWorldPosition() - audio_->GetListenerPosition()));
-        float distance = Clamp(relativePos.Length() - nearDistance_, 0.0f, interval);
-        float attenuation = powf(1.0f - distance / interval, rolloffFactor_);
-        float panning = relativePos.Normalized().x_;
+        SoundListener* listener = audio_->GetListener();
         
-        attenuation_ = attenuation;
-        panning_ = panning;
+        // Listener must either be sceneless or in the same scene, else attenuate sound to silence
+        if (listener && listener->GetNode() && (!listener->GetScene() || listener->GetScene() == GetScene()))
+        {
+            Node* listenerNode = listener->GetNode();
+            Vector3 relativePos(listenerNode->GetWorldRotation().Inverse() * (node_->GetWorldPosition() - listenerNode->GetWorldPosition()));
+            float distance = Clamp(relativePos.Length() - nearDistance_, 0.0f, interval);
+            float attenuation = powf(1.0f - distance / interval, rolloffFactor_);
+            float panning = relativePos.Normalized().x_;
+            
+            attenuation_ = attenuation;
+            panning_ = panning;
+        }
+        else
+            attenuation_ = 0.0f;
     }
+    else
+        attenuation_ = 0.0f;
 }
 
 }

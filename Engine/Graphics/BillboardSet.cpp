@@ -36,7 +36,6 @@
 #include "ResourceCache.h"
 #include "Sort.h"
 #include "VertexBuffer.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 

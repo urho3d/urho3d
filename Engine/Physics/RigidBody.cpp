@@ -36,7 +36,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
-#include "XMLElement.h"
 
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
