@@ -726,7 +726,9 @@ When reuse is disabled, all shadow maps are rendered before the actual scene ren
 
 \page SkeletalAnimation Skeletal animation
 
-There are two ways to play skeletal animations. Either manually, by adding or removing animation states to the AnimatedModel, and advancing their time positions & weights, see \ref AnimatedModel::AddAnimationState "AddAnimationState()", \ref AnimatedModel::RemoveAnimationState "RemoveAnimationState()", \ref AnimationState::AddTime "AddTime()" and \ref AnimationState::SetWeight "SetWeight()". Alternatively the helper component AnimationController can be used by adding it into the same Node as the AnimatedModel, and using its functions, such as \ref AnimationController::Play "Play()" and \ref AnimationController::Stop "Stop()". AnimationController will advance the animations automatically during scene update. It also enables automatic network synchronization of animations, which the AnimatedModel does not do on its own.
+The AnimatedModel component renders GPU-skinned geometry and is capable of skeletal animation. When a model is assigned to it using \ref AnimatedModel::SetModel "SetModel()", it creates a bone node hierarchy under its scene node, and these bone nodes can be moved and rotated to animate.
+
+There are two ways to play skeletal animations. Either manually, by adding or removing animation states to the AnimatedModel, and advancing their time positions & weights, see \ref AnimatedModel::AddAnimationState "AddAnimationState()", \ref AnimatedModel::RemoveAnimationState "RemoveAnimationState()", \ref AnimationState::AddTime "AddTime()" and \ref AnimationState::SetWeight "SetWeight()". Alternatively the helper component AnimationController can be used by creating it into the same scene node as the AnimatedModel, and using its functions, such as \ref AnimationController::Play "Play()" and \ref AnimationController::Stop "Stop()". AnimationController will advance the animations automatically during scene update. It also enables automatic network synchronization of animations, which the AnimatedModel does not do on its own.
 
 Note that AnimationController does not by default stop non-looping animations automatically once they reach the end, so their final pose will stay in effect. Rather they must either be stopped manually, or the \ref AnimationController::SetAutoFade "SetAutoFade()" function can be used to make them automatically fade out once reaching the end.
 
@@ -748,7 +750,20 @@ The trigger data definition is below. Either normalized (0 = animation start, 1 
     <trigger ... />
 </animation>
 \endcode
-<particleemitter>
+
+\section SkeletalAnimation_ManualControl Manual bone control
+
+By default an AnimatedModel's bone nodes are reset on each frame, after which all active animation states are applied to the bones. This mechanism can be turned off per-bone basis to allow manual bone control. To do this, query a bone from the AnimatedModel's skeleton and set its \ref Bone::animated_ "animated_" member variable to false. For example:
+
+\code
+Bone* headBone = model->GetSkeleton().GetBone("Bip01_Head");
+if (headBone)
+    headBone->animated_ = false;
+\endcode
+
+\section SkeletalAnimation_CombinedModels Combined skinned models
+
+To create a combined skinned model from many parts (for example body + clothes), several AnimatedModel components can be created to the same scene node. These will then share the same bone nodes. The component that was first created will be the "master" model which drives the animations; the rest of the models will just skin themselves using the same bones. For this to work, all parts must have been authored from a compatible skeleton, with the same bone names. The master model should have all the bones required by the combined whole (for example a full biped), while the other models may omit unnecessary bones. Note that if the parts contain compatible vertex morphs (matching names), the vertex morph weights will also be controlled by the master model and copied to the rest.
 
 \page Particles %Particle systems
 
@@ -935,8 +950,7 @@ By default rigid bodies can move and rotate about all 3 coordinate axes when for
 
 To prevent tunneling of a fast moving rigid body through obstacles, continuous collision detection can be used. It approximates the object as a swept sphere, but has a performance cost, so it should be used only when necessary. Call \ref RigidBody::SetCcdRadius "SetCcdRadius()" and \ref RigidBody::SetCcdMotionThreshold "SetCcdMotionThreshold()" with non-zero values to enable. To prevent false collisions, the body's actual collision shape should completely contain the radius. The motion threshold is the required motion per simulation step for CCD to kick in: for example a box with size 1 should have motion threshold 1 as well.
 
-All physics calculations are performed in world space. Nodes containing a RigidBody component should preferably be parented to the Scene (root node) to ensure independent
-motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is more important, but be aware that the ragdoll bones may drift far from the animated model's root scene node.
+All physics calculations are performed in world space. Nodes containing a RigidBody component should preferably be parented to the Scene (root node) to ensure independent motion. For ragdolls this is not absolute, as retaining proper bone hierarchy is more important, but be aware that the ragdoll bones may drift far from the animated model's root scene node.
 
 \section Physics_ConstraintParameters Constraint parameters
 
