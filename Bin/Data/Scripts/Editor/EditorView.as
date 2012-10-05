@@ -77,6 +77,7 @@ void CreateCamera()
     // Note: the camera will not be bound into the scene, so that it is not listed, and does not get deleted
     cameraNode = Node();
     camera = cameraNode.CreateComponent("Camera");
+    audio.listener = cameraNode.CreateComponent("SoundListener");
     ResetCamera();
 
     renderer.viewports[0] = Viewport(editorScene, camera);
@@ -160,10 +161,6 @@ void UpdateStats(float timeStep)
 
 void UpdateView()
 {
-    // Update audio listener
-    audio.listenerPosition = cameraNode.position;
-    audio.listenerRotation = cameraNode.rotation;
-    
     // Update camera fill mode
     camera.fillMode = fillMode;
 }
