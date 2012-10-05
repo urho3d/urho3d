@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# Modified by Lasse Öörni for Urho3D
+# Modified by Lasse Oorni for Urho3D
 
 # Generate a build configuration file to ensure the build flags match for the user of the library.
 SET(BUILD_CONFIG_FILE include/kNetBuildConfig.h)

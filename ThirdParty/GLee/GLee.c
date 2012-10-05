@@ -33,7 +33,7 @@
 *
 ***************************************************************************/
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #ifdef _MSC_VER
 	#pragma optimize( "g", off )

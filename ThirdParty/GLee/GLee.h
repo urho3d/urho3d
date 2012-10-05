@@ -33,7 +33,7 @@
 *
 ***************************************************************************/
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #ifndef __glee_h_
 #define __glee_h_
