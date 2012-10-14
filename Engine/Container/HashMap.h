@@ -313,7 +313,7 @@ public:
         ResetPtrs();
     }
     
-    /// Sort keys. After sorting the set can be iterated in order until new elements are inserted.
+    /// Sort pairs. After sorting the map can be iterated in order until new elements are inserted.
     void Sort()
     {
         unsigned numKeys = Size();
