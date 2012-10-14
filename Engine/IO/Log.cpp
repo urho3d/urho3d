@@ -119,7 +119,10 @@ void Log::Write(int level, const String& message)
     #endif
     
     if (logFile_)
+    {
         logFile_->WriteLine(formattedMessage);
+        logFile_->Flush();
+    }
     
     using namespace LogMessage;
     

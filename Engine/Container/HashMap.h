@@ -313,6 +313,36 @@ public:
         ResetPtrs();
     }
     
+    /// Sort keys. After sorting the set can be iterated in order until new elements are inserted.
+    void Sort()
+    {
+        unsigned numKeys = Size();
+        if (!numKeys)
+            return;
+        
+        Node** ptrs = new Node*[numKeys];
+        Node* ptr = Head();
+        
+        for (unsigned i = 0; i < numKeys; ++i)
+        {
+            ptrs[i] = ptr;
+            ptr = ptr->Next();
+        }
+        
+        Urho3D::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
+        
+        for (unsigned i = 0; i < numKeys; ++i)
+        {
+            ptrs[i]->next_ = (i < numKeys - 1) ? ptrs[i + 1] : tail_;
+            ptrs[i]->prev_ = (i > 0) ? ptrs[i - 1] : 0;
+        }
+        
+        head_ = ptrs[0];
+        tail_->prev_ = ptrs[numKeys - 1];
+        
+        delete[] ptrs;
+    }
+    
     /// Rehash to a specific bucket count, which must be a power of two. Return true if successful.
     bool Rehash(unsigned numBuckets)
     {
@@ -537,6 +567,9 @@ private:
             Ptrs()[hashKey] = node;
         }
     }
+    
+    /// Compare two nodes.
+    static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->pair_.first_ < rhs->pair_.first_; }
 };
 
 }
