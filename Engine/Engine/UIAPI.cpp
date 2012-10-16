@@ -435,7 +435,7 @@ static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, 
 {
     if (file)
     {
-        SharedPtr<UIElement> root = ptr->LoadLayout(*file);
+        SharedPtr<UIElement> root = ptr->LoadLayout(*file, styleFile);
         if (root)
             root->AddRef();
         return root.Get();
