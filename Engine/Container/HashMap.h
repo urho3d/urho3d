@@ -25,6 +25,7 @@
 
 #include "HashBase.h"
 #include "Pair.h"
+#include "Sort.h"
 
 namespace Urho3D
 {
