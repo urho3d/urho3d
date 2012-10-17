@@ -139,6 +139,8 @@ public:
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Return rigid bodies that have been in collision with a specific body on the last simulation step.
+    void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
     /// Return gravity.
     Vector3 GetGravity() const;
     /// Return whether interpolation between simulation steps is enabled.

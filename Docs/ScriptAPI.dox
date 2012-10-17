@@ -2628,6 +2628,30 @@ Properties:<br>
 - bool compressed (readonly)
 
 
+SoundListener
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
 SoundSource
 
 Methods:<br>
@@ -2714,14 +2738,12 @@ Methods:<br>
 - void SetMode(int, int, bool, bool arg3 = true)
 - bool Play()
 - void Stop()
-- void SetListenerTransform(const Vector3&, const Quaternion&)
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - float[] masterGain
-- Vector3 listenerPosition
-- Quaternion listenerRotation
+- SoundListener@ listener
 - uint sampleSize (readonly)
 - int mixRate (readonly)
 - bool stereo (readonly)
@@ -4496,6 +4518,7 @@ Properties:<br>
 - uint collisionLayer
 - uint collisionMask
 - CollisionEventMode collisionEventMode
+- RigidBody@[]@ collidingBodies (readonly)
 
 
 Constraint
@@ -4564,6 +4587,7 @@ Methods:<br>
 - PhysicsRaycastResult SphereCast(const Ray&, float, float arg2 = M_INFINITY, uint arg3 = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint arg1 = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint arg1 = 0xffff)
+- RigidBody@[]@ GetRigidBodies(RigidBody@)
 - void DrawDebugGeometry(bool)
 
 Properties:<br>

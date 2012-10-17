@@ -642,6 +642,14 @@ bool RigidBody::IsActive() const
         return false;
 }
 
+void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
+{
+    if (physicsWorld_)
+        physicsWorld_->GetRigidBodies(result, this);
+    else
+        result.Clear();
+}
+
 void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
 {
     physicsWorld_->SetApplyingTransforms(true);

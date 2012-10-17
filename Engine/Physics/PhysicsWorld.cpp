@@ -382,6 +382,21 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
     delete tempRigidBody;
 }
 
+void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+{
+    PROFILE(PhysicsWorld_GetRigidBodies);
+    
+    result.Clear();
+    
+    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = currentCollisions_.Begin(); i != currentCollisions_.End(); ++i)
+    {
+        if (i->first_ == body)
+            result.Push(i->second_);
+        else if (i->second_ == body)
+            result.Push(i->first_);
+    }
+}
+
 Vector3 PhysicsWorld::GetGravity() const
 {
     return ToVector3(world_->getGravity());
@@ -395,6 +410,15 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
     rigidBodies_.Erase(rigidBodies_.Find(body));
+    
+    // Erase from collision pairs so that they can be used to safely find overlapping bodies
+    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = currentCollisions_.Begin(); i != currentCollisions_.End();)
+    {
+        if (i->first_ == body || i->second_ == body)
+            i = currentCollisions_.Erase(i);
+        else
+            ++i;
+    }
 }
 
 void PhysicsWorld::AddCollisionShape(CollisionShape* shape)

@@ -187,6 +187,8 @@ public:
     unsigned GetCollisionMask() const { return collisionMask_; }
     /// Return collision event signaling mode.
     CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
+    /// Return colliding rigid bodies from the last simulation step.
+    void GetCollidingBodies(PODVector<RigidBody*>& result) const;
     
     /// Apply new world transform after a simulation step. Called internally.
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);

@@ -944,7 +944,7 @@ CollisionShape provides two APIs for defining the collision geometry. Either set
 
 RigidBodies can be either static or moving. A body is static if its mass is 0, and moving if the mass is greater than 0. Note that the triangle mesh collision shape is not supported for moving objects; it will not collide properly due to limitations in the Bullet library. In this case the convex hull shape can be used instead.
 
-The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetPhantom "phantom mode" to only report collisions without actually applying collision forces. Finally, the \ref RigidBody::SetFriction "friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions.
+The collision behaviour of a rigid body is controlled by several variables. First, the collision layer and mask define which other objects to collide with: see \ref RigidBody::SetCollisionLayer "SetCollisionLayer()" and \ref RigidBody::SetCollisionMask "SetCollisionMask()". By default a rigid body is on layer 1; the layer will be ANDed with the other body's collision mask to see if the collision should be reported. A rigid body can also be set to \ref RigidBody::SetPhantom "phantom mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Finally, the \ref RigidBody::SetFriction "friction" and \ref RigidBody::SetRestitution "restitution" coefficients (between 0 - 1) control how kinetic energy is transferred in the collisions.
 
 By default rigid bodies can move and rotate about all 3 coordinate axes when forces are applied. To limit the movement, use \ref RigidBody::SetLinearFactor "SetLinearFactor()" and \ref RigidBody::SetAngularFactor "SetAngularFactor()" and set the axes you wish to use to 1 and those you do not wish to use to 0. For example moving humanoid characters are often represented by a capsule shape: to ensure they stay upright and only rotate when you explicitly set the rotation in code, set the angular factor to 0, 0, 0.
 
@@ -1002,6 +1002,14 @@ void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
+\section Physics_Queries Physics queries
+
+The following queries into the physics world are provided:
+
+- Raycasts, see \ref PhysicsWorld::Raycast "Raycast()" and \ref PhysicsWorld::RaycastSingle "RaycastSingle()".
+- %Sphere cast (raycast with thickness), see \ref PhysicsWorld::SphereCast "SphereCast()".
+- %Sphere and box overlap tests, see \ref PhysicsWorld::GetRigidBodies() "GetRigidBodies()".
+- Which other rigid bodies are colliding with a body, see \ref RigidBody::GetCollidingBodies() "GetCollidingBodies()". In script this maps into the collidingBodies property.
 
 \page UI User interface
 

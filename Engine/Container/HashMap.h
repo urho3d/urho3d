@@ -27,6 +27,8 @@
 #include "Pair.h"
 #include "Sort.h"
 
+#include <cassert>
+
 namespace Urho3D
 {
 
@@ -297,13 +299,40 @@ public:
             previous->down_ = node->down_;
         else
             Ptrs()[hashKey] = node->down_;
-        EraseNode(node);
         
+        EraseNode(node);
         return true;
     }
     
     /// Erase a pair by iterator.
-    void Erase(const Iterator& it) { Erase(it->first_); }
+    Iterator Erase(const Iterator& it)
+    {
+        if (!ptrs_ || !it.ptr_)
+            return End();
+        
+        Node* node = reinterpret_cast<Node*>(it.ptr_);
+        Node* next = node->Next();
+        
+        unsigned hashKey = MakeHash(node->pair_.first_) & (NumBuckets() - 1);
+        
+        Node* previous = 0;
+        Node* current = reinterpret_cast<Node*>(Ptrs()[hashKey]);
+        while (current && current != node)
+        {
+            previous = current;
+            current = current->Down();
+        }
+        
+        assert(current == node);
+        
+        if (previous)
+            previous->down_ = node->down_;
+        else
+            Ptrs()[hashKey] = node->down_;
+        
+        EraseNode(node);
+        return Iterator(next);
+    }
     
     /// Clear the map.
     void Clear()
