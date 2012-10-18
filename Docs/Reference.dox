@@ -962,17 +962,19 @@ Hinge, slider and cone twist constraints support defining limits for the motion.
 
 \section Physics_Events Physics events
 
-The physics world sends 3 types of events during its update step:
+The physics world sends 8 types of events during its update step:
 
 - E_PHYSICSPRESTEP before the simulation is stepped.
-- E_PHYSICSCOLLISION for each collision during the simulation step. The participating scene nodes will also send E_NODECOLLISION events.
+- E_PHYSICSCOLLISIONSTART for each new collision during the simulation step. The participating scene nodes will also send E_NODECOLLISIONSTART events.
+- E_PHYSICSCOLLISION for each ongoing collision during the simulation step. The participating scene nodes will also send E_NODECOLLISION events.
+- E_PHYSICSCOLLISIONEND for each collision which has ceased. The participating scene nodes will also send E_NODECOLLISIONEND events.
 - E_PHYSICSPOSTSTEP after the simulation has been stepped.
 
 Note that if the rendering framerate is high, the physics might not be stepped at all on each frame: in that case those events will not be sent.
 
 \section Physics_Collision Reading collision events
 
-A physics collision event will report the collided scene nodes and rigid bodies, whether the collision is new (meaning the same pair of rigid bodies did not collide on the previous simulation step) and the list of contact points.
+A new or ongoing physics collision event will report the collided scene nodes and rigid bodies, whether either of the bodies is a phantom, and the list of contact points.
 
 The contact points are encoded in a byte buffer, which can be read using the VectorBuffer or MemoryBuffer helper class. The following structure repeats for each contact:
 

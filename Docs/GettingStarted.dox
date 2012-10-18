@@ -141,7 +141,11 @@ For details on how to use the editor, see \ref EditorInstructions "Editor instru
 
 \section Running_Terrain Terrain
 
-%Terrain rendering example. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as. %Controls are the same as in TestScene.
+%Terrain rendering example. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as. %Controls are the same as in TestScene, and additionally:
+
+\verbatim
+L           Toggle buoyant liquid volume
+\endverbatim
 
 \section Running_Physics Physics
 

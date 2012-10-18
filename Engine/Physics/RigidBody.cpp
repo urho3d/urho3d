@@ -510,8 +510,8 @@ void RigidBody::ResetForces()
 
 void RigidBody::Activate()
 {
-    if (mass_ > 0.0f && body_ && !body_->isActive())
-        body_->activate();
+    if (mass_ > 0.0f && body_)
+        body_->activate(true);
 }
 
 Vector3 RigidBody::GetPosition() const

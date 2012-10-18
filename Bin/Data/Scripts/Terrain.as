@@ -104,6 +104,7 @@ void InitScene()
     cameraNode = Node();
     camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 1000;
+    camera.nearClip = 0.5;
     cameraNode.position = Vector3(0, 20, 0);
 
     if (!engine.headless)
@@ -310,6 +311,9 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (key == 'T')
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 
+        if (key == 'L')
+            ToggleLiquid();
+
         if (key == KEY_F5)
         {
             File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Terrain.xml", FILE_WRITE);
@@ -401,7 +405,7 @@ void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
     Vector3 position = eventData["Pos"].GetVector3();
     Quaternion rotation = eventData["Rot"].GetQuaternion();
 
-    Node@ newNode = testScene.CreateChild();
+    Node@ newNode = testScene.CreateChild("Box");
     newNode.position = position;
     newNode.rotation = rotation;
     newNode.SetScale(0.2);
@@ -557,4 +561,84 @@ void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&
     constraint.otherAxis = parentAxis;
     constraint.highLimit = highLimit;
     constraint.lowLimit = lowLimit;
+}
+
+void ToggleLiquid()
+{
+    Node@ liquidNode = testScene.GetChild("Liquid");
+    
+    if (liquidNode is null)
+    {
+        Node@ liquidNode = testScene.CreateChild("Liquid");
+        liquidNode.position = Vector3(0, -48.75, 0);
+        liquidNode.scale = Vector3(2000, 100, 2000);
+
+        RigidBody@ body = liquidNode.CreateComponent("RigidBody");
+        body.phantom = true;
+
+        CollisionShape@ shape = liquidNode.CreateComponent("CollisionShape");
+        shape.SetBox(Vector3(1, 1, 1));
+    
+        StaticModel@ object = liquidNode.CreateComponent("StaticModel");
+        object.model = cache.GetResource("Model", "Models/Box.mdl");
+        object.material = cache.GetResource("Material", "Materials/GreenTransparent.xml");
+        
+        liquidNode.CreateScriptObject(scriptFile, "BuoyancyVolume");
+    }
+    else
+        liquidNode.Remove();
+}
+
+class BuoyancyVolume : ScriptObject
+{
+    void Start()
+    {
+        SubscribeToEvent(node, "NodeCollisionStart", "HandleCollisionStart");
+        SubscribeToEvent(node, "NodeCollisionEnd", "HandleCollisionEnd");
+    }
+    
+    void HandleCollisionStart(StringHash eventType, VariantMap& eventData)
+    {
+        Node@ otherNode = eventData["OtherNode"].GetNode();
+        Print("Object " + otherNode.name + " entered the volume");
+    }
+
+    void HandleCollisionEnd(StringHash eventType, VariantMap& eventData)
+    {
+        Node@ otherNode = eventData["OtherNode"].GetNode();
+        Print("Object " + otherNode.name + " left the volume");
+    }
+
+    void FixedUpdate(float timeStep)
+    {
+        RigidBody@ body = node.GetComponent("RigidBody");
+        CollisionShape@ shape = node.GetComponent("CollisionShape");
+        Array<RigidBody@>@ bodiesInside = body.collidingBodies;
+
+        // The liquid volume should be a box
+        float liquidLevel = node.worldPosition.y + node.worldScale.y * 0.5 * shape.size.y;
+
+        for (uint i = 0; i < bodiesInside.length; ++i)
+        {
+            RigidBody@ otherBody = bodiesInside[i];
+            if (otherBody.phantom == false && otherBody.mass > 0)
+            {
+                Node@ otherNode = otherBody.node;
+                CollisionShape@ otherShape = otherNode.GetComponent("CollisionShape");
+                
+                // Assume the colliding shape is also a box
+                float topLevel = otherNode.worldPosition.y + otherNode.worldScale.y * 0.5 * shape.size.y;
+                float bottomLevel = otherNode.worldPosition.y - otherNode.worldScale.y * 0.5 * shape.size.y;
+                float insideFraction = Clamp((liquidLevel - bottomLevel) / (topLevel - bottomLevel), 0.0, 1.0);
+
+                // Apply buoyancy
+                otherBody.ApplyForce(Vector3(0, 20.0, 0) * insideFraction * otherBody.mass);
+
+                // Apply damping to linear & angular velocity
+                float damping = 1.0 - insideFraction * 0.05;
+                otherBody.linearVelocity = otherBody.linearVelocity * damping;
+                otherBody.angularVelocity = otherBody.angularVelocity * damping;;
+            }
+        }
+    }
 }

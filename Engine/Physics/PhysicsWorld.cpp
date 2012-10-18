@@ -419,6 +419,14 @@ void PhysicsWorld::RemoveRigidBody(RigidBody* body)
         else
             ++i;
     }
+    
+    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End();)
+    {
+        if (i->first_ == body || i->second_ == body)
+            i = previousCollisions_.Erase(i);
+        else
+            ++i;
+    }
 }
 
 void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
@@ -580,12 +588,13 @@ void PhysicsWorld::SendCollisionEvents()
                 bodyPair = MakePair(bodyB, bodyA);
             currentCollisions_.Insert(bodyPair);
             bool newCollision = !previousCollisions_.Contains(bodyPair);
+            bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
             
             physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)nodeA;
             physicsCollisionData[PhysicsCollision::P_NODEB] = (void*)nodeB;
             physicsCollisionData[PhysicsCollision::P_BODYA] = (void*)bodyA;
             physicsCollisionData[PhysicsCollision::P_BODYB] = (void*)bodyB;
-            physicsCollisionData[PhysicsCollision::P_NEWCOLLISION] = !previousCollisions_.Contains(bodyPair);
+            physicsCollisionData[PhysicsCollision::P_PHANTOM] = phantom;
             
             contacts.Clear();
             
@@ -600,22 +609,35 @@ void PhysicsWorld::SendCollisionEvents()
             
             physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.GetBuffer();
             
-            SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
+            // Send separate collision start event if collision is new
+            if (newCollision)
+            {
+                SendEvent(E_PHYSICSCOLLISIONSTART, physicsCollisionData);
+                // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
+                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                    continue;
+            }
             
-            // Skip if either of the nodes or bodies has been removed as a response to the event
+            // Then send the ongoing collision event
+            SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
             if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
                 continue;
             
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
             nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeB;
             nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyB;
-            nodeCollisionData[NodeCollision::P_NEWCOLLISION] = newCollision;
+            nodeCollisionData[NodeCollision::P_PHANTOM] = phantom;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
             
-            nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
+            if (newCollision)
+            {
+                nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
+                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                    continue;
+            }
             
-            // Skip if either of the nodes has been removed as a response to the event
-            if (!nodeWeakA || !nodeWeakB)
+            nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
+            if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
                 continue;
             
             contacts.Clear();
@@ -633,7 +655,74 @@ void PhysicsWorld::SendCollisionEvents()
             nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyA;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
             
+            if (newCollision)
+            {
+                nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
+                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                    continue;
+            }
+            
             nodeB->SendEvent(E_NODECOLLISION, nodeCollisionData);
+        }
+    }
+    
+    // Send collision end events as applicable
+    {
+        VariantMap physicsCollisionData;
+        VariantMap nodeCollisionData;
+        
+        physicsCollisionData[PhysicsCollisionEnd::P_WORLD] = (void*)this;
+        
+        for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
+        {
+            if (!currentCollisions_.Contains(*i))
+            {
+                RigidBody* bodyA = i->first_;
+                RigidBody* bodyB = i->second_;
+                WeakPtr<RigidBody> bodyWeakA(bodyA);
+                WeakPtr<RigidBody> bodyWeakB(bodyB);
+                bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
+                
+                // Skip collision event signaling if both objects are static, or if collision event mode does not match
+                if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
+                    continue;
+                if (bodyA->GetCollisionEventMode() == COLLISION_NEVER || bodyB->GetCollisionEventMode() == COLLISION_NEVER)
+                    continue;
+                if (bodyA->GetCollisionEventMode() == COLLISION_ACTIVE && bodyB->GetCollisionEventMode() == COLLISION_ACTIVE &&
+                    !bodyA->IsActive() && !bodyB->IsActive())
+                    continue;
+                
+                Node* nodeA = bodyA->GetNode();
+                Node* nodeB = bodyB->GetNode();
+                WeakPtr<Node> nodeWeakA(nodeA);
+                WeakPtr<Node> nodeWeakB(nodeB);
+                
+                physicsCollisionData[PhysicsCollisionEnd::P_BODYA] = (void*)bodyA;
+                physicsCollisionData[PhysicsCollisionEnd::P_BODYB] = (void*)bodyB;
+                physicsCollisionData[PhysicsCollisionEnd::P_NODEA] = (void*)nodeA;
+                physicsCollisionData[PhysicsCollisionEnd::P_NODEB] = (void*)nodeB;
+                physicsCollisionData[PhysicsCollisionEnd::P_PHANTOM] = phantom;
+                
+                SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData);
+                // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
+                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                    continue;
+                
+                nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyA;
+                nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeB;
+                nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyB;
+                nodeCollisionData[NodeCollisionEnd::P_PHANTOM] = phantom;
+                
+                nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
+                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                    continue;
+                
+                nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyB;
+                nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeA;
+                nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyA;
+                
+                nodeB->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
+            }
         }
     }
     
