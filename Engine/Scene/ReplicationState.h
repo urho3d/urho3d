@@ -144,7 +144,7 @@ struct ReplicationState
 };
 
 /// Per-user component network replication state.
-struct ComponentReplicationState : ReplicationState
+struct ComponentReplicationState : public ReplicationState
 {
     /// Parent node replication state.
     NodeReplicationState* nodeState_;
@@ -155,7 +155,7 @@ struct ComponentReplicationState : ReplicationState
 };
 
 /// Per-user node network replication state.
-struct NodeReplicationState : ReplicationState
+struct NodeReplicationState : public ReplicationState
 {
     /// Construct.
     NodeReplicationState() :
@@ -182,7 +182,7 @@ struct NodeReplicationState : ReplicationState
 };
 
 /// Per-user scene network replication state.
-struct SceneReplicationState : ReplicationState
+struct SceneReplicationState : public ReplicationState
 {
     /// Nodes by ID.
     HashMap<unsigned, NodeReplicationState> nodeStates_;
