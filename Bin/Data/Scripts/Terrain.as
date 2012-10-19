@@ -121,7 +121,7 @@ void InitScene()
         renderer.viewports[0].AddPostProcess(edgeFilter);
         renderer.viewports[0].AddPostProcess(bloom);
         
-        audio.listener = cameraNode.CreateComponent("SoundListener");        
+        audio.listener = cameraNode.CreateComponent("SoundListener");
     }
 
     if (runClient)
@@ -596,7 +596,7 @@ class BuoyancyVolume : ScriptObject
         SubscribeToEvent(node, "NodeCollisionStart", "HandleCollisionStart");
         SubscribeToEvent(node, "NodeCollisionEnd", "HandleCollisionEnd");
     }
-    
+
     void HandleCollisionStart(StringHash eventType, VariantMap& eventData)
     {
         Node@ otherNode = eventData["OtherNode"].GetNode();
@@ -637,7 +637,7 @@ class BuoyancyVolume : ScriptObject
                 // Apply damping to linear & angular velocity
                 float damping = 1.0 - insideFraction * 0.05;
                 otherBody.linearVelocity = otherBody.linearVelocity * damping;
-                otherBody.angularVelocity = otherBody.angularVelocity * damping;;
+                otherBody.angularVelocity = otherBody.angularVelocity * damping;
             }
         }
     }
