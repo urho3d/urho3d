@@ -33,7 +33,6 @@ void Start()
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("SpawnBox", "HandleSpawnBox");
-    SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision");
 
     network.RegisterRemoteEvent("SpawnBox");
 
@@ -464,103 +463,6 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
     Connection@ connection = eventData["Connection"].GetConnection();
     connection.scene = testScene; // Begin scene replication to the client
     connection.logStatistics = true;
-}
-
-void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
-{
-    // Check if either of the nodes has an AnimatedModel component
-    Node@ nodeA = eventData["NodeA"].GetNode();
-    Node@ nodeB = eventData["NodeB"].GetNode();
-    if (nodeA.HasComponent("AnimatedModel"))
-    {
-        // Remove the trigger physics shape, and create the ragdoll
-        nodeA.RemoveComponent("RigidBody");
-        nodeA.RemoveComponent("CollisionShape");
-        CreateRagdoll(nodeA.GetComponent("AnimatedModel"));
-    }
-    else if (nodeB.HasComponent("AnimatedModel"))
-    {
-        nodeB.RemoveComponent("RigidBody");
-        nodeB.RemoveComponent("CollisionShape");
-        CreateRagdoll(nodeB.GetComponent("AnimatedModel"));
-    }
-}
-
-void CreateRagdoll(AnimatedModel@ model)
-{
-    Node@ root = model.node;
-
-    CreateRagdollBone(root, "Bip01_Pelvis", SHAPE_CAPSULE, Vector3(0.3, 0.3, 0.3), Vector3(0.0, 0, 0), Quaternion(0, 0, 0));
-    CreateRagdollBone(root, "Bip01_Spine1", SHAPE_CAPSULE, Vector3(0.3, 0.4, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_L_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_R_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_L_Calf", SHAPE_CAPSULE, Vector3(0.15, 0.55, 0.15), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_R_Calf", SHAPE_CAPSULE, Vector3(0.15, 0.55, 0.15), Vector3(0.25, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_Head", SHAPE_SPHERE, Vector3(0.25, 0.25, 0.25), Vector3(0.1, 0, 0), Quaternion(0, 0, 0));
-    CreateRagdollBone(root, "Bip01_L_UpperArm", SHAPE_CAPSULE, Vector3(0.125, 0.35, 0.125), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_R_UpperArm", SHAPE_CAPSULE, Vector3(0.125, 0.35, 0.125), Vector3(0.1, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_L_Forearm", SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
-    CreateRagdollBone(root, "Bip01_R_Forearm", SHAPE_CAPSULE, Vector3(0.1, 0.3, 0.1), Vector3(0.15, 0, 0), Quaternion(0, 0, 90));
-
-    CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(90, 0), Vector2(-25, 0));
-    CreateRagdollConstraint(root, "Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(45, 25), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
-    CreateRagdollConstraint(root, "Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0));
-
-    // Disable animation from all bones (both physical and non-physical) to not interfere
-    Skeleton@ skel = model.skeleton;
-    for (uint i = 0; i < skel.numBones; ++i)
-        skel.bones[i].animated = false;
-}
-
-void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position,
-    const Quaternion&in rotation)
-{
-    Node@ boneNode = root.GetChild(boneName, true);
-    if (boneNode is null || boneNode.HasComponent("RigidBody"))
-        return;
-
-    // In networked operation both client and server detect collisions separately, and create ragdolls on their own
-    // (bones are not synced over network.) To prevent replicated component ID range clashes when the client creates
-    // any components, it is important that the LOCAL creation mode is specified.
-    RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL);
-    body.mass = 1.0;
-    body.linearDamping = 0.05;
-    body.angularDamping = 0.85;
-    body.linearRestThreshold = 1.5;
-    body.angularRestThreshold = 2.5;
-
-    CollisionShape@ shape = boneNode.CreateComponent("CollisionShape", LOCAL);
-    shape.shapeType = type;
-    shape.size = size;
-    shape.position = position;
-    shape.rotation = rotation;
-}
-
-void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type,
-    const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit)
-{
-    Node@ boneNode = root.GetChild(boneName, true);
-    Node@ parentNode = root.GetChild(parentName, true);
-    if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
-        return;
-
-    Constraint@ constraint = boneNode.CreateComponent("Constraint", LOCAL);
-    constraint.constraintType = type;
-    constraint.disableCollision = true;
-    // The connected body must be specified before setting the world position
-    constraint.otherBody = parentNode.GetComponent("RigidBody");
-    constraint.worldPosition = boneNode.worldPosition;
-    constraint.axis = axis;
-    constraint.otherAxis = parentAxis;
-    constraint.highLimit = highLimit;
-    constraint.lowLimit = lowLimit;
 }
 
 void ToggleLiquid()
