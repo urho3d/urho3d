@@ -345,7 +345,7 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
 {
-    PROFILE(PhysicsWorld_GetRigidBodies);
+    PROFILE(PhysicsSphereQuery);
     
     result.Clear();
     
@@ -365,7 +365,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
 {
-    PROFILE(PhysicsWorld_GetRigidBodies);
+    PROFILE(PhysicsBoxQuery);
     
     result.Clear();
     
@@ -384,7 +384,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
-    PROFILE(PhysicsWorld_GetRigidBodies);
+    PROFILE(GetCollidingBodies);
     
     result.Clear();
     
