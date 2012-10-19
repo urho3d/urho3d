@@ -471,7 +471,7 @@ void ToggleLiquid()
     
     if (liquidNode is null)
     {
-        Node@ liquidNode = testScene.CreateChild("Liquid");
+        liquidNode = testScene.CreateChild("Liquid");
         liquidNode.position = Vector3(0, -48.75, 0);
         liquidNode.scale = Vector3(2000, 100, 2000);
 
