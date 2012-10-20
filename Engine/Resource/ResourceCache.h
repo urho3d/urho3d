@@ -90,7 +90,7 @@ public:
     /// Enable or disable automatic reloading of resources as files are modified.
     void SetAutoReloadResources(bool enable);
     
-    /// Open and return a file from the resource load paths or from inside a package file. If allowed paths have not been registered, also do a fallback search by interpreting the path as absolute. Return null if fails.
+    /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, const String& name);

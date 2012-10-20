@@ -375,11 +375,8 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
                 return file;
             }
         }
-    }
-    
-    // Fallback using absolute path
-    if (fileSystem && !fileSystem->HasRegisteredPaths())
-    {
+        
+        // Fallback using absolute path
         if (fileSystem->FileExists(name))
             return SharedPtr<File>(new File(context_, name));
     }
@@ -472,11 +469,8 @@ bool ResourceCache::Exists(const String& nameIn) const
             if (fileSystem->FileExists(resourceDirs_[i] + name))
                 return true;
         }
-    }
-    
-    // Fallback using absolute path
-    if (fileSystem && !fileSystem->HasRegisteredPaths())
-    {
+        
+        // Fallback using absolute path
         if (fileSystem->FileExists(name))
             return true;
     }
