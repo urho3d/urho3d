@@ -454,8 +454,10 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash t
     }
 }
 
-bool ResourceCache::Exists(const String& name) const
+bool ResourceCache::Exists(const String& nameIn) const
 {
+    String name = SanitateResourceName(nameIn);
+    
     for (unsigned i = 0; i < packages_.Size(); ++i)
     {
         if (packages_[i]->Exists(name))
