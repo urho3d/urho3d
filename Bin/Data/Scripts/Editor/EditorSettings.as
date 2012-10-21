@@ -52,6 +52,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ localIDToggle = settingsDialog.GetChild("LocalIDToggle", true);
     localIDToggle.checked = useLocalIDs;
 
+    CheckBox@ generateTangentsToggle = settingsDialog.GetChild("GenerateTangentsToggle", true);
+    generateTangentsToggle.checked = generateTangents;
+
     DropDownList@ pickModeEdit = settingsDialog.GetChild("PickModeEdit", true);
     pickModeEdit.selection = pickMode;
 
@@ -104,6 +107,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(rotateSnapToggle, "Toggled", "EditRotateSnap");
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
         SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
+        SubscribeToEvent(generateTangentsToggle, "Toggled", "EditGenerateTangents");
         SubscribeToEvent(pickModeEdit, "ItemSelected", "EditPickMode");
         SubscribeToEvent(renderModeEdit, "ItemSelected", "EditRenderMode");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
@@ -218,6 +222,12 @@ void EditUseLocalIDs(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     useLocalIDs = edit.checked;
+}
+
+void EditGenerateTangents(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    generateTangents = edit.checked;
 }
 
 void EditPickMode(StringHash eventType, VariantMap& eventData)

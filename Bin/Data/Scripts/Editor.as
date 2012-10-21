@@ -98,6 +98,7 @@ void LoadConfig()
         rotateSnap = objectElem.GetBool("rotatesnap");
         scaleSnap = objectElem.GetBool("scalesnap");
         useLocalIDs = objectElem.GetBool("uselocalids");
+        generateTangents = objectElem.GetBool("generatetangents");
         pickMode = objectElem.GetInt("pickmode");
     }
 
@@ -139,6 +140,7 @@ void SaveConfig()
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
+    objectElem.SetBool("generatetangents", generateTangents);
     objectElem.SetInt("pickmode", pickMode);
 
     renderingElem.SetInt("rendermode", renderer.renderMode);

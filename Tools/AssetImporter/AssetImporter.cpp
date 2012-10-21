@@ -1157,10 +1157,11 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     
     String diffuseTexName;
     String normalTexName;
+    String specularTexName;
     Color diffuseColor;
+    Color specularColor;
     bool hasAlpha = false;
     bool twoSided = false;
-    float specIntensity = 0.0f;
     float specPower = 1.0f;
     
     aiString stringVal;
@@ -1172,8 +1173,12 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         diffuseTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
         normalTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
+        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
         diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (material->Get(AI_MATKEY_COLOR_SPECULAR, colorVal) == AI_SUCCESS)
+        specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
         if (floatVal < 1.0f)
@@ -1182,8 +1187,6 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (material->Get(AI_MATKEY_SHININESS, floatVal) == AI_SUCCESS)
         specPower = floatVal;
-    if (material->Get(AI_MATKEY_SHININESS_STRENGTH, floatVal) == AI_SUCCESS)
-        specIntensity = floatVal;
     if (material->Get(AI_MATKEY_TWOSIDED, intVal) == AI_SUCCESS)
         twoSided = (intVal != 0);
     
@@ -1193,6 +1196,8 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         techniqueName = "Techniques/Diff";
         if (!normalTexName.Empty())
             techniqueName += "Normal";
+        if (!specularTexName.Empty())
+            techniqueName += "Spec";
     }
     if (hasAlpha)
         techniqueName += "Alpha";
@@ -1210,17 +1215,24 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (!normalTexName.Empty())
     {
         XMLElement normalElem = materialElem.CreateChild("texture");
-        normalElem.SetString("unit", "diffuse");
+        normalElem.SetString("unit", "normal");
         normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + normalTexName);
         usedTextures.Insert(normalTexName);
+    }
+    if (!specularTexName.Empty())
+    {
+        XMLElement normalElem = materialElem.CreateChild("texture");
+        normalElem.SetString("unit", "specular");
+        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
+        usedTextures.Insert(specularTexName);
     }
     
     XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
     diffuseColorElem.SetString("name", "MatDiffColor");
     diffuseColorElem.SetColor("value", diffuseColor);
     XMLElement specularElem = materialElem.CreateChild("parameter");
-    specularElem.SetString("name", "MatSpecProperties");
-    specularElem.SetVector2("value", Vector2(specIntensity, specPower));
+    specularElem.SetString("name", "MatSpecColor");
+    specularElem.SetVector4("value", Vector4(specularColor.r_, specularColor.g_, specularColor.b_, specPower));
     
     if (twoSided)
     {

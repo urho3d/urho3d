@@ -41,6 +41,7 @@ namespace Urho3D
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_RANGE = 10.0f;
 static const float DEFAULT_FOV = 30.0f;
+static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
 static const float DEFAULT_SHADOWFADESTART = 0.8f;
@@ -89,7 +90,7 @@ Light::Light(Context* context) :
     shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
-    specularIntensity_(0.0f),
+    specularIntensity_(DEFAULT_SPECULARINTENSITY),
     range_(DEFAULT_RANGE),
     fov_(DEFAULT_FOV),
     aspectRatio_(1.0f),
@@ -113,7 +114,7 @@ void Light::RegisterObject(Context* context)
     
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color(), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);

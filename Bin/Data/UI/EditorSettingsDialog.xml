@@ -216,6 +216,20 @@
             <attribute name="Text" value="Use local entity IDs on import" />
         </element>
     </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="CheckBox">
+            <attribute name="Name" value="GenerateTangentsToggle" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+        <element type="Text">
+            <attribute name="Text" value="Generate tangents on import" />
+        </element>
+    </element>
     <element type="BorderImage" style="EditorDivider">
         <attribute name="Min Size" value="0 4" />
         <attribute name="Max Size" value="2147483647 4" />
