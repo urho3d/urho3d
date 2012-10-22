@@ -147,19 +147,35 @@ void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPo
 
 bool LineEdit::OnDragDropTest(UIElement* source)
 {
-    return (dynamic_cast<LineEdit*>(source) != 0);
+    if (source)
+    {
+        ShortStringHash sourceType = source->GetType();
+        return sourceType == LineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
+    }
+    
+    return false;
 }
 
 bool LineEdit::OnDragDropFinish(UIElement* source)
 {
-    LineEdit* sourceLineEdit = dynamic_cast<LineEdit*>(source);
-    if (sourceLineEdit)
+    if (source)
     {
-        SetText(sourceLineEdit->GetText());
-        return true;
+        ShortStringHash sourceType = source->GetType();
+        if (sourceType == LineEdit::GetTypeStatic())
+        {
+            LineEdit* sourceLineEdit = static_cast<LineEdit*>(source);
+            SetText(sourceLineEdit->GetText());
+            return true;
+        }
+        else if (sourceType == Text::GetTypeStatic())
+        {
+            Text* sourceText = static_cast<Text*>(source);
+            SetText(sourceText->GetText());
+            return true;
+        }
     }
-    else
-        return false;
+    
+    return false;
 }
 
 void LineEdit::OnKey(int key, int buttons, int qualifiers)
