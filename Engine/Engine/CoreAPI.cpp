@@ -691,6 +691,26 @@ static const String& GetTypeName(ShortStringHash type)
     return GetScriptContext()->GetTypeName(type);
 }
 
+static void ConstructWeakHandle(WeakPtr<Object>* ptr)
+{
+    new(ptr) WeakPtr<Object>();
+}
+
+static void ConstructWeakHandleCopy(const WeakPtr<Object>& src, WeakPtr<Object>* ptr)
+{
+    new(ptr) WeakPtr<Object>(src);
+}
+
+static void ConstructWeakHandlePtr(Object* object, WeakPtr<Object>* ptr)
+{
+    new(ptr) WeakPtr<Object>(object);
+}
+
+static void DestructWeakHandle(WeakPtr<Object>* ptr)
+{
+    ptr->~WeakPtr<Object>();
+}
+
 void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
@@ -716,6 +736,18 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(ShortStringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
+    
+    engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<Object>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructWeakHandle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f(const WeakHandle&in)", asFUNCTION(ConstructWeakHandleCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f(Object@+)", asFUNCTION(ConstructWeakHandlePtr), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructWeakHandle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("WeakHandle", "WeakHandle& opAssign(const WeakHandle&in)", asMETHODPR(WeakPtr<Object>, operator =, (const WeakPtr<Object>&), WeakPtr<Object>&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "WeakHandle& opAssign(Object@+)", asMETHODPR(WeakPtr<Object>, operator =, (Object*), WeakPtr<Object>&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "Object@+ Get() const", asMETHODPR(WeakPtr<Object>, Get, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "int get_refs() const", asMETHOD(WeakPtr<Object>, Refs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "int get_weakRefs() const", asMETHOD(WeakPtr<Object>, WeakRefs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "bool get_expired() const", asMETHOD(WeakPtr<Object>, Expired), asCALL_THISCALL);
 }
 
 void RegisterCoreAPI(asIScriptEngine* engine)

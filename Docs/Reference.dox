@@ -388,7 +388,12 @@ There are some complexities of the scripting system one has to watch out for:
 
 The following changes have been made to AngelScript in Urho3D:
 
-- For performance reasons and to guarantee immediate removal of expired objects, AngelScript garbage collection has been disabled for script classes and the Array type. This has the downside that circular references will not be detected. Therefore, whenever you have object handles in your script, think of them as if they were C++ shared pointers and avoid creating circular references with them.
+- For performance reasons and to guarantee immediate removal of expired objects, AngelScript garbage collection has been disabled for script classes and the Array type. This has the downside that circular references will not be detected. Therefore, whenever you have object handles in your script, think of them as if they were C++ shared pointers and avoid creating circular references with them. For safety, consider using the value type WeakHandle, which is a WeakPtr<Object> exposed to script and can be used to point to any engine object (but not to script objects.) An example of using WeakHandle:
+
+\code
+WeakHandle rigidBodyWeak = node.CreateComponent("RigidBody");
+RigidBody@ rigidBodyShared = rigidBodyWeak.Get(); // Is null if expired
+\endcode
 
 - %Object handle assignment can be done without the @ symbol if the object in question does not support value assignment. All exposed Urho3D C++ classes that derive from RefCounted never support value assignment. For example, when assigning the Model and Material of a StaticModel component:
 

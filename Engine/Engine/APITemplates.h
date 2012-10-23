@@ -262,6 +262,8 @@ template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* 
     engine->RegisterObjectType(className, 0, asOBJ_REF);
     engine->RegisterObjectBehaviour(className, asBEHAVE_ADDREF, "void f()", asMETHODPR(T, AddRef, (), void), asCALL_THISCALL);
     engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_refs() const", asMETHODPR(T, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_weakRefs() const", asMETHODPR(T, WeakRefs, () const, int), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Object.
@@ -272,6 +274,8 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_refs() const", asMETHODPR(T, Refs, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_weakRefs() const", asMETHODPR(T, WeakRefs, () const, int), asCALL_THISCALL);
     RegisterSubclass<Object, T>(engine, "Object", className);
 }
 

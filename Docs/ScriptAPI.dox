@@ -760,6 +760,19 @@ Object
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+
+
+WeakHandle
+
+Methods:<br>
+- Object@ Get() const
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+- bool expired (readonly)
 
 
 Timer
@@ -774,6 +787,8 @@ Time
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint frameNumber (readonly)
 - float timeStep (readonly)
 - float elapsedTime (readonly)
@@ -791,6 +806,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - int level
 - bool timeStamp
 - String lastMessage (readonly)
@@ -932,6 +949,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - FileMode mode (readonly)
 - bool open (readonly)
 - bool packaged (readonly)
@@ -1030,6 +1049,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String currentDir
 - String programDir (readonly)
 - String userDocumentsDir (readonly)
@@ -1044,6 +1065,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name (readonly)
 - uint numFiles (readonly)
 - uint totalSize (readonly)
@@ -1059,6 +1082,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1090,6 +1115,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint[] memoryBudget
 - uint[] memoryUse (readonly)
 - uint totalMemoryUse (readonly)
@@ -1109,6 +1136,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1129,6 +1158,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1203,6 +1234,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1225,6 +1258,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1290,6 +1325,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1335,6 +1372,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1418,6 +1457,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1503,6 +1544,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1532,6 +1575,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1571,6 +1616,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1601,6 +1648,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - XMLFile@ parameters
 - uint numPasses
 - Vector4[] shaderParameters
@@ -1618,6 +1667,8 @@ Methods:<br>
 - void RemoveAllPostProcesses()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - Scene@ scene
 - Camera@ camera
 - IntRect rect
@@ -1649,6 +1700,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1681,6 +1734,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1710,6 +1765,8 @@ Properties:<br>
 Pass
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - BlendMode blendMode
 - CompareMode depthTestMode
 - bool depthWrite
@@ -1730,6 +1787,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1750,6 +1809,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1769,6 +1830,8 @@ Methods:<br>
 - void RemoveShaderParameter(const String&)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - String vertexShader
 - String pixelShader
 - String output
@@ -1785,6 +1848,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1807,6 +1872,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1833,6 +1900,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1891,6 +1960,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1947,6 +2018,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -1996,6 +2069,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2041,6 +2116,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2075,6 +2152,8 @@ Methods:<br>
 - void AddTime(float)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - Bone@ startBone
 - bool looped
 - float weight
@@ -2113,6 +2192,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2191,6 +2272,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2227,6 +2310,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2274,6 +2359,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2324,6 +2411,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2369,6 +2458,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2410,6 +2501,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2472,6 +2565,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2493,6 +2588,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String windowTitle
 - int width (readonly)
 - int height (readonly)
@@ -2523,6 +2620,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numViewports
 - Viewport@[] viewports
 - RenderMode renderMode
@@ -2584,6 +2683,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - bool mouseVisible
 - bool toggleFullscreen
 - bool[] keyDown (readonly)
@@ -2616,6 +2717,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2645,6 +2748,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2674,6 +2779,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2713,6 +2820,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2742,6 +2851,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - float[] masterGain
 - SoundListener@ listener
 - uint sampleSize (readonly)
@@ -2761,6 +2872,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2811,6 +2924,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -2907,6 +3022,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3010,6 +3127,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3115,6 +3234,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3218,6 +3339,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3320,6 +3443,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3425,6 +3550,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3530,6 +3657,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3649,6 +3778,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3765,6 +3896,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3873,6 +4006,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -3988,6 +4123,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4108,6 +4245,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4222,6 +4361,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4288,6 +4429,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String title
 - String path
 - String fileName
@@ -4320,6 +4463,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
 - UIElement@ focusElement
@@ -4359,6 +4504,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4382,6 +4529,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - Scene@ scene
 - bool logStatistics
 - bool client (readonly)
@@ -4417,6 +4566,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - int updateFps
 - String packageCacheDir
 - bool serverRunning (readonly)
@@ -4450,6 +4601,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4491,6 +4644,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4538,6 +4693,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4593,6 +4750,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4613,6 +4772,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -4645,6 +4806,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
@@ -4666,6 +4829,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - ScriptFile@ defaultScriptFile
 - Scene@ defaultScene
 
@@ -4679,6 +4844,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - XMLFile@ style
 - bool visible
 - uint numRows
@@ -4698,6 +4865,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - XMLFile@ style
 - uint mode
 - uint profilerMaxDepth
@@ -4722,6 +4891,8 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
 - int minFps
 - int maxFps
 - int maxInactiveFps
