@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
@@ -102,9 +105,6 @@ CG_SetError(const char *prefix, CGDisplayErr result)
     case kCGErrorCannotComplete:
         error = "kCGErrorCannotComplete";
         break;
-    case kCGErrorNameTooLong:
-        error = "kCGErrorNameTooLong";
-        break;
     case kCGErrorNotImplemented:
         error = "kCGErrorNotImplemented";
         break;
@@ -113,9 +113,6 @@ CG_SetError(const char *prefix, CGDisplayErr result)
         break;
     case kCGErrorTypeCheck:
         error = "kCGErrorTypeCheck";
-        break;
-    case kCGErrorNoCurrentPoint:
-        error = "kCGErrorNoCurrentPoint";
         break;
     case kCGErrorInvalidOperation:
         error = "kCGErrorInvalidOperation";
