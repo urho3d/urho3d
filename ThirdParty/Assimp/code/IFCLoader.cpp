@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  IFCLoad.cpp
  *  @brief Implementation of the Industry Foundation Classes loader.
  */
@@ -46,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_IFC_IMPORTER
 
 #include <iterator>
-#include <boost/tuple/tuple.hpp>
+//#include <boost/tuple/tuple.hpp>
 
 
 #include "IFCLoader.h"
