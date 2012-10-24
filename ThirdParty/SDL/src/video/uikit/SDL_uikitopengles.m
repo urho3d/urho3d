@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Öörni for Urho3D
+// Modified by Lasse Oorni for Urho3D
 
 #include "SDL_config.h"
 
@@ -129,8 +129,12 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         [view->viewcontroller retain];
     }
 
-    /* add the view to our window */
-    [uiwindow addSubview: view ];
+    // The view controller needs to be the root in order to control rotation on iOS 6.0
+    if (uiwindow.rootViewController == nil) {
+        uiwindow.rootViewController = view->viewcontroller;
+    } else {
+        [uiwindow addSubview: view];
+    }
 
     if ( UIKit_GL_MakeCurrent(_this, window, view) < 0 ) {
         UIKit_GL_DeleteContext(_this, view);
