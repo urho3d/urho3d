@@ -31,9 +31,8 @@
 @property (readwrite) SDL_Window *window;
 
 - (id)initWithSDLWindow:(SDL_Window *)_window;
-- (void)loadView;
-- (void)viewDidLayoutSubviews;
-- (NSUInteger)supportedInterfaceOrientations;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orient;
+- (void)loadView;
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation;
 
 @end
