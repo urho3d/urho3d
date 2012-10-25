@@ -16,6 +16,7 @@ include_directories (
 if (WIN32)
     add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
 elseif (IOS)
+    set (MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/iOS/Urho3DPlist.info.in)
     set (RESOURCE_DIR \${TARGET_BUILD_DIR}/\${FULL_PRODUCT_NAME})
     set (CMAKE_EXE_LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
     add_executable (${TARGET_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
