@@ -293,6 +293,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             if (fullscreen)
                 flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
             
+            // On iOS window needs to be resizable to handle orientation changes properly
+            #ifdef IOS
+            flags |= SDL_WINDOW_RESIZABLE;
+            #endif
+            
             for (;;)
             {
                 if (!externalWindow_)

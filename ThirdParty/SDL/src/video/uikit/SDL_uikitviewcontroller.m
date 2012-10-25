@@ -28,9 +28,11 @@
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_events_c.h"
 
-#include "SDL_uikitwindow.h"
 #include "SDL_uikitviewcontroller.h"
 #include "SDL_uikitvideo.h"
+#include "SDL_uikitmodes.h"
+#include "SDL_uikitwindow.h"
+
 
 @implementation SDL_uikitviewcontroller
 
@@ -43,63 +45,8 @@
         return nil;
     }
     self.window = _window;
+
     return self;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orient
-{
-    const char *orientationsCString;
-    if ((orientationsCString = SDL_GetHint(SDL_HINT_ORIENTATIONS)) != NULL) {
-        BOOL rotate = NO;
-        NSString *orientationsNSString = [NSString stringWithCString:orientationsCString
-                                                            encoding:NSUTF8StringEncoding];
-        NSArray *orientations = [orientationsNSString componentsSeparatedByCharactersInSet:
-                                 [NSCharacterSet characterSetWithCharactersInString:@" "]];
-
-        switch (orient) {
-            case UIInterfaceOrientationLandscapeLeft:
-                rotate = [orientations containsObject:@"LandscapeLeft"];
-                break;
-
-            case UIInterfaceOrientationLandscapeRight:
-                rotate = [orientations containsObject:@"LandscapeRight"];
-                break;
-
-            case UIInterfaceOrientationPortrait:
-                rotate = [orientations containsObject:@"Portrait"];
-                break;
-
-            case UIInterfaceOrientationPortraitUpsideDown:
-                rotate = [orientations containsObject:@"PortraitUpsideDown"];
-                break;
-
-            default: break;
-        }
-
-        return rotate;
-    }
-
-    if (self->window->flags & SDL_WINDOW_RESIZABLE) {
-        return YES;  // any orientation is okay.
-    }
-
-    // If not resizable, allow device to orient to other matching sizes
-    //  (that is, let the user turn the device upside down...same screen
-    //   dimensions, but it lets the user place the device where it's most
-    //   comfortable in relation to its physical buttons, headphone jack, etc).
-    switch (orient) {
-        case UIInterfaceOrientationLandscapeLeft:
-        case UIInterfaceOrientationLandscapeRight:
-            return (self->window->w >= self->window->h);
-
-        case UIInterfaceOrientationPortrait:
-        case UIInterfaceOrientationPortraitUpsideDown:
-            return (self->window->h >= self->window->w);
-
-        default: break;
-    }
-
-    return NO;  // Nothing else is acceptable.
 }
 
 - (void)loadView
@@ -107,57 +54,73 @@
     // do nothing.
 }
 
-// Send a resized event when the orientation changes.
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+- (void)viewDidLayoutSubviews
 {
-    const UIInterfaceOrientation toInterfaceOrientation = [self interfaceOrientation];
-    SDL_WindowData *data = self->window->driverdata;
-    UIWindow *uiwindow = data->uiwindow;
-    SDL_VideoDisplay *display = SDL_GetDisplayForWindow(self->window);
-    SDL_DisplayData *displaydata = (SDL_DisplayData *) display->driverdata;
-    SDL_DisplayModeData *displaymodedata = (SDL_DisplayModeData *) display->current_mode.driverdata;
-    UIScreen *uiscreen = displaydata->uiscreen;
-    const int noborder = (self->window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_BORDERLESS));
-    CGRect frame = noborder ? [uiscreen bounds] : [uiscreen applicationFrame];
-    const CGSize size = frame.size;
-    int w, h;
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_ORIENTATION_CHANGED;
-    event.sysevent.data=NULL;
-
-    switch (toInterfaceOrientation) {
-        case UIInterfaceOrientationPortrait:
-        case UIInterfaceOrientationPortraitUpsideDown:
-            w = (size.width < size.height) ? size.width : size.height;
-            h = (size.width > size.height) ? size.width : size.height;
-            event.sysevent.data=(void*)SDL_ORIENTATION_PORTRAIT;
-            break;
-
-        case UIInterfaceOrientationLandscapeLeft:
-        case UIInterfaceOrientationLandscapeRight:
-            w = (size.width > size.height) ? size.width : size.height;
-            h = (size.width < size.height) ? size.width : size.height;
-            event.sysevent.data=(void*)SDL_ORIENTATION_LANDSCAPE;
-            break;
-
-        default:
-            SDL_assert(0 && "Unexpected interface orientation!");
-            return;
+    if (self->window->flags & SDL_WINDOW_RESIZABLE) {
+        SDL_WindowData *data = self->window->driverdata;
+        SDL_VideoDisplay *display = SDL_GetDisplayForWindow(self->window);
+        SDL_DisplayModeData *displaymodedata = (SDL_DisplayModeData *) display->current_mode.driverdata;
+        const CGSize size = data->view.bounds.size;
+        int w, h;
+        
+        w = (int)(size.width * displaymodedata->scale);
+        h = (int)(size.height * displaymodedata->scale);
+        
+        SDL_SendWindowEvent(self->window, SDL_WINDOWEVENT_RESIZED, w, h);
     }
-
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
-
-    w = (int)(w * displaymodedata->scale);
-    h = (int)(h * displaymodedata->scale);
-
-    [uiwindow setFrame:frame];
-    [data->view setFrame:frame];
-    [data->view updateFrame];
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
-    else SDL_SendWindowEvent(self->window, SDL_WINDOWEVENT_RESIZED, w, h);
 }
 
-#endif /* SDL_VIDEO_DRIVER_UIKIT */
+- (NSUInteger)supportedInterfaceOrientations
+{
+    NSUInteger orientationMask = 0;
+    
+    const char *orientationsCString;
+    if ((orientationsCString = SDL_GetHint(SDL_HINT_ORIENTATIONS)) != NULL) {
+        BOOL rotate = NO;
+        NSString *orientationsNSString = [NSString stringWithCString:orientationsCString
+                                                            encoding:NSUTF8StringEncoding];
+        NSArray *orientations = [orientationsNSString componentsSeparatedByCharactersInSet:
+                                 [NSCharacterSet characterSetWithCharactersInString:@" "]];
+        
+        if ([orientations containsObject:@"LandscapeLeft"]) {
+            orientationMask |= UIInterfaceOrientationMaskLandscapeLeft;
+        }
+        if ([orientations containsObject:@"LandscapeRight"]) {
+            orientationMask |= UIInterfaceOrientationMaskLandscapeRight;
+        }
+        if ([orientations containsObject:@"Portrait"]) {
+            orientationMask |= UIInterfaceOrientationMaskPortrait;
+        }
+        if ([orientations containsObject:@"PortraitUpsideDown"]) {
+            orientationMask |= UIInterfaceOrientationMaskPortraitUpsideDown;
+        }
+        
+    } else if (self->window->flags & SDL_WINDOW_RESIZABLE) {
+        orientationMask = UIInterfaceOrientationMaskAll;  // any orientation is okay.
+    } else {
+        if (self->window->w >= self->window->h) {
+            orientationMask |= UIInterfaceOrientationMaskLandscape;
+        }
+        if (self->window->h >= self->window->w) {
+            orientationMask |= (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
+        }
+    }
+    
+    // Don't allow upside-down orientation on the phone, so answering calls is in the natural orientation
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        orientationMask &= ~UIInterfaceOrientationMaskPortraitUpsideDown;
+    }
+    return orientationMask;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orient
+{
+    NSUInteger orientationMask = [self supportedInterfaceOrientations];
+    return (orientationMask & (1 << orient));
+}
+
 @end
+
+#endif /* SDL_VIDEO_DRIVER_UIKIT */
+
+/* vi: set ts=4 sw=4 expandtab: */

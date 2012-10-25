@@ -18,34 +18,34 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef _SDL_uikitwindow_h
-#define _SDL_uikitwindow_h
+#include "SDL_config.h"
 
-#include "../SDL_sysvideo.h"
-#import "SDL_uikitvideo.h"
-#import "SDL_uikitopenglview.h"
-#import "SDL_uikitviewcontroller.h"
+#ifndef _SDL_uikitmodes_h
+#define _SDL_uikitmodes_h
 
-typedef struct SDL_WindowData SDL_WindowData;
+#include "SDL_uikitvideo.h"
 
-extern int UIKit_CreateWindow(_THIS, SDL_Window * window);
-extern void UIKit_ShowWindow(_THIS, SDL_Window * window);
-extern void UIKit_HideWindow(_THIS, SDL_Window * window);
-extern void UIKit_RaiseWindow(_THIS, SDL_Window * window);
-extern void UIKit_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
-extern void UIKit_DestroyWindow(_THIS, SDL_Window * window);
-extern SDL_bool UIKit_GetWindowWMInfo(_THIS, SDL_Window * window,
-                                      struct SDL_SysWMinfo * info);
-
-@class UIWindow;
-
-struct SDL_WindowData
+typedef struct
 {
-    UIWindow *uiwindow;
-    SDL_uikitopenglview *view;
-    SDL_uikitviewcontroller *viewcontroller;
-};
+    UIScreen *uiscreen;
+    CGFloat scale;
+} SDL_DisplayData;
 
-#endif /* _SDL_uikitwindow_h */
+typedef struct
+{
+    UIScreenMode *uiscreenmode;
+    CGFloat scale;
+} SDL_DisplayModeData;
+
+extern BOOL SDL_UIKit_supports_multiple_displays;
+
+extern SDL_bool UIKit_IsDisplayLandscape(UIScreen *uiscreen);
+
+extern int UIKit_InitModes(_THIS);
+extern void UIKit_GetDisplayModes(_THIS, SDL_VideoDisplay * display);
+extern int UIKit_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode);
+extern void UIKit_QuitModes(_THIS);
+
+#endif /* _SDL_uikitmodes_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

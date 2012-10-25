@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Öörni for Urho3D
-
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -28,9 +25,10 @@
 #include "SDL_uikitopengles.h"
 #include "SDL_uikitopenglview.h"
 #include "SDL_uikitappdelegate.h"
+#include "SDL_uikitmodes.h"
 #include "SDL_uikitwindow.h"
 #include "jumphack.h"
-#include "../../video/SDL_sysvideo.h"
+#include "../SDL_sysvideo.h"
 #include "../../events/SDL_keyboard_c.h"
 #include "../../events/SDL_mouse_c.h"
 #include "../../power/uikit/SDL_syspower.h"
@@ -93,7 +91,7 @@ void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
         return;
     }
     [data->view swapBuffers];
-    
+
     /* we need to let the event cycle run, or the OS won't update the OpenGL view! */
     SDL_PumpEvents();
 }
@@ -108,7 +106,13 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
     UIWindow *uiwindow = data->uiwindow;
 
     /* construct our view, passing in SDL's OpenGL configuration data */
-    view = [[SDL_uikitopenglview alloc] initWithFrame: [uiwindow bounds]
+    CGRect frame;
+    if (window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_BORDERLESS)) {
+        frame = [displaydata->uiscreen bounds];
+    } else {
+        frame = [displaydata->uiscreen applicationFrame];
+    }
+    view = [[SDL_uikitopenglview alloc] initWithFrame: frame
                                     scale: displaymodedata->scale
                                     retainBacking: _this->gl_config.retained_backing
                                     rBits: _this->gl_config.red_size
@@ -128,11 +132,14 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         [view->viewcontroller setView:view];
         [view->viewcontroller retain];
     }
+    [uiwindow addSubview: view];
+    
+    // The view controller needs to be the root in order to control rotation on iOS 6.0
+    if (uiwindow.rootViewController == nil) {
+        uiwindow.rootViewController = view->viewcontroller;
+    }
 
-    /* add the view to our window */
-    [uiwindow addSubview: view ];
-
-    if ( UIKit_GL_MakeCurrent(_this, window, view) < 0 ) {
+    if (UIKit_GL_MakeCurrent(_this, window, view) < 0) {
         UIKit_GL_DeleteContext(_this, view);
         return NULL;
     }
@@ -151,6 +158,10 @@ void UIKit_GL_DeleteContext(_THIS, SDL_GLContext context)
     /* the delegate has retained the view, this will release him */
     SDL_uikitopenglview *view = (SDL_uikitopenglview *)context;
     if (view->viewcontroller) {
+        UIWindow *uiwindow = (UIWindow *)view.superview;
+        if (uiwindow.rootViewController == view->viewcontroller) {
+            uiwindow.rootViewController = nil;
+        }
         [view->viewcontroller setView:nil];
         [view->viewcontroller release];
     }

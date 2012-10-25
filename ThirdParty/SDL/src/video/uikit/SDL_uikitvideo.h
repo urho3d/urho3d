@@ -23,23 +23,22 @@
 
 #include <UIKit/UIKit.h>
 
-extern BOOL SDL_UIKit_supports_multiple_displays;
+#include "../SDL_sysvideo.h"
 
-typedef struct SDL_DisplayData SDL_DisplayData;
-
-struct SDL_DisplayData
+#ifndef __IPHONE_6_0
+// This enum isn't available in older SDKs, but we use it for our own purposes on iOS 5.1 and for the system on iOS 6.0
+enum UIInterfaceOrientationMask
 {
-    UIScreen *uiscreen;
-    CGFloat scale;
+    UIInterfaceOrientationMaskPortrait = (1 << UIInterfaceOrientationPortrait),
+    UIInterfaceOrientationMaskLandscapeLeft = (1 << UIInterfaceOrientationLandscapeLeft),
+    UIInterfaceOrientationMaskLandscapeRight = (1 << UIInterfaceOrientationLandscapeRight),
+    UIInterfaceOrientationMaskPortraitUpsideDown = (1 << UIInterfaceOrientationPortraitUpsideDown),
+    UIInterfaceOrientationMaskLandscape = (UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
+    UIInterfaceOrientationMaskAll = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown),
+    UIInterfaceOrientationMaskAllButUpsideDown = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
 };
+#endif // !__IPHONE_6_0
 
-typedef struct SDL_DisplayModeData SDL_DisplayModeData;
-
-struct SDL_DisplayModeData
-{
-    UIScreenMode *uiscreenmode;
-    CGFloat scale;
-};
 
 #endif /* _SDL_uikitvideo_h */
 

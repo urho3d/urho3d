@@ -46,6 +46,11 @@
 
     /* format of depthRenderbuffer */
     GLenum depthBufferFormat;
+
+    id displayLink;
+    int animationInterval;
+    void (*animationCallback)(void*);
+    void *animationCallbackParam;
 }
 
 @property (nonatomic, retain, readonly) EAGLContext *context;
@@ -65,6 +70,15 @@
     majorVersion:(int)majorVersion;
 
 - (void)updateFrame;
+
+- (void)setAnimationCallback:(int)interval
+    callback:(void (*)(void*))callback
+    callbackParam:(void*)callbackParam;
+
+- (void)startAnimation;
+- (void)stopAnimation;
+
+- (void)doLoop:(id)sender;
 
 @end
 
