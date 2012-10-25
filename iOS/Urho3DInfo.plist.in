@@ -6,6 +6,7 @@
 	<string>UIInterfaceOrientationLandscapeRight</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
