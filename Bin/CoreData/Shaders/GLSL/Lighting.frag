@@ -73,19 +73,19 @@ float GetShadow(vec4 shadowPos)
             return cShadowIntensity.y + cShadowIntensity.x * inLight;
         #endif
     #else
-        vec3 projShadowPos = shadowPos.xyz / shadowPos.w;
+        vec2 offsets = cShadowMapInvSize * shadowPos.w;
         #ifndef LQSHADOW
             // Take four samples and average them
             vec4 inLight = vec4(
-                texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z,
-                texture2D(sShadowMap, vec2(projShadowPos.x + cShadowMapInvSize.x, projShadowPos.y)).r > projShadowPos.z,
-                texture2D(sShadowMap, vec2(projShadowPos.x, projShadowPos.y + cShadowMapInvSize.y)).r > projShadowPos.z,
-                texture2D(sShadowMap, projShadowPos.xy + cShadowMapInvSize).r > projShadowPos.z
+                texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r * shadowPos.w > shadowPos.z,
+                texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
             );
             return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
         #else
             // Take one sample
-            return cShadowIntensity.y + (texture2D(sShadowMap, projShadowPos.xy).r > projShadowPos.z) ? cShadowIntensity.x : 0.0;
+            return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z) ? cShadowIntensity.x : 0.0;
         #endif
     #endif
 }
