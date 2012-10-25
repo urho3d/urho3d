@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Öörni for Urho3D
 
 #include "SDL_config.h"
 
@@ -93,9 +93,9 @@ void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
         return;
     }
     [data->view swapBuffers];
-    /* since now we've got something to draw
-       make the window visible */
-    [data->uiwindow makeKeyAndVisible];
+    
+    /* we need to let the event cycle run, or the OS won't update the OpenGL view! */
+    SDL_PumpEvents();
 }
 
 SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
@@ -129,12 +129,8 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         [view->viewcontroller retain];
     }
 
-    // The view controller needs to be the root in order to control rotation on iOS 6.0
-    if (uiwindow.rootViewController == nil) {
-        uiwindow.rootViewController = view->viewcontroller;
-    } else {
-        [uiwindow addSubview: view];
-    }
+    /* add the view to our window */
+    [uiwindow addSubview: view ];
 
     if ( UIKit_GL_MakeCurrent(_this, window, view) < 0 ) {
         UIKit_GL_DeleteContext(_this, view);

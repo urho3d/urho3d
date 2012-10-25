@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -205,6 +208,8 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
         [uiwindow release];
         return -1;
     }
+
+    [uiwindow makeKeyAndVisible];
 
     return 1;
 
