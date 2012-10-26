@@ -1,0 +1,8 @@
+<technique>
+    <pass name="base" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCube" />
+    <pass name="light" vs="LitSolid" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffPrepass" />
+    <pass name="material" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCubeMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="LitSolid_EnvCube" ps="LitSolid_DiffEnvCubeDeferred" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

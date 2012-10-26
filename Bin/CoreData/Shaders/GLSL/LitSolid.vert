@@ -30,6 +30,9 @@ varying vec2 vTexCoord;
     #else
         varying vec4 vScreenPos;
     #endif
+    #ifdef ENVCUBEMAP
+        varying vec3 vReflectionVec;
+    #endif
 #endif
 
 void main()
@@ -101,6 +104,10 @@ void main()
         
         #ifndef NORMALMAP
             vScreenPos = GetScreenPos(gl_Position);
+        #endif
+        
+        #ifdef ENVCUBEMAP
+            vReflectionVec = reflect(worldPos - cCameraPos, vNormal);
         #endif
     #endif
 }

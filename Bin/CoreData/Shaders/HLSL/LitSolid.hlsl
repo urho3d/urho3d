@@ -53,6 +53,9 @@ void VS(float4 iPos : POSITION,
         #else
             out float4 oScreenPos : TEXCOORD3,
         #endif
+        #ifdef ENVCUBEMAP
+            out float3 oReflectionVec : TEXCOORD5,
+        #endif
     #endif
     out float4 oPos : POSITION)
 {
@@ -118,6 +121,10 @@ void VS(float4 iPos : POSITION,
         #ifndef NORMALMAP
             oScreenPos = GetScreenPos(oPos);
         #endif
+        
+        #ifdef ENVCUBEMAP
+            oReflectionVec = reflect(worldPos - cCameraPos, oNormal);
+        #endif
     #endif
 }
 
@@ -147,6 +154,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float3 iBitangent : TEXCOORD4,
         #else
             float4 iScreenPos : TEXCOORD3,
+        #endif
+        #ifdef ENVCUBEMAP
+            float3 iReflectionVec : TEXCOORD5,
         #endif
     #endif
     #if defined(PREPASS) && !defined(HWDEPTH)
@@ -255,6 +265,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor = float4(GetFog(iVertexLight.rgb * diffColor.rgb, iVertexLight.a), 1.0);
         oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
         oNormal = float4(normal * 0.5 + 0.5, specPower);
+
+        #ifdef ENVCUBEMAP
+            oColor.rgb += cMatEnvMapColor * texCUBE(sEnvCubeMap, iReflectionVec);
+        #endif
+
         #ifndef HWDEPTH
             oDepth = iVertexLight.a;
         #endif
@@ -269,6 +284,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
+        #endif
+
+        #ifdef ENVCUBEMAP
+            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, iReflectionVec);
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);

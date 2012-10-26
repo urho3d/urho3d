@@ -335,6 +335,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
             image = image->GetNextLevel();
+            levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
         }

@@ -1,0 +1,8 @@
+<cubemap>
+    <face name="BrightDay1_PosX.png" />
+    <face name="BrightDay1_NegX.png" />
+    <face name="BrightDay1_PosY.png" />
+    <face name="BrightDay1_NegY.png" />
+    <face name="BrightDay1_PosZ.png" />
+    <face name="BrightDay1_NegZ.png" />
+</cubemap>

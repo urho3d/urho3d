@@ -30,6 +30,9 @@ varying vec2 vTexCoord;
     #else
         varying vec4 vScreenPos;
     #endif
+    #ifdef ENVCUBEMAP
+        varying vec3 vReflectionVec;
+    #endif
 #endif
 
 void main()
@@ -125,6 +128,11 @@ void main()
         gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, vVertexLight.a), 1.0);
         gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
+        
+        #ifdef ENVCUBEMAP
+            gl_FragData[0].rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, vReflectionVec);
+        #endif
+
         #ifndef HWDEPTH
             gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
         #endif
@@ -139,6 +147,10 @@ void main()
             vec3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
+        #endif
+
+        #ifdef ENVCUBEMAP
+            finalColor.rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, vReflectionVec);
         #endif
 
         gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);

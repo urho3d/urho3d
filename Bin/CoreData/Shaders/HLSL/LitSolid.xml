@@ -1,20 +1,21 @@
 <shaders>
     <shader type="vs">
         <option name="Normal" define="NORMALMAP" />
+        <option name="EnvCube" define="ENVCUBEMAP" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
         <variation name="3VL" define="NUMVERTEXLIGHTS=3" />
         <variation name="4VL" define="NUMVERTEXLIGHTS=4" />
-        <variation name="Dir">
+        <variation name="Dir" exclude="EnvCube">
             <define name="DIRLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Spot">
+        <variation name="Spot" exclude="EnvCube">
             <define name="SPOTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Point">
+        <variation name="Point" exclude="EnvCube">
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
@@ -29,22 +30,23 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
+        <option name="EnvCube" define="ENVCUBEMAP" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
-        <variation name="" define="AMBIENT" />        
-        <variation name="Dir">
+        <variation name="" define="AMBIENT" />
+        <variation name="Dir" exclude="EnvCube">
             <define name="DIRLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Spot">
+        <variation name="Spot" exclude="EnvCube">
             <define name="SPOTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Point">
+        <variation name="Point" exclude="EnvCube">
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Prepass" define="PREPASS" />
+        <variation name="Prepass" define="PREPASS" exclude="EnvCube" />
         <variation name="Material" define="MATERIAL" exclude="Normal" />
         <variation name="Deferred" define="DEFERRED" />
         <option name="HW" define="HWDEPTH" require="PREPASS" />

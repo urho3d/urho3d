@@ -1,0 +1,6 @@
+<material>
+    <technique name="Techniques/NoTextureEnvCube.xml" />
+    <texture unit="environment" name="Textures/Skybox.xml" />
+    <parameter name="MatSpecColor" value="0.5 0.5 0.5 16" />
+    <parameter name="MatEnvMapColor" value="0.2 0.2 0.2" />
+</material>
