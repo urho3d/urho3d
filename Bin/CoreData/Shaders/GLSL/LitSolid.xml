@@ -30,7 +30,7 @@
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="EnvCube" define="ENVCUBEMAP" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
         <variation name="" define="AMBIENT" />
         <variation name="Dir" exclude="EnvCube">
@@ -46,7 +46,7 @@
             <define name="PERPIXEL" />
         </variation>
         <variation name="Prepass" define="PREPASS" exclude="EnvCube" />
-        <variation name="Material" define="MATERIAL" exclude="Normal" />
+        <variation name="Material" define="MATERIAL" />
         <variation name="Deferred" define="DEFERRED" />
         <option name="HW" define="HWDEPTH" require="PREPASS" />
         <option name="HW" define="HWDEPTH" require="DEFERRED" />

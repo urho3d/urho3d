@@ -47,7 +47,7 @@
             <define name="PERPIXEL" />
         </variation>
         <variation name="Prepass" define="PREPASS" exclude="EnvCube" />
-        <variation name="Material" define="MATERIAL" exclude="Normal" />
+        <variation name="Material" define="MATERIAL" />
         <variation name="Deferred" define="DEFERRED" />
         <option name="HW" define="HWDEPTH" require="PREPASS" />
         <option name="HW" define="HWDEPTH" require="DEFERRED" />

@@ -27,9 +27,8 @@ varying vec2 vTexCoord;
     #ifdef NORMALMAP
         varying vec3 vTangent;
         varying vec3 vBitangent;
-    #else
-        varying vec4 vScreenPos;
     #endif
+    varying vec4 vScreenPos;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
@@ -130,7 +129,8 @@ void main()
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
         
         #ifdef ENVCUBEMAP
-            gl_FragData[0].rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, vReflectionVec);
+            normal = normalize(normal);
+            gl_FragData[0].rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal));
         #endif
 
         #ifndef HWDEPTH
@@ -150,7 +150,14 @@ void main()
         #endif
 
         #ifdef ENVCUBEMAP
-            finalColor.rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, vReflectionVec);
+            #ifdef NORMALMAP
+                mat3 tbn = mat3(vTangent, vBitangent, vNormal);
+                vec3 normal = tbn * DecodeNormal(texture2D(sNormalMap, vTexCoord));
+            #else
+                vec3 normal = vNormal;
+            #endif
+            normal = normalize(normal);
+            finalColor.rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal));
         #endif
 
         gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);

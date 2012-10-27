@@ -50,11 +50,10 @@ void VS(float4 iPos : POSITION,
         #ifdef NORMALMAP
             out float3 oTangent : TEXCOORD3,
             out float3 oBitangent : TEXCOORD4,
-        #else
-            out float4 oScreenPos : TEXCOORD3,
         #endif
+        out float4 oScreenPos : TEXCOORD5,
         #ifdef ENVCUBEMAP
-            out float3 oReflectionVec : TEXCOORD5,
+            out float3 oReflectionVec : TEXCOORD6,
         #endif
     #endif
     out float4 oPos : POSITION)
@@ -118,12 +117,10 @@ void VS(float4 iPos : POSITION,
                 oVertexLight.rgb += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
         
-        #ifndef NORMALMAP
-            oScreenPos = GetScreenPos(oPos);
-        #endif
-        
+        oScreenPos = GetScreenPos(oPos);
+
         #ifdef ENVCUBEMAP
-            oReflectionVec = reflect(worldPos - cCameraPos, oNormal);
+            oReflectionVec = worldPos - cCameraPos;
         #endif
     #endif
 }
@@ -152,11 +149,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef NORMALMAP
             float3 iTangent : TEXCOORD3,
             float3 iBitangent : TEXCOORD4,
-        #else
-            float4 iScreenPos : TEXCOORD3,
         #endif
+        float4 iScreenPos : TEXCOORD5,
         #ifdef ENVCUBEMAP
-            float3 iReflectionVec : TEXCOORD5,
+            float3 iReflectionVec : TEXCOORD6,
         #endif
     #endif
     #if defined(PREPASS) && !defined(HWDEPTH)
@@ -255,7 +251,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         // If using SM2, light volume shader may not have instructions left to normalize the normal. Therefore do it here
-        #if !defined(SM3)
+        #if !defined(SM3) || defined(ENVCUBEMAP)
             normal = normalize(normal);
         #endif
 
@@ -267,7 +263,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oNormal = float4(normal * 0.5 + 0.5, specPower);
 
         #ifdef ENVCUBEMAP
-            oColor.rgb += cMatEnvMapColor * texCUBE(sEnvCubeMap, iReflectionVec);
+            oColor.rgb += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal));
         #endif
 
         #ifndef HWDEPTH
@@ -287,7 +283,14 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         #ifdef ENVCUBEMAP
-            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, iReflectionVec);
+            #ifdef NORMALMAP
+                float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
+                float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord)), tbn);
+            #else
+                float3 normal = iNormal;
+            #endif
+            normal = normalize(normal);
+            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal));
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);

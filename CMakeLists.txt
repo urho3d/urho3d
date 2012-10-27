@@ -1,5 +1,5 @@
 # Disable unnecessary build types
-set (CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configurations" FORCE)
+set (CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Debug;Release" CACHE STRING "Configurations" FORCE)
 
 # Set project name
 project (Urho3D)

@@ -27,9 +27,8 @@ varying vec2 vTexCoord;
     #ifdef NORMALMAP
         varying vec3 vTangent;
         varying vec3 vBitangent;
-    #else
-        varying vec4 vScreenPos;
     #endif
+    varying vec4 vScreenPos;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
@@ -102,12 +101,10 @@ void main()
                 vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
         #endif
         
-        #ifndef NORMALMAP
-            vScreenPos = GetScreenPos(gl_Position);
-        #endif
-        
+        vScreenPos = GetScreenPos(gl_Position);
+
         #ifdef ENVCUBEMAP
-            vReflectionVec = reflect(worldPos - cCameraPos, vNormal);
+            vReflectionVec = worldPos - cCameraPos;
         #endif
     #endif
 }
