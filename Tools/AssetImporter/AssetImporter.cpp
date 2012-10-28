@@ -187,6 +187,7 @@ void Run(const Vector<String>& arguments)
             "\n"
             "Options:\n"
             "-b    Save scene in binary format, default format is XML\n"
+            "-h    Generate hard instead of smooth normals if input file has no normals\n"
             "-i    Use local ID's for scene nodes\n"
             "-mX   Output a material list file X (model mode only)\n"
             "-na   Do not output animations\n"
@@ -196,7 +197,7 @@ void Run(const Vector<String>& arguments)
             "-pX   Set path X for scene resources. Default is output file path\n"
             "-rX   Use scene node X as root node\n"
             "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
-            "-t    Generate tangents to model(s)\n"
+            "-t    Generate tangents\n"
         );
     }
     
@@ -238,6 +239,11 @@ void Run(const Vector<String>& arguments)
             {
             case 'b':
                 saveBinary_ = true;
+                break;
+                
+            case 'h':
+                flags &= ~aiProcess_GenSmoothNormals;
+                flags |= aiProcess_GenNormals;
                 break;
                 
             case 'i':
