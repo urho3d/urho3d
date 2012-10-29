@@ -631,8 +631,7 @@ void View::GetDrawables()
     sceneBox_.defined_ = false;
     minZ_ = M_INFINITY;
     maxZ_ = 0.0f;
-    const Matrix3x4& view = camera_->GetInverseWorldTransform();
-    
+
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
         Drawable* drawable = tempDrawables[i];
@@ -1662,8 +1661,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
     float occluderSizeThreshold_ = renderer_->GetOccluderSizeThreshold();
     float halfViewSize = camera->GetHalfViewSize();
     float invOrthoSize = 1.0f / camera->GetOrthoSize();
-    Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
-    
+
     for (PODVector<Drawable*>::Iterator i = occluders.Begin(); i != occluders.End();)
     {
         Drawable* occluder = *i;
@@ -2213,7 +2211,6 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
     shadowCamera->SetOrthoSize(viewSize);
     
     // Center shadow camera to the view space bounding box
-    Vector3 pos(shadowCameraNode->GetWorldPosition());
     Quaternion rot(shadowCameraNode->GetWorldRotation());
     Vector3 adjust(center.x_, center.y_, 0.0f);
     shadowCameraNode->Translate(rot * adjust);

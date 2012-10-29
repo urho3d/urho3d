@@ -391,7 +391,6 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
-    Vector3 worldScale = worldTransform.Scale();
     
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)

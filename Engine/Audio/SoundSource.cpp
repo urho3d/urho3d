@@ -106,9 +106,6 @@ OBJECTTYPESTATIC(SoundSource);
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
-    position_(0),
-    fractPosition_(0),
-    timePosition_(0.0f),
     soundType_(SOUND_EFFECT),
     frequency_(0.0f),
     gain_(1.0f),
@@ -116,6 +113,9 @@ SoundSource::SoundSource(Context* context) :
     panning_(0.0f),
     autoRemoveTimer_(0.0f),
     autoRemove_(false),
+    position_(0),
+    fractPosition_(0),
+    timePosition_(0.0f),
     decoder_(0),
     decodePosition_(0)
 {

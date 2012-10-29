@@ -860,7 +860,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     
     unsigned shadowMapFormat = (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() :
         graphics_->GetShadowMapFormat();
-    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     if (!shadowMapFormat)
         return 0;
     
@@ -888,6 +887,8 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     }
     #else
     // Direct3D9: create shadow map and dummy color rendertarget
+    unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
+    
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))

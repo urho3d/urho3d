@@ -91,8 +91,10 @@ struct CascadeParameters
     {
         splits_[0] = split1;
         splits_[1] = split2;
+        #if MAX_CASCADE_SPLITS > 2
         splits_[2] = split3;
         splits_[3] = split4;
+        #endif
     }
     
     /// Validate parameters.

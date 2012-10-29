@@ -324,7 +324,6 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             // Represent the decal as a sphere, try to find the biggest colliding bone
             Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * worldPosition, 0.5f * size /
                 bone->node_->GetWorldScale().Length());
-            float distance = (adjustedWorldPosition - bone->node_->GetWorldPosition()).Length();
             
             if (bone->collisionMask_ & BONECOLLISION_BOX)
             {

@@ -312,7 +312,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         graphics->SetShaderParameter(PSP_FOGCOLOR, fogColorZone->GetFogColor());
         
         float farClip = camera_->GetFarClip();
-        float nearClip = camera_->GetNearClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
         float fogEnd = Min(zone_->GetFogEnd(), farClip);
         if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
