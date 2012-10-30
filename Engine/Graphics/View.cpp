@@ -327,6 +327,11 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (!octree)
         return false;
     
+    // Do not accept view if camera projection is illegal
+    // (there is a possibility of crash if occlusion is used and it can not clip properly)
+    if (!camera->IsProjectionValid())
+        return false;
+    
     renderMode_ = renderer_->GetRenderMode();
     octree_ = octree;
     camera_ = camera;
@@ -411,11 +416,6 @@ void View::Update(const FrameInfo& frame)
     alphaQueue_.Clear(maxSortedInstances);
     postAlphaQueue_.Clear(maxSortedInstances);
     vertexLightQueues_.Clear();
-    
-    // Do not update if camera projection is illegal
-    // (there is a possibility of crash if occlusion is used and it can not clip properly)
-    if (!camera_->IsProjectionValid())
-        return;
     
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
@@ -1237,7 +1237,7 @@ void View::RenderBatchesForward()
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
     graphics_->ClearParameterSource(SP_MATERIAL);
-    DrawFullscreenQuad(camera_, false);
+    DrawFullscreenQuad(false);
     #endif
     
     graphics_->SetFillMode(camera_->GetFillMode());
@@ -1396,7 +1396,7 @@ void View::RenderBatchesDeferred()
     graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
     graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
     graphics_->ClearParameterSource(SP_MATERIAL);
-    DrawFullscreenQuad(camera_, false);
+    DrawFullscreenQuad(false);
     
     graphics_->SetFillMode(camera_->GetFillMode());
     
@@ -1495,7 +1495,7 @@ void View::BlitFramebuffer()
     
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
     graphics_->SetTexture(TU_DIFFUSE, screenBuffers_[0]);
-    DrawFullscreenQuad(camera_, false);
+    DrawFullscreenQuad(false);
 }
 
 void View::RunPostProcesses()
@@ -1644,7 +1644,8 @@ void View::RunPostProcesses()
                 }
             }
             
-            DrawFullscreenQuad(camera_, false);
+            /// \todo Draw a near plane quad optionally
+            DrawFullscreenQuad(false);
             
             // Swap the ping-pong buffer sides now if necessary
             if (swapBuffers)
@@ -2486,17 +2487,26 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
 }
 
-void View::DrawFullscreenQuad(Camera* camera, bool nearQuad)
+void View::DrawFullscreenQuad(bool nearQuad)
 {
     Light* quadDirLight = renderer_->GetQuadDirLight();
-    Matrix3x4 model(quadDirLight->GetDirLightTransform(camera, nearQuad));
+    Geometry* geometry = renderer_->GetLightGeometry(quadDirLight);
+    
+    Matrix3x4 model = Matrix3x4::IDENTITY;
+    Matrix4 projection = Matrix4::IDENTITY;
+    
+    #ifdef USE_OPENGL
+    model.m23_ = nearQuad ? -1.0f : 1.0f;
+    #else
+    model.m23_ = nearQuad ? 0.0f : 1.0f;
+    #endif
     
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetShaderParameter(VSP_MODEL, model);
-    graphics_->SetShaderParameter(VSP_VIEWPROJ, camera->GetProjection());
+    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
     graphics_->ClearTransformSources();
     
-    renderer_->GetLightGeometry(quadDirLight)->Draw(graphics_);
+    geometry->Draw(graphics_);
 }
 
 void View::RenderShadowMap(const LightBatchQueue& queue)

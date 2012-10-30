@@ -174,7 +174,7 @@ private:
     /// Set up a light volume rendering batch.
     void SetupLightVolumeBatch(Batch& batch);
     /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
-    void DrawFullscreenQuad(Camera* camera, bool nearQuad);
+    void DrawFullscreenQuad(bool nearQuad);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     /// Return the proper depth-stencil surface to use for a rendertarget.
