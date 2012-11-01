@@ -42,6 +42,7 @@ Urho3D uses the following third-party libraries:
 - GLee 5.4 (http://elf-stone.com/)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
+- MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library 3.0 (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
 - SDL 2.0 (http://www.libsdl.org/)
@@ -51,6 +52,7 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 0.99996 (http://nothings.org/)
 
 Contributions and bugfixes from:
+- Colin Barrett
 - Miika Santala
 - Magic.Lixin
 - skaiware

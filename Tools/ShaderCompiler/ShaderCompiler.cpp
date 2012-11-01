@@ -37,8 +37,8 @@
 #include <cstring>
 
 #include <windows.h>
-#include <d3d9.h>
-#include <d3dx9shader.h>
+#include <d3dcompiler.h>
+#include <mojoshader.h>
 
 #include "DebugNew.h"
 
@@ -149,10 +149,10 @@ public:
     }
 };
 
-class IncludeHandler : public ID3DXInclude
+class IncludeHandler : public ID3DInclude
 {
 public:
-    STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
+    STDMETHOD(Open)(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
     {
         String fileName = inDir_ + String((const char*)pFileName);
         File file(context_, fileName);
@@ -408,37 +408,36 @@ void CompileShader(const String& fileName)
 void CompileVariation(CompiledVariation* variation)
 {
     IncludeHandler includeHandler;
-    PODVector<D3DXMACRO> macros;
+    PODVector<D3D_SHADER_MACRO> macros;
     
     // Insert variation-specific and global defines
     for (unsigned i = 0; i < variation->defines_.Size(); ++i)
     {
-        D3DXMACRO macro;
+        D3D_SHADER_MACRO macro;
         macro.Name = variation->defines_[i].CString();
         macro.Definition = variation->defineValues_[i].CString();
         macros.Push(macro);
     }
     for (unsigned i = 0; i < defines_.Size(); ++i)
     {
-        D3DXMACRO macro;
+        D3D_SHADER_MACRO macro;
         macro.Name = defines_[i].CString();
         macro.Definition = defineValues_[i].CString();
         macros.Push(macro);
     }
     
-    D3DXMACRO endMacro;
+    D3D_SHADER_MACRO endMacro;
     endMacro.Name = 0;
     endMacro.Definition = 0;
     macros.Push(endMacro);
     
-    LPD3DXBUFFER shaderCode = 0;
-    LPD3DXBUFFER errorMsgs = 0;
-    LPD3DXCONSTANTTABLE constantTable = 0;
+    LPD3DBLOB shaderCode = NULL;
+    LPD3DBLOB errorMsgs = NULL;
     
     // Set the profile, entrypoint and flags according to the shader being compiled
     String profile;
     String entryPoint;
-    unsigned flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
+    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
     
     if (variation->type_ == VS)
     {
@@ -456,13 +455,14 @@ void CompileVariation(CompiledVariation* variation)
         else
         {
             profile = "ps_3_0";
-            flags |= D3DXSHADER_PREFER_FLOW_CONTROL;
+            flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
         }
     }
     
-    // Compile using D3DX
-    HRESULT hr = D3DXCompileShader(hlslCode_.CString(), hlslCode_.Length(), &macros.Front(), &includeHandler, 
-        entryPoint.CString(), profile.CString(), flags, &shaderCode, &errorMsgs, &constantTable);
+    // Compile using D3DCompiler
+    HRESULT hr = D3DCompile(hlslCode_.CString(), hlslCode_.Length(), NULL, &macros.Front(), &includeHandler,
+        entryPoint.CString(), profile.CString(), flags, 0, &shaderCode, &errorMsgs);
+
     if (FAILED(hr))
     {
         variation->errorMsg_ = String((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
@@ -470,6 +470,10 @@ void CompileVariation(CompiledVariation* variation)
     }
     else
     {
+        BYTE const *const bufData = static_cast<BYTE *>(shaderCode->GetBufferPointer());
+        SIZE_T const bufSize = shaderCode->GetBufferSize();
+        MOJOSHADER_parseData const *parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, NULL, 0, NULL, 0, NULL, NULL, NULL);
+
         CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
         
         if (!variation->name_.Empty())
@@ -483,23 +487,17 @@ void CompileVariation(CompiledVariation* variation)
             String warning((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
             PrintLine("WARNING: " + warning);
         }
-        
-        // Parse the constant table for constants and texture units
-        D3DXCONSTANTTABLE_DESC desc;
-        constantTable->GetDesc(&desc);
-        for (unsigned i = 0; i < desc.Constants; ++i)
+
+        for(int i = 0; i < parseData->symbol_count; i++)
         {
-            D3DXHANDLE handle = constantTable->GetConstant(NULL, i);
-            D3DXCONSTANT_DESC constantDesc;
-            unsigned numElements = 1;
-            constantTable->GetConstantDesc(handle, &constantDesc, &numElements);
-            
-            String name(constantDesc.Name);
-            unsigned reg = constantDesc.RegisterIndex;
-            unsigned regCount = constantDesc.RegisterCount;
-            
+            MOJOSHADER_symbol const& symbol = parseData->symbols[i];
+
+            String name(symbol.name);
+            unsigned const reg = symbol.register_index;
+            unsigned const regCount = symbol.register_count;
+
             // Check if the parameter is a constant or a texture sampler
-            bool isSampler = (name[0] == 's');
+            bool const isSampler = (name[0] == 's');
             name = name.Substring(1);
             
             if (isSampler)
@@ -517,7 +515,9 @@ void CompileVariation(CompiledVariation* variation)
                 variation->constants_.Push(newParam);
             }
         }
-        
+
+        MOJOSHADER_freeParseData(parseData);
+
         File outFile(context_);
         if (!outFile.Open(variation->outFileName_, FILE_WRITE))
         {
@@ -554,14 +554,13 @@ void CompileVariation(CompiledVariation* variation)
     
     if (shaderCode)
         shaderCode->Release();
-    if (constantTable)
-        constantTable->Release();
     if (errorMsgs)
         errorMsgs->Release();
 }
 
 void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSize)
 {
+    unsigned const D3DSIO_COMMENT = 0xFFFE;
     unsigned* srcWords = (unsigned*)src;
     unsigned srcWordSize = srcSize >> 2;
     

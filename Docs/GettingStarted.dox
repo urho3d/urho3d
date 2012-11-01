@@ -250,6 +250,7 @@ The third-party libraries are used for the following functionality:
 - GLee: OpenGL extensions handling
 - kNet: UDP networking
 - libcpuid: CPU properties detection
+- MojoShader: parsing HLSL bytecode after shader compilation
 - Open Asset Import Library: reading various 3D file formats
 - pugixml: parsing XML files
 - SDL: window and OpenGL context creation, input and sound output
