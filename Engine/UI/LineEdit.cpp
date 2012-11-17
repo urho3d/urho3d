@@ -214,6 +214,18 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             const String& clipBoard = GetSubsystem<UI>()->GetClipBoardText();
             if (!clipBoard.Empty())
             {
+                // Remove selected text first
+                if(text_->GetSelectionLength() > 0)
+                {
+                    unsigned start = text_->GetSelectionStart();
+                    unsigned length = text_->GetSelectionLength();
+                    if (start + length < line_.LengthUTF8())
+                        line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
+                    else
+                        line_ = line_.SubstringUTF8(0, start);
+                    text_->ClearSelection();
+                    cursorPosition_ = start;
+                }
                 if (cursorPosition_ < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, cursorPosition_) + clipBoard + line_.SubstringUTF8(cursorPosition_);
                 else
