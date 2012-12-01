@@ -941,7 +941,7 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
                 current = current->GetParent();
             
             // Then write the base node ID and the parent's name hash
-            attrBuffer_.WriteVLE(current->GetID());
+            attrBuffer_.WriteNetID(current->GetID());
             attrBuffer_.WriteStringHash(parent_->GetNameHash());
         }
     }
