@@ -53,6 +53,7 @@ Urho3D uses the following third-party libraries:
 
 Contributions and bugfixes from:
 - Colin Barrett
+- Jason Kinzer
 - Miika Santala
 - Magic.Lixin
 - skaiware
