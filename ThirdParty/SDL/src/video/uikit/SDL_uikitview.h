@@ -19,12 +19,14 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #import <UIKit/UIKit.h>
 #import "SDL_uikitviewcontroller.h"
 
 #include "SDL_touch.h"
 
-#define IPHONE_TOUCH_EFFICIENT_DANGEROUS
+//#define IPHONE_TOUCH_EFFICIENT_DANGEROUS
 
 #ifndef IPHONE_TOUCH_EFFICIENT_DANGEROUS
 #define MAX_SIMULTANEOUS_TOUCHES 5
