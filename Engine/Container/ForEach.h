@@ -100,3 +100,11 @@ Urho3D::RandomAccessConstIterator<T> End(const Urho3D::PODVector<T> *v) {
     for (auto it = _foreach_begin.value; it != _foreach_end.value; ++it) \
     if (bool _foreach_flag = false) { } else \
     for (VAL = *it; !_foreach_flag; _foreach_flag = true)
+
+#define foreachv(ITER, VAL, VALS) \
+    if (const auto& _foreach_begin = Urho3D::make_false_wrapper(Urho3D::Begin(VALS))) { } else \
+    if (const auto& _foreach_end = Urho3D::make_false_wrapper(Urho3D::End(VALS))) { } else \
+    if (int ITER = 0) { } else \
+    for (auto it = _foreach_begin.value; it != _foreach_end.value; ++it) \
+    if (bool _foreach_flag = false) { } else \
+    for (VAL = *it; !_foreach_flag; ITER++, _foreach_flag = true)

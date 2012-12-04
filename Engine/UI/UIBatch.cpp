@@ -124,6 +124,46 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
 }
 
 void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+    int texHeight, bool tiled)
+{
+    if (!quads_)
+        return;
+
+    unsigned uintColor = element.GetUIntColor();
+    // If alpha is 0, nothing will be rendered, so do not add the quad
+    if (!(uintColor & 0xff000000))
+        return;
+
+    if (!tiled)
+    {
+        AddQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
+        return;
+    }
+
+    int tileX = 0;
+    int tileY = 0;
+    int tileW = 0;
+    int tileH = 0;
+
+    while(tileY < height)
+    {
+        tileX = 0;
+        tileH = Min(height - tileY, texHeight);
+
+        while(tileX < width)
+        {
+            tileW = Min(width - tileX, texWidth);
+
+            AddQuad(element, x + tileX, y + tileY, tileW, tileH, texOffsetX, texOffsetY, tileW, tileH);
+
+            tileX += tileW;
+        }
+
+        tileY += tileH;
+    }
+}
+
+void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight, const Color& color)
 {
     if (!quads_)

@@ -59,6 +59,10 @@ public:
     void SetHoverOffset(const IntVector2& offset);
     /// Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
+    /// Set tiled.
+    void SetTiled(bool enable);
+    /// Return whether is tiled.
+    bool IsTiled() const { return tiled_; }
     
     /// Return texture.
     Texture* GetTexture() const { return texture_; }
@@ -86,6 +90,8 @@ protected:
     IntRect border_;
     /// Offset to image rectangle on hover.
     IntVector2 hoverOffset_;
+    /// Tiled flag.
+    bool tiled_;
 };
 
 }

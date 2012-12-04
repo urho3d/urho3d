@@ -56,6 +56,7 @@ Contributions and bugfixes from:
 - Jason Kinzer
 - Miika Santala
 - Magic.Lixin
+- primitivewaste
 - skaiware
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong

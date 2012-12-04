@@ -38,7 +38,8 @@ BorderImage::BorderImage(Context* context) :
     UIElement(context),
     imageRect_(IntRect::ZERO),
     border_(IntRect::ZERO),
-    hoverOffset_(IntVector2::ZERO)
+    hoverOffset_(IntVector2::ZERO),
+    tiled_(false)
 {
 }
 
@@ -54,6 +55,7 @@ void BorderImage::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(BorderImage, VAR_BOOL, "Tiled", IsTiled, SetTiled, bool, true, AM_FILE);
     COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
 }
 
@@ -113,6 +115,11 @@ void BorderImage::SetHoverOffset(int x, int y)
     hoverOffset_ = IntVector2(x, y);
 }
 
+void BorderImage::SetTiled(bool enable)
+{
+    tiled_ = enable;
+}
+
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
 {
     bool allOpaque = true;
@@ -145,7 +152,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
             batch.AddQuad(*this, 0, 0, border_.left_, border_.top_, topLeft.x_, topLeft.y_);
         if (innerSize.x_)
             batch.AddQuad(*this, border_.left_, 0, innerSize.x_, border_.top_,
-            topLeft.x_ + border_.left_, topLeft.y_, innerTextureSize.x_, border_.top_);
+            topLeft.x_ + border_.left_, topLeft.y_, innerTextureSize.x_, border_.top_, tiled_);
         if (border_.right_)
             batch.AddQuad(*this, border_.left_ + innerSize.x_, 0, border_.right_, border_.top_,
             topLeft.x_ + border_.left_ + innerTextureSize.x_, topLeft.y_);
@@ -155,14 +162,14 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
     {
         if (border_.left_)
             batch.AddQuad(*this, 0, border_.top_, border_.left_, innerSize.y_,
-            topLeft.x_, topLeft.y_ + border_.top_, border_.left_, innerTextureSize.y_);
+            topLeft.x_, topLeft.y_ + border_.top_, border_.left_, innerTextureSize.y_, tiled_);
         if (innerSize.x_)
             batch.AddQuad(*this, border_.left_, border_.top_, innerSize.x_, innerSize.y_,
-            topLeft.x_ + border_.left_, topLeft.y_ + border_.top_, innerTextureSize.x_, innerTextureSize.y_);
+            topLeft.x_ + border_.left_, topLeft.y_ + border_.top_, innerTextureSize.x_, innerTextureSize.y_, tiled_);
         if (border_.right_)
             batch.AddQuad(*this, border_.left_ + innerSize.x_, border_.top_, border_.right_,
             innerSize.y_, topLeft.x_ + border_.left_ + innerTextureSize.x_, topLeft.y_ + border_.top_,
-            border_.right_, innerTextureSize.y_);
+            border_.right_, innerTextureSize.y_, tiled_);
     }
     // Bottom
     if (border_.bottom_)
@@ -173,7 +180,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
         if (innerSize.x_)
             batch.AddQuad(*this, border_.left_, border_.top_ + innerSize.y_, innerSize.x_,
             border_.bottom_, topLeft.x_ + border_.left_, topLeft.y_ + border_.top_ + innerTextureSize.y_,
-            innerTextureSize.x_, border_.bottom_);
+            innerTextureSize.x_, border_.bottom_, tiled_);
         if (border_.right_)
             batch.AddQuad(*this, border_.left_ + innerSize.x_, border_.top_ + innerSize.y_,
             border_.right_, border_.bottom_, topLeft.x_ + border_.left_ + innerTextureSize.x_, 

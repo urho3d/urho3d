@@ -84,6 +84,8 @@ public:
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
     /// Add a quad with scaled texture.
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);
+    /// Add a quad with tiled texture.
+    void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Add a quad with custom color.
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
     /// Merge with another batch.
