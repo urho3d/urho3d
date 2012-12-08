@@ -423,13 +423,15 @@ void View::Update(const FrameInfo& frame)
     
     GetDrawables();
     GetBatches();
-    UpdateGeometries();
 }
 
 void View::Render()
 {
     if (!octree_ || !camera_)
         return;
+    
+    // Actually update geometry data now
+    UpdateGeometries();
     
     // Allocate screen buffers for post-processing and blitting as necessary
     AllocateScreenBuffers();
