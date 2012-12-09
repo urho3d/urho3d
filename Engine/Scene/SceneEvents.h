@@ -49,6 +49,13 @@ EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
     PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
 }
 
+/// Scene drawable update finished. Custom animation (eg. IK) can be done at this point.
+EVENT(E_SCENEDRAWABLEUPDATEFINISHED, SceneDrawableUpdateFinished)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_TIMESTEP, TimeStep);            // float
+}
+
 /// SmoothedTransform target position changed.
 EVENT(E_TARGETPOSITION, TargetPositionChanged)
 {

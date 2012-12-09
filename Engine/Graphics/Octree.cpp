@@ -27,6 +27,7 @@
 #include "Profiler.h"
 #include "Octree.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "Sort.h"
 #include "WorkQueue.h"
 
@@ -386,6 +387,19 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
 void Octree::Update(const FrameInfo& frame)
 {
     UpdateDrawables(frame);
+    
+    // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        using namespace SceneDrawableUpdateFinished;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene;
+        eventData[P_TIMESTEP] = frame.timeStep_;
+        scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
+    }
+    
     ReinsertDrawables(frame);
 }
 
