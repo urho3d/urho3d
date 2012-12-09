@@ -35,6 +35,8 @@ char String::endZero = 0;
 
 const String String::EMPTY;
 
+void PrintArgs(const char *formatString, va_list args);
+
 String::String(const WString& str) :
     length_(0),
     capacity_(0),
@@ -935,6 +937,109 @@ Vector<String> String::Split(const char* str, char separator)
     }
     
     return ret;
+}
+
+void String::Print(const char *formatString, ... )
+{
+    va_list args;
+    va_start(args, formatString);
+    PrintArgs(formatString, args);
+    va_end(args);
+}
+
+void String::PrintArgs(const char *formatString, va_list args)
+{
+    int pos = 0, lastPos = 0;
+    int length = strlen(formatString);
+
+    while (true)
+    {
+        // Scan the format string and find %a argument where a is one of d, f, s ...
+        while (pos < length && formatString[pos] != '%') pos++;
+        Append(formatString + lastPos, pos - lastPos);
+        if (pos >= length)
+            return;
+        
+        char arg = formatString[pos + 1];
+        pos += 2;
+        lastPos = pos;
+        
+        switch (arg)
+        {
+        // Integer
+        case 'd':
+        case 'i':
+            {
+                int arg = va_arg(args, int);
+                Append(String(arg));
+                break;
+            }
+            
+        // Real
+        case 'f':
+            {
+                double arg = va_arg(args, double);
+                Append(String(arg));
+                break;
+            }
+            
+        // Character
+        case 'c':
+            {
+                char arg = va_arg(args, char);
+                Append(arg);
+                break;
+            }
+            
+        // C string
+        case 'r':
+            {
+                char* arg = va_arg(args, char*);
+                Append(arg);
+                break;
+            }
+            
+        // String
+        case 's':
+            {
+                String& arg = va_arg(args, String);
+                
+                // Some heuristics to try to detect cases where user has accidentally passed in a regular string
+                // (unfortunately it's impossible to handle both cases as %s since String has additional members)
+                assert(arg.Length() < 1000000);
+                assert(arg.Capacity() < 1000000);
+                assert(arg.Length() <= arg.Capacity());
+                Append(arg);
+                break;
+            }
+            
+        // Hex
+        case 'x':
+            {
+                char buf[CONVERSION_BUFFER_LENGTH];
+                int arg = va_arg(args, int);
+                int arglen = ::sprintf(buf, "%x", arg);
+                Append(buf, arglen);
+                break;
+            }
+            
+        // Pointer
+        case 'p':
+            {
+                char buf[CONVERSION_BUFFER_LENGTH];
+                int arg = va_arg(args, int);
+                int arglen = ::sprintf(buf, "%p", arg);
+                Append(buf, arglen);
+                break;
+            }
+            
+        case '%':
+            {
+                Append("%", 1);
+                break;
+            }
+        }
+    }
 }
 
 int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)

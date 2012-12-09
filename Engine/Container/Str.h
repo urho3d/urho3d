@@ -26,6 +26,7 @@
 #include "Vector.h"
 
 #include <cstring>
+#include <cstdarg>
 #include <ctype.h>
 
 namespace Urho3D
@@ -423,6 +424,11 @@ public:
         return ptr - str;
         #endif
     }
+    
+    /// Append to string using formatting.
+    void Print(const char *formatString, ... );
+    /// Append to string using variable arguments.
+    void PrintArgs(const char *formatString, va_list args);
     
     /// Compare two C strings.
     static int Compare(const char* str1, const char* str2, bool caseSensitive);
