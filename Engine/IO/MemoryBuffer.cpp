@@ -120,7 +120,7 @@ unsigned MemoryBuffer::Write(const void* data, unsigned size)
         *((unsigned*)destPtr) = *((unsigned*)srcPtr);
         srcPtr += sizeof(unsigned);
         destPtr += sizeof(unsigned);
-        size -= sizeof(unsigned);
+        copySize -= sizeof(unsigned);
     }
     if (copySize & sizeof(unsigned short))
     {
