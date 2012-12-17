@@ -757,6 +757,9 @@ Properties:<br>
 
 Object
 
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
@@ -784,6 +787,9 @@ Methods:<br>
 
 Time
 
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
@@ -797,6 +803,7 @@ Properties:<br>
 Log
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Write(const String&)
 - void Debug(const String&)
 - void Info(const String&)
@@ -888,6 +895,7 @@ Properties:<br>
 File
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Open(const String&, FileMode arg1 = FILE_READ)
 - void Close()
 - bool WriteInt(int)
@@ -1034,6 +1042,7 @@ Properties:<br>
 FileSystem
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool FileExists(const String&) const
 - bool DirExists(const String&) const
 - uint GetLastModifiedTime(const String&) const
@@ -1059,6 +1068,7 @@ Properties:<br>
 PackageFile
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Open(const String&) const
 - bool Exists(const String&) const
 
@@ -1076,6 +1086,7 @@ Properties:<br>
 Resource
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 
@@ -1092,6 +1103,7 @@ Properties:<br>
 ResourceCache
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool AddResourceDir(const String&)
 - void AddPackageFile(PackageFile@, bool arg1 = false)
 - bool AddManualResource(Resource@)
@@ -1128,6 +1140,7 @@ Properties:<br>
 Image
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void SaveBMP(const String&)
@@ -1150,6 +1163,7 @@ Properties:<br>
 XMLFile
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - XMLElement CreateRoot(const String&)
@@ -1223,6 +1237,7 @@ Properties:<br>
 Serializable
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1244,6 +1259,7 @@ Properties:<br>
 Component
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1270,6 +1286,7 @@ Properties:<br>
 Node
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1357,6 +1374,7 @@ Properties:<br>
 SmoothedTransform
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1389,6 +1407,7 @@ Properties:<br>
 Scene
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1523,6 +1542,7 @@ Properties:<br>
 DebugRenderer
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1556,6 +1576,7 @@ Properties:<br>
 Camera
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1608,6 +1629,7 @@ Properties:<br>
 Texture
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void SetNumLevels(uint)
@@ -1639,6 +1661,7 @@ Properties:<br>
 PostProcess
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
 - void RemoveRenderTarget(const String&)
 - void RemoveShaderParameter(const String&)
@@ -1690,6 +1713,7 @@ Properties:<br>
 Texture2D
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void SetNumLevels(uint)
@@ -1724,6 +1748,7 @@ Properties:<br>
 TextureCube
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void SetNumLevels(uint)
@@ -1778,6 +1803,7 @@ Properties:<br>
 Technique
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - Pass@ CreatePass(PassType)
@@ -1799,6 +1825,7 @@ Properties:<br>
 Material
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
@@ -1842,6 +1869,7 @@ Properties:<br>
 Model
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 
@@ -1863,6 +1891,7 @@ Properties:<br>
 Animation
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - void AddTrigger(float, bool, const Variant&)
@@ -1886,6 +1915,7 @@ Properties:<br>
 Drawable
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -1946,6 +1976,7 @@ Properties:<br>
 Light
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2004,6 +2035,7 @@ Properties:<br>
 Zone
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2055,6 +2087,7 @@ Properties:<br>
 StaticModel
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2102,6 +2135,7 @@ Properties:<br>
 Skybox
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2167,6 +2201,7 @@ Properties:<br>
 AnimatedModel
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2232,6 +2267,7 @@ Properties:<br>
 AnimationController
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2295,6 +2331,7 @@ Properties:<br>
 BillboardSet
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2344,6 +2381,7 @@ Properties:<br>
 ParticleEmitter
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2394,6 +2432,7 @@ Properties:<br>
 DecalSet
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2444,6 +2483,7 @@ Properties:<br>
 TerrainPatch
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2484,6 +2524,7 @@ Properties:<br>
 Terrain
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2541,6 +2582,7 @@ Properties:<br>
 Octree
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2579,6 +2621,7 @@ Properties:<br>
 Graphics
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool SetMode(int, int, bool, bool, bool, int)
 - bool SetMode(int, int)
 - bool ToggleFullscreen()
@@ -2614,6 +2657,7 @@ Properties:<br>
 Renderer
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void DrawDebugGeometry(bool) const
 - void ReloadShaders() const
 
@@ -2676,6 +2720,7 @@ Properties:<br>
 Input
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool OpenJoystick(uint)
 - void CloseJoystick(uint)
 - bool DetectJoysticks()
@@ -2711,6 +2756,7 @@ Properties:<br>
 Sound
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 
@@ -2734,6 +2780,7 @@ Properties:<br>
 SoundListener
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2760,6 +2807,7 @@ Properties:<br>
 SoundSource
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2800,6 +2848,7 @@ Properties:<br>
 SoundSource3D
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2844,6 +2893,7 @@ Properties:<br>
 Audio
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SetMode(int, int, bool, bool arg3 = true)
 - bool Play()
 - void Stop()
@@ -2866,6 +2916,7 @@ Properties:<br>
 Font
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 
@@ -2882,6 +2933,7 @@ Properties:<br>
 UIElement
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -2978,6 +3030,7 @@ Properties:<br>
 BorderImage
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3080,6 +3133,7 @@ Properties:<br>
 Button
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3189,6 +3243,7 @@ Properties:<br>
 CheckBox
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3294,6 +3349,7 @@ Properties:<br>
 Cursor
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3398,6 +3454,7 @@ Properties:<br>
 Slider
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3505,6 +3562,7 @@ Properties:<br>
 ScrollBar
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3613,6 +3671,7 @@ Properties:<br>
 ScrollView
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3718,6 +3777,7 @@ Properties:<br>
 ListView
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3850,6 +3910,7 @@ Properties:<br>
 Text
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -3962,6 +4023,7 @@ Properties:<br>
 LineEdit
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4074,6 +4136,7 @@ Properties:<br>
 Menu
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4190,6 +4253,7 @@ Properties:<br>
 DropDownList
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4317,6 +4381,7 @@ Properties:<br>
 Window
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4422,6 +4487,7 @@ Properties:<br>
 FileSelector
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
 - void UpdateElements()
@@ -4451,6 +4517,7 @@ Properties:<br>
 UI
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Clear()
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
@@ -4490,6 +4557,7 @@ Properties:<br>
 NetworkPriority
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4520,6 +4588,7 @@ Properties:<br>
 Connection
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SendMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0)
 - void SendRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
 - void SendRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
@@ -4550,6 +4619,7 @@ Properties:<br>
 Network
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Connect(const String&, uint16, Scene@, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
 - bool StartServer(uint16)
@@ -4578,6 +4648,7 @@ Properties:<br>
 CollisionShape
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4620,6 +4691,7 @@ Properties:<br>
 RigidBody
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4679,6 +4751,7 @@ Properties:<br>
 Constraint
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4727,6 +4800,7 @@ Properties:<br>
 PhysicsWorld
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4765,6 +4839,7 @@ Properties:<br>
 ScriptFile
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool Execute(const String&, const Variant[]@)
@@ -4786,6 +4861,7 @@ ScriptObject
 ScriptInstance
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
 - bool LoadXML(const XMLElement&)
@@ -4823,6 +4899,7 @@ Properties:<br>
 Script
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Execute(const String&)
 - void DumpAPI()
 
@@ -4838,6 +4915,7 @@ Properties:<br>
 Console
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
 
@@ -4859,6 +4937,7 @@ Properties:<br>
 DebugHud
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Toggle(uint)
 - void ToggleAll()
 
@@ -4880,6 +4959,7 @@ Properties:<br>
 Engine
 
 Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void RunFrame()
 - void Exit()
 - void DumpProfilingData()
