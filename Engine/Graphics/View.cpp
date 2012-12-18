@@ -522,7 +522,8 @@ void View::GetDrawables()
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
     
-    // Get zones and occluders first
+    // Get zones and occluders first. Note: camera viewmask is intentionally disregarded here, to prevent the zone membership
+    // or occlusion depending from the used camera
     {
         ZoneOccluderOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
         octree_->GetDrawables(query);
@@ -596,12 +597,13 @@ void View::GetDrawables()
     if (occlusionBuffer_)
     {
         OccludedFrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), occlusionBuffer_, DRAWABLE_GEOMETRY |
-            DRAWABLE_LIGHT);
+            DRAWABLE_LIGHT, camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     else
     {
-        FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+        FrustumOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
+            camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     
