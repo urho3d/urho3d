@@ -136,6 +136,7 @@ static void RegisterImage(asIScriptEngine* engine)
     RegisterResource<Image>(engine, "Image");
     engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in)", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in)", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int)", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "int get_width() const", asMETHOD(Image, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "int get_height() const", asMETHOD(Image, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_components() const", asMETHOD(Image, GetComponents), asCALL_THISCALL);

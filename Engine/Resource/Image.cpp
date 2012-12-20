@@ -31,6 +31,7 @@
 #include <cstring>
 #include <stb_image.h>
 #include <stb_image_write.h>
+#include <jo_jpeg.h>
 
 #include "DebugNew.h"
 
@@ -538,6 +539,27 @@ bool Image::SaveTGA(const String& fileName)
     
     if (data_)
         return stbi_write_tga(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
+    else
+        return false;
+}
+
+bool Image::SaveJPG(const String & fileName, int quality)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to JPG");
+        return false;
+    }
+    
+    if (data_)
+        return jo_write_jpg(fileName.CString(), data_.Get(), width_, height_, components_, quality) != 0;
     else
         return false;
 }

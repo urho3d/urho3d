@@ -100,6 +100,8 @@ public:
     unsigned GetTimerPeriod() const { return timerPeriod_; }
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();
+    /// Get system time as milliseconds.
+    unsigned GetSystemTime();
     
     /// Sleep for a number of milliseconds.
     static void Sleep(unsigned mSec);

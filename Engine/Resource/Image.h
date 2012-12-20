@@ -103,6 +103,8 @@ public:
     bool SaveBMP(const String& fileName);
     /// Save in TGA format. Return true if successful.
     bool SaveTGA(const String& fileName);
+    /// Save in JPG format with compression quality. Return true if successful.
+    bool SaveJPG(const String& fileName, int quality);
     
     /// Return width.
     int GetWidth() const { return width_; }

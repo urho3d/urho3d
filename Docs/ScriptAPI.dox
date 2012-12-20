@@ -798,6 +798,7 @@ Properties:<br>
 - uint frameNumber (readonly)
 - float timeStep (readonly)
 - float elapsedTime (readonly)
+- uint systemTime (readonly)
 
 
 Log
@@ -1145,6 +1146,7 @@ Methods:<br>
 - bool Save(File@)
 - void SaveBMP(const String&)
 - void SaveTGA(const String&)
+- void SaveJPG(const String&, int)
 
 Properties:<br>
 - ShortStringHash type (readonly)

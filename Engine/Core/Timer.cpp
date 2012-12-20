@@ -134,6 +134,19 @@ void Time::Sleep(unsigned mSec)
     #endif
 }
 
+unsigned Time::GetSystemTime()
+{
+    #ifdef WIN32
+    unsigned currentTime = timeGetTime();
+    #else
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    unsigned currentTime = time.tv_sec * 1000 + time.tv_usec / 1000;
+    #endif
+    
+    return currentTime;
+}
+
 Timer::Timer()
 {
     Reset();

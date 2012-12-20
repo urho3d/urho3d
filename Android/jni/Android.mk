@@ -195,6 +195,20 @@ LOCAL_SRC_FILES := \
 include $(BUILD_STATIC_LIBRARY)
 
 
+# JO JPEG
+LOCAL_PATH = $(ROOT_PATH)/ThirdParty/JO
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := JO
+
+LOCAL_SRC_FILES := \
+    $(subst $(LOCAL_PATH)/,, \
+    $(wildcard $(LOCAL_PATH)/*.cpp))
+
+include $(BUILD_STATIC_LIBRARY)
+
+
 # Urho3D executable
 LOCAL_PATH = $(ROOT_PATH)
 
@@ -224,7 +238,8 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/ThirdParty/PugiXml/src \
     $(LOCAL_PATH)/ThirdParty/SDL/include \
     $(LOCAL_PATH)/ThirdParty/StanHull \
-    $(LOCAL_PATH)/ThirdParty/STB
+    $(LOCAL_PATH)/ThirdParty/STB \
+    $(LOCAL_PATH)/ThirdParty/JO
 
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
@@ -246,7 +261,7 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/Urho3D/*.cpp) \
     $(wildcard $(LOCAL_PATH)/ThirdParty/SDL/src/main/android/*.cpp))
 
-LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL StanHull STB
+LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL StanHull STB JO
 
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog
 

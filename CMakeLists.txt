@@ -134,6 +134,7 @@ add_subdirectory (ThirdParty/PugiXml)
 add_subdirectory (ThirdParty/SDL)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
+add_subdirectory (ThirdParty/JO)
 add_subdirectory (Urho3D)
 
 if (NOT IOS)

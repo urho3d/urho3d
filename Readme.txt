@@ -50,9 +50,11 @@ Urho3D uses the following third-party libraries:
   john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
+- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 
 Contributions and bugfixes from:
 - Colin Barrett
+- Alex Fuller
 - Jason Kinzer
 - Miika Santala
 - Magic.Lixin
