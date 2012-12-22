@@ -52,6 +52,13 @@ class Ninja : GameObject
         SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
         aimX = node.rotation.yaw;
     }
+    
+    void DelayedStart()
+    {
+        // Start playing the idle animation immediately, even before the first physics update
+        AnimationController@ animCtrl = node.children[0].GetComponent("AnimationController");
+        animCtrl.PlayExclusive("Models/Ninja_Idle3.ani", LAYER_MOVE, true);
+    }
 
     void SetControls(const Controls&in newControls)
     {

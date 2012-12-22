@@ -130,9 +130,16 @@ static const unsigned glStencilOps[] =
     GL_DECR_WRAP
 };
 
-static unsigned numInstances = 0;
+// Remap vertex attributes on OpenGL so that all usually needed attributes including skinning fit to the first 8.
+// This avoids a skinning bug on GLES2 devices which only support 8.
+static const unsigned glVertexAttrIndex[] =
+{
+    0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12
+};
 
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
+
+static unsigned numInstances = 0;
 
 OBJECTTYPESTATIC(Graphics);
 
@@ -695,6 +702,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
         {
+            unsigned attrIndex = glVertexAttrIndex[j];
             unsigned elementBit = 1 << j;
             
             if (elementMask & elementBit)
@@ -704,12 +712,12 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
                 // Enable attribute if not enabled yet
                 if ((impl_->enabledAttributes_ & elementBit) == 0)
                 {
-                    glEnableVertexAttribArray(j);
+                    glEnableVertexAttribArray(attrIndex);
                     impl_->enabledAttributes_ |= elementBit;
                 }
                 
                 // Set the attribute pointer
-                glVertexAttribPointer(j, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
+                glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
             }
         }
@@ -720,12 +728,13 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
     
     // Now check which vertex attributes should be disabled
     unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
-    int disableIndex = 0;
+    unsigned disableIndex = 0;
+    
     while (disableAttributes)
     {
         if (disableAttributes & 1)
         {
-            glDisableVertexAttribArray(disableIndex);
+            glDisableVertexAttribArray(glVertexAttrIndex[disableIndex]);
             impl_->enabledAttributes_ &= ~(1 << disableIndex);
         }
         disableAttributes >>= 1;
@@ -766,6 +775,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
                 elementMask = buffer->GetElementMask() & elementMasks[i];
         }
         
+        // If buffer and element mask have stayed the same, skip to the next buffer
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
         {
             newAttributes |= elementMask;
@@ -776,6 +786,8 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         elementMasks_[i] = elementMask;
         changed = true;
         
+        // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
+        // in which case the pointer will be invalid and cause a crash
         if (!buffer || !buffer->GetGPUObject())
             continue;
         
@@ -784,19 +796,22 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
         {
+            unsigned attrIndex = glVertexAttrIndex[j];
             unsigned elementBit = 1 << j;
             
             if (elementMask & elementBit)
             {
                 newAttributes |= elementBit;
                 
+                // Enable attribute if not enabled yet
                 if ((impl_->enabledAttributes_ & elementBit) == 0)
                 {
-                    glEnableVertexAttribArray(j);
+                    glEnableVertexAttribArray(attrIndex);
                     impl_->enabledAttributes_ |= elementBit;
                 }
                 
-                glVertexAttribPointer(j, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
+                // Set the attribute pointer
+                glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
             }
         }
@@ -805,13 +820,15 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
     if (!changed)
         return true;
     
+    // Now check which vertex attributes should be disabled
     unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
-    int disableIndex = 0;
+    unsigned disableIndex = 0;
+    
     while (disableAttributes)
     {
         if (disableAttributes & 1)
         {
-            glDisableVertexAttribArray(disableIndex);
+            glDisableVertexAttribArray(glVertexAttrIndex[disableIndex]);
             impl_->enabledAttributes_ &= ~(1 << disableIndex);
         }
         disableAttributes >>= 1;

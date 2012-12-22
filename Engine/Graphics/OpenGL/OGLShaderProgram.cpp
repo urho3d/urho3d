@@ -94,16 +94,18 @@ bool ShaderProgram::Link()
     }
     
     // Bind vertex attribute locations to ensure they are the same in all shaders
+    // Note: this is not the same order as in VertexBuffer, instead a remapping is used to ensure everything except cube texture
+    // coordinates fit to the first 8 for better GLES2 device compatibility
     glBindAttribLocation(object_, 0, "iPos");
     glBindAttribLocation(object_, 1, "iNormal");
     glBindAttribLocation(object_, 2, "iColor");
     glBindAttribLocation(object_, 3, "iTexCoord");
     glBindAttribLocation(object_, 4, "iTexCoord2");
-    glBindAttribLocation(object_, 5, "iCubeTexCoord");
-    glBindAttribLocation(object_, 6, "iCubeTexCoord2");
-    glBindAttribLocation(object_, 7, "iTangent");
-    glBindAttribLocation(object_, 8, "iBlendWeights");
-    glBindAttribLocation(object_, 9, "iBlendIndices");
+    glBindAttribLocation(object_, 5, "iTangent");
+    glBindAttribLocation(object_, 6, "iBlendWeights");
+    glBindAttribLocation(object_, 7, "iBlendIndices");
+    glBindAttribLocation(object_, 8, "iCubeTexCoord");
+    glBindAttribLocation(object_, 9, "iCubeTexCoord2");
     glAttachShader(object_, vertexShader_->GetGPUObject());
     glAttachShader(object_, pixelShader_->GetGPUObject());
     glLinkProgram(object_);

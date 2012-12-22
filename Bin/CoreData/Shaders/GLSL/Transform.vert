@@ -3,11 +3,11 @@ attribute vec3 iNormal;
 attribute vec4 iColor;
 attribute vec2 iTexCoord;
 attribute vec2 iTexCoord2;
-attribute vec3 iCubeTexCoord;
-attribute vec4 iCubeTexCoord2;
 attribute vec4 iTangent;
 attribute vec4 iBlendWeights;
 attribute vec4 iBlendIndices;
+attribute vec3 iCubeTexCoord;
+attribute vec4 iCubeTexCoord2;
 
 mat4 GetSkinMatrix(vec4 blendWeights, vec4 blendIndices)
 {

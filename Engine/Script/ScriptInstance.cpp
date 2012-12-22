@@ -184,7 +184,7 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     delayedMethodCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
-    if (!methods_[METHOD_UPDATE] && !HasSubscribedToEvent(E_SCENEUPDATE))
+    if (!methods_[METHOD_UPDATE] && !methods_[METHOD_DELAYEDSTART] && !HasSubscribedToEvent(E_SCENEUPDATE))
         SubscribeToEvent(GetScene(), E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
 }
 
@@ -376,7 +376,7 @@ void ScriptInstance::GetSupportedMethods()
     Scene* scene = GetScene();
     if (scene)
     {
-        if (methods_[METHOD_UPDATE])
+        if (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART])
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
         if (methods_[METHOD_POSTUPDATE])
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
@@ -448,12 +448,6 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     
     using namespace ScenePostUpdate;
     
-    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
-    {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        delayedStart_ = true;
-    }
-    
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
@@ -465,12 +459,6 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
         return;
     
     using namespace PhysicsPreStep;
-    
-    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
-    {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        delayedStart_ = true;
-    }
     
     if (!fixedUpdateFps_)
     {
@@ -498,12 +486,6 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
         return;
     
     using namespace PhysicsPostStep;
-    
-    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
-    {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        delayedStart_ = true;
-    }
     
     if (!fixedUpdateFps_)
     {
