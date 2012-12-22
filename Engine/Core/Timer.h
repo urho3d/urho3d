@@ -101,7 +101,9 @@ public:
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();
     /// Get system time as milliseconds.
-    unsigned GetSystemTime();
+    unsigned GetSystemTime() const;
+    /// Get a date/time stamp as a string.
+    String GetTimeStamp() const;
     
     /// Sleep for a number of milliseconds.
     static void Sleep(unsigned mSec);

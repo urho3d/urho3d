@@ -26,6 +26,8 @@
 #include "Profiler.h"
 #include "Timer.h"
 
+#include <ctime>
+
 #ifdef WIN32
 #include <windows.h>
 #include <mmsystem.h>
@@ -125,16 +127,7 @@ float Time::GetElapsedTime()
     return elapsedTime_.GetMSec(false) / 1000.0f;
 }
 
-void Time::Sleep(unsigned mSec)
-{
-    #ifdef WIN32
-    ::Sleep(mSec);
-    #else
-    usleep(mSec * 1000);
-    #endif
-}
-
-unsigned Time::GetSystemTime()
+unsigned Time::GetSystemTime() const
 {
     #ifdef WIN32
     unsigned currentTime = timeGetTime();
@@ -145,6 +138,23 @@ unsigned Time::GetSystemTime()
     #endif
     
     return currentTime;
+}
+
+String Time::GetTimeStamp() const
+{
+    time_t sysTime;
+    time(&sysTime);
+    const char* dateTime = ctime(&sysTime);
+    return String(dateTime).Replaced("\n", "");
+}
+
+void Time::Sleep(unsigned mSec)
+{
+    #ifdef WIN32
+    ::Sleep(mSec);
+    #else
+    usleep(mSec * 1000);
+    #endif
 }
 
 Timer::Timer()

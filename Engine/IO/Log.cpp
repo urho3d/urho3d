@@ -27,9 +27,9 @@
 #include "IOEvents.h"
 #include "Log.h"
 #include "ProcessUtils.h"
+#include "Timer.h"
 
 #include <cstdio>
-#include <ctime>
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -102,11 +102,9 @@ void Log::Write(int level, const String& message)
     
     if (timeStamp_)
     {
-        time_t sysTime;
-        time(&sysTime);
-        const char* dateTime = ctime(&sysTime);
-        String dateTimeString = String(dateTime).Replaced("\n", "");
-        formattedMessage = "[" + dateTimeString + "] " + formattedMessage;
+        Time* time = GetSubsystem<Time>();
+        if (time)
+            formattedMessage = "[" + time->GetTimeStamp() + "] " + formattedMessage;
     }
     
     #if defined(ANDROID)

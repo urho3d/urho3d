@@ -799,6 +799,7 @@ Properties:<br>
 - float timeStep (readonly)
 - float elapsedTime (readonly)
 - uint systemTime (readonly)
+- String timeStamp (readonly)
 
 
 Log
