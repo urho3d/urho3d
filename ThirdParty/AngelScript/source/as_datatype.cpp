@@ -217,7 +217,7 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 	isObjectHandle   = dt.isObjectHandle;
 	isConstHandle    = dt.isConstHandle;
 	funcDef          = dt.funcDef;
-	// Urho3D: copy cached type id
+	// Urho3D: copy cached type ID
 	cachedTypeId     = dt.cachedTypeId;
 
 	return (asCDataType &)*this;

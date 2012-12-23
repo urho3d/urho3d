@@ -3744,12 +3744,12 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 
 
 // TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
-// Urho3D: modified for type id caching
+// Urho3D: modified for type ID caching
 int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 {
 	if( dtIn.IsNullHandle() ) return 0;
 
-	/// Urho3D: check cached type id first
+	/// Urho3D: check cached type ID first
 	int typeId = dtIn.GetCachedTypeId();
 	if( typeId )
 		return typeId;
@@ -3777,7 +3777,7 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 					typeId |= asTYPEID_HANDLETOCONST;
 			}
 
-			// Urho3D: cache the type id for next query
+			// Urho3D: cache the type ID for next query
 			dtIn.SetCachedTypeId(typeId);
 			return typeId;
 		}
