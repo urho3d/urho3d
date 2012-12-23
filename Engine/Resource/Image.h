@@ -99,6 +99,8 @@ public:
     void SetSize(int width, int height, unsigned components);
     /// Set data.
     void SetData(const unsigned char* pixelData);
+    /// Flip image vertically.
+    void FlipVertical();
     /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName);
     /// Save in TGA format. Return true if successful.

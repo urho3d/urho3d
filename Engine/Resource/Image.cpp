@@ -496,6 +496,26 @@ void Image::SetSize(int width, int height, unsigned components)
     SetMemoryUse(width * height * components);
 }
 
+void Image::FlipVertical()
+{
+    if (!data_)
+        return;
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not flip a compressed image");
+        return;
+    }
+    
+    SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+    unsigned rowSize = width_ * components_;
+    
+    for (int y = 0; y < height_; ++y)
+        memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
+    
+    data_ = newData;
+}
+
 void Image::SetData(const unsigned char* pixelData)
 {
     memcpy(data_.Get(), pixelData, width_ * height_ * components_);

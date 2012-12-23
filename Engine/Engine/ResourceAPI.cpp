@@ -134,6 +134,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
 static void RegisterImage(asIScriptEngine* engine)
 {
     RegisterResource<Image>(engine, "Image");
+    engine->RegisterObjectMethod("Image", "void FlipVertical()", asMETHOD(Image, FlipVertical), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in)", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in)", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int)", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
