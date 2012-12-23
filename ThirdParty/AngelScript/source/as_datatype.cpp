@@ -54,7 +54,7 @@ asCDataType::asCDataType()
 	isObjectHandle = false;
 	isConstHandle  = false;
 	funcDef        = 0;
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId   = 0;
 }
 
@@ -67,7 +67,7 @@ asCDataType::asCDataType(const asCDataType &dt)
 	isObjectHandle = dt.isObjectHandle;
 	isConstHandle  = dt.isConstHandle;
 	funcDef        = dt.funcDef;
-	// Urho3D: copy cached type ID
+	// Urho3D: copy cached type id
 	cachedTypeId   = dt.cachedTypeId;
 }
 
@@ -217,7 +217,7 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 	isObjectHandle   = dt.isObjectHandle;
 	isConstHandle    = dt.isConstHandle;
 	funcDef          = dt.funcDef;
-	// Urho3D: copy cached type ID
+	// Urho3D: copy cached type id
 	cachedTypeId     = dt.cachedTypeId;
 
 	return (asCDataType &)*this;
@@ -225,7 +225,7 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 
 int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 {
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId = 0;
 
 	if( !b )
@@ -260,7 +260,7 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 
 int asCDataType::MakeArray(asCScriptEngine *engine)
 {
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId = 0;
 
 	if( engine->defaultArrayObjectType == 0 )
@@ -282,7 +282,7 @@ int asCDataType::MakeArray(asCScriptEngine *engine)
 
 int asCDataType::MakeReference(bool b)
 {
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId = 0;
 
 	isReference = b;
@@ -292,7 +292,7 @@ int asCDataType::MakeReference(bool b)
 
 int asCDataType::MakeReadOnly(bool b)
 {
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId = 0;
 
 	if( isObjectHandle )
@@ -307,7 +307,7 @@ int asCDataType::MakeReadOnly(bool b)
 
 int asCDataType::MakeHandleToConst(bool b)
 {
-	// Urho3D: reset cached type ID
+	// Urho3D: reset cached type id
 	cachedTypeId = 0;
 
 	if( !isObjectHandle ) return -1;
