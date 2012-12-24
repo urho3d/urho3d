@@ -992,23 +992,9 @@ void String::PrintArgs(const char *formatString, va_list args)
             }
             
         // C string
-        case 'r':
-            {
-                char* arg = va_arg(args, char*);
-                Append(arg);
-                break;
-            }
-            
-        // String
         case 's':
             {
-                String& arg = va_arg(args, String);
-                
-                // Some heuristics to try to detect cases where user has accidentally passed in a regular string
-                // (unfortunately it's impossible to handle both cases as %s since String has additional members)
-                assert(arg.Length() < 1000000);
-                assert(arg.Capacity() < 1000000);
-                assert(arg.Length() <= arg.Capacity());
+                char* arg = va_arg(args, char*);
                 Append(arg);
                 break;
             }
