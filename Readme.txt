@@ -131,8 +131,8 @@ process has two steps:
 
 1) Run CMake in the root directory with your preferred toolchain specified to
 generate the build files. You can use the batch files or shell scripts provided:
-cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and
-Mac OS X.
+cmake_vs2008.bat, cmake_vs2010.bat or cmake_vs2012.bat on Windows, and 
+cmake_gcc.sh on Linux and Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
 For gcc, execute make (by default, cmake_gcc.sh specifies to make a

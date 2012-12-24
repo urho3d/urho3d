@@ -1,0 +1,1 @@
+cmake -G "Visual Studio 11"
