@@ -113,8 +113,6 @@ private:
     Vector<SharedPtr<Geometry> > geometries_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
-    /// Material list attribute.
-    mutable ResourceRefList materialsAttr_;
     /// Element mask used so far.
     unsigned elementMask_;
     /// Current geometry being updated.
