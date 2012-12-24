@@ -79,7 +79,9 @@ public:
     void Reset();
     /// Clear the buffer.
     void Clear();
-    /// Draw a triangle mesh to the buffer.
+    /// Draw a triangle mesh to the buffer using non-indexed geometry.
+    bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount);
+    /// Draw a triangle mesh to the buffer using indexed geometry.
     bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
     /// Build reduced size mip levels.
     void BuildDepthHierarchy();

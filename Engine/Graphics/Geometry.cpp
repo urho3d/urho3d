@@ -291,10 +291,13 @@ float Geometry::GetHitDistance(const Ray& ray)
     unsigned elementMask;
     
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (!vertexData || !indexData)
-        return M_INFINITY;
     
-    return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+    if (vertexData && indexData)
+        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+    else if (vertexData)
+        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_);
+    else
+        return M_INFINITY;
 }
 
 void Geometry::GetPositionBufferIndex()

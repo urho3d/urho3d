@@ -693,7 +693,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
 {
     // Try to use the most accurate LOD level if possible
     Geometry* geometry = target->GetLodGeometry(batchIndex, 0);
-    if (!geometry)
+    if (!geometry || geometry->GetPrimitiveType() != TRIANGLE_LIST)
         return;
     
     const unsigned char* positionData = 0;
@@ -740,43 +740,59 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     }
     
     // Positions and indices are needed
-    if (!positionData || !indexData)
+    if (!positionData)
     {
         // As a fallback, try to get the geometry's raw vertex/index data
         unsigned elementMask;
         geometry->GetRawData(positionData, positionStride, indexData, indexStride, elementMask);
-        if (!positionData || !indexData)
+        if (!positionData)
         {
             LOGWARNING("Can not add decal, target drawable has no CPU-side geometry data");
             return;
         }
     }
     
-    unsigned indexStart = geometry->GetIndexStart();
-    unsigned indexCount = geometry->GetIndexCount();
-    
-    // 16-bit indices
-    if (indexStride == sizeof(unsigned short))
+    if (indexData)
     {
-        const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
-        const unsigned short* indicesEnd = indices + indexCount;
+        unsigned indexStart = geometry->GetIndexStart();
+        unsigned indexCount = geometry->GetIndexCount();
         
-        while (indices < indicesEnd)
+        // 16-bit indices
+        if (indexStride == sizeof(unsigned short))
         {
-            GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
-                positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
-            indices += 3;
+            const unsigned short* indices = ((const unsigned short*)indexData) + indexStart;
+            const unsigned short* indicesEnd = indices + indexCount;
+            
+            while (indices < indicesEnd)
+            {
+                GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
+                    positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
+                indices += 3;
+            }
+        }
+        else
+        // 32-bit indices
+        {
+            const unsigned* indices = ((const unsigned*)indexData) + indexStart;
+            const unsigned* indicesEnd = indices + indexCount;
+            
+            while (indices < indicesEnd)
+            {
+                GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
+                    positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
+                indices += 3;
+            }
         }
     }
     else
-    // 32-bit indices
     {
-        const unsigned* indices = ((const unsigned*)indexData) + indexStart;
-        const unsigned* indicesEnd = indices + indexCount;
+        // Non-indexed geometry
+        unsigned indices = geometry->GetVertexStart();
+        unsigned indicesEnd = indices + geometry->GetVertexCount();
         
-        while (indices < indicesEnd)
+        while (indices + 2 < indicesEnd)
         {
-            GetFace(faces, target, batchIndex, indices[0], indices[1], indices[2], positionData, normalData, skinningData,
+            GetFace(faces, target, batchIndex, indices, indices + 1, indices + 2, positionData, normalData, skinningData,
                 positionStride, normalStride, skinningStride, frustum, decalNormal, normalCutoff);
             indices += 3;
         }

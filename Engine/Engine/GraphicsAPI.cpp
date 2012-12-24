@@ -28,6 +28,7 @@
 #include "AnimationState.h"
 #include "APITemplates.h"
 #include "Camera.h"
+#include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DecalSet.h"
 #include "Graphics.h"
@@ -778,6 +779,30 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
 }
 
+static void RegisterCustomGeometry(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("PrimitiveType");
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
+    
+    RegisterDrawable<CustomGeometry>(engine, "CustomGeometry");
+    engine->RegisterObjectMethod("CustomGeometry", "void Clear()", asMETHOD(CustomGeometry, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void BeginGeometry(uint, PrimitiveType)", asMETHOD(CustomGeometry, BeginGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineVertex(const Vector3&in)", asMETHOD(CustomGeometry, DefineVertex), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineNormal(const Vector3&in)", asMETHOD(CustomGeometry, DefineNormal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineColor(const Color&in)", asMETHOD(CustomGeometry, DefineColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineTexCoord(const Color&in)", asMETHOD(CustomGeometry, DefineTexCoord), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineTangent(const Vector4&in)", asMETHOD(CustomGeometry, DefineTangent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void Commit()", asMETHOD(CustomGeometry, Commit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void set_material(Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "bool set_materials(uint, Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "Material@+ get_materials(uint) const", asMETHOD(CustomGeometry, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "const BoundingBox& get_boundingBox() const", asMETHOD(CustomGeometry, GetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void set_numGeometries(uint)", asMETHOD(CustomGeometry, SetNumGeometries), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "uint get_numGeometries() const", asMETHOD(CustomGeometry, GetNumGeometries), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "Zone@+ get_zone() const", asMETHOD(CustomGeometry, GetZone), asCALL_THISCALL);
+}
+
 static void RegisterDecalSet(asIScriptEngine* engine)
 {
     RegisterDrawable<DecalSet>(engine, "DecalSet");
@@ -1136,6 +1161,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterAnimationController(engine);
     RegisterBillboardSet(engine);
     RegisterParticleEmitter(engine);
+    RegisterCustomGeometry(engine);
     RegisterDecalSet(engine);
     RegisterTerrain(engine);
     RegisterOctree(engine);

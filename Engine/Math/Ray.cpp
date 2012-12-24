@@ -246,6 +246,25 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
     return M_INFINITY;
 }
 
+
+float Ray::HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+{
+    float nearest = M_INFINITY;
+    const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexSize;
+    unsigned index = 0;
+    
+    while (index + 2 < vertexCount)
+    {
+        const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexSize]));
+        const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexSize]));
+        const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexSize]));
+        nearest = Min(nearest, HitDistance(v0, v1, v2));
+        index += 3;
+    }
+    
+    return nearest;
+}
+
 float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
 {
     float nearest = M_INFINITY;

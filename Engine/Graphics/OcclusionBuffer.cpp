@@ -152,6 +152,38 @@ void OcclusionBuffer::Clear()
     depthHierarchyDirty_ = true;
 }
 
+bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount)
+{
+    const unsigned char* srcData = ((const unsigned char*)vertexData) + vertexStart * vertexSize;
+    
+    Matrix4 modelViewProj = viewProj_ * model;
+    depthHierarchyDirty_ = true;
+    
+    // Theoretical max. amount of vertices if each of the 6 clipping planes doubles the triangle count
+    Vector4 vertices[64 * 3];
+    
+    // 16-bit indices
+    unsigned index = 0;
+    while (index + 2 < vertexCount)
+    {
+        if (numTriangles_ >= maxTriangles_)
+            return false;
+        
+        const Vector3& v0 = *((const Vector3*)(&srcData[index * vertexSize]));
+        const Vector3& v1 = *((const Vector3*)(&srcData[(index + 1) * vertexSize]));
+        const Vector3& v2 = *((const Vector3*)(&srcData[(index + 2) * vertexSize]));
+        
+        vertices[0] = ModelTransform(modelViewProj, v0);
+        vertices[1] = ModelTransform(modelViewProj, v1);
+        vertices[2] = ModelTransform(modelViewProj, v2);
+        DrawTriangle(vertices);
+        
+        index += 3;
+    }
+    
+    return true;
+}
+
 bool OcclusionBuffer::Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData,
     unsigned indexSize, unsigned indexStart, unsigned indexCount)
 {

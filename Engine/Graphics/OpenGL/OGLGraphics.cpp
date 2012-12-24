@@ -28,6 +28,7 @@
 #include "BillboardSet.h"
 #include "Camera.h"
 #include "Context.h"
+#include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DecalSet.h"
 #include "Graphics.h"
@@ -2511,6 +2512,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
+    CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);
     Terrain::RegisterObject(context);
     TerrainPatch::RegisterObject(context);

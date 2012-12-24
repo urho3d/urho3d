@@ -1145,6 +1145,7 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
+- void FlipVertical()
 - void SaveBMP(const String&)
 - void SaveTGA(const String&)
 - void SaveJPG(const String&, int)
@@ -2429,6 +2430,60 @@ Properties:<br>
 - XMLFile@ parameters
 - bool active (readonly)
 - uint numParticles (readonly)
+- Zone@ zone (readonly)
+
+
+CustomGeometry
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void Clear()
+- void BeginGeometry(uint, PrimitiveType)
+- void DefineVertex(const Vector3&)
+- void DefineNormal(const Vector3&)
+- void DefineColor(const Color&)
+- void DefineTexCoord(const Color&)
+- void DefineTangent(const Vector4&)
+- void Commit()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool inView (readonly)
+- bool visible
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox worldBoundingBox (readonly)
+- Material@ material (writeonly)
+- Material@[] materials
+- BoundingBox boundingBox (readonly)
+- uint numGeometries
 - Zone@ zone (readonly)
 
 

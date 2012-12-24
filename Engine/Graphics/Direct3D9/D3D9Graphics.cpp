@@ -27,6 +27,7 @@
 #include "AnimationController.h"
 #include "Camera.h"
 #include "Context.h"
+#include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DecalSet.h"
 #include "Graphics.h"
@@ -2190,7 +2191,7 @@ void Graphics::CheckFeatureSupport()
         // so use INTZ buffer only with other vendors
         if (impl_->adapterIdentifier_.VendorId != 0x1002)
         {
-            hardwareDepthSupport_ = true;
+            hardwareDepthSupport_ = false;
             lightPrepassSupport_ = true;
             depthStencilFormat = MAKEFOURCC('I', 'N', 'T', 'Z');
             if (impl_->deviceCaps_.NumSimultaneousRTs >= 3)
@@ -2374,6 +2375,7 @@ void RegisterGraphicsLibrary(Context* context)
     AnimationController::RegisterObject(context);
     BillboardSet::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
+    CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);
     Terrain::RegisterObject(context);
     TerrainPatch::RegisterObject(context);

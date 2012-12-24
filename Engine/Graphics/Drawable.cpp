@@ -116,7 +116,14 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
 
 void Drawable::UpdateBatches(const FrameInfo& frame)
 {
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(node_->GetWorldPosition());
+    
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+    {
+        batches_[i].distance_ = distance_;
+        batches_[i].worldTransform_ = &worldTransform;
+    }
     
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
