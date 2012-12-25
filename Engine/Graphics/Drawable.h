@@ -90,9 +90,9 @@ struct SourceBatch
     SharedPtr<Material> material_;
     /// %Object's world transform.
     const Matrix3x4* worldTransform_;
-    /// Vertex shader data.
+    /// Vertex shader data in floats.
     const float* shaderData_;
-    /// Vertex shader data size in floats.
+    /// Vertex shader data size.
     unsigned shaderDataSize_;
     /// %Geometry type.
     GeometryType geometryType_;
@@ -111,7 +111,7 @@ class Drawable : public Component
     
 public:
     /// Construct.
-    Drawable(Context* context);
+    Drawable(Context* context, unsigned char drawableFlags);
     /// Destruct.
     virtual ~Drawable();
     /// Register object attributes. Drawable must be registered first.

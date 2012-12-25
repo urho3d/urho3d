@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "Addons.h"
-#include "Str.h"
 
 #include <cstring>
 #include <new>
@@ -748,10 +747,12 @@ bool CScriptArray::operator==(const CScriptArray &other) const
         }
 
     if( cmpContext )
+    {
         if( isNested )
             cmpContext->PopState();
         else
             cmpContext->Release();
+    }
 
     return isEqual;
 }
@@ -895,10 +896,12 @@ int CScriptArray::Find(asUINT index, void *value) const
     }
 
     if( cmpContext )
+    {
         if( isNested )
             cmpContext->PopState();
         else
             cmpContext->Release();
+    }
 
     return ret;
 }
@@ -1054,10 +1057,12 @@ void CScriptArray::Sort(asUINT index, asUINT count, bool asc)
     }
 
     if( cmpContext )
+    {
         if( isNested )
             cmpContext->PopState();
         else
             cmpContext->Release();
+    }
 }
 
 // internal
@@ -1463,10 +1468,10 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String Replaced(uint8, uint8) const", asMETHODPR(String, Replaced, (char, char) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Replaced(const String&in, const String&in) const", asMETHODPR(String, Replaced, (const String&, const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void Resize(uint)", asFUNCTION(StringResize), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "int Find(const String&in, uint start = 0) const", asMETHODPR(String, Find, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "int Find(uint8, uint start = 0) const", asMETHODPR(String, Find, (char, unsigned) const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "int FindLast(const String&in, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "int FindLast(uint8, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (char, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "uint Find(const String&in, uint start = 0) const", asMETHODPR(String, Find, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "uint Find(uint8, uint start = 0) const", asMETHODPR(String, Find, (char, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "uint FindLast(const String&in, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "uint FindLast(uint8, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (char, unsigned) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool StartsWith(const String&in) const", asMETHOD(String, StartsWith), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool EndsWith(const String&in) const", asMETHOD(String, EndsWith), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Substring(uint) const", asMETHODPR(String, Substring, (unsigned) const, String), asCALL_THISCALL);
@@ -1486,6 +1491,8 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "uint get_length() const", asMETHOD(String, Length), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool get_empty() const", asMETHOD(String, Empty), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "int Compare(const String&in, bool caseSensitive = true) const", asMETHODPR(String, Compare, (const String&, bool) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "bool Contains(const String&in) const", asMETHODPR(String, Contains, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "bool Contains(uint8) const", asMETHODPR(String, Contains, (char) const, bool), asCALL_THISCALL);
     
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);

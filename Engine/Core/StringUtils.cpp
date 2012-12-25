@@ -390,4 +390,14 @@ unsigned GetStringListIndex(const char* value, const char** strings, unsigned de
     return defaultIndex;
 }
 
+String ToString(const char* formatString, ...)
+{
+    String ret;
+    va_list args;
+    va_start(args, formatString);
+    ret.AppendWithFormatArgs(formatString, args);
+    va_end(args);
+    return ret;
+}
+
 }

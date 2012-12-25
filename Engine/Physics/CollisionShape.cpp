@@ -85,7 +85,9 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
         {
+            #ifdef ENABLE_LOGGING
             WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for triangle mesh collision");
+            #endif
             continue;
         }
         
@@ -98,7 +100,9 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
         {
+            #ifdef ENABLE_LOGGING
             WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for triangle mesh collision");
+            #endif
             continue;
         }
         
@@ -161,7 +165,9 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
         {
+            #ifdef ENABLE_LOGGING
             WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for convex hull collision");
+            #endif
             continue;
         };
         
@@ -174,7 +180,9 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
         {
+            #ifdef ENABLE_LOGGING
             WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for convex hull collision");
+            #endif
             continue;
         }
         
@@ -230,15 +238,11 @@ HeightfieldData::HeightfieldData(Terrain* terrain) :
         unsigned points = size_.x_ * size_.y_;
         float* data = heightData_.Get();
         
-        for (unsigned i = 0; i < points; ++i)
+        minHeight_ = maxHeight_ = data[0];
+        for (unsigned i = 1; i < points; ++i)
         {
-            if (!i)
-                minHeight_ = maxHeight_ = data[i];
-            else
-            {
-                minHeight_ = Min(minHeight_, data[i]);
-                maxHeight_ = Max(maxHeight_, data[i]);
-            }
+            minHeight_ = Min(minHeight_, data[i]);
+            maxHeight_ = Max(maxHeight_, data[i]);
         }
     }
 }

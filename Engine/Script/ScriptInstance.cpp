@@ -62,7 +62,7 @@ ScriptInstance::ScriptInstance(Context* context) :
     script_(GetSubsystem<Script>()),
     scriptObject_(0),
     active_(true),
-    delayedStart_(false),
+    subscribed_(false),
     fixedUpdateFps_(0),
     fixedUpdateInterval_(0.0f),
     fixedUpdateAcc_(0.0f),
@@ -184,18 +184,26 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     delayedMethodCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
-    if (!methods_[METHOD_UPDATE] && !methods_[METHOD_DELAYEDSTART] && !HasSubscribedToEvent(E_SCENEUPDATE))
+    if (!subscribed_)
+    {
         SubscribeToEvent(GetScene(), E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
+        subscribed_ = true;
+    }
 }
 
 void ScriptInstance::ClearDelayedExecute(const String& declaration)
 {
-    for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End();)
+    if (declaration.Empty())
+        delayedMethodCalls_.Clear();
+    else
     {
-        if (declaration.Empty() || declaration == i->declaration_)
-            i = delayedMethodCalls_.Erase(i);
-        else
-            ++i;
+        for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End();)
+        {
+            if (declaration == i->declaration_)
+                i = delayedMethodCalls_.Erase(i);
+            else
+                ++i;
+        }
     }
 }
 
@@ -377,7 +385,10 @@ void ScriptInstance::GetSupportedMethods()
     if (scene)
     {
         if (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART])
+        {
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
+            subscribed_ = true;
+        }
         if (methods_[METHOD_POSTUPDATE])
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
         
@@ -390,8 +401,6 @@ void ScriptInstance::GetSupportedMethods()
                 SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
         }
     }
-    
-    delayedStart_ = false;
 }
 
 void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
@@ -427,10 +436,10 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     }
     
     // Execute delayed start before first update
-    if (methods_[METHOD_DELAYEDSTART] && !delayedStart_)
+    if (methods_[METHOD_DELAYEDSTART])
     {
         scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
-        delayedStart_ = true;
+        methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
     }
     
     if (methods_[METHOD_UPDATE])
@@ -587,16 +596,7 @@ ScriptEventListener* GetScriptContextEventListener()
 
 Object* GetScriptContextEventListenerObject()
 {
-    asIScriptContext* context = asGetActiveContext();
-    if (context)
-    {
-        if (context->GetThisPointer())
-            return GetScriptContextInstance();
-        else
-            return GetScriptContextFile();
-    }
-    else
-        return 0;
+    return dynamic_cast<Object*>(GetScriptContextEventListener());
 }
 
 

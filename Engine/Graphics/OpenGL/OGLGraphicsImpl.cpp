@@ -22,12 +22,8 @@
 //
 
 #include "Precompiled.h"
-#include "Context.h"
 #include "Graphics.h"
-#include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
-#include "Mutex.h"
-#include "ProcessUtils.h"
 
 #include "DebugNew.h"
 

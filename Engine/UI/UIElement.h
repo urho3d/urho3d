@@ -256,8 +256,8 @@ public:
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
     void InsertChild(unsigned index, UIElement* element);
-    /// Remove a child element.
-    void RemoveChild(UIElement* element);
+    /// Remove a child element. Starting search at specified index if provided.
+    void RemoveChild(UIElement* element, unsigned index = 0);
     /// Remove all child elements.
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
@@ -276,7 +276,7 @@ public:
     /// Return position.
     const IntVector2& GetPosition() const { return position_; }
     /// Return screen position.
-    IntVector2 GetScreenPosition();
+    IntVector2 GetScreenPosition() const;
     /// Return size.
     const IntVector2& GetSize() const { return size_; }
     /// Return width.
@@ -310,7 +310,7 @@ public:
     /// Return opacity.
     float GetOpacity() const { return opacity_; }
     /// Return derived opacity (affected by parent elements.)
-    float GetDerivedOpacity();
+    float GetDerivedOpacity() const;
     /// Return whether should be brought to front when focused.
     bool GetBringToFront() const { return bringToFront_; }
     /// Return whether should be put to background when another element is focused.
@@ -357,8 +357,8 @@ public:
     UIElement* GetParent() const { return parent_; }
     /// Return root element.
     UIElement* GetRoot() const;
-    /// Return precalculated 32-bit color. Only valid when no gradient.
-    unsigned GetUIntColor();
+    /// Return derived color. Only valid when no gradient.
+    const Color& GetDerivedColor() const;
     /// Return a user variable.
     const Variant& GetVar(ShortStringHash key) const;
     /// Return all user variables.
@@ -453,11 +453,13 @@ private:
     void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
     /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
+    /// Detach from parent.
+    void Detach();
     
     /// Position.
     IntVector2 position_;
     /// Screen position.
-    IntVector2 screenPosition_;
+    mutable IntVector2 screenPosition_;
     /// Size.
     IntVector2 size_;
     /// Minimum size.
@@ -473,15 +475,15 @@ private:
     /// Opacity.
     float opacity_;
     /// Derived opacity.
-    float derivedOpacity_;
-    /// Precalculated 32-bit color.
-    unsigned uintColor_;
+    mutable float derivedOpacity_;
+    /// Derived color. Only valid when no gradient.
+    mutable Color derivedColor_;
     /// Screen position dirty flag.
-    bool positionDirty_;
+    mutable bool positionDirty_;
     /// Derived opacity dirty flag.
-    bool opacityDirty_;
+    mutable bool opacityDirty_;
     /// Derived color dirty flag (only used when no gradient.)
-    bool derivedColorDirty_;
+    mutable bool derivedColorDirty_;
     /// Child priority sorting dirty flag.
     bool sortOrderDirty_;
     /// Has color gradient flag.

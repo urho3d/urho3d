@@ -68,7 +68,10 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     for (unsigned k = 0; k < propertyInfos.Size(); ++k)
     {
         if (propertyInfos[k].name_ == propertyName)
+        {
             info = &propertyInfos[k];
+            break;
+        }
     }
     if (!info)
     {
@@ -76,7 +79,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
         info = &propertyInfos.Back();
         info->name_ = propertyName;
     }
-    if (functionName.Find("get_") != String::NPOS)
+    if (functionName.Contains("get_"))
     {
         info->read_ = true;
         // Extract type from the return value
@@ -89,7 +92,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
                 info->type_ = parts[1];
         }
         // If get method has parameters, it is indexed
-        if (declaration.Find("()") == String::NPOS)
+        if (!declaration.Contains("()"))
         {
             info->indexed_ = true;
             info->type_ += "[]";
@@ -98,7 +101,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
         // Sanitate the reference operator away
         info->type_.Replace("&", "");
     }
-    if (functionName.Find("set_") != String::NPOS)
+    if (functionName.Contains("set_"))
     {
         info->write_ = true;
         if (info->type_.Empty())
@@ -133,6 +136,7 @@ Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
     immediateContext_(0),
+    logMode_(LOGMODE_IMMEDIATE),
     scriptNestingLevel_(0)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
@@ -168,7 +172,6 @@ Script::~Script()
     
     for (unsigned i = 0 ; i < scriptFileContexts_.Size(); ++i)
         scriptFileContexts_[i]->Release();
-    scriptFileContexts_.Clear();
     
     if (scriptEngine_)
     {
@@ -205,9 +208,7 @@ bool Script::Execute(const String& line)
         return false;
     }
     
-    bool success = false;
-    
-    success = immediateContext_->Execute() >= 0;
+    bool success = immediateContext_->Execute() >= 0;
     immediateContext_->Unprepare();
     function->Release();
     
@@ -236,6 +237,7 @@ void Script::ClearLogMessages()
 
 void Script::DumpAPI()
 {
+    #ifdef ENABLE_LOGGING
     LOGRAW("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
     
     Vector<PropertyInfo> globalPropertyInfos;
@@ -248,7 +250,7 @@ void Script::DumpAPI()
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
         
-        if (functionName.Find("set_") != String::NPOS || functionName.Find("get_") != String::NPOS)
+        if (functionName.Contains("set_") || functionName.Contains("get_"))
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
         else
             globalFunctions.Push(declaration);
@@ -299,18 +301,18 @@ void Script::DumpAPI()
                 asIScriptFunction* method = type->GetMethodByIndex(j);
                 String methodName(method->GetName());
                 String declaration(method->GetDeclaration());
-                if (methodName.Find("get_") == String::NPOS && methodName.Find("set_") == String::NPOS)
+                if (methodName.Contains("get_") || methodName.Contains("set_"))
+                    ExtractPropertyInfo(methodName, declaration, propertyInfos);
+                else
                 {
-                    // Sanitate the method name. For now, skip the operators
-                    if (declaration.Find("::op") == String::NPOS)
+                    // Sanitate the method name. \todo For now, skip the operators
+                    if (!declaration.Contains("::op"))
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
                         methodDeclarations.Push(declaration);
                     }
                 }
-                else
-                    ExtractPropertyInfo(methodName, declaration, propertyInfos);
             }
             
             // Assume that the same property is never both an accessor property, and a direct one
@@ -358,6 +360,7 @@ void Script::DumpAPI()
     }
     
     LOGRAW("*/\n\n}\n");
+    #endif
 }
 
 void Script::MessageCallback(const asSMessageInfo* msg)
@@ -444,6 +447,7 @@ asIScriptContext* Script::GetScriptFileContext()
 
 void Script::OutputAPIRow(const String& row, bool removeReference)
 {
+    #ifdef ENABLE_LOGGING
     String out = row;
     out.Replace("double", "float");
     out.Replace("&in", "&");
@@ -452,6 +456,7 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
         out.Replace("&", "");
     
     LOGRAW("- " + out + "\n");
+    #endif
 }
 
 void RegisterScriptLibrary(Context* context)

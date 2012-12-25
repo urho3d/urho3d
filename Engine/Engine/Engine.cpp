@@ -86,7 +86,8 @@ Engine::Engine(Context* context) :
     #endif
     initialized_(false),
     exiting_(false),
-    headless_(false)
+    headless_(false),
+   audioPaused_(false)
 {
 }
 
@@ -155,31 +156,30 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 forceSM2 = true;
             else
             {
+                int value;
+                if (argument.Length() > 1)
+                    value = ToInt(argument.Substring(1));
+                
                 switch (tolower(argument[0]))
                 {
                 case 'x':
-                    if (arguments[i].Length() > 1)
-                        width = ToInt(argument.Substring(1));
+                    width = value;
                     break;
                     
                 case 'y':
-                    if (arguments[i].Length() > 1)
-                        height = ToInt(argument.Substring(1));
+                    height = value;
                     break;
                 
                 case 'm':
-                    if (arguments[i].Length() > 1)
-                        multiSample = ToInt(argument.Substring(1));
+                    multiSample = value;
                     break;
                     
                 case 'b':
-                    if (arguments[i].Length() > 1)
-                        buffer = ToInt(argument.Substring(1));
+                    buffer = value;
                     break;
                     
                 case 'r':
-                    if (arguments[i].Length() > 1)
-                        mixRate = ToInt(argument.Substring(1));
+                    mixRate = value;
                     break;
                     
                 case 'v':
@@ -208,24 +208,24 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     
     // Start logging
     Log* log = GetSubsystem<Log>();
-    log->Open(logName);
-    if (logDebug)
-        log->SetLevel(LOG_DEBUG);
+    if (log)
+    {
+        log->Open(logName);
+        if (logDebug)
+            log->SetLevel(LOG_DEBUG);
+    }
     
     // Set maximally accurate low res timer
     GetSubsystem<Time>()->SetTimerPeriod(1);
     
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
-    int numThreads = threads ? GetNumPhysicalCPUs() - 1 : 0;
-    if (numThreads > 0)
+    unsigned numThreads = threads ? GetNumPhysicalCPUs() - 1 : 0;
+    if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
         
-        String workerThreadString = "Created " + String(numThreads) + " worker thread";
-        if (numThreads > 1)
-            workerThreadString += "s";
-        LOGINFO(workerThreadString);
+        LOGINFO(ToString("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : ""));
     }
     
     // Add default resource paths: CoreData package or directory, Data package or directory
@@ -318,15 +318,7 @@ bool Engine::InitializeScripting()
 
 void Engine::RunFrame()
 {
-    if (!initialized_ || exiting_)
-        return;
-    
-    // Set exit flag if the window was closed
-    if (!headless_ && !GetSubsystem<Graphics>()->IsInitialized())
-    {
-        exiting_ = true;
-        return;
-    }
+    assert(initialized_ && !exiting_);
     
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
@@ -335,17 +327,24 @@ void Engine::RunFrame()
     time->BeginFrame(timeStep_);
     
     // If pause when minimized -mode is in use, stop updates and audio as necessary
-    if (!input || !input->IsMinimized() || !pauseMinimized_)
+    if (pauseMinimized_ && input->IsMinimized())
     {
-        if (pauseMinimized_ && audio && audio->IsInitialized() && !audio->IsPlaying())
-            audio->Play();
-        
-        Update();
+        if (audio->IsPlaying())
+        {
+            audio->Stop();
+            audioPaused_ = true;
+        }
     }
     else
     {
-        if (audio && audio->IsInitialized() && audio->IsPlaying())
-            audio->Stop();
+        // Only unpause when it was paused by the engine
+        if (audioPaused_)
+        {
+            audio->Play();
+            audioPaused_ = false;
+        }
+        
+        Update();
     }
     
     Render();
@@ -408,6 +407,7 @@ void Engine::DumpProfilingData()
 
 void Engine::DumpResources()
 {
+    #ifdef ENABLE_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
@@ -426,10 +426,12 @@ void Engine::DumpResources()
     }
     
     LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+    #endif
 }
 
 void Engine::DumpMemory()
 {
+    #ifdef ENABLE_LOGGING
     #if defined(_MSC_VER) && defined(_DEBUG)
     _CrtMemState state;
     _CrtMemCheckpoint(&state);
@@ -463,6 +465,7 @@ void Engine::DumpMemory()
     LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
     #else
     LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
+    #endif
     #endif
 }
 
@@ -570,7 +573,9 @@ void Engine::RegisterSubsystems()
     #ifdef ENABLE_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
     #endif
+    #ifdef ENABLE_LOGGING
     context_->RegisterSubsystem(new Log(context_));
+    #endif
     context_->RegisterSubsystem(new FileSystem(context_));
     context_->RegisterSubsystem(new ResourceCache(context_));
     context_->RegisterSubsystem(new Network(context_));

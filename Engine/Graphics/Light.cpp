@@ -84,7 +84,7 @@ template<> LightType Variant::Get<LightType>() const
 OBJECTTYPESTATIC(Light);
 
 Light::Light(Context* context) :
-    Drawable(context),
+    Drawable(context, DRAWABLE_LIGHT),
     lightType_(DEFAULT_LIGHTTYPE),
     shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
     shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
@@ -101,7 +101,6 @@ Light::Light(Context* context) :
     shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
     perVertex_(false)
 {
-    drawableFlags_ =  DRAWABLE_LIGHT;
 }
 
 Light::~Light()
@@ -133,7 +132,11 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
+    #if !defined(ANDROID) && !defined(IOS)
     ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    #else
+    ATTRIBUTE(Light, VAR_VECTOR2, "CSM Splits", shadowCascade_.splits_, Vector2(M_LARGE_VALUE, 0.0f), AM_DEFAULT);
+    #endif
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
@@ -159,64 +162,51 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    RayQueryLevel level = query.level_;
+    // Do not record a raycast result for a directional light, as they would overwhelm all other results
+    if (lightType_ == LIGHT_DIRECTIONAL)
+        return;
     
-    switch (level)
+    float distance;
+    switch (query.level_)
     {
     case RAY_AABB_NOSUBOBJECTS:
     case RAY_AABB:
-        // Do not record a raycast result for a directional light, as they would overwhelm all other results
-        if (lightType_ != LIGHT_DIRECTIONAL)
-            Drawable::ProcessRayQuery(query, results);
-        break;
+        Drawable::ProcessRayQuery(query, results);
+        return;
         
     case RAY_OBB:
-        if (lightType_ != LIGHT_DIRECTIONAL)
         {
             Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = localRay.HitDistance(GetWorldBoundingBox());
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+            distance = localRay.HitDistance(GetWorldBoundingBox().Transformed(inverse));
+            if (distance > query.maxDistance_)
+                return;
         }
         break;
         
     case RAY_TRIANGLE:
         if (lightType_ == LIGHT_SPOT)
         {
-            float distance = query.ray_.HitDistance(GetFrustum());
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+            distance = query.ray_.HitDistance(GetFrustum());
+            if (distance > query.maxDistance_)
+                return;
         }
-        if (lightType_ == LIGHT_POINT)
+        else // if (lightType_ == LIGHT_POINT)
         {
-            float distance = query.ray_.HitDistance(Sphere(node_->GetWorldPosition(), range_));
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+            distance = query.ray_.HitDistance(Sphere(node_->GetWorldPosition(), range_));
+            if (distance > query.maxDistance_)
+                return;
         }
         break;
     }
+
+    // If the code reaches here then we have a hit
+    RayQueryResult result;
+    result.drawable_ = this;
+    result.node_ = node_;
+    result.distance_ = distance;
+    result.subObject_ = M_MAX_UNSIGNED;
+    results.Push(result);
 }
 
 void Light::UpdateBatches(const FrameInfo& frame)
@@ -240,12 +230,26 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         switch (lightType_)
         {
+        case LIGHT_DIRECTIONAL:
+            {
+                Vector3 start = node_->GetWorldPosition();
+                Vector3 end = start + node_->GetWorldDirection() * 10.f;
+                for (short i = -1; i < 2; ++i)
+                    for (short j = -1; j < 2; ++j)
+                    {
+                        Vector3 offset = Vector3::UP * (5.f * i) + Vector3::RIGHT * (5.f * j);
+                        debug->AddSphere(Sphere(start + offset, 0.1f), color_, depthTest);
+                        debug->AddLine(start + offset, end + offset, color_, depthTest);
+                    }
+            }
+            break;
+            
         case LIGHT_SPOT:
             debug->AddFrustum(GetFrustum(), color_, depthTest);
             break;
             
         case LIGHT_POINT:
-            debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), GetColor(), depthTest);
+            debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), color_, depthTest);
             break;
         }
     }
@@ -450,6 +454,11 @@ void Light::OnWorldBoundingBoxUpdate()
         // Directional light always sets humongous bounding box not affected by transform
         worldBoundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
         break;
+            
+    case LIGHT_SPOT:
+        // Frustum is already transformed into world space
+        worldBoundingBox_.Define(GetFrustum());
+        break;
         
     case LIGHT_POINT:
         {
@@ -457,11 +466,6 @@ void Light::OnWorldBoundingBoxUpdate()
             Vector3 edge(range_, range_, range_);
             worldBoundingBox_.Define(center - edge, center + edge);
         }
-        break;
-        
-    case LIGHT_SPOT:
-        // Frustum is already transformed into world space
-        worldBoundingBox_.Define(GetFrustum());
         break;
     }
 }
@@ -488,24 +492,11 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
         sortValue_ = 1.0f / (color_.Intensity() + M_EPSILON);
         break;
         
-    case LIGHT_POINT:
-        {
-            Vector3 centerPos = box.Center();
-            Vector3 lightPos = node_->GetWorldPosition();
-            Vector3 lightDir = (centerPos - lightPos).Normalized();
-            Ray lightRay(lightPos, lightDir);
-            float distance = lightRay.HitDistance(box);
-            float normDistance = distance / range_;
-            float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
-            sortValue_ = 1.0f / (color_.Intensity() * att + M_EPSILON);
-        }
-        break;
-        
     case LIGHT_SPOT:
         {
             Vector3 centerPos = box.Center();
             Vector3 lightPos = node_->GetWorldPosition();
-            Vector3 lightDir = node_->GetWorldRotation() * Vector3::FORWARD;
+            Vector3 lightDir = node_->GetWorldDirection();
             Ray lightRay(lightPos, lightDir);
             
             Vector3 centerProj = lightRay.Project(centerPos);
@@ -525,6 +516,19 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float spotFactor = Min(spotAngle / maxAngle, 1.0f);
             // We do not know the actual range attenuation ramp, so take only spot attenuation into account
             float att = Max(1.0f - spotFactor * spotFactor, M_EPSILON);
+            sortValue_ = 1.0f / (color_.Intensity() * att + M_EPSILON);
+        }
+        break;
+            
+    case LIGHT_POINT:
+        {
+            Vector3 centerPos = box.Center();
+            Vector3 lightPos = node_->GetWorldPosition();
+            Vector3 lightDir = (centerPos - lightPos).Normalized();
+            Ray lightRay(lightPos, lightDir);
+            float distance = lightRay.HitDistance(box);
+            float normDistance = distance / range_;
+            float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
             sortValue_ = 1.0f / (color_.Intensity() * att + M_EPSILON);
         }
         break;

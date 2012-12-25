@@ -126,7 +126,8 @@ void AnimatedModel::ApplyAttributes()
 void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     // If no bones or no bone-level testing, use the Drawable test
-    if (query.level_ < RAY_AABB || !skeleton_.GetRootBone() || !skeleton_.GetRootBone()->node_)
+    RayQueryLevel level = query.level_;
+    if (level < RAY_AABB || !skeleton_.GetRootBone() || !skeleton_.GetRootBone()->node_)
     {
         Drawable::ProcessRayQuery(query, results);
         return;
@@ -138,7 +139,6 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
     
     const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
-    RayQueryLevel level = query.level_;
     
     for (unsigned i = 0; i < bones.Size(); ++i)
     {
@@ -146,57 +146,45 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
         if (!bone.node_)
             continue;
         
+        float distance;
+
         // Use hitbox if available
         if (bone.collisionMask_ & BONECOLLISION_BOX)
         {
             // Do an initial crude test using the bone's AABB
             const BoundingBox& box = bone.boundingBox_;
             const Matrix3x4& transform = bone.node_->GetWorldTransform();
-            float distance = query.ray_.HitDistance(box.Transformed(transform));
-            if (distance <= query.maxDistance_)
+            distance = query.ray_.HitDistance(box.Transformed(transform));
+            if (distance > query.maxDistance_)
+                continue;
+            if (level != RAY_AABB)
             {
-                if (level == RAY_AABB)
-                {
-                    RayQueryResult result;
-                    result.drawable_ = this;
-                    result.node_ = GetNode();
-                    result.distance_ = distance;
-                    result.subObject_ = i;
-                    results.Push(result);
-                }
-                else
-                {
-                    // Follow with an OBB test if required
-                    Matrix3x4 inverse = transform.Inverse();
-                    Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-                    distance = localRay.HitDistance(box);
-                    if (distance <= query.maxDistance_)
-                    {
-                        RayQueryResult result;
-                        result.drawable_ = this;
-                        result.node_ = GetNode();
-                        result.distance_ = distance;
-                        result.subObject_ = i;
-                        results.Push(result);
-                    }
-                }
+                // Follow with an OBB test if required
+                Matrix3x4 inverse = transform.Inverse();
+                Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+                distance = localRay.HitDistance(box);
+                if (distance > query.maxDistance_)
+                    continue;
             }
         }
         else if (bone.collisionMask_ & BONECOLLISION_SPHERE)
         {
             boneSphere.center_ = bone.node_->GetWorldPosition();
             boneSphere.radius_ = bone.radius_;
-            float distance = query.ray_.HitDistance(boneSphere);
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.subObject_ = i;
-                result.distance_ = distance;
-                results.Push(result);
-            }
+            distance = query.ray_.HitDistance(boneSphere);
+            if (distance > query.maxDistance_)
+                continue;
         }
+        else
+            continue;
+
+        // If the code reaches here then we have a hit
+        RayQueryResult result;
+        result.drawable_ = this;
+        result.node_ = node_;
+        result.distance_ = distance;
+        result.subObject_ = i;
+        results.Push(result);
     }
 }
 
@@ -317,6 +305,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     // Copy geometry bone mappings
     const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
     geometryBoneMappings_.Clear();
+    geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
     for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
         geometryBoneMappings_.Push(geometryBoneMappings[i]);
     
@@ -324,6 +313,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     morphVertexBuffers_.Clear();
     morphs_.Clear();
     const Vector<ModelMorph>& morphs = model->GetMorphs();
+    morphs_.Reserve(morphs.Size());
     morphElementMask_ = 0;
     for (unsigned i = 0; i < morphs.Size(); ++i)
     {
@@ -551,7 +541,6 @@ void AnimatedModel::ResetMorphWeights()
         PODVector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
         
-        // Indexing might not be the same, so use the name hash instead
         for (unsigned i = 1; i < models.Size(); ++i)
         {
             if (!models[i]->isMaster_)
@@ -773,7 +762,8 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
     RemoveAllAnimationStates();
     unsigned index = 0;
     unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
-    while (numStates)
+    animationStates_.Reserve(numStates);
+    while (numStates--)
     {
         if (index + 5 < value.Size())
         {
@@ -794,8 +784,6 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
             SharedPtr<AnimationState> newState(new AnimationState(this, 0));
             animationStates_.Push(newState);
         }
-        
-        --numStates;
     }
     
     MarkAnimationOrderDirty();
@@ -803,8 +791,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
 
 void AnimatedModel::SetMorphsAttr(const PODVector<unsigned char>& value)
 {
-    unsigned index = 0;
-    while (index < value.Size())
+    for (unsigned index = 0; index < value.Size(); ++index)
         SetMorphWeight(index, (float)value[index] / 255.0f);
 }
 
@@ -817,6 +804,7 @@ VariantVector AnimatedModel::GetBonesEnabledAttr() const
 {
     VariantVector ret;
     const Vector<Bone>& bones = skeleton_.GetBones();
+    ret.Reserve(bones.Size());
     for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
         ret.Push(i->animated_);
     return ret;
@@ -825,6 +813,7 @@ VariantVector AnimatedModel::GetBonesEnabledAttr() const
 VariantVector AnimatedModel::GetAnimationStatesAttr() const
 {
     VariantVector ret;
+    ret.Reserve(animationStates_.Size() * 6 + 1);
     ret.Push(animationStates_.Size());
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
@@ -1008,16 +997,11 @@ void AnimatedModel::CloneGeometries()
                 if (clonedVertexBuffers.Contains(originalBuffer))
                 {
                     VertexBuffer* clonedBuffer = clonedVertexBuffers[originalBuffer];
-                    clone->SetVertexBuffer(l, originalBuffer, originalMask & ~clonedBuffer->GetElementMask());
-                    ++l;
-                    clone->SetVertexBuffer(l, clonedBuffer, originalMask & clonedBuffer->GetElementMask());
-                    ++l;
+                    clone->SetVertexBuffer(l++, originalBuffer, originalMask & ~clonedBuffer->GetElementMask());
+                    clone->SetVertexBuffer(l++, clonedBuffer, originalMask & clonedBuffer->GetElementMask());
                 }
                 else
-                {
-                    clone->SetVertexBuffer(l, originalBuffer, originalMask);
-                    ++l;
-                }
+                    clone->SetVertexBuffer(l++, originalBuffer, originalMask);
             }
             
             clone->SetIndexBuffer(original->GetIndexBuffer());
@@ -1272,7 +1256,7 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
 void AnimatedModel::HandleModelReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     Model* currentModel = model_;
-    model_ = 0; // Set null to allow to be re-set
+    model_.Reset(); // Set null to allow to be re-set
     SetModel(currentModel);
 }
 

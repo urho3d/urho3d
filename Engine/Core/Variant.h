@@ -53,7 +53,8 @@ enum VariantType
     VAR_VARIANTVECTOR,
     VAR_VARIANTMAP,
     VAR_INTRECT,
-    VAR_INTVECTOR2
+    VAR_INTVECTOR2,
+    MAX_VAR_TYPES
 };
 
 /// Union for the possible variant values. Also stores non-POD objects such as String which must not exceed 16 bytes in size.

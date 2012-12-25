@@ -361,7 +361,11 @@ public:
     int Compare(const String& str, bool caseSensitive = true) const;
     /// Return comparision result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
-    
+    /// Return whether contains a specific occurences of string.
+    bool Contains(const String& str) const { return Find(str) != NPOS; }
+    /// Return whether contains a specific character.
+    bool Contains(char c) const { return Find(c) != NPOS; }
+
     /// Construct UTF8 content from Latin1.
     void SetUTF8FromLatin1(const char* str);
     /// Construct UTF8 content from wide characters.
@@ -426,9 +430,9 @@ public:
     }
     
     /// Append to string using formatting.
-    void Print(const char *formatString, ... );
+    void AppendWithFormat(const char* formatString, ... );
     /// Append to string using variable arguments.
-    void PrintArgs(const char *formatString, va_list args);
+    void AppendWithFormatArgs(const char* formatString, va_list args);
     
     /// Compare two C strings.
     static int Compare(const char* str1, const char* str2, bool caseSensitive);

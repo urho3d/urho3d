@@ -66,7 +66,6 @@ struct TextureAnimation
     float time_;
 };
 
-class ResourceCache;
 class XMLFile;
 class XMLElement;
 

@@ -324,10 +324,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
         XMLElement colorFadeElem = rootElem.GetChild("colorfade");
         while (colorFadeElem)
         {
-            ColorFade fade;
-            fade.color_ = colorFadeElem.GetColor("color");
-            fade.time_ = colorFadeElem.GetFloat("time");
-            fades.Push(fade);
+            fades.Push(ColorFade(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
             
             colorFadeElem = colorFadeElem.GetNext("colorfade");
         }
@@ -394,6 +391,7 @@ ResourceRef ParticleEmitter::GetParameterSourceAttr() const
 VariantVector ParticleEmitter::GetParticlesAttr() const
 {
     VariantVector ret;
+    ret.Reserve(particles_.Size() * 8 + 1);
     ret.Push(particles_.Size());
     for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
     {
@@ -430,12 +428,8 @@ void ParticleEmitter::SetNumParticles(int num)
 
 void ParticleEmitter::SetParticleColor(const Color& color)
 {
-    ColorFade newColor;
-    newColor.color_ = color;
-    newColor.time_ = 0.0f;
-    
     colors_.Clear();
-    colors_.Push(newColor);
+    colors_.Push(ColorFade(color));
 }
 
 void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
@@ -449,8 +443,9 @@ void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
 bool ParticleEmitter::EmitNewParticle()
 {
     unsigned index = GetFreeParticle();
-    if (index >= particles_.Size())
+    if (index == M_MAX_UNSIGNED)
         return false;
+    assert(index < particles_.Size());
     Particle& particle = particles_[index];
     Billboard& billboard = billboards_[index];
     

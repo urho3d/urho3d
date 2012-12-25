@@ -286,7 +286,8 @@ Renderer::Renderer(Context* context) :
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
+
+    // Delay SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate)) until renderer is initialized
     
     quadDirLight_->SetLightType(LIGHT_DIRECTIONAL);
     
@@ -457,7 +458,12 @@ void Renderer::SetMaxShadowMaps(int shadowMaps)
 
 void Renderer::SetMaxShadowCascades(int cascades)
 {
+    #ifndef USE_OPENGL
+    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
+    cascades = Clamp(cascades, 1, renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support() ? 3 : MAX_CASCADE_SPLITS);
+    #else
     cascades = Clamp(cascades, 1, MAX_CASCADE_SPLITS);
+    #endif
     
     if (cascades != maxShadowCascades_)
     {
@@ -508,17 +514,6 @@ void Renderer::ReloadShaders()
 Viewport* Renderer::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
-}
-
-int Renderer::GetMaxShadowCascades() const
-{
-    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
-    #ifndef USE_OPENGL
-    if (renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support())
-        return Max(maxShadowCascades_, 3);
-    #endif
-    
-    return maxShadowCascades_;
 }
 
 ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
@@ -649,8 +644,8 @@ void Renderer::Update(float timeStep)
 
 void Renderer::Render()
 {
-    if (!graphics_)
-        return;
+    // Engine does not render when window is closed or device is lost
+    assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
     
     PROFILE(RenderViews);
     
@@ -750,10 +745,9 @@ bool Renderer::AddView(RenderSurface* renderTarget, Viewport* viewport)
         }
     }
     
-    if (views_.Size() <= numViews_)
-        views_.Resize(numViews_ + 1);
-    if (!views_[numViews_])
-        views_[numViews_] = new View(context_);
+    assert(numViews_ <= views_.Size());
+    if (numViews_ == views_.Size())
+        views_.Push(SharedPtr<View>(new View(context_)));
     
     if (views_[numViews_]->Define(renderTarget, viewport))
     {
@@ -766,15 +760,15 @@ bool Renderer::AddView(RenderSurface* renderTarget, Viewport* viewport)
 
 Geometry* Renderer::GetLightGeometry(Light* light)
 {
-    LightType type = light->GetLightType();
-    if (type == LIGHT_DIRECTIONAL)
+    switch (light->GetLightType())
+    {
+    case LIGHT_DIRECTIONAL:
         return dirLightGeometry_;
-    if (type == LIGHT_SPOT)
+    case LIGHT_SPOT:
         return spotLightGeometry_;
-    else if (type == LIGHT_POINT)
+    case LIGHT_POINT:
         return pointLightGeometry_;
-    else
-        return 0;
+    }
 }
 
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)
@@ -963,7 +957,8 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
 {
-    if (numOcclusionBuffers_ >= occlusionBuffers_.Size())
+    assert(numOcclusionBuffers_ <= occlusionBuffers_.Size());
+    if (numOcclusionBuffers_ == occlusionBuffers_.Size())
     {
         SharedPtr<OcclusionBuffer> newBuffer(new OcclusionBuffer(context_));
         occlusionBuffers_.Push(newBuffer);
@@ -972,12 +967,11 @@ OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
     int width = occlusionBufferSize_;
     int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
     
-    OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_];
+    OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_++];
     buffer->SetSize(width, height);
     buffer->SetView(camera);
     buffer->ResetUseTimer();
     
-    ++numOcclusionBuffers_;
     return buffer;
 }
 
@@ -985,18 +979,18 @@ Camera* Renderer::GetShadowCamera()
 {
     MutexLock lock(rendererMutex_);
     
-    if (numShadowCameras_ >= shadowCameraNodes_.Size())
+    assert(numShadowCameras_ <= shadowCameraNodes_.Size());
+    if (numShadowCameras_ == shadowCameraNodes_.Size())
     {
         SharedPtr<Node> newNode(new Node(context_));
         newNode->CreateComponent<Camera>();
         shadowCameraNodes_.Push(newNode);
     }
     
-    Camera* camera = shadowCameraNodes_[numShadowCameras_]->GetComponent<Camera>();
+    Camera* camera = shadowCameraNodes_[numShadowCameras_++]->GetComponent<Camera>();
     camera->SetOrthographic(false);
     camera->SetZoom(1.0f);
     
-    ++numShadowCameras_;
     return camera;
 }
 
@@ -1088,6 +1082,11 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             case LIGHT_DIRECTIONAL:
                 vsi += LVS_DIR;
                 break;
+                    
+            case LIGHT_SPOT:
+                psi += LPS_SPOT;
+                vsi += LVS_SPOT;
+                break;
                 
             case LIGHT_POINT:
                 if (light->GetShapeTexture())
@@ -1095,11 +1094,6 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
                 else
                     psi += LPS_POINT;
                 vsi += LVS_POINT;
-                break;
-                
-            case LIGHT_SPOT:
-                psi += LPS_SPOT;
-                vsi += LVS_SPOT;
                 break;
             }
             
@@ -1172,16 +1166,16 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch)
     case LIGHT_DIRECTIONAL:
         vsi += DLVS_DIR;
         break;
+            
+    case LIGHT_SPOT:
+        psi += DLPS_SPOT;
+        break;
         
     case LIGHT_POINT:
         if (light->GetShapeTexture())
             psi += DLPS_POINTMASK;
         else
             psi += DLPS_POINT;
-        break;
-        
-    case LIGHT_SPOT:
-        psi += DLPS_SPOT;
         break;
     }
     
@@ -1341,22 +1335,16 @@ const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
     const Matrix3x4& view = camera->GetInverseWorldTransform();
     const Matrix4& projection = camera->GetProjection();
     
-    switch (light->GetLightType())
+    assert(light->GetLightType() != LIGHT_DIRECTIONAL);
+    if (light->GetLightType() == LIGHT_SPOT)
     {
-    case LIGHT_POINT:
-        {
-            BoundingBox viewBox(light->GetWorldBoundingBox().Transformed(view));
-            return lightScissorCache_[combination] = viewBox.Projected(projection);
-        }
-        
-    case LIGHT_SPOT:
-        {
-            Frustum viewFrustum(light->GetFrustum().Transformed(view));
-            return lightScissorCache_[combination] = viewFrustum.Projected(projection);
-        }
-        
-    default:
-        return lightScissorCache_[combination] = Rect::FULL;
+        Frustum viewFrustum(light->GetFrustum().Transformed(view));
+        return lightScissorCache_[combination] = viewFrustum.Projected(projection);
+    }
+    else // LIGHT_POINT
+    {
+        BoundingBox viewBox(light->GetWorldBoundingBox().Transformed(view));
+        return lightScissorCache_[combination] = viewBox.Projected(projection);
     }
 }
 
@@ -1452,6 +1440,8 @@ void Renderer::Initialize()
     shadersDirty_ = true;
     initialized_ = true;
     
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
+
     LOGINFO("Initialized renderer");
 }
 
@@ -1538,9 +1528,9 @@ void Renderer::LoadPassShaders(Technique* tech, PassType type)
     String pixelShaderName = pass->GetPixelShader();
     
     // Check if the shader name is already a variation in itself
-    if (vertexShaderName.Find('_') == String::NPOS)
+    if (!vertexShaderName.Contains('_'))
         vertexShaderName += "_";
-    if (pixelShaderName.Find('_') == String::NPOS)
+    if (!pixelShaderName.Contains('_'))
         pixelShaderName += "_";
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
@@ -1787,12 +1777,9 @@ void Renderer::HandleGraphicsFeatures(StringHash eventType, VariantMap& eventDat
 
 void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (initialized_)
-    {
-        using namespace RenderUpdate;
-        
-        Update(eventData[P_TIMESTEP].GetFloat());
-    }
+    using namespace RenderUpdate;
+    
+    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

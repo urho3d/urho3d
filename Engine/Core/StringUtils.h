@@ -90,5 +90,7 @@ unsigned GetStringListIndex(const String& value, const String* strings, unsigned
 unsigned GetStringListIndex(const char* value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return an index to a C string list corresponding to the given C string, or a default value if not found. The string list must be empty-terminated.
 unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false);
+/// Return a formatted string.
+String ToString(const char* formatString, ...);
 
 }

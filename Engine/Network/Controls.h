@@ -28,8 +28,6 @@
 namespace Urho3D
 {
 
-class XMLElement;
-
 /// %Controls sent over the network.
 class Controls
 {

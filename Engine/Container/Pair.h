@@ -59,7 +59,7 @@ public:
         return second_ < rhs.second_;
     }
     
-    /// Test for less than with another pair.
+    /// Test for greater than with another pair.
     bool operator > (const Pair<T, U>& rhs) const
     {
         if (first_ > rhs.first_)

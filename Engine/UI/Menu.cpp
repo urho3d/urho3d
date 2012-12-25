@@ -245,7 +245,7 @@ void Menu::ShowPopup(bool enable)
                 menu->ShowPopup(false);
         }
         
-        popup_->SetVar(originHash, Variant());
+        popup_->SetVar(originHash, Variant::EMPTY);
         popup_->SetVisible(false);
         popup_->Remove();
     }

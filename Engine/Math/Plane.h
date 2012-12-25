@@ -40,6 +40,7 @@ public:
     /// Copy-construct from another plane.
     Plane(const Plane& plane) :
         normal_(plane.normal_),
+        absNormal_(plane.absNormal_),
         intercept_(plane.intercept_)
     {
     }
@@ -62,17 +63,15 @@ public:
         Vector3 dist1 = v1 - v0;
         Vector3 dist2 = v2 - v0;
         
-        normal_ = (dist1.CrossProduct(dist2)).Normalized();
-        absNormal_ = Vector3(Abs(normal_.x_), Abs(normal_.y_), Abs(normal_.z_));
-        intercept_ = normal_.DotProduct(v0);
+        Define(dist1.CrossProduct(dist2).Normalized(), v0);
     }
 
     /// Define from a normal and a point.
     void Define(const Vector3& normal, const Vector3& point)
     {
         normal_ = normal;
-        absNormal_ = Vector3(Abs(normal_.x_), Abs(normal_.y_), Abs(normal_.z_));
-        intercept_ = normal_.DotProduct(point);
+        absNormal_ = normal.Abs();
+        intercept_ = normal.DotProduct(point);
     }
     
     /// Return signed distance to a point.

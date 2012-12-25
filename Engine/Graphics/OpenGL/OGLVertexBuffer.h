@@ -41,8 +41,6 @@ public:
     /// Destruct.
     virtual ~VertexBuffer();
     
-    /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost();
     /// Recreate the GPU resource and restore data if applicable.
     virtual void OnDeviceReset();
     /// Release the buffer.

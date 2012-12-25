@@ -510,7 +510,7 @@ void RigidBody::ResetForces()
 
 void RigidBody::Activate()
 {
-    if (mass_ > 0.0f && body_)
+    if (body_ && mass_ > 0.0f)
         body_->activate(true);
 }
 
@@ -711,7 +711,7 @@ void RigidBody::AddConstraint(Constraint* constraint)
 
 void RigidBody::RemoveConstraint(Constraint* constraint)
 {
-    constraints_.Erase(constraints_.Find(constraint));
+    constraints_.Remove(constraint);
 }
 
 void RigidBody::ReleaseBody()

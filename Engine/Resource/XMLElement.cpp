@@ -34,6 +34,8 @@
 namespace Urho3D
 {
 
+const XMLElement XMLElement::EMPTY;
+
 XMLElement::XMLElement() :
     node_(0)
 {

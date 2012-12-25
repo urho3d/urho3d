@@ -242,15 +242,15 @@ public:
     U& operator [] (const T& key)
     {
         if (!ptrs_)
-            return InsertNode(key, U())->pair_.second_;
+            return InsertNode(key, U(), false)->pair_.second_;
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         
         Node* node = FindNode(key, hashKey);
         if (node)
             return node->pair_.second_;
         else
-            return InsertNode(key, U())->pair_.second_;
+            return InsertNode(key, U(), false)->pair_.second_;
     }
     
     /// Insert a pair. Return an iterator to it.
@@ -288,7 +288,7 @@ public:
         if (!ptrs_)
             return false;
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         
         Node* previous;
         Node* node = FindNode(key, hashKey, previous);
@@ -310,13 +310,13 @@ public:
         if (!ptrs_ || !it.ptr_)
             return End();
         
-        Node* node = reinterpret_cast<Node*>(it.ptr_);
+        Node* node = static_cast<Node*>(it.ptr_);
         Node* next = node->Next();
         
-        unsigned hashKey = MakeHash(node->pair_.first_) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(node->pair_.first_);
         
         Node* previous = 0;
-        Node* current = reinterpret_cast<Node*>(Ptrs()[hashKey]);
+        Node* current = static_cast<Node*>(Ptrs()[hashKey]);
         while (current && current != node)
         {
             previous = current;
@@ -337,8 +337,17 @@ public:
     /// Clear the map.
     void Clear()
     {
-        while (Size())
-            EraseNode(Head());
+        if (Size())
+        {
+            for (Iterator i = Begin(); i != End(); )
+            {
+                FreeNode(static_cast<Node*>(i++.ptr_));
+                i.ptr_->prev_ = 0;
+            }
+            
+            head_ = tail_;
+            SetSize(0);
+        }
         
         ResetPtrs();
     }
@@ -361,13 +370,14 @@ public:
         
         Urho3D::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
         
-        for (unsigned i = 0; i < numKeys; ++i)
-        {
-            ptrs[i]->next_ = (i < numKeys - 1) ? ptrs[i + 1] : tail_;
-            ptrs[i]->prev_ = (i > 0) ? ptrs[i - 1] : 0;
-        }
-        
         head_ = ptrs[0];
+        ptrs[0]->prev_ = 0;
+        for (unsigned i = 1; i < numKeys; ++i)
+        {
+            ptrs[i - 1]->next_ = ptrs[i];
+            ptrs[i]->prev_ = ptrs[i - 1];
+        }
+        ptrs[numKeys - 1]->next_ = tail_;
         tail_->prev_ = ptrs[numKeys - 1];
         
         delete[] ptrs;
@@ -399,7 +409,7 @@ public:
         if (!ptrs_)
             return End();
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         Node* node = FindNode(key, hashKey);
         if (node)
             return Iterator(node);
@@ -413,7 +423,7 @@ public:
         if (!ptrs_)
             return End();
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         Node* node = FindNode(key, hashKey);
         if (node)
             return ConstIterator(node);
@@ -427,7 +437,7 @@ public:
         if (!ptrs_)
             return false;
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         return FindNode(key, hashKey) != 0;
     }
     
@@ -446,14 +456,14 @@ public:
     
 private:
     /// Return the head node.
-    Node* Head() const { return reinterpret_cast<Node*>(head_); }
+    Node* Head() const { return static_cast<Node*>(head_); }
     /// Return the tail node.
-    Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
+    Node* Tail() const { return static_cast<Node*>(tail_); }
     
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey) const
     {
-        Node* node = reinterpret_cast<Node*>(Ptrs()[hashKey]);
+        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -469,7 +479,7 @@ private:
     {
         previous = 0;
         
-        Node* node = reinterpret_cast<Node*>(Ptrs()[hashKey]);
+        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -482,7 +492,7 @@ private:
     }
     
     /// Insert a key and value and return either the new or existing node.
-    Node* InsertNode(const T& key, const U& value)
+    Node* InsertNode(const T& key, const U& value, bool findExisting = true)
     {
         // If no pointers yet, allocate with minimum bucket count
         if (!ptrs_)
@@ -491,14 +501,17 @@ private:
             Rehash();
         }
         
-        unsigned hashKey = MakeHash(key) & (NumBuckets() - 1);
+        unsigned hashKey = Hash(key);
         
-        // If exists, just change the value
-        Node* existing = FindNode(key, hashKey);
-        if (existing)
+        if (findExisting)
         {
-            existing->pair_.second_ = value;
-            return existing;
+            // If exists, just change the value
+            Node* existing = FindNode(key, hashKey);
+            if (existing)
+            {
+                existing->pair_.second_ = value;
+                return existing;
+            }
         }
         
         Node* newNode = InsertNode(Tail(), key, value);
@@ -564,6 +577,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
+        assert(allocator_);
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
@@ -572,8 +586,7 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(Node));
+        assert(allocator_);
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
@@ -591,8 +604,8 @@ private:
     {
         for (Iterator i = Begin(); i != End(); ++i)
         {
-            Node* node = reinterpret_cast<Node*>(i.ptr_);
-            unsigned hashKey = MakeHash(i->first_) & (NumBuckets() - 1);
+            Node* node = static_cast<Node*>(i.ptr_);
+            unsigned hashKey = Hash(i->first_);
             node->down_ = Ptrs()[hashKey];
             Ptrs()[hashKey] = node;
         }
@@ -600,6 +613,9 @@ private:
     
     /// Compare two nodes.
     static bool CompareNodes(Node*& lhs, Node*& rhs) { return lhs->pair_.first_ < rhs->pair_.first_; }
+    
+    /// Compute a hash based on the key and the bucket size
+    unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
 }

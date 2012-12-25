@@ -38,7 +38,6 @@
 #include "Scene.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
-#include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -54,36 +53,26 @@ namespace Urho3D
 
 static const Vector3 directions[] =
 {
-    Vector3(1.0f, 0.0f, 0.0f),
-    Vector3(-1.0f, 0.0f, 0.0f),
-    Vector3(0.0f, 1.0f, 0.0f),
-    Vector3(0.0f, -1.0f, 0.0f),
-    Vector3(0.0f, 0.0f, 1.0f),
-    Vector3(0.0f, 0.0f, -1.0f)
+    Vector3::RIGHT,
+    Vector3::LEFT,
+    Vector3::UP,
+    Vector3::DOWN,
+    Vector3::FORWARD,
+    Vector3::BACK
 };
 
 static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
 static const float LIGHT_INTENSITY_THRESHOLD = 0.001f;
 
 /// %Frustum octree query for shadowcasters.
-class ShadowCasterOctreeQuery : public OctreeQuery
+class ShadowCasterOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
     ShadowCasterOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
-        frustum_(frustum)
+        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
     {
-    }
-    
-    /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside)
-    {
-        if (inside)
-            return INSIDE;
-        else
-            return frustum_.IsInside(box);
     }
     
     /// Intersection test for drawables.
@@ -91,42 +80,27 @@ public:
     {
         while (start != end)
         {
-            Drawable* drawable = *start;
+            Drawable* drawable = *start++;
             
-            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->GetCastShadows() && drawable->IsVisible() &&
+            if (drawable->GetCastShadows() && drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) &&
                 (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-            
-            ++start;
         }
     }
-    
-    /// Frustum.
-    Frustum frustum_;
 };
 
 /// %Frustum octree query for zones and occluders.
-class ZoneOccluderOctreeQuery : public OctreeQuery
+class ZoneOccluderOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
     ZoneOccluderOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
-        frustum_(frustum)
+        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask)
     {
-    }
-    
-    /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside)
-    {
-        if (inside)
-            return INSIDE;
-        else
-            return frustum_.IsInside(box);
     }
     
     /// Intersection test for drawables.
@@ -134,7 +108,7 @@ public:
     {
         while (start != end)
         {
-            Drawable* drawable = *start;
+            Drawable* drawable = *start++;
             unsigned char flags = drawable->GetDrawableFlags();
             
             if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
@@ -143,24 +117,18 @@ public:
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-            
-            ++start;
         }
     }
-    
-    /// Frustum.
-    Frustum frustum_;
 };
 
 /// %Frustum octree query with occlusion.
-class OccludedFrustumOctreeQuery : public OctreeQuery
+class OccludedFrustumOctreeQuery : public FrustumOctreeQuery
 {
 public:
     /// Construct with frustum, occlusion buffer and query parameters.
     OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer, unsigned char
         drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
-        OctreeQuery(result, drawableFlags, viewMask),
-        frustum_(frustum),
+        FrustumOctreeQuery(result, frustum, drawableFlags, viewMask),
         buffer_(buffer)
     {
     }
@@ -184,21 +152,17 @@ public:
     {
         while (start != end)
         {
-            Drawable* drawable = *start;
+            Drawable* drawable = *start++;
             
-            if ((drawable->GetDrawableFlags() & drawableFlags_) && drawable->IsVisible() &&
+            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) &&
                 (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
             }
-            
-            ++start;
         }
     }
     
-    /// Frustum.
-    Frustum frustum_;
     /// Occlusion buffer.
     OcclusionBuffer* buffer_;
 };
@@ -210,6 +174,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
     OcclusionBuffer* buffer = view->occlusionBuffer_;
     const Matrix3x4& viewMatrix = view->camera_->GetInverseWorldTransform();
+    Vector3 viewZ = Vector3(viewMatrix.m20_, viewMatrix.m21_, viewMatrix.m22_);
+    Vector3 absViewZ = viewZ.Abs();
     
     while (start != end)
     {
@@ -228,11 +194,9 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             {
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
                 Vector3 center = geomBox.Center();
-                float viewCenterZ = viewMatrix.m20_ * center.x_ + viewMatrix.m21_ * center.y_ + viewMatrix.m22_ * center.z_ +
-                    viewMatrix.m23_;
+                float viewCenterZ = viewZ.DotProduct(center) + viewMatrix.m23_;
                 Vector3 edge = geomBox.Size() * 0.5f;
-                float viewEdgeZ = Abs(viewMatrix.m20_) * edge.x_ + Abs(viewMatrix.m21_) * edge.y_ + Abs(viewMatrix.m22_) *
-                    edge.z_;
+                float viewEdgeZ = absViewZ.DotProduct(edge);
                 
                 drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
                 drawable->ClearLights();
@@ -257,9 +221,8 @@ void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
     
     while (start != end)
     {
-        Drawable* drawable = *start;
+        Drawable* drawable = *start++;
         drawable->UpdateGeometry(frame);
-        ++start;
     }
 }
 
@@ -300,12 +263,10 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
-    renderTarget_(0)
+    renderTarget_(0),
+    tempDrawables_(GetSubsystem<WorkQueue>()->GetNumThreads() + 1)  // Create octree query vector for each thread
 {
     frame_.camera_ = 0;
-    
-    // Create octree query vector for each thread
-    tempDrawables_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
 }
 
 View::~View()
@@ -549,7 +510,7 @@ void View::GetDrawables()
             int priority = zone->GetPriority();
             if (priority > highestZonePriority_)
                 highestZonePriority_ = priority;
-            if (zone->IsInside(cameraPos) && priority > bestPriority)
+            if (priority > bestPriority && zone->IsInside(cameraPos))
             {
                 cameraZone_ = zone;
                 bestPriority = priority;
@@ -569,7 +530,7 @@ void View::GetDrawables()
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
             int priority = (*i)->GetPriority();
-            if ((*i)->IsInside(farClipPos) && priority > bestPriority)
+            if (priority > bestPriority && (*i)->IsInside(farClipPos))
             {
                 farClipZone_ = *i;
                 bestPriority = priority;
@@ -1815,11 +1776,8 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
                 continue;
             if (maxZ_ < query.shadowNearSplits_[i])
                 continue;
-        }
         
-        // Reuse lit geometry query for all except directional lights
-        if (type == LIGHT_DIRECTIONAL)
-        {
+            // Reuse lit geometry query for all except directional lights
             ShadowCasterOctreeQuery query(tempDrawables, shadowCameraFrustum, DRAWABLE_GEOMETRY,
                 camera_->GetViewMask());
             octree_->GetDrawables(query);
@@ -1873,7 +1831,10 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         // Check for that first
         if (!drawable->GetCastShadows())
             continue;
-        // For point light, check that this drawable is inside the split shadow camera frustum
+        // Check shadow mask
+        if (!(GetShadowMask(drawable) & light->GetLightMask()))
+            continue;
+       // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
         
@@ -1889,10 +1850,6 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
             maxShadowDistance = drawDistance;
         
         if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
-            continue;
-        
-        // Check shadow mask
-        if (!(GetShadowMask(drawable) & light->GetLightMask()))
             continue;
         
         // Project shadow caster bounding box to light view space for visibility check
@@ -1922,7 +1879,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
     {
         // Extrude the light space bounding box up to the far edge of the frustum's light space bounding box
         lightViewBox.max_.z_ = Max(lightViewBox.max_.z_,lightViewFrustumBox.max_.z_);
-        return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
+        return lightViewFrustum.IsInsideFast(lightViewBox);
     }
     else
     {
@@ -1947,7 +1904,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         BoundingBox extrudedBox(newCenter - newHalfSize, newCenter + newHalfSize);
         lightViewBox.Merge(extrudedBox);
         
-        return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
+        return lightViewFrustum.IsInsideFast(lightViewBox);
     }
 }
 
@@ -1983,72 +1940,77 @@ void View::SetupShadowCameras(LightQueryResult& query)
 {
     Light* light = query.light_;
     
-    LightType type = light->GetLightType();
     int splits = 0;
     
-    if (type == LIGHT_DIRECTIONAL)
+    switch (light->GetLightType())
     {
-        const CascadeParameters& cascade = light->GetShadowCascade();
-        
-        float nearSplit = camera_->GetNearClip();
-        float farSplit;
-        
-        while (splits < renderer_->GetMaxShadowCascades())
+    case LIGHT_DIRECTIONAL:
         {
-            // If split is completely beyond camera far clip, we are done
-            if (nearSplit > camera_->GetFarClip())
-                break;
+            const CascadeParameters& cascade = light->GetShadowCascade();
             
-            farSplit = Min(camera_->GetFarClip(), cascade.splits_[splits]);
-            if (farSplit <= nearSplit)
-                break;
+            float nearSplit = camera_->GetNearClip();
+            float farSplit;
             
-            // Setup the shadow camera for the split
-            Camera* shadowCamera = renderer_->GetShadowCamera();
-            query.shadowCameras_[splits] = shadowCamera;
-            query.shadowNearSplits_[splits] = nearSplit;
-            query.shadowFarSplits_[splits] = farSplit;
-            SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit);
-            
-            nearSplit = farSplit;
-            ++splits;
+            while (splits < renderer_->GetMaxShadowCascades())
+            {
+                // If split is completely beyond camera far clip, we are done
+                if (nearSplit > camera_->GetFarClip())
+                    break;
+                
+                farSplit = Min(camera_->GetFarClip(), cascade.splits_[splits]);
+                if (farSplit <= nearSplit)
+                    break;
+                
+                // Setup the shadow camera for the split
+                Camera* shadowCamera = renderer_->GetShadowCamera();
+                query.shadowCameras_[splits] = shadowCamera;
+                query.shadowNearSplits_[splits] = nearSplit;
+                query.shadowFarSplits_[splits] = farSplit;
+                SetupDirLightShadowCamera(shadowCamera, light, nearSplit, farSplit);
+                
+                nearSplit = farSplit;
+                ++splits;
+            }
         }
-    }
+        break;
     
-    if (type == LIGHT_SPOT)
-    {
-        Camera* shadowCamera = renderer_->GetShadowCamera();
-        query.shadowCameras_[0] = shadowCamera;
-        Node* cameraNode = shadowCamera->GetNode();
-        Node* lightNode = light->GetNode();
-        
-        cameraNode->SetTransform(lightNode->GetWorldPosition(), lightNode->GetWorldRotation());
-        shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
-        shadowCamera->SetFarClip(light->GetRange());
-        shadowCamera->SetFov(light->GetFov());
-        shadowCamera->SetAspectRatio(light->GetAspectRatio());
-        
-        splits = 1;
-    }
-    
-    if (type == LIGHT_POINT)
-    {
-        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    case LIGHT_SPOT:
         {
             Camera* shadowCamera = renderer_->GetShadowCamera();
-            query.shadowCameras_[i] = shadowCamera;
+            query.shadowCameras_[0] = shadowCamera;
             Node* cameraNode = shadowCamera->GetNode();
+            Node* lightNode = light->GetNode();
             
-            // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
-            cameraNode->SetPosition(light->GetNode()->GetWorldPosition());
-            cameraNode->SetDirection(directions[i]);
+            cameraNode->SetTransform(lightNode->GetWorldPosition(), lightNode->GetWorldRotation());
             shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
             shadowCamera->SetFarClip(light->GetRange());
-            shadowCamera->SetFov(90.0f);
-            shadowCamera->SetAspectRatio(1.0f);
+            shadowCamera->SetFov(light->GetFov());
+            shadowCamera->SetAspectRatio(light->GetAspectRatio());
+            
+            splits = 1;
         }
-        
-        splits = MAX_CUBEMAP_FACES;
+        break;
+    
+    case LIGHT_POINT:
+        {
+            for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+            {
+                Camera* shadowCamera = renderer_->GetShadowCamera();
+                query.shadowCameras_[i] = shadowCamera;
+                Node* cameraNode = shadowCamera->GetNode();
+                
+                // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
+                cameraNode->SetPosition(light->GetNode()->GetWorldPosition());
+                cameraNode->SetDirection(directions[i]);
+                shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
+                shadowCamera->SetFarClip(light->GetRange());
+                shadowCamera->SetFov(90.0f);
+                shadowCamera->SetAspectRatio(1.0f);
+            }
+            
+            splits = MAX_CUBEMAP_FACES;
+        }
+        break;
     }
     
     query.numSplits_ = splits;
@@ -2062,8 +2024,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     const FocusParameters& parameters = light->GetShadowFocus();
     
     // Calculate initial position & rotation
-    Vector3 lightWorldDirection = lightNode->GetWorldRotation() * Vector3::FORWARD;
-    Vector3 pos = cameraNode_->GetWorldPosition() - extrusionDistance * lightWorldDirection;
+    Vector3 pos = cameraNode_->GetWorldPosition() - extrusionDistance * lightNode->GetWorldDirection();
     shadowCameraNode->SetTransform(pos, lightNode->GetWorldRotation());
     
     // Calculate main camera shadowed frustum in light's view space
@@ -2240,8 +2201,8 @@ void View::FindZone(Drawable* drawable)
     
     // First check if the last zone remains a conclusive result
     Zone* lastZone = drawable->GetLastZone();
-    if (lastZone && lastZone->IsInside(center) && (drawable->GetZoneMask() & lastZone->GetZoneMask()) &&
-        lastZone->GetPriority() >= highestZonePriority_)
+    if (lastZone && lastZone->GetPriority() >= highestZonePriority_ &&
+        (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->IsInside(center))
         newZone = lastZone;
     else
     {
@@ -2249,7 +2210,7 @@ void View::FindZone(Drawable* drawable)
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
-            if (zone->IsInside(center) && (drawable->GetZoneMask() & zone->GetZoneMask()) && priority > bestPriority)
+            if (priority > bestPriority && (drawable->GetZoneMask() & zone->GetZoneMask()) && zone->IsInside(center))
             {
                 newZone = zone;
                 bestPriority = priority;

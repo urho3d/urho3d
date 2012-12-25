@@ -44,7 +44,7 @@ static const float DEFAULT_FOG_END = 1000.0f;
 OBJECTTYPESTATIC(Zone);
 
 Zone::Zone(Context* context) :
-    Drawable(context),
+    Drawable(context, DRAWABLE_ZONE),
     inverseWorldDirty_(true),
     override_(false),
     ambientGradient_(false),
@@ -55,7 +55,6 @@ Zone::Zone(Context* context) :
     fogEnd_(DEFAULT_FOG_END),
     priority_(0)
 {
-    drawableFlags_ =  DRAWABLE_ZONE;
 }
 
 Zone::~Zone()
@@ -85,7 +84,7 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
     
-    // If bounding box, override mode, visibility or priority changes, dirty the drawable as applicable
+    // If bounding box, visibility or priority changes, dirty the drawable as applicable
     if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
         attr.offset_ == offsetof(Zone, visible_) || attr.offset_ == offsetof(Zone, priority_))
         OnMarkedDirty(node_);
@@ -154,10 +153,9 @@ void Zone::SetAmbientGradient(bool enable)
 
 const Matrix3x4& Zone::GetInverseWorldTransform() const
 {
-    if (inverseWorldDirty_ && node_)
+    if (inverseWorldDirty_)
     {
-        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
-        inverseWorld_ = worldTransform.Inverse();
+        inverseWorld_ = node_ ? node_->GetWorldTransform().Inverse() : Matrix3x4::IDENTITY;
         inverseWorldDirty_ = false;
     }
     
@@ -190,7 +188,7 @@ bool Zone::IsInside(const Vector3& point) const
 {
     // Use an oriented bounding box test
     Vector3 localPoint(GetInverseWorldTransform() * point);
-    return boundingBox_.IsInside(localPoint) != OUTSIDE;
+    return boundingBox_.IsInside(localPoint);
 }
 
 void Zone::OnMarkedDirty(Node* node)
@@ -267,7 +265,7 @@ void Zone::UpdateAmbientGradient()
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
-            if (zone != this && priority > bestPriority && zone->IsInside(minZPosition))
+            if (priority > bestPriority && zone != this && zone->IsInside(minZPosition))
             {
                 bestZone = zone;
                 bestPriority = priority;
@@ -292,7 +290,7 @@ void Zone::UpdateAmbientGradient()
         {
             Zone* zone = *i;
             int priority = zone->GetPriority();
-            if (zone != this && priority > bestPriority && zone->IsInside(maxZPosition))
+            if (priority > bestPriority && zone != this && zone->IsInside(maxZPosition))
             {
                 bestZone = zone;
                 bestPriority = priority;

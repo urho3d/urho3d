@@ -3,6 +3,7 @@ bool runClient = false;
 String serverAddress;
 uint16 serverPort = 1234;
 String userName;
+bool nobgm = false;
 
 void ParseNetworkArguments()
 {
@@ -29,6 +30,12 @@ void ParseNetworkArguments()
                 userName = arguments[i];
             
             ++index;
+        }
+        else
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            if (argument == "nobgm")
+                nobgm = true;
         }
     }
 }

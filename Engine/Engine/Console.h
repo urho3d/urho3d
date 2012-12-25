@@ -100,7 +100,7 @@ private:
     /// Command history.
     Vector<String> history_;
     /// Current row being edited.
-    String current_Row;
+    String currentRow_;
     /// Command history maximum rows.
     unsigned historyRows_;
     /// Command history current position.

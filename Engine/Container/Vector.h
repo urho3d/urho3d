@@ -246,7 +246,7 @@ public:
     void Erase(unsigned pos, unsigned length = 1)
     {
         // Return if the range is illegal
-        if (!length || pos + length > size_)
+        if (pos + length > size_ || !length)
             return;
         
         MoveRange(pos, pos + length, size_ - pos - length);
@@ -274,6 +274,19 @@ public:
         Erase(pos, length);
         
         return Begin() + pos;
+    }
+    
+    /// Erase an element if found.
+    bool Remove(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            Erase(i);
+            return true;
+        }
+        else
+            return false;
     }
     
     /// Clear the vector.
@@ -343,9 +356,9 @@ public:
     /// Return const first element.
     const T& Front() const { return Buffer()[0]; }
     /// Return last element.
-    T& Back() { return Buffer()[size_ - 1]; }
+    T& Back() { assert(size_); return Buffer()[size_ - 1]; }
     /// Return const last element.
-    const T& Back() const { return Buffer()[size_ - 1]; }
+    const T& Back() const { assert(size_); return Buffer()[size_ - 1]; }
     /// Return size of vector.
     unsigned Size() const { return size_; }
     /// Return capacity of vector.
@@ -693,6 +706,19 @@ public:
         return Begin() + pos;
     }
     
+    /// Erase an element if found.
+    bool Remove(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            Erase(i);
+            return true;
+        }
+        else
+            return false;
+    }
+    
     /// Clear the vector.
     void Clear() { Resize(0); }
     
@@ -782,9 +808,9 @@ public:
     /// Return const first element.
     const T& Front() const { return Buffer()[0]; }
     /// Return last element.
-    T& Back() { return Buffer()[size_ - 1]; }
+    T& Back() { assert(size_); return Buffer()[size_ - 1]; }
     /// Return const last element.
-    const T& Back() const { return Buffer()[size_ - 1]; }
+    const T& Back() const { assert(size_); return Buffer()[size_ - 1]; }
     /// Return number of elements.
     unsigned Size() const { return size_; }
     /// Return capacity of vector.

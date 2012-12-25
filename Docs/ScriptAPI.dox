@@ -260,10 +260,10 @@ Methods:<br>
 - String Replaced(uint8, uint8) const
 - String Replaced(const String&, const String&) const
 - void Resize(uint)
-- int Find(const String&, uint arg1 = 0) const
-- int Find(uint8, uint arg1 = 0) const
-- int FindLast(const String&, uint arg1 = 0xffffffff) const
-- int FindLast(uint8, uint arg1 = 0xffffffff) const
+- uint Find(const String&, uint arg1 = 0) const
+- uint Find(uint8, uint arg1 = 0) const
+- uint FindLast(const String&, uint arg1 = 0xffffffff) const
+- uint FindLast(uint8, uint arg1 = 0xffffffff) const
 - bool StartsWith(const String&) const
 - bool EndsWith(const String&) const
 - String Substring(uint) const
@@ -280,6 +280,8 @@ Methods:<br>
 - String SubstringUTF8(uint) const
 - String SubstringUTF8(uint, uint) const
 - int Compare(const String&, bool arg1 = true) const
+- bool Contains(const String&) const
+- bool Contains(uint8) const
 - String[]@ Split(uint8) const
 - bool ToBool() const
 - float ToFloat() const
@@ -2705,7 +2707,6 @@ Properties:<br>
 - bool sm3Support (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
-- bool hardwareDepthSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
@@ -3878,7 +3879,7 @@ Methods:<br>
 - void SetScrollBarsVisible(bool, bool)
 - void AddItem(UIElement@)
 - void InsertItem(uint, UIElement@)
-- void RemoveItem(UIElement@)
+- void RemoveItem(UIElement@, uint arg1 = 0)
 - void RemoveItem(uint)
 - void RemoveAllItems()
 - void AddSelection(uint)
@@ -4595,6 +4596,7 @@ Properties:<br>
 - UIElement@ focusElement
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)
+- bool nonFocusedMouseWheel
 
 
 Controls

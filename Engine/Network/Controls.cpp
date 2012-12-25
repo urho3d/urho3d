@@ -29,9 +29,11 @@
 namespace Urho3D
 {
 
-Controls::Controls()
+Controls::Controls() :
+    buttons_(0),
+    yaw_(0.f),
+    pitch_(0.f)
 {
-    Reset();
 }
 
 Controls::~Controls()

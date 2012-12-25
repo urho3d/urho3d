@@ -80,11 +80,12 @@ bool ScriptFile::Load(Deserializer& source)
         return false;
     
     // Compile. Set script engine logging to retained mode so that potential exceptions can show all error info
+    ScriptLogMode oldLogMode = script_->GetLogMode();
     script_->SetLogMode(LOGMODE_RETAINED);
     script_->ClearLogMessages();
     int result = scriptModule_->Build();
     String errors = script_->GetLogMessages();
-    script_->SetLogMode(LOGMODE_IMMEDIATE);
+    script_->SetLogMode(oldLogMode);
     if (result < 0)
     {
         LOGERROR("Failed to compile script module " + GetName() + ":\n" + errors);
@@ -158,7 +159,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
         return false;
     }
     
-    return Execute(GetFunction(declaration), parameters, unprepare);
+    return Execute(function, parameters, unprepare);
 }
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
@@ -230,7 +231,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
 {
     PROFILE(CreateObject);
     
-    if (!IsCompiled())
+    if (!compiled_)
         return 0;
     
     asIScriptContext* context = script_->GetScriptFileContext();

@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "HashSet.h"
 #include "ShaderParser.h"
 #include "XMLElement.h"
 
@@ -77,8 +76,10 @@ bool ShaderParser::HasCombination(const String& name) const
     return combinations_.Contains(name);
 }
 
-bool ShaderParser::GetCombination(ShaderCombination& dest, const String& name) const
+ShaderCombination ShaderParser::GetCombination(const String& name) const
 {
+    ShaderCombination dest;
+    
     HashMap<String, unsigned>::ConstIterator i = combinations_.Find(name);
     if (i != combinations_.End())
     {
@@ -100,11 +101,9 @@ bool ShaderParser::GetCombination(ShaderCombination& dest, const String& name) c
                 }
             }
         }
-        
-        return true;
     }
-    else
-        return false;
+
+    return dest;
 }
 
 bool ShaderParser::ParseOptions(const XMLElement& element)

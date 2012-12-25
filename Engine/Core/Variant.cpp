@@ -56,7 +56,7 @@ static const String typeNames[] =
     "VariantVector",
     "VariantMap",
     "IntRect",
-    "IntVector2"
+    "IntVector2",
     ""
 };
 
@@ -334,14 +334,6 @@ String Variant::ToString() const
         // Pointer serialization not supported (convert to null)
         return String(0);
         
-    case VAR_RESOURCEREF:
-    case VAR_RESOURCEREFLIST:
-    case VAR_VARIANTVECTOR:
-    case VAR_VARIANTMAP:
-        // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
-        // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
-        return String();
-        
     case VAR_INTRECT:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
         
@@ -349,7 +341,10 @@ String Variant::ToString() const
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
         
     default:
-        return String();
+        // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
+        // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
+        // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
+        return String::EMPTY;
     }
 }
 
@@ -579,7 +574,7 @@ VariantType Variant::GetTypeFromName(const String& typeName)
 VariantType Variant::GetTypeFromName(const char* typeName)
 {
     unsigned index = 0;
-    while (!typeNames[index].Empty())
+    while (index < MAX_VAR_TYPES)
     {
         if (!typeNames[index].Compare(typeName, false))
             return (VariantType)index;

@@ -100,11 +100,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     // Hovering or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
-        UIBatch batch;
-        batch.Begin(&quads);
-        batch.blendMode_ = BLEND_ALPHA;
-        batch.scissor_ = currentScissor;
-        batch.texture_ = 0;
+        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
         batch.AddQuad(*this, 0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
             hoverColor_);
         UIBatch::AddOrMerge(batch, batches);
@@ -113,11 +109,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     // Partial selection batch
     if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
-        UIBatch batch;
-        batch.Begin(&quads);
-        batch.blendMode_ = BLEND_ALPHA;
-        batch.scissor_ = currentScissor;
-        batch.texture_ = 0;
+        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
         
         IntVector2 currentStart = charPositions_[selectionStart_];
         IntVector2 currentEnd = currentStart;
@@ -156,11 +148,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         if (!face)
             return;
         
-        UIBatch batch;
-        batch.Begin(&quads);
-        batch.blendMode_ = BLEND_ALPHA;
-        batch.scissor_ = currentScissor;
-        batch.texture_ = face->texture_;
+        UIBatch batch(BLEND_ALPHA, currentScissor, face->texture_, &quads);
         
         unsigned rowIndex = 0;
         int x = GetRowStartPosition(rowIndex);
@@ -182,8 +170,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
             }
             else
             {
-                rowIndex++;
-                x = GetRowStartPosition(rowIndex);
+                x = GetRowStartPosition(++rowIndex);
                 y += rowHeight_;
             }
         }
@@ -465,8 +452,7 @@ void Text::UpdateText(bool inResize)
             else
             {
                 charSizes_[printToText[i]] = IntVector2::ZERO;
-                rowIndex++;
-                x = GetRowStartPosition(rowIndex);
+                x = GetRowStartPosition(++rowIndex);
                 y += rowHeight;
             }
         }

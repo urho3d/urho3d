@@ -145,11 +145,6 @@ VertexBuffer::~VertexBuffer()
     Release();
 }
 
-void VertexBuffer::OnDeviceLost()
-{
-    GPUObject::OnDeviceLost();
-}
-
 void VertexBuffer::OnDeviceReset()
 {
     if (!object_)
@@ -359,6 +354,9 @@ void VertexBuffer::Unlock()
         lockScratchData_ = 0;
         lockState_ = LOCK_NONE;
         break;
+    
+    default:
+        break;
     }
 }
 
@@ -395,11 +393,8 @@ unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement elem
 {
     unsigned offset = 0;
     
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    for (unsigned i = 0; i != element; ++i)
     {
-        if (i == element)
-            break;
-        
         if (elementMask & (1 << i))
             offset += elementSize[i];
     }

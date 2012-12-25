@@ -184,10 +184,11 @@ bool CompressedLevel::Decompress(unsigned char* dest)
     case CF_PVRTC_RGBA_4BPP:
         DecompressImagePVRTC(dest, data_, width_, height_, format_);
         return true;
-    }
     
-    // Unknown format
-    return false;
+    default:
+         // Unknown format
+         return false;
+    }    
 }
 
 OBJECTTYPESTATIC(Image);
@@ -269,7 +270,9 @@ bool Image::Load(Deserializer& source)
         unsigned faces = source.ReadUInt();
         unsigned mipmaps = source.ReadUInt();
         unsigned keyValueBytes = source.ReadUInt();
-        
+
+#pragma unused (typeSize, baseInternalFormat, arrayElements)
+
         if (endianness != 0x04030201)
         {
             LOGERROR("Big-endian KTX files not supported");
@@ -384,6 +387,8 @@ bool Image::Load(Deserializer& source)
         unsigned numFaces = source.ReadUInt();
         unsigned mipmapCount = source.ReadUInt();
         unsigned metaDataSize = source.ReadUInt();
+   
+#pragma unused (flags, pixelFormatHi, colourSpace, channelType, numSurfaces)
         
         if (depth > 1 || numFaces > 1)
         {

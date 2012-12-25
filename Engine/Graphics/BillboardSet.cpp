@@ -52,7 +52,7 @@ inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 OBJECTTYPESTATIC(BillboardSet);
 
 BillboardSet::BillboardSet(Context* context) :
-    Drawable(context),
+    Drawable(context, DRAWABLE_GEOMETRY),
     animationLodBias_(1.0f),
     animationLodTimer_(0.0f),
     relative_(true),
@@ -67,8 +67,6 @@ BillboardSet::BillboardSet(Context* context) :
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
 {
-    drawableFlags_ = DRAWABLE_GEOMETRY;
-    
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
     geometry_->SetIndexBuffer(indexBuffer_);
     
@@ -176,29 +174,25 @@ void BillboardSet::SetNumBillboards(unsigned num)
     }
     
     bufferSizeDirty_ = true;
-    MarkPositionsDirty();
-    MarkNetworkUpdate();
+    Updated();
 }
 
 void BillboardSet::SetRelative(bool enable)
 {
     relative_ = enable;
-    MarkPositionsDirty();
-    MarkNetworkUpdate();
+    Updated();
 }
 
 void BillboardSet::SetScaled(bool enable)
 {
     scaled_ = enable;
-    MarkPositionsDirty();
-    MarkNetworkUpdate();
+    Updated();
 }
 
 void BillboardSet::SetSorted(bool enable)
 {
     sorted_ = enable;
-    MarkPositionsDirty();
-    MarkNetworkUpdate();
+    Updated();
 }
 
 void BillboardSet::SetAnimationLodBias(float bias)
@@ -276,6 +270,7 @@ ResourceRef BillboardSet::GetMaterialAttr() const
 VariantVector BillboardSet::GetBillboardsAttr() const
 {
     VariantVector ret;
+    ret.Reserve(billboards_.Size() * 6 + 1);
     ret.Push(billboards_.Size());
     
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)

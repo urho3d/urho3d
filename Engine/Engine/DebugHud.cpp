@@ -38,19 +38,22 @@
 namespace Urho3D
 {
 
-static const String renderModeTexts[] = {
+static const char* renderModeTexts[] =
+{
     "Forward",
     "Prepass",
     "Deferred"
 };
 
-static const String qualityTexts[] = {
+static const char* qualityTexts[] =
+{
     "Low",
     "Med",
     "High"
 };
 
-static const String shadowQualityTexts[] = {
+static const char* shadowQualityTexts[] =
+{
     "16bit Low",
     "24bit Low",
     "16bit High",
@@ -91,14 +94,9 @@ DebugHud::DebugHud(Context* context) :
 
 DebugHud::~DebugHud()
 {
-    UI* ui = GetSubsystem<UI>();
-    if (ui)
-    {
-        UIElement* uiRoot = ui->GetRoot();
-        uiRoot->RemoveChild(statsText_);
-        uiRoot->RemoveChild(modeText_);
-        uiRoot->RemoveChild(profilerText_);
-    }
+    statsText_->Remove();
+    modeText_->Remove();
+    profilerText_->Remove();
 }
 
 void DebugHud::Update()
@@ -108,27 +106,28 @@ void DebugHud::Update()
     if (!renderer || !graphics)
         return;
     
-    unsigned primitives, batches;
-    if (!useRendererStats_)
-    {
-        primitives = graphics->GetNumPrimitives();
-        batches = graphics->GetNumBatches();
-    }
-    else
-    {
-        primitives = renderer->GetNumPrimitives();
-        batches = renderer->GetNumBatches();
-    }
-    
     if (statsText_->IsVisible())
     {
-        String stats = 
-            "Triangles " + String(graphics->GetNumPrimitives()) +
-            "\nBatches " + String(graphics->GetNumBatches()) +
-            "\nViews " + String(renderer->GetNumViews()) + 
-            "\nLights " + String(renderer->GetNumLights(true)) +
-            "\nShadowmaps " + String(renderer->GetNumShadowMaps(true)) +
-            "\nOccluders " + String(renderer->GetNumOccluders(true));
+        unsigned primitives, batches;
+        if (!useRendererStats_)
+        {
+            primitives = graphics->GetNumPrimitives();
+            batches = graphics->GetNumBatches();
+        }
+        else
+        {
+            primitives = renderer->GetNumPrimitives();
+            batches = renderer->GetNumBatches();
+        }
+        
+        String stats;
+        stats.AppendWithFormat("Triangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+            primitives,
+            batches,
+            renderer->GetNumViews(),
+            renderer->GetNumLights(true),
+            renderer->GetNumShadowMaps(true),
+            renderer->GetNumOccluders(true));
         
         statsText_->SetText(stats);
     }
@@ -136,47 +135,21 @@ void DebugHud::Update()
     if (modeText_->IsVisible())
     {
         String mode;
-        
-        mode += renderModeTexts[renderer->GetRenderMode()];
-        mode += " Tex: " + qualityTexts[renderer->GetTextureQuality()];
-        mode += " Mat: " + qualityTexts[renderer->GetMaterialQuality()];
-        
-        mode += " Spec:";
-        if (renderer->GetSpecularLighting())
-            mode += "On";
-        else
-            mode += "Off";
-        
-        mode += " Shadows:";
-        if (renderer->GetDrawShadows())
-            mode += "On";
-        else
-            mode += "Off";
-        
-        mode += " Size:" + String(renderer->GetShadowMapSize());
-        mode += " Quality:" + shadowQualityTexts[renderer->GetShadowQuality()];
-        
-        mode += " Occlusion:";
-        if (renderer->GetMaxOccluderTriangles() > 0)
-            mode += "On";
-        else
-            mode += "Off";
-        
-        mode += " Instancing:";
-        if (renderer->GetDynamicInstancing())
-            mode += "On";
-        else
-            mode += "Off";
-        
-        mode += " Mode:";
-        #ifdef USE_OPENGL
-        mode += "OGL";
-        #else
-        if (graphics->GetSM3Support())
-            mode += "SM3";
-        else
-            mode += "SM2";
-        #endif
+        mode.AppendWithFormat("Render:%s Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s Mode:%s",
+            renderModeTexts[renderer->GetRenderMode()],
+            qualityTexts[renderer->GetTextureQuality()],
+            qualityTexts[renderer->GetMaterialQuality()],
+            renderer->GetSpecularLighting() ? "On" : "Off",
+            renderer->GetDrawShadows() ? "On" : "Off",
+            renderer->GetShadowMapSize(),
+            shadowQualityTexts[renderer->GetShadowQuality()],
+            renderer->GetMaxOccluderTriangles() > 0 ? "On" : "Off",
+            renderer->GetDynamicInstancing() ? "On" : "Off",
+            #ifdef USE_OPENGL
+            "OGL");
+            #else
+            graphics->GetSM3Support() ? "SM3" : "SM2");
+            #endif
         
         modeText_->SetText(mode);
     }
@@ -239,7 +212,7 @@ void DebugHud::Toggle(unsigned mode)
 
 void DebugHud::ToggleAll()
 {
-    Toggle(DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_PROFILER);
+    Toggle(DEBUGHUD_SHOW_ALL);
 }
 
 unsigned DebugHud::GetMode() const

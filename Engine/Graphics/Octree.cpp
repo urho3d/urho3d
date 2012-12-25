@@ -83,12 +83,13 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
     return lhs.distance_ < rhs.distance_;
 }
 
-Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root) :
+Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
     worldBoundingBox_(box),
     level_(level),
     numDrawables_(0),
     parent_(parent),
-    root_(root)
+    root_(root),
+    index_(index)
 {
     center_ = worldBoundingBox_.Center();
     halfSize_ = worldBoundingBox_.Size() * 0.5f;
@@ -127,7 +128,7 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     else
         newMax.z_ = oldCenter.z_;
     
-    children_[index] = new Octant(BoundingBox(newMin, newMax), level_ + 1, this, root_);
+    children_[index] = new Octant(BoundingBox(newMin, newMax), level_ + 1, this, root_, index);
     return children_[index];
 }
 
@@ -139,15 +140,8 @@ void Octant::DeleteChild(unsigned index)
 
 void Octant::DeleteChild(Octant* octant)
 {
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-    {
-        if (children_[i] == octant)
-        {
-            delete octant;
-            children_[i] = 0;
-            return;
-        }
-    }
+    assert(octant && octant->index_ < NUM_OCTANTS);
+    DeleteChild(octant->index_);
 }
 
 void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize)
@@ -187,6 +181,10 @@ void Octant::ResetRoot()
 {
     root_ = 0;
     
+    // The whole octree is being destroyed, just detach the drawables
+    for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        (*i)->SetOctant(0);
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
         if (children_[i])
@@ -249,13 +247,11 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
        
         while (start != end)
         {
-            Drawable* drawable = *start;
+            Drawable* drawable = *start++;
             
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() &&
+            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & query.drawableFlags_) &&
                 (drawable->GetViewMask() & query.viewMask_))
                 drawable->ProcessRayQuery(query, query.result_);
-            
-            ++start;
         }
     }
     
@@ -279,13 +275,11 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         
         while (start != end)
         {
-            Drawable* drawable = *start;
+            Drawable* drawable = *start++;
             
-            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && drawable->IsVisible() &&
+            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & query.drawableFlags_) &&
                 (drawable->GetViewMask() & query.viewMask_))
                 drawables.Push(drawable);
-            
-            ++start;
         }
     }
     
@@ -298,7 +292,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
 
 void Octant::Release()
 {
-    if (root_ && this != root_)
+    if (root_)
     {
         // Remove the drawables (if any) from this octant to the root octant
         for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
@@ -309,12 +303,6 @@ void Octant::Release()
         }
         drawables_.Clear();
         numDrawables_ = 0;
-    }
-    else if (!root_)
-    {
-        // If the whole octree is being destroyed, just detach the drawables
-        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
-            (*i)->SetOctant(0);
     }
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
@@ -374,7 +362,8 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
     numLevels = Max((int)numLevels, 1);
     
     // If drawables exist, they are temporarily moved to the root
-    Release();
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        DeleteChild(i);
     
     Vector3 halfSize = box.Size() * 0.5f;
     

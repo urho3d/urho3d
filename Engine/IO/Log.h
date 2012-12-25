@@ -88,10 +88,17 @@ void WriteToLog(Context* context, int level, const String& message);
 /// Write raw output to the log (static.)
 void WriteToLogRaw(Context* context, const String& message);
 
+#ifdef ENABLE_LOGGING
 #define LOGDEBUG(message) WriteToLog(context_, LOG_DEBUG, message)
 #define LOGINFO(message) WriteToLog(context_, LOG_INFO, message)
 #define LOGWARNING(message) WriteToLog(context_, LOG_WARNING, message)
 #define LOGERROR(message) WriteToLog(context_, LOG_ERROR, message)
 #define LOGRAW(message) WriteToLogRaw(context_, message)
-
+#else
+#define LOGDEBUG(message)
+#define LOGINFO(message)
+#define LOGWARNING(message)
+#define LOGERROR(message)
+#define LOGRAW(message)
+#endif
 }

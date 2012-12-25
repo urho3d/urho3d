@@ -60,19 +60,10 @@ void Rect::Clip(const Rect& rect)
     if (rect.max_.y_ < max_.y_)
         max_.y_ = rect.max_.y_;
     
-    float temp;
     if (min_.x_ > max_.x_)
-    {
-        temp = min_.x_;
-        min_.x_ = max_.x_;
-        max_.x_ = temp;
-    }
+        Swap(min_.x_, max_.x_);
     if (min_.y_ > max_.y_)
-    {
-        temp = min_.y_;
-        min_.y_ = max_.y_;
-        max_.y_ = temp;
-    }
+        Swap(min_.y_, max_.y_);
 }
 
 }

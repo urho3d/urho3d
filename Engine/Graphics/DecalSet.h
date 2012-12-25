@@ -228,6 +228,8 @@ private:
     bool skinningDirty_;
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
+    /// Subscribed to scene post update event flag.
+    bool subscribed_;
 };
 
 }

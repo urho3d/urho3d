@@ -145,14 +145,6 @@ private:
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Return the viewport for a shadow map split.
     IntRect GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap);
-    /// Optimize light rendering by setting up a scissor rectangle.
-    void OptimizeLightByScissor(Light* light);
-    /// Optimize spot or point light rendering by drawing its volume to the stencil buffer.
-    void OptimizeLightByStencil(Light* light);
-    /// Return scissor rectangle for a light.
-    const Rect& GetLightScissor(Light* light);
-    /// Split directional or point light for shadow rendering.
-    unsigned SplitLight(Light* light);
     /// Find and set a new zone for a drawable when it has moved.
     void FindZone(Drawable* drawable);
     /// Return the drawable's zone, or camera zone if it has override mode enabled.

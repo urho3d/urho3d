@@ -261,6 +261,8 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/Urho3D/*.cpp) \
     $(wildcard $(LOCAL_PATH)/ThirdParty/SDL/src/main/android/*.cpp))
 
+LOCAL_CPPFLAGS += -DENABLE_LOGGING
+
 LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL StanHull STB JO
 
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog

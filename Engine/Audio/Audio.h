@@ -27,8 +27,6 @@
 #include "AudioDefs.h"
 #include "Mutex.h"
 #include "Object.h"
-#include "Quaternion.h"
-#include "Thread.h"
 
 namespace Urho3D
 {

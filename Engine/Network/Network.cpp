@@ -77,50 +77,8 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
     if (connection)
     {
         MemoryBuffer msg(data, numBytes);
-        
-        switch (msgId)
-        {
-        case MSG_IDENTITY:
-            connection->ProcessIdentity(msgId, msg);
+        if (connection->ProcessMessage(msgId, msg))
             return;
-        
-        case MSG_CONTROLS:
-            connection->ProcessControls(msgId, msg);
-            return;
-            
-        case MSG_SCENELOADED:
-            connection->ProcessSceneLoaded(msgId, msg);
-            return;
-            
-        case MSG_REQUESTPACKAGE:
-        case MSG_PACKAGEDATA:
-            connection->ProcessPackageDownload(msgId, msg);
-            return;
-            
-        case MSG_LOADSCENE:
-            connection->ProcessLoadScene(msgId, msg);
-            return;
-        
-        case MSG_SCENECHECKSUMERROR:
-            connection->ProcessSceneChecksumError(msgId, msg);
-            return;
-            
-        case MSG_CREATENODE:
-        case MSG_NODEDELTAUPDATE:
-        case MSG_NODELATESTDATA:
-        case MSG_REMOVENODE:
-        case MSG_CREATECOMPONENT:
-        case MSG_COMPONENTDELTAUPDATE:
-        case MSG_COMPONENTLATESTDATA:
-        case MSG_REMOVECOMPONENT:
-            connection->ProcessSceneUpdate(msgId, msg);
-            return;
-            
-        case MSG_REMOTEEVENT:
-        case MSG_REMOTENODEEVENT:
-            connection->ProcessRemoteEvent(msgId, msg);
-            return;
-        }
         
         // If message was not handled internally, forward as an event
         using namespace NetworkMessage;
@@ -353,13 +311,16 @@ void Network::SetPackageCacheDir(const String& path)
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
-    if (i != clientConnections_.End())
-        return i->second_;
-    else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
+    if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
         return serverConnection_;
     else
-        return 0;
+    {
+        HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+        if (i != clientConnections_.End())
+            return i->second_;
+        else
+            return 0;
+    }
 }
 
 Connection* Network::GetServerConnection() const

@@ -155,10 +155,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         requestedLevels_ = 1;
         dynamic_ = true;
     }
-    else if (usage == TEXTURE_DYNAMIC)
-        dynamic_ = true;
     else
-        dynamic_ = false;
+        dynamic_ = usage == TEXTURE_DYNAMIC;
     
     width_ = size;
     height_ = size;
@@ -283,7 +281,7 @@ bool TextureCube::Load(Deserializer& source)
         
         SharedPtr<Image> image(cache->GetResource<Image>(name));
         Load((CubeMapFace)faces, image);
-        faces++;
+        ++faces;
         
         faceElem = faceElem.GetNext("face");
     }

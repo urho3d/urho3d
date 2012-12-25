@@ -39,6 +39,15 @@ class UIElement;
 /// %UI rendering quad.
 struct UIQuad
 {
+    /// Construct with defaults.
+    UIQuad();
+    /// Construct.
+    UIQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
+        int texWidth = 0, int texHeight = 0, Color* color = 0);
+
+    /// Return an interpolated color for an UI element.
+    static unsigned GetInterpolatedColor(const UIElement& element, int x, int y);
+
     /// Left coordinate.
     int left_;
     /// Top coordinate.
@@ -63,6 +72,8 @@ struct UIQuad
     unsigned bottomLeftColor_;
     /// Bottom right color.
     unsigned bottomRightColor_;
+    /// Defined flag.
+    bool defined_;
 };
 
 /// %UI rendering draw call.
@@ -70,24 +81,20 @@ class UIBatch
 {
 public:
     /// Construct with defaults.
-    UIBatch() :
-        texture_(0),
-        quads_(0),
-        quadStart_(0),
-        quadCount_(0)
-    {
-    }
+    UIBatch();
+    /// Construct
+    UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
     
     /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
     /// Add a quad.
-    void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
+    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
     /// Add a quad with scaled texture.
-    void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);
+    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);
     /// Add a quad with tiled texture.
-    void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
+    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Add a quad with custom color.
-    void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
+    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
     /// Update the vertex data.
@@ -95,8 +102,6 @@ public:
     
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
-    /// Return an interpolated color for an UI element.
-    static unsigned GetInterpolatedColor(UIElement& element, int x, int y);
     
     /// Blending mode.
     BlendMode blendMode_;

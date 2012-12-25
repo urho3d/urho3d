@@ -28,6 +28,7 @@
 #include "ReplicationState.h"
 #include "Serializable.h"
 #include "Serializer.h"
+#include "StringUtils.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"
@@ -130,6 +131,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     case VAR_INTVECTOR2:
         *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
         break;
+
+    default:
+        LOGERROR("Unsupported attribute type for OnSetAttribute()");
+        return;
     }
 }
 
@@ -214,6 +219,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
     case VAR_INTVECTOR2:
         dest = *(reinterpret_cast<const IntVector2*>(src));
         break;
+    
+    default:
+        LOGERROR("Unsupported attribute type for OnGetAttribute()");
+        return;
     }
 }
 
@@ -296,18 +305,25 @@ bool Serializable::LoadXML(const XMLElement& source)
                 if (attr.enumNames_)
                 {
                     const char* value = attrElem.GetAttribute("value");
-                    const char** enumPtr = attr.enumNames_;
-                    int enumValue = 0;
-                    bool enumFound = false;
-                    while (*enumPtr)
+                    String enumString = attrElem.GetAttribute("enum");  // Optional
+                    bool enumFound = !enumString.Empty();
+                    int enumValue;
+                    if (enumFound)
+                        enumValue = ToInt(enumString);
+                    else
                     {
-                        if (!String::Compare(*enumPtr, value, false))
+                        enumValue = 0;
+                        const char** enumPtr = attr.enumNames_;
+                        while (*enumPtr)
                         {
-                            enumFound = true;
-                            break;
+                            if (!String::Compare(*enumPtr, value, false))
+                            {
+                                enumFound = true;
+                                break;
+                            }
+                            ++enumPtr;
+                            ++enumValue;
                         }
-                        ++enumPtr;
-                        ++enumValue;
                     }
                     if (enumFound)
                         OnSetAttribute(attr, Variant(enumValue));
@@ -364,6 +380,7 @@ bool Serializable::SaveXML(XMLElement& dest)
         {
             int enumValue = value.GetInt();
             attrElem.SetAttribute("value", attr.enumNames_[enumValue]);
+            attrElem.SetInt("enum", enumValue);
         }
         else
             attrElem.SetVariantValue(value);
@@ -564,9 +581,17 @@ Variant Serializable::GetAttribute(unsigned index)
     Variant ret;
     
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
-    if (!attributes || index >= attributes->Size())
+    if (!attributes)
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
         return ret;
-    
+    }
+    if (index >= attributes->Size())
+    {
+        LOGERROR("Attribute index out of bounds");
+        return ret;
+    }
+
     OnGetAttribute(attributes->At(index), ret);
     return ret;
 }

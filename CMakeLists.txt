@@ -37,6 +37,9 @@ add_definitions (-DENABLE_FILEWATCHER)
 # instantiated.
 add_definitions (-DENABLE_PROFILING)
 
+# Enable logging. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
+add_definitions (-DENABLE_LOGGING)
+
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
 # set, but Windows graphics card drivers are usually better optimized for Direct3D.
@@ -65,17 +68,21 @@ if (MSVC)
     endif ()
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
-elseif (NOT IOS)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
-    if (ENABLE_SSE)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+else ()
+    if (NOT IOS)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
+        if (ENABLE_SSE)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+        endif ()
+        if (WIN32)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+        endif ()
     endif ()
-    if (WIN32)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
-    endif ()
+    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif ()
 
 # Macro for precompiled headers

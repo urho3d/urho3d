@@ -105,14 +105,13 @@ void InitAudio()
     if (engine.headless)
         return;
 
-    // Lower mastervolumes slightly. On the server, turn sound off completely
-    audio.masterGain[SOUND_MASTER] = runServer ? 0.0 : 0.75;
+    // Lower mastervolumes slightly.
+    audio.masterGain[SOUND_MASTER] = 0.75;
     audio.masterGain[SOUND_MUSIC] = 0.75;
 
-    // Start music playback (play in singleplayer only to avoid cacophony if testing with multiple connections)
-    // Note: the non-positional sound source component does not need to be in the scene
-    if (singlePlayer)
+    if (!nobgm)
     {
+        // Note: the non-positional sound source component does not need to be in the scene
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
         musicSource = SoundSource();

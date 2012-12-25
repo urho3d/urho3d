@@ -64,11 +64,11 @@ TextureUnit ParseTextureUnitName(const String& name)
     TextureUnit unit = (TextureUnit)GetStringListIndex(name, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS);
     if (name == "diff")
         unit = TU_DIFFUSE;
-    if (name == "norm")
+    else if (name == "norm")
         unit = TU_NORMAL;
-    if (name == "spec")
+    else if (name == "spec")
         unit = TU_SPECULAR;
-    if (name == "env")
+    else if (name == "env")
         unit = TU_ENVIRONMENT;
     
     return unit;
@@ -101,7 +101,8 @@ Material::Material(Context* context) :
     shadowCullMode_(CULL_CCW),
     depthBias_(BiasParameters(0.0f, 0.0f)),
     auxViewFrameNumber_(0),
-    occlusion_(true)
+    occlusion_(true),
+    specular_(false)
 {
     SetNumTechniques(1);
     
@@ -112,8 +113,6 @@ Material::Material(Context* context) :
     SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector4::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-    
-    CheckSpecular();
 }
 
 Material::~Material()
@@ -218,7 +217,6 @@ bool Material::Load(Deserializer& source)
     
     SetMemoryUse(memoryUse);
     CheckOcclusion();
-    CheckSpecular();
     return true;
 }
 
@@ -297,9 +295,11 @@ void Material::SetShaderParameter(const String& name, const Vector4& value)
     MaterialShaderParameter newParam;
     newParam.name_ = name;
     newParam.value_ = value;
-    shaderParameters_[StringHash(name)] = newParam;
+    StringHash stringHash(name);
+    shaderParameters_[stringHash] = newParam;
     
-    CheckSpecular();
+    if (stringHash == PSP_MATSPECCOLOR)
+        specular_ = value.x_ > 0.0f || value.y_ > 0.0f || value.z_ > 0.0f;
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -360,8 +360,11 @@ void Material::SetDepthBias(const BiasParameters& parameters)
 
 void Material::RemoveShaderParameter(const String& name)
 {
-    shaderParameters_.Erase(StringHash(name));
-    CheckSpecular();
+    StringHash stringHash(name);
+    shaderParameters_.Erase(stringHash);
+
+    if (stringHash == PSP_MATSPECCOLOR)
+        specular_ = false;
 }
 
 void Material::ReleaseShaders()
@@ -441,15 +444,6 @@ void Material::CheckOcclusion()
                 occlusion_ = true;
         }
     }
-}
-
-void Material::CheckSpecular()
-{
-    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(PSP_MATSPECCOLOR);
-    if (i != shaderParameters_.End())
-        specular_ = i->second_.value_.x_ > 0.0f || i->second_.value_.y_ > 0.0f || i->second_.value_.z_ > 0.0f;
-    else
-        specular_ = false;
 }
 
 }

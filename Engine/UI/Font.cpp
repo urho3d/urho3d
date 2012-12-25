@@ -96,7 +96,7 @@ short FontFace::GetKerning(unsigned c, unsigned d) const
     unsigned leftIndex = 0;
     unsigned rightIndex = 0;
     HashMap<unsigned, unsigned>::ConstIterator leftIt = glyphMapping_.Find(c);
-    HashMap<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(c);
+    HashMap<unsigned, unsigned>::ConstIterator rightIt = glyphMapping_.Find(d);
     if (leftIt != glyphMapping_.End())
         leftIndex = leftIt->second_;
     if (rightIt != glyphMapping_.End())
@@ -219,6 +219,9 @@ const FontFace* Font::GetFace(int pointSize)
     // Load each of the glyphs to see the sizes & store other information
     int maxOffsetY = 0;
     int maxHeight = 0;
+    FT_Pos ascender = face->size->metrics.ascender;
+    
+    newFace->glyphs_.Reserve(numGlyphs);
     
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
@@ -231,7 +234,7 @@ const FontFace* Font::GetFace(int pointSize)
             newGlyph.width_ = (short)((slot->metrics.width) >> 6);
             newGlyph.height_ = (short)((slot->metrics.height) >> 6);
             newGlyph.offsetX_ = (short)((slot->metrics.horiBearingX) >> 6);
-            newGlyph.offsetY_ = (short)((face->size->metrics.ascender - slot->metrics.horiBearingY) >> 6);
+            newGlyph.offsetY_ = (short)((ascender - slot->metrics.horiBearingY) >> 6);
             newGlyph.advanceX_ = (short)((slot->metrics.horiAdvance) >> 6);
             
             maxOffsetY = Max(maxOffsetY, newGlyph.offsetY_);
@@ -253,7 +256,6 @@ const FontFace* Font::GetFace(int pointSize)
     if (FT_HAS_KERNING(face))
     {
         newFace->hasKerning_ = true;
-        unsigned numGlyphs = newFace->glyphs_.Size();
         
         for (unsigned i = 0; i < numGlyphs; ++i)
         {
@@ -281,7 +283,7 @@ const FontFace* Font::GetFace(int pointSize)
         
         // Check first for theoretical possible fit. If it fails, there is no need to try to fit
         int totalArea = 0;
-        for (unsigned i = 0; i < newFace->glyphs_.Size(); ++i)
+        for (unsigned i = 0; i < numGlyphs; ++i)
             totalArea += (newFace->glyphs_[i].width_ + 1) * (newFace->glyphs_[i].height_ + 1);
         
         if (totalArea > texWidth * texHeight)
@@ -289,7 +291,7 @@ const FontFace* Font::GetFace(int pointSize)
         else
         {
             AreaAllocator allocator(texWidth, texHeight);
-            for (unsigned i = 0; i < newFace->glyphs_.Size(); ++i)
+            for (unsigned i = 0; i < numGlyphs; ++i)
             {
                 if (newFace->glyphs_[i].width_ && newFace->glyphs_[i].height_)
                 {
@@ -350,7 +352,7 @@ const FontFace* Font::GetFace(int pointSize)
     unsigned char avgMaxOpacity = 255;
     unsigned sumMaxOpacity = 0;
     unsigned samples = 0;
-    for (unsigned i = 0; i < newFace->glyphs_.Size(); ++i)
+    for (unsigned i = 0; i < numGlyphs; ++i)
     {
         if (!newFace->glyphs_[i].width_ || !newFace->glyphs_[i].height_)
             continue;
@@ -385,7 +387,7 @@ const FontFace* Font::GetFace(int pointSize)
     {
         // Apply the scaling value if necessary
         float scale = 255.0f / avgMaxOpacity;
-        for (unsigned i = 0; i < newFace->glyphs_.Size(); ++i)
+        for (unsigned i = 0; i < numGlyphs; ++i)
         {
             for (int y = 0; y < newFace->glyphs_[i].height_; ++y)
             {

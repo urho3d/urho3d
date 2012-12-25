@@ -152,7 +152,7 @@ bool ShaderProgram::Link()
         if (index != String::NPOS)
         {
             // If not the first index, skip
-            if (name.Find("[0]") == String::NPOS)
+            if (name.Find("[0]", index) == String::NPOS)
                 continue;
             
             name = name.Substring(0, index);

@@ -136,10 +136,10 @@ void Texture::UpdateParameters()
         return;
     
     // Wrapping
-    glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
-    glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[COORD_U]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[COORD_V]]);
     #ifndef GL_ES_VERSION_2_0
-    glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[2]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[COORD_W]]);
     #endif
     
     TextureFilterMode filterMode = filterMode_;
@@ -169,6 +169,9 @@ void Texture::UpdateParameters()
         else
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        break;
+    
+    default:
         break;
     }
     

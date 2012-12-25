@@ -51,8 +51,6 @@ class View;
 class Zone;
 
 static const int SHADOW_MIN_PIXELS = 64;
-static const int NUM_LIGHT_TYPES = 3;
-static const int NUM_SHADOWMAP_RESOLUTIONS = 3;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 
 /// Light vertex shader variations.
@@ -235,7 +233,7 @@ public:
     /// Return maximum number of shadow maps per resolution.
     int GetMaxShadowMaps() const { return maxShadowMaps_; }
     /// Return maximum number of directional light shadow map cascades.
-    int GetMaxShadowCascades() const;
+    int GetMaxShadowCascades() const { return maxShadowCascades_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of triangles per object for instancing.
@@ -365,7 +363,7 @@ private:
     void ResetBuffers();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle graphics features (re)check event.
+    /// Handle graphics features (re)check event. Event only sent by D3D9Graphics class.
     void HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);

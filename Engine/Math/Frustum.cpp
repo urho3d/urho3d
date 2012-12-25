@@ -80,7 +80,7 @@ void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, floa
 {
     nearZ = Max(nearZ, 0.0f);
     farZ = Max(farZ, nearZ);
-    float halfViewSize = tanf(fov * M_DEGTORAD * 0.5f) / zoom;
+    float halfViewSize = tanf(fov * M_DEGTORAD_2) / zoom;
     Vector3 near, far;
     
     near.z_ = nearZ;

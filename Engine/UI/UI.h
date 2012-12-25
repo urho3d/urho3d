@@ -69,6 +69,8 @@ public:
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
     void SetClipBoardText(const String& text);
+    /// Set mouse wheel handling flag.
+    void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -86,6 +88,8 @@ public:
     IntVector2 GetCursorPosition();
     /// Return clipboard text.
     const String& GetClipBoardText() const { return clipBoard_; }
+    /// Return mouse wheel handling flag.
+    bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
     
 private:
     /// Initialize when screen mode initially se.
@@ -163,6 +167,8 @@ private:
     int qualifiers_;
     /// Initialized flag.
     bool initialized_;
+    /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
+    bool nonFocusedMouseWheel_;
 };
 
 /// Register UI library objects.

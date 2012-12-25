@@ -150,7 +150,7 @@ void Decal::CalculateBoundingBox()
 OBJECTTYPESTATIC(DecalSet);
 
 DecalSet::DecalSet(Context* context) :
-    Drawable(context),
+    Drawable(context, DRAWABLE_GEOMETRY),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -163,10 +163,9 @@ DecalSet::DecalSet(Context* context) :
     bufferDirty_(true),
     boundingBoxDirty_(true),
     skinningDirty_(false),
-    assignBonesPending_(false)
+    assignBonesPending_(false),
+    subscribed_(false)
 {
-    drawableFlags_ = DRAWABLE_GEOMETRY;
-    
     geometry_->SetIndexBuffer(indexBuffer_);
     
     batches_.Resize(1);
@@ -312,7 +311,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     {
         Skeleton& skeleton = animatedModel->GetSkeleton();
         unsigned numBones = skeleton.GetNumBones();
-        unsigned bestIndex = M_MAX_UNSIGNED;
+        Bone* bestBone = 0;
         float bestSize = 0.0f;
         
         for (unsigned i = 0; i < numBones; ++i)
@@ -328,9 +327,9 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             if (bone->collisionMask_ & BONECOLLISION_BOX)
             {
                 float size = bone->boundingBox_.HalfSize().Length();
-                if (bone->boundingBox_.IsInside(decalSphere) != OUTSIDE && size > bestSize)
+                if (bone->boundingBox_.IsInside(decalSphere) && size > bestSize)
                 {
-                    bestIndex = i;
+                    bestBone = bone;
                     bestSize = size;
                 }
             }
@@ -338,19 +337,16 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             {
                 Sphere boneSphere(Vector3::ZERO, bone->radius_);
                 float size = bone->radius_;
-                if (boneSphere.IsInside(decalSphere) != OUTSIDE && size > bestSize)
+                if (boneSphere.IsInside(decalSphere) && size > bestSize)
                 {
-                    bestIndex = i;
+                    bestBone = bone;
                     bestSize = size;
                 }
             }
         }
         
-        if (bestIndex < numBones)
-        {
-            Bone* bone = skeleton.GetBone(bestIndex);
-            targetTransform = (bone->node_->GetWorldTransform() * bone->offsetMatrix_).Inverse();
-        }
+        if (bestBone)
+            targetTransform = (bestBone->node_->GetWorldTransform() * bestBone->offsetMatrix_).Inverse();
     }
     
     // Build the decal frustum
@@ -451,8 +447,11 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     
     // Subscribe to scene post-update if defined a time-limited decal
     Scene* scene = GetScene();
-    if (newDecal.timeToLive_ > 0.0f && scene && !HasSubscribedToEvent(scene, E_SCENEPOSTUPDATE))
+    if (!subscribed_ && newDecal.timeToLive_ > 0.0f && scene)
+    {
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
+        subscribed_ = true;
+    }
     
     // Remove oldest decals if total vertices exceeded
     while (decals_.Size() && (numVertices_ > maxVertices_ || numIndices_ > maxIndices_))
@@ -466,11 +465,8 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
 
 void DecalSet::RemoveDecals(unsigned num)
 {
-    while (decals_.Size() && num)
-    {
+    while (num-- && decals_.Size())
         RemoveDecal(decals_.Begin());
-        --num;
-    }
 }
 
 void DecalSet::RemoveAllDecals()
@@ -515,6 +511,8 @@ void DecalSet::SetDecalsAttr(VariantVector value)
     
     skinned_ = value[index++].GetBool();
     unsigned numDecals = value[index++].GetInt();
+
+    bool hasTimeLimitedDecal = false;
     
     while (numDecals--)
     {
@@ -549,20 +547,26 @@ void DecalSet::SetDecalsAttr(VariantVector value)
         numVertices_ += newDecal.vertices_.Size();
         numIndices_ += newDecal.indices_.Size();
         
-        // Subscribe to scene post-update if defined a time-limited decal
-        if (newDecal.timeToLive_ > 0.0f && scene && !HasSubscribedToEvent(scene, E_SCENEPOSTUPDATE))
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
+        if (!hasTimeLimitedDecal && newDecal.timeToLive_ > 0.0f)
+            hasTimeLimitedDecal = true;
+    }
+
+    // Subscribe to scene post-update if defined a time-limited decal
+    if (!subscribed_ && hasTimeLimitedDecal && scene)
+    {
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
+        subscribed_ = true;
     }
     
     if (skinned_)
     {
         unsigned numBones = value[index++].GetInt();
         skinMatrices_.Resize(numBones);
+        bones_.Resize(numBones);
         
-        while (numBones--)
+        for (unsigned i = 0; i < numBones; ++i)
         {
-            bones_.Resize(bones_.Size() + 1);
-            Bone& newBone = bones_.Back();
+            Bone& newBone = bones_[i];
             
             newBone.name_ = value[index++].GetString();
             MemoryBuffer boneData(value[index++].GetBuffer());
@@ -721,18 +725,20 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         
         unsigned elementMask = geometry->GetVertexElementMask(i);
         unsigned char* data = vb->GetShadowData();
+        if (!data)
+            continue;
         
-        if ((elementMask & MASK_POSITION) && data)
+        if (elementMask & MASK_POSITION)
         {
             positionData = data;
             positionStride = vb->GetVertexSize();
         }
-        if ((elementMask & MASK_NORMAL) && data)
+        if (elementMask & MASK_NORMAL)
         {
             normalData = data + vb->GetElementOffset(ELEMENT_NORMAL);
             normalStride = vb->GetVertexSize();
         }
-        if ((elementMask & MASK_BLENDWEIGHTS) && data)
+        if (elementMask & MASK_BLENDWEIGHTS)
         {
             skinningData = data + vb->GetElementOffset(ELEMENT_BLENDWEIGHTS);
             skinningStride = vb->GetVertexSize();
@@ -844,6 +850,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     PODVector<DecalVertex>& face = faces.Back();
     if (!hasSkinning)
     {
+        face.Reserve(3);
         face.Push(DecalVertex(v0, n0));
         face.Push(DecalVertex(v1, n1));
         face.Push(DecalVertex(v2, n2));
@@ -865,6 +872,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
             !GetBones(target, batchIndex, bw2, bi2, nbi2))
             return;
         
+        face.Reserve(3);
         face.Push(DecalVertex(v0, n0, bw0, nbi0));
         face.Push(DecalVertex(v1, n1, bw1, nbi1));
         face.Push(DecalVertex(v2, n2, bw2, nbi2));

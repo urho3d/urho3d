@@ -130,7 +130,7 @@ public:
     unsigned char GetLayer(const String& name) const;
     /// Return animation start bone, or null if no such animation.
     Bone* GetStartBone(const String& name) const;
-    /// Return animation start bone name, or null if no such animation.
+    /// Return animation start bone name, or empty string if no such animation.
     const String& GetStartBoneName(const String& name) const;
     /// Return animation time position.
     float GetTime(const String& name) const;

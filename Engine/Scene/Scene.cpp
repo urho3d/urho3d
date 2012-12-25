@@ -76,17 +76,9 @@ Scene::~Scene()
     
     // Remove scene reference and owner from all nodes that still exist
     for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)
-    {
-        i->second_->SetID(0);
-        i->second_->SetScene(0);
-        i->second_->SetOwner(0);
-    }
+        i->second_->ResetScene();
     for (HashMap<unsigned, Node*>::Iterator i = localNodes_.Begin(); i != localNodes_.End(); ++i)
-    {
-        i->second_->SetID(0);
-        i->second_->SetScene(0);
-        i->second_->SetOwner(0);
-    }
+        i->second_->ResetScene();
 }
 
 void Scene::RegisterObject(Context* context)
@@ -247,8 +239,6 @@ bool Scene::LoadAsync(File* file)
     // Then prepare for loading all root level child nodes in the async update
     asyncLoading_ = true;
     asyncProgress_.file_ = file;
-    asyncProgress_.xmlFile_.Reset();
-    asyncProgress_.xmlElement_ = XMLElement();
     asyncProgress_.loadedNodes_ = 0;
     asyncProgress_.totalNodes_ = file->ReadVLE();
     
@@ -306,7 +296,7 @@ void Scene::StopAsyncLoading()
     asyncLoading_ = false;
     asyncProgress_.file_.Reset();
     asyncProgress_.xmlFile_.Reset();
-    asyncProgress_.xmlElement_ = XMLElement();
+    asyncProgress_.xmlElement_ = XMLElement::EMPTY;
     resolver_.Reset();
 }
 
@@ -370,7 +360,7 @@ void Scene::Clear()
     StopAsyncLoading();
     RemoveAllChildren();
     RemoveAllComponents();
-    fileName_ = String();
+    fileName_.Clear();
     checksum_ = 0;
     replicatedNodeID_ = FIRST_REPLICATED_ID;
     replicatedComponentID_ = FIRST_REPLICATED_ID;
@@ -632,9 +622,7 @@ void Scene::NodeAdded(Node* node)
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->SetID(0);
-            i->second_->SetScene(0);
-            i->second_->SetOwner(0);
+            i->second_->ResetScene();
         }
         
         replicatedNodes_[id] = node;
@@ -648,9 +636,7 @@ void Scene::NodeAdded(Node* node)
         if (i != localNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->SetID(0);
-            i->second_->SetScene(0);
-            i->second_->SetOwner(0);
+            i->second_->ResetScene();
         }
         
         localNodes_[id] = node;
@@ -732,11 +718,12 @@ String Scene::GetVarNamesAttr() const
 {
     String ret;
     
-    for (HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
+    if (!varNames_.Empty())
     {
-        if (i != varNames_.Begin())
-            ret += ';';
-        ret += i->second_;
+        for (HashMap<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
+            ret += i->second_ + ';';
+        
+        ret.Resize(ret.Length() - 1);
     }
     
     return ret;
@@ -822,7 +809,7 @@ void Scene::UpdateAsyncLoading()
             return;
         }
         
-        // Read one child node with its full sub-hierarchy from either from binary or XML
+        // Read one child node with its full sub-hierarchy either from binary or XML
         if (!asyncProgress_.xmlFile_)
         {
             unsigned nodeID = asyncProgress_.file_->ReadUInt();

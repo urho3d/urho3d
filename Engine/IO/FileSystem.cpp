@@ -203,7 +203,6 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
 
 bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
-    #ifdef WIN32
     if (allowedPaths_.Empty())
     {
         if (!FileExists(fileName) && !DirExists(fileName))
@@ -212,22 +211,27 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             return false;
         }
         
+        #ifdef WIN32
         bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
             GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
         if (!success)
             LOGERROR("Failed to open " + fileName + " externally");
         return success;
+        #elif defined(__APPLE__)
+        Vector<String> arguments;
+        arguments.Push(fileName);
+        return SystemRun("open", arguments) == 0;
+        #else
+        /// \todo Implement on Unix-like systems
+        LOGERROR("SystemOpen not implemented");
+        return false;
+        #endif
     }
     else
     {
         LOGERROR("Opening a file externally is not allowed");
         return false;
     }
-    #else
-    /// \todo Implement on Unix-like systems
-    LOGERROR("SystemOpen not implemented");
-    return false;
-    #endif
 }
 
 bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
@@ -315,7 +319,7 @@ bool FileSystem::CheckAccess(const String& pathName) const
         return true;
     
     // If there is any attempt to go to a parent directory, disallow
-    if (fixedPath.Find("..") != String::NPOS)
+    if (fixedPath.Contains(".."))
         return false;
     
     // Check if the path is a partial match of any of the allowed directories
@@ -528,7 +532,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     }
     #else
     String filterExtension = filter.Substring(filter.Find('.'));
-    if (filterExtension.Find('*') != String::NPOS)
+    if (filterExtension.Contains('*'))
         filterExtension.Clear();
     DIR *dir;
     struct dirent *de;
@@ -540,6 +544,9 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         {
             /// \todo Filename may be unnormalized Unicode on Mac OS X. Re-normalize as necessary
             String fileName(de->d_name);
+            bool normalEntry = fileName != "." && fileName != "..";
+            if (normalEntry && !(flags & SCAN_HIDDEN) && fileName.StartsWith("."))
+                continue;
             String pathAndName = path + fileName;
             if (!stat(pathAndName.CString(), &st))
             {
@@ -547,7 +554,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                 {
                     if (flags & SCAN_DIRS)
                         result.Push(deltaPath + fileName);
-                    if (recursive && fileName != "." && fileName != "..")
+                    if (recursive && normalEntry)
                         ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)

@@ -144,10 +144,11 @@ static unsigned numInstances = 0;
 
 OBJECTTYPESTATIC(Graphics);
 
-bool CheckExtension(const String& name)
+bool CheckExtension(String& extensions, const String& name)
 {
-    String extensions((const char*)glGetString(GL_EXTENSIONS));
-    return extensions.Find(name) != String::NPOS;
+    if (extensions.Empty())
+        extensions = (const char*)glGetString(GL_EXTENSIONS);
+    return extensions.Contains(name);
 }
 
 Graphics::Graphics(Context* context_) :
@@ -171,7 +172,8 @@ Graphics::Graphics(Context* context_) :
     maxScratchBufferRequest_(0),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
-    defaultTextureFilterMode_(FILTER_BILINEAR)
+    defaultTextureFilterMode_(FILTER_BILINEAR),
+    releasingGPUObjects_(false)
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -254,6 +256,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
             height = mode.h;
         }
     }
+    
+    String extensions;
     
     // With an external window, only the size can change after initial setup, so do not recreate context
     if (!externalWindow_ || !impl_->context_)
@@ -356,19 +360,19 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
                 return false;
             }
             
-            if (!CheckExtension("EXT_framebuffer_object") || !CheckExtension("EXT_packed_depth_stencil"))
+            if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil)
             {
                 LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
                 Release(true, true);
                 return false;
             }
         
-            dxtTextureSupport_ = CheckExtension("EXT_texture_compression_s3tc");
-            anisotropySupport_ = CheckExtension("EXT_texture_filter_anisotropic");
+            dxtTextureSupport_ = _GLEE_EXT_texture_compression_s3tc;
+            anisotropySupport_ = _GLEE_EXT_texture_filter_anisotropic;
             #else
-            dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
-            etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
-            pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
+            dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
+            etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
+            pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
             #endif
         }
     }
@@ -395,7 +399,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
-    CheckFeatureSupport();
+    CheckFeatureSupport(extensions);
     
     if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
@@ -1154,14 +1158,21 @@ void Graphics::ClearTransformSources()
 
 void Graphics::CleanupShaderPrograms()
 {
+    // Ignore individual call from ShaderVariation instance when Graphics subsystem is in process of
+    // releasing all GPU objects or recreating GPU objects due device lost, because the Graphics subsystem
+    // will eventually erase all the shader programs afterward as part of the release process.
+    if (releasingGPUObjects_)
+        return;
+    
     for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
     {
-        ShaderProgramMap::Iterator current = i++;
-        ShaderVariation* vs = current->second_->GetVertexShader();
-        ShaderVariation* ps = current->second_->GetPixelShader();
+        ShaderVariation* vs = i->second_->GetVertexShader();
+        ShaderVariation* ps = i->second_->GetPixelShader();
         
         if (!vs || !ps || !vs->GetGPUObject() || !ps->GetGPUObject())
-            shaderPrograms_.Erase(current);
+            i = shaderPrograms_.Erase(i);
+        else
+            ++i;
     }
 }
 
@@ -1549,7 +1560,6 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 void Graphics::SetScissorTest(bool enable, const IntRect& rect)
 {
     IntVector2 rtSize(GetRenderTargetDimensions());
-    IntVector2 viewSize(viewport_.Size());
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
     if (enable)
@@ -1722,9 +1732,10 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     case CF_PVRTC_RGBA_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0;
     #endif
-    }
     
-    return 0;
+    default:
+        return 0;
+    }
 }
 
 
@@ -1792,7 +1803,7 @@ void Graphics::AddGPUObject(GPUObject* object)
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
-    gpuObjects_.Erase(gpuObjects_.Find(object));
+    gpuObjects_.Remove(object);
 }
 
 void* Graphics::ReserveScratchBuffer(unsigned size)
@@ -1877,6 +1888,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
+    releasingGPUObjects_ = true;
+    
     if (clearGPUObjects)
     {
         // Shutting down: release all GPU objects that still exist
@@ -1890,6 +1903,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
     }
+    
+    releasingGPUObjects_ = false;
     
     CleanupFramebuffers(true);
     depthTextures_.Clear();
@@ -2139,7 +2154,7 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
-void Graphics::CheckFeatureSupport()
+void Graphics::CheckFeatureSupport(String& extensions)
 {
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
@@ -2156,7 +2171,7 @@ void Graphics::CheckFeatureSupport()
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
     #else
-    if (!CheckExtension("GL_OES_depth_texture"))
+    if (!CheckExtension(extensions, "GL_OES_depth_texture"))
     {
         shadowMapFormat_ = 0;
         hiresShadowMapFormat_ = 0;
@@ -2370,13 +2385,14 @@ void Graphics::CleanupFramebuffers(bool contextLost)
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
             i != impl_->frameBuffers_.End();)
         {
-            HashMap<unsigned long long, FrameBufferObject>::Iterator current = i++;
-            if (current->second_.fbo_ != impl_->boundFbo_ && current->second_.useTimer_.GetMSec(false) >
+            if (i->second_.fbo_ != impl_->boundFbo_ && i->second_.useTimer_.GetMSec(false) >
                 MAX_FRAMEBUFFER_AGE)
             {
-                glDeleteFramebuffersEXT(1, &current->second_.fbo_);
-                impl_->frameBuffers_.Erase(current);
+                glDeleteFramebuffersEXT(1, &i->second_.fbo_);
+                i = impl_->frameBuffers_.Erase(i);
             }
+            else
+                ++i;
         }
     }
     else

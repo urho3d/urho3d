@@ -108,7 +108,7 @@ void Viewport::InsertPostProcess(unsigned index, PostProcess* effect)
     if (index >= postProcesses_.Size())
         postProcesses_.Push(effectPtr);
     else
-        postProcesses_.Insert(postProcesses_.Begin() + index, effectPtr);
+        postProcesses_.Insert(index, effectPtr);
 }
 
 void Viewport::RemovePostProcess(PostProcess* effect)

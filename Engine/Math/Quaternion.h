@@ -117,6 +117,16 @@ public:
         z_ += rhs.z_;
         return *this;
     }
+  
+    /// Multiply-assign a scalar.
+    Quaternion& operator *= (float rhs)
+    {
+        w_ *= rhs;
+        x_ *= rhs;
+        y_ *= rhs;
+        z_ *= rhs;
+        return *this;
+    }
     
     /// Test for equality with another quaternion without epsilon.
     bool operator == (const Quaternion& rhs) const { return w_ == rhs.w_ && x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
@@ -166,25 +176,19 @@ public:
     /// Normalize to unit length and return the previous length.
     float Normalize()
     {
-        float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
+        float len = sqrtf(LengthSquared());
         if (len >= M_EPSILON)
-        {
-            float invLen = 1.0f / len;
-            w_ *= invLen;
-            x_ *= invLen;
-            y_ *= invLen;
-            z_ *= invLen;
-        }
-        
+            *this *= (1.0f / len);
+
         return len;
     }
     
     /// Return normalized to unit length.
     Quaternion Normalized() const
     {
-        float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
-        if (len >= M_EPSILON)
-            return *this * (1.0f / len);
+        float lenSquared = LengthSquared();
+        if (lenSquared >= M_EPSILON * M_EPSILON)
+            return *this * (1.0f / sqrtf(lenSquared));
         else
             return IDENTITY;
     }
@@ -192,17 +196,11 @@ public:
     /// Return inverse.
     Quaternion Inverse() const
     {
-        float lenSquared = w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_;
-        if (lenSquared >= M_EPSILON)
-        {
-            float invLenSquared = 1.0f / lenSquared;
-            return Quaternion(
-                w_ * invLenSquared,
-                -x_ * invLenSquared,
-                -y_ * invLenSquared,
-                -z_ * invLenSquared
-            );
-        }
+        float lenSquared = LengthSquared();
+        if (lenSquared == 1.0f)
+            return Conjugate();
+        else if (lenSquared >= M_EPSILON)
+            return Conjugate() * (1.0f / lenSquared);
         else
             return IDENTITY;
     }
@@ -213,6 +211,8 @@ public:
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Test for equality with another quaternion with epsilon.
     bool Equals(const Quaternion& rhs) const { return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
+    /// Return conjugate.
+    Quaternion Conjugate() const { return Quaternion(w_, -x_, -y_, -z_); }
     
     /// Return Euler angles in degrees.
     Vector3 EulerAngles() const;

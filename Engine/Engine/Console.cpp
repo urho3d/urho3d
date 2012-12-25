@@ -76,7 +76,6 @@ Console::Console(Context* context) :
     uiRoot->AddChild(background_);
     
     SetNumRows(DEFAULT_CONSOLE_ROWS);
-    UpdateElements();
     
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
@@ -86,9 +85,7 @@ Console::Console(Context* context) :
 
 Console::~Console()
 {
-    UI* ui = GetSubsystem<UI>();
-    if (ui)
-        ui->GetRoot()->RemoveChild(background_);
+    background_->Remove();
 }
 
 void Console::SetStyle(XMLFile* style)
@@ -162,9 +159,7 @@ void Console::UpdateElements()
 
 bool Console::IsVisible() const
 {
-    if (!background_)
-        return false;
-    return background_->IsVisible();
+    return background_ ? background_->IsVisible() : false;
 }
 
 const String& Console::GetHistoryRow(unsigned index) const
@@ -189,8 +184,8 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             history_.Erase(history_.Begin());
         historyPosition_ = history_.Size();
         
-        current_Row.Clear();
-        lineEdit_->SetText(current_Row);
+        currentRow_.Clear();
+        lineEdit_->SetText(currentRow_);
     }
 }
 
@@ -209,7 +204,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         if (historyPosition_ > 0)
         {
             if (historyPosition_ == history_.Size())
-                current_Row = lineEdit_->GetText();
+                currentRow_ = lineEdit_->GetText();
             --historyPosition_;
             changed = true;
         }
@@ -229,7 +224,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         if (historyPosition_ < history_.Size())
             lineEdit_->SetText(history_[historyPosition_]);
         else
-            lineEdit_->SetText(current_Row);
+            lineEdit_->SetText(currentRow_);
     }
 }
 

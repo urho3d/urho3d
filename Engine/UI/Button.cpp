@@ -63,7 +63,7 @@ void Button::RegisterObject(Context* context)
 
 void Button::Update(float timeStep)
 {
-    if (!hovering_ && pressed_ == true)
+    if (!hovering_ && pressed_)
         SetPressed(false);
     
     // Send repeat events if pressed
@@ -135,7 +135,6 @@ void Button::SetPressedOffset(int x, int y)
 {
     pressedOffset_ = IntVector2(x, y);
 }
-
 
 void Button::SetLabelOffset(const IntVector2& offset)
 {

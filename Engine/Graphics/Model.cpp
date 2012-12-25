@@ -98,6 +98,7 @@ bool Model::Load(Deserializer& source)
     
     // Read vertex buffers
     unsigned numVertexBuffers = source.ReadUInt();
+    vertexBuffers_.Reserve(numVertexBuffers);
     morphRangeStarts_.Resize(numVertexBuffers);
     morphRangeCounts_.Resize(numVertexBuffers);
     for (unsigned i = 0; i < numVertexBuffers; ++i)
@@ -122,6 +123,7 @@ bool Model::Load(Deserializer& source)
 
     // Read index buffers
     unsigned numIndexBuffers = source.ReadUInt();
+    indexBuffers_.Reserve(numIndexBuffers);
     for (unsigned i = 0; i < numIndexBuffers; ++i)
     {
         unsigned indexCount = source.ReadUInt();
@@ -141,17 +143,21 @@ bool Model::Load(Deserializer& source)
     
     // Read geometries
     unsigned numGeometries = source.ReadUInt();
+    geometries_.Reserve(numGeometries);
+    geometryBoneMappings_.Reserve(numGeometries);
+    geometryCenters_.Reserve(numGeometries);
     for (unsigned i = 0; i < numGeometries; ++i)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadUInt();
-        PODVector<unsigned> boneMapping;
+        PODVector<unsigned> boneMapping(boneMappingCount);
         for (unsigned j = 0; j < boneMappingCount; ++j)
-            boneMapping.Push(source.ReadUInt());
+            boneMapping[j] = source.ReadUInt();
         geometryBoneMappings_.Push(boneMapping);
         
         unsigned numLodLevels = source.ReadUInt();
         Vector<SharedPtr<Geometry> > geometryLodLevels;
+        geometryLodLevels.Reserve(numLodLevels);
         
         for (unsigned j = 0; j < numLodLevels; ++j)
         {
@@ -175,7 +181,6 @@ bool Model::Load(Deserializer& source)
             }
             
             SharedPtr<Geometry> geometry(new Geometry(context_));
-            geometry->SetNumVertexBuffers(1);
             geometry->SetVertexBuffer(0, vertexBuffers_[vertexBufferRef]);
             geometry->SetIndexBuffer(indexBuffers_[indexBufferRef]);
             geometry->SetDrawRange(type, indexStart, indexCount);
@@ -190,6 +195,7 @@ bool Model::Load(Deserializer& source)
     
     // Read morphs
     unsigned numMorphs = source.ReadUInt();
+    morphs_.Reserve(numMorphs);
     for (unsigned i = 0; i < numMorphs; ++i)
     {
         ModelMorph newMorph;

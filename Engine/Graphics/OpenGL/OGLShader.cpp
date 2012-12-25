@@ -114,8 +114,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
             // Create the shader variation now if not created yet
             if (i == vsVariations_.End())
             {
-                ShaderCombination combination;
-                vsParser_.GetCombination(combination, name);
+                ShaderCombination combination = vsParser_.GetCombination(name);
                 
                 i = vsVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
                 
@@ -145,8 +144,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& name)
             // Create the shader variation now if not created yet
             if (i == psVariations_.End())
             {
-                ShaderCombination combination;
-                psParser_.GetCombination(combination, name);
+                ShaderCombination combination = psParser_.GetCombination(name);
                 
                 i = psVariations_.Insert(MakePair(nameHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
                 

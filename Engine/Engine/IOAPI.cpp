@@ -45,6 +45,8 @@ static Log* GetLog()
     return GetScriptContext()->GetSubsystem<Log>();
 }
 
+#ifdef ENABLE_LOGGING
+
 static void Print(const String& value)
 {
     GetLog()->WriteRaw(value + "\n");
@@ -94,6 +96,21 @@ static void LogError(const String& str, Log* ptr)
 {
     ptr->Write(LOG_ERROR, str);
 }
+
+#else
+
+static void Print(const String& value) {}
+static void Print(int value) {}
+static void Print(unsigned value) {}
+static void Print(float value) {}
+static void Print(bool value) {}
+static void LogWrite(const String& str, Log* ptr) {}
+static void LogDebug(const String& str, Log* ptr) {}
+static void LogInfo(const String& str, Log* ptr) {}
+static void LogWarning(const String& str, Log* ptr) {}
+static void LogError(const String& str, Log* ptr) {}
+
+#endif
 
 static void RegisterLog(asIScriptEngine* engine)
 {

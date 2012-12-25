@@ -55,7 +55,7 @@ OBJECTTYPESTATIC(Log);
 
 Log::Log(Context* context) :
     Object(context),
-    #if defined(_DEBUG) || defined(XCODE_DEBUG_CONFIGURATION)
+    #ifdef _DEBUG
     level_(LOG_DEBUG),
     #else
     level_(LOG_INFO),
@@ -88,12 +88,14 @@ void Log::Open(const String& fileName)
 
 void Log::Write(int level, const String& message)
 {
+    assert(level >= LOG_DEBUG && level < LOG_NONE);
+    
     // Prevent recursion
     if (inWrite_)
         return;
     
     // Check message level
-    if (level_ > level || level < LOG_DEBUG || level >= LOG_NONE)
+    if (level_ > level)
         return;
     
     inWrite_ = true;
@@ -165,6 +167,8 @@ void Log::WriteRaw(const String& message)
 
 void Log::SetLevel(int level)
 {
+    assert(level >= LOG_DEBUG && level < LOG_NONE);
+
     level_ = level;
 }
 

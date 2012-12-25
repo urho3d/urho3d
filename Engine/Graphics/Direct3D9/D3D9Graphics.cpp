@@ -1818,7 +1818,7 @@ void Graphics::AddGPUObject(GPUObject* object)
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
-    gpuObjects_.Erase(gpuObjects_.Find(object));
+    gpuObjects_.Remove(object);
 }
 
 void* Graphics::ReserveScratchBuffer(unsigned size)

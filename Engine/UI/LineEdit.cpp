@@ -83,7 +83,7 @@ void LineEdit::RegisterObject(Context* context)
 
 void LineEdit::ApplyAttributes()
 {
-    UIElement::ApplyAttributes();
+    BorderImage::ApplyAttributes();
     
     // Set the text's position to match clipping, so that text left edge is not left partially hidden
     text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
@@ -93,8 +93,6 @@ void LineEdit::Update(float timeStep)
 {
     if (cursorBlinkRate_ > 0.0f)
         cursorBlinkTimer_ = fmodf(cursorBlinkTimer_ + cursorBlinkRate_ * timeStep, 1.0f);
-    else
-        cursorBlinkTimer_ = 0.0f;
     
     // Update cursor position if font has changed
     if (text_->GetFont() != lastFont_ || text_->GetFontSize() != lastFontSize_)
@@ -104,9 +102,7 @@ void LineEdit::Update(float timeStep)
         UpdateCursor();
     }
    
-    bool cursorVisible = false;
-    if (HasFocus())
-        cursorVisible = cursorBlinkTimer_ < 0.5f;
+    bool cursorVisible = HasFocus() ? cursorBlinkTimer_ < 0.5f : false;
     cursor_->SetVisible(cursorVisible);
 }
 
@@ -236,6 +232,10 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         }
         break;
         
+    case KEY_HOME:
+        qualifiers |= QUAL_CTRL;
+        // Fallthru
+            
     case KEY_LEFT:
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
@@ -262,6 +262,10 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         }
         break;
         
+    case KEY_END:
+        qualifiers |= QUAL_CTRL;
+        // Fallthru
+
     case KEY_RIGHT:
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
@@ -285,22 +289,6 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
                 else
                     text_->SetSelection(current, start - current);
             }
-        }
-        break;
-        
-    case KEY_HOME:
-        if (cursorMovable_ && cursorPosition_ > 0)
-        {
-            cursorPosition_ = 0;
-            cursorMoved = true;
-        }
-        break;
-        
-    case KEY_END:
-        if (cursorMovable_ && cursorPosition_ < line_.Length())
-        {
-            cursorPosition_ = line_.LengthUTF8();
-            cursorMoved = true;
         }
         break;
         
@@ -463,6 +451,9 @@ void LineEdit::SetCursorPosition(unsigned position)
 void LineEdit::SetCursorBlinkRate(float rate)
 {
     cursorBlinkRate_ = Max(rate, 0.0f);
+    
+    if (cursorBlinkRate_ == 0.0f)
+        cursorBlinkTimer_ = 0.0f;   // Cursor does not blink, i.e. always visible
 }
 
 void LineEdit::SetMaxLength(unsigned length)

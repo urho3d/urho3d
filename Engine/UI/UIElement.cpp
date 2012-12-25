@@ -147,15 +147,10 @@ UIElement::UIElement(Context* context) :
 UIElement::~UIElement()
 {
     // If child elements have outside references, detach them
-    while (children_.Size())
+    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); ++i)
     {
-        const SharedPtr<UIElement>& element = children_.Back();
-        if (element.Refs() > 1)
-        {
-            element->parent_ = 0;
-            element->MarkDirty();
-        }
-        children_.Pop();
+        if (i->Refs() > 1)
+            (*i)->Detach();
     }
 }
 
@@ -763,8 +758,7 @@ void UIElement::UpdateLayout()
             ++j;
         }
     }
-    
-    if (layoutMode_ == LM_VERTICAL)
+    else if (layoutMode_ == LM_VERTICAL)
     {
         int minChildWidth = 0;
         
@@ -907,8 +901,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     else
         children_.Insert(children_.Begin() + index, SharedPtr<UIElement>(element));
     
-    if (element->parent_)
-        element->parent_->RemoveChild(element);
+    element->Remove();
     
     if (sortChildren_)
         sortOrderDirty_ = true;
@@ -918,14 +911,13 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     UpdateLayout();
 }
 
-void UIElement::RemoveChild(UIElement* element)
+void UIElement::RemoveChild(UIElement* element, unsigned index)
 {
-    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+    for (unsigned i = index; i < children_.Size(); ++i)
     {
-        if (*i == element)
+        if (children_[i] == element)
         {
-            element->parent_ = 0;
-            element->MarkDirty();
+            element->Detach();
             children_.Erase(i);
             UpdateLayout();
             return;
@@ -935,13 +927,9 @@ void UIElement::RemoveChild(UIElement* element)
 
 void UIElement::RemoveAllChildren()
 {
-    while (children_.Size())
-    {
-        const SharedPtr<UIElement>& element = children_.Back();
-        element->parent_ = 0;
-        element->MarkDirty();
-        children_.Pop();
-    }
+    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); )
+        (*i++)->Detach();
+    children_.Clear();
 }
 
 void UIElement::Remove()
@@ -966,7 +954,7 @@ void UIElement::SetInternal(bool enable)
     internal_ = enable;
 }
 
-IntVector2 UIElement::GetScreenPosition()
+IntVector2 UIElement::GetScreenPosition() const
 {
     if (positionDirty_)
     {
@@ -1018,7 +1006,7 @@ IntVector2 UIElement::GetScreenPosition()
     return screenPosition_;
 }
 
-float UIElement::GetDerivedOpacity()
+float UIElement::GetDerivedOpacity() const
 {
     if (opacityDirty_)
     {
@@ -1053,6 +1041,7 @@ void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const
     
     if (!recursive)
     {
+        dest.Reserve(children_.Size());
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             dest.Push(*i);
     }
@@ -1107,17 +1096,16 @@ UIElement* UIElement::GetRoot() const
     return root;
 }
 
-unsigned UIElement::GetUIntColor()
+const Color& UIElement::GetDerivedColor() const
 {
     if (derivedColorDirty_)
     {
-        Color color = color_[C_TOPLEFT];
-        color.a_ *= GetDerivedOpacity();
-        uintColor_ = color.ToUInt();
+        derivedColor_ = color_[C_TOPLEFT];
+        derivedColor_.a_ *= GetDerivedOpacity();
         derivedColorDirty_ = false;
     }
     
-    return uintColor_;
+    return derivedColor_;
 }
 
 const Variant& UIElement::GetVar(ShortStringHash key) const
@@ -1276,16 +1264,18 @@ void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
 int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing)
 {
     int width = begin + end;
+    if (sizes.Empty())
+        return width;
+    
     for (unsigned i = 0; i < sizes.Size(); ++i)
     {
         // If calculating maximum size, and the default is specified, do not overflow it
         if (sizes[i] == M_MAX_INT)
             return M_MAX_INT;
-        width += sizes[i];
-        if (i < sizes.Size() - 1)
-            width += spacing;
+        width += sizes[i] + spacing;
     }
-    return width;
+    // The last spacing is not needed
+    return width - spacing;
 }
 
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
@@ -1373,8 +1363,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     for (int i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
-        position += sizes[i];
-        position += spacing;
+        position += sizes[i] + spacing;
         if (sizes[i] < layoutMinSize_)
             layoutMinSize_ = sizes[i];
     }
@@ -1394,6 +1383,9 @@ IntVector2 UIElement::GetLayoutChildPosition(UIElement* child)
     case HA_RIGHT:
         ret.x_ = -layoutBorder_.right_;
         break;
+    
+    default:
+        break;
     }
     
     VerticalAlignment va = child->GetVerticalAlignment();
@@ -1406,10 +1398,18 @@ IntVector2 UIElement::GetLayoutChildPosition(UIElement* child)
     case VA_BOTTOM:
         ret.y_ = -layoutBorder_.bottom_;
         break;
+    
+    default:
+        break;
     }
     
     return ret;
 }
 
+void UIElement::Detach()
+{
+    parent_ = 0;
+    MarkDirty();
+}
 
 }

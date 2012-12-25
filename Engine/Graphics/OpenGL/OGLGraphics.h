@@ -381,7 +381,7 @@ public:
     
 private:
     /// Check supported rendering features.
-    void CheckFeatureSupport();
+    void CheckFeatureSupport(String& extensions);
     /// Select FBO and commit changes.
     void CommitFramebuffer();
     /// Check FBO completeness.
@@ -513,6 +513,8 @@ private:
     Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
     /// Temp matrices for transposing shader parameters.
     Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
+    /// Releasing GPU objects flag.
+    bool releasingGPUObjects_;
 };
 
 /// Register Graphics library objects.

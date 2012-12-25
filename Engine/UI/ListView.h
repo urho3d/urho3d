@@ -64,8 +64,8 @@ public:
     void AddItem(UIElement* item);
     /// Insert item at a specific position.
     void InsertItem(unsigned index, UIElement* item);
-    /// Remove specific item. In hierarchy mode will also remove any children.
-    void RemoveItem(UIElement* item);
+    /// Remove specific item, starting search at the specified index if provided. In hierarchy mode will also remove any children.
+    void RemoveItem(UIElement* item, unsigned index = 0);
     /// Remove item at index. In hierarchy mode will also remove any children.
     void RemoveItem(unsigned index);
     /// Remove all items.
@@ -158,8 +158,6 @@ private:
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
     /// Handle global focus change to check whether an invisible item was focused.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle being focused.
-    void HandleFocused(StringHash eventType, VariantMap& eventData);
     /// Handle being defocused.
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
 };

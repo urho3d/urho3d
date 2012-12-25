@@ -69,7 +69,7 @@ public:
     void SetLogMode(ScriptLogMode mode);
     /// Clear retained mode log messages.
     void ClearLogMessages();
-    /// Print the whole script API (all registered classes, methods and properties) to the log.
+    /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when ENABLE_LOGGING not defined.
     void DumpAPI();
     /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
@@ -102,7 +102,7 @@ private:
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
     /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext();
-    /// Output a sanitated row of script API.
+    /// Output a sanitated row of script API. No-ops when ENABLE_LOGGING not defined.
     void OutputAPIRow(const String& row, bool removeReference = false);
     
     /// AngelScript engine.

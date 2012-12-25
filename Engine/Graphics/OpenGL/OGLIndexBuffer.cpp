@@ -59,11 +59,6 @@ IndexBuffer::~IndexBuffer()
     Release();
 }
 
-void IndexBuffer::OnDeviceLost()
-{
-    GPUObject::OnDeviceLost();
-}
-
 void IndexBuffer::OnDeviceReset()
 {
     if (!object_)
@@ -269,6 +264,9 @@ void IndexBuffer::Unlock()
             graphics_->FreeScratchBuffer(lockScratchData_);
         lockScratchData_ = 0;
         lockState_ = LOCK_NONE;
+        break;
+    
+    default:
         break;
     }
 }

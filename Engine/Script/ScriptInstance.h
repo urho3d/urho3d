@@ -169,8 +169,8 @@ private:
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
     /// Active flag.
     bool active_;
-    /// DelayedStart called flag.
-    bool delayedStart_;
+    /// Subscribed to scene update event flag.
+    bool subscribed_;
     /// Fixed update FPS.
     int fixedUpdateFps_;
     /// Fixed update time interval.

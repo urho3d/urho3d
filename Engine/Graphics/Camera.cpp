@@ -428,20 +428,17 @@ float Camera::GetHalfViewSize() const
 
 Vector3 Camera::GetForwardVector()
 {
-    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
-    return worldRotation * Vector3::FORWARD;
+    return node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
 }
 
 Vector3 Camera::GetRightVector()
 {
-    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
-    return worldRotation * Vector3::RIGHT;
+    return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::RIGHT : Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector()
 {
-    Matrix3 worldRotation = node_ ? node_->GetWorldTransform().RotationMatrix() : Matrix3::IDENTITY;
-    return worldRotation * Vector3::UP;
+    return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::UP : Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos) const

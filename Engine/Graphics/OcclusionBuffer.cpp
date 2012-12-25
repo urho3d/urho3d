@@ -143,11 +143,8 @@ void OcclusionBuffer::Clear()
     int* dest = buffer_;
     int count = width_ * height_;
     
-    while (count)
-    {
+    while (count--)
         *dest++ = 0x7fffffff;
-        --count;
-    }
     
     depthHierarchyDirty_ = true;
 }

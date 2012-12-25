@@ -140,9 +140,7 @@ FileSelector::FileSelector(Context* context) :
 
 FileSelector::~FileSelector()
 {
-    UI* ui = GetSubsystem<UI>();
-    if (ui)
-        ui->GetRoot()->RemoveChild(window_);
+    window_->Remove();
 }
 
 void FileSelector::RegisterObject(Context* context)
@@ -325,6 +323,8 @@ void FileSelector::RefreshFiles()
     fileSystem->ScanDir(directories, path_, "*.*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
     
+    fileEntries_.Reserve(directories.Size() + files.Size());
+    
     for (unsigned i = 0; i < directories.Size(); ++i)
     {
         FileSelectorEntry newEntry;
@@ -499,7 +499,7 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
     using namespace FileSelected;
     
     VariantMap newEventData;
-    newEventData[P_FILENAME] = String();
+    newEventData[P_FILENAME] = String::EMPTY;
     newEventData[P_OK] = false;
     SendEvent(E_FILESELECTED, newEventData);
 }

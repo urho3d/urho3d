@@ -28,12 +28,18 @@
 namespace Urho3D
 {
 
-inline unsigned GetIndex(unsigned index, const void* indexData, unsigned indexSize)
+inline unsigned GetIndex(void*& indexPointer, unsigned indexSize)
 {
     if (indexSize == sizeof(unsigned short))
-        return ((const unsigned short*)indexData)[index];
+    {
+        unsigned short* p = (unsigned short*)indexPointer;
+        return *p++;
+    }
     else
-        return ((const unsigned*)indexData)[index];
+    {
+        unsigned* p = (unsigned*)indexPointer;
+        return *p++;
+    }
 }
 
 void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
@@ -45,9 +51,10 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
     unsigned maxVertex = 0;
     unsigned char* vertices = (unsigned char*)vertexData;
     
+    void* indexPointer = const_cast<void*>(indexData);
     for (unsigned i = indexStart; i < indexStart + indexCount; ++i)
     {
-        unsigned v = GetIndex(i, indexData, indexSize);
+        unsigned v = GetIndex(indexPointer, indexSize);
         if (v < minVertex)
             minVertex = v;
         if (v > maxVertex)
@@ -59,11 +66,12 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
     Vector3 *tan2 = tan1 + vertexCount;
     memset(tan1, 0, sizeof(Vector3) * vertexCount * 2);
     
+    indexPointer = const_cast<void*>(indexData);
     for (unsigned i = indexStart; i < indexStart + indexCount; i += 3)
     {
-        unsigned i1 = GetIndex(i, indexData, indexSize);
-        unsigned i2 = GetIndex(i + 1, indexData, indexSize);
-        unsigned i3 = GetIndex(i + 2, indexData, indexSize);
+        unsigned i1 = GetIndex(indexPointer, indexSize);
+        unsigned i2 = GetIndex(indexPointer, indexSize);
+        unsigned i3 = GetIndex(indexPointer, indexSize);
         
         const Vector3& v1 = *((Vector3*)(vertices + i1 * vertexSize));
         const Vector3& v2 = *((Vector3*)(vertices + i2 * vertexSize));

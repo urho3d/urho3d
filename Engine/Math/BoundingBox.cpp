@@ -61,10 +61,7 @@ void BoundingBox::Define(const Sphere& sphere)
 void BoundingBox::Merge(const Vector3* vertices, unsigned count)
 {
     while (count--)
-    {
-        Merge(*vertices);
-        ++vertices;
-    }
+        Merge(*vertices++);
 }
 
 void BoundingBox::Merge(const Frustum& frustum)
@@ -106,66 +103,27 @@ void BoundingBox::Clip(const BoundingBox& box)
     if (box.max_.z_ < max_.z_)
         max_.z_ = box.max_.z_;
     
-    float temp;
     if (min_.x_ > max_.x_)
-    {
-        temp = min_.x_;
-        min_.x_ = max_.x_;
-        max_.x_ = temp;
-    }
+        Swap(min_.x_, max_.x_);
     if (min_.y_ > max_.y_)
-    {
-        temp = min_.y_;
-        min_.y_ = max_.y_;
-        max_.y_ = temp;
-    }
+        Swap(min_.y_, max_.y_);
     if (min_.z_ > max_.z_)
-    {
-        temp = min_.z_;
-        min_.z_ = max_.z_;
-        max_.z_ = temp;
-    }
+        Swap(min_.z_, max_.z_);
 }
 
 void BoundingBox::Transform(const Matrix3& transform)
 {
-    Vector3 newCenter = transform * Center();
-    Vector3 oldEdge = Size() * 0.5f;
-    Vector3 newEdge = Vector3(
-        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
-        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
-        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
-    );
-    
-    min_ = newCenter - newEdge;
-    max_ = newCenter + newEdge;
+    *this = Transformed(Matrix3x4(transform));
 }
 
 void BoundingBox::Transform(const Matrix3x4& transform)
 {
-    Vector3 newCenter = transform * Center();
-    Vector3 oldEdge = Size() * 0.5f;
-    Vector3 newEdge = Vector3(
-        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
-        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
-        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
-    );
-    
-    min_ = newCenter - newEdge;
-    max_ = newCenter + newEdge;
+    *this = Transformed(transform);
 }
 
 BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
 {
-    Vector3 newCenter = transform * Center();
-    Vector3 oldEdge = Size() * 0.5f;
-    Vector3 newEdge = Vector3(
-        Abs(transform.m00_) * oldEdge.x_ + Abs(transform.m01_) * oldEdge.y_ + Abs(transform.m02_) * oldEdge.z_,
-        Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
-        Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
-    );
-    
-    return BoundingBox(newCenter - newEdge, newCenter + newEdge);
+    return Transformed(Matrix3x4(transform));
 }
 
 BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const

@@ -34,8 +34,9 @@ const Quaternion Quaternion::IDENTITY;
 void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 {
     Vector3 normAxis = axis.Normalized();
-    float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
-    float cosAngle = cosf((angle * M_DEGTORAD) * 0.5f);
+    angle *= M_DEGTORAD_2;
+    float sinAngle = sinf(angle);
+    float cosAngle = cosf(angle);
     
     w_ = cosAngle;
     x_ = normAxis.x_ * sinAngle;
@@ -46,12 +47,15 @@ void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 void Quaternion::FromEulerAngles(float x, float y, float z)
 {
     // Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
-    float sinX = sinf((x * M_DEGTORAD) * 0.5f);
-    float cosX = cosf((x * M_DEGTORAD) * 0.5f);
-    float sinY = sinf((y * M_DEGTORAD) * 0.5f);
-    float cosY = cosf((y * M_DEGTORAD) * 0.5f);
-    float sinZ = sinf((z * M_DEGTORAD) * 0.5f);
-    float cosZ = cosf((z * M_DEGTORAD) * 0.5f);
+    x *= M_DEGTORAD_2;
+    y *= M_DEGTORAD_2;
+    z *= M_DEGTORAD_2;
+    float sinX = sinf(x);
+    float cosX = cosf(x);
+    float sinY = sinf(y);
+    float cosY = cosf(y);
+    float sinZ = sinf(z);
+    float cosZ = cosf(z);
     
     w_ = cosY * cosX * cosZ + sinY * sinX * sinZ;
     x_ = cosY * sinX * cosZ + sinY * cosX * sinZ;
@@ -81,16 +85,8 @@ void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
         Vector3 axis = Vector3::RIGHT.CrossProduct(normStart);
         if (axis.Length() < M_EPSILON)
             axis = Vector3::UP.CrossProduct(normStart);
-        float angle = 180.0f;
         
-        Vector3 normAxis = axis.Normalized();
-        float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
-        float cosAngle = cosf((angle * M_DEGTORAD) * 0.5f);
-        
-        w_ = cosAngle;
-        x_ = normAxis.x_ * sinAngle;
-        y_ = normAxis.y_ * sinAngle;
-        z_ = normAxis.z_ * sinAngle;
+        FromAngleAxis(180.f, axis);
     }
 }
 
@@ -111,43 +107,40 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
     
     if (t > 0.0f)
     {
-        float s = 0.5f / sqrtf(1.0f + t);
+        float invS = 0.5f / sqrtf(1.0f + t);
         
-        x_ = (matrix.m21_ - matrix.m12_) * s;
-        y_ = (matrix.m02_ - matrix.m20_) * s;
-        z_ = (matrix.m10_ - matrix.m01_) * s;
-        w_ = 0.25f / s;
+        x_ = (matrix.m21_ - matrix.m12_) * invS;
+        y_ = (matrix.m02_ - matrix.m20_) * invS;
+        z_ = (matrix.m10_ - matrix.m01_) * invS;
+        w_ = 0.25f / invS;
     }
     else
     {
         if (matrix.m00_ > matrix.m11_ && matrix.m00_ > matrix.m22_)
         {
-            float s = sqrtf(1.0f + matrix.m00_ - matrix.m11_ - matrix.m22_) * 2.0f;
-            float invS = 1.0f / s;
+            float invS = 0.5f / sqrtf(1.0f + matrix.m00_ - matrix.m11_ - matrix.m22_);
             
-            x_ = 0.25f * s;
+            x_ = 0.25f / invS;
             y_ = (matrix.m01_ + matrix.m10_) * invS;
             z_ = (matrix.m20_ + matrix.m02_) * invS;
             w_ = (matrix.m21_ - matrix.m12_) * invS;
         }
         else if (matrix.m11_ > matrix.m22_)
         {
-            float s = sqrtf(1.0f + matrix.m11_ - matrix.m00_ - matrix.m22_) * 2.0f;
-            float invS = 1.0f / s;
+            float invS = 0.5f / sqrtf(1.0f + matrix.m11_ - matrix.m00_ - matrix.m22_);
             
             x_ = (matrix.m01_ + matrix.m10_) * invS;
-            y_ = 0.25f * s;
+            y_ = 0.25f / invS;
             z_ = (matrix.m12_ + matrix.m21_) * invS;
             w_ = (matrix.m02_ - matrix.m20_) * invS;
         }
         else
         {
-            float s = sqrtf(1.0f + matrix.m22_ - matrix.m00_ - matrix.m11_) * 2.0f;
-            float invS = 1.0f / s;
+            float invS = 0.5f / sqrtf(1.0f + matrix.m22_ - matrix.m00_ - matrix.m11_);
             
             x_ = (matrix.m02_ + matrix.m20_) * invS;
             y_ = (matrix.m12_ + matrix.m21_) * invS;
-            z_ = 0.25f * s;
+            z_ = 0.25f / invS;
             w_ = (matrix.m10_ - matrix.m01_) * invS;
         }
     }

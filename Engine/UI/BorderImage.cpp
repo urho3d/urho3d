@@ -72,10 +72,7 @@ ResourceRef BorderImage::GetTextureAttr() const
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    if (hovering_ || selected_)
-        GetBatches(batches, quads, currentScissor, hoverOffset_);
-    else
-        GetBatches(batches, quads, currentScissor, IntVector2::ZERO);
+    GetBatches(batches, quads, currentScissor, hovering_ || selected_ ? hoverOffset_ : IntVector2::ZERO);
 }
 
 void BorderImage::SetTexture(Texture* texture)
@@ -127,11 +124,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
         
-    UIBatch batch;
-    batch.Begin(&quads);
-    batch.blendMode_ = allOpaque ? BLEND_REPLACE : BLEND_ALPHA;
-    batch.scissor_ = currentScissor;
-    batch.texture_ = texture_;
+    UIBatch batch(allOpaque ? BLEND_REPLACE : BLEND_ALPHA, currentScissor, texture_, &quads);
     
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     const IntVector2& size = GetSize();

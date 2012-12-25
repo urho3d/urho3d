@@ -100,9 +100,6 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Recalculate the local-space bounding box.
-    void CalculateBoundingBox();
-    
     /// Local-space bounding box.
     BoundingBox boundingBox_;
     /// Primitive type per geometry.

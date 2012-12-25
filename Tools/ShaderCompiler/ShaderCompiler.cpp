@@ -295,9 +295,8 @@ void CompileShader(const String& fileName)
         {
             if (!compileVariation_ || i->first_ == variationName_)
             {
-                ShaderCombination src;
+                ShaderCombination src = vsParser.GetCombination(i->first_);
                 CompiledVariation compile;
-                vsParser.GetCombination(src, i->first_);
                 
                 compile.type_ = VS;
                 compile.name_ = file;
@@ -328,9 +327,8 @@ void CompileShader(const String& fileName)
         {
             if (!compileVariation_ || i->first_ == variationName_)
             {
-                ShaderCombination src;
+                ShaderCombination src = psParser.GetCombination(i->first_);
                 CompiledVariation compile;
-                psParser.GetCombination(src, i->first_);
                 
                 compile.type_ = PS;
                 compile.name_ = file;
@@ -503,7 +501,7 @@ void CompileVariation(CompiledVariation* variation)
             if (isSampler)
             {
                 // Skip if it's a G-buffer sampler
-                if (name.Find("Buffer") == String::NPOS)
+                if (!name.Contains("Buffer"))
                 {
                     Parameter newTextureUnit(name, reg, 1);
                     variation->textureUnits_.Push(newTextureUnit);

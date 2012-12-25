@@ -275,9 +275,10 @@ bool Serializer::WriteVariantData(const Variant& value)
         
     case VAR_INTVECTOR2:
         return WriteIntVector2(value.GetIntVector2());
+            
+    default:
+        return false;
     }
-    
-    return false;
 }
 
 bool Serializer::WriteVariantVector(const VariantVector& value)

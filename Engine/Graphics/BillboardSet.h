@@ -32,7 +32,6 @@ namespace Urho3D
 {
 
 class IndexBuffer;
-class Graphics;
 class VertexBuffer;
 
 /// One billboard in the billboard set.

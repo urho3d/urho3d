@@ -32,6 +32,7 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "StringUtils.h"
+#include "Engine.h"
 
 #include <cstring>
 
@@ -68,6 +69,9 @@ OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
     Object(context),
+    mouseButtonDown_(0),
+    mouseButtonPress_(0),
+    mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
@@ -77,12 +81,9 @@ Input::Input(Context* context) :
     suppressNextMouseMove_(false),
     initialized_(false)
 {
-    // Zero the initial state
-    mouseButtonDown_ = 0;
-    ResetState();
-    
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame));
+    
+    // Delay SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame)) until input is initialized
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -101,10 +102,9 @@ Input::~Input()
 
 void Input::Update()
 {
-    PROFILE(UpdateInput);
+    assert(initialized_);
     
-    if (!graphics_ || !graphics_->IsInitialized())
-        return;
+    PROFILE(UpdateInput);
     
     // Reset input accumulation for this frame
     keyPress_.Clear();
@@ -139,7 +139,7 @@ void Input::Update()
             if (evt.type != SDL_QUIT)
                 HandleSDLEvent(&evt);
             else
-                graphics_->Close();
+                GetSubsystem<Engine>()->Exit();
         }
     }
     
@@ -178,43 +178,49 @@ void Input::Update()
         else
             lastMousePosition_ = mousePosition;
         
-        if (mouseMove_ != IntVector2::ZERO && suppressNextMouseMove_)
-        {
-            mouseMove_ = IntVector2::ZERO;
-            suppressNextMouseMove_ = false;
-        }
-        
         // Send mouse move event if necessary
         if (mouseMove_ != IntVector2::ZERO)
         {
-            using namespace MouseMove;
-            
-            VariantMap eventData;
-            if (mouseVisible_)
+            if (suppressNextMouseMove_)
             {
-                eventData[P_X] = mousePosition.x_;
-                eventData[P_Y] = mousePosition.y_;
+                mouseMove_ = IntVector2::ZERO;
+                suppressNextMouseMove_ = false;
             }
-            eventData[P_DX] = mouseMove_.x_;
-            eventData[P_DY] = mouseMove_.y_;
-            eventData[P_BUTTONS] = mouseButtonDown_;
-            eventData[P_QUALIFIERS] = GetQualifiers();
-            SendEvent(E_MOUSEMOVE, eventData);
+            else
+            {
+                using namespace MouseMove;
+                
+                VariantMap eventData;
+                if (mouseVisible_)
+                {
+                    eventData[P_X] = mousePosition.x_;
+                    eventData[P_Y] = mousePosition.y_;
+                }
+                eventData[P_DX] = mouseMove_.x_;
+                eventData[P_DY] = mouseMove_.y_;
+                eventData[P_BUTTONS] = mouseButtonDown_;
+                eventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_MOUSEMOVE, eventData);
+            }
         }
     }
 }
 
 void Input::SetMouseVisible(bool enable)
 {
-    // External windows can only support visible mouse cursor
-    if (graphics_ && graphics_->GetExternalWindow())
-        enable = true;
-    
     if (enable != mouseVisible_)
     {
         mouseVisible_ = enable;
+        
         if (initialized_)
         {
+            // External windows can only support visible mouse cursor
+            if (graphics_ && graphics_->GetExternalWindow())
+            {
+                mouseVisible_ = true;
+                return;
+            }
+            
             if (!mouseVisible_ && active_)
                 SDL_ShowCursor(SDL_FALSE);
             else
@@ -356,7 +362,7 @@ IntVector2 Input::GetMousePosition() const
 {
     IntVector2 ret = IntVector2::ZERO;
     
-    if (!graphics_ || !graphics_->IsInitialized())
+    if (!initialized_)
         return ret;
     
     SDL_GetMouseState(&ret.x_, &ret.y_);
@@ -366,16 +372,14 @@ IntVector2 Input::GetMousePosition() const
 
 TouchState* Input::GetTouch(unsigned index) const
 {
-    unsigned cmpIndex = 0;
-    for (HashMap<int, TouchState>::ConstIterator i = touches_.Begin(); i != touches_.End(); ++i)
-    {
-        if (cmpIndex == index)
-            return const_cast<TouchState*>(&i->second_);
-        else
-            ++cmpIndex;
-    }
+    if (index >= touches_.Size())
+        return 0;
     
-    return 0;
+    HashMap<int, TouchState>::ConstIterator i = touches_.Begin();
+    while (index--)
+        ++i;
+    
+    return const_cast<TouchState*>(&i->second_);
 }
 
 const String& Input::GetJoystickName(unsigned index) const
@@ -434,7 +438,10 @@ void Input::Initialize()
     }
     
     ResetJoysticks();
+    ResetState();
     
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame));
+
     LOGINFO("Initialized input");
 }
 
@@ -448,9 +455,6 @@ void Input::ResetJoysticks()
 
 void Input::MakeActive()
 {
-    if (!graphics_ || !graphics_->IsInitialized())
-        return;
-    
     ResetState();
     
     active_ = true;
@@ -470,9 +474,6 @@ void Input::MakeActive()
 
 void Input::MakeInactive()
 {
-    if (!graphics_ || !graphics_->IsInitialized())
-        return;
-    
     ResetState();
     
     active_ = false;
@@ -537,7 +538,7 @@ void Input::SetMouseButton(int button, bool newState)
 {
     // After deactivation in windowed hidden mouse mode, activate only after a left-click inside the window
     // This allows glitchfree window dragging on all operating systems
-    if (initialized_ && !graphics_->GetFullscreen() && !mouseVisible_)
+    if (!mouseVisible_ && !graphics_->GetFullscreen())
     {
         if (!active_ && newState && button == MOUSEB_LEFT)
             activated_ = true;
@@ -923,8 +924,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // Update input right at the beginning of the frame
-    if (initialized_)
-        Update();
+    Update();
 }
 
 }

@@ -166,6 +166,7 @@ static Viewport* ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera*
     Vector<SharedPtr<PostProcess> > vec;
     if (arr)
     {
+        vec.Reserve(arr->GetSize());
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
     }
@@ -178,6 +179,7 @@ static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Cam
     Vector<SharedPtr<PostProcess> > vec;
     if (arr)
     {
+        vec.Reserve(arr->GetSize());
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
     }

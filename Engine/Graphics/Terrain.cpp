@@ -61,12 +61,12 @@ Terrain::Terrain(Context* context) :
     Component(context),
     indexBuffer_(new IndexBuffer(context)),
     spacing_(DEFAULT_SPACING),
-    patchWorldSize_(Vector2::ZERO),
     patchWorldOrigin_(Vector2::ZERO),
+    patchWorldSize_(Vector2::ZERO),
     numVertices_(IntVector2::ZERO),
     numPatches_(IntVector2::ZERO),
-    numLodLevels_(1),
     patchSize_(DEFAULT_PATCH_SIZE),
+    numLodLevels_(1),
     visible_(true),
     castShadows_(false),
     occluder_(false),
@@ -122,10 +122,7 @@ void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 void Terrain::ApplyAttributes()
 {
     if (recreateTerrain_)
-    {
         CreateGeometry();
-        recreateTerrain_ = false;
-    }
 }
 
 void Terrain::SetSpacing(const Vector3& spacing)
@@ -642,7 +639,9 @@ void Terrain::CreateGeometry()
                         (numVertices_.y_ - 1 - z) + imgComps * x + 1] / 256.0f) * spacing_.y_;
             }
         }
-        
+
+        patches_.Reserve(numPatches_.x_ * numPatches_.y_);
+
         // Create patches and set node transforms
         for (int z = 0; z < numPatches_.y_; ++z)
         {
@@ -922,6 +921,7 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     const IntVector2& coords = patch->GetCoordinates();
     PODVector<float>& lodErrors = patch->GetLodErrors();
     lodErrors.Clear();
+    lodErrors.Reserve(numLodLevels_);
     
     int xStart = coords.x_ * patchSize_;
     int zStart = coords.y_ * patchSize_;

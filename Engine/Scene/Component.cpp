@@ -26,7 +26,6 @@
 #include "Context.h"
 #include "ReplicationState.h"
 #include "Scene.h"
-#include "XMLElement.h"
 
 #include "DebugNew.h"
 
@@ -162,7 +161,7 @@ void Component::CleanupConnection(Connection* connection)
 
 void Component::MarkNetworkUpdate()
 {
-    if (id_ < FIRST_LOCAL_ID && !networkUpdate_)
+    if (!networkUpdate_ && id_ < FIRST_LOCAL_ID)
     {
         Scene* scene = GetScene();
         if (scene)

@@ -31,11 +31,6 @@
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
 
-namespace kNet
-{
-    class MessageConnection;
-}
-
 namespace Urho3D
 {
 

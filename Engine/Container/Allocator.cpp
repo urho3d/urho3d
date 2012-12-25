@@ -54,16 +54,16 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
     unsigned char* nodePtr = blockPtr + sizeof(AllocatorBlock);
     AllocatorNode* firstNewNode = reinterpret_cast<AllocatorNode*>(nodePtr);
     
-    for (unsigned i = 0; i < capacity; ++i)
+    for (unsigned i = 0; i < capacity - 1; ++i)
     {
         AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
-        
-        if (i < capacity - 1)
-            newNode->next_ = reinterpret_cast<AllocatorNode*>(nodePtr + sizeof(AllocatorNode) + nodeSize);
-        else
-            newNode->next_ = allocator->free_;
-        
+        newNode->next_ = reinterpret_cast<AllocatorNode*>(nodePtr + sizeof(AllocatorNode) + nodeSize);
         nodePtr += sizeof(AllocatorNode) + nodeSize;
+    }
+    // i == capacity - 1
+    {
+        AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
+        newNode->next_ = 0;
     }
     
     allocator->free_ = firstNewNode;
@@ -92,19 +92,13 @@ void* AllocatorReserve(AllocatorBlock* allocator)
     if (!allocator)
         return 0;
     
-    if (allocator->free_)
+    if (!allocator->free_)
     {
-        AllocatorNode* freeNode = allocator->free_;
-        void* ptr = (reinterpret_cast<unsigned char*>(freeNode)) + sizeof(AllocatorNode);
-        allocator->free_ = freeNode->next_;
-        freeNode->next_ = 0;
-        return ptr;
+        // Free nodes have been exhausted. Allocate a new larger block
+        unsigned newCapacity = (allocator->capacity_ + 1) >> 1;
+        AllocatorReserveBlock(allocator, allocator->nodeSize_, newCapacity);
+        allocator->capacity_ += newCapacity;
     }
-    
-    // Free nodes have been exhausted. Allocate a new larger block
-    unsigned newCapacity = (allocator->capacity_ + 1) >> 1;
-    AllocatorReserveBlock(allocator, allocator->nodeSize_, newCapacity);
-    allocator->capacity_ += newCapacity;
     
     // We should have new free node(s) chained
     AllocatorNode* freeNode = allocator->free_;

@@ -25,8 +25,6 @@
 #include "Audio.h"
 #include "Context.h"
 #include "CoreEvents.h"
-#include "Graphics.h"
-#include "GraphicsEvents.h"
 #include "Log.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
@@ -83,9 +81,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     
     desired.freq = mixRate;
     desired.format = AUDIO_S16SYS;
-    desired.channels = 1;
-    if (stereo)
-        desired.channels = 2;
+    desired.channels = stereo ? 2 : 1;
     
     // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
     if (desired.freq <= 11025)
@@ -241,15 +237,14 @@ void Audio::MixOutput(void *dest, unsigned samples)
             clipSamples <<= 1;
         
         // Clear clip buffer
-        memset(clipBuffer_.Get(), 0, clipSamples * sizeof(int));
         int* clipPtr = clipBuffer_.Get();
+        memset(clipPtr, 0, clipSamples * sizeof(int));
         
         // Mix samples to clip buffer
         for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
             (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
         
         // Copy output from clip buffer to destination
-        clipPtr = clipBuffer_.Get();
         short* destPtr = (short*)dest;
         while (clipSamples--)
             *destPtr++ = Clamp(*clipPtr++, -32768, 32767);

@@ -175,7 +175,7 @@ private:
     void CloneGeometries();
     /// Copy morph vertices.
     void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
-    /// Recalculate animations. Called from UpdateNode().
+    /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning.
     void UpdateSkinning();

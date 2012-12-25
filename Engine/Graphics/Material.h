@@ -146,8 +146,6 @@ public:
 private:
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
-    /// Re-evaluate specular lighting.
-    void CheckSpecular();
     
     /// Techniques.
     Vector<TechniqueEntry> techniques_;

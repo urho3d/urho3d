@@ -487,6 +487,9 @@ void Constraint::ApplyFrames()
             coneTwistConstraint->setFrames(ownFrame, otherFrame);
         }
         break;
+
+    default:
+        break;
     }
 }
 
@@ -519,6 +522,9 @@ void Constraint::ApplyLimits()
             btConeTwistConstraint* coneTwistConstraint = static_cast<btConeTwistConstraint*>(constraint_);
             coneTwistConstraint->setLimit(highLimit_.y_ * M_DEGTORAD, highLimit_.y_ * M_DEGTORAD, highLimit_.x_ * M_DEGTORAD);
         }
+        break;
+    
+    default:
         break;
     }
 }

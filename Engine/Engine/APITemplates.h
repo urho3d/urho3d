@@ -314,6 +314,12 @@ template <class T> void RegisterNamedObjectConstructor(asIScriptEngine* engine, 
 
 static const AttributeInfo noAttributeInfo;
 
+// To keep Xcode LLVM/Clang happy - it erroneosly warns on unused functions defined below which are actually being referenced in the code
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Serializable* ptr)
 {
     const Vector<AttributeInfo>* attributes = ptr->GetAttributes();
@@ -474,7 +480,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
-        Node* node = (*i);
+        Node* node = *i;
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
         for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
@@ -743,6 +749,10 @@ static VariantMap& UIElementGetVars(UIElement* ptr)
 {
     return const_cast<VariantMap&>(ptr->GetVars());
 }
+
+#if __clang__
+#pragma clang diagnostic pop
+#endif
 
 /// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className)

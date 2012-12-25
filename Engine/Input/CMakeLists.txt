@@ -8,7 +8,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene
+    ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../Engine
 )
 
 if (USE_OPENGL)

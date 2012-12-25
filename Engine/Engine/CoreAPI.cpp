@@ -362,7 +362,7 @@ static Variant& VariantMapAtHash(ShortStringHash key, VariantMap& map)
 
 static bool VariantMapContains(const String& key, VariantMap& map)
 {
-    return map.Find(ShortStringHash(key)) != map.End();
+    return map.Contains(ShortStringHash(key));
 }
 
 static void VariantMapErase(const String& key, VariantMap& map)
@@ -372,7 +372,7 @@ static void VariantMapErase(const String& key, VariantMap& map)
 
 static bool VariantMapContainsHash(ShortStringHash key, VariantMap& map)
 {
-    return map.Find(key) != map.End();
+    return map.Contains(key);
 }
 
 static void VariantMapEraseHash(ShortStringHash key, VariantMap& map)
@@ -383,6 +383,7 @@ static void VariantMapEraseHash(ShortStringHash key, VariantMap& map)
 static CScriptArray* VariantMapGetKeys(const VariantMap& map)
 {
     Vector<ShortStringHash> result;
+    result.Reserve(map.Size());
     for (VariantMap::ConstIterator i = map.Begin(); i != map.End(); ++i)
         result.Push(i->first_);
     return VectorToArray<ShortStringHash>(result, "Array<StringHash>");
@@ -622,10 +623,7 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
     Vector<String> enumNames;
     const char** enumNamePtrs = ptr->enumNames_;
     while (enumNamePtrs && *enumNamePtrs)
-    {
-        enumNames.Push(*enumNamePtrs);
-        ++enumNamePtrs;
-    }
+        enumNames.Push(*enumNamePtrs++);
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 

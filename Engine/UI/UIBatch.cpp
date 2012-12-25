@@ -32,6 +32,93 @@
 namespace Urho3D
 {
 
+UIQuad::UIQuad() :
+    defined_(false)
+{
+}
+
+UIQuad::UIQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
+    int texWidth, int texHeight, Color* color) :
+    defined_(false)
+{
+    if (color || !element.HasColorGradient())
+    {
+        unsigned uintColor = (color ? *color : element.GetDerivedColor()).ToUInt();
+        
+        // If alpha is 0, nothing will be rendered, so do not add the quad
+        if (!(uintColor & 0xff000000))
+            return;
+        
+        topLeftColor_ = uintColor;
+        topRightColor_ = uintColor;
+        bottomLeftColor_ = uintColor;
+        bottomRightColor_ = uintColor;
+    }
+    else
+    {
+        topLeftColor_ = GetInterpolatedColor(element, x, y);
+        topRightColor_ = GetInterpolatedColor(element, x + width, y);
+        bottomLeftColor_ = GetInterpolatedColor(element, x, y + height);
+        bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
+    }
+    
+    const IntVector2& screenPos = element.GetScreenPosition();
+    
+    left_ = x + screenPos.x_;
+    top_ = y + screenPos.y_;
+    right_ = left_ + width;
+    bottom_ = top_ + height;
+    leftUV_ = texOffsetX;
+    topUV_ = texOffsetY;
+    rightUV_ = texOffsetX + (texWidth ? texWidth : width);
+    bottomUV_ = texOffsetY + (texHeight ? texHeight : height);
+    
+    defined_ = true;
+}
+    
+unsigned UIQuad::GetInterpolatedColor(const UIElement& element, int x, int y)
+{
+    const IntVector2& size = element.GetSize();
+    
+    if (size.x_ && size.y_)
+    {
+        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
+        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
+        
+        Color topColor = element.GetColor(C_TOPLEFT).Lerp(element.GetColor(C_TOPRIGHT), cLerpX);
+        Color bottomColor = element.GetColor(C_BOTTOMLEFT).Lerp(element.GetColor(C_BOTTOMRIGHT), cLerpX);
+        Color color = topColor.Lerp(bottomColor, cLerpY);
+        color.a_ *= element.GetDerivedOpacity();
+        return color.ToUInt();
+    }
+    else
+    {
+        Color color = element.GetColor(C_TOPLEFT);
+        color.a_ *= element.GetDerivedOpacity();
+        return color.ToUInt();
+    }
+}
+
+UIBatch::UIBatch() :
+    blendMode_(BLEND_REPLACE),
+    texture_(0),
+    quads_(0),
+    quadStart_(0),
+    quadCount_(0)
+{
+}
+
+UIBatch::UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads) :
+    blendMode_(blendMode),
+    scissor_(scissor),
+    texture_(texture),
+    quads_(0),
+    quadStart_(0),
+    quadCount_(0)
+{
+    Begin(quads);
+}
+
 void UIBatch::Begin(PODVector<UIQuad>* quads)
 {
     if (quads)
@@ -42,98 +129,42 @@ void UIBatch::Begin(PODVector<UIQuad>* quads)
     }
 }
 
-void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY)
+void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY)
 {
     if (!quads_)
         return;
    
-    UIQuad quad;
-    const IntVector2& screenPos = element.GetScreenPosition();
-    
-    quad.left_ = x + screenPos.x_;
-    quad.top_ = y + screenPos.y_;
-    quad.right_ = quad.left_ + width;
-    quad.bottom_ = quad.top_ + height;
-    quad.leftUV_ = texOffsetX;
-    quad.topUV_ = texOffsetY;
-    quad.rightUV_ = texOffsetX + width;
-    quad.bottomUV_ = texOffsetY + height;
-    
-    if (element.HasColorGradient())
+    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY);
+    if (quad.defined_)
     {
-        quad.topLeftColor_ = GetInterpolatedColor(element, x, y);
-        quad.topRightColor_ = GetInterpolatedColor(element, x + width, y);
-        quad.bottomLeftColor_ = GetInterpolatedColor(element, x, y + height);
-        quad.bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
+        quads_->Push(quad);
+        ++quadCount_;
     }
-    else
-    {
-        unsigned uintColor = element.GetUIntColor();
-        // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
-            return;
-        quad.topLeftColor_ = uintColor;
-        quad.topRightColor_ = uintColor;
-        quad.bottomLeftColor_ = uintColor;
-        quad.bottomRightColor_ = uintColor;
-    }
-    
-    quads_->Push(quad);
-    quadCount_++;
 }
 
-void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight)
 {
     if (!quads_)
         return;
     
-    UIQuad quad;
-    const IntVector2& screenPos = element.GetScreenPosition();
-    
-    quad.left_ = x + screenPos.x_;
-    quad.top_ = y + screenPos.y_;
-    quad.right_ = quad.left_ + width;
-    quad.bottom_ = quad.top_ + height;
-    quad.leftUV_ = texOffsetX;
-    quad.topUV_ = texOffsetY;
-    quad.rightUV_ = texOffsetX + texWidth;
-    quad.bottomUV_ = texOffsetY + texHeight;
-    
-    if (element.HasColorGradient())
+    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
+    if (quad.defined_)
     {
-        quad.topLeftColor_ = GetInterpolatedColor(element, x, y);
-        quad.topRightColor_ = GetInterpolatedColor(element, x + width, y);
-        quad.bottomLeftColor_ = GetInterpolatedColor(element, x, y + height);
-        quad.bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
+        quads_->Push(quad);
+        ++quadCount_;
     }
-    else
-    {
-        unsigned uintColor = element.GetUIntColor();
-        // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
-            return;
-        quad.topLeftColor_ = uintColor;
-        quad.topRightColor_ = uintColor;
-        quad.bottomLeftColor_ = uintColor;
-        quad.bottomRightColor_ = uintColor;
-    }
-    
-    quads_->Push(quad);
-    quadCount_++;
 }
 
-void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight, bool tiled)
 {
     if (!quads_)
         return;
 
-    unsigned uintColor = element.GetUIntColor();
-    // If alpha is 0, nothing will be rendered, so do not add the quad
-    if (!(uintColor & 0xff000000))
-        return;
-
+    if (!(element.HasColorGradient() || element.GetDerivedColor().ToUInt() & 0xff000000))
+        return; // No gradient and alpha is 0, so do not add the quads
+    
     if (!tiled)
     {
         AddQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
@@ -145,12 +176,12 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
     int tileW = 0;
     int tileH = 0;
 
-    while(tileY < height)
+    while (tileY < height)
     {
         tileX = 0;
         tileH = Min(height - tileY, texHeight);
 
-        while(tileX < width)
+        while (tileX < width)
         {
             tileW = Min(width - tileX, texWidth);
 
@@ -163,36 +194,19 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
     }
 }
 
-void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight, const Color& color)
 {
     if (!quads_)
         return;
     
-    UIQuad quad;
-    const IntVector2& screenPos = element.GetScreenPosition();
-    
-    quad.left_ = x + screenPos.x_;
-    quad.top_ = y + screenPos.y_;
-    quad.right_ = quad.left_ + width;
-    quad.bottom_ = quad.top_ + height;
-    quad.leftUV_ = texOffsetX;
-    quad.topUV_ = texOffsetY;
-    quad.rightUV_ = texOffsetX + texWidth;
-    quad.bottomUV_ = texOffsetY + texHeight;
-    
     Color derivedColor(color.r_, color.g_, color.b_, color.a_ * element.GetDerivedOpacity());
-    // If alpha is 0, nothing will be rendered, so exit without adding the quad
-    if (derivedColor.a_ <= 0.0f)
-        return;
-    unsigned uintColor = derivedColor.ToUInt();
-    quad.topLeftColor_ = uintColor;
-    quad.topRightColor_ = uintColor;
-    quad.bottomLeftColor_ = uintColor;
-    quad.bottomRightColor_ = uintColor;
-    
-    quads_->Push(quad);
-    quadCount_++;
+    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor);
+    if (quad.defined_)
+    {
+        quads_->Push(quad);
+        ++quadCount_;
+    }
 }
 
 bool UIBatch::Merge(const UIBatch& batch)
@@ -303,38 +317,10 @@ void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
     if (!batch.quadCount_)
         return;
     
-    if (!batches.Size())
-        batches.Push(batch);
-    else
-    {
-        if (batches.Back().Merge(batch))
-            return;
-        else
-            batches.Push(batch);
-    }
-}
-
-unsigned UIBatch::GetInterpolatedColor(UIElement& element, int x, int y)
-{
-    const IntVector2& size = element.GetSize();
+    if (!batches.Empty() && batches.Back().Merge(batch))
+        return;
     
-    if (size.x_ && size.y_)
-    {
-        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
-        
-        Color topColor = element.GetColor(C_TOPLEFT).Lerp(element.GetColor(C_TOPRIGHT), cLerpX);
-        Color bottocolor_ = element.GetColor(C_BOTTOMLEFT).Lerp(element.GetColor(C_BOTTOMRIGHT), cLerpX);
-        Color color = topColor.Lerp(bottocolor_, cLerpY);
-        color.a_ *= element.GetDerivedOpacity();
-        return color.ToUInt();
-    }
-    else
-    {
-        Color color = element.GetColor(C_TOPLEFT);
-        color.a_ *= element.GetDerivedOpacity();
-        return color.ToUInt();
-    }
+    batches.Push(batch);
 }
 
 }

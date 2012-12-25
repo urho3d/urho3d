@@ -64,7 +64,6 @@ ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
@@ -222,21 +221,18 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
 {
     bool released = false;
     
-    for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
-        i != resourceGroups_.End(); ++i)
+    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    if (i != resourceGroups_.End())
     {
-        if (i->first_ == type)
+        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            j != i->second_.resources_.End();)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
-                j != i->second_.resources_.End();)
+            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            // If other references exist, do not release, unless forced
+            if (current->second_.Refs() == 1 || force)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
-                // If other references exist, do not release, unless forced
-                if (current->second_.Refs() == 1 || force)
-                {
-                    i->second_.resources_.Erase(current);
-                    released = true;
-                }
+                i->second_.resources_.Erase(current);
+                released = true;
             }
         }
     }
@@ -249,23 +245,20 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
 {
     bool released = false;
     
-    for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
-        i != resourceGroups_.End(); ++i)
+    HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    if (i != resourceGroups_.End())
     {
-        if (i->first_ == type)
+        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            j != i->second_.resources_.End();)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
-                j != i->second_.resources_.End();)
+            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+            if (current->second_->GetName().Contains(partialName))
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
-                if (current->second_->GetName().Find(partialName) != String::NPOS)
+                // If other references exist, do not release, unless forced
+                if (current->second_.Refs() == 1 || force)
                 {
-                    // If other references exist, do not release, unless forced
-                    if (current->second_.Refs() == 1 || force)
-                    {
-                        i->second_.resources_.Erase(current);
-                        released = true;
-                    }
+                    i->second_.resources_.Erase(current);
+                    released = true;
                 }
             }
         }
@@ -341,9 +334,14 @@ void ResourceCache::SetAutoReloadResources(bool enable)
                 watcher->StartWatching(resourceDirs_[i], true);
                 fileWatchers_.Push(watcher);
             }
+
+            SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
         }
         else
+        {
+            UnsubscribeFromEvent(E_BEGINFRAME);
             fileWatchers_.Clear();
+        }
         
         autoReloadResources_ = enable;
     }
@@ -685,9 +683,6 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
 
 void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
-    if (!autoReloadResources_)
-        return;
-    
     for (unsigned i = 0; i < fileWatchers_.Size(); ++i)
     {
         String fileName;

@@ -245,6 +245,9 @@ void Window::SetCursorShape(WindowDragMode mode, Cursor* cursor) const
     case DRAG_RESIZE_BOTTOMRIGHT:
         cursor->SetShape(CS_RESIZEDIAGONAL_TOPLEFT);
         break;
+    
+    default:
+        break;
     }
 }
 

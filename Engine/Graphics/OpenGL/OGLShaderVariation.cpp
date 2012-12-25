@@ -102,17 +102,6 @@ bool ShaderVariation::Create()
     // Check if there is a version definition; it must stay in the beginning
     String shaderCode(sourceCode_.Get(), sourceCodeLength_);
     String defines;
-    String version;
-    
-    if (shaderCode.StartsWith("#version"))
-    {
-        unsigned firstLineEnd = shaderCode.Find('\n') + 1;
-        if (firstLineEnd != String::NPOS)
-        {
-            version = shaderCode.Substring(0, firstLineEnd);
-            shaderCode = shaderCode.Substring(firstLineEnd);
-        }
-    }
     
     for (unsigned i = 0; i < defines_.Size(); ++i)
         defines += "#define " + defines_[i] + " " + defineValues_[i] + "\n";
@@ -120,7 +109,17 @@ bool ShaderVariation::Create()
     if (!defines_.Empty())
         defines += "\n";
     
-    shaderCode = version + defines + shaderCode;
+    unsigned pos = 0;
+    if (shaderCode.StartsWith("#version"))
+    {
+        pos = shaderCode.Find('\n');
+        if (pos != String::NPOS)
+            ++pos;
+        else
+            pos = 0;
+    }
+    
+    shaderCode.Insert(pos, defines);
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);

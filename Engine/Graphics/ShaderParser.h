@@ -83,7 +83,7 @@ public:
     /// Return whether a shader combination exists.
     bool HasCombination(const String& name) const;
     /// Return a combination by name.
-    bool GetCombination(ShaderCombination& dest, const String& name) const;
+    ShaderCombination GetCombination(const String& name) const;
     
 private:
     /// Parse options for a shader.

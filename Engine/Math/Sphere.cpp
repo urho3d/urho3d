@@ -67,10 +67,7 @@ void Sphere::Define(const Polyhedron& poly)
 void Sphere::Merge(const Vector3* vertices, unsigned count)
 {
     while (count--)
-    {
-        Merge(*vertices);
-        ++vertices;
-    }
+        Merge(*vertices++);
 }
 
 void Sphere::Merge(const BoundingBox& box)

@@ -182,6 +182,7 @@ void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
 {
     unsigned numItems = selections->GetSize();
     PODVector<unsigned> dest;
+    dest.Reserve(numItems);
     
     for (unsigned i = 0; i < numItems; ++i)
         dest.Push(*((unsigned*)selections->At(i)));
@@ -218,7 +219,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void SetScrollBarsVisible(bool, bool)", asMETHOD(ListView, SetScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void AddItem(UIElement@+)", asMETHOD(ListView, AddItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void InsertItem(uint, UIElement@+)", asMETHOD(ListView, InsertItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void RemoveItem(UIElement@+)", asMETHODPR(ListView, RemoveItem, (UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void RemoveItem(UIElement@+, uint index = 0)", asMETHODPR(ListView, RemoveItem, (UIElement*, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveItem(uint)", asMETHODPR(ListView, RemoveItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveAllItems()", asMETHOD(ListView, RemoveAllItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void AddSelection(uint)", asMETHOD(ListView, AddSelection), asCALL_THISCALL);
@@ -486,6 +487,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
+    engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
 }
 
 void RegisterUIAPI(asIScriptEngine* engine)

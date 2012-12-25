@@ -52,17 +52,18 @@ void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
     
     // Check for being too far ahead
     while (index && time < keyFrames_[index].time_)
-        index--;
+        --index;
     
     // Check for being too far behind
     while (index < keyFrames_.Size() - 1 && time >= keyFrames_[index + 1].time_)
-        index++;
+        ++index;
 }
 
 OBJECTTYPESTATIC(Animation);
 
 Animation::Animation(Context* context) :
-    Resource(context)
+    Resource(context),
+    length_(0.f)
 {
 }
 

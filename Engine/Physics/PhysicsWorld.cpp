@@ -135,9 +135,6 @@ PhysicsWorld::~PhysicsWorld()
             (*i)->ReleaseShape();
     }
     
-    // Remove any cached geometries that still remain
-    geometryCache_.Clear();
-    
     delete world_;
     world_ = 0;
     
@@ -222,16 +219,15 @@ void PhysicsWorld::Update(float timeStep)
     while (!delayedWorldTransforms_.Empty())
     {
         for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
-            i != delayedWorldTransforms_.End(); )
+            i != delayedWorldTransforms_.End(); ++i)
         {
-            HashMap<RigidBody*, DelayedWorldTransform>::Iterator current = i++;
-            const DelayedWorldTransform& transform = current->second_;
+            const DelayedWorldTransform& transform = i->second_;
             
             // If parent's transform has already been assigned, can proceed
             if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
             {
                 transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
-                delayedWorldTransforms_.Erase(current);
+                delayedWorldTransforms_.Erase(i);
             }
         }
     }
@@ -409,7 +405,7 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
-    rigidBodies_.Erase(rigidBodies_.Find(body));
+    rigidBodies_.Remove(body);
     
     // Erase from collision pairs so that they can be used to safely find overlapping bodies
     for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = currentCollisions_.Begin(); i != currentCollisions_.End();)
@@ -436,7 +432,7 @@ void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
 
 void PhysicsWorld::RemoveCollisionShape(CollisionShape* shape)
 {
-    collisionShapes_.Erase(collisionShapes_.Find(shape));
+    collisionShapes_.Remove(shape);
 }
 
 void PhysicsWorld::AddConstraint(Constraint* constraint)
@@ -446,7 +442,7 @@ void PhysicsWorld::AddConstraint(Constraint* constraint)
 
 void PhysicsWorld::RemoveConstraint(Constraint* constraint)
 {
-    constraints_.Erase(constraints_.Find(constraint));
+    constraints_.Remove(constraint);
 }
 
 void PhysicsWorld::AddDelayedWorldTransform(const DelayedWorldTransform& transform)

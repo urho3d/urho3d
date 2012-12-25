@@ -24,12 +24,19 @@
 #include "Precompiled.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
+#include "MathDefs.h"
 
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
 
-#if !defined(ANDROID) && !defined(IOS)
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#endif
+
+#if defined(IOS)
+#include <mach/mach_host.h>
+#elif !defined(ANDROID)
 #include <libcpuid.h>
 #endif
 
@@ -80,7 +87,14 @@ static String currentLine;
 static Vector<String> arguments;
 static Mutex staticMutex;
 
-#if !defined(ANDROID) && !defined(IOS)
+#if defined(IOS)
+void GetCPUData(host_basic_info_data_t* data)
+{
+    mach_msg_type_number_t infoCount;
+    infoCount = HOST_BASIC_INFO_COUNT;
+    host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
+}
+#elif !defined(ANDROID)
 void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -242,11 +256,7 @@ const Vector<String>& ParseArguments(int argc, char** argv)
     String cmdLine;
     
     for (int i = 0; i < argc; ++i)
-    {
-        cmdLine += (const char*)argv[i];
-        if (i < argc - 1)
-            cmdLine += ' ';
-    }
+        cmdLine.AppendWithFormat("\"%s\" ", (const char*)argv[i]);
     
     return ParseArguments(cmdLine);
 }
@@ -344,7 +354,16 @@ String GetPlatform()
 
 unsigned GetNumPhysicalCPUs()
 {
-    #if !defined(ANDROID) && !defined(IOS)
+    #if defined(IOS)
+    host_basic_info_data_t data;
+    GetCPUData(&data);
+    #if defined(TARGET_IPHONE_SIMULATOR)
+    // Hardcoded to dual-core on simulator mode even if the host has more
+    return Min(2, data.physical_cpu);
+    #else
+    return data.physical_cpu;
+    #endif
+    #elif !defined(ANDROID)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -356,7 +375,15 @@ unsigned GetNumPhysicalCPUs()
 
 unsigned GetNumLogicalCPUs()
 {
-    #if !defined(ANDROID) && !defined(IOS)
+    #if defined(IOS)
+    host_basic_info_data_t data;
+    GetCPUData(&data);
+    #if defined(TARGET_IPHONE_SIMULATOR)
+    return Min(2, data.logical_cpu);
+    #else
+    return data.logical_cpu;
+    #endif
+    #elif !defined(ANDROID)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

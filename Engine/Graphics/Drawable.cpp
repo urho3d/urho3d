@@ -53,9 +53,9 @@ SourceBatch::~SourceBatch()
 
 OBJECTTYPESTATIC(Drawable);
 
-Drawable::Drawable(Context* context) :
+Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
-    drawableFlags_(0),
+    drawableFlags_(drawableFlags),
     worldBoundingBoxDirty_(true),
     visible_(true),
     castShadows_(false),
@@ -229,7 +229,7 @@ void Drawable::SetOccludee(bool enable)
 
 void Drawable::MarkForUpdate()
 {
-    if (octant_ && !updateQueued_)
+    if (!updateQueued_ && octant_)
         octant_->GetRoot()->QueueUpdate(this);
 }
 
@@ -361,7 +361,7 @@ void Drawable::OnNodeSet(Node* node)
 void Drawable::OnMarkedDirty(Node* node)
 {
     worldBoundingBoxDirty_ = true;
-    if (octant_ && !reinsertionQueued_)
+    if (!reinsertionQueued_ && octant_)
         octant_->GetRoot()->QueueReinsertion(this);
     
     if (node == node_)

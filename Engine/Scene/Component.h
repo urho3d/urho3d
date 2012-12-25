@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "Matrix3x4.h"
 #include "Serializable.h"
 
 namespace Urho3D

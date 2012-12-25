@@ -200,6 +200,8 @@ public:
     XMLFile* GetFile() const;
     /// Return pugixml node.s
     pugi::xml_node_struct* GetNode() const { return node_; }
+    /// Empty XMLElement.
+    static const XMLElement EMPTY;
     
 private:
     /// XML file.

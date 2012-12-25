@@ -34,13 +34,14 @@ namespace Urho3D
 class Octree;
 
 static const int NUM_OCTANTS = 8;
+static const unsigned ROOT_INDEX = M_MAX_UNSIGNED;
 
 /// %Octree octant
 class Octant
 {
 public:
     /// Construct.
-    Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root);
+    Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index = ROOT_INDEX);
     /// Destruct. Move drawables to root if available (detach if not) and free child octants.
     virtual ~Octant();
     
@@ -66,12 +67,10 @@ public:
     /// Remove a drawable object from this octant.
     void RemoveDrawable(Drawable* drawable, bool resetOctant = true)
     {
-        PODVector<Drawable*>::Iterator i = drawables_.Find(drawable);
-        if (i != drawables_.End())
+        if (drawables_.Remove(drawable))
         {
             if (resetOctant)
                 drawable->SetOctant(0);
-            drawables_.Erase(i);
             DecDrawableCount();
         }
     }
@@ -150,6 +149,8 @@ protected:
     Octant* parent_;
     /// Octree root.
     Octree* root_;
+    /// Octant index relative to its siblings or ROOT_INDEX for root octant
+    unsigned index_;
 };
 
 /// %Octree component. Should be added only to the root scene node

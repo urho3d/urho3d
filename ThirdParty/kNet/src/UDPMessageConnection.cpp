@@ -280,7 +280,7 @@ void UDPMessageConnection::HandleFlowControl()
 		{
 			float oldRate = datagramSendRate;
 			datagramSendRate = min(datagramSendRate, max(minBandwidthOnLoss, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
-			std::cout << "Loss!" << std::endl;
+			//std::cout << "Loss!" << std::endl;
 			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
 		else

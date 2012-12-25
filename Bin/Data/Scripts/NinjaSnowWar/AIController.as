@@ -49,9 +49,9 @@ class AIController
         {
             Node@ otherNode = nodes[i];
             Ninja@ otherNinja = cast<Ninja>(otherNode.scriptObject);
-            if (otherNinja.side == SIDE_PLAYER)
+            if (otherNinja.side == SIDE_PLAYER && otherNinja.health > 0)
             {
-                float distance = (node.position - otherNode.position).length;
+                float distance = (node.position - otherNode.position).lengthSquared;
                 if (distance < closestDistance)
                 {
                     @targetNode = otherNode;
@@ -61,7 +61,7 @@ class AIController
             }
         }
 
-        if ((targetNode !is null) && (targetNinja.health > 0))
+        if (targetNode !is null)
         {
             RigidBody@ targetBody = targetNode.GetComponent("RigidBody");
 

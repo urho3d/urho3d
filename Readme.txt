@@ -57,6 +57,7 @@ Contributions and bugfixes from:
 - Alex Fuller
 - Jason Kinzer
 - Miika Santala
+- Wei Tjong Yao
 - Magic.Lixin
 - primitivewaste
 - skaiware
@@ -75,7 +76,6 @@ BlueHighway font from Larabie Fonts.
 Anonymous Pro font by Mark Simonson.
 
 NinjaSnowWar sounds by Veli-Pekka Tätilä.
-
 
 
 Documentation

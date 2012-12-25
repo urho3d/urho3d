@@ -56,7 +56,9 @@ PackageDownload::PackageDownload() :
 {
 }
 
-PackageUpload::PackageUpload()
+PackageUpload::PackageUpload() :
+    fragment_(0),
+    totalFragments_(0)
 {
 }
 
@@ -256,6 +258,7 @@ void Connection::SendClientUpdate()
 
 void Connection::SendRemoteEvents()
 {
+    #ifdef ENABLE_LOGGING
     if (logStatistics_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
     {
         statsTimer_.Reset();
@@ -264,6 +267,7 @@ void Connection::SendRemoteEvents()
             (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
         LOGINFO(statsBuffer);
     }
+    #endif
     
     if (remoteEvents_.Empty())
         return;
@@ -352,6 +356,60 @@ void Connection::ProcessPendingLatestData()
             componentLatestData_.Erase(current);
         }
     }
+}
+
+bool Connection::ProcessMessage(int msgID, MemoryBuffer &msg)
+{
+    bool processed = true;
+    
+    switch (msgID)
+    {
+        case MSG_IDENTITY:
+            ProcessIdentity(msgID, msg);
+            break;
+            
+        case MSG_CONTROLS:
+            ProcessControls(msgID, msg);
+            break;
+            
+        case MSG_SCENELOADED:
+            ProcessSceneLoaded(msgID, msg);
+            break;
+            
+        case MSG_REQUESTPACKAGE:
+        case MSG_PACKAGEDATA:
+            ProcessPackageDownload(msgID, msg);
+            break;
+            
+        case MSG_LOADSCENE:
+            ProcessLoadScene(msgID, msg);
+            break;
+            
+        case MSG_SCENECHECKSUMERROR:
+            ProcessSceneChecksumError(msgID, msg);
+            break;
+            
+        case MSG_CREATENODE:
+        case MSG_NODEDELTAUPDATE:
+        case MSG_NODELATESTDATA:
+        case MSG_REMOVENODE:
+        case MSG_CREATECOMPONENT:
+        case MSG_COMPONENTDELTAUPDATE:
+        case MSG_COMPONENTLATESTDATA:
+        case MSG_REMOVECOMPONENT:
+            ProcessSceneUpdate(msgID, msg);
+            break;
+            
+        case MSG_REMOTEEVENT:
+        case MSG_REMOTENODEEVENT:
+            ProcessRemoteEvent(msgID, msg);
+            break;
+            
+        default:
+            processed = false;
+    }
+    
+    return processed;
 }
 
 void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
@@ -522,7 +580,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 {
                     if (component)
                         component->Remove();
-                    component = node->CreateComponent(type, componentID, REPLICATED);
+                    component = node->CreateComponent(type, REPLICATED, componentID);
                 }
                 
                 // If was unable to create the component, would desync the message and therefore have to abort
@@ -606,7 +664,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 {
                     if (component)
                         component->Remove();
-                    component = node->CreateComponent(type, componentID, REPLICATED);
+                    component = node->CreateComponent(type, REPLICATED, componentID);
                 }
                 
                 // If was unable to create the component, would desync the message and therefore have to abort

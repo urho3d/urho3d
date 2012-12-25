@@ -939,15 +939,15 @@ Vector<String> String::Split(const char* str, char separator)
     return ret;
 }
 
-void String::Print(const char *formatString, ... )
+void String::AppendWithFormat(const char* formatString, ... )
 {
     va_list args;
     va_start(args, formatString);
-    PrintArgs(formatString, args);
+    AppendWithFormatArgs(formatString, args);
     va_end(args);
 }
 
-void String::PrintArgs(const char *formatString, va_list args)
+void String::AppendWithFormatArgs(const char* formatString, va_list args)
 {
     int pos = 0, lastPos = 0;
     int length = strlen(formatString);
@@ -975,6 +975,14 @@ void String::PrintArgs(const char *formatString, va_list args)
                 break;
             }
             
+        // Unsigned
+        case 'u':
+            {
+                unsigned arg = va_arg(args, unsigned);
+                Append(String(arg));
+                break;
+            }
+            
         // Real
         case 'f':
             {
@@ -986,7 +994,7 @@ void String::PrintArgs(const char *formatString, va_list args)
         // Character
         case 'c':
             {
-                char arg = va_arg(args, char);
+                int arg = va_arg(args, int);
                 Append(arg);
                 break;
             }
@@ -1014,7 +1022,7 @@ void String::PrintArgs(const char *formatString, va_list args)
             {
                 char buf[CONVERSION_BUFFER_LENGTH];
                 int arg = va_arg(args, int);
-                int arglen = ::sprintf(buf, "%p", arg);
+                int arglen = ::sprintf(buf, "%p", reinterpret_cast<void*>(arg));
                 Append(buf, arglen);
                 break;
             }

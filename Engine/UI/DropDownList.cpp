@@ -77,7 +77,7 @@ void DropDownList::ApplyAttributes()
 
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    Button::GetBatches(batches, quads, currentScissor);
+    Menu::GetBatches(batches, quads, currentScissor);
     
     if (!placeholder_->IsVisible())
         return;
@@ -117,10 +117,7 @@ void DropDownList::OnShowPopup()
         if (screenPos.y_ + GetHeight() + popup_->GetHeight() > root->GetHeight() && screenPos.y_ - popup_->GetHeight() >= 0)
             showAbove = true;
     }
-    if (!showAbove)
-        SetPopupOffset(0, GetHeight());
-    else
-        SetPopupOffset(0, -popup_->GetHeight());
+    SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
 }
 
 void DropDownList::AddItem(UIElement* item)
@@ -174,9 +171,7 @@ UIElement* DropDownList::GetItem(unsigned index) const
 
 PODVector<UIElement*> DropDownList::GetItems() const
 {
-    PODVector<UIElement*> items;
-    listView_->GetContentElement()->GetChildren(items);
-    return items;
+    return listView_->GetItems();
 }
 
 unsigned DropDownList::GetSelection() const

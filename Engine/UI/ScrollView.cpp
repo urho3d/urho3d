@@ -132,6 +132,10 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
         }
         break;
         
+    case KEY_HOME:
+        qualifiers |= QUAL_CTRL;
+        // Fallthru
+        
     case KEY_UP:
         if (verticalScrollBar_->IsVisible())
         {
@@ -141,6 +145,10 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
                 verticalScrollBar_->StepBack();
         }
         break;
+        
+    case KEY_END:
+        qualifiers |= QUAL_CTRL;
+        // Fallthru
         
     case KEY_DOWN:
         if (verticalScrollBar_->IsVisible())
@@ -160,16 +168,6 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
     case KEY_PAGEDOWN:
         if (verticalScrollBar_->IsVisible())
             verticalScrollBar_->ChangeValue(pageStep_);
-        break;
-    
-    case KEY_HOME:
-        if (verticalScrollBar_->IsVisible())
-            verticalScrollBar_->SetValue(0.0f);
-        break;
-    
-    case KEY_END:
-        if (verticalScrollBar_->IsVisible())
-            verticalScrollBar_->SetValue(verticalScrollBar_->GetRange());
         break;
     }
 }

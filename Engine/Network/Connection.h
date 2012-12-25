@@ -136,22 +136,8 @@ public:
     void SendPackages();
     /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
-    /// Process a LoadScene message from the server. Called by Network.
-    void ProcessLoadScene(int msgID, MemoryBuffer& msg);
-    /// Process a SceneChecksumError message from the server. Called by Network.
-    void ProcessSceneChecksumError(int msgID, MemoryBuffer& msg);
-    /// Process a scene update message from the server. Called by Network.
-    void ProcessSceneUpdate(int msgID, MemoryBuffer& msg);
-    /// Process package download related messages. Called by Network.
-    void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
-    /// Process an Identity message from the client. Called by Network.
-    void ProcessIdentity(int msgID, MemoryBuffer& msg);
-    /// Process a Controls message from the client. Called by Network.
-    void ProcessControls(int msgID, MemoryBuffer& msg);
-    /// Process a SceneLoaded message from the client. Called by Network.
-    void ProcessSceneLoaded(int msgID, MemoryBuffer& msg);
-    /// Process a remote event message from the client or server. Called by Network.
-    void ProcessRemoteEvent(int msgID, MemoryBuffer& msg);
+    /// Process a message from the server or client. Called by Network.
+    bool ProcessMessage(int msgID, MemoryBuffer& msg);
     
     /// Return the kNet message connection.
     kNet::MessageConnection* GetMessageConnection() const;
@@ -196,6 +182,22 @@ public:
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
+    /// Process a LoadScene message from the server. Called by Network.
+    void ProcessLoadScene(int msgID, MemoryBuffer& msg);
+    /// Process a SceneChecksumError message from the server. Called by Network.
+    void ProcessSceneChecksumError(int msgID, MemoryBuffer& msg);
+    /// Process a scene update message from the server. Called by Network.
+    void ProcessSceneUpdate(int msgID, MemoryBuffer& msg);
+    /// Process package download related messages. Called by Network.
+    void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
+    /// Process an Identity message from the client. Called by Network.
+    void ProcessIdentity(int msgID, MemoryBuffer& msg);
+    /// Process a Controls message from the client. Called by Network.
+    void ProcessControls(int msgID, MemoryBuffer& msg);
+    /// Process a SceneLoaded message from the client. Called by Network.
+    void ProcessSceneLoaded(int msgID, MemoryBuffer& msg);
+    /// Process a remote event message from the client or server. Called by Network.
+    void ProcessRemoteEvent(int msgID, MemoryBuffer& msg);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first.
     void ProcessNode(unsigned nodeID);
     /// Process a node that the client has not yet received.

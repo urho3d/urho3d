@@ -273,8 +273,17 @@ public:
     /// Clear the list.
     void Clear()
     {
-        while (size_)
-            EraseNode(Head());
+        if (Size())
+        {
+            for (Iterator i = Begin(); i != End(); )
+            {
+                FreeNode(static_cast<Node*>(i++.ptr_));
+                i.ptr_->prev_ = 0;
+            }
+            
+            head_ = tail_;
+            size_ = 0;
+        }
     }
     
     /// Resize the list by removing or adding items at the end.
@@ -330,9 +339,9 @@ public:
     
 private:
     /// Return the head node.
-    Node* Head() const { return reinterpret_cast<Node*>(head_); }
+    Node* Head() const { return static_cast<Node*>(head_); }
     /// Return the tail node.
-    Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
+    Node* Tail() const { return static_cast<Node*>(tail_); }
     
     /// Allocate and insert a node into the list.
     void InsertNode(Node* dest, const T& value)

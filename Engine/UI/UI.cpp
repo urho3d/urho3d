@@ -63,7 +63,12 @@ UI::UI(Context* context) :
     Object(context),
     mouseButtons_(0),
     qualifiers_(0),
-    initialized_(false)
+    initialized_(false),
+    #ifdef WIN32
+    nonFocusedMouseWheel_(false)    // Default MS Windows behaviour
+    #else
+    nonFocusedMouseWheel_(true)     // Default Mac OS X and Linux behaviour
+    #endif
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
@@ -75,8 +80,9 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate));
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+    
+    // Delay SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate)) and
+    // SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate)) until UI is initialized
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -169,8 +175,7 @@ void UI::Clear()
 
 void UI::Update(float timeStep)
 {
-    if (!rootElement_)
-        return;
+    assert(rootElement_);
     
     PROFILE(UpdateUI);
     
@@ -221,7 +226,7 @@ void UI::Update(float timeStep)
         for (unsigned i = 0; i < numTouches; ++i)
         {
             TouchState* touch = input->GetTouch(i);
-            WeakPtr<UIElement> element(GetElementAt(touch->position_));
+            UIElement* element = GetElementAt(touch->position_);
             if (element)
                 element->OnHover(element->ScreenToElement(touch->position_), touch->position_, MOUSEB_LEFT, 0, 0);
         }
@@ -232,8 +237,7 @@ void UI::Update(float timeStep)
 
 void UI::RenderUpdate()
 {
-    if (!rootElement_ || !graphics_)
-        return;
+    assert(rootElement_ && graphics_);
     
     PROFILE(GetUIBatches);
     
@@ -263,9 +267,12 @@ void UI::RenderUpdate()
 
 void UI::Render()
 {
+    // Engine does not render when window is closed or device is lost
+    assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
+    
     PROFILE(RenderUI);
     
-    if (!graphics_ || graphics_->IsDeviceLost() || !quads_.Size())
+    if (quads_.Empty())
         return;
     
     // Update quad geometry into the vertex buffer
@@ -408,6 +415,11 @@ void UI::SetClipBoardText(const String& text)
     clipBoard_ = text;
 }
 
+void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
+{
+    nonFocusedMouseWheel_ = nonFocusedMouseWheel;
+}
+
 UIElement* UI::GetElementAt(const IntVector2& position, bool activeOnly)
 {
     if (!rootElement_)
@@ -486,8 +498,12 @@ void UI::Initialize()
     
     vertexBuffer_ = new VertexBuffer(context_);
     
-    LOGINFO("Initialized user interface");
     initialized_ = true;
+    
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    LOGINFO("Initialized user interface");
 }
 
 void UI::Update(float timeStep, UIElement* element)
@@ -517,9 +533,9 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     if (element != rootElement_)
     {
         Vector<SharedPtr<UIElement> >::ConstIterator j = i;
-        int currentPriority = children.Front()->GetPriority();
         while (i != children.End())
         {
+            int currentPriority = (*i)->GetPriority();
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
                 if (IsVisible(*j, currentScissor))
@@ -533,8 +549,6 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
                     GetBatches(*i, currentScissor);
                 ++i;
             }
-            if (i != children.End())
-                currentPriority = (*i)->GetPriority();
         }
     }
     // On the root level draw each element and its children immediately after to avoid artifacts
@@ -561,11 +575,8 @@ bool UI::IsVisible(UIElement* element, const IntRect& currentScissor)
 
     // Then check element dimensions against the scissor rectangle
     const IntVector2& screenPos = element->GetScreenPosition();
-    if (screenPos.x_ >= currentScissor.right_ || screenPos.x_ + element->GetWidth() <= currentScissor.left_ ||
-        screenPos.y_ >= currentScissor.bottom_ || screenPos.y_ + element->GetHeight() <= currentScissor.top_)
-        return false;
-    else
-        return true;
+    return screenPos.x_ < currentScissor.right_ && screenPos.x_ + element->GetWidth() > currentScissor.left_ &&
+        screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + element->GetHeight() > currentScissor.top_;
 }
 
 void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly)
@@ -577,9 +588,9 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     const Vector<SharedPtr<UIElement> >& children = current->GetChildren();
     LayoutMode parentLayoutMode = current->GetLayoutMode();
     
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    for (unsigned i = 0; i < children.Size(); ++i)
     {
-        UIElement* element = *i;
+        UIElement* element = children[i];
         bool hasChildren = element->GetNumChildren() > 0;
         
         if (element != cursor_.Get() && element->IsVisible())
@@ -608,7 +619,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 // or if we already passed all visible elements
                 else if (parentLayoutMode != LM_FREE)
                 {
-                    if (i == children.Begin())
+                    if (!i)
                     {
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
@@ -618,11 +629,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                         {
                             unsigned toSkip = -screenPos / layoutMinSize;
                             if (toSkip > 0)
-                            {
                                 i += (toSkip - 1);
-                                if (i >= children.End())
-                                    break;
-                            }
                         }
                     }
                     else if (parentLayoutMode == LM_HORIZONTAL)
@@ -813,24 +820,37 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     int delta = eventData[P_WHEEL].GetInt();
     
-    UIElement* element = GetFocusElement();
-    if (element)
+    UIElement* element;
+    if (!nonFocusedMouseWheel_&& (element = GetFocusElement()))
         element->OnWheel(delta, mouseButtons_, qualifiers_);
     else
     {
-        // If no element has actual focus, get the element at cursor
+        // If no element has actual focus or in non-focused mode, get the element at cursor
         if (cursor_)
         {
             IntVector2 pos = cursor_->GetPosition();
-            UIElement* element = GetElementAt(pos);
-            // If the element itself is not focusable, search for a focusable parent
-            element = GetFocusableElement(element);
-            if (element && element->GetFocusMode() >= FM_FOCUSABLE)
+            element = GetElementAt(pos);
+            if (nonFocusedMouseWheel_)
+            {
+                // Going up the hierarchy chain to find element that could handle mouse wheel
+                while (element)
+                {
+                    if (element->GetType() == ListView::GetTypeStatic() ||
+                        element->GetType() == ScrollView::GetTypeStatic())
+                        break;
+                    element = element->GetParent();
+                }
+            }
+            else
+                // If the element itself is not focusable, search for a focusable parent,
+                // although the focusable element may not actually handle mouse wheel
+                element = GetFocusableElement(element);
+
+            if (element && (nonFocusedMouseWheel_ || element->GetFocusMode() >= FM_FOCUSABLE))
                 element->OnWheel(delta, mouseButtons_, qualifiers_);
         }
     }
 }
-
 
 void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
@@ -880,7 +900,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     
     // Transmit hover end to the position where the finger was lifted
-    WeakPtr<UIElement> element(GetElementAt(pos));
+    UIElement* element = GetElementAt(pos);
     if (element)
         element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
     
@@ -1000,18 +1020,14 @@ void UI::HandleChar(StringHash eventType, VariantMap& eventData)
 
 void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (initialized_)
-    {
-        using namespace PostUpdate;
-        
-        Update(eventData[P_TIMESTEP].GetFloat());
-    }
+    using namespace PostUpdate;
+    
+    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (initialized_)
-        RenderUpdate();
+    RenderUpdate();
 }
 
 void RegisterUILibrary(Context* context)

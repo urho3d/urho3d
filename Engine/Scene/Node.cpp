@@ -34,10 +34,10 @@
 
 #include "DebugNew.h"
 
-// Normalize rotation quaternion after this many incremental updates to prevent distortion
 namespace Urho3D
 {
 
+// Normalize rotation quaternion after this many incremental updates to prevent distortion
 static const int NORMALIZE_ROTATION_EVERY = 32;
 
 OBJECTTYPESTATIC(Node);
@@ -231,8 +231,7 @@ void Node::SetName(const String& name)
 void Node::SetPosition(const Vector3& position)
 {
     position_ = position;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -241,8 +240,7 @@ void Node::SetRotation(const Quaternion& rotation)
 {
     rotation_ = rotation;
     rotateCount_ = 0;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -254,18 +252,13 @@ void Node::SetDirection(const Vector3& direction)
 
 void Node::SetScale(float scale)
 {
-    scale_ = Vector3(scale, scale, scale).Abs();
-    if (!dirty_)
-        MarkDirty();
-    
-    MarkNetworkUpdate();
+    SetScale(Vector3(scale, scale, scale));
 }
 
 void Node::SetScale(const Vector3& scale)
 {
     scale_ = scale.Abs();
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -275,22 +268,14 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
     position_ = position;
     rotation_ = rotation;
     rotateCount_ = 0;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 {
-    position_ = position;
-    rotation_ = rotation;
-    rotateCount_ = 0;
-    scale_ = Vector3(scale, scale, scale);
-    if (!dirty_)
-        MarkDirty();
-    
-    MarkNetworkUpdate();
+    SetTransform(position, rotation, Vector3(scale, scale, scale));
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
@@ -299,8 +284,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
     rotation_ = rotation;
     rotateCount_ = 0;
     scale_ = scale;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -374,8 +358,7 @@ void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation
 void Node::Translate(const Vector3& delta)
 {
     position_ += delta;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -383,8 +366,7 @@ void Node::Translate(const Vector3& delta)
 void Node::TranslateRelative(const Vector3& delta)
 {
     position_ += rotation_ * delta;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -396,15 +378,13 @@ void Node::Rotate(const Quaternion& delta, bool fixedAxis)
     else
         rotation_ = delta * rotation_;
     
-    ++rotateCount_;
-    if (rotateCount_ >= NORMALIZE_ROTATION_EVERY)
+    if (++rotateCount_ >= NORMALIZE_ROTATION_EVERY)
     {
         rotation_.Normalize();
         rotateCount_ = 0;
     }
     
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -443,18 +423,13 @@ void Node::LookAt(const Vector3& target, const Vector3& upAxis, bool worldSpace)
 
 void Node::Scale(float scale)
 {
-    scale_ *= scale;
-    if (!dirty_)
-        MarkDirty();
-    
-    MarkNetworkUpdate();
+    Scale(Vector3(scale, scale, scale));
 }
 
 void Node::Scale(const Vector3& scale)
 {
     scale_ *= scale;
-    if (!dirty_)
-        MarkDirty();
+    MarkDirty();
     
     MarkNetworkUpdate();
 }
@@ -466,6 +441,9 @@ void Node::SetOwner(Connection* owner)
 
 void Node::MarkDirty()
 {
+    if (dirty_)
+        return;
+
     dirty_ = true;
     
     // Notify listener components first, then mark child nodes
@@ -508,9 +486,7 @@ void Node::AddChild(Node* node)
     
     // Add first, then remove from old parent, to ensure the node does not get deleted
     children_.Push(SharedPtr<Node>(node));
-    
-    if (node->parent_)
-        node->parent_->RemoveChild(node);
+    node->Remove();
     
     // Add to the scene if not added yet
     if (scene_ && !node->GetScene())
@@ -539,12 +515,21 @@ void Node::RemoveChild(Node* node)
 void Node::RemoveAllChildren()
 {
     while (children_.Size())
-        RemoveChild(children_.End() - 1);
+        RemoveChild(--children_.End());
 }
 
-Component* Node::CreateComponent(ShortStringHash type, CreateMode mode)
+Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
 {
-    return CreateComponent(type, 0, mode);
+    // Check that creation succeeds and that the object in fact is a component
+    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
+    if (!newComponent)
+    {
+        LOGERROR("Could not create unknown component type " + type.ToString());
+        return 0;
+    }
+    
+    AddComponent(newComponent, id, mode);
+    return newComponent;
 }
 
 Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode)
@@ -553,7 +538,7 @@ Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode)
     if (oldComponent)
         return oldComponent;
     else
-        return CreateComponent(type, 0, mode);
+        return CreateComponent(type, mode);
 }
 
 void Node::RemoveComponent(Component* component)
@@ -562,16 +547,7 @@ void Node::RemoveComponent(Component* component)
     {
         if (*i == component)
         {
-            WeakPtr<Component> componentWeak(*i);
-            
-            RemoveListener(*i);
-            if (scene_)
-                scene_->ComponentRemoved(*i);
-            components_.Erase(i);
-            
-            // If the component is still referenced elsewhere, reset its node pointer now
-            if (componentWeak)
-                componentWeak->SetNode(0);
+            RemoveComponent(i);
             
             // Mark node dirty in all replication states
             MarkReplicationDirty();
@@ -586,16 +562,7 @@ void Node::RemoveComponent(ShortStringHash type)
     {
         if ((*i)->GetType() == type)
         {
-            WeakPtr<Component> componentWeak(*i);
-            
-            RemoveListener(*i);
-            if (scene_)
-                scene_->ComponentRemoved(*i);
-            components_.Erase(i);
-            
-            // If the component is still referenced elsewhere, reset its node pointer now
-            if (componentWeak)
-                componentWeak->SetNode(0);
+            RemoveComponent(i);
             
             // Mark node dirty in all replication states
             MarkReplicationDirty();
@@ -610,19 +577,7 @@ void Node::RemoveAllComponents()
         return;
     
     while (components_.Size())
-    {
-        Vector<SharedPtr<Component> >::Iterator i = components_.End() - 1;
-        WeakPtr<Component> componentWeak(*i);
-        
-        RemoveListener(*i);
-        if (scene_)
-            scene_->ComponentRemoved(*i);
-        components_.Erase(i);
-        
-        // If the component is still referenced elsewhere, reset its node pointer now
-        if (componentWeak)
-            componentWeak->SetNode(0);
-    }
+        RemoveComponent(--components_.End());
     
     // Mark node dirty in all replication states
     MarkReplicationDirty();
@@ -854,6 +809,13 @@ void Node::SetScene(Scene* scene)
     scene_ = scene;
 }
 
+void Node::ResetScene()
+{
+    SetID(0);
+    SetScene(0);
+    SetOwner(0);
+}
+
 void Node::SetNetPositionAttr(const Vector3& value)
 {
     SmoothedTransform* transform = GetComponent<SmoothedTransform>();
@@ -965,8 +927,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        Component* newComponent = CreateComponent(compType, rewriteIDs ? 0 : compID, (mode == REPLICATED &&
-            compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
+        Component* newComponent = CreateComponent(compType,
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1006,8 +968,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(ShortStringHash(typeName), rewriteIDs ? 0 : compID, (mode == REPLICATED &&
-            compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
+        Component* newComponent = CreateComponent(ShortStringHash(typeName),
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -1150,7 +1112,7 @@ void Node::CleanupConnection(Connection* connection)
 
 void Node::MarkNetworkUpdate()
 {
-    if (id_ < FIRST_LOCAL_ID && !networkUpdate_ && scene_)
+    if (!networkUpdate_ && scene_ && id_ < FIRST_LOCAL_ID)
     {
         scene_->MarkNetworkUpdate(this);
         networkUpdate_ = true;
@@ -1172,20 +1134,6 @@ void Node::MarkReplicationDirty()
             }
         }
     }
-}
-
-Component* Node::CreateComponent(ShortStringHash type, unsigned id, CreateMode mode)
-{
-    // Check that creation succeeds and that the object in fact is a component
-    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
-    if (!newComponent)
-    {
-        LOGERROR("Could not create unknown component type " + type.ToString());
-        return 0;
-    }
-    
-    AddComponent(newComponent, id, mode);
-    return newComponent;
 }
 
 Node* Node::CreateChild(unsigned id, CreateMode mode)
@@ -1235,14 +1183,11 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 
 void Node::UpdateWorldTransform() const
 {
+    Matrix3x4 transform = GetTransform();
     if (parent_)
-    {
-        if (parent_->dirty_)
-            parent_->UpdateWorldTransform();
-        worldTransform_ = parent_->worldTransform_ * Matrix3x4(position_, rotation_, scale_);
-    }
+        worldTransform_ = parent_->GetWorldTransform() * transform;
     else
-        worldTransform_ = Matrix3x4(position_, rotation_, scale_);
+        worldTransform_ = transform;
     
     dirty_ = false;
 }
@@ -1315,6 +1260,20 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     }
     
     return cloneNode;
+}
+
+void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
+{
+    WeakPtr<Component> componentWeak(*i);
+    
+    RemoveListener(*i);
+    if (scene_)
+        scene_->ComponentRemoved(*i);
+    components_.Erase(i);
+    
+    // If the component is still referenced elsewhere, reset its node pointer now
+    if (componentWeak)
+        componentWeak->SetNode(0);
 }
 
 }

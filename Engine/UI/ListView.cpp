@@ -79,8 +79,6 @@ ListView::ListView(Context* context) :
     
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
-    SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocused));
-    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
 }
 
 ListView::~ListView()
@@ -110,26 +108,21 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     // If no selection, can not move with keys
     unsigned numItems = GetNumItems();
     unsigned selection = GetSelection();
+
+    // If either shift or ctrl held down, add to selection if multiselect enabled
+    bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
+    int delta = 0;
+    int pageDirection = 1;
     
     if (selection != M_MAX_UNSIGNED && numItems)
     {
-        // If either shift or ctrl held down, add to selection if multiselect enabled
-        bool additive = multiselect_ && qualifiers != 0;
-        
         switch (key)
         {
         case KEY_LEFT:
-            if (hierarchyMode_)
-            {
-                SetChildItemsVisible(selection, false);
-                return;
-            }
-            break;
-            
         case KEY_RIGHT:
             if (hierarchyMode_)
             {
-                SetChildItemsVisible(selection, true);
+                SetChildItemsVisible(selection, key == KEY_RIGHT);
                 return;
             }
             break;
@@ -143,19 +136,24 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
             break;
             
         case KEY_UP:
-            ChangeSelection(-1, additive);
-            return;
-            
+            delta = -1;
+            break;
+
         case KEY_DOWN:
-            ChangeSelection(1, additive);
-            return;
+            delta = 1;
+            break;
             
         case KEY_PAGEUP:
+            pageDirection = -1;
+            // Fallthru
+
+        case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
                 int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - GetSelectedItem()->GetHeight();
                 unsigned newSelection = selection;
                 unsigned okSelection = selection;
+                unsigned invisible = 0;
                 while (newSelection < numItems)
                 {
                     UIElement* item = GetItem(newSelection);
@@ -165,52 +163,31 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                         height = item->GetHeight();
                         okSelection = newSelection;
                     }
+                    else
+                        ++invisible;
                     if (stepPixels < height)
                         break;
                     stepPixels -= height;
-                    --newSelection;
+                    newSelection += pageDirection;
                 }
-                if (!additive)
-                    SetSelection(okSelection);
-                else
-                    AddSelection(okSelection);
+                delta = okSelection - selection - pageDirection * invisible;
             }
-            return;
-            
-        case KEY_PAGEDOWN:
-            {
-                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - GetSelectedItem()->GetHeight();
-                unsigned newSelection = selection;
-                unsigned okSelection = selection;
-                while (newSelection < numItems)
-                {
-                    UIElement* item = GetItem(newSelection);
-                    int height = 0;
-                    if (item->IsVisible())
-                    {
-                        height = item->GetHeight();
-                        okSelection = newSelection;
-                    }
-                    if (stepPixels < height)
-                        break;
-                    stepPixels -= height;
-                    ++newSelection;
-                }
-                if (!additive)
-                    SetSelection(okSelection);
-                else
-                    AddSelection(okSelection);
-            }
-            return;
+            break;
             
         case KEY_HOME:
-            ChangeSelection(-(int)GetNumItems(), additive);
-            return;
+            delta = -(int)GetNumItems();
+            break;
             
         case KEY_END:
-            ChangeSelection(GetNumItems(), additive);
-            return;
+            delta = GetNumItems();
+            break;
         }
+    }
+    
+    if (delta)
+    {
+        ChangeSelection(delta, additive);
+        return;
     }
     
     using namespace UnhandledKey;
@@ -260,24 +237,23 @@ void ListView::InsertItem(unsigned index, UIElement* item)
     }
 }
 
-void ListView::RemoveItem(UIElement* item)
+void ListView::RemoveItem(UIElement* item, unsigned index)
 {
     unsigned numItems = GetNumItems();
     
-    for (unsigned i = 0; i < numItems; ++i)
+    for (unsigned i = index; i < numItems; ++i)
     {
         if (GetItem(i) == item)
         {
             item->SetSelected(false);
-            selections_.Erase(selections_.Find(i));
-            
+            selections_.Remove(i);
+
             // Remove any child items in hierarchy mode
             unsigned removed = 1;
             if (hierarchyMode_)
             {
                 int baseIndent = GetItemIndent(item);
-                int j = i + 1;
-                for (;;)
+                for (unsigned j = i + 1; ; ++j)
                 {
                     UIElement* childItem = GetItem(i + 1);
                     if (!childItem)
@@ -286,15 +262,14 @@ void ListView::RemoveItem(UIElement* item)
                     {
                         childItem->SetSelected(false);
                         selections_.Erase(j);
-                        contentElement_->RemoveChild(childItem);
+                        contentElement_->RemoveChild(childItem, i + 1);
                         ++removed;
                     }
                     else
                         break;
-                    ++j;
                 }
             }
-            
+
             // If necessary, shift the following selections
             if (!selections_.Empty())
             {
@@ -306,26 +281,24 @@ void ListView::RemoveItem(UIElement* item)
                 
                 UpdateSelectionEffect();
             }
+            
+            contentElement_->RemoveChild(item, i);
             break;
         }
     }
-    contentElement_->RemoveChild(item);
 }
 
 void ListView::RemoveItem(unsigned index)
 {
-    RemoveItem(GetItem(index));
+    RemoveItem(GetItem(index), index);
 }
 
 void ListView::RemoveAllItems()
 {
     contentElement_->DisableLayoutUpdate();
     
-    unsigned numItems = GetNumItems();
-    for (unsigned i = 0; i < numItems; ++i)
-        contentElement_->GetChild(i)->SetSelected(false);
-    contentElement_->RemoveAllChildren();
     ClearSelection();
+    contentElement_->RemoveAllChildren();
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
@@ -410,8 +383,7 @@ void ListView::AddSelection(unsigned index)
         if (index >= GetNumItems())
             return;
         
-        PODVector<unsigned>::Iterator i = selections_.Find(index);
-        if (i == selections_.End())
+        if (!selections_.Contains(index))
         {
             selections_.Push(index);
             
@@ -436,11 +408,8 @@ void ListView::RemoveSelection(unsigned index)
     if (index >= GetNumItems())
         return;
     
-    PODVector<unsigned>::Iterator i = selections_.Find(index);
-    if (i != selections_.End())
+    if (selections_.Remove(index))
     {
-        selections_.Erase(i);
-        
         using namespace ItemSelected;
         
         VariantMap eventData;
@@ -475,44 +444,35 @@ void ListView::ChangeSelection(int delta, bool additive)
     
     // If going downwards, use the last selection as a base. Otherwise use first
     unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
+    int direction = delta > 0 ? 1 : -1;
     unsigned numItems = GetNumItems();
     unsigned newSelection = selection;
     unsigned okSelection = selection;
+    PODVector<unsigned> indices = selections_;
+
     while (delta != 0)
     {
-        if (delta > 0)
-        {
-            ++newSelection;
-            if (newSelection >= numItems)
-                break;
-        }
-        if (delta < 0)
-        {
-            --newSelection;
-            if (newSelection >= numItems)
-                break;
-        }
+        newSelection += direction;
+        if (newSelection >= numItems)
+            break;
+
         UIElement* item = GetItem(newSelection);
         if (item->IsVisible())
         {
-            okSelection = newSelection;
-            if (delta > 0)
-                --delta;
-            if (delta < 0)
-                ++delta;
+            indices.Push(okSelection = newSelection);
+            delta -= direction;            
         }
     }
     
     if (!additive)
         SetSelection(okSelection);
     else
-        AddSelection(okSelection);
+        SetSelections(indices);
 }
 
 void ListView::ClearSelection()
 {
     SetSelections(PODVector<unsigned>());
-    UpdateSelectionEffect();
 }
 
 void ListView::SetHighlightMode(HighlightMode mode)
@@ -533,7 +493,20 @@ void ListView::SetHierarchyMode(bool enable)
 
 void ListView::SetClearSelectionOnDefocus(bool enable)
 {
-    clearSelectionOnDefocus_ = enable;
+    if (enable != clearSelectionOnDefocus_)
+    {
+        clearSelectionOnDefocus_ = enable;
+    
+        if (clearSelectionOnDefocus_)
+        {
+            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
+
+            if (!HasFocus())
+                ClearSelection();
+        }
+        else
+            UnsubscribeFromEvent(this, E_DEFOCUSED);
+    }
 }
 
 void ListView::SetDoubleClickInterval(float interval)
@@ -575,8 +548,9 @@ void ListView::SetChildItemsVisible(bool enable)
             SetChildItemsVisible(i, enable);
     }
     
-    if (GetSelections().Size() == 1)
-        EnsureItemVisibility(GetSelection());
+    unsigned firstSelected = GetSelection();
+    if (firstSelected != M_MAX_UNSIGNED)
+        EnsureItemVisibility(firstSelected);
 }
 
 void ListView::ToggleChildItemsVisible(unsigned index)
@@ -590,7 +564,7 @@ void ListView::ToggleChildItemsVisible(unsigned index)
     
     int baseIndent = GetItemIndent(GetItem(index));
     bool firstChild = true;
-    UIElement* prevItem = 0;
+    bool firstChildVisible;
     for (unsigned i = index + 1; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
@@ -598,16 +572,14 @@ void ListView::ToggleChildItemsVisible(unsigned index)
         {
             if (firstChild)
             {
-                item->SetVisible(!item->IsVisible());
+                item->SetVisible(firstChildVisible = !item->IsVisible());
                 firstChild = false;
             }
             else
-                item->SetVisible(prevItem->IsVisible());
+                item->SetVisible(firstChildVisible);
         }
         else
             break;
-        
-        prevItem = item;
     }
     
     contentElement_->EnableLayoutUpdate();
@@ -666,12 +638,13 @@ bool ListView::IsSelected(unsigned index) const
 void ListView::UpdateSelectionEffect()
 {
     unsigned numItems = GetNumItems();
+    bool highlighted = highlightMode_ == HM_ALWAYS || HasFocus();
     
     for (unsigned i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
         if (highlightMode_ != HM_NEVER && selections_.Contains(i))
-            item->SetSelected(HasFocus() || highlightMode_ == HM_ALWAYS);
+            item->SetSelected(highlighted);
         else
             item->SetSelected(false);
     }
@@ -809,17 +782,9 @@ void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void ListView::HandleFocused(StringHash eventType, VariantMap& eventData)
-{
-    UpdateSelectionEffect();
-}
-
 void ListView::HandleDefocused(StringHash eventType, VariantMap& eventData)
 {
-    if (clearSelectionOnDefocus_)
-        ClearSelection();
-    
-    UpdateSelectionEffect();
+    ClearSelection();
 }
 
 }

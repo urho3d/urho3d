@@ -158,10 +158,8 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
-    else if (usage == TEXTURE_DYNAMIC)
-        dynamic_ = true;
     else
-        dynamic_ = false;
+        dynamic_ = usage == TEXTURE_DYNAMIC;
     
     width_ = width;
     height_ = height;

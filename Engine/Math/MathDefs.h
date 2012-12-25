@@ -32,7 +32,7 @@ namespace Urho3D
 {
 
 #ifndef M_PI
-static const float M_PI = 3.141592653589793238462643f;
+static const float M_PI = 3.14159265358979323846264338327950288f;
 #endif
 
 static const int M_MIN_INT = 0x80000000;
@@ -47,6 +47,7 @@ static const float M_MAX_FOV = 160.0f;
 static const float M_LARGE_VALUE = 100000000.0f;
 static const float M_INFINITY = (float)HUGE_VAL;
 static const float M_DEGTORAD = (float)M_PI / 180.0f;
+static const float M_DEGTORAD_2 = (float)M_PI / 360.0f; // M_DEGTORAD / 2.f
 static const float M_RADTODEG = 1.0f / M_DEGTORAD;
 
 /// Intersection test result.

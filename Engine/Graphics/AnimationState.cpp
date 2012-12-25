@@ -65,11 +65,13 @@ void AnimationState::SetStartBone(Bone* startBone)
         return;
     
     Skeleton& skeleton = model_->GetSkeleton();
-    Bone* rootBone = skeleton.GetRootBone();
-    if (!rootBone)
-        return;
     if (!startBone)
+    {
+        Bone* rootBone = skeleton.GetRootBone();
+        if (!rootBone)
+            return;
         startBone = rootBone;
+    }
     
     // Do not reassign if the start bone did not actually change, and we already have valid bone nodes
     if (startBone == startBone_ && !trackToBoneMap_.Empty())

@@ -43,13 +43,11 @@ namespace Urho3D
 OBJECTTYPESTATIC(CustomGeometry);
 
 CustomGeometry::CustomGeometry(Context* context) :
-    Drawable(context),
-    geometryIndex_(0),
-    elementMask_(MASK_POSITION)
+    Drawable(context, DRAWABLE_GEOMETRY),
+    vertexBuffer_(new VertexBuffer(context)),
+    elementMask_(MASK_POSITION),
+    geometryIndex_(0)
 {
-    drawableFlags_ = DRAWABLE_GEOMETRY;
-    
-    vertexBuffer_ = new VertexBuffer(context_);
     vertexBuffer_->SetShadowed(true);
     SetNumGeometries(1);
 }
@@ -84,50 +82,37 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         break;
         
     case RAY_OBB:
-        {
-            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = localRay.HitDistance(boundingBox_);
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
-        }
-        break;
-        
     case RAY_TRIANGLE:
+        Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+        Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+        float distance = localRay.HitDistance(boundingBox_);
+        if (distance <= query.maxDistance_)
         {
-            // Do a pretest using the OBB
-            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = localRay.HitDistance(boundingBox_);
-            if (distance <= query.maxDistance_)
+            if (level == RAY_TRIANGLE)
             {
-                // Then the actual test using triangle geometry
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                // After a pretest using the OBB, do the actual test using triangle geometry
+                unsigned i = 0;
+                while (i < batches_.Size())
                 {
-                    Geometry* geometry = batches_[i].geometry_;
+                    Geometry* geometry = batches_[i++].geometry_;
                     if (geometry)
                     {
                         distance = geometry->GetHitDistance(localRay);
                         if (distance <= query.maxDistance_)
-                        {
-                            RayQueryResult result;
-                            result.drawable_ = this;
-                            result.node_ = GetNode();
-                            result.distance_ = distance;
-                            result.subObject_ = M_MAX_UNSIGNED;
-                            results.Push(result);
                             break;
-                        }
                     }
                 }
+                if (i == batches_.Size())
+                    break;
             }
+            
+            // If the code reaches here then we have a hit
+            RayQueryResult result;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.distance_ = distance;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
         }
         break;
     }

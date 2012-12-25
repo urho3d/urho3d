@@ -133,15 +133,15 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
     /// Create a child scene node.
-    Node* CreateChild(const String& name = String(), CreateMode mode = REPLICATED);
+    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED);
     /// Add a child scene node.
     void AddChild(Node* node);
     /// Remove a child scene node.
     void RemoveChild(Node* node);
     /// Remove all child scene nodes.
     void RemoveAllChildren();
-    /// Create a component to this node.
-    Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
+    /// Create a component to this node (with specified ID if provided).
+    Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
     Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
     /// Remove a component from this node.
@@ -193,37 +193,25 @@ public:
     /// Return position in world space.
     Vector3 GetWorldPosition() const
     {
-        if (dirty_)
-            UpdateWorldTransform();
-        
-        return worldTransform_.Translation();
+        return GetWorldTransform().Translation();
     }
     
     /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
-        if (dirty_)
-            UpdateWorldTransform();
-        
-        return worldTransform_.Rotation();
+        return GetWorldTransform().Rotation();
     }
     
     /// Return direction in world space.
     Vector3 GetWorldDirection() const
     {
-        if (dirty_)
-            UpdateWorldTransform();
-        
-        return worldTransform_.RotationMatrix() * Vector3::FORWARD;
+        return GetWorldTransform().RotationMatrix() * Vector3::FORWARD;
     }
     
     /// Return scale in world space.
     Vector3 GetWorldScale() const
     {
-        if (dirty_)
-            UpdateWorldTransform();
-        
-        return worldTransform_.Scale();
+        return GetWorldTransform().Scale();
     }
     
     /// Return transform matrix in world space.
@@ -294,6 +282,8 @@ public:
     void SetID(unsigned id);
     /// Set scene. Called by Scene.
     void SetScene(Scene* scene);
+    /// Reset scene. Called by Scene.
+    void ResetScene();
     /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);
     /// Set network rotation attribute.
@@ -320,13 +310,15 @@ public:
     void MarkNetworkUpdate();
     /// Mark node dirty in scene replication states.
     void MarkReplicationDirty();
-    /// Create a component with specific ID.
-    Component* CreateComponent(ShortStringHash type, unsigned id, CreateMode mode);
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
     /// Add a pre-created component.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
     
+protected:
+    /// User variables.
+    VariantMap vars_;
+
 private:
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
@@ -338,7 +330,9 @@ private:
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const;
     /// Clone node recursively.
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
-    
+    /// Remove a component from this node with the specified iterator.
+    void RemoveComponent(Vector<SharedPtr<Component> >::Iterator i);
+   
     /// World-space transform matrix.
     mutable Matrix3x4 worldTransform_;
     /// World transform needs update flag.
@@ -375,10 +369,6 @@ private:
     StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
-    
-protected:
-    /// User variables.
-    VariantMap vars_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }

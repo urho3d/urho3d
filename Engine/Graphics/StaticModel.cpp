@@ -44,11 +44,10 @@ namespace Urho3D
 OBJECTTYPESTATIC(StaticModel);
 
 StaticModel::StaticModel(Context* context) :
-    Drawable(context),
-    occlusionLodLevel_(M_MAX_UNSIGNED)
+    Drawable(context, DRAWABLE_GEOMETRY),
+    occlusionLodLevel_(M_MAX_UNSIGNED),
+    materialsAttr_(Material::GetTypeStatic())
 {
-    drawableFlags_ = DRAWABLE_GEOMETRY;
-    materialsAttr_.type_ = Material::GetTypeStatic();
 }
 
 StaticModel::~StaticModel()
@@ -84,50 +83,37 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         break;
         
     case RAY_OBB:
-        {
-            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = localRay.HitDistance(boundingBox_);
-            if (distance <= query.maxDistance_)
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = GetNode();
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
-        }
-        break;
-        
     case RAY_TRIANGLE:
+        Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+        Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+        float distance = localRay.HitDistance(boundingBox_);
+        if (distance <= query.maxDistance_)
         {
-            // Do a pretest using the OBB
-            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = localRay.HitDistance(boundingBox_);
-            if (distance <= query.maxDistance_)
+            if (level == RAY_TRIANGLE)
             {
-                // Then the actual test using triangle geometry
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                // After a pretest using the OBB, do the actual test using triangle geometry
+                unsigned i = 0;
+                while (i < batches_.Size())
                 {
-                    Geometry* geometry = batches_[i].geometry_;
+                    Geometry* geometry = batches_[i++].geometry_;
                     if (geometry)
                     {
                         distance = geometry->GetHitDistance(localRay);
                         if (distance <= query.maxDistance_)
-                        {
-                            RayQueryResult result;
-                            result.drawable_ = this;
-                            result.node_ = GetNode();
-                            result.distance_ = distance;
-                            result.subObject_ = M_MAX_UNSIGNED;
-                            results.Push(result);
                             break;
-                        }
                     }
                 }
+                if (i == batches_.Size())
+                    break;
             }
+            
+            // If the code reaches here then we have a hit
+            RayQueryResult result;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.distance_ = distance;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
         }
         break;
     }
@@ -197,8 +183,6 @@ unsigned StaticModel::GetNumOccluderTriangles()
 
 bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 {
-    bool success = true;
-    
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         Geometry* geometry = GetLodGeometry(i, occlusionLodLevel_);
@@ -231,13 +215,11 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned indexCount = geometry->GetIndexCount();
         
         // Draw and check for running out of triangles
-        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount);
-        
-        if (!success)
-            break;
+        if (!buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
+            return false;
     }
     
-    return success;
+    return true;
 }
 
 void StaticModel::SetModel(Model* model)
@@ -386,7 +368,7 @@ void StaticModel::CalculateLodLevels()
 void StaticModel::HandleModelReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     Model* currentModel = model_;
-    model_ = 0; // Set null to allow to be re-set
+    model_.Reset(); // Set null to allow to be re-set
     SetModel(currentModel);
 }
 

@@ -116,6 +116,8 @@ private:
     bool exiting_;
     /// Headless mode flag.
     bool headless_;
+    /// Audio paused flag.
+    bool audioPaused_;
 };
 
 }
