@@ -411,11 +411,12 @@ bool Texture2D::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
-    // Create a renderbuffer instead of a texture if depth texture is not properly supported
+    // Create a renderbuffer instead of a texture if depth texture is not properly supported, or if this will be a packed
+    // depth stencil texture
     #ifndef GL_ES_VERSION_2_0
-    if (!graphics_->GetHardwareDepthSupport() && format_ == Graphics::GetDepthStencilFormat())
+    if (format_ == Graphics::GetDepthStencilFormat())
     #else
-    if (!graphics_->GetHardwareDepthSupport() && externalFormat == GL_DEPTH_COMPONENT)
+    if (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT)
     #endif
     {
         if (renderSurface_)

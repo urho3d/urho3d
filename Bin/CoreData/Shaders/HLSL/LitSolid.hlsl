@@ -155,15 +155,13 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float3 iReflectionVec : TEXCOORD6,
         #endif
     #endif
-    #if defined(PREPASS) && !defined(HWDEPTH)
+    #ifdef PREPASS
         out float4 oDepth : COLOR1,
     #endif
     #ifdef DEFERRED
         out float4 oAlbedo : COLOR1,
         out float4 oNormal : COLOR2,
-        #ifndef HWDEPTH
-            out float4 oDepth : COLOR3,
-        #endif
+        out float4 oDepth : COLOR3,
     #endif
     out float4 oColor : COLOR0)
 {
@@ -238,9 +236,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float specPower = cMatSpecColor.a / 255.0;
 
         oColor = float4(normal * 0.5 + 0.5, specPower);
-        #ifndef HWDEPTH
-            oDepth = iVertexLight.a;
-        #endif
+        oDepth = iVertexLight.a;
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
         #ifdef NORMALMAP
@@ -261,13 +257,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor = float4(GetFog(iVertexLight.rgb * diffColor.rgb, iVertexLight.a), 1.0);
         oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
         oNormal = float4(normal * 0.5 + 0.5, specPower);
+        oDepth = iVertexLight.a;
 
         #ifdef ENVCUBEMAP
             oColor.rgb += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal));
-        #endif
-
-        #ifndef HWDEPTH
-            oDepth = iVertexLight.a;
         #endif
     #else
         // Ambient & per-vertex lighting

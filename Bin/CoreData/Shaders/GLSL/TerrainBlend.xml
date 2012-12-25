@@ -41,8 +41,6 @@
         <variation name="Prepass" define="PREPASS" />
         <variation name="Material" define="MATERIAL" exclude="Normal" />
         <variation name="Deferred" define="DEFERRED" />
-        <option name="HW" define="HWDEPTH" require="PREPASS" />
-        <option name="HW" define="HWDEPTH" require="DEFERRED" />
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
         <option name="Spec" define="SPECULAR" require="PERPIXEL" />
         <option name="Shadow" define="SHADOW" require="PERPIXEL" />

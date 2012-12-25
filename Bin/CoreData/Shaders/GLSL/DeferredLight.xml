@@ -12,6 +12,5 @@
         <option name="Spec" define="SPECULAR" />
         <option name="Shadow" define="SHADOW" />
         <option name="LQ" define="LQSHADOW" />
-        <option name="HW" define="HWDEPTH" />
     </shader>
 </shaders>

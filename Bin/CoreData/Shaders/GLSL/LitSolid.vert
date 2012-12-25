@@ -56,17 +56,13 @@ void main()
     #ifdef PERPIXEL
         // Per-pixel forward lighting
         vec4 projWorldPos = vec4(worldPos, 1.0);
-    
+
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #ifndef POINTLIGHT
-                for (int i = 0; i < NUMCASCADES; i++)
-                    vShadowPos[i] = cLightMatrices[i] * projWorldPos;
-            #else
-                vShadowPos[0] = vec4(projWorldPos.xyz - cLightPos.xyz, 1.0);
-            #endif
+            for (int i = 0; i < NUMCASCADES; i++)
+                vShadowPos[i] = GetShadowPos(i, projWorldPos);
         #endif
-    
+
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
             vSpotPos = cLightMatrices[0] * projWorldPos;

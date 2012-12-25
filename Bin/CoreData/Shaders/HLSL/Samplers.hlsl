@@ -33,8 +33,3 @@ float3 DecodeNormal(float4 normalInput)
     normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
     return normal;
 }
-
-float ReconstructDepth(float hwDepth)
-{
-    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
-}

@@ -432,7 +432,7 @@ When setting the initial screen mode, Graphics does a few checks:
 - For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
-- Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and either R32F texture format or readable hardware depth.
+- Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
 \section Rendering_Renderer Renderer
 
@@ -522,11 +522,11 @@ Materials can also define an optimization pass for forward rendering where the a
 
 \section RenderingModes_Prepass Light pre-pass rendering
 
-%Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer. If the INTZ readable hardware depth-stencil texture format is available, the second color rendertarget will be omitted:
+%Light pre-pass requires a minimum of two passes per object. First the normal, specular power, depth and lightmask (8 low bits only) of opaque objects are rendered to the following G-buffer:
 
 - RT0: World-space normal and specular power (D3DFMT_A8R8G8B8)
 - RT1: Linear depth (D3DFMT_R32F)
-- DS: Hardware depth and lightmask (D3DFMT_D24S8 or INTZ)
+- DS: Hardware depth and lightmask (D3DFMT_D24S8)
 
 After the G-buffer is complete, light volumes (spot and point lights) or fullscreen quads (directional lights) will be rendered to a light accumulation buffer to calculate the diffuse and specular light at each opaque pixel. Specular light is stored as intensity only. Stencil compare (AND operation) with the 8 low bits of the light's lightmask will be used for light culling. Similarly to forward rendering, shadow maps will be updated before each light as necessary.
 
@@ -534,13 +534,13 @@ Finally the opaque objects are re-rendered during the material pass, which combi
 
 \section RenderingModes_Deferred Deferred rendering
 
-Deferred rendering needs to render each opaque object only once to the G-buffer, but this rendering pass is much heavier than in light pre-pass rendering, as also ambient, emissive and diffuse albedo information is output at the same time. The G-buffer is the following, with the last color rendertarget omitted if hardware depth can be read:
+Deferred rendering needs to render each opaque object only once to the G-buffer, but this rendering pass is much heavier than in light pre-pass rendering, as also ambient, emissive and diffuse albedo information is output at the same time. The G-buffer is the following:
 
 - RT0: Final rendertarget with ambient, per-vertex and emissive color (D3DFMT_X8R8G8B8)
 - RT1: Diffuse albedo and specular intensity (D3DFMT_A8R8G8B8)
 - RT2: World-space normal and specular power (D3DFMT_A8R8G8B8)
 - RT3: Linear depth (D3DFMT_R32F)
-- DS: Hardware depth and lightmask (D3DFMT_D24S8 or INTZ)
+- DS: Hardware depth and lightmask (D3DFMT_D24S8)
 
 After the G-buffer has been rendered, light volumes will be rendered into the final rendertarget to accumulate per-pixel lighting. As the material albedo is available, all lighting calculations are final and output both the diffuse and specular color at the same time. After light accumulation rendering proceeds to pre-alpha, transparent, and post-alpha passes, as in other rendering modes.
 

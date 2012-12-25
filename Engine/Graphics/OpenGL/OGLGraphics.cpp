@@ -162,7 +162,6 @@ Graphics::Graphics(Context* context_) :
     tripleBuffer_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
-    hardwareDepthSupport_(false),
     anisotropySupport_(false),
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
@@ -2145,45 +2144,17 @@ void Graphics::CheckFeatureSupport()
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
-    hardwareDepthSupport_ = false;
     
     int numSupportedRTs = 1;
     
     #ifndef GL_ES_VERSION_2_0
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
     
-    // For now hardware depth texture is only tested for on NVIDIA hardware because of visual artifacts and slowdown on ATI
-    String vendorString = String((const char*)glGetString(GL_VENDOR)).ToUpper();
-    if (vendorString.Find("NVIDIA") != String::NPOS)
-    {
-        SharedPtr<Texture2D> depthTexture(new Texture2D(context_));
-        
-        hardwareDepthSupport_ = true;
-        // Note: Texture2D::SetSize() requires hardwareDepthSupport_ == true to create a texture instead of a renderbuffer
-        depthTexture->SetSize(256, 256, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-        SetDepthStencil(depthTexture);
-        
-        // If hardware depth textures work, this means also light pre-pass is automatically supported
-        if (CheckFramebuffer())
-        {
-            lightPrepassSupport_ = true;
-            if (numSupportedRTs >= 3)
-                deferredSupport_ = true;
-        }
-        else
-            hardwareDepthSupport_ = false;
-        
-        ResetDepthStencil();
-    }
-    
-    if (!hardwareDepthSupport_)
-    {
-        // If hardware depth is not supported, must support 2 rendertargets for light pre-pass, and 4 for deferred
-        if (numSupportedRTs >= 2)
-            lightPrepassSupport_ = true;
-        if (numSupportedRTs >= 4)
-            deferredSupport_ = true;
-    }
+    // If hardware depth is not supported, must support 2 rendertargets for light pre-pass, and 4 for deferred
+    if (numSupportedRTs >= 2)
+        lightPrepassSupport_ = true;
+    if (numSupportedRTs >= 4)
+        deferredSupport_ = true;
     #else
     if (!CheckExtension("GL_OES_depth_texture"))
     {
@@ -2194,7 +2165,6 @@ void Graphics::CheckFeatureSupport()
     {
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
-        hardwareDepthSupport_ = true;
     }
     #endif
 }

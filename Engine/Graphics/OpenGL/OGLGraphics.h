@@ -246,8 +246,6 @@ public:
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
     bool GetDeferredSupport() const { return deferredSupport_; }
-    /// Return whether hardware depth texture is supported. On OpenGL ES this means the depth texture extension.
-    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether anisotropic texture filtering is supported.
     bool GetAnisotropySupport() const { return anisotropySupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
@@ -417,8 +415,6 @@ private:
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.
     bool deferredSupport_;
-    /// Hardware depth support flag.
-    bool hardwareDepthSupport_;
     /// Anisotropic filtering support flag.
     bool anisotropySupport_;
     /// DXT format support flag.

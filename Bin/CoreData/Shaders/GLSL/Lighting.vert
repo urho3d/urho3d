@@ -69,4 +69,15 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
     #define NUMCASCADES 1
 #endif
 
+vec4 GetShadowPos(int index, vec4 projWorldPos)
+{
+    #if defined(DIRLIGHT)
+        return cLightMatrices[index] * projWorldPos;
+    #elif defined(SPOTLIGHT)
+        return cLightMatrices[1] * projWorldPos;
+    #else
+        return vec4(projWorldPos.xyz - cLightPos.xyz, 1.0);
+    #endif
+}
+
 #endif

@@ -187,12 +187,6 @@ static const String shadowVariations[] =
     #endif
 };
 
-static const String hwVariations[] =
-{
-    "",
-    "HW"
-};
-
 static const String geometryVSVariations[] =
 {
     "",
@@ -933,14 +927,6 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
     if (filtered)
         searchKey |= 0x8000000000000000LL;
     
-    // Return the default depth-stencil if applicable (Direct3D9 only)
-    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && depthStencil)
-    {
-        Texture2D* depthTexture = graphics_->GetDepthTexture();
-        if (depthTexture)
-            return depthTexture;
-    }
-    
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
         screenBufferAllocations_[searchKey] = 0;
@@ -1502,23 +1488,17 @@ void Renderer::LoadShaders()
         
         for (unsigned i = 0; i < lightPS_.Size(); ++i)
         {
-            String ortho, hwDepth;
-            #ifdef USE_OPENGL
-            hwDepth = hwVariations[graphics_->GetHardwareDepthSupport() ? 1 : 0];
-            #else
-            if (!graphics_->GetHardwareDepthSupport() && i < DLPS_ORTHO)
-                ortho = "Linear";
-            #endif
+            String ortho;
             if (i >= DLPS_ORTHO)
                 ortho = "Ortho";
             
             if (i & DLPS_SHADOW)
             {
                 lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO] +
-                    shadowVariations[shadows] + hwDepth);
+                    shadowVariations[shadows]);
             }
             else
-                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO] + hwDepth);
+                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO]);
         }
     }
     
@@ -1562,13 +1542,6 @@ void Renderer::LoadPassShaders(Technique* tech, PassType type)
         vertexShaderName += "_";
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
-    
-    // If hardware depth is used, choose a G-buffer shader that does not write depth manually
-    if (type == PASS_PREPASS || type == PASS_DEFERRED)
-    {
-        unsigned hwDepth = graphics_->GetHardwareDepthSupport() ? 1 : 0;
-        pixelShaderName += hwVariations[hwDepth];
-    }
     
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();

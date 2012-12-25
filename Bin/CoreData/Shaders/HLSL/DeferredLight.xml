@@ -4,8 +4,7 @@
         <option name="Dir" define="DIRLIGHT" />
     </shader>
     <shader type="ps">
-        <option name="Linear" define="LINEAR" exclude="Ortho" />
-        <option name="Ortho" define="ORTHO" exclude="Linear" />
+        <option name="Ortho" define="ORTHO" />
         <variation name="Dir" define="DIRLIGHT" />
         <variation name="Spot" define="SPOTLIGHT" />
         <variation name="Point" define="POINTLIGHT" />

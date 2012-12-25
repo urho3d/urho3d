@@ -39,12 +39,8 @@ void main()
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            #ifndef POINTLIGHT
-                for (int i = 0; i < NUMCASCADES; i++)
-                    vShadowPos[i] = cLightMatrices[i] * projWorldPos;
-            #else
-                vShadowPos[0] = vec4(projWorldPos.xyz - cLightPos.xyz, 1.0);
-            #endif
+            for (int i = 0; i < NUMCASCADES; i++)
+                vShadowPos[i] = GetShadowPos(i, projWorldPos);
         #endif
 
         #ifdef SPOTLIGHT

@@ -87,12 +87,8 @@ void main()
 
         float specPower = cMatSpecColor.a / 255.0;
 
-        #ifdef HWDEPTH
-            gl_FragColor = vec4(normal * 0.5 + 0.5, specPower);
-        #else
-            gl_FragData[0] = vec4(normal * 0.5 + 0.5, specPower);
-            gl_FragData[1] = vec4(EncodeDepth(vVertexLight.a), 0.0);
-        #endif
+        gl_FragData[0] = vec4(normal * 0.5 + 0.5, specPower);
+        gl_FragData[1] = vec4(EncodeDepth(vVertexLight.a), 0.0);
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
         vec3 normal = vNormal;
@@ -103,9 +99,7 @@ void main()
         gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, vVertexLight.a), 1.0);
         gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
-        #ifndef HWDEPTH
-            gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
-        #endif
+        gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;

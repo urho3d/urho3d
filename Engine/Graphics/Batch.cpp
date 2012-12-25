@@ -248,11 +248,6 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
         
         graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, cameraWorldRotation * Vector3::RIGHT);
         graphics->SetShaderParameter(VSP_VIEWUPVECTOR, cameraWorldRotation * Vector3::UP);
-        
-        float farClip = camera_->GetFarClip();
-        float nearClip = camera_->GetNearClip();
-        Vector4 depthReconstruct(farClip / (farClip - nearClip), -nearClip / (farClip - nearClip), 0.0f, 0.0f);
-        graphics->SetShaderParameter(PSP_DEPTHRECONSTRUCT, depthReconstruct);
     }
     
     // Set viewport shader parameters

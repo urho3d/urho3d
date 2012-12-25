@@ -237,8 +237,6 @@ public:
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
     bool GetDeferredSupport() const { return deferredSupport_; }
-    /// Return whether hardware depth can be read as a texture.
-    bool GetHardwareDepthSupport() const { return hardwareDepthSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether stream offset is supported.
@@ -269,8 +267,6 @@ public:
     RenderSurface* GetRenderTarget(unsigned index) const;
     /// Return current depth-stencil surface.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return backbuffer depth-stencil texture, created if available.
-    Texture2D* GetDepthTexture() const;
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
     /// Return texture anisotropy.
@@ -408,14 +404,10 @@ private:
     bool tripleBuffer_;
     /// Direct3D device lost flag.
     bool deviceLost_;
-    /// System depth-stencil flag.
-    bool systemDepthStencil_;
     /// Light pre-pass rendering support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.
     bool deferredSupport_;
-    /// Hardware depth texture support flag.
-    bool hardwareDepthSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
     /// Stream offset support flag.
@@ -466,8 +458,6 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
-    /// Backbuffer depth-stencil texture.
-    SharedPtr<Texture2D> depthTexture_;
     /// View texture.
     Texture* viewTexture_;
     /// Viewport coordinates.

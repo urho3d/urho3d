@@ -45,9 +45,3 @@ float DecodeDepth(vec3 depth)
     const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
     return dot(depth, dotValues);
 }
-
-float ReconstructDepth(float hwDepth)
-{
-    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
-}
-

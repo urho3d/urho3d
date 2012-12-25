@@ -1288,29 +1288,25 @@ void View::RenderBatchesDeferred()
         }
     }
     
-    bool hwDepth = graphics_->GetHardwareDepthSupport();
     // In light prepass mode the albedo buffer is used for light accumulation instead
     Texture2D* albedoBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
     Texture2D* normalBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
-    Texture2D* depthBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, hwDepth ? Graphics::GetDepthStencilFormat() :
-        Graphics::GetLinearDepthFormat());
+    Texture2D* depthBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetLinearDepthFormat());
     
     RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil = hwDepth ? depthBuffer->GetRenderSurface() : renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
+    RenderSurface* depthStencil = renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
     
     if (renderMode_ == RENDER_PREPASS)
     {
         graphics_->SetRenderTarget(0, normalBuffer);
-        if (!hwDepth)
-            graphics_->SetRenderTarget(1, depthBuffer);
+        graphics_->SetRenderTarget(1, depthBuffer);
     }
     else
     {
         graphics_->SetRenderTarget(0, renderTarget);
         graphics_->SetRenderTarget(1, albedoBuffer);
         graphics_->SetRenderTarget(2, normalBuffer);
-        if (!hwDepth)
-            graphics_->SetRenderTarget(3, depthBuffer);
+        graphics_->SetRenderTarget(3, depthBuffer);
     }
     
     graphics_->SetDepthStencil(depthStencil);
