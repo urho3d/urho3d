@@ -259,6 +259,7 @@ View::View(Context* context) :
     Object(context),
     graphics_(GetSubsystem<Graphics>()),
     renderer_(GetSubsystem<Renderer>()),
+    scene_(0),
     octree_(0),
     camera_(0),
     cameraZone_(0),
@@ -294,6 +295,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         return false;
     
     renderMode_ = renderer_->GetRenderMode();
+    scene_ = scene;
     octree_ = octree;
     camera_ = camera;
     cameraNode_ = camera->GetNode();
@@ -467,13 +469,24 @@ void View::Render()
         }
     }
     
-    // "Forget" the camera, octree and zone after rendering
+    // "Forget" the scene, camera, octree and zone after rendering
+    scene_ = 0;
     camera_ = 0;
     octree_ = 0;
     cameraZone_ = 0;
     farClipZone_ = 0;
     occlusionBuffer_ = 0;
     frame_.camera_ = 0;
+}
+
+Graphics* View::GetGraphics() const
+{
+    return graphics_;
+}
+
+Renderer* View::GetRenderer() const
+{
+    return renderer_;
 }
 
 void View::GetDrawables()
@@ -1162,7 +1175,7 @@ void View::RenderBatchesForward()
     if (!baseQueue_.IsEmpty())
     {
         PROFILE(RenderBase);
-        baseQueue_.Draw(graphics_, renderer_);
+        baseQueue_.Draw(this);
     }
     
     // Render shadow maps + opaque objects' additive lighting
@@ -1182,7 +1195,7 @@ void View::RenderBatchesForward()
                 graphics_->SetFillMode(camera_->GetFillMode());
             }
             
-            i->litBatches_.Draw(i->light_, graphics_, renderer_);
+            i->litBatches_.Draw(i->light_, this);
         }
     }
     
@@ -1211,21 +1224,21 @@ void View::RenderBatchesForward()
     if (!preAlphaQueue_.IsEmpty())
     {
         PROFILE(RenderPreAlpha);
-        preAlphaQueue_.Draw(graphics_, renderer_);
+        preAlphaQueue_.Draw(this);
     }
     
     // Render transparent objects (both base passes & additive lighting)
     if (!alphaQueue_.IsEmpty())
     {
         PROFILE(RenderAlpha);
-        alphaQueue_.Draw(graphics_, renderer_, true);
+        alphaQueue_.Draw(this, true);
     }
     
     // Render post-alpha custom pass
     if (!postAlphaQueue_.IsEmpty())
     {
         PROFILE(RenderPostAlpha);
-        postAlphaQueue_.Draw(graphics_, renderer_);
+        postAlphaQueue_.Draw(this);
     }
     
     graphics_->SetFillMode(FILL_SOLID);
@@ -1280,7 +1293,7 @@ void View::RenderBatchesDeferred()
     if (!gbufferQueue_.IsEmpty())
     {
         PROFILE(RenderGBuffer);
-        gbufferQueue_.Draw(graphics_, renderer_, false, true);
+        gbufferQueue_.Draw(this, false, true);
     }
     
     graphics_->SetFillMode(FILL_SOLID);
@@ -1331,7 +1344,7 @@ void View::RenderBatchesDeferred()
             for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
             {
                 SetupLightVolumeBatch(i->volumeBatches_[j]);
-                i->volumeBatches_[j].Draw(graphics_, renderer_);
+                i->volumeBatches_[j].Draw(this);
             }
         }
     }
@@ -1367,7 +1380,7 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderBase);
         
         graphics_->SetTexture(TU_LIGHTBUFFER, renderMode_ == RENDER_PREPASS ? albedoBuffer : 0);
-        baseQueue_.Draw(graphics_, renderer_);
+        baseQueue_.Draw(this);
         graphics_->SetTexture(TU_LIGHTBUFFER, 0);
     }
     
@@ -1375,21 +1388,21 @@ void View::RenderBatchesDeferred()
     if (!preAlphaQueue_.IsEmpty())
     {
         PROFILE(RenderPreAlpha);
-        preAlphaQueue_.Draw(graphics_, renderer_);
+        preAlphaQueue_.Draw(this);
     }
     
     // Render transparent objects (both base passes & additive lighting)
     if (!alphaQueue_.IsEmpty())
     {
         PROFILE(RenderAlpha);
-        alphaQueue_.Draw(graphics_, renderer_, true);
+        alphaQueue_.Draw(this, true);
     }
     
     // Render post-alpha custom pass
     if (!postAlphaQueue_.IsEmpty())
     {
         PROFILE(RenderPostAlpha);
-        postAlphaQueue_.Draw(graphics_, renderer_);
+        postAlphaQueue_.Draw(this);
     }
     
     graphics_->SetFillMode(FILL_SOLID);
@@ -1879,7 +1892,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
     {
         // Extrude the light space bounding box up to the far edge of the frustum's light space bounding box
         lightViewBox.max_.z_ = Max(lightViewBox.max_.z_,lightViewFrustumBox.max_.z_);
-        return lightViewFrustum.IsInsideFast(lightViewBox);
+        return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
     }
     else
     {
@@ -1904,7 +1917,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         BoundingBox extrudedBox(newCenter - newHalfSize, newCenter + newHalfSize);
         lightViewBox.Merge(extrudedBox);
         
-        return lightViewFrustum.IsInsideFast(lightViewBox);
+        return lightViewFrustum.IsInsideFast(lightViewBox) != OUTSIDE;
     }
 }
 
@@ -2367,16 +2380,16 @@ void View::PrepareInstancingBuffer()
     
     unsigned totalInstances = 0;
     
-    totalInstances += baseQueue_.GetNumInstances(renderer_);
-    totalInstances += preAlphaQueue_.GetNumInstances(renderer_);
+    totalInstances += baseQueue_.GetNumInstances();
+    totalInstances += preAlphaQueue_.GetNumInstances();
     if (renderMode_ != RENDER_FORWARD)
-        totalInstances += gbufferQueue_.GetNumInstances(renderer_);
+        totalInstances += gbufferQueue_.GetNumInstances();
     
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
         for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-            totalInstances += i->shadowSplits_[j].shadowBatches_.GetNumInstances(renderer_);
-        totalInstances += i->litBatches_.GetNumInstances(renderer_);
+            totalInstances += i->shadowSplits_[j].shadowBatches_.GetNumInstances();
+        totalInstances += i->litBatches_.GetNumInstances();
     }
     
     // If fail to set buffer size, fall back to per-group locking
@@ -2388,16 +2401,16 @@ void View::PrepareInstancingBuffer()
         if (!dest)
             return;
         
-        baseQueue_.SetTransforms(renderer_, dest, freeIndex);
-        preAlphaQueue_.SetTransforms(renderer_, dest, freeIndex);
+        baseQueue_.SetTransforms(this, dest, freeIndex);
+        preAlphaQueue_.SetTransforms(this, dest, freeIndex);
         if (renderMode_ != RENDER_FORWARD)
-            gbufferQueue_.SetTransforms(renderer_, dest, freeIndex);
+            gbufferQueue_.SetTransforms(this, dest, freeIndex);
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-                i->shadowSplits_[j].shadowBatches_.SetTransforms(renderer_, dest, freeIndex);
-            i->litBatches_.SetTransforms(renderer_, dest, freeIndex);
+                i->shadowSplits_[j].shadowBatches_.SetTransforms(this, dest, freeIndex);
+            i->litBatches_.SetTransforms(this, dest, freeIndex);
         }
         
         instancingBuffer->Unlock();
@@ -2504,7 +2517,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         if (!shadowQueue.shadowBatches_.IsEmpty())
         {
             graphics_->SetViewport(shadowQueue.shadowViewport_);
-            shadowQueue.shadowBatches_.Draw(graphics_, renderer_);
+            shadowQueue.shadowBatches_.Draw(this);
         }
     }
     

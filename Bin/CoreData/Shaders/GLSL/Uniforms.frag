@@ -3,6 +3,7 @@
 #endif
 
 uniform vec3 cAmbientColor;
+uniform float cElapsedTimePS;
 uniform vec2 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;

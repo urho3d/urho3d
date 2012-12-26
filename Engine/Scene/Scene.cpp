@@ -58,6 +58,7 @@ Scene::Scene(Context* context) :
     timeScale_(1.0f),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
+    elapsedTime_(0),
     active_(true),
     asyncLoading_(false),
     threadedUpdate_(false)
@@ -92,6 +93,7 @@ void Scene::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Time Scale", GetTimeScale, SetTimeScale, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Scene, VAR_FLOAT, "Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
@@ -391,6 +393,11 @@ void Scene::SetSnapThreshold(float threshold)
     Node::MarkNetworkUpdate();
 }
 
+void Scene::SetElapsedTime(float time)
+{
+    elapsedTime_ = time;
+}
+
 void Scene::AddRequiredPackageFile(PackageFile* package)
 {
     // Do not add packages that failed to load
@@ -515,6 +522,8 @@ void Scene::Update(float timeStep)
     
     // Post-update variable timestep logic
     SendEvent(E_SCENEPOSTUPDATE, eventData);
+    
+    elapsedTime_ += timeStep;
 }
 
 void Scene::BeginThreadedUpdate()

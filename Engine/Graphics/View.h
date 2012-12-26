@@ -91,6 +91,12 @@ public:
     /// Render batches.
     void Render();
     
+    /// Return graphics subsystem.
+    Graphics* GetGraphics() const;
+    /// Return renderer subsystem.
+    Renderer* GetRenderer() const;
+    /// Return scene.
+    Scene* GetScene() const { return scene_; }
     /// Return octree.
     Octree* GetOctree() const { return octree_; }
     /// Return camera.
@@ -176,6 +182,8 @@ private:
     WeakPtr<Graphics> graphics_;
     /// Renderer subsystem.
     WeakPtr<Renderer> renderer_;
+    /// Scene to use.
+    Scene* scene_;
     /// Octree to use.
     Octree* octree_;
     /// Camera to use.

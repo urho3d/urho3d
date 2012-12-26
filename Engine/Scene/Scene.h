@@ -102,6 +102,8 @@ public:
     void SetActive(bool enable);
     /// Set update time scale. 1.0 = real time (default.)
     void SetTimeScale(float scale);
+    /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
+    void SetElapsedTime(float time);
     /// Set network client motion smoothing constant.
     void SetSmoothingConstant(float constant);
     /// Set network client motion smoothing snap threshold.
@@ -133,6 +135,8 @@ public:
     unsigned GetChecksum() const { return checksum_; }
     /// Return update time scale.
     float GetTimeScale() const { return timeScale_; }
+    /// Return elapsed time in seconds.
+    float GetElapsedTime() const { return elapsedTime_; }
     /// Return motion smoothing constant.
     float GetSmoothingConstant() const { return smoothingConstant_; }
     /// Return motion smoothing snap threshold.
@@ -227,6 +231,8 @@ private:
     unsigned checksum_;
     /// Scene update time scale.
     float timeScale_;
+    /// Elapsed time accumulator.
+    float elapsedTime_;
     /// Motion smoothing constant.
     float smoothingConstant_;
     /// Motion smoothing snap threshold.

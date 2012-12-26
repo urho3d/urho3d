@@ -769,6 +769,8 @@ Geometry* Renderer::GetLightGeometry(Light* light)
     case LIGHT_POINT:
         return pointLightGeometry_;
     }
+    
+    return 0;
 }
 
 Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight)

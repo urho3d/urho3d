@@ -30,6 +30,7 @@
 #include "Node.h"
 #include "Renderer.h"
 #include "Profiler.h"
+#include "Scene.h"
 #include "ShaderVariation.h"
 #include "Sort.h"
 #include "Technique.h"
@@ -172,11 +173,13 @@ void Batch::CalculateSortKey()
         (((unsigned long long)materialID) << 16) | geometryID;
 }
 
-void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransform) const
+void Batch::Prepare(View* view, bool setModelTransform) const
 {
     if (!vertexShader_ || !pixelShader_)
         return;
     
+    Graphics* graphics = view->GetGraphics();
+    Renderer* renderer = view->GetRenderer();
     Node* cameraNode = camera_ ? camera_->GetNode() : 0;
     
     // Set pass / material-specific renderstates
@@ -197,6 +200,18 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     
     // Set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
+    
+    // Set global frame parameters
+    if (graphics->NeedParameterUpdate(SP_FRAME, (void*)0))
+    {
+        Scene* scene = view->GetScene();
+        if (scene)
+        {
+            float elapsedTime = scene->GetElapsedTime();
+            graphics->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+            graphics->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+        }
+    }
     
     // Set camera shader parameters
     unsigned cameraHash = overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_;
@@ -598,19 +613,19 @@ void Batch::Prepare(Graphics* graphics, Renderer* renderer, bool setModelTransfo
     }
 }
 
-void Batch::Draw(Graphics* graphics, Renderer* renderer) const
+void Batch::Draw(View* view) const
 {
     if (!geometry_->IsEmpty())
     {
-        Prepare(graphics, renderer);
-        geometry_->Draw(graphics);
+        Prepare(view);
+        geometry_->Draw(view->GetGraphics());
     }
 }
 
-void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
+void BatchGroup::SetTransforms(View* view, void* lockedData, unsigned& freeIndex)
 {
     // Do not use up buffer space if not going to draw as instanced
-    if (geometry_->GetIndexCount() > (unsigned)renderer->GetMaxInstanceTriangles() * 3)
+    if (geometry_->GetIndexCount() > (unsigned)view->GetRenderer()->GetMaxInstanceTriangles() * 3)
         return;
     
     startIndex_ = freeIndex;
@@ -623,15 +638,18 @@ void BatchGroup::SetTransforms(Renderer* renderer, void* lockedData, unsigned& f
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
+void BatchGroup::Draw(View* view) const
 {
+    Graphics* graphics = view->GetGraphics();
+    Renderer* renderer = view->GetRenderer();
+    
     if (instances_.Size() && !geometry_->IsEmpty())
     {
         // Draw as individual objects if instancing not supported
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
         if (!instanceBuffer || geometry_->GetIndexCount() > (unsigned)renderer->GetMaxInstanceTriangles() * 3)
         {
-            Batch::Prepare(graphics, renderer, false);
+            Batch::Prepare(view, false);
             
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
             graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -647,7 +665,7 @@ void BatchGroup::Draw(Graphics* graphics, Renderer* renderer) const
         }
         else
         {
-            Batch::Prepare(graphics, renderer, false);
+            Batch::Prepare(view, false);
             
             // Get the geometry vertex buffers, then add the instancing stream buffer
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
@@ -864,16 +882,19 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     #endif
 }
 
-void BatchQueue::SetTransforms(Renderer* renderer, void* lockedData, unsigned& freeIndex)
+void BatchQueue::SetTransforms(View* view, void* lockedData, unsigned& freeIndex)
 {
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        i->second_.SetTransforms(renderer, lockedData, freeIndex);
+        i->second_.SetTransforms(view, lockedData, freeIndex);
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
-        i->second_.SetTransforms(renderer, lockedData, freeIndex);
+        i->second_.SetTransforms(view, lockedData, freeIndex);
 }
 
-void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, bool markToStencil) const
+void BatchQueue::Draw(View* view, bool useScissor, bool markToStencil) const
 {
+    Graphics* graphics = view->GetGraphics();
+    Renderer* renderer = view->GetRenderer();
+    
     graphics->SetScissorTest(false);
     
     // During G-buffer rendering, mark opaque pixels to stencil buffer
@@ -887,7 +908,7 @@ void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, b
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
         
-        group->Draw(graphics, renderer);
+        group->Draw(view);
     }
     // Base non-instanced
     for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
@@ -896,7 +917,7 @@ void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, b
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
         
-        batch->Draw(graphics, renderer);
+        batch->Draw(view);
     }
     
     // Non-base instanced
@@ -908,7 +929,7 @@ void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, b
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
         
-        group->Draw(graphics, renderer);
+        group->Draw(view);
     }
     // Non-base non-instanced
     for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
@@ -924,12 +945,15 @@ void BatchQueue::Draw(Graphics* graphics, Renderer* renderer, bool useScissor, b
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, batch->lightMask_);
         
-        batch->Draw(graphics, renderer);
+        batch->Draw(view);
     }
 }
 
-void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) const
+void BatchQueue::Draw(Light* light, View* view) const
 {
+    Graphics* graphics = view->GetGraphics();
+    Renderer* renderer = view->GetRenderer();
+    
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     
@@ -937,13 +961,13 @@ void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) cons
     for (PODVector<BatchGroup*>::ConstIterator i = sortedBaseBatchGroups_.Begin(); i != sortedBaseBatchGroups_.End(); ++i)
     {
         BatchGroup* group = *i;
-        group->Draw(graphics, renderer);
+        group->Draw(view);
     }
     // Base non-instanced
     for (PODVector<Batch*>::ConstIterator i = sortedBaseBatches_.Begin(); i != sortedBaseBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics, renderer);
+        batch->Draw(view);
     }
     
     // All base passes have been drawn. Optimize at this point by both stencil volume and scissor
@@ -959,7 +983,7 @@ void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) cons
             renderer->OptimizeLightByScissor(light, group->camera_);
             optimized = true;
         }
-        group->Draw(graphics, renderer);
+        group->Draw(view);
     }
     // Non-base non-instanced
     for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
@@ -971,11 +995,11 @@ void BatchQueue::Draw(Light* light, Graphics* graphics, Renderer* renderer) cons
             renderer->OptimizeLightByScissor(light, batch->camera_);
             optimized = true;
         }
-        batch->Draw(graphics, renderer);
+        batch->Draw(view);
     }
 }
 
-unsigned BatchQueue::GetNumInstances(Renderer* renderer) const
+unsigned BatchQueue::GetNumInstances() const
 {
     unsigned total = 0;
     

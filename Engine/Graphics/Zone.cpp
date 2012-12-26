@@ -188,7 +188,7 @@ bool Zone::IsInside(const Vector3& point) const
 {
     // Use an oriented bounding box test
     Vector3 localPoint(GetInverseWorldTransform() * point);
-    return boundingBox_.IsInside(localPoint);
+    return boundingBox_.IsInside(localPoint) != OUTSIDE;
 }
 
 void Zone::OnMarkedDirty(Node* node)
