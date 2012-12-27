@@ -36,20 +36,6 @@
 namespace Urho3D
 {
 
-static const String passNames[] =
-{
-    "base",
-    "litbase",
-    "light",
-    "prealpha",
-    "postalpha",
-    "prepass",
-    "material",
-    "deferred",
-    "shadow",
-    ""
-};
-
 static const String blendModeNames[] =
 {
     "replace",
@@ -74,7 +60,7 @@ static const String compareModeNames[] =
     ""
 };
 
-Pass::Pass(PassType type) :
+Pass::Pass(StringHash type) :
     type_(type),
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
@@ -158,20 +144,10 @@ bool Technique::Load(Deserializer& source)
     XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
-        PassType type = MAX_PASSES;
         if (passElem.HasAttribute("name"))
         {
-            String name = passElem.GetAttributeLower("name");
-            type = (PassType)GetStringListIndex(name, passNames, MAX_PASSES);
-            if (type == MAX_PASSES)
-                LOGERROR("Unknown pass " + name);
-        }
-        else
-            LOGERROR("Missing pass name");
-        
-        if (type != MAX_PASSES)
-        {
-            Pass* newPass = CreatePass(type);
+            StringHash nameHash(passElem.GetAttribute("name"));
+            Pass* newPass = CreatePass(nameHash);
             
             if (passElem.HasAttribute("vs"))
                 newPass->SetVertexShader(passElem.GetAttribute("vs"));
@@ -200,17 +176,18 @@ bool Technique::Load(Deserializer& source)
             if (passElem.HasAttribute("alphamask"))
                 newPass->SetAlphaMask(passElem.GetBool("alphamask"));
         }
+        else
+            LOGERROR("Missing pass name");
         
         passElem = passElem.GetNext("pass");
     }
     
+    // Rehash the pass map to ensure minimum load factor and fast queries
+    passes_.Rehash(NextPowerOfTwo(passes_.Size()));
+    
     // Calculate memory use
     unsigned memoryUse = sizeof(Technique);
-    for (unsigned i = 0; i < MAX_PASSES; ++i)
-    {
-        if (passes_[i])
-            memoryUse += sizeof(Pass);
-    }
+    memoryUse += sizeof(HashMap<StringHash, SharedPtr<Pass> >) + passes_.Size() * sizeof(Pass);
     
     SetMemoryUse(memoryUse);
     return true;
@@ -223,34 +200,39 @@ void Technique::SetIsSM3(bool enable)
 
 void Technique::ReleaseShaders()
 {
-    for (unsigned i = 0; i < MAX_PASSES; ++i)
-    {
-        if (passes_[i])
-            passes_[i]->ReleaseShaders();
-    }
+    for (HashMap<StringHash, SharedPtr<Pass> >::Iterator i = passes_.Begin(); i != passes_.End(); ++i)
+        i->second_->ReleaseShaders();
 }
 
-Pass* Technique::CreatePass(PassType pass)
+Pass* Technique::CreatePass(StringHash type)
 {
-    if (!passes_[pass])
-        passes_[pass] = new Pass(pass);
+    Pass* oldPass = GetPass(type);
+    if (oldPass)
+        return oldPass;
     
-    return passes_[pass];
+    SharedPtr<Pass> newPass(new Pass(type));
+    passes_[type] = newPass;
+    
+    // Rehash the pass map to ensure minimum load factor and fast queries
+    passes_.Rehash(NextPowerOfTwo(passes_.Size()));
+    
+    return newPass;
 }
 
-void Technique::RemovePass(PassType pass)
+void Technique::RemovePass(StringHash type)
 {
-    passes_[pass].Reset();
+    passes_.Erase(type);
+}
+
+Pass* Technique::GetPass(StringHash type) const
+{
+    HashMap<StringHash, SharedPtr<Pass> >::ConstIterator i = passes_.Find(type);
+    return i != passes_.End() ? i->second_ : (Pass*)0;
 }
 
 void Technique::MarkShadersLoaded(unsigned frameNumber)
 {
     shadersLoadedFrameNumber_ = frameNumber;
-}
-
-const String& Technique::GetPassName(PassType pass)
-{
-    return passNames[pass];
 }
 
 }

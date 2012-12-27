@@ -338,7 +338,7 @@ private:
     /// Reload shaders for a material technique.
     void LoadMaterialShaders(Technique* tech);
     /// Reload shaders for a material pass.
-    void LoadPassShaders(Technique* tech, PassType type);
+    void LoadPassShaders(Technique* tech, StringHash passType);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.

@@ -1508,6 +1508,7 @@ Properties:<br>
 - VariantMap vars (readonly)
 - bool active
 - float timeScale
+- float elapsedTime
 - float smoothingConstant
 - float snapThreshold
 - bool asyncLoading (readonly)
@@ -1812,9 +1813,9 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
-- Pass@ CreatePass(PassType)
-- void RemovePass(PassType)
-- bool HasPass(PassType) const
+- Pass@ CreatePass(StringHash)
+- void RemovePass(StringHash)
+- bool HasPass(StringHash) const
 
 Properties:<br>
 - ShortStringHash type (readonly)

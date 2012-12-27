@@ -177,21 +177,6 @@ enum TextureUsage
     TEXTURE_DEPTHSTENCIL
 };
 
-/// Rendering passes.
-enum PassType
-{
-    PASS_BASE = 0,
-    PASS_LITBASE,
-    PASS_LIGHT,
-    PASS_PREALPHA,
-    PASS_POSTALPHA,
-    PASS_PREPASS,
-    PASS_MATERIAL,
-    PASS_DEFERRED,
-    PASS_SHADOW,
-    MAX_PASSES
-};
-
 /// Cube map faces.
 enum CubeMapFace
 {
@@ -251,7 +236,18 @@ extern StringHash PSP_SHADOWMAPINVSIZE;
 extern StringHash PSP_SHADOWSPLITS;
 extern StringHash PSP_LIGHTMATRICES;
 
-// Scale calculation from bounding box diagonal
+// Inbuild pass types
+extern StringHash PASS_BASE;
+extern StringHash PASS_LITBASE;
+extern StringHash PASS_LIGHT;
+extern StringHash PASS_SHADOW;
+extern StringHash PASS_DEFERRED;
+extern StringHash PASS_PREPASS;
+extern StringHash PASS_MATERIAL;
+extern StringHash PASS_PREALPHA;
+extern StringHash PASS_POSTALPHA;
+
+// Scale calculation from bounding box diagonal.
 extern Vector3 DOT_SCALE;
 
 /// Texture units.

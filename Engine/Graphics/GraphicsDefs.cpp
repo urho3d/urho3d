@@ -69,6 +69,16 @@ StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
 StringHash PSP_SHADOWSPLITS("ShadowSplits");
 StringHash PSP_LIGHTMATRICES("LightMatricesPS");
 
+StringHash PASS_BASE("base");
+StringHash PASS_LITBASE("litbase");
+StringHash PASS_LIGHT("light");
+StringHash PASS_SHADOW("shadow");
+StringHash PASS_DEFERRED("deferred");
+StringHash PASS_PREPASS("prepass");
+StringHash PASS_MATERIAL("material");
+StringHash PASS_PREALPHA("prealpha");
+StringHash PASS_POSTALPHA("postalpha");
+
 Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 }

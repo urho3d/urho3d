@@ -36,7 +36,7 @@ class Pass : public RefCounted
 {
 public:
     /// Construct.
-    Pass(PassType type);
+    Pass(StringHash type);
     /// Destruct.
     ~Pass();
     
@@ -56,7 +56,7 @@ public:
     void ReleaseShaders();
     
     /// Return pass type.
-    PassType GetType() const { return type_; }
+    const StringHash& GetType() const { return type_; }
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return depth compare mode.
@@ -76,7 +76,7 @@ public:
     
 private:
     /// Pass type.
-    PassType type_;
+    StringHash type_;
     /// Blend mode.
     BlendMode blendMode_;
     /// Depth compare mode.
@@ -116,25 +116,22 @@ public:
     /// Set whether requires %Shader %Model 3.
     void SetIsSM3(bool enable);
     /// Create a new pass.
-    Pass* CreatePass(PassType pass);
+    Pass* CreatePass(StringHash type);
     /// Remove a pass.
-    void RemovePass(PassType pass);
+    void RemovePass(StringHash type);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
     /// Mark shaders loaded this frame
     void MarkShadersLoaded(unsigned frameNumber);
     
     /// Return whether has a pass.
-    bool HasPass(PassType pass) const { return passes_[pass] != 0; }
-    /// Return a pass.
-    Pass* GetPass(PassType pass) const { return passes_[pass]; }
+    bool HasPass(StringHash type) const { return passes_.Contains(type); }
+    /// Return a pass, or null if not found.
+    Pass* GetPass(StringHash type) const;
     /// Return whether requires %Shader %Model 3.
     bool IsSM3() const { return isSM3_; }
     /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
-    
-    /// Return name for pass.
-    static const String& GetPassName(PassType pass);
     
 private:
     /// Require %Shader %Model 3 flag.
@@ -142,7 +139,7 @@ private:
     /// Last shaders loaded frame number.
     unsigned shadersLoadedFrameNumber_;
     /// Passes.
-    SharedPtr<Pass> passes_[MAX_PASSES];
+    HashMap<StringHash, SharedPtr<Pass> > passes_;
 };
 
 }

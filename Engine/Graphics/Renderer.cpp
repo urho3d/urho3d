@@ -1050,7 +1050,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             geomType = GEOM_STATIC;
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
-        PassType type = batch.pass_->GetType();
+        const StringHash& type = batch.pass_->GetType();
         if (type == PASS_LIGHT || type == PASS_LITBASE)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
@@ -1518,7 +1518,7 @@ void Renderer::LoadMaterialShaders(Technique* tech)
     LoadPassShaders(tech, PASS_SHADOW);
 }
 
-void Renderer::LoadPassShaders(Technique* tech, PassType type)
+void Renderer::LoadPassShaders(Technique* tech, StringHash type)
 {
     Pass* pass = tech->GetPass(type);
     if (!pass)

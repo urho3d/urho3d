@@ -338,16 +338,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     
-    engine->RegisterEnum("PassType");
-    engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
-    engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
-    engine->RegisterEnumValue("PassType", "PASS_PREALPHA", PASS_PREALPHA);
-    engine->RegisterEnumValue("PassType", "PASS_POSTALPHA", PASS_POSTALPHA);
-    engine->RegisterEnumValue("PassType", "PASS_PREPASS", PASS_PREPASS);
-    engine->RegisterEnumValue("PassType", "PASS_MATERIAL", PASS_MATERIAL);
-    engine->RegisterEnumValue("PassType", "PASS_DEFERRED", PASS_DEFERRED);
-    engine->RegisterEnumValue("PassType", "PASS_SHADOW", PASS_SHADOW);
-    
     engine->RegisterEnum("BlendMode");
     engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
     engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
@@ -386,12 +376,12 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "const String& get_pixelShader() const", asMETHOD(Pass, GetPixelShader), asCALL_THISCALL);
     
     RegisterResource<Technique>(engine, "Technique");
-    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(PassType)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "void RemovePass(PassType)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "bool HasPass(PassType) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(StringHash)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "void RemovePass(StringHash)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "bool HasPass(StringHash) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void set_sm3(bool)", asMETHOD(Technique, SetIsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(PassType)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
     RegisterResource<Material>(engine, "Material");
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);

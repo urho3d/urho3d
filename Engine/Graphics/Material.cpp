@@ -408,10 +408,10 @@ Technique* Material::GetTechnique(unsigned index) const
     return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
 }
 
-Pass* Material::GetPass(unsigned index, PassType pass) const
+Pass* Material::GetPass(unsigned index, StringHash passType) const
 {
     Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
-    return tech ? tech->GetPass(pass) : 0;
+    return tech ? tech->GetPass(passType) : 0;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
@@ -432,7 +432,7 @@ const String& Material::GetTextureUnitName(TextureUnit unit)
 
 void Material::CheckOcclusion()
 {
-    // Determine occlusion by checking the first pass of each technique
+    // Determine occlusion by checking the base pass of each technique
     occlusion_ = false;
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
