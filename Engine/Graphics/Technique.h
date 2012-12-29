@@ -124,6 +124,8 @@ public:
     /// Mark shaders loaded this frame
     void MarkShadersLoaded(unsigned frameNumber);
     
+    /// Return all passes.
+    const HashMap<StringHash, SharedPtr<Pass> >& GetPasses() const { return passes_; }
     /// Return whether has a pass.
     bool HasPass(StringHash type) const { return passes_.Contains(type); }
     /// Return a pass, or null if not found.

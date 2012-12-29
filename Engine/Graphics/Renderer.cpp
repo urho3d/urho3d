@@ -1499,23 +1499,9 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadMaterialShaders(Technique* tech)
 {
-    if (renderMode_ == RENDER_PREPASS && tech->HasPass(PASS_PREPASS))
-    {
-        LoadPassShaders(tech, PASS_PREPASS);
-        LoadPassShaders(tech, PASS_MATERIAL);
-    }
-    else if (renderMode_ == RENDER_DEFERRED && tech->HasPass(PASS_DEFERRED))
-        LoadPassShaders(tech, PASS_DEFERRED);
-    else
-    {
-        LoadPassShaders(tech, PASS_BASE);
-        LoadPassShaders(tech, PASS_LITBASE);
-        LoadPassShaders(tech, PASS_LIGHT);
-    }
-    
-    LoadPassShaders(tech, PASS_PREALPHA);
-    LoadPassShaders(tech, PASS_POSTALPHA);
-    LoadPassShaders(tech, PASS_SHADOW);
+    const HashMap<StringHash, SharedPtr<Pass> >& passes = tech->GetPasses();
+    for (HashMap<StringHash, SharedPtr<Pass> >::ConstIterator i = passes.Begin(); i != passes.End(); ++i)
+        LoadPassShaders(tech, i->first_);
 }
 
 void Renderer::LoadPassShaders(Technique* tech, StringHash type)
