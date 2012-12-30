@@ -1491,9 +1491,9 @@ void View::RunPostProcesses()
         
         // For each effect, rendertargets can be re-used. Allocate them now
         renderer_->SaveScreenBufferAllocations();
-        const HashMap<StringHash, PostProcessRenderTarget>& renderTargetInfos = effect->GetRenderTargets();
+        const HashMap<StringHash, RenderTargetInfo>& renderTargetInfos = effect->GetRenderTargets();
         HashMap<StringHash, Texture2D*> renderTargets;
-        for (HashMap<StringHash, PostProcessRenderTarget>::ConstIterator j = renderTargetInfos.Begin(); j !=
+        for (HashMap<StringHash, RenderTargetInfo>::ConstIterator j = renderTargetInfos.Begin(); j !=
             renderTargetInfos.End(); ++j)
         {
             unsigned width = j->second_.size_.x_;
@@ -1576,7 +1576,7 @@ void View::RunPostProcesses()
             graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
             
             // Set per-rendertarget inverse size / offset shader parameters as necessary
-            for (HashMap<StringHash, PostProcessRenderTarget>::ConstIterator k = renderTargetInfos.Begin(); k !=
+            for (HashMap<StringHash, RenderTargetInfo>::ConstIterator k = renderTargetInfos.Begin(); k !=
                 renderTargetInfos.End(); ++k)
             {
                 String invSizeName = k->second_.name_ + "InvSize";
@@ -2313,7 +2313,7 @@ void View::CheckMaterialForAuxView(Material* material)
                 if (target)
                 {
                     Viewport* viewport = target->GetViewport();
-                    if (viewport->GetScene() && viewport->GetCamera())
+                    if (viewport && viewport->GetScene() && viewport->GetCamera())
                         renderer_->AddView(target, viewport);
                 }
             }
@@ -2326,7 +2326,7 @@ void View::CheckMaterialForAuxView(Material* material)
                     if (target)
                     {
                         Viewport* viewport = target->GetViewport();
-                        if (viewport->GetScene() && viewport->GetCamera())
+                        if (viewport && viewport->GetScene() && viewport->GetCamera())
                             renderer_->AddView(target, viewport);
                     }
                 }

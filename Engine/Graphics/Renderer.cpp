@@ -307,7 +307,7 @@ void Renderer::SetNumViewports(unsigned num)
     for (unsigned i = 0; i < viewports_.Size(); ++i)
     {
         if (!viewports_[i])
-            viewports_[i] = new Viewport();
+            viewports_[i] = new Viewport(context_);
     }
 }
 

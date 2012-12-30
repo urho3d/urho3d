@@ -24,7 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
-#include "Object.h"
+#include "Viewport.h"
 
 namespace Urho3D
 {
@@ -84,21 +84,6 @@ private:
     String outputName_;
 };
 
-/// Post-processing rendertarget info.
-struct PostProcessRenderTarget
-{
-    /// Name.
-    String name_;
-    /// Texture format.
-    unsigned format_;
-    /// Size.
-    IntVector2 size_;
-    /// Divisor mode flag.
-    bool sizeDivisor_;
-    /// Filtering flag.
-    bool filtered_;
-};
-
 /// Post-processing effect.
 class PostProcess : public Object
 {
@@ -136,7 +121,7 @@ public:
     /// Return if has a specific rendertarget.
     bool HasRenderTarget(const String& name) const;
     /// Return all rendertargets.
-    const HashMap<StringHash, PostProcessRenderTarget>& GetRenderTargets() const { return renderTargets_; }
+    const HashMap<StringHash, RenderTargetInfo>& GetRenderTargets() const { return renderTargets_; }
     /// Return shader parameter.
     const Vector4& GetShaderParameter(const String& name) const;
     /// Return all global shader parameters.
@@ -149,7 +134,7 @@ private:
     /// Parameter XML file.
     SharedPtr<XMLFile> parameterSource_;
     /// Rendertargets.
-    HashMap<StringHash, PostProcessRenderTarget> renderTargets_;
+    HashMap<StringHash, RenderTargetInfo> renderTargets_;
     /// Global shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Effect passes.

@@ -32,21 +32,96 @@ namespace Urho3D
 class Camera;
 class PostProcess;
 class Scene;
+class XMLFile;
+
+/// Rendering path command types.
+enum RenderCommandType
+{
+    CMD_CLEAR = 0,
+    CMD_SCENEPASS,
+    CMD_QUAD,
+    CMD_FORWARDLIGHTS,
+    CMD_LIGHTVOLUMES,
+    CMD_UNKNOWN
+};
+
+/// Rendering path sorting modes.
+enum RenderCommandSortMode
+{
+    SORT_STATE = 0,
+    SORT_FRONTTOBACK,
+    SORT_BACKTOFRONT
+};
+
+/// Rendertarget definition.
+struct RenderTargetInfo
+{
+    /// Name.
+    String name_;
+    /// Texture format.
+    unsigned format_;
+    /// Size.
+    IntVector2 size_;
+    /// Divisor mode flag.
+    bool sizeDivisor_;
+    /// Filtering flag.
+    bool filtered_;
+};
+
+/// Rendering path command.
+struct RenderPathCommand
+{
+    /// Command type.
+    RenderCommandType type_;
+    /// Sorting mode.
+    RenderCommandSortMode sortMode_;
+    /// Scene pass name.
+    String passName_;
+    /// Clear flags.
+    unsigned clearFlags_;
+    /// Clear color.
+    Color clearColor_;
+    /// Clear depth.
+    float clearDepth_;
+    /// Clear stencil value.
+    unsigned clearStencil_;
+    /// Vertex shader name.
+    String vertexShaderName_;
+    /// Pixel shader name.
+    String pixelShaderName_;
+    /// Textures.
+    String textureNames_[MAX_MATERIAL_TEXTURE_UNITS];
+    /// %Shader parameters.
+    HashMap<StringHash, Vector4> shaderParameters_;
+    /// Output rendertarget names.
+    Vector<String> outputs_;
+};
+
+/// Rendering path definition.
+struct RenderPath
+{
+    /// Rendertargets.
+    Vector<RenderTargetInfo> renderTargets_;
+    /// Rendering commands.
+    Vector<RenderPathCommand> commands_;
+};
 
 /// %Viewport definition either for a render surface or the backbuffer.
-class Viewport : public RefCounted
+class Viewport : public Object
 {
+    OBJECT(Viewport);
+    
 public:
     /// Construct with defaults.
-    Viewport();
+    Viewport(Context* context);
     /// Construct with a full rectangle.
-    Viewport(Scene* scene, Camera* camera);
+    Viewport(Context* context, Scene* scene, Camera* camera, XMLFile* renderPath = 0);
     /// Construct with a specified rectangle.
-    Viewport(Scene* scene, Camera* camera, const IntRect& rect);
+    Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, XMLFile* renderPath = 0);
     /// Construct with a full rectangle and post-processing effects.
-    Viewport(Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses);
+    Viewport(Context* context, Scene* scene, Camera* camera, const Vector<SharedPtr<PostProcess> >& postProcesses, XMLFile* renderPath = 0);
     /// Construct with a specified rectangle and post-processing effects.
-    Viewport(Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses);
+    Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, const Vector<SharedPtr<PostProcess> >& postProcesses, XMLFile* renderPath = 0);
     /// Destruct.
     ~Viewport();
     
@@ -56,6 +131,8 @@ public:
     void SetCamera(Camera* camera);
     /// Set rectangle.
     void SetRect(const IntRect& rect);
+    /// Set rendering path. Return true if successful.
+    bool SetRenderPath(XMLFile* file);
     /// Add a post-processing effect at the end of the chain.
     void AddPostProcess(PostProcess* effect);
     /// Insert a post-processing effect at position in the chain.
@@ -71,6 +148,8 @@ public:
     Scene* GetScene() const;
     /// Return camera.
     Camera* GetCamera() const;
+    /// Return rendering path.
+    const RenderPath& GetRenderPath() const { return renderPath_; }
     /// Return rectangle.
     const IntRect& GetRect() const { return rect_; }
     /// Return number of post-processing effects.
@@ -87,9 +166,10 @@ private:
     WeakPtr<Camera> camera_;
     /// Viewport rectangle.
     IntRect rect_;
+    /// Rendering path.
+    RenderPath renderPath_;
     /// Post-processing effects.
     Vector<SharedPtr<PostProcess> > postProcesses_;
 };
-
 
 }

@@ -37,8 +37,7 @@ namespace Urho3D
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    surface_(0),
-    viewport_(new Viewport())
+    surface_(0)
 {
 }
 

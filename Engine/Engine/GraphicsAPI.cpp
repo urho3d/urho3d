@@ -148,33 +148,20 @@ static void RegisterSkeleton(asIScriptEngine* engine)
 
 static Viewport* ConstructViewport()
 {
-    return new Viewport();
+    return new Viewport(GetScriptContext());
 }
 
-static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera)
+static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera, XMLFile* renderPath)
 {
-    return new Viewport(scene, camera);
+    return new Viewport(GetScriptContext(), scene, camera, renderPath);
 }
 
-static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect)
+static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, XMLFile* renderPath)
 {
-    return new Viewport(scene, camera, rect);
+    return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
 }
 
-static Viewport* ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr)
-{
-    Vector<SharedPtr<PostProcess> > vec;
-    if (arr)
-    {
-        vec.Reserve(arr->GetSize());
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
-    }
-    
-    return new Viewport(scene, camera, vec);
-}
-
-static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr)
+static Viewport* ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr, XMLFile* renderPath)
 {
     Vector<SharedPtr<PostProcess> > vec;
     if (arr)
@@ -184,7 +171,20 @@ static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Cam
             vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
     }
     
-    return new Viewport(scene, camera, rect, vec);
+    return new Viewport(GetScriptContext(), scene, camera, vec, renderPath);
+}
+
+static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr, XMLFile* renderPath)
+{
+    Vector<SharedPtr<PostProcess> > vec;
+    if (arr)
+    {
+        vec.Reserve(arr->GetSize());
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
+    }
+    
+    return new Viewport(GetScriptContext(), scene, camera, rect, vec, renderPath);
 }
 
 static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
@@ -239,10 +239,10 @@ static void RegisterTextures(asIScriptEngine* engine)
     RegisterObject<PostProcess>(engine, "PostProcess");
     RegisterRefCounted<Viewport>(engine, "Viewport");
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f()", asFUNCTION(ConstructViewport), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, Array<PostProcess@>@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL);
     engine->RegisterObjectMethod("Viewport", "void AddPostProcess(PostProcess@+)", asMETHOD(Viewport, AddPostProcess), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void InsertPostProcess(uint, PostProcess@+)", asMETHOD(Viewport, InsertPostProcess), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void RemovePostProcess(PostProcess@+)", asMETHODPR(Viewport, RemovePostProcess, (PostProcess*), void), asCALL_THISCALL);
@@ -252,6 +252,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asMETHOD(Viewport, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_renderPath(XMLFile@+)", asMETHOD(Viewport, SetRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_rect(const IntRect&in)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "const IntRect& get_rect() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "uint get_numPostProcesses() const", asMETHOD(Viewport, GetNumPostProcesses), asCALL_THISCALL);

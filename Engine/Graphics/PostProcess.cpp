@@ -238,7 +238,7 @@ bool PostProcess::CreateRenderTarget(const String& name, unsigned width, unsigne
     if (name.Trimmed().Empty())
         return false;
     
-    PostProcessRenderTarget target;
+    RenderTargetInfo target;
     target.name_ = name;
     target.format_ = format;
     target.size_ = IntVector2(width, height),
