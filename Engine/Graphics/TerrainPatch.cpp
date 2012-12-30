@@ -92,20 +92,27 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
         {
             if (level == RAY_TRIANGLE)
             {
-                // Ater a pretest using the OBB, do the actual test using triangle geometry
                 distance = geometry_->GetHitDistance(localRay);
-                
-                if (distance > query.maxDistance_)
+                if (distance <= query.maxDistance_)
+                {
+                    RayQueryResult result;
+                    result.drawable_ = this;
+                    result.node_ = node_;
+                    result.distance_ = distance;
+                    result.subObject_ = M_MAX_UNSIGNED;
+                    results.Push(result);
                     break;
+                }
             }
-            
-            // If the code reaches here then we have a hit
-            RayQueryResult result;
-            result.drawable_ = this;
-            result.node_ = node_;
-            result.distance_ = distance;
-            result.subObject_ = M_MAX_UNSIGNED;
-            results.Push(result);
+            else
+            {
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = node_;
+                result.distance_ = distance;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
         }
         break;
     }

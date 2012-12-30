@@ -90,29 +90,34 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         {
             if (level == RAY_TRIANGLE)
             {
-                // After a pretest using the OBB, do the actual test using triangle geometry
-                unsigned i = 0;
-                while (i < batches_.Size())
+                for (unsigned i = 0; i < batches_.Size(); ++i)
                 {
-                    Geometry* geometry = batches_[i++].geometry_;
+                    Geometry* geometry = batches_[i].geometry_;
                     if (geometry)
                     {
                         distance = geometry->GetHitDistance(localRay);
                         if (distance <= query.maxDistance_)
+                        {
+                            RayQueryResult result;
+                            result.drawable_ = this;
+                            result.node_ = node_;
+                            result.distance_ = distance;
+                            result.subObject_ = M_MAX_UNSIGNED;
+                            results.Push(result);
                             break;
+                        }
                     }
                 }
-                if (i == batches_.Size())
-                    break;
             }
-            
-            // If the code reaches here then we have a hit
-            RayQueryResult result;
-            result.drawable_ = this;
-            result.node_ = node_;
-            result.distance_ = distance;
-            result.subObject_ = M_MAX_UNSIGNED;
-            results.Push(result);
+            else
+            {
+                RayQueryResult result;
+                result.drawable_ = this;
+                result.node_ = node_;
+                result.distance_ = distance;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
         }
         break;
     }
