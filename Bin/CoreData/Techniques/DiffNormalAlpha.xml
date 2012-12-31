@@ -1,5 +1,5 @@
 <technique>
-    <pass name="base" vs="LitSolid" ps="LitSolid_Diff" depthwrite="false" blend="alpha" />
-    <pass name="light" vs="LitSolid_Normal" ps="LitSolid_DiffNormal" depthwrite="false" blend="addalpha" />
+    <pass name="alpha" vs="LitSolid" ps="LitSolid_Diff" depthwrite="false" blend="alpha" />
+    <pass name="litalpha" vs="LitSolid_Normal" ps="LitSolid_DiffNormal" depthwrite="false" blend="addalpha" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

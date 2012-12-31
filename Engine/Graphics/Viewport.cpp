@@ -26,6 +26,7 @@
 #include "Graphics.h"
 #include "Log.h"
 #include "PostProcess.h"
+#include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "StringUtils.h"
@@ -38,13 +39,20 @@ namespace Urho3D
 
 TextureUnit ParseTextureUnitName(const String& name);
 
-static const String cmdNames[] =
+static const String commandTypeNames[] =
 {
     "clear",
     "scenepass",
     "quad",
     "forwardlights",
     "lightvolumes",
+    ""
+};
+
+static const String sortModeNames[] =
+{
+    "fronttoback"
+    "backtofront",
     ""
 };
 
@@ -117,14 +125,18 @@ void Viewport::SetRect(const IntRect& rect)
 bool Viewport::SetRenderPath(XMLFile* file)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!file && cache)
-        file = cache->GetResource<XMLFile>("Data/RenderPaths/Forward.xml");
+    Renderer* renderer = GetSubsystem<Renderer>();
+    if (!file && cache && renderer)
+        file = cache->GetResource<XMLFile>(renderer->GetDefaultRenderPathName());
     if (!file)
         return false;
     
     XMLElement rootElem = file->GetRoot();
     if (!rootElem)
         return false;
+    
+    renderPath_.renderTargets_.Clear();
+    renderPath_.commands_.Clear();
     
     XMLElement rtElem = rootElem.GetChild("rendertarget");
     while (rtElem)
@@ -161,83 +173,101 @@ bool Viewport::SetRenderPath(XMLFile* file)
         
         if (!name.Trimmed().Empty())
         {
-            RenderTargetInfo target;
-            target.name_ = name;
-            target.format_ = format;
-            target.size_ = IntVector2(width, height),
-            target.sizeDivisor_ = sizeDivisor;
-            target.filtered_ = filtered;
-            renderPath_.renderTargets_[StringHash(name)] = target;
+            RenderTargetInfo rtInfo;
+            rtInfo.name_ = name;
+            rtInfo.format_ = format;
+            rtInfo.size_ = IntVector2(width, height),
+            rtInfo.sizeDivisor_ = sizeDivisor;
+            rtInfo.filtered_ = filtered;
+            renderPath_.renderTargets_.Push(rtInfo);
         }
         
         rtElem = rtElem.GetNext("rendertarget");
     }
     
-    XMLElement cmdElem = rootElem.GetChild("command");
-    while (cmdElem)
+    XMLElement commandElem = rootElem.GetChild("command");
+    while (commandElem)
     {
-        RenderCommandType type = (RenderCommandType)GetStringListIndex(cmdElem.GetAttributeLower("type"), cmdNames, CMD_UNKNOWN);
+        RenderCommandType type = (RenderCommandType)GetStringListIndex(commandElem.GetAttributeLower("type"), commandTypeNames,
+            CMD_UNKNOWN);
         if (type != CMD_UNKNOWN)
         {
-            RenderPathCommand cmd;
-            cmd.type_ = type;
-            cmd.passName_ = cmdElem.GetAttribute("pass");
-            cmd.vertexShaderName_ = cmdElem.GetAttribute("vs");
-            cmd.pixelShaderName_ = cmdElem.GetAttribute("ps");
+            RenderPathCommand command;
+            command.type_ = type;
             
-            if (type == CMD_CLEAR)
+            switch (type)
             {
-                cmd.clearFlags_ = 0;
-                if (cmdElem.HasAttribute("color"))
+            case CMD_CLEAR:
+                if (commandElem.HasAttribute("color"))
                 {
-                    cmd.clearFlags_ |= CLEAR_COLOR;
+                    command.clearFlags_ |= CLEAR_COLOR;
                     // Mark fog color with negative values
-                    if (cmdElem.GetAttributeLower("color") == "fog")
-                        cmd.clearColor_ = Color(-1.0f, -1.0f, -1.0f, -1.0f);
+                    if (commandElem.GetAttributeLower("color") == "fog")
+                        command.clearColor_ = Color(-1.0f, -1.0f, -1.0f, -1.0f);
                     else
-                        cmd.clearColor_ = cmdElem.GetColor("color");
+                        command.clearColor_ = commandElem.GetColor("color");
                 }
-                if (cmdElem.HasAttribute("depth"))
+                if (commandElem.HasAttribute("depth"))
                 {
-                    cmd.clearFlags_ |= CLEAR_DEPTH;
-                    cmd.clearDepth_ = cmdElem.GetFloat("depth");
+                    command.clearFlags_ |= CLEAR_DEPTH;
+                    command.clearDepth_ = commandElem.GetFloat("depth");
                 }
-                if (cmdElem.HasAttribute("stencil"))
+                if (commandElem.HasAttribute("stencil"))
                 {
-                    cmd.clearFlags_ |= CLEAR_STENCIL;
-                    cmd.clearStencil_ = cmdElem.GetInt("stencil");
+                    command.clearFlags_ |= CLEAR_STENCIL;
+                    command.clearStencil_ = commandElem.GetInt("stencil");
                 }
+                break;
+            
+            case CMD_SCENEPASS:
+                command.pass_ = StringHash(commandElem.GetAttribute("pass"));
+                command.sortMode_ = (RenderCommandSortMode)GetStringListIndex(commandElem.GetAttributeLower("sort"), sortModeNames, SORT_FRONTTOBACK);
+                if (commandElem.HasAttribute("marktostencil"))
+                    command.markToStencil_ = commandElem.GetBool("marktostencil");
+                if (commandElem.HasAttribute("vertexlights"))
+                    command.vertexLights_ = commandElem.GetBool("vertexlights");
+                if (commandElem.HasAttribute("usescissor"))
+                    command.useScissor_ = commandElem.GetBool("usescissor");
+                break;
+                
+            case CMD_LIGHTVOLUMES:
+            case CMD_QUAD:
+                command.vertexShaderName_ = commandElem.GetAttribute("vs");
+                command.pixelShaderName_ = commandElem.GetAttribute("ps");
+                if (type == CMD_QUAD)
+                {
+                    XMLElement parameterElem = commandElem.GetChild("parameter");
+                    while (parameterElem)
+                    {
+                        String name = parameterElem.GetAttribute("name");
+                        Vector4 value = parameterElem.GetVector("value");
+                        command.shaderParameters_[StringHash(name)] = value;
+                        
+                        parameterElem = parameterElem.GetNext("parameter");
+                    }
+                }
+                break;
             }
             
             // By default use 1 output, which is the viewport
-            cmd.outputs_.Push("viewport");
-            if (cmdElem.HasAttribute("output"))
-                cmd.outputs_[0] = cmdElem.GetAttribute("output");
+            command.outputs_.Push("viewport");
+            if (commandElem.HasAttribute("output"))
+                command.outputs_[0] = commandElem.GetAttribute("output");
             // Check for defining multiple outputs
-            XMLElement outputElem = cmdElem.GetChild("output");
+            XMLElement outputElem = commandElem.GetChild("output");
             while (outputElem)
             {
                 unsigned index = outputElem.GetInt("index");
                 if (index < MAX_RENDERTARGETS)
                 {
-                    if (index >= cmd.outputs_.Size())
-                        cmd.outputs_.Resize(index + 1);
-                    cmd.outputs_[index] = outputElem.GetAttribute("name");
+                    if (index >= command.outputs_.Size())
+                        command.outputs_.Resize(index + 1);
+                    command.outputs_[index] = outputElem.GetAttribute("name");
                 }
                 outputElem = outputElem.GetNext("output");
             }
             
-            XMLElement parameterElem = cmdElem.GetChild("parameter");
-            while (parameterElem)
-            {
-                String name = parameterElem.GetAttribute("name");
-                Vector4 value = parameterElem.GetVector("value");
-                cmd.shaderParameters_[StringHash(name)] = value;
-                
-                parameterElem = parameterElem.GetNext("parameter");
-            }
-            
-            XMLElement textureElem = cmdElem.GetChild("texture");
+            XMLElement textureElem = commandElem.GetChild("texture");
             while (textureElem)
             {
                 TextureUnit unit = TU_DIFFUSE;
@@ -247,23 +277,25 @@ bool Viewport::SetRenderPath(XMLFile* file)
                     if (unitName.Length() > 1)
                     {
                         unit = ParseTextureUnitName(unitName);
-                        if (unit == MAX_MATERIAL_TEXTURE_UNITS)
+                        if (unit >= MAX_TEXTURE_UNITS)
                             LOGERROR("Unknown texture unit " + unitName);
                     }
                     else
-                        unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);
+                        unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_TEXTURE_UNITS - 1);
                 }
-                if (unit != MAX_TEXTURE_UNITS)
+                if (unit < MAX_TEXTURE_UNITS)
                 {
                     String name = textureElem.GetAttribute("name");
-                    cmd.textureNames_[unit] = name;
+                    command.textureNames_[unit] = name;
                 }
                 
                 textureElem = textureElem.GetNext("texture");
             }
+            
+            renderPath_.commands_.Push(command);
         }
         
-        cmdElem = cmdElem.GetNext("command");
+        commandElem = commandElem.GetNext("command");
     }
     
     return true;

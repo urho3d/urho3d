@@ -43,6 +43,8 @@ class Technique;
 class Texture2D;
 class Viewport;
 class Zone;
+struct RenderPath;
+struct RenderPathCommand;
 struct WorkItem;
 
 /// Intermediate light processing result.
@@ -68,6 +70,23 @@ struct LightQueryResult
     float shadowFarSplits_[MAX_LIGHT_SPLITS];
     /// Shadow map split count.
     unsigned numSplits_;
+};
+
+/// Scene render pass info.
+struct ScenePassInfo
+{
+    /// Pass name hash.
+    StringHash pass_;
+    /// Allow instancing flag.
+    bool allowInstancing_;
+    /// Mark to stencil flag.
+    bool markToStencil_;
+    /// Light scissor optimization flag.
+    bool useScissor_;
+    /// Vertex light flag.
+    bool vertexLights_;
+    /// Batch queue.
+    BatchQueue* batchQueue_;
 };
 
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
@@ -120,11 +139,13 @@ private:
     /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
-    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue);
-    /// Render batches using forward rendering.
-    void RenderBatchesForward();
-    /// Render batches using light pre-pass or deferred rendering.
-    void RenderBatchesDeferred();
+    void GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue);
+    /// Execute render commands.
+    void ExecuteRenderPathCommands();
+    /// Set rendertargets for current render command.
+    void SetRenderTargets(const RenderPathCommand& command);
+    /// Set textures for current render command.
+    void SetTextures(const RenderPathCommand& command);
     /// Allocate needed screen buffers for post-processing and/or framebuffer blitting.
     void AllocateScreenBuffers();
     /// Blit the framebuffer to destination. Used in OpenGL deferred rendering modes.
@@ -198,6 +219,12 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Color rendertarget to use.
     RenderSurface* renderTarget_;
+    /// Depth stencil to use.
+    RenderSurface* depthStencil_;
+    /// Effective color rendertarget to use, may be different if screenbuffers are used.
+    RenderSurface* usedRenderTarget_;
+    /// Effective depth stencil to use, may be different if screenbuffers are used.
+    RenderSurface* usedDepthStencil_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -212,8 +239,6 @@ private:
     float minZ_;
     /// Maximum Z value of the visible scene.
     float maxZ_;
-    /// Rendering mode.
-    RenderMode renderMode_;
     /// Material quality level.
     int materialQuality_;
     /// Maximum number of occluder triangles.
@@ -224,8 +249,10 @@ private:
     bool cameraZoneOverride_;
     /// Draw shadows flag.
     bool drawShadows_;
-    /// Whether objects with zero lightmask exist. In light pre-pass mode this means skipping some optimizations.
-    bool hasZeroLightMask_;
+    /// Deferred flag. Inferred from the existence of a light volume command in the renderpath.
+    bool deferred_;
+    /// Renderpath.
+    const RenderPath* renderPath_;
     /// Post-processing effects.
     Vector<SharedPtr<PostProcess> > postProcesses_;
     /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
@@ -246,24 +273,24 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
+    /// Light volume vertex shaders.
+    PODVector<ShaderVariation*> lightVS_;
+    /// Light volume pixel shaders.
+    PODVector<ShaderVariation*> lightPS_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
+    /// Rendertargets defined by the renderpath.
+    HashMap<StringHash, Texture2D*> renderTargets_;
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
+    /// Info for scene render passes defined by the renderpath.
+    Vector<ScenePassInfo> scenePasses_;
     /// Per-pixel light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Base pass batches.
-    BatchQueue baseQueue_;
-    /// Deferred rendering G-buffer batches.
-    BatchQueue gbufferQueue_;
-    /// Pre-transparent pass batches.
-    BatchQueue preAlphaQueue_;
-    /// Transparent geometry batches.
-    BatchQueue alphaQueue_;
-    /// Post-transparent pass batches.
-    BatchQueue postAlphaQueue_;
+    /// Batch queues.
+    HashMap<StringHash, BatchQueue> batchQueues_;
 };
 
 }

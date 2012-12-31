@@ -72,6 +72,8 @@ StringHash PSP_LIGHTMATRICES("LightMatricesPS");
 StringHash PASS_BASE("base");
 StringHash PASS_LITBASE("litbase");
 StringHash PASS_LIGHT("light");
+StringHash PASS_ALPHA("alpha");
+StringHash PASS_LITALPHA("litalpha");
 StringHash PASS_SHADOW("shadow");
 StringHash PASS_DEFERRED("deferred");
 StringHash PASS_PREPASS("prepass");

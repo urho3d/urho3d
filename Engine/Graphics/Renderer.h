@@ -167,8 +167,8 @@ public:
     void SetNumViewports(unsigned num);
     /// Set a viewport. Return true if successful.
     bool SetViewport(unsigned index, Viewport* viewport);
-    /// Set rendering mode (forward / light pre-pass / deferred.)
-    void SetRenderMode(RenderMode mode);
+    /// Set default renderpath resource name.
+    void SetDefaultRenderPathName(const String& name);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// Set texture anisotropy.
@@ -210,8 +210,8 @@ public:
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.
     Viewport* GetViewport(unsigned index) const;
-    /// Return rendering mode.
-    RenderMode GetRenderMode() const { return renderMode_; }
+    /// Return default renderpath resource name.
+    const String& GetDefaultRenderPathName() const { return defaultRenderPathName_; }
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -295,6 +295,8 @@ public:
     void DrawDebugGeometry(bool depthTest);
     /// Add a view. Return true if successful.
     bool AddView(RenderSurface* renderTarget, Viewport* viewport);
+    /// Populate light volume shaders.
+    void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
@@ -312,7 +314,7 @@ public:
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
-    void SetLightVolumeBatchShaders(Batch& batch);
+    void SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS);
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
@@ -398,10 +400,6 @@ private:
     SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader.
     SharedPtr<ShaderVariation> stencilPS_;
-    /// Light vertex shaders.
-    Vector<SharedPtr<ShaderVariation> > lightVS_;
-    /// Light pixel shaders.
-    Vector<SharedPtr<ShaderVariation> > lightPS_;
     /// Reusable scene nodes with shadow camera components.
     Vector<SharedPtr<Node> > shadowCameraNodes_;
     /// Reusable occlusion buffers.
@@ -430,12 +428,12 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
+    /// Default renderpath resource name.
+    String defaultRenderPathName_;
     /// Base directory for shaders.
     String shaderPath_;
     /// Frame info for rendering.
     FrameInfo frame_;
-    /// Rendering mode.
-    RenderMode renderMode_;
     /// Texture anisotropy level.
     int textureAnisotropy_;
     /// Texture filtering mode.

@@ -1,6 +1,8 @@
 sampler2D sDiffMap : register(S0);
 samplerCUBE sDiffCubeMap : register(S0);
+sampler2D sAlbedoBuffer : register(S0);
 sampler2D sNormalMap : register(S1);
+sampler2D sNormalBuffer : register(S1);
 sampler2D sSpecMap : register(S2);
 sampler2D sEmissiveMap : register(S3);
 sampler2D sEnvMap : register(S4);
@@ -11,10 +13,8 @@ samplerCUBE sLightCubeMap : register(S6);
 sampler2D sShadowMap : register(S7);
 samplerCUBE sFaceSelectCubeMap : register(S8);
 samplerCUBE sIndirectionCubeMap : register(S9);
-sampler2D sAlbedoBuffer : register(S0);
-sampler2D sNormalBuffer : register(S1);
-sampler2D sDepthBuffer : register(S2);
-sampler2D sLightBuffer : register(S5);
+sampler2D sDepthBuffer : register(S10);
+sampler2D sLightBuffer : register(S11);
 
 float4 Sample(sampler2D map, float2 texCoord)
 {

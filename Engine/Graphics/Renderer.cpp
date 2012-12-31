@@ -259,7 +259,7 @@ Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
     quadDirLight_(new Light(context)),
-    renderMode_(RENDER_FORWARD),
+    defaultRenderPathName_("CoreData/RenderPaths/Forward.xml"),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -329,33 +329,11 @@ bool Renderer::SetViewport(unsigned index, Viewport* viewport)
     return true;
 }
 
-void Renderer::SetRenderMode(RenderMode mode)
+void Renderer::SetDefaultRenderPathName(const String& name)
 {
-    if (!initialized_)
-    {
-        LOGERROR("Can not switch rendering mode before setting initial screen mode");
-        return;
-    }
-    
-    if (mode == RENDER_PREPASS && !graphics_->GetLightPrepassSupport())
-        mode = RENDER_FORWARD;
-    if (mode == RENDER_DEFERRED && !graphics_->GetDeferredSupport())
-        mode = RENDER_FORWARD;
-    
-    if (mode != renderMode_)
-    {
-        // Deferred rendering is incompatible with hardware multisampling, so set new screen mode with 1x sampling if in use
-        if (mode != RENDER_FORWARD && graphics_->GetMultiSample() > 1)
-        {
-            graphics_->SetMode(graphics_->GetWidth(), graphics_->GetHeight(), graphics_->GetFullscreen(), graphics_->GetVSync(),
-                graphics_->GetTripleBuffer(), 1);
-        }
-        
-        ResetBuffers();
-        ResetShadowMaps();
-        renderMode_ = mode;
-        shadersDirty_ = true;
-    }
+    String nameTrimmed = name.Trimmed();
+    if (!nameTrimmed.Empty())
+        defaultRenderPathName_ = name;
 }
 
 void Renderer::SetSpecularLighting(bool enable)
@@ -458,12 +436,7 @@ void Renderer::SetMaxShadowMaps(int shadowMaps)
 
 void Renderer::SetMaxShadowCascades(int cascades)
 {
-    #ifndef USE_OPENGL
-    // Due to instruction count limits, deferred modes in SM2.0 can only support up to 3 cascades
-    cascades = Clamp(cascades, 1, renderMode_ != RENDER_FORWARD && !graphics_->GetSM3Support() ? 3 : MAX_CASCADE_SPLITS);
-    #else
     cascades = Clamp(cascades, 1, MAX_CASCADE_SPLITS);
-    #endif
     
     if (cascades != maxShadowCascades_)
     {
@@ -756,6 +729,32 @@ bool Renderer::AddView(RenderSurface* renderTarget, Viewport* viewport)
     }
     else
         return false;
+}
+
+void Renderer::GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName)
+{
+    lightVS.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
+    lightPS.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+    
+    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    
+    for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
+        lightVS[i] = GetVertexShader(vsName + "_" + deferredLightVSVariations[i]);
+    
+    for (unsigned i = 0; i < lightPS.Size(); ++i)
+    {
+        String ortho;
+        if (i >= DLPS_ORTHO)
+            ortho = "Ortho";
+        
+        if (i & DLPS_SHADOW)
+        {
+            lightPS[i] = GetPixelShader(psName + "_" + ortho + lightPSVariations[i % DLPS_ORTHO] +
+                shadowVariations[shadows]);
+        }
+        else
+            lightPS[i] = GetPixelShader(psName + "_" + ortho + lightPSVariations[i % DLPS_ORTHO]);
+    }
 }
 
 Geometry* Renderer::GetLightGeometry(Light* light)
@@ -1051,7 +1050,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
         const StringHash& type = batch.pass_->GetType();
-        if (type == PASS_LIGHT || type == PASS_LITBASE)
+        if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
             if (!lightQueue)
@@ -1121,7 +1120,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
         else
         {
             // Check if pass has vertex lighting support
-            if (type == PASS_BASE || type == PASS_MATERIAL || type == PASS_DEFERRED)
+            if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
             {
                 unsigned numVertexLights = 0;
                 if (batch.lightQueue_)
@@ -1157,7 +1156,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch)
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS)
 {
     unsigned vsi = DLVS_NONE;
     unsigned psi = DLPS_NONE;
@@ -1193,8 +1192,8 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch)
         psi += DLPS_ORTHO;
     }
     
-    batch.vertexShader_ = lightVS_[vsi];
-    batch.pixelShader_ = lightPS_[psi];
+    batch.vertexShader_ = lightVS[vsi];
+    batch.pixelShader_ = lightPS[psi];
 }
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
@@ -1464,35 +1463,6 @@ void Renderer::LoadShaders()
     // Load inbuilt shaders
     stencilVS_ = GetVertexShader("Stencil");
     stencilPS_ = GetPixelShader("Stencil");
-    lightVS_.Clear();
-    lightPS_.Clear();
-    
-    if (renderMode_ != RENDER_FORWARD)
-    {
-        lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
-        lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-        
-        unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-        String shaderName = renderMode_ == RENDER_PREPASS ? "PrepassLight_" : "DeferredLight_";
-        
-        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-            lightVS_[i] = GetVertexShader(shaderName + deferredLightVSVariations[i]);
-        
-        for (unsigned i = 0; i < lightPS_.Size(); ++i)
-        {
-            String ortho;
-            if (i >= DLPS_ORTHO)
-                ortho = "Ortho";
-            
-            if (i & DLPS_SHADOW)
-            {
-                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO] +
-                    shadowVariations[shadows]);
-            }
-            else
-                lightPS_[i] = GetPixelShader(shaderName + ortho + lightPSVariations[i % DLPS_ORTHO]);
-        }
-    }
     
     shadersDirty_ = false;
 }
@@ -1528,7 +1498,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (type == PASS_LIGHT || type == PASS_LITBASE)
+    if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
     {
         // Load forward pixel lit variations
         vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
@@ -1551,7 +1521,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     else
     {
         // Load vertex light variations for forward ambient pass, deferred G-buffer pass and pre-pass material pass
-        if (type == PASS_BASE || type == PASS_MATERIAL || type == PASS_DEFERRED)
+        if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
         {
             vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)

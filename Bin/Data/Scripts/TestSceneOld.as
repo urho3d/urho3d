@@ -380,9 +380,6 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (ui.focusElement is null)
     {
         if (key == '1')
-            renderer.renderMode = RenderMode((renderer.renderMode + 1) % 3);
-
-        if (key == '2')
         {
             int quality = renderer.textureQuality;
             ++quality;
@@ -391,7 +388,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             renderer.textureQuality = quality;
         }
 
-        if (key == '3')
+        if (key == '2')
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -400,13 +397,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             renderer.materialQuality = quality;
         }
 
-        if (key == '4')
+        if (key == '3')
             renderer.specularLighting = !renderer.specularLighting;
 
-        if (key == '5')
+        if (key == '4')
             renderer.drawShadows = !renderer.drawShadows;
 
-        if (key == '6')
+        if (key == '5')
         {
             int size = renderer.shadowMapSize;
             size *= 2;
@@ -415,17 +412,17 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             renderer.shadowMapSize = size;
         }
 
-        if (key == '7')
+        if (key == '6')
             renderer.shadowQuality = renderer.shadowQuality + 1;
 
-        if (key == '8')
+        if (key == '7')
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
 
-        if (key == '9')
+        if (key == '8')
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
         if (key == ' ')

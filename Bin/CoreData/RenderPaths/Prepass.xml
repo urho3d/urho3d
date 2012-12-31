@@ -1,0 +1,21 @@
+<renderpath>
+    <rendertarget name="light" format="rgba" />
+    <rendertarget name="normal" format="rgba" />
+    <rendertarget name="depth" format="lineardepth" />
+    <command type="clear" color="fog" depth="1.0" stencil="0" />
+    <command type="scenepass" pass="prepass" marktostencil="true" sort="fronttoback">
+        <output index="0" name="normal" />
+        <output index="1" name="depth" />
+    </command>
+    <command type="clear" color="0 0 0 0" output="light" />
+    <command type="lightvolumes" vs="PrepassLight" ps="PrepassLight" output="light">
+        <texture unit="normal" name="normal" />
+        <texture unit="depth" name="depth" />
+    </command>
+    <command type="scenepass" pass="material" vertexlights="true" sort="fronttoback">
+        <texture unit="light" name="light" />
+    </command>
+    <command type="scenepass" pass="prealpha" sort="fronttoback" />
+    <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" />
+    <command type="scenepass" pass="postalpha" sort="backtofront" />
+</renderpath>

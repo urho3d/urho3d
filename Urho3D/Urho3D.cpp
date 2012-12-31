@@ -75,8 +75,6 @@ void Run()
                 "-r<freq>    Sound mixing frequency in Hz\n"
                 "-headless   Headless mode. No application window will be created\n"
                 "-logdebug   Display debug level log messages also in release mode\n"
-                "-prepass    Use light pre-pass rendering\n"
-                "-deferred   Use deferred rendering\n"
                 "-lqshadows  Use low-quality (1-sample) shadow filtering\n"
                 "-noshadows  Disable shadow rendering\n"
                 "-nolimit    Disable frame limiter\n"

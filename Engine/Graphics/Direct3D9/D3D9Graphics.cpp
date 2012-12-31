@@ -2003,6 +2003,8 @@ unsigned Graphics::GetFormat(const String& formatName)
         return GetFloat16Format();
     if (nameLower == "r32f" || nameLower == "float")
         return GetFloat32Format();
+    if (nameLower == "lineardepth" || nameLower == "depth")
+        return GetLinearDepthFormat();
     if (nameLower == "d24s8")
         return GetDepthStencilFormat();
     

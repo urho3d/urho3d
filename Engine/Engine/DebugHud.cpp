@@ -38,13 +38,6 @@
 namespace Urho3D
 {
 
-static const char* renderModeTexts[] =
-{
-    "Forward",
-    "Prepass",
-    "Deferred"
-};
-
 static const char* qualityTexts[] =
 {
     "Low",
@@ -135,8 +128,7 @@ void DebugHud::Update()
     if (modeText_->IsVisible())
     {
         String mode;
-        mode.AppendWithFormat("Render:%s Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s Mode:%s",
-            renderModeTexts[renderer->GetRenderMode()],
+        mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s Mode:%s",
             qualityTexts[renderer->GetTextureQuality()],
             qualityTexts[renderer->GetMaterialQuality()],
             renderer->GetSpecularLighting() ? "On" : "Off",

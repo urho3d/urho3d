@@ -240,38 +240,6 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
         <element type="Text">
-            <attribute name="Text" value="Rendering mode" />
-        </element>
-        <element type="DropDownList">
-            <attribute name="Name" value="RenderModeEdit" />
-            <attribute name="Min Size" value="100 0" />
-            <attribute name="Max Size" value="100 2147483647" />
-            <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Forward" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Pre-pass" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Deferred" />
-                            </element>
-                        </element>
-                    </element>
-                </element>
-            </element>
-        </element>
-    </element>
-    <element>
-        <attribute name="Min Size" value="0 17" />
-        <attribute name="Max Size" value="2147483647 17" />
-        <attribute name="Layout Mode" value="Horizontal" />
-        <attribute name="Layout Spacing" value="8" />
-        <element type="Text">
             <attribute name="Text" value="Texture quality" />
         </element>
         <element type="DropDownList">

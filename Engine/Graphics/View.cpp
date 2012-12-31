@@ -294,12 +294,13 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (!camera->IsProjectionValid())
         return false;
     
-    renderMode_ = renderer_->GetRenderMode();
     scene_ = scene;
     octree_ = octree;
     camera_ = camera;
     cameraNode_ = camera->GetNode();
     renderTarget_ = renderTarget;
+    depthStencil_ = GetDepthStencil(renderTarget_);
+    renderPath_ = &viewport->GetRenderPath();
     
     // Get active post-processing effects on the viewport
     const Vector<SharedPtr<PostProcess> >& postProcesses = viewport->GetPostProcesses();
@@ -309,6 +310,47 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         PostProcess* effect = i->Get();
         if (effect && effect->IsActive())
             postProcesses_.Push(*i);
+    }
+    
+    // Make sure that all necessary batch queues exist
+    scenePasses_.Clear();
+    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    {
+        const RenderPathCommand& command = renderPath_->commands_[i];
+        
+        if (command.type_ == CMD_SCENEPASS)
+        {
+            ScenePassInfo info;
+            info.pass_ = command.pass_;
+            info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
+            info.markToStencil_ = command.markToStencil_;
+            info.useScissor_ = command.useScissor_;
+            info.vertexLights_ = command.vertexLights_;
+            
+            HashMap<StringHash, BatchQueue>::Iterator j = batchQueues_.Find(command.pass_);
+            if (j == batchQueues_.End())
+                j = batchQueues_.Insert(Pair<StringHash, BatchQueue>(command.pass_, BatchQueue()));
+            info.batchQueue_ = &j->second_;
+            
+            scenePasses_.Push(info);
+        }
+    }
+    
+    // Get light volume shaders according to the renderpath, if it needs them
+    deferred_ = false;
+    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    {
+        const RenderPathCommand& command = renderPath_->commands_[i];
+        if (command.type_ == CMD_LIGHTVOLUMES)
+        {
+            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.pixelShaderName_);
+            deferred_ = true;
+        }
+    }
+    if (!deferred_)
+    {
+        lightVS_.Clear();
+        lightPS_.Clear();
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
@@ -368,17 +410,15 @@ void View::Update(const FrameInfo& frame)
     
     // Clear screen buffers, geometry, light, occluder & batch lists
     screenBuffers_.Clear();
+    renderTargets_.Clear();
     geometries_.Clear();
     shadowGeometries_.Clear();
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
-    baseQueue_.Clear(maxSortedInstances);
-    preAlphaQueue_.Clear(maxSortedInstances);
-    gbufferQueue_.Clear(maxSortedInstances);
-    alphaQueue_.Clear(maxSortedInstances);
-    postAlphaQueue_.Clear(maxSortedInstances);
     vertexLightQueues_.Clear();
+    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+        i->second_.Clear(maxSortedInstances);
     
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
@@ -434,10 +474,7 @@ void View::Render()
     #endif
     
     // Render
-    if (renderMode_ == RENDER_FORWARD)
-        RenderBatchesForward();
-    else
-        RenderBatchesDeferred();
+    ExecuteRenderPathCommands();
     
     #ifdef USE_OPENGL
     camera_->SetFlipVertical(false);
@@ -658,6 +695,7 @@ void View::GetBatches()
 {
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
+    BatchQueue* alphaQueue = batchQueues_.Contains(PASS_ALPHA) ? &batchQueues_[PASS_ALPHA] : (BatchQueue*)0;
     
     // Process lit geometries and shadow casters for each light
     {
@@ -792,13 +830,13 @@ void View::GetBatches()
                     
                     // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                     if (!drawable->GetMaxLights())
-                        GetLitBatches(drawable, lightQueue);
+                        GetLitBatches(drawable, lightQueue, alphaQueue);
                     else
                         maxLightsDrawables_.Insert(drawable);
                 }
                 
                 // In deferred modes, store the light volume batch now
-                if (renderMode_ != RENDER_FORWARD)
+                if (deferred_)
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
@@ -810,7 +848,7 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeBatchShaders(volumeBatch);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVS_, lightPS_);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
@@ -844,7 +882,7 @@ void View::GetBatches()
                 // Find the correct light queue again
                 LightBatchQueue* queue = light->GetLightQueue();
                 if (queue)
-                    GetLitBatches(drawable, *queue);
+                    GetLitBatches(drawable, *queue, alphaQueue);
             }
         }
     }
@@ -852,8 +890,6 @@ void View::GetBatches()
     // Build base pass batches
     {
         PROFILE(GetBaseBatches);
-        
-        hasZeroLightMask_ = false;
         
         for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
         {
@@ -874,10 +910,6 @@ void View::GetBatches()
                 if (srcBatch.material_ && srcBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
                     CheckMaterialForAuxView(srcBatch.material_);
                 
-                // If already has a lit base pass, skip (forward rendering only)
-                if (j < 32 && drawable->HasBasePass(j))
-                    continue;
-                
                 Technique* tech = GetTechnique(drawable, srcBatch.material_);
                 if (!srcBatch.geometry_ || !tech)
                     continue;
@@ -889,37 +921,23 @@ void View::GetBatches()
                 destBatch.pass_ = 0;
                 destBatch.lightMask_ = GetLightMask(drawable);
                 
-                // In deferred modes check for G-buffer and material passes first
-                if (renderMode_ == RENDER_PREPASS)
+                // Check each of the scene passes
+                for (unsigned k = 0; k < scenePasses_.Size(); ++k)
                 {
-                    destBatch.pass_ = tech->GetPass(PASS_PREPASS);
-                    if (destBatch.pass_)
-                    {
-                        // If the opaque object has a zero lightmask, have to skip light buffer optimization
-                        if (!hasZeroLightMask_ && (!(GetLightMask(drawable) & 0xff)))
-                            hasZeroLightMask_ = true;
-                        
-                        // Allow G-buffer pass instancing only if lightmask matches zone lightmask
-                        AddBatchToQueue(gbufferQueue_, destBatch, tech, destBatch.lightMask_ == (zone->GetLightMask() & 0xff));
-                        destBatch.pass_ = tech->GetPass(PASS_MATERIAL);
-                    }
-                }
-                
-                if (renderMode_ == RENDER_DEFERRED)
-                    destBatch.pass_ = tech->GetPass(PASS_DEFERRED);
-                
-                // Next check for forward unlit base pass
-                if (!destBatch.pass_)
-                    destBatch.pass_ = tech->GetPass(PASS_BASE);
-                
-                if (destBatch.pass_)
-                {
-                    // Check for vertex lights (both forward unlit, light pre-pass material pass, and deferred G-buffer)
-                    if (!drawableVertexLights.Empty())
+                    ScenePassInfo& info = scenePasses_[k];
+                    destBatch.pass_ = tech->GetPass(info.pass_);
+                    if (!destBatch.pass_)
+                        continue;
+                    
+                    // Skip forward base pass if the corresponding litbase pass already exists
+                    if (info.pass_ == PASS_BASE && j < 32 && drawable->HasBasePass(j))
+                        continue;
+                    
+                    if (info.vertexLights_ && !drawableVertexLights.Empty())
                     {
                         // For a deferred opaque batch, check if the vertex lights include converted per-pixel lights, and remove
                         // them to prevent double-lighting
-                        if (renderMode_ != RENDER_FORWARD && destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
+                        if (deferred_ && destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
                         {
                             vertexLights.Clear();
                             for (unsigned i = 0; i < drawableVertexLights.Size(); ++i)
@@ -947,40 +965,14 @@ void View::GetBatches()
                             destBatch.lightQueue_ = &(i->second_);
                         }
                     }
-                    
-                    // Check whether batch is opaque or transparent
-                    if (destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
-                    {
-                        if (destBatch.pass_->GetType() != PASS_DEFERRED)
-                            AddBatchToQueue(baseQueue_, destBatch, tech);
-                        else
-                        {
-                            // Allow G-buffer pass instancing only if lightmask matches zone lightmask
-                            AddBatchToQueue(gbufferQueue_, destBatch, tech, destBatch.lightMask_ == (destBatch.zone_->GetLightMask() & 0xff));
-                        }
-                    }
                     else
-                    {
-                        // Transparent batches can not be instanced
-                        AddBatchToQueue(alphaQueue_, destBatch, tech, false);
-                    }
-                    continue;
-                }
-                
-                // If no pass found so far, finally check for pre-alpha / post-alpha custom passes
-                destBatch.pass_ = tech->GetPass(PASS_PREALPHA);
-                if (destBatch.pass_)
-                {
-                    AddBatchToQueue(preAlphaQueue_, destBatch, tech);
-                    continue;
-                }
-                
-                destBatch.pass_ = tech->GetPass(PASS_POSTALPHA);
-                if (destBatch.pass_)
-                {
-                    // Post-alpha pass is treated similarly as alpha, and is not instanced
-                    AddBatchToQueue(postAlphaQueue_, destBatch, tech, false);
-                    continue;
+                        destBatch.lightQueue_ = 0;
+                    
+                    bool allowInstancing = info.allowInstancing_;
+                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff))
+                        allowInstancing = false;
+                    
+                    AddBatchToQueue(*info.batchQueue_, destBatch, tech, allowInstancing);
                 }
             }
         }
@@ -997,22 +989,18 @@ void View::UpdateGeometries()
     {
         WorkItem item;
         
-        item.workFunction_ = SortBatchQueueFrontToBackWork;
-        item.start_ = &baseQueue_;
-        queue->AddWorkItem(item);
-        item.start_ = &preAlphaQueue_;
-        queue->AddWorkItem(item);
-        if (renderMode_ != RENDER_FORWARD)
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            item.start_ = &gbufferQueue_;
-            queue->AddWorkItem(item);
+            const RenderPathCommand& command = renderPath_->commands_[i];
+            
+            if (command.type_ == CMD_SCENEPASS)
+            {
+                item.workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork :
+                    SortBatchQueueBackToFrontWork;
+                item.start_ = &batchQueues_[command.pass_];
+                queue->AddWorkItem(item);
+            }
         }
-        
-        item.workFunction_ = SortBatchQueueBackToFrontWork;
-        item.start_ = &alphaQueue_;
-        queue->AddWorkItem(item);
-        item.start_ = &postAlphaQueue_;
-        queue->AddWorkItem(item);
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
@@ -1079,7 +1067,7 @@ void View::UpdateGeometries()
     queue->Complete();
 }
 
-void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
+void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue)
 {
     Light* light = lightQueue.light_;
     Zone* zone = GetZone(drawable);
@@ -1099,11 +1087,11 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if ((renderMode_ == RENDER_PREPASS && tech->HasPass(PASS_PREPASS)) || (renderMode_ == RENDER_DEFERRED &&
-            tech->HasPass(PASS_DEFERRED)))
+        if (deferred_ && (tech->HasPass(PASS_PREPASS) || tech->HasPass(PASS_DEFERRED)))
             continue;
         
         Batch destBatch(srcBatch);
+        bool isLitAlpha = false;
         
         // Check for lit base pass. Because it uses the replace blend mode, it must be ensured to be the first light
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
@@ -1121,6 +1109,13 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         else
             destBatch.pass_ = tech->GetPass(PASS_LIGHT);
         
+        // If no lit pass, check for lit alpha
+        if (!destBatch.pass_)
+        {
+            destBatch.pass_ = tech->GetPass(PASS_LITALPHA);
+            isLitAlpha = true;
+        }
+        
         // Skip if material does not receive light at all
         if (!destBatch.pass_)
             continue;
@@ -1129,24 +1124,29 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue)
         destBatch.lightQueue_ = &lightQueue;
         destBatch.zone_ = zone;
         
-        // Check from the ambient pass whether the object is opaque or transparent
-        Pass* ambientPass = tech->GetPass(PASS_BASE);
-        if (!ambientPass || ambientPass->GetBlendMode() == BLEND_REPLACE)
+        if (!isLitAlpha)
             AddBatchToQueue(lightQueue.litBatches_, destBatch, tech);
-        else
+        else if (alphaQueue)
         {
             // Transparent batches can not be instanced
-            AddBatchToQueue(alphaQueue_, destBatch, tech, false, allowTransparentShadows);
+            AddBatchToQueue(*alphaQueue, destBatch, tech, false, allowTransparentShadows);
         }
     }
 }
 
-void View::RenderBatchesForward()
+void View::ExecuteRenderPathCommands()
 {
     // If using hardware multisampling with post-processing, render to the backbuffer first and then resolve
-    bool resolve = screenBuffers_.Size() && !renderTarget_ && graphics_->GetMultiSample() > 1;
-    RenderSurface* renderTarget = (screenBuffers_.Size() && !resolve) ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil = GetDepthStencil(renderTarget);
+    if (screenBuffers_.Size())
+    {
+        usedRenderTarget_ = screenBuffers_[0]->GetRenderSurface();
+        usedDepthStencil_ = GetDepthStencil(usedRenderTarget_);
+    }
+    else
+    {
+        usedRenderTarget_ = renderTarget_;
+        usedDepthStencil_ = depthStencil_;
+    }
     
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
@@ -1160,252 +1160,173 @@ void View::RenderBatchesForward()
         }
     }
     
-    graphics_->SetRenderTarget(0, renderTarget);
-    graphics_->SetDepthStencil(depthStencil);
-    graphics_->SetViewport(viewRect_);
-    #ifndef GL_ES_VERSION_2_0
-    graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
-    #else
-    graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH, farClipZone_->GetFogColor());
-    #endif
-    
     graphics_->SetFillMode(camera_->GetFillMode());
     
-    // Render opaque object unlit base pass
-    if (!baseQueue_.IsEmpty())
     {
-        PROFILE(RenderBase);
-        baseQueue_.Draw(this);
-    }
-    
-    // Render shadow maps + opaque objects' additive lighting
-    if (!lightQueues_.Empty())
-    {
-        PROFILE(RenderLights);
+        PROFILE(RenderCommands);
         
-        for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            // If reusing shadowmaps, render each of them before the lit batches
-            if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
-            {
-                RenderShadowMap(*i);
-                graphics_->SetRenderTarget(0, renderTarget);
-                graphics_->SetDepthStencil(depthStencil);
-                graphics_->SetViewport(viewRect_);
-                graphics_->SetFillMode(camera_->GetFillMode());
-            }
+            const RenderPathCommand& command = renderPath_->commands_[i];
             
-            i->litBatches_.Draw(i->light_, this);
+            switch (command.type_)
+            {
+            case CMD_CLEAR:
+                {
+                    PROFILE(ClearRenderTarget);
+                    
+                    Color clearColor = command.clearColor_;
+                    if (clearColor.r_ < 0.0f)
+                        clearColor = farClipZone_->GetFogColor();
+                    
+                    SetRenderTargets(command);
+                    graphics_->Clear(command.clearFlags_, clearColor, command.clearDepth_, command.clearStencil_);
+                }
+                break;
+                
+            case CMD_SCENEPASS:
+                if (!batchQueues_[command.pass_].IsEmpty())
+                {
+                    PROFILE(RenderScenePass);
+                    
+                    SetRenderTargets(command);
+                    SetTextures(command);
+                    batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
+                }
+                break;
+                
+            case CMD_FORWARDLIGHTS:
+                // Render shadow maps + opaque objects' additive lighting
+                if (!lightQueues_.Empty())
+                {
+                    PROFILE(RenderLights);
+                    
+                    SetRenderTargets(command);
+                    
+                    for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
+                    {
+                        // If reusing shadowmaps, render each of them before the lit batches
+                        if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
+                        {
+                            RenderShadowMap(*i);
+                            SetRenderTargets(command);
+                            graphics_->SetFillMode(camera_->GetFillMode());
+                        }
+                        
+                        SetTextures(command);
+                        i->litBatches_.Draw(i->light_, this);
+                    }
+                    
+                    graphics_->SetScissorTest(false);
+                    graphics_->SetStencilTest(false);
+                }
+                break;
+                
+            case CMD_LIGHTVOLUMES:
+                // Render shadow maps + light volumes
+                if (!lightQueues_.Empty())
+                {
+                    PROFILE(RenderLightVolumes);
+                    
+                    SetRenderTargets(command);
+                    
+                    for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
+                    {
+                        // If reusing shadowmaps, render each of them before the lit batches
+                        if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
+                        {
+                            RenderShadowMap(*i);
+                            SetRenderTargets(command);
+                        }
+                        
+                        SetTextures(command);
+                        
+                        for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
+                        {
+                            SetupLightVolumeBatch(i->volumeBatches_[j]);
+                            i->volumeBatches_[j].Draw(this);
+                        }
+                    }
+                    
+                    graphics_->SetScissorTest(false);
+                    graphics_->SetStencilTest(false);
+                }
+                break;
+            }
         }
     }
     
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
-    
-    #ifndef GL_ES_VERSION_2_0
-    // At this point clear the parts of viewport not occupied by opaque geometry with fog color.
-    // On OpenGL ES an ordinary color clear has been performed beforehand instead
-    graphics_->SetBlendMode(BLEND_REPLACE);
-    graphics_->SetColorWrite(true);
-    graphics_->SetDepthTest(CMP_LESSEQUAL);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetFillMode(FILL_SOLID);
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
-    graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
-    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-    graphics_->ClearParameterSource(SP_MATERIAL);
-    DrawFullscreenQuad(false);
-    #endif
-    
-    graphics_->SetFillMode(camera_->GetFillMode());
-    
-    // Render pre-alpha custom pass
-    if (!preAlphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderPreAlpha);
-        preAlphaQueue_.Draw(this);
-    }
-    
-    // Render transparent objects (both base passes & additive lighting)
-    if (!alphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderAlpha);
-        alphaQueue_.Draw(this, true);
-    }
-    
-    // Render post-alpha custom pass
-    if (!postAlphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderPostAlpha);
-        postAlphaQueue_.Draw(this);
-    }
-    
+    graphics_->SetRenderTarget(0, renderTarget_);
+    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        graphics_->SetRenderTarget(i, (RenderSurface*)0);
+    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetViewport(viewRect_);
     graphics_->SetFillMode(FILL_SOLID);
     
     // Resolve multisampled backbuffer now if necessary
-    if (resolve)
-        graphics_->ResolveToTexture(screenBuffers_[0], viewRect_);
+    //if (resolve)
+    //    graphics_->ResolveToTexture(screenBuffers_[0], viewRect_);
 }
 
-void View::RenderBatchesDeferred()
+void View::SetRenderTargets(const RenderPathCommand& command)
 {
-    // If not reusing shadowmaps, render all of them first
-    if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
+    unsigned index = 0;
+    
+    while (index < command.outputs_.Size())
     {
-        PROFILE(RenderShadowMaps);
-        
-        for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
+        if (!command.outputs_[index].Compare("viewport", false))
+            graphics_->SetRenderTarget(index, usedRenderTarget_);
+        else
         {
-            if (i->shadowMap_)
-                RenderShadowMap(*i);
+            StringHash nameHash(command.outputs_[index]);
+            if (renderTargets_.Contains(nameHash))
+                graphics_->SetRenderTarget(index, renderTargets_[nameHash]);
+            else
+                graphics_->SetRenderTarget(0, (RenderSurface*)0);
         }
+        
+        ++index;
     }
     
-    // In light prepass mode the albedo buffer is used for light accumulation instead
-    Texture2D* albedoBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
-    Texture2D* normalBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetRGBAFormat());
-    Texture2D* depthBuffer = renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, Graphics::GetLinearDepthFormat());
-    
-    RenderSurface* renderTarget = screenBuffers_.Size() ? screenBuffers_[0]->GetRenderSurface() : renderTarget_;
-    RenderSurface* depthStencil = renderer_->GetDepthStencil(rtSize_.x_, rtSize_.y_);
-    
-    if (renderMode_ == RENDER_PREPASS)
+    while (index < MAX_RENDERTARGETS)
     {
-        graphics_->SetRenderTarget(0, normalBuffer);
-        graphics_->SetRenderTarget(1, depthBuffer);
-    }
-    else
-    {
-        graphics_->SetRenderTarget(0, renderTarget);
-        graphics_->SetRenderTarget(1, albedoBuffer);
-        graphics_->SetRenderTarget(2, normalBuffer);
-        graphics_->SetRenderTarget(3, depthBuffer);
+        graphics_->SetRenderTarget(index, (RenderSurface*)0);
+        ++index;
     }
     
-    graphics_->SetDepthStencil(depthStencil);
+    graphics_->SetDepthStencil(usedDepthStencil_);
     graphics_->SetViewport(viewRect_);
-    graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+}
+
+void View::SetTextures(const RenderPathCommand& command)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    graphics_->SetFillMode(camera_->GetFillMode());
-    
-    // Render G-buffer batches
-    if (!gbufferQueue_.IsEmpty())
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        PROFILE(RenderGBuffer);
-        gbufferQueue_.Draw(this, false, true);
-    }
-    
-    graphics_->SetFillMode(FILL_SOLID);
-    
-    // Clear the light accumulation buffer (light pre-pass only.) However, skip the clear if the first light is a directional
-    // light with full mask
-    RenderSurface* lightRenderTarget = renderMode_ == RENDER_PREPASS ? albedoBuffer->GetRenderSurface() : renderTarget;
-    if (renderMode_ == RENDER_PREPASS)
-    {
-        bool optimizeLightBuffer = !hasZeroLightMask_ && !lightQueues_.Empty() && lightQueues_.Front().light_->GetLightType() ==
-            LIGHT_DIRECTIONAL && (lightQueues_.Front().light_->GetLightMask() & 0xff) == 0xff;
-        
-        graphics_->SetRenderTarget(0, lightRenderTarget);
-        graphics_->ResetRenderTarget(1);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(viewRect_);
-        if (!optimizeLightBuffer)
-            graphics_->Clear(CLEAR_COLOR);
-    }
-    else
-    {
-        graphics_->ResetRenderTarget(1);
-        graphics_->ResetRenderTarget(2);
-        graphics_->ResetRenderTarget(3);
-    }
-    
-    // Render shadow maps + light volumes
-    if (!lightQueues_.Empty())
-    {
-        PROFILE(RenderLights);
-        
-        for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
+        if (!command.textureNames_[i].Empty())
         {
-            // If reusing shadowmaps, render each of them before the lit batches
-            if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
+            /// \todo allow referring to the current pingpong target
+            HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(StringHash(command.textureNames_[i]));
+            if (j != renderTargets_.End())
+                graphics_->SetTexture(i, j->second_);
+            else
             {
-                RenderShadowMap(*i);
-                graphics_->SetRenderTarget(0, lightRenderTarget);
-                graphics_->SetDepthStencil(depthStencil);
-                graphics_->SetViewport(viewRect_);
-            }
-            
-            if (renderMode_ == RENDER_DEFERRED)
-                graphics_->SetTexture(TU_ALBEDOBUFFER, albedoBuffer);
-            graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
-            graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-            
-            for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
-            {
-                SetupLightVolumeBatch(i->volumeBatches_[j]);
-                i->volumeBatches_[j].Draw(this);
+                if (cache)
+                {
+                    Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+                    if (texture)
+                        graphics_->SetTexture(i, texture);
+                    else
+                    {
+                        // If requesting a texture fails, clear the texture name to prevent redundant attempts
+                        RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
+                        cmdWrite.textureNames_[i] = String();
+                    }
+                }
             }
         }
     }
-    
-    graphics_->SetTexture(TU_ALBEDOBUFFER, 0);
-    graphics_->SetTexture(TU_NORMALBUFFER, 0);
-    graphics_->SetTexture(TU_DEPTHBUFFER, 0);
-    
-    if (renderMode_ == RENDER_PREPASS)
-    {
-        graphics_->SetRenderTarget(0, renderTarget);
-        graphics_->SetDepthStencil(depthStencil);
-        graphics_->SetViewport(viewRect_);
-    }
-    
-    // At this point clear the parts of viewport not occupied by opaque geometry with fog color
-    graphics_->SetBlendMode(BLEND_REPLACE);
-    graphics_->SetColorWrite(true);
-    graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(true, CMP_EQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0);
-    graphics_->SetShaders(renderer_->GetVertexShader("Basic"), renderer_->GetPixelShader("Basic"));
-    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, farClipZone_->GetFogColor());
-    graphics_->ClearParameterSource(SP_MATERIAL);
-    DrawFullscreenQuad(false);
-    
-    graphics_->SetFillMode(camera_->GetFillMode());
-    
-    // Render opaque objects with deferred lighting result (light pre-pass only)
-    if (!baseQueue_.IsEmpty())
-    {
-        PROFILE(RenderBase);
-        
-        graphics_->SetTexture(TU_LIGHTBUFFER, renderMode_ == RENDER_PREPASS ? albedoBuffer : 0);
-        baseQueue_.Draw(this);
-        graphics_->SetTexture(TU_LIGHTBUFFER, 0);
-    }
-    
-    // Render pre-alpha custom pass
-    if (!preAlphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderPreAlpha);
-        preAlphaQueue_.Draw(this);
-    }
-    
-    // Render transparent objects (both base passes & additive lighting)
-    if (!alphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderAlpha);
-        alphaQueue_.Draw(this, true);
-    }
-    
-    // Render post-alpha custom pass
-    if (!postAlphaQueue_.IsEmpty())
-    {
-        PROFILE(RenderPostAlpha);
-        postAlphaQueue_.Draw(this);
-    }
-    
-    graphics_->SetFillMode(FILL_SOLID);
 }
 
 void View::AllocateScreenBuffers()
@@ -1414,8 +1335,8 @@ void View::AllocateScreenBuffers()
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with deferred rendering, it must be RGBA to comply with the rest of the buffers.
-    if (renderMode_ != RENDER_FORWARD && (!renderTarget_ || (renderMode_ == RENDER_DEFERRED &&
-        renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat())))
+    if (deferred_ && (!renderTarget_ || (deferred_ && renderTarget_->GetParentTexture()->GetFormat() != 
+        Graphics::GetRGBAFormat())))
         neededBuffers = 1;
     #endif
     
@@ -1429,13 +1350,34 @@ void View::AllocateScreenBuffers()
     
     unsigned format = Graphics::GetRGBFormat();
     #ifdef USE_OPENGL
-    if (renderMode_ == RENDER_DEFERRED)
+    if (deferred_)
         format = Graphics::GetRGBAFormat();
     #endif
     
     // Allocate screen buffers with filtering active in case the post-processing effects need that
     for (unsigned i = 0; i < neededBuffers; ++i)
         screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true));
+    
+    // Allocate extra render targets defined by the rendering path
+    for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
+    {
+        const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
+        unsigned width = rtInfo.size_.x_;
+        unsigned height = rtInfo.size_.y_;
+        if (!width || !height)
+        {
+            width = rtSize_.x_;
+            height = rtSize_.y_;
+        }
+        
+        if (rtInfo.sizeDivisor_)
+        {
+            width = rtSize_.x_ / width;
+            height = rtSize_.y_ / height;
+        }
+        
+        renderTargets_[StringHash(rtInfo.name_)] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_);
+    }
 }
 
 void View::BlitFramebuffer()
@@ -1593,7 +1535,7 @@ void View::RunPostProcesses()
             }
             
             const String* textureNames = pass->GetTextures();
-            for (unsigned k = 0; k < MAX_MATERIAL_TEXTURE_UNITS; ++k)
+            for (unsigned k = 0; k < MAX_TEXTURE_UNITS; ++k)
             {
                 if (!textureNames[k].Empty())
                 {
@@ -2380,10 +2322,8 @@ void View::PrepareInstancingBuffer()
     
     unsigned totalInstances = 0;
     
-    totalInstances += baseQueue_.GetNumInstances();
-    totalInstances += preAlphaQueue_.GetNumInstances();
-    if (renderMode_ != RENDER_FORWARD)
-        totalInstances += gbufferQueue_.GetNumInstances();
+    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+        totalInstances += i->second_.GetNumInstances();
     
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
@@ -2401,10 +2341,8 @@ void View::PrepareInstancingBuffer()
         if (!dest)
             return;
         
-        baseQueue_.SetTransforms(this, dest, freeIndex);
-        preAlphaQueue_.SetTransforms(this, dest, freeIndex);
-        if (renderMode_ != RENDER_FORWARD)
-            gbufferQueue_.SetTransforms(this, dest, freeIndex);
+        for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+            i->second_.SetTransforms(this, dest, freeIndex);
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
@@ -2424,8 +2362,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     Vector3 cameraPos = cameraNode_->GetWorldPosition();
     float lightDist;
     
-    // Use replace blend mode for the first pre-pass light volume, and additive for the rest
-    graphics_->SetBlendMode(renderMode_ == RENDER_PREPASS && light == lightQueues_.Front().light_ ? BLEND_REPLACE : BLEND_ADD);
+    graphics_->SetBlendMode(BLEND_ADD);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     

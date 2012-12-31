@@ -77,7 +77,7 @@ private:
     /// Pixel shader name.
     String pixelShaderName_;
     /// Textures.
-    String textureNames_[MAX_MATERIAL_TEXTURE_UNITS];
+    String textureNames_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Output rendertarget name.

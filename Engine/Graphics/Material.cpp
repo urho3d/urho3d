@@ -48,6 +48,13 @@ const String textureUnitNames[] =
     "specular",
     "emissive",
     "environment",
+    "lightramp",
+    "lightshape",
+    "shadowmap",
+    "faceselect",
+    "indirection",
+    "depth",
+    "light",
     ""
 };
 
@@ -61,8 +68,10 @@ static const String cullModeNames[] =
 
 TextureUnit ParseTextureUnitName(const String& name)
 {
-    TextureUnit unit = (TextureUnit)GetStringListIndex(name, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS);
+    TextureUnit unit = (TextureUnit)GetStringListIndex(name, textureUnitNames, MAX_TEXTURE_UNITS);
     if (name == "diff")
+        unit = TU_DIFFUSE;
+    else if (name == "albedo")
         unit = TU_DIFFUSE;
     else if (name == "norm")
         unit = TU_NORMAL;
@@ -168,8 +177,8 @@ bool Material::Load(Deserializer& source)
             if (unitName.Length() > 1)
             {
                 unit = ParseTextureUnitName(unitName);
-                if (unit == MAX_MATERIAL_TEXTURE_UNITS)
-                    LOGERROR("Unknown texture unit " + unitName);
+                if (unit >= MAX_MATERIAL_TEXTURE_UNITS)
+                    LOGERROR("Unknown or illegal texture unit " + unitName);
             }
             else
                 unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);

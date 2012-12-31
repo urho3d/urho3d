@@ -58,9 +58,6 @@ void UpdateEditorSettingsDialog()
     DropDownList@ pickModeEdit = settingsDialog.GetChild("PickModeEdit", true);
     pickModeEdit.selection = pickMode;
 
-    DropDownList@ renderModeEdit = settingsDialog.GetChild("RenderModeEdit", true);
-    renderModeEdit.selection = renderer.renderMode;
-
     DropDownList@ textureQualityEdit = settingsDialog.GetChild("TextureQualityEdit", true);
     textureQualityEdit.selection = renderer.textureQuality;
 
@@ -109,7 +106,6 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
         SubscribeToEvent(generateTangentsToggle, "Toggled", "EditGenerateTangents");
         SubscribeToEvent(pickModeEdit, "ItemSelected", "EditPickMode");
-        SubscribeToEvent(renderModeEdit, "ItemSelected", "EditRenderMode");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
         SubscribeToEvent(shadowResolutionEdit, "ItemSelected", "EditShadowResolution");
@@ -234,12 +230,6 @@ void EditPickMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetUIElement();
     pickMode = edit.selection;
-}
-
-void EditRenderMode(StringHash eventType, VariantMap& eventData)
-{
-    DropDownList@ edit = eventData["Element"].GetUIElement();
-    renderer.renderMode = RenderMode(edit.selection);
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)

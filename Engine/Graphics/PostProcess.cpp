@@ -56,7 +56,7 @@ void PostProcessPass::SetPixelShader(const String& name)
 
 void PostProcessPass::SetTexture(TextureUnit unit, const String& name)
 {
-    if (unit < MAX_MATERIAL_TEXTURE_UNITS)
+    if (unit < MAX_TEXTURE_UNITS)
         textureNames_[unit] = name;
 }
 
@@ -81,7 +81,7 @@ SharedPtr<PostProcessPass> PostProcessPass::Clone()
     clone->vertexShaderName_ = vertexShaderName_;
     clone->pixelShaderName_ = pixelShaderName_;
     clone->shaderParameters_ = shaderParameters_;
-    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         clone->textureNames_[i] = textureNames_[i];
     clone->outputName_ = outputName_;
     
@@ -90,7 +90,7 @@ SharedPtr<PostProcessPass> PostProcessPass::Clone()
 
 const String& PostProcessPass::GetTexture(TextureUnit unit) const
 {
-    return unit < MAX_MATERIAL_TEXTURE_UNITS ? textureNames_[unit] : String::EMPTY;
+    return unit < MAX_TEXTURE_UNITS ? textureNames_[unit] : String::EMPTY;
 }
 
 const Vector4& PostProcessPass::GetShaderParameter(const String& name) const
@@ -190,13 +190,13 @@ bool PostProcess::LoadParameters(XMLFile* file)
                 if (unitName.Length() > 1)
                 {
                     unit = ParseTextureUnitName(unitName);
-                    if (unit == MAX_MATERIAL_TEXTURE_UNITS)
+                    if (unit >= MAX_TEXTURE_UNITS)
                         LOGERROR("Unknown texture unit " + unitName);
                 }
                 else
-                    unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_MATERIAL_TEXTURE_UNITS - 1);
+                    unit = (TextureUnit)Clamp(ToInt(unitName), 0, MAX_TEXTURE_UNITS - 1);
             }
-            if (unit != MAX_MATERIAL_TEXTURE_UNITS)
+            if (unit < MAX_TEXTURE_UNITS)
             {
                 String name = textureElem.GetAttribute("name");
                 pass->SetTexture(unit, name);

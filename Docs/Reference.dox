@@ -644,7 +644,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|prealpha|postalpha|prepass|material|deferred|shadow" vs="VertexShaderName" ps="PixelShaderName"
+    <pass name="base|litbase|light|alpha|litalpha|prealpha|postalpha|prepass|material|deferred|shadow" vs="VertexShaderName" ps="PixelShaderName"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" alphamask="true|false" />
     <pass ... />
@@ -654,15 +654,19 @@ A technique definition looks like this:
 
 The purposes of the different passes are:
 
-- base: Renders ambient light, per-vertex lights and fog.
-- litbase: Renders the first per-pixel light, ambient light and fog. This is an optional pass for optimization.
-- light: Renders one per-pixel light's contribution additively.
+- base: Renders ambient light, per-vertex lights and fog for an opaque object.
+- litbase: Renders the first per-pixel light, ambient light and fog for an opaque object. This is an optional pass for optimization.
+- light: Renders one per-pixel light's contribution additively for an opaque object.
+- alpha: Renders ambient light, per-vertex lights and fog for a transparent object.
+- litalpha: Renders one per-pixel light's contribution additively for a transparent object
 - prealpha: Custom rendering pass after opaque geometry. Can be used for example to render the skybox.
 - postalpha: Custom rendering pass after transparent geometry.
 - prepass: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
 - material: %Light pre-pass only - renders opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
 - deferred: Deferred rendering only - renders ambient light and per-vertex lights to the output rendertarget, and diffuse albedo, normals, specular intensity + power and depth to the G-buffer.
 - shadow: Renders depth only for shadow map generation.
+
+More custom passes can be defined and referred to in the render path definition.
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
 

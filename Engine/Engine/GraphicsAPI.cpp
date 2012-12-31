@@ -912,11 +912,6 @@ static Renderer* GetRenderer()
 
 static void RegisterRenderer(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("RenderMode");
-    engine->RegisterEnumValue("RenderMode", "RENDER_FORWARD", RENDER_FORWARD);
-    engine->RegisterEnumValue("RenderMode", "RENDER_PREPASS", RENDER_PREPASS);
-    engine->RegisterEnumValue("RenderMode", "RENDER_DEFERRED", RENDER_DEFERRED);
-    
     engine->RegisterGlobalProperty("const int QUALITY_LOW", (void*)&QUALITY_LOW);
     engine->RegisterGlobalProperty("const int QUALITY_MEDIUM", (void*)&QUALITY_MEDIUM);
     engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
@@ -933,8 +928,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_renderMode(RenderMode)", asMETHOD(Renderer, SetRenderMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "RenderMode get_renderMode() const", asMETHOD(Renderer, GetRenderMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_textureAnisotropy(int)", asMETHOD(Renderer, SetTextureAnisotropy), asCALL_THISCALL);

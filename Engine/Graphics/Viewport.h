@@ -48,8 +48,7 @@ enum RenderCommandType
 /// Rendering path sorting modes.
 enum RenderCommandSortMode
 {
-    SORT_STATE = 0,
-    SORT_FRONTTOBACK,
+    SORT_FRONTTOBACK = 0,
     SORT_BACKTOFRONT
 };
 
@@ -71,12 +70,20 @@ struct RenderTargetInfo
 /// Rendering path command.
 struct RenderPathCommand
 {
+    RenderPathCommand() :
+        clearFlags_(0),
+        markToStencil_(false),
+        useScissor_(false),
+        vertexLights_(false)
+    {
+    }
+    
     /// Command type.
     RenderCommandType type_;
     /// Sorting mode.
     RenderCommandSortMode sortMode_;
-    /// Scene pass name.
-    String passName_;
+    /// Scene pass hash.
+    StringHash pass_;
     /// Clear flags.
     unsigned clearFlags_;
     /// Clear color.
@@ -85,12 +92,18 @@ struct RenderPathCommand
     float clearDepth_;
     /// Clear stencil value.
     unsigned clearStencil_;
+    /// Mark to stencil flag.
+    bool markToStencil_;
+    /// Vertex lights flag.
+    bool vertexLights_;
+    /// Scissor optimization flag.
+    bool useScissor_;
     /// Vertex shader name.
     String vertexShaderName_;
     /// Pixel shader name.
     String pixelShaderName_;
     /// Textures.
-    String textureNames_[MAX_MATERIAL_TEXTURE_UNITS];
+    String textureNames_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Output rendertarget names.

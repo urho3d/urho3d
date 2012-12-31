@@ -284,7 +284,7 @@ bool Shader::PrepareVariation(ShaderVariation* variation)
         unsigned sampler = file->ReadUByte();
         
         TextureUnit tuIndex = graphics->GetTextureUnit(unitName);
-        if (tuIndex != MAX_TEXTURE_UNITS)
+        if (tuIndex < MAX_TEXTURE_UNITS)
             variation->AddTextureUnit(tuIndex);
         else if (sampler < MAX_TEXTURE_UNITS)
             variation->AddTextureUnit((TextureUnit)sampler);
