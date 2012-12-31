@@ -3,7 +3,7 @@
     <rendertarget name="normal" format="rgba" />
     <rendertarget name="depth" format="lineardepth" />
     <command type="clear" color="fog" depth="1.0" stencil="0" />
-    <command type="scenepass" pass="deferred" marktostencil="true" vertexlights="true" sort="fronttoback">
+    <command type="scenepass" pass="deferred" marktostencil="true" vertexlights="true">
         <output index="0" name="viewport" />
         <output index="1" name="albedo" />
         <output index="2" name="normal" />
@@ -14,7 +14,7 @@
         <texture unit="normal" name="normal" />
         <texture unit="depth" name="depth" />
     </command>
-    <command type="scenepass" pass="prealpha" sort="fronttoback" />
+    <command type="scenepass" pass="prealpha" />
     <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" />
     <command type="scenepass" pass="postalpha" sort="backtofront" />
 </renderpath>

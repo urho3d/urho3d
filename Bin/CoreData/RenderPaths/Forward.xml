@@ -1,6 +1,6 @@
 <renderpath>
     <command type="clear" color="fog" depth="1.0" stencil="0" />
-    <command type="scenepass" pass="base" vertexlights="true" sort="state" />
+    <command type="scenepass" pass="base" vertexlights="true" />
     <command type="forwardlights" />
     <command type="scenepass" pass="prealpha" sort="state" />
     <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" />
