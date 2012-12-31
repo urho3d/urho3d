@@ -32,12 +32,12 @@ inline unsigned GetIndex(void*& indexPointer, unsigned indexSize)
 {
     if (indexSize == sizeof(unsigned short))
     {
-        unsigned short* p = (unsigned short*)indexPointer;
+        unsigned short*& p = (unsigned short*&)indexPointer;
         return *p++;
     }
     else
     {
-        unsigned* p = (unsigned*)indexPointer;
+        unsigned*& p = (unsigned*&)indexPointer;
         return *p++;
     }
 }
