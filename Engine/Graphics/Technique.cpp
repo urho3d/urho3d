@@ -1,6 +1,5 @@
 //
-// Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Oorni
+// Copyright (c) 2008-2013 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,13 +59,27 @@ static const String compareModeNames[] =
     ""
 };
 
+static const String lightingModeNames[] =
+{
+    "unlit",
+    "pervertex",
+    "perpixel",
+    ""
+};
+
 Pass::Pass(StringHash type) :
     type_(type),
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
+    lightingMode_(LIGHTING_UNLIT),
     depthWrite_(true),
     alphaMask_(false)
 {
+    // Guess default lighting mode from pass name
+    if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
+        lightingMode_ = LIGHTING_PERVERTEX;
+    if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
+        lightingMode_ = LIGHTING_PERPIXEL;
 }
 
 Pass::~Pass()
@@ -81,6 +94,11 @@ void Pass::SetBlendMode(BlendMode mode)
 void Pass::SetDepthTestMode(CompareMode mode)
 {
     depthTestMode_ = mode;
+}
+
+void Pass::SetLightingMode(PassLightingMode mode)
+{
+    lightingMode_ = mode;
 }
 
 void Pass::SetDepthWrite(bool enable)
@@ -154,6 +172,12 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("ps"))
                 newPass->SetPixelShader(passElem.GetAttribute("ps"));
+            
+            if (passElem.HasAttribute("lighting"))
+            {
+                String lighting = passElem.GetAttributeLower("lighting");
+                newPass->SetLightingMode((PassLightingMode)GetStringListIndex(lighting, lightingModeNames, LIGHTING_UNLIT));
+            }
             
             if (passElem.HasAttribute("blend"))
             {

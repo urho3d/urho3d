@@ -1,6 +1,5 @@
 //
-// Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Oorni
+// Copyright (c) 2008-2013 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1049,8 +1048,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             geomType = GEOM_STATIC;
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
-        const StringHash& type = batch.pass_->GetType();
-        if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
+        if (batch.pass_->GetLightingMode() == LIGHTING_PERPIXEL)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
             if (!lightQueue)
@@ -1120,7 +1118,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
         else
         {
             // Check if pass has vertex lighting support
-            if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
+            if (batch.pass_->GetLightingMode() == LIGHTING_PERVERTEX)
             {
                 unsigned numVertexLights = 0;
                 if (batch.lightQueue_)
@@ -1498,7 +1496,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     vertexShaders.Clear();
     pixelShaders.Clear();
     
-    if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
+    if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
         // Load forward pixel lit variations
         vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
@@ -1520,8 +1518,8 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
     }
     else
     {
-        // Load vertex light variations for forward ambient pass, deferred G-buffer pass and pre-pass material pass
-        if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
+        // Load vertex light variations
+        if (pass->GetLightingMode() == LIGHTING_PERVERTEX)
         {
             vertexShaders.Resize(MAX_VERTEXLIGHT_VS_VARIATIONS * MAX_GEOMETRYTYPES);
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_VERTEXLIGHT_VS_VARIATIONS; ++j)

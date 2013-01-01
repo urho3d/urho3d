@@ -444,16 +444,16 @@ By default there is one viewport, but the amount can be increased with the funct
 
 Viewports can have a chain of post-processing effects. See \ref Postprocessing "Post-processing" for more details.
 
-Either forward, light pre-pass or deferred rendering can be chosen, see \ref Renderer::SetRenderMode "SetRenderMode()". Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the TestScene script application for an example of how to use.
+Each viewport defines a command sequence for rendering the scene, called the RenderPath. By default there exist forward, light pre-pass and deferred rendering paths in the Bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPathName "SetDefaultRenderPathName()" to set the default for new viewports. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the TestScene script application for an example of how to use.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
 - Query the octree for visible objects and lights in the camera's view frustum.
 - Check the influence of each visible light on the objects. If the light casts shadows, query the octree for shadowcaster geometries.
-- Construct render operations (batches) for the visible objects.
-- Perform these render operations during the rendering step at the end of the frame.
+- Construct render operations (batches) for the visible objects, according to the scene passes in the render path command sequence.
+- Perform the render path command sequence during the rendering step at the end of the frame.
 
-The rendering operations proceed in the following order:
+In the default render paths, the rendering operations proceed in the following order:
 
 - Opaque geometry ambient pass, or G-buffer pass in deferred rendering modes.
 - Opaque geometry per-pixel lighting passes. For shadow casting lights, the shadow map is rendered first.
@@ -512,7 +512,7 @@ See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to w
 
 \page RenderingModes Rendering modes
 
-Urho3D implements both forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering. Note that on OpenGL ES 2.0 only forward rendering is available.
+The default render paths supplied with Urho3D implement forward, light pre-pass and deferred rendering modes. Where they differ is how per-pixel lighting is calculated for opaque objects; transparent objects always use forward rendering. Note that on OpenGL ES 2.0 only forward rendering is available.
 
 \section RenderingModes_Forward Forward rendering
 

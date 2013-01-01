@@ -1,6 +1,6 @@
 //  
-// Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Oorni
+
+// Copyright (c) 2008-2013 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

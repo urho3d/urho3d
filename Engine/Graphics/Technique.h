@@ -1,6 +1,5 @@
 //
-// Urho3D Engine
-// Copyright (c) 2008-2012 Lasse Oorni
+// Copyright (c) 2008-2013 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +30,14 @@ namespace Urho3D
 
 class ShaderVariation;
 
+/// Lighting mode of a pass.
+enum PassLightingMode
+{
+    LIGHTING_UNLIT,
+    LIGHTING_PERVERTEX,
+    LIGHTING_PERPIXEL
+};
+
 /// %Material rendering pass, which defines shaders and render state.
 class Pass : public RefCounted
 {
@@ -44,6 +51,8 @@ public:
     void SetBlendMode(BlendMode mode);
     /// Set depth compare mode.
     void SetDepthTestMode(CompareMode mode);
+    /// Set pass lighting mode, affects what shader variations will be attempted to be loaded.
+    void SetLightingMode(PassLightingMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
     /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
@@ -61,6 +70,8 @@ public:
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return depth compare mode.
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
+    /// Return pass lighting mode.
+    PassLightingMode GetLightingMode() const { return lightingMode_; }
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return alpha masking hint.
@@ -81,6 +92,8 @@ private:
     BlendMode blendMode_;
     /// Depth compare mode.
     CompareMode depthTestMode_;
+    /// Lighting mode.
+    PassLightingMode lightingMode_;
     /// Depth write mode.
     bool depthWrite_;
     /// Alpha masking hint.

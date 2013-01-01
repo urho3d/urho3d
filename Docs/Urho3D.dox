@@ -46,7 +46,16 @@ For release history and major changes, see \ref History.
 
 \page Credits Credits
 
-Urho3D engine & example code by Lasse &Ouml;&ouml;rni (loorni@gmail.com)
+Urho3D development, contributions and bugfixes by:
+- Lasse &Ouml;&ouml;rni (loorni@gmail.com)
+- Colin Barrett
+- Alex Fuller
+- Jason Kinzer
+- Miika Santala
+- Wei Tjong Yao
+- Magic.Lixin
+- primitivewaste
+- skaiware
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://www.horde3d.org/). Additional inspiration & research used:
 
@@ -78,17 +87,6 @@ Urho3D uses the following third-party libraries:
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
 
-Contributions and bugfixes from:
-
-- Colin Barrett
-- Alex Fuller
-- Jason Kinzer
-- Miika Santala
-- Wei Tjong Yao
-- Magic.Lixin
-- primitivewaste
-- skaiware
-
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.
 
 Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
@@ -106,8 +104,7 @@ NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 
 \page License License
 
-Urho3D %Engine
-Copyright (c) 2008-2012 Lasse &Ouml;&ouml;rni
+Copyright (c) 2008-2013 the Urho3D project.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
