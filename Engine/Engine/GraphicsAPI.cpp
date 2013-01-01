@@ -35,7 +35,7 @@
 #include "Material.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
-#include "PostProcess.h"
+#include "RenderPath.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
 #include "Technique.h"
@@ -150,40 +150,14 @@ static Viewport* ConstructViewport()
     return new Viewport(GetScriptContext());
 }
 
-static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera, XMLFile* renderPath)
+static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera, RenderPath* renderPath)
 {
     return new Viewport(GetScriptContext(), scene, camera, renderPath);
 }
 
-static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, XMLFile* renderPath)
+static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath)
 {
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
-}
-
-static Viewport* ConstructViewportSceneCameraPostProcesses(Scene* scene, Camera* camera, CScriptArray* arr, XMLFile* renderPath)
-{
-    Vector<SharedPtr<PostProcess> > vec;
-    if (arr)
-    {
-        vec.Reserve(arr->GetSize());
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
-    }
-    
-    return new Viewport(GetScriptContext(), scene, camera, vec, renderPath);
-}
-
-static Viewport* ConstructViewportSceneCameraRectPostProcesses(Scene* scene, Camera* camera, const IntRect& rect, CScriptArray* arr, XMLFile* renderPath)
-{
-    Vector<SharedPtr<PostProcess> > vec;
-    if (arr)
-    {
-        vec.Reserve(arr->GetSize());
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            vec.Push(SharedPtr<PostProcess>(*(static_cast<PostProcess**>(arr->At(i)))));
-    }
-    
-    return new Viewport(GetScriptContext(), scene, camera, rect, vec, renderPath);
 }
 
 static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
@@ -194,6 +168,20 @@ static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
 static bool TextureCubeLoad(CubeMapFace face, Image* image, bool useAlpha, TextureCube* ptr)
 {
     return ptr->Load(face, SharedPtr<Image>(image), useAlpha);
+}
+
+static RenderPath* ConstructRenderPath()
+{
+    return new RenderPath();
+}
+
+static RenderPath* RenderPathClone(RenderPath* ptr)
+{
+    SharedPtr<RenderPath> clone = ptr->Clone();
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
 }
 
 static void RegisterTextures(asIScriptEngine* engine)
@@ -234,27 +222,27 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     RegisterTexture<Texture>(engine, "Texture");
     
-    // Must register PostProcess early as Viewport needs it
-    RegisterObject<PostProcess>(engine, "PostProcess");
-    RegisterRefCounted<Viewport>(engine, "Viewport");
+    RegisterRefCounted<RenderPath>(engine, "RenderPath");
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ConstructRenderPath), asCALL_CDECL);
+    engine->RegisterObjectMethod("RenderPath", "RenderPath@ Clone()", asFUNCTION(RenderPathClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderPath", "bool LoadParameters(XMLFile@+)", asMETHOD(RenderPath, LoadParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHOD(RenderPath, Append), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void SetActive(const String&in, bool)", asMETHOD(RenderPath, SetActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void ToggleActive(const String&in)", asMETHOD(RenderPath, ToggleActive), asCALL_THISCALL);
+    
+    RegisterObject<Viewport>(engine, "Viewport");
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f()", asFUNCTION(ConstructViewport), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, Array<PostProcess@>@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraPostProcesses), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, Array<PostProcess@>@+, XMLFile@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRectPostProcesses), asCALL_CDECL);
-    engine->RegisterObjectMethod("Viewport", "void AddPostProcess(PostProcess@+)", asMETHOD(Viewport, AddPostProcess), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void InsertPostProcess(uint, PostProcess@+)", asMETHOD(Viewport, InsertPostProcess), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void RemovePostProcess(PostProcess@+)", asMETHODPR(Viewport, RemovePostProcess, (PostProcess*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void RemovePostProcess(uint)", asMETHODPR(Viewport, RemovePostProcess, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void RemoveAllPostProcesses()", asMETHOD(Viewport, RemoveAllPostProcesses), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, RenderPath@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f(Scene@+, Camera@+, const IntRect&in, RenderPath@+ renderPath = null)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL);
+    engine->RegisterObjectMethod("Viewport", "void SetRenderPath(XMLFile@+)", asMETHODPR(Viewport, SetRenderPath, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asMETHOD(Viewport, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asMETHOD(Viewport, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "void set_renderPath(XMLFile@+)", asMETHOD(Viewport, SetRenderPath), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_renderPath(RenderPath@+)", asMETHODPR(Viewport, SetRenderPath, (RenderPath*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "RenderPath@+ get_renderPath() const", asMETHOD(Viewport, GetRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_rect(const IntRect&in)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "const IntRect& get_rect() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Viewport", "uint get_numPostProcesses() const", asMETHOD(Viewport, GetNumPostProcesses), asCALL_THISCALL);
     
     engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
@@ -409,47 +397,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
-}
-
-static PostProcess* PostProcessClone(PostProcess* ptr)
-{
-    SharedPtr<PostProcess> clone = ptr->Clone();
-    // The shared pointer will go out of scope, so have to increment the reference count
-    // (here an auto handle can not be used)
-    clone->AddRef();
-    return clone.Get();
-}
-
-static void RegisterPostProcess(asIScriptEngine* engine)
-{
-    RegisterRefCounted<PostProcessPass>(engine, "PostProcessPass");
-    engine->RegisterObjectMethod("PostProcessPass", "void RemoveShaderParameter(const String&in)", asMETHOD(PostProcessPass, RemoveShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "void set_vertexShader(const String&in)", asMETHOD(PostProcessPass, SetVertexShader), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "const String& get_vertexShader() const", asMETHOD(PostProcessPass, GetVertexShader), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "void set_pixelShader(const String&in)", asMETHOD(PostProcessPass, SetPixelShader), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "const String& get_pixelShader() const", asMETHOD(PostProcessPass, GetPixelShader), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "void set_output(const String&in)", asMETHOD(PostProcessPass, SetOutput), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "const String& get_output() const", asMETHOD(PostProcessPass, GetOutput), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "void set_textures(uint, const String&in)", asMETHOD(PostProcessPass, SetTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "const String& get_textures(uint) const", asMETHOD(PostProcessPass, GetTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(PostProcessPass, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcessPass", "Vector4 get_shaderParameters(const String&in) const", asMETHOD(PostProcessPass, GetShaderParameter), asCALL_THISCALL);
-    
-    RegisterObjectConstructor<PostProcess>(engine, "PostProcess");
-    engine->RegisterObjectMethod("PostProcess", "bool CreateRenderTarget(const String&in, uint, uint, uint, bool, bool)", asMETHOD(PostProcess, CreateRenderTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "void RemoveRenderTarget(const String&in)", asMETHOD(PostProcess, RemoveRenderTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "void RemoveShaderParameter(const String&in)", asMETHOD(PostProcess, RemoveShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "PostProcess@ Clone() const", asFUNCTION(PostProcessClone), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PostProcess", "bool HasRenderTarget(const String&in) const", asMETHOD(PostProcess, HasRenderTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "bool set_parameters(XMLFile@+)", asMETHOD(PostProcess, LoadParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "XMLFile@+ get_parameters() const", asMETHOD(PostProcess, GetParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "void set_numPasses(uint)", asMETHOD(PostProcess, SetNumPasses), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "uint get_numPasses() const", asMETHOD(PostProcess, GetNumPasses), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(PostProcess, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "Vector4 get_shaderParameters(const String&in) const", asMETHOD(PostProcess, GetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "void set_active(bool)", asMETHOD(PostProcess, SetActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "bool get_active() const", asMETHOD(PostProcess, IsActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PostProcess", "PostProcessPass@+ get_passes(uint) const", asMETHOD(PostProcess, GetPass), asCALL_THISCALL);
 }
 
 static void RegisterModel(asIScriptEngine* engine)
@@ -934,6 +881,9 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void SetDefaultRenderPath(XMLFile@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (XMLFile*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "RenderPath@+ get_defaultRenderPath() const", asMETHOD(Renderer, GetDefaultRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_textureAnisotropy(int)", asMETHOD(Renderer, SetTextureAnisotropy), asCALL_THISCALL);
@@ -1140,7 +1090,6 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterCamera(engine);
     RegisterTextures(engine);
     RegisterMaterial(engine);
-    RegisterPostProcess(engine);
     RegisterModel(engine);
     RegisterAnimation(engine);
     RegisterDrawable(engine);

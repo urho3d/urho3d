@@ -1,19 +1,19 @@
-<postprocess>
-    <rendertarget name="vblur" sizedivisor="4 4" format="rgb" filter="true" />
-    <rendertarget name="hblur" sizedivisor="4 4" format="rgb" filter="true" />
-    <parameter name="BloomThreshold" value="0.3" />
-    <parameter name="BloomMix" value="0.9 0.4" />
-    <pass vs="Bloom" ps="Bloom_Bright" output="vblur">
+<renderpath>
+    <rendertarget name="vblur" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
+    <rendertarget name="hblur" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom_Bright" output="vblur">
+        <parameter name="BloomThreshold" value="0.3" />
         <texture unit="diffuse" name="viewport" />
-    </pass>
-    <pass vs="Bloom" ps="Bloom_HBlur" output="hblur">
+    </command>
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom_HBlur" output="hblur">
         <texture unit="diffuse" name="vblur" />
-    </pass>
-    <pass vs="Bloom" ps="Bloom_VBlur" output="vblur">
+    </command>
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom_VBlur" output="vblur">
         <texture unit="diffuse" name="hblur" />
-    </pass>
-    <pass vs="Bloom" ps="Bloom_Combine" output="viewport">
+    </command>
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom_Combine" output="viewport">
+        <parameter name="BloomMix" value="0.9 0.4" />
         <texture unit="diffuse" name="viewport" />
         <texture unit="normal" name="vblur" />
-    </pass>
-</postprocess>
+    </command>
+</renderpath>

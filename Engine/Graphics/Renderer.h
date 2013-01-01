@@ -40,6 +40,7 @@ class Pass;
 class Technique;
 class Octree;
 class Graphics;
+class RenderPath;
 class RenderSurface;
 class ResourceCache;
 class Skeleton;
@@ -166,8 +167,10 @@ public:
     void SetNumViewports(unsigned num);
     /// Set a viewport. Return true if successful.
     bool SetViewport(unsigned index, Viewport* viewport);
-    /// Set default renderpath resource name.
-    void SetDefaultRenderPathName(const String& name);
+    /// Set default renderpath.
+    void SetDefaultRenderPath(RenderPath* renderPath);
+    /// Set default renderpath from an XML file.
+    void SetDefaultRenderPath(XMLFile* file);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// Set texture anisotropy.
@@ -209,8 +212,8 @@ public:
     unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport.
     Viewport* GetViewport(unsigned index) const;
-    /// Return default renderpath resource name.
-    const String& GetDefaultRenderPathName() const { return defaultRenderPathName_; }
+    /// Return default renderpath.
+    RenderPath* GetDefaultRenderPath() const;
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -373,6 +376,8 @@ private:
     WeakPtr<Graphics> graphics_;
     /// Resource cache subsystem.
     WeakPtr<ResourceCache> cache_;
+    /// Default renderpath.
+    SharedPtr<RenderPath> defaultRenderPath_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
     /// Directional light for drawing fullscreen quads.
@@ -427,8 +432,6 @@ private:
     HashSet<Technique*> shaderErrorDisplayed_;
     /// Mutex for shadow camera allocation.
     Mutex rendererMutex_;
-    /// Default renderpath resource name.
-    String defaultRenderPathName_;
     /// Base directory for shaders.
     String shaderPath_;
     /// Frame info for rendering.

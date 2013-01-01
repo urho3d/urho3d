@@ -31,8 +31,8 @@
 #include "OcclusionBuffer.h"
 #include "Octree.h"
 #include "Renderer.h"
+#include "RenderPath.h"
 #include "ResourceCache.h"
-#include "PostProcess.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "ShaderVariation.h"
@@ -299,23 +299,15 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     cameraNode_ = camera->GetNode();
     renderTarget_ = renderTarget;
     depthStencil_ = GetDepthStencil(renderTarget_);
-    renderPath_ = &viewport->GetRenderPath();
-    
-    // Get active post-processing effects on the viewport
-    const Vector<SharedPtr<PostProcess> >& postProcesses = viewport->GetPostProcesses();
-    postProcesses_.Clear();
-    for (Vector<SharedPtr<PostProcess> >::ConstIterator i = postProcesses.Begin(); i != postProcesses.End(); ++i)
-    {
-        PostProcess* effect = i->Get();
-        if (effect && effect->IsActive())
-            postProcesses_.Push(*i);
-    }
+    renderPath_ = viewport->GetRenderPath();
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
+        if (!command.active_)
+            continue;
         
         if (command.type_ == CMD_SCENEPASS)
         {
@@ -340,6 +332,9 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
+        if (!command.active_)
+            continue;
+        
         if (command.type_ == CMD_LIGHTVOLUMES)
         {
             renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.pixelShaderName_);
@@ -438,6 +433,10 @@ void View::Render()
     // Allocate screen buffers for post-processing and blitting as necessary
     AllocateScreenBuffers();
     
+    // Initialize screenbuffer indices to use for read and write (pingponging)
+    writeBuffer_ = 0;
+    readBuffer_ = 0;
+    
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
     
@@ -485,14 +484,9 @@ void View::Render()
     graphics_->SetViewTexture(0);
     graphics_->ResetStreamFrequencies();
     
-    // Run post-processes or framebuffer blitting now
-    if (screenBuffers_.Size())
-    {
-        if (postProcesses_.Size())
-            RunPostProcesses();
-        else
-            BlitFramebuffer();
-    }
+    // Run framebuffer blitting if necessary
+    if (screenBuffers_.Size() && currentRenderTarget_ != renderTarget_)
+        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, depthStencil_, true);
     
     // If this is a main view, draw the associated debug geometry now
     if (!renderTarget_)
@@ -991,6 +985,8 @@ void View::UpdateGeometries()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
+            if (!command.active_)
+                continue;
             
             if (command.type_ == CMD_SCENEPASS)
             {
@@ -1135,18 +1131,6 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
 
 void View::ExecuteRenderPathCommands()
 {
-    // If using hardware multisampling with post-processing, render to the backbuffer first and then resolve
-    if (screenBuffers_.Size())
-    {
-        usedRenderTarget_ = screenBuffers_[0]->GetRenderSurface();
-        usedDepthStencil_ = GetDepthStencil(usedRenderTarget_);
-    }
-    else
-    {
-        usedRenderTarget_ = renderTarget_;
-        usedDepthStencil_ = depthStencil_;
-    }
-    
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !lightQueues_.Empty())
     {
@@ -1164,9 +1148,56 @@ void View::ExecuteRenderPathCommands()
     {
         PROFILE(RenderCommands);
         
+        unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
+            if (!command.active_)
+                continue;
+            lastCommandIndex = i;
+        }
+        
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+        {
+            const RenderPathCommand& command = renderPath_->commands_[i];
+            if (!command.active_)
+                continue;
+            
+            bool pingpong = false;
+            
+            // If command writes and reads the target at same time, pingpong automatically
+            if (CheckViewportRead(command))
+            {
+                readBuffer_ = writeBuffer_;
+                if (!command.outputs_[0].Compare("viewport", false))
+                {
+                    pingpong = true;
+                    ++writeBuffer_;
+                    if (writeBuffer_ >= screenBuffers_.Size())
+                        writeBuffer_ = 0;
+                }
+            }
+            
+            // Check which rendertarget will be used on this pass
+            if (screenBuffers_.Size())
+            {
+                currentRenderTarget_ = screenBuffers_[writeBuffer_]->GetRenderSurface();
+                currentDepthStencil_ = screenBufferDepthStencil_;
+            }
+            else
+            {
+                currentRenderTarget_ = renderTarget_;
+                currentDepthStencil_ = depthStencil_;
+            }
+            
+            // Optimization: if the last command is a quad with output to the viewport, do not use the screenbuffers,
+            // but the viewport directly. This saves the extra copy
+            if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputs_.Size() == 1 &&
+                !command.outputs_[0].Compare("viewport", false))
+            {
+                currentRenderTarget_ = renderTarget_;
+                currentDepthStencil_ = depthStencil_;
+            }
             
             switch (command.type_)
             {
@@ -1175,7 +1206,7 @@ void View::ExecuteRenderPathCommands()
                     PROFILE(ClearRenderTarget);
                     
                     Color clearColor = command.clearColor_;
-                    if (clearColor.r_ < 0.0f)
+                    if (command.useFogColor_)
                         clearColor = farClipZone_->GetFogColor();
                     
                     SetRenderTargets(command);
@@ -1184,6 +1215,14 @@ void View::ExecuteRenderPathCommands()
                 break;
                 
             case CMD_SCENEPASS:
+                // If this is a pingpong scene pass which reads the existing viewport contents, must copy it first
+                // in case the whole viewport is not overwritten
+                if (pingpong)
+                {
+                    BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(),
+                        screenBufferDepthStencil_, false);
+                }
+                
                 if (!batchQueues_[command.pass_].IsEmpty())
                 {
                     PROFILE(RenderScenePass);
@@ -1191,6 +1230,16 @@ void View::ExecuteRenderPathCommands()
                     SetRenderTargets(command);
                     SetTextures(command);
                     batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
+                }
+                break;
+                
+            case CMD_QUAD:
+                {
+                    PROFILE(RenderQuad);
+                    
+                    SetRenderTargets(command);
+                    SetTextures(command);
+                    RenderQuad(command);
                 }
                 break;
                 
@@ -1274,7 +1323,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
     while (index < command.outputs_.Size())
     {
         if (!command.outputs_[index].Compare("viewport", false))
-            graphics_->SetRenderTarget(index, usedRenderTarget_);
+            graphics_->SetRenderTarget(index, currentRenderTarget_);
         else
         {
             StringHash nameHash(command.outputs_[index]);
@@ -1293,7 +1342,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
         ++index;
     }
     
-    graphics_->SetDepthStencil(usedDepthStencil_);
+    graphics_->SetDepthStencil(currentDepthStencil_);
     graphics_->SetViewport(viewRect_);
 }
 
@@ -1303,29 +1352,108 @@ void View::SetTextures(const RenderPathCommand& command)
     
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (!command.textureNames_[i].Empty())
+        if (command.textureNames_[i].Empty())
+            continue;
+        
+        // Bind the rendered output
+        if (!command.textureNames_[i].Compare("viewport", false))
         {
-            /// \todo allow referring to the current pingpong target
-            HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(StringHash(command.textureNames_[i]));
-            if (j != renderTargets_.End())
-                graphics_->SetTexture(i, j->second_);
+            graphics_->SetTexture(i, screenBuffers_[readBuffer_]);
+            continue;
+        }
+        
+        // Bind a rendertarget
+        HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(StringHash(command.textureNames_[i]));
+        if (j != renderTargets_.End())
+        {
+            graphics_->SetTexture(i, j->second_);
+            continue;
+        }
+        
+        // Bind a texture from the resource system
+        if (cache)
+        {
+            Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+            if (texture)
+                graphics_->SetTexture(i, texture);
             else
             {
-                if (cache)
-                {
-                    Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
-                    if (texture)
-                        graphics_->SetTexture(i, texture);
-                    else
-                    {
-                        // If requesting a texture fails, clear the texture name to prevent redundant attempts
-                        RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
-                        cmdWrite.textureNames_[i] = String();
-                    }
-                }
+                // If requesting a texture fails, clear the texture name to prevent redundant attempts
+                RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
+                cmdWrite.textureNames_[i] = String();
             }
         }
     }
+}
+
+void View::RenderQuad(const RenderPathCommand& command)
+{
+    // Set shaders & shader parameters and textures
+    graphics_->SetShaders(renderer_->GetVertexShader(command.vertexShaderName_), renderer_->GetPixelShader(command.pixelShaderName_));
+    
+    const HashMap<StringHash, Vector4>& parameters = command.shaderParameters_;
+    for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+        graphics_->SetShaderParameter(k->first_, k->second_);
+    
+    float rtWidth = (float)rtSize_.x_;
+    float rtHeight = (float)rtSize_.y_;
+    float widthRange = 0.5f * viewSize_.x_ / rtWidth;
+    float heightRange = 0.5f * viewSize_.y_ / rtHeight;
+    
+    #ifdef USE_OPENGL
+    Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
+        1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
+    #else
+    Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
+        (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
+    #endif
+    
+    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
+    
+    // Set per-rendertarget inverse size / offset shader parameters as necessary
+    for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
+    {
+        const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
+        if (!rtInfo.active_)
+            continue;
+        
+        StringHash nameHash(rtInfo.name_);
+        if (!renderTargets_.Contains(nameHash))
+            continue;
+        
+        String invSizeName = rtInfo.name_ + "InvSize";
+        String offsetsName = rtInfo.name_ + "Offsets";
+        float width = (float)renderTargets_[nameHash]->GetWidth();
+        float height = (float)renderTargets_[nameHash]->GetHeight();
+        
+        graphics_->SetShaderParameter(StringHash(invSizeName), Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
+        #ifdef USE_OPENGL
+        graphics_->SetShaderParameter(StringHash(offsetsName), Vector4::ZERO);
+        #else
+        graphics_->SetShaderParameter(StringHash(offsetsName), Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
+        #endif
+    }
+    
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetDepthWrite(false);
+    graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetScissorTest(false);
+    graphics_->SetStencilTest(false);
+    
+    DrawFullscreenQuad(false);
+}
+
+bool View::CheckViewportRead(const RenderPathCommand& command)
+{
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    {
+        if (!command.textureNames_[i].Empty() && !command.textureNames_[i].Compare("viewport", false))
+            return true;
+    }
+    
+    return false;
 }
 
 void View::AllocateScreenBuffers()
@@ -1339,37 +1467,69 @@ void View::AllocateScreenBuffers()
         neededBuffers = 1;
     #endif
     
-    unsigned postProcessPasses = 0;
-    for (unsigned i = 0; i < postProcesses_.Size(); ++i)
-        postProcessPasses += postProcesses_[i]->GetNumPasses();
-    
-    // If more than one post-process pass, need 2 buffers for ping-pong rendering
-    if (postProcessPasses)
-        neededBuffers = Min((int)postProcessPasses, 2);
-    
     unsigned format = Graphics::GetRGBFormat();
     #ifdef USE_OPENGL
     if (deferred_)
         format = Graphics::GetRGBAFormat();
     #endif
     
-    // Allocate screen buffers with filtering active in case the post-processing effects need that
+    // Check for commands which read the rendered scene and allocate a buffer for each, up to 2 maximum for pingpong
+    /// \todo If the last copy is optimized away, this allocates an extra buffer unnecessarily
+    bool hasViewportRead = false;
+    bool hasViewportReadWrite = false;
+    
+    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    {
+        const RenderPathCommand& command = renderPath_->commands_[i];
+        if (!command.active_)
+            continue;
+        if (CheckViewportRead(command))
+        {
+            hasViewportRead = true;
+            if (!command.outputs_[0].Compare("viewport", false))
+                hasViewportReadWrite = true;
+        }
+    }
+    if (hasViewportRead && !neededBuffers)
+        neededBuffers = 1;
+    if (hasViewportReadWrite)
+        neededBuffers = 2;
+    
+    // Allocate screen buffers with filtering active in case the quad commands need that
     for (unsigned i = 0; i < neededBuffers; ++i)
         screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true));
+    
+    screenBufferDepthStencil_ = neededBuffers ? GetDepthStencil(screenBuffers_[0]->GetRenderSurface()) : (RenderSurface*)0;
     
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
     {
         const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
+        if (!rtInfo.active_)
+            continue;
+        
         unsigned width = rtInfo.size_.x_;
         unsigned height = rtInfo.size_.y_;
         if (!width || !height)
         {
-            width = rtSize_.x_;
-            height = rtSize_.y_;
+            if (rtInfo.sizeMode_ != SIZE_VIEWPORTDIVISOR)
+            {
+                width = rtSize_.x_;
+                height = rtSize_.y_;
+            }
+            else
+            {
+                width = viewSize_.x_;
+                height = viewSize_.y_;
+            }
         }
         
-        if (rtInfo.sizeDivisor_)
+        if (rtInfo.sizeMode_ == SIZE_VIEWPORTDIVISOR)
+        {
+            width = viewSize_.x_ / width;
+            height = viewSize_.y_ / height;
+        }
+        if (rtInfo.sizeMode_ == SIZE_RENDERTARGETDIVISOR)
         {
             width = rtSize_.x_ / width;
             height = rtSize_.y_ / height;
@@ -1379,17 +1539,18 @@ void View::AllocateScreenBuffers()
     }
 }
 
-void View::BlitFramebuffer()
+void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, RenderSurface* depthStencil, bool depthWrite)
 {
-    // Blit the final image to destination rendertarget
-    /// \todo Depth is reset to far plane, so geometry drawn after the view can not be depth tested
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(true);
+    graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetRenderTarget(0, renderTarget_);
-    graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
+    graphics_->SetRenderTarget(0, destination);
+    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+        graphics_->SetRenderTarget(i, (RenderSurface*)0);
+    graphics_->SetDepthStencil(depthStencil);
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
@@ -1409,167 +1570,30 @@ void View::BlitFramebuffer()
     #endif
     
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetTexture(TU_DIFFUSE, screenBuffers_[0]);
+    graphics_->SetTexture(TU_DIFFUSE, source);
     DrawFullscreenQuad(false);
 }
 
-void View::RunPostProcesses()
+void View::DrawFullscreenQuad(bool nearQuad)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Light* quadDirLight = renderer_->GetQuadDirLight();
+    Geometry* geometry = renderer_->GetLightGeometry(quadDirLight);
     
-    // Ping-pong buffer indices for read and write
-    unsigned readRtIndex = 0;
-    unsigned writeRtIndex = screenBuffers_.Size() - 1;
+    Matrix3x4 model = Matrix3x4::IDENTITY;
+    Matrix4 projection = Matrix4::IDENTITY;
     
-    graphics_->SetBlendMode(BLEND_REPLACE);
-    graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetScissorTest(false);
-    graphics_->SetStencilTest(false);
+    #ifdef USE_OPENGL
+    model.m23_ = nearQuad ? -1.0f : 1.0f;
+    #else
+    model.m23_ = nearQuad ? 0.0f : 1.0f;
+    #endif
     
-    for (unsigned i = 0; i < postProcesses_.Size(); ++i)
-    {
-        PostProcess* effect = postProcesses_[i];
-        
-        // For each effect, rendertargets can be re-used. Allocate them now
-        renderer_->SaveScreenBufferAllocations();
-        const HashMap<StringHash, RenderTargetInfo>& renderTargetInfos = effect->GetRenderTargets();
-        HashMap<StringHash, Texture2D*> renderTargets;
-        for (HashMap<StringHash, RenderTargetInfo>::ConstIterator j = renderTargetInfos.Begin(); j !=
-            renderTargetInfos.End(); ++j)
-        {
-            unsigned width = j->second_.size_.x_;
-            unsigned height = j->second_.size_.y_;
-            if (j->second_.sizeDivisor_)
-            {
-                width = viewSize_.x_ / width;
-                height = viewSize_.y_ / height;
-            }
-            
-            renderTargets[j->first_] = renderer_->GetScreenBuffer(width, height, j->second_.format_, j->second_.filtered_);
-        }
-        
-        // Run each effect pass
-        for (unsigned j = 0; j < effect->GetNumPasses(); ++j)
-        {
-            PostProcessPass* pass = effect->GetPass(j);
-            bool lastPass = (i == postProcesses_.Size() - 1) && (j == effect->GetNumPasses() - 1);
-            bool swapBuffers = false;
-            
-            // Write depth on the last pass only
-            graphics_->SetDepthWrite(lastPass);
-            
-            // Set output rendertarget
-            RenderSurface* rt = 0;
-            String output = pass->GetOutput().ToLower();
-            if (output == "viewport")
-            {
-                if (!lastPass)
-                {
-                    rt = screenBuffers_[writeRtIndex]->GetRenderSurface();
-                    swapBuffers = true;
-                }
-                else
-                    rt = renderTarget_;
-                
-                graphics_->SetRenderTarget(0, rt);
-                graphics_->SetDepthStencil(GetDepthStencil(rt));
-                graphics_->SetViewport(viewRect_);
-            }
-            else
-            {
-                HashMap<StringHash, Texture2D*>::ConstIterator k = renderTargets.Find(StringHash(output));
-                if (k != renderTargets.End())
-                    rt = k->second_->GetRenderSurface();
-                else
-                    continue; // Skip pass if rendertarget can not be found
-                
-                graphics_->SetRenderTarget(0, rt);
-                graphics_->SetDepthStencil(GetDepthStencil(rt));
-                graphics_->SetViewport(IntRect(0, 0, rt->GetWidth(), rt->GetHeight()));
-            }
-            
-            // Set shaders, shader parameters and textures
-            graphics_->SetShaders(renderer_->GetVertexShader(pass->GetVertexShader()),
-                renderer_->GetPixelShader(pass->GetPixelShader()));
-            
-            const HashMap<StringHash, Vector4>& globalParameters = effect->GetShaderParameters();
-            for (HashMap<StringHash, Vector4>::ConstIterator k = globalParameters.Begin(); k != globalParameters.End(); ++k)
-                graphics_->SetShaderParameter(k->first_, k->second_);
-            
-            const HashMap<StringHash, Vector4>& parameters = pass->GetShaderParameters();
-            for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
-                graphics_->SetShaderParameter(k->first_, k->second_);
-            
-            float rtWidth = (float)rtSize_.x_;
-            float rtHeight = (float)rtSize_.y_;
-            float widthRange = 0.5f * viewSize_.x_ / rtWidth;
-            float heightRange = 0.5f * viewSize_.y_ / rtHeight;
-            
-            #ifdef USE_OPENGL
-            Vector4 bufferUVOffset(((float)viewRect_.left_) / rtWidth + widthRange,
-                1.0f - (((float)viewRect_.top_) / rtHeight + heightRange), widthRange, heightRange);
-            #else
-            Vector4 bufferUVOffset((0.5f + (float)viewRect_.left_) / rtWidth + widthRange,
-                (0.5f + (float)viewRect_.top_) / rtHeight + heightRange, widthRange, heightRange);
-            #endif
-            
-            graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-            graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(1.0f / rtWidth, 1.0f / rtHeight, 0.0f, 0.0f));
-            
-            // Set per-rendertarget inverse size / offset shader parameters as necessary
-            for (HashMap<StringHash, RenderTargetInfo>::ConstIterator k = renderTargetInfos.Begin(); k !=
-                renderTargetInfos.End(); ++k)
-            {
-                String invSizeName = k->second_.name_ + "InvSize";
-                String offsetsName = k->second_.name_ + "Offsets";
-                float width = (float)renderTargets[k->first_]->GetWidth();
-                float height = (float)renderTargets[k->first_]->GetHeight();
-                
-                graphics_->SetShaderParameter(StringHash(invSizeName), Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
-                #ifdef USE_OPENGL
-                graphics_->SetShaderParameter(StringHash(offsetsName), Vector4::ZERO);
-                #else
-                graphics_->SetShaderParameter(StringHash(offsetsName), Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
-                #endif
-            }
-            
-            const String* textureNames = pass->GetTextures();
-            for (unsigned k = 0; k < MAX_TEXTURE_UNITS; ++k)
-            {
-                if (!textureNames[k].Empty())
-                {
-                    // Texture may either refer to a rendertarget or to a texture resource
-                    if (!textureNames[k].Compare("viewport", false))
-                        graphics_->SetTexture(k, screenBuffers_[readRtIndex]);
-                    else
-                    {
-                        HashMap<StringHash, Texture2D*>::ConstIterator l = renderTargets.Find(StringHash(textureNames[k]));
-                        if (l != renderTargets.End())
-                            graphics_->SetTexture(k, l->second_);
-                        else
-                        {
-                            // If requesting a texture fails, clear the texture name to prevent redundant attempts
-                            Texture2D* texture = cache->GetResource<Texture2D>(textureNames[k]);
-                            if (texture)
-                                graphics_->SetTexture(k, texture);
-                            else
-                                pass->SetTexture((TextureUnit)k, String());
-                        }
-                    }
-                }
-            }
-            
-            /// \todo Draw a near plane quad optionally
-            DrawFullscreenQuad(false);
-            
-            // Swap the ping-pong buffer sides now if necessary
-            if (swapBuffers)
-                Swap(readRtIndex, writeRtIndex);
-        }
-        
-        // Forget the rendertargets allocated during this effect
-        renderer_->RestoreScreenBufferAllocations();
-    }
+    graphics_->SetCullMode(CULL_NONE);
+    graphics_->SetShaderParameter(VSP_MODEL, model);
+    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+    graphics_->ClearTransformSources();
+    
+    geometry->Draw(graphics_);
 }
 
 void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
@@ -2395,28 +2419,6 @@ void View::SetupLightVolumeBatch(Batch& batch)
     
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
-}
-
-void View::DrawFullscreenQuad(bool nearQuad)
-{
-    Light* quadDirLight = renderer_->GetQuadDirLight();
-    Geometry* geometry = renderer_->GetLightGeometry(quadDirLight);
-    
-    Matrix3x4 model = Matrix3x4::IDENTITY;
-    Matrix4 projection = Matrix4::IDENTITY;
-    
-    #ifdef USE_OPENGL
-    model.m23_ = nearQuad ? -1.0f : 1.0f;
-    #else
-    model.m23_ = nearQuad ? 0.0f : 1.0f;
-    #endif
-    
-    graphics_->SetCullMode(CULL_NONE);
-    graphics_->SetShaderParameter(VSP_MODEL, model);
-    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-    graphics_->ClearTransformSources();
-    
-    geometry->Draw(graphics_);
 }
 
 void View::RenderShadowMap(const LightBatchQueue& queue)

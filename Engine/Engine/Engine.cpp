@@ -45,6 +45,7 @@
 #include "StringUtils.h"
 #include "UI.h"
 #include "WorkQueue.h"
+#include "XMLFile.h"
 
 #include "DebugNew.h"
 
@@ -264,7 +265,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             return false;
         
         if (!renderPath.Empty())
-            renderer->SetDefaultRenderPathName(renderPath);
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(renderPath));
         renderer->SetDrawShadows(shadows);
         if (shadows && lqShadows)
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);

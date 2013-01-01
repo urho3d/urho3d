@@ -1,6 +1,6 @@
-<postprocess>
-    <pass vs="EdgeFilter" ps="EdgeFilter" output="viewport">
+<renderpath>
+    <command type="quad" tag="EdgeFilter" vs="EdgeFilter" ps="EdgeFilter" output="viewport">
         <texture unit="diffuse" name="viewport" />
         <parameter name="EdgeFilterParams" value="0.4 0.5 0.75" />
-    </pass>
-</postprocess>
+    </command>
+</renderpath>

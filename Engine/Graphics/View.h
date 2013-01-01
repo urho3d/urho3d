@@ -37,12 +37,12 @@ class Light;
 class Drawable;
 class OcclusionBuffer;
 class Octree;
+class RenderPath;
 class RenderSurface;
 class Technique;
 class Texture2D;
 class Viewport;
 class Zone;
-struct RenderPath;
 struct RenderPathCommand;
 struct WorkItem;
 
@@ -145,12 +145,16 @@ private:
     void SetRenderTargets(const RenderPathCommand& command);
     /// Set textures for current render command.
     void SetTextures(const RenderPathCommand& command);
-    /// Allocate needed screen buffers for post-processing and/or framebuffer blitting.
+    /// Perform a quad rendering command.
+    void RenderQuad(const RenderPathCommand& command);
+    /// Check if a command reads the rendered scene.
+    bool CheckViewportRead(const RenderPathCommand& command);
+    /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
-    /// Blit the framebuffer to destination. Used in OpenGL deferred rendering modes.
-    void BlitFramebuffer();
-    /// Run post-processing effects.
-    void RunPostProcesses();
+    /// Blit the viewport from one surface to another.
+    void BlitFramebuffer(Texture2D* source, RenderSurface* destination, RenderSurface* depthStencil, bool depthWrite);
+    /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
+    void DrawFullscreenQuad(bool nearQuad);
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
@@ -191,11 +195,9 @@ private:
     void PrepareInstancingBuffer();
     /// Set up a light volume rendering batch.
     void SetupLightVolumeBatch(Batch& batch);
-    /// Draw a full screen quad (either near or far.) Shaders must have been set beforehand.
-    void DrawFullscreenQuad(bool nearQuad);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
-    /// Return the proper depth-stencil surface to use for a rendertarget.
+    /// Return the proper depth-stencil surface to use for a rendertarget. Should only be called once per rendertarget.
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     
     /// Graphics subsystem.
@@ -216,14 +218,16 @@ private:
     Zone* farClipZone_;
     /// Occlusion buffer for the main camera.
     OcclusionBuffer* occlusionBuffer_;
-    /// Color rendertarget to use.
+    /// Destination color rendertarget.
     RenderSurface* renderTarget_;
-    /// Depth stencil to use.
+    /// Destination depth stencil.
     RenderSurface* depthStencil_;
+    /// Screenbuffers' depth stencil.
+    RenderSurface* screenBufferDepthStencil_;
     /// Effective color rendertarget to use, may be different if screenbuffers are used.
-    RenderSurface* usedRenderTarget_;
+    RenderSurface* currentRenderTarget_;
     /// Effective depth stencil to use, may be different if screenbuffers are used.
-    RenderSurface* usedDepthStencil_;
+    RenderSurface* currentDepthStencil_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -234,6 +238,10 @@ private:
     FrameInfo frame_;
     /// Combined bounding box of visible geometries.
     BoundingBox sceneBox_;
+    /// Write screenbuffer index.
+    unsigned writeBuffer_;
+    /// Read screenbuffer index.
+    unsigned readBuffer_;
     /// Minimum Z value of the visible scene.
     float minZ_;
     /// Maximum Z value of the visible scene.
@@ -252,9 +260,7 @@ private:
     bool deferred_;
     /// Renderpath.
     const RenderPath* renderPath_;
-    /// Post-processing effects.
-    Vector<SharedPtr<PostProcess> > postProcesses_;
-    /// Intermediate screen buffers used in postprocessing and OpenGL deferred framebuffer blit.
+    /// Intermediate screen buffers used in pingpong copies and OpenGL deferred framebuffer blit.
     PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;

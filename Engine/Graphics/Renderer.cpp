@@ -35,6 +35,7 @@
 #include "Octree.h"
 #include "Profiler.h"
 #include "Renderer.h"
+#include "RenderPath.h"
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "Shader.h"
@@ -258,7 +259,6 @@ Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
     quadDirLight_(new Light(context)),
-    defaultRenderPathName_("CoreData/RenderPaths/Forward.xml"),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -328,11 +328,17 @@ bool Renderer::SetViewport(unsigned index, Viewport* viewport)
     return true;
 }
 
-void Renderer::SetDefaultRenderPathName(const String& name)
+void Renderer::SetDefaultRenderPath(RenderPath* renderPath)
 {
-    String nameTrimmed = name.Trimmed();
-    if (!nameTrimmed.Empty())
-        defaultRenderPathName_ = name;
+    if (renderPath)
+        defaultRenderPath_ = renderPath;
+}
+
+void Renderer::SetDefaultRenderPath(XMLFile* xmlFile)
+{
+    SharedPtr<RenderPath> newRenderPath(new RenderPath());
+    if (newRenderPath->LoadParameters(xmlFile))
+        defaultRenderPath_ = newRenderPath;
 }
 
 void Renderer::SetSpecularLighting(bool enable)
@@ -486,6 +492,11 @@ void Renderer::ReloadShaders()
 Viewport* Renderer::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+}
+
+RenderPath* Renderer::GetDefaultRenderPath() const
+{
+    return defaultRenderPath_;
 }
 
 ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
@@ -1427,6 +1438,9 @@ void Renderer::Initialize()
     // If default material not found, create one. This will actually not render properly, but prevents crashing
     if (!defaultMaterial_)
         defaultMaterial_ = new Material(context_);
+    
+    defaultRenderPath_ = new RenderPath();
+    defaultRenderPath_->LoadParameters(cache->GetResource<XMLFile>("CoreData/RenderPaths/Forward.xml"));
     
     CreateGeometries();
     CreateInstancingBuffer();

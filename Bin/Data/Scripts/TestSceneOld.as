@@ -12,8 +12,6 @@ Node@ cameraNode;
 Camera@ camera;
 Node@ cameraLightNode;
 Light@ cameraLight;
-PostProcess@ edgeFilter;
-PostProcess@ bloom;
 
 float yaw = 0.0;
 float pitch = 0.0;
@@ -320,18 +318,16 @@ void CreateCamera()
 
     if (!engine.headless)
     {
-        edgeFilter = PostProcess();
-        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
-        edgeFilter.active = false; // Start out disabled
-
-        bloom = PostProcess();
-        bloom.parameters = cache.GetResource("XMLFile", "PostProcess/Bloom.xml");
-        bloom.active = false;
-
         renderer.viewports[0] = Viewport(testScene, camera);
-        renderer.viewports[0].AddPostProcess(edgeFilter);
-        renderer.viewports[0].AddPostProcess(bloom);
         
+        // Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
+        RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
+        newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
+        newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml"));
+        newRenderPath.SetActive("Bloom", false);
+        newRenderPath.SetActive("EdgeFilter", false);
+        renderer.viewports[0].renderPath = newRenderPath;
+
         audio.listener = cameraNode.CreateComponent("SoundListener");
     }
 }
@@ -447,14 +443,14 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 cameraLightNode.parent = testScene;
         }
 
-        if (key == 'O')
-            camera.orthographic = !camera.orthographic;
-
         if (key == 'B')
-            bloom.active = !bloom.active;
+            renderer.viewports[0].renderPath.ToggleActive("Bloom");
 
         if (key == 'F')
-            edgeFilter.active = !edgeFilter.active;
+            renderer.viewports[0].renderPath.ToggleActive("EdgeFilter");
+
+        if (key == 'O')
+            camera.orthographic = !camera.orthographic;
 
         if (key == 'T')
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
