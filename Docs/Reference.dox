@@ -692,9 +692,9 @@ The available commands are:
 - forwardlights: Render per-pixel forward lighting for opaque objects. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 
-A render path can be constructed from a main XML file, and then other XML files (for example one for each post-processing effect) can be appended to it. Rendertargets and commands can be \ref RenderPath::SetActive "activated or deactivated" to switch eg. a post-processing effect on or off. To aid in this, they can be identified by tag names, for example the bloom effect marks itself with the tag "Bloom".
+A render path can be loaded from a main XML file by calling \ref RenderPath::LoadParameters "LoadParameters()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be activated or deactivated by calling \ref RenderPath::SetActive "SetActive()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
-It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before the first pass which samples it.
+It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before the first command which samples it.
 
 The render path XML definition looks like this:
 

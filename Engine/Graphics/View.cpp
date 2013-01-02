@@ -1312,6 +1312,7 @@ void View::ExecuteRenderPathCommands()
 void View::SetRenderTargets(const RenderPathCommand& command)
 {
     unsigned index = 0;
+    IntRect viewPort = viewRect_;
     
     while (index < command.outputNames_.Size())
     {
@@ -1321,7 +1322,40 @@ void View::SetRenderTargets(const RenderPathCommand& command)
         {
             StringHash nameHash(command.outputNames_[index]);
             if (renderTargets_.Contains(nameHash))
-                graphics_->SetRenderTarget(index, renderTargets_[nameHash]);
+            {
+                Texture2D* texture = renderTargets_[nameHash];
+                graphics_->SetRenderTarget(index, texture);
+                if (!index)
+                {
+                    // Determine viewport size from rendertarget info
+                    for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
+                    {
+                        const RenderTargetInfo& info = renderPath_->renderTargets_[i];
+                        if (!info.name_.Compare(command.outputNames_[index], false))
+                        {
+                            switch (info.sizeMode_)
+                            {
+                                // If absolute or a divided viewport size, use the full texture
+                            case SIZE_ABSOLUTE:
+                            case SIZE_VIEWPORTDIVISOR:
+                                viewPort = IntRect(0, 0, texture->GetWidth(), texture->GetHeight());
+                                break;
+                            
+                                // If a divided rendertarget size, retain the same viewport, but scaled
+                            case SIZE_RENDERTARGETDIVISOR:
+                                if (info.size_.x_ && info.size_.y_)
+                                {
+                                    viewPort = IntRect(viewRect_.left_ / info.size_.x_, viewRect_.top_ / info.size_.y_,
+                                        viewRect_.right_ / info.size_.x_, viewRect_.bottom_ / info.size_.y_);
+                                }
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+            }
             else
                 graphics_->SetRenderTarget(0, (RenderSurface*)0);
         }
@@ -1336,7 +1370,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
     }
     
     graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
-    graphics_->SetViewport(viewRect_);
+    graphics_->SetViewport(viewPort);
     graphics_->SetColorWrite(true);
 }
 
@@ -1505,29 +1539,16 @@ void View::AllocateScreenBuffers()
         
         unsigned width = rtInfo.size_.x_;
         unsigned height = rtInfo.size_.y_;
-        if (!width || !height)
-        {
-            if (rtInfo.sizeMode_ != SIZE_VIEWPORTDIVISOR)
-            {
-                width = rtSize_.x_;
-                height = rtSize_.y_;
-            }
-            else
-            {
-                width = viewSize_.x_;
-                height = viewSize_.y_;
-            }
-        }
         
         if (rtInfo.sizeMode_ == SIZE_VIEWPORTDIVISOR)
         {
-            width = viewSize_.x_ / width;
-            height = viewSize_.y_ / height;
+            width = viewSize_.x_ / (width ? width : 1);
+            height = viewSize_.y_ / (height ? height : 1);
         }
         if (rtInfo.sizeMode_ == SIZE_RENDERTARGETDIVISOR)
         {
-            width = rtSize_.x_ / width;
-            height = rtSize_.y_ / height;
+            width = rtSize_.x_ / (width ? width : 1);
+            height = rtSize_.y_ / (height ? height : 1);
         }
         
         renderTargets_[StringHash(rtInfo.name_)] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_);
