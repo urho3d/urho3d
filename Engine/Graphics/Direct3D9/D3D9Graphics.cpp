@@ -626,6 +626,8 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
         destination->GetHeight() != height_)
         return false;
     
+    PROFILE(ResolveToTexture);
+    
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
         vpCopy.right_ = vpCopy.left_ + 1;

@@ -1141,6 +1141,9 @@ void View::ExecuteRenderPathCommands()
         }
     }
     
+    // Check if forward rendering needs to resolve the multisampled backbuffer to a texture
+    bool needResolve = !deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1 && screenBuffers_.Size();
+    
     {
         PROFILE(RenderCommands);
         
@@ -1159,7 +1162,7 @@ void View::ExecuteRenderPathCommands()
             if (!command.active_)
                 continue;
             
-            bool pingpong = false;
+            bool needBlit = false;
             
             // If command writes and reads the target at same time, pingpong automatically
             if (CheckViewportRead(command))
@@ -1167,15 +1170,30 @@ void View::ExecuteRenderPathCommands()
                 readBuffer_ = writeBuffer_;
                 if (!command.outputs_[0].Compare("viewport", false))
                 {
-                    pingpong = true;
                     ++writeBuffer_;
                     if (writeBuffer_ >= screenBuffers_.Size())
                         writeBuffer_ = 0;
+                    
+                    // If this is a scene render pass, must copy the previous viewport contents now
+                    if (command.type_ == CMD_SCENEPASS && !needResolve)
+                    {
+                        BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(),
+                            screenBufferDepthStencil_, false);
+                    }
+                    
+                }
+                
+                // Resolve multisampled framebuffer now if necessary
+                /// \todo Does not copy the depth buffer
+                if (needResolve)
+                {
+                    graphics_->ResolveToTexture(screenBuffers_[readBuffer_], viewRect_);
+                    needResolve = false;
                 }
             }
             
             // Check which rendertarget will be used on this pass
-            if (screenBuffers_.Size())
+            if (screenBuffers_.Size() && !needResolve)
             {
                 currentRenderTarget_ = screenBuffers_[writeBuffer_]->GetRenderSurface();
                 currentDepthStencil_ = screenBufferDepthStencil_;
@@ -1211,14 +1229,6 @@ void View::ExecuteRenderPathCommands()
                 break;
                 
             case CMD_SCENEPASS:
-                // If this is a pingpong scene pass which reads the existing viewport contents, must copy it first
-                // in case the whole viewport is not overwritten
-                if (pingpong)
-                {
-                    BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(),
-                        screenBufferDepthStencil_, false);
-                }
-                
                 if (!batchQueues_[command.pass_].IsEmpty())
                 {
                     PROFILE(RenderScenePass);
@@ -1538,6 +1548,8 @@ void View::AllocateScreenBuffers()
 
 void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, RenderSurface* depthStencil, bool depthWrite)
 {
+    PROFILE(BlitFramebuffer);
+    
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(true);
