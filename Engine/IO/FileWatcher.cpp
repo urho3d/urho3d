@@ -28,6 +28,12 @@
 
 #ifdef WIN32
 #include <windows.h>
+#elif __linux__
+#include <sys/inotify.h>
+extern "C" {
+// Need read/close for inotify
+#include "unistd.h"
+}
 #endif
 
 namespace Urho3D
@@ -42,11 +48,21 @@ FileWatcher::FileWatcher(Context* context) :
     fileSystem_(GetSubsystem<FileSystem>()),
     watchSubDirs_(false)
 {
+#if defined(ENABLE_FILEWATCHER)
+#if defined(__linux__)
+    watchHandle_ = inotify_init();
+#endif
+#endif
 }
 
 FileWatcher::~FileWatcher()
 {
     StopWatching();
+#if defined(ENABLE_FILEWATCHER)
+#if defined(__linux__)
+    close(watchHandle_);
+#endif
+#endif
 }
 
 bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
@@ -60,7 +76,8 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     // Stop any previous watching
     StopWatching();
     
-#if defined(WIN32) && defined(ENABLE_FILEWATCHER)
+#if defined(ENABLE_FILEWATCHER)
+#if defined(WIN32)
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
     
     dirHandle_ = (void*)CreateFileW(
@@ -86,6 +103,55 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         LOGERROR("Failed to start watching path " + pathName);
         return false;
     }
+#elif defined(__linux__)
+    //String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
+
+    int flags = IN_CREATE|IN_DELETE|IN_MODIFY|IN_MOVED_FROM|IN_MOVED_TO;
+    int handle;
+    dirHandle_;
+    handle = inotify_add_watch(watchHandle_, pathName.CString(), flags);
+
+    if (handle < 0)
+    {
+        LOGERROR("Failed to start watching path " + pathName);
+        return false;
+    }
+    else
+    {
+        // Store the root path here when reconstructed with inotify later
+        dirHandle_[handle] = "";
+        path_ = AddTrailingSlash(pathName);
+        watchSubDirs_ = watchSubDirs;
+
+        if (watchSubDirs_)
+        {
+            Vector<String> subDirs;
+            fileSystem_->ScanDir(subDirs, pathName, "*", SCAN_DIRS, true);
+
+            for (unsigned i = 0; i < subDirs.Size(); ++i)
+            {
+                String subDirFullPath = AddTrailingSlash(path_ + subDirs[i]);
+
+                // Don't watch ./ or ../ sub-directories
+                if (!subDirFullPath.EndsWith("./"))
+                {
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), flags);
+                    if (handle < 0)
+                        LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
+                    else
+                    {
+                        // Store sub-directory to reconstruct later from inotify
+                        dirHandle_[handle] = AddTrailingSlash(subDirs[i]);
+                    }
+                }
+            }
+        }
+        Start();
+
+        LOGDEBUG("Started watching path " + pathName);
+        return true;
+    }
+#endif
 #else
     /// \todo Implement on Unix-like systems
     LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
@@ -108,8 +174,12 @@ void FileWatcher::StopWatching()
         
         Stop();
         
-        #ifdef WIN32
+        #if defined(WIN32)
         CloseHandle((HANDLE)dirHandle_);
+        #elif defined(__linux__)
+        for (HashMap<int, String>::Iterator i = dirHandle_.Begin(); i != dirHandle_.End(); ++i)
+            inotify_rm_watch(watchHandle_, i->first_);
+        dirHandle_.Clear();
         #endif
         
         LOGDEBUG("Stopped watching path " + path_);
@@ -119,7 +189,8 @@ void FileWatcher::StopWatching()
 
 void FileWatcher::ThreadFunction()
 {
-#if defined(WIN32) && defined(ENABLE_FILEWATCHER)
+#if defined(ENABLE_FILEWATCHER)
+#if defined(WIN32)
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
     
@@ -166,6 +237,41 @@ void FileWatcher::ThreadFunction()
             }
         }
     }
+#elif defined(__linux__)
+    unsigned char buffer[BUFFERSIZE];
+
+    while (shouldRun_)
+    {
+        int i = 0;
+        int length = read(watchHandle_, buffer, sizeof(buffer));
+
+        if (length < 0)
+            return;
+
+        while (i < length)
+        {
+            inotify_event* event = (inotify_event*)&buffer[i];
+
+            if (event->len > 0)
+            {
+                if (event->mask & IN_MODIFY || event->mask & IN_MOVE)
+                {
+                    String fileName;
+                    fileName = dirHandle_[event->wd] + event->name;
+
+                    {
+                        MutexLock lock(changesMutex_);
+                        // If we have 2 unprocessed modifies in a row into the same file, only record the first
+                        if (changes_.Empty() || changes_.Back() != fileName)
+                            changes_.Push(fileName);
+                    }
+                }
+            }
+
+            i += sizeof(inotify_event) + event->len;
+        }
+    }
+#endif
 #endif
 }
 

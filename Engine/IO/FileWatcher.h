@@ -67,9 +67,20 @@ private:
     Mutex changesMutex_;
     /// Watch subdirectories flag.
     bool watchSubDirs_;
-    
+
+#ifdef WIN32
+
     // Directory handle for the path being watched
     void* dirHandle_;
+
+#elif __linux__
+
+    /// HashMap for the directory and sub-directories (needed for inotify's int handles)
+    HashMap<int, String> dirHandle_;
+    /// Linux inotify needs a handle.
+    int watchHandle_;
+
+#endif
 };
 
 }
