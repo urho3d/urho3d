@@ -145,9 +145,9 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
     }
     
     // By default use 1 output, which is the viewport
-    outputs_.Push("viewport");
+    outputNames_.Push("viewport");
     if (element.HasAttribute("output"))
-        outputs_[0] = element.GetAttribute("output");
+        outputNames_[0] = element.GetAttribute("output");
     // Check for defining multiple outputs
     XMLElement outputElem = element.GetChild("output");
     while (outputElem)
@@ -155,9 +155,9 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
         unsigned index = outputElem.GetInt("index");
         if (index < MAX_RENDERTARGETS)
         {
-            if (index >= outputs_.Size())
-                outputs_.Resize(index + 1);
-            outputs_[index] = outputElem.GetAttribute("name");
+            if (index >= outputNames_.Size())
+                outputNames_.Resize(index + 1);
+            outputNames_[index] = outputElem.GetAttribute("name");
         }
         outputElem = outputElem.GetNext("output");
     }
@@ -182,6 +182,52 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
         
         textureElem = textureElem.GetNext("texture");
     }
+}
+
+void RenderPathCommand::SetTextureName(TextureUnit unit, const String& name)
+{
+    if (unit < MAX_TEXTURE_UNITS)
+        textureNames_[unit] = name;
+}
+
+void RenderPathCommand::SetShaderParameter(const String& name, const Vector4& value)
+{
+    shaderParameters_[StringHash(name)] = value;
+}
+
+void RenderPathCommand::RemoveShaderParameter(const String& name)
+{
+    shaderParameters_.Erase(StringHash(name));
+}
+
+void RenderPathCommand::SetNumOutputs(unsigned num)
+{
+    num = Clamp((int)num, 1, MAX_RENDERTARGETS);
+    outputNames_.Resize(num);
+}
+
+void RenderPathCommand::SetOutputName(unsigned index, const String& name)
+{
+    if (index < outputNames_.Size())
+        outputNames_[index] = name;
+    else if (index == outputNames_.Size() && index < MAX_RENDERTARGETS)
+        outputNames_.Push(name);
+}
+
+const String& RenderPathCommand::GetTextureName(TextureUnit unit) const
+{
+    return unit < MAX_TEXTURE_UNITS ? textureNames_[unit] : String::EMPTY;
+}
+
+const Vector4& RenderPathCommand::GetShaderParameter(const String& name) const
+{
+    HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(StringHash(name));
+    return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
+}
+
+const String& RenderPathCommand::GetOutputName(unsigned index) const
+{
+    return index < outputNames_.Size() ? outputNames_[index] : String::EMPTY;
 }
 
 RenderPath::RenderPath()
@@ -270,6 +316,103 @@ void RenderPath::ToggleActive(const String& tag)
         if (!commands_[i].tag_.Compare(tag, false))
             commands_[i].active_ = !commands_[i].active_;
     }
+}
+
+void RenderPath::SetRenderTarget(unsigned index, const RenderTargetInfo& info)
+{
+    if (index < renderTargets_.Size())
+        renderTargets_[index] = info;
+    else if (index == renderTargets_.Size())
+        AddRenderTarget(info);
+}
+
+void RenderPath::AddRenderTarget(const RenderTargetInfo& info)
+{
+    renderTargets_.Push(info);
+}
+
+void RenderPath::RemoveRenderTarget(unsigned index)
+{
+    renderTargets_.Erase(index);
+}
+
+void RenderPath::RemoveRenderTarget(const String& name)
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].name_.Compare(name, false))
+        {
+            renderTargets_.Erase(i);
+            return;
+        }
+    }
+}
+
+void RenderPath::RemoveRenderTargets(const String& tag)
+{
+    for (unsigned i = renderTargets_.Size() - 1; i < renderTargets_.Size(); --i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            renderTargets_.Erase(i);
+    }
+}
+
+void RenderPath::SetCommand(unsigned index, const RenderPathCommand& command)
+{
+    if (index < commands_.Size())
+        commands_[index] = command;
+    else if (index == commands_.Size())
+        AddCommand(command);
+}
+
+void RenderPath::AddCommand(const RenderPathCommand& command)
+{
+    commands_.Push(command);
+}
+
+void RenderPath::InsertCommand(unsigned index, const RenderPathCommand& command)
+{
+    commands_.Insert(index, command);
+}
+
+void RenderPath::RemoveCommand(unsigned index)
+{
+    commands_.Erase(index);
+}
+
+void RenderPath::RemoveCommands(const String& tag)
+{
+    for (unsigned i = commands_.Size() - 1; i < commands_.Size(); --i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            commands_.Erase(i);
+    }
+}
+
+void RenderPath::SetShaderParameter(const String& name, const Vector4& value)
+{
+    StringHash nameHash(name);
+    
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        HashMap<StringHash, Vector4>::Iterator j = commands_[i].shaderParameters_.Find(nameHash);
+        if (j != commands_[i].shaderParameters_.End())
+            j->second_ = value;
+    }
+}
+
+const Vector4& RenderPath::GetShaderParameter(const String& name) const
+{
+    StringHash nameHash(name);
+    
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        HashMap<StringHash, Vector4>::ConstIterator j = commands_[i].shaderParameters_.Find(nameHash);
+        if (j != commands_[i].shaderParameters_.End())
+            return j->second_;
+    }
+    
+    return Vector4::ZERO;
 }
 
 }

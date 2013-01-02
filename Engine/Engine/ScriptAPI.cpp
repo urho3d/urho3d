@@ -182,6 +182,13 @@ static void SelfDelayedExecute(float delay, bool repeat, const String& declarati
     ptr->DelayedExecute(delay, repeat, declaration, destParams);
 }
 
+static void SelfMarkNetworkUpdate()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        ptr->MarkNetworkUpdate();
+}
+
 static void SelfDelayedExecuteNoParams(float delay, bool repeat, const String& declaration)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
@@ -230,7 +237,8 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", asMETHOD(ScriptInstance, GetClassName), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
     
-    // Register convenience functions for controlling delayed execution on self, similar to event sending
+    // Register convenience functions for controlling self, similar to event sending
+    engine->RegisterGlobalFunction("void MarkNetworkUpdate()", asFUNCTION(SelfMarkNetworkUpdate), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
     engine->RegisterGlobalFunction("void ClearDelayedExecute(const String&in declaration = String())", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);

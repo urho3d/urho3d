@@ -1167,7 +1167,7 @@ void View::ExecuteRenderPathCommands()
             if (CheckViewportRead(command))
             {
                 readBuffer_ = writeBuffer_;
-                if (!command.outputs_[0].Compare("viewport", false))
+                if (!command.outputNames_[0].Compare("viewport", false))
                 {
                     ++writeBuffer_;
                     if (writeBuffer_ >= screenBuffers_.Size())
@@ -1198,8 +1198,8 @@ void View::ExecuteRenderPathCommands()
             
             // Optimization: if the last command is a quad with output to the viewport, do not use the screenbuffers,
             // but the viewport directly. This saves the extra copy
-            if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputs_.Size() == 1 &&
-                !command.outputs_[0].Compare("viewport", false))
+            if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputNames_.Size() == 1 &&
+                !command.outputNames_[0].Compare("viewport", false))
                 currentRenderTarget_ = renderTarget_;
             
             switch (command.type_)
@@ -1313,13 +1313,13 @@ void View::SetRenderTargets(const RenderPathCommand& command)
 {
     unsigned index = 0;
     
-    while (index < command.outputs_.Size())
+    while (index < command.outputNames_.Size())
     {
-        if (!command.outputs_[index].Compare("viewport", false))
+        if (!command.outputNames_[index].Compare("viewport", false))
             graphics_->SetRenderTarget(index, currentRenderTarget_);
         else
         {
-            StringHash nameHash(command.outputs_[index]);
+            StringHash nameHash(command.outputNames_[index]);
             if (renderTargets_.Contains(nameHash))
                 graphics_->SetRenderTarget(index, renderTargets_[nameHash]);
             else
@@ -1483,7 +1483,7 @@ void View::AllocateScreenBuffers()
         if (CheckViewportRead(command))
         {
             hasViewportRead = true;
-            if (!command.outputs_[0].Compare("viewport", false))
+            if (!command.outputNames_[0].Compare("viewport", false))
                 hasViewportReadWrite = true;
         }
     }

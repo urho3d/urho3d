@@ -76,6 +76,7 @@ namespace Urho3D
 - uint GetFloat32Format()
 - uint GetDepthStencilFormat()
 - uint GetFormat(const String&)
+- void MarkNetworkUpdate()
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - void DelayedExecute(float, bool, const String&)
 - void ClearDelayedExecute(const String& arg0 = String ( ))
@@ -1633,6 +1634,72 @@ Properties:<br>
 - Vector3 upVector (readonly)
 
 
+RenderTargetInfo
+
+Properties:<br>
+- String name
+- String tag
+- uint format
+- IntVector2 size
+- RenderTargetSizeMode sizeMode
+- bool active
+- bool filtered
+
+
+RenderPathCommand
+
+Methods:<br>
+- void RemoveShaderParameter(const String&)
+
+Properties:<br>
+- String[] textureNames
+- Vector4[] shaderParameters
+- uint numOutputs
+- String[] outputNames
+- String tag
+- RenderCommandType type
+- RenderCommandSortMode sortMode
+- StringHash pass
+- uint clearFlags
+- Color clearColor
+- float clearDepth
+- uint clearStencil
+- bool active
+- bool useFogColor
+- bool markToStencil
+- bool vertexLights
+- bool useScissor
+- String vertexShaderName
+- String pixelShaderName
+
+
+RenderPath
+
+Methods:<br>
+- RenderPath@ Clone()
+- bool LoadParameters(XMLFile@)
+- bool Append(XMLFile@)
+- void SetActive(const String&, bool)
+- void ToggleActive(const String&)
+- void AddRenderTarget(const RenderTargetInfo&)
+- void RemoveRenderTarget(uint)
+- void RemoveRenderTarget(const String&)
+- void RemoveRenderTargts(const String&)
+- void AddCommand(const RenderPathCommand&)
+- void InsertCommand(uint, const RenderPathCommand&)
+- void RemoveCommand(uint)
+- void RemoveCommands(const String&)
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numRenderTargets (readonly)
+- RenderTargetInfo[] renderTargets
+- uint numCommands (readonly)
+- RenderPathCommand[] commands
+- Vector4[] shaderParameters
+
+
 Texture
 
 Methods:<br>
@@ -1665,44 +1732,21 @@ Properties:<br>
 - bool dataLost (readonly)
 
 
-PostProcess
+Viewport
 
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool CreateRenderTarget(const String&, uint, uint, uint, bool, bool)
-- void RemoveRenderTarget(const String&)
-- void RemoveShaderParameter(const String&)
-- PostProcess@ Clone() const
-- bool HasRenderTarget(const String&) const
+- void SetRenderPath(XMLFile@)
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
-- XMLFile@ parameters
-- uint numPasses
-- Vector4[] shaderParameters
-- bool active
-- PostProcessPass@[] passes (readonly)
-
-
-Viewport
-
-Methods:<br>
-- void AddPostProcess(PostProcess@)
-- void InsertPostProcess(uint, PostProcess@)
-- void RemovePostProcess(PostProcess@)
-- void RemovePostProcess(uint)
-- void RemoveAllPostProcesses()
-
-Properties:<br>
-- int refs (readonly)
-- int weakRefs (readonly)
 - Scene@ scene
 - Camera@ camera
+- RenderPath@ renderPath
 - IntRect rect
-- uint numPostProcesses (readonly)
 
 
 RenderSurface
@@ -1801,6 +1845,7 @@ Properties:<br>
 - int weakRefs (readonly)
 - BlendMode blendMode
 - CompareMode depthTestMode
+- PassLightingMode lightingMode
 - bool depthWrite
 - bool alphaMask
 - String vertexShader
@@ -1856,21 +1901,6 @@ Properties:<br>
 - CullMode cullMode
 - CullMode shadowCullMode
 - BiasParameters depthBias
-
-
-PostProcessPass
-
-Methods:<br>
-- void RemoveShaderParameter(const String&)
-
-Properties:<br>
-- int refs (readonly)
-- int weakRefs (readonly)
-- String vertexShader
-- String pixelShader
-- String output
-- String[] textures
-- Vector4[] shaderParameters
 
 
 Model
@@ -2720,6 +2750,7 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void DrawDebugGeometry(bool) const
 - void ReloadShaders() const
+- void SetDefaultRenderPath(XMLFile@)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2728,7 +2759,7 @@ Properties:<br>
 - int weakRefs (readonly)
 - uint numViewports
 - Viewport@[] viewports
-- RenderMode renderMode
+- RenderPath@ defaultRenderPath
 - bool specularLighting
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode

@@ -170,6 +170,38 @@ static bool TextureCubeLoad(CubeMapFace face, Image* image, bool useAlpha, Textu
     return ptr->Load(face, SharedPtr<Image>(image), useAlpha);
 }
 
+static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
+{
+    // Init to zero because performance is not critical
+    new(ptr) RenderTargetInfo();
+}
+
+static void ConstructRenderTargetInfoCopy(const RenderTargetInfo& info, RenderTargetInfo* ptr)
+{
+    new(ptr) RenderTargetInfo(info);
+}
+
+static void DestructRenderTargetInfo(RenderTargetInfo* ptr)
+{
+    ptr->~RenderTargetInfo();
+}
+
+static void ConstructRenderPathCommand(RenderPathCommand* ptr)
+{
+    // Init to zero because performance is not critical
+    new(ptr) RenderPathCommand();
+}
+
+static void ConstructRenderPathCommandCopy(const RenderPathCommand& command, RenderPathCommand* ptr)
+{
+    new(ptr) RenderPathCommand(command);
+}
+
+static void DestructRenderPathCommand(RenderPathCommand* ptr)
+{
+    ptr->~RenderPathCommand();
+}
+
 static RenderPath* ConstructRenderPath()
 {
     return new RenderPath();
@@ -182,6 +214,137 @@ static RenderPath* RenderPathClone(RenderPath* ptr)
     // (here an auto handle can not be used)
     clone->AddRef();
     return clone.Get();
+}
+
+static RenderTargetInfo* RenderPathGetRenderTarget(unsigned index, RenderPath* ptr)
+{
+    if (index >= ptr->renderTargets_.Size())
+    {
+        asIScriptContext* context = asGetActiveContext();
+        if (context)
+            context->SetException("Index out of bounds");
+        return 0;
+    }
+    else
+        return &ptr->renderTargets_[index];
+}
+
+static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
+{
+    if (index >= ptr->commands_.Size())
+    {
+        asIScriptContext* context = asGetActiveContext();
+        if (context)
+            context->SetException("Index out of bounds");
+        return 0;
+    }
+    else
+        return &ptr->commands_[index];
+}
+
+static void RegisterRenderPath(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("RenderCommandType");
+    engine->RegisterEnumValue("RenderCommandType", "CMD_NONE", CMD_NONE);
+    engine->RegisterEnumValue("RenderCommandType", "CMD_CLEAR", CMD_CLEAR);
+    engine->RegisterEnumValue("RenderCommandType", "CMD_SCENEPASS", CMD_SCENEPASS);
+    engine->RegisterEnumValue("RenderCommandType", "CMD_QUAD", CMD_QUAD);
+    engine->RegisterEnumValue("RenderCommandType", "CMD_FORWARDLIGHTS", CMD_FORWARDLIGHTS);
+    engine->RegisterEnumValue("RenderCommandType", "CMD_LIGHTVOLUMES", CMD_LIGHTVOLUMES);
+    
+    engine->RegisterEnum("RenderCommandSortMode");
+    engine->RegisterEnumValue("RenderCommandType", "SORT_FRONTTOBACK", SORT_FRONTTOBACK);
+    engine->RegisterEnumValue("RenderCommandType", "SORT_BACKTOFRONT", SORT_BACKTOFRONT);
+    
+    engine->RegisterEnum("RenderTargetSizeMode");
+    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_ABSOLUTE", SIZE_ABSOLUTE);
+    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_RENDERTARGETDIVISOR", SIZE_RENDERTARGETDIVISOR);
+    engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_VIEWPORTDIVISOR", SIZE_VIEWPORTDIVISOR);
+    
+    engine->RegisterEnum("TextureUnit");
+    engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
+    engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
+    engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
+    engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
+    engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
+    engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
+    engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
+    engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
+    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
+    engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
+    
+    engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f(const RenderTargetInfo&in)", asFUNCTION(ConstructRenderTargetInfoCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructRenderTargetInfo), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderTargetInfo", "RenderTargetInfo& opAssign(const RenderTargetInfo&in)", asMETHOD(RenderTargetInfo, operator =), asCALL_THISCALL);
+    engine->RegisterObjectProperty("RenderTargetInfo", "String name", offsetof(RenderTargetInfo, name_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "String tag", offsetof(RenderTargetInfo, tag_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "uint format", offsetof(RenderTargetInfo, format_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "IntVector2 size", offsetof(RenderTargetInfo, size_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "RenderTargetSizeMode sizeMode", offsetof(RenderTargetInfo, sizeMode_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "bool active", offsetof(RenderTargetInfo, active_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "bool filtered", offsetof(RenderTargetInfo, filtered_));
+    
+    engine->RegisterObjectType("RenderPathCommand", sizeof(RenderPathCommand), asOBJ_VALUE | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderPathCommand), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f(const RenderPathCommand&in)", asFUNCTION(ConstructRenderPathCommandCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructRenderPathCommand), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderPathCommand", "void RemoveShaderParameter(const String&in)", asMETHOD(RenderPathCommand, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "RenderPathCommand& opAssign(const RenderPathCommand&in)", asMETHOD(RenderPathCommand, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_textureNames(TextureUnit, const String&in)", asMETHOD(RenderPathCommand, SetTextureName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "const String& get_textureNames(TextureUnit) const", asMETHOD(RenderPathCommand, GetTextureName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(RenderPathCommand, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(RenderPathCommand, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_numOutputs(uint)", asMETHOD(RenderPathCommand, SetNumOutputs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "uint get_numOutputs() const", asMETHOD(RenderPathCommand, GetNumOutputs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_outputNames(uint, const String&in)", asMETHOD(RenderPathCommand, SetOutputName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "const String& get_outputNames(uint) const", asMETHOD(RenderPathCommand, GetOutputName), asCALL_THISCALL);
+    engine->RegisterObjectProperty("RenderPathCommand", "String tag", offsetof(RenderPathCommand, tag_));
+    engine->RegisterObjectProperty("RenderPathCommand", "RenderCommandType type", offsetof(RenderPathCommand, type_));
+    engine->RegisterObjectProperty("RenderPathCommand", "RenderCommandSortMode sortMode", offsetof(RenderPathCommand, sortMode_));
+    engine->RegisterObjectProperty("RenderPathCommand", "StringHash pass", offsetof(RenderPathCommand, pass_));
+    engine->RegisterObjectProperty("RenderPathCommand", "uint clearFlags", offsetof(RenderPathCommand, clearFlags_));
+    engine->RegisterObjectProperty("RenderPathCommand", "Color clearColor", offsetof(RenderPathCommand, clearColor_));
+    engine->RegisterObjectProperty("RenderPathCommand", "float clearDepth", offsetof(RenderPathCommand, clearDepth_));
+    engine->RegisterObjectProperty("RenderPathCommand", "uint clearStencil", offsetof(RenderPathCommand, clearStencil_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool active", offsetof(RenderPathCommand, active_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool useFogColor", offsetof(RenderPathCommand, useFogColor_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool markToStencil", offsetof(RenderPathCommand, markToStencil_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool vertexLights", offsetof(RenderPathCommand, vertexLights_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool useScissor", offsetof(RenderPathCommand, useScissor_));
+    engine->RegisterObjectProperty("RenderPathCommand", "String vertexShaderName", offsetof(RenderPathCommand, vertexShaderName_));
+    engine->RegisterObjectProperty("RenderPathCommand", "String pixelShaderName", offsetof(RenderPathCommand, pixelShaderName_));
+    
+    RegisterRefCounted<RenderPath>(engine, "RenderPath");
+    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ConstructRenderPath), asCALL_CDECL);
+    engine->RegisterObjectMethod("RenderPath", "RenderPath@ Clone()", asFUNCTION(RenderPathClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderPath", "bool LoadParameters(XMLFile@+)", asMETHOD(RenderPath, LoadParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHOD(RenderPath, Append), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void SetActive(const String&in, bool)", asMETHOD(RenderPath, SetActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void ToggleActive(const String&in)", asMETHOD(RenderPath, ToggleActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void AddRenderTarget(const RenderTargetInfo&in)", asMETHOD(RenderPath, AddRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(uint)", asMETHODPR(RenderPath, RemoveRenderTarget, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(const String&in)", asMETHODPR(RenderPath, RemoveRenderTarget, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTargts(const String&in)", asMETHOD(RenderPath, RemoveRenderTargets), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void AddCommand(const RenderPathCommand&in)", asMETHOD(RenderPath, AddCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void InsertCommand(uint, const RenderPathCommand&in)", asMETHOD(RenderPath, InsertCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void RemoveCommand(uint)", asMETHOD(RenderPath, RemoveCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void RemoveCommands(const String&in)", asMETHOD(RenderPath, RemoveCommands), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "uint get_numRenderTargets() const", asMETHOD(RenderPath, GetNumRenderTargets), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_renderTargets(uint, const RenderTargetInfo&in)", asMETHOD(RenderPath, SetRenderTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "const RenderTargetInfo& get_renderTargets(uint) const", asFUNCTION(RenderPathGetRenderTarget), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderPath", "uint get_numCommands() const", asMETHOD(RenderPath, GetNumCommands), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_commands(uint, const RenderPathCommand&in)", asMETHOD(RenderPath, SetCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "const RenderPathCommand& get_commands(uint) const", asFUNCTION(RenderPathGetCommand), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(RenderPath, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(RenderPath, GetShaderParameter), asCALL_THISCALL);
 }
 
 static void RegisterTextures(asIScriptEngine* engine)
@@ -221,14 +384,6 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
     
     RegisterTexture<Texture>(engine, "Texture");
-    
-    RegisterRefCounted<RenderPath>(engine, "RenderPath");
-    engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ConstructRenderPath), asCALL_CDECL);
-    engine->RegisterObjectMethod("RenderPath", "RenderPath@ Clone()", asFUNCTION(RenderPathClone), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("RenderPath", "bool LoadParameters(XMLFile@+)", asMETHOD(RenderPath, LoadParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHOD(RenderPath, Append), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void SetActive(const String&in, bool)", asMETHOD(RenderPath, SetActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void ToggleActive(const String&in)", asMETHOD(RenderPath, ToggleActive), asCALL_THISCALL);
     
     RegisterObject<Viewport>(engine, "Viewport");
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_FACTORY, "Viewport@+ f()", asFUNCTION(ConstructViewport), asCALL_CDECL);
@@ -317,24 +472,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
-    
-    engine->RegisterEnum("TextureUnit");
-    engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
-    engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
-    engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
-    engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
-    engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
-    engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
-    engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
-    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
-    engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
     engine->RegisterEnum("BlendMode");
     engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
@@ -1098,6 +1235,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterSkeleton(engine);
     RegisterDebugRenderer(engine);
     RegisterCamera(engine);
+    RegisterRenderPath(engine);
     RegisterTextures(engine);
     RegisterMaterial(engine);
     RegisterModel(engine);

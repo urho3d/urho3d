@@ -39,8 +39,7 @@ enum RenderCommandType
     CMD_SCENEPASS,
     CMD_QUAD,
     CMD_FORWARDLIGHTS,
-    CMD_LIGHTVOLUMES,
-    CMD_UNKNOWN
+    CMD_LIGHTVOLUMES
 };
 
 /// Rendering path sorting modes.
@@ -105,6 +104,25 @@ struct RenderPathCommand
     
     /// Read from an XML element.
     void LoadParameters(const XMLElement& element);
+    /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
+    void SetTextureName(TextureUnit unit, const String& name);
+    /// Set a shader parameter.
+    void SetShaderParameter(const String& name, const Vector4& value);
+    /// Remove a shader parameter.
+    void RemoveShaderParameter(const String& name);
+    /// Set number of output rendertargets.
+    void SetNumOutputs(unsigned num);
+    /// Set output rendertarget name.
+    void SetOutputName(unsigned index, const String& name);
+    
+    /// Return texture resource name.
+    const String& GetTextureName(TextureUnit unit) const;
+    /// Return shader paramter.
+    const Vector4& GetShaderParameter(const String& name) const;
+    /// Return number of output rendertargets.
+    unsigned GetNumOutputs() const { return outputNames_.Size(); }
+    /// Return output rendertarget name.
+    const String& GetOutputName(unsigned index) const;
     
     /// Tag name.
     String tag_;
@@ -141,7 +159,7 @@ struct RenderPathCommand
     /// %Shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     /// Output rendertarget names.
-    Vector<String> outputs_;
+    Vector<String> outputNames_;
 };
 
 /// Rendering path definition.
@@ -163,6 +181,35 @@ public:
     void SetActive(const String& tag, bool active);
     /// Toggle activation of commands and rendertargets by tag.
     void ToggleActive(const String& tag);
+    /// Assign rendertarget at index.
+    void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
+    /// Add a rendertarget.
+    void AddRenderTarget(const RenderTargetInfo& info);
+    /// Remove a rendertarget by index.
+    void RemoveRenderTarget(unsigned index);
+    /// Remove a rendertarget by name.
+    void RemoveRenderTarget(const String& name);
+    /// Remove rendertargets by tag name.
+    void RemoveRenderTargets(const String& tag);
+    /// Assign command at index.
+    void SetCommand(unsigned index, const RenderPathCommand& command);
+    /// Add a command to the end of the list.
+    void AddCommand(const RenderPathCommand& command);
+    /// Insert a command at a position.
+    void InsertCommand(unsigned index, const RenderPathCommand& command);
+    /// Remove a command by index.
+    void RemoveCommand(unsigned index);
+    /// Remove commands by tag name.
+    void RemoveCommands(const String& tag);
+    /// Set a shader parameter in all commands that define it.
+    void SetShaderParameter(const String& name, const Vector4& value);
+    
+    /// Return number of rendertargets.
+    unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
+    /// Return number of commands.
+    unsigned GetNumCommands() const { return commands_.Size(); }
+    /// Return a shader parameter (first appearance in any command.)
+    const Vector4& GetShaderParameter(const String& name) const;
     
     /// Rendertargets.
     Vector<RenderTargetInfo> renderTargets_;
