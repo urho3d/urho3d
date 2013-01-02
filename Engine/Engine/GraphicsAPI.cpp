@@ -324,7 +324,17 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
     engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
+    engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
+    engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
+    engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
+    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
+    engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
     engine->RegisterEnum("BlendMode");
     engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
