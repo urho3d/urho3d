@@ -143,9 +143,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             else if (argument == "mono")
                 stereo = false;
             else if (argument == "prepass")
-                renderPath = "CoreData/RenderPaths/Prepass.xml";
+                renderPath = "RenderPaths/Prepass.xml";
             else if (argument == "deferred")
-                renderPath = "CoreData/RenderPaths/Deferred.xml";
+                renderPath = "RenderPaths/Deferred.xml";
             else if (argument == "noshadows")
                 shadows = false;
             else if (argument == "lqshadows")
