@@ -1668,6 +1668,7 @@ Properties:<br>
 - bool useFogColor
 - bool markToStencil
 - bool vertexLights
+- bool useLitBase
 - bool useScissor
 - String vertexShaderName
 - String pixelShaderName

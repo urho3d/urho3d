@@ -97,6 +97,7 @@ struct RenderPathCommand
         active_(true),
         useFogColor_(false),
         markToStencil_(false),
+        useLitBase_(true),
         useScissor_(false),
         vertexLights_(false)
     {
@@ -148,6 +149,8 @@ struct RenderPathCommand
     bool markToStencil_;
     /// Vertex lights flag.
     bool vertexLights_;
+    /// Use lit base pass optimization for forward per-pixel lights.
+    bool useLitBase_;
     /// Scissor optimization flag.
     bool useScissor_;
     /// Vertex shader name.

@@ -687,6 +687,15 @@ void View::GetBatches()
     PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(PASS_ALPHA) ? &batchQueues_[PASS_ALPHA] : (BatchQueue*)0;
     
+    // Check whether to use the lit base pass optimization
+    bool useLitBase = true;
+    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    {
+        const RenderPathCommand& command = renderPath_->commands_[i];
+        if (command.type_ == CMD_FORWARDLIGHTS)
+            useLitBase = command.useLitBase_;
+    }
+    
     // Process lit geometries and shadow casters for each light
     {
         PROFILE(ProcessLights);
@@ -820,7 +829,7 @@ void View::GetBatches()
                     
                     // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                     if (!drawable->GetMaxLights())
-                        GetLitBatches(drawable, lightQueue, alphaQueue);
+                        GetLitBatches(drawable, lightQueue, alphaQueue, useLitBase);
                     else
                         maxLightsDrawables_.Insert(drawable);
                 }
@@ -872,7 +881,7 @@ void View::GetBatches()
                 // Find the correct light queue again
                 LightBatchQueue* queue = light->GetLightQueue();
                 if (queue)
-                    GetLitBatches(drawable, *queue, alphaQueue);
+                    GetLitBatches(drawable, *queue, alphaQueue, useLitBase);
             }
         }
     }
@@ -1059,7 +1068,7 @@ void View::UpdateGeometries()
     queue->Complete();
 }
 
-void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue)
+void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase)
 {
     Light* light = lightQueue.light_;
     Zone* zone = GetZone(drawable);
@@ -1068,7 +1077,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
     // Shadows on transparencies can only be rendered if shadow maps are not reused
     bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool allowLitBase = light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    bool allowLitBase = useLitBase && light == drawable->GetFirstLight() && drawable->GetVertexLights().Empty() && !hasAmbientGradient;
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {

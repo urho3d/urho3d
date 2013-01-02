@@ -125,6 +125,11 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
             useScissor_ = element.GetBool("usescissor");
         break;
         
+    case CMD_FORWARDLIGHTS:
+        if (element.HasAttribute("uselitbase"))
+            useLitBase_ = element.GetBool("uselitbase");
+        break;
+        
     case CMD_LIGHTVOLUMES:
     case CMD_QUAD:
         vertexShaderName_ = element.GetAttribute("vs");

@@ -713,7 +713,7 @@ The render path XML definition looks like this:
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <shaderparameter name="ParameterName" value="x y z w" />
     </command>
-    <command type="forwardlights" output="viewport|RTName" />
+    <command type="forwardlights" uselitbase="true|false" output="viewport|RTName" />
     <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
@@ -728,6 +728,7 @@ Otherwise fully customized scene render passes can be specified, but there are a
 
 - The "light" and "litbase" passes will be automatically rendered by the forwardlights command, interleaved with shadow map rendering as necessary.
 - The "litalpha" pass for transparent objects is automatically merged with the "alpha" pass, if it exists in the render path definition. The idea is that all transparent objects are sorted back to front, and their base passes (the actual "alpha" pass) are rendered first, followed by their additive pixel-lit passes. The "usescissor" flag in the scenepass command should be set to true, so that scissor rectangles limit the effect of lights on transparent objects.
+- The forwardlights command can optionally disable the "litbase" pass optimization without having to touch the material techniques, if a separate opaque ambient-only base pass is needed. By default the optimization is enabled.
 
 
 \page Lights Lights and shadows
