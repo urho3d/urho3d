@@ -152,7 +152,7 @@ private:
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
-    void BlitFramebuffer(Texture2D* source, RenderSurface* destination, RenderSurface* depthStencil, bool depthWrite);
+    void BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite);
     /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
     void DrawFullscreenQuad(bool nearQuad);
     /// Query for occluders as seen from a camera.
@@ -197,7 +197,7 @@ private:
     void SetupLightVolumeBatch(Batch& batch);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
-    /// Return the proper depth-stencil surface to use for a rendertarget. Should only be called once per rendertarget.
+    /// Return the proper depth-stencil surface to use for a rendertarget.
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     
     /// Graphics subsystem.
@@ -220,14 +220,8 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Destination color rendertarget.
     RenderSurface* renderTarget_;
-    /// Destination depth stencil.
-    RenderSurface* depthStencil_;
-    /// Screenbuffers' depth stencil.
-    RenderSurface* screenBufferDepthStencil_;
     /// Effective color rendertarget to use, may be different if screenbuffers are used.
     RenderSurface* currentRenderTarget_;
-    /// Effective depth stencil to use, may be different if screenbuffers are used.
-    RenderSurface* currentDepthStencil_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.

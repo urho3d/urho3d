@@ -936,7 +936,11 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
         screenBufferAllocations_[searchKey] = 0;
     
-    unsigned allocations = screenBufferAllocations_[searchKey]++;
+    // Reuse depth-stencil buffers whenever the size matches, instead of allocating new
+    unsigned allocations = screenBufferAllocations_[searchKey];
+    if(!depthStencil)
+        ++screenBufferAllocations_[searchKey];
+    
     if (allocations >= screenBuffers_[searchKey].Size())
     {
         SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
@@ -960,7 +964,7 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
 {
     // Return the default depth-stencil surface if applicable
     // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
-    if (width <= graphics_->GetWidth() && height <= graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
+    if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
         return 0;
     else
         return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();

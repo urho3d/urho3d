@@ -5,5 +5,6 @@
     <pass name="prepass" vs="LitSolid" ps="LitSolid_Prepass" />
     <pass name="material" vs="LitSolid" ps="LitSolid_Material" depthtest="equal" depthwrite="false" />
     <pass name="deferred" vs="LitSolid" ps="LitSolid_Deferred" />
+    <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

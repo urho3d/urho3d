@@ -298,7 +298,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     camera_ = camera;
     cameraNode_ = camera->GetNode();
     renderTarget_ = renderTarget;
-    depthStencil_ = GetDepthStencil(renderTarget_);
     renderPath_ = viewport->GetRenderPath();
     
     // Make sure that all necessary batch queues exist
@@ -484,7 +483,7 @@ void View::Render()
     
     // Run framebuffer blitting if necessary
     if (screenBuffers_.Size() && currentRenderTarget_ != renderTarget_)
-        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, depthStencil_, true);
+        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
     if (!renderTarget_)
@@ -1177,8 +1176,7 @@ void View::ExecuteRenderPathCommands()
                     // If this is a scene render pass, must copy the previous viewport contents now
                     if (command.type_ == CMD_SCENEPASS && !needResolve)
                     {
-                        BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(),
-                            screenBufferDepthStencil_, false);
+                        BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(), false);
                     }
                     
                 }
@@ -1194,24 +1192,15 @@ void View::ExecuteRenderPathCommands()
             
             // Check which rendertarget will be used on this pass
             if (screenBuffers_.Size() && !needResolve)
-            {
                 currentRenderTarget_ = screenBuffers_[writeBuffer_]->GetRenderSurface();
-                currentDepthStencil_ = screenBufferDepthStencil_;
-            }
             else
-            {
                 currentRenderTarget_ = renderTarget_;
-                currentDepthStencil_ = depthStencil_;
-            }
             
             // Optimization: if the last command is a quad with output to the viewport, do not use the screenbuffers,
             // but the viewport directly. This saves the extra copy
             if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputs_.Size() == 1 &&
                 !command.outputs_[0].Compare("viewport", false))
-            {
                 currentRenderTarget_ = renderTarget_;
-                currentDepthStencil_ = depthStencil_;
-            }
             
             switch (command.type_)
             {
@@ -1311,10 +1300,11 @@ void View::ExecuteRenderPathCommands()
         }
     }
     
+    // After executing all commands, reset rendertarget for debug geometry rendering
     graphics_->SetRenderTarget(0, renderTarget_);
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
     graphics_->SetViewport(viewRect_);
     graphics_->SetFillMode(FILL_SOLID);
 }
@@ -1345,7 +1335,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
         ++index;
     }
     
-    graphics_->SetDepthStencil(currentDepthStencil_);
+    graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
     graphics_->SetViewport(viewRect_);
     graphics_->SetColorWrite(true);
 }
@@ -1506,8 +1496,6 @@ void View::AllocateScreenBuffers()
     for (unsigned i = 0; i < neededBuffers; ++i)
         screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true));
     
-    screenBufferDepthStencil_ = neededBuffers ? GetDepthStencil(screenBuffers_[0]->GetRenderSurface()) : (RenderSurface*)0;
-    
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
     {
@@ -1546,7 +1534,7 @@ void View::AllocateScreenBuffers()
     }
 }
 
-void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, RenderSurface* depthStencil, bool depthWrite)
+void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite)
 {
     PROFILE(BlitFramebuffer);
     
@@ -1559,7 +1547,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, Render
     graphics_->SetRenderTarget(0, destination);
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(depthStencil);
+    graphics_->SetDepthStencil(GetDepthStencil(destination));
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
