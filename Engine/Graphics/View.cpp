@@ -430,7 +430,7 @@ void View::Render()
     // Actually update geometry data now
     UpdateGeometries();
     
-    // Allocate screen buffers for post-processing and blitting as necessary
+    // Allocate screen buffers as necessary
     AllocateScreenBuffers();
     
     // Initialize screenbuffer indices to use for read and write (pingponging)
@@ -449,8 +449,6 @@ void View::Render()
     // again to ensure correct projection will be used
     if (camera_->GetAutoAspectRatio())
         camera_->SetAspectRatio((float)(viewSize_.x_) / (float)(viewSize_.y_));
-    
-    graphics_->SetColorWrite(true);
     
     // Bind the face selection and indirection cube maps for point light shadows
     if (renderer_->GetDrawShadows())
@@ -1143,8 +1141,6 @@ void View::ExecuteRenderPathCommands()
         }
     }
     
-    graphics_->SetFillMode(camera_->GetFillMode());
-    
     {
         PROFILE(RenderCommands);
         
@@ -1229,6 +1225,7 @@ void View::ExecuteRenderPathCommands()
                     
                     SetRenderTargets(command);
                     SetTextures(command);
+                    graphics_->SetFillMode(camera_->GetFillMode());
                     batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
                 }
                 break;
@@ -1258,10 +1255,10 @@ void View::ExecuteRenderPathCommands()
                         {
                             RenderShadowMap(*i);
                             SetRenderTargets(command);
-                            graphics_->SetFillMode(camera_->GetFillMode());
                         }
                         
                         SetTextures(command);
+                        graphics_->SetFillMode(camera_->GetFillMode());
                         i->litBatches_.Draw(i->light_, this);
                     }
                     
@@ -1310,10 +1307,6 @@ void View::ExecuteRenderPathCommands()
     graphics_->SetDepthStencil(depthStencil_);
     graphics_->SetViewport(viewRect_);
     graphics_->SetFillMode(FILL_SOLID);
-    
-    // Resolve multisampled backbuffer now if necessary
-    //if (resolve)
-    //    graphics_->ResolveToTexture(screenBuffers_[0], viewRect_);
 }
 
 void View::SetRenderTargets(const RenderPathCommand& command)
@@ -1344,6 +1337,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
     
     graphics_->SetDepthStencil(currentDepthStencil_);
     graphics_->SetViewport(viewRect_);
+    graphics_->SetColorWrite(true);
 }
 
 void View::SetTextures(const RenderPathCommand& command)
@@ -1466,6 +1460,9 @@ void View::AllocateScreenBuffers()
         Graphics::GetRGBAFormat())))
         neededBuffers = 1;
     #endif
+    // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
+    if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
+        neededBuffers = 1;
     
     unsigned format = Graphics::GetRGBFormat();
     #ifdef USE_OPENGL
@@ -2388,6 +2385,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetBlendMode(BLEND_ADD);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
+    graphics_->SetFillMode(FILL_SOLID);
     
     if (type != LIGHT_DIRECTIONAL)
     {
