@@ -704,9 +704,9 @@ The render path XML definition looks like this:
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" />
     <command type="clear" tag="TagName" active="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false">
-        <output index="0" name="viewport" />
-        <output index="1" name="extra_rt1" />
-        <output index="2" name="extra_rt2" />
+        <output index="0" name="RTName1" />
+        <output index="1" name="RTName2" />
+        <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
     <command type="quad" vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
