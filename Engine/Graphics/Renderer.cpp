@@ -945,8 +945,7 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
     {
         SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
         newBuffer->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
-        if (filtered)
-            newBuffer->SetFilterMode(FILTER_BILINEAR);
+        newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
         LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
