@@ -258,20 +258,18 @@ bool Image::Load(Deserializer& source)
         
         unsigned endianness = source.ReadUInt();
         unsigned type = source.ReadUInt();
-        unsigned typeSize = source.ReadUInt();
+        /* unsigned typeSize = */ source.ReadUInt();
         unsigned format = source.ReadUInt();
         unsigned internalFormat = source.ReadUInt();
-        unsigned baseInternalFormat = source.ReadUInt();
+        /* unsigned baseInternalFormat = */ source.ReadUInt();
         unsigned width = source.ReadUInt();
         unsigned height = source.ReadUInt();
         unsigned depth = source.ReadUInt();
-        unsigned arrayElements = source.ReadUInt();
+        /* unsigned arrayElements = */ source.ReadUInt();
         unsigned faces = source.ReadUInt();
         unsigned mipmaps = source.ReadUInt();
         unsigned keyValueBytes = source.ReadUInt();
-
-#pragma unused (typeSize, baseInternalFormat, arrayElements)
-
+        
         if (endianness != 0x04030201)
         {
             LOGERROR("Big-endian KTX files not supported");
@@ -374,20 +372,18 @@ bool Image::Load(Deserializer& source)
     }
     else if (fileID == "PVR\3")
     {
-        unsigned flags = source.ReadUInt();
+        /* unsigned flags = */ source.ReadUInt();
         unsigned pixelFormatLo = source.ReadUInt();
-        unsigned pixelFormatHi = source.ReadUInt();
-        unsigned colourSpace = source.ReadUInt();
-        unsigned channelType = source.ReadUInt();
+        /* unsigned pixelFormatHi = */ source.ReadUInt();
+        /* unsigned colourSpace = */ source.ReadUInt();
+        /* unsigned channelType = */ source.ReadUInt();
         unsigned height = source.ReadUInt();
         unsigned width = source.ReadUInt();
         unsigned depth = source.ReadUInt();
-        unsigned numSurfaces = source.ReadUInt();
+        /* unsigned numSurfaces = */ source.ReadUInt();
         unsigned numFaces = source.ReadUInt();
         unsigned mipmapCount = source.ReadUInt();
         unsigned metaDataSize = source.ReadUInt();
-   
-#pragma unused (flags, pixelFormatHi, colourSpace, channelType, numSurfaces)
         
         if (depth > 1 || numFaces > 1)
         {

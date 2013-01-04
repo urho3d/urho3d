@@ -680,6 +680,20 @@ static void UnsubscribeFromAllEvents()
         listener->UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
 }
 
+static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
+{
+    Object* listener = GetScriptContextEventListenerObject();
+    if (!listener || !exceptions)
+        return;
+    
+    unsigned numExceptions = exceptions->GetSize();
+    PODVector<StringHash> destExceptions(numExceptions);
+    for (unsigned i = 0; i < numExceptions; ++i)
+        destExceptions[i] = StringHash(*(static_cast<String*>(exceptions->At(i))));
+    
+    listener->UnsubscribeFromAllEventsExcept(destExceptions, true);
+}
+
 static Object* GetEventSender()
 {
     return GetScriptContext()->GetEventSender();
@@ -733,6 +747,7 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String&in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromAllEventsExcept(Array<String>@+)", asFUNCTION(UnsubscribeFromAllEventsExcept), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(ShortStringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
     

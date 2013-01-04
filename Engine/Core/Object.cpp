@@ -184,7 +184,7 @@ void Object::UnsubscribeFromAllEvents()
     }
 }
 
-void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool needUserData)
+void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
 {
     EventHandler* handler = eventHandlers_.First();
     EventHandler* previous = 0;
@@ -193,7 +193,7 @@ void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& excepti
     {
         EventHandler* next = eventHandlers_.Next(handler);
         
-        if ((!needUserData || handler->GetUserData()) && !exceptions.Contains(handler->GetEventType()))
+        if ((!onlyUserData || handler->GetUserData()) && !exceptions.Contains(handler->GetEventType()))
         {
             if (handler->GetSender())
                 context_->RemoveEventReceiver(this, handler->GetSender(), handler->GetEventType());

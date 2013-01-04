@@ -44,6 +44,7 @@ namespace Urho3D
 - void UnsubscribeFromEvent(Object@, const String&)
 - void UnsubscribeFromEvents(Object@)
 - void UnsubscribeFromAllEvents()
+- void UnsubscribeFromAllEventsExcept(String[]@)
 - Object@ GetEventSender()
 - const String& GetTypeName(ShortStringHash)
 - void Print(const String&)
