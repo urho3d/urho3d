@@ -1218,7 +1218,7 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
         if (node->HasComponent(type))
             dest.Push(node);
         if (!node->children_.Empty())
-            node->GetChildrenRecursive(dest);
+            node->GetChildrenWithComponentRecursive(dest, type);
     }
 }
 
