@@ -233,8 +233,8 @@ bool Shader::PrepareVariation(ShaderVariation* variation)
             LOGINFO("Compiling shader " + shaderName);
             
             Vector<String> arguments;
-            arguments.Push(fullFileName_);
-            arguments.Push(GetPath(fullFileName_) + subDir_);
+            arguments.Push("\"" + fullFileName_ + "\"");
+            arguments.Push("\"" + GetPath(fullFileName_) + subDir_ + "\"");
             arguments.Push(variation->GetShaderType() == VS ? "-tVS" : "-tPS");
             arguments.Push("-v" + variationName);
             if (graphics->GetSM3Support())
