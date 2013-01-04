@@ -95,25 +95,34 @@ void Run()
             return;
         }
         
-        // Execute the Start function from the script file, then run the engine loop until exited
+        // When the script file is loaded, its Start() function will be executed
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         engine->InitializeScripting();
         SharedPtr<ScriptFile> scriptFile(context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
-        if (scriptFile && scriptFile->Execute("void Start()"))
+        bool success = false;
+        
+        if (scriptFile)
         {
-            while (!engine->IsExiting())
-                engine->RunFrame();
-            
-            // Run the optional shutdown function
-            if (scriptFile->GetFunction("void Stop()"))
-                scriptFile->Execute("void Stop()");
+            // Do not run engine loop if script did not have a Start() function at all
+            if (scriptFile->GetFunction("void Start()"))
+            {
+                success = true;
+                while (!engine->IsExiting())
+                    engine->RunFrame();
+            }
+            else
+                context->GetSubsystem<Log>()->Write(LOG_ERROR, "Script " + scriptFileName + " did not have a Start() function");
         }
-        else
+        
+        if (!success)
         {
             engine->Exit(); // Close the rendering window
             ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
         }
+        
+        // Release the script now to execute the Stop() function
         scriptFile.Reset();
+        context->GetSubsystem<ResourceCache>()->ReleaseResource(ScriptFile::GetTypeStatic(), scriptFileName, true);
     }
     catch (std::bad_alloc&)
     {

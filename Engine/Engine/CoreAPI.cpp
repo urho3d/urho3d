@@ -677,7 +677,7 @@ static void UnsubscribeFromAllEvents()
 {
     Object* listener = GetScriptContextEventListenerObject();
     if (listener)
-        listener->UnsubscribeFromAllEventsWithUserData();
+        listener->UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
 }
 
 static Object* GetEventSender()

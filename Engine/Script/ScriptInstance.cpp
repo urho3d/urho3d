@@ -360,7 +360,7 @@ void ScriptInstance::ReleaseObject()
         PODVector<StringHash> exceptions;
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
-        UnsubscribeFromAllEventsExcept(exceptions);
+        UnsubscribeFromAllEventsExcept(exceptions, false);
         subscribed_ = false;
         
         ClearMethods();

@@ -358,6 +358,12 @@ Console* Engine::CreateConsole()
 {
     if (headless_ || !initialized_)
         return 0;
+    
+    // Return existing console if possible
+    Console* console = GetSubsystem<Console>();
+    if (console)
+        return console;
+    
     context_->RegisterSubsystem(new Console(context_));
     return GetSubsystem<Console>();
 }
@@ -366,6 +372,12 @@ DebugHud* Engine::CreateDebugHud()
 {
     if (headless_ || !initialized_)
         return 0;
+    
+     // Return existing debug hud if possible
+    DebugHud* debugHud = GetSubsystem<DebugHud>();
+    if (debugHud)
+        return debugHud;
+    
     context_->RegisterSubsystem(new DebugHud(context_));
     return GetSubsystem<DebugHud>();
 }

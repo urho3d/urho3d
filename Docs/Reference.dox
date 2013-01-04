@@ -277,6 +277,8 @@ file->Execute("void MyFunction(int)", parameters); // Execute
 
 \ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but also more risky: in case the ScriptFile resource is unloaded or reloaded, any function pointers will be invalidated.
 
+Note that when a script file loads itself, it automatically calls the function "void Start()" after successfully compiling, if it exists in the script. Likewise, before a script file is unloaded or reloaded, it calls the function "void Stop()" if defined.
+
 \section Scripting_Object Instantiating a script object
 
 The component ScriptInstance can be used to instantiate a specific class from within a script file. After instantiation, the the script object can respond to scene updates, \ref Events "events" and \ref Serialization "serialization" much like a component written in C++ would do, if it has the appropriate methods implemented. For example:
