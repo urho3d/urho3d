@@ -64,6 +64,8 @@ public:
     void UnsubscribeFromAllEvents();
     /// Unsubscribe from all events with userdata defined in the handler.
     void UnsubscribeFromAllEventsWithUserData();
+    /// Unsubscribe from all events except those listed.
+    void UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions);
     /// Send event to all subscribers.
     void SendEvent(StringHash eventType);
     /// Send event with parameters to all subscribers.

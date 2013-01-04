@@ -357,7 +357,12 @@ void ScriptInstance::ReleaseObject()
         if (methods_[METHOD_STOP])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_STOP]);
         
-        UnsubscribeFromAllEvents();
+        PODVector<StringHash> exceptions;
+        exceptions.Push(E_RELOADSTARTED);
+        exceptions.Push(E_RELOADFINISHED);
+        UnsubscribeFromAllEventsExcept(exceptions);
+        subscribed_ = false;
+        
         ClearMethods();
         
         scriptObject_->SetUserData(0);

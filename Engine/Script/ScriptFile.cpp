@@ -88,7 +88,10 @@ bool ScriptFile::Load(Deserializer& source)
     if (result < 0)
     {
         LOGERROR("Failed to compile script module " + GetName() + ":\n" + errors);
-        return false;
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        // if a script is compiled error we also tell resource cache do not
+        // remove it from resource group if auto reload is true.
+        return cache->GetAutoReloadResources();
     }
     if (!errors.Empty())
         LOGWARNING(errors);
