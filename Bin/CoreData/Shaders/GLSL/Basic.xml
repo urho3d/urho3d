@@ -2,11 +2,14 @@
     <shader type="vs">
         <option name="Diff" define="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Billboard" define="BILLBOARD" />
     </shader>
     <shader type="ps">
         <option name="Diff" define="DIFFMAP" exclude="Alpha" />
         <option name="Alpha" define="ALPHAMAP" exclude="Diff" />
-        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />        
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
     </shader>
 </shaders>

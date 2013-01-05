@@ -3,6 +3,16 @@
 #include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
+    #ifdef SKINNED
+        float4 iBlendWeights : BLENDWEIGHT,
+        int4 iBlendIndices : BLENDINDICES,
+    #endif
+    #ifdef INSTANCED
+        float4x3 iModelInstance : TEXCOORD2,
+    #endif
+    #ifdef BILLBOARD
+        float2 iSize : TEXCOORD1,
+    #endif
     #ifdef DIFFMAP
         float2 iTexCoord : TEXCOORD0,
     #endif

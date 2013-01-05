@@ -44,7 +44,7 @@ static const String commandTypeNames[] =
 
 static const String sortModeNames[] =
 {
-    "fronttoback"
+    "fronttoback",
     "backtofront",
     ""
 };
