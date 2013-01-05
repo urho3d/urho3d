@@ -727,6 +727,11 @@ static UIElement* UIElementCreateChild(const String& typeName, const String& nam
     return ptr->CreateChild(ShortStringHash(typeName), name);
 }
 
+static void UIElementRemoveChild(UIElement* child, UIElement* ptr)
+{
+    ptr->RemoveChild(child);
+}
+
 static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
 {
     PODVector<UIElement*> elements;
@@ -782,7 +787,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String())", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void InsertChild(uint, UIElement@+)", asMETHOD(T, InsertChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+)", asMETHOD(T, RemoveChild), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+)", asFUNCTION(UIElementRemoveChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
