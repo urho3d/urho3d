@@ -101,11 +101,6 @@ bool ScriptFile::Load(Deserializer& source)
     // Map script module to script resource with userdata
     scriptModule_->SetUserData(this);
     
-    // Execute start function if defined
-    asIScriptFunction* start = GetFunction("void Start()");
-    if (start)
-        Execute(start);
-    
     return true;
 }
 
@@ -516,11 +511,6 @@ void ScriptFile::ReleaseModule()
 {
     if (scriptModule_)
     {
-        // Execute stop function if defined
-        asIScriptFunction* stop = GetFunction("void Stop()");
-        if (stop)
-            Execute(stop);
-        
         script_->ClearObjectTypeCache();
         
         // Clear search caches and event handlers

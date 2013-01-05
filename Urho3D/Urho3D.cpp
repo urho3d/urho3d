@@ -27,6 +27,7 @@
 #include "Main.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "ScriptFile.h"
 
 #include <exception>
@@ -34,6 +35,22 @@
 #include "DebugNew.h"
 
 using namespace Urho3D;
+
+class Application : public Object
+{
+    OBJECT(Application);
+    
+public:
+    Application(Context* context);
+    void Run(const String& scriptFileName);
+    
+private:
+    void ErrorExit();
+    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
+    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
+    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    
+};
 
 void Run()
 {
@@ -86,48 +103,86 @@ void Run()
             return;
         }
         
-        // Create the execution context and the engine
+        // Create the execution context and the application object. The application object is needed to subscribe to events
+        // which allow to live-reload the script.
         SharedPtr<Context> context(new Context());
-        SharedPtr<Engine> engine(new Engine(context));
-        if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
-        {
-            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
-            return;
-        }
-        
-        // When the script file is loaded, its Start() function will be executed
-        // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-        engine->InitializeScripting();
-        SharedPtr<ScriptFile> scriptFile(context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
-        bool success = false;
-        
-        if (scriptFile)
-        {
-            // Do not run engine loop if script did not have a Start() function at all
-            if (scriptFile->GetFunction("void Start()"))
-            {
-                success = true;
-                while (!engine->IsExiting())
-                    engine->RunFrame();
-            }
-            else
-                context->GetSubsystem<Log>()->Write(LOG_ERROR, "Script " + scriptFileName + " did not have a Start() function");
-        }
-        
-        if (!success)
-        {
-            engine->Exit(); // Close the rendering window
-            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage());
-        }
-        
-        // Release the script now to execute the Stop() function
-        scriptFile.Reset();
-        context->GetSubsystem<ResourceCache>()->ReleaseResource(ScriptFile::GetTypeStatic(), scriptFileName, true);
+        SharedPtr<Application> application(new Application(context));
+        application->Run(scriptFileName);
+        application.Reset();
+        context.Reset();
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog("Urho3D", "An out-of-memory error occurred. The application will now exit.");
     }
+}
+
+OBJECTTYPESTATIC(Application);
+
+Application::Application(Context* context) :
+    Object(context)
+{
+}
+
+void Application::Run(const String& scriptFileName)
+{
+    SharedPtr<Engine> engine(new Engine(context_));
+    if (!engine->Initialize("Urho3D", "Urho3D.log", GetArguments()))
+    {
+        ErrorExit();
+        return;
+    }
+    
+    // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
+    engine->InitializeScripting();
+    SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
+    
+    // If script loading is successful, execute engine loop
+    if (scriptFile && scriptFile->Execute("void Start()"))
+    {
+        // Subscribe to script's reload event to allow live-reload of the application
+        SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
+        SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
+        SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
+        
+        while (!engine->IsExiting())
+            engine->RunFrame();
+        
+        if (scriptFile->GetFunction("void Stop()"))
+            scriptFile->Execute("void Stop()");
+    }
+    else
+        ErrorExit();
+    
+    scriptFile.Reset();
+    engine.Reset();
+}
+
+void Application::ErrorExit()
+{
+    Engine* engine = context_->GetSubsystem<Engine>();
+    engine->Exit(); // Close the rendering window
+    ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage());
+}
+
+void Application::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
+{
+    ScriptFile* scriptFile = static_cast<ScriptFile*>(GetEventSender());
+    if (scriptFile->GetFunction("void Stop()"))
+        scriptFile->Execute("void Stop()");
+}
+
+void Application::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    ScriptFile* scriptFile = static_cast<ScriptFile*>(GetEventSender());
+    // Restart the script application after reload
+    if (!scriptFile->Execute("void Start()"))
+        ErrorExit();
+}
+
+void Application::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
+{
+    ErrorExit();
 }
 
 DEFINE_MAIN(Run());
