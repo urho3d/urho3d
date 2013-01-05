@@ -9,6 +9,9 @@
 
 String configFileName;
 
+// If loaded in OpenGL mode, remember the instancing setting in config instead of auto-disabling it
+bool instancingSetting = true;
+
 void Start()
 {
     if (engine.headless)
@@ -41,7 +44,7 @@ void Stop()
 void ParseArguments()
 {
     Array<String> arguments = GetArguments();
-    
+
     // The first argument should be the editor script name. Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
     {
@@ -110,7 +113,7 @@ void LoadConfig()
         renderer.shadowQuality = renderingElem.GetInt("shadowquality");
         renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
         renderer.specularLighting = renderingElem.GetBool("specularlighting");
-        renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
+        renderer.dynamicInstancing = instancingSetting = renderingElem.GetBool("dynamicinstancing");
         engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
     }
 }
@@ -148,7 +151,7 @@ void SaveConfig()
     renderingElem.SetInt("shadowquality", renderer.shadowQuality);
     renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
     renderingElem.SetBool("specularlighting", renderer.specularLighting);
-    renderingElem.SetBool("dynamicinstancing", renderer.dynamicInstancing);
+    renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 
     config.Save(File(configFileName, FILE_WRITE));
