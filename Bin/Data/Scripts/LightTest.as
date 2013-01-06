@@ -3,7 +3,6 @@
 Scene@ testScene;
 Camera@ camera;
 Node@ cameraNode;
-PostProcess@ edgeFilter;
 
 float yaw = 0.0;
 float pitch = 0.0;
@@ -117,12 +116,14 @@ void InitScene()
 
     if (!engine.headless)
     {
-        edgeFilter = PostProcess();
-        edgeFilter.parameters = cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml");
-        edgeFilter.active = false; // Start out disabled
-
         renderer.viewports[0] = Viewport(testScene, camera);
-        renderer.viewports[0].AddPostProcess(edgeFilter);
+
+        // Add FXAA effect to the renderpath. Clone the default renderpath so that we don't affect it
+        RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
+        newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml"));
+        newRenderPath.SetActive("Bloom", false);
+        newRenderPath.SetActive("EdgeFilter", false);
+        renderer.viewports[0].renderPath = newRenderPath;
 
         audio.listener = cameraNode.CreateComponent("SoundListener");
     }
@@ -191,7 +192,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyDown['D'])
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
-        if (input.keyPress['2'])
+        if (input.keyPress['1'])
         {
             int quality = renderer.textureQuality;
             ++quality;
@@ -200,7 +201,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.textureQuality = quality;
         }
 
-        if (input.keyPress['3'])
+        if (input.keyPress['2'])
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -209,13 +210,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.materialQuality = quality;
         }
 
-        if (input.keyPress['4'])
+        if (input.keyPress['3'])
             renderer.specularLighting = !renderer.specularLighting;
 
-        if (input.keyPress['5'])
+        if (input.keyPress['4'])
             renderer.drawShadows = !renderer.drawShadows;
 
-        if (input.keyPress['6'])
+        if (input.keyPress['5'])
         {
             int size = renderer.shadowMapSize;
             size *= 2;
@@ -224,25 +225,25 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             renderer.shadowMapSize = size;
         }
 
-        if (input.keyPress['7'])
+        if (input.keyPress['6'])
             renderer.shadowQuality = renderer.shadowQuality + 1;
 
-        if (input.keyPress['8'])
+        if (input.keyPress['7'])
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
             renderer.maxOccluderTriangles = occlusion ? 5000 : 0;
         }
 
-        if (input.keyPress['9'])
+        if (input.keyPress['8'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
         if (input.keyPress['O'])
             camera.orthographic = !camera.orthographic;
 
         if (input.keyPress['F'])
-            edgeFilter.active = !edgeFilter.active;
-            
+            renderer.viewports[0].renderPath.ToggleActive("EdgeFilter");
+
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 
