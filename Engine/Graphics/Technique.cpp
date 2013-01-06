@@ -72,6 +72,7 @@ Pass::Pass(StringHash type) :
     blendMode_(BLEND_REPLACE),
     depthTestMode_(CMP_LESSEQUAL),
     lightingMode_(LIGHTING_UNLIT),
+    shadersLoadedFrameNumber_(0),
     depthWrite_(true),
     alphaMask_(false)
 {
@@ -129,12 +130,16 @@ void Pass::ReleaseShaders()
     pixelShaders_.Clear();
 }
 
+void Pass::MarkShadersLoaded(unsigned frameNumber)
+{
+    shadersLoadedFrameNumber_ = frameNumber;
+}
+
 OBJECTTYPESTATIC(Technique);
 
 Technique::Technique(Context* context) :
     Resource(context),
-    isSM3_(false),
-    shadersLoadedFrameNumber_(0)
+    isSM3_(false)
 {
 }
 
@@ -252,11 +257,6 @@ Pass* Technique::GetPass(StringHash type) const
 {
     HashMap<StringHash, SharedPtr<Pass> >::ConstIterator i = passes_.Find(type);
     return i != passes_.End() ? i->second_ : (Pass*)0;
-}
-
-void Technique::MarkShadersLoaded(unsigned frameNumber)
-{
-    shadersLoadedFrameNumber_ = frameNumber;
 }
 
 }

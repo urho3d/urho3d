@@ -1038,14 +1038,15 @@ ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool c
 void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
 {
     // Check if shaders are unloaded or need reloading
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = batch.pass_->GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = batch.pass_->GetPixelShaders();
-    if (!vertexShaders.Size() || !pixelShaders.Size() || tech->GetShadersLoadedFrameNumber() !=
+    Pass* pass = batch.pass_;
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
+    if (!vertexShaders.Size() || !pixelShaders.Size() || pass->GetShadersLoadedFrameNumber() !=
         shadersChangedFrameNumber_)
     {
         // First release all previous shaders, then load
-        tech->ReleaseShaders();
-        LoadMaterialShaders(tech);
+        pass->ReleaseShaders();
+        LoadPassShaders(tech, pass->GetType());
     }
     
     // Make sure shaders are loaded now
@@ -1062,7 +1063,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             geomType = GEOM_STATIC;
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
-        if (batch.pass_->GetLightingMode() == LIGHTING_PERPIXEL)
+        if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
         {
             LightBatchQueue* lightQueue = batch.lightQueue_;
             if (!lightQueue)
@@ -1132,7 +1133,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
         else
         {
             // Check if pass has vertex lighting support
-            if (batch.pass_->GetLightingMode() == LIGHTING_PERVERTEX)
+            if (pass->GetLightingMode() == LIGHTING_PERVERTEX)
             {
                 unsigned numVertexLights = 0;
                 if (batch.lightQueue_)
@@ -1482,18 +1483,13 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadMaterialShaders(Technique* tech)
-{
-    const HashMap<StringHash, SharedPtr<Pass> >& passes = tech->GetPasses();
-    for (HashMap<StringHash, SharedPtr<Pass> >::ConstIterator i = passes.Begin(); i != passes.End(); ++i)
-        LoadPassShaders(tech, i->first_);
-}
-
 void Renderer::LoadPassShaders(Technique* tech, StringHash type)
 {
     Pass* pass = tech->GetPass(type);
     if (!pass)
         return;
+    
+    PROFILE(LoadPassShaders);
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
     
@@ -1558,7 +1554,7 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         pixelShaders[0] = GetPixelShader(pixelShaderName);
     }
     
-    tech->MarkShadersLoaded(shadersChangedFrameNumber_);
+    pass->MarkShadersLoaded(shadersChangedFrameNumber_);
 }
 
 void Renderer::ReleaseMaterialShaders()

@@ -63,6 +63,8 @@ public:
     void SetPixelShader(const String& name);
     /// Reset shader pointers.
     void ReleaseShaders();
+    /// Mark shaders loaded this frame.
+    void MarkShadersLoaded(unsigned frameNumber);
     
     /// Return pass type.
     const StringHash& GetType() const { return type_; }
@@ -72,6 +74,8 @@ public:
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
     /// Return pass lighting mode.
     PassLightingMode GetLightingMode() const { return lightingMode_; }
+    /// Return last shaders loaded frame number.
+    unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return alpha masking hint.
@@ -94,6 +98,8 @@ private:
     CompareMode depthTestMode_;
     /// Lighting mode.
     PassLightingMode lightingMode_;
+    /// Last shaders loaded frame number.
+    unsigned shadersLoadedFrameNumber_;
     /// Depth write mode.
     bool depthWrite_;
     /// Alpha masking hint.
@@ -134,8 +140,6 @@ public:
     void RemovePass(StringHash type);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
-    /// Mark shaders loaded this frame
-    void MarkShadersLoaded(unsigned frameNumber);
     
     /// Return all passes.
     const HashMap<StringHash, SharedPtr<Pass> >& GetPasses() const { return passes_; }
@@ -145,14 +149,10 @@ public:
     Pass* GetPass(StringHash type) const;
     /// Return whether requires %Shader %Model 3.
     bool IsSM3() const { return isSM3_; }
-    /// Return last shaders loaded frame number.
-    unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     
 private:
     /// Require %Shader %Model 3 flag.
     bool isSM3_;
-    /// Last shaders loaded frame number.
-    unsigned shadersLoadedFrameNumber_;
     /// Passes.
     HashMap<StringHash, SharedPtr<Pass> > passes_;
 };
