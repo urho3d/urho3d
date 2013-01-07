@@ -347,7 +347,7 @@ String GetPlatform()
     #elif defined(__linux__)
     return "Linux";
     #else
-    return String();
+    return String::EMPTY;
     #endif
 }
 

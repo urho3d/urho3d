@@ -55,9 +55,9 @@ Scene::Scene(Context* context) :
     localComponentID_(FIRST_LOCAL_ID),
     checksum_(0),
     timeScale_(1.0f),
+    elapsedTime_(0),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
-    elapsedTime_(0),
     active_(true),
     asyncLoading_(false),
     threadedUpdate_(false)
@@ -351,7 +351,7 @@ Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
-        return false;
+        return 0;
     
     return InstantiateXML(xml->GetRoot(), position, rotation, mode);
 }

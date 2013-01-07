@@ -626,6 +626,9 @@ Cocoa_CreateWindow(_THIS, SDL_Window * window)
         }
     }
     nswindow = [[SDLWindow alloc] initWithContentRect:rect styleMask:style backing:NSBackingStoreBuffered defer:YES screen:screen];
+    
+    // Urho3D - Set to black background to prevent annoying flash during startup 
+    [nswindow setBackgroundColor:[NSColor blackColor]];
 
     [pool release];
 

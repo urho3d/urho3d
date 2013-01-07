@@ -49,7 +49,6 @@ private:
     void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-    
 };
 
 void Run()
@@ -108,8 +107,6 @@ void Run()
         SharedPtr<Context> context(new Context());
         SharedPtr<Application> application(new Application(context));
         application->Run(scriptFileName);
-        application.Reset();
-        context.Reset();
     }
     catch (std::bad_alloc&)
     {
@@ -153,9 +150,6 @@ void Application::Run(const String& scriptFileName)
     }
     else
         ErrorExit();
-    
-    scriptFile.Reset();
-    engine.Reset();
 }
 
 void Application::ErrorExit()

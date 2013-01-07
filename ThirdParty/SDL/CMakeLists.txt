@@ -29,7 +29,20 @@ else ()
 
     include_directories (${OpenGL_INCLUDE_DIRS})
     include_directories (${X11_INCLUDE_DIRS})  
-    include_directories (${ALSA_INCLUDE_DIRS}) 
+    include_directories (${ALSA_INCLUDE_DIRS})
+
+    set(CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
+    check_c_source_compiles("
+        #include <X11/Xlib.h>
+        #include <X11/Xproto.h>
+        #include <X11/extensions/Xext.h>
+        #include <X11/extensions/extutil.h>
+        extern XExtDisplayInfo* XextAddDisplay(XExtensionInfo* a,Display* b,_Xconst char* c,XExtensionHooks* d,int e,XPointer f);
+        int main(int argc, char **argv) {}" HAVE_CONST_XEXT_ADDDISPLAY)
+    if(HAVE_CONST_XEXT_ADDDISPLAY)
+        add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY)
+    endif(HAVE_CONST_XEXT_ADDDISPLAY)
+    set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/x11/*.c

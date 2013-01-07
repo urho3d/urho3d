@@ -1170,8 +1170,6 @@ void View::ExecuteRenderPathCommands()
             if (!command.active_)
                 continue;
             
-            bool needBlit = false;
-            
             // If command writes and reads the target at same time, pingpong automatically
             if (CheckViewportRead(command))
             {
@@ -1304,6 +1302,9 @@ void View::ExecuteRenderPathCommands()
                     graphics_->SetScissorTest(false);
                     graphics_->SetStencilTest(false);
                 }
+                break;
+            
+            default:
                 break;
             }
         }

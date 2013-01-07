@@ -103,7 +103,11 @@ SDL_X11_SYM(int,XUngrabServer,(Display* a),(a),return)
 SDL_X11_SYM(int,XUnmapWindow,(Display* a,Window b),(a,b),return)
 SDL_X11_SYM(int,XWarpPointer,(Display* a,Window b,Window c,int d,int e,unsigned int f,unsigned int g,int h,int i),(a,b,c,d,e,f,g,h,i),return)
 SDL_X11_SYM(VisualID,XVisualIDFromVisual,(Visual* a),(a),return)
+#if SDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY
+SDL_X11_SYM(XExtDisplayInfo*,XextAddDisplay,(XExtensionInfo* a,Display* b,_Xconst char* c,XExtensionHooks* d,int e,XPointer f),(a,b,c,d,e,f),return)
+#else
 SDL_X11_SYM(XExtDisplayInfo*,XextAddDisplay,(XExtensionInfo* a,Display* b,char* c,XExtensionHooks* d,int e,XPointer f),(a,b,c,d,e,f),return)
+#endif
 SDL_X11_SYM(XExtensionInfo*,XextCreateExtension,(void),(),return)
 SDL_X11_SYM(void,XextDestroyExtension,(XExtensionInfo* a),(a),)
 SDL_X11_SYM(XExtDisplayInfo*,XextFindDisplay,(XExtensionInfo* a,Display* b),(a,b),return)

@@ -79,7 +79,7 @@ Pass::Pass(StringHash type) :
     // Guess default lighting mode from pass name
     if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
         lightingMode_ = LIGHTING_PERVERTEX;
-    if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
+    else if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
         lightingMode_ = LIGHTING_PERPIXEL;
 }
 
