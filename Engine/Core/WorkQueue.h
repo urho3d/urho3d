@@ -79,13 +79,13 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
-    /// Add a work item and resume work.
+    /// Add a work item and resume worker threads.
     void AddWorkItem(const WorkItem& item);
-    /// Pause work.
+    /// Pause worker threads.
     void Pause();
-    /// Resume work.
+    /// Resume worker threads.
     void Resume();
-    /// Finish all queued work which has at least the specified priority, then pause. Main thread will also execute priority work.
+    /// Finish all queued work which has at least the specified priority. Main thread will also execute priority work. Pause worker threads if no more work remains.
     void Complete(unsigned priority);
     
     /// Return number of worker threads.
@@ -98,7 +98,7 @@ private:
     void ProcessItems(unsigned threadIndex);
     /// Purge completed work items and send completion events as necessary.
     void PurgeCompleted();
-    /// Handle frame start event. Purges completed work from the main thread queue, and performs work if no threads at all.
+    /// Handle frame start event. Purge completed work from the main thread queue, and perform work if no threads at all.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Worker threads.
