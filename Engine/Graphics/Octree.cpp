@@ -458,7 +458,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
             }
             
             // Merge per-thread results
-            queue->Complete();
+            queue->Complete(M_MAX_UNSIGNED);
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 query.result_.Insert(query.result_.End(), rayQueryResults_[i].Begin(), rayQueryResults_[i].End());
         }
@@ -568,7 +568,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
         start = end;
     }
     
-    queue->Complete();
+    queue->Complete(M_MAX_UNSIGNED);
     scene->EndThreadedUpdate();
     drawableUpdates_.Clear();
 }

@@ -628,7 +628,7 @@ void View::GetDrawables()
             start = end;
         }
         
-        queue->Complete();
+        queue->Complete(M_MAX_UNSIGNED);
     }
     
     // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
@@ -716,7 +716,7 @@ void View::GetBatches()
         }
         
         // Ensure all lights have been processed before proceeding
-        queue->Complete();
+        queue->Complete(M_MAX_UNSIGNED);
     }
     
     // Build light queues and lit batches
@@ -1065,7 +1065,7 @@ void View::UpdateGeometries()
     }
     
     // Finally ensure all threaded work has completed
-    queue->Complete();
+    queue->Complete(M_MAX_UNSIGNED);
 }
 
 void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQueue* alphaQueue, bool useLitBase)

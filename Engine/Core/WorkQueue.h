@@ -29,11 +29,25 @@
 namespace Urho3D
 {
 
+/// Work item completed event.
+EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+{
+    PARAM(P_ITEM, Item);                        // WorkItem ptr
+}
+
 class WorkerThread;
 
 /// Work queue item.
 struct WorkItem
 {
+    // Construct
+    WorkItem() :
+        priority_(M_MAX_UNSIGNED),
+        sendEvent_(false),
+        completed_(false)
+    {
+    }
+    
     /// Work function. Called with the work item and thread index (0 = main thread) as parameters.
     void (*workFunction_)(const WorkItem*, unsigned);
     /// Data start pointer.
@@ -42,6 +56,12 @@ struct WorkItem
     void* end_;
     /// Auxiliary data pointer.
     void* aux_;
+    /// Priority. Higher value = will be completed first.
+    unsigned priority_;
+    /// Whether to send event on completion.
+    bool sendEvent_;
+    /// Completed flag.
+    volatile bool completed_;
 };
 
 /// Work queue subsystem for multithreading.
@@ -59,32 +79,36 @@ public:
     
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
-    /// Add a work item and resume work. If no threads, will process it immediately.
+    /// Add a work item and resume work.
     void AddWorkItem(const WorkItem& item);
     /// Pause work.
     void Pause();
     /// Resume work.
     void Resume();
-    /// Finish all queued work, then pause.
-    void Complete();
+    /// Finish all queued work which has at least the specified priority, then pause. Main thread will also execute priority work.
+    void Complete(unsigned priority);
     
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
-    /// Return whether all work is completed.
-    bool IsCompleted() const;
+    /// Return whether all work with at least the specified priority is finished.
+    bool IsCompleted(unsigned priority) const;
     
 private:
     /// Process work items until shut down. Called by the worker threads.
     void ProcessItems(unsigned threadIndex);
+    /// Purge completed work items and send completion events as necessary.
+    void PurgeCompleted();
+    /// Handle frame start event. Purges completed work from the main thread queue, and performs work if no threads at all.
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
-    /// Work item queue.
-    List<WorkItem> queue_;
-    /// Queue mutex.
+    /// Work item collection. Accessed only by the main thread.
+    List<WorkItem> workItems_;
+    /// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)
+    List<WorkItem*> queue_;
+    /// Worker queue mutex.
     Mutex queueMutex_;
-    /// Number of threads working on an item.
-    volatile unsigned numActive_;
     /// Shutting down flag.
     volatile bool shutDown_;
     /// Pausing flag. Indicates the worker threads should not contend for the queue mutex.
