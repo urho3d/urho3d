@@ -41,9 +41,9 @@ else ()
         #include <X11/extensions/extutil.h>
         extern XExtDisplayInfo* XextAddDisplay(XExtensionInfo* a,Display* b,_Xconst char* c,XExtensionHooks* d,int e,XPointer f);
         int main(int argc, char **argv) {}" HAVE_CONST_XEXT_ADDDISPLAY)
-    if(HAVE_CONST_XEXT_ADDDISPLAY)
+    if (HAVE_CONST_XEXT_ADDDISPLAY)
         add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY)
-    endif(HAVE_CONST_XEXT_ADDDISPLAY)
+    endif ()
     set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES
