@@ -19,6 +19,8 @@ elseif (APPLE)
         src/audio/coreaudio/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
     )
 else ()
+    include(CheckCSourceCompiles)
+
     # On Linux, make sure development libraries exist, and use their include file directories  
     find_package (OpenGL REQUIRED)
     find_package (X11 REQUIRED)
