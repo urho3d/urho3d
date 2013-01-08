@@ -76,13 +76,21 @@ public:
     /// Return profiler text.
     Text* GetProfilerText() const { return profilerText_; }
     /// Return currently shown elements.
-    unsigned GetMode() const;
+    unsigned GetMode() const { return mode_; }
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
     /// Return profiler accumulation interval.
     float GetProfilerInterval() const { return profilerInterval_; }
     /// Return whether showing 3D geometry primitive/batch count only.
     bool GetUseRendererStats() const { return useRendererStats_; }
+    /// Set application-specific stats.
+    void SetAppStats(const String& label, const Variant& stats);
+    /// Set application-specific stats.
+    void SetAppStats(const String& label, const String& stats);
+    /// Reset application-specific stats. Return true if it was erased successfully.
+    bool ResetAppStats(const String& label);
+    /// Clear all application-specific stats.
+    void ClearAppStats();
     
 private:
     /// Handle logic update event.
@@ -96,6 +104,8 @@ private:
     SharedPtr<Text> modeText_;
     /// Profiling information text.
     SharedPtr<Text> profilerText_;
+    /// Hashmap containing application specific stats.
+    HashMap<String, String> appStats_;
     /// Profiler timer.
     Timer profilerTimer_;
     /// Profiler max block depth.
@@ -104,6 +114,8 @@ private:
     float profilerInterval_;
     /// Show 3D geometry primitive/batch count flag.
     bool useRendererStats_;
+    /// Current shown-element mode.
+    unsigned mode_;
 };
 
 }

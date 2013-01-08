@@ -5034,6 +5034,10 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Toggle(uint)
 - void ToggleAll()
+- void SetAppStats(const String&, const Variant&)
+- void SetAppStats(const String&, const String&)
+- void ResetAppStats(const String&)
+- void ClearAppStats()
 
 Properties:<br>
 - ShortStringHash type (readonly)

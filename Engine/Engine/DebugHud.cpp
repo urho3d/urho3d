@@ -58,7 +58,8 @@ DebugHud::DebugHud(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1.0f),
-    useRendererStats_(false)
+    useRendererStats_(false),
+    mode_(DEBUGHUD_SHOW_NONE)
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -121,6 +122,13 @@ void DebugHud::Update()
             renderer->GetNumShadowMaps(true),
             renderer->GetNumOccluders(true));
         
+        if (!appStats_.Empty())
+        {
+            stats.Append("\n");
+            for (HashMap<String, String>::ConstIterator i = appStats_.Begin(); i != appStats_.End(); ++i)
+                stats.AppendWithFormat("\n%s %s", i->first_.CString(), i->second_.CString());
+        }
+        
         statsText_->SetText(stats);
     }
     
@@ -179,6 +187,8 @@ void DebugHud::SetMode(unsigned mode)
     statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
     modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
+    
+    mode_ = mode;
 }
 
 void DebugHud::SetProfilerMaxDepth(unsigned depth)
@@ -206,20 +216,29 @@ void DebugHud::ToggleAll()
     Toggle(DEBUGHUD_SHOW_ALL);
 }
 
-unsigned DebugHud::GetMode() const
+void DebugHud::SetAppStats(const String& label, const Variant& stats)
 {
-    unsigned mode = DEBUGHUD_SHOW_NONE;
-    
-    if (statsText_->IsVisible())
-        mode |= DEBUGHUD_SHOW_STATS;
-    if (modeText_->IsVisible())
-        mode |= DEBUGHUD_SHOW_MODE;
-    if (profilerText_->IsVisible())
-        mode |= DEBUGHUD_SHOW_PROFILER;
-    
-    return mode;
+    SetAppStats(label, stats.ToString());
 }
 
+void DebugHud::SetAppStats(const String& label, const String& stats)
+{
+    bool newLabel = !appStats_.Contains(label);
+    appStats_[label] = stats;
+    if (newLabel)
+        appStats_.Sort();
+}
+
+bool DebugHud::ResetAppStats(const String& label)
+{
+    return appStats_.Erase(label);
+}
+
+void DebugHud::ClearAppStats()
+{
+    appStats_.Clear();
+}
+    
 void DebugHud::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;

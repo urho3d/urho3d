@@ -83,6 +83,10 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_statsText() const", asMETHOD(DebugHud, GetStatsText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_modeText() const", asMETHOD(DebugHud, GetModeText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_profilerText() const", asMETHOD(DebugHud, GetProfilerText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void SetAppStats(const String&in, const Variant&in)", asMETHODPR(DebugHud, SetAppStats, (const String&, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void SetAppStats(const String&in, const String&in)", asMETHODPR(DebugHud, SetAppStats, (const String&, const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void ResetAppStats(const String&in)", asMETHOD(DebugHud, ResetAppStats), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void ClearAppStats()", asMETHOD(DebugHud, ClearAppStats), asCALL_THISCALL);
     engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", asFUNCTION(GetDebugHud), asCALL_CDECL);
 }
 
