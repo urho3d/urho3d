@@ -1,0 +1,10 @@
+<technique>
+    <pass name="base" vs="LitSolid" ps="LitSolid_Diff" />
+    <pass name="litbase" vs="LitSolid_Normal" ps="LitSolid_DiffNormalPackedAmbient" />
+    <pass name="light" vs="LitSolid_Normal" ps="LitSolid_DiffNormalPacked" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="LitSolid_Normal" ps="LitSolid_DiffNormalPackedPrepass" />
+    <pass name="material" vs="LitSolid" ps="LitSolid_DiffMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="LitSolid_Normal" ps="LitSolid_DiffNormalPackedDeferred" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

@@ -1,5 +1,5 @@
 <material>
-    <technique name="Techniques/DiffNormalEnvCube.xml" quality="1" />
+    <technique name="Techniques/DiffNormalPackedEnvCube.xml" quality="1" />
     <technique name="Techniques/DiffEnvCube.xml" quality="0" />
     <texture unit="diffuse" name="Textures/StoneDiffuse.dds" />
     <texture unit="normal" name="Textures/StoneNormal.dds" />

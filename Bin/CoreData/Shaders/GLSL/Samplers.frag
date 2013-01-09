@@ -22,10 +22,14 @@ uniform sampler2D sShadowMap;
 
 vec3 DecodeNormal(vec4 normalInput)
 {
-    vec3 normal;
-    normal.xy = normalInput.ag * 2.0 - 1.0;
-    normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
-    return normal;
+    #ifdef PACKEDNORMAL
+        vec3 normal;
+        normal.xy = normalInput.ag * 2.0 - 1.0;
+        normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
+        return normal;
+    #else
+        return normalize(normalInput.rgb);
+    #endif
 }
 
 vec3 EncodeDepth(float depth)

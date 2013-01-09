@@ -632,7 +632,12 @@ Default culling mode is counterclockwise. The shadowcull element specifies the c
 
 Diffuse maps specify the surface color in the RGB channels. Optionally they can use the alpha channel for blending and alpha testing. They should preferably be compressed to DXT1 (no alpha or 1-bit alpha) or DXT5 (smooth alpha) format.
 
-Normal maps encode the tangent-space surface normal for normal mapping. They need to be stored as xGxR, ie. Y-component in the green channel, and X-component in the alpha (Z will be reconstructed in the pixel shader.) This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx Before compression, make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
+Normal maps encode the tangent-space surface normal for normal mapping. There are two options for storing normals, which require choosing the correct material technique, as the pixel shader is different in each case:
+
+- Store as RGB. In this case use the DiffNormal techniques. This is the default used by AssetImporter, to ensure no conversion of normal textures needs to happen.
+- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx 
+
+Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
 
 Specular maps encode the specular surface color as RGB. Note that deferred rendering is only able to use monochromatic specular intensity from the G channel, while forward and light pre-pass rendering use fully colored specular. DXT1 format should suit these textures well.
 

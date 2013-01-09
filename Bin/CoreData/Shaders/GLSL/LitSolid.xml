@@ -28,6 +28,7 @@
     <shader type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" require="DIFFMAP" />
+        <option name="Packed" define="PACKEDNORMAL" require="NORMALMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="EnvCube" define="ENVCUBEMAP" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
