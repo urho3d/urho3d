@@ -269,3 +269,17 @@ V1.21   - Bugfixes and code cleanup.
         - Animation state editing and animation trigger events.
         - Scene update time scale can be modified.
         - Improved the delayed method call system.
+
+V1.22   - Configurable render path replaces hardcoded forward/prepass/deferred
+          modes. Render path system also used for postprocessing now.
+        - Threaded task priorities; long-running tasks (more than one frame) can
+          coexist with the time-critical tasks.
+        - Possibility to use also RGB normal maps.
+        - CustomGeometry component, which allows geometry to be defined
+          similarly to OpenGL immediate mode.
+        - Elapsed time shader parameter for material animation.
+        - Cubic environment mapping example shaders.
+        - Separate physics collision start & end events.
+        - Visual Studio 2012, Eclipse & Xcode build support.
+        - Many bugfixes, including iOS 6 orientation & shadow mapping bugfixes,
+          skinning on some Android devices.
