@@ -395,17 +395,19 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (command.length > 0)
             script.Execute(command);
     }
-
-    if (debugHud.mode != DEBUGHUD_SHOW_NONE)
+    else
     {
-        Node@ playerNode = FindOwnNode();
-        if (playerNode !is null)
+        if (debugHud.mode != DEBUGHUD_SHOW_NONE)
         {
-            debugHud.SetAppStats("Player Pos", playerNode.worldPosition.ToString());
-            debugHud.SetAppStats("Player Yaw", Variant(playerNode.worldRotation.yaw));
+            Node@ playerNode = FindOwnNode();
+            if (playerNode !is null)
+            {
+                debugHud.SetAppStats("Player Pos", playerNode.worldPosition.ToString());
+                debugHud.SetAppStats("Player Yaw", Variant(playerNode.worldRotation.yaw));
+            }
+            else
+                debugHud.ClearAppStats();
         }
-        else
-            debugHud.ClearAppStats();
     }
 }
 
