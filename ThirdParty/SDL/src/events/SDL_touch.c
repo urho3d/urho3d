@@ -127,7 +127,7 @@ SDL_AddTouch(const SDL_Touch * touch, char *name)
     /* we're setting the touch properties */
     length = 0;
     length = SDL_strlen(name);
-    SDL_touchPads[index]->focus = SDL_GetFocusWindow();
+    SDL_touchPads[index]->focus = 0;
     SDL_touchPads[index]->name = SDL_malloc((length + 2) * sizeof(char));
     SDL_strlcpy(SDL_touchPads[index]->name, name, length + 1);   
 
