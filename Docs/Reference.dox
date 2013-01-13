@@ -626,7 +626,7 @@ When a material defines several techniques for different LOD levels and quality 
 - Second most distant & highest quality
 - ...
 
-%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported.
+%Material shader parameters can be floats or vectors up to 4 components. Matrix parameters are not supported. Note that a built-in ElapsedTime shader parameter is available for implementing material animation effects; it measures the time elapsed in scene updates in seconds.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
