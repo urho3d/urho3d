@@ -102,10 +102,14 @@ unsigned long Clock::Time()
 
 tick_t Clock::Tick()
 {
-#ifdef _POSIX_MONOTONIC_CLOCK
+#if defined(ANDROID)
+	struct timespec res;
+	clock_gettime(CLOCK_REALTIME, &res);
+	return 1000000000ULL*res.tv_sec + (tick_t)res.tv_nsec;
+#elif defined(_POSIX_MONOTONIC_CLOCK)
 	timespec t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
-    return (tick_t)t.tv_sec * 1000 * 1000 * 1000 + (tick_t)t.tv_nsec;
+	return (tick_t)t.tv_sec * 1000 * 1000 * 1000 + (tick_t)t.tv_nsec;
 //_POSIX_C_SOURCE is not defined on OSX
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 	timeval t;
@@ -123,13 +127,15 @@ unsigned long Clock::TickU32()
 
 tick_t Clock::TicksPerSec()
 {
-#ifdef _POSIX_MONOTONIC_CLOCK
-    return 1000 * 1000 * 1000;
+#if defined(ANDROID)
+	return 1000000000ULL; // 1e9 == nanoseconds.
+#elif defined(_POSIX_MONOTONIC_CLOCK)
+	return 1000 * 1000 * 1000;
 //_POSIX_C_SOURCE is not defined on OSX
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
-    return 1000 * 1000;
+	return 1000 * 1000;
 #else
-    return 1;
+	return 1;
 #endif
 }
 
