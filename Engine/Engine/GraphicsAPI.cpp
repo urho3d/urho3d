@@ -885,7 +885,7 @@ static void RegisterCustomGeometry(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void DefineVertex(const Vector3&in)", asMETHOD(CustomGeometry, DefineVertex), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void DefineNormal(const Vector3&in)", asMETHOD(CustomGeometry, DefineNormal), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void DefineColor(const Color&in)", asMETHOD(CustomGeometry, DefineColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CustomGeometry", "void DefineTexCoord(const Color&in)", asMETHOD(CustomGeometry, DefineTexCoord), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CustomGeometry", "void DefineTexCoord(const Vector2&in)", asMETHOD(CustomGeometry, DefineTexCoord), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void DefineTangent(const Vector4&in)", asMETHOD(CustomGeometry, DefineTangent), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void Commit()", asMETHOD(CustomGeometry, Commit), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void set_material(Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (Material*), void), asCALL_THISCALL);

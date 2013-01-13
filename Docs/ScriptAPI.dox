@@ -2487,7 +2487,7 @@ Methods:<br>
 - void DefineVertex(const Vector3&)
 - void DefineNormal(const Vector3&)
 - void DefineColor(const Color&)
-- void DefineTexCoord(const Color&)
+- void DefineTexCoord(const Vector2&)
 - void DefineTangent(const Vector4&)
 - void Commit()
 

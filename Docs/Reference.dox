@@ -374,6 +374,8 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
 
+Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem.
+
 \section Scripting_Limitations Limitations
 
 There are some complexities of the scripting system one has to watch out for:
