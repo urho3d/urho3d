@@ -49,7 +49,6 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     sizeMin_(Vector2(0.1f, 0.1f)),
     sizeMax_(Vector2(0.1f, 0.1f)),
     dampingForce_(0.0f),
-    emitterRadius_(0.0f),
     periodTimer_(0.0f),
     emissionTimer_(0.0f),
     activeTime_(0.0f),
@@ -268,6 +267,9 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     if (rootElem.HasChild("emittersize"))
         emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
     
+    if (rootElem.HasChild("emitterradius"))
+        emitterSize_.x_ = rootElem.GetChild("emitterradius").GetFloat("value");
+    
     if (rootElem.HasChild("direction"))
         GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
     
@@ -473,7 +475,7 @@ bool ParticleEmitter::EmitNewParticle()
                 Random(2.0f) - 1.0f
             );
             dir.Normalize();
-            startPos = Random(emitterRadius_) * dir;
+            startPos = Random(emitterSize_.x_) * dir;
         }
         break;
     }

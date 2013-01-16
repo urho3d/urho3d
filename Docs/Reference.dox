@@ -857,6 +857,7 @@ Most of the parameters can take either a single value, or minimum and maximum va
     <sorted enable="true|false" />
     <emittertype value="point|box|sphere" />
     <emittersize value="x y z" />
+    <emitterradius value="x" />
     <direction min="x1 y1 z1" max="x2 y2 z2" />
     <constantforce value="x y z" />
     <dampingforce value="x" />

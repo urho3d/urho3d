@@ -154,8 +154,6 @@ private:
     Vector2 sizeMax_;
     /// Particle velocity damping force.
     float dampingForce_;
-    /// Emitter radius if spherical.
-    float emitterRadius_;
     /// Active/inactive period timer.
     float periodTimer_;
     /// New particle emission timer.
