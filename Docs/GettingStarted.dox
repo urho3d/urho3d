@@ -407,7 +407,7 @@ This example shows how to create an Urho3D C++ application from the ground up. T
 
 For simplicity, the application is assumed to be compiled on Windows and therefore defines the WinMain() function; look at the file Urho3D.cpp in the Urho3D subdirectory on how to handle cross-platform startup using a macro defined in Main.h in the Core library.
 
-To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt %file:
+To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the end of the root directory's CMakeLists.txt %file:
 
 \code
 add_subdirectory (HelloWorld)
@@ -563,7 +563,7 @@ void HelloWorld::CreateObjects()
     Camera* camera = cameraNode->CreateComponent<Camera>();
     cameraNode->SetPosition(Vector3(0.0f, 0.3f, -3.0f));
 
-    GetSubsystem<Renderer>()->SetViewport(0, new Viewport(helloScene_, camera));
+    GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, helloScene_, camera));
 }
 \endcode
 
