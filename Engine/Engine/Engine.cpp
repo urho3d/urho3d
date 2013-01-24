@@ -321,6 +321,8 @@ void Engine::RunFrame()
 {
     assert(initialized_ && !exiting_);
     
+    // Note: there is a minimal performance cost to looking up subsystems (uses a hashmap); if they would be looked up several
+    // times per frame it would be better to cache the pointers
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
     Audio* audio = GetSubsystem<Audio>();
