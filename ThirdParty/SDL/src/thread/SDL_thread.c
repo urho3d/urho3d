@@ -51,13 +51,8 @@ SDL_ThreadsInit(void)
     return (retval);
 }
 
-/* This should never be called...
-   If this is called by SDL_Quit(), we don't know whether or not we should
-   clean up threads here.  If any threads are still running after this call,
-   they will no longer have access to any per-thread data.
- */
-#if 0
-static void
+// Urho3D: SDL_ThreadsQuit() will be called in SDL_Quit() to clean up
+void
 SDL_ThreadsQuit(void)
 {
     SDL_mutex *mutex;
@@ -68,7 +63,6 @@ SDL_ThreadsQuit(void)
         SDL_DestroyMutex(mutex);
     }
 }
-#endif
 
 /* Routines for manipulating the thread list */
 static void

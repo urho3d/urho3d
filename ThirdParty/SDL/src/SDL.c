@@ -40,6 +40,9 @@ extern int SDL_HelperWindowCreate(void);
 extern int SDL_HelperWindowDestroy(void);
 #endif
 
+// Urho3D: added prototype
+void SDL_ThreadsQuit();
+
 
 /* The initialized subsystems */
 static Uint32 SDL_initialized = 0;
@@ -212,6 +215,9 @@ SDL_Quit(void)
     SDL_HelperWindowDestroy();
 #endif
     SDL_QuitSubSystem(SDL_INIT_EVERYTHING);
+
+    // Urho3D: delete threading mutex now
+    SDL_ThreadsQuit();
 
     /* Uninstall any parachute signal handlers */
     SDL_UninstallParachute();

@@ -261,6 +261,23 @@ SDL_SendMouseWheel(SDL_Window * window, int x, int y)
 void
 SDL_MouseQuit(void)
 {
+    // Urho3D: free default cursor on exit
+    SDL_Mouse *mouse = SDL_GetMouse();
+
+    if (!mouse) {
+        return;
+    }
+
+    if(!mouse->def_cursor) {
+        return;
+    }
+
+    if(!mouse->FreeCursor) {
+        return;
+    }
+
+    mouse->FreeCursor(mouse->def_cursor);
+    mouse->def_cursor = 0;
 }
 
 Uint8
