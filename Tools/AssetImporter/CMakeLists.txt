@@ -15,7 +15,7 @@ include_directories (
 
 # Define target & libraries to link
 if (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL")
+    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
 endif ()
 add_executable (${TARGET_NAME} ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Assimp Container Core Graphics IO Math Physics Scene Resource)

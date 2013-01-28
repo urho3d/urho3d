@@ -34,6 +34,10 @@ extern "C" {
 // Need read/close for inotify
 #include "unistd.h"
 }
+#elif defined(__APPLE__) && !defined(IOS)
+extern "C" {
+#include "MacFileWatcher.h"
+}
 #endif
 
 namespace Urho3D
@@ -51,6 +55,8 @@ FileWatcher::FileWatcher(Context* context) :
 #if defined(ENABLE_FILEWATCHER)
 #if defined(__linux__)
     watchHandle_ = inotify_init();
+#elif defined(__APPLE__) && !defined(IOS)
+    supported_ = IsFileWatcherSupported();
 #endif
 #endif
 }
@@ -104,8 +110,6 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         return false;
     }
 #elif defined(__linux__)
-    //String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
-
     int flags = IN_CREATE|IN_DELETE|IN_MODIFY|IN_MOVED_FROM|IN_MOVED_TO;
     int handle;
     dirHandle_;
@@ -151,10 +155,35 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         LOGDEBUG("Started watching path " + pathName);
         return true;
     }
-#endif
+#elif defined(__APPLE__) && !defined(IOS)
+    if (!supported_)
+    {
+        LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
+        return false;        
+    }
+    
+    watcher_ = CreateFileWatcher(pathName.CString(), watchSubDirs);
+    if (watcher_)
+    {
+        path_ = AddTrailingSlash(pathName);
+        watchSubDirs_ = watchSubDirs;
+        Start();
+        
+        LOGDEBUG("Started watching path " + pathName);
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to start watching path " + pathName);
+        return false;
+    }
 #else
     /// \todo Implement on Unix-like systems
     LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
+    return false;
+#endif
+#else
+    LOGDEBUG("FileWatcher feature not enabled");
     return false;
 #endif
 }
@@ -180,6 +209,8 @@ void FileWatcher::StopWatching()
         for (HashMap<int, String>::Iterator i = dirHandle_.Begin(); i != dirHandle_.End(); ++i)
             inotify_rm_watch(watchHandle_, i->first_);
         dirHandle_.Clear();
+        #elif defined(__APPLE__) && !defined(IOS)
+        CloseFileWatcher(watcher_);
         #endif
         
         LOGDEBUG("Stopped watching path " + path_);
@@ -221,13 +252,7 @@ void FileWatcher::ThreadFunction()
                         fileName.AppendUTF8(String::DecodeUTF16(src));
                     
                     fileName = GetInternalPath(fileName);
-                    
-                    {
-                        MutexLock lock(changesMutex_);
-                        // If we have 2 unprocessed modifies in a row into the same file, only record the first
-                        if (changes_.Empty() || changes_.Back() != fileName)
-                            changes_.Push(fileName);
-                    }
+                    AddChange(fileName);
                 }
                 
                 if (!record->NextEntryOffset)
@@ -258,21 +283,35 @@ void FileWatcher::ThreadFunction()
                 {
                     String fileName;
                     fileName = dirHandle_[event->wd] + event->name;
-
-                    {
-                        MutexLock lock(changesMutex_);
-                        // If we have 2 unprocessed modifies in a row into the same file, only record the first
-                        if (changes_.Empty() || changes_.Back() != fileName)
-                            changes_.Push(fileName);
-                    }
+                    AddChange(fileName);
                 }
             }
 
             i += sizeof(inotify_event) + event->len;
         }
     }
+#elif defined(__APPLE__) && !defined(IOS)
+    while (shouldRun_)
+    {
+        String changes = ReadFileWatcher(watcher_);
+        if (!changes.Empty())
+        {
+            Vector<String> fileNames = changes.Split(1);
+            for (unsigned i = 0; i < fileNames.Size(); ++i)
+                AddChange(fileNames[i]);
+        }
+    }
 #endif
 #endif
+}
+
+void FileWatcher::AddChange(const String& fileName)
+{
+    MutexLock lock(changesMutex_);
+    
+    // If we have 2 unprocessed modifies in a row into the same file, only record the first
+    if (changes_.Empty() || changes_.Back() != fileName)
+        changes_.Push(fileName);
 }
 
 bool FileWatcher::GetNextChange(String& dest)

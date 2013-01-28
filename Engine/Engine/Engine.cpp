@@ -588,9 +588,6 @@ void Engine::RegisterSubsystems()
     #ifdef ENABLE_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
     #endif
-    #ifdef ENABLE_LOGGING
-    context_->RegisterSubsystem(new Log(context_));
-    #endif
     context_->RegisterSubsystem(new FileSystem(context_));
     context_->RegisterSubsystem(new ResourceCache(context_));
     context_->RegisterSubsystem(new Network(context_));
@@ -604,6 +601,9 @@ void Engine::RegisterSubsystems()
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new UI(context_));
     context_->RegisterSubsystem(new Audio(context_));
+    #ifdef ENABLE_LOGGING
+    context_->RegisterSubsystem(new Log(context_));
+    #endif
 }
 
 }

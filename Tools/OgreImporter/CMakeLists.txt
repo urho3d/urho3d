@@ -13,6 +13,9 @@ include_directories (
 )
 
 # Define target & libraries to link
+if (APPLE)
+    set (CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreServices")
+endif ()
 add_executable (${TARGET_NAME} ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource)
 finalize_exe ()

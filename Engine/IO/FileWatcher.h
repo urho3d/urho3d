@@ -50,6 +50,8 @@ public:
     bool StartWatching(const String& pathName, bool watchSubDirs);
     /// Stop watching the directory.
     void StopWatching();
+    /// Add a file change into the changes queue.
+    void AddChange(const String& fileName);
     /// Return a file change (true if was found, false if not.)
     bool GetNextChange(String& dest);
     
@@ -70,15 +72,22 @@ private:
 
 #ifdef WIN32
 
-    // Directory handle for the path being watched
+    /// Directory handle for the path being watched.
     void* dirHandle_;
 
 #elif __linux__
 
-    /// HashMap for the directory and sub-directories (needed for inotify's int handles)
+    /// HashMap for the directory and sub-directories (needed for inotify's int handles).
     HashMap<int, String> dirHandle_;
     /// Linux inotify needs a handle.
     int watchHandle_;
+
+#elif defined(__APPLE__) && !defined(IOS)
+    
+    /// Flag indicating whether the running OS supports individual file watching.
+    bool supported_;
+    /// Pointer to internal MacFileWatcher delegate.
+    void* watcher_;
 
 #endif
 };
