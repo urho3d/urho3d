@@ -326,7 +326,7 @@ public:
     operator T* () const { return Get(); }
     
     /// Reset to null and release the weak reference.
-    void Reset() { Release(); }
+    void Reset() { ReleaseRef(); }
     
     /// Perform a static cast from a weak array pointer of another type.
     template <class U> void StaticCast(const WeakArrayPtr<U>& rhs)
