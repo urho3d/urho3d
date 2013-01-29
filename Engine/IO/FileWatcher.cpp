@@ -25,6 +25,7 @@
 #include "FileSystem.h"
 #include "FileWatcher.h"
 #include "Log.h"
+#include "Timer.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -178,7 +179,6 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         return false;
     }
 #else
-    /// \todo Implement on Unix-like systems
     LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
     return false;
 #endif
@@ -293,6 +293,8 @@ void FileWatcher::ThreadFunction()
 #elif defined(__APPLE__) && !defined(IOS)
     while (shouldRun_)
     {
+        Time::Sleep(100);
+
         String changes = ReadFileWatcher(watcher_);
         if (!changes.Empty())
         {
