@@ -69,9 +69,9 @@ public:
     const Matrix3x4& GetInverseWorldTransform() const;
     /// Return zone's own ambient color, disregarding gradient mode.
     const Color& GetAmbientColor() const { return ambientColor_; }
-    /// Return ambient start color.
+    /// Return ambient start color. Not safe to call from worker threads due to possible octree query.
     const Color& GetAmbientStartColor();
-    /// Return ambient end color.
+    /// Return ambient end color. Not safe to call from worker threads due to possible octree query.
     const Color& GetAmbientEndColor();
     /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
@@ -94,7 +94,7 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// Recalculate the ambient gradient colors from neighbor zones.
+    /// Recalculate the ambient gradient colors from neighbor zones. Not safe to call from worker threads due to octree query.
     void UpdateAmbientGradient();
     
     /// Cached inverse world transform matrix.

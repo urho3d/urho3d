@@ -646,7 +646,7 @@ void View::GetDrawables()
         if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
         {
             // Find zone for the drawable if necessary
-            if (!drawable->GetZone() && !cameraZoneOverride_)
+            if ((drawable->IsZoneDirty() || !drawable->GetZone()) && !cameraZoneOverride_)
                 FindZone(drawable);
             
             // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble

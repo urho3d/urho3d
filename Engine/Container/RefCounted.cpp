@@ -33,7 +33,7 @@ RefCounted::RefCounted() :
     refCount_(new RefCount())
 {
     // Hold a weak ref to self to avoid possible double delete of the refcount
-    ++(refCount_->weakRefs_);
+    (refCount_->weakRefs_)++;
 }
 
 RefCounted::~RefCounted()
@@ -44,7 +44,7 @@ RefCounted::~RefCounted()
     
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
     refCount_->refs_ = -1;
-    --(refCount_->weakRefs_);
+    (refCount_->weakRefs_)--;
     if (!refCount_->weakRefs_)
         delete refCount_;
     
@@ -54,13 +54,13 @@ RefCounted::~RefCounted()
 void RefCounted::AddRef()
 {
     assert(refCount_->refs_ >= 0);
-    ++(refCount_->refs_);
+    (refCount_->refs_)++;
 }
 
 void RefCounted::ReleaseRef()
 {
     assert(refCount_->refs_ > 0);
-    --(refCount_->refs_);
+    (refCount_->refs_)--;
     if (!refCount_->refs_)
         delete this;
 }

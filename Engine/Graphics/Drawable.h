@@ -219,6 +219,8 @@ public:
     Zone* GetZone() const;
     /// Return previous zone.
     Zone* GetLastZone() const;
+    /// Return if zone assignment needs re-evaluation.
+    bool IsZoneDirty() const { return zoneDirty_; }
     /// Return distance from camera.
     float GetDistance() const { return distance_; }
     /// Return LOD scaled distance from camera.
@@ -322,8 +324,8 @@ protected:
     const FrameInfo* viewFrame_;
     /// Last view's camera. Not safe to dereference.
     Camera* viewCamera_;
-    /// Zone assignment temporary flag.
-    bool temporaryZone_;
+    /// Zone assignment dirty flag.
+    bool zoneDirty_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

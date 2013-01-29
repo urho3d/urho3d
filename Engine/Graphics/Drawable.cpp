@@ -82,7 +82,7 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     firstLight_(0),
     viewFrame_(0),
     viewCamera_(0),
-    temporaryZone_(false)
+    zoneDirty_(false)
 {
 }
 
@@ -248,7 +248,9 @@ void Drawable::SetZone(Zone* zone, bool temporary)
 {
     zone_ = zone;
     lastZone_ = zone;
-    temporaryZone_ = temporary;
+    
+    // If the zone assignment was temporary (inconclusive) set the dirty flag so that it will be re-evaluated on the next frame
+    zoneDirty_ = temporary;
 }
 
 void Drawable::SetSortValue(float value)
@@ -266,13 +268,6 @@ void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
 {
     if (mainView)
     {
-        // Reset zone assignment now if was temporary
-        if (temporaryZone_)
-        {
-            zone_.Reset();
-            temporaryZone_ = false;
-        }
-        
         viewFrameNumber_ = frame.frameNumber_;
         viewFrame_ = &frame;
         viewCamera_ = frame.camera_;
@@ -364,8 +359,10 @@ void Drawable::OnMarkedDirty(Node* node)
     if (!reinsertionQueued_ && octant_)
         octant_->GetRoot()->QueueReinsertion(this);
     
+    // Mark zone assignment dirty. Due to possibly being called from a worker thread, it is unsafe to manipulate the Zone weak
+    // pointer here
     if (node == node_)
-        zone_.Reset();
+        zoneDirty_ = true;
 }
 
 void Drawable::AddToOctree()

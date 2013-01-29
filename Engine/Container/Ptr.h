@@ -43,22 +43,20 @@ public:
     SharedPtr(const SharedPtr<T>& rhs) :
         ptr_(rhs.ptr_)
     {
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
     }
     
     /// Construct from a raw pointer.
     explicit SharedPtr(T* ptr) :
         ptr_(ptr)
     {
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
     }
     
     /// Destruct. Release the object reference.
     ~SharedPtr()
     {
-        Release();
+        ReleaseRef();
     }
     
     /// Assign from another shared pointer.
@@ -67,11 +65,9 @@ public:
         if (ptr_ == rhs.ptr_)
             return *this;
         
-        Release();
-        
+        ReleaseRef();
         ptr_ = rhs.ptr_;
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
         
         return *this;
     }
@@ -82,11 +78,9 @@ public:
         if (ptr_ == ptr)
             return *this;
         
-        Release();
-        
+        ReleaseRef();
         ptr_ = ptr;
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
         
         return *this;
     }
@@ -109,26 +103,22 @@ public:
     operator T* () const { return ptr_; }
     
     /// Reset to null and release the object reference.
-    void Reset() { Release(); }
+    void Reset() { ReleaseRef(); }
     
     /// Perform a static cast from a shared pointer of another type.
     template <class U> void StaticCast(const SharedPtr<U>& rhs)
     {
-        Release();
-        
+        ReleaseRef();
         ptr_ = static_cast<T*>(rhs.Get());
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
     }
     
     /// Perform a dynamic cast from a shared pointer of another type.
     template <class U> void DynamicCast(const SharedPtr<U>& rhs)
     {
-        Release();
-        
+        ReleaseRef();
         ptr_ = dynamic_cast<T*>(rhs.Get());
-        if (ptr_)
-            ptr_->AddRef();
+        AddRef();
     }
     
     /// Check if the pointer is null.
@@ -150,8 +140,15 @@ private:
     /// Prevent direct assignment from a shared pointer of another type.
     template <class U> SharedPtr<T>& operator = (const SharedPtr<U>& rhs);
     
+    /// Add a reference to the object pointed to.
+    void AddRef()
+    {
+        if (ptr_)
+            ptr_->AddRef();
+    }
+    
     /// Release the object reference and delete it if necessary.
-    void Release()
+    void ReleaseRef()
     {
         if (ptr_)
         {
@@ -191,28 +188,20 @@ public:
     {
     }
     
-    /// Construct from a shared pointer.
-    WeakPtr(const SharedPtr<T>& rhs) :
-        ptr_(rhs.Get()),
-        refCount_(rhs.RefCountPtr())
-    {
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
-    }
-    
     /// Copy-construct from another weak pointer.
     WeakPtr(const WeakPtr<T>& rhs) :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
     {
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
+    }
+    
+    /// Construct from a shared pointer.
+    WeakPtr(const SharedPtr<T>& rhs) :
+        ptr_(rhs.Get()),
+        refCount_(rhs.RefCountPtr())
+    {
+        AddRef();
     }
     
     /// Construct from a raw pointer.
@@ -220,17 +209,13 @@ public:
         ptr_(ptr),
         refCount_(ptr ? ptr->RefCountPtr() : 0)
     {
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
     }
     
     /// Destruct. Release the weak reference to the object.
     ~WeakPtr()
     {
-        Release();
+        ReleaseRef();
     }
     
     /// Assign from a shared pointer.
@@ -239,15 +224,10 @@ public:
         if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
             return *this;
         
-        Release();
-        
+        ReleaseRef();
         ptr_ = rhs.Get();
         refCount_ = rhs.RefCountPtr();
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
         
         return *this;
     }
@@ -258,15 +238,10 @@ public:
         if (ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_)
             return *this;
         
-        Release();
-        
+        ReleaseRef();
         ptr_ = rhs.ptr_;
         refCount_ = rhs.refCount_;
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
         
         return *this;
     }
@@ -279,15 +254,10 @@ public:
         if (ptr_ == ptr && refCount_ == refCount)
             return *this;
         
-        Release();
-        
+        ReleaseRef();
         ptr_ = ptr;
         refCount_ = refCount;
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
         
         return *this;
     }
@@ -346,36 +316,27 @@ public:
     operator T* () const { return Get(); }
     
     /// Reset to null and release the weak reference.
-    void Reset() { Release(); }
+    void Reset() { ReleaseRef(); }
     
     /// Perform a static cast from a weak pointer of another type.
     template <class U> void StaticCast(const WeakPtr<U>& rhs)
     {
-        Release();
-        
+        ReleaseRef();
         ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.refCount_;
-        if (refCount_)
-        {
-            assert(refCount_->weakRefs_ >= 0);
-            ++(refCount_->weakRefs_);
-        }
+        AddRef();
     }
     
     /// Perform a dynamic cast from a weak pointer of another type.
     template <class U> void DynamicCast(const WeakPtr<U>& rhs)
     {
-        Release();
-        
+        ReleaseRef();
         ptr_ = dynamic_cast<T*>(rhs.Get());
+        
         if (ptr_)
         {
             refCount_ = rhs.refCount_;
-            if (refCount_)
-            {
-                assert(refCount_->weakRefs_ >= 0);
-                ++(refCount_->weakRefs_);
-            }
+            AddRef();
         }
         else
             refCount_ = 0;
@@ -408,8 +369,18 @@ private:
     /// Prevent direct assignment from a weak pointer of different type.
     template <class U> WeakPtr<T>& operator = (const WeakPtr<U>& rhs);
     
+    /// Add a weak reference to the object pointed to.
+    void AddRef()
+    {
+        if (refCount_)
+        {
+            assert(refCount_->weakRefs_ >= 0);
+            ++(refCount_->weakRefs_);
+        }
+    }
+    
     /// Release the weak reference. Delete the Refcount structure if necessary.
-    void Release()
+    void ReleaseRef()
     {
         if (refCount_)
         {

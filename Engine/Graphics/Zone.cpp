@@ -192,7 +192,7 @@ bool Zone::IsInside(const Vector3& point) const
 
 void Zone::OnMarkedDirty(Node* node)
 {
-    // Due to the octree query, is not safe from worker threads
+    // Due to the octree query and weak pointer manipulation, is not safe from worker threads
     Scene* scene = GetScene();
     if (scene && scene->IsThreadedUpdate())
     {
