@@ -133,14 +133,9 @@ Octant* Octant::GetOrCreateChild(unsigned index)
 
 void Octant::DeleteChild(unsigned index)
 {
+    assert(index < NUM_OCTANTS);
     delete children_[index];
     children_[index] = 0;
-}
-
-void Octant::DeleteChild(Octant* octant)
-{
-    assert(octant && octant->index_ < NUM_OCTANTS);
-    DeleteChild(octant->index_);
 }
 
 void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize)

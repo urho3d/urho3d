@@ -32,7 +32,7 @@ namespace Urho3D
 
 class FileSystem;
 
-/// Watches a directory and its subdirectories for files being modified
+/// Watches a directory and its subdirectories for files being modified.
 class FileWatcher : public Object, public Thread
 {
     OBJECT(FileWatcher);

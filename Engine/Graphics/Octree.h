@@ -48,8 +48,6 @@ public:
     Octant* GetOrCreateChild(unsigned index);
     /// Delete child octant.
     void DeleteChild(unsigned index);
-    /// Delete child octant by pointer.
-    void DeleteChild(Octant* octant);
     /// Insert a drawable object by checking for fit recursively.
     void InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize);
     /// Check if a drawable object fits.
@@ -121,7 +119,7 @@ protected:
         if (!numDrawables_)
         {
             if (parent)
-                parent->DeleteChild(this);
+                parent->DeleteChild(index_);
         }
         
         if (parent)
