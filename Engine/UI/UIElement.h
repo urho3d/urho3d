@@ -389,6 +389,8 @@ public:
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
+    /// Get color attribute. Uses just the top-left color.
+    const Color& GetColorAttr() const { return color_[0]; }
     
 protected:
     /// Mark screen position as needing an update.

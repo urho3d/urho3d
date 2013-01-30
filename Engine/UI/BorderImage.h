@@ -62,6 +62,10 @@ public:
     void SetTiled(bool enable);
     /// Return whether is tiled.
     bool IsTiled() const { return tiled_; }
+    /// Set blend mode.
+    void SetBlendMode(unsigned mode);
+    /// Return blend mode.
+    unsigned GetBlendMode() const { return blendMode_; }
     
     /// Return texture.
     Texture* GetTexture() const { return texture_; }
@@ -91,6 +95,8 @@ protected:
     IntVector2 hoverOffset_;
     /// Tiled flag.
     bool tiled_;
+    /// Blend mode flag.
+    unsigned blendMode_;
 };
 
 }

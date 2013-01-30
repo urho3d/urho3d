@@ -94,6 +94,11 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
     
     IntVector2 delta = screenPosition - dragBeginCursor_;
+
+    const IntVector2& position_ = GetPosition();
+    const IntVector2& size_ = GetSize();
+    const IntVector2& minSize_ = GetMinSize();
+    const IntVector2& maxSize_ = GetMaxSize();
     
     switch (dragMode_)
     {
@@ -102,12 +107,13 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
         
     case DRAG_RESIZE_TOPLEFT:
-        SetPosition(dragBeginPosition_ + delta);
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), 
+            Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
         SetSize(dragBeginSize_ - delta);
         break;
         
     case DRAG_RESIZE_TOP:
-        SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
+        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
         SetSize(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
         break;
         
@@ -129,12 +135,12 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
         
     case DRAG_RESIZE_BOTTOMLEFT:
-        SetPosition(dragBeginPosition_.x_ + delta.x_, dragBeginPosition_.y_);
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
         break;
         
     case DRAG_RESIZE_LEFT:
-        SetPosition(dragBeginPosition_.x_ + delta.x_, dragBeginPosition_.y_);
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
         break;
 
