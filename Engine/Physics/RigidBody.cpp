@@ -711,6 +711,8 @@ void RigidBody::AddConstraint(Constraint* constraint)
 void RigidBody::RemoveConstraint(Constraint* constraint)
 {
     constraints_.Remove(constraint);
+    // A constraint being removed should possibly cause the object to eg. start falling, so activate
+    Activate();
 }
 
 void RigidBody::ReleaseBody()

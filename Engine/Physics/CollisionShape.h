@@ -44,7 +44,8 @@ class Terrain;
 /// Collision shape type.
 enum ShapeType
 {
-    SHAPE_BOX = 0,
+    SHAPE_NONE = 0,
+    SHAPE_BOX,
     SHAPE_SPHERE,
     SHAPE_CYLINDER,
     SHAPE_CAPSULE,
@@ -129,10 +130,12 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Set as a sphere.
-    void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Remove collision geometry.
+    void Clear();
     /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Set as a sphere.
+    void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cylinder.
     void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a capsule.

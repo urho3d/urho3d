@@ -44,6 +44,7 @@ namespace Urho3D
 
 static const char* typeNames[] =
 {
+    "None",
     "Point",
     "Hinge",
     "Slider",
@@ -56,7 +57,7 @@ OBJECTTYPESTATIC(Constraint);
 Constraint::Constraint(Context* context) :
     Component(context),
     constraint_(0),
-    constraintType_(CONSTRAINT_POINT),
+    constraintType_(CONSTRAINT_NONE),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     otherPosition_(Vector3::ZERO),
@@ -82,7 +83,7 @@ void Constraint::RegisterObject(Context* context)
 {
     context->RegisterFactory<Constraint>();
     
-    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_NONE, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
@@ -161,6 +162,11 @@ void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         physicsWorld_->GetWorld()->debugDrawConstraint(constraint_);
         physicsWorld_->SetDebugRenderer(0);
     }
+}
+
+void Constraint::Clear()
+{
+    SetConstraintType(CONSTRAINT_NONE);
 }
 
 void Constraint::SetConstraintType(ConstraintType type)
@@ -358,10 +364,9 @@ void Constraint::OnNodeSet(Node* node)
             else
                 LOGERROR("No physics world component in scene, can not create constraint");
         }
-        node->AddListener(this);
         
-        // Try to create constraint immediately, may fail if the rigid body component does not exist yet
-        CreateConstraint();
+        node->AddListener(this);
+        cachedWorldScale_ = node->GetWorldScale();
     }
 }
 
@@ -426,16 +431,22 @@ void Constraint::CreateConstraint()
             constraint_ = new btConeTwistConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
+        
+    default:
+        break;
     }
     
-    constraint_->setUserConstraintPtr(this);
-    ownBody_->AddConstraint(this);
-    if (otherBody_)
-        otherBody_->AddConstraint(this);
-    
-    ApplyLimits();
-    
-    physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
+    if (constraint_)
+    {
+        constraint_->setUserConstraintPtr(this);
+        ownBody_->AddConstraint(this);
+        if (otherBody_)
+            otherBody_->AddConstraint(this);
+        
+        ApplyLimits();
+        
+        physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
+    }
 }
 
 void Constraint::ApplyFrames()

@@ -60,6 +60,7 @@ static RigidBody* PhysicsRaycastResultGetRigidBody(PhysicsRaycastResult* ptr)
 static void RegisterCollisionShape(asIScriptEngine* engine)
 {
     engine->RegisterEnum("ShapeType");
+    engine->RegisterEnumValue("ShapeType", "SHAPE_NONE", SHAPE_NONE);
     engine->RegisterEnumValue("ShapeType", "SHAPE_BOX", SHAPE_BOX);
     engine->RegisterEnumValue("ShapeType", "SHAPE_SPHERE", SHAPE_SPHERE);
     engine->RegisterEnumValue("ShapeType", "SHAPE_CYLINDER", SHAPE_CYLINDER);
@@ -70,8 +71,9 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterEnumValue("ShapeType", "SHAPE_TERRAIN", SHAPE_TERRAIN);
     
     RegisterComponent<CollisionShape>(engine, "CollisionShape");
-    engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void Clear()", asMETHOD(CollisionShape, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetBox(const Vector3&in, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetSphere(float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetSphere), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetCylinder(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCylinder), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetCapsule(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCapsule), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetCone(float, float, const Vector3&in pos = Vector3(), const Quaternion&in rot = Quaternion())", asMETHOD(CollisionShape, SetCone), asCALL_THISCALL);
@@ -175,12 +177,14 @@ static void RegisterRigidBody(asIScriptEngine* engine)
 static void RegisterConstraint(asIScriptEngine* engine)
 {
     engine->RegisterEnum("ConstraintType");
+    engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_NONE", CONSTRAINT_NONE);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_POINT", CONSTRAINT_POINT);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_HINGE", CONSTRAINT_HINGE);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_SLIDER", CONSTRAINT_SLIDER);
     engine->RegisterEnumValue("ConstraintType", "CONSTRAINT_CONETWIST", CONSTRAINT_CONETWIST);
     
     RegisterComponent<Constraint>(engine, "Constraint");
+    engine->RegisterObjectMethod("Constraint", "void Clear()", asMETHOD(Constraint, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_constraintType(ConstraintType)", asMETHOD(Constraint, SetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "ConstraintType get_constraintType() const", asMETHOD(Constraint, GetConstraintType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_position(const Vector3&in)", asMETHOD(Constraint, SetPosition), asCALL_THISCALL);

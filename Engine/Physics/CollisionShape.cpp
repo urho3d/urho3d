@@ -56,6 +56,7 @@ static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
 static const char* typeNames[] = 
 {
+    "None",
     "Box",
     "Sphere",
     "Cylinder",
@@ -255,7 +256,7 @@ OBJECTTYPESTATIC(CollisionShape);
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     shape_(0),
-    shapeType_(SHAPE_BOX),
+    shapeType_(SHAPE_NONE),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     size_(Vector3::ONE),
@@ -278,7 +279,7 @@ void CollisionShape::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape>();
     
-    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
+    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
@@ -338,6 +339,15 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         
         physicsWorld_->SetDebugRenderer(0);
     }
+}
+
+void CollisionShape::Clear()
+{
+    shapeType_ = SHAPE_NONE;
+    
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
 }
 
 void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation)
@@ -626,13 +636,12 @@ void CollisionShape::OnNodeSet(Node* node)
             else
                 LOGERROR("No physics world component in scene, can not create collision shape");
         }
+        
         node->AddListener(this);
+        cachedWorldScale_ = node->GetWorldScale();
         
         // Terrain collision shape depends on the terrain component's geometry updates. Subscribe to them
         SubscribeToEvent(node, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
-        
-        UpdateShape();
-        NotifyRigidBody();
     }
 }
 
@@ -787,6 +796,9 @@ void CollisionShape::UpdateShape()
                         newWorldScale * size_));
                 }
             }
+            break;
+            
+        default:
             break;
         }
         
