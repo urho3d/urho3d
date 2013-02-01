@@ -304,25 +304,18 @@ bool Serializable::LoadXML(const XMLElement& source)
                 if (attr.enumNames_)
                 {
                     const char* value = attrElem.GetAttribute("value");
-                    String enumString = attrElem.GetAttribute("enum");  // Optional
-                    bool enumFound = !enumString.Empty();
-                    int enumValue;
-                    if (enumFound)
-                        enumValue = ToInt(enumString);
-                    else
+                    bool enumFound = false;
+                    int enumValue = 0;
+                    const char** enumPtr = attr.enumNames_;
+                    while (*enumPtr)
                     {
-                        enumValue = 0;
-                        const char** enumPtr = attr.enumNames_;
-                        while (*enumPtr)
+                        if (!String::Compare(*enumPtr, value, false))
                         {
-                            if (!String::Compare(*enumPtr, value, false))
-                            {
-                                enumFound = true;
-                                break;
-                            }
-                            ++enumPtr;
-                            ++enumValue;
+                            enumFound = true;
+                            break;
                         }
+                        ++enumPtr;
+                        ++enumValue;
                     }
                     if (enumFound)
                         OnSetAttribute(attr, Variant(enumValue));
@@ -379,7 +372,6 @@ bool Serializable::SaveXML(XMLElement& dest)
         {
             int enumValue = value.GetInt();
             attrElem.SetAttribute("value", attr.enumNames_[enumValue]);
-            attrElem.SetInt("enum", enumValue);
         }
         else
             attrElem.SetVariantValue(value);
