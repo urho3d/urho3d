@@ -689,7 +689,7 @@ The optional "litbase" pass reduces draw call count by combining ambient lightin
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. If size definition is omitted, it will match the destination rendertarget size. For an example of rendertarget definitions, see the inbuilt bloom effect in Bin/Data/PostProcess/Bloom.xml.
+A rendertarget's size can be either absolute, divide the destination viewport size, or divide the destination rendertarget size. For an example of rendertarget definitions, see the inbuilt bloom effect in Bin/Data/PostProcess/Bloom.xml.
 
 The available commands are:
 
