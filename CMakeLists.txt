@@ -20,10 +20,12 @@ if (IOS)
     set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
     set (CMAKE_OSX_SYSROOT "iphoneos")	# Set to "Latest iOS"
 elseif (APPLE)
-    # MacOSX-specific setup
-    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-    set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
-    #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
+    if (CMAKE_GENERATOR STREQUAL "Xcode")
+        # MacOSX-specific setup
+        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+        set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
+        #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
+    endif ()
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
