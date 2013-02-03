@@ -164,10 +164,8 @@ Graphics::Graphics(Context* context_) :
     deferredSupport_(false),
     anisotropySupport_(false),
     dxtTextureSupport_(false),
-    #ifdef GL_ES_VERSION_2_0
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
-    #endif
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
