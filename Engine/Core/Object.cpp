@@ -200,15 +200,12 @@ void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& excepti
             else
                 context_->RemoveEventReceiver(this, handler->GetEventType());
             
-            EventHandler* next = eventHandlers_.Next(handler);
             eventHandlers_.Erase(handler, previous);
-            handler = next;
         }
         else
-        {
             previous = handler;
-            handler = eventHandlers_.Next(handler);
-        }
+
+        handler = next;
     }
 }
 

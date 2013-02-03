@@ -418,10 +418,12 @@ private:
     bool anisotropySupport_;
     /// DXT format support flag.
     bool dxtTextureSupport_;
+    #ifdef GL_ES_VERSION_2_0
     /// ETC1 format support flag.
     bool etcTextureSupport_;
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_;
+    #endif
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

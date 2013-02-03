@@ -81,10 +81,6 @@ private:
     Vector3 targetPosition_;
     /// Target rotation.
     Quaternion targetRotation_;
-    /// Smoothing constant.
-    float smoothingConstant_;
-    /// Position snap threshold.
-    float snapThreshold_;
     /// Active smoothing operations bitmask.
     unsigned char smoothingMask_;
     /// Subscribed to smoothing update event flag.

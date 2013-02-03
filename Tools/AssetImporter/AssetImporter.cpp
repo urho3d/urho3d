@@ -63,9 +63,9 @@ using namespace Urho3D;
 struct OutModel
 {
     OutModel() :
+        rootBone_(0),
         totalVertices_(0),
-        totalIndices_(0),
-        rootBone_(0)
+        totalIndices_(0)
     {
     }
     
@@ -591,7 +591,6 @@ void BuildBoneCollisionInfo(OutModel& model)
             unsigned boneIndex = GetBoneIndex(model, boneName);
             if (boneIndex == M_MAX_UNSIGNED)
                 continue;
-            aiNode* boneNode = model.bones_[boneIndex];
             for (unsigned k = 0; k < bone->mNumWeights; ++k)
             {
                 float weight = bone->mWeights[k].mWeight;
@@ -1063,12 +1062,12 @@ void BuildAndSaveScene(OutScene& scene)
     SharedPtr<Scene> outScene(new Scene(context_));
     
     /// \todo Make the physics properties configurable
-    PhysicsWorld* physicsWorld = outScene->CreateComponent<PhysicsWorld>();
+    outScene->CreateComponent<PhysicsWorld>();
     
     /// \todo Make the octree properties configurable, or detect from the scene contents
-    Octree* octree = outScene->CreateComponent<Octree>();
+    outScene->CreateComponent<Octree>();
     
-    DebugRenderer* debug = outScene->CreateComponent<DebugRenderer>();
+    outScene->CreateComponent<DebugRenderer>();
     
     if (createZone_)
     {

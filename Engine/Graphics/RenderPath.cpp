@@ -147,6 +147,9 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
             }
         }
         break;
+    
+    default:
+        break;
     }
     
     // By default use 1 output, which is the viewport

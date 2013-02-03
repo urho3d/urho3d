@@ -204,11 +204,6 @@ The Urho3D target will actually build the application bundle and copy resources
 from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose
 debug or release mode.
 
-Note that due to a CMake / Xcode bug, you may need to modify and save Urho3D.cpp
-after modifying any of the libraries to get Xcode to re-link the executable.
-Do this also if you modify the data files and get an error about resources
-having been added or modified after signing.
-
 
 History
 -------

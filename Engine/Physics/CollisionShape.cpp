@@ -682,6 +682,9 @@ void CollisionShape::OnMarkedDirty(Node* node)
                 shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
                     newWorldScale * size_));
             }
+        
+        default:
+            break;
         }
         
         NotifyRigidBody();

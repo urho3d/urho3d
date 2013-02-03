@@ -31,17 +31,12 @@
 namespace Urho3D
 {
 
-static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
-static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
-
 OBJECTTYPESTATIC(SmoothedTransform);
 
 SmoothedTransform::SmoothedTransform(Context* context) :
     Component(context),
     targetPosition_(Vector3::ZERO),
     targetRotation_(Quaternion::IDENTITY),
-    smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
-    snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     smoothingMask_(SMOOTH_NONE),
     subscribed_(false)
 {

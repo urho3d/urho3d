@@ -147,12 +147,12 @@ struct RenderPathCommand
     bool useFogColor_;
     /// Mark to stencil flag.
     bool markToStencil_;
-    /// Vertex lights flag.
-    bool vertexLights_;
     /// Use lit base pass optimization for forward per-pixel lights.
     bool useLitBase_;
     /// Scissor optimization flag.
     bool useScissor_;
+    /// Vertex lights flag.
+    bool vertexLights_;
     /// Vertex shader name.
     String vertexShaderName_;
     /// Pixel shader name.

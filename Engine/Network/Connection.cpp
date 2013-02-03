@@ -1002,10 +1002,9 @@ bool Connection::IsConnected() const
 
 String Connection::GetAddress() const
 {
-    const unsigned char* ip = connection_->RemoteEndPoint().ip;
-    char str[256];
-    sprintf(str, "%d.%d.%d.%d", (unsigned)ip[0], (unsigned)ip[1], (unsigned)ip[2], (unsigned)ip[3]);
-    return String(str);
+    kNet::EndPoint endPoint = connection_->RemoteEndPoint();
+    ///\todo Not IPv6-capable.
+    return Urho3D::ToString("%d.%d.%d.%d", endPoint.ip[0], endPoint.ip[1], endPoint.ip[2], endPoint.ip[3]);
 }
 
 unsigned short Connection::GetPort() const

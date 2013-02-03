@@ -230,6 +230,9 @@ void Constraint::SetAxis(const Vector3& axis)
     case CONSTRAINT_CONETWIST:
         rotation_ = Quaternion(Vector3::RIGHT, axis);
         break;
+
+    default:
+        break;
     }
     
     ApplyFrames();
@@ -268,6 +271,9 @@ void Constraint::SetOtherAxis(const Vector3& axis)
     case CONSTRAINT_SLIDER:
     case CONSTRAINT_CONETWIST:
         otherRotation_ = Quaternion(Vector3::RIGHT, axis);
+        break;
+    
+    default:
         break;
     }
     
