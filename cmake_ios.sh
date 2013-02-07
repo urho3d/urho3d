@@ -1,9 +1,11 @@
 rm -f CMakeCache.txt
 cmake -G "Xcode" -DIOS=1
-sed -i.bak 's/lastKnownFileType = sourcecode; name = "as_callfunc_arm_xcode.S"/lastKnownFileType = sourcecode.asm; name = "as_callfunc_arm_xcode.S"/g' Urho3D.xcodeproj/project.pbxproj
 sed -i.bak 's/OpenGL/Direct3D9/g' Doxyfile
 #
-# Below two empty files when present will force Xcode to always relink the executable and always copy resource folders on each builds, respectively
-# Removed these empty files in the project folder and commented out these two commands below, if this is not desirable on slower machine
-touch IOS_FORCE_COPY_RESOURCES 
-touch IOS_FORCE_LINK
+# Below fix may no longer be required for newer version of CMake.
+sed -i.bak 's/lastKnownFileType = sourcecode; name = "as_callfunc_arm_xcode.S"/lastKnownFileType = sourcecode.asm; name = "as_callfunc_arm_xcode.S"/g' Urho3D.xcodeproj/project.pbxproj
+#
+# Due to a bug in the CMake/Xcode generator where it has a wrong assumption of the IOS bundle structure which is slightly different from MacOSX bundle structure,
+# below temporary fix is required to solve the auto-linking issue when dependent libraries is changed.
+sed -i.bak 's/\/Contents\/MacOS//g' CMakeScripts/XCODE_DEPEND_HELPER.make
+echo -e "\tsed -i.bak 's/\/Contents\/MacOS//g' CMakeScripts/XCODE_DEPEND_HELPER.make" >> CMakeScripts/ReRunCMake.make

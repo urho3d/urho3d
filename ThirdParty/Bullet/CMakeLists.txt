@@ -16,9 +16,8 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-# Include directories
-include_directories (src)
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY src)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-finalize_lib ()
+# Setup target
+setup_library ()

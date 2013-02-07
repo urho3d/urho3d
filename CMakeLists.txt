@@ -19,13 +19,11 @@ if (IOS)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
     set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
     set (CMAKE_OSX_SYSROOT "iphoneos")	# Set to "Latest iOS"
-elseif (APPLE)
-    if (CMAKE_GENERATOR STREQUAL "Xcode")
-        # MacOSX-specific setup
-        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-        set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
-        #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
-    endif ()
+elseif (CMAKE_GENERATOR STREQUAL "Xcode")
+    # MacOSX-Xcode-specific setup
+    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+    set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
+    #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
@@ -108,19 +106,34 @@ macro (enable_pch)
     endif ()
 endmacro ()
 
-# Macro for exe finalization
-macro (finalize_exe)
+# Macro for setting up dependency lib for compilation and linking of a target
+macro (setup_target)
+    # Include directories
+    include_directories (${LIBS} ${INCLUDE_DIRS_ONLY})
+    # Link libraries
+    string (REGEX REPLACE "\\.\\./|ThirdParty/|Engine/|/include|/src" "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
+    target_link_libraries (${TARGET_NAME} ${STRIP_LIBS})
+endmacro ()
+
+# Macro for setting up an executable target
+macro (setup_executable)
+    add_executable (${TARGET_NAME} ${EXE_TYPE} ${SOURCE_FILES})
+    setup_target ()
     if (MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" ${PROJECT_SOURCE_DIR}/Bin)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" ${PROJECT_SOURCE_DIR}/Bin)
-    elseif (NOT IOS)
+    elseif (IOS)
+        set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
+    else ()
         get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_SOURCE_DIR}/Bin)
     endif ()
 endmacro ()
 
-# Macro for lib finalization
-macro (finalize_lib)
+# Macro for setting up a library target
+macro (setup_library)
+    add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
+    setup_target ()
 endmacro ()
 
 # Add SDL as a global include directory

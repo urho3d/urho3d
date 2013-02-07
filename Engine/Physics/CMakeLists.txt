@@ -6,15 +6,9 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-# Include directories
-include_directories (
-    ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene 
-    ../../ThirdParty/Bullet/src ../../ThirdParty/StanHull
-)
+# Define dependency libs
+set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../../ThirdParty/Bullet/src ../../ThirdParty/StanHull)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Bullet Container Core Graphics IO Math Resource Scene
-    StanHull)
+# Setup target
 enable_pch ()
-finalize_lib ()
+setup_library ()

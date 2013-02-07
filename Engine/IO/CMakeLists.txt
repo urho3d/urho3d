@@ -11,13 +11,9 @@ endif()
 
 set (SOURCE_FILES ${CPP_FILES} ${C_FILES} ${H_FILES})
 
-# Include directories
-include_directories (
-    ../Container ../Core ../Math
-)
+# Define dependency libs
+set (LIBS ../Container ../Core ../Math)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Math)
+# Setup target
 enable_pch ()
-finalize_lib ()
+setup_library ()

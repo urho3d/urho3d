@@ -6,27 +6,24 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-# Include directories
-include_directories (
-    ../Container ../Math ../../ThirdParty/LibCpuId/libcpuid
-)
-
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Math)
+# Define dependency libs
+set (LIBS ../Container ../Math)
 
 if (NOT IOS)
-    target_link_libraries (${TARGET_NAME} LibCpuId)
+    set (INCLUDE_DIRS_ONLY ../../ThirdParty/LibCpuId/libcpuid)
+    set (LINK_LIBS_ONLY LibCpuId)
 endif ()
 
 if (WIN32)
-    target_link_libraries (${TARGET_NAME} winmm.lib)
+    set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} winmm.lib)
     if (ENABLE_MINIDUMPS)
-        target_link_libraries (${TARGET_NAME} dbghelp.lib)
+        set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dbghelp.lib)
     endif ()
 else ()
-    target_link_libraries (${TARGET_NAME} pthread)
+    set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
 endif ()
 
+# Setup target
 enable_pch ()
-finalize_lib ()
+setup_library ()
+

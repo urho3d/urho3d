@@ -71,5 +71,3 @@ elseif (APPLE)
 else ()
     target_link_libraries (${TARGET_NAME} dl pthread GL)
 endif ()
-
-finalize_lib ()

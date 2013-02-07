@@ -11,6 +11,5 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1 -TP)
 endif(MSVC)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-finalize_lib ()
+# Setup target
+setup_library ()

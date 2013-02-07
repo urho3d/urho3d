@@ -15,26 +15,19 @@ endif ()
 
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${SYS_CPP_FILES} ${SYS_H_FILES})
 
-# Include directories
-include_directories (
-    . ../Container ../Core ../IO ../Math ../Resource ../Scene
-)
-
-if (USE_OPENGL AND NOT IOS)
-    include_directories (../../ThirdParty/GLee)
-endif ()
-
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene SDL)
+# Define dependency libs
+set (LIBS ../Container ../Core ../IO ../Math ../Resource ../Scene)
+set (INCLUDE_DIRS_ONLY .)
+set (LINK_LIBS_ONLY SDL)
 
 if (USE_OPENGL)
     if (NOT IOS)
-        target_link_libraries (${TARGET_NAME} GLee)
-    endif ()
+        set (LIBS ${LIBS} ../../ThirdParty/GLee)
+    endif()
 else ()
-    target_link_libraries (${TARGET_NAME} d3d9.lib)
+    set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} d3d9.lib)
 endif ()
 
+# Setup target
 enable_pch ()
-finalize_lib ()
+setup_library ()

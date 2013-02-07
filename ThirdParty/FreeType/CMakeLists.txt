@@ -44,9 +44,8 @@ set (SOURCE_FILES
     src/type42/type42.c
     src/winfonts/winfnt.c)
 
-# Include directories
-include_directories (include)
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY include)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-finalize_lib ()
+# Setup target
+setup_library ()

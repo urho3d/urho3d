@@ -12,11 +12,8 @@ file (GLOB H_FILES
 
 set (SOURCE_FILES ${C_FILES} ${H_FILES})
 
-# Include directories
-include_directories (
-    libcpuid
-)
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY libcpuid)
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-finalize_lib ()
+# Setup target
+setup_library ()
