@@ -542,6 +542,27 @@ bool Image::SaveBMP(const String& fileName)
         return false;
 }
 
+bool Image::SavePNG(const String& fileName)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to PNG");
+        return false;
+    }
+    
+    if (data_)
+        return stbi_write_png(fileName.CString(), width_, height_, components_, data_.Get(), 0) != 0;
+    else
+        return false;
+}
+
 bool Image::SaveTGA(const String& fileName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();

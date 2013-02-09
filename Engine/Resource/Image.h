@@ -102,6 +102,8 @@ public:
     void FlipVertical();
     /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName);
+    /// Save in PNG format. Return true if successful.
+    bool SavePNG(const String& fileName);
     /// Save in TGA format. Return true if successful.
     bool SaveTGA(const String& fileName);
     /// Save in JPG format with compression quality. Return true if successful.

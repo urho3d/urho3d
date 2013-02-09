@@ -1151,6 +1151,7 @@ Methods:<br>
 - bool Save(File@)
 - void FlipVertical()
 - void SaveBMP(const String&)
+- void SavePNG(const String&)
 - void SaveTGA(const String&)
 - void SaveJPG(const String&, int)
 
