@@ -28,7 +28,7 @@ vec3 DecodeNormal(vec4 normalInput)
         normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
         return normal;
     #else
-        return normalize(normalInput.rgb);
+        return normalize(normalInput.rgb * 2.0 - 1.0);
     #endif
 }
 
