@@ -38,7 +38,7 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 On Windows, using other compilers than Visual Studio is not officially supported. MinGW may work (cmake -G "MinGW Makefiles"), but may lack required DirectX headers. They can be copied to a MinGW installation from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
-When using Xcode on Mac OS X, select the i386 architecture before building. Compiling Urho3D as 64-bit is not supported.
+When using Xcode on Mac OS X, select the i386 architecture before building (CMake should already select this when generating the Xcode project). Compiling Urho3D as 64-bit is not supported.
 
 After the build is complete, the programs can be run from the Bin directory.
 
@@ -70,7 +70,7 @@ By default the Android package for Urho3D is com.googlecode.urho3d. For a real a
 
 Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
 
-Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK. In Code Signing, enter your developer identity as necessary.
+Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK (CMake would automatically select latest iOS when generating the Xcode project). In Code Signing, enter your developer identity as necessary.
 
 The Urho3D target will actually build the application bundle and copy resources from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose debug or release mode.
 
@@ -398,6 +398,24 @@ Note that to get the ESC keypress without having to poll it for each frame, we c
 
 The example application is now complete. To try it out, save it as HelloWorld.as in the Bin/Data/Scripts directory, then run Urho3D.exe Scripts/HelloWorld.as
 
+\section Xcode_AngleScript_Info Mac OS X specific - How to view/edit AngelScript within Xcode
+
+By default Mac OS X recognizes file having extension .as as 'AppleSingle Archive'. So, even after associating this file type to always open with Xcode, Xcode is still not able to view/edit the content of the file correctly. In order to view/edit the scripts, after launching the Urho3D project in Xcode, select the .as file(s) in the Project Navigator and then in the %File Inspector (right panel) change the file type from 'Default - AppleSingle archive' to 'C++ Source' in the %File Type drop down list. The current editor view usually does not refresh its content after this change. Selecting another file in the Project Navigator then reselecting the .as file should force the editor to reload and show the .as file correctly afterwards.
+
+The drawback of the above approach is, Xcode does not remember it. The steps needs to be carried out each time Xcode is relaunched.
+
+To solve this permanently, we need to 'hack' the system a little bit to 'fool' Xcode to always treat .as file as one of the C++ source files. Execute the following commands in a terminal as normal user. These commands have been verified on Lion.
+
+\code
+$ cd /System/Library/CoreServices/CoreTypes.bundle/Contents
+$ plutil -convert xml1 Info.plist -o /tmp/Info.plist.xml
+$ sed -i.bak "s/<string>cxx<\/string>/<string>cxx<\/string>\\`echo -e '\n\r'`<string>as<\/string>/g" /tmp/Info.plist.xml
+$ sudo cp -p Info.plist{,.ori}
+$ sudo plutil -convert binary1 /tmp/Info.plist.xml -o Info.plist
+$ find /System/Library/Frameworks -type f -name lsregister -exec {} -kill -r -domain local -domain system -domain user -domain network \;
+\endcode
+
+The last command resets the launch service database and rebuilds it, so the changes should take effect immediately when Xcode restarts.
 
 \page CppQuickstart Quickstart in C++
 

@@ -142,7 +142,8 @@ supported. MinGW may work (cmake -G "MinGW Makefiles"), but may lack required
 DirectX headers. They can be copied to a MinGW installation from the following 
 package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
-When using Xcode on Mac OS X, select the i386 architecture before building.
+When using Xcode on Mac OS X, select the i386 architecture before building 
+(CMake should already select this when generating the Xcode project). 
 Compiling Urho3D as 64-bit is not supported.
 
 After the build is complete, the programs can be run from the Bin directory.
@@ -197,7 +198,8 @@ iOS build process
 Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
 
 Open the Xcode project and check the properties for the Urho3D project (topmost
-in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK.
+in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK
+(CMake would automatically select latest iOS when generating the Xcode project).
 In Code Signing, enter your developer identity as necessary.
 
 The Urho3D target will actually build the application bundle and copy resources
