@@ -93,7 +93,7 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     index_(index)
 {
     center_ = worldBoundingBox_.Center();
-    halfSize_ = worldBoundingBox_.Size() * 0.5f;
+    halfSize_ = 0.5f * worldBoundingBox_.Size();
     cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
@@ -185,14 +185,12 @@ bool Octant::CheckDrawableFit(const BoundingBox& box) const
     // Also check if the box can not fit a possible child octant's culling box
     else
     {
-        Vector3 octantSize = worldBoundingBox_.Size();
-        
-        if (box.min_.x_ <= worldBoundingBox_.min_.x_ - octantSize.x_ * 0.25f ||
-            box.max_.x_ >= worldBoundingBox_.max_.x_ + octantSize.x_ * 0.25f ||
-            box.min_.y_ <= worldBoundingBox_.min_.y_ - octantSize.y_ * 0.25f ||
-            box.max_.y_ >= worldBoundingBox_.max_.y_ + octantSize.y_ * 0.25f ||
-            box.min_.z_ <= worldBoundingBox_.min_.z_ - octantSize.z_ * 0.25f ||
-            box.max_.z_ >= worldBoundingBox_.max_.z_ + octantSize.z_ * 0.25f)
+        if (box.min_.x_ <= worldBoundingBox_.min_.x_ - 0.5f * halfSize_.x_ ||
+            box.max_.x_ >= worldBoundingBox_.max_.x_ + 0.5f * halfSize_.x_ ||
+            box.min_.y_ <= worldBoundingBox_.min_.y_ - 0.5f * halfSize_.y_ ||
+            box.max_.y_ >= worldBoundingBox_.max_.y_ + 0.5f * halfSize_.y_ ||
+            box.min_.z_ <= worldBoundingBox_.min_.z_ - 0.5f * halfSize_.z_ ||
+            box.max_.z_ >= worldBoundingBox_.max_.z_ + 0.5f * halfSize_.z_)
             return true;
     }
     
@@ -388,10 +386,10 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
     
-    Vector3 halfSize = box.Size() * 0.5f;
-    
     worldBoundingBox_ = box;
-    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize, worldBoundingBox_.max_ + halfSize);
+    center_ = box.Center();
+    halfSize_ = 0.5f * box.Size();
+    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
     numDrawables_ = drawables_.Size();
     numLevels_ = numLevels;
 }
