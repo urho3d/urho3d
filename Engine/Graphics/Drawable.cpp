@@ -372,10 +372,7 @@ void Drawable::AddToOctree()
     {
         Octree* octree = scene->GetComponent<Octree>();
         if (octree)
-        {
-            const BoundingBox& box = GetWorldBoundingBox();
-            octree->InsertDrawable(this, box.Center(), box.Size());
-        }
+            octree->InsertDrawable(this);
     }
 }
 

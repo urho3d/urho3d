@@ -175,8 +175,6 @@ public:
     Plane planes_[NUM_FRUSTUM_PLANES];
     /// Frustum vertices.
     Vector3 vertices_[NUM_FRUSTUM_VERTICES];
-    /// Defined flag.
-    bool defined_;
 };
 
 }

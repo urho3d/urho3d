@@ -23,11 +23,13 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Log.h"
 #include "Profiler.h"
 #include "Octree.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
+#include "StringUtils.h"
 #include "WorkQueue.h"
 
 #include "DebugNew.h"
@@ -138,12 +140,19 @@ void Octant::DeleteChild(unsigned index)
     children_[index] = 0;
 }
 
-void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize)
+void Octant::InsertDrawable(Drawable* drawable)
 {
-    // If size OK or outside, stop recursion & insert here. Also, if drawable is not occluded, must stay in the root octant
-    // so that hierarchic octant occlusion does not erroneously hide the drawable
-    if ((!drawable->IsOccludee() && this == root_) || CheckDrawableSize(boxSize) ||
-        cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
+    const BoundingBox& box = drawable->GetWorldBoundingBox();
+    
+    // If root octant, insert all non-occludees here, so that octant occlusion does not hide the drawable.
+    // Also if drawable is outside the root octant bounds, insert to root
+    bool insertHere;
+    if (this == root_)
+        insertHere = !drawable->IsOccludee() || cullingBox_.IsInside(box) != INSIDE || CheckDrawableFit(box);
+    else
+        insertHere = CheckDrawableFit(box);
+    
+    if (insertHere)
     {
         Octant* oldOctant = drawable->octant_;
         if (oldOctant != this)
@@ -153,22 +162,42 @@ void Octant::InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const 
             if (oldOctant)
                 oldOctant->RemoveDrawable(drawable, false);
         }
-        return;
     }
-    
-    unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
-    unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
-    unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
-    GetOrCreateChild(x + y + z)->InsertDrawable(drawable, boxCenter, boxSize);
+    else
+    {
+        Vector3 boxCenter = box.Center();
+        unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
+        unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
+        unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
+        
+        GetOrCreateChild(x + y + z)->InsertDrawable(drawable);
+    }
 }
 
-bool Octant::CheckDrawableSize(const Vector3& boxSize) const
+bool Octant::CheckDrawableFit(const BoundingBox& box) const
 {
-    // If max split level, size always OK
-    if (level_ != root_->GetNumLevels())
-        return boxSize.x_ >= halfSize_.x_ || boxSize.y_ >= halfSize_.y_ || boxSize.z_ >= halfSize_.z_;
-    else
+    // If max split level, size always OK, otherwise check that box is at least half size of octant
+    Vector3 boxSize = box.Size();
+    
+    if (level_ >= root_->GetNumLevels() || boxSize.x_ >= halfSize_.x_ || boxSize.y_ >= halfSize_.y_ ||
+        boxSize.z_ >= halfSize_.z_)
         return true;
+    // Also check if the box can not fit a possible child octant's culling box
+    else
+    {
+        Vector3 octantSize = worldBoundingBox_.Size();
+        
+        if (box.min_.x_ <= worldBoundingBox_.min_.x_ - octantSize.x_ * 0.25f ||
+            box.max_.x_ >= worldBoundingBox_.max_.x_ + octantSize.x_ * 0.25f ||
+            box.min_.y_ <= worldBoundingBox_.min_.y_ - octantSize.y_ * 0.25f ||
+            box.max_.y_ >= worldBoundingBox_.max_.y_ + octantSize.y_ * 0.25f ||
+            box.min_.z_ <= worldBoundingBox_.min_.z_ - octantSize.z_ * 0.25f ||
+            box.max_.z_ >= worldBoundingBox_.max_.z_ + octantSize.z_ * 0.25f)
+            return true;
+    }
+    
+    // Should create a child octant
+    return false;
 }
 
 void Octant::ResetRoot()
@@ -581,33 +610,27 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
         Drawable* drawable = *i;
         if (!drawable)
             continue;
-        Octant* octant = drawable->GetOctant();
-        if (!octant)
-            continue;
-        
-        const BoundingBox& box = drawable->GetWorldBoundingBox();
-        Vector3 boxCenter = box.Center();
-        Vector3 boxSize = box.Size();
-        
-        if (octant == this)
-        {
-            // Handle root octant as special case: if outside the root, do not reinsert
-            if (GetCullingBox().IsInside(box) == INSIDE && !CheckDrawableSize(boxSize))
-                InsertDrawable(drawable, boxCenter, boxSize);
-        }
-        else
-        {
-            // Break if drawable no longer belongs to this octree (could theoretically happen as we do not explicitly clean up
-            // drawables from the reinsertion list as they leave the octree)
-            if (octant->GetRoot() != this)
-                continue;
-            
-            // Otherwise reinsert if outside current octant or if size does not fit octant size
-            if (octant->GetCullingBox().IsInside(box) != INSIDE || !octant->CheckDrawableSize(boxSize))
-                InsertDrawable(drawable, boxCenter, boxSize);
-        }
         
         drawable->reinsertionQueued_ = false;
+        Octant* octant = drawable->GetOctant();
+        const BoundingBox& box = drawable->GetWorldBoundingBox();
+        
+        // Skip if no octant or does not belong to this octree anymore
+        if (!octant || octant->GetRoot() != this)
+            continue;
+        // Skip if still fits the current octant
+        if (drawable->IsOccludee() && octant->GetCullingBox().IsInside(box) == INSIDE && octant->CheckDrawableFit(box))
+            continue;
+        
+        InsertDrawable(drawable);
+        
+        #ifdef _DEBUG
+        // Verify that the drawable will be culled correctly
+        octant = drawable->GetOctant();
+        if (octant != this && octant->GetCullingBox().IsInside(box) != INSIDE)
+            LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() + " octant box " +
+                octant->GetCullingBox().ToString());
+        #endif
     }
     
     drawableReinsertions_.Clear();

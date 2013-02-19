@@ -49,9 +49,9 @@ public:
     /// Delete child octant.
     void DeleteChild(unsigned index);
     /// Insert a drawable object by checking for fit recursively.
-    void InsertDrawable(Drawable* drawable, const Vector3& boxCenter, const Vector3& boxSize);
+    void InsertDrawable(Drawable* drawable);
     /// Check if a drawable object fits.
-    bool CheckDrawableSize(const Vector3& boxSize) const;
+    bool CheckDrawableFit(const BoundingBox& box) const;
     
     /// Add a drawable object to this octant.
     void AddDrawable(Drawable* drawable)

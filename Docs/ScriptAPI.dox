@@ -537,6 +537,7 @@ Methods:<br>
 - BoundingBox Transformed(const Matrix3&) const
 - BoundingBox Transformed(const Matrix3x4&) const
 - Rect Projected(const Matrix4&) const
+- String ToString() const
 
 Properties:<br>
 - Vector3 center (readonly)
@@ -565,7 +566,6 @@ Methods:<br>
 
 Properties:<br>
 - Vector3[] vertices (readonly)
-- bool defined
 
 
 Polyhedron

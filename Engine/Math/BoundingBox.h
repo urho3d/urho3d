@@ -298,6 +298,9 @@ public:
     /// Test if a sphere is (partially) inside or outside.
     Intersection IsInsideFast(const Sphere& sphere) const;
     
+    /// Return as string.
+    String ToString() const;
+    
     /// Minimum vector.
     Vector3 min_;
     /// Maximum vector.

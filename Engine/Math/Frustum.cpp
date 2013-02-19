@@ -54,8 +54,7 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
     rect.Merge(Vector2(tV1.x_, tV1.y_));
 }
 
-Frustum::Frustum() :
-    defined_(false)
+Frustum::Frustum()
 {
 }
 
@@ -70,7 +69,6 @@ Frustum& Frustum::operator = (const Frustum& rhs)
         planes_[i] = rhs.planes_[i];
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         vertices_[i] = rhs.vertices_[i];
-    defined_ = rhs.defined_;
     
     return *this;
 }
@@ -195,7 +193,6 @@ void Frustum::UpdatePlanes()
     planes_[PLANE_UP].Define(vertices_[0], vertices_[4], vertices_[7]);
     planes_[PLANE_DOWN].Define(vertices_[6], vertices_[5], vertices_[1]);
     planes_[PLANE_FAR].Define(vertices_[5], vertices_[6], vertices_[7]);
-    defined_ = true;
 }
 
 }
