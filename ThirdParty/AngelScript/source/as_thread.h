@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -49,13 +49,13 @@ BEGIN_AS_NAMESPACE
 
 class asCThreadLocalData;
 
-class asCThreadManager
+class asCThreadManager : public asIThreadManager
 {
 public:
 	static asCThreadLocalData *GetLocalData();
 	static int CleanupLocalData();
 
-	static void Prepare();
+	static int  Prepare(asIThreadManager *externalThreadMgr);
 	static void Unprepare();
 
 	// This read/write lock can be used by the application to provide simple synchronization

@@ -2,23 +2,23 @@
    AngelCode Scripting Library
    Copyright (c) 2012 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -50,13 +50,13 @@
 
 BEGIN_AS_NAMESPACE
 
-// TODO: cleanup: This should be in its own header. It is only here because it is 
+// TODO: cleanup: This should be in its own header. It is only here because it is
 //                needed for the template and cannot be resolved with a forward declaration
 struct asSNameSpace
 {
 	asCString name;
 
-	// TODO: namespace: A namespace should have access masks. The application should be 
+	// TODO: namespace: A namespace should have access masks. The application should be
 	//                  able to restrict specific namespaces from access to specific modules
 };
 
@@ -150,7 +150,7 @@ private:
 
     friend class asCSymbolTableIterator<T, T>;
     friend class asCSymbolTableIterator<T, const T>;
-	
+
 	void GetKey(const T *entry, asCString &key) const;
 	void BuildKey(const asSNameSpace *ns, const asCString &name, asCString &key) const;
 	bool CheckIdx(unsigned idx) const;
@@ -224,7 +224,7 @@ const asCArray<unsigned int> &asCSymbolTable<T>::GetIndexes(const asSNameSpace *
 		return m_map.GetValue(cursor);
 
 	static asCArray<unsigned int> dummy;
-	return dummy;	
+	return dummy;
 }
 
 
@@ -362,7 +362,7 @@ bool asCSymbolTable<T>::Erase(unsigned idx)
 
     T *entry = m_entries[idx];
     asASSERT(entry);
-    if( !entry ) 
+    if( !entry )
 		return false;
 
 	if( idx == m_entries.GetLength() - 1 )
@@ -398,7 +398,7 @@ bool asCSymbolTable<T>::Erase(unsigned idx)
 template<class T>
 int asCSymbolTable<T>::Put(T *entry)
 {
-	unsigned int idx = m_entries.GetLength();
+	unsigned int idx = (unsigned int)(m_entries.GetLength());
 	asCString key;
 	GetKey(entry, key);
 
@@ -422,10 +422,10 @@ int asCSymbolTable<T>::Put(T *entry)
 template<class T>
 void asCSymbolTable<T>::BuildKey(const asSNameSpace *ns, const asCString &name, asCString &key) const
 {
-	// TODO: optimize: The key shouldn't be just an asCString. It should keep the 
+	// TODO: optimize: The key shouldn't be just an asCString. It should keep the
 	//                 namespace as a pointer, so it can be compared as pointer.
-	//                 Which should be compared first, the namespace or the name? There is likely 
-	//                 going to be many symbols with the same namespace, so it is probably best to 
+	//                 Which should be compared first, the namespace or the name? There is likely
+	//                 going to be many symbols with the same namespace, so it is probably best to
 	//                 compare the name first
     key = ns->name + "::" + name;
 }
@@ -455,7 +455,7 @@ unsigned int asCSymbolTable<T>::GetSize() const
 template<class T>
 bool asCSymbolTable<T>::CheckIdx(unsigned int idx) const
 {
-    return (idx >= 0 && idx < m_entries.GetLength());
+    return idx < m_entries.GetLength();
 }
 
 
@@ -464,7 +464,7 @@ bool asCSymbolTable<T>::CheckIdx(unsigned int idx) const
 template<class T>
 int asCSymbolTable<T>::GetLastIndex() const
 {
-    unsigned int idx = m_entries.GetLength() - 1;
+    unsigned int idx = (unsigned int)(m_entries.GetLength()) - 1;
 	asASSERT( idx == asUINT(-1) || m_entries[idx] );
     return int(idx);
 }
@@ -495,7 +495,7 @@ typename asCSymbolTable<T>::const_iterator asCSymbolTable<T>::List() const
 template<class T, class T2>
 asCSymbolTableIterator<T, T2>::asCSymbolTableIterator(asCSymbolTable<T> *table) : m_table(table), m_idx(0)
 {
-    unsigned int sz = m_table->m_entries.GetLength();
+    unsigned int sz = (unsigned int)(m_table->m_entries.GetLength());
     while( m_idx < sz && m_table->m_entries[m_idx] == 0 )
         m_idx++;
 }
@@ -543,7 +543,7 @@ asCSymbolTableIterator<T, T2>::operator bool() const
 template<class T, class T2>
 void asCSymbolTableIterator<T, T2>::Next()
 {
-    unsigned int sz = m_table->m_entries.GetLength();
+    unsigned int sz = (unsigned int)(m_table->m_entries.GetLength());
     m_idx++;
     while( m_idx < sz && m_table->m_entries[m_idx] == 0 )
         m_idx++;
@@ -555,7 +555,7 @@ template<class T, class T2>
 void asCSymbolTableIterator<T, T2>::Previous()
 {
     // overflow on stepping over first element
-    unsigned int sz = m_table->m_entries.GetLength();
+    unsigned int sz = (unsigned int)(m_table->m_entries.GetLength());
     m_idx--;
     while( m_idx < sz && m_table->m_entries[m_idx] == 0 )
         m_idx--;

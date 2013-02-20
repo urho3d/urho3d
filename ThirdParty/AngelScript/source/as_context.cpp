@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -80,7 +80,7 @@ public:
 		// It's useful for determining what needs to be optimized.
 
 		_mkdir("AS_DEBUG");
-		#if _MSC_VER >= 1500 
+		#if _MSC_VER >= 1500 && !defined(AS_MARMALADE)
 			FILE *f;
 			fopen_s(&f, "AS_DEBUG/stats.txt", "wt");
 		#else
@@ -202,7 +202,9 @@ bool asCContext::IsNested(asUINT *nestCount) const
 		return false;
 
 	// Search for a marker on the call stack
-	for( asUINT n = 1; n <= c; n++ )
+	// This loop starts at 2 because the 0th entry is not stored in m_callStack, 
+	// and then we need to subtract one more to get the base of each frame
+	for( asUINT n = 2; n <= c; n++ )
 	{
 		const asPWORD *s = m_callStack.AddressOf() + (c - n)*CALLSTACK_FRAME_SIZE;
 		if( s && s[0] == 0 )
@@ -1152,6 +1154,13 @@ int asCContext::Execute()
 	while( m_status == asEXECUTION_ACTIVE )
 		ExecuteNext();
 
+	if( m_lineCallback )
+	{
+		// Call the line callback one last time before leaving 
+		// so anyone listening can catch the state change
+		CallLineCallback();
+	}
+
 	if( m_engine->ep.autoGarbageCollect )
 	{
 		asUINT gcPosObjects = 0;
@@ -1377,11 +1386,19 @@ int asCContext::GetLineNumber(asUINT stackLevel, int *column, const char **secti
 		bytePos -= 1;
 	}
 
-	asDWORD line = func->GetLineNumber(int(bytePos - func->byteCode.AddressOf()));
+	// For nested calls it is possible that func is null
+	if( func == 0 )
+	{
+		if( column ) *column = 0;
+		if( sectionName ) *sectionName = 0;
+		return 0;
+	}
+
+	int sectionIdx;
+	asDWORD line = func->GetLineNumber(int(bytePos - func->byteCode.AddressOf()), &sectionIdx);
 	if( column ) *column = (line >> 20);
-
-	if( sectionName ) *sectionName = func->GetScriptSectionName();
-
+	if( sectionName ) 
+		*sectionName = sectionIdx >= 0 ? m_engine->scriptSectionNames[sectionIdx]->AddressOf() : 0;
 	return (line & 0xFFFFF);
 }
 
@@ -3863,7 +3880,7 @@ void asCContext::SetInternalException(const char *descr)
 
 	m_exceptionString       = descr;
 	m_exceptionFunction     = m_currentFunction->id;
-	m_exceptionLine         = m_currentFunction->GetLineNumber(int(m_regs.programPointer - m_currentFunction->byteCode.AddressOf()));
+	m_exceptionLine         = m_currentFunction->GetLineNumber(int(m_regs.programPointer - m_currentFunction->byteCode.AddressOf()), &m_exceptionSectionIdx);
 	m_exceptionColumn       = m_exceptionLine >> 20;
 	m_exceptionLine        &= 0xFFFFF;
 
@@ -4224,7 +4241,7 @@ int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 
 	if( column ) *column = m_exceptionColumn;
 
-	if( sectionName ) *sectionName = m_engine->scriptFunctions[m_exceptionFunction]->GetScriptSectionName();
+	if( sectionName ) *sectionName = m_engine->scriptSectionNames[m_exceptionSectionIdx]->AddressOf();
 
 	return m_exceptionLine;
 }
@@ -4275,7 +4292,7 @@ int asCContext::SetLineCallback(asSFuncPtr callback, void *obj, int callConv)
 		}
 	}
 
-	int r = DetectCallingConvention(isObj, callback, callConv, &m_lineCallbackFunc);
+	int r = DetectCallingConvention(isObj, callback, callConv, 0, &m_lineCallbackFunc);
 	if( r < 0 ) m_lineCallback = false;
 
 	m_regs.doProcessSuspend = m_doSuspend || m_lineCallback;
@@ -4308,7 +4325,7 @@ int asCContext::SetExceptionCallback(asSFuncPtr callback, void *obj, int callCon
 			return asINVALID_ARG;
 		}
 	}
-	int r = DetectCallingConvention(isObj, callback, callConv, &m_exceptionCallbackFunc);
+	int r = DetectCallingConvention(isObj, callback, callConv, 0, &m_exceptionCallbackFunc);
 	if( r < 0 ) m_exceptionCallback = false;
 	return r;
 }

@@ -38,6 +38,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// TODO: optimize: On compilers with C++11 support the string class should take advantage of the move operator &&
+
 class asCString
 {
 public:
@@ -65,7 +67,7 @@ public:
 
 	asCString SubString(size_t start, size_t length = (size_t)(-1)) const;
 
-	int FindLast(const char *str) const;
+	int FindLast(const char *str, int *count = 0) const;
 
 	size_t Format(const char *fmt, ...);
 

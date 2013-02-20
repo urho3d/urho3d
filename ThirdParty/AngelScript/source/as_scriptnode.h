@@ -74,7 +74,6 @@ enum eScriptNode
 	snDoWhile,
 	snAssignment,
 	snCondition,
-	snGlobalVar,
 	snSwitch,
 	snCase,
 	snImport,

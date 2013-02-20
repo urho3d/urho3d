@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -99,14 +99,16 @@ public:
 	virtual asIScriptEngine *GetEngine() const;
 	virtual void             SetName(const char *name);
 	virtual const char      *GetName() const;
+	// TODO: interface: Should have a method Discard(); which will replace the engine's DiscardModule() method
 
 	// Compilation
-	virtual int     AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset);
-	virtual int     Build();
-	virtual int     CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD reserved, asIScriptFunction **outFunc);
-	virtual int     CompileGlobalVar(const char *sectionName, const char *code, int lineOffset);
-	virtual asDWORD SetAccessMask(asDWORD accessMask);
-	virtual int     SetDefaultNamespace(const char *nameSpace);
+	virtual int         AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset);
+	virtual int         Build();
+	virtual int         CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD reserved, asIScriptFunction **outFunc);
+	virtual int         CompileGlobalVar(const char *sectionName, const char *code, int lineOffset);
+	virtual asDWORD     SetAccessMask(asDWORD accessMask);
+	virtual int         SetDefaultNamespace(const char *nameSpace);
+	virtual const char *GetDefaultNamespace() const;
 
 	// Script functions
 	virtual asUINT             GetFunctionCount() const;
@@ -190,19 +192,17 @@ public:
 
 	void JITCompile();
 
-	int  AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, asSNameSpace *ns = 0);
+#ifndef AS_NO_COMPILER
+	int  AddScriptFunction(int sectionIdx, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, asSNameSpace *ns = 0);
 	int  AddScriptFunction(asCScriptFunction *func);
-	int  AddImportedFunction(int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, int paramCount, const asCString &moduleName);
-	int  AddFuncDef(const char *name, asSNameSpace *ns);
+	int  AddImportedFunction(int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, asSNameSpace *ns, const asCString &moduleName);
+	int  AddFuncDef(const asCString &name, asSNameSpace *ns);
+#endif
 
-	int  GetNextImportedFunctionId();
-
+	int                GetNextImportedFunctionId();
 	asCScriptFunction *GetImportedFunction(int funcId) const;
-
-	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns);
-
+	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
 	asCGlobalProperty *AllocateGlobalProperty(const char *name, const asCDataType &dt, asSNameSpace *ns);
-
 
 	asCString name;
 

@@ -63,7 +63,7 @@ public:
 
 	// Called from compiler
 	int ParseStatementBlock(asCScriptCode *script, asCScriptNode *block);
-	int ParseGlobalVarInit(asCScriptCode *script, asCScriptNode *init);
+	int ParseVarInit(asCScriptCode *script, asCScriptNode *init);
 	int ParseExpression(asCScriptCode *script);
 #endif
 	
@@ -75,8 +75,8 @@ protected:
 	void GetToken(sToken *token);
 	void RewindTo(const sToken *token);
 	void SetPos(size_t pos);
-	void Error(const char *text, sToken *token);
-	void Info(const char *text, sToken *token);
+	void Error(const asCString &text, sToken *token);
+	void Info(const asCString &text, sToken *token);
 
 	asCScriptNode *CreateNode(eScriptNode type);
 
@@ -96,7 +96,7 @@ protected:
 #ifndef AS_NO_COMPILER
 	// Statements
 	asCScriptNode *SuperficiallyParseStatementBlock();
-	asCScriptNode *SuperficiallyParseGlobalVarInit();
+	asCScriptNode *SuperficiallyParseVarInit();
 	asCScriptNode *ParseStatementBlock();
 	asCScriptNode *ParseStatement();
 	asCScriptNode *ParseExpressionStatement();
@@ -111,13 +111,12 @@ protected:
 	asCScriptNode *ParseContinue();
 
 	// Declarations
-	asCScriptNode *ParseDeclaration();
+	asCScriptNode *ParseDeclaration(bool isClassProp = false, bool isGlobalVar = false);
 	asCScriptNode *ParseImport();
 	asCScriptNode *ParseScript(bool inBlock);
 	asCScriptNode *ParseNamespace();
 	asCScriptNode *ParseFunction(bool isMethod = false);
 	asCScriptNode *ParseFuncDef();
-	asCScriptNode *ParseGlobalVar();
 	asCScriptNode *ParseClass();
 	asCScriptNode *ParseMixin();
 	asCScriptNode *ParseInitList();

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -43,7 +43,6 @@
 #define AS_ATOMIC_H
 
 #include "as_config.h"
-#include "as_criticalsection.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -63,10 +62,6 @@ public:
 
 protected:
 	asDWORD value;
-
-#if !defined(AS_NO_THREADS) && defined(AS_NO_ATOMIC)
-	DECLARECRITICALSECTION(cs)
-#endif
 };
 
 END_AS_NAMESPACE

@@ -143,6 +143,24 @@ void asCGlobalProperty::ReleaseAllHandles(asIScriptEngine *)
 	}
 }
 
+void asCGlobalProperty::Orphan(asCModule *module)
+{
+	if( initFunc && initFunc->module == module )
+	{
+		// The owning module is releasing the property, so we need to notify 
+		// the GC in order to resolve any circular references that may exists
+
+		// This will add the property
+		initFunc->engine->gc.AddScriptObjectToGC(this, &initFunc->engine->globalPropertyBehaviours);
+
+		// This will add the function
+		initFunc->AddRef();
+		initFunc->Orphan(module);
+	}
+
+	Release();
+}
+
 void asCGlobalProperty::SetInitFunc(asCScriptFunction *initFunc)
 {
 	// This should only be done once
@@ -150,11 +168,6 @@ void asCGlobalProperty::SetInitFunc(asCScriptFunction *initFunc)
 
 	this->initFunc = initFunc;
 	this->initFunc->AddRef();
-
-	// When there is an initialization function there is a chance that
-	// a circular reference is created, so it is necessary to notify the
-	// GC of this property.
-	initFunc->engine->gc.AddScriptObjectToGC(this, &initFunc->engine->globalPropertyBehaviours);
 }
 
 asCScriptFunction *asCGlobalProperty::GetInitFunc()

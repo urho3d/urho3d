@@ -512,7 +512,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	int     argsCnt = 0;
 
 	// If the function returns an object in memory, we allocate the memory and put the ptr to the front (will go to r3)
-	if( descr->returnType.IsObject() && !descr->returnType.IsReference() && !descr->returnType.IsObjectHandle() )
+	if( sysFunc->hostReturnInMemory )
 	{
 		ppcArgs[argsCnt] = (asDWORD)retPointer;
 		ppcArgsType[argsCnt] = ppcINTARG;

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -93,7 +93,7 @@ public:
     virtual asIJITCompiler *GetJITCompiler() const;
 
 	// Global functions
-	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	virtual asUINT             GetGlobalFunctionCount() const;
 #ifdef AS_DEPRECATED
 	// Deprecated since 2.24.0 - 2012-05-20
@@ -148,11 +148,12 @@ public:
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId, const char **nameSpace, const char **configGroup = 0, asDWORD *accessMask = 0) const;
 
 	// Configuration groups
-	virtual int     BeginConfigGroup(const char *groupName);
-	virtual int     EndConfigGroup();
-	virtual int     RemoveConfigGroup(const char *groupName);
-	virtual asDWORD SetDefaultAccessMask(asDWORD defaultMask);
-	virtual int     SetDefaultNamespace(const char *nameSpace);
+	virtual int         BeginConfigGroup(const char *groupName);
+	virtual int         EndConfigGroup();
+	virtual int         RemoveConfigGroup(const char *groupName);
+	virtual asDWORD     SetDefaultAccessMask(asDWORD defaultMask);
+	virtual int         SetDefaultNamespace(const char *nameSpace);
+	virtual const char *GetDefaultNamespace() const;
 
 	// Script modules
 	virtual asIScriptModule *GetModule(const char *module, asEGMFlags flag);
@@ -251,7 +252,7 @@ public:
 
 	void ConstructScriptObjectCopy(void *mem, void *obj, asCObjectType *type);
 
-	void ClearUnusedTypes();
+	int  ClearUnusedTypes();
 	void RemoveTemplateInstanceType(asCObjectType *t);
 	void RemoveTypeAndRelatedFromList(asCArray<asCObjectType*> &types, asCObjectType *ot);
 
@@ -294,9 +295,11 @@ public:
 	void               RemoveFromTypeIdMap(asCObjectType *type);
 
 	bool               IsTemplateType(const char *name) const;
-	asCObjectType     *GetTemplateInstanceType(asCObjectType *templateType, asCDataType &subType);
+	asCObjectType     *GetTemplateInstanceType(asCObjectType *templateType, asCArray<asCDataType> &subTypes);
 	asCScriptFunction *GenerateTemplateFactoryStub(asCObjectType *templateType, asCObjectType *templateInstanceType, int origFactoryId);
-	bool               GenerateNewTemplateFunction(asCObjectType *templateType, asCObjectType *templateInstanceType, asCDataType &subType, asCScriptFunction *templateFunc, asCScriptFunction **newFunc);
+	bool               GenerateNewTemplateFunction(asCObjectType *templateType, asCObjectType *templateInstanceType, asCScriptFunction *templateFunc, asCScriptFunction **newFunc);
+	void               OrphanTemplateInstances(asCObjectType *subType);
+	asCDataType        DetermineTypeForTemplate(const asCDataType &orig, asCObjectType *tmpl, asCObjectType *ot);
 
 	// String constants
 	// TODO: Must free unused string constants, thus the ref count for each must be tracked

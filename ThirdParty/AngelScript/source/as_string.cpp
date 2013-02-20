@@ -308,17 +308,23 @@ size_t asCString::RecalculateLength()
 	return length;
 }
 
-int asCString::FindLast(const char *str) const
+int asCString::FindLast(const char *str, int *count) const
 {
 	// There is no strstr that starts from the end, so 
 	// we'll iterate until we find the last occurrance.
 	// This shouldn't cause a performance problem because
 	// it is not expected that this will be done very often,
 	// and then only on quite short strings anyway.
+
+	if( count ) *count = 0;
+
 	const char *last = 0;
 	const char *curr = AddressOf()-1;
 	while( (curr = strstr(curr+1, str)) != 0 )
+	{
+		if( count ) (*count)++;
 		last = curr;
+	}
 
 	if( last )
 		return int(last - AddressOf());

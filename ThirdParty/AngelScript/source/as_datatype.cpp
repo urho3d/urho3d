@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -28,7 +28,6 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni for Urho3D
 
 //
 // as_datatype.cpp
@@ -54,8 +53,6 @@ asCDataType::asCDataType()
 	isObjectHandle = false;
 	isConstHandle  = false;
 	funcDef        = 0;
-	// Urho3D: reset cached type id
-	cachedTypeId   = 0;
 }
 
 asCDataType::asCDataType(const asCDataType &dt)
@@ -67,8 +64,6 @@ asCDataType::asCDataType(const asCDataType &dt)
 	isObjectHandle = dt.isObjectHandle;
 	isConstHandle  = dt.isConstHandle;
 	funcDef        = dt.funcDef;
-	// Urho3D: copy cached type id
-	cachedTypeId   = dt.cachedTypeId;
 }
 
 asCDataType::~asCDataType()
@@ -173,7 +168,8 @@ asCString asCDataType::Format(bool includeNamespace) const
 	}
 	else if( IsArrayType() && objectType && !objectType->engine->ep.expandDefaultArrayToTemplate )
 	{
-		str += objectType->templateSubType.Format(includeNamespace);
+		asASSERT( objectType->templateSubTypes.GetLength() == 1 );
+		str += objectType->templateSubTypes[0].Format(includeNamespace);
 		str += "[]";
 	}
 	else if( funcDef )
@@ -186,7 +182,12 @@ asCString asCDataType::Format(bool includeNamespace) const
 		if( objectType->flags & asOBJ_TEMPLATE )
 		{
 			str += "<";
-			str += objectType->templateSubType.Format(includeNamespace);
+			for( asUINT subtypeIndex = 0; subtypeIndex < objectType->templateSubTypes.GetLength(); subtypeIndex++ )
+			{
+				str += objectType->templateSubTypes[subtypeIndex].Format(includeNamespace);
+				if( subtypeIndex != objectType->templateSubTypes.GetLength()-1 )
+					str += ",";
+			}
 			str += ">";
 		}
 	}
@@ -217,17 +218,12 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 	isObjectHandle   = dt.isObjectHandle;
 	isConstHandle    = dt.isConstHandle;
 	funcDef          = dt.funcDef;
-	// Urho3D: copy cached type id
-	cachedTypeId     = dt.cachedTypeId;
 
 	return (asCDataType &)*this;
 }
 
 int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 {
-	// Urho3D: reset cached type id
-	cachedTypeId = 0;
-
 	if( !b )
 	{
 		isObjectHandle = b;
@@ -260,15 +256,14 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 
 int asCDataType::MakeArray(asCScriptEngine *engine)
 {
-	// Urho3D: reset cached type id
-	cachedTypeId = 0;
-
 	if( engine->defaultArrayObjectType == 0 )
 		return asINVALID_TYPE;
 
 	bool tmpIsReadOnly = isReadOnly;
 	isReadOnly = false;
-	asCObjectType *at = engine->GetTemplateInstanceType(engine->defaultArrayObjectType, *this);
+	asCArray<asCDataType> subTypes;
+	subTypes.PushLast(*this);
+	asCObjectType *at = engine->GetTemplateInstanceType(engine->defaultArrayObjectType, subTypes);
 	isReadOnly = tmpIsReadOnly;
 
 	isObjectHandle = false;
@@ -282,9 +277,6 @@ int asCDataType::MakeArray(asCScriptEngine *engine)
 
 int asCDataType::MakeReference(bool b)
 {
-	// Urho3D: reset cached type id
-	cachedTypeId = 0;
-
 	isReference = b;
 
 	return 0;
@@ -292,9 +284,6 @@ int asCDataType::MakeReference(bool b)
 
 int asCDataType::MakeReadOnly(bool b)
 {
-	// Urho3D: reset cached type id
-	cachedTypeId = 0;
-
 	if( isObjectHandle )
 	{
 		isConstHandle = b;
@@ -307,9 +296,6 @@ int asCDataType::MakeReadOnly(bool b)
 
 int asCDataType::MakeHandleToConst(bool b)
 {
-	// Urho3D: reset cached type id
-	cachedTypeId = 0;
-
 	if( !isObjectHandle ) return -1;
 
 	isReadOnly = b;
@@ -401,10 +387,10 @@ bool asCDataType::IsScriptObject() const
 	return false;
 }
 
-asCDataType asCDataType::GetSubType() const
+asCDataType asCDataType::GetSubType(asUINT subtypeIndex) const
 {
 	asASSERT(objectType);
-	return objectType->templateSubType;
+	return objectType->templateSubTypes[subtypeIndex];
 }
 
 
@@ -449,31 +435,6 @@ bool asCDataType::IsEqualExceptConst(const asCDataType &dt) const
 {
 	if( !IsEqualExceptRefAndConst(dt) ) return false;
 	if( isReference != dt.isReference ) return false;
-
-	return true;
-}
-
-bool asCDataType::IsEqualExceptInterfaceType(const asCDataType &dt) const
-{
-	if( tokenType != dt.tokenType )           return false;
-	if( isReference != dt.isReference )       return false;
-	if( isObjectHandle != dt.isObjectHandle ) return false;
-	if( isReadOnly != dt.isReadOnly )         return false;
-	if( isConstHandle != dt.isConstHandle )   return false;
-
-	if( objectType != dt.objectType )
-	{
-		if( !objectType || !dt.objectType ) return false;
-
-		// If the types are not interfaces or templates with interfaces then the they are not equal
-		if( !objectType->IsInterface() && !((objectType->flags & asOBJ_TEMPLATE) && objectType->templateSubType.GetObjectType() && objectType->templateSubType.GetObjectType()->IsInterface()) ) return false;
-		if( !dt.objectType->IsInterface() && !((dt.objectType->flags & asOBJ_TEMPLATE) && dt.objectType->templateSubType.GetObjectType() && dt.objectType->templateSubType.GetObjectType()->IsInterface()) ) return false;
-
-		// If one is interface and the other is not, then it is not equal
-		if( objectType->IsInterface() != dt.objectType->IsInterface() ) return false;
-	}
-
-	if( funcDef != dt.funcDef ) return false;
 
 	return true;
 }

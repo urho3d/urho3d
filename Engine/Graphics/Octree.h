@@ -93,14 +93,14 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
+    /// Initialize bounding box.
+    void Initialize(const BoundingBox& box);
     /// Return drawable objects by a query, called internally.
     void GetDrawablesInternal(OctreeQuery& query, bool inside) const;
     /// Return drawable objects by a ray query, called internally.
     void GetDrawablesInternal(RayOctreeQuery& query) const;
     /// Return drawable objects only for a threaded ray query, called internally.
     void GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const;
-    /// Free child octants. If drawable objects still exist, move them to root.
-    void Release();
     
     /// Increase drawable object count recursively.
     void IncDrawableCount()

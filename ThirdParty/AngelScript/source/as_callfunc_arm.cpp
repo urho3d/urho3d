@@ -37,7 +37,7 @@
 // Written by Fredrik Ehnbom in June 2009, based on as_callfunc_x86.cpp
 
 
-// This code has conform to both AAPCS and the modified ABI for iOS
+// This code has to conform to both AAPCS and the modified ABI for iOS
 //
 // Reference:
 //
@@ -186,10 +186,14 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)obj);
 		break;
 	case ICC_THISCALL_RETURNINMEM:
-#ifndef __GNUC__
+#ifdef __GNUC__
+		// On GNUC the address where the return value will be placed should be put in R0
+		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
+#else
+		// On Windows the R0 should always hold the object pointer, and the address for the return value comes after
 		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)obj, (asDWORD)retPointer);
-		break;
 #endif
+		break;
 	case ICC_CDECL_OBJFIRST_RETURNINMEM:
 		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
 		break;
@@ -201,9 +205,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
 		// Get virtual function table from the object pointer
 		vftable = *(asFUNCTION_t**)obj;
-#ifndef __GNUC__
+#ifdef __GNUC__
+		// On GNUC the address where the return value will be placed should be put in R0
 		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)retPointer, (asDWORD)obj);
 #else
+		// On Windows the R0 should always hold the object pointer, and the address for the return value comes after
 		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj, (asDWORD)retPointer);
 #endif
 		break;

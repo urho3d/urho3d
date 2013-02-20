@@ -66,9 +66,10 @@ public:
 
 	int GetSize();
 
-	void Finalize();
+	void Finalize(const asCArray<int> &tempVariableOffsets);
 
-	int  Optimize();
+	void Optimize();
+	void OptimizeLocally(const asCArray<int> &tempVariableOffsets);
 	void ExtractLineNumbers();
 	void ExtractObjectVariableInfo(asCScriptFunction *outFunc);
 	int  ResolveJumpAddresses();
@@ -96,11 +97,10 @@ public:
 	bool IsSimpleExpression();
 
 	void Label(short label);
-	void Line(int line, int column);
+	void Line(int line, int column, int scriptIdx);
 	void ObjInfo(int offset, int info);
 	void Block(bool start);
 	void VarDecl(int varDeclIdx);
-	void DiscardVar(int varIdx);
 	void Call(asEBCInstr bc, int funcID, int pop);
 	void CallPtr(asEBCInstr bc, int funcPtrVar, int pop);
 	void Alloc(asEBCInstr bc, void *objID, int funcID, int pop);
@@ -130,11 +130,13 @@ public:
 	int InstrW_W(asEBCInstr bc, int w, int b);
 
 	asCArray<int> lineNumbers;
+	asCArray<int> sectionIdxs;
 	int largestStackUsed;
 
-	void DefineTemporaryVariable(int varOffset);
-
 protected:
+	// Assignments are not allowed
+	void operator=(const asCByteCode &) {}
+
 	// Helpers for Optimize
 	bool CanBeSwapped(asCByteInstruction *curr);
 	asCByteInstruction *ChangeFirstDeleteNext(asCByteInstruction *curr, asEBCInstr bc);
@@ -142,9 +144,10 @@ protected:
 	asCByteInstruction *DeleteInstruction(asCByteInstruction *instr);
 	void RemoveInstruction(asCByteInstruction *instr);
 	asCByteInstruction *GoBack(asCByteInstruction *curr);
+	asCByteInstruction *GoForward(asCByteInstruction *curr);
 	void InsertBefore(asCByteInstruction *before, asCByteInstruction *instr);
 	bool RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction **next);
-	bool IsTemporary(short offset);
+	bool IsTemporary(int offset);
 	bool IsTempRegUsed(asCByteInstruction *curr);
 	bool IsTempVarRead(asCByteInstruction *curr, int offset);
 	bool PostponeInitOfTemp(asCByteInstruction *curr, asCByteInstruction **next);
@@ -158,7 +161,7 @@ protected:
 	asCByteInstruction *first;
 	asCByteInstruction *last;
 
-	asCArray<int> temporaryVariables;
+	const asCArray<int> *temporaryVariables;
 
 	asCScriptEngine *engine;
 };

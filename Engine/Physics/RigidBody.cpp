@@ -138,10 +138,15 @@ void RigidBody::ApplyAttributes()
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
 {
-    lastPosition_ = node_->GetWorldPosition();
-    lastRotation_ = node_->GetWorldRotation();
-    worldTrans.setOrigin(ToBtVector3(lastPosition_));
-    worldTrans.setRotation(ToBtQuaternion(lastRotation_));
+    // We may be in a pathological state where a RigidBody exists without a scene node when this callback is fired,
+    // so check to be sure
+    if (node_)
+    {
+        lastPosition_ = node_->GetWorldPosition();
+        lastRotation_ = node_->GetWorldRotation();
+        worldTrans.setOrigin(ToBtVector3(lastPosition_));
+        worldTrans.setRotation(ToBtQuaternion(lastRotation_));
+    }
 }
 
 void RigidBody::setWorldTransform(const btTransform &worldTrans)
@@ -150,25 +155,30 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     RigidBody* parentRigidBody = 0;
     
-    // If the rigid body is parented to another rigid body, can not set the transform immediately.
-    // In that case store it to PhysicsWorld for delayed assignment
-    Node* parent = node_->GetParent();
-    if (parent && parent != GetScene())
-        parentRigidBody = parent->GetComponent<RigidBody>();
-    
-    if (!parentRigidBody)
-        ApplyWorldTransform(newWorldPosition, newWorldRotation);
-    else
+    // It is possible that the RigidBody component has been kept alive via a shared pointer,
+    // while its scene node has already been destroyed
+    if (node_)
     {
-        DelayedWorldTransform delayed;
-        delayed.rigidBody_ = this;
-        delayed.parentRigidBody_ = parentRigidBody;
-        delayed.worldPosition_ = newWorldPosition;
-        delayed.worldRotation_ = newWorldRotation;
-        physicsWorld_->AddDelayedWorldTransform(delayed);
+        // If the rigid body is parented to another rigid body, can not set the transform immediately.
+        // In that case store it to PhysicsWorld for delayed assignment
+        Node* parent = node_->GetParent();
+        if (parent && parent != GetScene())
+            parentRigidBody = parent->GetComponent<RigidBody>();
+        
+        if (!parentRigidBody)
+            ApplyWorldTransform(newWorldPosition, newWorldRotation);
+        else
+        {
+            DelayedWorldTransform delayed;
+            delayed.rigidBody_ = this;
+            delayed.parentRigidBody_ = parentRigidBody;
+            delayed.worldPosition_ = newWorldPosition;
+            delayed.worldRotation_ = newWorldRotation;
+            physicsWorld_->AddDelayedWorldTransform(delayed);
+        }
+        
+        MarkNetworkUpdate();
     }
-    
-    MarkNetworkUpdate();
 }
 
 void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

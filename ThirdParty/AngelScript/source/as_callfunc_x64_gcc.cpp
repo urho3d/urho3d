@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -59,7 +59,7 @@ typedef asQWORD ( *funcptr_t )( void );
 
 static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, int cnt, funcptr_t func, asQWORD &retQW2, bool returnFloat) 
 {
-	asQWORD   retQW1;
+	asQWORD   retQW1 = 0;
 
 	// Reference: http://www.x86-64.org/documentation/abi.pdf
 

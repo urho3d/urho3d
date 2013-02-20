@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -52,12 +52,13 @@
 #define TXT_CANNOT_CALL_CONSTRUCTOR_IN_LOOPS     "Can't call a constructor in loops"
 #define TXT_CANNOT_CALL_CONSTRUCTOR_IN_SWITCH    "Can't call a constructor in switch"
 #define TXT_CANNOT_CALL_CONSTRUCTOR_TWICE        "Can't call a constructor multiple times"
+#define TXT_CANNOT_IMPLEMENT_SELF                "Can't implement itself, or another interface that implements this interface"
 #define TXT_CANNOT_INHERIT_FROM_s_FINAL          "Can't inherit from class '%s' marked as final"
 #define TXT_CANNOT_INHERIT_FROM_MULTIPLE_CLASSES "Can't inherit from multiple classes"
 #define TXT_CANNOT_INHERIT_FROM_SELF             "Can't inherit from itself, or another class that inherits from this class"
 #define TXT_CANNOT_INSTANCIATE_TEMPLATE_s_WITH_s "Can't instanciate template '%s' with subtype '%s'"
-#define TXT_CANT_IMPLICITLY_CONVERT_s_TO_s       "Can't implicitly convert from '%s' to '%s'."
 #define TXT_CANNOT_RETURN_REF_TO_LOCAL           "Can't return reference to local value."
+#define TXT_CANT_IMPLICITLY_CONVERT_s_TO_s       "Can't implicitly convert from '%s' to '%s'."
 #define TXT_CANT_RETURN_VALUE                    "Can't return value when return type is 'void'"
 #define TXT_CHANGE_SIGN                          "Implicit conversion changed sign of value"
 #define TXT_COMPILING_s                          "Compiling %s"
@@ -110,6 +111,7 @@
 #define TXT_ILLEGAL_VARIABLE_NAME_s             "Illegal variable name '%s'."
 #define TXT_INIT_LIST_CANNOT_BE_USED_WITH_s     "Initialization lists cannot be used with '%s'"
 #define TXT_INTERFACE_s_ALREADY_IMPLEMENTED     "The interface '%s' is already implemented"
+#define TXT_INTERFACE_CAN_ONLY_IMPLEMENT_INTERFACE "Interfaces can only implement other interfaces"
 #define TXT_INVALID_BREAK                       "Invalid 'break'"
 #define TXT_INVALID_CHAR_LITERAL                "Invalid character literal"
 #define TXT_INVALID_CONTINUE                    "Invalid 'continue'"
@@ -127,7 +129,7 @@
 #define TXT_MISSING_IMPLEMENTATION_OF_s             "Missing implementation of '%s'"
 #define TXT_MIXIN_CANNOT_BE_DECLARED_AS_s           "Mixin class cannot be declared as '%s'"
 #define TXT_MIXIN_CANNOT_HAVE_CONSTRUCTOR           "Mixin classes cannot have constructors or destructors"
-#define TXT_MIXIN_CLASS_CANNOT_INHERIT              "Mixin class cannot inherit from classes or implement interfaces"
+#define TXT_MIXIN_CLASS_CANNOT_INHERIT              "Mixin class cannot inherit from classes"
 #define TXT_MORE_THAN_ONE_MATCHING_OP               "Found more than one matching operator"
 #define TXT_MULTIPLE_MATCHING_SIGNATURES_TO_s       "Multiple matching signatures to '%s'"
 #define TXT_MULTIPLE_PROP_GET_ACCESSOR_FOR_s        "Found multiple get accessors for property '%s'"
@@ -159,6 +161,7 @@
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPE_s        "No matching operator that takes the type '%s' found"
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPES_s_AND_s "No matching operator that takes the types '%s' and '%s' found"
 #define TXT_NON_CONST_METHOD_ON_CONST_OBJ          "Non-const method call on read-only object reference"
+#define TXT_NONTERMINATED_STRING                   "Non-terminated string literal"
 #define TXT_NOT_A_FUNC_s_IS_VAR                    "Expression doesn't form a function call. '%s' is a variable of a non-function type"
 #define TXT_NOT_ALL_PATHS_RETURN                   "Not all paths return a value"
 #define TXT_s_NOT_DECLARED                         "'%s' is not declared"
@@ -187,6 +190,7 @@
 #define TXT_PROPERTY_CANT_BE_CONST                "Class properties cannot be declared as const"
 #define TXT_PROPERTY_HAS_NO_GET_ACCESSOR          "The property has no get accessor"
 #define TXT_PROPERTY_HAS_NO_SET_ACCESSOR          "The property has no set accessor"
+#define TXT_PROPERTY_WITHOUT_ACCESSOR             "Virtual property must have at least one get or set accessor"
 
 #define TXT_REF_IS_READ_ONLY                    "Reference is read-only"
 #define TXT_REF_IS_TEMP                         "Reference is temporary"
@@ -196,17 +200,18 @@
 
 #define TXT_SHARED_CANNOT_ACCESS_NON_SHARED_VAR_s      "Shared code cannot access non-shared global variable '%s'"
 #define TXT_SHARED_CANNOT_CALL_NON_SHARED_FUNC_s       "Shared code cannot call non-shared function '%s'"
-#define TXT_SHARED_CANNOT_IMPLEMENT_NON_SHARED_s       "Shared class cannot implement non-shared interface '%s'"
+#define TXT_SHARED_CANNOT_IMPLEMENT_NON_SHARED_s       "Shared type cannot implement non-shared interface '%s'"
 #define TXT_SHARED_CANNOT_INHERIT_FROM_NON_SHARED_s    "Shared class cannot inherit from non-shared class '%s'"
 #define TXT_SHARED_CANNOT_USE_NON_SHARED_TYPE_s        "Shared code cannot use non-shared type '%s'"
-#define TXT_SHARED_DOESNT_MATCH_ORIGINAL               "Shared type doesn't match the original declaration in other module"
+#define TXT_SHARED_s_DOESNT_MATCH_ORIGINAL             "Shared type '%s' doesn't match the original declaration in other module"
 #define TXT_SIGNED_UNSIGNED_MISMATCH                   "Signed/Unsigned mismatch"
 #define TXT_STRINGS_NOT_RECOGNIZED                     "Strings are not recognized by the application"
 #define TXT_SWITCH_CASE_MUST_BE_CONSTANT               "Case expressions must be constants"
 #define TXT_SWITCH_MUST_BE_INTEGRAL                    "Switch expressions must be integral numbers"
 
-#define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE  "Type '%s' is not available for this module"
+#define TXT_TMPL_s_EXPECTS_d_SUBTYPES        "Template '%s' expects %d sub type(s)"
 #define TXT_TOO_MANY_JUMP_LABELS             "The function has too many jump labels to handle. Split the function into smaller ones."
+#define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE  "Type '%s' is not available for this module"
 
 #define TXT_UNEXPECTED_END_OF_FILE        "Unexpected end of file"
 #define TXT_UNEXPECTED_TOKEN_s            "Unexpected token '%s'"
@@ -220,6 +225,7 @@
 #define TXT_WHILE_PARSING_ARG_LIST        "While parsing argument list"
 #define TXT_WHILE_PARSING_EXPRESSION      "While parsing expression"
 #define TXT_WHILE_PARSING_INIT_LIST       "While parsing initialization list"
+#define TXT_WHILE_PARSING_NAMESPACE       "While parsing namespace"
 #define TXT_WHILE_PARSING_STATEMENT_BLOCK "While parsing statement block"
 #define TXT_WHILE_INCLUDING_MIXIN         "Previous error occurred while including mixin"
 

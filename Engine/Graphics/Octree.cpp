@@ -85,16 +85,13 @@ inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResu
 }
 
 Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root, unsigned index) :
-    worldBoundingBox_(box),
     level_(level),
     numDrawables_(0),
     parent_(parent),
     root_(root),
     index_(index)
 {
-    center_ = worldBoundingBox_.Center();
-    halfSize_ = 0.5f * worldBoundingBox_.Size();
-    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
+    Initialize(box);
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         children_[i] = 0;
@@ -102,7 +99,21 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
 
 Octant::~Octant()
 {
-    Release();
+    if (root_)
+    {
+        // Remove the drawables (if any) from this octant to the root octant
+        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        {
+            (*i)->SetOctant(root_);
+            root_->drawables_.Push(*i);
+            root_->QueueReinsertion(*i);
+        }
+        drawables_.Clear();
+        numDrawables_ = 0;
+    }
+    
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        DeleteChild(i);
 }
 
 Octant* Octant::GetOrCreateChild(unsigned index)
@@ -176,13 +187,13 @@ void Octant::InsertDrawable(Drawable* drawable)
 
 bool Octant::CheckDrawableFit(const BoundingBox& box) const
 {
-    // If max split level, size always OK, otherwise check that box is at least half size of octant
     Vector3 boxSize = box.Size();
     
+    // If max split level, size always OK, otherwise check that box is at least half size of octant
     if (level_ >= root_->GetNumLevels() || boxSize.x_ >= halfSize_.x_ || boxSize.y_ >= halfSize_.y_ ||
         boxSize.z_ >= halfSize_.z_)
         return true;
-    // Also check if the box can not fit a possible child octant's culling box
+    // Also check if the box can not fit a child octant's culling box, in that case size OK (must insert here)
     else
     {
         if (box.min_.x_ <= worldBoundingBox_.min_.x_ - 0.5f * halfSize_.x_ ||
@@ -194,7 +205,7 @@ bool Octant::CheckDrawableFit(const BoundingBox& box) const
             return true;
     }
     
-    // Should create a child octant
+    // Bounding box too small, should create a child octant
     return false;
 }
 
@@ -225,6 +236,14 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 children_[i]->DrawDebugGeometry(debug, depthTest);
         }
     }
+}
+
+void Octant::Initialize(const BoundingBox& box)
+{
+    worldBoundingBox_ = box;
+    center_ = box.Center();
+    halfSize_ = 0.5f * box.Size();
+    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
 }
 
 void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
@@ -311,25 +330,6 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
     }
 }
 
-void Octant::Release()
-{
-    if (root_)
-    {
-        // Remove the drawables (if any) from this octant to the root octant
-        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
-        {
-            (*i)->SetOctant(root_);
-            root_->drawables_.Push(*i);
-            root_->QueueReinsertion(*i);
-        }
-        drawables_.Clear();
-        numDrawables_ = 0;
-    }
-    
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-        DeleteChild(i);
-}
-
 OBJECTTYPESTATIC(Octree);
 
 Octree::Octree(Context* context) :
@@ -380,18 +380,13 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
 {
     PROFILE(ResizeOctree);
     
-    numLevels = Max((int)numLevels, 1);
-    
     // If drawables exist, they are temporarily moved to the root
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
     
-    worldBoundingBox_ = box;
-    center_ = box.Center();
-    halfSize_ = 0.5f * box.Size();
-    cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize_, worldBoundingBox_.max_ + halfSize_);
+    Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = numLevels;
+    numLevels_ = Max((int)numLevels, 1);
 }
 
 void Octree::Update(const FrameInfo& frame)
@@ -562,7 +557,7 @@ void Octree::DrawDebugGeometry(bool depthTest)
 
 void Octree::UpdateDrawables(const FrameInfo& frame)
 {
-    // Let drawables update themselves before reinsertion
+    // Let drawables update themselves before reinsertion. This can be used for animation
     if (drawableUpdates_.Empty())
         return;
     
@@ -597,12 +592,13 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
 
 void Octree::ReinsertDrawables(const FrameInfo& frame)
 {
+    // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
+    // the proper octant yet
     if (drawableReinsertions_.Empty())
         return;
     
     PROFILE(ReinsertToOctree);
     
-    // Reinsert drawables into the octree
     for (Vector<WeakPtr<Drawable> >::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;

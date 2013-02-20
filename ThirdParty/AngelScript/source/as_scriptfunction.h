@@ -87,11 +87,6 @@ struct asSSystemFunctionInterface;
 //       also functions/methods that are being called. This could be used to build a 
 //       code database with call graphs, etc.
 
-// TODO: runtime optimize: The GC should only be notified of the script function when the last module
-//                         removes it from the scope. Must make sure it is only added to the GC once
-//                         in case the function is added to another module after the GC already knows 
-//                         about the function.
-
 void RegisterScriptFunction(asCScriptEngine *engine);
 
 class asCScriptFunction : public asIScriptFunction
@@ -152,17 +147,19 @@ public:
 	~asCScriptFunction();
 
 	void      DestroyInternal();
+	void      Orphan(asIScriptModule *mod);
 
 	void      AddVariable(asCString &name, asCDataType &type, int stackOffset);
 
 	int       GetSpaceNeededForArguments();
 	int       GetSpaceNeededForReturnValue();
 	asCString GetDeclarationStr(bool includeObjectName = true, bool includeNamespace = false) const;
-	int       GetLineNumber(int programPosition);
+	int       GetLineNumber(int programPosition, int *sectionIdx);
 	void      ComputeSignatureId();
 	bool      IsSignatureEqual(const asCScriptFunction *func) const;
 	bool      IsSignatureExceptNameEqual(const asCScriptFunction *func) const;
 	bool      IsSignatureExceptNameEqual(const asCDataType &retType, const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
+	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCScriptFunction *fun) const;
 	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
 
 	bool      DoesReturnOnStack() const;
@@ -237,6 +234,7 @@ public:
 	int                             stackNeeded;
 	asCArray<int>                   lineNumbers;      // debug info
 	int                             scriptSectionIdx; // debug info
+	asCArray<int>                   sectionIdxs;      // debug info. Store position/index pairs if the bytecode is compiled from multiple script sections
 	bool                            dontCleanUpOnException;   // Stub functions don't own the object and parameters
 
 	// Used by asFUNC_VIRTUAL

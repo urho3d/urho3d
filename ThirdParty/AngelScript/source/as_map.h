@@ -48,6 +48,7 @@ public:
 	~asCMap();
 
 	int   Insert(const KEY &key, const VAL &value);
+	int   Insert(asSMapNode<KEY,VAL> *node);
 	int   GetCount() const;
 	
 	const KEY &GetKey(const asSMapNode<KEY,VAL> *cursor) const;
@@ -55,6 +56,7 @@ public:
 	VAL       &GetValue(asSMapNode<KEY,VAL> *cursor);
 
 	void Erase(asSMapNode<KEY,VAL> *cursor);
+	asSMapNode<KEY,VAL> *Remove(asSMapNode<KEY,VAL> *cursor);
 	void EraseAll();
 
 	void SwapWith(asCMap<KEY,VAL> &other);
@@ -104,6 +106,7 @@ protected:
 template <class KEY, class VAL> struct asSMapNode
 {
 	asSMapNode() {parent = 0; left = 0; right = 0; isRed = true;}
+	void Init(KEY k, VAL v) {key = k; value = v; parent = 0; left = 0; right = 0; isRed = true;}
 
 	asSMapNode *parent;
 	asSMapNode *left;
@@ -183,6 +186,12 @@ int asCMap<KEY, VAL>::Insert(const KEY &key, const VAL &value)
 	nnode->key   = key;
 	nnode->value = value;
 
+	return Insert(nnode);
+}
+
+template <class KEY, class VAL>
+int asCMap<KEY, VAL>::Insert(asSMapNode<KEY,VAL> *nnode)
+{
 	// Insert the node
 	if( root == 0 )
 		root = nnode;
@@ -362,7 +371,17 @@ bool asCMap<KEY, VAL>::MoveTo(asSMapNode<KEY,VAL> **out, const KEY &key) const
 template <class KEY, class VAL>
 void asCMap<KEY, VAL>::Erase(asSMapNode<KEY,VAL> *cursor)
 {
-	if( cursor == 0 ) return;
+	asSMapNode<KEY,VAL> *node = Remove(cursor);
+	asASSERT( node == cursor );
+
+	typedef asSMapNode<KEY,VAL> node_t;
+	asDELETE(node,node_t);
+}
+
+template <class KEY, class VAL>
+asSMapNode<KEY,VAL> *asCMap<KEY, VAL>::Remove(asSMapNode<KEY,VAL> *cursor)
+{
+	if( cursor == 0 ) return 0;
 
 	asSMapNode<KEY,VAL> *node = cursor;
 
@@ -423,10 +442,9 @@ void asCMap<KEY, VAL>::Erase(asSMapNode<KEY,VAL> *cursor)
 		if( remove->right ) remove->right->parent = remove;	
 	}
 
-	typedef asSMapNode<KEY,VAL> node_t;
-	asDELETE(node,node_t);
-
 	count--;
+
+	return node;
 }
 
 // Call method only if removed node was black

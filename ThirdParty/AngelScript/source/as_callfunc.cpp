@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -44,20 +44,21 @@
 
 BEGIN_AS_NAMESPACE
 
-int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, asSSystemFunctionInterface *internal)
+int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *objForThiscall, asSSystemFunctionInterface *internal)
 {
 	memset(internal, 0, sizeof(asSSystemFunctionInterface));
 
-	internal->func = ptr.ptr.f.func;
+	internal->func           = ptr.ptr.f.func;
+	internal->objForThiscall = 0;
 
 	// Was a compatible calling convention specified?
 	if( internal->func )
 	{
 		if( ptr.flag == 1 && callConv != asCALL_GENERIC )
 			return asWRONG_CALLING_CONV;
-		else if( ptr.flag == 2 && (callConv == asCALL_GENERIC || callConv == asCALL_THISCALL) )
+		else if( ptr.flag == 2 && (callConv == asCALL_GENERIC || callConv == asCALL_THISCALL || callConv == asCALL_THISCALL_ASGLOBAL) )
 			return asWRONG_CALLING_CONV;
-		else if( ptr.flag == 3 && callConv != asCALL_THISCALL )
+		else if( ptr.flag == 3 && !(callConv == asCALL_THISCALL || callConv == asCALL_THISCALL_ASGLOBAL) )
 			return asWRONG_CALLING_CONV;
 	}
 
@@ -68,6 +69,13 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 			internal->callConv = ICC_CDECL;
 		else if( base == asCALL_STDCALL )
 			internal->callConv = ICC_STDCALL;
+		else if( base == asCALL_THISCALL_ASGLOBAL )
+		{
+			if( objForThiscall == 0 )
+				return asINVALID_ARG;
+			internal->objForThiscall = objForThiscall;
+			internal->callConv       = ICC_THISCALL;
+		}
 		else if( base == asCALL_GENERIC )
 			internal->callConv = ICC_GENERIC_FUNC;
 		else
@@ -409,7 +417,13 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 
 	if( callConv >= ICC_THISCALL )
 	{
-		if( objectPointer )
+		if( sysFunc->objForThiscall )
+		{
+			// This class method is being called as if it is a global function
+			obj = sysFunc->objForThiscall;
+			asASSERT( objectPointer == 0 );
+		}
+		else if( objectPointer )
 		{
 			obj = objectPointer;
 		}
@@ -423,8 +437,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 			if( obj == 0 )
 			{
 				context->SetInternalException(TXT_NULL_POINTER_ACCESS);
-				if( retPointer )
-					engine->CallFree(retPointer);
 				return 0;
 			}
 
@@ -548,6 +560,8 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 		}
 		else
 		{
+			asASSERT( retPointer );
+
 			if( !sysFunc->hostReturnInMemory )
 			{
 				// Copy the returned value to the pointer sent by the script engine
@@ -575,23 +589,14 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 				}
 			}
 
-			// Store the object in the register
-			context->m_regs.objectRegister = retPointer;
-
-			// If the value is returned on the stack we shouldn't update the object register
-			if( descr->DoesReturnOnStack() )
+			if( context->m_status == asEXECUTION_EXCEPTION )
 			{
-				context->m_regs.objectRegister = 0;
-
-				if( context->m_status == asEXECUTION_EXCEPTION )
-				{
-					// If the function raised a script exception it really shouldn't have 
-					// initialized the object. However, as it is a soft exception there is 
-					// no way for the application to not return a value, so instead we simply
-					// destroy it here, to pretend it was never created.
-					if( descr->returnType.GetObjectType()->beh.destruct )
-						engine->CallObjectMethod(retPointer, descr->returnType.GetObjectType()->beh.destruct);
-				}
+				// If the function raised a script exception it really shouldn't have 
+				// initialized the object. However, as it is a soft exception there is 
+				// no way for the application to not return a value, so instead we simply
+				// destroy it here, to pretend it was never created.
+				if( descr->returnType.GetObjectType()->beh.destruct )
+					engine->CallObjectMethod(retPointer, descr->returnType.GetObjectType()->beh.destruct);
 			}
 		}
 	}

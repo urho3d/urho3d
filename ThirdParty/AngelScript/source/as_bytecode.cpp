@@ -46,6 +46,7 @@
 #include "as_array.h"
 #include "as_string.h"
 #include "as_scriptengine.h"
+#include "as_debug.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -54,6 +55,7 @@ asCByteCode::asCByteCode(asCScriptEngine *engine)
 	first = 0;
 	last  = 0;
 	largestStackUsed = -1;
+	temporaryVariables = 0;
 
 	this->engine = engine;
 }
@@ -63,14 +65,15 @@ asCByteCode::~asCByteCode()
 	ClearAll();
 }
 
-void asCByteCode::Finalize()
+void asCByteCode::Finalize(const asCArray<int> &tempVariableOffsets)
 {
+	temporaryVariables = &tempVariableOffsets;
+
 	// verify the bytecode
 	PostProcess();
 
-	// Optimize the code (optionally)
-	if( engine->ep.optimizeByteCode )
-		Optimize();
+	// Optimize the code
+	Optimize();
 
 	// Resolve jumps
 	ResolveJumpAddresses();
@@ -96,8 +99,6 @@ void asCByteCode::ClearAll()
 	lineNumbers.SetLength(0);
 
 	largestStackUsed = -1;
-
-	temporaryVariables.SetLength(0);
 }
 
 void asCByteCode::InsertIfNotExists(asCArray<int> &vars, int var)
@@ -108,6 +109,8 @@ void asCByteCode::InsertIfNotExists(asCArray<int> &vars, int var)
 
 void asCByteCode::GetVarsUsed(asCArray<int> &vars)
 {
+	TimeIt("asCByteCode::GetVarsUsed");
+
 	asCByteInstruction *curr = first;
 	while( curr )
 	{
@@ -145,6 +148,8 @@ void asCByteCode::GetVarsUsed(asCArray<int> &vars)
 
 bool asCByteCode::IsVarUsed(int offset)
 {
+	TimeIt("asCByteCode::IsVarUsed");
+
 	asCByteInstruction *curr = first;
 	while( curr )
 	{
@@ -296,19 +301,21 @@ void asCByteCode::RemoveInstruction(asCByteInstruction *instr)
 
 bool asCByteCode::CanBeSwapped(asCByteInstruction *curr)
 {
-	if( !curr || !curr->next || !curr->next->next ) return false;
-	if( curr->next->next->op != asBC_SwapPtr ) return false;
+	asASSERT( curr->op == asBC_SwapPtr );
 
-	asCByteInstruction *next = curr->next;
+	if( !curr->prev || !curr->prev->prev ) return false;
 
-	if( curr->op != asBC_PshNull &&
-		curr->op != asBC_PshVPtr &&
-		curr->op != asBC_PSF )
+	asCByteInstruction *b = curr->prev;
+	asCByteInstruction *a = b->prev;
+
+	if( a->op != asBC_PshNull &&
+		a->op != asBC_PshVPtr &&
+		a->op != asBC_PSF )
 		return false;
 
-	if( next->op != asBC_PshNull &&
-		next->op != asBC_PshVPtr &&
-		next->op != asBC_PSF )
+	if( b->op != asBC_PshNull &&
+		b->op != asBC_PshVPtr &&
+		b->op != asBC_PSF )
 		return false;
 
 	return true;
@@ -323,8 +330,19 @@ asCByteInstruction *asCByteCode::GoBack(asCByteInstruction *curr)
 	return curr;
 }
 
+asCByteInstruction *asCByteCode::GoForward(asCByteInstruction *curr)
+{
+	// Go forward 2 instructions
+	if( !curr ) return 0;
+	if( curr->next ) curr = curr->next;
+	if( curr->next ) curr = curr->next;
+	return curr;
+}
+
 bool asCByteCode::PostponeInitOfTemp(asCByteInstruction *curr, asCByteInstruction **next)
 {
+	TimeIt("asCByteCode::PostponeInitOfTemp");
+
 	// This is not done for pointers
 	if( (curr->op != asBC_SetV4 && curr->op != asBC_SetV8) || 
 		!IsTemporary(curr->wArg[0]) ) return false;
@@ -348,23 +366,23 @@ bool asCByteCode::PostponeInitOfTemp(asCByteInstruction *curr, asCByteInstructio
 
 	if( use && use->prev != curr )
 	{
-		*next = curr->next;
+		asCByteInstruction *orig = curr->next;
 
 		// Move the instruction
 		RemoveInstruction(curr);
 		InsertBefore(use, curr);
 
 		// Try a RemoveUnusedValue to see if it can be combined with the other 
-		asCByteInstruction *temp;
-		if( RemoveUnusedValue(curr, &temp) )
+		if( RemoveUnusedValue(curr, 0) )
 		{
-			*next = GoBack(*next);
+			// Optimizations should continue from the instruction that uses the value
+			*next = orig;
 			return true;
 		}
 		
 		// Return the instructions to its original position as it wasn't useful
 		RemoveInstruction(curr);
-		InsertBefore(*next, curr);
+		InsertBefore(orig, curr);
 	}
 
 	return false;
@@ -372,27 +390,38 @@ bool asCByteCode::PostponeInitOfTemp(asCByteInstruction *curr, asCByteInstructio
 
 bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction **next)
 {
+	TimeIt("asCByteCode::RemoveUnusedValue");
+
+	asCByteInstruction *dummy;
+	if( next == 0 )
+		next = &dummy;
+
 	// TODO: runtime optimize: Should work for 64bit types as well
 
+	// TODO: runtime optimize: Need a asBCTYPE_rwW_ARG to cover the instructions that read 
+	//                         and write to the same variable. Currently they are considered
+	//                         as readers only, so they are not optimized away. This includes
+	//                         NOT, BNOT, IncV, DecV, NEG, iTOf (and all other type casts)
+
 	// The value isn't used for anything
-	if( (asBCInfo[curr->op].type == asBCTYPE_wW_rW_rW_ARG ||
+	if( curr->op != asBC_FREE && // Can't remove the FREE instruction
+		(asBCInfo[curr->op].type == asBCTYPE_wW_rW_rW_ARG ||
 		 asBCInfo[curr->op].type == asBCTYPE_wW_rW_ARG    ||
 		 asBCInfo[curr->op].type == asBCTYPE_wW_rW_DW_ARG ||
 		 asBCInfo[curr->op].type == asBCTYPE_wW_ARG       ||
 		 asBCInfo[curr->op].type == asBCTYPE_wW_DW_ARG    ||
 		 asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG) &&
 		IsTemporary(curr->wArg[0]) &&
-		!IsTempVarRead(curr, curr->wArg[0]) &&
-		curr->op != asBC_FREE ) // Can't remove the FREE instruction
+		!IsTempVarRead(curr, curr->wArg[0]) ) 
 	{
 		if( curr->op == asBC_LdGRdR4 && IsTempRegUsed(curr) )
 		{
 			curr->op = asBC_LDG;
-			*next = GoBack(curr);
+			*next = GoForward(curr);
 			return true;
 		}
 
-		*next = GoBack(DeleteInstruction(curr));
+		*next = GoForward(DeleteInstruction(curr));
 		return true;
 	}
 
@@ -403,15 +432,15 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 		     curr->next->op == asBC_CMPf ||
 		     curr->next->op == asBC_CMPu) &&
 		    curr->wArg[0] == curr->next->wArg[1] &&
-		    (IsTemporary(curr->wArg[0]) &&                       // The variable is temporary and never used again
-		    !IsTempVarRead(curr->next, curr->wArg[0])) )
+		    IsTemporary(curr->wArg[0]) &&                       // The variable is temporary and never used again
+		    !IsTempVarRead(curr->next, curr->wArg[0]) )
 		{
 			if(      curr->next->op == asBC_CMPi ) curr->next->op = asBC_CMPIi;
 			else if( curr->next->op == asBC_CMPf ) curr->next->op = asBC_CMPIf;
 			else if( curr->next->op == asBC_CMPu ) curr->next->op = asBC_CMPIu;
 			curr->next->size = asBCTypeSize[asBCInfo[asBC_CMPIi].type];
 			curr->next->arg = curr->arg;
-			*next = GoBack(DeleteInstruction(curr));
+			*next = GoForward(DeleteInstruction(curr));
 			return true;
 		}
 	
@@ -435,7 +464,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 			else if( curr->next->op == asBC_MULf ) curr->next->op = asBC_MULIf;
 			curr->next->size = asBCTypeSize[asBCInfo[asBC_ADDIi].type];
 			curr->next->arg = curr->arg;
-			*next = GoBack(DeleteInstruction(curr));
+			*next = GoForward(DeleteInstruction(curr));
 			return true;
 		}
 
@@ -458,7 +487,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 			// The order of the operands are changed
 			curr->next->wArg[1] = curr->next->wArg[2];
 
-			*next = GoBack(DeleteInstruction(curr));
+			*next = GoForward(DeleteInstruction(curr));
 			return true;
 		}
 
@@ -469,8 +498,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 			!IsTempVarRead(curr->next, curr->wArg[0]) )
 		{
 			curr->wArg[0] = curr->next->wArg[0];
-			DeleteInstruction(curr->next);
-			*next = GoBack(curr);
+			*next = GoForward(DeleteInstruction(curr->next));
 			return true;
 		}
 
@@ -482,8 +510,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 		{
 			curr->op = asBC_PshC4;
 			curr->stackInc = asBCInfo[asBC_PshC4].stackInc;
-			DeleteInstruction(curr->next);
-			*next = GoBack(curr);
+			*next = GoForward(DeleteInstruction(curr->next));
 			return true;
 		}
 
@@ -497,13 +524,12 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 			curr->size = asBCTypeSize[asBCInfo[asBC_SetG4].type];
 			*(((asDWORD*)&curr->arg)+AS_PTR_SIZE) = *ARG_DW(curr->arg);
 			*ARG_PTR(curr->arg) = *ARG_PTR(curr->next->arg);
-			DeleteInstruction(curr->next);
-			*next = GoBack(curr);
+			*next = GoForward(DeleteInstruction(curr->next));
 			return true;
 		}
 	}
 
-	// The values is immediately moved to another variable and then not used again
+	// The value is immediately moved to another variable and then not used again
 	if( (asBCInfo[curr->op].type == asBCTYPE_wW_rW_rW_ARG || 
 		 asBCInfo[curr->op].type == asBCTYPE_wW_rW_DW_ARG) && 
 		curr->next && curr->next->op == asBC_CpyVtoV4 &&
@@ -512,8 +538,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 		!IsTempVarRead(curr->next, curr->wArg[0]) )
 	{
 		curr->wArg[0] = curr->next->wArg[0];
-		DeleteInstruction(curr->next);
-		*next = GoBack(curr);
+		*next = GoForward(DeleteInstruction(curr->next));
 		return true;
 	}
 
@@ -525,7 +550,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 	{
 		// Delete both instructions
 		DeleteInstruction(curr->next);
-		*next = GoBack(DeleteInstruction(curr));
+		*next = GoForward(DeleteInstruction(curr));
 		return true;
 	}
 
@@ -538,8 +563,7 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 		curr->op = asBC_PshG4;
 		curr->size = asBCTypeSize[asBCInfo[asBC_PshG4].type];
 		curr->stackInc = asBCInfo[asBC_PshG4].stackInc;
-		DeleteInstruction(curr->next);
-		*next = GoBack(curr);
+		*next = GoForward(DeleteInstruction(curr->next));
 		return true;
 	}
 
@@ -552,69 +576,522 @@ bool asCByteCode::RemoveUnusedValue(asCByteInstruction *curr, asCByteInstruction
 	{
 		curr->op = asBC_PshC8;
 		curr->stackInc = asBCInfo[asBC_PshC8].stackInc;
-		DeleteInstruction(curr->next);
-		*next = GoBack(curr);
+		*next = GoForward(DeleteInstruction(curr->next));
 		return true;
 	}
 
 	return false;
 }
 
-bool asCByteCode::IsTemporary(short offset)
+bool asCByteCode::IsTemporary(int offset)
 {
-	for( asUINT n = 0; n < temporaryVariables.GetLength(); n++ )
-		if( temporaryVariables[n] == offset )
-			return true;
+	TimeIt("asCByteCode::IsTemporary");
 
-	return false;
+	asASSERT(temporaryVariables);
+
+	return temporaryVariables->Exists(offset);
 }
 
-int asCByteCode::Optimize()
+void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 {
-	// TODO: runtime optimize: The optimizer should be able to inline function calls.
-	//                         If the called function has only a few instructions, the function call should be inlined.
-	//                         This is especially useful with the factory stubs used for template types and script classes.
+	// This function performs the optimizations that doesn't require global knowledge of the 
+	// entire function, e.g. replacement of sequences of bytecodes for specialized instructions. 
 
-	// TODO: runtime optimize: Need a bytecode BC_AddRef so that BC_CALLSYS doesn't have to be used for this trivial call
-	
-	// TODO: runtime optimize: A single bytecode for incrementing a variable, comparing, and jumping can probably improve 
-	//                         loops a lot. How often do these loops really occur?
+	if( !engine->ep.optimizeByteCode )
+		return;
+
+	temporaryVariables = &tempVariableOffsets;
 
 	// TODO: runtime optimize: VAR + GET... should be optimized if the only instructions between them are trivial, i.e. no 
 	//                         function calls that can suspend the execution.
 
 	// TODO: runtime optimize: Remove temporary copies of handles, when the temp is just copied to yet another location
 
-	// TODO: optimize: Reorganize checks to avoid checking the same instructions multiple times
+	// TODO: runtime optimize: A single bytecode for incrementing a variable, comparing, and jumping can probably improve 
+	//                         loops a lot. How often do these loops really occur?
 
+	// TODO: runtime optimize: Need a bytecode BC_AddRef so that BC_CALLSYS doesn't have to be used for this trivial call
+
+	// TODO: optimize: Should possibly do two loops. Some of the checks are best doing by iterating from 
+	//                 the end to beginning, e.g. the removal of unused values. Other checks are best
+	//                 doing by iterating from the beginning to end, e.g. replacement of sequences with 
+	//                 shorter ones. By doing this, we should be able to avoid backtracking with every 
+	//                 change thus avoid unnecessary duplicate checks.
+
+	// Iterate through the bytecode instructions in the reverse order. 
+	// An optimization in an instruction may mean that another instruction before that 
+	// can also be optimized, e.g. if an add instruction is removed because the result is not
+	// used, then the instructions that created the operands may potentially also be removed.
+	asCByteInstruction *instr = last;
+	while( instr )
+	{
+		asCByteInstruction *curr = instr;
+		instr = instr->prev;
+
+		// Remove instructions when the result is not used anywhere
+		// This will return true if the instruction is deleted, and
+		// false if it is not deleted. Observe that the instruction
+		// can be modified.
+		if( RemoveUnusedValue(curr, &instr) ) continue;
+
+		// Postpone initializations so that they may be combined in the second pass.
+		// If the initialization is postponed, then the optimizations should continue
+		// from where the value was used, so instr will be updated to point to that.
+		if( PostponeInitOfTemp(curr, &instr) ) continue;
+
+		// Look for sequences that can be replaced with shorter ones
+		const asEBCInstr currOp = curr->op;
+		if( currOp == asBC_SwapPtr )
+		{
+			// XXX x, YYY y, SwapPtr -> YYY y, XXX x
+			if( CanBeSwapped(curr) )
+			{
+				// Delete the SwapPtr
+				DeleteInstruction(curr);
+
+				// Swap instructions
+				asCByteInstruction *a = instr->prev;
+				RemoveInstruction(instr);
+				InsertBefore(a, instr);
+
+				// Continue the optimization from the second instruction
+				instr = GoForward(a);
+				continue;
+			}
+		}
+		else if( currOp == asBC_ClrHi )
+		{
+			// T??, ClrHi -> T??
+			if( instr &&
+				(instr->op == asBC_TZ  ||
+			     instr->op == asBC_TNZ ||
+			     instr->op == asBC_TS  ||
+			     instr->op == asBC_TNS ||
+			     instr->op == asBC_TP  ||
+		 	     instr->op == asBC_TNP) ) 
+			{
+				// Remove the ClrHi instruction since the test  
+				// instructions always clear the top bytes anyway
+				instr = GoForward(DeleteInstruction(curr));
+				continue;
+			}
+			
+			// ClrHi, JZ -> JLowZ
+			if( curr->next &&
+				curr->next->op == asBC_JZ )
+			{
+				curr->next->op = asBC_JLowZ;
+				instr = GoForward(DeleteInstruction(curr));
+				continue;
+			}
+			
+			// ClrHi, JNZ -> JLowNZ
+			if( curr->next && 
+				curr->next->op == asBC_JNZ )
+			{
+				curr->next->op = asBC_JLowNZ;
+				instr = GoForward(DeleteInstruction(curr));
+				continue;				
+			}
+		}
+		else if( currOp == asBC_LDV && curr->next )
+		{
+			// LDV x, INCi -> IncVi x
+			if( curr->next->op == asBC_INCi && !IsTempRegUsed(curr->next) )
+			{
+				curr->op = asBC_IncVi;
+				DeleteInstruction(curr->next);
+				instr = GoForward(curr);
+			}
+			// LDV x, DECi -> DecVi x
+			else if( curr->next->op == asBC_DECi && !IsTempRegUsed(curr->next) )
+			{
+				curr->op = asBC_DecVi;
+				DeleteInstruction(curr->next);
+				instr = GoForward(curr);
+			}
+		}
+		else if( currOp == asBC_LDG && curr->next )
+		{
+			// LDG x, WRTV4 y -> CpyVtoG4 y, x
+			if( curr->next->op == asBC_WRTV4 && !IsTempRegUsed(curr->next) )
+			{
+				curr->op = asBC_CpyVtoG4;
+				curr->size = asBCTypeSize[asBCInfo[asBC_CpyVtoG4].type];
+				curr->wArg[0] = curr->next->wArg[0];
+				DeleteInstruction(curr->next);
+				instr = GoForward(curr);
+			}
+			// LDG x, RDR4 y -> CpyGtoV4 y, x
+			else if( curr->next->op == asBC_RDR4 )
+			{
+				if( !IsTempRegUsed(curr->next) )
+					curr->op = asBC_CpyGtoV4;
+				else 
+					curr->op = asBC_LdGRdR4;
+				curr->size = asBCTypeSize[asBCInfo[asBC_CpyGtoV4].type];
+				curr->wArg[0] = curr->next->wArg[0];
+				DeleteInstruction(curr->next);
+				instr = GoForward(curr);
+			}
+		}
+		else if( currOp == asBC_CHKREF )
+		{
+			// CHKREF, ADDSi -> ADDSi
+			// CHKREF, RDSPtr -> RDSPtr
+			if( curr->next && 
+				(curr->next->op == asBC_ADDSi || curr->next->op == asBC_RDSPtr) )
+			{
+				// As ADDSi & RDSPtr already checks the pointer the CHKREF instruction is unnecessary
+				instr = GoForward(DeleteInstruction(curr));
+			}
+			// ADDSi, CHKREF -> ADDSi
+			// PGA, CHKREF -> PGA 
+			// PSF, CHKREF -> PSF
+			else if( instr && 
+				     (instr->op == asBC_ADDSi ||
+					  instr->op == asBC_PGA ||
+					  instr->op == asBC_PSF) )
+			{
+				// ADDSi is guaranteed to work on valid pointers so CHKREF is not necessary.
+				// PGA and PSF always pushes a valid address on the stack.
+				instr = GoForward(DeleteInstruction(curr));
+			}
+			// PGA, ChkRefS, CHKREF -> PGA, ChkRefS
+			else if( instr && instr->op == asBC_ChkRefS &&
+				     instr->prev && instr->prev->op == asBC_PGA )
+			{
+				// Delete CHKREF since PGA always pushes a valid address on the stack
+				instr = GoForward(DeleteInstruction(curr));
+			}
+		}
+		else if( currOp == asBC_PopPtr )
+		{
+			// RDSPtr, PopPtr -> PopPtr
+			if( instr && instr->op == asBC_RDSPtr )
+			{
+				instr = GoForward(DeleteInstruction(instr));
+			}
+			// PshNull, RefCpyV, PopPtr -> FREE
+			else if( instr && instr->op == asBC_RefCpyV &&
+					 instr->prev && instr->prev->op == asBC_PshNull )
+			{
+				DeleteInstruction(curr);
+				DeleteInstruction(instr->prev);
+				instr->op = asBC_FREE;
+				instr = GoForward(instr);
+			}
+			// PshVPtr y, PopPtr -> nothing
+			// PSF y    , PopPtr -> nothing
+			// VAR y    , PopPtr -> nothing
+			// PshNull  , PopPtr -> nothing
+			// PshRPtr  , PopPtr -> nothing
+			else if( instr &&
+				     (instr->op == asBC_PshRPtr ||
+					  instr->op == asBC_PSF     ||
+					  instr->op == asBC_VAR     ||
+					  instr->op == asBC_PshVPtr ||
+					  instr->op == asBC_PshNull) )
+			{
+				// A pointer is pushed on the stack then immediately removed
+				// Remove both instructions as they cancel each other
+				DeleteInstruction(curr);
+				instr = GoForward(DeleteInstruction(instr));
+			}
+			// PSF, ChkRefS, PopPtr -> ChkNullV
+			else if( instr && instr->op == asBC_ChkRefS &&
+				     instr->prev && instr->prev->op == asBC_PSF )
+			{
+				instr = instr->prev;
+				instr->op = asBC_ChkNullV;
+				instr->stackInc = 0;
+				// Delete the PopPtr instruction
+				DeleteInstruction(curr);
+				// Delete the ChkRefS instruction
+				DeleteInstruction(instr->next);
+				instr = GoForward(instr);
+			}
+			// PshVPtr, CHKREF, PopPtr -> ChkNullV
+			else if( instr && instr->op == asBC_CHKREF &&
+					 instr->prev && instr->prev->op == asBC_PshVPtr )
+			{
+				instr = instr->prev;
+				instr->op = asBC_ChkNullV;
+				instr->stackInc = 0;
+				DeleteInstruction(curr->prev);
+				DeleteInstruction(curr);
+				instr = GoForward(instr);
+			}
+			// STOREOBJ y, PSF y, RDSPtr, PSF x, REFCPY, FREE y, PopPtr -> FREE x, STOREOBJ x
+			else if( instr && instr->op == asBC_FREE )
+			{
+				asCByteInstruction *i = instr->prev;
+				if( !i || i->op != asBC_REFCPY ) continue; 
+				i = i->prev;
+				if( !i || i->op != asBC_PSF ) continue;
+				short x = i->wArg[0];
+				i = i->prev;
+				if( !i || i->op != asBC_RDSPtr ) continue;
+				i = i->prev;
+				if( !i || i->op != asBC_PSF ) continue;
+				short y = i->wArg[0];
+				i = i->prev;
+				if( !i || i->op != asBC_STOREOBJ || i->wArg[0] != y ) continue;
+
+				// Don't do the substitution if the var y is not a temporary, or if it is used after PopPtr
+				if( !IsTemporary(y) || IsTempVarRead(curr, y) ) continue;
+
+				// Transform the PopPtr into STOREOBJ
+				curr->op = asBC_STOREOBJ;
+				curr->stackInc = 0;
+				curr->wArg[0] = x;
+				curr->size = i->size;
+
+				// Change arg of the FREE to x
+				// TODO: runtime optimize: The FREE instruction shouldn't be necessary. STOREOBJ should free the previous value by itself
+				instr->wArg[0] = x;
+
+				// Delete all other instructions
+				DeleteInstruction(instr->prev); // REFCPY
+				DeleteInstruction(instr->prev); // PSF
+				DeleteInstruction(instr->prev); // RDSTR
+				DeleteInstruction(instr->prev); // PSF
+				DeleteInstruction(instr->prev); // STOREOBJ
+	
+				instr = GoForward(curr);
+			}
+
+		}
+		else if( currOp == asBC_RDSPtr )
+		{
+			// PGA, RDSPtr -> PshGPtr
+			if( instr && instr->op == asBC_PGA )
+			{
+				instr->op = asBC_PshGPtr;
+				DeleteInstruction(curr);
+				instr = GoForward(instr);
+			}	
+			// ChkRefS, RDSPtr -> RDSPtr, CHKREF
+			else if( instr && instr->op == asBC_ChkRefS )
+			{
+				// This exchange removes one pointer dereference, and also 
+				// makes it easier to completely remove the CHKREF instruction
+				curr->op = asBC_CHKREF;
+				instr->op = asBC_RDSPtr;
+				instr = GoForward(curr);
+			}
+			// PSF, RDSPtr -> PshVPtr
+			else if( instr && instr->op == asBC_PSF )
+			{
+				instr->op = asBC_PshVPtr;
+				instr = GoForward(DeleteInstruction(curr));
+			}
+			// PSF, ChkRefS, RDSPtr -> PshVPtr, CHKREF
+			else if( instr && instr->op == asBC_ChkRefS &&
+					 instr->prev && instr->prev->op == asBC_PSF )
+			{
+				instr->prev->op = asBC_PshVPtr;
+				instr->op = asBC_CHKREF;
+				instr = GoForward(DeleteInstruction(curr));
+			}
+		}
+		else if( currOp == asBC_PopRPtr )
+		{
+			// PshVPtr 0, ADDSi, PopRPtr -> LoadThisR
+			if( instr && instr->op == asBC_ADDSi &&
+			    instr->prev && instr->prev->op == asBC_PshVPtr &&
+			    instr->prev->wArg[0] == 0 )
+			{
+				DeleteInstruction(instr->prev);
+				ChangeFirstDeleteNext(instr, asBC_LoadThisR);
+				instr = GoForward(instr);
+			}
+			// TODO: runtime optimize: PshVPtr x, PopRPtr -> LoadRObjR x, 0
+			// PshVPtr x, ADDSi, PopRPtr -> LoadRObjR
+			else if( instr && instr->op == asBC_ADDSi &&
+					 instr->prev && instr->prev->op == asBC_PshVPtr &&
+					 instr->prev->wArg[0] != 0 )
+			{
+				instr = instr->prev;
+				instr->op = asBC_LoadRObjR;
+				instr->size = asBCTypeSize[asBCInfo[asBC_LoadRObjR].type];
+				instr->stackInc = asBCInfo[asBC_LoadRObjR].stackInc;
+				instr->wArg[1] = instr->next->wArg[0];
+				*(asDWORD*)&instr->arg = *(asDWORD*)&instr->next->arg;
+				DeleteInstruction(instr->next);
+				DeleteInstruction(curr);
+				instr = GoForward(instr);
+			}
+			// PSF x, ADDSi, PopRPtr -> LoadVObjR
+			else if( instr && instr->op == asBC_ADDSi &&
+				     instr->prev && instr->prev->op == asBC_PSF )
+			{
+				instr = instr->prev;
+				instr->op = asBC_LoadVObjR;
+				instr->size = asBCTypeSize[asBCInfo[asBC_LoadVObjR].type];
+				instr->stackInc = asBCInfo[asBC_LoadVObjR].stackInc;
+				instr->wArg[1] = instr->next->wArg[0];
+				*(asDWORD*)&instr->arg = *(asDWORD*)&instr->next->arg;
+				DeleteInstruction(instr->next);
+				DeleteInstruction(curr);
+				instr = GoForward(instr);
+			}
+		}
+		else if( currOp == asBC_REFCPY )
+		{
+			// PSF x, REFCPY -> RefCpyV x
+			if( instr && instr->op == asBC_PSF )
+			{
+				curr->op = asBC_RefCpyV;
+				curr->wArg[0] = instr->wArg[0];
+				curr->stackInc = asBCInfo[asBC_LoadVObjR].stackInc;
+				DeleteInstruction(instr);
+				instr = GoForward(curr);
+			}
+		}
+		else if( ((currOp >= asBC_JZ && currOp <= asBC_JNP) || currOp == asBC_JLowZ || currOp == asBC_JLowNZ) && instr )
+		{
+			// T**; J** +x -> J** +x
+			if( (instr->op == asBC_TZ && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+			    (instr->op == asBC_TNZ && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JNZ));
+			else if( (instr->op == asBC_TNZ && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+					 (instr->op == asBC_TZ && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JZ));
+			else if( (instr->op == asBC_TS && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+					 (instr->op == asBC_TNS && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JNS));
+			else if( (instr->op == asBC_TNS && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+					 (instr->op == asBC_TS && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JS));
+			else if( (instr->op == asBC_TP && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+					 (instr->op == asBC_TNP && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JNP));
+			else if( (instr->op == asBC_TNP && (currOp == asBC_JZ || currOp == asBC_JLowZ)) ||
+					 (instr->op == asBC_TP && (currOp == asBC_JNZ || currOp == asBC_JLowNZ)) )
+				instr = GoForward(DeleteFirstChangeNext(instr, asBC_JP));
+		}
+		else if( currOp == asBC_FREE && instr )
+		{
+			// PSF, FREE -> FREE, PSF
+			if( instr->op == asBC_PSF )
+			{
+				// This pattern usually happens when a function returns an object, or handle
+				// and then releases a temporary variable, possibly used in one of the arguments.
+				// By swapping the order of these instructions, the code can be further optimized
+				// to combine the PSF with the following instructions
+				RemoveInstruction(curr);
+				InsertBefore(instr, curr);
+				instr = GoForward(instr);
+			}
+			// VAR, FREE -> FREE, VAR
+			else if( instr->op == asBC_VAR )
+			{
+				// Swap the two instructions, so that the VAR instruction 
+				// gets closer to its corresponding GET instruction and thus
+				// has a greater chance of getting optimized
+				RemoveInstruction(curr);
+				InsertBefore(instr, curr);
+				instr = GoForward(instr);
+			}
+		}
+		else if( currOp == asBC_VAR )
+		{
+			// VAR, PSF, GETOBJREF {PTR_SIZE} -> PshVPtr, PSF
+			if( curr->next && curr->next->op == asBC_PSF &&
+				curr->next->next && curr->next->next->op == asBC_GETOBJREF &&
+				curr->next->next->wArg[0] == AS_PTR_SIZE )
+			{
+				curr->op = asBC_PshVPtr;
+				DeleteInstruction(curr->next->next);
+				instr = GoForward(curr);
+			}
+			// VAR a, GETREF 0 -> PSF a
+			else if( curr->next && curr->next->op == asBC_GETREF && curr->next->wArg[0] == 0 )
+			{
+				ChangeFirstDeleteNext(curr, asBC_PSF);
+				instr = GoForward(curr);
+			}
+		}
+	}
+
+	// Optimize unnecessary refcpy for return handle. This scenario only happens for return statements
+	// and LOADOBJ can only be the last instruction before the RET, so doing this check after the rest of
+	// the optimizations have taken place saves us time.
+	if( last && last->op == asBC_LOADOBJ && IsTemporary(last->wArg[0]) )
+	{
+		// A temporary handle is being loaded into the object register. 
+		// Let's look for a trivial RefCpyV to that temporary variable, and a Free of the original
+		// variable. If this is found, then we can simply load the original value into the register
+		// and avoid both the RefCpy and the Free.
+		short tempVar = last->wArg[0];
+		asCArray<short> freedVars;
+
+		asCByteInstruction *instr = last->prev;
+		asASSERT( instr && instr->op == asBC_Block );
+		instr = instr->prev;
+		while( instr && instr->op == asBC_FREE )
+		{
+			freedVars.PushLast(instr->wArg[0]);
+			instr = instr->prev;
+		}
+
+		// If there is any non-trivial cleanups, e.g. call to destructors, then we skip this optimizations
+		// TODO: runtime optimize: Do we need to skip it? Is there really a chance the local variable 
+		//                         will be invalidated while the destructor, or any other function for  
+		//                         that matter, is being called?
+		if( instr && instr->op == asBC_Block )
+		{
+			// We expect a sequence PshVPtr, RefCpyV, PopPtr just before the clean up block
+			instr = instr->prev;
+			if( instr && instr->op == asBC_PopPtr ) instr = instr->prev;
+			if( instr && instr->op == asBC_RefCpyV && instr->wArg[0] == tempVar ) instr = instr->prev;
+			if( instr && instr->op == asBC_PshVPtr && freedVars.Exists(instr->wArg[0]) )
+			{
+				// Update the LOADOBJ to load the local variable directly
+				tempVar = instr->wArg[0];
+				last->wArg[0] = tempVar;
+
+				// Remove the copy of the local variable into the temp
+				DeleteInstruction(instr->next); // deletes RefCpyV
+				DeleteInstruction(instr->next); // deletes PopPtr
+				DeleteInstruction(instr);       // deletes PshVPtr
+
+				// Find and remove the FREE instruction for the local variable too
+				instr = last->prev->prev;
+				while( instr )
+				{
+					asASSERT( instr->op == asBC_FREE );
+					if( instr->wArg[0] == tempVar )
+					{
+						DeleteInstruction(instr);
+						break;
+					}
+					instr = instr->prev;
+				}
+			}
+		}
+	}
+}
+
+void asCByteCode::Optimize()
+{
+	// This function performs the optimizations that require global knowledge of the entire function
+
+	TimeIt("asCByteCode::Optimize");
+
+	if( !engine->ep.optimizeByteCode )
+		return;
+
+	// TODO: runtime optimize: The optimizer should be able to inline function calls.
+	//                         If the called function has only a few instructions, the function call should be inlined.
+	//                         This is especially useful with the factory stubs used for template types and script classes.
 
 	asCByteInstruction *instr = first;
 	while( instr )
 	{
 		asCByteInstruction *curr = instr;
 		instr = instr->next;
-
-		// Remove or combine instructions 
-		if( RemoveUnusedValue(curr, &instr) ) continue;
-
-		// Postpone initializations so that they may be combined in the second pass
-		if( PostponeInitOfTemp(curr, &instr) ) continue;
-
-		// XXX x, YYY y, SwapPtr -> YYY y, XXX x
-		if( CanBeSwapped(curr) )
-		{
-			// Delete SwapPtr
-			DeleteInstruction(instr->next);
-
-			// Swap instructions
-			RemoveInstruction(instr);
-			InsertBefore(curr, instr);
-
-			instr = GoBack(instr);
-
-			continue;
-		}
-
 
 		const asEBCInstr currOp = curr->op;
 
@@ -629,212 +1106,8 @@ int asCByteCode::Optimize()
 		{
 			const asEBCInstr instrOp = instr->op;
 
-			// T??, DiscardVar -> DiscardVar, T??
-			if( instrOp == asBC_DiscardVar &&
-				(currOp == asBC_TZ  ||
-				 currOp == asBC_TNZ ||
-				 currOp == asBC_TS  ||
-				 currOp == asBC_TNS ||
-				 currOp == asBC_TP  ||
-				 currOp == asBC_TNP ) )
-			{
-				// Swap instructions
-				RemoveInstruction(instr);
-				InsertBefore(curr, instr);
-				instr = GoBack(instr);
-			}
-			// T??, ClrHi -> T??
-			else if( instrOp == asBC_ClrHi &&
-				     (currOp == asBC_TZ  ||
-				      currOp == asBC_TNZ ||
-				      currOp == asBC_TS  ||
-				      currOp == asBC_TNS ||
-				      currOp == asBC_TP  ||
-			 	      currOp == asBC_TNP ) )
-			{
-				// Remove the ClrHi instruction, since the test instructions always clear the top bytes anyway
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			else if( currOp == asBC_ClrHi )
-			{
-				// ClrHi, JZ -> JLowZ
-				if( instrOp == asBC_JZ )
-				{
-					DeleteInstruction(curr);
-					instr->op = asBC_JLowZ;
-					instr = GoBack(instr);
-				}
-				// ClrHi, JNZ -> JLowNZ
-				else if( instrOp == asBC_JNZ )
-				{
-					DeleteInstruction(curr);
-					instr->op = asBC_JLowNZ;
-					instr = GoBack(instr);
-				}
-			}
-			// PGA, RDSPtr -> PshGPtr
-			else if( currOp == asBC_PGA && instrOp == asBC_RDSPtr )
-			{
-				curr->op = asBC_PshGPtr;
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// RDSPtr, PopPtr -> PopPtr
-			else if( currOp == asBC_RDSPtr && instrOp == asBC_PopPtr )
-			{
-				DeleteInstruction(curr);
-				instr = GoBack(instr);
-			}
-			// VAR, FREE -> FREE, VAR
-			else if( currOp == asBC_VAR && instrOp == asBC_FREE )
-			{
-				// Swap the two instructions, so that the VAR instruction 
-				// gets closer to its corresponding GET instruction and thus
-				// has a greater chance of getting optimized
-				RemoveInstruction(instr);
-				InsertBefore(curr, instr);
-				instr = GoBack(instr);
-			}
-			// VAR, PSF, GETOBJREF {PTR_SIZE} -> PshVPtr, PSF
-			else if( currOp == asBC_VAR &&
-				     instrOp == asBC_PSF &&
-					 instr->next &&
-					 instr->next->op == asBC_GETOBJREF &&
-					 instr->next->wArg[0] == AS_PTR_SIZE )
-			{
-				curr->op = asBC_PshVPtr;
-				DeleteInstruction(instr->next);
-				instr = GoBack(curr);
-			}
-			// ChkRefS, RDSPtr -> RDSPtr, CHKREF
-			else if( currOp == asBC_ChkRefS && instrOp == asBC_RDSPtr )
-			{
-				// This exchange removes one pointer dereference, and also 
-				// makes it easier to completely remove the CHKREF instruction
-				curr->op = asBC_RDSPtr;
-				instr->op = asBC_CHKREF;
-				instr = GoBack(curr);
-			}
-			// CHKREF, ADDSi -> ADDSi
-			// CHKREF, RDSPtr -> RDSPtr
-			else if( currOp == asBC_CHKREF &&
-					 (instrOp == asBC_ADDSi || instrOp == asBC_RDSPtr) )
-			{
-				// As ADDSi & RDSPtr already checks the pointer, the CHKREF instruction is unnecessary
-				DeleteInstruction(curr);
-				instr = GoBack(instr);
-			}
-			// ADDSi, CHKREF -> ADDSi
-			else if( currOp == asBC_ADDSi && instrOp == asBC_CHKREF )
-			{
-				// As ADDSi is guaranteed to work on valid pointers, then CHKREF is not necessary
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// PshVPtr 0, ADDSi, PopRPtr -> LoadThisR
-			else if( currOp == asBC_PshVPtr &&
-				     instrOp == asBC_ADDSi &&
-					 instr->next &&
-					 instr->next->op == asBC_PopRPtr &&
-					 curr->wArg[0] == 0 )
-			{
-				DeleteInstruction(curr);
-				instr = GoBack(ChangeFirstDeleteNext(instr, asBC_LoadThisR));
-			}
-			// TODO: runtime optimize: PshVPtr x, PopRPtr -> LoadRObjR x, 0
-			// PshVPtr x, ADDSi, PopRPtr -> LoadRObjR
-			else if( currOp == asBC_PshVPtr &&
-				     instrOp == asBC_ADDSi &&
-					 instr->next &&
-					 instr->next->op == asBC_PopRPtr &&
-					 curr->wArg[0] != 0 )
-			{
-				curr->op = asBC_LoadRObjR;
-				curr->size = asBCTypeSize[asBCInfo[asBC_LoadRObjR].type];
-				curr->stackInc = asBCInfo[asBC_LoadRObjR].stackInc;
-				curr->wArg[1] = instr->wArg[0];
-				*(asDWORD*)&curr->arg = *(asDWORD*)&instr->arg;
-				DeleteInstruction(instr->next);
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// PSF x, REFCPY -> RefCpyV x
-			else if( currOp == asBC_PSF && instrOp == asBC_REFCPY )
-			{
-				instr->op = asBC_RefCpyV;
-				instr->wArg[0] = curr->wArg[0];
-				instr->stackInc = asBCInfo[asBC_LoadVObjR].stackInc;
-				DeleteInstruction(curr);
-				instr = GoBack(instr);
-			}
-			// PshNull, RefCpyV, PopPtr -> FREE
-			else if( currOp == asBC_PshNull &&
-				     instrOp == asBC_RefCpyV &&
-					 instr->next &&
-					 instr->next->op == asBC_PopPtr )
-			{
-				DeleteInstruction(curr);
-				instr->op = asBC_FREE;
-				DeleteInstruction(instr->next);
-				instr = GoBack(instr);
-			}
-			// PSF x, ADDSi, PopRPtr -> LoadVObjR
-			else if( currOp == asBC_PSF &&
-				     instrOp == asBC_ADDSi &&
-					 instr->next &&
-					 instr->next->op == asBC_PopRPtr )
-			{
-				curr->op = asBC_LoadVObjR;
-				curr->size = asBCTypeSize[asBCInfo[asBC_LoadVObjR].type];
-				curr->stackInc = asBCInfo[asBC_LoadVObjR].stackInc;
-				curr->wArg[1] = instr->wArg[0];
-				*(asDWORD*)&curr->arg = *(asDWORD*)&instr->arg;
-				DeleteInstruction(instr->next);
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// LDG x, WRTV4 y -> CpyVtoG4 y, x
-			else if( currOp == asBC_LDG && instrOp == asBC_WRTV4 && !IsTempRegUsed(instr) )
-			{
-				curr->op = asBC_CpyVtoG4;
-				curr->size = asBCTypeSize[asBCInfo[asBC_CpyVtoG4].type];
-				curr->wArg[0] = instr->wArg[0];
-
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// LDG x, RDR4 y -> CpyGtoV4 y, x
-			else if( currOp == asBC_LDG && instrOp == asBC_RDR4 )
-			{
-				if( !IsTempRegUsed(instr) )
-					curr->op = asBC_CpyGtoV4;
-				else 
-					curr->op = asBC_LdGRdR4;
-				curr->size = asBCTypeSize[asBCInfo[asBC_CpyGtoV4].type];
-				curr->wArg[0] = instr->wArg[0];
-
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// LDV x, INCi -> IncVi x
-			else if( currOp == asBC_LDV && instrOp == asBC_INCi && !IsTempRegUsed(instr) )
-			{
-				curr->op = asBC_IncVi;
-				
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// LDV x, DECi -> DecVi x
-			else if( currOp == asBC_LDV && instrOp == asBC_DECi && !IsTempRegUsed(instr) )
-			{
-				curr->op = asBC_DecVi;
-				
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
 			// PopPtr, RET b -> RET b
-			else if( currOp == asBC_PopPtr && instrOp == asBC_RET )
+			if( currOp == asBC_PopPtr && instrOp == asBC_RET )
 			{
 				// We don't combine the PopPtr+RET because RET first restores
 				// the previous stack pointer and then pops the arguments
@@ -842,155 +1115,55 @@ int asCByteCode::Optimize()
 				// Delete PopPtr
 				instr = GoBack(DeleteInstruction(curr));
 			}
-			// SUSPEND, JitEntry, SUSPEND -> SUSPEND
-			// LINE, JitEntry, LINE -> LINE
-			else if( (currOp == asBC_SUSPEND && instrOp == asBC_JitEntry && instr->next && instr->next->op == asBC_SUSPEND) || 
-					 (currOp == asBC_LINE && instrOp == asBC_JitEntry && instr->next && instr->next->op == asBC_LINE) )
+			else if( currOp == asBC_SUSPEND )
 			{
-				// Delete the two first instructions
-				DeleteInstruction(instr);
-				instr = GoBack(DeleteInstruction(curr));
+				// SUSPEND, JitEntry, SUSPEND -> SUSPEND
+				if( instrOp == asBC_JitEntry && instr->next && instr->next->op == asBC_SUSPEND )
+				{
+					// Delete the two first instructions
+					DeleteInstruction(instr);
+					instr = GoBack(DeleteInstruction(curr));
+				}
+				// SUSPEND, SUSPEND -> SUSPEND
+				else if( instrOp == asBC_SUSPEND ) 
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
+				// SUSPEND, Block, SUSPEND -> Block, SUSPEND
+				else if( instrOp == asBC_Block && instr->next && instr->next->op == asBC_SUSPEND )
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
 			}
-			// SUSPEND, SUSPEND -> SUSPEND
-			// LINE, LINE -> LINE
-			else if( (currOp == asBC_SUSPEND && instrOp == asBC_SUSPEND) || 
-					 (currOp == asBC_LINE && instrOp == asBC_LINE) ) 
+			else if( currOp == asBC_LINE )
 			{
-				// Delete the first instruction
-				instr = GoBack(DeleteInstruction(curr));
+				// LINE, JitEntry, LINE -> LINE
+				if( instrOp == asBC_JitEntry && instr->next && instr->next->op == asBC_LINE )
+				{
+					// Delete the two first instructions
+					DeleteInstruction(instr);
+					instr = GoBack(DeleteInstruction(curr));
+				}
+				// LINE, LINE -> LINE
+				else if( instrOp == asBC_LINE ) 
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
+				// LINE, Block, LINE -> Block, LINE
+				else if( instrOp == asBC_Block && instr->next && instr->next->op == asBC_LINE )
+				{
+					// Delete the first instruction
+					instr = GoBack(DeleteInstruction(curr));
+				}
 			}
-			// SUSPEND, Block, SUSPEND -> Block, SUSPEND
-			else if( (currOp == asBC_SUSPEND && instrOp == asBC_Block && instr->next && instr->next->op == asBC_SUSPEND) || 
-					 (currOp == asBC_LINE && instrOp == asBC_Block && instr->next && instr->next->op == asBC_LINE) )
-			{
-				// Delete the first instruction
-				instr = GoBack(DeleteInstruction(curr));
-			}
-			// VAR a, GETREF 0 -> PSF a
-			else if( currOp == asBC_VAR && instrOp == asBC_GETREF && instr->wArg[0] == 0 )
-			{
-				instr = GoBack(ChangeFirstDeleteNext(curr, asBC_PSF));
-			}
-			// PGA, CHKREF -> PGA 
-			// PSF, CHKREF -> PSF
-			else if( (currOp == asBC_PGA || currOp == asBC_PSF) && instrOp == asBC_CHKREF )
-			{
-				// Delete CHKREF since PGA and PSF always pushes a valid address on the stack
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// PGA, ChkRefS, CHKREF -> PGA, ChkRefS
-			else if( currOp == asBC_PGA &&
-					 instrOp == asBC_ChkRefS &&
-					 instr->next &&
-					 instr->next->op == asBC_CHKREF )
-			{
-				// Delete CHKREF since PGA always pushes a valid address on the stack
-				DeleteInstruction(instr->next);
-				instr = GoBack(curr);
-			}
-			// PSF, FREE -> FREE, PSF
-			else if( currOp == asBC_PSF && instrOp == asBC_FREE )
-			{
-				// This pattern usually happens when a function returns an object, or handle
-				// and then releases a temporary variable, possibly used in one of the arguments.
-				// By swapping the order of these instructions, the code can be further optimized
-				// to combine the PSF with the following instructions
-				RemoveInstruction(instr);
-				InsertBefore(curr, instr);
-				instr = GoBack(instr);
-			}
-			// PshVPtr y, PopPtr -> nothing
-			// PSF y    , PopPtr -> nothing
-			// VAR y    , PopPtr -> nothing
-			// PshNull  , PopPtr -> nothing
-			// PshRPtr  , PopPtr -> nothing
-			else if( instrOp == asBC_PopPtr && 
-				     (currOp == asBC_PshRPtr ||
-					  currOp == asBC_PSF     ||
-					  currOp == asBC_VAR     ||
-					  currOp == asBC_PshVPtr ||
-					  currOp == asBC_PshNull) )
-			{
-				// A pointer is pushed on the stack then immediately removed
-				// Remove both instructions as they cancel each other
-				asCByteInstruction *instr2 = instr->next;
-				DeleteInstruction(curr);
-				DeleteInstruction(instr);
-				instr = GoBack(instr2);
-			}
-	// Begin PATTERN
-			// T**; J** +x -> J** +x
-			else if( (currOp == asBC_TZ && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TNZ && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JNZ));
-			else if( (currOp == asBC_TNZ && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TZ && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JZ));
-			else if( (currOp == asBC_TS && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TNS && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JNS));
-			else if( (currOp == asBC_TNS && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TS && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JS));
-			else if( (currOp == asBC_TP && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TNP && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JNP));
-			else if( (currOp == asBC_TNP && instrOp == asBC_JZ) ||
-					 (currOp == asBC_TP && instrOp == asBC_JNZ) )
-				instr = GoBack(DeleteFirstChangeNext(curr, asBC_JP));
-	// End PATTERN
 			// JMP +0 -> remove
 			else if( currOp == asBC_JMP && instrOp == asBC_LABEL && *(int*)&curr->arg == instr->wArg[0] )
 				instr = GoBack(DeleteInstruction(curr));
-			// PSF, RDSPtr -> PshVPtr
-			else if( currOp == asBC_PSF && instrOp == asBC_RDSPtr )
-			{
-				curr->op = asBC_PshVPtr;
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// PSF, ChkRefS, RDSPtr -> PshVPtr, CHKREF
-			else if( currOp == asBC_PSF &&
-					 instrOp == asBC_ChkRefS &&
-					 instr->next &&
-					 instr->next->op == asBC_RDSPtr )
-			{
-				curr->op = asBC_PshVPtr;
-				instr->op = asBC_CHKREF;
-				DeleteInstruction(instr->next);
-				instr = GoBack(curr);
-			}
-			// PSF, ChkRefS, PopPtr -> ChkNullV
-			else if( currOp == asBC_PSF &&
-				     instrOp == asBC_ChkRefS &&
-					 instr->next &&
-					 instr->next->op == asBC_PopPtr )
-			{
-				curr->op = asBC_ChkNullV;
-				curr->stackInc = 0;
-				// Delete the PopPtr instruction
-				DeleteInstruction(instr->next);
-				// Delete the ChkRefS instruction
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
-			// PshVPtr, CHKREF, PopPtr -> ChkNullV
-			else if( currOp == asBC_PshVPtr &&
-					 instrOp == asBC_CHKREF &&
-					 instr->next &&
-					 instr->next->op == asBC_PopPtr )
-			{
-				curr->op = asBC_ChkNullV;
-				curr->stackInc = 0;
-				DeleteInstruction(instr->next);
-				DeleteInstruction(instr);
-				instr = GoBack(curr);
-			}
 		}
 	}
-
-	return 0;
 }
 
 bool asCByteCode::IsTempVarReadByInstr(asCByteInstruction *curr, int offset)
@@ -1052,14 +1225,14 @@ bool asCByteCode::IsTempVarOverwrittenByInstr(asCByteInstruction *curr, int offs
 			  asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG) &&
 			 int(curr->wArg[0]) == offset )
 		return true;
-	else if( curr->op == asBC_DiscardVar && int(curr->wArg[0]) == offset )
-		return true;
 
 	return false;
 }
 
 bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 {
+	TimeIt("asCByteCode::IsTempVarRead");
+
 	asCArray<asCByteInstruction *> openPaths;
 	asCArray<asCByteInstruction *> closedPaths;
 
@@ -1083,10 +1256,13 @@ bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 			// In case of jumps, we must follow the each of the paths
 			if( curr->op == asBC_JMP )
 			{
-				int label = *((int*)ARG_DW(curr->arg));
-				int r = FindLabel(label, curr, &curr, 0); asASSERT( r == 0 ); UNUSED_VAR(r);
+				// Find the destination. If it cannot be found it is because we're doing a localized 
+				// optimization and the label hasn't been added to the final bytecode yet
 
-				if( !closedPaths.Exists(curr) &&
+				int label = *((int*)ARG_DW(curr->arg));
+				int r = FindLabel(label, curr, &curr, 0);
+				if( r >= 0 &&
+					!closedPaths.Exists(curr) &&
 					!openPaths.Exists(curr) )
 					openPaths.PushLast(curr);
 
@@ -1097,11 +1273,14 @@ bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 					 curr->op == asBC_JP    || curr->op == asBC_JNP    ||
 					 curr->op == asBC_JLowZ || curr->op == asBC_JLowNZ )
 			{
+				// Find the destination. If it cannot be found it is because we're doing a localized 
+				// optimization and the label hasn't been added to the final bytecode yet
+
 				asCByteInstruction *dest = 0;
 				int label = *((int*)ARG_DW(curr->arg));
-				int r = FindLabel(label, curr, &dest, 0); asASSERT( r == 0 ); UNUSED_VAR(r);
-
-				if( !closedPaths.Exists(dest) &&
+				int r = FindLabel(label, curr, &dest, 0); 
+				if( r >= 0 &&
+					!closedPaths.Exists(dest) &&
 					!openPaths.Exists(dest) )
 					openPaths.PushLast(dest);
 			}
@@ -1113,11 +1292,14 @@ bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 				curr = curr->next;
 				while( curr->op == asBC_JMP )
 				{
+					// Find the destination. If it cannot be found it is because we're doing a localized 
+					// optimization and the label hasn't been added to the final bytecode yet
+				
 					asCByteInstruction *dest = 0;
 					int label = *((int*)ARG_DW(curr->arg));
-					int r = FindLabel(label, curr, &dest, 0); asASSERT( r == 0 ); UNUSED_VAR(r);
-
-					if( !closedPaths.Exists(dest) &&
+					int r = FindLabel(label, curr, &dest, 0);
+					if( r >= 0 &&
+						!closedPaths.Exists(dest) &&
 						!openPaths.Exists(dest) )
 						openPaths.PushLast(dest);
 
@@ -1139,6 +1321,8 @@ bool asCByteCode::IsTempVarRead(asCByteInstruction *curr, int offset)
 
 bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 {
+	TimeIt("asCByteCode::IsTempRegUsed");
+
 	// We're not interested in the first instruction, since it is the one that sets the register
 	while( curr->next )
 	{
@@ -1252,6 +1436,11 @@ bool asCByteCode::IsSimpleExpression()
 
 void asCByteCode::ExtractLineNumbers()
 {
+	// This function will extract the line number and source file for each statement by looking for LINE instructions.
+	// The LINE instructions will be converted to SUSPEND instructions, or removed depending on the configuration.
+
+	TimeIt("asCByteCode::ExtractLineNumbers");
+
 	int lastLinePos = -1;
 	int pos = 0;
 	asCByteInstruction *instr = first;
@@ -1264,13 +1453,15 @@ void asCByteCode::ExtractLineNumbers()
 		{
 			if( lastLinePos == pos )
 			{
-				lineNumbers.PopLast();
-				lineNumbers.PopLast();
+				lineNumbers.PopLast(); // pop position
+				lineNumbers.PopLast(); // pop line number 
+				sectionIdxs.PopLast(); // pop section index
 			}
 
 			lastLinePos = pos;
 			lineNumbers.PushLast(pos);
 			lineNumbers.PushLast(*(int*)ARG_DW(curr->arg));
+			sectionIdxs.PushLast(*((int*)ARG_DW(curr->arg)+1));
 
 			if( !engine->ep.buildWithoutLineCues )
 			{
@@ -1494,7 +1685,7 @@ void asCByteCode::Label(short label)
 	last->wArg[0]  = label;
 }
 
-void asCByteCode::Line(int line, int column)
+void asCByteCode::Line(int line, int column, int scriptIdx)
 {
 	if( AddInstruction() < 0 )
 		return;
@@ -1508,6 +1699,7 @@ void asCByteCode::Line(int line, int column)
 		last->size = asBCTypeSize[asBCInfo[asBC_SUSPEND].type];
 	last->stackInc = 0;
 	*((int*)ARG_DW(last->arg)) = (line & 0xFFFFF)|((column & 0xFFF)<<20);
+	*((int*)ARG_DW(last->arg)+1) = scriptIdx;
 
     // Add a JitEntry after the line instruction to allow the JIT function to resume after a suspend
     InstrPTR(asBC_JitEntry, 0);
@@ -1549,20 +1741,10 @@ void asCByteCode::VarDecl(int varDeclIdx)
 	last->wArg[0]  = asWORD(varDeclIdx);
 }
 
-void asCByteCode::DiscardVar(int varIdx)
-{
-	if( AddInstruction() < 0 )
-		return;
-
-	last->op       = asBC_DiscardVar;
-	last->size     = 0;
-	last->stackInc = 0;
-	last->wArg[0]  = asWORD(varIdx);
-}
-
-
 int asCByteCode::FindLabel(int label, asCByteInstruction *from, asCByteInstruction **dest, int *positionDelta)
 {
+	TimeIt("asCByteCode::FindLabel");
+
 	// Search forward
 	int labelPos = -from->GetSize();
 
@@ -1613,6 +1795,8 @@ int asCByteCode::FindLabel(int label, asCByteInstruction *from, asCByteInstructi
 
 int asCByteCode::ResolveJumpAddresses()
 {
+	TimeIt("asCByteCode::ResolveJumpAddresses");
+
 	asCByteInstruction *instr = first;
 	while( instr )
 	{
@@ -1653,6 +1837,8 @@ asCByteInstruction *asCByteCode::DeleteInstruction(asCByteInstruction *instr)
 
 void asCByteCode::Output(asDWORD *array)
 {
+	TimeIt("asCByteCode::Output");
+
 	// TODO: Receive a script function pointer instead of the bytecode array
 
 	asDWORD *ap = array;
@@ -1723,6 +1909,8 @@ void asCByteCode::Output(asDWORD *array)
 
 void asCByteCode::PostProcess()
 {
+	TimeIt("asCByteCode::PostProcess");
+
 	if( first == 0 ) return;
 
 	// This function will do the following
@@ -1835,7 +2023,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 	asCString str = "AS_DEBUG/";
 	str += name;
 
-#if _MSC_VER >= 1500 
+#if _MSC_VER >= 1500 && !defined(AS_MARMALADE)
 	FILE *file;
 	fopen_s(&file, str.AddressOf(), "w");
 #else
@@ -1854,10 +2042,10 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 	fprintf(file, "%s\n\n", func->GetDeclaration());
 
 	fprintf(file, "Temps: ");
-	for( n = 0; n < temporaryVariables.GetLength(); n++ )
+	for( n = 0; n < temporaryVariables->GetLength(); n++ )
 	{
-		fprintf(file, "%d", temporaryVariables[n]);
-		if( n < temporaryVariables.GetLength()-1 )
+		fprintf(file, "%d", (*temporaryVariables)[n]);
+		if( n < temporaryVariables->GetLength()-1 )
 			fprintf(file, ", ");
 	}
 	fprintf(file, "\n\n");
@@ -1920,7 +2108,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 		fprintf(file, "%5d ", pos);
 		pos += instr->GetSize();
 
-		fprintf(file, "%3d %c ", instr->stackSize + func->variableSpace, instr->marked ? '*' : ' ');
+		fprintf(file, "%3d %c ", int(instr->stackSize + func->variableSpace), instr->marked ? '*' : ' ');
 
 		switch( asBCInfo[instr->op].type )
 		{
@@ -2528,11 +2716,6 @@ asDWORD asCByteCode::GetLastInstrValueDW()
 	if( last == 0 ) return 0;
 
 	return *ARG_DW(last->arg);
-}
-
-void asCByteCode::DefineTemporaryVariable(int varOffset)
-{
-	temporaryVariables.PushLast(varOffset);
 }
 
 //===================================================================

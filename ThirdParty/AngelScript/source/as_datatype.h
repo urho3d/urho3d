@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -28,7 +28,6 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni for Urho3D
 
 //
 // as_datatype.h
@@ -98,7 +97,6 @@ public:
 	bool IsEqualExceptRef(const asCDataType &)             const;
 	bool IsEqualExceptRefAndConst(const asCDataType &)     const;
 	bool IsEqualExceptConst(const asCDataType &)           const;
-	bool IsEqualExceptInterfaceType(const asCDataType &dt) const;
 	bool IsNullHandle()                                    const;
 
 	bool SupportHandles() const;
@@ -108,7 +106,7 @@ public:
 	bool operator ==(const asCDataType &) const;
 	bool operator !=(const asCDataType &) const;
 
-	asCDataType        GetSubType()    const;
+	asCDataType        GetSubType(asUINT subtypeIndex = 0)    const;
 	eTokenType         GetTokenType()  const {return tokenType;}
 	asCObjectType     *GetObjectType() const {return objectType;}
 	asCScriptFunction *GetFuncDef()    const {return funcDef;}
@@ -117,18 +115,13 @@ public:
 	int  GetSizeInMemoryBytes()  const;
 	int  GetSizeInMemoryDWords() const;
 
-	// Urho3D: reset cached type id whenever something changes
-	void SetTokenType(eTokenType tt)         { tokenType = tt; cachedTypeId = 0; }
-	void SetObjectType(asCObjectType *obj)   { objectType = obj; cachedTypeId = 0; }
-	void SetFuncDef(asCScriptFunction *func) { asASSERT(funcDef); funcDef = func; cachedTypeId = 0; }
+	void SetTokenType(eTokenType tt)         {tokenType = tt;}
+	void SetObjectType(asCObjectType *obj)   {objectType = obj;}
+	void SetFuncDef(asCScriptFunction *func) { asASSERT(funcDef); funcDef = func; }
 
 	asCDataType &operator =(const asCDataType &);
 
 	asSTypeBehaviour *GetBehaviour() const;
-
-	// Urho3D: cache the type id for repeated queries
-	void SetCachedTypeId(int id)       const {cachedTypeId = id;}
-	int GetCachedTypeId()              const {return cachedTypeId;}
 
 protected:
 	// Base object type
@@ -137,9 +130,6 @@ protected:
 	// Behaviour type
 	asCObjectType *objectType;
 	asCScriptFunction *funcDef;
-
-	// Urho3D: cached type id
-	mutable int cachedTypeId;
 
 	// Top level
 	bool isReference:1;

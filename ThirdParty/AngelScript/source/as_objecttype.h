@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -150,8 +150,9 @@ public:
 	asDWORD          GetFlags() const;
 	asUINT           GetSize() const;
 	int              GetTypeId() const;
-	int              GetSubTypeId() const;
-	asIObjectType   *GetSubType() const;
+	int              GetSubTypeId(asUINT subtypeIndex = 0) const;
+	asIObjectType   *GetSubType(asUINT subtypeIndex = 0) const;
+	asUINT			 GetSubTypeCount() const;
 
 	// Interfaces
 	asUINT           GetInterfaceCount() const;
@@ -200,6 +201,7 @@ public:
 	asCObjectType(asCScriptEngine *engine);
 	~asCObjectType();
 
+	void Orphan(asCModule *module);
 	int  GetRefCount();
 	void SetGCFlag();
 	bool GetGCFlag();
@@ -212,6 +214,7 @@ public:
 	bool IsShared() const;
 
 	asCObjectProperty *AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate);
+	void ReleaseAllProperties();
 
 	asCString                    name;
 	asSNameSpace                *nameSpace;
@@ -229,11 +232,12 @@ public:
 	asSTypeBehaviour beh;
 
 	// Used for template types
-	asCDataType    templateSubType;
-	bool           acceptValueSubType;
-	bool           acceptRefSubType;
+	asCArray<asCDataType> templateSubTypes;
+	bool                  acceptValueSubType;
+	bool                  acceptRefSubType;
 
 	asCScriptEngine  *engine;
+	asCModule        *module;
 	asCArray<asPWORD> userData;
 
 protected:

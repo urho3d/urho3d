@@ -188,6 +188,7 @@ public:
 	bool      m_inExceptionHandler;
 	asCString m_exceptionString;
 	int       m_exceptionFunction;
+	int       m_exceptionSectionIdx;
 	int       m_exceptionLine;
 	int       m_exceptionColumn;
 

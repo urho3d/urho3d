@@ -92,6 +92,8 @@ public:
 	void EnumReferences(asIScriptEngine *);
 	void ReleaseAllHandles(asIScriptEngine *);
 
+	void Orphan(asCModule *module);
+
 	// This is only stored for registered properties, and keeps the pointer given by the application
 	void       *realAddress;
 
