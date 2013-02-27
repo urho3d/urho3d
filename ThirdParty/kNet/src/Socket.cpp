@@ -15,6 +15,8 @@
 /** @file Socket.cpp
 	@brief */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <string>
 #include <cassert>
 #include <utility>
@@ -290,11 +292,12 @@ void Socket::EnqueueNewReceiveBuffer(OverlappedTransferBuffer *buffer)
 	{
 		if (ret == 0 && buffer->bytesContains == 0)
 		{
-			if (IsUDPServerSocket())
-				LOG(LogError, "Unexpected: Received a message of 0 bytes on a UDP server socket!");
-
-			LOG(LogInfo, "Socket::EnqueueNewReceiveBuffer: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
-			readOpen = false;
+            // Urho3D: only close TCP sockets upon receiving 0 bytes
+            if (transport == SocketOverTCP && readOpen)
+            {
+                LOG(LogInfo, "Socket::EnqueueNewReceiveBuffer: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
+                readOpen = false;
+            }
 			DeleteOverlappedTransferBuffer(buffer);
 			return;
 		}
@@ -400,8 +403,12 @@ size_t Socket::Receive(char *dst, size_t maxBytes, EndPoint *endPoint)
 	}
 	else if (ret == 0)
 	{
-		LOG(LogInfo, "Socket::Receive: Received 0 bytes from network. Read-connection closed to socket %s.", ToString().c_str());
-		readOpen = false;
+        // Urho3D: only close TCP sockets upon receiving 0 bytes
+        if (transport == SocketOverTCP && readOpen)
+        {
+            LOG(LogInfo, "Socket::Receive: Received 0 bytes from network. Read-connection closed to socket %s.", ToString().c_str());
+            readOpen = false;
+        }
 		return 0;
 	}
 	else
@@ -526,11 +533,12 @@ OverlappedTransferBuffer *Socket::BeginReceive()
 		if (receivedData->bytesContains == 0)
 		{
 			DeleteOverlappedTransferBuffer(receivedData);
-			if (readOpen)
-				LOG(LogInfo, "Socket::BeginReceive: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
-			readOpen = false;
-			if (IsUDPServerSocket())
-				LOG(LogError, "Socket::BeginReceive: UDP server socket transitioned to readOpen==false!");
+            // Urho3D: only close TCP sockets upon receiving 0 bytes
+            if (transport == SocketOverTCP && readOpen)
+            {
+                LOG(LogInfo, "Socket::BeginReceive: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
+                readOpen = false;
+            }
 			return 0;
 		}
 
