@@ -503,7 +503,7 @@ See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuf
 
 \section Rendering_Further Further details
 
-See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
+See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
@@ -676,11 +676,94 @@ More custom passes can be defined and referred to in the \ref RenderPaths "rende
 
 By default draw calls within passes are sorted by render state, but transparent base and light passes, as well as the postalpha pass, are sorted by distance back to front.
 
-Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See the file LitSolid.xml in either Bin/CoreData/Shaders/HLSL or Bin/CoreData/Shaders/GLSL to see which variations are required.
+Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead specific hardcoded shader variations are assumed to exist. See \ref Shaders "Shaders" for details.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
 "Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
+
+
+\page Shaders Shaders
+
+Urho3D uses an ubershader-like approach: permutations of each shader will be built with different defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
+
+The building of these variations is controlled by an XML shader definition file, which always accompanies the shader source code.
+
+For example, the Basic shader in Bin/CoreData/Shaders/HLSL has the following definition file:
+
+\code
+<shaders>
+    <shader type="vs">
+        <option name="Diff" define="DIFFMAP" />
+        <option name="VCol" define="VERTEXCOLOR" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Instanced" define="INSTANCED" require="SM3" />
+        <variation name="Billboard" define="BILLBOARD" />
+    </shader>
+    <shader type="ps">
+        <option name="Diff" define="DIFFMAP" exclude="Alpha" />
+        <option name="Alpha" define="ALPHAMAP" exclude="Diff" />
+        <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
+        <option name="VCol" define="VERTEXCOLOR" />
+    </shader>
+</shaders>
+\endcode
+
+Permutations can be defined separately for both the vertex and the pixel shader. There exist two different mechanisms for adding permutations: a "variation" and an "option". A variation always excludes other variations within the same "variation group" and is most often used to define the geometry types for the vertex shader. In contrast, an
+option does not exclude other options by default.
+
+For both variations and options, a name is required, and one or more defines to be passed to the shader compiler. If there is only one define, it can be listed as an attribute of the permutation, as shown. If many defines are needed, they can be included as child elements of the permutation, eg. (from the LitSolid shader)
+
+\code
+<variation name="Dir">
+    <define name="DIRLIGHT" />
+    <define name="PERPIXEL" />
+</variation>
+\endcode
+
+A variation or option can "require" other defines, for example instancing requires the SM3 define which tells that we are compiling for %Shader %Model 3. Like defines, requires can be listed either as an attribute (if only one) or as a child element (if many.)
+
+Additionally, an option can "include" or "exclude" other options. Use this mechanism instead of variations if complex dependencies between options is required, instead of simple exclusion. Again, includes or excludes can be listed either as attributes or child elements.
+
+The final name of a shader permutation is formed by taking the shader's name, adding an underscore (if there are active variations/options) and then listing the names of all active variations/options in top-to-bottom order. For example the Basic vertex shader with vertex color and skinning active would be
+Basic_VColSkinned. This final name is used to request shaders from the Renderer subsystem.
+
+\section Shaders_Required Required shader permutations
+
+When rendering scene objects, the engine expects certain shader permutations to exist for different geometry types and lighting conditions. These must appear in the specific order listed below. Use the LitSolid shader for reference.
+
+Vertex shader:
+
+- 1VL, 2VL, 3VL, 4VL: number of vertex lights influencing the object
+- Dir, Spot, Point: a per-pixel forward light is being used
+- Spec: the per-pixel forward light has specular calculations
+- Shadow: the per-pixel forward light has shadowing
+- Skinned, Instanced, %Billboard: choosing the geometry type
+
+Pixel shader:
+
+- Dir, Spot, Point: a per-pixel forward light is being used
+- Mask: the point light has a cube map mask
+- Spec: the per-pixel forward light has specular calculations
+- Shadow: the per-pixel forward light has shadowing
+- LQ: use low-quality shadowing (1 hardware PCF sample instead of 4)
+- HW: use hardware shadow depth compare, Direct3D9 only
+
+\section Shaders_Writing Writing shaders
+
+Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
+
+To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the required include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
+Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code (for HLSL) verbatim:
+
+\code
+float4x3 modelMatrix = iModelMatrix;
+float3 worldPos = GetWorldPos(modelMatrix);
+oPos = GetClipPos(worldPos);
+\endcode
+
+Note that for HLSL shaders both the vertex and the pixel shader are written into the same file, and the functions must be called VS() and PS(), while for GLSL they are put into separate .vert and .frag files, and are called main().
 
 
 \page RenderPaths Render path
