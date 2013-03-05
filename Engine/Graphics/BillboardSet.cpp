@@ -93,8 +93,8 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(BillboardSet, Drawable);
-    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void BillboardSet::UpdateBatches(const FrameInfo& frame)

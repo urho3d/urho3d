@@ -158,6 +158,7 @@ Graphics::Graphics(Context* context_) :
     height_(0),
     multiSample_(1),
     fullscreen_(false),
+    resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
     lightPrepassSupport_(false),
@@ -220,18 +221,22 @@ void Graphics::SetWindowTitle(const String& windowTitle)
         SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
     
+    // Fullscreen can not be resizable
+    if (fullscreen)
+        resizable = false;
+    
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
@@ -244,8 +249,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     {
         if (!fullscreen)
         {
-            width = 800;
-            height = 600;
+            width = 1024;
+            height = 768;
         }
         else
         {
@@ -270,8 +275,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
         
             #ifdef IOS
             SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+
+            // On iOS window needs to be resizable to handle orientation changes properly
+            resizable = true;
             #endif
-            
+
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
             SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
             SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -297,16 +305,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
                 SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
             }
             
-            unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
             int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
             int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+
+            unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
             if (fullscreen)
                 flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
-            
-            // On iOS window needs to be resizable to handle orientation changes properly
-            #ifdef IOS
-            flags |= SDL_WINDOW_RESIZABLE;
-            #endif
+            if (resizable)
+                flags |= SDL_WINDOW_RESIZABLE;
             
             for (;;)
             {
@@ -385,6 +391,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     #endif
     
     fullscreen_ = fullscreen;
+    resizable_ = resizable;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
@@ -400,11 +407,15 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     
     CheckFeatureSupport(extensions);
     
+    #ifdef ENABLE_LOGGING
+    String msg;
+    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    if (resizable_)
+        msg.Append(" resizable");
     if (multiSample > 1)
-        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
-        " multisample " + String(multiSample));
-    else
-        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
+        msg.AppendWithFormat(" multisample %d", multiSample);
+    LOGINFO(msg);
+    #endif
 
     using namespace ScreenMode;
     
@@ -412,6 +423,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
+    eventData[P_RESIZABLE] = resizable_;
     SendEvent(E_SCREENMODE, eventData);
     
     return true;
@@ -419,12 +431,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool vsync, bool 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -1795,6 +1807,29 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     }
     
     return IntVector2(width, height);
+}
+
+void Graphics::WindowResized(int width, int height)
+{
+    if (width == width_ && height == height_)
+        return;
+    
+    width_ = width;
+    height_ = height;
+    
+    // Reset rendertargets and viewport for the new screen size
+    ResetRenderTargets();
+    
+    LOGDEBUG(ToString("Window was resized to %dx%d", width_, height_));
+    
+    using namespace ScreenMode;
+    
+    VariantMap eventData;
+    eventData[P_WIDTH] = width_;
+    eventData[P_HEIGHT] = height_;
+    eventData[P_FULLSCREEN] = fullscreen_;
+    eventData[P_RESIZABLE] = resizable_;
+    SendEvent(E_SCREENMODE, eventData);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)

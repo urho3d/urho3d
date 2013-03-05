@@ -80,12 +80,12 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>();
     
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String(), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
     ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
 }
 
 void ScriptInstance::ApplyAttributes()
@@ -96,7 +96,7 @@ void ScriptInstance::ApplyAttributes()
 
 bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& className)
 {
-    className_ = String(); // Do not create object during SetScriptFile()
+    className_ = String::EMPTY; // Do not create object during SetScriptFile()
     SetScriptFile(scriptFile);
     SetClassName(className);
     return scriptObject_ != 0;

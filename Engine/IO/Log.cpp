@@ -42,14 +42,6 @@ extern "C" void SDL_IOS_LogMessage(const char* message);
 namespace Urho3D
 {
 
-static const String levelPrefixes[] =
-{
-    "DEBUG",
-    "INFO",
-    "WARNING",
-    "ERROR"
-};
-
 OBJECTTYPESTATIC(Log);
 
 Log::Log(Context* context) :
@@ -60,7 +52,8 @@ Log::Log(Context* context) :
     level_(LOG_INFO),
     #endif
     timeStamp_(true),
-    inWrite_(false)
+    inWrite_(false),
+    quiet_(false)
 {
 }
 
@@ -114,7 +107,14 @@ void Log::Write(int level, const String& message)
     #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
     #else
-    PrintUnicodeLine(formattedMessage);
+    if (quiet_)
+    {
+        // If in quiet mode, still print the error message to the standard error stream
+        if (level == LOG_ERROR)
+            PrintUnicodeLine(formattedMessage, true);
+    }
+    else
+        PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
     #endif
     
     if (logFile_)
@@ -146,7 +146,8 @@ void Log::WriteRaw(const String& message)
     #elif defined(IOS)
     SDL_IOS_LogMessage(message.CString());
     #else
-    PrintUnicode(message);
+    if (!quiet_)
+        PrintUnicode(message);
     #endif
     
     if (logFile_)
@@ -174,6 +175,11 @@ void Log::SetLevel(int level)
 void Log::SetTimeStamp(bool enable)
 {
     timeStamp_ = enable;
+}
+
+void Log::SetQuiet(bool quiet)
+{
+    quiet_ = quiet;
 }
 
 void WriteToLog(Context* context, int level, const String& message)

@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Button.h"
 #include "Context.h"
+#include "InputEvents.h"
 #include "ScrollBar.h"
 #include "Slider.h"
 #include "UIEvents.h"
@@ -54,6 +55,7 @@ ScrollBar::ScrollBar(Context* context) :
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
     slider_ = CreateChild<Slider>();
     slider_->SetInternal(true);
+    slider_->SetRepeatRate(DEFAULT_REPEAT_RATE);
     forwardButton_ = CreateChild<Button>();
     forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
@@ -61,6 +63,7 @@ ScrollBar::ScrollBar(Context* context) :
     SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));
     SubscribeToEvent(slider_, E_SLIDERCHANGED, HANDLER(ScrollBar, HandleSliderChanged));
+    SubscribeToEvent(slider_, E_SLIDERPAGED, HANDLER(ScrollBar, HandleSliderPaged));
     
     // Set default orientation/layout
     SetOrientation(O_HORIZONTAL);
@@ -219,6 +222,26 @@ void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
     newEventData[ScrollBarChanged::P_ELEMENT] = (void*)this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
+}
+
+void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace SliderPaged;
+ 
+    if (eventData[P_BUTTONS].GetInt() & MOUSEB_LEFT)
+    {
+        if (eventData[P_OFFSET].GetInt() < 0)
+            backButton_->OnClick(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        else
+            forwardButton_->OnClick(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+    }
+    else
+    {
+        if (eventData[P_OFFSET].GetInt() < 0)
+            backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        else
+            forwardButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+    }
 }
 
 }

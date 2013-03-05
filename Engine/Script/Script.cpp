@@ -448,7 +448,10 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
 {
     #ifdef ENABLE_LOGGING
     String out = row;
-    out.Replace("double", "float");
+    ///\todo We need Regex capability in String class to handle whole-word replacement correctly.
+    // Temporary fix to prevent property name like 'doubleClickInterval' from being wrongly replaced.
+    // Fortunately, there is no occurence of type 'double' in the API at the moment.
+    //out.Replace("double", "float");
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)

@@ -51,7 +51,8 @@ Slider::Slider(Context* context) :
     orientation_(O_HORIZONTAL),
     range_(1.0f),
     value_(0.0f),
-    dragSlider_(false)
+    dragSlider_(false),
+    repeatRate_(0.0f)
 {
     active_ = true;
     knob_ = CreateChild<BorderImage>();
@@ -71,6 +72,7 @@ void Slider::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(Slider, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
     COPY_BASE_ATTRIBUTES(Slider, BorderImage);
 }
 
@@ -79,15 +81,30 @@ void Slider::Update(float timeStep)
     if (dragSlider_)
         hovering_ = true;
     
-    // Propagate hover and selection effect to the slider knob
+    // Propagate hover effect to the slider knob
     knob_->SetHovering(hovering_);
-    knob_->SetSelected(selected_);
+    knob_->SetSelected(hovering_);
 }
 
 void Slider::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
+    BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
+    
     // Show hover effect if inside the slider knob
     hovering_ = knob_->IsInside(screenPosition, true);
+    
+    // If not hovering on the knob, send it as page event
+    if (!hovering_)
+        Page(position, buttons, qualifiers);
+}
+
+void Slider::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    BorderImage::OnClick(position, screenPosition, buttons, qualifiers, cursor);
+    selected_ = true;
+    hovering_ = knob_->IsInside(screenPosition, true);
+    if (!hovering_)
+        Page(position, buttons, qualifiers);
 }
 
 void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
@@ -124,6 +141,7 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
 void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
 {
     dragSlider_ = false;
+    selected_ = false;
 }
 
 void Slider::OnResize()
@@ -169,6 +187,11 @@ void Slider::ChangeValue(float delta)
     SetValue(value_ + delta);
 }
 
+void Slider::SetRepeatRate(float rate)
+{
+    repeatRate_ = Max(rate, 0.0f);
+}
+
 void Slider::UpdateSlider()
 {
     const IntRect& border = knob_->GetBorder();
@@ -195,6 +218,30 @@ void Slider::UpdateSlider()
         knob_->SetSize(GetSize());
         knob_->SetPosition(0, 0);
     }
+}
+
+void Slider::Page(const IntVector2& position, int buttons, int qualifiers)
+{
+    IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
+    int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
+    float length = orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight();
+
+    using namespace SliderPaged;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_OFFSET] = offset;
+    // Only generate the 'click' variant of the event when the slider is selected
+    // i.e. when it has received the first initial click.
+    if (selected_ && repeatRate_ > 0.0f && repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
+    {
+        repeatTimer_.Reset();
+        eventData[P_BUTTONS] = buttons;
+        eventData[P_QUALIFIERS] = qualifiers;
+    }
+    // When without buttons & qualifiers parameters, the receiver should interpret
+    // this event as just mouse hovering on slider's 'paging' area instead
+    SendEvent(E_SLIDERPAGED, eventData);
 }
 
 }

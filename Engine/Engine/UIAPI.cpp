@@ -102,9 +102,10 @@ static void RegisterCursor(asIScriptEngine* engine)
     engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPLEFT", CS_RESIZEDIAGONAL_TOPLEFT);
     engine->RegisterEnumValue("CursorShape", "CS_ACCEPTDROP", CS_ACCEPTDROP);
     engine->RegisterEnumValue("CursorShape", "CS_REJECTDROP", CS_REJECTDROP);
+    engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
     
     RegisterBorderImage<Cursor>(engine, "Cursor");
-    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in, bool arg4 = false)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_shape(CursorShape)", asMETHOD(Cursor, SetShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "CursorShape get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
 }
@@ -135,6 +136,8 @@ static void RegisterSlider(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Slider", "void set_value(float)", asMETHOD(Slider, SetValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float get_value() const", asMETHOD(Slider, GetValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "BorderImage@+ get_knob() const", asMETHOD(Slider, GetKnob), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "void set_repeatRate(float)", asMETHOD(Slider, SetRepeatRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "float get_repeatRate() const", asMETHOD(Slider, GetRepeatRate), asCALL_THISCALL);
 }
 
 static void RegisterScrollBar(asIScriptEngine* engine)
@@ -266,7 +269,7 @@ static void RegisterText(asIScriptEngine* engine)
     RegisterUIElement<Text>(engine, "Text");
     engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const String&, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, int)", asMETHODPR(Text, SetFont, (Font*, int), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "Font@+ get_font() const", asMETHOD(Text, GetFont), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "int get_fontSize() const", asMETHOD(Text, GetFontSize), asCALL_THISCALL);
@@ -309,6 +312,8 @@ static void RegisterLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "bool get_textCopyable() const", asMETHOD(LineEdit, IsTextCopyable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "Text@+ get_textElement() const", asMETHOD(LineEdit, GetTextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ get_cursor() const", asMETHOD(LineEdit, GetCursor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void set_doubleClickInterval(float)", asMETHOD(LineEdit, SetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "float get_doubleClickInterval() const", asMETHOD(LineEdit, GetDoubleClickInterval), asCALL_THISCALL);
 }
 
 static void RegisterMenu(asIScriptEngine* engine)

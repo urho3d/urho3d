@@ -79,7 +79,9 @@ public:
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
-    
+    /// Set text selection doubleclick interval in seconds.
+    void SetDoubleClickInterval(float interval);
+
     /// Return text.
     const String& GetText() const { return line_; }
     /// Return cursor position.
@@ -100,7 +102,9 @@ public:
     Text* GetTextElement() const { return text_; }
     /// Return cursor element.
     BorderImage* GetCursor() const { return cursor_; }
-    
+    /// Return text selection doubleclick interval in seconds.
+    float GetDoubleClickInterval() const;
+
 protected:
     /// Update displayed text.
     void UpdateText();
@@ -136,7 +140,11 @@ protected:
     /// Text selectable flag.
     bool textSelectable_;
     /// Copy-paste enable flag.
-    bool textCopyable_;
+    bool textCopyable_;    
+    /// Doubleclick interval.
+    unsigned doubleClickInterval_;
+    /// Doubleclick timer.
+    Timer doubleClickTimer_;
     
 private:
     /// Handle being focused.

@@ -19,6 +19,9 @@ Array<AssetMapping> assetMappings;
 
 void ImportModel(const String&in fileName)
 {
+    if (fileName.empty)
+        return;
+    
     String modelName = "Models/" + GetFileName(fileName) + ".mdl";
     String outFileName = sceneResourcePath + modelName;
     String materialListName = sceneResourcePath + "_tempmatlist_.txt";
@@ -61,6 +64,9 @@ void ImportModel(const String&in fileName)
 
 void ImportScene(const String&in fileName)
 {
+    if (fileName.empty)
+        return;
+    
     // Handle Tundra scene files here in code, otherwise via AssetImporter
     if (GetExtension(fileName) == ".txml")
         ImportTundraScene(fileName);

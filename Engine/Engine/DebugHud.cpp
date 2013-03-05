@@ -57,7 +57,7 @@ OBJECTTYPESTATIC(DebugHud);
 DebugHud::DebugHud(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),
-    profilerInterval_(1.0f),
+    profilerInterval_(1000),
     useRendererStats_(false),
     mode_(DEBUGHUD_SHOW_NONE)
 {
@@ -156,7 +156,7 @@ void DebugHud::Update()
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
     {
-        if (profilerTimer_.GetMSec(false) >= (unsigned)(profilerInterval_ * 1000.0f))
+        if (profilerTimer_.GetMSec(false) >= profilerInterval_)
         {
             profilerTimer_.Reset();
 
@@ -198,7 +198,7 @@ void DebugHud::SetProfilerMaxDepth(unsigned depth)
 
 void DebugHud::SetProfilerInterval(float interval)
 {
-    profilerInterval_ = Max(interval, 0.0f);
+    profilerInterval_ = Max((int)(interval * 1000.0f), 0);
 }
 
 void DebugHud::SetUseRendererStats(bool enable)
@@ -214,6 +214,11 @@ void DebugHud::Toggle(unsigned mode)
 void DebugHud::ToggleAll()
 {
     Toggle(DEBUGHUD_SHOW_ALL);
+}
+
+float DebugHud::GetProfilerInterval() const
+{
+    return (float)profilerInterval_ / 1000.0f;
 }
 
 void DebugHud::SetAppStats(const String& label, const Variant& stats)

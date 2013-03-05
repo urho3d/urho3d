@@ -194,6 +194,8 @@ void UI::Update(float timeStep)
             if (!dragElement_ || dragElement_ == element || dragDropTest)
                 element->OnHover(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
         }
+        else
+            cursor_->SetShape(CS_NORMAL);
         
         // Drag and drop test
         if (dragDropTest)
@@ -254,11 +256,7 @@ void UI::RenderUpdate()
     quads_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
     GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
-    
-    // If no drag, reset cursor shape for next frame
-    if (cursor_ && !dragElement_)
-        cursor_->SetShape(CS_NORMAL);
-    
+
     // Restore UI cursor visibility state
     if (osCursorVisible && cursor_)
         cursor_->SetTempVisible(uiCursorVisible);

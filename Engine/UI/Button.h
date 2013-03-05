@@ -48,7 +48,9 @@ public:
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    
+    /// React to mouse drag motion.
+    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when pressed.

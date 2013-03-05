@@ -12,7 +12,7 @@ const int MAX_PICK_MODES = 4;
 Scene@ editorScene;
 
 String sceneFileName;
-String sceneResourcePath;
+String sceneResourcePath = fileSystem.programDir + "Data";
 String instantiateFileName;
 CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
@@ -73,6 +73,9 @@ void CreateScene()
 
 void SetResourcePath(String newPath, bool usePreferredDir = true)
 {
+    if (newPath.empty)
+        return;
+    
     if (usePreferredDir)
         newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
     else
@@ -85,15 +88,11 @@ void SetResourcePath(String newPath, bool usePreferredDir = true)
     renderer.ReloadShaders();
 
     // Remove the old scene resource path if any. However make sure that the default data paths do not get removed
-    if (!sceneResourcePath.empty && sceneResourcePath.Find(fileSystem.programDir) < 0)
+    if (!sceneResourcePath.empty && !sceneResourcePath.Contains(fileSystem.programDir))
         cache.RemoveResourceDir(sceneResourcePath);
 
     cache.AddResourceDir(newPath);
     sceneResourcePath = newPath;
-
-    // If scenes were not loaded yet, default load/save to the resource path
-    if (uiScenePath.empty)
-        uiScenePath = newPath;
 }
 
 Array<Resource@> GetSceneResources()
@@ -181,10 +180,15 @@ void ReloadResources()
 
 void LoadScene(const String&in fileName)
 {
+    if (fileName.empty)
+        return;
+    
+    ui.cursor.shape = CS_BUSY;
+    
     // Always load the scene from the filesystem, not from resource paths
     if (!fileSystem.FileExists(fileName))
     {
-        log.Error("No such scene " + fileName);
+        log.Error("No such scene: " + fileName);
         return;
     }
 
@@ -243,6 +247,9 @@ void SaveScene(const String&in fileName)
 
 void LoadNode(const String&in fileName)
 {
+    if (fileName.empty)
+        return;
+    
     if (!fileSystem.FileExists(fileName))
     {
         log.Error("No such node file " + fileName);
@@ -275,6 +282,9 @@ void LoadNode(const String&in fileName)
 
 void SaveNode(const String&in fileName)
 {
+    if (fileName.empty || GetFileName(fileName).empty)
+        return;
+
     if (selectedNodes.length == 1)
     {
         File file(fileName, FILE_WRITE);

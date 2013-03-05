@@ -29,35 +29,39 @@
     </element>
     <element type="Cursor">
         <attribute name="Shapes">
-            <variant type="Int" value="7" />
+            <variant type="Int" value="8" />
             <variant type="String" value="Normal" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="0 0 12 24" />
             <variant type="IntVector2" value="0 0" />
             <variant type="String" value="ResizeVertical" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="0 64 20 84" />
             <variant type="IntVector2" value="9 9" />
             <variant type="String" value="ResizeDiagonalTopRight" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="20 64 40 84" />
             <variant type="IntVector2" value="9 9" />
             <variant type="String" value="ResizeHorizontal" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="40 64 60 84" />
             <variant type="IntVector2" value="9 9" />
             <variant type="String" value="ResizeDiagonalTopLeft" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="60 64 80 84" />
             <variant type="IntVector2" value="9 9" />
             <variant type="String" value="RejectDrop" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="80 64 100 84" />
             <variant type="IntVector2" value="9 9" />
             <variant type="String" value="AcceptDrop" />
-            <variant type="ResourceRef" value="Texture2D;Textures/UI.png" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
             <variant type="IntRect" value="100 64 128 90" />
             <variant type="IntVector2" value="0 0" />
+            <variant type="String" value="Busy" />
+            <variant type="ResourceRef" value="Image;Textures/UI.png" />
+            <variant type="IntRect" value="128 64 148 85" />
+            <variant type="IntVector2" value="9 9" />
         </attribute>
     </element>
     <element type="DropDownList">
@@ -91,7 +95,7 @@
                     <element type="Slider" internal="true">
                         <attribute name="Size" value="12 12" />
                         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                        <attribute name="Image Rect" value="48 0 64 16" />
+                        <attribute name="Image Rect" value="112 0 128 16" />
                         <attribute name="Border" value="3 3 3 3" />
                         <element type="BorderImage" internal="true">
                             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -124,7 +128,7 @@
                     <element type="Slider" internal="true">
                         <attribute name="Size" value="12 12" />
                         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                        <attribute name="Image Rect" value="48 0 64 16" />
+                        <attribute name="Image Rect" value="112 0 128 16" />
                         <attribute name="Border" value="3 3 3 3" />
                         <element type="BorderImage" internal="true">
                             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -184,7 +188,7 @@
             <element type="Slider" internal="true">
                 <attribute name="Size" value="12 12" />
                 <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Image Rect" value="112 0 128 16" />
                 <attribute name="Border" value="3 3 3 3" />
                 <element type="BorderImage" internal="true">
                     <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -217,7 +221,7 @@
             <element type="Slider" internal="true">
                 <attribute name="Size" value="12 12" />
                 <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Image Rect" value="112 0 128 16" />
                 <attribute name="Border" value="3 3 3 3" />
                 <element type="BorderImage" internal="true">
                     <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -263,7 +267,7 @@
         <element type="Slider" internal="true">
             <attribute name="Size" value="12 12" />
             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-            <attribute name="Image Rect" value="48 0 64 16" />
+            <attribute name="Image Rect" value="112 0 128 16" />
             <attribute name="Border" value="3 3 3 3" />
             <element type="BorderImage" internal="true">
                 <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -297,7 +301,7 @@
             <element type="Slider" internal="true">
                 <attribute name="Size" value="12 12" />
                 <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Image Rect" value="112 0 128 16" />
                 <attribute name="Border" value="3 3 3 3" />
                 <element type="BorderImage" internal="true">
                     <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -330,7 +334,7 @@
             <element type="Slider" internal="true">
                 <attribute name="Size" value="12 12" />
                 <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                <attribute name="Image Rect" value="48 0 64 16" />
+                <attribute name="Image Rect" value="112 0 128 16" />
                 <attribute name="Border" value="3 3 3 3" />
                 <element type="BorderImage" internal="true">
                     <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -357,7 +361,7 @@
     <element type="Slider" internal="true">
         <attribute name="Size" value="12 12" />
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Image Rect" value="112 0 128 16" />
         <attribute name="Border" value="3 3 3 3" />
         <element type="BorderImage" internal="true">
             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -455,8 +459,10 @@
     </element>
     <element type="EditorDivider">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Image Rect" value="144 32 160 43" />
         <attribute name="Border" value="2 2 2 2" />
+        <attribute name="Min Size" value="0 11" />
+        <attribute name="Max Size" value="2147483647 11" />
     </element>
     <element type="EditorMenuBar">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
@@ -494,5 +500,11 @@
             <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Image Rect" value="12 0 16 16" />
         </element>
+    </element>
+    <element type="EditorGrid">
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="128 32 144 48" />
+        <attribute name="Tiled" value="true" />
+        <attribute name="Border" value="2 2 2 2" />
     </element>
 </elements>

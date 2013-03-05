@@ -17,10 +17,7 @@
             <attribute name="Name" value="CloseButton" />
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider">
-        <attribute name="Min Size" value="0 4" />
-        <attribute name="Max Size" value="2147483647 4" />
-    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Min Size" value="0 17" />
         <attribute name="Max Size" value="2147483647 17" />
@@ -77,10 +74,7 @@
             <attribute name="Max Size" value="100 2147483647" />
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider">
-        <attribute name="Min Size" value="0 4" />
-        <attribute name="Max Size" value="2147483647 4" />
-    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Min Size" value="0 17" />
         <attribute name="Max Size" value="2147483647 17" />
@@ -230,10 +224,7 @@
             <attribute name="Text" value="Generate tangents on import" />
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider">
-        <attribute name="Min Size" value="0 4" />
-        <attribute name="Max Size" value="2147483647 4" />
-    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Min Size" value="0 17" />
         <attribute name="Max Size" value="2147483647 17" />

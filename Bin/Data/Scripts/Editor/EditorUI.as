@@ -4,13 +4,23 @@ XMLFile@ uiStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
+const ShortStringHash windowType("Window");
+
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
-Array<String> uiAllFilter = {"*.*"};
-Array<String> uiScriptFilter = {"*.as", "*.*"};
+Array<String> uiAllFilters = {"*.*"};
+Array<String> uiScriptFilters = {"*.as", "*.*"};
 uint uiSceneFilter = 0;
-String uiScenePath;
+uint uiNodeFilter = 0;
+uint uiImportFilter = 0;
+uint uiScriptFilter = 0;
+String uiScenePath = fileSystem.programDir + "Data/Scenes";
+String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
-String uiScriptPath;
+String uiScriptPath = fileSystem.programDir + "Data/Scripts";
+
+bool uiHidden = false;
+float uiMinOpacity = 0.3;
+float uiMaxOpacity = 1.0;
 
 void CreateUI()
 {
@@ -28,11 +38,47 @@ void CreateUI()
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
     SubscribeToEvent("KeyDown", "HandleKeyDown");
+    SubscribeToEvent("KeyUp", "UnhideUI");
+    SubscribeToEvent("MouseButtonUp", "UnhideUI");
 }
 
 void ResizeUI()
 {
+    // Resize menu bar
     uiMenuBar.SetFixedWidth(graphics.width);
+    
+    // Relayout stats bar
+    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+    if (graphics.width >= 1200)
+    {
+        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 24, HA_RIGHT, VA_TOP);
+    }
+    else
+    {
+        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
+    }
+    
+    // Relayout windows
+    Array<UIElement@> children = ui.root.GetChildren();
+    for (int i = 0; i < children.length; ++i)
+    {
+        if (children[i].type == windowType)
+            AdjustPosition(children[i]);
+    }
+}
+
+void AdjustPosition(Window@ window)
+{
+    IntVector2 position = window.position;
+    IntVector2 size = window.size;
+    IntVector2 extend = position + size;
+    if (extend.x > graphics.width)
+        position.x = Max(20, graphics.width - size.x - 20);
+    if (extend.y > graphics.height)
+        position.y = Max(40, graphics.height - size.y - 20);
+    window.position = position;
 }
 
 void CreateCursor()
@@ -50,32 +96,34 @@ void CreateMenuBar()
     uiMenuBar = BorderImage("MenuBar");
     uiMenuBar.active = true;
     uiMenuBar.SetStyle(uiStyle, "EditorMenuBar");
-    uiMenuBar.SetLayout(LM_HORIZONTAL, 4, IntRect(2, 2, 2, 2));
+    uiMenuBar.SetLayout(LM_HORIZONTAL);
+    uiMenuBar.opacity = uiMaxOpacity;
+    uiMenuBar.SetFixedWidth(graphics.width);
     ui.root.AddChild(uiMenuBar);
 
     {
         Menu@ fileMenu = CreateMenu("File");
         Window@ filePopup = fileMenu.popup;
         filePopup.AddChild(CreateMenuItem("New scene", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Open scene", 'O', QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
 
         Menu@ loadNodeMenu = CreateMenuItem("Load node", 0, 0);
         Window@ loadNodePopup = CreatePopup(loadNodeMenu);
         loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
-        loadNodePopup.AddChild(CreateMenuItem("As replicated", 0, 0));
-        loadNodePopup.AddChild(CreateMenuItem("As local", 0, 0));
+        loadNodePopup.AddChild(CreateMenuItem("As replicated...", 0, 0));
+        loadNodePopup.AddChild(CreateMenuItem("As local...", 0, 0));
         filePopup.AddChild(loadNodeMenu);
         
-        filePopup.AddChild(CreateMenuItem("Save node as", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Save node as...", 0, 0));
         filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Import model", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Import scene", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Run script", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Import model...", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Import scene...", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Run script...", 0, 0));
         filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Set resource path", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Set resource path...", 0, 0));
         filePopup.AddChild(CreateMenuItem("Reload resources", 'R', QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Exit", 0, 0));
@@ -121,17 +169,16 @@ void CreateMenuBar()
         uiMenuBar.AddChild(fileMenu);
     }
 
-    UIElement@ spacer = UIElement("MenuBarSpacer");
+    BorderImage@ spacer = BorderImage("MenuBarSpacer");
+    spacer.SetStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.AddChild(spacer);
-
-    ResizeUI();
 }
 
-Menu@ CreateMenuItem(const String&in title, int accelKey, int accelQual)
+Menu@ CreateMenuItem(const String&in title, int accelKey, int accelQual, int padding = 16)
 {
     Menu@ menu = Menu(title);
     menu.style = uiStyle;
-    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(4, 0, 4, 0));
+    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(padding, 2, padding, 2));
     if (accelKey != 0)
         menu.SetAccelerator(accelKey, accelQual);
 
@@ -147,7 +194,6 @@ BorderImage@ CreateMenuDivider()
 {
     BorderImage@ divider = BorderImage();
     divider.SetStyle(uiStyle, "EditorDivider");
-    divider.SetFixedHeight(4);
 
     return divider;
 }
@@ -156,7 +202,7 @@ Window@ CreatePopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
     popup.style = uiStyle;
-    popup.SetLayout(LM_VERTICAL, 4, IntRect(4, 4, 4, 4));
+    popup.SetLayout(LM_VERTICAL, 1, IntRect(2, 6, 2, 6));
     baseMenu.popup = popup;
     baseMenu.popupOffset = IntVector2(0, baseMenu.height);
 
@@ -165,7 +211,7 @@ Window@ CreatePopup(Menu@ baseMenu)
 
 Menu@ CreateMenu(const String&in title)
 {
-    Menu@ menu = CreateMenuItem(title, 0, 0);
+    Menu@ menu = CreateMenuItem(title, 0, 0, 8);
     menu.name = "";
     menu.SetFixedWidth(menu.width);
     CreatePopup(menu);
@@ -186,6 +232,15 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.SetFilters(filters, initialFilter);
 
     CenterDialog(uiFileSelector.window);
+}
+
+void CloseFileSelector(uint&out filterIndex, String&out path)
+{
+    // Save filter & path for next time
+    filterIndex = uiFileSelector.filterIndex;
+    path = uiFileSelector.path;
+    
+    uiFileSelector = null;
 }
 
 void CloseFileSelector()
@@ -224,8 +279,12 @@ void UpdateWindowTitle()
     graphics.windowTitle = "Urho3D editor - " + sceneName;
 }
 
-Menu@ GetTopLevelMenu(Menu@ menu)
+void HandlePopup(Menu@ menu)
 {
+    // Close the top level menu now unless the selected menu item has another popup
+    if (menu.popup !is null)
+        return;
+    
     for (;;)
     {
         UIElement@ menuParent = menu.parent;
@@ -240,9 +299,7 @@ Menu@ GetTopLevelMenu(Menu@ menu)
     }
 
     if (menu.parent is uiMenuBar)
-        return menu;
-    else
-        return null;
+        menu.showPopup = false;
 }
 
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
@@ -255,74 +312,64 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     if (action.empty)
         return;
 
-    Menu@ topLevelMenu = GetTopLevelMenu(menu);
-    // Close the top level menu now
-    if (topLevelMenu !is null && action != "Load node") // Instantiate has a submenu, so do not close in that case
-        topLevelMenu.showPopup = false;
+    HandlePopup(menu);
 
     if (uiFileSelector is null)
     {
         if (action == "New scene")
             CreateScene();
-
-        if (action == "Open scene")
+        else if (action == "Open scene...")
         {
             CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenSceneFile");
         }
-
-        if (action == "Save scene")
+        else if (action == "Save scene" && !sceneFileName.empty)
             SaveScene(sceneFileName);
-
-        if (action == "Save scene as")
+        else if (action == "Save scene as..." || action == "Save scene")
         {
             CreateFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
             uiFileSelector.fileName = GetFileNameAndExtension(sceneFileName);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
         }
-
-        if (action == "As replicated")
+        else if (action == "As replicated...")
         {
             instantiateMode = REPLICATED;
-            CreateFileSelector("Load node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
         }
-
-        if (action == "As local")
+        else if (action == "As local...")
         {
             instantiateMode = LOCAL;
-            CreateFileSelector("Load node", "Load", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
         }
-
-        if (action == "Save node as" && selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+        else if (action == "Save node as...")
         {
-            CreateFileSelector("Save node", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
+            if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+            {
+                CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+                uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
+                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
+            }
         }
-
-        if (action == "Import model")
+        else if (action == "Import model...")
         {
-            CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
+            CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportModel");
         }
-
-        if (action == "Import scene")
+        else if (action == "Import scene...")
         {
-            CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
+            CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
         }
-
-        if (action == "Run script")
+        else if (action == "Run script...")
         {
-            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilter, 0);
+            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilters, uiScriptFilter);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
         }
-
-        if (action == "Set resource path")
+        else if (action == "Set resource path...")
         {
-            CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilter, 0);
+            CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
             uiFileSelector.directoryMode = true;
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
         }
@@ -330,153 +377,91 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Reload resources")
         ReloadResources();
-
-    if (action == "Scene hierarchy")
+    else if (action == "Scene hierarchy")
         ShowSceneWindow();
-
-    if (action == "Node / component edit")
+    else if (action == "Node / component edit")
         ShowNodeWindow();
-
-    if (action == "Editor settings")
+    else if (action == "Editor settings")
         ShowEditorSettingsDialog();
-
-    if (action == "Cut")
+    else if (action == "Cut")
         SceneCut();
-
-    if (action == "Copy")
+    else if (action == "Copy")
         SceneCopy();
-
-    if (action == "Paste")
+    else if (action == "Paste")
         ScenePaste();
-
-    if (action == "Delete")
+    else if (action == "Delete")
         SceneDelete();
-
-    if (action == "Reset position")
+    else if (action == "Reset position")
         SceneResetPosition();
-    
-    if (action == "Reset rotation")
+    else if (action == "Reset rotation")
         SceneResetRotation();
-    
-    if (action == "Reset scale")
+    else if (action == "Reset scale")
         SceneResetScale();
-
-    if (action == "Unparent")
+    else if (action == "Unparent")
         SceneUnparent();
-
-    if (action == "Select all")
+    else if (action == "Select all")
         SceneSelectAll();
-
-    if (action == "Toggle update")
+    else if (action == "Toggle update")
         ToggleUpdate();
-        
-    if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" || 
+    else if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" ||
         action == "Pyramid" || action == "Sphere")
         CreateBuiltinObject(action);
-
-    if (action == "Exit")
+    else if (action == "Exit")
         engine.Exit();
+}
+
+String ExtractFileName(VariantMap& eventData)
+{
+    String fileName;
+    
+    // Check for OK
+    if (eventData["OK"].GetBool())
+        fileName = eventData["FileName"].GetString();
+    
+    return fileName;
 }
 
 void HandleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 {
-    // Save filter & path for next time
-    uiSceneFilter = uiFileSelector.filterIndex;
-    uiScenePath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    LoadScene(fileName);
+    CloseFileSelector(uiSceneFilter, uiScenePath);
+    LoadScene(ExtractFileName(eventData));
 }
 
 void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 {
-    // Save filter for next time
-    uiSceneFilter = uiFileSelector.filterIndex;
-    uiScenePath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    SaveScene(fileName);
+    CloseFileSelector(uiSceneFilter, uiScenePath);
+    SaveScene(ExtractFileName(eventData));
 }
 
 void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
 {
-    // Save filter for next time
-    uiSceneFilter = uiFileSelector.filterIndex;
-    uiScenePath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    LoadNode(fileName);
+    CloseFileSelector(uiNodeFilter, uiNodePath);
+    LoadNode(ExtractFileName(eventData));
 }
 
 void HandleSaveNodeFile(StringHash eventType, VariantMap& eventData)
 {
-    // Save filter for next time
-    uiSceneFilter = uiFileSelector.filterIndex;
-    uiScenePath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    SaveNode(fileName);
+    CloseFileSelector(uiNodeFilter, uiNodePath);
+    SaveNode(ExtractFileName(eventData));
 }
 
 void HandleImportModel(StringHash eventType, VariantMap& eventData)
 {
-    // Save path for next time
-    uiImportPath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    ImportModel(fileName);
+    CloseFileSelector(uiImportFilter, uiImportPath);
+    ImportModel(ExtractFileName(eventData));
 }
 
 void HandleImportScene(StringHash eventType, VariantMap& eventData)
 {
-    // Save path for next time
-    uiImportPath = uiFileSelector.path;
-    CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    String fileName = eventData["FileName"].GetString();
-    ImportScene(fileName);
+    CloseFileSelector(uiImportFilter, uiImportPath);
+    ImportScene(ExtractFileName(eventData));
 }
 
-void HandleRunScript(StringHash eventType, VariantMap& eventData)
+void ExecuteScript(const String&in fileName)
 {
-    // Save path for next time
-    uiScriptPath = uiFileSelector.path;
-    CloseFileSelector();
-    
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
+    if (fileName.empty)
         return;
-
-    String fileName = eventData["FileName"].GetString();
+    
     File@ file = File(fileName, FILE_READ);
     if (file.open)
     {
@@ -486,19 +471,20 @@ void HandleRunScript(StringHash eventType, VariantMap& eventData)
         file.Close();
         
         if (script.Execute(scriptCode))
-            log.Info("Script " + fileName + " run successfully");
+            log.Info("Script " + fileName + " ran successfully");
     }
+}
+
+void HandleRunScript(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiScriptFilter, uiScriptPath);
+    ExecuteScript(ExtractFileName(eventData));
 }
 
 void HandleResourcePath(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector();
-
-    // Check for cancel
-    if (!eventData["OK"].GetBool())
-        return;
-
-    SetResourcePath(eventData["FileName"].GetString(), false);
+    SetResourcePath(ExtractFileName(eventData), false);
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -556,8 +542,27 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             fillMode = FillMode(fillMode + 1);
             if (fillMode > FILL_POINT)
                 fillMode = FILL_SOLID;
+
+            // Update camera fill mode
+            camera.fillMode = fillMode;
         }
         else
             SteppedObjectManipulation(key);
     }
+}
+
+void UnhideUI()
+{
+    HideUI(false);
+}
+
+void HideUI(bool hide = true)
+{
+    if (uiHidden == hide)
+        return;
+    
+    float opacity = (uiHidden = hide) ? uiMinOpacity : uiMaxOpacity;
+    sceneWindow.opacity = opacity;
+    nodeWindow.opacity = opacity;
+    uiMenuBar.opacity = opacity;
 }

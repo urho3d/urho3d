@@ -1418,7 +1418,7 @@ void View::SetTextures(const RenderPathCommand& command)
             {
                 // If requesting a texture fails, clear the texture name to prevent redundant attempts
                 RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
-                cmdWrite.textureNames_[i] = String();
+                cmdWrite.textureNames_[i] = String::EMPTY;
             }
         }
     }

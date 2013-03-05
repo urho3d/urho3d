@@ -517,6 +517,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHODPR(Variant, FromString, (const String&, const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "void FromString(VariantType, const String&in)", asMETHODPR(Variant, FromString, (VariantType, const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool IsZero() const", asMETHOD(Variant, IsZero), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const String&), asCALL_THISCALL);
     

@@ -174,7 +174,7 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
 bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
 {
     if (!value.Size())
-        return SetAttribute(name, String());
+        return SetAttribute(name, String::EMPTY);
     else
         return SetBuffer(name, &value[0], value.Size());
 }

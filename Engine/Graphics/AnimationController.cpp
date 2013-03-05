@@ -61,8 +61,8 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
-    REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
 void AnimationController::Update(float timeStep)

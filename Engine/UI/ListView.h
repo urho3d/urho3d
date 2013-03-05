@@ -52,8 +52,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Perform UI element update.
-    virtual void Update(float timeStep);
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
@@ -125,7 +123,7 @@ public:
     /// Return whether hierarchy mode enabled.
     bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return item doubleclick interval in seconds.
-    float GetDoubleClickInterval() const { return doubleClickInterval_; }
+    float GetDoubleClickInterval() const;
     
 protected:
     /// Update selection effect when selection or focus changes.
@@ -146,9 +144,9 @@ protected:
     /// Clear selection on defocus flag.
     bool clearSelectionOnDefocus_;
     /// Doubleclick interval.
-    float doubleClickInterval_;
+    unsigned doubleClickInterval_;
     /// Doubleclick timer.
-    float doubleClickTimer_;
+    Timer doubleClickTimer_;
     /// Last clicked item.
     unsigned lastClickedItem_;
     

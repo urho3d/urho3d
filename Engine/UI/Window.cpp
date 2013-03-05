@@ -231,6 +231,11 @@ void Window::SetCursorShape(WindowDragMode mode, Cursor* cursor) const
     
     switch (mode)
     {
+    case DRAG_NONE:
+    case DRAG_MOVE:
+        cursor->SetShape(CS_NORMAL);
+        break;
+
     case DRAG_RESIZE_TOP:
     case DRAG_RESIZE_BOTTOM:
         cursor->SetShape(CS_RESIZEVERTICAL);

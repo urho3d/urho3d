@@ -43,8 +43,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 { \
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); \
     ParseArguments(GetCommandLineW()); \
-    function; \
-    return 0; \
+    return function; \
 }
 // MSVC release mode: write minidump on crash
 #elif defined(_MSC_VER) && defined(ENABLE_MINIDUMPS)
@@ -52,14 +51,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     ParseArguments(GetCommandLineW()); \
+    int exitCode; \
     __try \
     { \
-        function; \
+        exitCode = function; \
     } \
     __except(WriteMiniDump("Urho3D", GetExceptionInformation())) \
     { \
     } \
-    return 0; \
+    return exitCode; \
 }
 // Other Win32 or minidumps disabled: just execute the function
 #elif defined(WIN32)
@@ -67,8 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     ParseArguments(GetCommandLineW()); \
-    function; \
-    return 0; \
+    return function; \
 }
 // Android or iOS: use SDL_main
 #elif defined(ANDROID) || defined(IOS)
@@ -77,8 +76,7 @@ extern "C" int SDL_main(int argc, char** argv); \
 int SDL_main(int argc, char** argv) \
 { \
     ParseArguments(argc, argv); \
-    function; \
-    return 0; \
+    return function; \
 }
 // Linux or OS X: use main
 #else
@@ -86,7 +84,6 @@ int SDL_main(int argc, char** argv) \
 int main(int argc, char** argv) \
 { \
     ParseArguments(argc, argv); \
-    function; \
-    return 0; \
+    return function; \
 }
 #endif

@@ -113,6 +113,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     int buffer = 100;
     int mixRate = 44100;
     bool fullscreen = true;
+    bool resizable = false;
     bool vsync = false;
     bool tripleBuffer = false;
     bool forceSM2 = false;
@@ -122,7 +123,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool stereo = true;
     bool interpolation = true;
     bool threads = true;
-    bool logDebug = false;
+    int logLevel = -1;
+    bool quiet = false;
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
@@ -132,8 +134,15 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             
             if (argument == "headless")
                 headless_ = true;
-            else if (argument == "logdebug")
-                logDebug = true;
+            else if (argument.Substring(0, 3) == "log")
+            {
+                argument = argument.Substring(3).ToUpper();
+                for (logLevel = sizeof(levelPrefixes) / sizeof(String) - 1; logLevel > -1; --logLevel)
+                {
+                    if (argument == levelPrefixes[logLevel])
+                        break;
+                }
+            }
             else if (argument == "nolimit")
                 SetMaxFps(0);
             else if (argument == "nosound")
@@ -190,12 +199,16 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                     tripleBuffer = true;
                     break;
                     
-                case 'f':
-                    fullscreen = true;
-                    break;
-                    
                 case 'w':
                     fullscreen = false;
+                    break;
+                        
+                case 's':
+                    resizable = true;
+                    break;
+
+                case 'q':
+                    quiet = true;
                     break;
                 }
             }
@@ -210,9 +223,10 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     if (log)
     {
+        if (logLevel != -1)
+            log->SetLevel(logLevel);
+        log->SetQuiet(quiet);
         log->Open(logName);
-        if (logDebug)
-            log->SetLevel(LOG_DEBUG);
     }
     
     // Set maximally accurate low res timer
@@ -261,7 +275,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             graphics->SetExternalWindow(externalWindow);
         graphics->SetForceSM2(forceSM2);
         graphics->SetWindowTitle(windowTitle);
-        if (!graphics->SetMode(width, height, fullscreen, vsync, tripleBuffer, multiSample))
+        if (!graphics->SetMode(width, height, fullscreen, resizable, vsync, tripleBuffer, multiSample))
             return false;
         
         if (!renderPath.Empty())
@@ -285,9 +299,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
 
 bool Engine::InitializeScripting()
 {
-    if (!initialized_)
-        return false;
-    
     // Check if scripting already initialized
     if (GetSubsystem<Script>())
         return true;

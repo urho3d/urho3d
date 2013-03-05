@@ -23,6 +23,9 @@
 #pragma once
 
 #include "BorderImage.h"
+#include "Image.h"
+
+#include <SDL_mouse.h>
 
 namespace Urho3D
 {
@@ -37,6 +40,7 @@ enum CursorShape
     CS_RESIZEDIAGONAL_TOPLEFT,
     CS_ACCEPTDROP,
     CS_REJECTDROP,
+    CS_BUSY,
     CS_MAX_SHAPES
 };
 
@@ -49,6 +53,8 @@ struct CursorShapeInfo
     IntRect imageRect_;
     /// Hotspot coordinates.
     IntVector2 hotSpot_;
+    /// OS cursor.
+    SDL_Cursor* osCursor_;
 };
 
 /// Mouse cursor %UI element.
@@ -68,7 +74,7 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
     /// Define a shape.
-    void DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot);
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
     /// Set current shape.
     void SetShape(CursorShape shape);
     

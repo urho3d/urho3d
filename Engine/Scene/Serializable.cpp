@@ -264,6 +264,7 @@ bool Serializable::Save(Serializer& dest)
             continue;
         
         OnGetAttribute(attr, value);
+        
         if (!dest.WriteVariantData(value))
         {
             LOGERROR("Could not save " + GetTypeName() + ", writing to stream failed");
@@ -364,9 +365,14 @@ bool Serializable::SaveXML(XMLElement& dest)
         if (!(attr.mode_ & AM_FILE))
             continue;
         
+        OnGetAttribute(attr, value);
+        
+        // In XML serialization default values can be skipped. This will make the file easier to read or edit manually
+        if (value == attr.defaultValue_ && !SaveDefaultAttributes())
+            continue;
+        
         XMLElement attrElem = dest.CreateChild("attribute");
         attrElem.SetAttribute("name", attr.name_);
-        OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {

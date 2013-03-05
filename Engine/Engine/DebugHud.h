@@ -58,7 +58,7 @@ public:
     void SetMode(unsigned mode);
     /// Set maximum profiler block depth, default unlimited.
     void SetProfilerMaxDepth(unsigned depth);
-    /// Set profiler accumulation interval.
+    /// Set profiler accumulation interval in seconds.
     void SetProfilerInterval(float interval);
     /// Set whether to show 3D geometry primitive/batch count only. Default false.
     void SetUseRendererStats(bool enable);
@@ -79,8 +79,9 @@ public:
     unsigned GetMode() const { return mode_; }
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
-    /// Return profiler accumulation interval.
-    float GetProfilerInterval() const { return profilerInterval_; }
+    /// Return profiler accumulation interval in seconds
+    float GetProfilerInterval() const;
+    
     /// Return whether showing 3D geometry primitive/batch count only.
     bool GetUseRendererStats() const { return useRendererStats_; }
     /// Set application-specific stats.
@@ -111,7 +112,7 @@ private:
     /// Profiler max block depth.
     unsigned profilerMaxDepth_;
     /// Profiler accumulation interval.
-    float profilerInterval_;
+    unsigned profilerInterval_;
     /// Show 3D geometry primitive/batch count flag.
     bool useRendererStats_;
     /// Current shown-element mode.

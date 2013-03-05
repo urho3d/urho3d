@@ -47,7 +47,8 @@ LineEdit::LineEdit(Context* context) :
     echoCharacter_(0),
     cursorMovable_(true),
     textSelectable_(true),
-    textCopyable_(true)
+    textCopyable_(true),
+    doubleClickInterval_(500)
 {
     clipChildren_ = true;
     active_ = true;
@@ -77,6 +78,7 @@ void LineEdit::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
     ATTRIBUTE(LineEdit, VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
     COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
 }
 
@@ -109,11 +111,16 @@ void LineEdit::OnClick(const IntVector2& position, const IntVector2& screenPosit
 {
     if (buttons & MOUSEB_LEFT && cursorMovable_)
     {
-        unsigned pos = GetCharIndex(position);
-        if (pos != M_MAX_UNSIGNED)
+        if (doubleClickTimer_.GetMSec(true) < doubleClickInterval_)
+            text_->SetSelection(0);
+        else
         {
-            SetCursorPosition(pos);
-            text_->ClearSelection();
+            unsigned pos = GetCharIndex(position);
+            if (pos != M_MAX_UNSIGNED)
+            {
+                SetCursorPosition(pos);
+                text_->ClearSelection();
+            }
         }
     }
 }
@@ -360,6 +367,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_RETURN:
+    case KEY_RETURN2:
+    case KEY_KP_ENTER:
         {
             using namespace TextFinished;
             
@@ -479,6 +488,16 @@ void LineEdit::SetTextSelectable(bool enable)
 void LineEdit::SetTextCopyable(bool enable)
 {
     textCopyable_ = enable;
+}
+
+void LineEdit::SetDoubleClickInterval(float interval)
+{
+    doubleClickInterval_ = Max((int)(interval * 1000.0f), 0);
+}
+
+float LineEdit::GetDoubleClickInterval() const
+{
+    return (float)doubleClickInterval_ / 1000.0f;
 }
 
 void LineEdit::UpdateText()

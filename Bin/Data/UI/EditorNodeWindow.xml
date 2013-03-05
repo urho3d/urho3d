@@ -17,10 +17,7 @@
             <attribute name="Name" value="CloseButton" />
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider">
-        <attribute name="Min Size" value="0 4" />
-        <attribute name="Max Size" value="2147483647 4" />
-    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element type="Text">
         <attribute name="Name" value="NodeTitle" />
         <attribute name="Min Size" value="0 17" />
@@ -31,9 +28,6 @@
         <attribute name="Highlight Mode" value="Always" />
         <attribute name="Min Size" value="0 74" />
         <attribute name="Max Size" value="2147483647 74" />
-        <element type="ScrollBar" internal="true">
-            <attribute name="Is Visible" value="false" />
-        </element>
     </element>
     <element>
         <attribute name="Min Size" value="0 17" />
@@ -93,10 +87,7 @@
             </element>
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider">
-        <attribute name="Min Size" value="0 4" />
-        <attribute name="Max Size" value="2147483647 4" />
-    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element type="Text">
         <attribute name="Name" value="ComponentTitle" />
         <attribute name="Min Size" value="0 17" />
@@ -105,8 +96,5 @@
     <element type="ListView">
         <attribute name="Name" value="ComponentAttributeList" />
         <attribute name="Highlight Mode" value="Always" />
-        <element type="ScrollBar" internal="true">
-            <attribute name="Is Visible" value="false" />
-        </element>
     </element>
 </element>

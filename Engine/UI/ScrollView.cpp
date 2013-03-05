@@ -260,6 +260,7 @@ void ScrollView::UpdateViewSize()
 
 void ScrollView::UpdateScrollBars()
 {
+    bool needResize = false;
     ignoreEvents_ = true;
     
     IntVector2 size = scrollPanel_->GetSize();
@@ -269,18 +270,30 @@ void ScrollView::UpdateScrollBars()
     
     if (horizontalScrollBar_ && size.x_ > 0 && viewSize_.x_ > 0)
     {
-        horizontalScrollBar_->SetRange((float)viewSize_.x_ / (float)size.x_ - 1.0f);
+        float range = (float)viewSize_.x_ / (float)size.x_ - 1.0f;
+        horizontalScrollBar_->SetRange(range);
         horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
         horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
+        
+        // Hide/Show the horizontal scroll bar as needed
+        needResize = SetScrollBarVisible(horizontalScrollBar_, range > 0.0f);
     }
     if (verticalScrollBar_ && size.y_ > 0 && viewSize_.y_ > 0)
     {
-        verticalScrollBar_->SetRange((float)viewSize_.y_ / (float)size.y_ - 1.0f);
+        float range = (float)viewSize_.y_ / (float)size.y_ - 1.0f;
+        verticalScrollBar_->SetRange(range);
         verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
         verticalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.y_);
+        
+        // Hide/Show the vertical scroll bar as needed
+        needResize = SetScrollBarVisible(verticalScrollBar_, range > 0.0f) || needResize;
     }
     
     ignoreEvents_ = false;
+    // Since the scrollbar visibility changed event is intentionally ignored to prevent
+    // infinite loop in the above code, call OnResize now if needed
+    if (needResize)
+        OnResize();
 }
 
 void ScrollView::UpdateView(const IntVector2& position)
@@ -306,6 +319,13 @@ void ScrollView::UpdateView(const IntVector2& position)
     }
 }
 
+bool ScrollView::SetScrollBarVisible(ScrollBar* scrollBar, bool visible)
+{
+    bool oldVisible = scrollBar->IsVisible();
+    scrollBar->SetVisible(visible);
+    return oldVisible != scrollBar->IsVisible();
+}
+
 void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventData)
 {
     IntVector2 size = scrollPanel_->GetSize();
@@ -325,7 +345,8 @@ void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventD
 void ScrollView::HandleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData)
 {
     // Need to recalculate panel size when scrollbar visibility changes
-    OnResize();
+    if (!ignoreEvents_)
+        OnResize();
 }
 
 void ScrollView::HandleElementResized(StringHash eventType, VariantMap& eventData)

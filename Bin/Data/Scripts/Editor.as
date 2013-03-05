@@ -7,6 +7,7 @@
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 
+String configPath;
 String configFileName;
 
 // If loaded in OpenGL mode, remember the instancing setting in config instead of auto-disabling it
@@ -21,14 +22,20 @@ void Start()
         return;
     }
 
-    configFileName = fileSystem.userDocumentsDir + "Urho3D/Editor/Config.xml";
+    if (GetPlatform() == "Windows")
+        configPath = "Urho3D/Editor/";
+    else
+        // Unix-like platforms usually hide application configuration file
+        configPath = ".Urho3D/Editor/";
+    configFileName = fileSystem.userDocumentsDir + configPath + "Config.xml";
+
     SubscribeToEvent("Update", "HandleUpdate");
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
     cache.autoReloadResources = true;
-    // Set default resource path
-    SetResourcePath(fileSystem.programDir + "Data");
+    // Use OS mouse without grabbing it
+    input.mouseVisible = true;
 
     CreateScene();
     CreateUI();
@@ -60,11 +67,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
-    MoveCamera(timeStep);
+    UpdateView(timeStep);
     UpdateStats(timeStep);
     UpdateScene(timeStep);
     UpdateGizmo();
-    UpdateView();
 }
 
 void LoadConfig()
@@ -120,8 +126,7 @@ void LoadConfig()
 
 void SaveConfig()
 {
-    fileSystem.CreateDir(fileSystem.userDocumentsDir + "Urho3D");
-    fileSystem.CreateDir(fileSystem.userDocumentsDir + "Urho3D/Editor");
+    CreateDir(configPath);
 
     XMLFile config;
     XMLElement configElem = config.CreateRoot("configuration");
@@ -155,4 +160,15 @@ void SaveConfig()
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
 
     config.Save(File(configFileName, FILE_WRITE));
+}
+
+void CreateDir(const String&in pathName, const String&in baseDir = fileSystem.userDocumentsDir)
+{
+    Array<String> dirs = pathName.Split('/');
+    String subdir = baseDir;
+    for (uint i = 0; i < dirs.length; ++i)
+    {
+        subdir += dirs[i] + "/";
+        fileSystem.CreateDir(subdir);
+    }
 }

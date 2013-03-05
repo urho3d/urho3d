@@ -104,7 +104,7 @@ public:
     /// Reset all shader pointers.
     void ReleaseShaders();
     /// Clone material.
-    SharedPtr<Material> Clone(const String& cloneName = String()) const;
+    SharedPtr<Material> Clone(const String& cloneName = String::EMPTY) const;
     /// Mark material for auxiliary view rendering.
     void MarkForAuxView(unsigned frameNumber);
     

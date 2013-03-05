@@ -38,6 +38,14 @@ static const int LOG_ERROR = 3;
 /// Disable all log messages.
 static const int LOG_NONE = 4;
 
+static const String levelPrefixes[] =
+{
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR"
+};
+
 class File;
 
 /// Logging subsystem.
@@ -61,6 +69,8 @@ public:
     void SetLevel(int level);
     /// Set whether to timestamp log messages.
     void SetTimeStamp(bool enable);
+    /// Set quiet mode ie. only log errors to standard output stream.
+    void SetQuiet(bool quiet);
     
     /// Return logging level.
     int GetLevel() const { return level_; }
@@ -68,6 +78,8 @@ public:
     bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
     const String& GetLastMessage() const { return lastMessage_; }
+    /// Return whether log is in quiet mode (only errors printed to standard output.)
+    bool IsQuiet() const { return quiet_; }
     
 private:
     /// Log file.
@@ -80,6 +92,8 @@ private:
     bool timeStamp_;
     /// In write flag to prevent recursion.
     bool inWrite_;
+    /// Quiet mode flag.
+    bool quiet_;
 };
 
 /// Write to the log (static.)

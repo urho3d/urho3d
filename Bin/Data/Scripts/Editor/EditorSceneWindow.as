@@ -17,6 +17,7 @@ void CreateSceneWindow()
     int height = Min(ui.root.height - 60, 500);
     sceneWindow.SetSize(300, height);
     sceneWindow.SetPosition(20, 40);
+    sceneWindow.opacity = uiMaxOpacity;
     sceneWindow.BringToFront();
     UpdateSceneWindow();
 

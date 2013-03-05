@@ -84,7 +84,7 @@ public:
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
     /// Set screen mode. Return true if successful.
-    bool SetMode(int width, int height, bool fullscreen, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Toggle between full screen and windowed mode. Return true if successful.
@@ -214,6 +214,8 @@ public:
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
+    /// Return whether window is resizable.
+    bool GetResizable() const { return resizable_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
@@ -313,6 +315,8 @@ public:
     /// Return force Shader Model 2 flag.
     bool GetForceSM2() const { return forceSM2_; }
     
+    /// Window was resized through user interaction. Called by Input subsystem.
+    void WindowResized(int width, int height);
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -359,7 +363,7 @@ public:
     
 private:
     /// Create the application window.
-    bool OpenWindow(int width, int height);
+    bool OpenWindow(int width, int height, bool resizable);
     /// Adjust the window for new resolution and fullscreen mode.
     void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen);
     /// Create the Direct3D interface.
@@ -397,6 +401,8 @@ private:
     int windowPosY_;
     /// Fullscreen flag.
     bool fullscreen_;
+    /// Resizable flag.
+    bool resizable_;
     /// Vertical sync flag.
     bool vsync_;
     /// Triple buffering flag.

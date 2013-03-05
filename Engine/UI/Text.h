@@ -63,8 +63,8 @@ public:
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
-    /// Set selection.
-    void SetSelection(unsigned start, unsigned length);
+    /// Set selection. When length is not provided, select until the text ends.
+    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
     /// Clear selection.
     void ClearSelection();
     /// Set selection background color. Color with 0 alpha (default) disables.

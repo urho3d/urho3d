@@ -63,6 +63,30 @@ void Menu::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(Menu, Button);
 }
 
+void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
+    if (popup_ && !showPopup_)
+    {
+        // Check if popup is shown by one of the siblings
+        Vector<SharedPtr<UIElement> > children = GetParent()->GetChildren();
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        {
+            if ((*i) != this && (*i)->GetType() == Menu::GetTypeStatic())
+            {
+                Menu* sibling = static_cast<Menu*>(i->Get());
+                if (sibling->showPopup_)
+                {
+                    // "Move" the popup from sibling menu to this menu
+                    sibling->ShowPopup(false);
+                    ShowPopup(true);
+                    return;
+                }
+            }
+        }
+    }
+}
+    
 void Menu::OnShowPopup()
 {
 }

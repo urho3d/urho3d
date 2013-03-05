@@ -55,8 +55,8 @@ Text::Text(Context* context) :
     wordWrap_(false),
     selectionStart_(0),
     selectionLength_(0),
-    selectionColor_(Color(0.0f, 0.0f, 0.0f, 0.0f)),
-    hoverColor_(Color(0.0f, 0.0f, 0.0f, 0.0f)),
+    selectionColor_(Color::TRANSPARENT),
+    hoverColor_(Color::TRANSPARENT),
     rowHeight_(0)
 {
 }
@@ -71,12 +71,12 @@ void Text::RegisterObject(Context* context)
     
     ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
-    ATTRIBUTE(Text, VAR_STRING, "Text", text_, String(), AM_FILE);
+    ATTRIBUTE(Text, VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
     ENUM_ATTRIBUTE(Text, "Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     ATTRIBUTE(Text, VAR_FLOAT, "Row Spacing", rowSpacing_, 1.0f, AM_FILE);
     ATTRIBUTE(Text, VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::BLACK, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::BLACK, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     COPY_BASE_ATTRIBUTES(Text, UIElement);
 }
 

@@ -605,7 +605,7 @@ void Input::SetKey(int key, bool newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
 
-    if (key == KEY_RETURN && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
+    if ((key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER) && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
         graphics_->ToggleFullscreen();
 }
 
@@ -878,6 +878,12 @@ void Input::HandleSDLEvent(void* sdlEvent)
             case SDL_WINDOWEVENT_SURFACE_CREATED:
                 // Restore GPU objects
                 input->graphics_->Restore();
+                break;
+            #endif
+
+            #if !defined(IOS) && !defined(ANDROID)
+            case SDL_WINDOWEVENT_RESIZED:
+                input->graphics_->WindowResized(evt.window.data1, evt.window.data2);
                 break;
             #endif
             }

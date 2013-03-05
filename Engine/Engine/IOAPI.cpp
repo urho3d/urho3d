@@ -130,6 +130,8 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void set_timeStamp(bool)", asMETHOD(Log, SetTimeStamp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "bool get_timeStamp() const", asMETHOD(Log, GetTimeStamp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "const String& get_lastMessage()", asMETHOD(Log, GetLastMessage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void set_quiet(bool)", asMETHOD(Log, SetQuiet), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "bool get_quiet() const", asMETHOD(Log, IsQuiet), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
     
     // Register also Print() functions for convenience

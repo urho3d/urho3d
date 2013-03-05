@@ -159,25 +159,25 @@ void OpenConsoleWindow()
     #endif
 }
 
-void PrintUnicode(const String& str)
+void PrintUnicode(const String& str, bool error)
 {
     #if !defined(ANDROID) && !defined(IOS)
     #ifdef WIN32
-    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (output == INVALID_HANDLE_VALUE)
+    HANDLE stream = GetStdHandle(error ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
+    if (stream == INVALID_HANDLE_VALUE)
         return;
     WString strW(str);
     DWORD charsWritten;
-    WriteConsoleW(output, strW.CString(), strW.Length(), &charsWritten, 0);
+    WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, 0);
     #else
-    printf("%s", str.CString());
+    fprintf(error ? stderr : stdout, "%s", str.CString());
     #endif
     #endif
 }
 
-void PrintUnicodeLine(const String& str)
+void PrintUnicodeLine(const String& str, bool error)
 {
-    PrintUnicode(str + '\n');
+    PrintUnicode(str + '\n', error);
 }
 
 void PrintLine(const String& str)

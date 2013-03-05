@@ -55,7 +55,7 @@ public:
     /// Run a specific program, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemRun(const String& fileName, const Vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined.
-    bool SystemOpen(const String& fileName, const String& mode = String());
+    bool SystemOpen(const String& fileName, const String& mode = String::EMPTY);
     /// Copy a file. Return true if successful.
     bool Copy(const String& srcFileName, const String& destFileName);
     /// Rename a file. Return true if successful.

@@ -92,8 +92,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
 void ParticleEmitter::Update(const FrameInfo& frame)
@@ -196,7 +196,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                         ++index;
                 }
                 if (index < colors_.Size() - 1)
-                    billboard.color_ = colors_[index].interpolate(colors_[index + 1], particle.timer_);
+                    billboard.color_ = colors_[index].Interpolate(colors_[index + 1], particle.timer_);
                 else
                     billboard.color_ = colors_[index].color_;
             }

@@ -55,7 +55,7 @@ public:
     XMLElement CreateRoot(const String& name);
     
     /// Return the root element, with optionally specified name. Return null element if not found.
-    XMLElement GetRoot(const String& name = String());
+    XMLElement GetRoot(const String& name = String::EMPTY);
     /// Return the pugixml document.
     pugi::xml_document* GetDocument() const { return document_; }
     

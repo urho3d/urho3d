@@ -114,6 +114,15 @@ EVENT(E_SLIDERCHANGED, SliderChanged)
     PARAM(P_VALUE, Value);                  // float
 }
 
+/// UI slider being paged.
+EVENT(E_SLIDERPAGED, SliderPaged)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_OFFSET, Offset);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// UI scrollbar value changed.
 EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {

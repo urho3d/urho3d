@@ -175,6 +175,7 @@ if (NOT IOS)
     add_subdirectory (Tools/OgreImporter)
     add_subdirectory (Tools/PackageTool)
     add_subdirectory (Tools/RampGenerator)
+    add_subdirectory (Tools/ScriptAPIDumper)
 endif ()
 
 if (NOT USE_OPENGL)

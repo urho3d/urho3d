@@ -65,8 +65,7 @@ ListView::ListView(Context* context) :
     multiselect_(false),
     hierarchyMode_(false),
     clearSelectionOnDefocus_(false),
-    doubleClickInterval_(0.5f),
-    doubleClickTimer_(0.0f),
+    doubleClickInterval_(500),
     lastClickedItem_(M_MAX_UNSIGNED)
 {
     UIElement* container = new UIElement(context_);
@@ -96,12 +95,6 @@ void ListView::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(ListView, ScrollView);
 }
 
-void ListView::Update(float timeStep)
-{
-    if (doubleClickTimer_ > 0.0f)
-        doubleClickTimer_ = Max(doubleClickTimer_ - timeStep, 0.0f);
-}
-
 void ListView::OnKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
@@ -127,6 +120,8 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
             break;
             
         case KEY_RETURN:
+        case KEY_RETURN2:
+        case KEY_KP_ENTER:
             if (hierarchyMode_)
             {
                 ToggleChildItemsVisible(selection);
@@ -510,7 +505,7 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
 
 void ListView::SetDoubleClickInterval(float interval)
 {
-    doubleClickInterval_ = interval;
+    doubleClickInterval_ = Max((int)(interval * 1000.0f), 0);
 }
 
 void ListView::SetChildItemsVisible(unsigned index, bool enable)
@@ -634,6 +629,11 @@ bool ListView::IsSelected(unsigned index) const
     return selections_.Contains(index);
 }
 
+float ListView::GetDoubleClickInterval() const
+{
+    return (float)doubleClickInterval_ / 1000.0f;
+}
+
 void ListView::UpdateSelectionEffect()
 {
     unsigned numItems = GetNumItems();
@@ -690,16 +690,8 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
             bool isDoubleClick = false;
             if (!multiselect_ || !qualifiers)
             {
-                if (doubleClickTimer_ > 0.0f && lastClickedItem_ == i)
-                {
-                    isDoubleClick = true;
-                    doubleClickTimer_ = 0.0f;
-                }
-                else
-                {
-                    doubleClickTimer_ = doubleClickInterval_;
+                if (!(isDoubleClick = doubleClickTimer_.GetMSec(true) < doubleClickInterval_ && lastClickedItem_ == i))
                     lastClickedItem_ = i;
-                }
                 SetSelection(i);
             }
             

@@ -7,6 +7,12 @@ const uint MAX_NODE_ATTRIBUTES = 8;
 const int ATTRNAME_WIDTH = 135;
 const int ATTR_HEIGHT = 19;
 
+const ShortStringHash textType("Text");
+const ShortStringHash containerType("UIElement");
+const StringHash textChangedEventType("TextChanged");
+const Color normalTextColor(1.0f, 1.0f, 1.0f);
+const Color modifiedTextColor(1.0f, 0.8f, 0.5f);
+
 class ResourcePicker
 {
     String resourceType;
@@ -104,6 +110,7 @@ void CreateNodeWindow()
     int height = Min(ui.root.height - 60, 500);
     nodeWindow.SetSize(300, height);
     nodeWindow.SetPosition(ui.root.width - 20 - nodeWindow.width, 40);
+    nodeWindow.opacity = uiMaxOpacity;
     nodeWindow.BringToFront();
     UpdateNodeWindow();
 
@@ -252,7 +259,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 
     uint index = attrEdit.vars["Index"].GetUInt();
     uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
-    bool intermediateEdit = eventType == StringHash("TextChanged");
+    bool intermediateEdit = eventType == textChangedEventType;
 
     StoreAttributeEditor(parent, serializables, index, subIndex);
     for (uint i = 0; i < serializables.length; ++i)
@@ -280,11 +287,8 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
             AttributeInfo info = serializables[0].attributeInfos[i];
             if (info.mode & AM_NOEDIT != 0)
                 continue;
-            // Resource editors have the title + the editor row itself, so count 2
-            if (info.type == VAR_RESOURCEREF)
-                count += 2;
-            else if (info.type == VAR_RESOURCEREFLIST)
-                count += 2 * serializables[0].attributes[i].GetResourceRefList().length;
+            if (info.type == VAR_RESOURCEREFLIST)
+                count += serializables[0].attributes[i].GetResourceRefList().length;
             else if (info.type == VAR_VARIANTVECTOR && GetVectorStruct(serializables, i) !is null)
                 count += serializables[0].attributes[i].GetVariantVector().length;
             else if (info.type == VAR_VARIANTMAP)
@@ -297,17 +301,26 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
     return count;
 }
 
-UIElement@ CreateAttributeEditorParentTitle(ListView@ list, String name)
+UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, String name, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
-    UIElement@ editorParent = UIElement();
-    editorParent.SetLayout(LM_HORIZONTAL);
-    editorParent.SetFixedHeight(ATTR_HEIGHT);
+    UIElement@ editorParent = UIElement("Edit" + String(index) + "_" + String(subIndex));
+    editorParent.vars["Index"] = index;
+    editorParent.vars["SubIndex"] = subIndex;
+    editorParent.SetLayout(LM_VERTICAL, 2);
     list.AddItem(editorParent);
 
-    Text@ attrNameText = Text();
-    attrNameText.SetStyle(uiStyle, "EditorAttributeText");
-    attrNameText.text = name;
-    editorParent.AddChild(attrNameText);
+    if (suppressedSeparatedLabel)
+    {
+        UIElement@ placeHolder = UIElement();
+        editorParent.AddChild(placeHolder);
+    }
+    else
+    {
+        Text@ attrNameText = Text();
+        attrNameText.SetStyle(uiStyle, "EditorAttributeText");
+        attrNameText.text = name;
+        editorParent.AddChild(attrNameText);
+    }
 
     return editorParent;
 }
@@ -321,14 +334,11 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, String name, uint index, 
     editorParent.SetFixedHeight(ATTR_HEIGHT);
     list.AddItem(editorParent);
 
-    if (!name.empty)
-    {
-        Text@ attrNameText = Text();
-        attrNameText.SetStyle(uiStyle, "EditorAttributeText");
-        attrNameText.text = name;
-        attrNameText.SetFixedWidth(ATTRNAME_WIDTH);
-        editorParent.AddChild(attrNameText);
-    }
+    Text@ attrNameText = Text();
+    attrNameText.SetStyle(uiStyle, "EditorAttributeText");
+    attrNameText.text = name;
+    attrNameText.SetFixedWidth(ATTRNAME_WIDTH);
+    editorParent.AddChild(attrNameText);
 
     return editorParent;
 }
@@ -415,7 +425,7 @@ void CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, 
     CreateAttributeEditor(list, serializables, info.name, info.type, info.enumNames, index, 0);
 }
 
-UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
+UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
     UIElement@ parent;
 
@@ -499,21 +509,16 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             resourceType = serializables[0].attributes[index].GetVariantVector()[subIndex].GetResourceRef().type;
 
         // Create the resource name on a separate non-interactive line to allow for more space
-        CreateAttributeEditorParentTitle(list, name);
+        parent = CreateAttributeEditorParentWithSeparatedLabel(list, name, index, subIndex, suppressedSeparatedLabel);
 
-        parent = CreateAttributeEditorParent(list, "", index, subIndex);
-
-        UIElement@ spacer = UIElement();
-        spacer.SetFixedSize(10, ATTR_HEIGHT - 2);
-        parent.AddChild(spacer);
-
-        LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
+        UIElement@ container = UIElement();
+        container.SetLayout(LM_HORIZONTAL, 4, IntRect(name.StartsWith("   ") ? 20 : 10, 0, 4, 0));    // Left margin is indented more when the name is so
+        container.SetFixedHeight(ATTR_HEIGHT);
+        parent.AddChild(container);
+        
+        LineEdit@ attrEdit = CreateAttributeLineEdit(container, serializables, index, subIndex);
         attrEdit.vars["Type"] = resourceType.value;
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
-
-        UIElement@ spacer2 = UIElement();
-        spacer2.SetFixedSize(4, ATTR_HEIGHT - 2);
-        parent.AddChild(spacer2);
 
         Button@ pickButton = Button();
         pickButton.style = uiStyle;
@@ -527,12 +532,8 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
         pickButtonText.text = "Pick";
         pickButton.AddChild(pickButtonText);
-        parent.AddChild(pickButton);
+        container.AddChild(pickButton);
         SubscribeToEvent(pickButton, "Released", "PickResource");
-
-        UIElement@ spacer3 = UIElement();
-        spacer3.SetFixedSize(4, 16);
-        parent.AddChild(spacer3);
 
         Button@ openButton = Button();
         openButton.style = uiStyle;
@@ -546,14 +547,14 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
         openButtonText.text = "Open";
         openButton.AddChild(openButtonText);
-        parent.AddChild(openButton);
+        container.AddChild(openButton);
         SubscribeToEvent(openButton, "Released", "OpenResource");
     }
     if (type == VAR_RESOURCEREFLIST)
     {
         uint numRefs = serializables[0].attributes[index].GetResourceRefList().length;
         for (uint i = 0; i < numRefs; ++i)
-            CreateAttributeEditor(list, serializables, name, VAR_RESOURCEREF, null, index, i);
+            CreateAttributeEditor(list, serializables, name, VAR_RESOURCEREF, null, index, i, i > 0);
     }
     if (type == VAR_VARIANTVECTOR)
     {
@@ -608,15 +609,29 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, ui
     }
 
     if (sameValue)
-        LoadAttributeEditor(parent, value, value.type, info.enumNames);
+        LoadAttributeEditor(parent, value, value.type, info.enumNames, info.defaultValue);
 
     inLoadAttributeEditor = false;
 }
 
-void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames)
+void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue)
 {
     uint index = parent.vars["Index"].GetUInt();
 
+    // Assume the first child is always a text label element or a container that containing a text label element
+    UIElement@ label = parent.children[0];
+    if (label.type == containerType)
+        label = label.children[0];
+    if (label.type == textType)
+    {
+        bool modified;
+        if (defaultValue.type == VAR_NONE || defaultValue.type == VAR_RESOURCEREFLIST)
+            modified = !value.IsZero();
+        else
+            modified = value != defaultValue;
+        cast<Text>(label).color = (modified ? modifiedTextColor : normalTextColor);
+    }
+    
     if (type == VAR_STRING)
     {
         LineEdit@ attrEdit = parent.children[1];
@@ -711,7 +726,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
     }
     if (type == VAR_RESOURCEREF)
     {
-        LineEdit@ attrEdit = parent.children[1];
+        LineEdit@ attrEdit = parent.children[1].children[0];
         attrEdit.text = cache.GetResourceName(value.GetResourceRef().id);
         attrEdit.cursorPosition = 0;
     }
@@ -724,7 +739,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             parent = GetAttributeEditorParent(list, index, subIndex);
             if (parent is null)
                 break;
-            LineEdit@ attrEdit = parent.children[1];
+            LineEdit@ attrEdit = parent.children[1].children[0];
             attrEdit.text = cache.GetResourceName(refList.ids[subIndex]);
             attrEdit.cursorPosition = 0;
         }
@@ -738,7 +753,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             parent = GetAttributeEditorParent(list, index, i);
             if (parent is null)
                 break;
-            LoadAttributeEditor(parent, vector[i], vector[i].type, null);
+            LoadAttributeEditor(parent, vector[i], vector[i].type, null, Variant());
         }
     }
     if (type == VAR_VARIANTMAP)
@@ -752,7 +767,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             if (parent is null)
                 break;
             Variant value = map[keys[i]];
-            LoadAttributeEditor(parent, value, value.type, null);
+            LoadAttributeEditor(parent, value, value.type, null, Variant());
         }
     }
 }
@@ -874,7 +889,7 @@ Variant GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumN
     }
     if (type == VAR_RESOURCEREF)
     {
-        LineEdit@ attrEdit = parent.children[1];
+        LineEdit@ attrEdit = parent.children[1].children[0];
         ResourceRef ref;
         ref.id = StringHash(attrEdit.text.Trimmed());
         ref.type = ShortStringHash(attrEdit.vars["Type"].GetUInt());
@@ -901,7 +916,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ button = eventData["Element"].GetUIElement();
-    LineEdit@ attrEdit = button.parent.children[1];
+    LineEdit@ attrEdit = button.parent.children[0];
 
     Array<Serializable@>@ targets = GetAttributeEditorTargets(attrEdit);
     if (targets.empty)
@@ -1038,7 +1053,7 @@ void PickResourceCanceled()
 void OpenResource(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ button = eventData["Element"].GetUIElement();
-    LineEdit@ attrEdit = button.parent.children[1];
+    LineEdit@ attrEdit = button.parent.children[0];
     
     String fileName = attrEdit.text.Trimmed();
     if (fileName.empty)

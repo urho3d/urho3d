@@ -374,7 +374,7 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
 
-Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem.
+Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem or by using \ref Tools_ScriptAPIDumper "ScriptAPIDumper tool".
 
 \section Scripting_Limitations Limitations
 
@@ -1456,6 +1456,20 @@ Specify a wildcard to compile multiple shaders from the directory.
 The D3DX library from the DirectX runtime or SDK needs to be installed. Note that when running in Direct3D9 mode, the engine will automatically invoke ShaderCompiler if it can not find a shader in binary form. Depending on shader complexity this can take a substantial amount of time. To avoid this, execute the file CompileAllShaders.bat in the Bin directory to precompile all shader permutations. It is also highly recommended to not ship ShaderCompiler with Urho3D applications, but to instead precompile all shaders. After precompiling you can delete all .hlsl files from the CoreData directory of the shipping build.
 
 Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use similar XML definition files, but no precompiling tool exists for them; they are always compiled during runtime.
+
+\section Tools_ScriptAPIDumper ScriptAPIDumper
+
+Dump the %Script API in Doxygen format.
+
+Usage:
+
+\verbatim
+ScriptAPIDumper <output file>
+\endverbatim
+
+The output file can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory.
+
+Note that if you build ScriptAPIDumper from source, it must be built with ENABLE_LOGGING defined as the tool requires Log subsystem to capture the output.
 
 \page Unicode Unicode support
 

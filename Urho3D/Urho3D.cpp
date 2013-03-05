@@ -42,16 +42,17 @@ class Application : public Object
     
 public:
     Application(Context* context);
-    void Run(const String& scriptFileName);
+    int Run(const String& scriptFileName);
     
 private:
     void ErrorExit();
     void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    int exitCode_;
 };
 
-void Run()
+int Run()
 {
     try
     {
@@ -86,10 +87,12 @@ void Run()
                 "-v          Enable vertical sync\n"
                 "-t          Enable triple buffering\n"
                 "-w          Start in windowed mode\n"
+                "-s          Enable resizing when in windowed mode\n"
+                "-q          Enable quiet mode which does not log to standard output stream\n"
                 "-b<length>  Sound buffer length in milliseconds\n"
                 "-r<freq>    Sound mixing frequency in Hz\n"
                 "-headless   Headless mode. No application window will be created\n"
-                "-logdebug   Display debug level log messages also in release mode\n"
+                "-log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'\n"
                 "-lqshadows  Use low-quality (1-sample) shadow filtering\n"
                 "-noshadows  Disable shadow rendering\n"
                 "-nolimit    Disable frame limiter\n"
@@ -99,64 +102,73 @@ void Run()
                 "-sm2        Force SM2.0 rendering\n"
                 #endif
             );
-            return;
+            return EXIT_FAILURE;
         }
         
         // Create the execution context and the application object. The application object is needed to subscribe to events
         // which allow to live-reload the script.
         SharedPtr<Context> context(new Context());
         SharedPtr<Application> application(new Application(context));
-        application->Run(scriptFileName);
+        return application->Run(scriptFileName);
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog("Urho3D", "An out-of-memory error occurred. The application will now exit.");
+        return EXIT_FAILURE;
     }
 }
 
 OBJECTTYPESTATIC(Application);
 
 Application::Application(Context* context) :
-    Object(context)
+    Object(context),
+    exitCode_(EXIT_SUCCESS)
 {
 }
 
-void Application::Run(const String& scriptFileName)
+int Application::Run(const String& scriptFileName)
 {
     SharedPtr<Engine> engine(new Engine(context_));
-    if (!engine->Initialize("Urho3D", "Urho3D.log", GetArguments()))
+    if (engine->Initialize("Urho3D", "Urho3D.log", GetArguments()))
     {
-        ErrorExit();
-        return;
+        // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
+        engine->InitializeScripting();
+        SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
+        
+        // If script loading is successful, execute engine loop
+        if (scriptFile && scriptFile->Execute("void Start()"))
+        {
+            // Subscribe to script's reload event to allow live-reload of the application
+            SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
+            
+            while (!engine->IsExiting())
+                engine->RunFrame();
+            
+            if (scriptFile->GetFunction("void Stop()"))
+                scriptFile->Execute("void Stop()");
+            
+            return exitCode_;
+        }
     }
     
-    // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-    engine->InitializeScripting();
-    SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
-    
-    // If script loading is successful, execute engine loop
-    if (scriptFile && scriptFile->Execute("void Start()"))
-    {
-        // Subscribe to script's reload event to allow live-reload of the application
-        SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
-        SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
-        SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
-        
-        while (!engine->IsExiting())
-            engine->RunFrame();
-        
-        if (scriptFile->GetFunction("void Stop()"))
-            scriptFile->Execute("void Stop()");
-    }
-    else
-        ErrorExit();
+    ErrorExit();
+    return exitCode_;
 }
 
 void Application::ErrorExit()
 {
     Engine* engine = context_->GetSubsystem<Engine>();
     engine->Exit(); // Close the rendering window
-    ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage());
+
+    // Only for WIN32, otherwise the last message would be double posted on Mac OS X and Linux platforms
+    #ifdef WIN32
+    Log* log = context_->GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during built
+    ErrorDialog("Urho3D", log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
+    #endif
+    
+    exitCode_ = EXIT_FAILURE;
 }
 
 void Application::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)

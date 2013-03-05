@@ -63,7 +63,7 @@ public:
     virtual void ClientDisconnected(kNet::MessageConnection* connection);
     
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
-    bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = VariantMap());
+    bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
@@ -75,11 +75,11 @@ public:
     /// Broadcast a message with content ID to all client connections.
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections.
-    void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Broadcast a remote event to all client connections in a specific scene.
-    void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Broadcast a remote event with the specified node as a sender. Is sent to all client connections in the node's scene.
-    void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
     void SetUpdateFps(int fps);
     /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed.

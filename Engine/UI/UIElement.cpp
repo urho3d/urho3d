@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Cursor.h"
 #include "HashSet.h"
 #include "Log.h"
 #include "ResourceCache.h"
@@ -157,7 +158,7 @@ void UIElement::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIElement>();
     
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String(), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
@@ -183,7 +184,7 @@ void UIElement::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE);
+    ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()
@@ -303,6 +304,8 @@ void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads
 
 void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
+    if (cursor && cursor->IsVisible())
+        cursor->SetShape(CS_NORMAL);
     hovering_ = true;
 }
 

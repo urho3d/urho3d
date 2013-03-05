@@ -61,7 +61,7 @@ public:
     /// Remove a child element by name. Return true if successful.
     bool RemoveChild(const char* name);
     /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
-    bool RemoveChildren(const String& name = String());
+    bool RemoveChildren(const String& name = String::EMPTY);
     /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
     bool RemoveChildren(const char* name);
     /// Set an attribute.
@@ -124,11 +124,11 @@ public:
     /// Return whether has a child element.
     bool HasChild(const char* name) const;
     /// Return child element, or null if missing.
-    XMLElement GetChild(const String& name = String()) const;
+    XMLElement GetChild(const String& name = String::EMPTY) const;
     /// Return child element, or null if missing.
     XMLElement GetChild(const char* name) const;
     /// Return next sibling element.
-    XMLElement GetNext(const String& name = String()) const;
+    XMLElement GetNext(const String& name = String::EMPTY) const;
     /// Return next sibling element.
     XMLElement GetNext(const char* name) const;
     /// Return parent element.

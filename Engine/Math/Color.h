@@ -24,6 +24,9 @@
 
 #include "Vector4.h"
 
+// Defined by Windows headers
+#undef TRANSPARENT
+
 namespace Urho3D
 {
 
@@ -153,6 +156,8 @@ public:
     static const Color BLUE;
     /// Opaque black color.
     static const Color BLACK;
+    /// Transparent color (black with no alpha).
+    static const Color TRANSPARENT;
 };
 
 /// Multiply Color with a scalar.
@@ -182,8 +187,8 @@ public:
     {
     }
     
-    /// Return interpolated value with another color-time pair, at the time specified.
-    Color interpolate(const ColorFade& next, float time)
+    /// Return interpolated value with another color-time pair at the time specified.
+    Color Interpolate(const ColorFade& next, float time)
     {
         float timeInterval = next.time_ - time_;
         if (timeInterval > 0.0f)

@@ -96,13 +96,13 @@ public:
     /// Set fixed updates per second. 0 (default) uses the physics frame rate.
     void SetFixedUpdateFps(int fps);
     /// Query for a method by declaration and execute if found.
-    bool Execute(const String& declaration, const VariantVector& parameters = VariantVector());
+    bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Execute a method.
-    bool Execute(asIScriptFunction* method, const VariantVector& parameters = VariantVector());
+    bool Execute(asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Add a delay-executed method call, optionally repeating.
-    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = VariantVector());
+    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Clear pending delay-executed method calls. If empty declaration given, clears all.
-    void ClearDelayedExecute(const String& declaration = String());
+    void ClearDelayedExecute(const String& declaration = String::EMPTY);
     
     /// Return script file.
     ScriptFile* GetScriptFile() const { return scriptFile_; }

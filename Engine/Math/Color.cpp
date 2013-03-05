@@ -35,6 +35,7 @@ const Color Color::RED(1.0f, 0.0f, 0.0f);
 const Color Color::GREEN(0.0f, 1.0f, 0.0f);
 const Color Color::BLUE(0.0f, 0.0f, 1.0f);
 const Color Color::BLACK(0.0f, 0.0f, 0.0f);
+const Color Color::TRANSPARENT(0.0f, 0.0f, 0.0f, 0.0f);
 
 String Color::ToString() const
 {

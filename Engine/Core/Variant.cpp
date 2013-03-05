@@ -347,6 +347,75 @@ String Variant::ToString() const
     }
 }
 
+bool Variant::IsZero() const
+{
+    switch (type_)
+    {
+    case VAR_INT:
+        return value_.int_ == 0;
+        
+    case VAR_BOOL:
+        return value_.bool_ == false;
+        
+    case VAR_FLOAT:
+        return value_.float_ == 0.0f;
+        
+    case VAR_VECTOR2:
+        return *reinterpret_cast<const Vector2*>(&value_) == Vector2::ZERO;
+        
+    case VAR_VECTOR3:
+        return *reinterpret_cast<const Vector3*>(&value_) == Vector3::ZERO;
+        
+    case VAR_VECTOR4:
+        return *reinterpret_cast<const Vector4*>(&value_) == Vector4::ZERO;
+        
+    case VAR_QUATERNION:
+        return *reinterpret_cast<const Quaternion*>(&value_) == Quaternion::IDENTITY;
+        
+    case VAR_COLOR:
+        // WHITE is considered empty (i.e. default) color in the Color class definition
+        return *reinterpret_cast<const Color*>(&value_) == Color::WHITE;
+        
+    case VAR_STRING:
+        return reinterpret_cast<const String*>(&value_)->Empty();
+        
+    case VAR_BUFFER:
+        return reinterpret_cast<const PODVector<unsigned char>*>(&value_)->Empty();
+        
+    case VAR_PTR:
+        return value_.ptr_ == 0;
+        
+    case VAR_RESOURCEREF:
+        return reinterpret_cast<const ResourceRef*>(&value_)->id_ == StringHash::ZERO;
+        
+    case VAR_RESOURCEREFLIST:
+    {
+        Vector<StringHash> ids = reinterpret_cast<const ResourceRefList*>(&value_)->ids_;
+        for (Vector<StringHash>::ConstIterator i = ids.Begin(); i != ids.End(); ++i)
+        {
+            if (*i != StringHash::ZERO)
+                return false;
+        }
+        return true;
+    }
+    
+    case VAR_VARIANTVECTOR:
+        return reinterpret_cast<const VariantVector*>(&value_)->Empty();
+        
+    case VAR_VARIANTMAP:
+        return reinterpret_cast<const VariantMap*>(&value_)->Empty();
+        
+    case VAR_INTRECT:
+        return *reinterpret_cast<const IntRect*>(&value_) == IntRect::ZERO;
+        
+    case VAR_INTVECTOR2:
+        return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
+        
+    default:
+        return false;
+    }
+}
+
 void Variant::SetType(VariantType newType)
 {
     if (type_ == newType)

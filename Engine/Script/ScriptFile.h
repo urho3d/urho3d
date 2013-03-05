@@ -61,15 +61,13 @@ public:
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
     
     /// Query for a function by declaration and execute if found.
-    bool Execute(const String& declaration, const VariantVector& parameters = VariantVector(), bool unprepare = true);
+    bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Execute a function.
-    bool Execute(asIScriptFunction* function, const VariantVector& parameters = VariantVector(), bool unprepare = true);
+    bool Execute(asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Query for an object method by declaration and execute if found.
-    bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters =
-        VariantVector(), bool unprepare = true);
+    bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Execute an object method.
-    bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = VariantVector(),
-        bool unprepare = true);
+    bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Create a script object.
     asIScriptObject* CreateObject(const String& className);
     

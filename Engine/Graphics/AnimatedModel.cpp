@@ -93,9 +93,9 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
 }
 
 bool AnimatedModel::Load(Deserializer& source)
@@ -820,7 +820,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         Animation* animation = state->GetAnimation();
         Bone* startBone = state->GetStartBone();
         ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
-        ret.Push(startBone ? startBone->name_ : String());
+        ret.Push(startBone ? startBone->name_ : String::EMPTY);
         ret.Push(state->IsLooped());
         ret.Push(state->GetWeight());
         ret.Push(state->GetTime());

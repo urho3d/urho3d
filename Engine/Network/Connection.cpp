@@ -1220,7 +1220,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                     // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
                     LOGWARNING("Sending dummy user variable as original value was removed");
                     msg_.WriteShortStringHash(ShortStringHash());
-                    msg_.WriteVariant(Variant());
+                    msg_.WriteVariant(Variant::EMPTY);
                 }
             }
             

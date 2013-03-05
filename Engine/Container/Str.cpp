@@ -307,7 +307,7 @@ String::Iterator String::Insert(const String::Iterator& dest, char c)
 
 void String::Erase(unsigned pos, unsigned length)
 {
-    Replace(pos, length, String());
+    Replace(pos, length, String::EMPTY);
 }
 
 String::Iterator String::Erase(const String::Iterator& it)

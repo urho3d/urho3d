@@ -944,6 +944,8 @@ public:
     const String& GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
+    /// Return true when the variant value is considered zero according to its actual type
+    bool IsZero() const;
     
     /// Return name for variant type.
     static const String& GetTypeName(VariantType type);
@@ -954,16 +956,6 @@ public:
     
     /// Empty variant.
     static const Variant EMPTY;
-    
-private:
-    /// Set new type and allocate/deallocate memory as necessary.
-    void SetType(VariantType newType);
-    
-    /// Variant type.
-    VariantType type_;
-    /// Variant value.
-    VariantValue value_;
-    
     /// Empty buffer.
     static const PODVector<unsigned char> emptyBuffer;
     /// Empty resource reference.
@@ -974,6 +966,15 @@ private:
     static const VariantMap emptyVariantMap;
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
+    
+private:
+    /// Set new type and allocate/deallocate memory as necessary.
+    void SetType(VariantType newType);
+    
+    /// Variant type.
+    VariantType type_;
+    /// Variant value.
+    VariantValue value_;
 };
 
 }

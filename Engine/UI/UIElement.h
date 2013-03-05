@@ -120,11 +120,13 @@ public:
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
+    /// Return whether should save default-valued attributes into XML. For UI elements this is false, as otherwise a lot of unnecessary info would be stored.
+    virtual bool SaveDefaultAttributes() const { return false; }
+    
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
-    
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click.
@@ -250,7 +252,7 @@ public:
     /// Bring UI element to front.
     void BringToFront();
     /// Create and add a child element and return it.
-    UIElement* CreateChild(ShortStringHash type, const String& name = String());
+    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY);
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -268,7 +270,7 @@ public:
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
     /// Template version of creating a child element.
-    template <class T> T* CreateChild(const String& name = String());
+    template <class T> T* CreateChild(const String& name = String::EMPTY);
     
     /// Return name.
     const String& GetName() const { return name_; }

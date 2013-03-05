@@ -187,7 +187,7 @@ void DecalSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(DecalSet, Drawable);
-    ACCESSOR_ATTRIBUTE(DecalSet, VAR_VARIANTVECTOR, "Decals", GetDecalsAttr, SetDecalsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_VARIANTVECTOR, "Decals", GetDecalsAttr, SetDecalsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
 void DecalSet::ApplyAttributes()

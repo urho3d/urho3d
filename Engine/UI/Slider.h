@@ -44,6 +44,8 @@ public:
     virtual void Update(float timeStep);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse click.
+    virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
     virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
@@ -61,7 +63,9 @@ public:
     void SetValue(float value);
     /// Change value by a delta.
     void ChangeValue(float delta);
-    
+    /// Set paging minimum repeat rate (number of events per second).
+    void SetRepeatRate(float rate);
+
     /// Return orientation type.
     Orientation GetOrientation() const { return orientation_; }
     /// Return slider range.
@@ -70,11 +74,15 @@ public:
     float GetValue() const { return value_; }
     /// Return knob element.
     BorderImage* GetKnob() const { return knob_; }
-    
+    /// Return paging minimum repeat rate (number of events per second).
+    float GetRepeatRate() const { return repeatRate_; }
+
 protected:
     /// Update slider knob position & size.
     void UpdateSlider();
-    
+    /// Send slider page event.
+    void Page(const IntVector2& position, int buttons, int qualifiers);
+
     /// Slider knob.
     SharedPtr<BorderImage> knob_;
     /// Orientation.
@@ -89,6 +97,10 @@ protected:
     IntVector2 dragBeginCursor_;
     /// Original slider position at drag begin.
     IntVector2 dragBeginPosition_;
+    /// Paging repeat rate.
+    float repeatRate_;
+    /// Paging minimum repeat timer.
+    Timer repeatTimer_;
 };
 
 }

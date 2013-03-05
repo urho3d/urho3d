@@ -95,17 +95,19 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
 
 void Button::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    bool oldPressed = pressed_;
-    SetPressed((buttons & MOUSEB_LEFT) != 0);
-    hovering_ = true;
-    
-    if (oldPressed && !pressed_)
+    BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
+    if (pressed_)
     {
-        using namespace Released;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        SendEvent(E_RELEASED, eventData);
+        if (!(buttons & MOUSEB_LEFT))
+        {
+            SetPressed(false);
+            
+            using namespace Released;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            SendEvent(E_RELEASED, eventData);
+        }
     }
 }
 
@@ -123,6 +125,11 @@ void Button::OnClick(const IntVector2& position, const IntVector2& screenPositio
         eventData[P_ELEMENT] = (void*)this;
         SendEvent(E_PRESSED, eventData);
     }
+}
+
+void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    SetPressed(true);
 }
 
 void Button::SetPressedOffset(const IntVector2& offset)

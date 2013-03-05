@@ -99,18 +99,21 @@ void CreateStatsBar()
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
 
     editorModeText = Text();
+    ui.root.AddChild(editorModeText);
     renderStatsText = Text();
+    ui.root.AddChild(renderStatsText);
     cameraPosText = Text();
+    ui.root.AddChild(cameraPosText);
 
-    if (ui.root.width >= 1024)
+    if (ui.root.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 0, 20, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 20, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 24, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 0, 20, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 32, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
     }
 
     SetupStatsBarText(cameraPosText, font, 0, 0, HA_LEFT, VA_BOTTOM);
@@ -124,7 +127,6 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
     text.SetFont(font, 11);
     text.color = Color(1, 1, 0);
     text.priority = -100;
-    ui.root.AddChild(text);
 }
 
 void UpdateStats(float timeStep)
@@ -159,13 +161,7 @@ void UpdateStats(float timeStep)
     cameraPosText.size = cameraPosText.minSize;
 }
 
-void UpdateView()
-{
-    // Update camera fill mode
-    camera.fillMode = fillMode;
-}
-
-void MoveCamera(float timeStep)
+void UpdateView(float timeStep)
 {
     // Move camera
     if (ui.focusElement is null && !input.keyDown[KEY_LCTRL])
@@ -175,13 +171,25 @@ void MoveCamera(float timeStep)
             speedMultiplier = cameraShiftSpeedMultiplier;
 
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
+        {
             cameraNode.TranslateRelative(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
+            HideUI();
+        }
         if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
+        {
             cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
+            HideUI();
+        }
         if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
+        {
             cameraNode.TranslateRelative(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+            HideUI();
+        }
         if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
+        {
             cameraNode.TranslateRelative(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+            HideUI();
+        }
     }
 
     // Rotate camera
@@ -198,6 +206,7 @@ void MoveCamera(float timeStep)
                 cameraPitch = 90.0;
 
             cameraNode.rotation = Quaternion(cameraPitch, cameraYaw, 0);
+            HideUI();
         }
     }
 

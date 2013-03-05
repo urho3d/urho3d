@@ -23,6 +23,8 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Cursor.h"
+#include "Input.h"
+#include "Ptr.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
 #include "Texture2D.h"
@@ -41,6 +43,7 @@ static const char* shapeNames[] =
     "ResizeDiagonalTopLeft",
     "AcceptDrop",
     "RejectDrop",
+    "Busy",
     0
 };
 
@@ -58,41 +61,96 @@ Cursor::Cursor(Context* context) :
         CursorShapeInfo& info = shapeInfos_[i];
         info.imageRect_ = IntRect::ZERO;
         info.hotSpot_ = IntVector2::ZERO;
+        info.osCursor_ = 0;
     }
 }
 
 Cursor::~Cursor()
 {
+    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
+    {
+        CursorShapeInfo& info = shapeInfos_[i];
+        if (info.osCursor_)
+        {
+            SDL_FreeCursor(info.osCursor_);
+            info.osCursor_ = 0;
+        }
+    }
 }
 
 void Cursor::RegisterObject(Context* context)
 {
     context->RegisterFactory<Cursor>();
     
-    ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, VariantVector(), AM_FILE);
+    ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
     COPY_BASE_ATTRIBUTES(Cursor, BorderImage);
 }
 
-void Cursor::DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot)
+void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible)
 {
     CursorShapeInfo& info = shapeInfos_[shape];
+    Texture2D* texture = new Texture2D(context_);
+    texture->Load(SharedPtr<Image>(image));
     info.texture_ = texture;
     info.imageRect_ = imageRect;
     info.hotSpot_ = hotSpot;
-    
+    if (info.osCursor_)
+    {
+        SDL_FreeCursor(info.osCursor_);
+        info.osCursor_ = 0;
+    }
+
+    if (osMouseVisible)
+    {
+        unsigned comp = image->GetComponents();
+        int imageWidth = image->GetWidth();
+        int width = imageRect.Width();
+        int height = imageRect.Height();
+        
+        // Assume little-endian for all the supported platforms
+        unsigned rMask = 0x000000ff;
+        unsigned gMask = 0x0000ff00;
+        unsigned bMask = 0x00ff0000;
+        unsigned aMask = 0xff000000;
+        
+        SDL_Surface* surface = (comp >= 3 ? SDL_CreateRGBSurface(0, width, height, comp * 8, rMask, gMask, bMask, aMask) : 0);
+        if (surface)
+        {
+            unsigned char* destination = reinterpret_cast<unsigned char*>(surface->pixels);
+            unsigned char* source = image->GetData() + comp * (imageWidth * imageRect.top_ + imageRect.left_);
+            for (int i = 0; i < height; ++i)
+            {
+                memcpy(destination, source, comp * width);
+                destination += comp * width;
+                source += comp * imageWidth;
+            }
+            info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
+            SDL_FreeSurface(surface);
+        }
+    }
+
     // Reset current shape if it was edited
     if (shape == shape_)
-        SetShape(shape_);
+    {
+        shape_ = CS_MAX_SHAPES;
+        SetShape(shape);
+    }
 }
 
 void Cursor::SetShape(CursorShape shape)
 {
+    if (shape == shape_ || shape < CS_NORMAL || shape >= CS_MAX_SHAPES)
+        return;
+
     shape_ = shape;
     
     CursorShapeInfo& info = shapeInfos_[shape_];
     texture_ = info.texture_;
     imageRect_ = info.imageRect_;
     SetSize(info.imageRect_.Size());
+    
+    if (info.osCursor_)
+        SDL_SetCursor(info.osCursor_);
 }
 
 void Cursor::SetShapesAttr(VariantVector value)
@@ -101,6 +159,9 @@ void Cursor::SetShapesAttr(VariantVector value)
     if (!value.Size())
         return;
     
+    Input* input = GetSubsystem<Input>();
+    bool osMouseVisible = input->IsMouseVisible();
+
     unsigned numShapes = value[index++].GetUInt();
     while (numShapes-- && (index + 4) <= value.Size())
     {
@@ -110,7 +171,7 @@ void Cursor::SetShapesAttr(VariantVector value)
             ResourceRef ref = value[index++].GetResourceRef();
             IntRect imageRect = value[index++].GetIntRect();
             IntVector2 hotSpot = value[index++].GetIntVector2();
-            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(ref.id_), imageRect, hotSpot);
+            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.id_), imageRect, hotSpot, osMouseVisible);
         }
         else
             index += 3;

@@ -111,6 +111,8 @@ protected:
     bool ignoreEvents_;
     
 private:
+    /// Return true when scrollbar has the visible flag toggled.
+    static bool SetScrollBarVisible(ScrollBar* scrollBar, bool visible);
     /// Handle scrollbar value changed.
     void HandleScrollBarChanged(StringHash eventType, VariantMap& eventData);
     /// Handle scrollbar visibility changed.

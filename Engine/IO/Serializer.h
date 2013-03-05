@@ -24,6 +24,7 @@
 
 #include "HashMap.h"
 #include "StringHash.h"
+#include "Variant.h"
 
 namespace Urho3D
 {
@@ -33,15 +34,9 @@ class IntRect;
 class IntVector2;
 class Quaternion;
 class Rect;
-class Variant;
 class Vector2;
 class Vector3;
 class Vector4;
-struct ResourceRef;
-struct ResourceRefList;
-
-typedef Vector<Variant> VariantVector;
-typedef HashMap<ShortStringHash, Variant> VariantMap;
 
 /// Abstract stream for writing.
 class Serializer

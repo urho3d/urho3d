@@ -20,45 +20,39 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "Context.h"
+#include "Engine.h"
+#include "Log.h"
+#include "Main.h"
+#include "ProcessUtils.h"
+#include "Script.h"
+#include "ScriptAPI.h"
 
-#include "Object.h"
+#include "DebugNew.h"
 
-namespace Urho3D
+using namespace Urho3D;
+
+int main(int argc, char** argv)
 {
+    #ifdef WIN32
+    ParseArguments(GetCommandLineW());
+    #else
+    ParseArguments(argc, argv);
+    #endif
+    
+    if (GetArguments().Size() < 1)
+        ErrorExit("Usage: ScriptAPIDumper <output file>\n");
 
-/// Operating system window message.
-EVENT(E_WINDOWMESSAGE, WindowMessage)
-{
-    PARAM(P_WINDOW, Window);                // int
-    PARAM(P_MSG, Msg);                      // int
-    PARAM(P_WPARAM, WParam);                // int
-    PARAM(P_LPARAM, LParam);                // int
-    PARAM(P_HANDLED, Handled);              // bool
-}
-
-/// New screen mode set.
-EVENT(E_SCREENMODE, ScreenMode)
-{
-    PARAM(P_WIDTH, Width);                  // int
-    PARAM(P_HEIGHT, Height);                // int
-    PARAM(P_FULLSCREEN, Fullscreen);        // bool
-    PARAM(P_RESIZABLE, Resizable);          // bool
-}
-
-/// Graphics features checked.
-EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
-{
-}
-
-/// Frame rendering started.
-EVENT(E_BEGINRENDERING, BeginRendering)
-{
-}
-
-/// Frame rendering ended.
-EVENT(E_ENDRENDERING, EndRendering)
-{
-}
-
+    SharedPtr<Context> context(new Context());
+    SharedPtr<Engine> engine(new Engine(context));
+    if (!engine->InitializeScripting())
+        ErrorExit("Unabled to initialize script engine. The application will now exit.");
+    Log* log;   // All subsystems are auto-disposed
+    context->RegisterSubsystem(log = new Log(context));
+    log->SetLevel(LOG_ERROR);
+    log->SetQuiet(true);
+    log->Open(GetArguments()[0]);
+    context->GetSubsystem<Script>()->DumpAPI();
+   
+    return EXIT_SUCCESS;
 }

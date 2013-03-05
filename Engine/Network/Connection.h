@@ -108,9 +108,9 @@ public:
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Send a remote event.
-    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Send a remote event with the specified node as sender.
-    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network.

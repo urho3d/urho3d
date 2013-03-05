@@ -152,6 +152,8 @@ namespace Urho3D
 - int KEY_BACKSPACE
 - int KEY_TAB
 - int KEY_RETURN
+- int KEY_RETURN2
+- int KEY_KP_ENTER
 - int KEY_PAUSE
 - int KEY_CAPSLOCK
 - int KEY_ESC
@@ -719,6 +721,7 @@ Methods:<br>
 - void FromString(const String&, const String&)
 - void FromString(VariantType, const String&)
 - String ToString() const
+- bool IsZero() const
 - VectorBuffer GetBuffer() const
 - Node@ GetNode() const
 - Component@ GetComponent() const
@@ -824,6 +827,7 @@ Properties:<br>
 - int level
 - bool timeStamp
 - String lastMessage (readonly)
+- bool quiet
 
 
 Serializer
@@ -2716,7 +2720,7 @@ Graphics
 
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool SetMode(int, int, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, bool, int)
 - bool SetMode(int, int)
 - bool ToggleFullscreen()
 - void Close()
@@ -2732,6 +2736,7 @@ Properties:<br>
 - int height (readonly)
 - int multiSample (readonly)
 - bool fullscreen (readonly)
+- bool resizable (readonly)
 - bool vsync (readonly)
 - bool tripleBuffer (readonly)
 - bool initialized (readonly)
@@ -3484,7 +3489,7 @@ Methods:<br>
 - bool IsInsideCombined(IntVector2, bool)
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
-- void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&)
+- void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&, bool arg4 = false)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3651,6 +3656,7 @@ Properties:<br>
 - float range
 - float value
 - BorderImage@ knob (readonly)
+- float repeatRate
 
 
 ScrollBar
@@ -3998,7 +4004,7 @@ Properties:<br>
 - bool multiselect
 - bool hierarchyMode
 - bool clearSelectionOnDefocus
-- float floatClickInterval
+- float doubleClickInterval
 
 
 Text
@@ -4045,7 +4051,7 @@ Methods:<br>
 - bool IsInsideCombined(IntVector2, bool)
 - bool SetFont(const String&, int)
 - bool SetFont(Font@, int)
-- void SetSelection(uint, uint)
+- void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)
 - void ClearSelection()
 
 Properties:<br>
@@ -4225,6 +4231,7 @@ Properties:<br>
 - bool textCopyable
 - Text@ textElement (readonly)
 - BorderImage@ cursor (readonly)
+- float doubleClickInterval
 
 
 Menu

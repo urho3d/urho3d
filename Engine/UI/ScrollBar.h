@@ -111,6 +111,8 @@ private:
     void HandleForwardButtonPressed(StringHash eventType, VariantMap& eventData);
     /// Handle slider movement.
     void HandleSliderChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle slider touch and click on "paging" area.
+    void HandleSliderPaged(StringHash eventType, VariantMap& eventData);
 };
 
 }
