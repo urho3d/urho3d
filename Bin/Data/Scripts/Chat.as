@@ -76,6 +76,9 @@ void InitUI()
     startServerButton = AddUIButton("Start Server", 110);
 
     chatHistory.Resize((graphics.height - 20) / chatHistoryText.rowHeight);
+    
+    // No viewports or scene is defined. However, the default zone's fog color controls the fill color
+    renderer.defaultZone.fogColor = Color(0, 0, 0.1);
 }
 
 Button@ AddUIButton(const String& text, int width)

@@ -658,7 +658,7 @@ void Renderer::Render()
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();
-        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, defaultZone_->GetFogColor());
         
         numPrimitives_ = 0;
         numBatches_ = 0;
