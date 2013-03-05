@@ -120,8 +120,6 @@ public:
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Return whether should save default-valued attributes into XML. For UI elements this is false, as otherwise a lot of unnecessary info would be stored.
-    virtual bool SaveDefaultAttributes() const { return false; }
     
     /// Perform UI element update.
     virtual void Update(float timeStep);

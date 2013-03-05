@@ -64,8 +64,8 @@ public:
     virtual bool SaveXML(XMLElement& dest);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() {}
-    /// Return whether should save default-valued attributes into XML. Default true.
-    virtual bool SaveDefaultAttributes() const { return true; }
+    /// Return whether should save default-valued attributes into XML. Default false.
+    virtual bool SaveDefaultAttributes() const { return false; }
     
     /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);

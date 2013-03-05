@@ -70,6 +70,8 @@ public:
     virtual bool SaveXML(XMLElement& dest);
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
+    /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
+    virtual bool SaveDefaultAttributes() const { return true; }
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
     
