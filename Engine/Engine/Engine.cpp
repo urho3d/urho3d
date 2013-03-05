@@ -87,7 +87,7 @@ Engine::Engine(Context* context) :
     initialized_(false),
     exiting_(false),
     headless_(false),
-   audioPaused_(false)
+    audioPaused_(false)
 {
 }
 
@@ -374,11 +374,13 @@ Console* Engine::CreateConsole()
     
     // Return existing console if possible
     Console* console = GetSubsystem<Console>();
-    if (console)
-        return console;
+    if (!console)
+    {
+        console = new Console(context_);
+        context_->RegisterSubsystem(console);
+    }
     
-    context_->RegisterSubsystem(new Console(context_));
-    return GetSubsystem<Console>();
+    return console;
 }
 
 DebugHud* Engine::CreateDebugHud()
@@ -386,13 +388,15 @@ DebugHud* Engine::CreateDebugHud()
     if (headless_ || !initialized_)
         return 0;
     
-     // Return existing debug hud if possible
+     // Return existing debug HUD if possible
     DebugHud* debugHud = GetSubsystem<DebugHud>();
-    if (debugHud)
-        return debugHud;
+    if (!debugHud)
+    {
+        debugHud = new DebugHud(context_);
+        context_->RegisterSubsystem(debugHud);
+    }
     
-    context_->RegisterSubsystem(new DebugHud(context_));
-    return GetSubsystem<DebugHud>();
+    return debugHud;
 }
 
 void Engine::SetMinFps(int fps)
