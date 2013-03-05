@@ -12,7 +12,6 @@ const int MAX_PICK_MODES = 4;
 Scene@ editorScene;
 
 String sceneFileName;
-String sceneResourcePath = fileSystem.programDir + "Data";
 String instantiateFileName;
 CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;

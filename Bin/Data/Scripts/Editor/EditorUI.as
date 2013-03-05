@@ -63,7 +63,7 @@ void ResizeUI()
     
     // Relayout windows
     Array<UIElement@> children = ui.root.GetChildren();
-    for (int i = 0; i < children.length; ++i)
+    for (uint i = 0; i < children.length; ++i)
     {
         if (children[i].type == windowType)
             AdjustPosition(children[i]);
