@@ -154,6 +154,22 @@ const String& Context::GetTypeName(ShortStringHash type) const
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 
+AttributeInfo* Context::GetAttribute(ShortStringHash objectType, const char* name)
+{
+    HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
+    if (i == attributes_.End())
+        return 0;
+    
+    Vector<AttributeInfo>& infos = i->second_;
+    
+    for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
+    {
+        if (!String::Compare(j->name_, name, true))
+            return &(*j);
+    }
+    
+    return 0;
+}
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {

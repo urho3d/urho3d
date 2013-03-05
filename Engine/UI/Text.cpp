@@ -82,15 +82,7 @@ void Text::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(Text, UIElement);
     
     // Change the default value for UseDerivedOpacity
-    Vector<AttributeInfo>& attributes = const_cast<Vector<AttributeInfo>&>(*context->GetAttributes(GetTypeStatic()));
-    for (unsigned i = 0; i < attributes.Size(); ++i)
-    {
-        if (attributes[i].name_ == "Use Derived Opacity")
-        {
-            attributes[i].defaultValue_ = false;
-            break;
-        }
-    }
+    context->GetAttribute<Text>("Use Derived Opacity")->defaultValue_ = false;
 }
 
 void Text::ApplyAttributes()

@@ -52,6 +52,7 @@ public:
     void RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
     void RemoveAttribute(ShortStringHash objectType, const char* name);
+    
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Template version of registering an object factory.
@@ -77,8 +78,12 @@ public:
     EventHandler* GetEventHandler() const { return eventHandler_; }
     /// Return object type name from hash, or empty if unknown.
     const String& GetTypeName(ShortStringHash type) const;
+    /// Return a specific attribute description for an object, or null if not found.
+    AttributeInfo* GetAttribute(ShortStringHash objectType, const char* name);
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
+    /// Template version of returning a specific attribute description.
+    template <class T> AttributeInfo* GetAttribute(const char* name);
     
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
@@ -156,5 +161,6 @@ template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { 
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
+template <class T> AttributeInfo* Context::GetAttribute(const char* name) { return GetAttribute(T::GetTypeStatic(), name); }
 
 }

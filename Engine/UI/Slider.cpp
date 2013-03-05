@@ -224,7 +224,7 @@ void Slider::Page(const IntVector2& position, int buttons, int qualifiers)
 {
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
-    float length = orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight();
+    float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
     
