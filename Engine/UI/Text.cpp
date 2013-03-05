@@ -59,6 +59,8 @@ Text::Text(Context* context) :
     hoverColor_(Color::TRANSPARENT),
     rowHeight_(0)
 {
+    // By default Text does not derive opacity from parent elements
+    SetUseDerivedOpacity(false);
 }
 
 Text::~Text()
@@ -78,6 +80,17 @@ void Text::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     COPY_BASE_ATTRIBUTES(Text, UIElement);
+    
+    // Change the default value for UseDerivedOpacity
+    Vector<AttributeInfo>& attributes = const_cast<Vector<AttributeInfo>&>(*context->GetAttributes(GetTypeStatic()));
+    for (unsigned i = 0; i < attributes.Size(); ++i)
+    {
+        if (attributes[i].name_ == "Use Derived Opacity")
+        {
+            attributes[i].defaultValue_ = false;
+            break;
+        }
+    }
 }
 
 void Text::ApplyAttributes()
@@ -185,12 +198,6 @@ void Text::OnResize()
 {
     if (wordWrap_)
         UpdateText();
-}
-
-float Text::GetDerivedOpacity() const
-{
-    // Text should always use its own opacity.
-    return GetOpacity();
 }
 
 bool Text::SetFont(const String& fontName, int size)

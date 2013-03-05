@@ -52,7 +52,7 @@ public:
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
     /// Set linked depth-stencil surface.
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
-    /// Queue manual update of the viewports.
+    /// Queue manual update of the viewport(s).
     void QueueUpdate();
     /// Release surface.
     void Release();

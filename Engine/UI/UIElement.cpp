@@ -115,6 +115,7 @@ UIElement::UIElement(Context* context) :
     bringToBack_(true),
     clipChildren_(false),
     sortChildren_(true),
+    useDerivedOpacity_(true),
     active_(false),
     selected_(false),
     visible_(true),
@@ -179,6 +180,7 @@ void UIElement::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, false, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
@@ -588,6 +590,11 @@ void UIElement::SetSortChildren(bool enable)
         sortOrderDirty_ = true;
     
     sortChildren_ = enable;
+}
+
+void UIElement::SetUseDerivedOpacity(bool enable)
+{
+    useDerivedOpacity_ = enable;
 }
 
 void UIElement::SetActive(bool enable)
@@ -1011,18 +1018,20 @@ IntVector2 UIElement::GetScreenPosition() const
 
 float UIElement::GetDerivedOpacity() const
 {
+    if (!useDerivedOpacity_)
+        return opacity_;
+  
     if (opacityDirty_)
     {
-        float opacity = opacity_;
+        derivedOpacity_ = opacity_;
         const UIElement* parent = parent_;
         
         while (parent)
         {
-            opacity *= parent->opacity_;
+            derivedOpacity_ *= parent->opacity_;
             parent = parent->parent_;
         }
         
-        derivedOpacity_ = opacity;
         opacityDirty_ = false;
     }
     

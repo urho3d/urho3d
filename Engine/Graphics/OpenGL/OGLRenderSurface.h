@@ -54,7 +54,7 @@ public:
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
     /// Set linked depth-stencil surface.
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
-    /// Queue manual update of the viewports.
+    /// Queue manual update of the viewport(s).
     void QueueUpdate();
     /// Create a renderbuffer. Return true if successful.
     bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);

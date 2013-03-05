@@ -1758,12 +1758,17 @@ Properties:<br>
 
 RenderSurface
 
+Methods:<br>
+- void QueueUpdate()
+
 Properties:<br>
 - Texture@ parentTexture (readonly)
 - int width (readonly)
 - int height (readonly)
 - TextureUsage usage (readonly)
-- Viewport@ viewport
+- uint numViewports
+- Viewport@[] viewports
+- RenderSurfaceUpdateMode updateMode
 - RenderSurface@ linkedRenderTarget
 - RenderSurface@ linkedDepthStencil
 
@@ -2768,6 +2773,7 @@ Properties:<br>
 - uint numViewports
 - Viewport@[] viewports
 - RenderPath@ defaultRenderPath
+- Zone@ defaultZone (readonly)
 - bool specularLighting
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
@@ -3103,6 +3109,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3202,6 +3209,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3308,6 +3316,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3416,6 +3425,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3522,6 +3532,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3627,6 +3638,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3736,6 +3748,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3844,6 +3857,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -3966,6 +3980,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -4085,6 +4100,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -4196,6 +4212,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -4315,6 +4332,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -4438,6 +4456,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected
@@ -4555,6 +4574,7 @@ Properties:<br>
 - bool bringToBack
 - bool clipChildren
 - bool sortChildren
+- bool useDerivedOpacity
 - bool active
 - bool focus
 - bool selected

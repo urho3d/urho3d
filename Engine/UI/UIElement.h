@@ -215,6 +215,8 @@ public:
     void SetClipChildren(bool enable);
     /// Set whether should sort child elements according to priority. Default true.
     void SetSortChildren(bool enable);
+    /// Set whether parent elements' opacity affects opacity. Default true.
+    void SetUseDerivedOpacity(bool enable);
     /// Set whether reacts to input.
     void SetActive(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
@@ -308,8 +310,8 @@ public:
     int GetPriority() const { return priority_; }
     /// Return opacity.
     float GetOpacity() const { return opacity_; }
-    /// Return derived opacity (affected by parent elements.)
-    virtual float GetDerivedOpacity() const;
+    /// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
+    float GetDerivedOpacity() const;
     /// Return whether should be brought to front when focused.
     bool GetBringToFront() const { return bringToFront_; }
     /// Return whether should be put to background when another element is focused.
@@ -318,6 +320,8 @@ public:
     bool GetClipChildren() const { return clipChildren_; }
     /// Return whether should sort child elements according to priority.
     bool GetSortChildren() const { return sortChildren_; }
+    /// Return whether parent elements' opacity affects opacity.
+    bool GetUseDerivedOpacity() const { return useDerivedOpacity_; }
     /// Return whether has focus.
     bool HasFocus() const;
     /// Return whether reacts to input.
@@ -416,8 +420,10 @@ protected:
     bool bringToBack_;
     /// Clip children flag.
     bool clipChildren_;
-    /// Sort childrenaccording to priority flag.
+    /// Sort children according to priority flag.
     bool sortChildren_;
+    /// Use derived opacity flag.
+    bool useDerivedOpacity_;
     /// Input enabled flag.
     bool active_;
     /// Selected flag.
