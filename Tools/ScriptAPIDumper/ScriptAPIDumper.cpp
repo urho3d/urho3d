@@ -23,10 +23,12 @@
 #include "Context.h"
 #include "Engine.h"
 #include "Log.h"
-#include "Main.h"
 #include "ProcessUtils.h"
 #include "Script.h"
-#include "ScriptAPI.h"
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include "DebugNew.h"
 

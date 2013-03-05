@@ -309,7 +309,7 @@ public:
     /// Return opacity.
     float GetOpacity() const { return opacity_; }
     /// Return derived opacity (affected by parent elements.)
-    float GetDerivedOpacity() const;
+    virtual float GetDerivedOpacity() const;
     /// Return whether should be brought to front when focused.
     bool GetBringToFront() const { return bringToFront_; }
     /// Return whether should be put to background when another element is focused.

@@ -26,7 +26,6 @@
 #include "MathDefs.h"
 
 #include <cstdio>
-#include <cstdlib>
 #include <fcntl.h>
 
 #ifdef __APPLE__

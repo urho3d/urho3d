@@ -10,8 +10,9 @@ const int ATTR_HEIGHT = 19;
 const ShortStringHash textType("Text");
 const ShortStringHash containerType("UIElement");
 const StringHash textChangedEventType("TextChanged");
-const Color normalTextColor(1.0f, 1.0f, 1.0f);
-const Color modifiedTextColor(1.0f, 0.8f, 0.5f);
+
+Color normalTextColor(1.0f, 1.0f, 1.0f);
+Color modifiedTextColor(1.0f, 0.8f, 0.5f);
 
 class ResourcePicker
 {

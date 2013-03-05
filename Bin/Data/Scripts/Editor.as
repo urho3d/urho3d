@@ -4,6 +4,7 @@
 #include "Scripts/Editor/EditorScene.as"
 #include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorSettings.as"
+#include "Scripts/Editor/EditorPreferences.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 
@@ -133,6 +134,9 @@ void SaveConfig()
     XMLElement cameraElem = configElem.CreateChild("camera");
     XMLElement objectElem = configElem.CreateChild("object");
     XMLElement renderingElem = configElem.CreateChild("rendering");
+    XMLElement uiElem = configElem.CreateChild("ui");
+    XMLElement attributeInspector = configElem.CreateChild("attribute-inspector");
+    XMLElement textLabelColorElem = attributeInspector.CreateChild("text-label-color");
 
     cameraElem.SetFloat("nearclip", camera.nearClip);
     cameraElem.SetFloat("farclip", camera.farClip);
@@ -158,6 +162,12 @@ void SaveConfig()
     renderingElem.SetBool("specularlighting", renderer.specularLighting);
     renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
+    
+    uiElem.SetFloat("min-opacity", uiMinOpacity);
+    uiElem.SetFloat("max-opacity", uiMaxOpacity);
+    
+    textLabelColorElem.SetColor("original-attribute", normalTextColor);
+    textLabelColorElem.SetColor("modified-attribute", modifiedTextColor);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

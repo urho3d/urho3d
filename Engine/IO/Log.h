@@ -69,7 +69,7 @@ public:
     void SetLevel(int level);
     /// Set whether to timestamp log messages.
     void SetTimeStamp(bool enable);
-    /// Set quiet mode ie. only log errors to standard output stream.
+    /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
     void SetQuiet(bool quiet);
     
     /// Return logging level.
@@ -78,7 +78,7 @@ public:
     bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
     const String& GetLastMessage() const { return lastMessage_; }
-    /// Return whether log is in quiet mode (only errors printed to standard output.)
+    /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
     
 private:
@@ -96,9 +96,9 @@ private:
     bool quiet_;
 };
 
-/// Write to the log (static.)
+/// Write to the log (static).
 void WriteToLog(Context* context, int level, const String& message);
-/// Write raw output to the log (static.)
+/// Write raw output to the log (static).
 void WriteToLogRaw(Context* context, const String& message);
 
 #ifdef ENABLE_LOGGING

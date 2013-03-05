@@ -2,7 +2,6 @@
 
 Node@ cameraNode;
 Camera@ camera;
-Window@ settingsDialog;
 
 enum EditMode
 {

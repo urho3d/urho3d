@@ -51,6 +51,9 @@ public:
     /// React to resize.
     virtual void OnResize();
     
+    /// Return derived opacity (affected by parent elements.)
+    virtual float GetDerivedOpacity() const;
+
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size.

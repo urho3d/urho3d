@@ -20,7 +20,7 @@ String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 
 bool uiHidden = false;
 float uiMinOpacity = 0.3;
-float uiMaxOpacity = 1.0;
+float uiMaxOpacity = 0.7;
 
 void CreateUI()
 {
@@ -31,6 +31,7 @@ void CreateUI()
     CreateSceneWindow();
     CreateNodeWindow();
     CreateEditorSettingsDialog();
+    CreateEditorPreferencesDialog();
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
@@ -166,6 +167,7 @@ void CreateMenuBar()
         filePopup.AddChild(CreateMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Node / component edit", 'N', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Editor settings", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Editor preferences", 0, 0));
         uiMenuBar.AddChild(fileMenu);
     }
 
@@ -383,6 +385,8 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         ShowNodeWindow();
     else if (action == "Editor settings")
         ShowEditorSettingsDialog();
+    else if (action == "Editor preferences")
+        ShowEditorPreferencesDialog();
     else if (action == "Cut")
         SceneCut();
     else if (action == "Copy")

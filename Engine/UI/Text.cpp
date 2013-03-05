@@ -187,6 +187,12 @@ void Text::OnResize()
         UpdateText();
 }
 
+float Text::GetDerivedOpacity() const
+{
+    // Text should always use its own opacity.
+    return GetOpacity();
+}
+
 bool Text::SetFont(const String& fontName, int size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

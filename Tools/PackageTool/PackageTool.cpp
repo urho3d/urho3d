@@ -31,7 +31,6 @@
 #endif
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
 #include "DebugNew.h"
