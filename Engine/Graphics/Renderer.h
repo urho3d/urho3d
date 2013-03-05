@@ -163,10 +163,10 @@ public:
     /// Destruct.
     virtual ~Renderer();
     
-    /// Set number of viewports to render.
+    /// Set number of backbuffer viewports to render.
     void SetNumViewports(unsigned num);
-    /// Set a viewport. Return true if successful.
-    bool SetViewport(unsigned index, Viewport* viewport);
+    /// Set a backbuffer viewport.
+    void SetViewport(unsigned index, Viewport* viewport);
     /// Set default renderpath.
     void SetDefaultRenderPath(RenderPath* renderPath);
     /// Set default renderpath from an XML file.
@@ -208,9 +208,9 @@ public:
     /// Force reload of shaders.
     void ReloadShaders();
     
-    /// Return number of viewports.
+    /// Return number of backbuffer viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
-    /// Return viewport.
+    /// Return backbuffer viewport by index.
     Viewport* GetViewport(unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
@@ -295,8 +295,11 @@ public:
     void Render();
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Add a view. Return true if successful.
-    bool AddView(RenderSurface* renderTarget, Viewport* viewport);
+    /// Queue a render surface's viewports for rendering. Called by the surface, or by View.
+    void QueueRenderSurface(RenderSurface* renderTarget);
+    /// Queue a viewport for rendering. Null surface means backbuffer.
+    void QueueViewport(RenderSurface* renderTarget, Viewport* viewport);
+    
     /// Populate light volume shaders.
     void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName);
     /// Return volume geometry for a light.
@@ -422,6 +425,8 @@ private:
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Viewports.
     Vector<SharedPtr<Viewport> > viewports_;
+    /// Queued views.
+    Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > > queuedViews_;
     /// Views.
     Vector<SharedPtr<View> > views_;
     /// Octrees that have been updated during the frame.

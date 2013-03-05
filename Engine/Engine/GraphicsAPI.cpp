@@ -384,6 +384,10 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
     engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
     
+    engine->RegisterEnum("RenderSurfaceUpdateMode");
+    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_MANUALUPDATE", SURFACE_MANUALUPDATE);
+    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_UPDATEVISIBLE", SURFACE_UPDATEVISIBLE);
+    engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_UPDATEALWAYS", SURFACE_UPDATEALWAYS);
     RegisterTexture<Texture>(engine, "Texture");
     
     RegisterObject<Viewport>(engine, "Viewport");
@@ -403,12 +407,17 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, AddRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHOD(RenderSurface, ReleaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void QueueUpdate()", asMETHOD(RenderSurface, QueueUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "Texture@+ get_parentTexture() const", asMETHOD(RenderSurface, GetParentTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHOD(RenderSurface, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int get_height() const", asMETHOD(RenderSurface, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "TextureUsage get_usage() const", asMETHOD(RenderSurface, GetUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_viewport(Viewport@+)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ get_viewport() const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_numViewports(uint)", asMETHOD(RenderSurface, SetNumViewports), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "uint get_numViewports() const", asMETHOD(RenderSurface, GetNumViewports), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_viewports(uint, Viewport@+)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "Viewport@+ get_viewports(uint) const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_updateMode(RenderSurfaceUpdateMode)", asMETHOD(RenderSurface, SetUpdateMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "RenderSurfaceUpdateMode get_updateMode() const", asMETHOD(RenderSurface, GetUpdateMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHOD(RenderSurface, GetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
@@ -1028,7 +1037,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void ReloadShaders() const", asMETHOD(Renderer, ReloadShaders), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_numViewports(uint)", asMETHOD(Renderer, SetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "bool set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_viewports(uint, Viewport@+)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetDefaultRenderPath(XMLFile@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);

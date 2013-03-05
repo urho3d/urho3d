@@ -905,7 +905,7 @@ void View::GetBatches()
                 const SourceBatch& srcBatch = batches[j];
                 
                 // Check here if the material refers to a rendertarget texture with camera(s) attached
-                // Only check this for the main view (null rendertarget)
+                // Only check this for backbuffer views (null rendertarget)
                 if (srcBatch.material_ && srcBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_ && !renderTarget_)
                     CheckMaterialForAuxView(srcBatch.material_);
                 
@@ -2295,20 +2295,16 @@ void View::CheckMaterialForAuxView(Material* material)
     
     for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
     {
-        // Have to check cube & 2D textures separately
         Texture* texture = textures[i];
-        if (texture)
+        if (texture && texture->GetUsage() == TEXTURE_RENDERTARGET)
         {
+            // Have to check cube & 2D textures separately
             if (texture->GetType() == Texture2D::GetTypeStatic())
             {
                 Texture2D* tex2D = static_cast<Texture2D*>(texture);
                 RenderSurface* target = tex2D->GetRenderSurface();
-                if (target)
-                {
-                    Viewport* viewport = target->GetViewport();
-                    if (viewport && viewport->GetScene() && viewport->GetCamera())
-                        renderer_->AddView(target, viewport);
-                }
+                if (target && target->GetUpdateMode() == SURFACE_UPDATEVISIBLE)
+                    target->QueueUpdate();
             }
             else if (texture->GetType() == TextureCube::GetTypeStatic())
             {
@@ -2316,18 +2312,14 @@ void View::CheckMaterialForAuxView(Material* material)
                 for (unsigned j = 0; j < MAX_CUBEMAP_FACES; ++j)
                 {
                     RenderSurface* target = texCube->GetRenderSurface((CubeMapFace)j);
-                    if (target)
-                    {
-                        Viewport* viewport = target->GetViewport();
-                        if (viewport && viewport->GetScene() && viewport->GetCamera())
-                            renderer_->AddView(target, viewport);
-                    }
+                    if (target && target->GetUpdateMode() == SURFACE_UPDATEVISIBLE)
+                        target->QueueUpdate();
                 }
             }
         }
     }
     
-    // Set frame number so that we can early-out next time we come across this material on the same frame
+    // Flag as processed so we can early-out next time we come across this material on the same frame
     material->MarkForAuxView(frame_.frameNumber_);
 }
 

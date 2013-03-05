@@ -25,6 +25,7 @@
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
+#include "Renderer.h"
 #include "RenderSurface.h"
 #include "Scene.h"
 #include "Texture.h"
@@ -36,7 +37,9 @@ namespace Urho3D
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    surface_(0)
+    surface_(0),
+    updateMode_(SURFACE_UPDATEVISIBLE),
+    updateQueued_(false)
 {
 }
 
@@ -45,10 +48,22 @@ RenderSurface::~RenderSurface()
     Release();
 }
 
-void RenderSurface::SetViewport(Viewport* viewport)
+void RenderSurface::SetNumViewports(unsigned num)
 {
-    if (viewport)
-        viewport_ = viewport;
+    viewports_.Resize(num);
+}
+
+void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
+{
+    if (index >= viewports_.Size())
+        viewports_.Resize(index + 1);
+    
+    viewports_[index] = viewport;
+}
+
+void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode)
+{
+    updateMode_ = mode;
 }
 
 void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
@@ -61,6 +76,34 @@ void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
 {
     if (depthStencil != this)
         linkedDepthStencil_ = depthStencil;
+}
+
+void RenderSurface::QueueUpdate()
+{
+    if (!updateQueued_)
+    {
+        bool hasValidView = false;
+        
+        // Verify that there is at least 1 non-null viewport, as otherwise Renderer will not accept the surface and the update flag
+        // will be left on
+        for (unsigned i = 0; i < viewports_.Size(); ++i)
+        {
+            if (viewports_[i])
+            {
+                hasValidView = true;
+                break;
+            }
+        }
+        
+        if (hasValidView)
+        {
+            Renderer* renderer = parentTexture_->GetSubsystem<Renderer>();
+            if (renderer)
+                renderer->QueueRenderSurface(this);
+            
+            updateQueued_ = true;
+        }
+    }
 }
 
 void RenderSurface::Release()
@@ -98,6 +141,16 @@ int RenderSurface::GetHeight() const
 TextureUsage RenderSurface::GetUsage() const
 {
     return parentTexture_->GetUsage();
+}
+
+Viewport* RenderSurface::GetViewport(unsigned index) const
+{
+    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+}
+
+void RenderSurface::WasUpdated()
+{
+    updateQueued_ = false;
 }
 
 }

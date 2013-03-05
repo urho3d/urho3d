@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
+#include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
@@ -145,12 +146,12 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 {
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-    
+
     if (usage >= TEXTURE_RENDERTARGET)
     {
         renderSurface_ = new RenderSurface(this, GL_TEXTURE_2D);
         dynamic_ = true;
-        
+
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
@@ -159,7 +160,12 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     }
     else
         dynamic_ = usage == TEXTURE_DYNAMIC;
-    
+
+    if (usage == TEXTURE_RENDERTARGET)
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
+    else
+        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
+
     width_ = width;
     height_ = height;
     format_ = format;
@@ -465,6 +471,12 @@ bool Texture2D::Create()
     graphics_->SetTexture(0, 0);
     
     return success;
+}
+
+void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
+        renderSurface_->QueueUpdate();
 }
 
 }

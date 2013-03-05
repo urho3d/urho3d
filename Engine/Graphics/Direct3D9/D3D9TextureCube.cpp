@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
@@ -158,6 +159,11 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         usage_ |= D3DUSAGE_DYNAMIC;
         pool_ = D3DPOOL_DEFAULT;
     }
+    
+    if (usage == TEXTURE_RENDERTARGET)
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(TextureCube, HandleRenderSurfaceUpdate));
+    else
+        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
     
     width_ = size;
     height_ = size;
@@ -643,6 +649,15 @@ bool TextureCube::Create()
     }
     
     return true;
+}
+
+void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
+{
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        if (renderSurfaces_[i] && renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS)
+            renderSurfaces_[i]->QueueUpdate();
+    }
 }
 
 }

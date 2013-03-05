@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
+#include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
 #include "Renderer.h"
@@ -166,6 +167,11 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         pool_ = D3DPOOL_DEFAULT;
     }
     
+    if (usage == TEXTURE_RENDERTARGET)
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
+    else
+        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
+
     width_ = width;
     height_ = height;
     format_ = format;
@@ -552,6 +558,12 @@ bool Texture2D::Create()
     }
     
     return true;
+}
+
+void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
+        renderSurface_->QueueUpdate();
 }
 
 }

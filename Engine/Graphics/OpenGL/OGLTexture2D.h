@@ -67,6 +67,8 @@ public:
 private:
     /// Create texture.
     bool Create();
+    /// Handle render surface update event.
+    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;

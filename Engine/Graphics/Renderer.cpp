@@ -292,7 +292,6 @@ Renderer::Renderer(Context* context) :
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
-    SetNumViewports(1);
 }
 
 Renderer::~Renderer()
@@ -302,30 +301,14 @@ Renderer::~Renderer()
 void Renderer::SetNumViewports(unsigned num)
 {
     viewports_.Resize(num);
-    
-    for (unsigned i = 0; i < viewports_.Size(); ++i)
-    {
-        if (!viewports_[i])
-            viewports_[i] = new Viewport(context_);
-    }
 }
 
-bool Renderer::SetViewport(unsigned index, Viewport* viewport)
+void Renderer::SetViewport(unsigned index, Viewport* viewport)
 {
     if (index >= viewports_.Size())
-    {
-        LOGERROR("Viewport index out of bounds");
-        return false;
-    }
-    
-    if (!viewport)
-    {
-        LOGERROR("Null viewport");
-        return false;
-    }
+        viewports_.Resize(index + 1);
     
     viewports_[index] = viewport;
-    return true;
 }
 
 void Renderer::SetDefaultRenderPath(RenderPath* renderPath)
@@ -584,21 +567,42 @@ void Renderer::Update(float timeStep)
     if (shadersDirty_)
         LoadShaders();
     
-    // Process all viewports. Use reverse order, because during rendering the order will be reversed again
-    // to handle auxiliary view dependencies correctly
+    // Queue update of the main viewports. Use reverse order, as rendering order is also reverse
+    // to render auxiliary views before dependant main views
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
+        QueueViewport(0, viewports_[i]);
+    
+    // Gather other render surfaces that are autoupdated
+    SendEvent(E_RENDERSURFACEUPDATE);
+    
+    // Process gathered views. This may queue further views (render surfaces that are only updated when visible)
+    for (unsigned i = 0; i < queuedViews_.Size(); ++i)
     {
-        unsigned mainView = numViews_;
-        Viewport* viewport = viewports_[i];
-        if (!viewport || !AddView(0, viewport))
+        WeakPtr<RenderSurface>& renderTarget = queuedViews_[i].first_;
+        WeakPtr<Viewport>& viewport = queuedViews_[i].second_;
+        
+        // Null pointer means backbuffer view. Differentiate between that and an expired rendersurface
+        if ((renderTarget.NotNull() && renderTarget.Expired()) || viewport.Expired())
             continue;
+        
+        // Allocate new view if necessary
+        if (numViews_ == views_.Size())
+            views_.Push(SharedPtr<View>(new View(context_)));
+        
+        // Check if view can be defined successfully (has valid scene, camera and octree)
+        assert(numViews_ < views_.Size());
+        View* view = views_[numViews_];
+        if (!view->Define(renderTarget, viewport))
+            continue;
+        
+        ++numViews_;
         
         const IntRect& viewRect = viewport->GetRect();
         Scene* scene = viewport->GetScene();
+        Octree* octree = scene->GetComponent<Octree>();
         
         // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
-        Octree* octree = scene->GetComponent<Octree>();
         if (!updatedOctrees_.Contains(octree))
         {
             frame_.camera_ = viewport->GetCamera();
@@ -608,21 +612,26 @@ void Renderer::Update(float timeStep)
             octree->Update(frame_);
             updatedOctrees_.Insert(octree);
             
-            // Set also the view for the debug graphics already here, so that it can use culling
+            // Set also the view for the debug renderer already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
             DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
             if (debug)
                 debug->SetView(viewport->GetCamera());
         }
         
-        // Update the viewport's main view and any auxiliary views it has created
-        for (unsigned i = mainView; i < numViews_; ++i)
-        {
-            // Reset shadow map allocations; they can be reused between views as each is rendered completely at a time
-            ResetShadowMapAllocations();
-            views_[i]->Update(frame_);
-        }
+        // Update view. This may queue further views. Reset shadow map allocations, as they can be reused between views.
+        view->Update(frame_);
     }
+    
+    // Reset update flag from queued render surfaces. At this point no new views can be added on this frame.
+    for (unsigned i = 0; i < queuedViews_.Size(); ++i)
+    {
+        WeakPtr<RenderSurface>& renderTarget = queuedViews_[i].first_;
+        if (renderTarget)
+            renderTarget->WasUpdated();
+    }
+    
+    queuedViews_.Clear();
 }
 
 void Renderer::Render()
@@ -716,29 +725,24 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     }
 }
 
-bool Renderer::AddView(RenderSurface* renderTarget, Viewport* viewport)
+void Renderer::QueueRenderSurface(RenderSurface* renderTarget)
 {
-    // If using a rendertarget texture, make sure it will not be rendered to multiple times
     if (renderTarget)
     {
-        for (unsigned i = 0; i < numViews_; ++i)
-        {
-            if (views_[i]->GetRenderTarget() == renderTarget)
-                return false;
-        }
+        unsigned numViewports = renderTarget->GetNumViewports();
+        
+        for (unsigned i = 0; i < numViewports; ++i)
+            QueueViewport(renderTarget, renderTarget->GetViewport(i));
     }
-    
-    assert(numViews_ <= views_.Size());
-    if (numViews_ == views_.Size())
-        views_.Push(SharedPtr<View>(new View(context_)));
-    
-    if (views_[numViews_]->Define(renderTarget, viewport))
+}
+
+void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
+{
+    if (viewport)
     {
-        ++numViews_;
-        return true;
+        queuedViews_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
+            WeakPtr<Viewport>(viewport)));
     }
-    else
-        return false;
 }
 
 void Renderer::GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName)

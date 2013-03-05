@@ -188,6 +188,14 @@ enum CubeMapFace
     MAX_CUBEMAP_FACES
 };
 
+/// Update mode for render surface viewports.
+enum RenderSurfaceUpdateMode
+{
+    SURFACE_MANUALUPDATE = 0,
+    SURFACE_UPDATEVISIBLE,
+    SURFACE_UPDATEALWAYS
+};
+
 /// Shader types.
 enum ShaderType
 {

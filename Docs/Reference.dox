@@ -974,7 +974,7 @@ Zones also define a lightmask and a shadowmask (with all bits set by default.) A
 
 \page AuxiliaryViews Auxiliary views
 
-Auxiliary views are viewports defined into a RenderSurface. These will be rendered whenever the texture containing the surface is visible, and can be typically used to implement for example reflections. The texture in question must have been created in rendertarget mode, see Texture's \ref Texture2D::SetSize "SetSize()" function.
+Auxiliary views are viewports defined into a RenderSurface. By default, these will be rendered whenever the texture containing the surface is visible, and can be typically used to implement for example camera displays or reflections. The texture in question must have been created in rendertarget mode, see Texture's \ref Texture2D::SetSize "SetSize()" function.
 
 The viewport is not assigned directly to the texture because of cube map support: a renderable cube map has 6 render surfaces, and done this way, a different camera could be assigned to each.
 
@@ -983,8 +983,10 @@ A "backup texture" can be assigned to the rendertarget texture: because it is il
 Rendering detailed auxiliary views can easily have a large performance impact. Some things you can do for optimization with the auxiliary view camera:
 
 - Set the far clip distance as small as possible.
-- Set the camera's viewmask to for example VIEW_REFLECTION, then clear that viewmask bit from objects you don't need rendered.
+- Use viewmasks on the camera and the scene objects to only render some of the objects in the auxiliary view.
 - Use the camera's \ref Camera::SetViewOverrideFlags "SetViewOverrideFlags()" function to disable shadows, to disable occlusion, or force the lowest material quality.
+
+The surface can also be configured to always update its viewports, or to only update when manually requested. See \ref RenderSurface::SetUpdateMode "SetUpdateMode()". For example an editor widget showing a rendered texture might use either of those modes. Call \ref RenderSurface::QueueUpdate "QueueUpdate()" to request a manual update of the surface on the current frame.
 
 
 \page Input %Input

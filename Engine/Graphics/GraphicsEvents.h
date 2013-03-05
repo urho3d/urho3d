@@ -51,6 +51,11 @@ EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
 {
 }
 
+/// Request for queuing autoupdated rendersurfaces
+EVENT(E_RENDERSURFACEUPDATE, RenderSurfaceUpdate)
+{
+}
+
 /// Frame rendering started.
 EVENT(E_BEGINRENDERING, BeginRendering)
 {
