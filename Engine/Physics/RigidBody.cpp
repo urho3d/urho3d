@@ -65,6 +65,7 @@ RigidBody::RigidBody(Context* context) :
     Component(context),
     body_(0),
     compoundShape_(0),
+    gravityOverride_(Vector3::ZERO),
     mass_(DEFAULT_MASS),
     collisionLayer_(DEFAULT_COLLISION_LAYER),
     collisionMask_(DEFAULT_COLLISION_MASK),
@@ -73,6 +74,7 @@ RigidBody::RigidBody(Context* context) :
     lastRotation_(Quaternion::IDENTITY),
     kinematic_(false),
     phantom_(false),
+    useGravity_(true),
     hasSmoothedTransform_(false),
     readdBody_(false)
 {
@@ -116,6 +118,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_BOOL, "Is Kinematic", kinematic_, false, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_BOOL, "Is Phantom", phantom_, false, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Gravity Override", GetGravityOverride, SetGravityOverride, Vector3, Vector3::ZERO, AM_DEFAULT);
 }
 
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -380,22 +383,20 @@ void RigidBody::SetCcdMotionThreshold(float threshold)
 
 void RigidBody::SetUseGravity(bool enable)
 {
-    if (physicsWorld_ && body_ && enable != GetUseGravity())
+    if (enable != useGravity_)
     {
-        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        
-        int flags = body_->getFlags();
-        if (enable)
-            flags &= ~BT_DISABLE_WORLD_GRAVITY;
-        else
-            flags |= BT_DISABLE_WORLD_GRAVITY;
-        body_->setFlags(flags);
-        
-        if (enable)
-            body_->setGravity(world->getGravity());
-        else
-            body_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-        
+        useGravity_ = enable;
+        UpdateGravity();
+        MarkNetworkUpdate();
+    }
+}
+
+void RigidBody::SetGravityOverride(const Vector3& gravity)
+{
+    if (gravity != gravityOverride_)
+    {
+        gravityOverride_ = gravity;
+        UpdateGravity();
         MarkNetworkUpdate();
     }
 }
@@ -635,14 +636,6 @@ float RigidBody::GetCcdMotionThreshold() const
         return 0.0f;
 }
 
-bool RigidBody::GetUseGravity() const
-{
-    if (body_)
-        return (body_->getFlags() & BT_DISABLE_WORLD_GRAVITY) == 0;
-    else
-        return true;
-}
-
 bool RigidBody::IsActive() const
 {
     if (body_)
@@ -695,6 +688,32 @@ void RigidBody::UpdateMass()
             compoundShape_->calculateLocalInertia(mass_, localInertia);
         body_->setMassProps(mass_, localInertia);
         body_->updateInertiaTensor();
+    }
+}
+
+void RigidBody::UpdateGravity()
+{
+    if (physicsWorld_ && body_)
+    {
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        
+        int flags = body_->getFlags();
+        if (useGravity_ && gravityOverride_ == Vector3::ZERO)
+            flags &= ~BT_DISABLE_WORLD_GRAVITY;
+        else
+            flags |= BT_DISABLE_WORLD_GRAVITY;
+        body_->setFlags(flags);
+        
+        if (useGravity_)
+        {
+            // If override vector is zero, use world's gravity
+            if (gravityOverride_ == Vector3::ZERO)
+                body_->setGravity(world->getGravity());
+            else
+                body_->setGravity(ToBtVector3(gravityOverride_));
+        }
+        else
+            body_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
     }
 }
 
@@ -852,6 +871,8 @@ void RigidBody::AddBodyToWorld()
     
     if (!massUpdated)
         UpdateMass();
+    
+    UpdateGravity();
     
     int flags = body_->getCollisionFlags();
     if (phantom_)

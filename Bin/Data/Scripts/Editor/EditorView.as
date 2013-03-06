@@ -7,7 +7,8 @@ enum EditMode
 {
     EDIT_MOVE = 0,
     EDIT_ROTATE,
-    EDIT_SCALE
+    EDIT_SCALE,
+    EDIT_SELECT
 }
 
 enum AxisMode
@@ -50,7 +51,8 @@ Array<int> pickModeDrawableFlags = {
 Array<String> editModeText = {
     "Move",
     "Rotate",
-    "Scale"
+    "Scale",
+    "Select"
 };
 
 Array<String> axisModeText = {
@@ -210,7 +212,7 @@ void UpdateView(float timeStep)
     }
 
     // Move/rotate/scale object
-    if (!editNodes.empty && ui.focusElement is null && input.keyDown[KEY_LCTRL])
+    if (!editNodes.empty && editMode != EDIT_SELECT && ui.focusElement is null && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
         if (input.keyDown[KEY_UP])
@@ -270,7 +272,7 @@ void UpdateView(float timeStep)
 
 void SteppedObjectManipulation(int key)
 {
-    if (editNodes.empty)
+    if (editNodes.empty || editMode == EDIT_SELECT)
         return;
 
     // Do not react in non-snapped mode, because that is handled in frame update

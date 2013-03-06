@@ -47,6 +47,7 @@
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <hull.h>
 
 namespace Urho3D
@@ -59,6 +60,7 @@ static const char* typeNames[] =
     "None",
     "Box",
     "Sphere",
+	"StaticPlane",
     "Cylinder",
     "Capsule",
     "Cone",
@@ -723,6 +725,12 @@ void CollisionShape::UpdateShape()
             
         case SHAPE_SPHERE:
             shape_ = new btSphereShape(size_.x_ * 0.5f);
+            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            break;
+
+        case SHAPE_STATICPLANE:
+            /// \todo: plane normal is always hard coded
+            shape_ = new btStaticPlaneShape(btVector3(0,1,0), size_.y_);
             shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
             

@@ -527,21 +527,23 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             editMode = EDIT_ROTATE;
         else if (key == '3')
             editMode = EDIT_SCALE;
-        else if (key == '4')
-            axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+        if (key == '4')
+            editMode = EDIT_SELECT;
         else if (key == '5')
+            axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+        else if (key == '6')
         {
             --pickMode;
             if (pickMode < PICK_GEOMETRIES)
                 pickMode = MAX_PICK_MODES - 1;
         }
-        else if (key == '6')
+        else if (key == '7')
         {
             ++pickMode;
             if (pickMode >= MAX_PICK_MODES)
                 pickMode = PICK_GEOMETRIES;
         }
-        else if (key == '7')
+        else if (key == 'W')
         {
             fillMode = FillMode(fillMode + 1);
             if (fillMode > FILL_POINT)

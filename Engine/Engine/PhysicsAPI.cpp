@@ -157,6 +157,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_ccdMotionThreshold() const", asMETHOD(RigidBody, GetCcdMotionThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_useGravity(bool)", asMETHOD(RigidBody, SetUseGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_useGravity() const", asMETHOD(RigidBody, GetUseGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_gravityOverride(const Vector3&in)", asMETHOD(RigidBody, SetGravityOverride), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "const Vector3& get_gravityOverride() const", asMETHOD(RigidBody, GetGravityOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_phantom(bool)", asMETHOD(RigidBody, SetPhantom), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "bool get_phantom() const", asMETHOD(RigidBody, IsPhantom), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_kinematic(bool)", asMETHOD(RigidBody, SetKinematic), asCALL_THISCALL);
@@ -169,7 +171,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void set_collisionEventMode(CollisionEventMode)", asMETHOD(RigidBody, SetCollisionEventMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "CollisionEventMode get_collisionEventMode() const", asMETHOD(RigidBody, GetCollisionEventMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "Array<RigidBody@>@ get_collidingBodies() const", asFUNCTION(RigidBodyGetCollidingBodies), asCALL_CDECL_OBJLAST);
-    
+
     // Register Variant GetPtr() for RigidBody
     engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }

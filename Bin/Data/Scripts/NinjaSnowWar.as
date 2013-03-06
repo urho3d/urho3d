@@ -217,7 +217,7 @@ void CreateOverlays()
     sight.SetSize(height, height);
     ui.root.AddChild(sight);
 
-    Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
+    Font@ font = cache.GetResource("Font", "Fonts/Arial.fnt");
 
     scoreText = Text();
     scoreText.SetFont(font, 17);

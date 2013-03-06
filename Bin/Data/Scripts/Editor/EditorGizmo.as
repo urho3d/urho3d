@@ -140,7 +140,7 @@ void PositionGizmo()
         lastGizmoMode = editMode;
     }
 
-    gizmo.visible = true;
+    gizmo.visible = editMode != EDIT_SELECT;
 }
 
 void ResizeGizmo()
@@ -176,7 +176,7 @@ void GizmoMoved()
 
 void UseGizmo()
 {
-    if (gizmo is null || !gizmo.visible)
+    if (gizmo is null || !gizmo.visible || editMode == EDIT_SELECT)
         return;
 
     IntVector2 pos = ui.cursorPosition;
@@ -268,7 +268,7 @@ void UseGizmo()
 
 bool IsGizmoSelected()
 {
-    return gizmoAxisX.selected || gizmoAxisY.selected || gizmoAxisZ.selected;
+    return gizmo !is null && gizmo.visible && (gizmoAxisX.selected || gizmoAxisY.selected || gizmoAxisZ.selected);
 }
 
 bool MoveNodes(Vector3 adjust)

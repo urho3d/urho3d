@@ -104,7 +104,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     interpolation_(true),
     applyingTransforms_(false),
     debugRenderer_(0),
-    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints)
+    debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits)
 {
     collisionConfiguration_ = new btDefaultCollisionConfiguration();
     collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
@@ -559,6 +559,10 @@ void PhysicsWorld::SendCollisionEvents()
             
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
+			// If it's not a rigidbody, maybe a ghost object
+			if (!bodyA || !bodyB)
+				continue;
+
             WeakPtr<RigidBody> bodyWeakA(bodyA);
             WeakPtr<RigidBody> bodyWeakB(bodyB);
             

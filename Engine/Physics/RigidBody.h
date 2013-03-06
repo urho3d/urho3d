@@ -103,6 +103,8 @@ public:
     void SetCcdMotionThreshold(float threshold);
     /// Set whether gravity is applied to rigid body.
     void SetUseGravity(bool enable);
+    /// Set gravity override. If zero, uses physics world's gravity.
+    void SetGravityOverride(const Vector3& gravity);
     /// Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
     void SetKinematic(bool enable);
     /// Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
@@ -173,7 +175,9 @@ public:
     /// Return continuous collision detection motion-per-simulation-step threshold.
     float GetCcdMotionThreshold() const;
     /// Return whether rigid body uses gravity.
-    bool GetUseGravity() const;
+    bool GetUseGravity() const { return useGravity_; }
+    /// Return gravity override. If zero (default), uses the physics world's gravity.
+    const Vector3& GetGravityOverride() const { return gravityOverride_; }
     /// Return kinematic mode flag.
     bool IsKinematic() const { return kinematic_; }
     /// Return phantom mode flag.
@@ -191,8 +195,10 @@ public:
     
     /// Apply new world transform after a simulation step. Called internally.
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
-    /// Update mass and inertia of rigid body.
+    /// Update mass and inertia to the Bullet rigid body.
     void UpdateMass();
+    /// Update gravity parameters to the Bullet rigid body.
+    void UpdateGravity();
     /// Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute.
@@ -226,6 +232,8 @@ private:
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Constraints that refer to this rigid body.
     PODVector<Constraint*> constraints_;
+    /// Gravity override vector.
+    Vector3 gravityOverride_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.
@@ -244,6 +252,8 @@ private:
     bool kinematic_;
     /// Phantom flag.
     bool phantom_;
+    /// Use gravity flag.
+    bool useGravity_;
     /// Smoothed transform mode.
     bool hasSmoothedTransform_;
     /// Readd body to world flag.
