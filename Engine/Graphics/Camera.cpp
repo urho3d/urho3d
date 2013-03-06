@@ -290,6 +290,34 @@ Ray Camera::GetScreenRay(float x, float y)
     return ret;
 }
 
+Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos)
+{
+    Vector3 eyeSpacePos = GetInverseWorldTransform() * worldPos;
+    Vector2 ret;
+    
+    if(eyeSpacePos.z_ > 0.0f)
+    {
+        Vector3 screenSpacePos = GetProjection(false) * eyeSpacePos;
+        ret.x_ = screenSpacePos.x_;
+        ret.y_ = screenSpacePos.y_;
+    }
+    else
+    {
+        ret.x_ = (-eyeSpacePos.x_ > 0.0f) ? -1.0f : 1.0f;
+        ret.y_ = (-eyeSpacePos.y_ > 0.0f) ? -1.0f : 1.0f;
+    }
+    
+    ret.x_ = (ret.x_ / 2.0f) + 0.5f;
+    ret.y_ = 1.0f - ((ret.y_ / 2.0f) + 0.5f);
+    return ret;
+}
+
+Vector3 Camera::ScreenToWorldPoint(const Vector3& screenPos)
+{
+    Ray ray = GetScreenRay(screenPos.x_, screenPos.y_);
+    return ray.origin_ + ray.direction_ * screenPos.z_;
+}
+
 const Frustum& Camera::GetFrustum() const
 {
     if (frustumDirty_)

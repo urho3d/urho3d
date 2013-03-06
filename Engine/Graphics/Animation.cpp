@@ -248,6 +248,11 @@ void Animation::RemoveAllTriggers()
     triggers_.Clear();
 }
 
+void Animation::SetNumTriggers(unsigned num)
+{
+    triggers_.Resize(num);
+}
+
 const AnimationTrack* Animation::GetTrack(unsigned index) const
 {
     return index < tracks_.Size() ? &tracks_[index] : 0;

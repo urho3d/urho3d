@@ -108,6 +108,8 @@ namespace Urho3D
 \section ScriptAPI_GlobalConstants Global constants
 - float M_INFINITY
 - float M_EPSILON
+- float M_DEGTORAD
+- float M_RADTODEG
 - int LOG_DEBUG
 - int LOG_INFO
 - int LOG_WARNING
@@ -1604,6 +1606,8 @@ Methods:<br>
 - void SetOrthoSize(const Vector2&)
 - Frustum GetSplitFrustum(float, float) const
 - Ray GetScreenRay(float, float)
+- Vector2 WorldToScreenPoint(const Vector3&)
+- Vector3 ScreenToWorldPoint(const Vector3&)
 - float GetDistance(const Vector3&) const
 - float GetDistanceSquared(const Vector3&) const
 
@@ -1892,6 +1896,7 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
+- void SetTechnique(uint, Technique@, uint arg2 = 0, float arg3 = 0.0)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)
 - void RemoveShaderParameter(const String&)
@@ -1906,7 +1911,7 @@ Properties:<br>
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
 - uint numTechniques
-- Technique@[] technique (readonly)
+- Technique@[] techniques (readonly)
 - Vector4[] shaderParameters
 - Texture@[] textures
 - bool occlusion (readonly)
@@ -1937,6 +1942,13 @@ Properties:<br>
 - uint numMorphs (readonly)
 
 
+AnimationTriggerPoint
+
+Properties:<br>
+- float time
+- Variant data
+
+
 Animation
 
 Methods:<br>
@@ -1958,7 +1970,8 @@ Properties:<br>
 - String animationName (readonly)
 - float length (readonly)
 - uint numTracks (readonly)
-- uint numTriggers (readonly)
+- uint numTriggers
+- AnimationTriggerPoint@[] triggers (readonly)
 
 
 Drawable
@@ -4862,6 +4875,7 @@ Properties:<br>
 - float ccdRadius
 - float ccdMotionThreshold
 - bool useGravity
+- Vector3 gravityOverride
 - bool phantom
 - bool kinematic
 - bool active (readonly)

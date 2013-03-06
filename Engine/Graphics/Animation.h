@@ -62,6 +62,12 @@ struct AnimationTrack
 /// %Animation trigger point.
 struct AnimationTriggerPoint
 {
+    /// Construct.
+    AnimationTriggerPoint() :
+        time_(0.0f)
+    {
+    }
+    
     /// Trigger time.
     float time_;
     /// Trigger data.
@@ -102,6 +108,8 @@ public:
     void RemoveTrigger(unsigned index);
     /// Remove all trigger points.
     void RemoveAllTriggers();
+    /// Resize trigger point vector.
+    void SetNumTriggers(unsigned num);
     
     /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }

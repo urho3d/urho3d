@@ -72,6 +72,8 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Ray GetScreenRay(float, float)", asMETHOD(Camera, GetScreenRay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector2 WorldToScreenPoint(const Vector3&in)", asMETHOD(Camera, WorldToScreenPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector3 ScreenToWorldPoint(const Vector3&in)", asMETHOD(Camera, ScreenToWorldPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3&in) const", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3&in) const", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_nearClip(float)", asMETHOD(Camera, SetNearClip), asCALL_THISCALL);
@@ -536,13 +538,14 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
     RegisterResource<Material>(engine, "Material");
+    engine->RegisterObjectMethod("Material", "void SetTechnique(uint, Technique@+, uint qualityLevel = 0, float lodDistance = 0.0)", asMETHOD(Material, SetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(const String&in)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in cloneName = String()) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
@@ -566,8 +569,20 @@ static void RegisterModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
 }
 
+static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* animation)
+{
+    const Vector<AnimationTriggerPoint>& points = animation->GetTriggers();
+    return index < points.Size() ? const_cast<AnimationTriggerPoint*>(&points[index]) : (AnimationTriggerPoint*)0;
+}
+
 static void RegisterAnimation(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("AnimationTriggerPoint", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("AnimationTriggerPoint", "float time", offsetof(AnimationTriggerPoint, time_));
+    engine->RegisterObjectProperty("AnimationTriggerPoint", "Variant data", offsetof(AnimationTriggerPoint, data_));
+    
     RegisterResource<Animation>(engine, "Animation");
     engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHOD(Animation, AddTrigger), asCALL_THISCALL);
@@ -575,6 +590,8 @@ static void RegisterAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHOD(Animation, RemoveAllTriggers), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHOD(Animation, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHOD(Animation, GetNumTracks), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_numTriggers(uint)", asMETHOD(Animation, SetNumTriggers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "AnimationTriggerPoint@+ get_triggers(uint) const", asFUNCTION(AnimationGetTrigger), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHOD(Animation, GetNumTriggers), asCALL_THISCALL);
 }
 

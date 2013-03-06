@@ -119,8 +119,12 @@ public:
     Frustum GetViewSpaceFrustum() const;
     /// Return split frustum in view space.
     Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
-    /// Return ray corresponding to screen coordinates (0.0 to 1.0.)
+    /// Return ray corresponding to normalized screen coordinates (0.0 to 1.0.)
     Ray GetScreenRay(float x, float y);
+    // Convert a world space point to normalized screen coordinates (0.0 - 1.0).
+    Vector2 WorldToScreenPoint(const Vector3& worldPos);
+    // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
+    Vector3 ScreenToWorldPoint(const Vector3& screenPos);
     /// Return forward vector.
     Vector3 GetForwardVector();
     /// Return right vector.
