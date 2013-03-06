@@ -1366,7 +1366,7 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model Output a model
+model Output a model and a material list
 scene Output a scene
 dump  Dump scene node structure. No output file is generated
 lod   Combine several Urho3D models as LOD levels of the output model
@@ -1375,7 +1375,6 @@ lod   Combine several Urho3D models as LOD levels of the output model
 Options:
 -b    Save scene in binary format, default format is XML
 -i    Use local ID's for scene nodes
--mX   Output a material list file X (model mode only)
 -na   Do not output animations
 -nm   Do not output materials
 -ns   Do not create subdirectories for resources
@@ -1384,6 +1383,8 @@ Options:
 -rX   Use scene node X as root node
 -t    Generate tangents to model(s)
 \endverbatim
+
+The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, AnimatedModel or Skybox component. The list files can safely be deleted if not needed, and should not be included in production builds of Urho3D applications.
 
 \section Tools_OgreImporter OgreImporter
 

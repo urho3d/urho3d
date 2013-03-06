@@ -431,20 +431,6 @@ void ExportModel(const String& outName)
         CollectAnimations(model);
         BuildAndSaveAnimations(model);
     }
-    
-    // If exporting materials, also save material list for use by the editor
-    if (!noMaterials_)
-    {
-        String materialListName = ReplaceExtension(model.outName_, ".txt");
-        File listFile(context_);
-        if (listFile.Open(materialListName, FILE_WRITE))
-        {
-            for (unsigned i = 0; i < model.meshes_.Size(); ++i)
-                listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
-        }
-        else
-            PrintLine("Warning: could not write material list file " + materialListName);
-    }
 }
 
 void CollectMeshes(OutModel& model, aiNode* node)
@@ -826,6 +812,20 @@ void BuildAndSaveModel(OutModel& model)
     if (!outFile.Open(model.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + model.outName_);
     outModel->Save(outFile);
+    
+    // If exporting materials, also save material list for use by the editor
+    if (!noMaterials_)
+    {
+        String materialListName = ReplaceExtension(model.outName_, ".txt");
+        File listFile(context_);
+        if (listFile.Open(materialListName, FILE_WRITE))
+        {
+            for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+                listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
+        }
+        else
+            PrintLine("Warning: could not write material list file " + materialListName);
+    }
 }
 
 void BuildAndSaveAnimations(OutModel& model)
@@ -986,7 +986,7 @@ void ExportScene(const String& outName)
     
     CollectSceneModels(outScene, rootNode_);
     
-    // Save models
+    // Save models and their material lists
     for (unsigned i = 0; i < outScene.models_.Size(); ++i)
         BuildAndSaveModel(outScene.models_[i]);
     

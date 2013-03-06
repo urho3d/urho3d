@@ -64,7 +64,11 @@ void ApplyMaterialList(StaticModel@ newModel)
         for (uint i = 0; i < newModel.numGeometries; ++i)
         {
             if (!list.eof)
-                newModel.materials[i] = cache.GetResource("Material", list.ReadLine());
+            {
+                Material@ newMat = cache.GetResource("Material", list.ReadLine());
+                if (newMat !is null)
+                    newModel.materials[i] = newMat;
+            }
             else
                 break;
         }
