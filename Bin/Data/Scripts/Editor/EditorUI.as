@@ -566,7 +566,10 @@ void HideUI(bool hide = true)
         return;
     
     float opacity = (uiHidden = hide) ? uiMinOpacity : uiMaxOpacity;
-    sceneWindow.opacity = opacity;
-    nodeWindow.opacity = opacity;
-    uiMenuBar.opacity = opacity;
+    Array<UIElement@> children = ui.root.GetChildren();
+    for (uint i = 0; i < children.length; ++i)
+    {
+        if (children[i].type != textType)
+            children[i].opacity = opacity;
+    }
 }

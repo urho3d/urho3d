@@ -108,7 +108,6 @@ void UpdateNodeAttributes()
     }
 }
 
-
 void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
 {
     // If node name changed, update it in the scene window also
@@ -173,8 +172,6 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     
     return ret;
 }
-
-
 
 void CreateNewVariable(StringHash eventType, VariantMap& eventData)
 {

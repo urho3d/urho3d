@@ -135,8 +135,10 @@ void LoadConfig()
 
     if (!inspectorElem.isNull)
     {
-        if (inspectorElem.HasAttribute("originalcolor")) normalTextColor = inspectorElem.GetColor("original");
-        if (inspectorElem.HasAttribute("modifiedcolor")) modifiedTextColor = inspectorElem.GetColor("modified");
+        if (inspectorElem.HasAttribute("originalcolor")) normalTextColor = inspectorElem.GetColor("originalcolor");
+        if (inspectorElem.HasAttribute("modifiedcolor")) modifiedTextColor = inspectorElem.GetColor("modifiedcolor");
+        if (inspectorElem.HasAttribute("noneditablecolor")) nonEditableTextColor = inspectorElem.GetColor("noneditablecolor");
+        if (inspectorElem.HasAttribute("shownoneditable")) showNonEditableAttribute = inspectorElem.GetBool("shownoneditable");
     }
 }
 
@@ -183,6 +185,8 @@ void SaveConfig()
 
     inspectorElem.SetColor("originalcolor", normalTextColor);
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);
+    inspectorElem.SetColor("noneditablecolor", nonEditableTextColor);
+    inspectorElem.SetBool("shownoneditable", showNonEditableAttribute);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

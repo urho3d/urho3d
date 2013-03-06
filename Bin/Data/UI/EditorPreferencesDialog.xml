@@ -67,6 +67,20 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="20 0 0 0" />
         <element type="Text">
+            <attribute name="Text" value="Show non-editable attributes" />
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="ShowNonEditableAttribute" />
+            <attribute name="Min Size" value="16 16" />
+            <attribute name="Max Size" value="16 16" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="20 0 0 0" />
+        <element type="Text">
             <attribute name="Text" value="Text label color" />
         </element>
     </element>
@@ -114,6 +128,30 @@
         </element>
         <element type="LineEdit">
             <attribute name="Name" value="ModifiedAttributeTextColor.b" />
+            <attribute name="Min Size" value="50 0" />
+            <attribute name="Max Size" value="50 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="40 0 0 0" />
+        <element type="Text">
+            <attribute name="Text" value="Non-editable attribute" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="NonEditableAttributeTextColor.r" />
+            <attribute name="Min Size" value="50 0" />
+            <attribute name="Max Size" value="50 2147483647" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="NonEditableAttributeTextColor.g" />
+            <attribute name="Min Size" value="50 0" />
+            <attribute name="Max Size" value="50 2147483647" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="NonEditableAttributeTextColor.b" />
             <attribute name="Min Size" value="50 0" />
             <attribute name="Max Size" value="50 2147483647" />
         </element>
